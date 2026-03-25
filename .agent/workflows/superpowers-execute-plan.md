@@ -4,6 +4,11 @@ description: Executes an approved plan in small steps with verification after ea
 
 # Superpowers Execute Plan
 
+## 🕹️ Adım 0: MISSION CONTROL (Model Dispatcher)
+Koda dokunmadan önce `.agent/skills/model-dispatcher/SKILL.md` kurallarını oku.
+Yazılacak kodun karmaşıklığını ve mevcut modelini (Flash/High/Sonnet) karşılaştırarak ekrana **ZORUNLU olarak [MISSION CONTROL]** panosunu bas.
+Özellikle sadece "Execute" aşaması bile olsa, TS hataları derinleşebileceğinden "High" model gerekebilir. Model uygunsa devam et, uygun değilse onay/model değişimi iste.
+
 ## Persist (mandatory)
 You must write execution artifacts to disk (not IDE-only documents):
 

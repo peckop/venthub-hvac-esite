@@ -34,11 +34,11 @@ export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => 
  * Inverse converters for legacy component support.
  */
 export const mapDomainCategoryToDatabase = (domainCat: DomainCategory): DbCategory => {
-  return domainCat as unknown as DbCategory
+  return domainCat as Partial<DbCategory> as DbCategory
 }
 
 export const mapDomainProductToDatabase = (domainProd: DomainProduct): DbProduct => {
-  return domainProd as unknown as DbProduct
+  return domainProd as Partial<DbProduct> as DbProduct
 }
 
 /**

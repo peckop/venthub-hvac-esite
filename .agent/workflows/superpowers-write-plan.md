@@ -4,6 +4,11 @@ description: Superpowers plan kapısı. Dosyalar ve doğrulama adımlarıyla bir
 
 # Superpowers Plan Yaz (Kapı)
 
+## 🕹️ Adım 0: MISSION CONTROL (Model Dispatcher)
+Planlamaya SAKIN BAŞLAMA! Önce `.agent/skills/model-dispatcher/SKILL.md` kurallarını oku.
+Görevin karmaşıklığını ve senin mevcut modelini (Flash/High/Sonnet) karşılaştırarak ekrana **ZORUNLU olarak [MISSION CONTROL]** panosunu bas.
+Eğer mevcut modelin bu planı yazmak için "Zayıf" ise dur ve kullanıcıdan onay/model değişikliği talep et. Sadece "Model Yeterli" veya "Onaylandı" durumunda aşağıdaki adıma geç.
+
 ## Görev
 Bu görev için plan (kullanıcı tarafından sağlandığı şekliyle):
 **{{input}}**

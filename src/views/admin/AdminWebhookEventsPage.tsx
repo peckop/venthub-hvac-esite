@@ -1,5 +1,4 @@
 'use client';
-/* eslint-disable */
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
@@ -13,23 +12,49 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { DbWebhookEvent } from '@/types/db-rows';
+import { Database } from '@/types/database.types';
+import { SupabaseClient } from '@supabase/supabase-js';
 
-const AdminWebhookEventsPage: React.FC = () => {
+// Use centralized DbWebhookEvent instead of local interface
+type WebhookEventRow = DbWebhookEvent;
+
+// Local database extension to satisfy TypeScript for the missing table
+interface AdminDatabase extends Omit<Database, 'public'> {
+    public: Omit<Database['public'], 'Tables'> & {
+        Tables: Database['public']['Tables'] & {
+            webhook_events: {
+                Row: DbWebhookEvent;
+                Insert: DbWebhookEvent;
+                Update: Partial<DbWebhookEvent>;
+                Relationships: [];
+            };
+        };
+    };
+}
+
+const AdminWebhookEventsPage = () => {
   const [loading, setLoading] = useState(true);
-  const [events, setEvents] = useState<unknown[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<unknown | null>(null);
+  const [events, setEvents] = useState<WebhookEventRow[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<WebhookEventRow | null>(null);
 
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const { data, error: fetchErr } = await supabase
-        .from('webhook_events' as any)
+      
+      // Use extended client for type-safe access to non-schema tables
+      const adminClient = supabase as unknown as SupabaseClient<AdminDatabase>;
+      const query = adminClient.from('webhook_events');
+      
+      const { data, error: fetchErr } = await query
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (fetchErr) throw fetchErr;
-      setEvents(data || []);
+      
+      const eventsData = (data as WebhookEventRow[]) || [];
+      setEvents(eventsData);
     } catch (err) {
       console.error('Webhook events fetch error:', err);
     } finally {
@@ -68,10 +93,10 @@ const AdminWebhookEventsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {events.map((event: any /* build-fallback */) => (
+              {events.map((event) => (
                 <tr 
                   key={event.id} 
-                  className={`hover:bg-slate-50 cursor-pointer transition-colors ${(selectedEvent as any)?.id === event.id ? 'bg-indigo-50/50' : ''}`}
+                  className={`hover:bg-slate-50 cursor-pointer transition-colors ${selectedEvent?.id === event.id ? 'bg-indigo-50/50' : ''}`}
                   onClick={() => setSelectedEvent(event)}
                 >
                   <td className="px-4 py-4 font-bold text-industrial-gray">{event.event_type}</td>
@@ -109,13 +134,13 @@ const AdminWebhookEventsPage: React.FC = () => {
             <div className="space-y-4">
               <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
                 <pre className="text-xs text-indigo-300 font-mono">
-                  {JSON.stringify((selectedEvent as any).payload, null, 2)}
+                  {JSON.stringify(selectedEvent.payload, null, 2)}
                 </pre>
               </div>
-              {(selectedEvent as any).error_message && (
+              {selectedEvent.error_message && (
                 <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
                   <p className="text-xs font-bold text-red-600 mb-1 uppercase">Hata Mesajı</p>
-                  <p className="text-xs text-red-500">{(selectedEvent as any).error_message}</p>
+                  <p className="text-xs text-red-500">{selectedEvent.error_message}</p>
                 </div>
               )}
             </div>

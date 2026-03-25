@@ -25,9 +25,9 @@ export type ReservedRow = {
     quantity: number
 }
 
-export enum LoadState { Idle, Loading, Error }
-
-export type Density = 'compact' | 'comfortable'
+import { Density, LoadState } from './admin-shared'
+export type { Density }
+export { LoadState }
 
 export type VisibleCols = {
     name: boolean;

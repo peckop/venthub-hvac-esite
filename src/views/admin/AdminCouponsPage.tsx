@@ -138,7 +138,7 @@ const AdminCouponsPage: React.FC = () => {
         used_count: 0,
       }
       // RLS sorunlarında edge function üzerinden oluştur
-      const { data, error } = await supabase.functions.invoke('admin-create-coupon', {
+      const response = await supabase.functions.invoke('admin-create-coupon', {
         body: {
           code: payload.code,
           type: (form.type as AllowedCouponType),
@@ -148,7 +148,8 @@ const AdminCouponsPage: React.FC = () => {
           active: payload.is_active,
           usage_limit: payload.usage_limit,
         }
-      }) as unknown as { data: DbCouponRow | null, error: unknown | null }
+      })
+      const { data, error }: { data: DbCouponRow | null, error: unknown | null } = response
       if (error) throw error
       if (!data) throw new Error('No data')
       const ui = dbToUi(data as DbCouponRow)

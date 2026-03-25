@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// three-setup.ts - No strict disables
 import * as THREE from 'three'
 import { createTimerClock } from '@/utils/three-utils'
 
@@ -11,7 +11,7 @@ import { createTimerClock } from '@/utils/three-utils'
 if (typeof window !== 'undefined') {
     const originalWarn = console.warn;
      
-    console.warn = (...args: any[]) => {
+    console.warn = (...args: unknown[]) => {
         const msg = typeof args[0] === 'string' ? args[0] : '';
         
         // Filter out known harmless deprecations and clutter
@@ -28,7 +28,7 @@ if (typeof window !== 'undefined') {
 
     // 2. Attempt to shim THREE.Clock for functionality if possible.
     try {
-        const threeObj = THREE as any;
+        const threeObj = THREE as typeof THREE & { Clock?: { __shimmed?: boolean } };
         if (threeObj.Clock && !threeObj.Clock.__shimmed) {
             const OriginalClock = THREE.Clock;
             const SilentClock = function() {
@@ -36,7 +36,7 @@ if (typeof window !== 'undefined') {
             };
             
             SilentClock.prototype = OriginalClock.prototype;
-            (SilentClock as any).__shimmed = true;
+            (SilentClock as typeof SilentClock & { __shimmed?: boolean }).__shimmed = true;
 
             Object.defineProperty(THREE, 'Clock', {
                 value: SilentClock,

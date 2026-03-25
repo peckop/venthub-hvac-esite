@@ -1,34 +1,63 @@
-### Goal
-Projedeki `id` vs `_id` uyu?mazl???n? ??zmek ve `process.env` hatalar?n? gidermek.
+# Task 3 — Admin Tip Sertleştirme (Component Hardening) Planı
 
-### Assumptions
-- Veritaban?ndaki kolon ismi `id`'dir.
-- `_id` kullan?m? yanl??l?kla veya yanl?? bir d?n???m sonucu olu?mu?tur.
+## Hedef
+Admin Dashboard bileşenleri (AdminInventoryPage, AdminReturnsPage, CategoryBuilderView, AdminWebhookEventsPage) üzerindeki `@ts-expect-error` bloklarını ve `as unknown as` kullanımlarını sıfıra indirmek; `Density` ve `LoadState` tiplerini merkezi bir `src/types/admin-shared.ts` dosyasında toplamak.
 
-### Plan
-1. **Temel Tip D?zeltmeleri**
-   - Files: `src/types/database.types.ts`, `src/types/db-rows.ts`
-   - Change: `_id` alanlar?n? `id` olarak de?i?tir. `DbCategory`, `DbProduct` ve di?er ana tablolar?n sat?r tiplerini g?ncelle.
-   - Verify: `pnpm exec tsc` (hatalar?n yer de?i?tirdi?ini ve bile?en seviyesine indi?ini do?rula).
+## Varsayımlar
+- `pnpm exec tsc -b tsconfig.build.json` Task 2 sonrası şu an sıfır hata vermektedir.
+- Supabase şemasında `inventory_summary` view'ının `category_id` kolonu generated types'de eksik → çözüm: manuel tip genişletme.
+- `ColumnsMenu.tsx` içindeki `Density` tipi merkeze taşınacak; export bu dosyada re-export olarak kalacak (geriye dönük uyumluluk).
+- Aşamalı ilerleme: Her adım sonrası `pnpm exec tsc -b tsconfig.build.json` çalıştırılır.
 
-2. **D?n??t?r?c? ve Hook G?ncellemeleri**
-   - Files: `src/lib/type-converters.ts`, `src/hooks/useCategoryGateway.ts`, `src/types/ui-models.ts`
-   - Change: `mapDatabaseCategoryToDomain` fonksiyonunu ve ilgili aray?zleri (`DomainCategory` vb.) `id` kullanacak ?ekilde g?ncelle.
-   - Verify: Hook i?indeki tip hatalar?n?n giderildi?ini do?rula.
+## Plan
 
-3. **UI ve Admin Sayfas? Onar?mlar?**
-   - Files: `src/components/admin/categories/CategoryFormModal.tsx`, `src/views/admin/AdminCategoriesPage.tsx`, `src/components/category/CategoryShowcase.tsx`
-   - Change: T?m `._id` referanslar?n? `.id` ile de?i?tir. `process.env` eri?imi i?in `global.d.ts` kontrol? yap veya Next.js standartlar?nda env kullan?m?n? sa?la.
-   - Verify: `pnpm run lint` ve `pnpm exec tsc`.
+### Adım 1 — `src/types/admin-shared.ts` Oluştur
+- **Dosyalar:** `src/types/admin-shared.ts` (yeni)
+- **Değişiklik:** `Density`, `LoadState`, `TableSortDir` gibi tüm admin-genelinde paylaşılan tipleri bu dosyaya ekle.
+- **Verify:** `pnpm exec tsc -b tsconfig.build.json` → sıfır hata.
 
-4. **Final Kontrol ve Derleme**
-   - Files: `src/`
-   - Change: Lint ve tip hatalar?n?n %100 temizlendi?inden emin ol.
-   - Verify: `pnpm run build`.
+### Adım 2 — `ColumnsMenu.tsx` re-export yap, yerel Density'yi sil
+- **Dosyalar:** `src/components/admin/ColumnsMenu.tsx`
+- **Değişiklik:** Yerel `export type Density = ...`'yi sil, `admin-shared`'den re-export ekle.
+- **Verify:** `pnpm exec tsc` → ColumnsMenu kaynaklı hata yok.
 
-### Risks & mitigations
-- **K?r?lmalar:** `_id` -> `id` d?n???m? geni? ?apl? bir de?i?ikliktir. Her ad?mda `tsc` ile kontrol yap?larak hatalar takip edilecektir.
+### Adım 3 — `src/types/inventory.ts` temizle
+- **Dosyalar:** `src/types/inventory.ts`
+- **Değişiklik:** `LoadState` ve `Density`'yi buradan sil, `admin-shared`'den re-export ile geriye dönük uyumu koru.
+- **Verify:** `pnpm exec tsc` → sıfır hata.
 
-### Rollback plan
-- `git checkout .` veya `git stash` ile de?i?iklikler geri al?nabilir.
+### Adım 4 — `AdminInventoryPage.tsx` — 3 @ts-expect-error bloğunu temizle
+- **Dosyalar:** `src/views/admin/AdminInventoryPage.tsx`
+- **Değişiklik (satır 73):** `InventorySummaryRow` lokal tipi oluştur, `category_id` alanını genişlet.
+- **Değişiklik (satır 143):** `loadState` state'ini `LoadState` enum ile tiplendir.
+- **Değişiklik (satır 147, 149):** `visibleCols` ve `density` başlangıç değerlerini tam uyumlu tiplerle düzelt.
+- **Verify:** `pnpm exec tsc` → AdminInventoryPage.tsx hata yok.
 
+### Adım 5 — `AdminWebhookEventsPage.tsx` — 2 @ts-expect-error bloğunu temizle
+- **Dosyalar:** `src/views/admin/AdminWebhookEventsPage.tsx`
+- **Değişiklik:** `WebhookEventRow` lokal interface tanımla, sorgu ve mapping tiplerini buna göre düzelt.
+- **Verify:** `pnpm exec tsc` → sıfır hata.
+
+### Adım 6 — `CategoryBuilderView.tsx` — 3 @ts-expect-error bloğunu temizle
+- **Dosyalar:** `src/views/admin/CategoryBuilderView.tsx`
+- **Değişiklik:** `authority_content` ve `metadata` JSON alanları için `isRecord` tipi guard kullan.
+- **Verify:** `pnpm exec tsc` → sıfır hata.
+
+### Adım 7 — Final TSC & Lint Kontrolü
+- **Dosyalar:** Tüm değişen dosyalar (doğrulama amaçlı).
+- **Verify:**
+  ```
+  pnpm exec tsc -b tsconfig.build.json
+  pnpm run lint
+  ```
+
+## Riskler ve Azaltmalar
+| Risk | Azaltma |
+|---|---|
+| Density tipinin başka sayfalarda string literal olarak kullanılması | Adım 1 sonrası TSC tam hata listesini görecek, cerrahi düzeltme yapılacak |
+| inventory_summary view genişletmesinin prod'da farklı davranması | Sadece TypeScript katmanı genişletiliyor, runtime'a etki yok |
+| CategoryBuilderView.tsx JSON guard'larının karmaşıklaşması | Adım 6'da lokal guard tercih edilecek |
+
+## Geri Dönüş (Rollback) Planı
+- Her adım bağımsız bir commit olacak.
+- `git stash` veya `git revert` ile granüler geri alma mümkündür.
