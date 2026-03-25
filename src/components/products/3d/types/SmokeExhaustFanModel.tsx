@@ -1,11 +1,11 @@
 "use client";
-import React, { useRef } from 'react'
+import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-
-
+import { useFanMaterials } from '../materials/useFanMaterials'
 
 export function SmokeExhaustFanModel() {
+    const materials = useFanMaterials()
     const rotorRef = useRef<THREE.Group>(null)
 
     // DUMAN EGZOZ FANI (MAX FILL UPDATE)
@@ -19,101 +19,85 @@ export function SmokeExhaustFanModel() {
         }
     })
 
-    const smokeCoating = new THREE.MeshStandardMaterial({
-        color: '#334155', roughness: 0.5, metalness: 0.4, side: THREE.DoubleSide
-    })
+    // BLADE GEOMETRY: Long Cleaver - Memoized to prevent leaks
+    const bladeGeometry = useMemo(() => {
+        const shape = new THREE.Shape()
 
-    const castBladeMat = new THREE.MeshStandardMaterial({
-        color: '#222',
-        roughness: 0.7,
-        metalness: 0.3,
-        side: THREE.DoubleSide
-    })
+        // Blade Root at (0,0). X is Radial Length. Y is Chord Width.
+        // Root Chord
+        shape.moveTo(0, -0.05)
+        shape.lineTo(0, 0.05)
 
-    const boltMaterial = new THREE.MeshStandardMaterial({
-        color: '#111', roughness: 0.8, metalness: 0.5
-    })
+        // Leading Edge (Long Sickle Curve)
+        // Adjust control points to stretch to X=0.51 (Max Fill)
+        shape.bezierCurveTo(0.15, 0.12, 0.35, 0.20, 0.51, 0.18) // Tip Leading at X=0.51
 
-    // BLADE GEOMETRY: Long Cleaver
-    const shape = new THREE.Shape()
+        // Tip Edge
+        shape.lineTo(0.52, 0.08) // Tip Trailing (slightly further out visually)
 
-    // Blade Root at (0,0). X is Radial Length. Y is Chord Width.
+        // Trailing Edge
+        shape.bezierCurveTo(0.35, -0.02, 0.15, -0.04, 0, -0.05) // Back to root
 
-    // Root Chord
-    shape.moveTo(0, -0.05)
-    shape.lineTo(0, 0.05)
-
-    // Leading Edge (Long Sickle Curve)
-    // Adjust control points to stretch to X=0.51 (Max Fill)
-    shape.bezierCurveTo(0.15, 0.12, 0.35, 0.20, 0.51, 0.18) // Tip Leading at X=0.51
-
-    // Tip Edge
-    shape.lineTo(0.52, 0.08) // Tip Trailing (slightly further out visually)
-
-    // Trailing Edge
-    shape.bezierCurveTo(0.35, -0.02, 0.15, -0.04, 0, -0.05) // Back to root
-
-    const extrudeSettings = {
-        depth: 0.015,
-        bevelEnabled: true,
-        bevelThickness: 0.003,
-        bevelSize: 0.003,
-        bevelSegments: 2
-    }
-    const bladeGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+        const extrudeSettings = {
+            depth: 0.015,
+            bevelEnabled: true,
+            bevelThickness: 0.003,
+            bevelSize: 0.003,
+            bevelSegments: 2
+        }
+        return new THREE.ExtrudeGeometry(shape, extrudeSettings)
+    }, [])
 
     return (
         <group scale={[0.65, 0.65, 0.65]} rotation={[0, -Math.PI / 4, 0]}>
 
             {/* FRAME & STANDS (Preserved) */}
             <group rotation={[Math.PI / 2, 0, 0]}>
-                <mesh material={smokeCoating}>
+                <mesh material={materials.smokeCoating}>
                     <cylinderGeometry args={[0.7, 0.7, 0.8, 64, 1, true]} />
-                    <meshStandardMaterial {...smokeCoating} />
                 </mesh>
             </group>
             {[0.38, -0.38].map((zPos, i) => (
-                <group key={`flange - ${i} `} position={[0, 0, zPos]}>
-                    <mesh material={smokeCoating}>
+                <group key={`flange-${i}`} position={[0, 0, zPos]}>
+                    <mesh material={materials.smokeCoating}>
                         <ringGeometry args={[0.7, 0.82, 64]} />
                     </mesh>
-                    <mesh rotation={[Math.PI / 2, 0, 0]} material={smokeCoating}>
+                    <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.smokeCoating}>
                         <cylinderGeometry args={[0.82, 0.82, 0.04, 64, 1, true]} />
                     </mesh>
                     {Array(16).fill(0).map((_, b) => (
                         <mesh key={b}
                             position={[0.76 * Math.cos(b * Math.PI / 8), 0.76 * Math.sin(b * Math.PI / 8), (i === 0 ? 0.025 : -0.025)]}
                             rotation={[Math.PI / 2, 0, 0]}
-                            material={boltMaterial}>
+                            material={materials.boltMaterial}>
                             <cylinderGeometry args={[0.012, 0.012, 0.02, 6]} />
                         </mesh>
                     ))}
                     <group position={[0, -0.75, 0]}>
-                        <mesh position={[-0.55, 0, 0]} material={smokeCoating}>
+                        <mesh position={[-0.55, 0, 0]} material={materials.smokeCoating}>
                             <boxGeometry args={[0.08, 0.4, 0.04]} />
                         </mesh>
-                        <mesh position={[0.55, 0, 0]} material={smokeCoating}>
+                        <mesh position={[0.55, 0, 0]} material={materials.smokeCoating}>
                             <boxGeometry args={[0.08, 0.4, 0.04]} />
                         </mesh>
                     </group>
                 </group>
             ))}
             <group position={[-0.55, -0.92, 0]}>
-                <mesh material={smokeCoating}><boxGeometry args={[0.1, 0.05, 1.2]} /></mesh>
+                <mesh material={materials.smokeCoating}><boxGeometry args={[0.1, 0.05, 1.2]} /></mesh>
             </group>
             <group position={[0.55, -0.92, 0]}>
-                <mesh material={smokeCoating}><boxGeometry args={[0.1, 0.05, 1.2]} /></mesh>
+                <mesh material={materials.smokeCoating}><boxGeometry args={[0.1, 0.05, 1.2]} /></mesh>
             </group>
 
             {/* ROTOR (Long Blades) */}
             <group ref={rotorRef} position={[0, 0, 0.2]}>
                 <group rotation={[Math.PI / 2, 0, 0]}>
-                    <mesh material={castBladeMat}>
+                    <mesh material={materials.castBladeMat}>
                         <cylinderGeometry args={[0.18, 0.18, 0.12, 16]} />
                     </mesh>
-                    <mesh position={[0, 0.065, 0]}>
+                    <mesh position={[0, 0.065, 0]} material={materials.matteBlack}>
                         <cylinderGeometry args={[0.08, 0.14, 0.08, 32]} />
-                        <meshStandardMaterial color="#333" />
                     </mesh>
                 </group>
 
@@ -122,7 +106,7 @@ export function SmokeExhaustFanModel() {
                     <group key={i} rotation={[0, 0, i * ((Math.PI * 2) / 6)]}>
                         <group position={[0.18, 0, 0]}>
                             <group rotation={[0.7, 0, 0]}>
-                                <mesh geometry={bladeGeometry} material={castBladeMat} />
+                                <mesh geometry={bladeGeometry} material={materials.castBladeMat} />
                             </group>
                         </group>
                     </group>
@@ -132,12 +116,12 @@ export function SmokeExhaustFanModel() {
             {/* MOTOR */}
             <group position={[0, 0, -0.2]}>
                 <group rotation={[Math.PI / 2, 0, 0]}>
-                    <mesh material={smokeCoating}>
+                    <mesh material={materials.smokeCoating}>
                         <cylinderGeometry args={[0.25, 0.25, 0.45, 32]} />
                     </mesh>
                 </group>
                 <group position={[0, 0.3, 0.1]}>
-                    <mesh material={smokeCoating}>
+                    <mesh material={materials.smokeCoating}>
                         <boxGeometry args={[0.12, 0.12, 0.08]} />
                     </mesh>
                 </group>
@@ -145,7 +129,3 @@ export function SmokeExhaustFanModel() {
         </group>
     )
 }
-
-
-
-

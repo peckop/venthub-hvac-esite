@@ -68,7 +68,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
     const handleShowProducts = () => {
         setShowProducts(true)
-        setSelectedSubcategory(null)
         setTimeout(() => handleScrollToTarget('products-anchor'), 100)
     }
 
