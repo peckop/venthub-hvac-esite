@@ -79,8 +79,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     useEffect(() => {
         const fetchCategories = async () => {
             const { data } = await supabase.from('categories').select('*').order('name')
-            /* @ts-expect-error REASON: Supabase returns generic row, expecting DbCategory */
-            setCategories(data || [])
+            setCategories((data as unknown as DbCategory[]) || [])
         }
         fetchCategories()
     }, [])

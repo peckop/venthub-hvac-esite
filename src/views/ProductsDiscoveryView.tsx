@@ -18,7 +18,7 @@ import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Loader2, LayoutGrid, List } from 'lucide-react'
 import type { Product } from '../lib/supabase'
-import type { DbCategory } from '../types/db-rows'
+import type { DomainCategory } from '../lib/type-converters'
 import ProductCard from '../components/ProductCard'
 
 // 3D Carousel dinamik import
@@ -36,7 +36,7 @@ const CategoryOrbitCarousel = dynamic(
 )
 
 interface ProductsDiscoveryViewProps {
-    initialCategories?: DbCategory[]
+    initialCategories?: DomainCategory[]
 }
 
 type ViewMode = 'grid' | 'list'

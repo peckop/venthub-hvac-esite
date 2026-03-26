@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import PageComponent from '../../../views/CategoryPage'
 import { supabase } from '../../../lib/supabase'
 import { mapDatabaseCategoryToDomain } from '../../../lib/type-converters'
+import type { DbCategory } from '../../../types/db-rows'
 export async function generateStaticParams() {
   try {
     const { data: categories } = await supabase
@@ -31,8 +32,7 @@ async function getCategoryData(slug: string) {
     .single()
   
   if (error || !data) return null
-  // @ts-expect-error - REASON: Supabase generated Json types do not overlap perfectly with custom UI models
-  return mapDatabaseCategoryToDomain(data)
+  return mapDatabaseCategoryToDomain(data as unknown as DbCategory)
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ categorySlug: string }> }) {
