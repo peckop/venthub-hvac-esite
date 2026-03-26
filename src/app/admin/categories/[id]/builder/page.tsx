@@ -1,16 +1,14 @@
 'use client';
 
-import React from 'react';
-import { useParams } from 'next/navigation';
+import React, { use } from 'react';
 import CategoryBuilderView from '@/views/admin/CategoryBuilderView';
 
 /**
  * @page CategoryBuilderPage
  * @description Kategori bazlı tam ekran Page Builder (Otorite Editörü) rotası.
  */
-export default function CategoryBuilderPage() {
-  const params = useParams();
-  const id = params?.id as string;
+export default function CategoryBuilderPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
 
   if (!id) {
     return (

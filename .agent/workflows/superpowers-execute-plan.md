@@ -60,6 +60,8 @@ Read and apply these skills when relevant:
 
 ## Execution rules (strict)
 1) Implement **ONE** plan step at a time.
+   - **[CRITICAL NEW RULE]**: BEFORE writing code for any step, you MUST STOP and explicitly tell the user which model is recommended for this step (based on the plan) and ask for their confirmation to proceed. Format: "Sıradaki Adım: [X], Önerilen Model: [Y]. Devam etmek için onay verin veya modeli değiştirin."
+   - Do NOT execute the step until the user replies with approval.
 2) After each step:
    - Run the step’s verification command(s) (or, if you cannot run them, provide exact commands and expected outcomes).
    - Append a short note to `artifacts/superpowers/execution.md` containing:

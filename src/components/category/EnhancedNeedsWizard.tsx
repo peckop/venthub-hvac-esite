@@ -5,8 +5,8 @@ import {
     DoorOpen, Snowflake, Factory, ShoppingCart,
     Ruler, ArrowRight
 } from 'lucide-react'
-import { supabase, type Product } from '../../lib/supabase'
-import { mapDatabaseProductToDomain } from '../../lib/type-converters'
+import { supabase } from '../../lib/supabase'
+import { toUIProductList, type DomainProduct } from '../../lib/type-converters'
 import { DbProduct, DbJson } from '../../types/db-rows'
 import { calculateAirCurtain } from '../../lib/hvacCalculations'
 
@@ -33,7 +33,7 @@ interface EnhancedWizardProps {
     parentSlug: string
 }
 
-interface MatchedProduct extends Product {
+interface MatchedProduct extends DomainProduct {
     matchScore: number
     matchReason: string
 }
@@ -108,8 +108,10 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 application: state.usageLocation === 'cold-storage' ? 'coldRoom' : 'comfort'
             })
 
-            const scored = (data as DbProduct[])
-                .map(db => mapDatabaseProductToDomain(db))
+            const rawProducts = data as unknown as DbProduct[]
+            const domainProducts = toUIProductList(rawProducts)
+
+            const scored = domainProducts
                 .map(p => {
                     let score = 0
                     const reason = 'Kapasite uyumu'
