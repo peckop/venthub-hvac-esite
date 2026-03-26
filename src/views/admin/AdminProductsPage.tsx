@@ -1,6 +1,8 @@
 import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { supabase, adminSearchProducts, type DbAdminSearchResult } from '../../lib/supabase'
+import type { DbProduct } from '../../types/db-rows'
+import { toUIProductList, type DomainProduct } from '../../lib/type-converters'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useSearchParams, usePathname } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -28,21 +30,6 @@ import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useRole } from '../../hooks/useRole'
 import { useDragScroll } from '../../hooks/useDragScroll'
 
-interface ProductRow {
-  id: string
-  name: string
-  sku: string
-  model_code?: string | null
-  brand?: string | null
-  status?: string | null
-  category_id?: string | null
-  price?: number | null
-  purchase_price?: number | null
-  stock_qty?: number | null
-  low_stock_threshold?: number | null
-  is_featured?: boolean | null
-}
-
 interface CategoryOpt { id: string; name: string }
 
 const AdminProductsPage: React.FC = () => {
@@ -52,7 +39,7 @@ const AdminProductsPage: React.FC = () => {
   const dragScrollRef = useDragScroll<HTMLDivElement>()
 
   const searchParams = useSearchParams()
-  const [rows, setRows] = React.useState<ProductRow[]>([])
+  const [rows, setRows] = React.useState<DomainProduct[]>([])
   const [cats, setCats] = React.useState<CategoryOpt[]>([])
   const [q, setQ] = React.useState('')
   const [debouncedQ, setDebouncedQ] = React.useState('')
@@ -151,7 +138,7 @@ const AdminProductsPage: React.FC = () => {
       await ensureSessionFresh()
 
       const term = debouncedQ.trim()
-      let list: ProductRow[] = []
+      let list: DomainProduct[] = []
       let totalCount = 0
 
       if (term) {
@@ -178,20 +165,7 @@ const AdminProductsPage: React.FC = () => {
           filtered = filtered.filter(r => r.is_featured)
         }
 
-        list = filtered.map(r => ({
-          id: r.id,
-          name: r.name,
-          sku: r.sku,
-          model_code: r.model_code,
-          brand: r.brand,
-          status: r.status,
-          category_id: r.category_id,
-          price: r.price != null ? Number(r.price) : null,
-          purchase_price: r.purchase_price != null ? Number(r.purchase_price) : null,
-          stock_qty: r.stock_qty != null ? Number(r.stock_qty) : null,
-          low_stock_threshold: r.low_stock_threshold != null ? Number(r.low_stock_threshold) : null,
-          is_featured: r.is_featured,
-        }))
+        list = toUIProductList(filtered as unknown as DbProduct[])
         // total_count: RPC window function üzerinden gelir
         totalCount = results.length > 0 ? Number((results[0] as { total_count?: number }).total_count || results.length) : 0
       } else {
@@ -224,7 +198,7 @@ const AdminProductsPage: React.FC = () => {
         const to = from + PAGE_SIZE - 1
         const { data, error, count } = await query.range(from, to)
         if (error) throw error
-        list = (data || []) as ProductRow[]
+        list = toUIProductList((data as unknown as DbProduct[]) || [])
         totalCount = typeof count === 'number' ? count : 0
       }
 

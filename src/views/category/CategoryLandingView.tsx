@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react'
-import type { DbProduct } from '../../types/db-rows'
+import { type DomainProduct } from '../../lib/type-converters'
 import ProductCard from '@/components/ProductCard'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
 import {
@@ -18,7 +18,7 @@ import {
     SilentFanTypeComparison,
     SilentFanFAQ
 } from '@/components/category/sections'
-import { mapDatabaseProductToDomain, DomainCategory } from '../../lib/type-converters'
+import { DomainCategory } from '../../lib/type-converters'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import Image from 'next/image'
 import { Info } from 'lucide-react'
@@ -26,7 +26,7 @@ import Breadcrumb from '@/components/navigation/Breadcrumb'
 
 interface CategoryLandingProps {
     category: DomainCategory
-    products: DbProduct[]
+    products: DomainProduct[]
     subCategories?: DomainCategory[]
 }
 
@@ -71,7 +71,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         setTimeout(() => handleScrollToTarget('products-anchor'), 100)
     }
 
-    const filteredProducts = (products || []).filter((p: DbProduct) => {
+    const filteredProducts = (products || []).filter((p: DomainProduct) => {
         if (activeFilter === 'all') return true
         if (activeFilter === 'quiet') return (Number(p.noise_level) || 100) <= 50
         return true
@@ -197,7 +197,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {(filteredProducts || []).map(p => (
-                            <ProductCard key={p.id} product={mapDatabaseProductToDomain(p)} layout="grid" />
+                            <ProductCard key={p.id} product={p} layout="grid" />
                         ))}
                     </div>
                 </div>

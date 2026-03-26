@@ -42,20 +42,41 @@ Ajanlar şu gerçekliğe göre karar vermek ZORUNDADIR:
 
 ---
 
+## 🗂️ KANONİK MODEL LİSTESİ (Kullanıcının Seçim Panelindeki Gerçek Modeller)
+
+Bütün atamalar KESİNLİKLE sadece aşağıdaki listede yer alan modellerle yapılacaktır. Hayali veya varsayımsal model (Örn: GPT 5 vb.) önermek yasaktır:
+
+1. **Gemini 3.1 Pro (High):** Yüksek akıl yürütme, "Ağır Top", karmaşık mimari ve refactoring işleri için. Pahalı kota.
+2. **Gemini 3.1 Pro (Low):** Aynı motorun daha düşük düşünme süreli versiyonu. Orta-Üst düzey işler için dengeli.
+3. **Gemini 3 Flash:** En hızlı, en ucuz. Sadece linter temizliği, basit CSS düzeltmeleri veya Build komutu çalıştırmak gibi rutin işler (amelelik) için.
+4. **Claude Sonnet 4.6 (Thinking):** Kodlama konusunda piyasadaki en yetenekli akıl yürütme motorlarından biri. Mimari kararlar için zirve model (High maliyet).
+5. **Claude Opus 4.6 (Thinking):** En derin akıl yürütme, devasa analizler. Sadece aşırı geniş kapsamlı "Sıfırdan Proje Mimarisi" veya "Çözülemeyen Kronik Bug" durumlarında kullanılmalı (Çok pahalı / Overkill).
+6. **GPT-OSS 120B (Medium):** Açık kaynaklı (Open-Weight), ortalama "Chain-of-Thought" yeteneğine sahip, çok güçlü ama maliyet dostu alternatif.
+
+## 🎯 Model Seçim Matrisi (Routing)
+
+Kullanıcının kotasını korumak ve `Rate Limit` / `Credit Exhaustion` sorunlarını önlemek için aşağıdaki matrisi kullan:
+
 ## 🚀 ZORUNLU KONSOL ÇIKTISI (Mission Control)
 
-Ajan göreve başlarken (`/superpowers-brainstorm` vb. komutlarda) EN TEPEDE aşağıdaki formatta bir pano sunmak zorundadır:
+Ajan göreve veya bir plana/adıma başlarken (`/superpowers-brainstorm` vb. komutlarda veya Execution adımları öncesinde) aşağdaki **katı ve objektif** şablonu kullanmak zorundadır. **Bütün modelleri "ya o ya bu" diye eşit kefeye koymak YASAKTIR.** Görevin ağırlığına göre puanlama (0-100) yapılarak sıralanmalıdır.
 
 ```markdown
-> [!MISSION_CONTROL] 
-> **Görev:** [Görevin Kısa Tanımı]
-> **Zorluk / Risk:** [Düşük | Orta | Yüksek]
-> **Önerilen Araç:** [Gemini Flash | Gemini High | Claude Sonnet / Opus]
+> [!MISSION_CONTROL] : AŞAMA X VEYA GÖREV Y
+> **Görev Özeti:** [Neyin yapılacağı (1-2 cümle)]
+> **Risk/Karmaşıklık:** [1 ile 10 arası bir puan, nedenleriyle (Örn: 9/10 - React Hydration riski)]
+>
+> 🥇 **BİRİNCİL ÖNERİ (En Uygun Model):** [Örn: Claude 3.5 Sonnet / Gemini 3.1 High vs.]
+> - **Nedeni:** [Objektif, dürüst ve tamamen o modele has bir yeteneği/farkı net belirten teknik sebep]
 > 
-> **Kota Stratejisi Açıklaması:** 
-> - [Eğer Flash öneriliyorsa]: "Bu görev basit olduğu için, haftalık kotalarınızı korumak adına '5 Saatlik Flash' kotasını sömürmenizi tavsiye ediyorum. Lütfen modeli Flash'a alın."
-> - [Eğer High/Sonnet öneriliyorsa]: "Bu görev mimari kararlar içerdiğinden 'Haftalık Kota' havuzuna (High/Sonnet) geçmeniz gerekiyor. Flash burada kodu kırabilir."
-> 
-> **Aksiyon:** 
-> "(Mevcut model ile devam ediyorum)" VEYA "(Lütfen modeli değiştirip 'Devam' deyin, bekliyorum...)"
+> 📊 **ALTERNATİFLER VE UYGUNLUK PUANLARI:**
+> - [Model A] **%100** -> (Neden mükemmel uyar / Nerede işe yarar)
+> - [Model B] **%85** -> (Hangi konuda hafif zayıf kalabilir)
+> - [Model C] **%40** -> (Neden BU GÖREV İÇİN KULLANILMAMALI)
+>
+> ⚠️ **KOTA / RİSK UYARISI:**
+> "Bu adımı sadece X ve Y modeliyle geçmeniz güvenlik açısından elzemdir. Z modelini kullanırsanız syntax kırılmaları yaşanabilir." VEYA "Bu sadece bir 'amelelik' (hammallık) görevidir, pahalı modelleri (Opus/Sonnet) harcamayın, direkt Flash kullanın."
+>
+> **Aksiyon:**
+> Lütfen en uygun modeli seçtiğinizden emin olduktan sonra **ONAYLANDI** yazarak devam komutunu veriniz.
 ```
