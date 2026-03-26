@@ -6,7 +6,8 @@ import { useI18n } from '../../i18n/I18nProvider'
 import StatCard from '../../components/admin/dashboard/StatCard'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
-import type { DbOrder, DbProduct } from '../../types/db-rows'
+import type { DbOrder } from '../../types/db-rows'
+import { toUIProductList } from '../../lib/type-converters'
 import { 
   TrendingUp, 
   ShoppingBag,
@@ -75,7 +76,8 @@ const AdminDashboardPage: React.FC = () => {
       setPendingShipments(shipRes.count)
 
       if (productsRes.data) {
-        const products = productsRes.data as Partial<DbProduct>[]
+        const rawProducts = productsRes.data as unknown as import('../../types/db-rows').DbProduct[]
+        const products = toUIProductList(rawProducts)
         const capital = products.reduce((acc, p) => acc + ((p.purchase_price || 0) * (p.stock_qty || 0)), 0)
         setTiedCapital(capital)
         setAlarmCount(products.filter(p => (p.stock_qty || 0) <= (p.low_stock_threshold || 5)).length)
