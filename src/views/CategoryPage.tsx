@@ -2,10 +2,10 @@
 
 import React from 'react';
 import CategoryMasterView from './CategoryMasterView';
-import type { DbCategory } from '../types/db-rows';
+import type { DomainCategory } from '../lib/type-converters';
 
 export interface CategoryPageProps {
-  initialCategory?: DbCategory | null;
+  initialCategory?: DomainCategory | null;
 }
 
 /**
