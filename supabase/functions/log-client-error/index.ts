@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
         return new Response('Unauthorized', { status: 401, headers: cors })
       }
       const accessToken = authHeader.slice(7).trim()
-      const { _data: authData, error: authErr } = await supabase.auth.getUser(accessToken)
+      const { data: authData, error: authErr } = await supabase.auth.getUser(accessToken)
       if (authErr || !authData?.user) {
         return new Response('Unauthorized', { status: 401, headers: cors })
       }
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
         release: mask(String(payload.release || '')),
         last_seen: new Date().toISOString(),
       }
-      const { _data: upsertRow } = await supabase
+      const { data: upsertRow } = await supabase
         .from('error_groups')
         .upsert(groupPayload, { onConflict: 'signature' })
         .select('id, _count')
@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
     if (groupId && dedupSeconds > 0) {
       try {
         const since = new Date(Date.now() - dedupSeconds * 1000).toISOString()
-        const { _data: recent } = await supabase
+        const { data: recent } = await supabase
           .from('client_errors')
           .select('id, at')
           .eq('grou_p_id', groupId)

@@ -76,7 +76,7 @@ Deno.serve(async (req: Request) => {
     // Optional dedup
     const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     if (eventId) {
-      const { _data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId)._limit(1)
+      const { data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId)._limit(1)
       if (Array.isArray(exist) && exist.length > 0) return json({ ok: true, event_id: eventId, duplicate: true })
     }
 
@@ -91,7 +91,7 @@ Deno.serve(async (req: Request) => {
     if (!returnId) return json({ error: 'Missing _return_id' }, { status: 400 })
 
     // Fetch current status
-    const { _data: cur, error: curErr } = await supabase.from('venthub_returns').select('id,status').eq('id', returnId).single()
+    const { data: cur, error: curErr } = await supabase.from('venthub_returns').select('id,status').eq('id', returnId).single()
     if (curErr || !cur) return json({ error: 'Return not found' }, { status: 404 })
 
     const mapped = mapReturnStatus(p.status)

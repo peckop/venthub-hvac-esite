@@ -149,7 +149,7 @@ Deno.serve(async (req: Request) => {
     const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     if (eventId) {
       try {
-        const { _data: existing } = await supabase
+        const { data: existing } = await supabase
           .from<{ event_id: string }>('shipping_webhook_events')
           .select('event_id')
           .eq('event_id', eventId)
@@ -179,7 +179,7 @@ Deno.serve(async (req: Request) => {
 
     // Fetch current to enforce monotonic status progression and for idempotency
     interface OrderRow { id: string; status?: string; shipped_at?: string | null; delivered_at?: string | null; tracking_number?: string | null; tracking_url?: string | null; carrier?: string | null }
-    const { _data: current, error: curErr } = await supabase
+    const { data: current, error: curErr } = await supabase
       .from<OrderRow>('venthub_orders')
       .select('id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
       .eq('id', orderId)

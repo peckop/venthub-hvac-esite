@@ -32,14 +32,14 @@ Deno.serve(async (req: Request) => {
     })
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
-    const { _data: userRes, error: userErr } = await supabaseUser.auth.getUser()
+    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
     if (userErr || !userRes?.user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
     const userId = userRes.user.id
 
-    const { _data: profile, error: profErr } = await supabaseAdmin
+    const { data: profile, error: profErr } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
       .eq('id', userId)

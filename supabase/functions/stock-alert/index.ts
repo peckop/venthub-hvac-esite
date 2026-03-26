@@ -86,7 +86,7 @@ serve(async (req) => {
 async function checkAllProducts(supabase: SupabaseClient) {
   // Eşik değerinin altında kalan ürünleri çek
   // Üstteki filtreleme SQL tarafında karmaşık olabilir, basitleştirip JS tarafında filtreleyelim
-  const { _data: allLowStock, error: fetchErr } = await supabase
+  const { data: allLowStock, error: fetchErr } = await supabase
     .from('products')
     .select('id, name, stock_qty, low_stock_threshold')
     .filter('stock_qty', 'lte', 10) // Önce genel bir filtre
@@ -104,7 +104,7 @@ async function checkAllProducts(supabase: SupabaseClient) {
 }
 
 async function checkSpecificProduct(supabase: SupabaseClient, _productId: string) {
-  const { _data: product, error } = await supabase
+  const { data: product, error } = await supabase
     .from('products')
     .select('id, name, stock_qty, low_stock_threshold')
     .eq('id', _productId)
@@ -189,7 +189,7 @@ async function sendNotification(type: string, to: string, _data: AlertData, prio
 
 async function getAlertRecipients(supabase: SupabaseClient): Promise<AlertRecipient[]> {
   // inventory_settings'den ana email'i al
-  const { _data: settings } = await supabase
+  const { data: settings } = await supabase
     .from('inventory_settings')
     .select('alert_email')
     .maybeSingle()
