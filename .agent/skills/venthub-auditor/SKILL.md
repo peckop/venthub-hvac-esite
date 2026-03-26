@@ -3,6 +3,22 @@ name: venthub-auditor
 description: VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, Next.js 15/React 19 uyumu, tip güvenliği, robotik temizlik denetimi YANISIRA Kritik Varlık korumalarını üstlenir.
 ---
 
+## 🛫 Prerequisites (Ön Koşul Kontrolü)
+
+Bu skill'i kullanmadan önce aşağıdaki kontrolleri yap. Herhangi biri başarısızsa, **DURMA** ve kullanıcıya bildir.
+
+1. **Bütünlük Scripti Erişimi:**
+   - `.agent/scripts/check_integrity.py` dosyasının mevcut olduğunu doğrula.
+   - Dosya yoksa veya çalıştırılamıyorsa → ❌ DURMA.
+
+2. **Git Durumu:**
+   - `git status` çalıştır. Eğer "not a git repository" hatası gelirse → ❌ DURMA.
+   - Commit edilmemiş kritik değişiklikler varsa, önce kullanıcıyı uyar.
+
+3. **Korunan Varlık Kontrolü:**
+   - Görevdeki dosyaların `src/components/products/visual-models/` veya `src/types/database.types.ts` içerip içermediğini kontrol et.
+   - İçeriyorsa → Adım 1 (Snapshot Zorunluluğu) otomatik tetiklenir. Yedekleme yapılmadan devam etme.
+
 # 🛡️ VentHub Unified Auditor Skill (v11.0 - Sentinel Edition)
 
 Bu yetenek, projenin sadece "çalışmasını" değil, **"mimari açıdan kusursuz" kalmasını ve "kritik dosyaların kazara silinmemesini" sağlar**. Projedeki tüm otonom ajanlar bu skill'in kurallarına biat etmek zorundadır.

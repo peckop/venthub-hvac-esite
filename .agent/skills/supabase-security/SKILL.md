@@ -3,6 +3,22 @@ name: supabase-security
 description: Defines RLS policies, migration patterns, and security best practices for VentHub Supabase. Use when writing SQL, creating policies, or modifying database schema.
 ---
 
+## 🛫 Prerequisites (Ön Koşul Kontrolü)
+
+Bu skill'i kullanmadan önce aşağıdaki kontrolleri sırayla yap. Herhangi biri başarısızsa, **DURMA** ve kullanıcıya bildir.
+
+1. **Supabase Proje Bağlantısı:**
+   - `GEMINI.md` veya `.env.local` dosyasında `NEXT_PUBLIC_SUPABASE_URL` tanımlı mı kontrol et.
+   - Boş veya placeholder ise → ❌ DURMA. Kullanıcıdan gerçek proje URL'sini iste.
+
+2. **Migration Dizini:**
+   - `supabase/migrations/` klasörünün var olduğunu doğrula.
+   - Yoksa → ❌ DURMA. Önce `supabase init` gerekebilir.
+
+3. **Yıkıcı SQL Kontrolü:**
+   - Yazacağın SQL içinde `DROP TABLE`, `DROP COLUMN`, `TRUNCATE` varsa → ❌ DURMA.
+   - Kullanıcıdan açık onay (`/override`) almadan bu komutları çalıştırma.
+
 # Supabase Security Skill
 
 Bu skill, VentHub'ın Supabase güvenlik standartlarını ve migration yazım kurallarını tanımlar.
