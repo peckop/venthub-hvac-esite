@@ -1,29 +1,30 @@
 ## Goal
-Aray??z bile??enlerini (UI Components) do??rudan Supabase veritaban?? raw tiplerinden (??rn: `ProductRow`, `DbCategory`) izole etmek. T??m verileri `src/lib/type-converters.ts` ??zerinden ge??irerek standart aray??z modellerine (`DomainProduct`, `DomainCategory`) d??n????t??rmek (ViewModel & Adapter Pattern).
+Next.js 15 ve React 19 standartlar?na uygun olarak projedeki dinamik rotalardaki (params, searchParams) asenkron gereklilikleri sa?lamak ve eslint-plugin-react-compiler'?n g?c?nden faydalanarak projeyi gereksiz useMemo ve useCallback hook'lar?ndan ar?nd?rmak.
 
 ## Constraints
-- Next.js 15 Server Components (RSC) ve Client Components yap??s??yla tam uyumluluk.
-- Performans s??z??nt??s?? yaratmamak i??in d??n??????mlerin (converter) saf fonksiyon (pure function) ve tip g??venli olmas??.
-- Zero-Downtime kural??: Mevcut ??al????an hi??bir UI kodu bozulmamal??d??r.
+- **Next.js 15 Strictness:** Next.js 15'te params ve searchParams prop'lar? **asenkron** (Promise) yap?s?na ge?ti. Senkron (do?rudan) eri?imler terminalde uyar?/hata ?retebilir veya Hydration/Render hatalar?na yol a?abilir.
+- **React 19 Compiler:** React 19 compiler re-render'lar? otomatik optimize etti?i i?in, manuel yaz?lan useCallback ve useMemo'lar kod karma?as?n? art?r?r ve compiler'?n native mekanizmalar?yla ?ak??abilir.
+- **Proje B?t?nl???:** Routing yap?s?nda k?r?lma olmadan wait params.id vb. kullan?mlar?n?n dikkatli yap?lmas? gereklidir. Rota (Page/Layout) bile?enleri sunucu bile?eniyse (Server Components) asenkron fonksiyonlara d?nd?r?lmelidir; e?er Client Component iseler React use() hook'u kullan?larak resolve edilmelidir.
 
 ## Known context
-- A??ama 1 (Technical Debt Cleanup & Admin Dashboard Type Hardening) hen??z ba??ar??l?? ??ekilde tamamlanm????t??r. Proje lint ve tsc uyumludur.
-- Veritaban??ndan gelen veriler hala baz?? UI bile??enlerinde do??rudan bas??lmakta olup, ??ema de??i??ikliklerinde sistemin k??r??lganl?????? (brittle) devam etmektedir.
+- VentHub bir e-ticaret uygulamas?, yani bolca dinamik rota ([slug], [id]) bar?nd?r?yor.
+- src/app/ alt?ndaki sayfalardaki (?rn: src/app/products/[id]/page.tsx veya src/app/category/[slug]/page.tsx) k?k yap? ta?lar?n?n elden ge?irilmesi gerekiyor.
+- Daha ?nce veritaban? yans?malar?ndan kaynaklanan sorunlar? ViewModel katman? sayesinde ??zd?k; ?u anki derlemeler (%100 Build Success) bize React ve Next.js'in saf API de?i?ikliklerine odaklanabilece?imiz m?kemmel bir zemin sa?l?yor.
 
 ## Risks
-- Bile??en (component) ba????ml??l??k grafi??inin (dependency tree) geni?? olmas?? hasebiyle, eski tip (Row) olan bir bile??ene yanl????l??kla yeni tip (Domain) g??nderildi??inde Type Mismatch build hatalar??n??n patlamas??.
-- ??eviri (i18n) eksiklerinin `DomainCategory` d??n????t??rme safhas??nda null basmas??na sebep olmas??.
+- **Build veya Hydration Hatalar?:** Senkron b?rak?lan component'lerin production build a?amas?nda gizli hata b?rakmas? veya Cloudflare/Vercel da??t?m?nda ?al??ma an?nda ??kmelere (Runtime crash) yol a?ma riski.
+- **Client Component Karma?as?:** Sunucu bile?eni yerine istemci bile?eni ("use client") olarak i?aretlenen Page'lerin hata vermesi. Client Components async Arrow / Function olamazlar; mecbur Promise ??z?mlemesi i?in React.use(params) hook'u gereklidir.
+- **Fazla De?i?iklik Hatas? (Scope Creep):** Projede ?ok fazla useMemo/useCallback k?rlemesine s?k?l?rse, useEffect ba??ml?l?k dizileri (dependency array) etkilenebilir.
 
-## Options (2???4)
-1. **A??amal?? ve ??zole (Incremental & Component-By-Component):** ??lk etapta sadece bir Domain (??rn: Category) tipini ele almak, ilgili `type-converters` fonksiyonunu yaz??p sadece Kategori bar??nd??ran sayfalar?? refactor etmek.
-2. **Toplu D??n??????m (Mass Architecture Overhaul):** T??m `ui-models` tiplerini ba??tan a??a???? yaz??p, projedeki t??m `views` klas??r??n?? tek seferde Converter ??zerinden ba??lamak.
-3. **Class Bazl?? DTO Mimarisi:** Veritaban??ndan gelen veriyi TypeScript s??n??flar??yla sarmalay??p property getter/setter ile y??netmek. (React'te referans kayb??na yol a??abilece??inden ??nerilmez).
+## Options (2-4)
+1. **Oto-Tarama & Kritik Temizlik:** ?ncelikle src/app/ i?inde [param_name] klas?rlerindeki page'leri tespit edip ilgili bile?enleri Next.js 15 asenkron prop uyumlu hale getirmek (Server ise async prop, Client ise use(params) entegrasyonu yapmak). Ard?ndan React 19 compiler uyar?lar?n? ve Lint ??kt?lar?n? baz alarak kullan??s?z hale gelen useMemo/useCallback kal?nt?lar?n? g?venli olan yerlerden s?k?p temizlemek. (Dengeli ve g?venli)
+2. **Kapsaml? T?m Proje Refactoring:** Regex veya ?zel bir kod analiz arac? (AST script) kullanarak t?m useMemo, useCallback'leri k?k?nden silmek. T?m rotalar? bir hamlede asenkron hale getirmek. (Son derece riskli, referans e?itli?ine (
+eference equality) ba?l? ?al??an useEffect zincirlerini k?rabilir).
 
 ## Recommendation
-Riski minimize etmek ve cerrahi disiplini korumak i??in **A??amal?? ve ??zole (Incremental)** opsiyon (Se??enek 1) ??nerilmektedir. ??lk ad??mda `ui-models.ts` aray??z tan??mlan??p, sadece "Product" veya sadece "Category" modellerinden biri d??n????t??r??lmeli, proje m??h??rlenip (lint/build kontrol??) di??er ad??ma ge??ilmelidir.
+**Option 1** son derece mant?kl? ve tavsiye edilendir. ??nk? React 19 compiler ne kadar ak?ll? olursa olsun, b?y?k kod bloklar?nda toplu manip?lasyon yan etki yaratabilir. ?nceli?imiz Next.js 15 params mecburiyetini dinamik rotalarda kusursuz oturtmakt?r. Sonras?nda linter / compiler'?n y?nlendirdi?i a?ikar refactor i?lemlerini tekil mod?ller ?zerinde yapaca??z.
 
 ## Acceptance criteria
-1. Hedeflenen UI bile??enlerinde, Supabase veritaban?? referanslar??n??n (`DbProduct`, vb.) tamamen temizlenmi?? olmas??.
-2. `src/lib/type-converters.ts` dosyas??nda veritaban?? raw tiplerini UI modellerine ??eviren tip g??venli Pure Function'lar??n ??al??????r durumda olmas??.
-3. TypeScript compiler (`tsc`) ve ESLint komutlar??n??n uyar??/hata vermeden (exit 0) tamamlanmas??.
-4. Local dev ortam??nda verinin ekranda eskisiyle birebir ayn?? g??r??n??mde render edilmesi.
+1. App router i?indeki t?m dinamik Page ve Layout'lar?n params okumas?n?n Next.js 15 standartlar?na asenkron olarak uymas? (Server'da wait, Client component'lerde use()).
+2. Manuel useMemo/useCallback varl?klar?n?n linter kural-setine uygun ?ekilde ay?klanmas? ve tip g?venli?inin s?rd?r?lmesi.
+3. D?n???m sonras? pnpm run build komutunun "0" hata ile ??k?? yapmas? (Statik render, dinamik render hatalar? vs olmamal?).

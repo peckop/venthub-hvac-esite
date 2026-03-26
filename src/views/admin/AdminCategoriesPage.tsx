@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { VentImage } from '@/components/ui/VentImage'
-import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo } from 'react'
+import React, { lazy, Suspense, useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
@@ -9,15 +9,15 @@ import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import { 
-  adminSectionTitleClass, 
+import {
+  adminSectionTitleClass,
   adminSubtitleClass,
-  adminTableHeadCellClass, 
-  adminTableCellClass, 
+  adminTableHeadCellClass,
+  adminTableCellClass,
   adminTableContainerClass,
-  adminButtonPrimaryClass, 
-  adminTableActionClass, 
-  adminTableActionDangerClass 
+  adminButtonPrimaryClass,
+  adminTableActionClass,
+  adminTableActionDangerClass
 } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { CategoryFormModal } from '../../components/admin/categories/CategoryFormModal'
@@ -49,8 +49,8 @@ const AdminCategoriesPage: React.FC = () => {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  
-  const selectedCategory = useMemo(() => rows.find(r => r.id === editingId), [rows, editingId])
+
+  const selectedCategory = rows.find(r => r.id === editingId)
 
   // Columns & density
   const STORAGE_KEY = 'toolbar:categories'
@@ -82,7 +82,7 @@ const AdminCategoriesPage: React.FC = () => {
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
   const cellPad = density === 'compact' ? 'px-2 py-2' : ''
 
-  const load = useCallback(async () => {
+  const load = async () => {
     setLoading(true)
     setError(null)
     try {
@@ -101,16 +101,13 @@ const AdminCategoriesPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }
 
   const pathname = usePathname()
-  useEffect(() => { load() }, [load, pathname])
+  useEffect(() => { load() }, [pathname])
 
-  const filtered = useMemo(() => {
-    const term = q.trim().toLowerCase()
-    if (!term) return rows
-    return rows.filter(r => r.name.toLowerCase().includes(term) || r.slug.toLowerCase().includes(term))
-  }, [rows, q])
+  const term = q.trim().toLowerCase()
+  const filtered = !term ? rows : rows.filter(r => r.name.toLowerCase().includes(term) || r.slug.toLowerCase().includes(term))
 
   const handleCreate = () => {
     setEditingId(null)
@@ -132,15 +129,15 @@ const AdminCategoriesPage: React.FC = () => {
       const before = rows.find(r => r.id === id) || null
       const { error: delErr } = await supabase.from('categories').delete().eq('id', id)
       if (delErr) throw delErr
-      
+
       const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, { 
-        table_name: 'categories', 
-        row_pk: id, 
-        action: 'DELETE', 
+      await logAdminAction(supabase, {
+        table_name: 'categories',
+        row_pk: id,
+        action: 'DELETE',
         before: before,
-        after: null, 
-        comment: 'delete category' 
+        after: null,
+        comment: 'delete category'
       })
       await load()
     } catch (e) {
@@ -220,8 +217,8 @@ const AdminCategoriesPage: React.FC = () => {
                 {visibleCols.sortOrder && (
                   <th className={`${adminTableHeadCellClass} ${headPad} w-24 text-center`}>
                     <div className="flex items-center justify-center gap-2">
-                       Sıra
-                       <InfoTooltip text="Kategorilerin sitedeki listelenme sırasını belirler. 1 değeri en üstte görünür." />
+                      Sıra
+                      <InfoTooltip text="Kategorilerin sitedeki listelenme sırasını belirler. 1 değeri en üstte görünür." />
                     </div>
                   </th>
                 )}
@@ -258,7 +255,7 @@ const AdminCategoriesPage: React.FC = () => {
                             <VentImage src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
                               alt=""
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                             />
+                            />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-white/5 text-[10px] font-black text-slate-700 uppercase">NO IMG</div>
                           )}
@@ -301,37 +298,37 @@ const AdminCategoriesPage: React.FC = () => {
                       <td className={`${adminTableCellClass} ${cellPad} text-center`}>
                         {hasWriteAccess ? (
                           <div className="inline-block glass bg-white/5 rounded-xl border border-white/5 group-hover:border-cyan-400/30 transition-all p-1">
-                             <EditableCell
-                                value={r.sort_order?.toString() || '0'}
-                                placeholder="0"
-                                type="number"
-                                inputWidth="w-12"
-                                 className="text-center text-cyan-400 font-black text-[11px] tracking-widest uppercase"
-                                onSave={async (val) => {
-                                  const num = parseInt(val || '0', 10)
-                                  if (isNaN(num)) return
-                                  if (r.sort_order === num) return
-                                  const { error: upErr } = await supabase.from('categories').update({ sort_order: num }).eq('id', r.id)
-                                  if (upErr) throw upErr
-                                  setRows(prev => prev.map(row => row.id === r.id ? { ...row, sort_order: num } : row))
-                                  toast.success('Sıra güncellendi')
-                                  load()
-                                }}
-                              />
+                            <EditableCell
+                              value={r.sort_order?.toString() || '0'}
+                              placeholder="0"
+                              type="number"
+                              inputWidth="w-12"
+                              className="text-center text-cyan-400 font-black text-[11px] tracking-widest uppercase"
+                              onSave={async (val) => {
+                                const num = parseInt(val || '0', 10)
+                                if (isNaN(num)) return
+                                if (r.sort_order === num) return
+                                const { error: upErr } = await supabase.from('categories').update({ sort_order: num }).eq('id', r.id)
+                                if (upErr) throw upErr
+                                setRows(prev => prev.map(row => row.id === r.id ? { ...row, sort_order: num } : row))
+                                toast.success('Sıra güncellendi')
+                                load()
+                              }}
+                            />
                           </div>
                         ) : (
-                           <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">{r.sort_order || 0}</span>
+                          <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">{r.sort_order || 0}</span>
                         )}
                       </td>
                     )}
                     {visibleCols.slug && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                         <code className="text-[9px] font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5 group-hover:text-cyan-400/60 transition-colors uppercase tracking-[0.15em] font-mono">{r.slug}</code>
+                        <code className="text-[9px] font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5 group-hover:text-cyan-400/60 transition-colors uppercase tracking-[0.15em] font-mono">{r.slug}</code>
                       </td>
                     )}
                     {visibleCols.parent && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">
                           {rows.find(x => x.id === r.parent_id)?.name || '-'}
                         </span>
                       </td>

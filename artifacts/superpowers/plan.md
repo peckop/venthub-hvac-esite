@@ -1,46 +1,52 @@
-# Task 4 ??? A??ama 2: ViewModel Mimarisine Ge??i?? (Category Refactoring) Plan??
+# Uygulama Plan?: Next.js 15 Async Params & React 19 Optimizasyonu
 
 ## Hedef
-Aray??z bile??enlerini do??rudan Supabase raw tiplerinden izole etmek (??rn: `DbCategory`). T??m verileri `src/lib/type-converters.ts` ??zerinden ge??irerek standart aray??z modellerine (`DomainCategory`) d??n????t??rmek. Bu a??amada "Kategori" objeleri (Category) refactor edilecektir.
+Next.js 15'in getirdi?i asenkron params / searchParams zorunlulu?unu projedeki t?m App Router (src/app/) sayfalar?na uygulamak ve React 19 Compiler dostu manuel useMemo / useCallback temizlikleri yapmak.
 
-## Varsay??mlar
-- Uygulaman??n ??u anki TSC derlemesi s??f??r hata ile ??al????maktad??r (A??ama 1 tamamland??).
-- UI taraf??nda `DomainCategory` i??in kullan??lacak temel ??zellikler (id, name, slug, status, metadata vb.) bellidir.
-- A??amal?? ge??i?? (Zero-downtime) g??zetilecek; veri modeli yaln??zca UI adapt??r?? ??zerinden d??necektir.
+## Varsay?mlar
+- Client Component'lerdeki useParams() ?a?r?lar? Next.js 15'te k?smen g?venli kalsa da, Page props'lar? KES?NL?KLE Promise'dir ve wait edilmek (Server) / use() ile ??z?lmek (Client) zorundad?r.
+- T?m temizlik i?lemleri Linter'?n ve sa?lam mimarinin izin verdi?i d?zeyde tutulacakt?r.
 
 ## Plan
 
-### Ad??m 1 ??? `src/types/ui-models.ts` Haz??rl??????
-- **Dosyalar:** `src/types/ui-models.ts` 
-- **De??i??iklik:** `DomainCategory` (ViewModel) aray??z??n?? tan??mla veya geli??tir. Raw DB JSON'lar?? (??rn. `metadata`) yerine UI'??n kulland?????? nesne kat??la??t??r??lm???? halini gir.
-- **Do??rulama:** `pnpm exec tsc` ??? Typelarda sorun olmad??????ndan emin ol.
+### Ad?m 1: Server Components Dynamic Params & Metadata Refactoring
+- **Model ?nerisi:** ?? **Claude Sonnet / Opus** veya ?? **Gemini High** *(Routing'deki k?k bile?enler oldu?u ve mimari k?r?lma riski bar?nd?rd??? i?in y?ksek mant?kl? model ?artt?r).*
+- **Dosyalar:** 
+  - src/app/products/[id]/page.tsx
+  - src/app/destek/konular/[slug]/page.tsx
+  - src/app/category/[categorySlug]/[subCategorySlug]/page.tsx
+  - src/app/category/[categorySlug]/page.tsx
+  - src/app/brands/[slug]/page.tsx
+- **De?i?iklik:** 
+  - generateMetadata ve Page i?indeki params tiplerini Promise<{ paramAd?: string }> s?zdizimi ile modernize et. 
+  - const { paramAd? } = await params format?nda Promise a?ma (await) operasyonunu kodla.
+- **Do?rulama:** pnpm exec tsc -b tsconfig.build.json --noEmit ?al??t?rarak asenkron await tip uyumsuzluklar?n?n (Promise is missing vb.) bulunmad???n? tam denetle.
 
-### Ad??m 2 ??? `src/lib/type-converters.ts` Adapter Yaz??lmas??
-- **Dosyalar:** `src/lib/type-converters.ts`
-- **De??i??iklik:** Supabase veritaban?? sat??r??n?? UI Modeline ??eviren fonksiyonu (`toDomainCategory(row: DbCategory): DomainCategory`) pure function olarak yaz??n. Veritaban??ndaki `string | null` veya karma????k JSON field'lar??n?? burada UI'??n bekledi??i kesin tiplere ??evirin.
-- **Do??rulama:** `pnpm exec tsc` ??? S??f??r hata.
+### Ad?m 2: Client Components Parameter Refactoring (React 19 Hooks)
+- **Model ?nerisi:** ?? **Gemini High** *(Next.js 15 / React 19 Client Component karma?as?n? ay?rt edebilecek g?ncel bir modele ihtiya? var).*
+- **Dosyalar:** 
+  - src/app/admin/categories/[id]/builder/page.tsx 
+  - Ve dinamik params alan muhtemel di?er Client Container rotalar?.
+- **De?i?iklik:** 
+  - Props'tan gelen dinamik params Promise objesi, bir Client Component ("use client") i?ine ak?yorsa onu asenkron ??zmek i?in React 19 use(props.params) hook'una ge?ir (Client'ta await yasakt?r).
+- **Do?rulama:** pnpm run lint:ci ge?i?i.
 
-### Ad??m 3 ??? Bile??en Props (Aray??z) G??ncellemesi
-- **Dosyalar:** `src/components/...` ve Kategori g??steren bile??enler.
-- **De??i??iklik:** Props i??indeki `category: DbCategory` tan??mlamalar??n?? `category: DomainCategory` olarak kat?? bir ??ekilde de??i??tir.
-- **Do??rulama:** TS hatalar?? f??rlayacak. Bu bilerek hedefleniyor ki hangi dosyalar??n ar??zaland??????/g??ncellenmesi gerekti??i ????ks??n.
+### Ad?m 3: Gereksiz useMemo / useCallback Temizli?i
+- **Model ?nerisi:** ?? **Gemini Flash** *(Linter'?n hata f?rlatt??? dosyalar ?zelinde "kald?rma/silme" yap?laca?? i?in basit bir amelelik (Rutin ??) i?lemidir. Pahal? modellere gerek yoktur).*
+- **Dosyalar:** Proje genelindeki manuel hook kullan?mlar? (src/views/admin/ vb.).
+- **De?i?iklik:** 
+  - ESLint 
+eact-compiler kurallar? do?rultusunda warning atan useMemo'lar?n do?rudan const ile yeniden hesaplanacak ?ekilde optimize edilmesi.
+- **Do?rulama:** pnpm run lint:ci sonucu "0" hataya ula??lmas?.
 
-### Ad??m 4 ??? Veri Fetch ve Mapping G??ncellemesi (Views/Pages)
-- **Dosyalar:** Kategori verisi ??eken (fetching) t??m `Views` (??rn: `CategoryMasterView`, `admin/CategoryBuilderView` vb.).
-- **De??i??iklik:** DB'den veri al??nd??ktan hemen sonra `row.map(toDomainCategory)` ile convert edilmesi ve Child bile??enlere `DomainCategory` olarak iletilmesi.
-- **Do??rulama:** `pnpm exec tsc` ??? 100% s??f??r hata.
-
-### Ad??m 5 ??? Next.js Build ve Lint Denetimi
-- **Dosyalar:** T??m dosya a??ac??
-- **De??i??iklik:** Yok
-- **Do??rulama:** `pnpm run lint:ci` ve `pnpm run build` hatas??z ge??melidir. ??al????mayan yer varsa geri d??n??p Cerrahi d??zeltme yap.
+### Ad?m 4: Build Stability ve Hydration Test
+- **Model ?nerisi:** ?? **Gemini Flash** *(Sadece komut ?al??t?rma ve sonu? okuma i?lemi yapacakt?r).*
+- **De?i?iklik:** T?m pass s?re?leri biti?iyle beraber uygulaman?n final statik-dinamik render s?re?lerinin test edilmesi.
+- **Do?rulama:** pnpm run build komutunun "0" hata (tamamlanan Page Generate a?amalar?) ile ??k?? yapmas?.
 
 ## Riskler ve Azaltmalar
-| Risk | Azaltma |
-|---|---|
-| Kategori objesi i??indeki i18n ??evirilerinin JSON format hatas?? f??rlatmas?? | Adapter i??inde try-catch & default (fallback) fallback de??erleri sarmalamas?? |
-| G??zden ka??an eski `DbCategory` tipli bile??en y??z??nden Build hatas?? | TSC komutu ad??m ad??m ko??turularak nokta at?????? bulunacak. |
+- **Risk:** Client page'lerde prop bazl? wait kullan?m? veya useEffect i?inde hatal? veri ?ekimi crash'e yol a?ar.
+  - **Azaltma:** Yaln?zca React 19'un use() hook'u kullan?larak client bazl? param Promise'leri bypass edilecektir.
 
-## Geri D??n???? (Rollback) Plan??
-- Bu g??revin t??m?? 1 ana hedef, 5 k??????k commit alt??nda birle??tirilebilir.
-- Ad??m 3'teki k??r??lma d??zelmezse, t??m s??re?? `git stash` veya `git reset --hard HEAD` ile an??nda geri al??n??r.
+## Geri D?n?? (Rollback) Plan?
+- Rotalarda Build ??kmesi durumuyla kar??la??l?rsa git restore operasyonuyla src/app mod?lleri base commit'e geri al?nacak ve hata izole de?erlendirilecektir.
