@@ -3,11 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Product, getProductsEnriched } from '../lib/supabase'
-import { mapDatabaseCategoryToDomain, DomainCategory } from '../lib/type-converters'
+import { DomainCategory } from '../lib/type-converters'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { useIsMounted } from './useIsMounted'
 import { useCategories } from '../contexts/CategoryContext'
-import type { DbCategory } from '../types/db-rows'
 
 export interface CategoryFilters {
   sortBy: string
@@ -43,7 +42,7 @@ const DEFAULT_FILTERS: CategoryFilters = {
  * 2. URL State Synchronization
  * 3. Raw filtering and sorting of products
  */
-export function useCategoryGateway(initialCategory?: DbCategory | null) {
+export function useCategoryGateway(initialCategory?: DomainCategory | null) {
   const isMounted = useIsMounted()
   const params = useParams()
   const router = useRouter()
@@ -54,7 +53,7 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
   const slug = (params?.slug || params?.subCategorySlug || params?.categorySlug) as string
   const parentSlug = (params?.parentSlug || (params?.subCategorySlug ? params?.categorySlug : undefined)) as string | undefined
 
-  const [category, setCategory] = useState<DomainCategory | null>(initialCategory ? mapDatabaseCategoryToDomain(initialCategory) : null)
+  const [category, setCategory] = useState<DomainCategory | null>(initialCategory ?? null)
   const [parentCategory, setParentCategory] = useState<DomainCategory | null>(null)
   const [subCategories, setSubCategories] = useState<DomainCategory[]>([])
   const [products, setProducts] = useState<Product[]>([])
@@ -139,7 +138,7 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
         }
 
         if (!targetCategory && initialCategory) {
-          targetCategory = mapDatabaseCategoryToDomain(initialCategory)
+          targetCategory = initialCategory
         }
 
         if (!targetCategory && slug) {

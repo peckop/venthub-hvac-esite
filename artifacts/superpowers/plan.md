@@ -1,63 +1,46 @@
-# Task 3 — Admin Tip Sertleştirme (Component Hardening) Planı
+# Task 4 ??? A??ama 2: ViewModel Mimarisine Ge??i?? (Category Refactoring) Plan??
 
 ## Hedef
-Admin Dashboard bileşenleri (AdminInventoryPage, AdminReturnsPage, CategoryBuilderView, AdminWebhookEventsPage) üzerindeki `@ts-expect-error` bloklarını ve `as unknown as` kullanımlarını sıfıra indirmek; `Density` ve `LoadState` tiplerini merkezi bir `src/types/admin-shared.ts` dosyasında toplamak.
+Aray??z bile??enlerini do??rudan Supabase raw tiplerinden izole etmek (??rn: `DbCategory`). T??m verileri `src/lib/type-converters.ts` ??zerinden ge??irerek standart aray??z modellerine (`DomainCategory`) d??n????t??rmek. Bu a??amada "Kategori" objeleri (Category) refactor edilecektir.
 
-## Varsayımlar
-- `pnpm exec tsc -b tsconfig.build.json` Task 2 sonrası şu an sıfır hata vermektedir.
-- Supabase şemasında `inventory_summary` view'ının `category_id` kolonu generated types'de eksik → çözüm: manuel tip genişletme.
-- `ColumnsMenu.tsx` içindeki `Density` tipi merkeze taşınacak; export bu dosyada re-export olarak kalacak (geriye dönük uyumluluk).
-- Aşamalı ilerleme: Her adım sonrası `pnpm exec tsc -b tsconfig.build.json` çalıştırılır.
+## Varsay??mlar
+- Uygulaman??n ??u anki TSC derlemesi s??f??r hata ile ??al????maktad??r (A??ama 1 tamamland??).
+- UI taraf??nda `DomainCategory` i??in kullan??lacak temel ??zellikler (id, name, slug, status, metadata vb.) bellidir.
+- A??amal?? ge??i?? (Zero-downtime) g??zetilecek; veri modeli yaln??zca UI adapt??r?? ??zerinden d??necektir.
 
 ## Plan
 
-### Adım 1 — `src/types/admin-shared.ts` Oluştur
-- **Dosyalar:** `src/types/admin-shared.ts` (yeni)
-- **Değişiklik:** `Density`, `LoadState`, `TableSortDir` gibi tüm admin-genelinde paylaşılan tipleri bu dosyaya ekle.
-- **Verify:** `pnpm exec tsc -b tsconfig.build.json` → sıfır hata.
+### Ad??m 1 ??? `src/types/ui-models.ts` Haz??rl??????
+- **Dosyalar:** `src/types/ui-models.ts` 
+- **De??i??iklik:** `DomainCategory` (ViewModel) aray??z??n?? tan??mla veya geli??tir. Raw DB JSON'lar?? (??rn. `metadata`) yerine UI'??n kulland?????? nesne kat??la??t??r??lm???? halini gir.
+- **Do??rulama:** `pnpm exec tsc` ??? Typelarda sorun olmad??????ndan emin ol.
 
-### Adım 2 — `ColumnsMenu.tsx` re-export yap, yerel Density'yi sil
-- **Dosyalar:** `src/components/admin/ColumnsMenu.tsx`
-- **Değişiklik:** Yerel `export type Density = ...`'yi sil, `admin-shared`'den re-export ekle.
-- **Verify:** `pnpm exec tsc` → ColumnsMenu kaynaklı hata yok.
+### Ad??m 2 ??? `src/lib/type-converters.ts` Adapter Yaz??lmas??
+- **Dosyalar:** `src/lib/type-converters.ts`
+- **De??i??iklik:** Supabase veritaban?? sat??r??n?? UI Modeline ??eviren fonksiyonu (`toDomainCategory(row: DbCategory): DomainCategory`) pure function olarak yaz??n. Veritaban??ndaki `string | null` veya karma????k JSON field'lar??n?? burada UI'??n bekledi??i kesin tiplere ??evirin.
+- **Do??rulama:** `pnpm exec tsc` ??? S??f??r hata.
 
-### Adım 3 — `src/types/inventory.ts` temizle
-- **Dosyalar:** `src/types/inventory.ts`
-- **Değişiklik:** `LoadState` ve `Density`'yi buradan sil, `admin-shared`'den re-export ile geriye dönük uyumu koru.
-- **Verify:** `pnpm exec tsc` → sıfır hata.
+### Ad??m 3 ??? Bile??en Props (Aray??z) G??ncellemesi
+- **Dosyalar:** `src/components/...` ve Kategori g??steren bile??enler.
+- **De??i??iklik:** Props i??indeki `category: DbCategory` tan??mlamalar??n?? `category: DomainCategory` olarak kat?? bir ??ekilde de??i??tir.
+- **Do??rulama:** TS hatalar?? f??rlayacak. Bu bilerek hedefleniyor ki hangi dosyalar??n ar??zaland??????/g??ncellenmesi gerekti??i ????ks??n.
 
-### Adım 4 — `AdminInventoryPage.tsx` — 3 @ts-expect-error bloğunu temizle
-- **Dosyalar:** `src/views/admin/AdminInventoryPage.tsx`
-- **Değişiklik (satır 73):** `InventorySummaryRow` lokal tipi oluştur, `category_id` alanını genişlet.
-- **Değişiklik (satır 143):** `loadState` state'ini `LoadState` enum ile tiplendir.
-- **Değişiklik (satır 147, 149):** `visibleCols` ve `density` başlangıç değerlerini tam uyumlu tiplerle düzelt.
-- **Verify:** `pnpm exec tsc` → AdminInventoryPage.tsx hata yok.
+### Ad??m 4 ??? Veri Fetch ve Mapping G??ncellemesi (Views/Pages)
+- **Dosyalar:** Kategori verisi ??eken (fetching) t??m `Views` (??rn: `CategoryMasterView`, `admin/CategoryBuilderView` vb.).
+- **De??i??iklik:** DB'den veri al??nd??ktan hemen sonra `row.map(toDomainCategory)` ile convert edilmesi ve Child bile??enlere `DomainCategory` olarak iletilmesi.
+- **Do??rulama:** `pnpm exec tsc` ??? 100% s??f??r hata.
 
-### Adım 5 — `AdminWebhookEventsPage.tsx` — 2 @ts-expect-error bloğunu temizle
-- **Dosyalar:** `src/views/admin/AdminWebhookEventsPage.tsx`
-- **Değişiklik:** `WebhookEventRow` lokal interface tanımla, sorgu ve mapping tiplerini buna göre düzelt.
-- **Verify:** `pnpm exec tsc` → sıfır hata.
-
-### Adım 6 — `CategoryBuilderView.tsx` — 3 @ts-expect-error bloğunu temizle
-- **Dosyalar:** `src/views/admin/CategoryBuilderView.tsx`
-- **Değişiklik:** `authority_content` ve `metadata` JSON alanları için `isRecord` tipi guard kullan.
-- **Verify:** `pnpm exec tsc` → sıfır hata.
-
-### Adım 7 — Final TSC & Lint Kontrolü
-- **Dosyalar:** Tüm değişen dosyalar (doğrulama amaçlı).
-- **Verify:**
-  ```
-  pnpm exec tsc -b tsconfig.build.json
-  pnpm run lint
-  ```
+### Ad??m 5 ??? Next.js Build ve Lint Denetimi
+- **Dosyalar:** T??m dosya a??ac??
+- **De??i??iklik:** Yok
+- **Do??rulama:** `pnpm run lint:ci` ve `pnpm run build` hatas??z ge??melidir. ??al????mayan yer varsa geri d??n??p Cerrahi d??zeltme yap.
 
 ## Riskler ve Azaltmalar
 | Risk | Azaltma |
 |---|---|
-| Density tipinin başka sayfalarda string literal olarak kullanılması | Adım 1 sonrası TSC tam hata listesini görecek, cerrahi düzeltme yapılacak |
-| inventory_summary view genişletmesinin prod'da farklı davranması | Sadece TypeScript katmanı genişletiliyor, runtime'a etki yok |
-| CategoryBuilderView.tsx JSON guard'larının karmaşıklaşması | Adım 6'da lokal guard tercih edilecek |
+| Kategori objesi i??indeki i18n ??evirilerinin JSON format hatas?? f??rlatmas?? | Adapter i??inde try-catch & default (fallback) fallback de??erleri sarmalamas?? |
+| G??zden ka??an eski `DbCategory` tipli bile??en y??z??nden Build hatas?? | TSC komutu ad??m ad??m ko??turularak nokta at?????? bulunacak. |
 
-## Geri Dönüş (Rollback) Planı
-- Her adım bağımsız bir commit olacak.
-- `git stash` veya `git revert` ile granüler geri alma mümkündür.
+## Geri D??n???? (Rollback) Plan??
+- Bu g??revin t??m?? 1 ana hedef, 5 k??????k commit alt??nda birle??tirilebilir.
+- Ad??m 3'teki k??r??lma d??zelmezse, t??m s??re?? `git stash` veya `git reset --hard HEAD` ile an??nda geri al??n??r.

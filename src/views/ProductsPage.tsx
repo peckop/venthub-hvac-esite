@@ -2,10 +2,10 @@
 
 import React from 'react'
 import ProductsDiscoveryView from './ProductsDiscoveryView'
-import type { DbCategory } from '../types/db-rows'
+import type { DomainCategory } from '../lib/type-converters'
 
 interface ProductsPageProps {
-  initialCategories?: DbCategory[]
+  initialCategories?: DomainCategory[]
 }
 
 /**

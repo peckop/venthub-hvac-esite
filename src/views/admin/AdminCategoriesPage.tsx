@@ -94,8 +94,7 @@ const AdminCategoriesPage: React.FC = () => {
         .order('name', { ascending: true })
 
       if (fetchErr) throw fetchErr
-      /* @ts-expect-error REASON: Supabase returns generic row, expecting DbCategory */
-      setRows(data || [])
+      setRows((data as unknown as DbCategory[]) || [])
     } catch (e) {
       setError((e as Error).message || 'Kategoriler yüklenemedi')
       setRows([])
