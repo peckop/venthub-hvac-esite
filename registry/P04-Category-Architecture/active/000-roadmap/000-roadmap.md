@@ -2,7 +2,12 @@
 id: "000"
 title: "Roadmap"
 status: "Active"
+artifacts:
+  brainstorm: "registry/P04-Category-Architecture/active/000-roadmap/brainstorm.md"
+  plan: "registry/P04-Category-Architecture/active/000-roadmap/plan.md"
+  review: "registry/P04-Category-Architecture/active/000-roadmap/review.md"
 ---
+
 
 # P04 - Category Architecture: Server-First Slot Architecture
 

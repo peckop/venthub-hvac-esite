@@ -1,0 +1,13 @@
+# Brainstorm: 000-roadmap
+
+## 🎯 Goal
+...
+
+## 🛡️ Constraints & Risks
+...
+
+## 💡 Options & Recommendation
+...
+
+## ✅ Acceptance Criteria
+...

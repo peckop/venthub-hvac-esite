@@ -257,10 +257,10 @@ export function getModelPlacement(
         config = MODEL_CONFIGS['NicotraFanModel'];
     }
     // Diğerleri
-    else if (s.includes('nem-alma')) {
+    else if (s.includes('nem-alma') || s.includes('dehumidifier')) {
         config = MODEL_CONFIGS['DehumidifierModel'];
     }
-    else if (s.includes('isi-geri')) {
+    else if (s.includes('isi-geri') || s.includes('heat-recovery')) {
         config = MODEL_CONFIGS['HRVModel'];
     }
     else if (s.includes('flexible')) {

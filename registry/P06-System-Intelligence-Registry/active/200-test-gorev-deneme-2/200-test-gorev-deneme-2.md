@@ -2,7 +2,7 @@
 id: "200"
 title: "Test Gorev Deneme 2"
 priority: "High"
-status: "Executing"
+status: "Planning"
 progress: 0%
 project: "P06-System-Intelligence-Registry"
 created_at: "2026-03-28 05:03:36"
@@ -12,6 +12,7 @@ artifacts:
   plan: "registry/P06-System-Intelligence-Registry/active/200-test-gorev-deneme-2/plan.md"
   review: "registry/P06-System-Intelligence-Registry/active/200-test-gorev-deneme-2/review.md"
 ---
+
 
 > **Önerilen Model:** Gemini 3.1 Pro (High) *(Kategori: Medium)*
 
