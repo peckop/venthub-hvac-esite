@@ -11,7 +11,13 @@ Görevin: Projeyi nihai kalite denetiminden geçir (Superpowers Standardı) ve G
 
 ## 🏁 Nihai Doğrulama ve Mühürleme Adımları
 
-0. **Diff Güvenliği Kontrolü:**
+0. **Hafıza Kontrolü (Recall — Zorunlu İlk Adım):**
+   - Duraklatilmış görev var mı? Önce onları bitir.
+```bash
+python registry/engine.py recall
+```
+
+0b. **Diff Güvenliği Kontrolü:**
 ```bash
 python .agent/skills/diff-review/scripts/check_diff_rules.py
 ```
@@ -36,17 +42,23 @@ pnpm run lint:ci
    - Hataları `superpowers-debug` veya `superpowers-tdd` ile çöz.
    - Tüm adımlar 0 hata ile tamamlanana kadar devam etme.
 
-5. **Registry Hafızasına Kayıt (Zorunlu):**
-   - Görevde çözdüğün kritik bir sorun veya yaptığın mimari bir keşif varsa bunu Otonom Hafızaya yaz.
-   - Yoksa bu adımı atla.
+5. **Kritik Karar Hafizası (Opsiyonel — Önem Taşıyan Bir Mimari Karar Varsa):**
+   - Bug fix, linter düzeltmesi gibi rutin işlerde bu adımı atla.
+   - Mimari bir karar, kritik bir tuzak veya tekrar edilmemesi gereken bir hata varsa yaz:
 ```bash
-python registry/manage_registry.py remember "Önemli ders/Kural: ..."
+python registry/engine.py remember "Karar/Ders: ..." --type DECISION
 ```
 
-6. **Görev Mühürleme (Registry Complete):**
-   - Registry üzerindeki görevi "completed" konumuna taşı ve %100 yap. (Örn: P06 009)
+   - Görevin JSON artifact'larını engine.py ile doğrula.
+   - Trivial ise sadece `trivial.json`'ı doğrula:
 ```bash
-python registry/manage_registry.py complete PXX YYY
+python registry/engine.py cross-validate registry/PXX-Proje/YYY-gorev
+```
+
+6. **Görev Mühürleme (Registry Finalize):**
+   - Tüm artifact'lar geçerliyse görevi tamamla ve `completed/` dizinine taşı.
+```bash
+python registry/engine.py finalize-task registry/PXX-Proje/YYY-gorev
 ```
 
 7. **Değişiklikleri Sahnele:**

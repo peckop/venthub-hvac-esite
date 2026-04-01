@@ -88,8 +88,12 @@ At the end:
    - Manual validation steps (if applicable)
 3) Confirm the artifacts exist by listing `artifacts/superpowers/`.
 4) **Registry Sync (Zorunlu Sentinel Gate):**
-   - Görev %100 ise Terminal'den KESİNLİKLE şu komutu çalıştır: `python registry/manage_registry.py complete <PXX> <YYY>`
-   - `PULSE.md` otonom güncellenecek ve görev arşive alınacaktır.
+   - Görev %100 ise önce cross-validate, sonra finalize et:
+     ```bash
+     python registry/engine.py cross-validate registry/PXX-Proje/YYY-gorev
+     python registry/engine.py finalize-task registry/PXX-Proje/YYY-gorev
+     ```
+   - `PULSE.md` otonom güncellenecek ve görev `completed/` dizinine taşınacaktır.
 5) **Linear Sync (Varsa):**
    - İlgili Linear issue varsa durumunu güncelle: `mcp_linear_save_issue(id="VENT-XXX", state="Done")`.
    - Bitiş özetini yorum olarak ekle: `mcp_linear_save_comment(issueId="VENT-XXX", body="...")`.

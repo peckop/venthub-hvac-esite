@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "venthub/trivial",
+  "title": "Trivial Fast-Track Artifact",
+  "description": "Ufak görevler (typo, import düzelme vb.) için cross-validation zorunluluğunu atlayan ancak Sentinel Guard (Test/Lint) kurallarını işleten özel bir şema.",
+  "type": "object",
+  "required": [
+    "skill",
+    "task_id",
+    "task_title",
+    "description",
+    "files_modified",
+    "verification_commands",
+    "all_passed"
+  ],
+  "properties": {
+    "skill": {
+      "type": "string",
+      "const": "superpowers-trivial"
+    },
+    "model": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Görev ID (örn: TRIVIAL-001, REC-25 vs.)"
+    },
+    "task_title": {
+      "type": "string",
+      "description": "Görev Başlığı"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Görevin neden 'trivial' sayıldığına dair teknik açıklama. Bu, sistemin bypass edilmesi riskini en aza indirmek içindir."
+    },
+    "files_modified": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "Değiştirilen dosyaların listesi."
+    },
+    "verification_commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "command",
+          "result",
+          "passed"
+        ],
+        "properties": {
+          "command": {
+            "type": "string",
+            "minLength": 3
+          },
+          "result": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Çalıştırılan doğrulama komutları (Ruff, Pytest)."
+    },
+    "all_passed": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
