@@ -47,14 +47,17 @@
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
 |:---|:---|:---|:---|:---|
 | `000`  | Roadmap                                       | ⚡ MED        | ⏳ WAIT       | `0%`       |
-| `015`  | Server-First Slot Architecture (SSR Gecisi    | ✅ DONE       | 🏗️ RUN       | `100%`     |
-| `016`  | i18n Tam Kilitleme ve Slug Konsolidasyonu     | ✅ DONE       | 🏗️ RUN       | `0%`       |
 ### ⏳ Backlog
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
 |:---|:---|:---|
 | `009`  | Hotfix Fix Category Visibility And 3D Orbi    | ⚡ MED        |
 | `008`  | Master Prototype: Fanlar Unified Experienc    | 🔥 HIGH       |
 | `010`  | urunleri-kesfet-sayfasi-yeniden-insa          | 🔥 HIGH       |
+### ✅ Tamamlananlar
+| ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
+|:---|:---|:---|:---|:---|
+| `015`  | Server-First Slot Architecture (SSR Gecisi)   | ✅ DONE       | 🏗️ RUN       | `100%`     |
+| `016`  | i18n Tam Kilitleme ve Slug Konsolidasyonu     | ✅ DONE       | 🏗️ RUN       | `100%`     |
 ## 📁 P05-NEXT15-MODERNIZATION
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
