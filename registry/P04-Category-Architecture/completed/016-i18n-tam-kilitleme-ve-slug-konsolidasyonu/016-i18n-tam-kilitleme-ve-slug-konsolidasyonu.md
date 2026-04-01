@@ -8,9 +8,9 @@ project: "P04-Category-Architecture"
 created_at: "2026-03-26 12:23:10"
 updated_at: "2026-03-26 12:23:10"
 artifacts:
-  brainstorm: "registry/P04-Category-Architecture/backlog/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/brainstorm.md"
-  plan: "registry/P04-Category-Architecture/backlog/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/plan.md"
-  review: "registry/P04-Category-Architecture/backlog/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/review.md"
+  brainstorm: "registry/P04-Category-Architecture/active/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/brainstorm.json"
+  plan: "registry/P04-Category-Architecture/active/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/plan.json"
+  review: "registry/P04-Category-Architecture/active/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/review.json"
 ---
 
 # 🛠️ 016: i18n Tam Kilitleme ve Slug Konsolidasyonu

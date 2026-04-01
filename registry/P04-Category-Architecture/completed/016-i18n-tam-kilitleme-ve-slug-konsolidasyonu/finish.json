@@ -1,0 +1,30 @@
+{
+  "skill": "superpowers-finish",
+  "plan_ref": "registry/P04-Category-Architecture/active/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/plan.json",
+  "date": "2026-04-01T22:50:00+03:00",
+  "verification_commands": [
+    {
+      "command": "pnpm exec tsc -b",
+      "result": "Completed with 0 errors",
+      "passed": true
+    },
+    {
+      "command": "pnpm run build",
+      "result": "Completed with 0 errors",
+      "passed": true
+    },
+    {
+      "command": "pnpm run lint:ci",
+      "result": "Completed with 0 errors",
+      "passed": true
+    }
+  ],
+  "all_passed": true,
+  "changes_summary": [
+    "Fixed Fanlar to Fans slug migration across utils and views",
+    "Compiled code without any TS or Lint errors"
+  ],
+  "follow_ups": [],
+  "pulse_updated": true,
+  "folder_moved": true
+}

@@ -55,8 +55,12 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
 
 ## 6. Onay ve Planlama (No-Plan-No-Code Policy)
 - **Planning-First:** Bir görev `backlog`'dan `active`'e çekildiğinde statüsü otomatik olarak `Planning` olur. 
-- **Zorunlu Plan:** `plan.json` dosyası doldurulmadan ve her adım için `Verify:` maddesi eklenmeden `src/` dizinine bir karakter bile yazılamaz.
-- **Trivial Bypass (İstisna):** Linter hatası veya typo gibi küçük işler için çapraz doğrulamayı atlayan `python registry/engine.py create-task ... --trivial` komutuyla doğrudan `trivial.json` üretilip, bürokrasiye girmeden kod yazılıp commetlenebilir. Kapama işleminde testlerin geçtiği (all_passed: true) kanıtlanmalıdır.
+- **Zorunlu JSON Pipeline Zinciri:** Ajan, "süreci bildiğini sanarak" adım atlayamaz. Yeni V8 Otonom Motorunda planlama HİÇBİR ZAMAN tek adımda düz metin olarak yapılmaz. Aşağıdaki `JSON Schema` zinciri sırasıyla işletilmeli ve her adım `python registry/engine.py validate <dosya>` ile doğrulanmalıdır:
+  1. `brainstorm.json` -> Hedefler, riskler, seçenekler.
+  2. `dispatcher.json` -> Karmaşıklık analizi, uygun AI modeli önerisi ve kota uyarısı.
+  3. `plan.json` -> Pre-checks (Ön doğrulama kanıtları), Adımlar (Değişiklik + Verify komutu), Riskler ve Rollback planı.
+- **Toplu Sunum İlkesi:** Ajan tüm .json dosyalarını üretip hata denetimini (pipeline status) tamamladıktan sonra KESİNLİKLE aralarda onay istemez. Tüm JSON zinciri bittikten sonra, AI IDE arayüzüne özel bir `implementation_plan.md` (Artifact) yaratarak Dispatcher Model Önerisini ve Uygulama Planını TEK BİR VİTRİNDE kullanıcıya sunar ve asıl onayı burada bekler.
+- **Trivial Bypass (İstisna):** Linter hatası veya typo gibi küçük işler için cross-validate'i atlayan `python registry/engine.py create-task ... --trivial` komutuyla doğrudan `trivial.json` üretilip, bürokrasiye girmeden kod yazılıp commetlenebilir. Kapama işleminde testlerin geçtiği (all_passed: true) kanıtlanmalıdır.
 
 ## 7. Registry Sentinel (Koruma Sistemi) - [🚨 GÜVENLİK KİLİDİ]
 > [!CAUTION]

@@ -1,0 +1,14 @@
+{
+  "skill": "execution-report",
+  "date": "2026-04-01T22:50:00+03:00",
+  "task_id": "P04-016",
+  "task_title": "i18n Tam Kilitleme ve Slug Konsolidasyonu",
+  "recommended_model": "Gemini 3.1 Pro (High)",
+  "actual_model": "Gemini 3.1 Pro (High)",
+  "model_match": true,
+  "duration_minutes": 20,
+  "error_count": 0,
+  "retry_count": 0,
+  "outcome": "success",
+  "lessons_learned": "Correctly updated 10+ TSX files to use semantic generic slugs (fans vs fanlar) and matched verify_categories.ts."
+}

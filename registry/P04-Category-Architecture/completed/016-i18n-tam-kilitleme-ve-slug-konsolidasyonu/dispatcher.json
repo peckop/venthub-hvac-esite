@@ -1,0 +1,27 @@
+{
+  "skill": "model-dispatcher",
+  "date": "2026-04-01",
+  "task_summary": "Frontend üzerinde yer alan tüm category linklerinin ayıklanması, veritabanı sluglarının yeni formata taşınması için migration oluşturulması ve next.config içinde 301 yönlendirmelerinin kurulması.",
+  "complexity": "high",
+  "recommended_model": "Gemini 3.1 Pro (High)",
+  "blast_radius": 12,
+  "reasoning": "Görev, hem frontend component'lerini geniş çapta etkilerken hem de veritabanı schema verisini eşzamanlı taşımayı gerektirdiğinden (cross-module bağımlılık), yüksek bağlamlı karmaşık akıl yürütme motoruna ihtiyaç vardır.",
+  "alternatives": [
+    {
+      "model": "Gemini 3.1 Pro (High)",
+      "score": 100,
+      "reason": "Mükemmel context kapasitesi; Migration ve Frontend logic değişimini hatasız bağlayabilecek temel güç."
+    },
+    {
+      "model": "Claude Sonnet 4.6 (Thinking)",
+      "score": 90,
+      "reason": "Akıl yürütme olarak zirvededir ancak sıfırdan sistem yazımı olmadığı için pahalı bütçesiyle overkill olur."
+    },
+    {
+      "model": "Gemini 3 Flash",
+      "score": 0,
+      "reason": "Bağlam yeteneği yetersizdir. Kodu paramparça etme veya eksik bırakma riski taşır, asla kullanılmamalıdır."
+    }
+  ],
+  "quota_warning": "Bu cerrahi bir sistem revizyonudur. Asla Flash gibi hızlı/ucuz modeller kullanmayınız. Gemini 3.1 Pro (High) devrededir."
+}
