@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "venthub/brainstorm",
+  "title": "Brainstorm Artifact",
+  "description": "Beyin fırtınası çıktısı. Ajan bu şemayı okuduğunda hedefi, kısıtları, riskleri ve seçenekleri nasıl yapılandıracağını tam olarak bilmelidir. Araştırma kanıtları (traces) zorunludur — ajan dosya sistemini gerçekten incelediğini ispatlamak zorundadır.",
+  "type": "object",
+  "required": ["goal", "constraints", "risks", "options", "recommendation", "traces"],
+  "properties": {
+    "skill": {
+      "type": "string",
+      "const": "superpowers-brainstorm"
+    },
+    "model": {
+      "type": "string",
+      "description": "Bu brainstorm'u üreten AI modelinin adı (örn. 'Claude Opus 4.6', 'Gemini 3.1 Flash')"
+    },
+    "date": {
+      "type": "string",
+      "description": "ISO 8601 tarih (YYYY-MM-DD)"
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 20,
+      "description": "Tek paragraf hedef tanımı. 'Ne yapılacak?' sorusuna net bir cevap. Belirsiz veya genel ifadeler kabul edilmez."
+    },
+    "constraints": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Teknik kısıtlar: Teknoloji stack'i, uyumluluk gereksinimleri, performans limitleri, 'kesinlikle değiştirilmemesi gereken' dosyalar vb. Bu alan işin sınırlarını çizer."
+    },
+    "known_context": {
+      "type": "string",
+      "description": "Mevcut durumun kısa özeti: Hangi dosyalar/bileşenler ilgili? Şu anki davranış ne? Bu bağlam, ajan tarafından view_file/grep_search ile doğrulanmış olmalı."
+    },
+    "risks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["severity", "description"],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "description": "low = cosmetic risk, medium = potential regression, high = data/security concern, critical = system-breaking"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "description": "Risk açıklaması: Ne olabilir ve ne kadar kötü?"
+          }
+        }
+      },
+      "description": "Risk analizi: Her risk için severity ve açıklama zorunlu. Severity sıralaması: low < medium < high < critical. 'critical' risk varsa kullanıcı uyarılmalıdır."
+    },
+    "options": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "selected"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Seçenek kimliği (A, B, C gibi)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Seçenek başlığı (kısa ve tanımlayıcı)"
+          },
+          "selected": {
+            "type": "boolean",
+            "description": "Sadece 1 seçenek true olmalı — recommendation ile tutarlı olmalı"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Bu seçeneğin neden seçildiği veya neden elediği"
+          }
+        }
+      },
+      "description": "En az 2 alternatif çözüm yolu. Her biri artı/eksi analizi ile sunulmalı. Scope creep'e yol açacak seçenekler ayrı görev olarak Linear'a önerilmeli."
+    },
+    "recommendation": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Seçilen opsiyon ve gerekçesi. options dizisindeki selected=true olan öğeyle tutarlı olmalı."
+    },
+    "traces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "required": ["tool", "target", "finding"],
+            "properties": {
+              "tool": { "type": "string", "enum": ["view_file", "grep_search", "list_dir"] },
+              "target": { "type": "string" },
+              "finding": { "type": "string", "minLength": 10 }
+            }
+          }
+        ]
+      },
+      "description": "KANITLAR DİZİSİ (Proof of Work): Bu brainstorm sırasında çalıştırılan araçlar. Örn: 'view_file: src/models/root.py', 'grep_search: technical_function in src/'. Bu dizi boş olamaz — ajan projeyi gerçekten incelediğini ispatlamak zorundadır."
+    }
+  },
+  "additionalProperties": false
+}

@@ -2,17 +2,18 @@
 
 Bu döküman, VentHub projesindeki iş akışının, disiplinin ve teknik hedeflerin "Kalıcı Hafızası"dır. 
 
-## 1. Registry Disiplini ve Otonom İşleyiş (V7 + Superpowers)
+## 1. Registry Disiplini ve Otonom İşleyiş (V8 + JSON Schema + Superpowers)
 Bir AI asistanı göreve başladığında şu otonom akışı izler:
+0. **Hafıza Kontrolü (Recall — her oturumun ilk komutu):** `python registry/engine.py recall` — duraklatılmış görev varsa önce onu bitir.
 1. **Dashboard Tarama:** `registry/PULSE.md` üzerinden genel durumu anlar.
 2. **Görev Seçimi:** `registry/PXX-Project/active/` altındaki ilgili klasöre girer.
-3. **Superpowers Döngüsü (Zorunlu):**
-   - `/superpowers-brainstorm` → `brainstorm.md`'ya kaydet (Hedef, Risk, Kısıt)
-   - `/superpowers-write-plan` → `plan.md`'ya kaydet (Adımlar, Doğrulama)
+3. **Superpowers Döngüsü (Zorunlu — JSON Tabanlı):**
+   - `/superpowers-brainstorm` → `brainstorm.json` oluştur, doğrula: `python registry/engine.py validate registry/PXX/YYY/brainstorm.json`
+   - `/superpowers-write-plan` → `plan.json` oluştur, çapraz kontrol: `python registry/engine.py cross-validate registry/PXX/YYY`
    - **Implement:** Kodu yaz. Karmaşık değişimlerde `superpowers-tdd` skill'ini kullan.
-   - `/superpowers-review` → `review.md`'ya kaydet (Blocker/Major/Minor)
-   - `/bitir` → Dörtlü Mühür (Lint + TSC + Build) + Registry Sync + PULSE güncelle
-4. **Gatekeeper:** `manage_registry.py activate` komutu; `brainstorm.md` ve `plan.md` boşsa görevi aktive etmez.
+   - `/superpowers-review` → `review.json` oluştur, doğrula: `python registry/engine.py validate registry/PXX/YYY/review.json`
+   - `/bitir` → Dörtlü Mühür (Lint + TSC + Build) + `python registry/engine.py finalize-task registry/PXX/YYY`
+4. **Gatekeeper (V8 Engine):** Pipeline durumu için `python registry/engine.py pipeline status registry/PXX/YYY` komutu kullanılır. Eksik veya geçersiz artifact varsa süreç ilerleyemez.
 
 ## 2. Nihai Hedef: "Visual Page Builder"
 Projenin kalbi, kategori ve ürün sayfalarını kod bağımlılığından kurtarmaktır. Her yeni görev (Otorite kurma, teknik zeka vb.), bu görsel oluşturucunun bir parçasıdır.

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "venthub/dispatcher",
+  "title": "Model Dispatcher Artifact",
+  "description": "Model sevk kararı. Görevin karmaşıklığını ölçerek uygun AI modelini öneren artifact. Bu şema sayesinde model seçimi artık modelin insafına değil, yapısal doğrulamaya dayanır. Ajan bu şemayı okuduğunda hangi model kademesinın hangi karmaşıklıkla eşleştiğini bilmelidir.",
+  "type": "object",
+  "required": ["task_summary", "complexity", "recommended_model", "blast_radius", "reasoning", "alternatives"],
+  "properties": {
+    "skill": {
+      "type": "string",
+      "const": "model-dispatcher"
+    },
+    "date": {
+      "type": "string",
+      "description": "ISO 8601 tarih (YYYY-MM-DD)"
+    },
+    "task_summary": {
+      "type": "string",
+      "minLength": 15,
+      "description": "Görevin kısa özeti. 'Ne yapılacak?' sorusuna 1-2 cümlelik net cevap."
+    },
+    "complexity": {
+      "type": "string",
+      "enum": ["trivial", "low", "medium", "high", "expert"],
+      "description": "Görev karmaşıklığı. trivial = Lint/Typo (1-2 dosya, <5dk). low = İzole rutin kod (1-2 dosya, <15dk). medium = 3-5 dosya arası state geçişi (<30dk). high = Sıfırdan şema, 5+ dosya (<60dk). expert = Tüm projeye etki eden paradigma değişikliği (<2 saat)."
+    },
+    "recommended_model": {
+      "type": "string",
+      "enum": [
+        "Gemini 3 Flash",
+        "Gemini 3.1 Pro (Low)",
+        "Gemini 3.1 Pro (High)",
+        "Claude Sonnet 4.6 (Thinking)",
+        "Claude Opus 4.6 (Thinking)",
+        "GPT-OSS 120B (Medium)"
+      ],
+      "description": "Önerilen model. trivial → Flash, low → Pro Low, medium → Pro High, high → Sonnet, expert → Opus. DİKKAT: Ajan modeli otomatik değiştiremez! Kullanıcıya 'Lütfen modeli [X] olarak değiştirin' uyarısı verilmelidir."
+    },
+    "blast_radius": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Etkilenen dosya sayısı (tahmini). Bu sayı complexity kademesiyle tutarlı olmalı: trivial=1-2, low=1-3, medium=3-8, high=5-15, expert=15+."
+    },
+    "reasoning": {
+      "type": "string",
+      "minLength": 20,
+      "description": "Model seçim gerekçesi. 'Bu model daha iyi' gibi belirsiz ifadeler YASAKTIR. Spesifik teknik neden belirtilmeli (örn: 'Cross-module import zinciri analizi gerektirdiği için Pro High lazım')."
+    },
+    "alternatives": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["model", "score", "reason"],
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": [
+              "Gemini 3 Flash",
+              "Gemini 3.1 Pro (Low)",
+              "Gemini 3.1 Pro (High)",
+              "Claude Sonnet 4.6 (Thinking)",
+              "Claude Opus 4.6 (Thinking)",
+              "GPT-OSS 120B (Medium)"
+            ],
+            "description": "Alternatif model adı"
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Bu görev için uygunluk puanı (0-100). 100 = mükemmel uyum, 0 = kesinlikle uygunsuz."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "description": "Bu modelin neden bu puanı aldığı. Güçlü ve zayıf yönleri spesifik olarak belirtilmeli."
+          }
+        }
+      },
+      "description": "En az 2 alternatif model ve uygunluk puanları. Birincil öneriye ek olarak karşılaştırma yapılmalı."
+    },
+    "quota_warning": {
+      "type": "string",
+      "description": "Kota uyarısı (opsiyonel). Örn: 'Bu sadece amelelik görevidir, pahalı modelleri harcamayın' veya 'Bu görev için Opus gereklidir, haftalık kotanızın %15ini tüketebilir'."
+    }
+  },
+  "additionalProperties": false
+}

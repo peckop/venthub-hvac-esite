@@ -55,7 +55,8 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
 
 ## 6. Onay ve Planlama (No-Plan-No-Code Policy)
 - **Planning-First:** Bir görev `backlog`'dan `active`'e çekildiğinde statüsü otomatik olarak `Planning` olur. 
-- **Zorunlu Plan:** `plan.md` dosyası `superpowers-write-plan` skill'ini ile doldurulmadan ve her adım için `Verify:` maddesi eklenmeden `src/` dizinine bir karakter bile yazılamaz.
+- **Zorunlu Plan:** `plan.json` dosyası doldurulmadan ve her adım için `Verify:` maddesi eklenmeden `src/` dizinine bir karakter bile yazılamaz.
+- **Trivial Bypass (İstisna):** Linter hatası veya typo gibi küçük işler için çapraz doğrulamayı atlayan `python registry/engine.py create-task ... --trivial` komutuyla doğrudan `trivial.json` üretilip, bürokrasiye girmeden kod yazılıp commetlenebilir. Kapama işleminde testlerin geçtiği (all_passed: true) kanıtlanmalıdır.
 
 ## 7. Registry Sentinel (Koruma Sistemi) - [🚨 GÜVENLİK KİLİDİ]
 > [!CAUTION]

@@ -14,8 +14,9 @@ This file defines the strict architectural rules, boundaries, and best practices
 
 ## 2. 🚨 HARD RULES (KIRILMAZ KURALLAR) - PLANI OLMAYANIN KODU OLMAZ
 1. **Registry-First Disiplini:** Herhangi bir koda (src/) dokunmadan önce MUTLAKA `registry/` klasöründeki ilgili `.md` dosyasını `view_file` ile oku. Okumadan başlanan her iş "kör aksiyon" sayılır.
-2. **NO-PLAN-NO-CODE (Plansız Kod Yazma Yasağı):** Eğer `plan.md` dosyası boşsa, placeholder (`...`) içeriyorsa veya her adımın bir `Verify:` maddesi yoksa, KOD YAZILAMAZ. `Planning` statüsündeyken `src/` içinde dosya üretmek veya değiştirmek "Mühendislik Suçu"dur.
-3. **Semantic Integrity Guard:** Bir görev dosyasında `## 🎯 Hedef` ve `## ✅ Alt Görevler` kısımları somut verilerle doldurulmadan `status` ASLA `Executing` veya `Completed` yapılamaz.
+2. **NO-PLAN-NO-CODE (Plansız Kod Yazma Yasağı):** Eğer `plan.json` dosyası boşsa, placeholder (`...`) içeriyorsa veya her adımın bir `Verify:` maddesi yoksa, KOD YAZILAMAZ. `Planning` statüsündeyken `src/` içinde dosya üretmek veya değiştirmek "Mühendislik Suçu"dur.
+   - **⚠️ İSTİSNA (Trivial Fast-Track):** Sadece linter hatası, typo veya çok ufak bir refactor yapılıyorsa `python registry/engine.py create-task ... --trivial` kullanılarak "NO-PLAN-NO-CODE" kuralı askıya alınıp tek adımda json üretilerek bypass geçilebilir.
+3. **Semantic Integrity Guard:** Bir görev dosyasında JSON alanları somut verilerle doldurulmadan `status` ASLA `Executing` veya `Completed` yapılamaz.
 4. **Atomic Registry Sync:** Kodda yaptığın her başarılı değişiklikten sonra `registry/` dosyasını veya `PULSE.md`yi güncelle.
 5. **No-Hardcore Strings:** Kullanıcıya dönük hiçbir metni TSX içine gömme. `useI18n()` kullan.
 
