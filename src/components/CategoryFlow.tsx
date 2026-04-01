@@ -11,25 +11,25 @@ import { DomainCategory } from '../lib/type-converters'
 // Kategori ikonları - slug bazlı eşleme
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
     'hava-perdesi': Wind,
-    'fanlar': Fan,
-    'nem-alma-cihazlari': Droplet,
-    'isi-geri-kazanim-cihazlari': Thermometer,
-    'hava-temizleyiciler': AirVent,
-    'hiz-kontrolu-cihazlari': Settings,
-    'flexible-hava-kanallari': Package,
-    'aksesuarlar': Wrench,
+    'fans': Fan,
+    'dehumidifiers': Droplet,
+    'heat-recovery-units': Thermometer,
+    'air-purifiers': AirVent,
+    'speed-controllers': Settings,
+    'flexible-air-ducts': Package,
+    'accessories': Wrench,
 }
 
 // Kategori renkleri - premium görünüm
 const CATEGORY_COLORS: Record<string, string> = {
     'hava-perdesi': 'from-blue-500 to-blue-700',
-    'fanlar': 'from-emerald-500 to-emerald-700',
-    'nem-alma-cihazlari': 'from-cyan-500 to-cyan-700',
-    'isi-geri-kazanim-cihazlari': 'from-orange-500 to-orange-700',
-    'hava-temizleyiciler': 'from-purple-500 to-purple-700',
-    'hiz-kontrolu-cihazlari': 'from-slate-500 to-slate-700',
-    'flexible-hava-kanallari': 'from-teal-500 to-teal-700',
-    'aksesuarlar': 'from-gray-500 to-gray-700',
+    'fans': 'from-emerald-500 to-emerald-700',
+    'dehumidifiers': 'from-cyan-500 to-cyan-700',
+    'heat-recovery-units': 'from-orange-500 to-orange-700',
+    'air-purifiers': 'from-purple-500 to-purple-700',
+    'speed-controllers': 'from-slate-500 to-slate-700',
+    'flexible-air-ducts': 'from-teal-500 to-teal-700',
+    'accessories': 'from-gray-500 to-gray-700',
 }
 
 function CategoryCard({ category }: { category: DomainCategory }) {

@@ -81,11 +81,11 @@ const BentoGrid: React.FC = () => {
   const { t } = useI18n()
   
   const items: BentoItem[] = [
-    { title: t('homeGallery.items.parking.title'), subtitle: t('homeGallery.items.parking.subtitle'), image: '/images/bento/parking.jpg', video: '/videos/parking.mp4', topic: 'jet-fan', hrefProducts: '/category/industrial-ventilation/otopark-jet-fanlari' },
+    { title: t('homeGallery.items.parking.title'), subtitle: t('homeGallery.items.parking.subtitle'), image: '/images/bento/parking.jpg', video: '/videos/parking.mp4', topic: 'jet-fan', hrefProducts: '/category/industrial-ventilation/jet-fans' },
     { title: t('homeGallery.items.airCurtain.title'), subtitle: t('homeGallery.items.airCurtain.subtitle'), image: '/images/bento/air-curtain.jpg', video: '/videos/air-curtain.mp4', topic: 'hava-perdesi', hrefProducts: '/category/commercial-ventilation/hava-perdeleri' },
     { title: t('homeGallery.items.heatRecovery.title'), subtitle: t('homeGallery.items.heatRecovery.subtitle'), image: '/images/bento/hrv.jpg', video: '/videos/hrv.mp4', topic: 'hrv', hrefProducts: '/category/heat-recovery-vmc' },
-    { title: t('homeGallery.items.industrialKitchen.title'), subtitle: t('homeGallery.items.industrialKitchen.subtitle'), image: '/images/bento/kitchen.jpg', video: '/videos/kitchen.mp4', topic: null, hrefProducts: '/category/commercial-ventilation/kanal-tipi-fanlar' },
-    { title: t('homeGallery.items.smokeExhaust.title'), subtitle: t('homeGallery.items.smokeExhaust.subtitle'), image: '/images/bento/smoke.jpg', video: '/videos/smoke.mp4', topic: null, hrefProducts: '/category/industrial-ventilation/duman-egzoz-fanlari' },
+    { title: t('homeGallery.items.industrialKitchen.title'), subtitle: t('homeGallery.items.industrialKitchen.subtitle'), image: '/images/bento/kitchen.jpg', video: '/videos/kitchen.mp4', topic: null, hrefProducts: '/category/commercial-ventilation/duct-type-fans' },
+    { title: t('homeGallery.items.smokeExhaust.title'), subtitle: t('homeGallery.items.smokeExhaust.subtitle'), image: '/images/bento/smoke.jpg', video: '/videos/smoke.mp4', topic: null, hrefProducts: '/category/industrial-ventilation/smoke-exhaust-fans' },
     { title: t('homeGallery.items.hvac.title'), subtitle: t('homeGallery.items.hvac.subtitle'), image: '/images/bento/hvac.jpg', video: '/videos/hvac.mp4', topic: null, hrefProducts: '/category/accessories-components' },
   ]
 

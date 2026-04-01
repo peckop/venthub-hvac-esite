@@ -103,7 +103,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
                 const isHeated = s.includes('isitici') || s.includes('elektrikli')
                 const isAmbient = s.includes('ortam-havali') || s.includes('naturel')
                 extraProps.isHeated = isHeated
-                extraProps.showMixed = (!isHeated && !isAmbient) || s === 'hava-perdeleri'
+                extraProps.showMixed = (!isHeated && !isAmbient) || s === 'air-curtains'
             }
 
             return <ModelComponent
@@ -130,7 +130,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
             const isHeated = s.includes('isitici') || s.includes('elektrikli')
             const isAmbient = s.includes('ortam-havali') || s.includes('naturel')
             // Tip belirtilmemişse veya ana kategori ise ana kategorideki gibi iki tipi de simüle et
-            const showMixed = (!isHeated && !isAmbient) || s === 'hava-perdeleri'
+            const showMixed = (!isHeated && !isAmbient) || s === 'air-curtains'
 
             return <AirCurtainModel isHeated={isHeated} showMixed={showMixed} />
         }
