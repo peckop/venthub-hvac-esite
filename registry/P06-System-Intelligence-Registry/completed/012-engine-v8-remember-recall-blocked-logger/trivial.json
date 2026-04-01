@@ -1,0 +1,25 @@
+{
+  "skill": "superpowers-trivial",
+  "task_id": "P06-012",
+  "task_title": "Engine V8: remember / recall / otomatik BLOCKED logger",
+  "description": "engine.py CLI'ya remember, recall ve otomatik BLOCKED loglama eklendi. Hayalet Is senaryosunu elimine eder: finalize-task blokladiginda motor otomatik shared_state.json'a yazar, ajan unutsa bile kayit olusur.",
+  "files_modified": [
+    "registry/engine.py",
+    ".agent/workflows/bitir.md",
+    ".agent/workflows/superpowers-execute-plan.md",
+    "registry/WORKFLOW_STRATEGY.md"
+  ],
+  "verification_commands": [
+    {
+      "command": "python registry/engine.py remember \"P06-012 test: remember/recall sistemi aktif edildi\"",
+      "result": "Hafizaya kaydedildi [NOTE]",
+      "passed": true
+    },
+    {
+      "command": "python registry/engine.py recall",
+      "result": "Duraklatilmis gorev yok. Son notlar listelendi.",
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

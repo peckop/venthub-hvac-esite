@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "venthub/finish",
+  "title": "Finish Artifact",
+  "description": "İş kapatma artifact'ı. Sentinel Guard doğrulama sonuçlarını, değişiklik özetini ve takip işlerini yapısal olarak zorlar. Bu şema sayesinde iş kapatma kalitesi standardize olur ve hiçbir kontrol adımı atlanamaz.",
+  "type": "object",
+  "required": ["plan_ref", "verification_commands", "all_passed", "changes_summary", "follow_ups"],
+  "properties": {
+    "skill": {
+      "type": "string",
+      "const": "superpowers-finish"
+    },
+    "model": {
+      "type": "string",
+      "description": "Bu finish'i üreten AI modelinin adı"
+    },
+    "date": {
+      "type": "string",
+      "description": "ISO 8601 tarih (YYYY-MM-DD)"
+    },
+    "plan_ref": {
+      "type": "string",
+      "description": "İlgili plan.json dosyasının görece yolu. Cross-validation için kullanılır — finish'te claim edilen adımların planda gerçekten tanımlı olduğu kontrol edilir."
+    },
+    "verification_commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["command", "result", "passed"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "minLength": 3,
+            "description": "Çalıştırılan doğrulama komutu (örn: 'pytest tests/ -v', 'ruff check src/')"
+          },
+          "result": {
+            "type": "string",
+            "description": "Komut çıktısının özeti (örn: '40 passed, coverage 86.89%')"
+          },
+          "passed": {
+            "type": "boolean",
+            "description": "Komut başarılı mı? true = geçti, false = başarısız"
+          }
+        }
+      },
+      "description": "Çalıştırılan doğrulama komutları ve sonuçları. En az 1 komut zorunlu (genellikle lint + test)."
+    },
+    "all_passed": {
+      "type": "boolean",
+      "description": "Tüm doğrulama komutları başarılı mı? false ise commit yapılmamalı."
+    },
+    "changes_summary": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Yapılan değişikliklerin özet listesi. Her öğe bir değişikliği tanımlar (örn: 'src/engine/base.py — BaseViolation oluşturuldu')."
+    },
+    "follow_ups": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Takip işleri listesi. Boş dizi olabilir — takip işi yoksa [] yaz."
+    },
+    "rollback_plan": {
+      "type": "string",
+      "description": "Geri dönüş planı (opsiyonel). İşler ters giderse nasıl rollback yapılır."
+    },
+    "pulse_updated": {
+      "type": "boolean",
+      "description": "PULSE.md tablosunun engine tarafından güncellendiğini belirtir."
+    },
+    "folder_moved": {
+      "type": "boolean",
+      "description": "Görev klasörünün git mv ile completed dizinine alındığını belirtir."
+    },
+    "linear_sync": {
+      "type": "object",
+      "properties": {
+        "issue_id": {
+          "type": "string",
+          "description": "Linear issue ID (örn: REC-25)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Done", "In Review", "Skipped"],
+          "description": "Linear issue durumu. Done = iş tamamlandı, In Review = review bekleniyor, Skipped = Linear issue yok."
+        }
+      },
+      "description": "Linear senkronizasyon durumu (opsiyonel)."
+    }
+  },
+  "additionalProperties": false
+}

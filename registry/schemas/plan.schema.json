@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "venthub/plan",
+  "title": "Implementation Plan Artifact",
+  "description": "Uygulama planı çıktısı. Bu şema hem YAPISAL doğrulama hem de MODEL SEVKİ (dispatcher) ve ONAY MEKANİZMASI sağlar. Ajan bu şemayı okuduğunda, görevin karmaşıklığını nasıl ölçeceğini, hangi modeli önereceğini ve kullanıcıdan onay isteyip istemeyeceğini bilmelidir.",
+  "type": "object",
+  "required": ["objective", "assumptions", "pre_checks", "steps", "risks", "rollback", "brainstorm_ref", "execution_complexity", "recommended_model", "requires_human_approval"],
+  "properties": {
+    "skill": {
+      "type": "string",
+      "const": "superpowers-write-plan"
+    },
+    "model": {
+      "type": "string",
+      "description": "Bu planı üreten AI modelinin adı"
+    },
+    "date": {
+      "type": "string",
+      "description": "ISO 8601 tarih (YYYY-MM-DD)"
+    },
+    "brainstorm_ref": {
+      "type": "string",
+      "description": "brainstorm.json dosyasının görece yolu. Plan mutlaka onaylanmış bir brainstorm'a dayanmalı."
+    },
+    "execution_complexity": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH"],
+      "description": "İşin karmaşıklık seviyesi. LOW = sadece yeni dosya ekleme veya küçük düzeltme (1-3 dosya, mevcut pattern takibi). MEDIUM = mevcut dosyaları değiştirme, yeni pattern tanımlama (3-8 dosya). HIGH = mimari değişiklik, DB migration, çoklu modül etkileşimi (8+ dosya veya breaking change)."
+    },
+    "recommended_model": {
+      "type": "string",
+      "description": "Bu planın icrası için önerilen AI modeli. LOW → 'Gemini Flash' veya 'Claude Haiku'. MEDIUM → 'Gemini Pro' veya 'Claude Sonnet'. HIGH → 'Claude Opus' veya 'Gemini Pro (High)'. DİKKAT: Ajan modeli otomatik değiştiremez! implementation_plan.md'de kullanıcıya 'Lütfen modeli [X] olarak değiştirin' uyarısı verilmelidir."
+    },
+    "requires_human_approval": {
+      "type": "boolean",
+      "description": "true = İş DB migration, güvenlik, mimari kırılma veya geri dönülemez değişiklik içeriyor → kullanıcı onayı zorunlu. false = İş basit ekleme/düzeltme, yan etkisi yok → ajan otonom ilerleyebilir (ancak kullanıcı modeli değiştirmeli)."
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 20,
+      "description": "Ne yapılacak ve neden. brainstorm.json'daki goal ve recommendation ile tutarlı olmalı."
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Varsayımlar: Plan bu koşulların doğru olduğunu varsayıyor. Eğer bir varsayım çökmüşse plan geçersizdir."
+    },
+    "pre_checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["claim", "verified", "source"],
+        "properties": {
+          "claim": { "type": "string", "minLength": 10 },
+          "verified": { "type": "boolean" },
+          "source": { "type": "string" }
+        }
+      },
+      "description": "GÖZLEM KANITI DİZİSİ: Plan yazılmadan ÖNCE mevcut kod tabanı incelenmiş mi? Her iddia view_file/grep_search ile doğrulanmalı. verified=false olan öğe varsa plan REDDEDILIR."
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "files", "changes", "verify"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Sıra numarası (1'den başlar, ardışık)"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "description": "Adım başlığı — ne yapılacağını 1 cümlede özetler"
+          },
+          "files": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Bu adımda oluşturulacak veya değiştirilecek dosya yolları (proje köküne göre)"
+          },
+          "changes": {
+            "type": "string",
+            "minLength": 10,
+            "description": "Tam olarak ne değişecek. 'Dosyayı güncelle' gibi belirsiz ifadeler YASAKTIR. Spesifik olmalı."
+          },
+          "verify": {
+            "type": "string",
+            "minLength": 5,
+            "description": "Doğrulama komutu — bu adım başarılı mı? Çalıştırılabilir komut olmalı (pytest, ruff, python -c gibi)."
+          }
+        }
+      },
+      "description": "Uygulama adımları. Her adım 2-10 dakikalık, küçük ve atomik olmalı. Her adım bağımsız doğrulanabilir."
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["risk", "severity", "mitigation"],
+        "properties": {
+          "risk": {
+            "type": "string",
+            "description": "Risk açıklaması"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "description": "low = ihmal edilebilir, medium = dikkat gerektirir, high = plan gözden geçirilmeli, critical = alternatif yaklaşım gerekli"
+          },
+          "mitigation": {
+            "type": "string",
+            "description": "Riski azaltma yöntemi. 'Dikkatli olacağız' gibi belirsiz ifadeler YASAKTIR."
+          }
+        }
+      },
+      "description": "Risk analizi. Her risk için spesifik azaltma stratejisi zorunlu."
+    },
+    "rollback": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Geri dönüş planı. İşler ters giderse sistemi önceki durumuna nasıl döndüreceğimiz."
+    }
+  },
+  "additionalProperties": false
+}
