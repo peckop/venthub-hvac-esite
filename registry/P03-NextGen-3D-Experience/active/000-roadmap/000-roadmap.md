@@ -2,7 +2,12 @@
 id: "000"
 title: "Roadmap"
 status: "Active"
+artifacts:
+  brainstorm: "registry/P03-NextGen-3D-Experience/active/000-roadmap/brainstorm.md"
+  plan: "registry/P03-NextGen-3D-Experience/active/000-roadmap/plan.md"
+  review: "registry/P03-NextGen-3D-Experience/active/000-roadmap/review.md"
 ---
+
 
 # Strategy: P03-NEXTGEN-3D-EXPERIENCE
 

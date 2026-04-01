@@ -2,7 +2,12 @@
 id: "000"
 title: "Roadmap"
 status: "Active"
+artifacts:
+  brainstorm: "registry/P01-Visual-Page-Builder/active/000-roadmap/brainstorm.md"
+  plan: "registry/P01-Visual-Page-Builder/active/000-roadmap/plan.md"
+  review: "registry/P01-Visual-Page-Builder/active/000-roadmap/review.md"
 ---
+
 
 # P01 - Visual Page Builder (Headless CMS)
 
