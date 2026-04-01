@@ -1,4 +1,3 @@
-import { CATEGORY_REGISTRY, getCategoryUrl } from '../config/categoryRegistry'
 
 /**
  * Helper function to generate application filter URL for products page
@@ -25,9 +24,9 @@ export const TOPIC_TO_APP_KEY: Record<string, string> = {
  * Maps topics directly to the definitive Category Registry paths
  */
 export const TOPIC_TO_CATEGORY_URL: Record<string, string> = {
-    'hava-perdesi': getCategoryUrl('COMMERCIAL', CATEGORY_REGISTRY.COMMERCIAL.subs.AIR_CURTAIN),
-    'jet-fan': getCategoryUrl('INDUSTRIAL', CATEGORY_REGISTRY.INDUSTRIAL.subs.JET),
-    'hrv': getCategoryUrl('VMC')
+    'hava-perdesi': '/products/commercial-ventilation/hava-perdeleri',
+    'jet-fan': '/products/industrial-ventilation/jet-fanlar',
+    'hrv': '/products/heat-recovery-vmc'
 }
 
 /**

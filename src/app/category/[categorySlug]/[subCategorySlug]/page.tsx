@@ -1,6 +1,9 @@
 import React, { Suspense } from 'react'
 import PageComponent from '../../../../views/CategoryPage'
-import { supabase } from '../../../../lib/supabase'
+import { supabase, getProductsEnriched } from '../../../../lib/supabase'
+import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
+import type { DbCategory } from '../../../../types/db-rows'
+import type { DomainProduct } from '../../../../lib/type-converters'
 
 
 export async function generateStaticParams() {
@@ -36,16 +39,37 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function Page({ params }: { params: Promise<{ categorySlug: string, subCategorySlug: string }> }) {
-  await params // Ensure params are awaited even if not directly used here yet
+async function getCategoryData(slug: string) {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('slug', slug)
+    .single()
   
+  if (error || !data) return null
+  return mapDatabaseCategoryToDomain(data as unknown as DbCategory)
+}
+
+export default async function Page({ params }: { params: Promise<{ categorySlug: string, subCategorySlug: string }> }) {
+  const { subCategorySlug } = await params
+  
+  const category = await getCategoryData(subCategorySlug)
+  
+  let products: DomainProduct[] = []
+  if (category) {
+    products = await getProductsEnriched({
+      categoryIds: [category.id],
+      limit: 100
+    })
+  }
+
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy" />
       </div>
     }>
-      <PageComponent />
+      <PageComponent initialCategory={category} initialProducts={products} />
     </Suspense>
   )
 }

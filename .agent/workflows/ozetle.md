@@ -2,6 +2,9 @@
 description: Son değişiklikleri analiz eder ve GitHub formatında commit mesajı hazırlar.
 ---
 
+> **Önerilen Model:** Gemini 3 Flash *(Kategori: Trivial)*
+
+
 Görevin: Yapılan son kod değişikliklerini (diff) analiz et.
 
 Format:

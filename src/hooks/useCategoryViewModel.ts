@@ -49,37 +49,18 @@ export function useCategoryViewModel() {
     const marketingTitle = category.marketing_title || displayName
 
     // 3. DISPLAY MODE RESOLVER (TOTAL UNIFIED SHELL)
+    // Priority: 1. DB Row (`display_mode`), 2. Metadata fallback (legacy), 3. Default ('series')
+    const typedCategory = category as typeof category & { display_mode?: string | null }
     const meta = (category.metadata as Record<string, unknown>) || {}
-    let displayMode: CategoryViewModel['displayMode'] = 'series' // VARSAYILAN ARTIK ESKİ GRID DEĞİL, YENİ BEYAZ TASARIM (SERIES)
     
-    if (meta.display_mode) {
-      displayMode = meta.display_mode as CategoryViewModel['displayMode']
-    } else {
-      // Global families that use the "Showcase" template (Dark Cinematic)
-      const showcaseSlugs = [
-        'residential-ventilation', 'industrial-ventilation', 
-        'commercial-ventilation', 'heat-recovery-vmc', 'air-treatment',
-        'hygiene-sanitizer', 'summer-ventilation', 'air-conditioning',
-        'electric-heating', 'industrial-ceiling-fans', 'accessories-components',
-        'smart-home'
-      ]
-      
-      // Specialized product groups that use the "Landing" template (Rich Content)
-      const landingSlugs = [
-        'hava-perdeleri', 
-        'sessiz-kanal-tipi-fanlar', 
-        'nem-alma-cihazlari'
-      ]
-      
-      if (showcaseSlugs.includes(category.slug)) {
-        displayMode = 'showcase' 
-      } else if (landingSlugs.includes(category.slug)) {
-        displayMode = 'landing' 
-      } else {
-        // Geri kalan TÜM alt kategoriler (Cam Tipi, Banyo, Radyal vb.) 
-        // eski sol menülü 'grid' yerine, yeni nesil 'series' (Beyaz Şablon) kullanacak.
-        displayMode = 'series'
-      }
+    let displayMode: CategoryViewModel['displayMode'] = 'series' // VARSAYILAN ARTIK ESKİ GRID DEĞİL, YENİ BEYAZ TASARIM (SERIES)
+
+    const rawDisplayMode = typedCategory.display_mode || meta.display_mode
+    
+    if (rawDisplayMode === 'showcase' || rawDisplayMode === 'landing') {
+      displayMode = rawDisplayMode
+    } else if (rawDisplayMode === 'grid') { // Legacy fallback
+      displayMode = 'series'
     }
 
     return {

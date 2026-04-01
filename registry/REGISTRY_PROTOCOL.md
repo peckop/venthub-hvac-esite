@@ -22,17 +22,25 @@ Bir ajan, "Sıfır Hata" hedefine koşarken aşağıdaki mimari etik kuralların
 4. **Tip Güvenliği Önceliği:** `any` dökümü `unknown` yapılarak geçiştirilemez. Gerçek Interface/Type kullanılmalıdır.
 5. **Runtime Sağlığı:** Browser konsolundaki uyarılar ve Three.js deprecations hataları da "temizlenmesi gereken hata" kabul edilir.
 
-## 4. 🛠️ Komut Seti (Registry CLI)
+## 4. 🛠️ Komut Seti (Registry CLI v7 Sentinel & Navigator)
 - `python registry/manage_registry.py normalize`: Otonom senkronizasyonu tetikler.
 - `python registry/manage_registry.py search <ID>`: Görevi tüm projelerde arar.
-- `python registry/manage_registry.py recall`: Ajanlar arası paylaşımlı hafızayı geri çağırır.
+- `python registry/manage_registry.py create-task P01 001 --query "Görev Adı"`: Yeni görev taslağı oluşturur (Otonom planlamanın ilk adımı).
+- `python registry/manage_registry.py activate P01 001`: Görevi yürütmeye hazır hale getirir (Sentinel Gate: Plan Yoksa Reddedilir).
+- `python registry/manage_registry.py progress P01 001 50`: Görev ilerlemesini %50 olarak kaydeder.
+- `python registry/manage_registry.py complete P01 001`: Görevi şifreler, mühürler ve arşivler.
+- `python registry/manage_registry.py dashboard` (veya `list`): Açık görev menüsünü gösterir.
+- `python registry/manage_registry.py next`: Açıkta bekleyen en acil/sıradaki görevi ajana sunar.
 
-## 5. Görev Yaşam Döngüsü (The 6-Step Workflow + Dispatcher)
-0. **[MISSION CONTROL]:** Ajan, herhangi bir görevi devraldığında veya yeni bir görev açacağında `.agent/skills/model-dispatcher` kurallarını çalıştırıp KOTA ONAYI ister.
-1. **[ZORUNLU DOĞRULAMA]:** Ajan, görevi devraldığında "Dörtlü Mühür" kontrolü yapar.
-2. **Brainstorm:** `/superpowers-brainstorm` ile hedef ve kısıtlar belirlenir.
-2. **Planl:** `/superpowers-write-plan` ile doğrulanabilir adımlar yazılır.
-3. **Activate:** `manage_registry.py activate` komutuyla görev yürütmeye hazır hale getirilir.
-4. **Executing:** Kod yazımı ve sürekli denetim (Ethic Analysis).
-5. **Review:** `/superpowers-review` ile kodun kalitesi oylanır.
-6. **Closing:** `/bitir` ile Dörtlü Mühür uygulanır ve görev mühürlenir.
+## 5. Görev Yaşam Döngüsü (The 6-Step Workflow + Gatekeeper)
+Bir ajan sıfırdan bir görev alıp kodlamaya geçtiğinde bu 6 kilitli adımdan geçer. Her atlamada `Sentinel Guard` kurallara uymayan ajanı durdurur.
+
+0. **[MISSION CONTROL]:** Ajan, herhangi bir görevi devraldığında veya yeni bir görev açacağında `.agent/skills/model-dispatcher` kurallarını çalıştırıp uygun model (Kota Onayı) ve strateji belirler.
+1. **Create Task:** Otonom ise `manage_registry.py create-task` çalıştırılır. Dosya `backlog` klasöründe oluşur.
+2. **Brainstorm:** `/superpowers-brainstorm` ile hedef ve kısıtlar tartışılır → `brainstorm.md` dosyasına Sentinel İmzası (`write_artifact.py`) ile atılır. **DUR.**
+3. **Plan:** `/superpowers-write-plan` ile doğrulanabilir adımlar planlanır → `plan.md` dosyasına kaydedilir. **ONAY BEKLE.**
+4. **Activate:** Onay alındığında `manage_registry.py activate` komutu çağrılır.
+   - ⛔ **GATE CHECK:** Sistem `brainstorm.md` ve `plan.md`'nin boş veya imzasız olup olmadığına bakar. Eksiklerse `sys.exit(1)` ile işlemi REDDEDER.
+5. **Executing:** Kod yazılır. Dörtlü Mühür kurallarına harfiyen uyulur (`pnpm lint`, `tsc`). Sık sık `progress` komutuyla veri güncellenir.
+6. **Review & Complete:** `/superpowers-review` testinden geçilir. `/bitir` çağrıldığında `manage_registry.py complete` komutu çalışır.
+   - ⛔ **GATE CHECK:** Dosyanın statüsü `active` değilse veya doğrulamalar atlanmışsa kapanış reddedilir. Kapanan görev `archive/completed` klasörüne geçer.

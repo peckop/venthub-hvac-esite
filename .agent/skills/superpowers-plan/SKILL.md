@@ -15,6 +15,7 @@ description: Writes an implementation plan with small steps, exact files to touc
 - Every step must include **verification**.
 - Prefer **incremental deliverables** (avoid “big bang” edits).
 - Identify **rollback** and **risk controls** early.
+- **[MCP ZORUNLULUĞU]**: If the task requires external framework knowledge, explicitly add a step to use `context7-live` MCP (`resolve-library-id` -> `live_query-docs`). If it touches Database architecture or Supabase logic, Step 0 or 1 MUST use Supabase MCP tools (`mcp_supabase_list_tables`, `mcp_supabase_execute_sql` vb.) to verify schema before proceeding.
 
 ## Plan format (use this exact structure)
 ### Goal

@@ -1,7 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Layers, Eye, MessageSquareText, ArrowLeft, Package } from 'lucide-react'
-import { CATEGORY_REGISTRY } from '@/config/categoryRegistry'
 
 export interface RadialMenuItem {
     id: string
@@ -23,67 +22,14 @@ interface RadialActionMenuProps {
     onClose: () => void
     position: { x: number; y: number }
     categoryId: string
+    subcategories?: { slug: string; label: string }[]
     onSelectProducts: () => void
     onSelectQuote: () => void
     onSelectSubcategory: (subSlug: string) => void
 }
 
-// Kategori slug'ından alt kategorileri al
-const getSubcategoriesForCategory = (categorySlug: string): SubcategoryItem[] => {
-    // CATEGORY_REGISTRY'den kategoriyi bul
-    const entries = Object.entries(CATEGORY_REGISTRY)
-    const found = entries.find(([, val]) => val.slug === categorySlug)
-
-    if (!found) return []
-
-    const subs = found[1].subs as Record<string, string>
-    if (!subs || Object.keys(subs).length === 0) return []
-
-    // Alt kategorileri düzenli isimlere çevir
-    return Object.entries(subs).map(([key, slug]) => ({
-        slug,
-        label: formatSubcategoryLabel(key)
-    }))
-}
-
-// KEY'i okunabilir label'a çevir (BASINCLANDIRMA -> Basınçlandırma)
-const formatSubcategoryLabel = (key: string): string => {
-    const labelMap: Record<string, string> = {
-        // Fanlar
-        BASINCLANDIRMA: 'Basınçlandırma Fanları',
-        CATI_TIPI: 'Çatı Tipi Fanlar',
-        DUMAN_EGZOZ: 'Duman Egzoz Fanları',
-        DUVAR_TIPI: 'Duvar Tipi Fanlar',
-        KANAL_TIPI: 'Kanal Tipi Fanlar',
-        OTOPARK_JET: 'Otopark Jet Fanları',
-        ENDUSTRIYEL: 'Exproof Fanlar',
-        KONUT_TIPI: 'Konut Tipi',
-        PLUG: 'Plug Fanlar',
-        SANTRIFUJ: 'Santrifüj Fanlar',
-        SIGINAK: 'Sığınak Fanları',
-        SESSIZ_KANAL: 'Sessiz Kanal Tipi',
-        NICOTRA: 'Nicotra Gebhardt',
-        // Hava Perdeleri
-        ELEKTRIKLI: 'Elektrikli Isıtıcı',
-        ORTAM_HAVALI: 'Ortam Havalı',
-        // Isı Geri Kazanım
-        TICARI_TIP: 'Ticari Tip',
-        // Hava Temizleyiciler
-        DEPURO_PRO: 'Depuro Pro',
-        SG_DISPENSER: 'SG Dispenser',
-        UV_LOGIKA: 'UV Logika',
-        VORT_SUPER_DRY: 'Vort Super Dry',
-        // Hız Kontrol
-        FREKANS_KONVERTOR: 'Frekans Konvertörü',
-        HIZ_ANAHTARI: 'Hız Anahtarı',
-        // Aksesuarlar
-        ALUMINYUM_BANT: 'Alüminyum Bantlar',
-        BAGLANTI_KONNEKTORU: 'Bağlantı Konnektörü',
-        GEMICI_ANEMOSTADI: 'Gemici Anemostadı',
-        PLASTIK_KELEPCE: 'Plastik Kelepçeler'
-    }
-    return labelMap[key] || key.toLowerCase().replace(/_/g, ' ')
-}
+// KEY'i okunabilir label'a çevir (Artık genel i18n veya map'ten gelmeliydi, ama geriye uyumluluk için burada veya dışarıdan gelmeli)
+// Yukarıdaki subcategories prop üzerinden geçildiğinden getSubcategoriesForCategory silindi.
 
 /**
  * Radial Action Menu - Alt Kategori Destekli
@@ -96,6 +42,7 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
     onClose,
     position,
     categoryId,
+    subcategories: initialSubcategories = [],
     onSelectProducts,
     onSelectQuote,
     onSelectSubcategory
@@ -103,14 +50,13 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
     const [showSubcategories, setShowSubcategories] = useState(false)
     const [subcategories, setSubcategories] = useState<SubcategoryItem[]>([])
 
-    // Menü açıldığında alt kategorileri yükle
+    // Menü açıldığında alt kategorileri yükle (prop üstünden)
     useEffect(() => {
         if (isOpen && categoryId) {
-            const subs = getSubcategoriesForCategory(categoryId)
-            setSubcategories(subs)
+            setSubcategories(initialSubcategories)
             setShowSubcategories(false) // Her açılışta ana menüden başla
         }
-    }, [isOpen, categoryId])
+    }, [isOpen, categoryId, initialSubcategories])
 
     // ESC tuşu ile kapat
     useEffect(() => {

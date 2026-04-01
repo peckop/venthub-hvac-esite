@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -124,11 +124,14 @@ export type Database = {
           authority_content: Json | null
           created_at: string
           description: string | null
+          display_mode: string | null
           id: string
           image_url: string | null
           is_active: boolean | null
           is_featured: boolean | null
           level: number
+          marketing_title: string | null
+          menu_label: string | null
           metadata: Json | null
           name: string
           parent_id: string | null
@@ -136,17 +139,21 @@ export type Database = {
           seo_title: string | null
           slug: string
           sort_order: number | null
+          translation_key: string | null
           updated_at: string
         }
         Insert: {
           authority_content?: Json | null
           created_at?: string
           description?: string | null
+          display_mode?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           is_featured?: boolean | null
           level?: number
+          marketing_title?: string | null
+          menu_label?: string | null
           metadata?: Json | null
           name: string
           parent_id?: string | null
@@ -154,17 +161,21 @@ export type Database = {
           seo_title?: string | null
           slug: string
           sort_order?: number | null
+          translation_key?: string | null
           updated_at?: string
         }
         Update: {
           authority_content?: Json | null
           created_at?: string
           description?: string | null
+          display_mode?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           is_featured?: boolean | null
           level?: number
+          marketing_title?: string | null
+          menu_label?: string | null
           metadata?: Json | null
           name?: string
           parent_id?: string | null
@@ -172,12 +183,57 @@ export type Database = {
           seo_title?: string | null
           slug?: string
           sort_order?: number | null
+          translation_key?: string | null
           updated_at?: string
         }
         Relationships: [
           {
             foreignKeyName: "categories_parent_id_fkey"
             columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      category_mapping_rules: {
+        Row: {
+          brand_filter: string | null
+          created_at: string | null
+          description: string | null
+          exclude_pattern: string | null
+          id: string
+          name_pattern: string
+          priority: number | null
+          spec_conditions: Json | null
+          target_subcategory_id: string | null
+        }
+        Insert: {
+          brand_filter?: string | null
+          created_at?: string | null
+          description?: string | null
+          exclude_pattern?: string | null
+          id?: string
+          name_pattern: string
+          priority?: number | null
+          spec_conditions?: Json | null
+          target_subcategory_id?: string | null
+        }
+        Update: {
+          brand_filter?: string | null
+          created_at?: string | null
+          description?: string | null
+          exclude_pattern?: string | null
+          id?: string
+          name_pattern?: string
+          priority?: number | null
+          spec_conditions?: Json | null
+          target_subcategory_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_mapping_rules_target_subcategory_id_fkey"
+            columns: ["target_subcategory_id"]
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
@@ -1006,6 +1062,7 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          is_category_manual: boolean | null
           is_featured: boolean
           low_stock_override: boolean
           low_stock_threshold: number | null
@@ -1035,6 +1092,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          is_category_manual?: boolean | null
           is_featured?: boolean
           low_stock_override?: boolean
           low_stock_threshold?: number | null
@@ -1064,6 +1122,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          is_category_manual?: boolean | null
           is_featured?: boolean
           low_stock_override?: boolean
           low_stock_threshold?: number | null
@@ -2318,6 +2377,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      fn_auto_categorize_products: { Args: never; Returns: undefined }
+      fn_enrich_product_specs: { Args: never; Returns: undefined }
       fts_search_products: {
         Args: { p_filters?: Json; p_limit?: number; p_q: string }
         Returns: {
@@ -2575,3 +2636,4 @@ export const Constants = {
     },
   },
 } as const
+
