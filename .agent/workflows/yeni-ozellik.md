@@ -2,6 +2,9 @@
 description: Yeni bir özellik veya modül geliştirirken izlenecek standart "Mühendislik Protokolü".
 ---
 
+> **Önerilen Model:** Claude 4.6 Sonnet *(Kategori: High)*
+
+
 Bu workflow, Manifesto'da belirtilen "Fiziksel/Ticari Mantık -> Kod" akışını uygular.
 
 0. **[MISSION CONTROL] Ajan & Model Seçimi**
@@ -12,6 +15,7 @@ Bu workflow, Manifesto'da belirtilen "Fiziksel/Ticari Mantık -> Kod" akışın�
    - Kullanıcının isteğini "Girdi -> İşlem -> Çıktı" mantığına göre analiz et.
    - Hangi fizik kuralları veya ticari kurallar geçerli? (Örn: Stok eksiye düşemez, debi 0 olamaz).
    - Veritabanı şeması veya API değişikliği gerekiyor mu?
+   - **[MCP ZORUNLULUĞU]:** Eğer görev yeni bir framework/kütüphane eklemeyi veya kullanmayı gerektiriyorsa, ezberden kod yazma! ZORUNLU olarak `context7-live` MCP aracını (`resolve-library-id` ve ardından `live_query-docs`) kullanarak güncel dökümantasyonu ve en iyi pratikleri (best practices) sorgula.
 
 2. **Onay (Confirmation)**
    - Kod yazmadan önce, mantıksal tasarımı kullanıcıya (Kaptan'a) sun.

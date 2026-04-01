@@ -2,11 +2,19 @@
 description: İş bittiğinde Tip kontrolü (TSC), Build testi ve Lint kontrolü yapar; her şey geçiyorsa commit/push eder.
 ---
 
+> **Önerilen Model:** Gemini 3 Flash *(Kategori: Trivial)*
+
+
 // turbo-all
 
 Görevin: Projeyi nihai kalite denetiminden geçir (Superpowers Standardı) ve GitHub'a mühürle.
 
 ## 🏁 Nihai Doğrulama ve Mühürleme Adımları
+
+0. **Diff Güvenliği Kontrolü:**
+```bash
+python .agent/skills/diff-review/scripts/check_diff_rules.py
+```
 
 1. **Tip Kontrolü (TSC):**
 ```bash
@@ -28,21 +36,34 @@ pnpm run lint:ci
    - Hataları `superpowers-debug` veya `superpowers-tdd` ile çöz.
    - Tüm adımlar 0 hata ile tamamlanana kadar devam etme.
 
-5. **Değişiklikleri Sahnele:**
+5. **Registry Hafızasına Kayıt (Zorunlu):**
+   - Görevde çözdüğün kritik bir sorun veya yaptığın mimari bir keşif varsa bunu Otonom Hafızaya yaz.
+   - Yoksa bu adımı atla.
+```bash
+python registry/manage_registry.py remember "Önemli ders/Kural: ..."
+```
+
+6. **Görev Mühürleme (Registry Complete):**
+   - Registry üzerindeki görevi "completed" konumuna taşı ve %100 yap. (Örn: P06 009)
+```bash
+python registry/manage_registry.py complete PXX YYY
+```
+
+7. **Değişiklikleri Sahnele:**
 ```bash
 git add .
 ```
 
-6. **Conventional Commit Mesajı Hazırla:**
+8. **Conventional Commit Mesajı Hazırla:**
    - Yapılan işi analiz et (Örn: `fix(auth): solved id mismatch in projects`).
    - `superpowers-finish` standartlarına uygun detaylı bir mesaj yaz.
 
-7. **Mühürleme (Commit):**
+9. **Mühürleme (Commit):**
 ```bash
 git commit -m "TİP: açıklama"
 ```
 
-8. **Yayına Gönder (Push):**
+10. **Yayına Gönder (Push):**
 ```bash
 git push origin master
 ```

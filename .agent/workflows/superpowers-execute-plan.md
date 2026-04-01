@@ -87,5 +87,12 @@ At the end:
    - Follow-ups (if any)
    - Manual validation steps (if applicable)
 3) Confirm the artifacts exist by listing `artifacts/superpowers/`.
+4) **Registry Sync (Zorunlu Sentinel Gate):**
+   - Görev %100 ise Terminal'den KESİNLİKLE şu komutu çalıştır: `python registry/manage_registry.py complete <PXX> <YYY>`
+   - `PULSE.md` otonom güncellenecek ve görev arşive alınacaktır.
+5) **Linear Sync (Varsa):**
+   - İlgili Linear issue varsa durumunu güncelle: `mcp_linear_save_issue(id="VENT-XXX", state="Done")`.
+   - Bitiş özetini yorum olarak ekle: `mcp_linear_save_comment(issueId="VENT-XXX", body="...")`.
+   - Linear'da issue yoksa bu adımı atla.
 
 Stop after completing the finish step.
