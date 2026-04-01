@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "venthub/review",
+  "title": "Code Review Artifact",
+  "description": "Kod denetimi çıktısı. Bu şema hem YAPISAL doğrulama hem de ANLAMSAL rehberlik sağlar. Ajan bu şemayı okuduğunda, her severity seviyesinin ne anlama geldiğini ve anti_hallucination dizisini nasıl dolduracağını bilmelidir.",
+  "type": "object",
+  "required": ["blockers", "majors", "minors", "nits", "summary", "verdict"],
+  "properties": {
+    "skill": {
+      "type": "string",
+      "const": "superpowers-review"
+    },
+    "model": {
+      "type": "string",
+      "description": "Bu review'ı yapan AI modelinin adı (örn. 'Claude Opus 4.6', 'Gemini 3.1 Pro')"
+    },
+    "date": {
+      "type": "string",
+      "description": "ISO 8601 tarih (YYYY-MM-DD)"
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description"],
+        "properties": {
+          "description": { "type": "string", "minLength": 20 },
+          "file": { "type": "string" },
+          "fix": { "type": "string" }
+        }
+      },
+      "description": "BLOCKER (Engelleyici): Yanlış davranış, güvenlik açığı, veri kaybı riski veya bozuk test/build. Bunlar çözülmeden KESİNLİKLE commit yapılamaz ve iş devam edemez. Uydurma ORM alanı kullanımı da otomatik Blocker'dır."
+    },
+    "majors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description"],
+        "properties": {
+          "description": { "type": "string", "minLength": 20 },
+          "file": { "type": "string" },
+          "fix": { "type": "string" }
+        }
+      },
+      "description": "MAJOR (Önemli): Muhtemel bug, eksik edge case, düşük güvenilirlik. Commit yapılabilir ama düzeltilmeden Done yapılamaz."
+    },
+    "minors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description"],
+        "properties": {
+          "description": { "type": "string" },
+          "file": { "type": "string" }
+        }
+      },
+      "description": "MINOR (Küçük): Stil, okunabilirlik, küçük bakım sorunları. Düzeltilmesi tercih edilir ama bloklamaz."
+    },
+    "nits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description"],
+        "properties": {
+          "description": { "type": "string" },
+          "file": { "type": "string" }
+        }
+      },
+      "description": "NIT (Kozmetik): İsteğe bağlı iyileştirme. Değişken isimlendirme, yorum eksikliği gibi. Göz ardı edilebilir."
+    },
+    "anti_hallucination": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "verified", "source"],
+        "properties": {
+          "claim": {
+            "type": "string",
+            "description": "Doğrulanması gereken iddia (örn. 'Root.technical_function_flag alanı mevcut')"
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "true = view_file ile doğrulandı, false = doğrulanamadı (Blocker olarak işaretle!)"
+          },
+          "source": {
+            "type": "string",
+            "description": "Kanıt dosya yolu ve satır numarası (örn. 'src/models/root.py:19')"
+          }
+        }
+      },
+      "description": "UYDURMA KORUMA DİZİSİ (Anti-Hallucination): Review esnasında kullanılan her ORM alanı, import veya API çağrısı burada listelenmeli. Her iddia view_file ile doğrulanmalı. verified=false olan öğe otomatik olarak Blocker'a dönüşür."
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 50,
+      "description": "Genel değerlendirme: Kaç blocker/major/minor/nit bulunduğu, anti_hallucination sonuçları ve nihai öneri."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["approved", "needs_changes"],
+      "description": "approved = 0 blocker + 0 major ise. needs_changes = herhangi bir blocker veya major varsa. Minör ve Nit'ler verdict'i etkilemez."
+    }
+  },
+  "additionalProperties": false
+}
