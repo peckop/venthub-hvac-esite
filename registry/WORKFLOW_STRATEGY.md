@@ -22,5 +22,10 @@ Projenin kalbi, kategori ve ürün sayfalarını kod bağımlılığından kurta
 - `any` kullanımı kesinlikle yasaktır (Anayasa kuralı).
 - Tüm dinamik rotalar Next.js 15 Async Params protokolüne uygun şekilde `await` edilmelidir.
 
+## 4. 🌐 Linear + Registry Sinerji Stratejisi
+- **Linear (Bulut):** Milestone, Roadmap ve üst düzey görev takibi.
+- **Registry (Yerel Sentinel):** Ajan otonom yönetimi, kriptografik dosya güvenlik imzalama (Anti-Forgery) ve tam otonom işleyiş.
+- İki sistem birbirini tamamlar, ikisi de tek başına yeterli değildir. Her görevin sonunda Linear statüsü `mcp_linear_save_issue` (VENT-XXX ID'leri ile) güncellenmelidir.
+
 ---
-*Bu strateji, projenin "Kimseye Bağımlı Kalmadan" büyümesini sağlar.*
+*Bu strateji, projenin "Kimseye Bağımlı Kalmadan" pürüzsüz büyümesini sağlar.*

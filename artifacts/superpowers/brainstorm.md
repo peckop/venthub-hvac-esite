@@ -1,30 +1,34 @@
+---
+description: Superpowers brainstorm. Produces goal/constraints/risks/options/recommendation/acceptance criteria.
+---
+
 ## Goal
-Next.js 15 ve React 19 standartlar?na uygun olarak projedeki dinamik rotalardaki (params, searchParams) asenkron gereklilikleri sa?lamak ve eslint-plugin-react-compiler'?n g?c?nden faydalanarak projeyi gereksiz useMemo ve useCallback hook'lar?ndan ar?nd?rmak.
+Ajanların VentHub kod tabanındaki işlem gücünü artıran "Workflows" ve "Skills" yönergelerini salt tavsiyeden öteye taşıyarak; MCP (Model Context Protocol) araçlarını (Context7, Supabase, TestSprite, Github vb.) tetikleyen kesin ve emredici promptlar haline getirmek. Otonom yapıyı (Registry'yi) "agent-ic" hale getirmek.
 
 ## Constraints
-- **Next.js 15 Strictness:** Next.js 15'te params ve searchParams prop'lar? **asenkron** (Promise) yap?s?na ge?ti. Senkron (do?rudan) eri?imler terminalde uyar?/hata ?retebilir veya Hydration/Render hatalar?na yol a?abilir.
-- **React 19 Compiler:** React 19 compiler re-render'lar? otomatik optimize etti?i i?in, manuel yaz?lan useCallback ve useMemo'lar kod karma?as?n? art?r?r ve compiler'?n native mekanizmalar?yla ?ak??abilir.
-- **Proje B?t?nl???:** Routing yap?s?nda k?r?lma olmadan wait params.id vb. kullan?mlar?n?n dikkatli yap?lmas? gereklidir. Rota (Page/Layout) bile?enleri sunucu bile?eniyse (Server Components) asenkron fonksiyonlara d?nd?r?lmelidir; e?er Client Component iseler React use() hook'u kullan?larak resolve edilmelidir.
+- Ajanların mevcut "Güvenli Bütünlük" (`venthub-auditor`, `AGENTS.md`) kuralları kesinlikle dışına çıkılmayacak.
+- Verilecek komutlar ve promptlar, LLM'in halüsinasyon yapmadan hangi tool'u çağırması gerektiğini net bir şekilde (kesin isimlerle örn: `mcp_context7-live_query-docs`) belirtecek.
+- Workflow akışını bozmadan sadece aralara "Enjeksiyon (Injection)" yapılacak.
 
 ## Known context
-- VentHub bir e-ticaret uygulamas?, yani bolca dinamik rota ([slug], [id]) bar?nd?r?yor.
-- src/app/ alt?ndaki sayfalardaki (?rn: src/app/products/[id]/page.tsx veya src/app/category/[slug]/page.tsx) k?k yap? ta?lar?n?n elden ge?irilmesi gerekiyor.
-- Daha ?nce veritaban? yans?malar?ndan kaynaklanan sorunlar? ViewModel katman? sayesinde ??zd?k; ?u anki derlemeler (%100 Build Success) bize React ve Next.js'in saf API de?i?ikliklerine odaklanabilece?imiz m?kemmel bir zemin sa?l?yor.
+- P06 zeka fırtınası ve planlama döngüleri oturmaya başladı.
+- Ajanların elinde zaten `context7`, `supabase` gibi sunucular var ama bu sunucuları nasıl dahil edeceklerini (örneğin `/yeni-ozellik` dediğimizde hemen açıp doküman çekmeyi, ya da `/bitir` dediğimizde `manage_registry.py`'yi kendiliğinden invoke etmeyi) bilmiyorlar. 
+- Bu iş tamamen `.agent/workflows/*` içindeki markdown belgelerine müdahale etmeyi gerektiriyor.
 
 ## Risks
-- **Build veya Hydration Hatalar?:** Senkron b?rak?lan component'lerin production build a?amas?nda gizli hata b?rakmas? veya Cloudflare/Vercel da??t?m?nda ?al??ma an?nda ??kmelere (Runtime crash) yol a?ma riski.
-- **Client Component Karma?as?:** Sunucu bile?eni yerine istemci bile?eni ("use client") olarak i?aretlenen Page'lerin hata vermesi. Client Components async Arrow / Function olamazlar; mecbur Promise ??z?mlemesi i?in React.use(params) hook'u gereklidir.
-- **Fazla De?i?iklik Hatas? (Scope Creep):** Projede ?ok fazla useMemo/useCallback k?rlemesine s?k?l?rse, useEffect ba??ml?l?k dizileri (dependency array) etkilenebilir.
+- **Tool Overload (Araç Boğulması):** Ajanlara gereksiz MCP çağrıları yaptırmak, Context Limit'ini (Jeton) şişirebilir.
+- **Infinite Loops (Sonsuz Döngü):** MCP araçlarının çıkardığı sonuçlara göre ajanların "Şimdi buradan ne yapmalıyım?" sendromuna girip hedeften şaşması.
+- **Senaryo Bozulumu:** `/bitir` komutu gibi hassas workflow'ların akışının bozulması ve işlemi finalize edememesi.
 
-## Options (2-4)
-1. **Oto-Tarama & Kritik Temizlik:** ?ncelikle src/app/ i?inde [param_name] klas?rlerindeki page'leri tespit edip ilgili bile?enleri Next.js 15 asenkron prop uyumlu hale getirmek (Server ise async prop, Client ise use(params) entegrasyonu yapmak). Ard?ndan React 19 compiler uyar?lar?n? ve Lint ??kt?lar?n? baz alarak kullan??s?z hale gelen useMemo/useCallback kal?nt?lar?n? g?venli olan yerlerden s?k?p temizlemek. (Dengeli ve g?venli)
-2. **Kapsaml? T?m Proje Refactoring:** Regex veya ?zel bir kod analiz arac? (AST script) kullanarak t?m useMemo, useCallback'leri k?k?nden silmek. T?m rotalar? bir hamlede asenkron hale getirmek. (Son derece riskli, referans e?itli?ine (
-eference equality) ba?l? ?al??an useEffect zincirlerini k?rabilir).
+## Options (2–4)
+- **Option 1 (Yüzeysel Güncelleme):** Workflow dosyalarının başına sadece "Lütfen MCP imkanlarınızı kullanmaktan çekinmeyin" gibi soft uyarılar yazmak. (Etkisiz)
+- **Option 2 (Direktif Bazlı - Tavsiye Edilen):** İlgili adım geldiğinde ajana kesin emirler veren triggerlar yazmak. Örneğin: `Adım 1: context7'nin "resolve-library-id" metodunu kullanarak Nextjs 15 dokümanı ara ve analiz et.`
 
 ## Recommendation
-**Option 1** son derece mant?kl? ve tavsiye edilendir. ??nk? React 19 compiler ne kadar ak?ll? olursa olsun, b?y?k kod bloklar?nda toplu manip?lasyon yan etki yaratabilir. ?nceli?imiz Next.js 15 params mecburiyetini dinamik rotalarda kusursuz oturtmakt?r. Sonras?nda linter / compiler'?n y?nlendirdi?i a?ikar refactor i?lemlerini tekil mod?ller ?zerinde yapaca??z.
+**Option 2 (Direktif Bazlı)** tercih edilmelidir. Ajanlar net ve "Call tool X with parameter Y" şekline yakın, deterministik insan talimatlarıyla en iyi performansı gösterirler. Hangi aşamada hangi aracın tetikleneceği `.md` dosyalarında "ZORUNLU ADIM" olarak işaretlenmelidir.
 
 ## Acceptance criteria
-1. App router i?indeki t?m dinamik Page ve Layout'lar?n params okumas?n?n Next.js 15 standartlar?na asenkron olarak uymas? (Server'da wait, Client component'lerde use()).
-2. Manuel useMemo/useCallback varl?klar?n?n linter kural-setine uygun ?ekilde ay?klanmas? ve tip g?venli?inin s?rd?r?lmesi.
-3. D?n???m sonras? pnpm run build komutunun "0" hata ile ??k?? yapmas? (Statik render, dinamik render hatalar? vs olmamal?).
+- `/bitir.md` workflow metninin sonunda `run_command` üzerinden `manage_registry.py remember` ve `manage_registry.py progress` çalıştırılmasını ve onaylanmasını isteyen kesin emirlerin bulunması.
+- `/yeni-ozellik.md` workflow başlarında "Kullanılacak teknolojilerin güncel Next.js 15 versiyonu veya x kütüphanesi için context7-live MCP sunucusundan resmi doküman çek. Biliyormuş gibi yapma, son değişiklikleri mutlaka teyit et." tarzında sert uyarıların yer alması.
+- `/supabase-bagla.md` için Supabase MCP (örn: şema getirme veya SQL çalıştırma) önerilerinin (tool referanslarıyla) verilmesi.
+- `superpowers-plan/SKILL.md` kurallarındaki planlama şablonuna (Plan adımlarında hangi MCP aracıyla ne yapılacağını belirtmek üzerine) bir alt kırılımın eklenmesi.

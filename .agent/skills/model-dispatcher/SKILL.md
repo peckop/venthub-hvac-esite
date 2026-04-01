@@ -17,28 +17,30 @@ Ajanlar şu gerçekliğe göre karar vermek ZORUNDADIR:
 
 ---
 
-## ⚙️ ÇALIŞMA ALGORİTMASI VE MODEL ÖNERİLERİ
+## ⚙️ ÇALIŞMA ALGORİTMASI VE MODEL KADEMELERİ (5 Seviye)
 
-### 🟢 Düşük Sıklet / Rutin İşler (Öneri: GEMINI FLASH)
-*Strateji: Neredeyse tüm amelelik işleri için bağımsız 5 saatlik kotayı sömür. Haftalık paketleri asla harcama.*
-- CSS / Tailwind ufak stil düzenlemeleri.
-- Basit Linter / Unused Vars hatalarının temizliği.
-- Sabit metinlerin i18n objelerine (tr.ts) taşınması işlemi.
-- README veya Dökümantasyon (PULSE.md) güncellemeleri.
-- 1-2 dosyalık risksiz CRUD veya UI güncellemeleri.
+### 🟢 1. Trivial (Çok Düşük Sıklet) - [Öneri: GEMINI 3 FLASH]
+*Strateji: Neredeyse tüm amelelik, Linter, Build, ufak CSS işleri için bağımsız 5 saatlik kotayı sömür. Sıfır derin mimari gerektirir.*
+- Tip hatalarını hızlı onarma, kullanılmayan değişken silme, format güncelleme.
 
-### 🟡 Orta Sıklet / Kritik Çözümler (Öneri: GEMINI HIGH)
-*Strateji: Flash'ın tıkanacağı veya "Tunnel Vision" (Tünel Görüşü) yaşayabileceği çok dosyalı ve mantıksal işler. (Ortak Haftalık Kotadan harcar, dikkat et).*
-- Birden fazla dosyayı kapsayan fonksiyonel bağımlılıklar.
-- TSC (Tip uyumsuzluğu) hatalarının derinlemesine onarımı (Örn: `check_integrity.py` 52 Blocker temizliği).
-- Gelişmiş Supabase verilerindeki (Join/Relational) mantıkların kurulması.
-- Bileşen seviyesi React Lifecycle (useEffect vb.) revizyonları.
+### 🟡 2. Low (Rutin Kodlama) - [Öneri: GEMINI 3.1 PRO (LOW)]
+*Strateji: Mantıksal çıkarım gerektirir ancak context'i dardır ve çok ağır bir "Thinking" sürecine ihtiyaç duymaz. Motor kalitesi yüksektir fakat compute limiti dardır.*
+- 1-2 dosya arasında spesifik fonksiyon entegrasyonu.
+- Hazır şablonlarda (ör. Registry Workflow) veri modifikasyonları, Argument Parser güncellemeleri.
 
-### 🔴 Ağır Sıklet / Merkezi Mimari (Öneri: CLAUDE SONNET / OPUS)
-*Strateji: "Haftalık" Anthropic paketinden harcar. SADECE BEYİN GEREKTİREN işlerde kullanılmalıdır. Opus'un kotayı çok hızlı yaktığını unutma.*
-- Yeni Mimarilerin (ViewModel, Agent Automation, Integrity Scripts) baştan kurgulanması.
-- Projenin ana iskelet (Routing, App-Router, State Management) revizyonları.
-- Derin matematiksel analiz, fizik tabanlı sistemler veya kompleks Supabase RLS mimarisi inşası.
+### 🟠 3. Medium (Orta-İleri Mantık) - [Öneri: GEMINI 3.1 PRO (HIGH)]
+*Strateji: Hızlı ve keskin bir akıl yürütme, birden fazla dosyadaki stateleri izlemeyi gerektirir. Flash'ın patlayacağı, Pro Low'un ise context'i nedeniyle tıkanacağı görevler içindir.*
+- Karmaşık State/Lifecycle (useEffect vs.) onarımları.
+- Kapsamlı ve kritik refactoring işlemleri (Örn: Model eşleştirme asistanının otomasyonu).
+
+### 🔴 4. High (Karmaşık Mimari) - [Öneri: CLAUDE 4.6 SONNET]
+*Strateji: "Haftalık" Anthropic paketinden harcar. SADECE derin düşünce gereken yepyeni mimarilerde kapı açar.*
+- Relational Veritabanı (Supabase RLS/Join) mantık inşaları ve API katmanı kurgusu.
+- App Router üzerinde 3-4 root layout'u sarsan iskelet güncellemeleri.
+
+### 🟣 5. Expert (Uç Nokta / Overkill) - [Öneri: CLAUDE 4.6 OPUS]
+*Strateji: En derin zeka. Geniş codebase aramaları, projedeki "kaynağı bulunamayan" kördüğüm bug'lar için saklanır.*
+- "Çözülemez" zannedilen kronik framework sorunları veya 100+ dosyayı etkileyecek paradigma devrimleri.
 
 ---
 
@@ -55,7 +57,15 @@ Bütün atamalar KESİNLİKLE sadece aşağıdaki listede yer alan modellerle ya
 
 ## 🎯 Model Seçim Matrisi (Routing)
 
-Kullanıcının kotasını korumak ve `Rate Limit` / `Credit Exhaustion` sorunlarını önlemek için aşağıdaki matrisi kullan:
+Kullanıcının kotasını korumak ve `Rate Limit` / `Credit Exhaustion` sorunlarını önlemek için aşağıdaki otonom referans matrisini kullan:
+
+| Kompleksite / Kademe | Görev Karakteristiği & Örnekler | Risk & Süre | Önerilen Model |
+| :--- | :--- | :--- | :--- |
+| **`trivial`** | Sadece statik hatalar (Lint/Typo), README metinleri, CSS renk kodu değişimi. | Düşük. 1-2 dosya (<5dk) | **Gemini 3 Flash** |
+| **`low`** | Zeka içeren ancak sadece 1-2 lokal dosyayı etkileyen rutin kod yazımı (Component izolasyonu, test). | Orta. İzole (<15dk) | **Gemini 3.1 Pro (Low)** |
+| **`medium`** | 3-5 dosyalı state ve Context veri geçişi, kompleks tip onarımı, orta çaplı script inşası. | Yüksek-Orta (<30dk) | **Gemini 3.1 Pro (High)** |
+| **`high`** | Sıfırdan Supabase Schema, Workflow-Agent icadı, Root Layout revizesi. | Yüksek. 5+ dosya (<60dk) | **Claude 4.6 Sonnet** |
+| **`expert`** | Bulunamayan Memory-Leak veya devasa Monorepo dönüşümleri (Tüm projeye etki). | Kritik Devrim (<2 Saat) | **Claude 4.6 Opus** |
 
 ## 🚀 ZORUNLU KONSOL ÇIKTISI (Mission Control)
 

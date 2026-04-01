@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Product, getProductsEnriched } from '../lib/supabase'
 import { DomainCategory } from '../lib/type-converters'
@@ -42,7 +42,7 @@ const DEFAULT_FILTERS: CategoryFilters = {
  * 2. URL State Synchronization
  * 3. Raw filtering and sorting of products
  */
-export function useCategoryGateway(initialCategory?: DomainCategory | null) {
+export function useCategoryGateway(initialCategory?: DomainCategory | null, initialProducts?: Product[]) {
   const isMounted = useIsMounted()
   const params = useParams()
   const router = useRouter()
@@ -56,10 +56,14 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null) {
   const [category, setCategory] = useState<DomainCategory | null>(initialCategory ?? null)
   const [parentCategory, setParentCategory] = useState<DomainCategory | null>(null)
   const [subCategories, setSubCategories] = useState<DomainCategory[]>([])
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<Product[]>(initialProducts ?? [])
   const [loading, setLoading] = useState(true)
 
   const [filters, setFilters] = useState<CategoryFilters>(DEFAULT_FILTERS)
+
+  // SSR Hydration Guard: initialProducts yalnızca ilk render'da (hydration) skip için kullanılır.
+  // Client-side navigation (slug değişimi) durumunda normal fetch yapılmalıdır.
+  const isFirstRender = useRef(true)
 
   useEffect(() => {
     if (!isMounted || !searchParams) return
@@ -165,7 +169,15 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null) {
           ? [targetCategory.id, ...subs.map(s => s.id)]
           : (targetCategory ? [targetCategory.id] : [])
 
-        if (categoryIds.length > 0 || !slug) {
+        if (isFirstRender.current && initialProducts && initialProducts.length > 0) {
+          // İlk yükleme: SSR verisi geldi, API isteği atla, sadece fiyat aralığını hesapla
+          isFirstRender.current = false
+          const prices = initialProducts.map(p => p.price).filter((v): v is number => v != null && Number.isFinite(v))
+          if (prices.length > 0) {
+            const maxPrice = Math.ceil(Math.max(...prices))
+            setFilters(prev => ({ ...prev, priceRange: [prev.priceRange[0], Math.max(prev.priceRange[1], maxPrice)] }))
+          }
+        } else if (categoryIds.length > 0 || !slug) {
           const productsData = await getProductsEnriched({
             categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
             limit: 100

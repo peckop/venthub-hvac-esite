@@ -2,6 +2,9 @@
 description: Hata mesajını analiz ederek nokta atışı çözüm kodu üretir.
 ---
 
+> **Önerilen Model:** Gemini 3.1 Pro (High) *(Kategori: Medium)*
+
+
 Görevin: Verilen hata mesajını ve ilgili kodu analiz edip sorunu çözmek.
 
 Adımlar:
