@@ -25,11 +25,11 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // Mapping: Subcategory slug -> keywords to match in product names
 const SUBCATEGORY_RULES: { slug: string; keywords: string[]; excludeKeywords?: string[] }[] = [
     // Fanlar alt kategorileri
-    { slug: 'otopark-jet-fanlari', keywords: ['Jet Fan', 'JET FAN', 'TJF', 'JPF'] },
+    { slug: 'jet-fans', keywords: ['Jet Fan', 'JET FAN', 'TJF', 'JPF'] },
     { slug: 'kanal-tipi-fanlar', keywords: ['Lineo', 'LINEO', 'Kanal Tipi', 'CA-IL'] },
     { slug: 'sessiz-kanal-tipi-fanlar', keywords: ['Quiet', 'QUIET', 'Sessiz', 'SILENT'] },
     { slug: 'cati-tipi-fanlar', keywords: ['Çatı', 'CATI', 'Roof', 'TRM', 'TRT', 'TORRETTE'] },
-    { slug: 'duman-egzoz-fanlari', keywords: ['Duman', 'DUMAN', 'Smoke', 'THGT', 'F400', 'F300'] },
+    { slug: 'smoke-exhaust-fans', keywords: ['Duman', 'DUMAN', 'Smoke', 'THGT', 'F400', 'F300'] },
     { slug: 'basinclandirma-fanlari', keywords: ['Basınçlandırma', 'Pressurization', 'THLZ'] },
     { slug: 'siginak-havalandirma-fanlari', keywords: ['Sığınak', 'SIGINAK', 'BVU', 'Shelter'] },
     { slug: 'nicotra-gebhardt-fanlar', keywords: ['NICOTRA', 'GEBHARDT', 'DD ', 'DAT', 'ADH'] },

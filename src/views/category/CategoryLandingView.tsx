@@ -43,9 +43,9 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     const vm = wrapCategory(category)
     const parentVm = wrapCategory(subCategories.find(s => s.id === category.parent_id)) // Attempt to find parent if any
     
-    const isAirCurtain = category.slug === 'hava-perdesi' || category.slug === 'hava-perdeleri'
-    const isSilentFan = category.slug === 'sessiz-kanal-tipi-fanlar'
-    const isDehumidifier = category.slug === 'nem-alma-cihazlari'
+    const isAirCurtain = category.slug === 'air-curtains'
+    const isSilentFan = category.slug === 'quiet-duct-fans'
+    const isDehumidifier = category.slug === 'dehumidifiers'
 
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
     const breadcrumbItems = [

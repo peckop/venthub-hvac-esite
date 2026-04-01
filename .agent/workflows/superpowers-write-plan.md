@@ -22,38 +22,25 @@ Eğer `{{input}}` boş veya eksikse, kullanıcıdan görevi tek bir cümleyle ye
 - Kod düzenleme YAPMA.
 - Bağlamı anlamak için dosyaları okuyabilirsin, ancak planı oluşturduktan sonra durmalısın.
 - Plan adımları küçük olmalı (her biri 2–10 dakika) ve doğrulama komutlarını içermelidir.
-- **[ZORUNLU ENTREGASYON ADIMI]:** Registry sisteminde üretilen `superpowers brainstorm` çıktısını (`brainstorm.md`) MUTLAKA okuyup, kendi **Agentic Plan (implementation_plan)** mantığınla harmanlayarak "v2" (22. seviye / fine-state) kapasitesine ulaştıracaksın.
-- **[ZORUNLU REVIEW ADIMI]:** Planı tam bitirdin sanıp kullanıcıya sunmadan HEMEN ÖNCE, kendi kendine bir `superpowers review` filtresinden geçireceksin. "Bu plan gerçekten mimariyi kırar mı? Gerçek bir çözüm mü (Anti-hallucination)?" diye kendini denetledikten sonra son (FINE) halini çıkaracaksın.
+- **[ZORUNLU V8 JSON ZİNCİRİ]:** Geleneksel `.md` metin planları V8 motorunda KESİNLİKLE yasaktır. Ajan aşağıdaki JSON zincirini `registry/schemas` altındaki şemalara harfiyen uyarak üretmeli ve DÜZENLİ OLARAK `python registry/engine.py validate ...` komutuyla sınamalıdır:
+  1. `brainstorm.json`
+  2. `dispatcher.json` (Karmaşıklığa göre [MISSION CONTROL] model önerisi)
+  3. `plan.json` (Adımlar, testler, rollback ve doğrulamalar)
 
-## Çıktı formatı (tam olarak kullanın)
-## Hedef
-## Varsayımlar
-## Plan
-(Her adım şunları içermelidir: Dosyalar, Değişiklik, Doğrulama)
-## Riskler ve Azaltmalar
-## Geri Dönüş (Rollback) Planı
+## JSON Pipeline Onayı (Toplu Sunum İlkesi)
+Bu zincirdeki (brainstorm, dispatcher, plan) TÜM dosyalar otonom olarak (aralarda kullanıcıya sorulmadan) JSON formatında oluşturulup V8 Motoru'ndan (`✅ Geçerli` çıktısı alarak) geçirilmelidir.
+Motor sana `pipeline status` sorgusunda "Artık uygulamaya (Execution) geçebilirsin" manasında bir yanıt verene kadar JSON üretmeye devam et.
 
-## Kaydet (Zorunlu)
-Yukarıdaki plan içeriğini oluşturduktan sonra, onu AŞAĞIDAKİ kurallara göre ZORUNLU olarak diske yazmalısın:
-
-1. **[ŞARTLI KAYIT KURALI]:** 
-   - **Eğer** üzerinde çalıştığın işlem bir Registry göreviyse (örn. `PXX-` gibi bir taslağı varsa), o görevin `.md` dosyasını bul ve `artifacts.plan` yolunu oku. Planı doğrudan o yola kaydet.
-   - **Eğer** Registry dışında, bağımsız jenerik bir plan oluşturuyorsan, standart `artifacts/superpowers/plan.md` yolunu kullan. Asla olmayan bir Registry klasörü uydurmaya çalışma.
-2. Dosyanın en tepesine MUTLAKA şu standart header bilgisini ekle:
-   ```markdown
-   # 📋 Implementation Plan: PXX/YYY — Görev Adı
-   > **Brainstorm:** `ilgili brainstorm.md dosyasının tam yolu`
-   > **Model:** Kullandığın Model (Örn: Flash/High) | **Tarih:** Günün Tarihi
-   > **Tahmini Toplam Süre:** ~X dakika (Y adım x Z dk vs)
-   ```
-3. Sentinel (Anti-Forgery) kalkanını geçebilmek için plan belgesinin en altına kriptografik imzayı atacak olan `write_artifact.py` (veya Sentinel uyumlu tetikleyiciyi) otonom olarak kullanmalısın.
-4. Kaydın başarılı olduğunu dosyanın içeriğini okuyarak teyit et.
+## Kaydet ve Sun (Zorunlu)
+JSON zinciri bittiğinde, **AI Sistemi Arayüzünde görünebilmesi için** EN SON aşamada `ArtifactType="implementation_plan"` olarak `write_to_file` komutunu kullanarak `implementation_plan.md` vitrinini oluştur.
+Bu vitrinin içine mutlaka:
+- Yapılacak teknik adımları
+- Ve `dispatcher.json`'dan elde ettiğin **[MISSION CONTROL] Model Önerisi ve Alternatiflerini** koy.
 
 ## Onay
-Sor:
-**Bu planı ve `artifacts.plan` dizinindeki yerleşimini onaylıyor musunuz? Her şey yolunda görünüyorsa ONAYLANDI (APPROVED) yazarak yanıtlayın.**
+Vitrin hazırlandıktan sonra kullanıcıya sor:
+**Aşağıdaki planı ve seçilen modeli (Mission Control) onaylıyor musunuz? (Modelinizi [Önerilen Model] olarak ayarlamayı unutmayın)**
 
 Eğer kullanıcı ONAYLANDI (APPROVED) yanıtını verirse:
 - Henüz uygulamaya GEÇME.
-- Şöyle yanıtla: **"Plan onaylandı. Uygulamayı başlatmak için `/superpowers-execute-plan` komutunu çalıştırın."**
-- İşlemi bitir ve kod değiştirmeye geçme.
+- Sistemi Execution moduna almak için onay al ve sonra kodlamaya geç.

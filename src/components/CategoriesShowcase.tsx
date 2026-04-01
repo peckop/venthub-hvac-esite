@@ -22,7 +22,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
   const getPopularCategories = () => {
     // Return specific popular categories
     return mainCategories.filter(cat =>
-      ['fanlar', 'isi-geri-kazanim-cihazlari', 'hava-perdeleri', 'hava-temizleyiciler'].includes(cat.slug)
+      ['fans', 'heat-recovery-units', 'air-curtains', 'air-purifiers'].includes(cat.slug)
     ).slice(0, 4)
   }
 

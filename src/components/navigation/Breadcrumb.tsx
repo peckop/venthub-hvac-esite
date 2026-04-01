@@ -22,7 +22,7 @@ interface BreadcrumbProps {
  * ```tsx
  * <Breadcrumb items={[
  *   { label: 'Ana Sayfa', href: '/' },
- *   { label: 'Fanlar', href: '/category/fanlar' },
+ *   { label: 'Fans', href: '/category/fans' },
  *   { label: 'Aksiyel Fanlar' } // Son item href yok
  * ]} />
  * ```

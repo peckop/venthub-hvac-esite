@@ -16,13 +16,13 @@ interface SolutionItem {
 const solutions: SolutionItem[] = [
   { 
     id: 'parking', 
-    href: '/category/industrial-ventilation/otopark-jet-fanlari', 
+    href: '/category/industrial-ventilation/jet-fans', 
     image: '/images/bento/parking.jpg',
     span: 'sm:col-span-2 lg:col-span-2'
   },
   { 
     id: 'kitchen', 
-    href: '/category/industrial-ventilation/kanal-tipi-fanlar', 
+    href: '/category/industrial-ventilation/duct-type-fans', 
     image: '/images/bento/kitchen.jpg',
     span: 'sm:col-span-1 lg:col-span-1'
   },

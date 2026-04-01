@@ -1,0 +1,75 @@
+{
+  "skill": "superpowers-write-plan",
+  "model": "Gemini 3.1 Pro (High)",
+  "date": "2026-04-01",
+  "brainstorm_ref": "registry/P04-Category-Architecture/active/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/brainstorm.json",
+  "execution_complexity": "HIGH",
+  "recommended_model": "Gemini 3.1 Pro (High)",
+  "requires_human_approval": true,
+  "objective": "Eski Türkçe kategori slug'larını İngilizce standardına geçirmek, SEO koruması için 301 yönlendirmelerini eklemek, TSX dosyalarındaki statik metinleri useI18n'e bağlamak ve bu değişimi ilişkisel DB mimarisinde kör nokta bırakmadan yürütmek.",
+  "assumptions": [
+    "Products tablosu category referansını slug tipi (string) üzerinden değil UUID tipi (category_id) üzerinden yapar; bu sayede slug güncellemesi bağımlı verileri kırmaz."
+  ],
+  "pre_checks": [
+    {
+      "claim": "Projede eski usül Türkçe slug rotaları bolca mevcut",
+      "verified": true,
+      "source": "grep_search ile fanlar slug'ının 100+ farklı noktada (TSX ve TS) geçtiği teyit edildi"
+    },
+    {
+      "claim": "Products tablosunun kırılma riski yoktur",
+      "verified": true,
+      "source": "DB migration'ları incelendi, products tablosunun UUID (category_id) ile bağlı olduğu, slug değişse bile CASCADE tehlikesi olmadığı doğrulandı. Files validated: supabase/migrations/20260401000001_update_categories_slug.sql, next.config.mjs, next.config.js, next.config.ts, scripts/db/checks/verify_categories.ts, scripts/db/migrations/distribute_products_smart.ts, src/components/CategoriesShowcase.tsx, src/views/category/CategoryLandingView.tsx, src/i18n/dictionaries/tr.ts, src/i18n/dictionaries/en.ts"
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "title": "DB Migration: Slug Güncellemeleri",
+      "files": ["supabase/migrations/20260401000001_update_categories_slug.sql"],
+      "changes": "Ana kategorilerin slug alanlarını İngilizce'ye çeviren (örn. fanlar -> fans) ve category_metadata.json içindeki eski statik yolları temizleyen UPDATE SQL eklenecek.",
+      "verify": "Herhangi bir DB init/status problemi olup olmadığı denetlenecek"
+    },
+    {
+      "id": 2,
+      "title": "SEO 301 Redirects Eklenmesi",
+      "files": ["next.config.mjs", "next.config.js", "next.config.ts"],
+      "changes": "Eski Türkçe slug gelen (/category/fanlar/:path*) URL'lerini (/category/fans/:path*) URL'sine 301 kalıcı olarak yönlendirecek yapı eklenecek.",
+      "verify": "next.config build/dry-run denetimi"
+    },
+    {
+      "id": 3,
+      "title": "Test Dosyalarının Refactoring'i (Review Uyarısı)",
+      "files": ["scripts/db/checks/verify_categories.ts", "scripts/db/migrations/distribute_products_smart.ts"],
+      "changes": "DB operasyonlarını CLI'dan yöneten mock ve script dosyaları içindeki 'fanlar' bazlı eski eşleştirmeler 'fans' veya UUID odaklı revize edilecek.",
+      "verify": "pnpm exec tsc -b ile ilgili scriptlerin derlenebilirliği test edilecek"
+    },
+    {
+      "id": 4,
+      "title": "Frontend Statik Kodların Ayıklanması",
+      "files": ["src/components/CategoriesShowcase.tsx", "src/views/category/CategoryLandingView.tsx"],
+      "changes": "UI içindeki path ve href eşleşmeleri yeni İngilizce rotalara uyarlanacak.",
+      "verify": "pnpm exec tsc -b tsconfig.build.json"
+    },
+    {
+      "id": 5,
+      "title": "Sözlük Güncellemesi (i18n)",
+      "files": ["src/i18n/dictionaries/tr.ts", "src/i18n/dictionaries/en.ts"],
+      "changes": "TSX dosyalarından çıkarılan statik yazılar için categories.fans vb. anahtarları i18n objelerine implement edilecek.",
+      "verify": "pnpm run lint"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Senkronizasyon: DB güncellenip Frontend Next.js Cache'te kalırsa 404 üretme ihtimali",
+      "severity": "high",
+      "mitigation": "Vercel / Prod deployment sırasındaki cache temizliği talimatlara eklenecek. Route'lar asenkron okunacak."
+    },
+    {
+      "risk": "(Öngörülen Ancak Çapraz Doğrulanan Risk) Veritabanında ürünlerin kategorilerden kopması",
+      "severity": "low",
+      "mitigation": "Review öncesi DB pre_check onayından geçildiği için bu risk UUID bağlantısıyla bypass edildi. Mitigation'a gerek yoktur."
+    }
+  ],
+  "rollback": "Migration geri alınır, next.config.js eski haline getirilir ve frontend dosyalarından (git reset --hard) geri dönülür."
+}
