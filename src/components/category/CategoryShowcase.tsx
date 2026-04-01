@@ -23,7 +23,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
     // Check if this is special showcase categories
     const isAirCurtain = category.slug === 'hava-perdeleri'
-    const isQuietFan = category.slug === 'sessiz-kanal-tipi-fanlar'
+    const isQuietFan = category.slug === 'quiet-duct-fans'
 
     interface CategoryMetadataExtended { showcase_images?: { desktop: string }[] }
     const metadata = category.metadata as CategoryMetadataExtended | null

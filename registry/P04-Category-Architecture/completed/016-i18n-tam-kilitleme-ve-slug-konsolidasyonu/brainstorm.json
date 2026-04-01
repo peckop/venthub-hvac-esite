@@ -1,0 +1,43 @@
+{
+  "skill": "superpowers-brainstorm",
+  "model": "Gemini 3.1 Pro (High)",
+  "date": "2026-04-01",
+  "goal": "Tüm View bileşenlerindeki eski Türkçe hardcoded slugları tam uyumlu useI18n() sözlüğüne ve İngilizce/kebab-case standardına taşıyarak siteyi i18n açısından kilitlemek.",
+  "constraints": [
+    "SEO optimizasyonu sebebiyle eski linkler 301 yönlendirmesiyle korunmak zorundadır",
+    "Next.js asenkron route (params) kırılmamalıdır"
+  ],
+  "known_context": "P04-015 göreviyle SSR mimarisine geçiş yapılarak rotalar düzeltildi. Sluglar 'fanlar', 'aksesuarlar' vb. olarak hardcoded kullanılıyor. Bu P04 projesinin son mühürleme görevidir.",
+  "risks": [
+    {
+      "severity": "high",
+      "description": "301 yönlendirmelerinin yanlış yapılandırılması sonucunda SEO trafik ölümü ve eski bookmarklarda sonsuz döngü kırılmaları."
+    },
+    {
+      "severity": "medium",
+      "description": "frontend viewlerinde dinamik kontrol yerine hala sabit Türkçe slug (if slug === 'fanlar') mantığı nedeniyle kategori bazlı görsellerin yüklenememesi."
+    }
+  ],
+  "options": [
+    {
+      "id": "A",
+      "title": "Middleware üzerinden Route Translation",
+      "selected": false,
+      "reason": "Dinamik olsa da Edge hesaplama performansını olumsuz etkiler ve DB statüsü ile farklılık yaratır."
+    },
+    {
+      "id": "B",
+      "title": "DB Güncellemesi + Next.config Redirects + useI18n",
+      "selected": true,
+      "reason": "Ana DB'nin tutarlılığını korur, redirects statik 301 ile tam performans verir ve codebase'i sonselliğe taşır."
+    }
+  ],
+  "recommendation": "DB referanslarını tamamen standartlaştırırken 301 next.config route'larıyla hatasız geçişi garanti eden Option B önerilir.",
+  "traces": [
+    {
+      "tool": "grep_search",
+      "target": "fanlar",
+      "finding": "Pek çok view ve config kodunda (örn: src/views/category/CategoryLandingView.tsx) slug hardcoded olarak 'fanlar' adıyla kullanıldığı doğrulandı."
+    }
+  ]
+}

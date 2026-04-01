@@ -277,9 +277,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             </button>
           )) : (
             [
-              { name: t('home.hero.quickChips.fans'), slug: 'fanlar' },
-              { name: t('home.hero.quickChips.airCurtains'), slug: 'hava-perdeleri' },
-              { name: t('home.hero.quickChips.heatRecovery'), slug: 'isi-geri-kazanim-cihazlari' }
+              { name: t('home.hero.quickChips.fans'), slug: 'fans' },
+              { name: t('home.hero.quickChips.airCurtains'), slug: 'air-curtains' },
+              { name: t('home.hero.quickChips.heatRecovery'), slug: 'heat-recovery-units' }
             ].map(cat => (
               <button
                 key={cat.slug}

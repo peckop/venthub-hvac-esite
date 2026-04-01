@@ -20,7 +20,7 @@ async function verify() {
         // Check renamed categories
         const renamedResult = await client.query(`
             SELECT name, slug, is_active FROM categories 
-            WHERE slug IN ('ec-motor-fanlar', 'frekans-konvertorler', 'nicotra-gebhardt-fanlar', 'danfoss')
+            WHERE slug IN ('ec-motor-fans', 'frequency-converters', 'fans')
             ORDER BY slug;
         `)
         console.warn('=== YENİDEN ADLANDIRILAN KATEGORİLER ===')
@@ -44,8 +44,8 @@ async function verify() {
         console.warn('\n=== is_active SÜTUNU ===')
         console.warn(JSON.stringify(columnResult.rows, null, 2))
 
-    } catch {
-        console.error('Error:', _e?.message || _e)
+    } catch (e: unknown) {
+        console.error('Error:', (e as Error)?.message || e)
     } finally {
         await client.end()
     }

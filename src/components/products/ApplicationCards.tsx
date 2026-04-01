@@ -21,7 +21,7 @@ const applications: ApplicationCard[] = [
         description: 'Konforlu hava kalitesi ve enerji tasarrufu.',
         icon: <Utensils size={20} />,
         image: '/images/bento/kitchen.jpg',
-        href: '/category/hava-perdeleri'
+        href: '/category/air-curtains'
     },
     {
         id: 'fabrika',
@@ -29,7 +29,7 @@ const applications: ApplicationCard[] = [
         description: 'Zorlu endüstriyel ortamlar için çözümler.',
         icon: <Factory size={20} />,
         image: '/images/bento/smoke.jpg',
-        href: '/category/fanlar'
+        href: '/category/fans'
     },
     {
         id: 'otopark',
@@ -37,7 +37,7 @@ const applications: ApplicationCard[] = [
         description: 'Güvenli ve temiz hava sirkülasyonu.',
         icon: <Car size={20} />,
         image: '/images/bento/parking.jpg',
-        href: '/category/fanlar'
+        href: '/category/fans'
     },
     {
         id: 'ofis',
@@ -45,7 +45,7 @@ const applications: ApplicationCard[] = [
         description: 'Verimli çalışma ortamları için ideal.',
         icon: <Building2 size={20} />,
         image: '/images/bento/hvac.jpg',
-        href: '/category/isi-geri-kazanim-cihazlari'
+        href: '/category/heat-recovery-units'
     }
 ]
 

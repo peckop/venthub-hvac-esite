@@ -14,21 +14,21 @@ type IconProps = { className?: string; size?: number }
 
 export const getCategoryIcon = (categorySlug: string, props: IconProps = {}) => {
   switch (categorySlug) {
-    case 'fanlar':
+    case 'fans':
       return <FanIcon {...props} />
-    case 'isi-geri-kazanim-cihazlari':
+    case 'heat-recovery-units':
       return <HeatRecoveryIcon {...props} />
-    case 'hava-perdeleri':
+    case 'air-curtains':
       return <AirCurtainIcon {...props} />
-    case 'nem-alma-cihazlari':
+    case 'dehumidifiers':
       return <DehumidifierIcon {...props} />
-    case 'hava-temizleyiciler':
+    case 'air-purifiers':
       return <AirPurifierIcon {...props} />
-    case 'flexible-hava-kanallari':
+    case 'flexible-air-ducts':
       return <FlexibleDuctIcon {...props} />
-    case 'hiz-kontrolu-cihazlari':
+    case 'speed-controllers':
       return <SpeedControlIcon {...props} />
-    case 'aksesuarlar':
+    case 'accessories':
       return <AccessoriesIcon {...props} />
     default:
       return <FanIcon {...props} />

@@ -24,9 +24,9 @@ export const TOPIC_TO_APP_KEY: Record<string, string> = {
  * Maps topics directly to the definitive Category Registry paths
  */
 export const TOPIC_TO_CATEGORY_URL: Record<string, string> = {
-    'hava-perdesi': '/products/commercial-ventilation/hava-perdeleri',
-    'jet-fan': '/products/industrial-ventilation/jet-fanlar',
-    'hrv': '/products/heat-recovery-vmc'
+    'hava-perdesi': '/category/air-curtains',
+    'jet-fan': '/category/jet-fans',
+    'hrv': '/category/heat-recovery-units'
 }
 
 /**
