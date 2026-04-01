@@ -2,7 +2,12 @@
 id: "000"
 title: "Roadmap"
 status: "Active"
+artifacts:
+  brainstorm: "registry/P05-Next15-Modernization/active/000-roadmap/brainstorm.md"
+  plan: "registry/P05-Next15-Modernization/active/000-roadmap/plan.md"
+  review: "registry/P05-Next15-Modernization/active/000-roadmap/review.md"
 ---
+
 
 # P05-Next15-Modernization Roadmap
 

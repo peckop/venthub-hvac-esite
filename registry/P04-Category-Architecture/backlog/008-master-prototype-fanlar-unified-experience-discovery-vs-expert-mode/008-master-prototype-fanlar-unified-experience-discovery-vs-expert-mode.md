@@ -13,6 +13,7 @@ artifacts:
   review: "registry/P04-Category-Architecture/backlog/008-master-prototype-fanlar-unified-experience-discovery-vs-expert-mode/review.md"
 ---
 
+
 # 🛠️ 008: Master Prototype: Fanlar Unified Experience (Discovery vs Expert Mode)
 
 ## 🎯 Hedefler

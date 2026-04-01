@@ -16,7 +16,7 @@ const getModelTypeForCategory = (slug?: string): string | undefined => {
     // Families / Groups
     if (s.includes('perde') || s.includes('air-curtain')) return 'AirCurtainModel'
     if (s.includes('temizleyici')) return 'AirPurifierModel'
-    if (s.includes('nem-alma')) return 'DehumidifierModel'
+    if (s.includes('nem-alma') || s.includes('dehumidifier')) return 'DehumidifierModel'
     if (s.includes('heat-recovery') || s.includes('isi-geri')) return 'HRVModel'
     if (s.includes('speed-control') || s.includes('hiz-kontrol')) return 'SpeedControlModel'
     if (s.includes('accessories') || s.includes('aksesuar')) return 'AccessoryModel'

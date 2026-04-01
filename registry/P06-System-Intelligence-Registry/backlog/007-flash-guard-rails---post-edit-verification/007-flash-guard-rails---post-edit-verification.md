@@ -12,6 +12,10 @@ artifacts:
   plan: "registry/P06-System-Intelligence-Registry/backlog/007-flash-guard-rails---post-edit-verification/plan.md"
   review: "registry/P06-System-Intelligence-Registry/backlog/007-flash-guard-rails---post-edit-verification/review.md"
 ---
+post-edit-verification/brainstorm.md"
+  plan: "registry/P06-System-Intelligence-Registry/backlog/007-flash-guard-rails---post-edit-verification/plan.md"
+  review: "registry/P06-System-Intelligence-Registry/backlog/007-flash-guard-rails---post-edit-verification/review.md"
+---
 
 # 🛠️ 007: Flash Guard Rails — Post-Edit Verification
 

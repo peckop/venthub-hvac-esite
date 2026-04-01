@@ -1,4 +1,3 @@
-```
 ---
 id: "009"
 title: "Hotfix: Fix Category Visibility and 3D Orbital Crash"
@@ -13,6 +12,7 @@ artifacts:
   plan: "registry/P04-Category-Architecture/backlog/009-hotfix-fix-category-visibility-and-3d-orbital-crash/plan.md"
   review: "registry/P04-Category-Architecture/backlog/009-hotfix-fix-category-visibility-and-3d-orbital-crash/review.md"
 ---
+
 
 # 🛠️ 009: Hotfix: Fix Category Visibility and 3D Orbital Crash
 

@@ -28,7 +28,7 @@ const solutions: SolutionItem[] = [
   },
   { 
     id: 'entrance', 
-    href: '/category/commercial-ventilation/hava-perdeleri', 
+    href: '/category/commercial-ventilation/air-curtains', 
     image: '/images/bento/entrance.jpg',
     span: 'sm:col-span-1 lg:col-span-1'
   },

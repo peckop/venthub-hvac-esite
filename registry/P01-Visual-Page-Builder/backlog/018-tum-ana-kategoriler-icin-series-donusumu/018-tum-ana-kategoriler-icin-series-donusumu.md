@@ -11,6 +11,7 @@ artifacts:
   plan: "registry/P01-Visual-Page-Builder/backlog/018-tum-ana-kategoriler-icin-series-donusumu/plan.md"
   review: "registry/P01-Visual-Page-Builder/backlog/018-tum-ana-kategoriler-icin-series-donusumu/review.md"
 ---
+
 # 🏗️ 018: Tüm Ana Kategoriler için Series Dönüşümü
 Görev içeriği buraya gelecek.
 

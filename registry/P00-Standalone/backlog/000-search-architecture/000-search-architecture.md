@@ -2,7 +2,12 @@
 id: "000"
 title: "Search Architecture"
 status: "Backlog"
+artifacts:
+  brainstorm: "registry/P00-Standalone/backlog/000-search-architecture/brainstorm.md"
+  plan: "registry/P00-Standalone/backlog/000-search-architecture/plan.md"
+  review: "registry/P00-Standalone/backlog/000-search-architecture/review.md"
 ---
+
 
 # Kurumsal Seviye Arama Mimarisi
 

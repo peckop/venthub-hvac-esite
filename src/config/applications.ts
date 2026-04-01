@@ -28,7 +28,7 @@ export const APPLICATION_CARDS: ApplicationCard[] = [
     key: 'air-curtain',
     title: 'AVM / Giriş Hava Perdesi',
     subtitle: 'Enerji kaybını azaltan giriş çözümleri',
-    href: '/category/hava-perdeleri',
+    href: '/category/air-curtains',
     icon: 'wind',
     accent: 'navy',
     active: true,
