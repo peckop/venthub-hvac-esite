@@ -15,6 +15,7 @@ artifacts:
   review: "registry/P01-Visual-Page-Builder/active/017-gorsel-sayfa-olusturucu-visual-page-builder/review.md"
 ---
 
+
 # 017 - Görsel Sayfa Oluşturucu (Visual Page Builder)
 
 ## 🎯 Hedef

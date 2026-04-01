@@ -13,6 +13,7 @@ artifacts:
   review: "registry/P04-Category-Architecture/backlog/010-urunleri-kesfet-sayfasi-yeniden-insa/review.md"
 ---
 
+
 # 🛠️ 010: urunleri-kesfet-sayfasi-yeniden-insa
 
 ## 🎯 Hedefler

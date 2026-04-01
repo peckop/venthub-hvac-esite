@@ -1,0 +1,13 @@
+# Brainstorm: 001-test-trivial-flow
+
+## 🎯 Goal
+...
+
+## 🛡️ Constraints & Risks
+...
+
+## 💡 Options & Recommendation
+...
+
+## ✅ Acceptance Criteria
+...

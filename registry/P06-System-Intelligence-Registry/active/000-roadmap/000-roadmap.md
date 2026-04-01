@@ -2,7 +2,12 @@
 id: "000"
 title: "Roadmap"
 status: "Active"
+artifacts:
+  brainstorm: "registry/P06-System-Intelligence-Registry/active/000-roadmap/brainstorm.md"
+  plan: "registry/P06-System-Intelligence-Registry/active/000-roadmap/plan.md"
+  review: "registry/P06-System-Intelligence-Registry/active/000-roadmap/review.md"
 ---
+
 
 # P06 - System Intelligence & Agent Infrastructure
 

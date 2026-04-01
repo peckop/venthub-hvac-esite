@@ -13,6 +13,7 @@ artifacts:
   review: "registry/P01-Visual-Page-Builder/backlog/021-premium-block-authority-statik-kalitesinde-dinamik-bloklar/review.md"
 ---
 
+
 # 🛠️ 021: Premium Block Authority: Statik Kalitesinde Dinamik Bloklar
 
 ## 🎯 Hedefler

@@ -11,5 +11,6 @@ artifacts:
   plan: "registry/P00-Standalone/backlog/034-error-boundary-resilience-layer/plan.md"
   review: "registry/P00-Standalone/backlog/034-error-boundary-resilience-layer/review.md"
 ---
+
 # 🏗️ 034: Error Boundary & Resilience Layer
 Görev içeriği buraya gelecek.
