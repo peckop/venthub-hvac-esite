@@ -11,6 +11,9 @@ Eğer mevcut modelin kod denetimi (code review) için yeterince "akıllı" deği
 
 Read and apply the `superpowers-review` skill.
 
+## Review Zorunlulukları (Anti-Halüsinasyon Kancası)
+Review esnasında KESİNLİKLE şu kurala uygunluğu test etmelisin:
+- **Fake Property Check:** TypeScript arayüzlerinde (Interface), Prisma şemalarında veya Zod modellerinde OLMAYAN "uydurma (hallucinated)" bir özellik (prop) UI'a veya fonksiyona atanmış mı? Eğer varsa bunu doğrudan **[BLOCKER]** olarak işaretle ve düzeltilmesini talep et. Testler ve derlemeler gerçek TS şemaları (Source of Truth) ile çalışmak zorundadır.
 Output:
 - Blockers
 - Majors
@@ -22,10 +25,10 @@ Output:
 After generating the review content above, you MUST write it to disk:
 
 1) Copy the full review markdown output.
-2) Run:
+2) Run (veya `multi_replace_file_content` tool'unu kullanarak otonom Sentinel imzasıyla kaydet):
 
 ```bash
-python .agent/skills/superpowers-workflow/scripts/write_artifact.py --path artifacts/superpowers/review.md
+python .agent/skills/superpowers-workflow/scripts/write_artifact.py --path registry/<PXX_PROJENIN_ROTASI>/review.md
 
 ```
 

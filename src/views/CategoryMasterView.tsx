@@ -15,9 +15,10 @@ import { DomainProduct } from '../lib/type-converters'
 
 interface CategoryMasterViewProps {
   initialCategory?: DomainCategory | null
+  initialProducts?: DomainProduct[]
 }
 
-const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory }) => {
+const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory, initialProducts }) => {
   const isMounted = useIsMounted()
   
   // 1. Pure Data Layer (Gateway)
@@ -29,7 +30,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
     loading,
     filters,
     updateFilters
-  } = useCategoryGateway(initialCategory)
+  } = useCategoryGateway(initialCategory, initialProducts)
 
   // 2. Presentation Layer (ViewModel)
   const { wrapCategory } = useCategoryViewModel()
@@ -44,7 +45,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
   }
 
   if (!category && !loading) {
-    return <ProductsDiscoveryView />
+    return <ProductsDiscoveryView products={products} isLoading={loading} />
   }
 
   // Determine which view to render based on ViewModel's displayMode

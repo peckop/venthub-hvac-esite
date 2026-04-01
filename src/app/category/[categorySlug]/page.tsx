@@ -1,7 +1,8 @@
 import React, { Suspense } from 'react'
 import PageComponent from '../../../views/CategoryPage'
-import { supabase } from '../../../lib/supabase'
+import { supabase, getProductsEnriched } from '../../../lib/supabase'
 import { mapDatabaseCategoryToDomain } from '../../../lib/type-converters'
+import type { DomainProduct } from '../../../lib/type-converters'
 import type { DbCategory } from '../../../types/db-rows'
 export async function generateStaticParams() {
   try {
@@ -58,6 +59,23 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
   const { categorySlug } = await params
   const category = await getCategoryData(categorySlug)
   
+  let products: DomainProduct[] = []
+  if (category) {
+    // Kategoriye ait varsa alt kategorilerin ID'lerini topla (SSR)
+    const { data: subsData } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('parent_id', category.id)
+      .eq('is_active', true)
+      
+    const categoryIds = [category.id, ...(subsData?.map(s => s.id) || [])]
+    
+    products = await getProductsEnriched({
+      categoryIds,
+      limit: 100
+    })
+  }
+  
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -77,7 +95,7 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy" />
         </div>
       }>
-        <PageComponent initialCategory={category} />
+        <PageComponent initialCategory={category} initialProducts={products} />
       </Suspense>
     </>
   )

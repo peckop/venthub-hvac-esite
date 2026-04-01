@@ -2,10 +2,11 @@
 
 import React from 'react';
 import CategoryMasterView from './CategoryMasterView';
-import type { DomainCategory } from '../lib/type-converters';
+import type { DomainCategory, DomainProduct } from '../lib/type-converters';
 
 export interface CategoryPageProps {
   initialCategory?: DomainCategory | null;
+  initialProducts?: DomainProduct[];
 }
 
 /**
@@ -13,8 +14,8 @@ export interface CategoryPageProps {
  * @description Dinamik Kategori Sayfası Giriş Noktası. 
  * Tüm mantık ve sunum merkezi Unified Category Shell (CategoryMasterView) bileşenine delege edilmiştir.
  */
-const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) => {
-  return <CategoryMasterView initialCategory={initialCategory} />;
+const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, initialProducts }) => {
+  return <CategoryMasterView initialCategory={initialCategory} initialProducts={initialProducts} />;
 };
 
 export default CategoryPage;
