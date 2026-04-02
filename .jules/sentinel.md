@@ -7,3 +7,8 @@
 **Vulnerability:** Found `admin-order-inspect` edge function directly invoking an admin RPC via `SUPABASE_SERVICE_ROLE_KEY` without extracting the `Authorization` header and validating `auth.getUser()`, allowing unauthenticated actors to read private orders.
 **Learning:** Edge functions are fully detached from Next.js middleware and Supabase RLS policies if they use the `SERVICE_ROLE_KEY`. Relying on Edge Functions to be "obscure" is dangerous.
 **Prevention:** Always construct a user-scoped Supabase client (using `createClient(url, anonKey, { global: { headers: { Authorization: authHeader } } })`), explicitly call `auth.getUser()`, and query the `user_profiles` table to enforce RBAC before executing any privileged `SERVICE_ROLE_KEY` logic.
+
+## 2024-05-20 - [HIGH] Fix XSS vulnerability in AuthorityRenderer
+**Vulnerability:** Found unescaped user-controlled HTML (`rtBlock.content.html`) being passed directly into `dangerouslySetInnerHTML` in the `AuthorityRenderer.tsx` component.
+**Learning:** The `dangerouslySetInnerHTML` React prop is inherently risky. If any rich text HTML content from a CMS or external source isn't sanitized correctly prior to rendering, an attacker could potentially inject malicious JavaScript (XSS).
+**Prevention:** In Next.js environments, use `isomorphic-dompurify` to safely sanitize the injected HTML on both the server and client (`dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}`).
