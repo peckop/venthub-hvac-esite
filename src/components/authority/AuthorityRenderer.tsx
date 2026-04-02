@@ -12,6 +12,7 @@ import {
   CtaBannerBlock as CtaBannerBlockType
 } from '@/types/authority';
 import { cn } from '@/lib/utils';
+import DOMPurify from 'isomorphic-dompurify';
 import VideoAuthority from './VideoAuthority';
 import ThreeDAuthority from './ThreeDAuthority';
 import TechnicalDrawingAuthority from './TechnicalDrawingAuthority';
@@ -246,7 +247,8 @@ export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> =
               <div 
                 key={rtBlock.id} 
                 className="max-w-4xl mx-auto py-16 px-6 prose prose-slate prose-lg md:prose-xl"
-                dangerouslySetInnerHTML={{ __html: rtBlock.content.html }}
+                /* 🛡️ Sentinel: Sanitize HTML content to prevent Cross-Site Scripting (XSS) vulnerabilities. */
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rtBlock.content.html) }}
               />
             );
           }
