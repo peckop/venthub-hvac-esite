@@ -505,8 +505,16 @@ def check_scope(json_path: str | Path) -> None:
         return
         
     try:
-        res = subprocess.run(["git", "diff", "HEAD", "--name-only"], capture_output=True, text=True, check=True)
-        changed_files = [f.strip() for f in res.stdout.splitlines() if f.strip()]
+        # 1. Tracked (İzlenen) Değişiklikler
+        res_tracked = subprocess.run(["git", "diff", "HEAD", "--name-only"], capture_output=True, text=True, check=True)
+        tracked_files = [f.strip() for f in res_tracked.stdout.splitlines() if f.strip()]
+        
+        # 2. Untracked (Yeni oluşturulup git add yapılmamış) Dosyalar
+        res_untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], capture_output=True, text=True, check=True)
+        untracked_files = [f.strip() for f in res_untracked.stdout.splitlines() if f.strip()]
+        
+        # Hepsini birleştir (Tekrarları set ile sil)
+        changed_files = list(set(tracked_files + untracked_files))
     except subprocess.CalledProcessError as e:
         print(f"⚠️ Git diff alınamadı: {e}. Devam ediliyor ancak Scope Police çalışamıyor.")
         return
