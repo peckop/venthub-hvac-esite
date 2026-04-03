@@ -1,5 +1,5 @@
 # 🛰️ VENTHUB MISSION CONTROL (PULSE)
-> **Güncelleme:** 01.04.2026 15:09 | **İlerleme:** %62
+> **Güncelleme:** 03.04.2026 11:01 | **İlerleme:** %67
 
 ## 📁 P00-STANDALONE
 ### ⏳ Backlog
@@ -50,14 +50,10 @@
 ### ⏳ Backlog
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
 |:---|:---|:---|
-| `009`  | Hotfix Fix Category Visibility And 3D Orbi    | ⚡ MED        |
 | `008`  | Master Prototype: Fanlar Unified Experienc    | 🔥 HIGH       |
+| `009`  | Hotfix: Fix Category Visibility and 3D Orb    | 🔥 HIGH       |
 | `010`  | urunleri-kesfet-sayfasi-yeniden-insa          | 🔥 HIGH       |
-### ✅ Tamamlananlar
-| ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
-|:---|:---|:---|:---|:---|
-| `015`  | Server-First Slot Architecture (SSR Gecisi)   | ✅ DONE       | 🏗️ RUN       | `100%`     |
-| `016`  | i18n Tam Kilitleme ve Slug Konsolidasyonu     | ✅ DONE       | 🏗️ RUN       | `100%`     |
+
 ## 📁 P05-NEXT15-MODERNIZATION
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
@@ -73,17 +69,9 @@
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
 |:---|:---|:---|:---|:---|
 | `000`  | Roadmap                                       | ⚡ MED        | ⏳ WAIT       | `0%`       |
-| `099`  | Test Gorev Deneme                             | 🔥 HIGH       | 🏗️ RUN       | `100%`     |
-| `200`  | Test Gorev Deneme 2                           | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
+| `200`  | Test Gorev Deneme 2                           | 🔥 HIGH       | 📝 PLAN       | `0%`       |
 ### ⏳ Backlog
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
 |:---|:---|:---|
 | `007`  | Flash Guard Rails - Post-Edit Verification    | 🔥 HIGH       |
-| `999`  | Test Complexity                               | 🔥 HIGH       |
-
-## 📁 P99-REGISTRY-TEST
-### ⚡ Aktif Görevler
-| ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
-|:---|:---|:---|:---|:---|
-| `001`  | Otonom Prosedur Denetimi                      | 🔥 HIGH       | 🏗️ RUN       | `100%`     |
 
