@@ -1,4 +1,4 @@
-// @ts-expect-error - NodeJS path module is available in the Vite environment but may lack explicit root types
+// @ts-ignore - NodeJS path module is available in the Vite environment but may lack explicit root types in some environments
 import * as path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vitest/config"
