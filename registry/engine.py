@@ -483,6 +483,69 @@ def pipeline_status(task_dir: str | Path) -> dict[str, Any]:
     return status
 
 
+def check_scope(json_path: str | Path) -> None:
+    """Verilen JSON sözleşmesindeki kısıtlamaları (Scope) 'git diff' ile test eder."""
+    import subprocess
+    import fnmatch
+    
+    path = Path(json_path)
+    if not path.exists():
+        print(f"❌ JSON bulunamadı: {path}")
+        sys.exit(1)
+        
+    data = _load_json(path)
+    
+    allowed = data.get("allowed_paths", [])
+    forbidden = data.get("forbidden_paths", [])
+    max_count = data.get("max_files_changed", 999)
+    
+    # Bazen JSON'da eksik olabilir (eski tasklar için)
+    if not allowed and not forbidden and max_count == 999:
+        print("⚠️ Uyarı: Bu görev eski formatta, Scope Contract kısıtlamaları bulunmuyor. Bypass ediliyor.")
+        return
+        
+    try:
+        res = subprocess.run(["git", "diff", "HEAD", "--name-only"], capture_output=True, text=True, check=True)
+        changed_files = [f.strip() for f in res.stdout.splitlines() if f.strip()]
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️ Git diff alınamadı: {e}. Devam ediliyor ancak Scope Police çalışamıyor.")
+        return
+        
+    errors = []
+    
+    if len(changed_files) > max_count:
+        errors.append(f"Değiştirilen dosya sayısı bütçeyi aştı! Sınır: {max_count}, Değişen: {len(changed_files)}")
+        
+    for f in changed_files:
+        f_posix = f.replace("\\", "/") 
+        
+        is_forbidden = False
+        for fpat in forbidden:
+            if fnmatch.fnmatchcase(f_posix, fpat) or f_posix.startswith(fpat.strip("/*")):
+                is_forbidden = True
+                break
+        if is_forbidden:
+            errors.append(f"[SCOPE BLOCKED] '{f}' kesinlikle YASAKLI (forbidden_paths) alanda.")
+            continue
+            
+        is_allowed = False
+        for apat in allowed:
+            if fnmatch.fnmatchcase(f_posix, apat) or f_posix.startswith(apat.strip("/*")):
+                is_allowed = True
+                break
+                
+        if not is_allowed:
+            errors.append(f"[SCOPE BLOCKED] '{f}' izinli alanın dışında.\n   → Bu değişiklik için yeni Trivial Task açılması gerekiyor.\n   → Mevcut görev sadece izni olan dosyalarla devam edebilir.")
+
+    if errors:
+        print("🚨 Scope Police (Sınır Polisi) Müdahalesi!")
+        for err in errors:
+            print(f"  ❌ {err}")
+        sys.exit(1)
+        
+    print("✅ Scope Police: Sözleşme sınırları içinde kalındı. [PASS]")
+
+
 def finalize_task(task_dir: str | Path) -> None:
     """Görevi finalize eder: Git mv ile klasörü taşır, PULSE.md'yi günceller."""
     import subprocess
@@ -665,6 +728,12 @@ def main() -> None:  # noqa: C901
             print("Kullanım: python registry/engine.py finalize-task <görev_klasörü>")
             sys.exit(1)
         finalize_task(sys.argv[2])
+
+    elif action == "check-scope":
+        if len(sys.argv) < 3:
+            print("Kullanım: python registry/engine.py check-scope <dosya.json>")
+            sys.exit(1)
+        check_scope(sys.argv[2])
 
     else:
         print(f"Bilinmeyen komut: {action}")
