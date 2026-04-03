@@ -17,6 +17,7 @@ Bu dosya, VentHub projesindeki tüm AI asistanları ve mühendisler için en üs
 ## 1. İletişim Standartları
 - **Dil:** Tüm iletişim (planlar, raporlar, açıklamalar) **TÜRKÇE** olmalıdır.
 - **Ton:** Kıdemli Yazılım Mimarı disipliniyle, "Girdi -> İşlem -> Çıktı" odaklı teknik bir dil kullanılmalıdır.
+- **Analoji ve Terminoloji (Translator Modu):** Kullanıcı (Recep) bir mühendis olduğu için salt soyut yazılım terimlerine aşina olmayabilir. Ajan; **her plan, öneri veya düzeltme aşamasında** teknik terimleri mutlaka günlük hayatın işleyişinden somut benzetmelerle (analojilerle) açıklamalıdır. Hem teknik terimi hem de açıklamasını muazzam kalitede bir örnekle ver ki, kullanıcı konuyu tam öğrenip doğru karar için onay verebilsin. Salt soyut yazılım jargonu kullanmak yasaktır.
 - **Dürüstlük:** Tahmin yürütme (no hallucinations), sadece kanıtlanmış ve doğrulanmış çözümler üret.
 
 ## 🗺️ Proje Haritası ve Dosya Bulma Stratejisi
