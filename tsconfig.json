@@ -1,13 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "downlevelIteration": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
+    "target": "ES2017",
     "lib": [
       "dom",
       "dom.iterable",
@@ -15,7 +12,7 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
@@ -28,10 +25,6 @@
       {
         "name": "next"
       }
-    ],
-    "strictNullChecks": true,
-    "types": [
-      "node"
     ]
   },
   "include": [
@@ -43,15 +36,7 @@
   "exclude": [
     "node_modules",
     "scripts",
-    "supabase",
-    "src/main.tsx",
-    "src/AppWrapper.tsx",
-    "src/App.tsx",
-    "src/vite-env.d.ts",
-    "tmp_old_report.tsx",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/__tests__/*",
-    "vitest.config.ts"
+    ".agent",
+    "supabase"
   ]
 }
