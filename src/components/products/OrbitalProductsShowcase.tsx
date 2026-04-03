@@ -1,4 +1,5 @@
 "use client"
+import { Routes } from '../../utils/routes'
 
 import React, { useRef, useState, useMemo, useCallback, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
@@ -207,7 +208,7 @@ const OrbitalCard: React.FC<{
     const handleDoubleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
         // Çift tık: Direkt kategori sayfasına git
-        router.push(`/category/${item.id}`)
+        router.push(Routes.category(item.id))
     }, [router, item.id])
 
     const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
