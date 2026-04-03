@@ -15,9 +15,13 @@ Bir AI asistanı göreve başladığında şu otonom akışı izler:
    - `/bitir` → Dörtlü Mühür (Lint + TSC + Build) + `python registry/engine.py finalize-task registry/PXX/YYY`
 4. **Gatekeeper (V8 Engine):** Pipeline durumu için `python registry/engine.py pipeline status registry/PXX/YYY` komutu kullanılır. Eksik veya geçersiz artifact varsa süreç ilerleyemez.
 
-## 2. Nihai Hedef: "Visual Page Builder"
-Projenin kalbi, kategori ve ürün sayfalarını kod bağımlılığından kurtarmaktır. Her yeni görev (Otorite kurma, teknik zeka vb.), bu görsel oluşturucunun bir parçasıdır.
+## 2. Nihai Hedefler ve Mimari Felsefe (Soket Mantığı)
+VentHub sıradan bir e-ticaret sitesi değil, otonom çalışan modüllerden oluşan **merkezi bir mühendislik platformudur**. Bütün geliştirmeler, yerel (sayfa bazlı) manuel çözümler yerine "soket" mantığıyla çalışan iki ana motor etrafında şekillenir:
 
+1. **Visual Page Builder (Görsel İçerik Motoru - P01 & P04):** Kategori ve ürün sayfalarını kod bağımlılığından kurtarmak, parçalanabilir dinamik bloklar (Master Prototype, Unified Category Shell) inşa etmek.
+2. **Autonomous SEO & Performance Engine (Otonom SEO Motoru - P00/031 & P05):** Yüzlerce sayfa için manuel ayar yapmak yerine; veritabanından okuduğu veriyle otomatik JSON-LD (Product, Breadcrumb vb.) üreten fabrikalar, merkezi i18n Alt-Tag fallback sistemleri ve Next.js 15 Suspense/PPR ile çalışan CLS (kayma) engelleyici global skeleton mimarileri kurmak.
+
+Her yeni görev bu iki motorun bir "soket eklentisi" olacak şekilde global tasarlanmalıdır. Lokal ve tekrar eden çözümler Mimari Anayasa'ya aykırıdır.
 ## 3. Kodlama ve Tip Güvenliği
 - Tüm işlemler `src/types/database.types.ts` merkezli yürütülür.
 - `any` kullanımı kesinlikle yasaktır (Anayasa kuralı).

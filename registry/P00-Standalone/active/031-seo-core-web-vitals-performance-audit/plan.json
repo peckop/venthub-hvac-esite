@@ -1,0 +1,80 @@
+{
+  "skill": "superpowers-write-plan",
+  "model": "Gemini 2.5 Pro",
+  "date": "2026-04-02",
+  "brainstorm_ref": "brainstorm.json",
+  "execution_complexity": "MEDIUM",
+  "recommended_model": "Gemini Pro",
+  "requires_human_approval": true,
+  "objective": "Tüm sistem genelinde UUID -> Slug dönüşümünün frontend sızıntılarını kapatmak. Routes sınıfına legacy fallback tanımlamak ve sitemap.ts üzerinde gereksiz (slug olmayan) ürün sızıntılarını seo açısından iptal etmek.",
+  "assumptions": [
+    "Siparişlerin veritabanı (venthub_order_items) şemasında product_slug bulunmuyor, bu sebeple product_id ile linkleme bilerek yapılıyor ve buna 'Routes.legacyProduct' atanabilir.",
+    "Next.js App router uzerinden donen parametre artik id degil 'slug' olarak anilmalidir."
+  ],
+  "pre_checks": [
+    {
+      "claim": "sitemap.ts dosyasında prod.slug || prod.id fallback yapısı vardır",
+      "verified": true,
+      "source": "view_file sitemap.ts"
+    },
+    {
+      "claim": "ProductDetailPage.tsx icinde params?.id sorgulanmaktadir",
+      "verified": true,
+      "source": "grep_search ve view_file ProductDetailPage"
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "title": "src/utils/routes.ts güncellemesi",
+      "files": [
+        "src/utils/routes.ts"
+      ],
+      "changes": "Routes nesnesine 'legacyProduct(id: string)' eklenecek ve 'product(slug: string)' metodu guncellenecek.",
+      "verify": "npx tsc --noEmit"
+    },
+    {
+      "id": 2,
+      "title": "sitemap.ts ve page metadata temizliği",
+      "files": [
+        "src/app/sitemap.ts",
+        "src/app/products/[slug]/page.tsx"
+      ],
+      "changes": "sitemap.ts içindeki 'prod.slug || prod.id' mantığı kaldırılarak sadece slug içeren ürünler haritaya alınacak. page.tsx teki kalmis cift basli permanentRedirect kaldirilacak.",
+      "verify": "pnpm test -- --run"
+    },
+    {
+      "id": 3,
+      "title": "Client bilesen Param.id okuma bagimlilik giderimi",
+      "files": [
+        "src/views/ProductDetailPage.tsx",
+        "src/app/_components/ProductDetailPageView.tsx"
+      ],
+      "changes": "Component props veya hook icinde params.id aramasi params?.slug aramadina degistirilecek.",
+      "verify": "pnpm run lint"
+    },
+    {
+      "id": 4,
+      "title": "Raw UUID URL sızıntılarının temizliği",
+      "files": [
+        "src/views/account/OrderDetailPage.tsx",
+        "src/components/SearchOverlay.tsx",
+        "src/components/TickerCardLane.tsx",
+        "src/components/QuickViewModal.tsx",
+        "src/components/ProductFlow.tsx",
+        "src/views/BrandDetailPage.tsx",
+        "src/components/category/EnhancedNeedsWizard.tsx"
+      ],
+      "changes": "Tüm componentlerde '/products/' seklinde string interpolation yerine kesin ve hatasiz olarak Routes() servisi ('product' ve OrderDetails icin 'legacyProduct') kullanilmasi saglanacak.",
+      "verify": "pnpm run build"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Diger view componentlerinde tip eksikligi dolayisiyla routes guncellemesinde TypeScript error",
+      "severity": "medium",
+      "mitigation": "npx tsc --noEmit ile tip dogrulamasi yapilmadan kod gonderilmeyecek."
+    }
+  ],
+  "rollback": "Değişiklikleri git restore src komutu ile geri almak."
+}

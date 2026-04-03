@@ -1,0 +1,54 @@
+{
+  "skill": "superpowers-brainstorm",
+  "model": "Gemini 2.5 Pro",
+  "date": "2026-04-02",
+  "goal": "UUID -> Slug geçişini tamamlamak, UUID sızıntısını kapatmak, sitemap.ts üzerinde SEO güvenliği sağlamak ve gereksiz 'slug || id' çift başlılık bağımlılıklarını UI ve sistemden tamamen temizlemek.",
+  "constraints": [
+    "Next.js App Router yapısına (params.slug kullanımı) uygun kodlama yapılmalı.",
+    "Sipariş (Order) detayları gibi veri tabanı mimarisine dokunan kısımlar mevcut görev kapsamı dahilinde ALTER TABLE ile değiştirilmemeli ('Scope Creep' önlenmesi).",
+    "Sitemap, UUID veya ID sızıntısını kesinlikle barındırmamalı, sadece tanımlı slug'lar kullanılmalı."
+  ],
+  "known_context": "ProductDetailPage.tsx ve bazı UI bileşenleri hala 'params.id' okuyor veya `/products/${id}` yönlendirmesi üretiyor. Sipariş detaylarında slug yerine UUID kullanılarak link oluşturuluyor ve Routes yardımcı sınıfları by-pass ediliyor. sitemap.ts slug yoksa UUID veriyor.",
+  "risks": [
+    {
+      "severity": "medium",
+      "description": "Eski siparişlerdeki product_id kullanımı legacy methodlarla desteklenmezse veya edge redirect dikkate alınmazsa 404 sayfalarına çıkabilir."
+    },
+    {
+      "severity": "high",
+      "description": "Sitemap'te id fallback kullanımı sebebiyle arama motorlarının duplicate (Çift başlı) UUID URL'leri oluşturması, SEO değerini sıfırlaması."
+    }
+  ],
+  "options": [
+    {
+      "id": "A",
+      "title": "Central Route Edge Sızıntı Yaması + Legacy Route",
+      "selected": true,
+      "reason": "Mevcut architecture sınırlarını koruyarak OrderItems için geçici ve bilinen UUID desteği (legacyProduct) sağlarken, genel sistemde katı 'Routes.product(slug)' kurallarını uygular."
+    },
+    {
+      "id": "B",
+      "title": "Tam DB Schema Değişimi (Order Items Otonom Slug Snapshot)",
+      "selected": false,
+      "reason": "Scope creep yaratır. venthub_order_items tablosuna slug alanı eklemek ve checkout sürecini güncellemek başka bir Mimarisi/Görevin konusudur."
+    }
+  ],
+  "recommendation": "Option A seçilmelidir. 'Routes.product(slug)' kesinleştirilmeli. OrderDetailPage gibi yerler için anlaşılır bir şekilde 'Routes.legacyProduct(id)' oluşturulup Edge 308 rule tetiklenmesi belgelenmelidir. Uygulamanın diğer her yerindeki `slug || id` kodları temizlenmelidir.",
+  "traces": [
+    {
+      "tool": "grep_search",
+      "target": "src/",
+      "finding": "/products/ dizilimi hala bazi komponentlerde (UI bilesenleri, kartlar) raw olarak kullaniliyor."
+    },
+    {
+      "tool": "view_file",
+      "target": "ProductDetailPage.tsx",
+      "finding": "App Router params altindan slug degil 'id' kullanilarak deger okunmaya calisiliyor."
+    },
+    {
+      "tool": "view_file",
+      "target": "sitemap.ts",
+      "finding": "Sitemap uretiminde 'prod.slug || prod.id' formatiyle SEO'ya UUID sizintisina olanak saglaniyor."
+    }
+  ]
+}

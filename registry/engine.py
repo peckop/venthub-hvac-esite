@@ -7,7 +7,6 @@ Girdi: JSON artifact dosyaları (brainstorm.json, plan.json, review.json)
 
 import json
 import sys
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +20,6 @@ except ImportError:
 
 REGISTRY_DIR = Path(__file__).parent.absolute()
 SCHEMAS_DIR = REGISTRY_DIR / "schemas"
-SHARED_MEMORY_PATH = REGISTRY_DIR.parent / ".gemini" / "memory" / "shared_state.json"
 
 # Artifact tipi → şema dosyası eşlemesi
 SCHEMA_MAP: dict[str, str] = {
@@ -498,9 +496,7 @@ def finalize_task(task_dir: str | Path) -> None:
 
     status = pipeline_status(task_path)
     if "❌" in str(status):
-        reason = "Pipeline hatalı veya eksik artifact var"
-        _log_blocked_to_memory(task_path, reason)
-        print(f"❌ Görev kapatılamaz: {reason}. 💾 Hafizaya BLOCKED kaydı yazıldı.")
+        print("❌ Görev kapatılamaz, pipeline hatalı veya eksik. Çözün ve tekrar deneyin.")
         sys.exit(1)
 
     print("✅ Pipeline tamamen geçerli. Finalization (kapatma) silsilesi başlıyor...")
@@ -590,83 +586,6 @@ def finalize_task(task_dir: str | Path) -> None:
     print(f"🚀 Otonom Kapatma Başarılı! Sıradaki görev: git commit -am 'feat: complete {task_path.name}'")
 
 
-# ── Paylaşımlı Hafıza (remember / recall / BLOCKED logger) ──
-
-def _load_shared_memory() -> dict[str, Any]:
-    """shared_state.json dosyasını yükler; yoksa boş yapı döner."""
-    if SHARED_MEMORY_PATH.exists():
-        try:
-            with open(SHARED_MEMORY_PATH, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except (json.JSONDecodeError, OSError):
-            pass
-    return {"history": [], "last_update": ""}
-
-
-def _save_shared_memory(data: dict[str, Any]) -> None:
-    """shared_state.json dosyasına yazar."""
-    SHARED_MEMORY_PATH.parent.mkdir(parents=True, exist_ok=True)
-    data["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open(SHARED_MEMORY_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-
-def remember(fact: str, entry_type: str = "NOTE") -> None:
-    """Ajanlar arası paylaşımlı hafızaya not ekler.
-
-    Girdi: Kaydedilecek metin (fact) ve tip (NOTE / BLOCKED / DECISION)
-    Çıktı: .gemini/memory/shared_state.json güncellenir
-    """
-    data = _load_shared_memory()
-    data["history"].append({
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "type": entry_type,
-        "fact": fact,
-    })
-    _save_shared_memory(data)
-
-
-def _log_blocked_to_memory(task_path: Path, reason: str) -> None:
-    """finalize-task engellendiğinde motoru otomatik olarak BLOCKED kaydı oluşturur.
-
-    Girdi: Görev klasör yolu + engel nedeni
-    Çıktı: shared_state.json'a yapısal BLOCKED kaydı eklenir
-    Amaç: Ajan bunu unutsa bile motor kaydeder — 'Hayalet İş' senaryosu engellenir.
-    """
-    fact = (
-        f"[BLOCKED] Görev: {task_path.name} | "
-        f"Neden: {reason} | "
-        f"Devam: python registry/engine.py finalize-task {task_path}"
-    )
-    remember(fact, entry_type="BLOCKED")
-
-
-def recall(limit: int = 10) -> None:
-    """Paylaşımlı hafızadan son kayıtları okur; BLOCKED olanları önce listeler.
-
-    Ajanın yeni bir oturumda ilk yapacağı şey bu komutu çalıştırmaktır.
-    """
-    data = _load_shared_memory()
-    history = data.get("history", [])
-
-    blocked = [e for e in history if isinstance(e, dict) and e.get("type") == "BLOCKED"]
-    notes = [e for e in history if isinstance(e, dict) and e.get("type") != "BLOCKED"]
-
-    if blocked:
-        print(f"\n🚨 DURAKLATILMIŞ GÖREVLER ({len(blocked)} adet — önce bunları çöz!)")
-        for entry in blocked[-5:]:
-            print(f"   [{entry.get('timestamp', '?')}] {entry.get('fact', '')}")
-    else:
-        print("\n✅ Duraklatılmış görev yok.")
-
-    print(f"\n📝 SON {min(limit, len(notes))} NOT:")
-    for entry in notes[-limit:]:
-        ts = entry.get("timestamp") or entry.get("last_update", "?")
-        fact = entry.get("fact") or ""
-        if fact:
-            print(f"   [{ts}] {fact[:120]}")
-
-
 # ── CLI ──
 def main() -> None:  # noqa: C901
     """CLI — validate, create-task, cross-validate ve pipeline komutları."""
@@ -743,39 +662,9 @@ def main() -> None:  # noqa: C901
 
     elif action == "finalize-task":
         if len(sys.argv) < 3:
-            _log_blocked_to_memory(Path("unknown"), "Eksik argüman: finalize-task <görev_klasörü>")
             print("Kullanım: python registry/engine.py finalize-task <görev_klasörü>")
             sys.exit(1)
-        try:
-            finalize_task(sys.argv[2])
-        except Exception as e:
-            _log_blocked_to_memory(Path(sys.argv[2]), str(e))
-            raise
-
-    elif action == "remember":
-        if len(sys.argv) < 3:
-            print("Kullanım: python registry/engine.py remember \"not metni\" [--type NOTE|DECISION|BLOCKED]")
-            sys.exit(1)
-        # Tip argümanı varsa ayıkla
-        rem_args = sys.argv[2:]
-        entry_type = "NOTE"
-        if "--type" in rem_args:
-            idx = rem_args.index("--type")
-            if idx + 1 < len(rem_args):
-                entry_type = rem_args[idx + 1].upper()
-                rem_args = rem_args[:idx] + rem_args[idx + 2:]
-        fact = " ".join(rem_args)
-        remember(fact, entry_type=entry_type)
-        print(f"💾 Hafızaya kaydedildi [{entry_type}]: {fact[:80]}")
-
-    elif action == "recall":
-        limit = 10
-        if len(sys.argv) >= 3:
-            try:
-                limit = int(sys.argv[2])
-            except ValueError:
-                pass
-        recall(limit=limit)
+        finalize_task(sys.argv[2])
 
     else:
         print(f"Bilinmeyen komut: {action}")
