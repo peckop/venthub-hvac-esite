@@ -30,5 +30,5 @@ jobs:
             ⚠️ STRICT BOUNDARIES:
             - DO NOT TOUCH: src/types/database.types.ts, src/lib/supabase.ts, supabase/, package.json.
             - DO NOT OVER-MEMOIZE. Only apply memoization to heavy components or items rendered inside large lists.
-            - MUST PASS BEFORE PR: pnpm run lint, pnpm exec tsc -b tsconfig.build.json, pnpm test -- --run, pnpm run build:ci.
+            - MUST PASS BEFORE PR: pnpm run lint, pnpm exec tsc --noEmit, pnpm test -- --run, pnpm run build:ci.
             - READ: AGENTS.md.

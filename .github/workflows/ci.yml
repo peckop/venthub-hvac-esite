@@ -37,7 +37,7 @@ jobs:
         run: pnpm run lint
 
       - name: Type check
-        run: pnpm exec tsc -b tsconfig.build.json
+        run: pnpm exec tsc --noEmit
 
       - name: Test
         run: pnpm test -- --run --reporter=dot
