@@ -2,13 +2,14 @@ import React from 'react'
 import Link from 'next/link'
 import { trackEvent } from '../utils/analytics'
 import { useI18n } from '../i18n/I18nProvider'
+import { Routes } from '../utils/routes'
 
 const FAQShortSection: React.FC = () => {
   const { t } = useI18n()
   const items = [
-    { q: t('homeFaq.items.airCurtain.q'), a: t('homeFaq.items.airCurtain.a'), href: '/support/sss' },
-    { q: t('homeFaq.items.jetFan.q'), a: t('homeFaq.items.jetFan.a'), href: '/support/sss' },
-    { q: t('homeFaq.items.hrv.q'), a: t('homeFaq.items.hrv.a'), href: '/support/sss' },
+    { q: t('homeFaq.items.airCurtain.q'), a: t('homeFaq.items.airCurtain.a'), href: Routes.destek.sss() },
+    { q: t('homeFaq.items.jetFan.q'), a: t('homeFaq.items.jetFan.a'), href: Routes.destek.sss() },
+    { q: t('homeFaq.items.hrv.q'), a: t('homeFaq.items.hrv.a'), href: Routes.destek.sss() },
   ] as const
 
   return (

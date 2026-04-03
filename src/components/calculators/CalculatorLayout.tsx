@@ -40,7 +40,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Breadcrumb */}
                     <Link
-                        href={backLink}
+                        href={backLink as import('next').Route}
                         className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-4 transition-colors"
                     >
                         <ArrowLeft size={16} />

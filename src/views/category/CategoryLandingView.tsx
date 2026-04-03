@@ -1,4 +1,5 @@
 'use client';
+import { Routes } from '../../utils/routes'
 
 import React, { useState, useRef, useEffect } from 'react'
 import { type DomainProduct } from '../../lib/type-converters'
@@ -50,7 +51,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
     const breadcrumbItems = [
         { label: 'Ana Sayfa', href: '/' },
-        ...(parentVm ? [{ label: parentVm.displayName, href: `/category/${parentVm.slug}` }] : []),
+        ...(parentVm ? [{ label: parentVm.displayName, href: Routes.category(parentVm.slug) }] : []),
         { label: vm?.displayName || category.name, href: '' }
     ]
 

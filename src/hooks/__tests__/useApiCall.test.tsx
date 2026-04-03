@@ -25,7 +25,7 @@ describe('useApiCall hook', () => {
     })
 
     it('başarılı api çağrısında data döner ve loading statesini düzgün yönetir', async () => {
-        const { result } = renderHook(() => useApiCall())
+        const { result } = renderHook(() => useApiCall<{ id: number, name: string }>())
         const mockData = { id: 1, name: 'test' }
         const mockApiFunc = vi.fn().mockResolvedValue(mockData)
 

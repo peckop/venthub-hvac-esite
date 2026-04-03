@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState, startTransition } from 'react'
 import { fetchHomeProducts, LiteProduct } from '../lib/productsApi'
 import TickerLane from './TickerLane'
 import TickerCardLane from './TickerCardLane'
+import { Routes } from '../utils/routes'
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false)
@@ -14,6 +15,22 @@ function usePrefersReducedMotion() {
     return () => mq.removeEventListener?.('change', onChange)
   }, [])
   return reduced
+}
+
+function useIsCoarse() {
+  const [isCoarse, setIsCoarse] = useState(false)
+  useEffect(() => {
+    try {
+      const mq = window.matchMedia('(pointer: coarse)')
+      const onChange = () => setIsCoarse(!!mq.matches)
+      onChange()
+      mq.addEventListener?.('change', onChange)
+      return () => mq.removeEventListener?.('change', onChange)
+    } catch {
+      return
+    }
+  }, [])
+  return isCoarse
 }
 
 const useProductsWithImages = () => {
@@ -61,7 +78,7 @@ const useProductsWithImages = () => {
 const ProductFlow: React.FC = () => {
   const { items, allItems, loading, reduced } = useProductsWithImages()
   const urls = useMemo(() => items.map(p => p.image_url!).filter(Boolean), [items])
-  const isCoarse = (() => { try { return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches } catch { return false } })()
+  const isCoarse = useIsCoarse()
   const rotateProducts = (arr: LiteProduct[], n: number) => {
     if (!arr.length) return arr
     const k = ((n % arr.length) + arr.length) % arr.length
@@ -141,7 +158,7 @@ const ProductFlow: React.FC = () => {
   }
 
   const toTickerItems = (prods: LiteProduct[]) =>
-    prods.map(p => ({ src: p.image_url!, href: `/products/${p.id}` as const, alt: p.name }))
+    prods.map(p => ({ src: p.image_url!, href: Routes.product(p.slug!), alt: p.name }))
 
   return (
     <section className="py-8">

@@ -1,4 +1,5 @@
 'use client'
+import { Routes } from '../utils/routes'
 
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams } from 'next/navigation'
@@ -45,7 +46,7 @@ export interface ProductDetailPageProps {
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct }) => {
   const { t, lang } = useI18n()
   const params = useParams()
-  const id = (params?.id as string)?.replace(/cc$/, '')
+  const currentSlug = (params?.slug as string)?.replace(/cc$/, '')
   const { addToCart } = useCart()
   const { categories } = useCategories()
   const { wrapCategory } = useCategoryViewModel()
@@ -71,24 +72,24 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
   const breadcrumbItems = useMemo(() => {
     const items = [{ label: t('category.breadcrumbHome'), href: '/' }];
-    if (hierarchy.main) items.push({ label: hierarchy.main.displayName, href: `/category/${hierarchy.main.slug}` });
-    if (hierarchy.sub && hierarchy.sub.slug !== hierarchy.main?.slug) items.push({ label: hierarchy.sub.displayName, href: `/category/${hierarchy.main?.slug || 'all'}/${hierarchy.sub.slug}` });
+    if (hierarchy.main) items.push({ label: hierarchy.main.displayName, href: Routes.category(hierarchy.main.slug) });
+    if (hierarchy.sub && hierarchy.sub.slug !== hierarchy.main?.slug) items.push({ label: hierarchy.sub.displayName, href: Routes.category(hierarchy.main?.slug || 'all', hierarchy.sub.slug) });
     if (product) items.push({ label: product.name, href: '' });
     return items;
   }, [hierarchy, product, t]);
 
   useEffect(() => {
     async function fetchProduct() {
-      if (!id) return
-      if (product && (product.id === id || product.sku === id || product.slug === id)) return
-      if (initialProduct && (id === initialProduct.id || id === initialProduct.sku || id === initialProduct.slug)) {
+      if (!currentSlug) return
+      if (product && (product.id === currentSlug || product.sku === currentSlug || product.slug === currentSlug)) return
+      if (initialProduct && (currentSlug === initialProduct.id || currentSlug === initialProduct.sku || currentSlug === initialProduct.slug)) {
         setProduct(initialProduct)
         setLoading(false)
         return
       }
       try {
         setLoading(true)
-        const productData = await getProductBySlugOrId(id)
+        const productData = await getProductBySlugOrId(currentSlug)
         if (!productData) { setProduct(null); return; }
         setProduct(productData)
         try {
@@ -99,7 +100,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       } catch (error) { console.error('Error fetching product:', error); setProduct(null); } finally { setLoading(false) }
     }
     fetchProduct()
-  }, [id, initialProduct, product])
+  }, [currentSlug, initialProduct, product])
 
   useEffect(() => {
     const handleScroll = () => { if (navTriggerRef.current) setIsNavSticky(window.scrollY > (navTriggerRef.current.offsetTop - 80)) }

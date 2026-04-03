@@ -1,4 +1,5 @@
 'use client';
+import { Routes } from '../../utils/routes'
 
 import React, { useState } from 'react'
 import Image from 'next/image'
@@ -42,7 +43,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
         { label: 'Ana Sayfa', href: '/' },
-        ...(parentVm ? [{ label: parentVm.displayName, href: `/category/${parentVm.slug}` }] : []),
+        ...(parentVm ? [{ label: parentVm.displayName, href: Routes.category(parentVm.slug) }] : []),
         { label: vm?.displayName || category.name, href: '' }
     ]
 

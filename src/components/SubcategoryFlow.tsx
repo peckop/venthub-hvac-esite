@@ -1,3 +1,4 @@
+import { Routes } from '../utils/routes'
 import React, { useMemo } from 'react'
 import Link from 'next/link'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
@@ -12,7 +13,7 @@ interface SubcategoryCardProps {
 function SubcategoryCard({ subcategory, parentSlug }: SubcategoryCardProps) {
     return (
         <Link
-            href={`/category/${parentSlug}/${subcategory.slug}`}
+            href={Routes.category(parentSlug, subcategory.slug)}
             className="group flex-shrink-0"
         >
             <div className="

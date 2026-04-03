@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Product } from './supabase';
 import { PDF_FONTS, PDF_COLORS, getBase64ImageFromUrl } from './pdfAssets';
+import { SITE_URL } from '../config/siteUrl';
 
 /**
  * PDF Üretim Servisi (Premium Tasarım & Türkçe Karakter Destekli)
@@ -102,7 +103,7 @@ export async function generateProductDatasheet(
         // URL'yi sağ tarafa (sayfa numarasının üstüne) veya ortaya çakışmayacak şekilde koyalım
         doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
         doc.setFont('Roboto', 'bold');
-        doc.text('www.venthub.com', pageWidth / 2, pageHeight - 12, { align: 'center' });
+        doc.text(SITE_URL.replace(/^https?:\/\//, ''), pageWidth / 2, pageHeight - 12, { align: 'center' });
 
         doc.setFont('Roboto', 'normal');
         doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);

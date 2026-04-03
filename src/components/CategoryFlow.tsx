@@ -1,3 +1,4 @@
+import { Routes } from '../utils/routes'
 import React, { useMemo } from 'react'
 import Link from 'next/link'
 import {
@@ -38,7 +39,7 @@ function CategoryCard({ category }: { category: DomainCategory }) {
 
     return (
         <Link
-            href={`/category/${category.slug}`}
+            href={Routes.category(category.slug)}
             className="group flex-shrink-0 w-48 sm:w-56 md:w-64"
         >
             <div className={`

@@ -8,6 +8,7 @@ import { ArrowLeft, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import { supabase } from '../lib/supabase'
+import { Routes } from '../utils/routes'
 
 export const LoginPage: React.FC = () => {
   const [isPending, setIsPending] = useState(false)
@@ -31,7 +32,7 @@ export const LoginPage: React.FC = () => {
       } else {
         toast.success(t('auth.loginSuccess'))
         router.refresh()
-        router.push(from)
+        router.push(from as import('next').Route)
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_err) {
@@ -43,10 +44,8 @@ export const LoginPage: React.FC = () => {
 
   async function handleGoogleSignIn() {
     try {
-      const isProd = typeof window !== 'undefined' && window.location.hostname.endsWith('pages.dev')
-      const prodOrigin = 'https://venthub-hvac-esite.pages.dev'
-      const origin = isProd ? prodOrigin : window.location.origin
-      const redirectTo = `${origin}/auth/callback`
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+      const redirectTo = `${origin}${Routes.auth.callback()}`
       const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
       if (error) {
         console.error('Google sign-in error:', error)
@@ -66,7 +65,7 @@ export const LoginPage: React.FC = () => {
 
       <div className="relative max-w-md mx-auto px-4 py-8">
         <Link
-          href={from}
+          href={from as import('next').Route}
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />
@@ -145,7 +144,7 @@ export const LoginPage: React.FC = () => {
                 <span className="text-sm text-steel-gray">{t('auth.rememberMe')}</span>
               </label>
               <Link
-                href="/auth/forgot-password"
+                href={Routes.auth.forgotPassword()}
                 className="text-sm font-medium text-primary-ocean hover:text-primary-navy transition-colors"
               >
                 {t('auth.forgotPassword')}
@@ -205,7 +204,7 @@ export const LoginPage: React.FC = () => {
             <p className="text-sm text-steel-gray">
               {t('auth.noAccount')}{' '}
               <Link
-                href="/auth/register"
+                href={Routes.auth.register()}
                 className="font-bold text-primary-ocean hover:text-primary-navy transition-colors"
               >
                 {t('auth.registerNow')}

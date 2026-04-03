@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { CheckCircle, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { Routes } from '../utils/routes'
 
 export const AuthCallbackPage: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
@@ -47,7 +48,7 @@ export const AuthCallbackPage: React.FC = () => {
             setMessage('E-posta doğrulama sırasında hata oluştu: ' + error.message)
             // Redirect to error page after 3 seconds
             setTimeout(() => {
-              router.push('/auth/login?error=' + encodeURIComponent(error.message))
+              router.push(Routes.auth.login(undefined, error.message))
             }, 3000)
             return
           }
@@ -68,14 +69,14 @@ export const AuthCallbackPage: React.FC = () => {
         setStatus('error')
         setMessage('Doğrulama linki geçersiz veya süresi dolmuş')
         setTimeout(() => {
-          router.push('/auth/login?error=No session found')
+          router.push(Routes.auth.login(undefined, 'No session found'))
         }, 3000)
       } catch (error: unknown) {
         console.error('Auth callback error:', error)
         setStatus('error')
         setMessage('Beklenmeyen bir hata oluştu')
         setTimeout(() => {
-          router.push('/auth/login')
+          router.push(Routes.auth.login())
         }, 3000)
       }
     }
@@ -125,7 +126,7 @@ export const AuthCallbackPage: React.FC = () => {
                 {message}
               </p>
               <button
-                onClick={() => router.push('/auth/login')}
+                onClick={() => router.push(Routes.auth.login())}
                 className="bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-2 px-4 rounded-lg transition-colors"
               >
                 Giriş Sayfasına Dön

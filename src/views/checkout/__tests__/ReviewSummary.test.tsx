@@ -4,7 +4,11 @@
 import React from 'react'
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, within, fireEvent, cleanup } from '@testing-library/react'
-import ReviewSummary, { CustomerInfo, AddressInfo } from '@/views/checkout/ReviewSummary'
+import ReviewSummary from '@/views/checkout/ReviewSummary'
+import {
+  type CheckoutCustomerInfo as CustomerInfo,
+  type CheckoutAddressInfo as AddressInfo
+} from '@/types/db-rows'
 import { I18nProvider } from '@/i18n/I18nProvider'
 
 vi.mock('@/i18n/dictionaries/tr', () => ({
@@ -31,8 +35,8 @@ function wrap(ui: React.ReactElement) {
 }
 
 const customer: CustomerInfo = { name: 'Ada Lovelace', email: 'ada@example.com', phone: '+90...' }
-const ship: AddressInfo = { fullAddress: 'Sokak 1', city: 'İstanbul', district: 'Kadıköy', postalCode: '34000' }
-const bill: AddressInfo = { fullAddress: 'Cadde 2', city: 'Ankara', district: 'Çankaya', postalCode: '06000' }
+const ship: AddressInfo = { fullAddress: 'Sokak 1', city: 'İstanbul', district: 'Kadıköy', postalCode: '34000', phone: '+90...' }
+const bill: AddressInfo = { fullAddress: 'Cadde 2', city: 'Ankara', district: 'Çankaya', postalCode: '06000', phone: '+90...' }
 
 describe('ReviewSummary', () => {
   it('sameAsShipping = true iken 3 kart gösterir', () => {
@@ -43,7 +47,7 @@ describe('ReviewSummary', () => {
         billing={bill}
         sameAsShipping={true}
         invoiceType="individual"
-        invoiceInfo={{ tckn: '12345678901' }}
+        invoiceInfo={{ type: 'individual', tckn: '12345678901' }}
         onEditPersonal={vi.fn()}
         onEditShipping={vi.fn()}
         onEditBilling={vi.fn()}
@@ -64,7 +68,7 @@ describe('ReviewSummary', () => {
         billing={bill}
         sameAsShipping={false}
         invoiceType="corporate"
-        invoiceInfo={{ companyName: 'Acme', vkn: '1234567890', taxOffice: 'XYZ' }}
+        invoiceInfo={{ type: 'corporate', companyName: 'Acme', vkn: '1234567890', taxOffice: 'XYZ' }}
         onEditPersonal={vi.fn()}
         onEditShipping={vi.fn()}
         onEditBilling={vi.fn()}
@@ -90,7 +94,7 @@ describe('ReviewSummary', () => {
         billing={bill}
         sameAsShipping={false}
         invoiceType="individual"
-        invoiceInfo={{ tckn: '12345678901' }}
+        invoiceInfo={{ type: 'individual', tckn: '12345678901' }}
         onEditPersonal={onPersonal}
         onEditShipping={onShipping}
         onEditBilling={onBilling}

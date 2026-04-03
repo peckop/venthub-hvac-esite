@@ -1,3 +1,4 @@
+import { Routes } from '../utils/routes'
 import React from 'react'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import Link from 'next/link'
@@ -52,7 +53,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
             {getPopularCategories().map((category) => (
               <Link
                 key={category.id}
-                href={`/category/${category.slug}`}
+                href={Routes.category(category.slug)}
                 className="group bg-gradient-to-br from-air-blue to-light-gray rounded-xl p-6 hover:shadow-hvac transition-all duration-200"
               >
                 <div className="text-center">
@@ -89,7 +90,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
             {mainCategories.map((category) => (
               <Link
                 key={category.id}
-                href={`/category/${category.slug}`}
+                href={Routes.category(category.slug)}
                 className="group flex items-center space-x-3 p-4 bg-white border border-light-gray rounded-lg hover:border-secondary-blue hover:shadow-sm transition-all duration-200"
               >
                 <div className="text-primary-navy group-hover:text-secondary-blue transition-colors">
@@ -112,7 +113,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
         {/* Bottom CTA */}
         <div className="text-center mt-12">
           <Link
-            href="/products"
+            href={Routes.products()}
             className="inline-flex items-center px-8 py-4 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors group"
           >
             <span>{t('common.seeAllProducts')}</span>

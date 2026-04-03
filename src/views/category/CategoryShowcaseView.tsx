@@ -1,4 +1,5 @@
 'use client';
+import { Routes } from '../../utils/routes'
 
 import { VentImage } from '@/components/ui/VentImage'
 import React, { useState } from 'react'
@@ -35,14 +36,14 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
         if (onSubcategorySelect) {
             onSubcategorySelect(subSlug)
         } else {
-            router.push(`/category/${category.slug}/${subSlug}`)
+            router.push(Routes.category(category.slug, subSlug))
         }
     }
 
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
         { label: 'Ana Sayfa', href: '/' },
-        { label: vm?.displayName || category.name, href: `/category/${category.slug}` }
+        { label: vm?.displayName || category.name, href: Routes.category(category.slug) }
     ]
 
     // Hero image logic

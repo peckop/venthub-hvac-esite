@@ -1,4 +1,5 @@
 'use client'
+import { Routes } from '../../utils/routes'
 
 import Link from 'next/link'
 import Image from 'next/image'
@@ -82,7 +83,7 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
                 transition={{ delay: idx * 0.1, duration: 0.8 }}
                 className="group relative flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center overflow-hidden bg-slate-100 aspect-square lg:aspect-[0.85/1] transition-all duration-700"
               >
-                <Link href={`/category/${category.slug}`} className="block w-full h-full">
+                <Link href={Routes.category(category.slug)} className="block w-full h-full">
                   {/* Background Image with Fallback Logic */}
                   <div className="absolute inset-0 z-0">
                     <Image

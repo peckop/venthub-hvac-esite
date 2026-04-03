@@ -3,16 +3,17 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { HelpCircle, Package, Truck, ShieldCheck, ArrowLeft, BookOpen } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
+import { Routes } from '../../utils/routes'
 import { WhatsAppIcon } from '../../components/HVACIcons'
 import { getSupportLink, isWhatsAppAvailable } from '../../utils/whatsapp'
 
 const SupportHomePage: React.FC = () => {
   const { t } = useI18n()
   const cards = [
-    { title: t('support.links.faq'), desc: t('support.home.faqDesc'), to: '/support/sss', icon: HelpCircle },
-    { title: t('support.links.returns'), desc: t('support.home.returnsDesc'), to: '/support/iade-degisim', icon: Package },
-    { title: t('support.links.shipping'), desc: t('support.home.shippingDesc'), to: '/support/teslimat-kargo', icon: Truck },
-    { title: t('support.links.warranty'), desc: t('support.home.warrantyDesc'), to: '/support/garanti-servis', icon: ShieldCheck },
+    { title: t('support.links.faq'), desc: t('support.home.faqDesc'), to: Routes.destek.sss(), icon: HelpCircle },
+    { title: t('support.links.returns'), desc: t('support.home.returnsDesc'), to: Routes.destek.iadeDegisim(), icon: Package },
+    { title: t('support.links.shipping'), desc: t('support.home.shippingDesc'), to: Routes.destek.teslimatKargo(), icon: Truck },
+    { title: t('support.links.warranty'), desc: t('support.home.warrantyDesc'), to: Routes.destek.garantiServis(), icon: ShieldCheck },
     { title: t('common.knowledgeHub'), desc: t('support.home.knowledgeDesc'), to: '/destek/merkez', icon: BookOpen },
   ]
 
@@ -30,7 +31,7 @@ const SupportHomePage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {cards.map(({ title, desc, to, icon: Icon }) => (
-          <Link key={to} href={to} className="group block bg-white rounded-xl border border-light-gray p-6 hover:border-primary-navy/40 hover:shadow-md transition-all">
+          <Link key={to} href={to as import('next').Route} className="group block bg-white rounded-xl border border-light-gray p-6 hover:border-primary-navy/40 hover:shadow-md transition-all">
             <div className="flex items-start gap-4">
               <div className="rounded-lg bg-primary-navy/10 p-3 text-primary-navy">
                 <Icon size={24} />
@@ -59,7 +60,7 @@ const SupportHomePage: React.FC = () => {
                 <h2 className="text-xl font-semibold whatsapp-text mb-2">Hızlı WhatsApp Desteği</h2>
                 <p className="whatsapp-subtext mb-4">Acil sorularınız için WhatsApp üzerinden anında destek alın.</p>
                 <a
-                  href={whatsappLink}
+                  href={whatsappLink as import('next').Route}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="whatsapp-btn"

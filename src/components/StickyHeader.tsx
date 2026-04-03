@@ -16,6 +16,7 @@ import { useCategories } from '../contexts/CategoryContext'
 import { trackEvent } from '../utils/analytics'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { NAVIGATION_PRIMARY_ITEMS, NAVIGATION_SECONDARY_ITEMS } from '../utils/navigationConfig'
+import { Routes } from '../utils/routes'
 
 import NavActionButton from './navigation/NavActionButton'
 import NavBrand from './navigation/NavBrand'
@@ -142,7 +143,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
     await signOut()
     setManualLogout(true)
     closeUserMenu()
-    router.push('/')
+    router.push(Routes.home())
   }, [closeUserMenu, router, signOut])
 
   const primaryItems = useMemo(
@@ -179,13 +180,13 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
     if (!user && !isDevBypass) {
       return (
         <>
-          <Link href="/auth/login" className="hidden rounded-2xl px-3.5 py-3 text-sm font-medium text-steel-gray transition-colors duration-300 hover:text-primary-navy lg:inline-flex">
+          <Link href={Routes.auth.login()} className="hidden rounded-2xl px-3.5 py-3 text-sm font-medium text-steel-gray transition-colors duration-300 hover:text-primary-navy lg:inline-flex">
             {t('common.signIn')}
           </Link>
-          <Link href="/auth/register" className="hidden rounded-2xl bg-gradient-to-r from-primary-navy to-secondary-blue px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_35px_-20px_rgba(37,99,235,0.7)] transition-all duration-300 hover:-translate-y-0.5 lg:inline-flex">
+          <Link href={Routes.auth.register()} className="hidden rounded-2xl bg-gradient-to-r from-primary-navy to-secondary-blue px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_35px_-20px_rgba(37,99,235,0.7)] transition-all duration-300 hover:-translate-y-0.5 lg:inline-flex">
             {t('common.signUp')}
           </Link>
-          <NavActionButton href="/auth/login" ariaLabel={t('common.signIn')} icon={<svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" /></svg>} className="lg:hidden" />
+          <NavActionButton href={Routes.auth.login()} ariaLabel={t('common.signIn')} icon={<svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" /></svg>} className="lg:hidden" />
         </>
       )
     }
@@ -210,12 +211,12 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
               <div className="truncate text-xs text-steel-gray">{user?.email || 'Geliştirici Modu'}</div>
             </div>
             <div className="p-2">
-              <Link href="/account" onClick={closeUserMenu} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-steel-gray hover:bg-air-blue/20 hover:text-primary-navy">
+              <Link href={Routes.account.overview()} onClick={closeUserMenu} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-steel-gray hover:bg-air-blue/20 hover:text-primary-navy">
                 <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" /></svg>
                 <span>{t('header.account')}</span>
               </Link>
               {finalIsAdmin && (
-                <Link href="/admin" onClick={closeUserMenu} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-steel-gray hover:bg-air-blue/20 hover:text-primary-navy">
+                <Link href={Routes.admin.dashboard()} onClick={closeUserMenu} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-steel-gray hover:bg-air-blue/20 hover:text-primary-navy">
                   <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l6 6 6-6M2 9l10 12L22 9" /></svg>
                   <span>{t('header.adminPanel')}</span>
                 </Link>
@@ -250,11 +251,11 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
             <div className="flex-1 max-w-xl hidden sm:flex justify-center md:px-4"><NavSearchTrigger label={t('header.commandSearchCompact')} shortcutLabel="/" ariaLabel={t('common.search')} onClick={openSearchOverlay} /></div>
             <NavUtilityRail>
               <div className="hidden xl:flex items-center gap-1.5 w-auto opacity-100">
-                <NavActionButton ariaLabel={t('header.quickOrder')} title={t('header.quickOrder')} onClick={() => router.push('/products?all=1&sort=bestsellers')} tone="warning" icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" /></svg>} label={t('header.quickOrder')} />
-                {recentProducts.length > 0 && (<NavActionButton ariaLabel={t('header.recentlyViewed')} title={t('header.recentlyViewed')} onClick={() => { if (recentProducts.length > 0) router.push(`/products/${recentProducts[0]}`) }} icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,6 12,12 16,14" /></svg>} />)}
-                <NavActionButton ariaLabel={t('header.favorites')} title={t('header.favorites')} onClick={() => router.push('/account/favorites')} icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" /></svg>} />
+                <NavActionButton ariaLabel={t('header.quickOrder')} title={t('header.quickOrder')} onClick={() => router.push(`${Routes.products()}?all=1&sort=bestsellers`)} tone="warning" icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" /></svg>} label={t('header.quickOrder')} />
+                {recentProducts.length > 0 && (<NavActionButton ariaLabel={t('header.recentlyViewed')} title={t('header.recentlyViewed')} onClick={() => { if (recentProducts.length > 0) router.push(Routes.legacyProduct(recentProducts[0])) }} icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,6 12,12 16,14" /></svg>} />)}
+                <NavActionButton ariaLabel={t('header.favorites')} title={t('header.favorites')} onClick={() => router.push(Routes.account.favorites())} icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" /></svg>} />
               </div>
-              <NavActionButton href="/cart" ariaLabel={t('header.cart')} tone="success" icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" /><path strokeWidth={2} d="M5 6L4 2H2" /><circle cx="16" cy="19" r="2" /><circle cx="8" cy="19" r="2" /></svg>} label={isMounted && cartTotal > 0 ? formatCurrency(cartTotal, lang, { maximumFractionDigits: 0 }) : undefined} labelClassName="hidden 2xl:block font-semibold text-success-green" badge={<>{isMounted && cartCount > 0 && (<span className="absolute flex items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue font-bold text-white shadow-md -right-2 -top-2 h-5 w-5 text-[11px]">{cartCount}</span>)}</>} />
+              <NavActionButton href={Routes.cart()} ariaLabel={t('header.cart')} tone="success" icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" /><path strokeWidth={2} d="M5 6L4 2H2" /><circle cx="16" cy="19" r="2" /><circle cx="8" cy="19" r="2" /></svg>} label={isMounted && cartTotal > 0 ? formatCurrency(cartTotal, lang, { maximumFractionDigits: 0 }) : undefined} labelClassName="hidden 2xl:block font-semibold text-success-green" badge={<>{isMounted && cartCount > 0 && (<span className="absolute flex items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue font-bold text-white shadow-md -right-2 -top-2 h-5 w-5 text-[11px]">{cartCount}</span>)}</>} />
               <div className="hidden lg:block">{renderUserMenu()}</div>
               <div className="transition-all duration-300 overflow-hidden sm:hidden"><NavActionButton ariaLabel={t('common.search')} onClick={openSearchOverlay} icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>} /></div>
               <NavActionButton ariaLabel={t('header.menu')} onClick={() => { trackEvent('nav_click', { target: 'menu', mode }); openMenu(); }} icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>} tone={activeSurface === 'menu' ? 'accent' : 'default'} className="lg:hidden" />

@@ -5,6 +5,7 @@ import { DomainCategory, toUICategoryList } from '../lib/type-converters'
 import { tr } from '../i18n/dictionaries/tr'
 import { en } from '../i18n/dictionaries/en'
 import type { Metadata } from 'next'
+import { SITE_URL } from '../config/siteUrl'
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -15,7 +16,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const lang = (params.lang as string) === 'en' ? 'en' : 'tr'
   const dict = lang === 'en' ? en : tr
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://venthub-hvac.com'
+  const siteUrl = SITE_URL
   const canonical = `${siteUrl}${lang === 'en' ? '/?lang=en' : '/'}`
 
   return {
@@ -74,7 +75,7 @@ export default async function RootPage({ searchParams }: Props) {
     console.error('SSR Data Fetch Error:', error)
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://venthub-hvac.com'
+  const siteUrl = SITE_URL
 
   const jsonLds = [
     {

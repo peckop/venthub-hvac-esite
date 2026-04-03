@@ -1,5 +1,6 @@
 import PageComponent from '../../../views/BrandDetailPage'
 import { HVAC_BRANDS } from '../../../lib/brands'
+import { SITE_URL } from '../../../config/siteUrl'
 
 export async function generateStaticParams() {
   try {
@@ -32,7 +33,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: `${brand.name} Ürünleri ve Çözümleri | VentHub`,
     description: `${brand.name} markasının en kaliteli havalandırma ürünleri, teknik özellikleri ve avantajlı fiyatları VentHub'da.`,
     alternates: {
-      canonical: `https://venthub-hvac.com/brands/${slug}`,
+      canonical: `${SITE_URL}/brands/${slug}`,
+    },
+    openGraph: {
+      title: `${brand.name} Ürünleri ve Çözümleri | VentHub`,
+      description: `${brand.name} markasının en kaliteli havalandırma ürünleri, teknik özellikleri ve avantajlı fiyatları VentHub'da.`,
+      url: `${SITE_URL}/brands/${slug}`,
+      siteName: 'VentHub',
+      images: [
+        {
+          url: '/images/og-default.jpg',
+          width: 1200,
+          height: 630,
+        },
+      ],
+      locale: 'tr_TR',
+      type: 'website',
     },
   }
 }
@@ -46,7 +62,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     "@type": "Brand",
     "name": brand?.name || slug,
     "description": brand?.description || `${brand?.name || slug} marka ürünler`,
-    "url": `https://venthub-hvac.com/brands/${slug}`
+    "url": `${SITE_URL}/brands/${slug}`
   }
 
   return (

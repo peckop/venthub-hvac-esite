@@ -1,3 +1,4 @@
+import { Routes } from '../utils/routes'
 import type { BreadcrumbItem } from '../components/navigation/Breadcrumb'
 import { getCategoryDisplayName } from './categoryHelpers'
 import { DomainCategory } from '../lib/type-converters'
@@ -17,7 +18,7 @@ export function buildCategoryBreadcrumb(
     if (parentCategory) {
         items.push({
             label: getCategoryDisplayName(parentCategory),
-            href: `/category/${parentCategory.slug}`
+            href: Routes.category(parentCategory.slug)
         })
     }
 

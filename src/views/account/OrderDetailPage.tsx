@@ -9,6 +9,7 @@ import { supabase, Product } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
+import { Routes } from '../../utils/routes'
 import { Package, Calendar, CreditCard, ArrowLeft, Link as LinkIcon, Copy, RefreshCcw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import jsPDF from 'jspdf'
@@ -74,7 +75,7 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push(`/auth/login?redirect=/account/orders/detail?id=${id}`)
+      router.push(Routes.auth.login(`/account/orders/detail?id=${id}`))
       return
     }
   }, [authLoading, user, id, router])
@@ -222,7 +223,7 @@ export default function OrderDetailPage() {
         if (!prod) prod = productMap[it.product_name]
         if (prod) { addToCart(prod, it.quantity); added += it.quantity }
       }
-      if (added > 0) { toast.success(t('orders.reorderedToast', { count: added })); router.push('/cart') } else { toast.error(t('orders.reorderNotFound')) }
+      if (added > 0) { toast.success(t('orders.reorderedToast', { count: added })); router.push(Routes.cart()) } else { toast.error(t('orders.reorderNotFound')) }
     } catch (e) { console.error(e); toast.error(t('orders.reorderError')) }
   }
 
@@ -406,7 +407,7 @@ export default function OrderDetailPage() {
                       <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
                         <td className="p-4 text-sm font-medium text-slate-900">
                           {item.product_id ? (
-                            <Link href={`/products/${item.product_id}`} className="hover:text-primary-navy transition-colors">
+                            <Link href={Routes.legacyProduct(item.product_id)} className="hover:text-primary-navy transition-colors">
                               {item.product_name}
                             </Link>
                           ) : (
@@ -416,7 +417,7 @@ export default function OrderDetailPage() {
                         <td className="p-4">
                           {item.product_image_url ? (
                             item.product_id ? (
-                              <Link href={`/products/${item.product_id}`}>
+                              <Link href={Routes.legacyProduct(item.product_id)}>
                                 <VentImage src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:opacity-80 transition-opacity"  />
                               </Link>
                             ) : (
