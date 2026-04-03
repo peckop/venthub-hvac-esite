@@ -1,4 +1,5 @@
 'use client'
+import { Routes } from '../../utils/routes'
 
 import React, { useEffect, useState } from 'react'
 import * as NavigationMenu from '@radix-ui/react-navigation-menu'
@@ -28,7 +29,7 @@ export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNav
                 return (
                     <div key={category.id} className="space-y-2">
                         <Link 
-                            href={`/category/${category.slug}`}
+                            href={Routes.category(category.slug)}
                             onClick={() => onNavigate?.()}
                             className="font-bold text-slate-900 flex items-center gap-2"
                         >
@@ -42,7 +43,7 @@ export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNav
                                     return (
                                         <Link 
                                             key={sub.id} 
-                                            href={`/category/${category.slug}/${sub.slug}`}
+                                            href={Routes.category(category.slug, sub.slug)}
                                             onClick={() => onNavigate?.()}
                                             className="text-sm text-slate-600"
                                         >
@@ -89,7 +90,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                         return (
                             <NavigationMenu.Item key={category.id}>
                                 <Link
-                                    href={`/category/${category.slug}`}
+                                    href={Routes.category(category.slug)}
                                     onClick={() => handleLinkClick(0, category.slug)}
                                     className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none text-slate-700 outline-none hover:bg-slate-50 focus:shadow-[0_0_0_2px] focus:shadow-slate-300 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer flex items-center gap-2"
                                 >
@@ -133,7 +134,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                                     {vm?.description || 'Yüksek kaliteli havalandırma çözümleri.'}
                                                 </p>
                                                 <Link
-                                                    href={`/category/${category.slug}`}
+                                                    href={Routes.category(category.slug)}
                                                     onClick={() => handleLinkClick(0, category.slug)}
                                                     className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-secondary-blue hover:text-primary-navy"
                                                 >
@@ -150,7 +151,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                                 return (
                                                     <li key={sub.id}>
                                                         <Link
-                                                            href={`/category/${category.slug}/${sub.slug}`}
+                                                            href={Routes.category(category.slug, sub.slug)}
                                                             onClick={() => handleLinkClick(1, sub.slug)}
                                                             className="block select-none rounded-[4px] p-3 text-[14px] font-medium leading-none text-slate-700 no-underline outline-none hover:bg-slate-50 transition-colors"
                                                         >
