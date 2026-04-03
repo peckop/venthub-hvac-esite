@@ -61,7 +61,11 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
   2. `dispatcher.json` -> Karmaşıklık analizi, uygun AI modeli önerisi ve kota uyarısı.
   3. `plan.json` -> Pre-checks (Ön doğrulama kanıtları), Adımlar (Değişiklik + Verify komutu), Riskler ve Rollback planı.
 - **Toplu Sunum İlkesi:** Ajan tüm .json dosyalarını üretip hata denetimini (pipeline status) tamamladıktan sonra KESİNLİKLE aralarda onay istemez. Tüm JSON zinciri bittikten sonra, AI IDE arayüzüne özel bir `implementation_plan.md` (Artifact) yaratarak Dispatcher Model Önerisini ve Uygulama Planını TEK BİR VİTRİNDE kullanıcıya sunar ve asıl onayı burada bekler.
-- **Trivial Bypass (İstisna):** Linter hatası veya typo gibi küçük işler için cross-validate'i atlayan `python registry/engine.py create-task ... --trivial` komutuyla doğrudan `trivial.json` üretilip, bürokrasiye girmeden kod yazılıp commetlenebilir. Kapama işleminde testlerin geçtiği (all_passed: true) kanıtlanmalıdır.
+- **Trivial Bypass (İstisna):** Linter hatası veya typo gibi küçük işler için cross-validate'i atlayan `python registry/engine.py create-task ... --trivial` komutuyla doğrudan `trivial.json` üretilip, bürokrasiye girmeden kod yazılıp commetlenebilir. Kapama işleminde testlerin geçtiği kanıtlanmalıdır.
+- **Scope Police (Kapsam Polisi):** Bir ajan `plan.json` veya `trivial.json` oluştururken YENİ güvenlik kurallarına uymak zorundadır:
+  - `allowed_paths`: Dokunulacak dosyalar/klasörler spesifik yazılmalıdır (`src/**` gibi geniş wildcard'lar yasaktır).
+  - `max_files_changed`: Trivial için max 5, Plan için max 10'dur.
+  - Bütçe aşımı veya izinsiz dosya değişimi `check-scope` (Git diff) tarafından anında bloke edilir ve Commit atılamaz.
 
 ## 7. Registry Sentinel (Koruma Sistemi) - [🚨 GÜVENLİK KİLİDİ]
 > [!CAUTION]
