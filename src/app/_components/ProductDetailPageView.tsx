@@ -1,4 +1,5 @@
 'use client'
+import { Routes } from '../../utils/routes'
 
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
@@ -59,7 +60,7 @@ export interface ProductDetailPageProps {
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct }) => {
   const { t, lang } = useI18n()
   const params = useParams()
-  const id = (params?.id as string)?.replace(/cc$/, '')
+  const currentSlug = (params?.slug as string)?.replace(/cc$/, '')
   const router = useRouter()
   const { addToCart } = useCart()
   const { refreshProjects } = useProjectLists()
@@ -105,14 +106,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
   useEffect(() => {
     async function fetchProduct() {
-      if (!id) return
+      if (!currentSlug) return
       
       // If we already have the correct product (from initialProduct or previous fetch), don't fetch again
-      if (product && (product.id === id || product.sku === id || product.slug === id)) {
+      if (product && (product.id === currentSlug || product.sku === currentSlug || product.slug === currentSlug)) {
         return
       }
 
-      if (initialProduct && (id === initialProduct.id || id === initialProduct.sku || id === initialProduct.slug)) {
+      if (initialProduct && (currentSlug === initialProduct.id || currentSlug === initialProduct.sku || currentSlug === initialProduct.slug)) {
         setProduct(initialProduct)
         setLoading(false)
         return
@@ -120,7 +121,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
       try {
         setLoading(true)
-        const productData = await getProductBySlugOrId(id)
+        const productData = await getProductBySlugOrId(currentSlug)
         if (!productData) {
           setProduct(null)
           return
@@ -153,7 +154,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       }
     }
     fetchProduct()
-  }, [id, initialProduct, product]) // Included product to satisfy lint, but fetch logic is guarded
+  }, [currentSlug, initialProduct, product]) // Included product to satisfy lint, but fetch logic is guarded
 
   useEffect(() => {
     const handleScroll = () => {
@@ -282,7 +283,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     )
   }
 
-  const canonicalUrl = `${origin}/products/${product.id}`
+  const canonicalUrl = `${origin}${Routes.product(product.slug!)}`
   const metaDesc = product.description || t('pdp.descFallback')
 
   return (
@@ -299,13 +300,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             <ChevronRight size={10} className="flex-shrink-0" />
             {mainCategory && (
               <>
-                <Link href={`/category/${mainCategory.slug}`} className="hover:text-primary-navy transition-colors">
+                <Link href={Routes.category(mainCategory.slug)} className="hover:text-primary-navy transition-colors">
                   {mainCategory.name}
                 </Link>
                 {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
                     <ChevronRight size={10} className="flex-shrink-0" />
-                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="hover:text-primary-navy transition-colors">
+                    <Link href={Routes.category(mainCategory.slug, subCategory.slug)} className="hover:text-primary-navy transition-colors">
                       {subCategory.name}
                     </Link>
                   </>
@@ -328,10 +329,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             let stack: string[] = [];
             try { stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : []; } catch { stack = []; }
             const lastSafeStop = stack[stack.length - 1];
-            if (lastSafeStop) { router.push(lastSafeStop, { scroll: false }); }
-            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(`/category/${mainCategory.slug}/${subCategory.slug}`, { scroll: false }) }
-            else if (mainCategory) { router.push(`/category/${mainCategory.slug}`, { scroll: false }) }
-            else { router.push('/', { scroll: false }) }
+            if (lastSafeStop) { router.push(lastSafeStop as import('next').Route, { scroll: false }); }
+            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(Routes.category(mainCategory.slug, subCategory.slug), { scroll: false }) }
+            else if (mainCategory) { router.push(Routes.category(mainCategory.slug), { scroll: false }) }
+            else { router.push('/' as import('next').Route, { scroll: false }) }
           }}
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 sm:mb-8 transition-all group font-bold text-xs uppercase tracking-widest"
         >

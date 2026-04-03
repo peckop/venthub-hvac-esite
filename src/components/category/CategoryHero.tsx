@@ -32,7 +32,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
     } catch { stack = [] }
 
     const prevPath = stack.length >= 2 ? stack[stack.length - 2] : '/'
-    navigate.push(prevPath)
+    navigate.push(prevPath as import('next').Route)
   }
 
   if (loading || !category) {

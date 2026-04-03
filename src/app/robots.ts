@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+import { SITE_URL } from '../config/siteUrl'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/auth/', '/account/', '/checkout/'],
     },
-    sitemap: 'https://venthub-hvac.com/sitemap.xml',
+    sitemap: `${SITE_URL}/sitemap.xml`,
   }
 }

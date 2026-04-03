@@ -95,7 +95,7 @@ const AirCurtainCalcPage: React.FC = () => {
     if (trafficIntensity !== 'medium') params.set('trafficIntensity', trafficIntensity)
 
     const query = params.toString()
-    router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+    router.replace(`${pathname}${query ? `?${query}` : ''}` as import('next').Route, { scroll: false })
   }, [currentStep, doorWidth, doorHeight, application, windCondition, trafficIntensity, pathname, router])
 
   // Result State

@@ -9,6 +9,7 @@ import { supabase } from '../../lib/supabase'
 import { toUIProductList, type DomainProduct } from '../../lib/type-converters'
 import { DbProduct, DbJson } from '../../types/db-rows'
 import { calculateAirCurtain } from '../../lib/hvacCalculations'
+import { Routes } from '../../utils/routes'
 
 // Types
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6
@@ -283,7 +284,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                     {matchedProducts.map((p: MatchedProduct) => (
                                         <Link
                                             key={p.id}
-                                            href={`/products/${p.slug || p.id}`}
+                                            href={Routes.product(p.slug!)}
                                             className="group block p-6 rounded-[2.5rem] bg-white border border-slate-100 hover:border-cyan-500/20 hover:shadow-2xl transition-all duration-500"
                                         >
                                             <div className="aspect-square relative mb-6 grayscale group-hover:grayscale-0 transition-all">

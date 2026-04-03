@@ -118,12 +118,12 @@ const CommandPalette: React.FC = () => {
 
         if (index < filteredNav.length) {
             setOpen(false)
-            router.push(filteredNav[index].href)
+            router.push(filteredNav[index].href as import('next').Route)
         } else {
             const prodIndex = index - filteredNav.length
             if (products[prodIndex]) {
                 setOpen(false)
-                router.push(`/admin/products?id=${products[prodIndex].id}`)
+                router.push(`/admin/products?id=${products[prodIndex].id}` as import('next').Route)
             }
         }
     }
@@ -186,7 +186,7 @@ const CommandPalette: React.FC = () => {
                                         return (
                                             <button
                                                 key={item.href}
-                                                onClick={() => { setOpen(false); router.push(item.href) }}
+                                                onClick={() => { setOpen(false); router.push(item.href as import('next').Route) }}
                                                 className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-all text-left group ${
                                                     isActive 
                                                         ? 'bg-cyan-400 text-[#0A0F1E] shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
@@ -216,7 +216,7 @@ const CommandPalette: React.FC = () => {
                                         return (
                                             <button
                                                 key={p.id}
-                                                onClick={() => { setOpen(false); router.push(`/admin/products?id=${p.id}`) }}
+                                                onClick={() => { setOpen(false); router.push(`/admin/products?id=${p.id}` as import('next').Route) }}
                                                 className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-all text-left group ${
                                                     isActive 
                                                         ? 'bg-cyan-400 text-[#0A0F1E] shadow-[0_0_20px_rgba(34,211,238,0.3)]' 

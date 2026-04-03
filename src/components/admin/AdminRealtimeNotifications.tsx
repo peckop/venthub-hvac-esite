@@ -131,7 +131,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                         <div
                             onClick={() => {
                                 toast.dismiss(t.id)
-                                if (notif.link) router.push(notif.link)
+                                if (notif.link) router.push(notif.link as import('next').Route)
                             }}
                             className={`${t.visible ? 'animate-in fade-in slide-in-from-top-4' : 'animate-out fade-out slide-out-to-top-2'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-primary-navy cursor-pointer hover:bg-slate-50 transition-colors`}
                         >
@@ -179,7 +179,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                         <div
                             onClick={() => {
                                 toast.dismiss(t.id)
-                                if (notif.link) router.push(notif.link)
+                                if (notif.link) router.push(notif.link as import('next').Route)
                             }}
                             className={`${t.visible ? 'animate-in fade-in slide-in-from-top-4' : 'animate-out fade-out slide-out-to-top-2'} max-w-md w-full bg-white shadow-lg rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-emerald-500 cursor-pointer hover:bg-slate-50 transition-colors`}
                         >
@@ -289,7 +289,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                                         onClick={() => {
                                             if (notif.link) {
                                                 setIsOpen(false)
-                                                router.push(notif.link)
+                                                router.push(notif.link as import('next').Route)
                                             }
                                         }}
                                         className={`p-4 border-b border-slate-100/50 hover:bg-slate-50/80 transition-colors flex gap-3 ${!notif.isRead ? 'bg-blue-50/30' : ''} ${notif.link ? 'cursor-pointer' : ''}`}

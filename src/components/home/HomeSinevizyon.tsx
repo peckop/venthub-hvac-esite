@@ -1,5 +1,6 @@
 'use client'
 
+import { Routes } from '@/utils/routes';
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState, useEffect, useCallback, useRef } from 'react'
@@ -191,7 +192,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
 
               <div className="flex flex-col gap-5 sm:flex-row">
                 <Link
-                  href="/products"
+                  href={Routes.products()}
                   className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl bg-cyan-500 px-12 text-[14px] font-bold uppercase tracking-widest text-slate-950 transition-all hover:bg-cyan-400 hover:shadow-[0_0_40px_rgba(34,211,238,0.4)]"
                 >
                   {t('home.hero.primaryCta')}
@@ -240,7 +241,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
                   exit={{ opacity: 0, scale: 1.1 }}
                   className={`absolute ${i === 0 ? 'z-20' : 'z-10 opacity-40 translate-x-32 translate-y-20 blur-[1px]'}`}
                 >
-                  <Link href={p.link} className="relative block group">
+                  <Link href={p.link as import('next').Route} className="relative block group">
                     {/* Technical HUD Label - Redesigned for High-Tech Aesthetic */}
                     <div className={`absolute ${i === 0 ? '-right-24 top-0' : '-left-24 bottom-0'} z-30 hidden lg:block`}>
                       <motion.div 

@@ -1,3 +1,4 @@
+import { Routes } from '../../utils/routes'
 import { VentImage } from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import Link from 'next/link'
@@ -131,7 +132,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                             {/* Elektrikli Card */}
                             <Link
-                                href={category.slug === 'elektrikli-isitici' ? `/category/${category.slug}` : `/category/${category.slug}/elektrikli-isitici`}
+                                href={category.slug === 'elektrikli-isitici' ? Routes.category(category.slug) : Routes.category(category.slug, 'elektrikli-isitici')}
                                 className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-orange-300 hover:shadow-md transition-all"
                             >
                                 <div className="flex items-center space-x-4 mb-4">
@@ -151,7 +152,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
                             {/* Ortam Havalı Card */}
                             <Link
-                                href={category.slug === 'ortam-havali' ? `/category/${category.slug}` : `/category/${category.slug}/ortam-havali`}
+                                href={category.slug === 'ortam-havali' ? Routes.category(category.slug) : Routes.category(category.slug, 'ortam-havali')}
                                 className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all"
                             >
                                 <div className="flex items-center space-x-4 mb-4">
@@ -286,7 +287,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                     {subCategories.filter(sub => sub.slug !== category.slug).map((sub) => (
                         <Link
                             key={sub.id}
-                            href={`/category/${category.slug}/${sub.slug}`}
+                            href={Routes.category(category.slug, sub.slug)}
                             className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:-translate-y-2 transition-all duration-300 border border-gray-100"
                         >
                             <div className="aspect-[4/3] bg-light-gray relative overflow-hidden">

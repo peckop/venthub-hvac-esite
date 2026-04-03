@@ -57,7 +57,7 @@ export const TickerLane: React.FC<TickerLaneProps> = ({
         <SplideSlide key={i} style={{ width: itemWidth }}>
           {item.href ? (
             <Link
-              href={item.href}
+              href={item.href as import('next').Route}
               className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy rounded-xl"
               aria-label={item.alt || 'product'}
             >

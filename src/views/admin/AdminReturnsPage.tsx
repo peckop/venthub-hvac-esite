@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { useRouter, usePathname } from 'next/navigation'
+import { Routes } from '../../utils/routes'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { syncOrderFromReturn } from '../../lib/orderStatusService'
@@ -75,7 +76,7 @@ export default function AdminReturnsPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace('/auth/login')
+      router.replace(Routes.auth.login())
       return
     }
   }, [user, loading, router])

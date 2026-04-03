@@ -1,4 +1,5 @@
 'use client';
+import { Routes } from '../utils/routes'
 
 import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect, useRef, useMemo } from 'react'
@@ -183,7 +184,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                 {/* Actions */}
                                 <div className="flex flex-wrap gap-4">
                                     <Link
-                                        href={`/category/${vm.slug}`}
+                                        href={Routes.category(vm.slug)}
                                         className="px-8 py-4 bg-secondary-blue hover:bg-blue-600 text-white rounded-lg font-bold transition-all flex items-center shadow-lg shadow-blue-500/30"
                                     >
                                         Ürünleri İncele

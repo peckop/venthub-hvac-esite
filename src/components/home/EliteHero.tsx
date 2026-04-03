@@ -1,5 +1,6 @@
 'use client'
 
+import { Routes } from '@/utils/routes';
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -73,7 +74,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
             className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-center"
           >
             <Link
-              href="/products"
+              href={Routes.products()}
               className="inline-flex h-16 items-center justify-center rounded-none bg-white px-10 text-[15px] font-bold uppercase tracking-widest text-slate-950 transition-all duration-500 hover:bg-cyan-400 hover:scale-105"
             >
               {t('home.hero.primaryCta')}

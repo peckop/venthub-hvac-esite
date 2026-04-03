@@ -172,7 +172,15 @@ export default function AccountReturnsPage() {
     return t(`returns.statusLabels.${status}`) || status
   }
 
-  const getReturnTimeline = (currentStatus: string) => {
+  interface TimelineStep {
+    key: string;
+    label: string;
+    completed: boolean;
+    isCurrent?: boolean;
+    isTerminal?: boolean;
+  }
+
+  const getReturnTimeline = (currentStatus: string): TimelineStep[] => {
     const allSteps = [
       { key: 'requested', label: 'Talep Alındı' },
       { key: 'approved', label: 'Onaylandı' },

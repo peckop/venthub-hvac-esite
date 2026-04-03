@@ -136,7 +136,7 @@ const AdminAuditLogPage: React.FC = () => {
                 setBatch(''); 
                 const url = new URL(typeof window !== 'undefined' ? window.location.href : 'http://localhost');
                 url.searchParams.delete('batch'); 
-                router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) 
+                router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : '') as import('next').Route, { scroll: false }) 
               }}
             >
               Temizle

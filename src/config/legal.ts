@@ -1,3 +1,5 @@
+import { SITE_URL } from './siteUrl'
+
 export interface LegalConfig {
   sellerTitle: string
   sellerAddress: string
@@ -28,7 +30,7 @@ const legalConfig: LegalConfig = {
   taxOffice: '[VERGI_DAIRESI]',
   taxNumber: '[VERGI_NO]',
   mersis: '[MERSIS]',
-  websiteUrl: 'venthub-hvac.com',
+  websiteUrl: SITE_URL.replace(/^https?:\/\//, ''),
   deliveryTime: '1-5 iş günü',
   shippingFee: 'Bedava',
   returnAddress: '[IADE_ADRESI]',

@@ -7,7 +7,7 @@ describe('buildPaymentRequest', () => {
     const payload = buildPaymentRequest({
       amount: 1234,
       items: [
-        { id: 'c1', quantity: 2, product: { id: 'p1', name: 'Ürün', price: '100.50', image_url: 'x' } },
+        { id: 'c1', quantity: 2, product: { id: 'p1', name: 'Ürün', price: 100.50, image_url: 'x' } },
       ],
       customer: { name: 'Ali', email: 'ali@example.com', phone: '+90...' },
       shipping: { fullAddress: 'A', city: 'İstanbul', district: 'Kadıköy', postalCode: '34000' },

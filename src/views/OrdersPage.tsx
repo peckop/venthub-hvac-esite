@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
 import { formatDateTime } from '../i18n/datetime'
+import { Routes } from '../utils/routes'
 
 
 interface Order {
@@ -131,7 +132,7 @@ export const OrdersPage: React.FC = () => {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/auth/login?redirect=/account/orders')
+      router.push(Routes.auth.login('/account/orders'))
       return
     }
 
