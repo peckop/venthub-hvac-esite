@@ -186,6 +186,10 @@ def create_task(
                 "task_title": title,
                 "description": "",
                 "files_modified": [],
+                "allowed_paths": [],
+                "forbidden_paths": [],
+                "max_files_changed": 5,
+                "allowed_change_types": [],
                 "verification_commands": verify_cmds,
                 "all_passed": False
             }
