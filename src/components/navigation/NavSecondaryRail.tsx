@@ -60,7 +60,7 @@ const NavSecondaryRail: React.FC<NavSecondaryRailProps> = React.memo(({ items })
                 {leftItems.map((item) => (
                     <Link
                         key={item.id}
-                        href={item.href || '#'}
+                        href={(item.href || '#') as import('next').Route}
                         className="group flex items-center gap-2 text-white/80 transition-colors duration-200 hover:text-white"
                     >
                         {getIconForId(item.id)}
@@ -74,7 +74,7 @@ const NavSecondaryRail: React.FC<NavSecondaryRailProps> = React.memo(({ items })
                 {rightItems.map((item) => (
                     <Link
                         key={item.id}
-                        href={item.href || '#'}
+                        href={(item.href || '#') as import('next').Route}
                         className="group flex items-center gap-2 text-white/90 transition-all duration-200 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg"
                     >
                         {getIconForId(item.id)}
