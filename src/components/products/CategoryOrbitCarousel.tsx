@@ -1,4 +1,5 @@
 'use client'
+import { Routes } from '../../utils/routes'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -155,7 +156,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                     if (onSubcategorySelect) {
                         onSubcategorySelect(categoryVm.slug)
                     } else {
-                        router.push(`/category/${categoryVm.slug}`)
+                        router.push(Routes.category(categoryVm.slug))
                     }
                 }
             }
@@ -165,7 +166,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                 if (onSubcategorySelect) {
                     onSubcategorySelect(activeMainCategorySlug, subVm.slug)
                 } else {
-                    router.push(`/category/${activeMainCategorySlug}/${subVm.slug}`)
+                    router.push(Routes.category(activeMainCategorySlug, subVm.slug))
                 }
             }
         }
@@ -182,7 +183,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
 
     const handleViewAllProducts = useCallback(() => {
         if (activeMainCategorySlug) {
-            router.push(`/category/${activeMainCategorySlug}`)
+            router.push(Routes.category(activeMainCategorySlug))
         }
     }, [activeMainCategorySlug, router])
 
