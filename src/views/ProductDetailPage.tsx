@@ -65,8 +65,21 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
   const hierarchy = useMemo(() => {
     if (!product || categories.length === 0) return { main: null, sub: null };
-    const rawSub = categories.find(c => c.id === product.subcategory_id);
-    const rawMain = categories.find(c => c.id === product.category_id);
+    
+    let rawSub = categories.find(c => c.id === product.subcategory_id);
+    let rawMain = categories.find(c => c.id === product.category_id);
+
+    // Fallback: Data integrity recovery.
+    // If the database has a missing or null product.category_id, but the subcategory
+    // exists and has a parent_id, we can reliably infer the parent category!
+    if (rawSub?.parent_id) {
+      rawMain = categories.find(c => c.id === rawSub!.parent_id) || rawMain;
+    } else if (rawMain?.parent_id && !rawSub) {
+      // Anomaly: category_id is actually pointing to a subcategory
+      rawSub = rawMain;
+      rawMain = categories.find(c => c.id === rawMain!.parent_id) || undefined;
+    }
+
     return { main: wrapCategory(rawMain), sub: wrapCategory(rawSub) };
   }, [product, categories, wrapCategory]);
 
