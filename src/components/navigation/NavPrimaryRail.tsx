@@ -72,7 +72,7 @@ const NavPrimaryRail: React.FC<NavPrimaryRailProps> = React.memo(({
                 return (
                     <Link
                         key={item.id}
-                        href={item.href}
+                        href={item.href as import('next').Route}
                         onMouseEnter={() => onItemHover?.(item.id)}
                         className={itemBaseClass}
                     >
