@@ -10,6 +10,10 @@
     "task_title",
     "description",
     "files_modified",
+    "allowed_paths",
+    "forbidden_paths",
+    "max_files_changed",
+    "allowed_change_types",
     "verification_commands",
     "all_passed"
   ],
@@ -44,6 +48,33 @@
         "type": "string"
       },
       "description": "Değiştirilen dosyaların listesi."
+    },
+    "domain_ref": {
+      "type": "string",
+      "description": ".agent/domains/ altındaki ilgili domain sınır dosyasının adı (örnek: _template-domain.md). Bu kurallar Scope Police tarafından otomatik olarak denetlenecektir."
+    },
+    "allowed_paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Dokunulmasına izin verilen klasör veya glob yolları (örnek: src/components/pdp/** veya src/app/page.tsx). Eğer bir path buraya eklenmediyse, Scope Police ajanı acımasızca reddedecektir."
+    },
+    "forbidden_paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Kesinlikle DOKUNULMAMASI gereken dosya yolları. Eğer ajan işin buraya girebileceğini düşünüyorsa işi planlamamalıdır."
+    },
+    "max_files_changed": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Bu görevin dosya değiştirme bütçesi. Trivial görevler için maksimum sınır 5'tir. Aşarsanız plan hazırlamanız zorunludur."
+    },
+    "allowed_change_types": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Değişim türleri örn: ui_spacing, component_refactor, api_change, db_migration vb."
     },
     "verification_commands": {
       "type": "array",

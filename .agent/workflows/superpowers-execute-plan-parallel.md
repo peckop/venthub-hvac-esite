@@ -201,7 +201,15 @@ Confirm files exist by listing `artifacts/superpowers/` when done.
 After all steps complete:
 1. Run `/superpowers-review` (or inline review pass)
 2. Generate final summary with time savings metrics
-3. List all changed files
-4. Provide any manual validation steps
+3. **Registry Sync & Scope Police (Zorunlu Sentinel Gate):**
+   - Görev %100 ise önce Scope Police ile sınırı kontrol et, sonra cross-validate ve finalize et:
+     ```bash
+     python registry/engine.py check-scope registry/PXX-Proje/YYY-gorev/plan.json
+     python registry/engine.py cross-validate registry/PXX-Proje/YYY-gorev
+     python registry/engine.py finalize-task registry/PXX-Proje/YYY-gorev
+     ```
+   - `PULSE.md` otonom güncellenecek ve görev `completed/` dizinine taşınacaktır.
+4. List all changed files
+5. Provide any manual validation steps
 
 Stop after completing the finish step.
