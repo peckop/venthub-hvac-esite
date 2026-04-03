@@ -83,7 +83,7 @@ const HRVCalcPage: React.FC = () => {
     if (electricityCost !== '3.5') params.set('electricityCost', electricityCost)
 
     const query = params.toString()
-    router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+    router.replace(`${pathname}${query ? `?${query}` : ''}` as import('next').Route, { scroll: false })
   }, [
     recoveryType, buildingType, climateZone, area, occupancy, 
     operatingHours, sensibleEfficiency, latentEfficiency, electricityCost, 

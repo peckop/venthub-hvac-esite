@@ -9,6 +9,7 @@ import { VentImage } from './ui/VentImage'
 import { useCart } from '../hooks/useCartHook'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
+import { Routes } from '../utils/routes'
 
 interface ProductCardProps {
   product: Product
@@ -40,7 +41,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
   // LIST VIEW LAYOUT
   if (isList) {
     return (
-      <Link href={`/products/${product.slug || product.id}`} className="block w-full">
+      <Link href={Routes.product(product.slug!)} className="block w-full">
         <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 bg-light-gray/50 rounded-xl overflow-hidden p-2">
             <VentImage
@@ -90,7 +91,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
 
   // GRID VIEW
   return (
-    <Link href={`/products/${product.slug || product.id}`} className="block h-full">
+    <Link href={Routes.product(product.slug!)} className="block h-full">
       <div className={`group relative flex flex-col h-full bg-white rounded-2xl border border-light-gray transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-1 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
         
         {/* Badges Overlay */}

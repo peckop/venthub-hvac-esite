@@ -8,6 +8,7 @@ import { BrandIcon } from '../components/HVACIcons'
 import SecurityRibbon from '../components/SecurityRibbon'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
+import { Routes } from '../utils/routes'
 
 export const CartPage: React.FC = () => {
   const { items, updateQuantity, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart()
@@ -71,7 +72,7 @@ export const CartPage: React.FC = () => {
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
                     <Link
-                      href={`/products/${item.product.id}`}
+                      href={Routes.product(item.product.slug!)}
                       className="block hover:text-primary-navy transition-colors"
                     >
                       <h3 className="font-semibold text-industrial-gray mb-1">
@@ -174,7 +175,7 @@ export const CartPage: React.FC = () => {
 
               {/* Checkout Button */}
               <Link
-                href="/checkout"
+                href={Routes.checkout()}
                 className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center block"
               >
                 {t('cart.checkout')}
@@ -182,7 +183,7 @@ export const CartPage: React.FC = () => {
 
               {/* Continue Shopping */}
               <Link
-                href="/"
+                href={Routes.home()}
                 className="w-full mt-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center block"
               >
                 {t('cart.continueShopping')}

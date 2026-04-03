@@ -4,6 +4,8 @@ import { supabase, getProductsEnriched } from '../../../lib/supabase'
 import { mapDatabaseCategoryToDomain } from '../../../lib/type-converters'
 import type { DomainProduct } from '../../../lib/type-converters'
 import type { DbCategory } from '../../../types/db-rows'
+import { SITE_URL } from '../../../config/siteUrl'
+
 export async function generateStaticParams() {
   try {
     const { data: categories } = await supabase
@@ -50,7 +52,22 @@ export async function generateMetadata({ params }: { params: Promise<{ categoryS
     title: `${category.name} | VentHub`,
     description: `${category.name} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`,
     alternates: {
-      canonical: `https://venthub-hvac.com/category/${categorySlug}`,
+      canonical: `${SITE_URL}/category/${categorySlug}`,
+    },
+    openGraph: {
+      title: `${category.name} | VentHub`,
+      description: `${category.name} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`,
+      url: `${SITE_URL}/category/${categorySlug}`,
+      siteName: 'VentHub',
+      images: [
+        {
+          url: category.image_url || '/images/og-default.jpg',
+          width: 1200,
+          height: 630,
+        },
+      ],
+      locale: 'tr_TR',
+      type: 'website',
     },
   }
 }
@@ -81,7 +98,15 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
     "@type": "CollectionPage",
     "name": category?.name || categorySlug,
     "description": `${category?.name || categorySlug} kategorisindeki ürünler`,
-    "url": `https://venthub-hvac.com/category/${categorySlug}`
+    "url": `${SITE_URL}/category/${categorySlug}`,
+    "numberOfItems": products.length,
+    "itemListElement": products
+      .filter((prod) => prod.slug)
+      .map((prod, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `${SITE_URL}/products/${prod.slug}`
+      }))
   }
 
   return (

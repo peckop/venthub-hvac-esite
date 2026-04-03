@@ -1,7 +1,7 @@
 'use client'
-
 import React from 'react'
 import { usePathname } from 'next/navigation'
+import { SITE_URL } from '@/config/siteUrl'
 
 interface SeoProps {
   title?: string
@@ -27,7 +27,7 @@ export const Seo: React.FC<SeoProps> = ({
   const finalDesc = description || defaultDesc
   
   // Construct absolute URLs for social sharing
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://venthub.com.tr'
+  const siteUrl = SITE_URL
   const url = canonical || `${siteUrl}${pathname}`
   const image = ogImage || `${siteUrl}/og-image.png`
 

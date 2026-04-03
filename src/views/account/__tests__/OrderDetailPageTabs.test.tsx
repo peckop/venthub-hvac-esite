@@ -1,13 +1,13 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'next/navigation'
+
 
 const mockNavigate = vi.fn()
 
-vi.mock('next/navigation', async (orig) => {
-  const actual = await orig()
-  return { ...actual, useRouter: () => mockNavigate }
+vi.mock('next/navigation', async () => {
+  const actual = await vi.importActual('next/navigation')
+  return { ...(actual as object), useRouter: () => mockNavigate }
 })
 
 vi.mock('../../../hooks/useAuth', () => ({
@@ -123,11 +123,7 @@ import OrderDetailPage from '../OrderDetailPage'
 describe.skip('OrderDetailPage', () => {
   it('Sekme geçişi çalışır ve tracking link görünür', async () => {
     render(
-      <MemoryRouter initialEntries={['/account/orders/ord1']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Routes>
-          <Route path="/account/orders/:id" element={<OrderDetailPage />} />
-        </Routes>
-      </MemoryRouter>
+      <OrderDetailPage />
     )
 
     // Özet sekmesi görünene kadar bekle (sayfa yüklendi işareti)

@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
+import { Routes } from '../utils/routes'
 
 export const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -59,7 +60,7 @@ export const ForgotPasswordPage: React.FC = () => {
             </p>
             <div className="space-y-3">
               <Link
-                href="/auth/login"
+                href={Routes.auth.login()}
                 className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
               >
                 {t('auth.backToLogin')}
@@ -87,7 +88,7 @@ export const ForgotPasswordPage: React.FC = () => {
       <div className="relative max-w-md mx-auto px-4 py-8">
         {/* Back Button */}
         <Link
-          href="/auth/login"
+          href={Routes.auth.login()}
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />

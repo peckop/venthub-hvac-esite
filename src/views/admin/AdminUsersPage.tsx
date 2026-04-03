@@ -22,6 +22,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatDate } from '../../i18n/datetime'
 import { useRole } from '../../hooks/useRole'
 import { useDragScroll } from '../../hooks/useDragScroll'
+import { Routes } from '../../utils/routes'
 
 interface AdminUser {
   id: string
@@ -66,7 +67,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/auth/login?redirect=/admin/users')
+      router.push(Routes.auth.login('/admin/users'))
       return
     }
   }, [user, loading, router])

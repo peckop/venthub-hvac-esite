@@ -1,5 +1,6 @@
 'use client'
 
+import { Routes } from '@/utils/routes';
 import { motion, Variants } from 'framer-motion'
 import React from 'react'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -113,7 +114,7 @@ export const ApplicationSolutions: React.FC = () => {
               variants={itemVariants}
               className={`group relative overflow-hidden rounded-3xl bg-slate-100 h-[300px] sm:h-[400px] lg:h-[450px] ${item.span}`}
             >
-              <Link href={item.href} className="block w-full h-full relative">
+              <Link href={item.href as import('next').Route} className="block w-full h-full relative">
                 <Image
                   src={item.image}
                   alt={t(`home.applicationSolutions.items.${item.id}.title`)}
@@ -162,7 +163,7 @@ export const ApplicationSolutions: React.FC = () => {
 
         <div className="mt-16 text-center">
           <Link 
-            href="/products"
+            href={Routes.products()}
             className="inline-flex items-center gap-4 group"
           >
             <span className="text-sm font-bold uppercase tracking-widest text-slate-400 group-hover:text-cyan-600 transition-colors">

@@ -5,6 +5,7 @@ import { useCart } from '../hooks/useCartHook'
 import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
+import { Routes } from '../utils/routes'
 
 interface QuickViewModalProps {
   product: Product | null
@@ -49,7 +50,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
               <button onClick={handleAdd} className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition-colors">
                 <ShoppingCart size={18} className="mr-2" /> {t('quickView.addToCart')}
               </button>
-              <Link href={`/products/${product.id}`} onClick={onClose} className="inline-flex items-center justify-center px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white rounded-lg transition-colors">
+              <Link href={Routes.product(product.slug!)} onClick={onClose} className="inline-flex items-center justify-center px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white rounded-lg transition-colors">
                 <Eye size={18} className="mr-2" /> {t('quickView.viewProduct')}
               </Link>
             </div>

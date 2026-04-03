@@ -52,7 +52,7 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href={item.hrefProducts || '/products#applications'}
+            href={(item.hrefProducts || '/products#applications') as import('next').Route}
             className="inline-flex items-center rounded-lg bg-white/90 hover:bg-white text-industrial-gray px-3 py-1.5 text-xs font-semibold shadow"
             onClick={() => trackEvent('home_gallery_cta', { cta: 'products', title: item.title })}
           >
@@ -60,7 +60,7 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
           </Link>
           {item.topic && (
             <Link
-              href={`/destek/konular/${item.topic}`}
+              href={`/destek/konular/${item.topic}` as import('next').Route}
               className="inline-flex items-center rounded-lg bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 text-xs font-semibold shadow"
               onClick={() => trackEvent('home_gallery_cta', { cta: 'guide', topic: item.topic, title: item.title })}
             >

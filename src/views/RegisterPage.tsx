@@ -7,6 +7,7 @@ import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, CheckCircle } from 'lucide-re
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import { hibpPwnedCount } from '../utils/passwordSecurity'
+import { Routes } from '../utils/routes'
 
 export const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -106,7 +107,7 @@ export const RegisterPage: React.FC = () => {
             </p>
             <div className="space-y-3">
               <Link
-                href="/auth/login"
+                href={Routes.auth.login()}
                 className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
               >
                 {t('auth.backToLogin')}
@@ -270,7 +271,7 @@ export const RegisterPage: React.FC = () => {
             <p className="text-steel-gray">
               {t('auth.alreadyHave')} {' '}
               <Link
-                href="/auth/login"
+                href={Routes.auth.login()}
                 className="text-primary-navy hover:text-secondary-blue font-medium"
               >
                 {t('auth.login')}

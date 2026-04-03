@@ -243,7 +243,7 @@ export default function AccountSecurityPage() {
                           if (error) throw error
                           const url = (data as unknown as { url?: string })?.url
                           if (url) {
-                            router.push(url)
+                            router.push(url as import('next').Route)
                           } else {
                             toast.success('Google hesabı bağlama işlemi başlatıldı')
                             await refreshIdentities()

@@ -2,7 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Routes, Route, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({ user: { id: 'u1', email: 'u@u.com', user_metadata: {} }, loading: false })
@@ -94,18 +94,16 @@ import OrdersPage from '../OrdersPage'
 
 function LocationProbe() {
   const loc = usePathname()
-  return <div data-testid="loc-path">{loc.pathname}</div>
+  return <div data-testid="loc-path">{loc}</div>
 }
 
 describe.skip('OrdersPage', () => {
   it('Detaylar butonuna tıklayınca order detail sayfasına yönlendirir', async () => {
     render(
-      <MemoryRouter initialEntries={['/account/orders']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Routes>
-          <Route path="/account/orders" element={<><LocationProbe /><OrdersPage /></>} />
-          <Route path="/account/orders/:id" element={<><LocationProbe /><div data-testid="detail">Detay sayfası</div></>} />
-        </Routes>
-      </MemoryRouter>
+      <>
+        <LocationProbe />
+        <OrdersPage />
+      </>
     )
 
     // Liste yüklenene kadar "Detaylar" butonunu bekle

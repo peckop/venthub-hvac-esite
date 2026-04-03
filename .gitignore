@@ -41,5 +41,13 @@ tsc_errors.txt
 test_output.txt
 test_failures.txt
 
+# Geçici analiz & lint raporları (kök dizinde üretilen)
+lint_*.json
+audit_*.json
+tsc_*.json
+eslint_report.json
+.lighthouserc.json
+src_lint.json
+
 .gemini/
 gha-creds-*.json

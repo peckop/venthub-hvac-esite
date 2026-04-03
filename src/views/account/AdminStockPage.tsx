@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { Search, Plus, Minus, Save } from 'lucide-react'
 import { checkAdminAccess } from '../../config/admin'
+import { Routes } from '../../utils/routes'
 
 export default function AdminStockPage() {
   const { user, loading } = useAuth()
@@ -18,7 +19,7 @@ export default function AdminStockPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/auth/login?redirect=/account/operations/stock')
+      router.push(Routes.auth.login('/account/operations/stock'))
       return
     }
   }, [user, loading, router])

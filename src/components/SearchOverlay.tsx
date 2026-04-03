@@ -7,6 +7,7 @@ import type { FtsProductResult, SearchSuggestion } from '../lib/supabase'
 import { useI18n } from '../i18n/I18nProvider'
 import { highlightMatch } from '../utils/searchHighlight'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
+import { Routes } from '../utils/routes'
 import type { DbCategory } from '../types/db-rows'
 import { useCategories } from '../contexts/CategoryContext'
 
@@ -166,11 +167,12 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       if (activeIndex > -1) {
         if (viewState === 'SUGGESTING') {
           const s = suggestions[activeIndex]
-          router.push(s.url || '#')
+          router.push((s.url || '#') as import('next').Route)
           addToRecent(s.label || '')
           handleClose()
         } else if (viewState === 'RESULTS') {
-          router.push(`/products/${results[activeIndex].id}`)
+          const res = results[activeIndex]
+          router.push(Routes.product(res.slug!))
           handleClose()
         }
       } else {
@@ -186,7 +188,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     const icon = s.type === 'product' ? (
       (s.metadata as Record<string, string>)?.image_url ? (
         <div className="w-8 h-8 relative rounded-md overflow-hidden bg-white border border-gray-100 flex-shrink-0">
-          <Image src={(s.metadata as Record<string, string>).image_url || ''} alt={s.label || ''} fill className="object-cover" />
+          <Image src={(s.metadata as Record<string, string>).image_url || ''} alt={s.label || ''} fill sizes="32px" className="object-cover" />
         </div>
       ) : (
         <svg className="w-5 h-5 text-steel-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
@@ -204,7 +206,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         key={`${s.type}-${Math.random()}`} // Avoid strict index mapping issues
         onMouseEnter={() => setActiveIndex(idx)}
         onClick={() => {
-          router.push(s.url || '#')
+          router.push((s.url || '#') as import('next').Route)
           addToRecent(q)
           handleClose()
         }}
@@ -269,7 +271,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           {popularCategories.length > 0 ? popularCategories.map(cat => (
             <button
               key={String(cat.id)}
-              onClick={() => { router.push(`/category/${String(cat.slug)}`); handleClose(); }}
+              onClick={() => { router.push(Routes.category(String(cat.slug))); handleClose(); }}
               className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-all flex items-center gap-1.5"
             >
               {getCategoryIcon(String(cat.slug), { size: 14 })}
@@ -283,7 +285,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             ].map(cat => (
               <button
                 key={cat.slug}
-                onClick={() => { router.push(`/category/${cat.slug}`); handleClose(); }}
+                onClick={() => { router.push(Routes.category(cat.slug)); handleClose(); }}
                 className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-all"
               >
                 {cat.name}
@@ -357,13 +359,13 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               <li key={r.id}>
                 <button
                   className={`w-full text-left px-4 py-3 flex items-center justify-between group outline-none transition-all ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20' : 'hover:bg-slate-50'}`}
-                  onClick={() => { router.push(`/products/${r.id}`); handleClose() }}
+                  onClick={() => { router.push(Routes.product(r.slug!)); handleClose() }}
                   onMouseEnter={() => setActiveIndex(idx)}
                 >
                   <div className="flex items-center gap-4">
                     {r.image_url ? (
                       <div className="w-10 h-10 relative rounded-md overflow-hidden bg-white border border-gray-100 flex-shrink-0 shadow-sm">
-                        <Image src={r.image_url} alt={r.name} fill className="object-cover" />
+                        <Image src={r.image_url} alt={r.name} fill sizes="40px" className="object-cover" />
                       </div>
                     ) : (
                       <div className="w-10 h-10 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">

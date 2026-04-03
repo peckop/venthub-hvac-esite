@@ -46,7 +46,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
 
     // If no user at all, redirect to home
     if (!user) {
-      router.replace('/')
+      router.replace('/' as import('next').Route)
       return
     }
 
@@ -58,7 +58,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
     const hasAccess = canAccess(pathname ?? '')
     if (!hasAccess && role !== undefined) {
       // Sadece rol bilgisi kesinleşmişse (undefined değilse) kararı uygula
-      // router.replace('/') // AccessDenied zaten render ediliyor
+      // router.replace('/' as import('next').Route) // AccessDenied zaten render ediliyor
     }
   }, [loading, user, pathname, canAccess, router, isEmailAdmin, role])
 
@@ -143,7 +143,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
                   {group.items.map((item) => (
                     <Link
                       key={item.href}
-                      href={item.href}
+                      href={item.href as import('next').Route}
                       className={`flex items-center gap-3 px-3 py-2.5 text-sm font-bold transition-all rounded-xl ${
                         pathname === item.href ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'
                       }`}

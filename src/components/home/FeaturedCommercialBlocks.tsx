@@ -1,5 +1,6 @@
 'use client'
 
+import { Routes } from '@/utils/routes';
 import { motion, AnimatePresence } from 'framer-motion'
 import React, { useMemo, useState } from 'react'
 import ProductCard from '../ProductCard'
@@ -181,7 +182,7 @@ export const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> =
                 </div>
 
                 <Link 
-                  href="/products"
+                  href={Routes.products()}
                   className="flex items-center justify-center gap-3 w-full py-5 bg-white text-slate-950 font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all hover:bg-cyan-400 hover:scale-[1.02] active:scale-95 shadow-xl"
                 >
                   {t('home.featuredCommercial.cta')}

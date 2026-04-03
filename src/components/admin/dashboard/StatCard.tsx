@@ -128,7 +128,7 @@ const StatCard: React.FC<StatCardProps> = ({
 
     if (href) {
         return (
-            <Link href={href} className={`${baseClass} block hover:-translate-y-2`}>
+            <Link href={href as import('next').Route} className={`${baseClass} block hover:-translate-y-2`}>
                 <div className={`absolute -top-12 -right-12 w-48 h-48 bg-gradient-to-br from-white/5 to-transparent rounded-full transition-transform duration-1000 group-hover:scale-150 opacity-20`}></div>
                 <div className={`absolute bottom-0 left-0 w-full h-1 ${currentAccent.accent} scale-x-0 transition-transform origin-left duration-700 group-hover:scale-x-100 shadow-[0_0_15px_rgba(34,211,238,0.5)]`}></div>
                 {content}

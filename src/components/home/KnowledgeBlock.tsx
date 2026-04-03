@@ -5,6 +5,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { useI18n } from '../../i18n/I18nProvider'
+import { Routes } from '../../utils/routes'
 
 interface KnowledgeItem {
   id: 'guides' | 'calculators' | 'support'
@@ -15,7 +16,7 @@ interface KnowledgeItem {
 const knowledgeItems: KnowledgeItem[] = [
   { 
     id: 'guides', 
-    href: '/destek/merkez',
+    href: Routes.destek.home(),
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -34,7 +35,7 @@ const knowledgeItems: KnowledgeItem[] = [
   },
   { 
     id: 'support', 
-    href: '/support/sss',
+    href: Routes.destek.sss(),
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <circle cx="12" cy="12" r="10" />
@@ -122,7 +123,7 @@ export const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ onQuoteClick }) 
               variants={cardVariants}
             >
               <Link
-                href={item.href}
+                href={item.href as import('next').Route}
                 className="group relative block h-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.02] p-10 backdrop-blur-md transition-all duration-500 hover:border-cyan-500/40 hover:bg-white/[0.05]"
               >
                 <div className="absolute top-8 right-10 text-4xl font-black text-white/5 transition-colors group-hover:text-cyan-500/10">

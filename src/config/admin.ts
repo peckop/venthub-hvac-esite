@@ -17,6 +17,12 @@ interface AdminUser {
 }
 
 /**
+ * Middleware & Edge Sabitleri
+ */
+export const SUPABASE_PROJECT_REF = 'tnofewwkwlyjsqgwjjga'
+export const AUTH_COOKIE_NAME = `sb-${SUPABASE_PROJECT_REF}-auth-token`
+
+/**
  * Production-ready admin email list
  * 
  * Admin rolleri artık database'den kontrol edilir:

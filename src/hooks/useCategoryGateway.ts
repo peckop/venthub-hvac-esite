@@ -110,7 +110,7 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
         if (newFilters.catSearch) urlParams.set('catSearch', newFilters.catSearch); else urlParams.delete('catSearch');
 
         const newQueryString = urlParams.toString()
-        router.replace(`${pathname}${newQueryString ? `?${newQueryString}` : ''}`, { scroll: false })
+        router.replace(`${pathname}${newQueryString ? `?${newQueryString}` : ''}` as import('next').Route, { scroll: false })
       }
       
       return newFilters
@@ -200,7 +200,7 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
     }
 
     fetchData()
-  }, [slug, parentSlug, initialCategory, globalCategories, categoriesLoading])
+  }, [slug, parentSlug, initialCategory, initialProducts, globalCategories, categoriesLoading])
 
   return {
     category,
