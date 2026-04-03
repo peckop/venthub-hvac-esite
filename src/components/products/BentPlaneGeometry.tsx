@@ -1,3 +1,4 @@
+import { Routes } from '../../utils/routes'
 import React, { useRef, useMemo, useState } from 'react'
 import { useFrame, ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -127,7 +128,7 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
 
     const handleClick = (e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
-        router.push(`/category/${id}`)
+        router.push(Routes.category(id))
     }
 
     return (

@@ -61,7 +61,7 @@ const ApplicationCards: React.FC = () => {
                 {applications.map((app) => (
                     <Link
                         key={app.id}
-                        href={app.href}
+                        href={app.href as import('next').Route}
                         className="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary-navy/20 transition-all duration-300"
                     >
                         {/* Image Container with Next/Image */}

@@ -1,3 +1,4 @@
+import { Routes } from '../../utils/routes'
 import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -30,7 +31,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
 
     const handleNavigate = () => {
         if (category) {
-            router.push(`/category/${category.id}`)
+            router.push(Routes.category(category.id))
             onClose()
         }
     }
