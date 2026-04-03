@@ -39,7 +39,7 @@ jobs:
             You are an expert code quality agent.
             Your task is to fix existing ESLint warnings and TypeScript `any` types ONLY across the `${{ github.event.inputs.scope || 'src/components/admin/' }}` folder.
 
-            1. Run `pnpm run lint` and `pnpm exec tsc -b tsconfig.build.json`.
+            1. Run `pnpm run lint` and `pnpm exec tsc --noEmit`.
             2. Analyze the errors specifically inside `${{ github.event.inputs.scope || 'src/components/admin/' }}`.
             3. Fix the errors target by target ONLY in `${{ github.event.inputs.scope || 'src/components/admin/' }}`.
 
