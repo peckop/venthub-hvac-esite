@@ -87,9 +87,10 @@ At the end:
    - Follow-ups (if any)
    - Manual validation steps (if applicable)
 3) Confirm the artifacts exist by listing `artifacts/superpowers/`.
-4) **Registry Sync (Zorunlu Sentinel Gate):**
-   - Görev %100 ise önce cross-validate, sonra finalize et:
+4) **Registry Sync & Scope Police (Zorunlu Sentinel Gate):**
+   - Görev %100 ise önce Scope Police ile sınırı kontrol et, sonra cross-validate ve finalize et:
      ```bash
+     python registry/engine.py check-scope registry/PXX-Proje/YYY-gorev/plan.json
      python registry/engine.py cross-validate registry/PXX-Proje/YYY-gorev
      python registry/engine.py finalize-task registry/PXX-Proje/YYY-gorev
      ```

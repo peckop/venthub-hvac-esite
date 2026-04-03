@@ -4,7 +4,7 @@
   "title": "Implementation Plan Artifact",
   "description": "Uygulama planı çıktısı. Bu şema hem YAPISAL doğrulama hem de MODEL SEVKİ (dispatcher) ve ONAY MEKANİZMASI sağlar. Ajan bu şemayı okuduğunda, görevin karmaşıklığını nasıl ölçeceğini, hangi modeli önereceğini ve kullanıcıdan onay isteyip istemeyeceğini bilmelidir.",
   "type": "object",
-  "required": ["objective", "assumptions", "pre_checks", "steps", "risks", "rollback", "brainstorm_ref", "execution_complexity", "recommended_model", "requires_human_approval"],
+  "required": ["objective", "assumptions", "pre_checks", "steps", "risks", "rollback", "brainstorm_ref", "execution_complexity", "recommended_model", "requires_human_approval", "domain_ref", "allowed_paths", "forbidden_paths", "max_files_changed", "allowed_change_types"],
   "properties": {
     "skill": {
       "type": "string",
@@ -34,6 +34,33 @@
     "requires_human_approval": {
       "type": "boolean",
       "description": "true = İş DB migration, güvenlik, mimari kırılma veya geri dönülemez değişiklik içeriyor → kullanıcı onayı zorunlu. false = İş basit ekleme/düzeltme, yan etkisi yok → ajan otonom ilerleyebilir (ancak kullanıcı modeli değiştirmeli)."
+    },
+    "domain_ref": {
+      "type": "string",
+      "description": ".agent/domains/ altındaki ilgili domain sınır dosyasının adı (örnek: _template-domain.md). Bu kurallar Scope Police tarafından otomatik olarak denetlenecektir."
+    },
+    "allowed_paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Dokunulmasına izin verilen klasör veya glob yolları (örnek: src/components/pdp/** veya src/app/page.tsx). Eğer bir path buraya eklenmediyse, Scope Police ajanı acımasızca reddedecektir."
+    },
+    "forbidden_paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Kesinlikle DOKUNULMAMASI gereken dosya yolları. Eğer ajan işin buraya girebileceğini düşünüyorsa işi planlamamalıdır."
+    },
+    "max_files_changed": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Bu görevin dosya değiştirme bütçesi. Eğer bu sayıyı aşarsanız Scope Police commit atmanızı engeller. Limit: 10."
+    },
+    "allowed_change_types": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Değişim türleri örn: ui_spacing, component_refactor, api_change, db_migration vb."
     },
     "objective": {
       "type": "string",

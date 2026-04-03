@@ -22,6 +22,12 @@ python registry/engine.py recall
 python .agent/skills/diff-review/scripts/check_diff_rules.py
 ```
 
+0c. **Scope Police Kontrolü (ZORUNLU):**
+   - O an üzerinde çalışılan görevin `plan.json` veya `trivial.json` dosyasını bul ve doğrula. Hata (FAIL) verirse işler durdurulur ve düzeltilmesi veya görev ayrılması istenir, devam edilemez.
+```bash
+python registry/engine.py check-scope registry/PXX-Proje/YYY-gorev/plan.json
+```
+
 1. **Tip Kontrolü (TSC):**
 ```bash
 pnpm exec tsc -b tsconfig.build.json
