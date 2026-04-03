@@ -25,7 +25,7 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
 
   return (
     <Link 
-      href={href}
+      href={href as import('next').Route}
       className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white transition-all duration-500 hover:-translate-y-1 hover:border-primary-navy/20 hover:shadow-[0_20px_40px_-15px_rgba(30,41,59,0.1)]"
     >
       {/* Image Container */}
