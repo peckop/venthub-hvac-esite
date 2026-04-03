@@ -19,6 +19,7 @@ This file defines the strict architectural rules, boundaries, and best practices
 3. **Semantic Integrity Guard:** Bir görev dosyasında JSON alanları somut verilerle doldurulmadan `status` ASLA `Executing` veya `Completed` yapılamaz.
 4. **Atomic Registry Sync:** Kodda yaptığın her başarılı değişiklikten sonra `registry/` dosyasını veya `PULSE.md`yi güncelle.
 5. **No-Hardcore Strings:** Kullanıcıya dönük hiçbir metni TSX içine gömme. `useI18n()` kullan.
+6. **İletişim Dili (Translator Modu):** Kullanıcı (Recep) ile iletişim kurarken, öneri sunarken veya plan yaparken teknik yazılım terimlerini mutlaka günlük hayatın işleyişinden somut benzetmelerle (analojilerle) açıklayarak basit "simultane çeviri" formatında aktar. Hem teknik terimi hem de açıklamasını muazzam kalitede bir örnekle ver ki, kullanıcı konuyu tam öğrenip doğru karar için onay verebilsin. Salt soyut yazılım jargonu kullanmak yasaktır.
 
 ## 3. Component Architecture
 - Place components in their respective structural domains inside `src/components/`:
