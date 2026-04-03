@@ -5,6 +5,7 @@ import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Routes } from '../utils/routes'
 import { 
   listAddresses, 
   UserAddress 
@@ -94,7 +95,7 @@ export const CheckoutPage: React.FC = () => {
   // Auth check
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/auth/login?from=/checkout')
+      router.push(Routes.auth.login('/checkout'))
     }
   }, [user, authLoading, router])
 
@@ -220,7 +221,7 @@ export const CheckoutPage: React.FC = () => {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <CheckoutProgress step={step} t={t} onBackToCart={() => router.push('/cart')} />
+        <CheckoutProgress step={step} t={t} onBackToCart={() => router.push(Routes.cart())} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">

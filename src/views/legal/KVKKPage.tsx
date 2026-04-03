@@ -1,5 +1,7 @@
 import React from 'react'
+import Link from 'next/link'
 import legalConfig from '../../config/legal'
+import { Routes } from '../../utils/routes'
 
 const KVKKPage: React.FC = () => {
   return (
@@ -74,7 +76,7 @@ const KVKKPage: React.FC = () => {
 
         <section>
           <h2 className="text-xl font-semibold text-industrial-gray mb-3">7) Çerezler</h2>
-          <p>Çerezler ve benzer teknolojiler hakkında detaylı bilgi için <a className="text-primary-navy underline" href="/legal/cerez-politikasi">Çerez Politikası</a> metnimizi inceleyiniz.</p>
+          <p>Çerezler ve benzer teknolojiler hakkında detaylı bilgi için <Link className="text-primary-navy underline" href={Routes.legal.cerez()}>Çerez Politikası</Link> metnimizi inceleyiniz.</p>
         </section>
 
         <section>

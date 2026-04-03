@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { Building2, X, CheckCircle2, ChevronRight, Mail, Phone, MapPin, Briefcase } from 'lucide-react'
+import { Routes } from '../utils/routes'
 
 interface LeadModalProps {
   open: boolean
@@ -284,7 +286,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     </div>
                     <div className="flex flex-col">
                       <label htmlFor="consent" className="text-xs text-steel-gray leading-tight cursor-pointer">
-                        <a href="/legal/kvkk" className="text-primary-navy hover:underline font-medium" target="_blank" rel="noopener">KVKK Aydınlatma Metni'ni</a> okudum ve kabul ediyorum.
+                        <Link href={Routes.legal.kvkk()} className="text-primary-navy hover:underline font-medium" target="_blank" rel="noopener">KVKK Aydınlatma Metni'ni</Link> okudum ve kabul ediyorum.
                       </label>
                       {errors.consent && <p className="text-[11px] text-red-500 mt-0.5">{errors.consent}</p>}
                     </div>

@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
 import { formatDateTime } from '../i18n/datetime'
+import { Routes } from '../utils/routes'
 
 type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
 
@@ -200,13 +201,13 @@ export const PaymentSuccessPage: React.FC = () => {
           </p>
           <div className="space-y-3">
             <Link
-              href="/checkout"
+              href={Routes.checkout()}
               className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
             >
               {t('payment.retry')}
             </Link>
             <Link
-              href="/cart"
+              href={Routes.cart()}
               className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
             >
               {t('checkout.backToCart')}

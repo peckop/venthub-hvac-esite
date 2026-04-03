@@ -1,5 +1,6 @@
 'use client'
 
+import { Routes } from '@/utils/routes';
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -231,7 +232,7 @@ const AboutPage: React.FC = () => {
               İletişime Geçin
             </Link>
             <Link 
-              href="/products" 
+              href={Routes.products()} 
               className="bg-white text-slate-950 border border-slate-200 px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-50 transition-all"
             >
               Ürünleri Keşfedin

@@ -7,6 +7,7 @@ export interface LiteProduct {
   image_url?: string | null
   brand?: string | null
   sku?: string | null
+  slug?: string | null
 }
 
 const BASE = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
@@ -34,7 +35,7 @@ async function srf(path: string, params: Record<string, string | number | boolea
 export async function fetchHomeProducts(limit: number = 36) {
   // 1) featured
   const featuredRes = await srf('products', {
-    select: 'id,name,image_url,brand,sku,is_featured,status',
+    select: 'id,name,slug,image_url,brand,sku,is_featured,status',
     'is_featured': 'eq.true',
     'status': 'eq.active',
     'order': ['is_featured.desc', 'name.asc'],
@@ -45,7 +46,7 @@ export async function fetchHomeProducts(limit: number = 36) {
 
   // 2) general list
   const listRes = await srf('products', {
-    select: 'id,name,image_url,brand,sku,is_featured,status',
+    select: 'id,name,slug,image_url,brand,sku,is_featured,status',
     'status': 'eq.active',
     'order': ['is_featured.desc', 'name.asc'],
     'limit': limit,

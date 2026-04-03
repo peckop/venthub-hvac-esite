@@ -1,4 +1,5 @@
 'use client'
+import { Routes } from '../utils/routes'
 
 /**
  * @view ProductsDiscoveryView
@@ -66,16 +67,15 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
     const [viewMode, setViewMode] = useState<ViewMode>('grid')
     const productsRef = useRef<HTMLDivElement>(null)
 
-    // Subcategory (veya ana sub olmayan category) seçildiğinde
     const handleSubcategorySelect = useCallback((
         categorySlug: string,
         subcategorySlug?: string
     ) => {
         // Doğrudan unified category yapısına yönlendir
         if (subcategorySlug) {
-            router.push(`/products/${categorySlug}/${subcategorySlug}`)
+            router.push(Routes.category(categorySlug, subcategorySlug))
         } else {
-            router.push(`/products/${categorySlug}`)
+            router.push(Routes.category(categorySlug))
         }
     }, [router])
 

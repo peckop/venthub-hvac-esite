@@ -5,6 +5,7 @@ import { BrandIcon } from './HVACIcons'
 import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
+import { Routes } from '../utils/routes'
 
 interface CartToastProps {
   isVisible: boolean
@@ -127,7 +128,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                   <span>{t('cartToast.continue')}</span>
                 </button>
 
-                <Link href="/cart" onClick={handleGoToCart}>
+                <Link href={Routes.cart()} onClick={handleGoToCart}>
                   <button 
                     className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
                     aria-label={t('cartToast.goToCart')}

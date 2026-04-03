@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '../../i18n/I18nProvider'
 import { LayoutDashboard, Package, Truck, MapPin, FileText, RefreshCcw, User, Shield } from 'lucide-react'
+import { Routes } from '../../utils/routes'
 
 type TabItem = { to: string; label: string; icon: React.ReactNode }
 type TabGroup = { label: string; items: TabItem[] }
@@ -47,7 +48,7 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
     if (process.env.NODE_ENV === 'development') return
 
     if (!loading && !user && active) {
-      router.replace('/auth/login')
+      router.replace(Routes.auth.login())
     }
     return () => { active = false }
   }, [user, loading, router])
@@ -76,7 +77,7 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
                       return (
                         <Link
                           key={tab.to}
-                          href={tab.to}
+                          href={tab.to as import('next').Route}
                           className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${isActive
                               ? 'bg-primary-navy text-white shadow-md shadow-primary-navy/20'
                               : 'text-slate-600 hover:bg-slate-100 hover:text-primary-navy hover:translate-x-0.5'

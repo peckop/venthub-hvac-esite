@@ -1,5 +1,7 @@
 import React from 'react'
+import Link from 'next/link'
 import legalConfig from '../../config/legal'
+import { Routes } from '../../utils/routes'
 
 const PrivacyPolicyPage: React.FC = () => {
   return (
@@ -49,7 +51,7 @@ const PrivacyPolicyPage: React.FC = () => {
 
         <section>
           <h2 className="text-xl font-semibold text-industrial-gray mb-3">5) Çerezler</h2>
-          <p>Detaylar için <a className="text-primary-navy underline" href="/legal/cerez-politikasi">Çerez Politikası</a> sayfasını inceleyiniz.</p>
+          <p>Detaylar için <Link className="text-primary-navy underline" href={Routes.legal.cerez()}>Çerez Politikası</Link> sayfasını inceleyiniz.</p>
         </section>
 
         <section>

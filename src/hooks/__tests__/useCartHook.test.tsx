@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { useCart } from '../useCartHook'
 import { CartContext, type CartContextType, type CartItem } from '../../contexts/CartContext'
-import type { Product } from '../../types/product'
+import type { DomainProduct as Product } from '../../types/ui-models'
 
 describe('useCart hook', () => {
   it('returns safe fallback object when CartContext is undefined', () => {
@@ -30,8 +30,6 @@ describe('useCart hook', () => {
     const mockContextValue: CartContextType = {
       items: [{ id: '1', quantity: 2, unitPrice: 100 } as Partial<CartItem> as CartItem],
       syncing: true,
-      isInitialized: true,
-      lastSynced: Date.now(),
       addToCart: vi.fn(),
       removeFromCart: vi.fn(),
       updateQuantity: vi.fn(),

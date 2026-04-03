@@ -117,7 +117,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                                     </td>
                                     <td className={`${adminTableCellClass} text-right last:pr-8`}>
                                         <Link 
-                                            href={`/admin/orders/${r.id}`} 
+                                            href={`/admin/orders/${r.id}` as import('next').Route} 
                                             className="inline-flex items-center gap-3 text-white text-[10px] font-black uppercase tracking-[0.2em] bg-white/5 px-6 py-3 rounded-xl hover:bg-cyan-500 hover:text-[#0A0F1E] border border-white/5 transition-all duration-500 shadow-lg"
                                         >
                                             Detay <ExternalLink size={14} className="opacity-60 group-hover/link:opacity-100" />

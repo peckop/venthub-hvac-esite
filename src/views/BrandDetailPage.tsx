@@ -13,6 +13,7 @@ import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { motion } from 'framer-motion'
 import Breadcrumb from '../components/navigation/Breadcrumb'
+import { Routes } from '../utils/routes'
 
 const BRAND_DETAILS: Record<string, {
   founded?: number
@@ -321,7 +322,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
               {products.map((product) => (
                 <Link 
                   key={product.id} 
-                  href={`/products/${product.slug || product.id}`}
+                  href={Routes.product(product.slug!)}
                   aria-label={`${product.name} ${t('pdp.details')}`}
                   className="group block bg-white rounded-[2.5rem] p-8 border border-white transition-all duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
                 >

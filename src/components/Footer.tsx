@@ -1,4 +1,5 @@
 'use client'
+import { Routes } from '../utils/routes'
 
 import React from 'react'
 import Link from 'next/link'
@@ -55,57 +56,52 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold mb-4">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+                <Link href={Routes.home()} className="text-gray-300 hover:text-white transition-colors">
                   {t('common.homeLabel')}
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="text-gray-300 hover:text-white transition-colors">
+                <Link href={Routes.products()} className="text-gray-300 hover:text-white transition-colors">
                   {t('common.products')}
                 </Link>
               </li>
               <li>
-                <Link href="/brands" className="text-gray-300 hover:text-white transition-colors">
+                <Link href={Routes.brands()} className="text-gray-300 hover:text-white transition-colors">
                   {t('common.brands')}
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+                <Link href={Routes.about()} className="text-gray-300 hover:text-white transition-colors">
                   {t('common.about')}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                <Link href={Routes.contact()} className="text-gray-300 hover:text-white transition-colors">
                   {t('common.contact')}
                 </Link>
               </li>
               <li>
-                <Link href="/destek/merkez" className="text-gray-300 hover:text-white transition-colors">
+                <Link href={Routes.destek.home()} className="text-gray-300 hover:text-white transition-colors">
                   {t('common.knowledgeHub')}
                 </Link>
               </li>
               <li>
-                <Link href="/support" className="text-gray-300 hover:text-white transition-colors">
-                  {t('common.supportCenter')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/support/sss" className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href={Routes.destek.sss()} className="text-steel-gray hover:text-white transition-colors text-sm">
                   • {t('support.links.faq')}
                 </Link>
               </li>
               <li>
-                <Link href="/support/iade-degisim" className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href={Routes.destek.iadeDegisim()} className="text-steel-gray hover:text-white transition-colors text-sm">
                   • {t('support.links.returns')}
                 </Link>
               </li>
               <li>
-                <Link href="/support/teslimat-kargo" className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href={Routes.destek.teslimatKargo()} className="text-steel-gray hover:text-white transition-colors text-sm">
                   • {t('support.links.shipping')}
                 </Link>
               </li>
               <li>
-                <Link href="/support/garanti-servis" className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href={Routes.destek.garantiServis()} className="text-steel-gray hover:text-white transition-colors text-sm">
                   • {t('support.links.warranty')}
                 </Link>
               </li>
@@ -119,7 +115,7 @@ const Footer: React.FC = () => {
               {mainCategories.slice(0, 6).map((category) => (
                 <li key={category.slug}>
                   <Link
-                    href={`/category/${category.slug}`}
+                    href={Routes.category(category.slug)}
                     className="text-gray-300 hover:text-white transition-colors text-sm"
                   >
                     {category.name}
@@ -169,22 +165,22 @@ const Footer: React.FC = () => {
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
               {/* Build meta tag */}
               <BuildTag />
-              <Link href="/legal/kvkk" className="text-gray-300 hover:text-white transition-colors">
+              <Link href={Routes.legal.kvkk()} className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.kvkk')}
               </Link>
-              <Link href="/legal/mesafeli-satis-sozlesmesi" className="text-gray-300 hover:text-white transition-colors">
+              <Link href={Routes.legal.mesafeliSatis()} className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.distanceSales')}
               </Link>
-              <Link href="/legal/on-bilgilendirme-formu" className="text-gray-300 hover:text-white transition-colors">
+              <Link href={Routes.legal.onBilgilendirme()} className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.preInformation')}
               </Link>
-              <Link href="/legal/cerez-politikasi" className="text-gray-300 hover:text-white transition-colors">
+              <Link href={Routes.legal.cerez()} className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.cookies')}
               </Link>
-              <Link href="/legal/gizlilik-politikasi" className="text-gray-300 hover:text-white transition-colors">
+              <Link href={Routes.legal.gizlilik()} className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.privacy')}
               </Link>
-              <Link href="/legal/kullanim-kosullari" className="text-gray-300 hover:text-white transition-colors">
+              <Link href={Routes.legal.kullanimKosullari()} className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.terms')}
               </Link>
             </div>

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { useI18n } from '../../i18n/I18nProvider'
+import { Routes } from '../../utils/routes'
 
 interface QuickEntryRailProps {
   onQuoteClick: () => void
@@ -34,7 +35,7 @@ const quickEntryItems = [
   },
   {
     id: 'support',
-    href: '/support',
+    href: Routes.destek.home(),
     icon: (
       <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M18 10a6 6 0 10-12 0v4a2 2 0 002 2h1l2.5 3 2.5-3H16a2 2 0 002-2v-4z" />
