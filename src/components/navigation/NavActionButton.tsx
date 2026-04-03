@@ -67,7 +67,7 @@ const NavActionButton: React.FC<NavActionButtonProps> = ({
 
     if (href) {
         return (
-            <Link href={href} aria-label={ariaLabel} title={title} className={classes}>
+            <Link href={href as import('next').Route} aria-label={ariaLabel} title={title} className={classes}>
                 {content}
             </Link>
         )

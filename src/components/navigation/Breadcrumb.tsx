@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { ChevronRight, Home } from 'lucide-react'
+import { SITE_URL } from '@/config/siteUrl'
 
 export interface BreadcrumbItem {
     label: string
@@ -59,12 +60,27 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     }
 
     const styles = textClasses[variant]
+    
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": items.map((item, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "name": item.label,
+            "item": item.href ? `${SITE_URL}${item.href}` : undefined
+        }))
+    };
 
     return (
         <nav
             aria-label="Breadcrumb"
             className={`${bgClasses[variant]} ${className}`}
         >
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <ol className="flex items-center flex-wrap gap-y-1 text-sm">
                     {items.map((item, index) => {
@@ -93,7 +109,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                                     </span>
                                 ) : (
                                     <Link
-                                        href={item.href}
+                                        href={item.href as import('next').Route}
                                         className={`${styles.link} transition-colors flex items-center`}
                                     >
                                         {isFirst && <Home size={14} className="inline mr-1.5 -mt-0.5" aria-hidden="true" />}

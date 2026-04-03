@@ -1,4 +1,5 @@
 'use client'
+import { Routes } from '../../utils/routes'
 
 import React, { useEffect, useState, useCallback, Suspense } from 'react'
 import { X, Grid3X3, ArrowLeft, ChevronRight } from 'lucide-react'
@@ -84,16 +85,16 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
             setSelectedParentCategory(category)
             setHoveredCategory(category)
         } else {
-            router.push(`/category/${category.slug}`)
+            router.push(Routes.category(category.slug))
             onClose()
         }
     }
 
     const handleSubCategoryClick = (subCategory: DomainCategory) => {
         if (selectedParentCategory) {
-            router.push(`/category/${selectedParentCategory.slug}/${subCategory.slug}`)
+            router.push(Routes.category(selectedParentCategory.slug, subCategory.slug))
         } else {
-            router.push(`/category/${subCategory.slug}`)
+            router.push(Routes.category(subCategory.slug))
         }
         onClose()
     }
