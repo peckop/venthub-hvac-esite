@@ -72,6 +72,53 @@ def check_property_mismatch(content: str, file_path: Path) -> list[str]:
     return issues
 
 
+    return issues
+
+
+def check_hardcoded_routes(content: str, file_path: Path) -> list[str]:
+    """
+    Kontrol: Hardcoded Route Sızıntısı — BLOCKER
+    İşlem: href="/category/" veya "/products/" kullanımlarını arar. Otoriteyi Routes.ts'ye zorlar.
+    """
+    issues = []
+    # routes.ts ve middleware'de kasıtlı URL üretimlerini atla
+    if file_path.name in ["routes.ts", "middleware.ts"]:
+        return []
+        
+    if re.search(r'href\s*=\s*["\']/(category|products)', content) or re.search(r'href\s*=\s*\{`/(category|products)', content):
+        issues.append(
+            f"[BLOCKER] Hardcoded Route: href icinde direkt /category veya /products kullanilamaz. Routes.ts metotlarini kullanin -> {file_path}"
+        )
+    return issues
+
+
+def check_middleware_supabase_fetch(content: str, file_path: Path) -> list[str]:
+    """
+    Kontrol: Middleware DB Yorgunluğu — BLOCKER
+    İşlem: middleware.ts içinde supabase.from() arar.
+    """
+    issues = []
+    if file_path.name == "middleware.ts":
+        if "supabase.from" in content or ".select(" in content:
+            issues.append(
+                f"[BLOCKER] Edge Yorgunlugu: middleware.ts icinde DB fetch yasaktir. RBAC onayi JWT Claims uzerinden alinmali -> {file_path}"
+            )
+    return issues
+
+
+def check_uuid_slug_fallback(content: str, file_path: Path) -> list[str]:
+    """
+    Kontrol: SEO UUID Sızıntısı — BLOCKER
+    İşlem: .slug || .id gibi hatalı SEO/URL fallback kullanımlarını engeller.
+    """
+    issues = []
+    if re.search(r'\.slug\s*\|\|\s*[a-zA-Z0-9_]+\.id', content):
+        issues.append(
+            f"[BLOCKER] SEO UUID Sizintisi: '.slug || .id' kullanimi yasaktir. Tanimlamalar katı sekilde '.slug' odakli olmali -> {file_path}"
+        )
+    return issues
+
+
 # --- WARNING Kontrolleri (kod kalite uyarısı, CI'da bloklayabilir) ---
 
 def check_i18n_leakage(content: str, file_path: Path) -> list[str]:
@@ -154,6 +201,9 @@ def check_file(file_path: Path) -> tuple[list[str], list[str]]:
     blockers.extend(check_type_escape(content, file_path))
     blockers.extend(check_hydration_risk(content, file_path))
     blockers.extend(check_property_mismatch(content, file_path))
+    blockers.extend(check_hardcoded_routes(content, file_path))
+    blockers.extend(check_middleware_supabase_fetch(content, file_path))
+    blockers.extend(check_uuid_slug_fallback(content, file_path))
 
     # WARNING kontrolleri
     warnings.extend(check_i18n_leakage(content, file_path))

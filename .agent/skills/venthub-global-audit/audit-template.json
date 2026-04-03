@@ -1,0 +1,48 @@
+{
+  "audit_name": "VentHub Global Mimari Denetim",
+  "audit_date": "YYYY-MM-DD",
+  "agent_id": "Antigravity",
+  "checks": {
+    "1_seo_and_uuid_leakage": {
+      "target": "JSON-LD, SEO sitemap veya yönlendirmelerde UUID sızıntısı kalmamalı. Yalnızca 'slug' kullanılmalı.",
+      "mandatory_action": "grep_search veya run_command ile 'prod.id', 'href=\"/products/' vb. kaçak ID/URL kullanımları incelenmeli.",
+      "executed_commands": [],
+      "exit_code": null,
+      "status": "PENDING | PASS | FAIL",
+      "evidence": "FAIL ise kanıt dizelerini (çıktı) buraya kopyala."
+    },
+    "2_middleware_jwt_rbac": {
+      "target": "Middleware üzerinde veritabanı (Supabase) sorgusu yasaktır (Maliyet/Performans). Güvenlik sadece JWT Claims üzerinden okunmalı.",
+      "mandatory_action": "grep_search ile 'src/middleware.ts' içinde 'supabase.from' aranmalı.",
+      "executed_commands": [],
+      "exit_code": null,
+      "status": "PENDING | PASS | FAIL",
+      "evidence": ""
+    },
+    "3_zero_tolerance_linting": {
+      "target": "ESLint kod standartlarına tam uyum sağlamalı.",
+      "mandatory_action": "Terminalden 'npm run lint' çalıştırılmalı.",
+      "executed_commands": [],
+      "exit_code": null,
+      "status": "PENDING | PASS | FAIL",
+      "evidence": ""
+    },
+    "4_strict_type_checking": {
+      "target": "TypeScript denetiminden sıfır (0) hata ile geçilmeli.",
+      "mandatory_action": "Terminalden 'npx tsc --noEmit' çalıştırılmalı.",
+      "executed_commands": [],
+      "exit_code": null,
+      "status": "PENDING | PASS | FAIL",
+      "evidence": ""
+    },
+    "5_integrity_guard_check": {
+      "target": "Projeni anayasa (GEMINI.md/AGENTS.md) ve kilitli dosya standartlarının doğrulanması.",
+      "mandatory_action": "Eğer varsa: 'python .agent/scripts/check_integrity.py' çalıştırılmalı.",
+      "executed_commands": [],
+      "exit_code": null,
+      "status": "PENDING | PASS | FAIL",
+      "evidence": ""
+    }
+  },
+  "overall_ship_status": "BLOCKED | READY"
+}
