@@ -1,19 +1,21 @@
 import PageComponent from '../../../views/ProductDetailPage'
-import { getProductBySlugOrId, supabase } from '../../../lib/supabase'
-import type { Product } from '../../../lib/supabase'
+import { getProductBySlug, supabase, type Product } from '../../../lib/supabase'
+import { SITE_URL } from '../../../config/siteUrl'
+
 
 export async function generateStaticParams() {
   try {
     const { data: products } = await supabase
       .from('products')
-      .select('id, slug')
+      .select('slug')
       .eq('status', 'active')
+      .not('slug', 'is', null)
 
-    const paths = (products || []).flatMap((p) => {
-      const results = [{ id: p.id }]
-      if (p.slug) results.push({ id: p.slug })
-      return results
-    })
+    const paths = (products || [])
+      .filter((p) => !!p.slug)
+      .map((p) => {
+        return { slug: p.slug! }
+      })
 
     if (paths.length === 0) {
       return []
@@ -25,16 +27,34 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const cleanId = id?.replace(/cc$/, '')
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   try {
-    const product = await getProductBySlugOrId(cleanId)
+    const product = await getProductBySlug(slug)
 
-    if (product) {
+    if (product && product.slug) {
+      const canonicalPath = product.slug
       return {
         title: `${product.name} | VentHub`,
         description: product.description?.substring(0, 160) || 'VentHub Ürün Detayı',
+        alternates: {
+          canonical: `${SITE_URL}/products/${canonicalPath}`,
+        },
+        openGraph: {
+          title: `${product.name} | VentHub`,
+          description: product.description?.substring(0, 160) || 'VentHub Ürün Detayı',
+          url: `${SITE_URL}/products/${canonicalPath}`,
+          siteName: 'VentHub',
+          images: [
+            {
+              url: product.image_url || '/images/og-default.jpg',
+              width: 1200,
+              height: 630,
+            },
+          ],
+          locale: 'tr_TR',
+          type: 'website',
+        },
       }
     }
   } catch (e) {
@@ -47,33 +67,34 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 }
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const cleanId = id?.replace(/cc$/, '')
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   let productData: Product | null = null
   
   try {
     // If we are prerendering 'generic' or the database is down, handle it gracefully
-    if (cleanId !== 'generic') {
-      productData = await getProductBySlugOrId(cleanId)
+    if (slug !== 'generic') {
+      productData = await getProductBySlug(slug)
     }
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err)
     if (errorMsg.includes('fetch failed')) {
-      console.warn(`Network fetch failed for product ${cleanId} (expected if Supabase env is missing)`)
+      console.warn(`Network fetch failed for product ${slug} (expected if Supabase env is missing)`)
     } else {
-      console.error(`Error fetching product data for ${cleanId}:`, err)
+      console.error(`Error fetching product data for ${slug}:`, err)
     }
   }
 
 
+  // SEO Kanonik Kilidi: Eğer cleanId (UUID) geçerse kanonik her zaman asıl route'u göstersin
+  const canonicalPath = productData?.slug || 'generic'
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "productID": cleanId,
+    "productID": canonicalPath,
     "name": productData?.name || "Product Details",
     "description": productData?.description || "VentHub Product Details",
-    "url": `https://venthub.com/products/${cleanId}`,
+    "url": `${SITE_URL}/products/${canonicalPath}`,
     ...(productData?.image_url && { "image": productData.image_url }),
     ...(productData?.brand && {
       "brand": {
@@ -86,7 +107,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       "availability": (productData?.stock_qty ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "price": productData?.price || "0.00",
       "priceCurrency": "TRY",
-      "url": `https://venthub.com/products/${cleanId}`
+      "url": `${SITE_URL}/products/${canonicalPath}`
     }
   }
 
