@@ -290,6 +290,8 @@ export const tr = {
         speedControl: 'Fan kontrol, sürücü ve hız yönetimini doğru ekipman katmanında seçin.'
       },
       sinevizyon: {
+        altMain: 'VentHub Sinevizyon',
+        altProduct: 'Teknik Ürün',
         slides: [
           {
             eyebrow: 'İLERİ AERODİNAMİK MÜHENDİSLİĞİ',
@@ -464,6 +466,7 @@ export const tr = {
       title: 'Mühendislik Hassasiyeti, Operasyonel Güven',
       subtitle: 'Havalandırma projelerinizde sadece bir tedarikçi değil, teknik çözüm ortağınızız. Her adımda doğrulanabilir kalite ve uzman desteği sunuyoruz.',
       badge: 'ONAYLI',
+      visualAlt: 'Teknik Kurulum',
       items: {
         brands: {
           eyebrow: 'Otorite',
