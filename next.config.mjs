@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    experimental: {
-        typedRoutes: true,
-    },
+    typedRoutes: true,
     images: {
         // Görsel optimizasyonunu devreye alıyoruz (Lighthouse Performans için kritik)
         remotePatterns: [

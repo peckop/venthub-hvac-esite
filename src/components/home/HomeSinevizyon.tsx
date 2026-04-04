@@ -153,7 +153,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
         >
           <Image
             src={slidesData[currentSlide].image}
-            alt="VentHub Sinevizyon"
+            alt={t('home.hero.sinevizyon.altMain')}
             fill
             sizes="100vw"
             priority={currentSlide === 0}
@@ -291,7 +291,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
                     >
                       <Image 
                         src={p.url} 
-                        alt="Technical Product" 
+                        alt={t('home.hero.sinevizyon.altProduct')} 
                         fill 
                         priority={currentSlide === 0}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
