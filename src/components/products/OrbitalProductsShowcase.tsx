@@ -10,6 +10,9 @@ import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
 import Category3DIcon from './Category3DIcon'
 
+const ANIM_STAGGER_DELAY = 0.12
+const ANIM_DURATION = 1.1
+
 export interface ProductItem {
     id: string
     title: string
@@ -229,32 +232,63 @@ const OrbitalCard: React.FC<{
     useFrame(() => {
         if (!groupRef.current) return
 
-        // 1. Entry Animation
+        // 1. Vacuum Suck-in Animation
+        // Eğer modeller tam yüklenmemişse (Suspense askıda ise) veya kişisel bekleme süresi gelmediyse kartları tamamen gizle.
+        if (!sharedState.current.isReady) {
+            groupRef.current.scale.set(0.001, 0.001, 0.001)
+            groupRef.current.position.set(-20, -10, -10)
+            return
+        }
+
         const now = Date.now()
-        const elapsed = (now - sharedState.current.startTime) / 2000
-        const entryProgress = Math.min(1, Math.max(0, elapsed))
-        const easeOutCubic = 1 - Math.pow(1 - entryProgress, 3)
+        const elapsedSec = (now - sharedState.current.startTime) / 1000
+        const personalDelay = index * ANIM_STAGGER_DELAY
+        const allCardsEntered = elapsedSec >= (total * ANIM_STAGGER_DELAY + ANIM_DURATION)
+
+        if (elapsedSec < personalDelay) {
+            // Animasyon sırası gelene kadar görünmez ve uzakta bekle (Flash fix)
+            groupRef.current.scale.set(0.001, 0.001, 0.001)
+            groupRef.current.position.set(-20, -10, -10)
+            return
+        }
+
+        const localProgress = Math.min(1, Math.max(0, (elapsedSec - personalDelay) / ANIM_DURATION))
+        
+        // Expo.easeOut: Başta inanılmaz hızlı çekilir, sonra orbit'e nazikçe oturur
+        const vacuumEase = localProgress === 1 ? 1 : 1 - Math.pow(2, -10 * localProgress)
+        // Y ekseninde parabolik bir kavis (arch) çizmesi için
+        const arch = Math.sin(localProgress * Math.PI) * 1.5
+        
+        const easeOutCubic = 1 - Math.pow(1 - localProgress, 3)
 
         // 2. Calculate Position
         const baseAngle = (index / total) * Math.PI * 2
-        const currentAngle = baseAngle + sharedState.current.rotation
+        // Giriş tamamlanana kadar dönüşü yansıtma (rotasyon donuk kalır), sonra geçerli rotasyonu ekle
+        const currentAngle = baseAngle + (allCardsEntered ? sharedState.current.rotation : 0)
 
-        const currentRadius = CONFIG.radius * easeOutCubic
+        const targetX = Math.sin(currentAngle) * CONFIG.radius
+        const targetZ = Math.cos(currentAngle) * CONFIG.radius
+        const targetY = 0.8
 
-        const x = Math.sin(currentAngle) * currentRadius
-        const z = Math.cos(currentAngle) * currentRadius
-        // const tiltRad = (CONFIG.tilt * Math.PI) / 180
-        // REMOVED WOBBLE: Set fixed Y to 0.8.
-        // AutoCenter removed for Orbit.
-        // We lift the whole group to +0.8 so the MANUAL offsets (usually -0.2 to -0.6)
-        // result in a net position slightly above the Ring (-0.8).
-        const y = 0.8
+        // Start Noktası: Kameranın önünden (Z+ dışı), aşağıdan yukarıya fışkırtma (Vacuum efekti)
+        const startX = (index % 2 === 0 ? -1 : 1) * 3.0
+        const startZ = 18.0
+        const startY = -4.0
 
+        // X ve Z için Vacuum, Y için yaylanma + lerp
+        const x = THREE.MathUtils.lerp(startX, targetX, vacuumEase)
+        const z = THREE.MathUtils.lerp(startZ, targetZ, vacuumEase)
+        const y = THREE.MathUtils.lerp(startY, targetY, vacuumEase) + arch
+
+        // Apply Position (Scale parent'tan silindi, artık child level'da uygulanır)
+        groupRef.current.scale.set(1, 1, 1) // Parent scale reset to 1
         groupRef.current.position.set(x, y, z)
+        
         // FIXED: Look at the center but maintain same Y height to avoid tilting down
-        groupRef.current.lookAt(0, y, 0)
+        groupRef.current.lookAt(0, targetY, 0)
 
         // 3. Scale & Visibility
+        const currentRadius = CONFIG.radius
         const isNear = z > currentRadius * 0.3
         // FIX: Only trigger React re-render when value ACTUALLY changes
         if (isNear !== lastIsNearRef.current) {
@@ -271,8 +305,8 @@ const OrbitalCard: React.FC<{
         const finalScale = hoverScaleBoost * easeOutCubic
 
         // Position'a z-offset ekle (hover'da kart öne gelir)
-        const targetZ = z + hoverZOffset
-        groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, targetZ, 0.12)
+        const hoverTargetZ = z + hoverZOffset
+        groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, hoverTargetZ, 0.12)
 
         // 🎯 PULSE EFFECT DISABLED: Fixed scale to prevent "tick" jumping
         const pulseMultiplier = 1
@@ -304,7 +338,7 @@ const OrbitalCard: React.FC<{
     const showLabel = (hovered || isNearFront)
 
     return (
-        <group ref={groupRef}>
+        <group ref={groupRef} position={[-20, -10, -10]} scale={0.001}>
             {/* REMOVED FLOAT: Stopped bobbing effect */}
             {/* Hitbox */}
             <mesh
@@ -488,8 +522,8 @@ const CarouselItems: React.FC<{
         // Animasyon başlamadıysa çık
         if (!sharedState.current.isReady) return
 
-        const elapsed = (now - sharedState.current.startTime) / 2000
-        const entryProgress = Math.min(1, Math.max(0, elapsed))
+        const elapsedSec = (now - sharedState.current.startTime) / 1000
+        const isEntryCompleted = elapsedSec >= (items.length * ANIM_STAGGER_DELAY + ANIM_DURATION)
 
         const isPausedByClick = now < sharedState.current.pauseUntil
         const friction = 0.95
@@ -519,7 +553,7 @@ const CarouselItems: React.FC<{
             sharedState.current.velocity *= friction
         }
         // OTO DÖNÜŞ
-        else if (!isPaused && !isPausedByClick && entryProgress >= 0.8 && !isDraggingRef.current) {
+        else if (!isPaused && !isPausedByClick && isEntryCompleted && !isDraggingRef.current) {
             let currentSpeed = delta * CONFIG.autoRotateSpeed
             if (shouldShowDragHint) {
                 currentSpeed *= 0.05
@@ -651,7 +685,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
         target: null,
         velocity: 0,
         pauseUntil: 0,
-        startTime: 0, // 0 means not started
+        startTime: 0, // isReady, Suspense resolve olduğunda Date.now() ile başlatacak
         isReady: false
     })
 

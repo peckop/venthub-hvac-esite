@@ -18,20 +18,19 @@ import React, { useState, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Loader2, LayoutGrid, List } from 'lucide-react'
+import { LayoutGrid, List } from 'lucide-react'
 import type { Product } from '../lib/supabase'
 import type { DomainCategory } from '../lib/type-converters'
 import ProductCard from '../components/ProductCard'
 
-// 3D Carousel dinamik import
 const CategoryOrbitCarousel = dynamic(
     () => import('../components/products/CategoryOrbitCarousel'),
     {
         ssr: false,
         loading: () => (
-            <div className="w-full h-full bg-[#020617] flex flex-col items-center justify-center animate-pulse gap-3">
-                <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
-                <span className="text-cyan-400/50 text-sm">3D Yükleniyor...</span>
+            <div className="w-full h-[500px] bg-[#020617] flex items-center justify-center overflow-hidden">
+                {/* Premium, spinner-less nebula glow placeholder */}
+                <div className="w-[300px] h-[300px] bg-cyan-500/5 blur-[100px] rounded-full animate-pulse" />
             </div>
         )
     }
@@ -45,19 +44,7 @@ interface ProductsDiscoveryViewProps {
 
 type ViewMode = 'grid' | 'list'
 
-function ProductsGridSkeleton() {
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array(6).fill(0).map((_, i) => (
-                <div
-                    key={i}
-                    className="rounded-2xl bg-slate-100 animate-pulse"
-                    style={{ height: 340 }}
-                />
-            ))}
-        </div>
-    )
-}
+
 
 const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({ 
     products = [],
@@ -139,9 +126,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                         </div>
 
                         {/* Sonuçlar */}
-                        {isLoading ? (
-                            <ProductsGridSkeleton />
-                        ) : products.length === 0 ? (
+                        {products.length === 0 && !isLoading ? (
                             <div className="py-32 flex flex-col items-center justify-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 text-center">
                                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
                                     <LayoutGrid className="w-8 h-8 text-slate-300" />
@@ -150,18 +135,35 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                 <p className="text-slate-500 mb-6 max-w-sm">Daha fazla ürün görmek için kategorilerden birini seçin.</p>
                             </div>
                         ) : (
-                            <div className={
+                            <div className={`transition-opacity duration-300 ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'} ${
                                 viewMode === 'grid'
                                     ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
                                     : 'flex flex-col gap-6 max-w-5xl mx-auto'
-                            }>
-                                {products.map(product => (
-                                    <ProductCard
-                                        key={product.id}
-                                        product={product}
-                                        layout={viewMode}
-                                    />
-                                ))}
+                            }`}>
+                                {products.map((product, index) => {
+                                    // 3D show süresiyle senkronizasyon hesaplaması
+                                    const ESTIMATED_3D_ITEMS = 8;
+                                    const TOTAL_3D_DURATION = ESTIMATED_3D_ITEMS * 0.18 + 1.2;
+                                    const GRID_ENTRY_DELAY = TOTAL_3D_DURATION * 0.6; // 3D show devam ederken %60'ında grid başlar
+                                    
+                                    return (
+                                        <motion.div
+                                            key={product.id}
+                                            initial={{ opacity: 0, y: 24 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{
+                                                duration: 0.4,
+                                                delay: GRID_ENTRY_DELAY + (index * 0.05),
+                                                ease: [0.16, 1, 0.3, 1]
+                                            }}
+                                        >
+                                            <ProductCard
+                                                product={product}
+                                                layout={viewMode}
+                                            />
+                                        </motion.div>
+                                    )
+                                })}
                             </div>
                         )}
                     </motion.section>
