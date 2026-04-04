@@ -186,7 +186,7 @@ def create_task(
                 "task_title": title,
                 "description": "",
                 "files_modified": [],
-                "allowed_paths": [],
+                "allowed_paths": [f"src/**/{slug.split('-')[0]}/**"],
                 "forbidden_paths": [],
                 "max_files_changed": 5,
                 "allowed_change_types": [],
@@ -221,6 +221,10 @@ def create_task(
                 "steps": [],
                 "risks": [],
                 "rollback": "",
+                "allowed_paths": [f"src/**/{slug.split('-')[0]}/**"],
+                "forbidden_paths": [],
+                "max_files_changed": 10,
+                "allowed_change_types": [],
             },
             "review.json": {
                 "skill": "superpowers-review",
@@ -487,10 +491,10 @@ def pipeline_status(task_dir: str | Path) -> dict[str, Any]:
     return status
 
 
-def check_scope(json_path: str | Path) -> None:
+def check_scope(json_path: str | Path, staged_only: bool = False) -> None:
     """Verilen JSON sözleşmesindeki kısıtlamaları (Scope) 'git diff' ile test eder."""
     import subprocess
-    import fnmatch
+    from pathlib import PurePosixPath
     
     path = Path(json_path)
     if not path.exists():
@@ -503,22 +507,36 @@ def check_scope(json_path: str | Path) -> None:
     forbidden = data.get("forbidden_paths", [])
     max_count = data.get("max_files_changed", 999)
     
-    # Bazen JSON'da eksik olabilir (eski tasklar için)
+    # Eski format: allowed_paths, forbidden_paths ve max_files_changed yoksa
     if not allowed and not forbidden and max_count == 999:
-        print("⚠️ Uyarı: Bu görev eski formatta, Scope Contract kısıtlamaları bulunmuyor. Bypass ediliyor.")
-        return
+        print("\033[1;33m" + "=" * 60 + "\033[0m")
+        print("\033[1;33m⚠️  SCOPE POLICE: DENETİMSİZ COMMIT UYARISI\033[0m")
+        print("\033[1;33m" + "=" * 60 + "\033[0m")
+        print(f"  Görev: {path.parent.name}")
+        print("  Bu görev plan.json'ında 'allowed_paths' / 'max_files_changed'")
+        print("  alanları bulunmuyor (eski format). Kapsam denetimi YAPILMIYOR.")
+        print("  → Çözüm: plan.json'a 'allowed_paths' ve 'max_files_changed' ekle.")
+        print("  → Yeni görevler bu alanlarla otomatik oluşturuluyor (engine.py).")
+        print("\033[1;33m" + "=" * 60 + "\033[0m")
+        return  # Bloklamıyoruz — sözleşmesi olmayan görevi engelleyemezsin
         
     try:
-        # 1. Tracked (İzlenen) Değişiklikler
-        res_tracked = subprocess.run(["git", "diff", "HEAD", "--name-only"], capture_output=True, text=True, check=True)
-        tracked_files = [f.strip() for f in res_tracked.stdout.splitlines() if f.strip()]
-        
-        # 2. Untracked (Yeni oluşturulup git add yapılmamış) Dosyalar
-        res_untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], capture_output=True, text=True, check=True)
-        untracked_files = [f.strip() for f in res_untracked.stdout.splitlines() if f.strip()]
-        
-        # Hepsini birleştir (Tekrarları set ile sil)
-        changed_files = list(set(tracked_files + untracked_files))
+        if staged_only:
+            # 1. Yalnızca Tracked ve Staged Değişiklikler
+            res_tracked = subprocess.run(["git", "diff", "--cached", "--name-only"], capture_output=True, text=True, check=True)
+            tracked_files = [f.strip() for f in res_tracked.stdout.splitlines() if f.strip()]
+            changed_files = list(set(tracked_files))
+        else:
+            # 1. Staged ve Unstaged (HEAD'den tüm farkı al, yani şu an değiştirilmiş tüm dosyalar)
+            res_tracked = subprocess.run(["git", "diff", "HEAD", "--name-only"], capture_output=True, text=True, check=True)
+            tracked_files = [f.strip() for f in res_tracked.stdout.splitlines() if f.strip()]
+            
+            # 2. Untracked (Yeni oluşturulup git add yapılmamış) Dosyalar
+            res_untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], capture_output=True, text=True, check=True)
+            untracked_files = [f.strip() for f in res_untracked.stdout.splitlines() if f.strip()]
+            
+            # Hepsini birleştir (Tekrarları set ile sil)
+            changed_files = list(set(tracked_files + untracked_files))
     except subprocess.CalledProcessError as e:
         print(f"⚠️ Git diff alınamadı: {e}. Devam ediliyor ancak Scope Police çalışamıyor.")
         return
@@ -530,10 +548,11 @@ def check_scope(json_path: str | Path) -> None:
         
     for f in changed_files:
         f_posix = f.replace("\\", "/") 
+        p_file = PurePosixPath(f_posix)
         
         is_forbidden = False
         for fpat in forbidden:
-            if fnmatch.fnmatchcase(f_posix, fpat) or f_posix.startswith(fpat.strip("/*")):
+            if p_file.match(fpat) or f_posix.startswith(fpat.strip("/*")):
                 is_forbidden = True
                 break
         if is_forbidden:
@@ -542,7 +561,7 @@ def check_scope(json_path: str | Path) -> None:
             
         is_allowed = False
         for apat in allowed:
-            if fnmatch.fnmatchcase(f_posix, apat) or f_posix.startswith(apat.strip("/*")):
+            if p_file.match(apat) or f_posix.startswith(apat.strip("/*")):
                 is_allowed = True
                 break
                 
