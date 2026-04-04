@@ -1,0 +1,6 @@
+[
+  "[allowed_change_types] [] should be non-empty",
+  "[description] '' is too short",
+  "[files_modified] [] should be non-empty",
+  "[TRIVIAL] trivial.json doğrulanamadı."
+]
