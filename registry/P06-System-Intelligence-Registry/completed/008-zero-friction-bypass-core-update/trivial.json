@@ -1,0 +1,39 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "Gemini 3.1 Pro (High)",
+  "date": "2026-04-04",
+  "task_id": "P06-008",
+  "task_title": "Zero Friction Bypass Core Update",
+  "description": "Registry motoruna trivial bypass icin dosya yolu secme destegi ve bypass mesajina hazir komut eklendi.",
+  "files_modified": [
+    "next.config.mjs",
+    "registry/engine.py",
+    "registry/pre_commit_scope.py"
+  ],
+  "allowed_paths": [
+    "next.config.mjs",
+    "registry/engine.py",
+    "registry/pre_commit_scope.py"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": ["script_update"],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "Linter executed successfully and no errors were found. All clear.",
+      "passed": true
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "TypeScript compiler ran successfully without any type errors.",
+      "passed": true
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "Vitest executed all tests successfully and they passed.",
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

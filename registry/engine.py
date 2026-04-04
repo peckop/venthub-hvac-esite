@@ -135,6 +135,7 @@ def create_task(
     title: str,
     task_dir: Path | None = None,
     is_trivial: bool = False,
+    strict_paths: list[str] = None,
 ) -> Path:
     """Yeni görev için klasör yapısı ve boş JSON şablonları oluşturur.
 
@@ -161,7 +162,7 @@ def create_task(
     # Boş JSON şablonları
     if is_trivial:
         # Dinamik komut tespiti (Universal Engine)
-        if (PROJECT_ROOT / "package.json").exists():
+        if (REGISTRY_DIR.parent / "package.json").exists():
             verify_cmds = [
                 {"command": "pnpm run lint:ci", "result": "", "passed": False},
                 {"command": "pnpm exec tsc -b tsconfig.build.json", "result": "", "passed": False},
@@ -177,6 +178,11 @@ def create_task(
                 {"command": "<DOGRULAMA_KOMUTUNU_BURAYA_YAZIN>", "result": "", "passed": False}
             ]
 
+        if strict_paths:
+            allowed = [p.replace('\\', '/') for p in strict_paths]
+        else:
+            allowed = [f"src/**/{slug.split('-')[0]}/**"]
+
         templates: dict[str, dict[str, Any]] = {
             "trivial.json": {
                 "skill": "superpowers-trivial",
@@ -186,7 +192,7 @@ def create_task(
                 "task_title": title,
                 "description": "",
                 "files_modified": [],
-                "allowed_paths": [f"src/**/{slug.split('-')[0]}/**"],
+                "allowed_paths": allowed,
                 "forbidden_paths": [],
                 "max_files_changed": 5,
                 "allowed_change_types": [],
@@ -521,6 +527,11 @@ def check_scope(json_path: str | Path, staged_only: bool = False) -> None:
         return  # Bloklamıyoruz — sözleşmesi olmayan görevi engelleyemezsin
         
     try:
+        project_id_match = path.parent.parent.parent.name.split("-")[0].upper()
+    except Exception:
+        project_id_match = "P0X"
+
+    try:
         if staged_only:
             # 1. Yalnızca Tracked ve Staged Değişiklikler
             res_tracked = subprocess.run(["git", "diff", "--cached", "--name-only"], capture_output=True, text=True, check=True)
@@ -566,7 +577,13 @@ def check_scope(json_path: str | Path, staged_only: bool = False) -> None:
                 break
                 
         if not is_allowed:
-            errors.append(f"[SCOPE BLOCKED] '{f}' izinli alanın dışında.\n   → Bu değişiklik için yeni Trivial Task açılması gerekiyor.\n   → Mevcut görev sadece izni olan dosyalarla devam edebilir.")
+            errors.append(
+                f"[SCOPE BLOCKED] '{f}' izinli alanın dışında.\n"
+                f"   → Trivial (hızlı) bir değişiklik ise bypass etmek yerine şu komutu çalıştırın:\n"
+                f"      python registry/engine.py create-task {project_id_match} 999 \"Scope Trivial Bypass\" --trivial --paths {f}\n"
+                f"   → Oluşan görevi doğruladıktan sonra tekrar commit atın.\n"
+                f"   → Mevcut görev kontratı izinsiz dosyaları kapsayamaz!"
+            )
 
     if errors:
         print("🚨 Scope Police (Sınır Polisi) Müdahalesi!")
@@ -709,7 +726,7 @@ def main() -> None:  # noqa: C901
 
     elif action == "create-task":
         if len(sys.argv) < 5:
-            print("Kullanım: python registry/engine.py create-task <PROJE> <ID> <BAŞLIK> [--trivial]")
+            print("Kullanım: python registry/engine.py create-task <PROJE> <ID> <BAŞLIK> [--trivial] [--paths file1 file2...]")
             sys.exit(1)
             
         args = sys.argv[2:]
@@ -717,14 +734,20 @@ def main() -> None:  # noqa: C901
         if is_trivial:
             args.remove("--trivial")
             
+        strict_paths = None
+        if "--paths" in args:
+            idx = args.index("--paths")
+            strict_paths = args[idx + 1:]
+            args = args[:idx]
+            
         if len(args) < 3:
-            print("Kullanım: python registry/engine.py create-task <PROJE> <ID> <BAŞLIK> [--trivial]")
+            print("Kullanım: python registry/engine.py create-task <PROJE> <ID> <BAŞLIK> [--trivial] [--paths file1 file2...]")
             sys.exit(1)
             
         project_id = args[0]
         task_id = args[1]
         title = " ".join(args[2:])
-        task_dir = create_task(project_id, task_id, title, is_trivial=is_trivial)
+        task_dir = create_task(project_id, task_id, title, is_trivial=is_trivial, strict_paths=strict_paths)
         print(f"✅ Görev oluşturuldu: {task_dir}" + (" (Trivial)" if is_trivial else ""))
 
     elif action == "cross-validate":

@@ -1,0 +1,6 @@
+[
+  "[verification_commands[0]] 'passed: true' işaretlenmiş ancak 'result' alanı boş veya yetersiz. İspat için terminal çıktısını yapıştırın.",
+  "[verification_commands[1]] 'passed: true' işaretlenmiş ancak 'result' alanı boş veya yetersiz. İspat için terminal çıktısını yapıştırın.",
+  "[verification_commands[2]] 'passed: true' işaretlenmiş ancak 'result' alanı boş veya yetersiz. İspat için terminal çıktısını yapıştırın.",
+  "[TRIVIAL] trivial.json doğrulanamadı."
+]
