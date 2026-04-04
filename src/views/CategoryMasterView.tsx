@@ -41,7 +41,14 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
   const availableBrands = useMemo(() => Array.from(new Set(products.map(p => p.brand).filter(Boolean))), [products])
 
   if (!isMounted || (loading && !category)) {
-    return <ProductsSkeleton />
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50/50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
+          <p className="text-zinc-400 text-sm font-medium tracking-widest uppercase animate-pulse">Yükleniyor...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!category && !loading) {
@@ -104,7 +111,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {renderView()}
     </div>
   )
