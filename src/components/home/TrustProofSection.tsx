@@ -95,7 +95,7 @@ export const TrustProofSection: React.FC = () => {
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2.5rem] border border-slate-200 shadow-2xl">
               <Image
                 src="/images/hvac_installation_close_up_premium_3.png"
-                alt="Technical Installation"
+                alt={t('home.trustProof.visualAlt')}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
