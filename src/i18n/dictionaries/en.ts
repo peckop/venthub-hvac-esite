@@ -217,6 +217,8 @@ export const en = {
         speedControl: 'Select fan control, drive and speed management in the right equipment layer.'
       },
       sinevizyon: {
+        altMain: 'VentHub Sinevizyon',
+        altProduct: 'Technical Product',
         slides: [
           {
             eyebrow: 'ADVANCED AERODYNAMIC ENGINEERING',
@@ -379,6 +381,7 @@ export const en = {
       title: 'We build trust with clear operational realities, not decorative promises.',
       subtitle: 'The trust layer on the VentHub homepage should make the verified working model and expert support approach visible.',
       badge: 'VERIFIED',
+      visualAlt: 'Technical Installation',
       items: {
         brands: {
           eyebrow: 'Brand Layer',
