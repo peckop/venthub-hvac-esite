@@ -1,5 +1,5 @@
 # 🛰️ VENTHUB MISSION CONTROL (PULSE)
-> **Güncelleme:** 04.04.2026 15:41 | **İlerleme:** %67
+> **Güncelleme:** 04.04.2026 21:47 | **İlerleme:** %66
 
 ## 📁 P00-STANDALONE
 ### ⏳ Backlog
@@ -63,6 +63,7 @@
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
 |:---|:---|:---|
 | `004`  | Next.js 15: Performans Optimizasyonu (PPR)    | 🔥 HIGH       |
+| `005`  | Kategori Sayfalari SSR ve Server Component    | 🔥 HIGH       |
 
 ## 📁 P06-SYSTEM-INTELLIGENCE-REGISTRY
 ### ⚡ Aktif Görevler
