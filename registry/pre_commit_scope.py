@@ -39,14 +39,25 @@ def main():
 
     if not executing_tasks:
         has_src = any(f.startswith("src/") for f in staged_files)
-        if has_src:
+        if has_src or any(f.endswith(('.js', '.mjs', '.ts', '.json', '.md')) for f in staged_files):
+            try:
+                proj_dirs = [d.name.split('-')[0].upper() for d in registry_dir.iterdir() if d.is_dir() and d.name.startswith('P0')]
+                proj_id = proj_dirs[0] if proj_dirs else "P0X"
+            except Exception:
+                proj_id = "P0X"
+                
+            files_str = " ".join([f for f in staged_files if " " not in f])
+            if not files_str:
+                files_str = "src/**"
+
             print("🚨 [NO-PLAN-NO-CODE] DİKKAT: 'Executing' durumunda aktif bir görev bulunamadı!")
-            print("   ↳ Kurallar gereği, aktif bir görev (plan.json veya trivial.json) olmadan 'src/' dizinine commit atılamaz.")
-            print("   ↳ Lütfen önce görevinizi oluşturun: python registry/engine.py create-task ...")
-            print("   ↳ Bu işlemi bypass etmek manuel müdahale gerektirir (--no-verify).")
+            print("   ↳ Kurallar gereği, aktif bir görev (plan.json veya trivial.json) olmadan commit atılamaz.")
+            print("   ↳ Trivial (hızlı) bir düzeltme ise bypass etmek yerine şu komutu çalıştırıp görevi oluşturun:\n")
+            print(f"      python registry/engine.py create-task {proj_id} 999 \"Trivial Update\" --trivial --paths {files_str}\n")
+            print("   ↳ Oluşturulan trivial.json dosyasını doğruladıktan sonra tekrar commit alın. (--no-verify kullanmaktan kaçının!)")
             sys.exit(1)
         else:
-            print("✅ Scope Police: Kaynak kod (src/) değişikliği yok, görev aranmadan devam ediliyor.")
+            print("✅ Scope Police: Kayıt gerektirmeyen dosya değişikliği, görev aranmadan devam ediliyor.")
             sys.exit(0)
 
     # İşletilen görev(ler) üzerinden Scope kontrolü
