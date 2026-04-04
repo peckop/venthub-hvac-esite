@@ -85,6 +85,49 @@ const Stage: React.FC<{
 }
 
 /**
+ * 3D Yükleme animasyonu için wireframe
+ */
+const PlaceholderWireframe = ({ scale = 1 }: { scale?: number }) => {
+    const meshRef = useRef<THREE.Mesh>(null)
+    useFrame((state) => {
+        if (meshRef.current) {
+            meshRef.current.rotation.y = state.clock.elapsedTime * 0.5
+            meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 2) * 0.2
+        }
+    })
+    return (
+        <group scale={[scale, scale, scale]}>
+            <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+                <mesh ref={meshRef}>
+                    <icosahedronGeometry args={[1, 1]} />
+                    <meshBasicMaterial color="#06b6d4" wireframe transparent opacity={0.3} />
+                </mesh>
+            </Float>
+        </group>
+    )
+}
+
+/**
+ * Texture Yüklenene Kadar Bekleyen Material (Kategori dışı standart resimli kartlar için)
+ */
+const SuspendedCardMaterial = ({ finalPath, hovered }: { finalPath: string | null, hovered: boolean }) => {
+    const texture = useTexture(finalPath || '/images/placeholders/product-placeholder.png')
+    if (texture) {
+        texture.colorSpace = THREE.SRGBColorSpace
+    }
+    return (
+        <meshStandardMaterial
+            map={texture || undefined}
+            transparent
+            opacity={0}
+            side={THREE.DoubleSide}
+            emissive={hovered ? CONFIG.glowColor : '#000000'}
+            emissiveIntensity={hovered ? CONFIG.emissiveIntensity * 1.5 : 0}
+        />
+    )
+}
+
+/**
  * Tek bir ürün kartı
  */
 const OrbitalCard: React.FC<{
@@ -144,13 +187,6 @@ const OrbitalCard: React.FC<{
         }
         return p;
     }, [item.image, item.categorySlug]);
-
-    // useTexture caches the resource and prevents OOM crashes
-    // We use a safe fallback to prevent suspense errors on invalid paths
-    const texture = useTexture(finalPath || '/images/placeholders/product-placeholder.png');
-    if (texture) {
-        texture.colorSpace = THREE.SRGBColorSpace;
-    }
 
     const triggerAction = useCallback((event?: MouseEvent) => {
         // KRİTİK: Sürükleme modunu ANINDA kapat (hem state hem ref)
@@ -358,7 +394,7 @@ const OrbitalCard: React.FC<{
             {item.categorySlug ? (
                 <group name="icon-wrapper" scale={modelScale} rotation={[0, Math.PI, 0]}>
                     {/* Model veya İkon */}
-                    <Suspense fallback={null}>
+                    <Suspense fallback={<PlaceholderWireframe scale={1} />}>
                         <Category3DIcon
                             categorySlug={item.categorySlug || ''}
                             scale={1}
@@ -370,14 +406,13 @@ const OrbitalCard: React.FC<{
             ) : (
                 <mesh ref={meshRef}>
                     <planeGeometry args={[CONFIG.cardWidth, CONFIG.cardHeight]} />
-                    <meshStandardMaterial
-                        map={texture || undefined}
-                        transparent
-                        opacity={0}
-                        side={THREE.DoubleSide}
-                        emissive={hovered ? CONFIG.glowColor : '#000000'}
-                        emissiveIntensity={hovered ? CONFIG.emissiveIntensity * 1.5 : 0}
-                    />
+                    {finalPath ? (
+                        <Suspense fallback={<meshBasicMaterial visible={false} />}>
+                            <SuspendedCardMaterial finalPath={finalPath} hovered={hovered} />
+                        </Suspense>
+                    ) : (
+                        <meshBasicMaterial visible={false} />
+                    )}
                 </mesh>
             )}
 
@@ -785,29 +820,31 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                 {/* Zemin ve Sparkles - HEMEN GÖRÜNÜR */}
                 <Stage sharedState={sharedState} />
 
-                {/* Ağır Modeller ve Environment - YÜKLENİNCE GELİR */}
+                {/* Environment Suspense ile ayrıldı */}
                 <Suspense fallback={null}>
                     <Environment preset="city" />
-                    <CarouselItems
-                        items={items}
-                        isPaused={isPaused || isDraggingState || externalPause}
-                        onHover={setIsPaused}
-                        isDraggingRef={isDraggingRef}
-                        dragDelta={dragDelta}
-                        onInteract={() => { }}
-                        sharedState={sharedState}
-                        setIsDragging={handleSetIsDragging}
-                        onCardClick={onCardClick}
-                        onFocusedItemChange={handleFocusedItemChangeInternal}
-                        onFrontCardChange={onFrontCardChange}
-                        shouldShowTapHint={shouldShowTapHint}
-                        shouldShowDragHint={shouldShowDragHint}
-                        hintStage={hintStage}
-                        onStageChange={setHintStage}
-                        modelScale={modelScale}
-                        onReady={handleItemsReady}
-                    />
                 </Suspense>
+
+                {/* Elemanlar hemen mount olur, ürün bazlı yerel Suspense başlar */}
+                <CarouselItems
+                    items={items}
+                    isPaused={isPaused || isDraggingState || externalPause}
+                    onHover={setIsPaused}
+                    isDraggingRef={isDraggingRef}
+                    dragDelta={dragDelta}
+                    onInteract={() => { }}
+                    sharedState={sharedState}
+                    setIsDragging={handleSetIsDragging}
+                    onCardClick={onCardClick}
+                    onFocusedItemChange={handleFocusedItemChangeInternal}
+                    onFrontCardChange={onFrontCardChange}
+                    shouldShowTapHint={shouldShowTapHint}
+                    shouldShowDragHint={shouldShowDragHint}
+                    hintStage={hintStage}
+                    onStageChange={setHintStage}
+                    modelScale={modelScale}
+                    onReady={handleItemsReady}
+                />
             </Canvas>
 
             {/* Sol-Sağ Gradient */}
