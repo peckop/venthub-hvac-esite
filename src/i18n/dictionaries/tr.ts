@@ -290,8 +290,8 @@ export const tr = {
         speedControl: 'Fan kontrol, sürücü ve hız yönetimini doğru ekipman katmanında seçin.'
       },
       sinevizyon: {
-        altMain: 'VentHub Sinevizyon',
-        altProduct: 'Teknik Ürün',
+        altMain: 'VentHub Endüstriyel Havalandırma Sistemleri',
+        altProduct: 'VentHub Özel Ürün Serisi',
         slides: [
           {
             eyebrow: 'İLERİ AERODİNAMİK MÜHENDİSLİĞİ',

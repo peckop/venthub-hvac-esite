@@ -57,7 +57,9 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
   const [parentCategory, setParentCategory] = useState<DomainCategory | null>(null)
   const [subCategories, setSubCategories] = useState<DomainCategory[]>([])
   const [products, setProducts] = useState<Product[]>(initialProducts ?? [])
-  const [loading, setLoading] = useState(true)
+  // Eğer slug yoksa (Örn: /products rotası), kategori yüklemeyeceğimiz için loading baştan false olmalıdır.
+  // Aksi takdirde SSR'da boş ekran render edilir.
+  const [loading, setLoading] = useState(!!slug && !initialCategory)
 
   const [filters, setFilters] = useState<CategoryFilters>(DEFAULT_FILTERS)
 
