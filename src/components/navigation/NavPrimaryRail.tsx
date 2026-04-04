@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import { cn } from '@/lib/utils'
 
@@ -27,6 +28,7 @@ const NavPrimaryRail: React.FC<NavPrimaryRailProps> = React.memo(({
     onCategoryClick,
     onItemHover,
 }) => {
+    const router = useRouter()
     return (
         <div className="hidden min-w-0 flex-1 items-center gap-2 pl-2 lg:flex xl:pl-4">
             {items.map((item) => {
@@ -73,7 +75,12 @@ const NavPrimaryRail: React.FC<NavPrimaryRailProps> = React.memo(({
                     <Link
                         key={item.id}
                         href={item.href as import('next').Route}
-                        onMouseEnter={() => onItemHover?.(item.id)}
+                        onMouseEnter={() => {
+                            onItemHover?.(item.id)
+                            if (item.href === '/products' || item.id === 'products') {
+                                router.prefetch('/products')
+                            }
+                        }}
                         className={itemBaseClass}
                     >
                         <span className="whitespace-nowrap">{item.label}</span>

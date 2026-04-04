@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import PageComponent from '../../../../views/CategoryPage'
 import { supabase, getProductsEnriched } from '../../../../lib/supabase'
 import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
@@ -64,12 +64,6 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
   }
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy" />
-      </div>
-    }>
-      <PageComponent initialCategory={category} initialProducts={products} />
-    </Suspense>
+    <PageComponent initialCategory={category} initialProducts={products} />
   )
 }
