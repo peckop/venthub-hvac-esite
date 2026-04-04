@@ -198,7 +198,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
     }, [])
 
     if (categoriesLoading) {
-        return <div className="h-[400px] flex items-center justify-center text-white/20">Yükleniyor...</div>
+        return <div className="h-[400px] flex items-center justify-center bg-[#020617] w-full" />
     }
 
     const responsiveHeight = compact ? (isMobile ? 220 : 280) : (isMobile ? 380 : 500)

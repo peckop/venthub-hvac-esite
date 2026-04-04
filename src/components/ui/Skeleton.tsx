@@ -1,25 +1,21 @@
-import React from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from "@/lib/utils";
+import React from "react";
 
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'light' | 'dark';
+  variant?: "light" | "dark" | "default";
 }
 
-export function Skeleton({
-  className,
-  variant = 'light',
-  ...props
-}: SkeletonProps) {
+export function Skeleton({ className, variant = "default", ...props }: SkeletonProps) {
+  const variantStyles = {
+    default: "bg-gray-200 dark:bg-gray-800",
+    light: "bg-gray-100 dark:bg-gray-700",
+    dark: "bg-slate-900 dark:bg-slate-950",
+  };
+
   return (
     <div
-      className={cn(
-        'animate-pulse rounded-md',
-        variant === 'dark' ? 'bg-slate-950/80' : 'bg-slate-200',
-        className
-      )}
+      className={cn("animate-pulse rounded-md", variantStyles[variant], className)}
       {...props}
     />
   );
 }
-
-export default Skeleton;

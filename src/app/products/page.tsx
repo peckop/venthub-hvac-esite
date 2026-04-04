@@ -1,6 +1,6 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import CategoryMasterView from '../../views/CategoryMasterView'
-import ProductsSkeleton from '../../components/products/ProductsSkeleton'
+
 import { getProductsEnriched } from '../../lib/supabase'
 import type { DomainProduct } from '../../lib/type-converters'
 
@@ -17,12 +17,12 @@ export default async function Page() {
   const products: DomainProduct[] = await getProductsEnriched({ limit: 100 })
 
   return (
-    <Suspense fallback={<ProductsSkeleton />}>
+    <>
       {/* initialCategory null olduğu için MasterView bunu Discovery olarak işleyecektir */}
       <CategoryMasterView
         initialCategory={null}
         initialProducts={products}
       />
-    </Suspense>
+    </>
   )
 }
