@@ -141,19 +141,23 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                     : 'flex flex-col gap-6 max-w-5xl mx-auto'
                             }`}>
                                 {products.map((product, index) => {
-                                    // 3D show süresiyle senkronizasyon hesaplaması
+                                    // SADECE ilk yüklenen görünür (veya ilk sayfa) ürünleri 3D animasyonunu beklesin.
+                                    // Aşağıda kalan ürünler zaten scroll edildikçe belirecek, onlar için bekleme (delay) gereksizdir.
                                     const ESTIMATED_3D_ITEMS = 8;
                                     const TOTAL_3D_DURATION = ESTIMATED_3D_ITEMS * 0.18 + 1.2;
                                     const GRID_ENTRY_DELAY = TOTAL_3D_DURATION * 0.6; // 3D show devam ederken %60'ında grid başlar
                                     
+                                    const isInitialView = index < 12; // Ortalama ilk ekranda / viewportta görünen ürün sayısı
+
                                     return (
                                         <motion.div
                                             key={product.id}
-                                            initial={{ opacity: 0, y: 24 }}
-                                            animate={{ opacity: 1, y: 0 }}
+                                            initial={{ opacity: 0, y: 30 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true, margin: "50px" }}
                                             transition={{
                                                 duration: 0.4,
-                                                delay: GRID_ENTRY_DELAY + (index * 0.05),
+                                                delay: isInitialView ? GRID_ENTRY_DELAY + (index * 0.05) : 0,
                                                 ease: [0.16, 1, 0.3, 1]
                                             }}
                                         >
