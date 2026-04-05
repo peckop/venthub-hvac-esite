@@ -83,8 +83,8 @@ export const VentImage: React.FC<VentImageProps> = ({
         width={isFillMode ? undefined : (width || (needsDefaultSizes ? 1200 : undefined))}
         height={isFillMode ? undefined : (height || (needsDefaultSizes ? 800 : undefined))}
         sizes={props.sizes || (isFillMode ? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" : undefined)}
-        className={`transition-all duration-500 ease-in-out ${
-          (isLoaded || props.priority) ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-95 blur-sm'
+        className={`transition-opacity duration-300 transform-gpu ease-in-out ${
+          (isLoaded || props.priority) ? 'opacity-100' : 'opacity-0'
         } ${isFillMode ? 'object-cover' : 'w-full h-auto'} ${className || ''}`}
         onLoad={() => setIsLoaded(true)}
         onError={() => {
@@ -94,7 +94,7 @@ export const VentImage: React.FC<VentImageProps> = ({
       />
       
       {!isLoaded && !error && (
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-gray-50 via-gray-100 to-gray-50 z-0" />
+        <div className="absolute inset-0 bg-gray-100/50 z-0" />
       )}
     </div>
   );
