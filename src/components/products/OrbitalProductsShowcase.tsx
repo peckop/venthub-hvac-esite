@@ -7,6 +7,7 @@ import { Environment, Float, Sparkles, Html, useTexture } from '@react-three/dre
 import * as THREE from 'three'
 import { useRouter } from 'next/navigation'
 import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useInView } from 'framer-motion'
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
 import Category3DIcon from './Category3DIcon'
 
@@ -700,6 +701,9 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
 
     const [focusedItemId, setFocusedItemId] = useState<string | null>(null)
 
+    const containerRef = useRef<HTMLDivElement>(null)
+    const isInView = useInView(containerRef, { margin: "200px" })
+
     // Resize Hack (Minimal) - Keep ensuring layout
     useEffect(() => {
         const timers = [50, 200, 500].map(delay =>
@@ -797,6 +801,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
 
     return (
         <div
+            ref={containerRef}
             className="w-full relative touch-none cursor-grab active:cursor-grabbing select-none"
             onPointerDown={handlePointerDownFull}
             onPointerMove={handlePointerMove}
@@ -807,7 +812,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             <Canvas
                 shadows
                 gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-                frameloop="always"
+                frameloop={isInView ? "always" : "demand"}
                 dpr={typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio) : [1, 1.5]}
                 camera={{
                     position: [0, (CONFIG.cameraHeight * (typeof containerHeight === 'number' && containerHeight < 400 ? 0.8 : 1)), CONFIG.cameraDistance],
