@@ -109,7 +109,7 @@ export default async function RootPage({ searchParams }: Props) {
         <script
           key={i}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
         />
       ))}
       <HomePage initialCategories={categories} initialProducts={products} />
