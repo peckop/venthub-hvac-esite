@@ -568,7 +568,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               availability: product.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
               url: canonicalUrl,
             },
-          }),
+          }).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
         }}
       />
 
