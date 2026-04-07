@@ -1,4 +1,4 @@
-name: '🤖 AI Auto-Repair'
+name: 🤖 AI Auto-Repair (Jules)
 
 on:
   workflow_run:
@@ -9,39 +9,92 @@ on:
 jobs:
   repair:
     # Sadece CI başarısız (failure) olduğunda çalış
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-    runs-on: 'ubuntu-latest'
+    # Fork'lardan gelen PR'larda çalıştırma (güvenlik)
+    if: |
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
     permissions:
-      contents: 'write'
-      pull-requests: 'write'
-      actions: 'read'
-    
+      contents: write
+      pull-requests: write
+      actions: read
+
     steps:
-      - name: 'Checkout code'
-        uses: 'actions/checkout@v4'
+      - name: Checkout (hatalı branch)
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
 
-      - name: 'Download CI Logs'
-        uses: 'actions/download-artifact@v4'
+      # Artefakt token'ını al (actions/download-artifact için gerekli)
+      - name: CI log artefaktını indir
+        uses: actions/download-artifact@v4
         with:
-          name: 'ci-logs'
+          name: ci-logs
           run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      - name: 'Invoke Gemini Repair Agent'
-        continue-on-error: true
-        uses: 'google-github-actions/run-gemini-cli@v0'
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Log dosyalarını tek bir dosyada birleştir
+      - name: Log dosyalarını birleştir
+        run: |
+          echo "=== CI FAILURE REPORT ===" > ci-failure-summary.txt
+          echo "Branch: ${{ github.event.workflow_run.head_branch }}" >> ci-failure-summary.txt
+          echo "Commit: ${{ github.event.workflow_run.head_sha }}" >> ci-failure-summary.txt
+          echo "" >> ci-failure-summary.txt
+
+          for f in ci-lint.log ci-typecheck.log ci-test.log ci-build.log; do
+            if [ -f "$f" ]; then
+              echo "=== $f ===" >> ci-failure-summary.txt
+              # Sadece hatalı satırları al (error, Error, ERR, warning, FAILED)
+              grep -iE "(error|warning|failed|cannot find|is not|does not)" "$f" \
+                | head -60 >> ci-failure-summary.txt 2>/dev/null || true
+              echo "" >> ci-failure-summary.txt
+            fi
+          done
+
+          echo "=== END OF REPORT ===" >> ci-failure-summary.txt
+          cat ci-failure-summary.txt
+
+      - name: Jules ile CI hatasını onar
+        uses: google-labs-code/jules-action@v1.0.0
         with:
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
+          starting_branch: ${{ github.event.workflow_run.head_branch }}
           prompt: |
-            CI/Build sürecimiz az önce BAŞARISIZ oldu. 
-            Görevin: Hata loglarını analiz et, hatayı veren dosyayı bul ve kodu build edilebilir hale getir.
-            
-            1. `pnpm run build` veya `pnpm run lint` komutlarının çıktılarını oku.
-            2. Hatayı (Type error, Lint error, Import error) tespit et.
-            3. Dosyayı düzelt ve "🤖 AI: Auto-repaired CI failure" mesajıyla commit at.
-            
-            ⚠️ Sadece hatayı düzelt, mimariyi değiştirme!
+            ## 🚨 CI/CD Otomatik Onarım Görevi
+
+            Projenin CI pipeline'ı BAŞARISIZ oldu. Aşağıdaki hata raporunu analiz et ve düzelt.
+
+            ### Hata Raporu:
+            ```
+            ${{ steps.merge-logs.outputs.summary || 'Log dosyaları indirilemedi. pnpm run lint ve pnpm exec tsc --noEmit komutlarını çalıştırarak hataları bul.' }}
+            ```
+
+            ### Çalışma Talimatları:
+            **ZORUNLU MASTER SYNC:** İlk önce `git fetch origin` yap, `${{ github.event.workflow_run.head_branch }}` branch'ine geç.
+
+            1. `pnpm install` ile bağımlılıkları kur
+            2. `pnpm run lint` çalıştır → lint hatalarını gör
+            3. `pnpm exec tsc --noEmit` çalıştır → TypeScript hatalarını gör
+            4. `pnpm test -- --run` çalıştır → test hatalarını gör
+            5. Hataları tek tek düzelt
+
+            ### SIKI SINIRLAR:
+            - ⚠️ SADECE hata veren dosyaları düzelt, başka hiçbir şeye dokunma
+            - ❌ src/types/database.types.ts → DOKUNAMAZSIN
+            - ❌ package.json, pnpm-lock.yaml → DOKUNAMAZSIN
+            - ❌ tsconfig*.json → DOKUNAMAZSIN
+            - ❌ supabase/ klasörü → DOKUNAMAZSIN
+            - ✅ Max 5 dosya değişikliği yapabilirsin
+            - ✅ İş mantığını (business logic) değiştirme, sadece hataları gider
+
+            ### Başarı Kriteri:
+            Tüm komutlar sıfır hata ile geçmeli:
+            1. `pnpm run lint` → 0 hata
+            2. `pnpm exec tsc --noEmit` → 0 hata
+            3. `pnpm test -- --run` → tüm testler yeşil
+            4. `pnpm run build:ci` → başarılı build
+
+            Düzeltmeleri yaptıktan sonra "🤖 Auto-Repair: CI hatası giderildi" mesajıyla commit at ve PR aç.
+            PR başlığı: "🤖 Auto-Repair: Fix CI failure on ${{ github.event.workflow_run.head_branch }}"
