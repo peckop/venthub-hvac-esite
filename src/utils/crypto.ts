@@ -5,7 +5,7 @@
  */
 export const generateId = (): string => {
     try {
-        if (typeof globalThis !== 'undefined' && globalThis.crypto?.randomUUID) {
+        if (typeof globalThis !== 'undefined' && typeof globalThis.crypto?.randomUUID === 'function') {
             return globalThis.crypto.randomUUID();
         }
         if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
