@@ -28,17 +28,20 @@ export function useHideOnScroll({ threshold = 50 }: UseHideOnScrollOptions = {})
         const updateScrollDir = () => {
             const scrollY = window.scrollY
 
+            // Capture last scroll synchronously
+            const currentLastScrollY = lastScrollY.current
+
             setState((prevState) => {
                 const isAtTop = scrollY < threshold
                 const isScrolled = scrollY > 0
                 let isScrollingDown = prevState.isScrollingDown
                 let isScrollingUp = prevState.isScrollingUp
 
-                if (Math.abs(scrollY - lastScrollY.current) > 5) {
-                    if (scrollY > lastScrollY.current && scrollY > threshold) {
+                if (Math.abs(scrollY - currentLastScrollY) > 5) {
+                    if (scrollY > currentLastScrollY && scrollY > threshold) {
                         isScrollingDown = true
                         isScrollingUp = false
-                    } else if (scrollY < lastScrollY.current) {
+                    } else if (scrollY < currentLastScrollY) {
                         isScrollingDown = false
                         isScrollingUp = true
                     }
