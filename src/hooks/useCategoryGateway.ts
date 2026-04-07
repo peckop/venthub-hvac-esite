@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Product, getProductsEnriched } from '../lib/supabase'
 import { DomainCategory } from '../lib/type-converters'
@@ -121,6 +121,30 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
 
   useManualScrollRestoration(loading)
 
+
+  const categoryMaps = useMemo(() => {
+    const byId = new Map<string, DomainCategory>()
+    const bySlug = new Map<string, DomainCategory>()
+    const rootBySlug = new Map<string, DomainCategory>()
+    const bySlugAndParent = new Map<string, DomainCategory>()
+    const childrenByParentId = new Map<string, DomainCategory[]>()
+
+    for (const c of globalCategories) {
+      if (!byId.has(c.id)) byId.set(c.id, c)
+      if (!bySlug.has(c.slug)) bySlug.set(c.slug, c)
+      if (!c.parent_id && !rootBySlug.has(c.slug)) rootBySlug.set(c.slug, c)
+      if (c.parent_id) {
+        const key = `${c.slug}|${c.parent_id}`
+        if (!bySlugAndParent.has(key)) bySlugAndParent.set(key, c)
+
+        const children = childrenByParentId.get(c.parent_id) || []
+        children.push(c)
+        childrenByParentId.set(c.parent_id, children)
+      }
+    }
+    return { byId, bySlug, rootBySlug, bySlugAndParent, childrenByParentId }
+  }, [globalCategories])
+
   useEffect(() => {
     async function fetchData() {
       if (categoriesLoading || globalCategories.length === 0) return
@@ -131,14 +155,15 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
 
         if (slug) {
           if (parentSlug) {
-            targetParentCategory = globalCategories.find(c => c.slug === parentSlug && !c.parent_id) || null
-            targetCategory = globalCategories.find(c => c.slug === slug && c.parent_id === targetParentCategory?.id) || null
+            targetParentCategory = categoryMaps.rootBySlug.get(parentSlug) || null
+            targetCategory = targetParentCategory
+              ? (categoryMaps.bySlugAndParent.get(`${slug}|${targetParentCategory.id}`) || null)
+              : null
           } else {
-            targetCategory = globalCategories.find(c => c.slug === slug && !c.parent_id) || 
-                             globalCategories.find(c => c.slug === slug) || null
+            targetCategory = categoryMaps.rootBySlug.get(slug) || categoryMaps.bySlug.get(slug) || null
             
             if (targetCategory?.parent_id) {
-              targetParentCategory = globalCategories.find(c => c.id === targetCategory!.parent_id) || null
+              targetParentCategory = categoryMaps.byId.get(targetCategory.parent_id) || null
             }
           }
         }
@@ -157,8 +182,7 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
 
         let subs: DomainCategory[] = []
         if (targetCategory && !targetCategory.parent_id) {
-          subs = globalCategories
-            .filter(c => c.parent_id === targetCategory!.id)
+          subs = [...(categoryMaps.childrenByParentId.get(targetCategory!.id) || [])]
             .sort((a, b) => {
               const orderA = Number((a.metadata as Record<string, unknown>)?.sort_order ?? 0)
               const orderB = Number((b.metadata as Record<string, unknown>)?.sort_order ?? 0)
@@ -202,7 +226,7 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
     }
 
     fetchData()
-  }, [slug, parentSlug, initialCategory, initialProducts, globalCategories, categoriesLoading])
+  }, [slug, parentSlug, initialCategory, initialProducts, globalCategories, categoryMaps, categoriesLoading])
 
   return {
     category,
