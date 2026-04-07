@@ -9,9 +9,10 @@ export const generateId = (): string => {
             return globalThis.crypto.randomUUID();
         }
         if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return (crypto as any).randomUUID();
         }
-    } catch (e) {
+    } catch {
         // Fallback if crypto.randomUUID fails or is unavailable
     }
 
