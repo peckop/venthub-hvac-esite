@@ -9,39 +9,68 @@ import { Product } from '../../lib/supabase';
 
 describe('engineeringIntelligence', () => {
   describe('getNoiseInference', () => {
-    it('returns null for zero or negative noise levels', () => {
+    it('returns null for zero, negative noise levels, or NaN', () => {
       expect(getNoiseInference(0)).toBeNull();
       expect(getNoiseInference(-10)).toBeNull();
+      expect(getNoiseInference(NaN as unknown as number)).toBeNull();
     });
 
-    it('returns ultraQuiet for noise levels below 30 dB', () => {
+    it('returns ultraQuiet for noise levels below 30 dB with all fields', () => {
       const result = getNoiseInference(25);
-      expect(result?.labelKey).toBe('pdp.engineering.noise.ultraQuiet.label');
-      expect(result?.value).toBe('25 dB(A)');
+      expect(result).toEqual({
+        labelKey: 'pdp.engineering.noise.ultraQuiet.label',
+        value: '25 dB(A)',
+        type: 'noise',
+        descriptionKey: 'pdp.engineering.noise.ultraQuiet.desc',
+        isI18n: true
+      });
+
+      // Boundary test
+      expect(getNoiseInference(29.9)?.labelKey).toBe('pdp.engineering.noise.ultraQuiet.label');
     });
 
-    it('returns officeComfort for noise levels between 30 and 44 dB', () => {
-      const result30 = getNoiseInference(30);
-      expect(result30?.labelKey).toBe('pdp.engineering.noise.officeComfort.label');
+    it('returns officeComfort for noise levels between 30 and 44 dB with all fields', () => {
+      const result35 = getNoiseInference(35);
+      expect(result35).toEqual({
+        labelKey: 'pdp.engineering.noise.officeComfort.label',
+        value: '35 dB(A)',
+        type: 'noise',
+        descriptionKey: 'pdp.engineering.noise.officeComfort.desc',
+        isI18n: true
+      });
 
-      const result44 = getNoiseInference(44);
-      expect(result44?.labelKey).toBe('pdp.engineering.noise.officeComfort.label');
+      // Boundary tests
+      expect(getNoiseInference(30.0)?.labelKey).toBe('pdp.engineering.noise.officeComfort.label');
+      expect(getNoiseInference(44.9)?.labelKey).toBe('pdp.engineering.noise.officeComfort.label');
     });
 
-    it('returns standard for noise levels between 45 and 59 dB', () => {
-      const result45 = getNoiseInference(45);
-      expect(result45?.labelKey).toBe('pdp.engineering.noise.standard.label');
+    it('returns standard for noise levels between 45 and 59 dB with all fields', () => {
+      const result50 = getNoiseInference(50);
+      expect(result50).toEqual({
+        labelKey: 'pdp.engineering.noise.standard.label',
+        value: '50 dB(A)',
+        type: 'noise',
+        descriptionKey: 'pdp.engineering.noise.standard.desc',
+        isI18n: true
+      });
 
-      const result59 = getNoiseInference(59);
-      expect(result59?.labelKey).toBe('pdp.engineering.noise.standard.label');
+      // Boundary tests
+      expect(getNoiseInference(45.0)?.labelKey).toBe('pdp.engineering.noise.standard.label');
+      expect(getNoiseInference(59.9)?.labelKey).toBe('pdp.engineering.noise.standard.label');
     });
 
-    it('returns industrial for noise levels 60 dB and above', () => {
-      const result60 = getNoiseInference(60);
-      expect(result60?.labelKey).toBe('pdp.engineering.noise.industrial.label');
-
+    it('returns industrial for noise levels 60 dB and above with all fields', () => {
       const result80 = getNoiseInference(80);
-      expect(result80?.labelKey).toBe('pdp.engineering.noise.industrial.label');
+      expect(result80).toEqual({
+        labelKey: 'pdp.engineering.noise.industrial.label',
+        value: '80 dB(A)',
+        type: 'noise',
+        descriptionKey: 'pdp.engineering.noise.industrial.desc',
+        isI18n: true
+      });
+
+      // Boundary test
+      expect(getNoiseInference(60.0)?.labelKey).toBe('pdp.engineering.noise.industrial.label');
     });
   });
 
