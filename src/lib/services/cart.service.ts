@@ -2,7 +2,7 @@ import { supabase } from '../supabase'
 import type { DbShoppingCart, DbCartItem, DbProduct } from '../../types/db-rows'
 import type { Product } from '../supabase'
 import { mapDatabaseProductToDomain } from '../type-converters'
-import type { Json, Database } from '../../types/database.types'
+import type { Database } from '../../types/database.types'
 async function ensureUserProfile(userId: string): Promise<boolean> {
   try {
     const { data: prof, error: selErr } = await supabase
