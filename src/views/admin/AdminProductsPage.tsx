@@ -345,9 +345,8 @@ const AdminProductsPage: React.FC = () => {
           : Math.round((currentPrice + value) * 100) / 100
         return { id: p.id, price: Math.max(0, newPrice) }
       })
-      for (const u of updates) {
-        await supabase.from('products').update({ price: u.price }).eq('id', u.id)
-      }
+      const { error: updateErr } = await supabase.from('products').upsert(updates)
+      if (updateErr) throw updateErr
       setSelectedIds(new Set())
       await load()
     } catch (e) { alert('Fiyat güncelleme hatası: ' + (e as Error).message) }
