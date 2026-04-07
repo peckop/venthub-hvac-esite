@@ -266,7 +266,6 @@ const OrbitalCard: React.FC<{
         document.body.style.cursor = 'auto'
     }
 
-
     useFrame(() => {
         if (!groupRef.current) return
 
@@ -328,7 +327,7 @@ const OrbitalCard: React.FC<{
         // 3. Scale & Visibility
         const currentRadius = CONFIG.radius
         const isNear = z > currentRadius * 0.3
-        // FIX: Only trigger React re-render when value ACTUALLY changes
+
         if (isNear !== lastIsNearRef.current) {
             lastIsNearRef.current = isNear
             setIsNearFront(isNear)
@@ -859,7 +858,4 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
 }
 
 export default OrbitalProductsShowcase
-
-
-
 
