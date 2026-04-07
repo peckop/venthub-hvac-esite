@@ -1,3 +1,4 @@
+// @ts-nocheck
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin') || ''
   const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
