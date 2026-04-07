@@ -25,12 +25,12 @@ Deno.serve(async (req) => {
     const supabaseUser = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
 
-    const { _data: userRes, error: userErr } = await supabaseUser.auth.getUser()
+    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
     if (userErr || !userRes?.user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
-    const { _data: profile, error: profErr } = await supabaseAdmin.from('user_profiles').select('role').eq('id', userRes.user.id).maybeSingle()
+    const { data: profile, error: profErr } = await supabaseAdmin.from('user_profiles').select('role').eq('id', userRes.user.id).maybeSingle()
     const userRole = profile?.role as string | undefined
     if (profErr || !userRole || !['admin', 'superadmin'].includes(userRole)) {
       return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type':'application/json' } })
@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
     })
 
     if (!resp.ok) {
-      const _text = await resp._text().catch(()=>'' )
+      const _text = await resp.text().catch(()=>'' )
       return new Response(JSON.stringify({ ok:false, httpStatus: resp.status, rpcUrl, body:_text }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
