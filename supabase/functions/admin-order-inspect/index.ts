@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
-    const id: string | null = null
+    let id: string | null = null
     let conv: string | null = null
     try {
       const url = new URL(req.url)
