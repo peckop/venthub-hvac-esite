@@ -345,7 +345,7 @@ const AdminProductsPage: React.FC = () => {
           : Math.round((currentPrice + value) * 100) / 100
         return { id: p.id, price: Math.max(0, newPrice) }
       })
-      const { error: updateErr } = await supabase.from('products').upsert(updates)
+      const { error: updateErr } = await supabase.from('products').upsert(updates as any)
       if (updateErr) throw updateErr
       setSelectedIds(new Set())
       await load()

@@ -8,7 +8,7 @@ export const generateId = (): string => {
         if (typeof globalThis !== 'undefined' && globalThis.crypto?.randomUUID) {
             return globalThis.crypto.randomUUID();
         }
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
             return (crypto as any).randomUUID();
         }
     } catch (e) {
