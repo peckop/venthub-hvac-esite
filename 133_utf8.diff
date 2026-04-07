@@ -1,0 +1,28 @@
+﻿diff --git a/src/views/admin/AdminProductsPage.tsx b/src/views/admin/AdminProductsPage.tsx
+index f7f577aa..3d81c3ad 100644
+--- a/src/views/admin/AdminProductsPage.tsx
++++ b/src/views/admin/AdminProductsPage.tsx
+@@ -336,18 +336,17 @@ const AdminProductsPage: React.FC = () => {
+     if (!confirm(`Se├ğili ${selectedIds.size} ├╝r├╝ne ${label} fiyat g├╝ncellemesi uygulanacak. Onayl─▒yor musunuz?`)) return
+     try {
+       const ids = Array.from(selectedIds)
+-      const { data: products, error: fetchErr } = await supabase.from('products').select('id,price').in('id', ids)
++      const { data: products, error: fetchErr } = await supabase.from('products').select('id,price,name,sku,brand').in('id', ids)
+       if (fetchErr) throw fetchErr
+-      const updates = (products || []).map((p: { id: string; price: number | null }) => {
++      const updates = (products || []).map((p: { id: string; price: number | null; name: string; sku: string; brand: string }) => {
+         const currentPrice = p.price ?? 0
+         const newPrice = mode === 'percent'
+           ? Math.round(currentPrice * (1 + value / 100) * 100) / 100
+           : Math.round((currentPrice + value) * 100) / 100
+-        return { id: p.id, price: Math.max(0, newPrice) }
++        return { id: p.id, price: Math.max(0, newPrice), name: p.name, sku: p.sku, brand: p.brand }
+       })
+-      for (const u of updates) {
+-        await supabase.from('products').update({ price: u.price }).eq('id', u.id)
+-      }
++      const { error: updateErr } = await supabase.from('products').upsert(updates)
++      if (updateErr) throw updateErr
+       setSelectedIds(new Set())
+       await load()
+     } catch (e) { alert('Fiyat g├╝ncelleme hatas─▒: ' + (e as Error).message) }

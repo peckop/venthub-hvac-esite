@@ -11,7 +11,7 @@ export const generateId = (): string => {
         if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
             return crypto.randomUUID();
         }
-    } catch (e) {
+    } catch {
         // Fallback if crypto.randomUUID fails or is unavailable
     }
 
