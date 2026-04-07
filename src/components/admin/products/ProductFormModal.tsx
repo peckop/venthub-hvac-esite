@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { supabase } from '../../../lib/supabase'
-import type { DbCategory, DbProductInsert, DbProductUpdate } from '../../../types/db-rows'
+import type { DbCategory, DbProductInsert, DbProductUpdate, DbJson } from '../../../types/db-rows'
 import toast from 'react-hot-toast'
 
 // Form schema
@@ -101,13 +101,17 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
         setLoading(true)
         try {
             if (_productId) {
-                /* @ts-expect-error REASON: form values structural mismatch to DbProductUpdate generic */
-                const payload: DbProductUpdate = values
+                const payload: DbProductUpdate = {
+                    ...values,
+                    technical_specs: values.technical_specs as DbJson
+                }
                 const { error } = await supabase.from('products').update(payload).eq('id', _productId)
                 if (error) throw error
             } else {
-                /* @ts-expect-error REASON: form values structural mismatch to DbProductInsert generic */
-                const payload: DbProductInsert = values
+                const payload: DbProductInsert = {
+                    ...values,
+                    technical_specs: values.technical_specs as DbJson
+                }
                 const { error } = await supabase.from('products').insert([payload])
                 if (error) throw error
             }
