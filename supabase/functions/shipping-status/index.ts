@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Supabase Edge Function: shipping-status
 // Returns shipping status for a given order_id or tracking_number
 // Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (read-only is okay but service role simplifies policies in sandbox)
