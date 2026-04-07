@@ -53,29 +53,86 @@ describe('engineeringIntelligence', () => {
     });
 
     it('returns diamond for efficiency 92% and above', () => {
-      const result = getEfficiencyInference(92);
-      expect(result?.labelKey).toBe('pdp.engineering.efficiency.diamond.label');
-      expect(result?.value).toBe('%92');
+      expect(getEfficiencyInference(92)).toEqual({
+        labelKey: 'pdp.engineering.efficiency.diamond.label',
+        value: '%92',
+        type: 'efficiency',
+        descriptionKey: 'pdp.engineering.efficiency.diamond.desc',
+        isI18n: true
+      });
+
+      expect(getEfficiencyInference(95)).toEqual({
+        labelKey: 'pdp.engineering.efficiency.diamond.label',
+        value: '%95',
+        type: 'efficiency',
+        descriptionKey: 'pdp.engineering.efficiency.diamond.desc',
+        isI18n: true
+      });
     });
 
-    it('returns platinum for efficiency between 88% and 91%', () => {
-      const result88 = getEfficiencyInference(88);
-      expect(result88?.labelKey).toBe('pdp.engineering.efficiency.platinum.label');
+    it('returns platinum for efficiency between 88% and 91.9%', () => {
+      expect(getEfficiencyInference(88)).toEqual({
+        labelKey: 'pdp.engineering.efficiency.platinum.label',
+        value: '%88',
+        type: 'efficiency',
+        descriptionKey: 'pdp.engineering.efficiency.platinum.desc',
+        isI18n: true
+      });
 
-      const result91 = getEfficiencyInference(91);
-      expect(result91?.labelKey).toBe('pdp.engineering.efficiency.platinum.label');
+      expect(getEfficiencyInference(91)).toEqual({
+        labelKey: 'pdp.engineering.efficiency.platinum.label',
+        value: '%91',
+        type: 'efficiency',
+        descriptionKey: 'pdp.engineering.efficiency.platinum.desc',
+        isI18n: true
+      });
+
+      expect(getEfficiencyInference(91.5)).toEqual({
+        labelKey: 'pdp.engineering.efficiency.platinum.label',
+        value: '%91.5',
+        type: 'efficiency',
+        descriptionKey: 'pdp.engineering.efficiency.platinum.desc',
+        isI18n: true
+      });
     });
 
-    it('returns gold for efficiency between 80% and 87%', () => {
-      const result80 = getEfficiencyInference(80);
-      expect(result80?.labelKey).toBe('pdp.engineering.efficiency.gold.label');
+    it('returns gold for efficiency between 80% and 87.9%', () => {
+      expect(getEfficiencyInference(80)).toEqual({
+        labelKey: 'pdp.engineering.efficiency.gold.label',
+        value: '%80',
+        type: 'efficiency',
+        descriptionKey: 'pdp.engineering.efficiency.gold.desc',
+        isI18n: true
+      });
 
-      const result87 = getEfficiencyInference(87);
-      expect(result87?.labelKey).toBe('pdp.engineering.efficiency.gold.label');
+      expect(getEfficiencyInference(87)).toEqual({
+        labelKey: 'pdp.engineering.efficiency.gold.label',
+        value: '%87',
+        type: 'efficiency',
+        descriptionKey: 'pdp.engineering.efficiency.gold.desc',
+        isI18n: true
+      });
+
+      expect(getEfficiencyInference(80.5)).toEqual({
+        labelKey: 'pdp.engineering.efficiency.gold.label',
+        value: '%80.5',
+        type: 'efficiency',
+        descriptionKey: 'pdp.engineering.efficiency.gold.desc',
+        isI18n: true
+      });
+
+      expect(getEfficiencyInference(87.9)).toEqual({
+        labelKey: 'pdp.engineering.efficiency.gold.label',
+        value: '%87.9',
+        type: 'efficiency',
+        descriptionKey: 'pdp.engineering.efficiency.gold.desc',
+        isI18n: true
+      });
     });
 
     it('returns null for efficiency below 80%', () => {
       expect(getEfficiencyInference(79)).toBeNull();
+      expect(getEfficiencyInference(79.9)).toBeNull();
     });
   });
 
