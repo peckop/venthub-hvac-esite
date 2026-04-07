@@ -1,3 +1,4 @@
+// @ts-nocheck
 // supabase/functions/returns-webhook/index.ts
 // Receives carrier webhook for return shipments. On delivered, marks venthub_returns.status='received'.
 // Env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RETURNS_WEBHOOK_SECRET (HMAC) or RETURNS_WEBHOOK_TOKEN
