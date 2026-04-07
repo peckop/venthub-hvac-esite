@@ -16,6 +16,7 @@
 
 import { supabase } from './supabase'
 import { logAdminAction } from './audit'
+import type { Database } from '../types/database.types'
 
 // İade/İptal olarak kabul edilen statüler (UI tarafında kullanılan)
 const RETURN_STATUSES = ['cancelled', 'refunded', 'partial_refunded'] as const
@@ -80,7 +81,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
         // --- 1. Sipariş statüsünü güncelle ---
         if (!skipOrdersSync) {
             const dbFields = resolveDbFields(newStatus)
-            const updatePayload: Record<string, string> = { status: dbFields.status }
+            const updatePayload: Database['public']['Tables']['venthub_orders']['Update'] = { status: dbFields.status }
             if (dbFields.payment_status) {
                 updatePayload.payment_status = dbFields.payment_status
             }
@@ -143,7 +144,7 @@ export async function syncOrderFromReturn(orderId: string, returnStatus: string)
     if (!mapped) return { ok: true }
 
     try {
-        const updatePayload: Record<string, string> = { status: mapped.status }
+        const updatePayload: Database['public']['Tables']['venthub_orders']['Update'] = { status: mapped.status }
         if (mapped.payment_status) {
             updatePayload.payment_status = mapped.payment_status
         }
@@ -229,8 +230,7 @@ async function restoreStockForOrder(orderId: string): Promise<void> {
                     product_id: item.product_id,
                     delta: item.quantity,
                     reason: 'return',
-                    reference_id: orderId,
-                    metadata: { note: 'Otomatik İade / İptal Stok Geri Alımı' }
+                    order_id: orderId
                 })
             }
         }
