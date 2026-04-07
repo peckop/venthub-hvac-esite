@@ -71,9 +71,9 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
         orbital: { position: [0, 0.1, 0], scale: 1 }
     },
     'DomesticFanModel': { // Ev Tipi Fan (Banyo/WC) Modeli
-        grounded: { position: [0, -0.22, 0], scale: 1 },
-        centered: { position: [0, 0, 0], scale: 1 },
-        orbital: { position: [0, 0.1, 0], scale: 1 }
+        grounded: { position: [0, -0.22, 0], scale: 0.25 },
+        centered: { position: [0, 0, 0], scale: 0.25 },
+        orbital: { position: [0, 0.1, 0], scale: 0.25 }
     },
     'DuctFanModel': { // Kanal Tipi Fan (Yuvarlak) Modeli
         grounded: { position: [0, -0.7, 0], scale: 1 },
