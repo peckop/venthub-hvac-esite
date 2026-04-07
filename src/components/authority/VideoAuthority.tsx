@@ -24,7 +24,7 @@ export default function VideoAuthority({ metadata, className = '' }: VideoAuthor
             case 'cloudflare':
                 return (
                     <iframe
-                        src={`https://customer-XXXXX.cloudflarestream.com/${metadata.id}/iframe?autoplay=${metadata.options?.autoPlay ? 'true' : 'false'}&muted=${isMuted ? 'true' : 'false'}`}
+                        src={`https://${process.env.NEXT_PUBLIC_CLOUDFLARE_STREAM_DOMAIN || 'customer-XXXXX.cloudflarestream.com'}/${metadata.id}/iframe?autoplay=${metadata.options?.autoPlay ? 'true' : 'false'}&muted=${isMuted ? 'true' : 'false'}`}
                         className="absolute inset-0 w-full h-full"
                         allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
                         onLoad={() => setIsLoaded(true)}
