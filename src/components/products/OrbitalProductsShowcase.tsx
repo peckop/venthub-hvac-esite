@@ -159,6 +159,7 @@ const OrbitalCard: React.FC<{
     const pointerDownTime = useRef(0)
     // FIX: Re-render storm prevention — only set state when value actually changes
     const lastIsNearRef = useRef(false)
+    const targetScaleRef = useRef(new THREE.Vector3())
 
     // El ikonu görünüm timer'ı
     // SceneContent'ten externalShouldShowHint true gelirse: 4sn göster, sonra gizle
@@ -363,11 +364,9 @@ const OrbitalCard: React.FC<{
             // 3D Icon Scale - Wrapper group'a uygula
             const iconGroup = groupRef.current.getObjectByName('icon-wrapper')
             if (iconGroup) {
-                // FIX: Use modelScale prop instead of hardcoded 1.5
                 const s = pulsedScale * modelScale
-            // Optimizasyon: Her frame'de yeni Vector3 yaratmak yerine state'deki vektörü kullan
-            const targetScale = new THREE.Vector3(s, s, s)
-            iconGroup.scale.lerp(targetScale, 0.15)
+                targetScaleRef.current.set(s, s, s)
+                iconGroup.scale.lerp(targetScaleRef.current, 0.15)
             }
         }
     })
