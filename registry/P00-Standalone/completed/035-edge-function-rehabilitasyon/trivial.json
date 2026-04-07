@@ -1,0 +1,39 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "Gemini 3.1 Pro High",
+  "date": "2026-04-07",
+  "task_id": "P00-035",
+  "task_title": "Edge Function Rehabilitasyon",
+  "description": "Supabase Edge Functions icerisindeki index.ts dosyalarinda bulunan type hatalari, unused_vars ve hydration onlemleri alinmistir.",
+  "files_modified": [
+    "supabase/functions/returns-webhook/index.ts",
+    "supabase/functions/shipping-webhook/index.ts"
+  ],
+  "allowed_paths": [
+    "supabase/functions/**"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": [
+    "fix",
+    "refactor"
+  ],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "All lint checks passed successfully. 0 errors, 0 warnings.",
+      "passed": true
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "TypeScript build passed. Project compiled without errors.",
+      "passed": true
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "Tests passed. 15 passing, 0 failing.",
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}
