@@ -4,10 +4,6 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
 export const WallMountedCompactFanModel: React.FC = () => {
-    // CRITICAL FIX: DO NOT USE useFanMaterials hook for spreading props.
-    // It causes "White Material" bug because THREE.Material instances cannot be spread into JSX.
-    // We define plain colors here.
-
     const fanRef = useRef<THREE.Group>(null)
 
     useFrame((state, delta) => {
