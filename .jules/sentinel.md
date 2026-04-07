@@ -11,3 +11,8 @@
 **Vulnerability:** Found multiple Supabase Edge Functions (`admin-orders-latest`, `admin-update-shipping`, `admin-iyzico-reconcile`) completely lacking Authentication and Role-Based Access Control (RBAC), exposing PII and administrative actions to unauthenticated users.
 **Learning:** Developers assumed that because a function is an "admin" function and uses `SUPABASE_SERVICE_ROLE_KEY` to interact with the database, it is protected. However, the Edge Function itself is publicly accessible over HTTPS unless explicit checks are implemented against `req.headers.get('Authorization')` and user role validation via `auth/v1/user`.
 **Prevention:** Establish a standard authorization wrapper or middleware for all Edge Functions that require admin access. Avoid using raw `Deno.serve` without an auth guard in `supabase/functions/admin-*`.
+
+## 2024-11-20 - [XSS] AuthorityRenderer XSS
+**Vulnerability:** A Cross-Site Scripting (XSS) vulnerability was reported in `src/components/authority/AuthorityRenderer.tsx` using `dangerouslySetInnerHTML={{ __html: rtBlock.content.html }}`.
+**Learning:** During investigation, it was discovered that the vulnerability had already been resolved using `DOMPurify.sanitize(rtBlock.content.html)` with the `isomorphic-dompurify` package.
+**Prevention:** Continue strictly enforcing the use of `isomorphic-dompurify` for all dynamic HTML rendering via `dangerouslySetInnerHTML`.
