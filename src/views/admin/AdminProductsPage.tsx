@@ -336,16 +336,18 @@ const AdminProductsPage: React.FC = () => {
     if (!confirm(`Seçili ${selectedIds.size} ürüne ${label} fiyat güncellemesi uygulanacak. Onaylıyor musunuz?`)) return
     try {
       const ids = Array.from(selectedIds)
-      const { data: products, error: fetchErr } = await supabase.from('products').select('id,price,name,sku,brand').in('id', ids)
+      const { data: products, error: fetchErr } = await supabase.from('products').select('id,price').in('id', ids)
       if (fetchErr) throw fetchErr
-      const updates = (products || []).map((p: { id: string; price: number | null; name: string; sku: string; brand: string }) => {
+      const updates = (products || []).map((p: { id: string; price: number | null }) => {
         const currentPrice = p.price ?? 0
         const newPrice = mode === 'percent'
           ? Math.round(currentPrice * (1 + value / 100) * 100) / 100
           : Math.round((currentPrice + value) * 100) / 100
-        return { id: p.id, price: Math.max(0, newPrice), name: p.name, sku: p.sku, brand: p.brand }
+        return { id: p.id, price: Math.max(0, newPrice) }
       })
-      const { error: updateErr } = await supabase.from('products').upsert(updates)
+
+      const results = await Promise.all(updates.map(u => supabase.from('products').update({ price: u.price }).eq('id', u.id)))
+      const updateErr = results.find(r => r.error)?.error
       if (updateErr) throw updateErr
       setSelectedIds(new Set())
       await load()

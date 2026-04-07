@@ -218,21 +218,30 @@ async function restoreStockForOrder(orderId: string): Promise<void> {
 
         if (!items || items.length === 0) return
 
-        for (const item of items) {
-            // Mevcut durumu al (JS ile incremental update; admin paneli için kabul edilebilir risk)
-            const { data: product } = await supabase.from('products').select('stock_qty').eq('id', item.product_id).single()
-            if (product) {
-                const newStock = (product.stock_qty || 0) + item.quantity
-                await supabase.from('products').update({ stock_qty: newStock }).eq('id', item.product_id)
+        // Fetch all current stock levels in one query
+        const productIds = items.map(i => i.product_id);
+        const { data: products } = await supabase.from('products').select('id, stock_qty').in('id', productIds);
 
-                // Movement kaydı at
-                await supabase.from('inventory_movements').insert({
-                    product_id: item.product_id,
-                    delta: item.quantity,
-                    reason: 'return',
-                    order_id: orderId
-                })
-            }
+        if (products) {
+            const productMap = new Map(products.map(p => [p.id, p]));
+
+            await Promise.all(items.map(async (item) => {
+                const product = productMap.get(item.product_id);
+                if (product) {
+                    const newStock = (product.stock_qty || 0) + item.quantity;
+                    const results = await Promise.all([
+                        supabase.from('products').update({ stock_qty: newStock }).eq('id', item.product_id),
+                        supabase.from('inventory_movements').insert({
+                            product_id: item.product_id,
+                            delta: item.quantity,
+                            reason: 'return',
+                            order_id: orderId
+                        })
+                    ]);
+                    const err = results.find(r => r.error)?.error;
+                    if (err) throw err;
+                }
+            }));
         }
     } catch (err) {
         console.error('[restoreStockForOrder] Hata:', err)
