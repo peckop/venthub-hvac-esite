@@ -22,7 +22,7 @@ module.exports = [
     }
   },
   {
-    ignores: [".next/**", "out/**", "public/**", "supabase/migrations/**", "node_modules/**", "next-env.d.ts"]
+    ignores: [".next/**", "out/**", "public/**", "supabase/**", "node_modules/**", "next-env.d.ts"]
   },
   {
     files: ["src/middleware.ts"],
