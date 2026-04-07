@@ -20,7 +20,7 @@ interface OrderItem {
     quantity: number
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
     // Handle CORS
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
@@ -40,7 +40,7 @@ serve(async (req) => {
 
     try {
         // 1. Ayarları al (saat cinsinden timeout)
-        const { _data: settingsData } = await supabase
+        const { data: settingsData } = await supabase
             .from('inventory_settings')
             .select('reservation_timeout_hours')
             .maybeSingle()
@@ -55,7 +55,7 @@ serve(async (req) => {
         console.warn(`[JOB] Checking for orders before: ${timeoutDate.toISOString()} (Timeout: ${hours}h)`)
 
         // 3. Süresi dolmuş "pending" siparişleri bul
-        const { _data: expiredOrders, error: findErr } = await supabase
+        const { data: expiredOrders, error: findErr } = await supabase
             .from('venthub_orders')
             .select('id, order_number')
             .eq('status', 'pending')
@@ -97,7 +97,7 @@ serve(async (req) => {
                 })
 
                 // c. Ürünleri ve stokları iade et
-                const { _data: itemsRaw } = await supabase
+                const { data: itemsRaw } = await supabase
                     .from('venthub_order_items')
                     .select('product_id, quantity')
                     .eq('order_id', order.id)

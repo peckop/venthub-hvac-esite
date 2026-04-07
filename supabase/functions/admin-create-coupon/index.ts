@@ -32,14 +32,14 @@ Deno.serve(async (req: Request) => {
     })
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
-    const { _data: userRes, error: userErr } = await supabaseUser.auth.getUser()
+    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
     if (userErr || !userRes?.user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
     const userId = userRes.user.id
 
-    const { _data: profile, error: profErr } = await supabaseAdmin
+    const { data: profile, error: profErr } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
       .eq('id', userId)
@@ -99,7 +99,7 @@ Deno.serve(async (req: Request) => {
       created_by: userId,
     }
 
-    const { _data, error: insErr } = await supabaseAdmin
+    const { data, error: insErr } = await supabaseAdmin
       .from('coupons')
       .insert(payload)
       .select('id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at')
@@ -109,7 +109,7 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'insert_failed', details: insErr.message }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
-    return new Response(JSON.stringify(_data), { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+    return new Response(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
   } catch (_e: unknown) {
     const msg = _e instanceof Error ? _e.message : String(_e)
     return new Response(JSON.stringify({ error: 'internal', details: msg }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })

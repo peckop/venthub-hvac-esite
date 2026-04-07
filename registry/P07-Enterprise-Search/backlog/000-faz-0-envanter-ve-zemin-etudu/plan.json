@@ -1,0 +1,21 @@
+{
+  "skill": "superpowers-write-plan",
+  "model": "",
+  "date": "",
+  "execution_complexity": "",
+  "recommended_model": "",
+  "requires_human_approval": false,
+  "brainstorm_ref": "000-faz-0-envanter-ve-zemin-etudu/brainstorm.json",
+  "objective": "",
+  "assumptions": [],
+  "pre_checks": [],
+  "steps": [],
+  "risks": [],
+  "rollback": "",
+  "allowed_paths": [
+    "src/**/faz/**"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 10,
+  "allowed_change_types": []
+}

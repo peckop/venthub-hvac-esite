@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+set -eu
+
+# Scope Police Stamp Dosyası
+STAMP_FILE=".git/pre-commit.stamp"
+LOG_FILE=".agent/bypass_log.md"
+
+if [ -f "$STAMP_FILE" ]; then
+  # Pre-commit çalışmış, bypass yok. Stamp'i temizle.
+  rm "$STAMP_FILE"
+else
+  # Stamp yok! Pre-commit atlanmış (büyük ihtimalle --no-verify)
+  echo "⚠️ DİKKAT: Pre-Commit denetimi atlandı (--no-verify). Bu durum ML Sentinel için kayıt altına alınıyor."
+  
+  # Log dosyası klasörünü garantile
+  mkdir -p .agent
+  
+  # Eğer log dosyası ilk kez oluşturuluyorsa başlık ekle
+  if [ ! -f "$LOG_FILE" ]; then
+    echo "# 🚨 Bypass Denetim Günlüğü" > "$LOG_FILE"
+    echo "Bu dosya \`--no-verify\` ile kaçak geçilen commitleri ML Sentinel davranış modeli için kayıt altına alır." >> "$LOG_FILE"
+    echo "" >> "$LOG_FILE"
+  fi
+  
+  COMMIT_DATE=$(date "+%Y-%m-%d %H:%M:%S")
+  COMMIT_HASH=$(git rev-parse --short HEAD)
+  COMMIT_MSG=$(git log -1 --pretty=%B | head -n 1)
+  
+  # name-status bazen tab ile ayrılır, onu biraz temizleyelim
+  # ama post-commit çok detaya inmez, bu yeterli
+  git_stat=$(git log -1 --name-status --pretty="")
+  
+  # Günlüğe yaz
+  echo "## Bypass: $COMMIT_DATE" >> "$LOG_FILE"
+  echo "- **Commit:** \`$COMMIT_HASH\`" >> "$LOG_FILE"
+  echo "- **Mesaj:** $COMMIT_MSG" >> "$LOG_FILE"
+  echo "- **Değişen Dosyalar:**" >> "$LOG_FILE"
+  
+  echo "```text" >> "$LOG_FILE"
+  echo "$git_stat" >> "$LOG_FILE"
+  echo "```" >> "$LOG_FILE"
+  echo "" >> "$LOG_FILE"
+fi
