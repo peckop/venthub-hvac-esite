@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 // Supabase Edge Function: shipping-status
 // Returns shipping status for a given order_id or tracking_number

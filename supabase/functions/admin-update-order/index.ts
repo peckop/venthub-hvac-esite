@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin') || ''
