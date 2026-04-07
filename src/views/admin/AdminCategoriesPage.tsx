@@ -43,7 +43,7 @@ const AdminCategoriesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
 
   const { canWrite } = useRole()
-  const hasWriteAccess = process.env.NODE_ENV === 'development' || canWrite('categories')
+  const hasWriteAccess = canWrite('categories')
   const dragScrollRef = useDragScroll<HTMLDivElement>()
 
   // Modal State
