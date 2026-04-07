@@ -85,7 +85,7 @@ Deno.serve(async (req: Request) => {
     }
 
     // Read raw body first for signature verification
-    const raw = await req._text()
+    const raw = await req.text()
     let payload: unknown = {}
     try { payload = JSON.parse(raw) } catch { payload = {} }
 
@@ -149,11 +149,11 @@ Deno.serve(async (req: Request) => {
     const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     if (eventId) {
       try {
-        const { _data: existing } = await supabase
+        const { data: existing } = await supabase
           .from<{ event_id: string }>('shipping_webhook_events')
           .select('event_id')
           .eq('event_id', eventId)
-          ._limit(1)
+          .limit(1)
         if (Array.isArray(existing) && existing.length > 0) {
           return jsonResponse({ ok: true, event_id: eventId, duplicate: true, unchanged: true })
         }
@@ -163,14 +163,14 @@ Deno.serve(async (req: Request) => {
     let orderId = (p.order_id || '').trim()
 
     if (!orderId && p.order_number) {
-      const { _data, error } = await supabase
+      const { data, error } = await supabase
         .from<{ id: string }>('venthub_orders')
         .select('id')
         .eq('order_number', p.order_number)
-        ._limit(1)
+        .limit(1)
         .single()
       if (error) return jsonResponse({ error: 'Order not found for given order_number' }, { status: 404 })
-      orderId = _data?.id as string
+      orderId = data?.id as string
     }
 
     if (!orderId) {
@@ -179,7 +179,7 @@ Deno.serve(async (req: Request) => {
 
     // Fetch current to enforce monotonic status progression and for idempotency
     interface OrderRow { id: string; status?: string; shipped_at?: string | null; delivered_at?: string | null; tracking_number?: string | null; tracking_url?: string | null; carrier?: string | null }
-    const { _data: current, error: curErr } = await supabase
+    const { data: current, error: curErr } = await supabase
       .from<OrderRow>('venthub_orders')
       .select('id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
       .eq('id', orderId)
@@ -240,7 +240,7 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ ok: true, order_id: current.id, shipping: current, unchanged: true })
     }
 
-    const { _data, error } = await supabase
+    const { data, error } = await supabase
       .from<OrderRow>('venthub_orders')
       .update(patch)
       .eq('id', orderId)
@@ -261,7 +261,7 @@ Deno.serve(async (req: Request) => {
           order_id: orderId,
           carrier: p.carrier || null,
           status_raw: p.status || null,
-          status_mapped: _data?.status || undefined,
+          status_mapped: data?.status || undefined,
           body_hash: bodyHash,
           received_at: new Date().toISOString(),
           processed_at: new Date().toISOString(),
@@ -271,21 +271,21 @@ Deno.serve(async (req: Request) => {
 
     // On delivered, send delivery notification (best effort)
     try {
-      if ((_data?.status || '').toLowerCase() === 'delivered') {
+      if ((data?.status || '').toLowerCase() === 'delivered') {
         await fetch(`${SUPABASE_URL}/functions/v1/delivery-notification`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY },
           body: JSON.stringify({
-            order_id: _data?.id,
-            order_number: (_data as unknown)?.order_number,
-            customer_email: (_data as unknown)?.customer_email,
-            customer_name: (_data as unknown)?.customer_name,
+            order_id: data?.id,
+            order_number: (data as Record<string, unknown>)?.order_number,
+            customer_email: (data as Record<string, unknown>)?.customer_email,
+            customer_name: (data as Record<string, unknown>)?.customer_name,
           })
         })
       }
     } catch {}
 
-    return jsonResponse({ ok: true, order_id: _data?.id, shipping: _data })
+    return jsonResponse({ ok: true, order_id: data?.id, shipping: data })
   } catch (_e) {
     return jsonResponse({ error: (_e as Error).message || 'Unexpected error' }, { status: 500 })
   }

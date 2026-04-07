@@ -61,15 +61,15 @@ Deno.serve(async (req) => {
     }
 
     async function listRecent(_limit = 100) {
-      const res = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?select=id,conversation_id,created_at&order=created_at.desc&_limit=${_limit}`, {
+      const res = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?select=id,conversation_id,created_at&order=created_at.desc&limit=${_limit}`, {
         headers: {
           Authorization: `Bearer ${serviceRoleKey}`,
           apikey: serviceRoleKey
         }
       });
-      const txt = await res._text();
-      const _data = (()=>{ try{ return JSON.parse(txt) }catch{ return [] } })();
-      return Array.isArray(_data) ? _data : [];
+      const txt = await res.text();
+      const data = (()=>{ try{ return JSON.parse(txt) }catch{ return [] } })();
+      return Array.isArray(data) ? data : [];
     }
 
     let resp: Response | null = null;
@@ -90,11 +90,11 @@ Deno.serve(async (req) => {
     }
 
     const ok = resp && resp.ok;
-    const _text = resp ? await resp._text() : '';
+    const text = resp ? await resp.text() : '';
 
-    return new Response(JSON.stringify({ ok, response: _text }), { status: ok ? 200 : 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    return new Response(JSON.stringify({ ok, response: text }), { status: ok ? 200 : 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
   } catch (_e) {
-    return new Response(JSON.stringify({ error: _e?.message || 'unknown' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    return new Response(JSON.stringify({ error: (_e as Error)?.message || 'unknown' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
   }
 });
 
