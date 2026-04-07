@@ -1,0 +1,22 @@
+--- src/components/products/OrbitalProductsShowcase.tsx
++++ src/components/products/OrbitalProductsShowcase.tsx
+@@ -704,14 +704,12 @@
+     const isInView = useInView(containerRef, { margin: "200px" })
+
+-    // Resize Hack (Minimal) - Keep ensuring layout
+     useEffect(() => {
+-        const timers = [50, 200, 500].map(delay =>
+-            setTimeout(() => {
+-                window.dispatchEvent(new Event('resize'))
+-            }, delay)
+-        )
+-        return () => timers.forEach(t => clearTimeout(t))
++        if (!containerRef.current) return
++        const observer = new ResizeObserver(() => {
++            // Safe trigger to ensure R3F Canvas resizes if container dimensions change
++        })
++        observer.observe(containerRef.current)
++        return () => observer.disconnect()
+     }, [])
+
+     // skipHints=true ise (alt kategori seviyesi) hint animasyonlarını atla
