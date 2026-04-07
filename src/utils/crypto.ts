@@ -8,10 +8,12 @@ export const generateId = (): string => {
         if (typeof globalThis !== 'undefined' && globalThis.crypto?.randomUUID) {
             return globalThis.crypto.randomUUID();
         }
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            return (crypto as any).randomUUID();
+        // Safely check for crypto without triggering TS2774 on global crypto definition
+        const gCrypto = (globalThis as unknown as { crypto?: { randomUUID?: () => string } }).crypto;
+        if (gCrypto?.randomUUID) {
+            return gCrypto.randomUUID();
         }
-    } catch (e) {
+    } catch {
         // Fallback if crypto.randomUUID fails or is unavailable
     }
 
