@@ -36,7 +36,7 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -86,14 +86,14 @@ serve(async (req) => {
 async function checkAllProducts(supabase: SupabaseClient) {
   // Eşik değerinin altında kalan ürünleri çek
   // Üstteki filtreleme SQL tarafında karmaşık olabilir, basitleştirip JS tarafında filtreleyelim
-  const { _data: allLowStock, error: fetchErr } = await supabase
+  const { data: allLowStock, error: fetchErr } = await supabase
     .from('products')
     .select('id, name, stock_qty, low_stock_threshold')
     .filter('stock_qty', 'lte', 10) // Önce genel bir filtre
   
   if (fetchErr) throw fetchErr
 
-  const productsToAlert = (allLowStock as Product[]).filter(p => p.stock_qty <= (p.low_stock_threshold || 5))
+  const productsToAlert = ((allLowStock || []) as Product[]).filter(p => p.stock_qty <= (p.low_stock_threshold || 5))
   console.warn(`[JOB] Found ${productsToAlert.length} products requiring alerts`)
 
   const results = []
@@ -104,7 +104,7 @@ async function checkAllProducts(supabase: SupabaseClient) {
 }
 
 async function checkSpecificProduct(supabase: SupabaseClient, _productId: string) {
-  const { _data: product, error } = await supabase
+  const { data: product, error } = await supabase
     .from('products')
     .select('id, name, stock_qty, low_stock_threshold')
     .eq('id', _productId)
@@ -158,7 +158,7 @@ async function processProductAlert(supabase: SupabaseClient, product: Product) {
   }
 }
 
-async function sendNotification(type: string, to: string, _data: AlertData, priority: string) {
+async function sendNotification(type: string, to: string, data: AlertData, priority: string) {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
@@ -173,9 +173,9 @@ async function sendNotification(type: string, to: string, _data: AlertData, prio
         type,
         to,
         priority,
-        _data: {
-          ..._data,
-          subject: _data.alertType === 'out_of_stock' ? '🚨 KRİTİK: STOK TÜKENDİ' : '⚠️ DÜŞÜK STOK UYARISI'
+        data: {
+          ...data,
+          subject: data.alertType === 'out_of_stock' ? '🚨 KRİTİK: STOK TÜKENDİ' : '⚠️ DÜŞÜK STOK UYARISI'
         }
       })
     })
@@ -189,7 +189,7 @@ async function sendNotification(type: string, to: string, _data: AlertData, prio
 
 async function getAlertRecipients(supabase: SupabaseClient): Promise<AlertRecipient[]> {
   // inventory_settings'den ana email'i al
-  const { _data: settings } = await supabase
+  const { data: settings } = await supabase
     .from('inventory_settings')
     .select('alert_email')
     .maybeSingle()
