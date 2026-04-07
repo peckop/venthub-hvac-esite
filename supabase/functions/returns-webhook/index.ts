@@ -52,7 +52,7 @@ Deno.serve(async (req: Request) => {
   try {
     if (req.method !== 'POST') return json({ error: 'Method not allowed' }, { status: 405 })
 
-    const raw = await req._text()
+    const raw = await req.text()
     let body: unknown = {}
     try { body = JSON.parse(raw) } catch {}
 
@@ -76,7 +76,7 @@ Deno.serve(async (req: Request) => {
     // Optional dedup
     const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     if (eventId) {
-      const { _data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId)._limit(1)
+      const { data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId).limit(1)
       if (Array.isArray(exist) && exist.length > 0) return json({ ok: true, event_id: eventId, duplicate: true })
     }
 
@@ -84,14 +84,14 @@ Deno.serve(async (req: Request) => {
     let returnId = (p._return_id || '').trim()
     if (!returnId && p.order_id) {
       try {
-        const { _data } = await supabase.from('venthub_returns').select('id').eq('order_id', p.order_id).order('created_at',{ ascending:false })._limit(1)
-        if (Array.isArray(_data) && _data[0]) returnId = _data[0].id
+        const { data } = await supabase.from('venthub_returns').select('id').eq('order_id', p.order_id).order('created_at',{ ascending:false }).limit(1)
+        if (Array.isArray(data) && data[0]) returnId = data[0].id
       } catch {}
     }
     if (!returnId) return json({ error: 'Missing _return_id' }, { status: 400 })
 
     // Fetch current status
-    const { _data: cur, error: curErr } = await supabase.from('venthub_returns').select('id,status').eq('id', returnId).single()
+    const { data: cur, error: curErr } = await supabase.from('venthub_returns').select('id,status').eq('id', returnId).single()
     if (curErr || !cur) return json({ error: 'Return not found' }, { status: 404 })
 
     const mapped = mapReturnStatus(p.status)
@@ -143,8 +143,8 @@ Deno.serve(async (req: Request) => {
         if (SUPABASE_URL && SERVICE_KEY) {
           // 1) Return details (reason, description, order_id fallback)
           let rOrderId = p.order_id || ''
-          const reason = ''
-          const description = ''
+          let reason = ''
+          let description = ''
           try {
             const r = await fetch(`${SUPABASE_URL}/rest/v1/venthub_returns?id=eq.${encodeURIComponent(returnId)}&select=order_id,reason,description,status`, {
               headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
