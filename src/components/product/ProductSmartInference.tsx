@@ -10,7 +10,7 @@ interface ProductSmartInferenceProps {
   product: Product
 }
 
-export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = ({ product }) => {
+export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = React.memo(({ product }) => {
   const { t } = useI18n()
   const summaries = generateEngineeringSummary(product)
 
@@ -84,4 +84,5 @@ export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = ({ pr
       </div>
     </div>
   )
-}
+})
+ProductSmartInference.displayName = 'ProductSmartInference'
