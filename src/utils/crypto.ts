@@ -8,8 +8,8 @@ export const generateId = (): string => {
         if (typeof globalThis !== 'undefined' && globalThis.crypto?.randomUUID) {
             return globalThis.crypto.randomUUID();
         }
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            return (crypto as any).randomUUID();
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return crypto.randomUUID();
         }
     } catch (e) {
         // Fallback if crypto.randomUUID fails or is unavailable
