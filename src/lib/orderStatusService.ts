@@ -215,24 +215,48 @@ async function restoreStockForOrder(orderId: string): Promise<void> {
             .from('venthub_order_items')
             .select('product_id, quantity')
             .eq('order_id', orderId)
-
         if (!items || items.length === 0) return
 
-        for (const item of items) {
-            // Mevcut durumu al (JS ile incremental update; admin paneli için kabul edilebilir risk)
-            const { data: product } = await supabase.from('products').select('stock_qty').eq('id', item.product_id).single()
-            if (product) {
-                const newStock = (product.stock_qty || 0) + item.quantity
-                await supabase.from('products').update({ stock_qty: newStock }).eq('id', item.product_id)
+        // Group items by product_id to sum quantities correctly and avoid overwriting
+        const groupedItems = items.reduce((acc, item) => {
+            if (!acc[item.product_id]) {
+                acc[item.product_id] = 0
+            }
+            acc[item.product_id] += item.quantity
+            return acc
+        }, {} as Record<string, number>)
 
-                // Movement kaydı at
-                await supabase.from('inventory_movements').insert({
-                    product_id: item.product_id,
-                    delta: item.quantity,
+        const productIds = Object.keys(groupedItems)
+        const { data: products } = await supabase.from('products').select('id, stock_qty').in('id', productIds)
+
+        if (!products) return
+
+        const productsMap = new Map(products.map(p => [p.id, p]))
+        const updates: { id: string; stock_qty: number }[] = []
+        const movements: { product_id: string; delta: number; reason: string; order_id: string }[] = []
+
+        for (const [productId, totalQuantity] of Object.entries(groupedItems)) {
+            const product = productsMap.get(productId)
+            if (product) {
+                updates.push({
+                    id: product.id,
+                    stock_qty: (product.stock_qty || 0) + totalQuantity
+                })
+                movements.push({
+                    product_id: productId,
+                    delta: totalQuantity,
                     reason: 'return',
                     order_id: orderId
                 })
             }
+        }
+
+        await Promise.all(
+            updates.map(update => supabase.from('products').update({ stock_qty: update.stock_qty }).eq('id', update.id))
+        )
+
+        if (movements.length > 0) {
+            await supabase.from('inventory_movements').insert(movements)
         }
     } catch (err) {
         console.error('[restoreStockForOrder] Hata:', err)
