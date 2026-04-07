@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 // supabase/functions/returns-webhook/index.ts
 // Receives carrier webhook for return shipments. On delivered, marks venthub_returns.status='received'.
