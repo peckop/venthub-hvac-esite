@@ -16,7 +16,6 @@ import VideoAuthority from './VideoAuthority';
 import ThreeDAuthority from './ThreeDAuthority';
 import TechnicalDrawingAuthority from './TechnicalDrawingAuthority';
 import * as LucideIcons from 'lucide-react';
-import DOMPurify from 'isomorphic-dompurify';
 
 // --- YARDIMCI BİLEŞENLER ---
 
@@ -247,7 +246,7 @@ export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> =
               <div 
                 key={rtBlock.id} 
                 className="max-w-4xl mx-auto py-16 px-6 prose prose-slate prose-lg md:prose-xl"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rtBlock.content.html) }}
+                dangerouslySetInnerHTML={{ __html: rtBlock.content.html }}
               />
             );
           }

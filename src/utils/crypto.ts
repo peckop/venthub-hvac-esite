@@ -1,20 +1,14 @@
 /**
- * Generates a unique, collision-resistant identifier.
- * Uses globalThis.crypto.randomUUID() when available (Secure Contexts).
- * Provides a fallback using timestamp and Math.random() for non-secure contexts.
+ * Centralized unique ID generation.
+ * Uses crypto.randomUUID() when available, falls back to timestamp-based ID.
  */
-export const generateId = (): string => {
-    try {
-        if (typeof globalThis !== 'undefined' && globalThis.crypto?.randomUUID) {
-            return globalThis.crypto.randomUUID();
-        }
-        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-            return crypto.randomUUID();
-        }
-    } catch {
-        // Fallback if crypto.randomUUID fails or is unavailable
+export function generateId(): string {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
     }
-
-    // Fallback for non-secure contexts
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-};
+  } catch (_unused) {
+    // Fallback below
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}

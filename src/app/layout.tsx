@@ -46,7 +46,7 @@ export default function RootLayout({
                                     "@type": "WebSite",
                                     "name": "VentHub",
                                     "url": SITE_URL
-                                }).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
+                                })
                             }}
                         />
                         {children}

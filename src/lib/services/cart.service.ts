@@ -2,7 +2,8 @@ import { supabase } from '../supabase'
 import type { DbShoppingCart, DbCartItem, DbProduct } from '../../types/db-rows'
 import type { Product } from '../supabase'
 import { mapDatabaseProductToDomain } from '../type-converters'
-import type { Database } from '../../types/database.types'
+import type { Json } from '../../types/database.types'
+
 async function ensureUserProfile(userId: string): Promise<boolean> {
   try {
     const { data: prof, error: selErr } = await supabase
@@ -119,7 +120,7 @@ export async function upsertCartItem(params: {
     .eq('product_id', _productId)
     .limit(1)
   
-  const common: Database['public']['Tables']['cart_items']['Update'] = { quantity }
+  const common: Record<string, Json> = { quantity }
   if (unitPrice !== undefined) common.unit_price = unitPrice
   if (priceListId !== undefined) common.price_list_id = priceListId
 

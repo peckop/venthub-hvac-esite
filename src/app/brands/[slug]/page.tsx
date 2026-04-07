@@ -69,7 +69,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <PageComponent initialBrandSlug={slug} />
     </>

@@ -33,14 +33,14 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY)
 
-    let query = supabase.from('venthub_orders').select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at').limit(1)
+    let query = supabase.from('venthub_orders').select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at')._limit(1)
     if (orderId) query = query.eq('id', orderId)
     if (tracking) query = query.eq('tracking_number', tracking)
 
-    const { data, error } = await query.single()
+    const { _data, error } = await query.single()
     if (error) return jsonResponse({ error: error.message || 'Not found' }, { status: 404 })
 
-    return jsonResponse({ ok: true, shipping: data })
+    return jsonResponse({ ok: true, shipping: _data })
   } catch (_e) {
     return jsonResponse({ error: (_e as Error).message || 'Unexpected error' }, { status: 500 })
   }

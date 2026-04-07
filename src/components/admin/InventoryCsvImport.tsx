@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { FileUp, X, CheckCircle2, Search, Info } from 'lucide-react'
-import { generateId } from '../../utils/crypto'
 
 interface CsvPreviewRow {
     sku: string
@@ -154,7 +153,15 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
 
             let successCount = 0
             const errors: Array<{ sku: string; message: string }> = []
-            const batchId = generateId()
+            const genBatchId = (): string => {
+                try {
+                    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                        return crypto.randomUUID()
+                    }
+                } catch { }
+                return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+            }
+            const batchId = genBatchId()
 
             const BATCH_SIZE = 20
             for (let i = 0; i < csvPreview.length; i += BATCH_SIZE) {

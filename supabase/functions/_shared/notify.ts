@@ -26,11 +26,11 @@ function getEmailConfig() {
   return { to, supabaseUrl, serviceKey };
 }
 
-async function sendSlack(text: string, fields?: NotifyField[]) {
+async function sendSlack(_text: string, fields?: NotifyField[]) {
   const url = getSlackWebhook();
   if (!url) return false;
   
-  const payload: Record<string, unknown> = { text };
+  const payload: Record<string, unknown> = { _text };
   if (Array.isArray(fields) && fields.length > 0) {
     payload.attachments = [{
       color: '#e01e5a',
@@ -54,11 +54,11 @@ async function sendSlack(text: string, fields?: NotifyField[]) {
   }
 }
 
-async function sendEmail(subject: string, text: string, fields?: NotifyField[]) {
+async function sendEmail(subject: string, _text: string, fields?: NotifyField[]) {
   const { to, supabaseUrl, serviceKey } = getEmailConfig();
   if (!to || !supabaseUrl || !serviceKey) return false;
   
-  let message = text;
+  let message = _text;
   if (fields && fields.length > 0) {
     message += '\n\n' + fields.map(f => `${f.title}: ${f.value}`).join('\n');
   }
@@ -69,7 +69,7 @@ async function sendEmail(subject: string, text: string, fields?: NotifyField[]) 
     message: message,
     priority: 'high',
     template: undefined,
-    data: { subject: `VentHub Alert: ${subject}` }
+    _data: { subject: `VentHub Alert: ${subject}` }
   };
   
   try {
@@ -88,26 +88,26 @@ async function sendEmail(subject: string, text: string, fields?: NotifyField[]) 
   }
 }
 
-export async function notify(text: string, fields?: NotifyField[]) {
+export async function notify(_text: string, fields?: NotifyField[]) {
   const debug = (getEnv('NOTIFY_DEBUG') || '').toLowerCase() === 'true';
-  const subject = text.slice(0, 50); // First 50 chars as subject
+  const subject = _text.slice(0, 50); // First 50 chars as subject
   
   let sent = false;
   
   // Try Slack first
-  if (await sendSlack(text, fields)) {
+  if (await sendSlack(_text, fields)) {
     sent = true;
     if (debug) console.warn('[notify] sent via Slack');
   }
   
   // Try Email if Slack failed or not configured
-  if (!sent && await sendEmail(subject, text, fields)) {
+  if (!sent && await sendEmail(subject, _text, fields)) {
     sent = true;
     if (debug) console.warn('[notify] sent via Email');
   }
   
   if (!sent && debug) {
-    console.warn('[notify] no channels configured ->', text, fields);
+    console.warn('[notify] no channels configured ->', _text, fields);
   }
 }
 

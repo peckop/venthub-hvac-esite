@@ -79,7 +79,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         >
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <ol className="flex items-center flex-wrap gap-y-1 text-sm">

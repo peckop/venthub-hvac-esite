@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
-Deno.serve(async (req: Request) => {
+Deno.serve(async (req) => {
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -25,18 +25,18 @@ Deno.serve(async (req: Request) => {
     const supabaseUser = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
 
-    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
+    const { _data: userRes, error: userErr } = await supabaseUser.auth.getUser()
     if (userErr || !userRes?.user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
-    const { data: profile, error: profErr } = await supabaseAdmin.from('user_profiles').select('role').eq('id', userRes.user.id).maybeSingle()
+    const { _data: profile, error: profErr } = await supabaseAdmin.from('user_profiles').select('role').eq('id', userRes.user.id).maybeSingle()
     const userRole = profile?.role as string | undefined
     if (profErr || !userRole || !['admin', 'superadmin'].includes(userRole)) {
       return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
-    let id: string | null = null
+    const id: string | null = null
     let conv: string | null = null
     try {
       const url = new URL(req.url)
@@ -67,7 +67,7 @@ Deno.serve(async (req: Request) => {
     })
 
     if (!resp.ok) {
-      const _text = await resp.text().catch(()=>'' )
+      const _text = await resp._text().catch(()=>'' )
       return new Response(JSON.stringify({ ok:false, httpStatus: resp.status, rpcUrl, body:_text }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 

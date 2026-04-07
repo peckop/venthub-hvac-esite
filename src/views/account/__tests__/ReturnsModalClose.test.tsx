@@ -28,7 +28,8 @@ vi.mock('../../../i18n/I18nProvider', () => ({
   useI18n: () => mockI18n
 }))
 
-const mockedSupabase = supabase as unknown as { from: ReturnType<typeof vi.fn> }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockedSupabase = supabase as any
 mockedSupabase.from = vi.fn().mockImplementation((table: string) => {
   const chain = {
     select: vi.fn().mockReturnThis(),
@@ -41,7 +42,8 @@ mockedSupabase.from = vi.fn().mockImplementation((table: string) => {
       return callback({ data: [], error: null })
     })
   }
-  return chain as unknown
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return chain as any
 })
 
 beforeEach(() => {

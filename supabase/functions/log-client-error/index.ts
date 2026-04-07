@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-Deno.serve(async (req: Request) => {
+Deno.serve(async (req) => {
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
   const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -42,7 +42,7 @@ Deno.serve(async (req: Request) => {
         return new Response('Unauthorized', { status: 401, headers: cors })
       }
       const accessToken = authHeader.slice(7).trim()
-      const { data: authData, error: authErr } = await supabase.auth.getUser(accessToken)
+      const { _data: authData, error: authErr } = await supabase.auth.getUser(accessToken)
       if (authErr || !authData?.user) {
         return new Response('Unauthorized', { status: 401, headers: cors })
       }
@@ -79,7 +79,7 @@ Deno.serve(async (req: Request) => {
         release: mask(String(payload.release || '')),
         last_seen: new Date().toISOString(),
       }
-      const { data: upsertRow } = await supabase
+      const { _data: upsertRow } = await supabase
         .from('error_groups')
         .upsert(groupPayload, { onConflict: 'signature' })
         .select('id, _count')
@@ -92,7 +92,7 @@ Deno.serve(async (req: Request) => {
           .select('id')
           .eq('signature', signature)
           .maybeSingle()
-        groupId = (q.data as { id?: string } | null)?.id || null
+        groupId = (q._data as { id?: string } | null)?.id || null
       }
       if (groupId) {
         await supabase.rpc('increment_error_group_count', { p_grou_p_id: groupId }).catch(()=>{})
@@ -107,7 +107,7 @@ Deno.serve(async (req: Request) => {
     if (groupId && dedupSeconds > 0) {
       try {
         const since = new Date(Date.now() - dedupSeconds * 1000).toISOString()
-        const { data: recent } = await supabase
+        const { _data: recent } = await supabase
           .from('client_errors')
           .select('id, at')
           .eq('grou_p_id', groupId)

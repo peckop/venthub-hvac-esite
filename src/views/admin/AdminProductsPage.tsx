@@ -358,10 +358,9 @@ const AdminProductsPage: React.FC = () => {
     const numVal = parseFloat(inlineEdit.value)
     if (isNaN(numVal)) { setInlineEdit(null); return }
     try {
-      const payload: Partial<DomainProduct> = inlineEdit.field === 'price' ? { price: numVal } : { stock_qty: numVal }
-      const { error } = await supabase.from('products').update(payload).eq('id', inlineEdit.id)
+      const { error } = await supabase.from('products').update({ [inlineEdit.field]: numVal }).eq('id', inlineEdit.id)
       if (error) throw error
-      setRows(prev => prev.map(r => r.id === inlineEdit.id ? { ...r, ...payload } : r))
+      setRows(prev => prev.map(r => r.id === inlineEdit.id ? { ...r, [inlineEdit.field]: numVal } : r))
       setInlineEdit(null)
     } catch (e) { alert('Kayıt hatası: ' + (e as Error).message) }
   }
