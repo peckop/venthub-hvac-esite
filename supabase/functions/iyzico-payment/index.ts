@@ -200,7 +200,7 @@ Deno.serve(async (req: Request) => {
         if (debugEnabled) console.warn('Iyzico keys (masked):', maskKey(iyzicoApiKey), maskKey(iyzicoSecretKey));
 
         // Generate unique identifiers
-        const orderId = `VH-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+        const orderId = `VH-${Date.now()}-${crypto.randomUUID().split("-")[0]}`;
         const conversationId = `CONV-${Date.now()}`;
 
         // Frontend origin for redirect after callback (if available)
@@ -224,7 +224,7 @@ Deno.serve(async (req: Request) => {
 
         // Create order in database
         // Not: venthub_orders.id NOT NULL ise, burada UUID oluşturup gönderiyoruz.
-        const dbGeneratedId = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        const dbGeneratedId = crypto.randomUUID();
         const orderData = {
             id: dbGeneratedId,
             user_id: user_id || null,
