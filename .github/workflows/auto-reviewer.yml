@@ -1,0 +1,35 @@
+name: 👁️ Auto Request Review
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  request-review:
+    name: Reviewer Ata
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: peckop'u reviewer olarak ata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+
+            // Kendisini reviewer atama
+            if (author === 'peckop') {
+              console.log('ℹ️ PR sahibi zaten peckop, reviewer atlanıyor.');
+              return;
+            }
+
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              reviewers: ['peckop'],
+            });
+
+            console.log(`✅ peckop PR #${pr.number} için reviewer olarak atandı.`);

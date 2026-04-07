@@ -1,0 +1,78 @@
+name: 🏷️ Auto Label PRs
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  label:
+    name: Etiketle
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: PR başlığına göre etiket ata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title;
+            const labels = [];
+
+            const labelMap = [
+              { pattern: /🛡️ Sentinel/i,   label: 'security'     },
+              { pattern: /⚡ Bolt/i,         label: 'performance'  },
+              { pattern: /🎨 Palette/i,      label: 'ux'           },
+              { pattern: /🧪 Darwin/i,       label: 'testing'      },
+              { pattern: /📚 Scribe/i,       label: 'documentation'},
+              { pattern: /🧹 Janitor/i,      label: 'tech-debt'    },
+              { pattern: /🌍 Consul/i,       label: 'i18n'         },
+              { pattern: /💉 Surgeon/i,      label: 'types'        },
+              { pattern: /⚰️ Undertaker/i,   label: 'cleanup'      },
+            ];
+
+            for (const { pattern, label } of labelMap) {
+              if (pattern.test(title)) labels.push(label);
+            }
+
+            if (labels.length === 0) return;
+
+            // Mevcut olmayan etiketleri oluştur
+            const existingLabels = await github.rest.issues.listLabelsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const existingNames = existingLabels.data.map(l => l.name);
+
+            const colorMap = {
+              'security':      'e11d48',
+              'performance':   'f59e0b',
+              'ux':            '8b5cf6',
+              'testing':       '10b981',
+              'documentation': '3b82f6',
+              'tech-debt':     '6b7280',
+              'i18n':          '06b6d4',
+              'types':         'ec4899',
+              'cleanup':       '84cc16',
+            };
+
+            for (const label of labels) {
+              if (!existingNames.includes(label)) {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label,
+                  color: colorMap[label] ?? 'ededed',
+                });
+              }
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels,
+            });
+
+            console.log(`✅ Etiketler eklendi: ${labels.join(', ')}`);

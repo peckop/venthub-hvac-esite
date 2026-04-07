@@ -1,0 +1,145 @@
+name: 🛡️ Supabase RLS Güvenlik Alarmı
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'supabase/migrations/**'
+
+jobs:
+  rls-check:
+    name: RLS Denetle
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Repo'yu çek
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Değişen migration dosyalarını analiz et
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+
+            // PR'da değişen migration dosyalarını bul
+            const baseSha  = context.payload.pull_request.base.sha;
+            const headSha  = context.payload.pull_request.head.sha;
+
+            let changedFiles;
+            try {
+              changedFiles = execSync(
+                `git diff --name-only ${baseSha} ${headSha} -- supabase/migrations/`
+              ).toString().trim().split('\n').filter(Boolean);
+            } catch {
+              console.log('Migration diff alınamadı, atlanıyor.');
+              return;
+            }
+
+            if (changedFiles.length === 0) {
+              console.log('⏭️ Migration değişikliği yok, kontrol atlanıyor.');
+              return;
+            }
+
+            const { readFileSync } = require('fs');
+            const warnings = [];
+
+            for (const file of changedFiles) {
+              let content;
+              try {
+                content = readFileSync(file, 'utf8').toUpperCase();
+              } catch {
+                continue;
+              }
+
+              const hasCreateTable = content.includes('CREATE TABLE');
+              const hasRLS         = content.includes('ENABLE ROW LEVEL SECURITY');
+              const hasPolicy      = content.includes('CREATE POLICY');
+
+              if (hasCreateTable && !hasRLS) {
+                warnings.push({
+                  file,
+                  issue: '`CREATE TABLE` var ama `ENABLE ROW LEVEL SECURITY` eksik',
+                  severity: '🚨 KRİTİK',
+                });
+              }
+
+              if (hasCreateTable && hasRLS && !hasPolicy) {
+                warnings.push({
+                  file,
+                  issue: 'RLS aktif ama hiç `CREATE POLICY` tanımlanmamış (tablo tamamen erişilemez olabilir)',
+                  severity: '⚠️ UYARI',
+                });
+              }
+            }
+
+            // Önceki bot yorumlarını temizle
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            for (const c of comments.data) {
+              if (c.user.login === 'github-actions[bot]' &&
+                  c.body.includes('🛡️ RLS Güvenlik Raporu')) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id,
+                });
+              }
+            }
+
+            if (warnings.length === 0) {
+              console.log('✅ Tüm migration dosyaları RLS kurallarına uygun.');
+              return;
+            }
+
+            const rows = warnings.map(w =>
+              `| ${w.severity} | \`${w.file}\` | ${w.issue} |`
+            ).join('\n');
+
+            const body = [
+              `## 🛡️ RLS Güvenlik Raporu`,
+              ``,
+              `Bu PR'da **${changedFiles.length}** migration dosyası değişti.`,
+              `**${warnings.length}** potansiyel RLS sorunu tespit edildi:`,
+              ``,
+              `| Önem | Dosya | Sorun |`,
+              `|------|-------|-------|`,
+              rows,
+              ``,
+              `### Ne yapmalısın?`,
+              ``,
+              `\`\`\`sql`,
+              `-- Her CREATE TABLE'dan sonra bu iki blok ZORUNLUDUR:`,
+              `ALTER TABLE public.tablo_adi ENABLE ROW LEVEL SECURITY;`,
+              ``,
+              `-- Halka açık veriler için (ürünler gibi):`,
+              `CREATE POLICY "public_select" ON public.tablo_adi`,
+              `  FOR SELECT TO public USING (true);`,
+              ``,
+              `-- Kullanıcıya özel veriler için (siparişler gibi):`,
+              `CREATE POLICY "user_select" ON public.tablo_adi`,
+              `  FOR SELECT USING ((SELECT auth.uid()) = user_id);`,
+              `\`\`\``,
+              ``,
+              `> 📌 AGENTS.md §4 — *RLS MUST BE ENABLED for all new tables.*`,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body,
+            });
+
+            if (warnings.some(w => w.severity.includes('KRİTİK'))) {
+              core.setFailed(`🚨 KRİTİK: RLS eksik migration tespit edildi. PR merge edilmeden önce düzeltilmeli.`);
+            } else {
+              core.warning('⚠️ RLS politika uyarısı. Lütfen inceleyin.');
+            }
