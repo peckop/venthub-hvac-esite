@@ -8,6 +8,7 @@ import { useCart } from '../hooks/useCartHook'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
+import { reportError } from '../lib/errorReporter'
 import { formatCurrency } from '../i18n/format'
 import { formatDateTime } from '../i18n/datetime'
 import { Routes } from '../utils/routes'
@@ -75,7 +76,7 @@ export const PaymentSuccessPage: React.FC = () => {
           })
 
           if (error) {
-            console.error('Callback verify error:', error)
+            reportError(error, { context: 'Callback verify error' })
             setStatus('error')
             setPaymentInfo({ errorMessage: error.message || t('payment.verifyError') })
             toast.error(t('payment.verifyError'))
@@ -119,7 +120,7 @@ export const PaymentSuccessPage: React.FC = () => {
             .maybeSingle()
 
           if (error) {
-            console.error('Order fetch error:', error)
+            reportError(error, { context: 'Order fetch error' })
             setStatus('error')
             setPaymentInfo({ errorMessage: 'Sipariş doğrulama hatası' })
             toast.error('Sipariş doğrulama hatası')
@@ -157,7 +158,7 @@ export const PaymentSuccessPage: React.FC = () => {
           toast.error(t('payment.unverified'))
         }
       } catch (e: unknown) {
-        console.error('Verify catch error:', e)
+        reportError(e, { context: 'Verify catch error' })
         const err = e as { message?: string }
         setStatus('error')
         setPaymentInfo({ errorMessage: err?.message || t('payment.unexpected') })

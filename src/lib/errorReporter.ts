@@ -1,3 +1,15 @@
+
+let manualReporter: ((err: unknown, context?: Record<string, unknown>) => void) | null = null;
+
+export function reportError(err: unknown, context?: Record<string, unknown>) {
+  if (manualReporter) {
+    manualReporter(err, context);
+  } else if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+    // Fallback if not installed, but only noisy in dev
+    console.warn('[errorReporter] reportError called before install:', err, context);
+  }
+}
+
 export function installErrorReporter(_endpoint: string, options?: { sample?: number; release?: string; env?: string; ttlMs?: number }) {
   const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
   const force = (() => {
@@ -64,6 +76,11 @@ export function installErrorReporter(_endpoint: string, options?: { sample?: num
     } catch (e) {
       console.warn('[errorReporter] post failed:', e)
     }
+  }
+
+  manualReporter = (err: unknown, context?: Record<string, unknown>) => {
+    const errorObj = err instanceof Error ? err : new Error(String(err));
+    post({ t: Date.now(), type: 'manual', msg: errorObj.message, stack: errorObj.stack || '', url: typeof location !== 'undefined' ? location.href : '', ua: typeof navigator !== 'undefined' ? navigator.userAgent : '', release, env, ...context });
   }
 
   if (typeof window !== 'undefined') {
