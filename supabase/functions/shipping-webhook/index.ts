@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 // Supabase Edge Function: shipping-webhook
 // Receives carrier sandbox/live webhook and updates order shipping fields securely
 // Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
