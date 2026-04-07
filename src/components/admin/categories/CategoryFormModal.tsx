@@ -12,7 +12,7 @@ import type { DbCategory, CategoryMetadata } from '../../../types/db-rows'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
 import { VentImage } from '../../ui/VentImage'
-import { generateId } from '../../../utils/crypto'
+
 
 type CategoryUpdate = Database['public']['Tables']['categories']['Update']
 type CategoryInsert = Database['public']['Tables']['categories']['Insert']
@@ -136,7 +136,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
             const compressedFile = await compressImage(file);
             
             const fileExt = file.name.split('.').pop()
-            const fileName = `${generateId()}.${fileExt}`
+            const fileName = `${crypto.randomUUID()}.${fileExt}`
             const filePath = `category-images/${fileName}`
 
             const { error: uploadError } = await supabase.storage
