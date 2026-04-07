@@ -694,6 +694,22 @@ const CarouselItems: React.FC<{
 /**
  * Ana bileşen
  */
+/**
+ * Internal helper to force R3F to render initial frames during Framer Motion scale transitions
+ * without polluting the global window object with resize events.
+ */
+const MotionTransitionFix = () => {
+    const { invalidate } = useThree()
+    useEffect(() => {
+        // Framer Motion transition is 400ms. We invalidate the frame locally during this window
+        // to ensure the canvas resolves its layout and correctly draws despite CSS scale transforms.
+        const interval = setInterval(() => invalidate(), 50)
+        setTimeout(() => clearInterval(interval), 600)
+        return () => clearInterval(interval)
+    }, [invalidate])
+    return null
+}
+
 const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange, onFrontCardChange, modelScale = 1.5, containerHeight = 500, skipHints = false }) => {
     const [isPaused, setIsPaused] = useState(false)
     const [dragDelta, setDragDelta] = useState(0)
@@ -703,14 +719,18 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     const containerRef = useRef<HTMLDivElement>(null)
     const isInView = useInView(containerRef, { margin: "200px" })
 
-    // Resize Hack (Minimal) - Keep ensuring layout
+    // Safe Resize Handler: Reacts to actual DOM size changes instead of relying on arbitrary timeouts
     useEffect(() => {
-        const timers = [50, 200, 500].map(delay =>
-            setTimeout(() => {
-                window.dispatchEvent(new Event('resize'))
-            }, delay)
-        )
-        return () => timers.forEach(t => clearTimeout(t))
+        if (!containerRef.current) return
+        // We observe the exact container for dimensions changing (e.g. from Framer Motion transitions)
+        const observer = new ResizeObserver(() => {
+            // Dispatch a global resize only when a real DOM resize is detected on our container.
+            // This is required because R3F Canvas might not catch the exact frame boundaries
+            // when animated via Framer Motion scale changes.
+            window.dispatchEvent(new Event('resize'))
+        })
+        observer.observe(containerRef.current)
+        return () => observer.disconnect()
     }, [])
 
     // skipHints=true ise (alt kategori seviyesi) hint animasyonlarını atla
@@ -818,6 +838,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     fov: (CONFIG.cameraFOV * (typeof containerHeight === 'number' && containerHeight < 400 ? 1.15 : 1))
                 }}
             >
+                <MotionTransitionFix />
                 <ambientLight intensity={0.5} />
                 <spotLight position={[10, 12, 10]} angle={0.3} penumbra={1} intensity={1} castShadow />
 
