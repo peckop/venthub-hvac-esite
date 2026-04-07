@@ -151,7 +151,6 @@ const OrbitalCard: React.FC<{
     const meshRef = useRef<THREE.Mesh>(null)
     const router = useRouter()
     const [hovered, setHover] = useState(false)
-    const [isNearFront, setIsNearFront] = useState(false)
     const [showTapHint, setShowTapHint] = useState(false) // El ikonu görünürlüğü
 
     // Robust Click Logiği için Ref'ler
@@ -160,6 +159,7 @@ const OrbitalCard: React.FC<{
     // FIX: Re-render storm prevention — only set state when value actually changes
     const lastIsNearRef = useRef(false)
     const targetScaleRef = useRef(new THREE.Vector3())
+    const labelContainerRef = useRef<HTMLDivElement>(null)
 
     // El ikonu görünüm timer'ı
     // SceneContent'ten externalShouldShowHint true gelirse: 4sn göster, sonra gizle
@@ -328,10 +328,12 @@ const OrbitalCard: React.FC<{
         // 3. Scale & Visibility
         const currentRadius = CONFIG.radius
         const isNear = z > currentRadius * 0.3
-        // FIX: Only trigger React re-render when value ACTUALLY changes
+        // FIX: Re-render storm prevention — update DOM directly instead of React state
         if (isNear !== lastIsNearRef.current) {
             lastIsNearRef.current = isNear
-            setIsNearFront(isNear)
+            if (labelContainerRef.current) {
+                labelContainerRef.current.style.opacity = (hovered || isNear) ? '1' : '0'
+            }
         }
 
         const normalizedZ = currentRadius > 0 ? (z + currentRadius) / (currentRadius * 2) : 0.5
@@ -370,8 +372,6 @@ const OrbitalCard: React.FC<{
             }
         }
     })
-
-    const showLabel = (hovered || isNearFront)
 
     return (
         <group ref={groupRef} position={[-20, -10, -10]} scale={0.001}>
@@ -484,29 +484,30 @@ const OrbitalCard: React.FC<{
             )}
 
             {/* Label */}
-            {showLabel && (
-                <Html
-                    key={`label-${item.id}`}
-                    position={[0, -CONFIG.cardHeight / 2 - 0.4, 0.5]}
-                    center
-                    distanceFactor={6}
-                    occlude={false}
-                    style={{ pointerEvents: 'none', transition: 'opacity 0.5s', opacity: 1 }}
+            <Html
+                key={`label-${item.id}`}
+                position={[0, -CONFIG.cardHeight / 2 - 0.4, 0.5]}
+                center
+                distanceFactor={6}
+                occlude={false}
+                style={{ pointerEvents: 'none' }}
+            >
+                <div
+                    ref={labelContainerRef}
+                    className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg"
+                    style={{
+                        background: 'rgba(0,0,0,0.85)',
+                        backdropFilter: 'blur(8px)',
+                        border: `1px solid ${hovered ? CONFIG.glowColor : 'rgba(34,211,238,0.3)'}`,
+                        color: hovered ? CONFIG.glowColor : '#fff',
+                        textShadow: '0 1px 3px rgba(0,0,0,0.8)',
+                        transition: 'opacity 0.5s ease-in-out',
+                        opacity: (hovered || lastIsNearRef.current) ? 1 : 0
+                    }}
                 >
-                    <div
-                        className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg"
-                        style={{
-                            background: 'rgba(0,0,0,0.85)',
-                            backdropFilter: 'blur(8px)',
-                            border: `1px solid ${hovered ? CONFIG.glowColor : 'rgba(34,211,238,0.3)'}`,
-                            color: hovered ? CONFIG.glowColor : '#fff',
-                            textShadow: '0 1px 3px rgba(0,0,0,0.8)',
-                        }}
-                    >
-                        {item.title}
-                    </div>
-                </Html>
-            )}
+                    {item.title}
+                </div>
+            </Html>
         </group>
     )
 }
