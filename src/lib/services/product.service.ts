@@ -137,41 +137,30 @@ export async function getProductsBySubcategory(subcategoryId: string): Promise<P
   return toUIProductList((data as DbProduct[]) || [])
 }
 
-export async function getProductById(id: string): Promise<Product | null> {
-  const { data, error } = await supabase
+async function fetchProductBy(column: 'id' | 'slug', value: string, throwOnError: boolean = false): Promise<Product | null> {
+  const query = supabase
     .from('products')
     .select('*')
-    .eq('id', id)
+    .eq(column, value)
     .maybeSingle()
 
-  if (error) throw error
-  return data ? mapDatabaseProductToDomain(data as DbProduct) : null
+  const { data, error } = await query
+  if (error && throwOnError) throw error
+  if (error || !data) return null
+  return mapDatabaseProductToDomain(data as DbProduct)
+}
+
+export async function getProductById(id: string): Promise<Product | null> {
+  return fetchProductBy('id', id, true)
 }
 
 export async function getProductBySlugOrId(identifier: string): Promise<Product | null> {
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier)
-  
-  const query = supabase
-    .from('products')
-    .select('*')
-    .eq(isUuid ? 'id' : 'slug', identifier)
-    .maybeSingle()
-
-  const { data, error } = await query
-  if (error || !data) return null
-  return mapDatabaseProductToDomain(data as DbProduct)
+  return fetchProductBy(isUuid ? 'id' : 'slug', identifier, false)
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const query = supabase
-    .from('products')
-    .select('*')
-    .eq('slug', slug)
-    .maybeSingle()
-
-  const { data, error } = await query
-  if (error || !data) return null
-  return mapDatabaseProductToDomain(data as DbProduct)
+  return fetchProductBy('slug', slug, false)
 }
 
 export async function getFeaturedProducts(): Promise<Product[]> {
