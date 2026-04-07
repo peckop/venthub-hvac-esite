@@ -82,6 +82,22 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
             .filter((vm): vm is NonNullable<typeof vm> => vm !== null)
     }, [categories, activeMainCategory, wrapCategory])
 
+    const mainCategoriesMap = useMemo(() => {
+        const map = new Map();
+        for (const c of mainCategories) {
+            if (!map.has(c.slug)) map.set(c.slug, c);
+        }
+        return map;
+    }, [mainCategories])
+
+    const subcategoriesMap = useMemo(() => {
+        const map = new Map();
+        for (const s of subcategories) {
+            if (!map.has(s.slug)) map.set(s.slug, s);
+        }
+        return map;
+    }, [subcategories])
+
     const handleFocusedItemChange = useCallback((itemId: string | null) => {
         if (!itemId) {
             setFocusedItemTitle(null)
@@ -91,27 +107,27 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
 
         let title = ''
         if (level === 'main') {
-            const cat = mainCategories.find(c => c.slug === itemId)
+            const cat = mainCategoriesMap.get(itemId)
             title = cat ? cat.displayName : ''
         } else if (level === 'subcategory') {
-            const sub = subcategories.find(s => s.slug === itemId)
+            const sub = subcategoriesMap.get(itemId)
             title = sub ? sub.displayName : ''
         }
         setFocusedItemTitle(title)
-    }, [level, mainCategories, subcategories])
+    }, [level, mainCategoriesMap, subcategoriesMap])
 
     const handleFrontCardChange = useCallback((itemId: string) => {
         let title = ''
         if (level === 'main') {
-            const cat = mainCategories.find(c => c.slug === itemId)
+            const cat = mainCategoriesMap.get(itemId)
             title = cat ? cat.displayName : ''
         } else if (level === 'subcategory') {
-            const sub = subcategories.find(s => s.slug === itemId)
+            const sub = subcategoriesMap.get(itemId)
             title = sub ? sub.displayName : ''
         }
         setFrontCardTitle(title)
         setHintIndex(prev => (prev + 1) % 4) 
-    }, [level, mainCategories, subcategories])
+    }, [level, mainCategoriesMap, subcategoriesMap])
 
     useEffect(() => {
         setFocusedItemTitle(null)
@@ -141,7 +157,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
 
     const handleCardClick = useCallback((itemId: string) => {
         if (level === 'main') {
-            const categoryVm = mainCategories.find(c => c.slug === itemId)
+            const categoryVm = mainCategoriesMap.get(itemId)
             if (categoryVm) {
                 // Check if has subs
                 const hasSubs = categories.some(c => c.parent_id === categoryVm.id)
@@ -161,7 +177,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                 }
             }
         } else if (level === 'subcategory') {
-            const subVm = subcategories.find(s => s.slug === itemId)
+            const subVm = subcategoriesMap.get(itemId)
             if (subVm && activeMainCategorySlug) {
                 if (onSubcategorySelect) {
                     onSubcategorySelect(activeMainCategorySlug, subVm.slug)
@@ -170,7 +186,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                 }
             }
         }
-    }, [level, mainCategories, subcategories, activeMainCategorySlug, categories, router, onSubcategorySelect])
+    }, [level, mainCategoriesMap, subcategoriesMap, activeMainCategorySlug, categories, router, onSubcategorySelect])
 
     const handleBack = useCallback(() => {
         setIsTransitioning(true)
