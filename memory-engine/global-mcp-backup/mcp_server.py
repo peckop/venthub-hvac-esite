@@ -45,24 +45,36 @@ def get_context():
     return active_project, open_router_key
 
 
+from mastar_validator import validate, resolve_conflict
+from query_intent import detect_query_intent
+
 @mcp.tool()
-def cc_search(query: str, cross_project: bool = False, domain_hint: str = None) -> str:
+def cc_search(query: str, cross_project: bool = False, domain_hint: str = None, intent_filter: str = None) -> str:
     """Hafizadan ilgili bilgileri getirir. (Retrieves relevant memories).
     
     Args:
         query: Aranacak bilgi veya soru.
         cross_project: Diger projelerin hafizasini da taramak icin True yapin.
         domain_hint: Sonuclari filtrelemek/bastirmak icin: database, frontend, planning, skill, general
+        intent_filter: N1_NE, N2_NEDEN, vb. manuel katman firtresi. Verilmezse otomatik tespit edilir.
     """
     active_project, api_key = get_context()
     if not api_key:
          return "Error: OPENROUTER_API_KEY not found."
+         
+    # Query intent detection
+    if not intent_filter:
+         detected_intent = detect_query_intent(query)
+         if detected_intent:
+              intent_filter = detected_intent
+              print(f"[{active_project}] Query Intent Detected: {detected_intent}")
          
     results = federated_engine.search(
         query=query,
         active_project=active_project,
         cross_project=cross_project,
         domain_hint=domain_hint,
+        intent_filter=intent_filter,
         open_router_key=api_key
     )
     
@@ -71,41 +83,74 @@ def cc_search(query: str, cross_project: bool = False, domain_hint: str = None) 
          
     # Format the results
     output_lines = ["--- FEDERATED MEMORY CONTEXT ---"]
+    if intent_filter:
+         output_lines.append(f"Filtre: [{intent_filter}]")
+         
+    # To avoid repeating related nodes, keep track of processed IDs
+    processed_related = set()
+    
     for idx, r in enumerate(results[:20]):
         age_str = f"{r['age']:.1f}d"
         source_tag = f"{r['source']}:{r['domain']}"
         proj_tag = f"[{r['project'].upper()}]" if cross_project else ""
+        intent_tag = f"[{r.get('intent_layer', 'UNKNOWN')}]"
         
-        block = f"{proj_tag}[{source_tag}/{age_str} | score:{r['score']:.2f}] {r['content'].strip()}"
+        block = f"{proj_tag}[{source_tag}/{age_str} | score:{r['score']:.2f}] {intent_tag} {r['content'].strip()}"
         output_lines.append(block)
+        
+        # Micro-GraphRAG: Fetch related nodes
+        raw_related_ids = r.get("raw_related_ids", [])
+        if raw_related_ids:
+            unprocessed_ids = [id for id in raw_related_ids if id not in processed_related]
+            if unprocessed_ids:
+                related_nodes = federated_engine.get_related_nodes(r["db_path"], unprocessed_ids)
+                for rel_node in related_nodes:
+                    rel_id, rel_content, rel_intent = rel_node
+                    processed_related.add(rel_id)
+                    output_lines.append(f"  └─[BAĞLANTILI - {rel_intent}]: {rel_content.strip()}")
         
     output_lines.append("---")
     return "\n".join(output_lines)
 
 
 @mcp.tool()
-def cc_remember(content: str, source_type: str = "doc", domain: str = "general") -> str:
-    """Yeni bir bilgiyi aktif projenin hafuzasuna kaydeder. (Saves a new memory).
+def cc_remember(content: str, intent_layer: str, source_type: str = "doc", domain: str = "general", related_to: list[int] = None) -> str:
+    """Yeni bir bilgiyi aktif projenin hafızasına kaydeder. (Saves a new memory).
     
     Args:
         content: Kaydedilecek bilgi metni.
+        intent_layer: ZORUNLU. 5N1K Katman (Örn: N1_NE, N2_NEDEN, vb.)
         source_type: doc, plan, skill, log.
         domain: database, frontend, planning, skill, general.
+        related_to: Micro-GraphRAG için ilişkili node ID'leri.
     """
     active_project, api_key = get_context()
     if not api_key:
          return "Error: OPENROUTER_API_KEY not found."
+         
+    # 1. Mastar-Kalıp Doğrulaması
+    validation_res = validate(content, intent_layer)
+    if not validation_res.valid:
+         return f"Error 400 (Bad Request): {validation_res.message}"
+         
+    # 2. Conflict Resolver
+    conflict_res = resolve_conflict(content, intent_layer)
+    warning_msg = ""
+    if conflict_res.warning:
+         warning_msg = f"\n{conflict_res.warning}"
          
     node_id = federated_engine.remember(
          active_project=active_project,
          content=content,
          source_type=source_type,
          domain=domain,
+         intent_layer=intent_layer,
+         related_to=related_to,
          open_router_key=api_key
     )
     
     if node_id != -1:
-         return f"Başarıyla kaydedildi. Node ID: {node_id} (Project: {active_project}, Domain: {domain})"
+         return f"Başarıyla kaydedildi. Node ID: {node_id} (Project: {active_project}, Domain: {domain}){warning_msg}"
     return "Hata: Kayıt işlemi başarısız oldu."
 
 

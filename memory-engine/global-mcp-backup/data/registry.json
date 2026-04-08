@@ -5,6 +5,12 @@
       "workspace_root": "C:\\Users\\alize\\venthub-hvac",
       "env_file": "C:\\Users\\alize\\venthub-hvac\\.env.local",
       "registered_at": "2026-04-08"
+    },
+    "qvalidator": {
+      "db_path": "C:\\Users\\alize\\QVALIDATOR\\memory-engine\\data\\memory.db",
+      "workspace_root": "C:\\Users\\alize\\QVALIDATOR",
+      "env_file": "C:\\Users\\alize\\QVALIDATOR\\.env",
+      "registered_at": "2026-04-08"
     }
   },
   "default_project": "venthub"

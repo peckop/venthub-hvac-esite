@@ -88,7 +88,7 @@ class MemoryFederation:
         return self.registry["projects"].get(name)
 
     def _ensure_schema(self, db_path: str):
-        """Creates memory_nodes table and status/last_accessed_at columns if missing."""
+        """Creates memory_nodes table and status/last_accessed_at/intent_layer columns if missing."""
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         conn = sqlite3.connect(db_path)
         try:
@@ -104,7 +104,9 @@ class MemoryFederation:
                 hit_count INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 status TEXT DEFAULT 'active',
-                last_accessed_at TIMESTAMP
+                last_accessed_at TIMESTAMP,
+                intent_layer TEXT,
+                related_node_ids TEXT
             )""")
             # Ensure status column exists (for old DBs)
             try:
@@ -113,6 +115,13 @@ class MemoryFederation:
                 conn.execute("ALTER TABLE memory_nodes ADD COLUMN status TEXT DEFAULT 'active'")
                 conn.execute("ALTER TABLE memory_nodes ADD COLUMN last_accessed_at TIMESTAMP")
                 conn.execute("UPDATE memory_nodes SET status = CASE WHEN is_valid = 1 THEN 'active' ELSE 'archived' END")
+                
+            # Ensure intent_layer and related_node_ids exist
+            try:
+                conn.execute("SELECT intent_layer FROM memory_nodes LIMIT 1")
+            except sqlite3.OperationalError:
+                conn.execute("ALTER TABLE memory_nodes ADD COLUMN intent_layer TEXT")
+                conn.execute("ALTER TABLE memory_nodes ADD COLUMN related_node_ids TEXT")
             conn.commit()
         finally:
             conn.close()
@@ -127,7 +136,14 @@ class MemoryFederation:
         finally:
             conn.close()
 
-    def search(self, query: str, active_project: str, cross_project: bool = False, domain_hint: str = None, open_router_key: str = None) -> list:
+    def get_related_nodes(self, db_path: str, node_ids: list[int]) -> list:
+        if not node_ids:
+            return []
+        placeholders = ",".join("?" for _ in node_ids)
+        query_sql = f"SELECT id, content, intent_layer FROM memory_nodes WHERE id IN ({placeholders}) AND status = 'active'"
+        return self._execute_readonly_query(db_path, query_sql, tuple(node_ids))
+
+    def search(self, query: str, active_project: str, cross_project: bool = False, domain_hint: str = None, intent_filter: str = None, open_router_key: str = None) -> list:
         if not open_router_key:
             return []
             
@@ -146,11 +162,16 @@ class MemoryFederation:
             if not proj_data: continue
             
             db_path = proj_data["db_path"]
-            query_sql = "SELECT id, content, source_type, source_path, domain, embedding, created_at, hit_count FROM memory_nodes WHERE status = 'active'"
+            query_sql = "SELECT id, content, source_type, source_path, domain, embedding, created_at, hit_count, intent_layer, related_node_ids FROM memory_nodes WHERE status = 'active'"
             nodes = self._execute_readonly_query(db_path, query_sql)
             
             for node in nodes:
-                node_id, content, source_type, source_path, node_domain, embedding_blob, created_at, hit_count = node
+                node_id, content, source_type, source_path, node_domain, embedding_blob, created_at, hit_count, node_intent, related_ids_json = node
+                
+                # Intent filtering Check
+                if intent_filter and node_intent and node_intent != intent_filter:
+                    continue
+                    
                 node_embedding = np.frombuffer(embedding_blob, dtype=np.float32)
                 
                 similarity = cosine_similarity(query_embedding, node_embedding)
@@ -170,20 +191,31 @@ class MemoryFederation:
                 final_score = similarity * weight * decay_mult * proj_multiplier * domain_multiplier
                 
                 if final_score > 0.4:
-                    results.append({
+                    related_ids = []
+                    if related_ids_json:
+                        try:
+                            related_ids = json.loads(related_ids_json)
+                        except:
+                            pass
+                    
+                    found_node = {
                         "project": proj,
                         "id": node_id,
                         "score": final_score,
                         "age": age_days,
                         "source": source_type.upper(),
                         "domain": node_domain,
-                        "content": content
-                    })
+                        "intent_layer": node_intent,
+                        "content": content,
+                        "raw_related_ids": related_ids,
+                        "db_path": db_path
+                    }
+                    results.append(found_node)
                     
         results.sort(key=lambda x: x["score"], reverse=True)
         return results
 
-    def remember(self, active_project: str, content: str, source_type: str, domain: str, open_router_key: str = None) -> int:
+    def remember(self, active_project: str, content: str, source_type: str, domain: str, intent_layer: str, related_to: list[int] = None, open_router_key: str = None) -> int:
         proj_data = self._get_project_data(active_project)
         if not proj_data or not open_router_key:
             return -1
@@ -193,13 +225,15 @@ class MemoryFederation:
         embedding = np.array(resp.data[0].embedding, dtype=np.float32)
         blob = embedding.tobytes()
         
+        related_json = json.dumps(related_to) if related_to else None
+        
         db_path = proj_data["db_path"]
         self._ensure_schema(db_path)
         conn = sqlite3.connect(db_path)
         try:
             cursor = conn.execute(
-                "INSERT INTO memory_nodes (content, source_type, source_path, domain, embedding, embedding_model, status, is_valid) VALUES (?, ?, ?, ?, ?, ?, 'active', 1)",
-                (content, source_type, 'mcp_proactive_memory', domain, blob, 'qwen/qwen3-embedding-8b')
+                "INSERT INTO memory_nodes (content, source_type, source_path, domain, embedding, embedding_model, status, is_valid, intent_layer, related_node_ids) VALUES (?, ?, ?, ?, ?, ?, 'active', 1, ?, ?)",
+                (content, source_type, 'mcp_proactive_memory', domain, blob, 'qwen/qwen3-embedding-8b', intent_layer, related_json)
             )
             conn.commit()
             return cursor.lastrowid
