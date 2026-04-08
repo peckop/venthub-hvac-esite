@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
 
 serve(async (req) => {
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
@@ -67,8 +68,28 @@ serve(async (req) => {
     // Basic config
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-    if (!supabaseUrl || !serviceKey) {
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
+    if (!supabaseUrl || !serviceKey || !anonKey) {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'unauthenticated' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+
+    const supabaseUser = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey)
+
+    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
+    if (userErr || !userRes?.user) {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+
+    const { data: profile, error: profErr } = await supabaseAdmin.from('user_profiles').select('role').eq('id', userRes.user.id).maybeSingle()
+    const userRole = profile?.role as string | undefined
+    if (profErr || !userRole || !['admin', 'superadmin'].includes(userRole)) {
+      return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
     // Read current order status to allow implicit cancel (if already shipped and no carrier/tracking provided)
