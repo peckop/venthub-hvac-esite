@@ -23,7 +23,7 @@ _workspace_root = _engine_dir.parent
 load_dotenv(_workspace_root / ".env.local")
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-EMBEDDING_MODEL = "qwen3-embedding-8b"
+EMBEDDING_MODEL = os.getenv("LLM_EMBEDDING_MODEL", "qwen/qwen3-embedding-8b")
 LLM_MODEL = "google/gemini-2.5-flash"
 
 client = OpenAI(

@@ -7,6 +7,8 @@ from pathlib import Path
 from datetime import datetime
 from openai import OpenAI
 
+EMBEDDING_MODEL = os.getenv("LLM_EMBEDDING_MODEL", "qwen/qwen3-embedding-8b")
+
 # We use the same scoring logic globally.
 def cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
     dot_product = np.dot(vec1, vec2)
@@ -81,7 +83,7 @@ class MemoryFederation:
             return []
             
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=open_router_key)
-        resp = client.embeddings.create(model="qwen/qwen3-embedding-8b", input=query)
+        resp = client.embeddings.create(model=EMBEDDING_MODEL, input=query)
         query_embedding = np.array(resp.data[0].embedding, dtype=np.float32)
 
         results = []
