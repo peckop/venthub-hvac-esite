@@ -37,6 +37,7 @@ jobs:
 
       # Log dosyalarını tek bir dosyada birleştir
       - name: Log dosyalarını birleştir
+        id: merge-logs
         run: |
           echo "=== CI FAILURE REPORT ===" > ci-failure-summary.txt
           echo "Branch: ${{ github.event.workflow_run.head_branch }}" >> ci-failure-summary.txt
@@ -55,6 +56,11 @@ jobs:
 
           echo "=== END OF REPORT ===" >> ci-failure-summary.txt
           cat ci-failure-summary.txt
+          
+          # Multiline output for Jules prompt
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          cat ci-failure-summary.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Jules ile CI hatasını onar
         uses: google-labs-code/jules-action@v1.0.0
