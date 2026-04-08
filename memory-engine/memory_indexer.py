@@ -226,7 +226,7 @@ class MemoryIndexer:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="TeleMem Pro Max — Memory Indexer")
+    parser = argparse.ArgumentParser(description="corpus-callosum — Memory Indexer")
     parser.add_argument("--bootstrap", action="store_true",
                         help="Tüm registry/skill/log dosyalarını sıfırdan indexle.")
     # FIX #2: Yeni --file argümanı — kancadan gelen tek dosyayı işler
