@@ -49,3 +49,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-08 16:03:23
+- **Commit:** `f0f63278`
+- **Mesaj:** feat(ai): federated telemem pro max engine & mcp bridge
+- **Değişen Dosyalar:**
+
+

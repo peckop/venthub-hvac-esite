@@ -17,14 +17,14 @@ federated_engine = MemoryFederation(str(registry_path))
 def get_context():
     active_project = os.environ.get("TELEMEM_ACTIVE_PROJECT", "venthub")
     
-    # Try to load API key from project's .env.local
+    # Priority: Always use the project's .env.local via registry
+    proj_data = federated_engine._get_project_data(active_project)
+    if proj_data and os.path.exists(proj_data["env_file"]):
+        load_dotenv(proj_data["env_file"], override=True)
+        
     open_router_key = os.environ.get("OPENROUTER_API_KEY")
-    if not open_router_key:
-         proj_data = federated_engine._get_project_data(active_project)
-         if proj_data and os.path.exists(proj_data["env_file"]):
-             load_dotenv(proj_data["env_file"])
-             open_router_key = os.environ.get("OPENROUTER_API_KEY")
-             
+    if open_router_key:
+        open_router_key = open_router_key.strip()
     return active_project, open_router_key
 
 
