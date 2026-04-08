@@ -1,11 +1,14 @@
-# 🧠 TeleMem Pro Max: Federatif Global Hafıza Motoru (Corpus Callosum)
+# 🧠 corpus-callosum: Federatif Global Hafıza Motoru
 
-## 📌 Bu Sistem Nedir?
-TeleMem Pro Max, otonom Yapay Zeka ajanlarının (Antigravity, Jules vb.) geçmiş konuşmaları, proje kararlarını ve mimari kuralları **uzun vadeli** hatırlamasını sağlayan, **SQLite ve Numpy tabanlı**, taşınabilir (portable) bir RAG (Retrieval-Augmented Generation) Vektör Veritabanı ve Akıllı Hafıza motorudur.
+corpus-callosum, otonom Yapay Zeka ajanlarının (Antigravity, Jules vb.) geçmiş konuşmaları, proje kararlarını ve mimari kuralları **uzun vadeli** hatırlamasını sağlayan, **SQLite ve Numpy tabanlı**, taşınabilir (portable) bir RAG (Retrieval-Augmented Generation) Vektör Veritabanı ve Akıllı Hafıza motorudur.
 
-Eski versiyonlarda her proje kendi hafızasına sağır bir biçimde sadece kendi yerel hatıralarıyla çalışıyordu. Bu "Federatif" sürüm ile birlikte; farklı klasörlerdeki projeler birbirlerinin tecrübelerinden "Corpus Callosum" adı verilen bir MCP (Model Context Protocol) Köprüsü sayesinde yararlanabilir hale gelmiştir. 
+## Neden corpus-callosum?
 
-## 🏗️ Mimari ve Bileşenler
+Hafıza sistemi, beyin anatomisindeki ilham alınarak tasarlanmıştır. Nasıl ki insan beyninde **Corpus Callosum** sağ ve sol lobları birbirine bağlar ve devasa bilgi akışını optimize ederse; bu hafıza motoru da yapay zeka ajanı ile proje verileri arasındaki bağlantıyı sağlar.
+
+## Mantık: Semantik Çekim (Semantic Gravity)
+
+corpus-callosum, basit bir anahtar kelime eşleştirme yapmaz; "Semantik Çekim (Semantic Gravity)" ilkeleriyle işlem yapar. Vektör uzaklıkları hesaplandıktan sonra sonuçlar 4 acımasız fizik filtresinden geçer:
 Sistem anatomik olarak iki ana parçadan oluşur:
 
 ### 1. Beyin Lobları (Lokal Veritabanı) - Klasör: `memory-engine`
