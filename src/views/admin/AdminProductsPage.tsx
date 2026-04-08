@@ -343,11 +343,14 @@ const AdminProductsPage: React.FC = () => {
         const newPrice = mode === 'percent'
           ? Math.round(currentPrice * (1 + value / 100) * 100) / 100
           : Math.round((currentPrice + value) * 100) / 100
-        return { id: p.id, price: Math.max(0, newPrice), name: p.name, sku: p.sku, brand: p.brand }
+        return { id: p.id, price: Math.max(0, newPrice) }
       })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: updateErr } = await supabase.from('products').upsert(updates as any)
-      if (updateErr) throw updateErr
+
+      const results = await Promise.all(
+        updates.map(u => supabase.from('products').update({ price: u.price }).eq('id', u.id))
+      )
+      const errorResult = results.find(r => r.error)
+      if (errorResult?.error) throw errorResult.error
       setSelectedIds(new Set())
       await load()
     } catch (e) { alert('Fiyat güncelleme hatası: ' + (e as Error).message) }
