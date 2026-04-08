@@ -336,18 +336,25 @@ const AdminProductsPage: React.FC = () => {
     if (!confirm(`Seçili ${selectedIds.size} ürüne ${label} fiyat güncellemesi uygulanacak. Onaylıyor musunuz?`)) return
     try {
       const ids = Array.from(selectedIds)
-      const { data: products, error: fetchErr } = await supabase.from('products').select('id,price,name,sku,brand').in('id', ids)
+      const { data: products, error: fetchErr } = await supabase.from('products').select('id,price').in('id', ids)
       if (fetchErr) throw fetchErr
-      const updates = (products || []).map((p: { id: string; price: number | null; name: string; sku: string; brand: string }) => {
+
+      const updates = (products || []).map((p: { id: string; price: number | null }) => {
         const currentPrice = p.price ?? 0
         const newPrice = mode === 'percent'
           ? Math.round(currentPrice * (1 + value / 100) * 100) / 100
           : Math.round((currentPrice + value) * 100) / 100
-        return { id: p.id, price: Math.max(0, newPrice), name: p.name, sku: p.sku, brand: p.brand }
+        return { id: p.id, price: Math.max(0, newPrice) }
       })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: updateErr } = await supabase.from('products').upsert(updates as any)
-      if (updateErr) throw updateErr
+
+      const updatePromises = updates.map(update =>
+        supabase.from('products').update({ price: update.price }).eq('id', update.id)
+      )
+
+      const results = await Promise.all(updatePromises)
+      const firstError = results.find(r => r.error)
+      if (firstError?.error) throw firstError.error
+
       setSelectedIds(new Set())
       await load()
     } catch (e) { alert('Fiyat güncelleme hatası: ' + (e as Error).message) }
