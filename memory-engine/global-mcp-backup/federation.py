@@ -62,12 +62,61 @@ class MemoryFederation:
         self._save_registry()
         return f"Project '{name}' registered successfully."
 
+    def detect_project_by_path(self, cwd: str) -> str:
+        """Finds the registered project that completely or partially matches the current working directory."""
+        cwd_path = Path(cwd).resolve()
+        best_match = None
+        best_len = 0
+        
+        for name, data in self.registry["projects"].items():
+            try:
+                proj_root = Path(data["workspace_root"]).resolve()
+                if cwd_path == proj_root or proj_root in cwd_path.parents:
+                    match_len = len(str(proj_root))
+                    if match_len > best_len:
+                        best_len = match_len
+                        best_match = name
+            except Exception:
+                pass
+                
+        return best_match
+
     def list_projects(self) -> dict:
         return self.registry["projects"]
 
     def _get_project_data(self, name: str):
         return self.registry["projects"].get(name)
-        
+
+    def _ensure_schema(self, db_path: str):
+        """Creates memory_nodes table and status/last_accessed_at columns if missing."""
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        conn = sqlite3.connect(db_path)
+        try:
+            conn.execute("""CREATE TABLE IF NOT EXISTS memory_nodes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                content TEXT NOT NULL,
+                source_type TEXT DEFAULT 'doc',
+                source_path TEXT,
+                domain TEXT DEFAULT 'general',
+                embedding BLOB,
+                embedding_model TEXT,
+                is_valid INTEGER DEFAULT 1,
+                hit_count INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status TEXT DEFAULT 'active',
+                last_accessed_at TIMESTAMP
+            )""")
+            # Ensure status column exists (for old DBs)
+            try:
+                conn.execute("SELECT status FROM memory_nodes LIMIT 1")
+            except sqlite3.OperationalError:
+                conn.execute("ALTER TABLE memory_nodes ADD COLUMN status TEXT DEFAULT 'active'")
+                conn.execute("ALTER TABLE memory_nodes ADD COLUMN last_accessed_at TIMESTAMP")
+                conn.execute("UPDATE memory_nodes SET status = CASE WHEN is_valid = 1 THEN 'active' ELSE 'archived' END")
+            conn.commit()
+        finally:
+            conn.close()
+
     def _execute_readonly_query(self, db_path: str, query: str, params=()):
         if not os.path.exists(db_path):
              return []
@@ -97,7 +146,7 @@ class MemoryFederation:
             if not proj_data: continue
             
             db_path = proj_data["db_path"]
-            query_sql = "SELECT id, content, source_type, source_path, domain, embedding, created_at, hit_count FROM memory_nodes WHERE is_valid = 1"
+            query_sql = "SELECT id, content, source_type, source_path, domain, embedding, created_at, hit_count FROM memory_nodes WHERE status = 'active'"
             nodes = self._execute_readonly_query(db_path, query_sql)
             
             for node in nodes:
@@ -145,13 +194,97 @@ class MemoryFederation:
         blob = embedding.tobytes()
         
         db_path = proj_data["db_path"]
+        self._ensure_schema(db_path)
         conn = sqlite3.connect(db_path)
         try:
             cursor = conn.execute(
-                "INSERT INTO memory_nodes (content, source_type, source_path, domain, embedding, embedding_model) VALUES (?, ?, ?, ?, ?, ?)",
-                (content, source_type, 'mcp_proactive_memory', domain, blob, 'qwen/qwen3-embedding-8b') # using the model defined in user .env.local LLM_EMBEDDING_MODEL
+                "INSERT INTO memory_nodes (content, source_type, source_path, domain, embedding, embedding_model, status, is_valid) VALUES (?, ?, ?, ?, ?, ?, 'active', 1)",
+                (content, source_type, 'mcp_proactive_memory', domain, blob, 'qwen/qwen3-embedding-8b')
             )
             conn.commit()
             return cursor.lastrowid
+        finally:
+            conn.close()
+
+    def cluster_memories(self, active_project: str, max_clusters: int, open_router_key: str = None) -> str:
+        """Finds highly similar active nodes and consolidates them into a macro-memory."""
+        if not open_router_key: return "API Key gerekli."
+        proj_data = self._get_project_data(active_project)
+        if not proj_data: return "Proje bulunamadı."
+        
+        db_path = proj_data["db_path"]
+        self._ensure_schema(db_path)
+        conn = sqlite3.connect(db_path)
+        try:
+            # Get all active nodes
+            cursor = conn.execute("SELECT id, content, embedding FROM memory_nodes WHERE status = 'active'")
+            nodes = cursor.fetchall()
+            
+            client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=open_router_key)
+            consolidated_count = 0
+            processed = set()
+            
+            for i, n1 in enumerate(nodes):
+                if n1[0] in processed: continue
+                emb1 = np.frombuffer(n1[2], dtype=np.float32)
+                
+                cluster_nodes = [n1]
+                for j, n2 in enumerate(nodes[i+1:]):
+                    if n2[0] in processed: continue
+                    emb2 = np.frombuffer(n2[2], dtype=np.float32)
+                    sim = cosine_similarity(emb1, emb2)
+                    
+                    if sim > 0.92: # Extremely similar logic
+                        cluster_nodes.append(n2)
+                        processed.add(n2[0])
+                        
+                if len(cluster_nodes) > 1:
+                    processed.add(n1[0])
+                    # LLM consolidation
+                    contents = "\n- ".join([n[1] for n in cluster_nodes])
+                    prompt = f"Aşağıdaki bilgileri tek bir net mühendislik belleği (macro-memory) olarak birleştir. Orijinal gürültüyü at, yazılım gerçeklerini ve bağlamı koru:\n- {contents}"
+                    try:
+                        resp = client.chat.completions.create(
+                            model="google/gemini-2.5-flash",
+                            messages=[{"role": "user", "content": prompt}],
+                            temperature=0.1
+                        )
+                        macro_content = resp.choices[0].message.content.strip()
+                        
+                        # Generate new embedding
+                        emb_resp = client.embeddings.create(model=EMBEDDING_MODEL, input=macro_content)
+                        new_embedding = np.array(emb_resp.data[0].embedding, dtype=np.float32).tobytes()
+                        
+                        # Archive old nodes
+                        for n in cluster_nodes:
+                            conn.execute("UPDATE memory_nodes SET status = 'archived', is_valid = 0 WHERE id = ?", (n[0],))
+                            
+                        # Insert MACRO node
+                        conn.execute("INSERT INTO memory_nodes (content, source_type, source_path, domain, embedding, embedding_model, status, is_valid, hit_count) VALUES (?, ?, ?, ?, ?, ?, 'active', 1, ?)", 
+                                     (f"[MACRO] {macro_content}", "plan", "memory_cluster.py", "general", new_embedding, EMBEDDING_MODEL, len(cluster_nodes)))
+                        
+                        consolidated_count += 1
+                        if max_clusters and consolidated_count >= max_clusters:
+                            break
+                    except Exception as e:
+                        print("Clustering error:", e)
+                        
+            conn.commit()
+            return f"{consolidated_count} adet MACRO-MEMORY (Konsolidasyon bloğu) başarıyla üretildi. Benzer eski türevler arşivlendi."
+        finally:
+            conn.close()
+
+    def reindex_memories(self, active_project: str) -> str:
+        """Physically deletes archived nodes and runs VACUUM."""
+        proj_data = self._get_project_data(active_project)
+        if not proj_data: return "Proje bulunamadı."
+        
+        db_path = proj_data["db_path"]
+        conn = sqlite3.connect(db_path, isolation_level=None)
+        try:
+            cursor = conn.execute("DELETE FROM memory_nodes WHERE status = 'archived' OR is_valid = 0")
+            deleted_count = cursor.rowcount
+            conn.execute("VACUUM")
+            return f"Re-indexing tamamlandı. {deleted_count} adet silinmiş/arşivlenmiş kayıt Vektör DB üzerinden %100 temizlendi (VACUUM çalıştırıldı)."
         finally:
             conn.close()

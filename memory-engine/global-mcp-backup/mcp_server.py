@@ -13,11 +13,28 @@ _global_dir = Path(__file__).parent.absolute()
 registry_path = _global_dir / "data" / "registry.json"
 federated_engine = MemoryFederation(str(registry_path))
 
+# Session-scoped project (set by agent via cc_set_project)
+_session_project = None
+
 # Helper to get active project and API key
 def get_context():
-    active_project = os.environ.get("TELEMEM_ACTIVE_PROJECT", "venthub")
+    # 1. Session-level (agent told us which project)
+    active_project = _session_project
     
-    # Priority: Always use the project's .env.local via registry
+    # 2. Environment variable (static config fallback)
+    if not active_project:
+        active_project = os.environ.get("CC_ACTIVE_PROJECT")
+    
+    # 3. Workspace Auto-Detection (best-effort)
+    if not active_project:
+        cwd = os.getcwd()
+        active_project = federated_engine.detect_project_by_path(cwd)
+        
+    # 4. Ultimate fallback
+    if not active_project:
+        active_project = "venthub"
+    
+    # Load project's API key from its .env file
     proj_data = federated_engine._get_project_data(active_project)
     if proj_data and os.path.exists(proj_data["env_file"]):
         load_dotenv(proj_data["env_file"], override=True)
@@ -29,7 +46,7 @@ def get_context():
 
 
 @mcp.tool()
-def telemem_search(query: str, cross_project: bool = False, domain_hint: str = None) -> str:
+def cc_search(query: str, cross_project: bool = False, domain_hint: str = None) -> str:
     """Hafizadan ilgili bilgileri getirir. (Retrieves relevant memories).
     
     Args:
@@ -63,11 +80,11 @@ def telemem_search(query: str, cross_project: bool = False, domain_hint: str = N
         output_lines.append(block)
         
     output_lines.append("---")
-    return "\\n".join(output_lines)
+    return "\n".join(output_lines)
 
 
 @mcp.tool()
-def telemem_remember(content: str, source_type: str = "doc", domain: str = "general") -> str:
+def cc_remember(content: str, source_type: str = "doc", domain: str = "general") -> str:
     """Yeni bir bilgiyi aktif projenin hafuzasuna kaydeder. (Saves a new memory).
     
     Args:
@@ -93,7 +110,7 @@ def telemem_remember(content: str, source_type: str = "doc", domain: str = "gene
 
 
 @mcp.tool()
-def telemem_list_projects() -> str:
+def cc_list_projects() -> str:
     """Kayutlu tüm projeleri listeler. (Lists all registered projects in the federation)."""
     projects = federated_engine.list_projects()
     if not projects:
@@ -103,14 +120,42 @@ def telemem_list_projects() -> str:
     for name, data in projects.items():
          lines.append(f"- {name} (Kayıt: {data.get('registered_at', 'N/A')})")
     
-    return "\\n".join(lines)
+    return "\n".join(lines)
 
 
 @mcp.tool()
-def telemem_register(project_name: str, db_path: str, workspace_root: str, env_file: str) -> str:
+def cc_register(project_name: str, db_path: str, workspace_root: str, env_file: str) -> str:
     """Yeni bir projeyi federasyona dahil eder. (Registers a new project)."""
     return federated_engine.register_project(project_name, db_path, workspace_root, env_file)
 
+@mcp.tool()
+def cc_cluster_memories(max_clusters: int = 5) -> str:
+    """Motor belleğini sıkıştırır. (Deduplicates memories and merges them)."""
+    active_project, api_key = get_context()
+    if not api_key:
+         return "Error: OPENROUTER_API_KEY not found."
+    return federated_engine.cluster_memories(active_project, max_clusters, api_key)
+
+@mcp.tool()
+def cc_reindex() -> str:
+    """Bozuk veya arşive (is_valid=0) alınmış node'ları kalıcı siler."""
+    active_project, _ = get_context()
+    return federated_engine.reindex_memories(active_project)
+
+@mcp.tool()
+def cc_set_project(project_name: str) -> str:
+    """Aktif projeyi ayarlar. Oturum basinda bir kez cagirin. (Sets the active project for this session).
+    
+    Args:
+        project_name: Registry'de kayitli proje adi (ornegin: venthub, qvalidator).
+    """
+    global _session_project
+    proj_data = federated_engine._get_project_data(project_name)
+    if not proj_data:
+        available = ", ".join(federated_engine.list_projects().keys())
+        return f"Hata: '{project_name}' registry'de bulunamadi. Kayitli projeler: {available}"
+    _session_project = project_name
+    return f"Aktif proje '{project_name}' olarak ayarlandi. Tum cc_* islemleri bu projeye yonlendirilecek."
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
