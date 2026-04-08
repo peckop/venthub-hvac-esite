@@ -1,4 +1,4 @@
-# 🚨 FEDERATIF TELEMEM PRO MAX: TAHLİYE VE KURTARMA PLANI
+# 🚨 FEDERATIF corpus-callosum: TAHLİYE VE KURTARMA PLANI
 
 Bu klasör (`global-mcp-backup`), bilgisayar değiştirdiğinde veya Antigravity/Gemini sistemini sıfırladığında **Global Hafızanı** (Corpus Callosum) kaybetmemen için oluşturulmuş bir can yeleğidir.
 
@@ -34,17 +34,15 @@ Antigravity, Cursor, Windsurf veya hangi AI tabanlı editörü kullanıyorsan, o
   "command": "C:\\[SENIN-YOLUN]\\mcp-env\\Scripts\\python.exe",
   "args": [
     "C:\\[SENIN-YOLUN]\\mcp_server.py"
-  ],
-  "env": {
-    "TELEMEM_ACTIVE_PROJECT": "venthub"
-  }
+  ]
 }
 ```
 *(Yukarıdaki yolları sunucuyu koyduğun bilgisayardaki güncel konumlara göre değiştir).*
+*(Not: Eskiden `CC_ACTIVE_PROJECT` çevresel değişkeni girerdik. Artık sistem **Workspace Auto-Detection** ile hangi projeyi açtığınızı `yol` (cwd) üzerinden otomatik anlıyor, bu sebeple "env" parametresini girmeye gerek kalmadı.)*
 
 ### ADIM 4: Antigravity'e Adresini Söyle (Tekrar Kayıt)
 `data/registry.json` içinde eski bilgisayarının dosya yolları kalacağı için veritabanını bulamayacaktır. Bunu manuel düzeltmek yerine, IDE'ye gir ve prompt olarak asistanından sadece şunu iste:
 
-**"Federasyona yeni klasör yollarımı kaydet. telemem_register komutunu çalıştır: project_name=venthub, db_path=C:\Yeni\Yol\venthub\memory-engine\data\memory.db, workspace_root=C:\Yeni\Yol\venthub, env_file=C:\Yeni\Yol\venthub\.env.local"**
+**"Federasyona yeni klasör yollarımı kaydet. cc_register komutunu çalıştır: project_name=venthub, db_path=C:\Yeni\Yol\venthub\memory-engine\data\memory.db, workspace_root=C:\Yeni\Yol\venthub, env_file=C:\Yeni\Yol\venthub\.env.local"**
 
 Ve bitti! Hafıza sıfırlanmadı, indeksleri kaybetmedin. Zekan yeni bilgisayarında yaşamaya devam ediyor.
