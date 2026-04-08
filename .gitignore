@@ -33,6 +33,8 @@ Thumbs.db
 
 # VentHub Registry Reports & Temp
 *.txt
+!requirements.txt
+!memory-engine/**/requirements.txt
 *.log
 /tmp/
 .snapshots/

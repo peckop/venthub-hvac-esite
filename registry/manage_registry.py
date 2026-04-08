@@ -638,6 +638,31 @@ def update_progress(proj_id: str, task_id_raw: str, value: int):
 def complete_task(proj_id: str, task_id_raw: str):
     update_progress(proj_id, task_id_raw, 100)
     move_task(proj_id, task_id_raw, "completed")
+    try:
+        import subprocess
+        log_info("🧠 TeleMem Pro Max Indexer tetikleniyor...")
+        env_python = PROJECT_ROOT / ".gemini" / "antigravity" / "memory" / "memory-env" / "Scripts" / "python.exe"
+        indexer_script = PROJECT_ROOT / "memory-engine" / "memory_indexer.py"
+        if env_python.exists() and indexer_script.exists():
+            # FIX #2: Biten gorev klasorundeki plan.md dosyasini delta olarak indexle
+            # (eski kod: bos kanca - sadece print yapiyordu)
+            proj_dir = next((d for d in REGISTRY_DIR.iterdir() if d.is_dir() and d.name.startswith(proj_id)), None)
+            if proj_dir:
+                tid_prefix = f"{str(task_id_raw).zfill(3)}-"
+                task_folder = next(
+                    (d for d in (proj_dir / "completed").iterdir() if d.is_dir() and d.name.startswith(tid_prefix)),
+                    None
+                )
+                if task_folder:
+                    plan_file = task_folder / "plan.md"
+                    if plan_file.exists():
+                        subprocess.Popen(
+                            [str(env_python), str(indexer_script), "--file", str(plan_file)],
+                            cwd=str(PROJECT_ROOT)
+                        )
+                        log_info(f"🧠 {plan_file.name} hafızaya alınıyor...")
+    except Exception as e:
+        log_error(f"Hafıza motoru tetiklenemedi: {e}")
 
 def auto_lifecycle(proj_id: str, task_id_raw: str, target: str):
     """Zincirleme Otomasyon: Doğrula → İmzala → Geçir.
@@ -921,7 +946,7 @@ def next_action():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Registry Engine 7.0 (Sentinel + Navigator)")
-    parser.add_argument("action", choices=["repair", "normalize", "reindex", "activate", "backlog", "complete", "progress", "create-project", "create-task", "remember", "recall", "dashboard", "list", "next", "init", "auto-sign", "auto-lifecycle"])
+    parser.add_argument("action", choices=["repair", "normalize", "reindex", "activate", "backlog", "complete", "progress", "create-project", "create-task", "remember", "recall", "dashboard", "list", "next", "init", "auto-sign", "auto-lifecycle", "rag"])
     parser.add_argument("project_id", nargs="?", help="Project ID (P01)")
     parser.add_argument("task_id", nargs="?", help="Task ID (008)")
     parser.add_argument("value", nargs="?", help="Progress value or lifecycle target (activate/complete)")
@@ -1060,5 +1085,19 @@ artifacts:
         auto_lifecycle(args.project_id, args.task_id, target)
     elif args.action == "remember": remember(args.fact)
     elif args.action == "recall": recall(limit=args.limit, query=args.query)
+    elif args.action == "rag":
+        if not args.query:
+            log_error("RAG sorgusu için --query gerekli.")
+            sys.exit(1)
+        try:
+            import subprocess
+            env_python = PROJECT_ROOT / ".gemini" / "antigravity" / "memory" / "memory-env" / "Scripts" / "python.exe"
+            retriever_script = PROJECT_ROOT / "memory-engine" / "memory_retriever.py"
+            if env_python.exists() and retriever_script.exists():
+                subprocess.run([str(env_python), str(retriever_script), args.query], cwd=str(PROJECT_ROOT))
+            else:
+                log_error("RAG Altyapısı (memory-engine) bulunamadı.")
+        except Exception as e:
+            log_error(f"RAG Hatası: {e}")
     elif args.action == "list": list_all()
     elif args.action == "next": next_action()

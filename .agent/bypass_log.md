@@ -37,3 +37,15 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-08 09:49:51
+- **Commit:** `4c2cc9e7`
+- **Mesaj:** sec: fix authentication bypass and enforce RBAC in admin-update-shipping
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-08 09:49:53
+- **Commit:** `585418f9`
+- **Mesaj:** ci: inject Trivial Bypass instruction into all Jules agent prompts to enable headless autonomy
+- **Değişen Dosyalar:**
+
+
