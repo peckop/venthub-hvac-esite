@@ -640,7 +640,7 @@ def complete_task(proj_id: str, task_id_raw: str):
     move_task(proj_id, task_id_raw, "completed")
     try:
         import subprocess
-        log_info("🧠 TeleMem Pro Max Indexer tetikleniyor...")
+        log_info("🧠 corpus-callosum Indexer tetikleniyor...")
         env_python = PROJECT_ROOT / ".gemini" / "antigravity" / "memory" / "memory-env" / "Scripts" / "python.exe"
         indexer_script = PROJECT_ROOT / "memory-engine" / "memory_indexer.py"
         if env_python.exists() and indexer_script.exists():
