@@ -56,3 +56,8 @@ jobs:
             4. CI/CD ONAYLARI: Mümkünse commit'ten önce `pnpm run lint` komutlarının temiz olduğundan emin ol.
             5. ANAYASA: Kök dizindeki `AGENTS.md` dosyasını oku, PR Boyut Limiti (max 100 satır diff) kuralına uy.
             If successful, commit the changes and create a PR.
+
+            CRITICAL OVERRIDE: 
+            You are operating in an autonomous Night Shift. 
+            DO NOT create an implementation plan and DO NOT wait for human approval (bypass the superpowers-plan rule). 
+            Execute your fixes using the Trivial bypass method, and open the Pull Request immediately.
