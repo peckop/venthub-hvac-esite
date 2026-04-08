@@ -1,0 +1,11 @@
+{
+  "projects": {
+    "venthub": {
+      "db_path": "C:\\Users\\alize\\venthub-hvac\\memory-engine\\data\\memory.db",
+      "workspace_root": "C:\\Users\\alize\\venthub-hvac",
+      "env_file": "C:\\Users\\alize\\venthub-hvac\\.env.local",
+      "registered_at": "2026-04-08"
+    }
+  },
+  "default_project": "venthub"
+}
