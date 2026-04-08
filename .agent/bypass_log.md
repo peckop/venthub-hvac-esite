@@ -61,3 +61,15 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-08 16:39:35
+- **Commit:** `ba05ef53`
+- **Mesaj:** [Memory Engine] Rename TeleMem Pro Max to corpus-callosum globally
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-08 21:52:55
+- **Commit:** `a7714db9`
+- **Mesaj:** refactor(memory-engine): corpus-callosum v2 federasyon temizligi - Eski yerel motor dosyalari silindi (sqlite_vector_store, memory_retriever, memory_indexer, memory_cluster, __init__, .env.sample, memory_hashes.json) - README guncellendi: cc_set_project, 8 tool, yeni proje ekleme adimlari - global-mcp-backup senkronize edildi (mcp_server.py + federation.py)
+- **Değişen Dosyalar:**
+
+
