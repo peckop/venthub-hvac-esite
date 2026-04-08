@@ -1367,7 +1367,8 @@ export const tr = {
     loading: 'Kategoriler hazırlanıyor...',
     notFound: 'Kategori bulunamadı',
     backHome: 'Ana Sayfaya Dön',
-    breadcrumbHome: 'Ana Sayfa'
+    breadcrumbHome: 'Ana Sayfa',
+    premiumCollection: 'Premium Koleksiyon'
   },
   categories: {
     title: 'Ürün Kategorileri',
