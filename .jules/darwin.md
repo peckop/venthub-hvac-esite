@@ -1,0 +1,3 @@
+## 2024-05-18 - [Vitest test grouping with object comparisons]
+**Learning:** When using object comparisons in tests (e.g. `expect(obj).toEqual({...})`), if properties share substrings (like `absorbed_power_1st_speed_w` and `airflow_speed_max_ms` both containing `speed`), simple string `includes()` checks in categorization logic will group them together.
+**Action:** When testing classification functions, ensure test data covers cases where keys might accidentally overlap in substring matches, or update categorization logic to use strict equality/regex if precise matching is needed.
