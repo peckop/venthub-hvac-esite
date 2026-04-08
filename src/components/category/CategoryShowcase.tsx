@@ -12,6 +12,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { DomainCategory } from '../../lib/type-converters'
+import { useI18n } from '../../i18n/I18nProvider'
 
 interface CategoryShowcaseProps {
     category: DomainCategory
@@ -20,6 +21,7 @@ interface CategoryShowcaseProps {
 }
 
 const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCategories, parentCategory }) => {
+    const { t } = useI18n()
     const [wizardOpen, setWizardOpen] = useState(false)
 
     // Check if this is special showcase categories
@@ -64,7 +66,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                         <div className="max-w-3xl animate-fadeIn">
                             <span className="inline-block px-4 py-1.5 rounded-full bg-secondary-blue/20 text-secondary-blue backdrop-blur-sm border border-secondary-blue/30 text-sm font-medium mb-6">
-                                Premium Koleksiyon
+                                {t('category.premiumCollection')}
                             </span>
                             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
                                 {getCategoryDisplayName(category)}
