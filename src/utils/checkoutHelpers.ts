@@ -37,7 +37,21 @@ export const getPriceHashServer = (
 }
 
 /**
- * Translation fallback helper for checkout components.
+ * Resolves a translation key using the provided translation function, returning a fallback string if the key is missing or an error occurs.
+ * This ensures the UI remains stable even when specific dictionary entries are unavailable.
+ *
+ * @param t - The translation function (e.g., from i18next or custom hook)
+ * @param key - The translation key to look up
+ * @param fallback - The string to return if the translation is missing or fails
+ * @returns The translated string, or the fallback string if the key equals the result or an error is thrown
+ *
+ * @example
+ * // When "checkout.title" exists
+ * getTranslationWithFallback(t, "checkout.title", "Secure Checkout") // returns "Güvenli Ödeme"
+ *
+ * @example
+ * // When "checkout.missing_key" does not exist
+ * getTranslationWithFallback(t, "checkout.missing_key", "Default Title") // returns "Default Title"
  */
 export const getTranslationWithFallback = (t: (key: string) => string, key: string, fallback: string) => {
   try {
