@@ -55,3 +55,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-08 16:32:36
+- **Commit:** `b8a7824b`
+- **Mesaj:** [Memory Engine] Sync MCP federation and embedding models for backup portability
+- **Değişen Dosyalar:**
+
+

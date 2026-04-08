@@ -16,7 +16,7 @@ _workspace_root = _engine_dir.parent
 load_dotenv(_workspace_root / ".env.local")
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-EMBEDDING_MODEL = "qwen3-embedding-8b"
+EMBEDDING_MODEL = os.getenv("LLM_EMBEDDING_MODEL", "qwen/qwen3-embedding-8b")
 MAX_CONTEXT_TOKENS = 2000  # hard-limit for context injection (~8000 chars)
 
 client = OpenAI(

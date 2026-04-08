@@ -6,7 +6,7 @@ from federation import MemoryFederation
 from dotenv import load_dotenv
 
 # Initialize MCP 
-mcp = FastMCP("TeleMem Pro Max")
+mcp = FastMCP("corpus-callosum")
 
 # Setup federation
 _global_dir = Path(__file__).parent.absolute()
