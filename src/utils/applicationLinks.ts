@@ -40,13 +40,5 @@ export function getCategoryUrlFromTopic(topicSlug: string): string {
     return TOPIC_TO_CATEGORY_URL[topicSlug] || '/products'
 }
 
-/**
- * Legacy: Get products URL from topic slug (shows application cards)
- */
-export function getProductsUrlFromTopic(topicSlug: string): string {
-    const appKey = TOPIC_TO_APP_KEY[topicSlug]
-    return appKey ? getApplicationProductsUrl(appKey) : '/products#applications'
-}
-
 
 
