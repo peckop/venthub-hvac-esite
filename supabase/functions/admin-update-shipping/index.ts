@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3"
 
 serve(async (req) => {
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
@@ -66,9 +67,41 @@ serve(async (req) => {
 
     // Basic config
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-    if (!supabaseUrl || !serviceKey) {
+    if (!supabaseUrl || !serviceKey || !anonKey) {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+
+    // 🚨 VULNERABILITY FIX: AUTHENTICATION + RBAC (Role-Based Access Control)
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Missing Authorization header' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    }
+
+    const authClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } }
+    })
+    
+    // Verify caller identity
+    const { data: { user }, error: authErr } = await authClient.auth.getUser()
+    if (authErr || !user) {
+      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    }
+
+    // Verify caller role (Must be admin or superadmin)
+    const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+      headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+    })
+    
+    if (roleCheck.ok) {
+      const arr = await roleCheck.json().catch(() => [])
+      const role = arr[0]?.role
+      if (role !== 'admin' && role !== 'superadmin') {
+        return new Response(JSON.stringify({ error: 'forbidden', message: 'Insufficient privileges' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+      }
+    } else {
+      return new Response(JSON.stringify({ error: 'internal_error', message: 'Failed to verify user role' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
     }
 
     // Read current order status to allow implicit cancel (if already shipped and no carrier/tracking provided)
