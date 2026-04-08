@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { ChevronRight, ChevronLeft, ArrowRight, Wind, Shield, Activity, Zap, Droplet, Layers, Cpu, Maximize, LucideIcon } from 'lucide-react'
 import { DomainCategory } from '../lib/type-converters'
 import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface HeroCarouselProps {
     categories: DomainCategory[]
@@ -67,6 +68,7 @@ const IconMap: Record<string, LucideIcon> = {
 
 export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
     const { wrapCategory } = useCategoryViewModel()
+    const { t } = useI18n()
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -187,14 +189,14 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                         href={Routes.category(vm.slug)}
                                         className="px-8 py-4 bg-secondary-blue hover:bg-blue-600 text-white rounded-lg font-bold transition-all flex items-center shadow-lg shadow-blue-500/30"
                                     >
-                                        Ürünleri İncele
+                                        {t('home.hero.primaryCta')}
                                         <ArrowRight className="ml-2 w-5 h-5" />
                                     </Link>
                                     <button
                                         onClick={() => ((window as unknown) as { openLeadModal?: () => void }).openLeadModal?.()}
                                         className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/20 rounded-lg font-bold transition-all backdrop-blur-sm"
                                     >
-                                        Hızlı Teklif Al
+                                        {t('home.hero.secondaryCta')}
                                     </button>
                                 </div>
                             </div>
@@ -207,14 +209,14 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
             <div className="absolute bottom-10 right-10 z-30 flex gap-2">
                 <button
                     onClick={handlePrev}
-                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10"
-                 aria-label="Önceki">
+                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+                 aria-label={t("common.prev") as string}>
                     <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
                     onClick={handleNext}
-                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10"
-                 aria-label="Sonraki">
+                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+                 aria-label={t("common.next") as string}>
                     <ChevronRight className="w-6 h-6" />
                 </button>
             </div>
@@ -226,8 +228,8 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                     <button
                         key={idx}
                         onClick={() => { setIsAutoPlaying(false); setCurrentIndex(idx) }}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8 bg-secondary-blue' : 'w-2 bg-white/30 hover:bg-white/50'
-                            }`}
+                        className={`h-1.5 rounded-full transition-all duration-300 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-2 focus-visible:ring-offset-black/50 ${idx === currentIndex ? 'w-8 bg-secondary-blue' : 'w-2 bg-white/30 hover:bg-white/50'
+                            }`} aria-label={`${t("common.next")} ${idx + 1}`}
                     />
                 ))}
             </div>
