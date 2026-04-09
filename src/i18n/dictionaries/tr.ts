@@ -121,6 +121,12 @@ export const tr = {
     nextAria: 'Sonraki'
   },
   products: {
+    allProductsTitle: "Tüm Ürünlerimiz",
+    systemTotalPrefix: "Sistemdeki tüm",
+    viewGrid: "Izgara",
+    viewList: "Liste",
+    emptyTitle: "Ürün Bulunamadı",
+    emptyDesc: "Daha fazla ürün görmek için kategorilerden birini seçin.",
     breadcrumbDiscover: "Keşfet",
     heroTitle: "HVAC ürünlerini keşfedin: mühendislik odaklı seçim, hızlı teklif",
     heroSubtitle: "Uygulama yönlendirmeli alanlar, popüler kategoriler ve öne çıkan ürünlerle aradığınızı hızla bulun.",
