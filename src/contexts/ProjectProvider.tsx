@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react'
 import { 
   listUserProjects, 
   createProject, 
@@ -54,7 +54,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [user, refreshProjects])
 
-  const addProject = async (name: string, description?: string) => {
+  const addProject = useCallback(async (name: string, description?: string) => {
     try {
       const newProject = await createProject({ name, description, user_id: user?.id })
       setProjects(prev => [newProject, ...prev])
@@ -64,9 +64,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       toast.error('Proje oluşturulamadı.')
       return null
     }
-  }
+  }, [user?.id])
 
-  const removeProject = async (id: string) => {
+  const removeProject = useCallback(async (id: string) => {
     try {
       await deleteProject(id)
       setProjects(prev => prev.filter(p => p.id !== id))
@@ -74,27 +74,27 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch {
       toast.error('Proje silinemedi.')
     }
-  }
+  }, [])
 
-  const addItem = async (projectId: string, _productId: string, quantity: number = 1) => {
+  const addItem = useCallback(async (projectId: string, _productId: string, quantity: number = 1) => {
     try {
       await addProductToProject(projectId, _productId, quantity)
       toast.success('Ürün projeye eklendi.')
     } catch {
       toast.error('Ürün eklenemedi.')
     }
-  }
+  }, [])
 
-  const removeItem = async (projectId: string, _productId: string) => {
+  const removeItem = useCallback(async (projectId: string, _productId: string) => {
     try {
       await removeProductFromProject(projectId, _productId)
       toast.success('Ürün projeden çıkarıldı.')
     } catch {
       toast.error('Ürün çıkarılamadı.')
     }
-  }
+  }, [])
 
-  const getProjectItems = async (projectId: string): Promise<ProjectItem[]> => {
+  const getProjectItems = useCallback(async (projectId: string): Promise<ProjectItem[]> => {
     try {
       const items = await listProjectItems(projectId)
       return items as ProjectItem[]
@@ -102,19 +102,21 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       console.error('Error getting project items')
       return []
     }
-  }
+  }, [])
+
+  const value = useMemo(() => ({
+    projects,
+    loading,
+    refreshProjects,
+    addProject,
+    removeProject,
+    addItem,
+    removeItem,
+    getProjectItems
+  }), [projects, loading, refreshProjects, addProject, removeProject, addItem, removeItem, getProjectItems])
 
   return (
-    <ProjectContext.Provider value={{
-      projects,
-      loading,
-      refreshProjects,
-      addProject,
-      removeProject,
-      addItem,
-      removeItem,
-      getProjectItems
-    }}>
+    <ProjectContext.Provider value={value}>
       {children}
     </ProjectContext.Provider>
   )
