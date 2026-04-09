@@ -3,7 +3,7 @@ import PageComponent from '../../../views/CategoryPage'
 import { supabase, getProductsEnriched } from '../../../lib/supabase'
 import { mapDatabaseCategoryToDomain } from '../../../lib/type-converters'
 import type { DomainProduct } from '../../../lib/type-converters'
-import type { DbCategory } from '../../../types/db-rows'
+import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../../types/db-rows'
 import { SITE_URL } from '../../../config/siteUrl'
 
 export async function generateStaticParams() {
@@ -35,7 +35,16 @@ async function getCategoryData(slug: string) {
     .single()
   
   if (error || !data) return null
-  return mapDatabaseCategoryToDomain(data as unknown as DbCategory)
+  return mapDatabaseCategoryToDomain({
+    ...data,
+    name: data.name || '',
+    menu_label: data.menu_label as string | null,
+    marketing_title: data.marketing_title as string | null,
+    translation_key: data.translation_key as string | null,
+    description: data.description as string | null,
+    metadata: data.metadata as CategoryMetadata | null,
+    authority_content: data.authority_content as AuthorityContent | null
+  } as DbCategory)
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ categorySlug: string }> }) {
