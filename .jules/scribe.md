@@ -1,0 +1,3 @@
+## 2024-06-25 - [TSDoc Hook Documentation]
+**Learning:** React custom hooks in VentHub (`src/hooks/*`) often return complex states alongside mutative functions. When documenting them, ensuring accurate descriptions of how functions interact with the internal state and UI side effects (like toasts) creates a significantly better Developer Experience.
+**Action:** Always include a detailed `@returns` tag explaining the shape of the returned object and an `@example` tag demonstrating a realistic implementation pattern within a component, especially for hooks involving asynchronous side effects like `useApiCall`.
