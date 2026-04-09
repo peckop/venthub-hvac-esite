@@ -1,6 +1,7 @@
 export const tr = {
   common: {
     loadingApp: 'VentHub yükleniyor... ',
+    loading: 'Yükleniyor...',
     // Navigation & generic
     categories: "Kategoriler",
     products: "Ürünler",

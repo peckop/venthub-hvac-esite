@@ -1,6 +1,7 @@
 export const en = {
   common: {
     loadingApp: 'Loading VentHub... ',
+    loading: 'Loading...',
     // Navigation & generic
     categories: "Categories",
     products: "Products",
