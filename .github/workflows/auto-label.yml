@@ -59,12 +59,16 @@ jobs:
 
             for (const label of labels) {
               if (!existingNames.includes(label)) {
-                await github.rest.issues.createLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: label,
-                  color: colorMap[label] ?? 'ededed',
-                });
+                try {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label,
+                    color: colorMap[label] ?? 'ededed',
+                  });
+                } catch (error) {
+                  console.log(`Failed to create label '${label}'. It might already exist.`);
+                }
               }
             }
 
