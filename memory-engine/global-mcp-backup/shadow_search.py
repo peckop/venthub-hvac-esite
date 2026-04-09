@@ -104,11 +104,9 @@ def cleanup_shadows(project_name, older_than_days):
             (cutoff_date.strftime("%Y-%m-%d %H:%M:%S"),)
         )
         updated = cursor.rowcount
-        conn.execute("COMMIT")
         print(f"[SHADOW] Cleanup tamam. {updated} node arşivlendi ({project_name}).")
     except Exception as e:
         print(f"[SHADOW] Cleanup hata: {e}")
-        conn.rollback()
     finally:
         conn.close()
 
@@ -130,10 +128,8 @@ def promote_shadow(project_name, node_id):
             print(f"[SHADOW] Node {node_id} kalıcı planning domain'ine promote edildi.")
         else:
             print(f"[SHADOW] Node {node_id} bulunamadı veya session_shadow değil.")
-        conn.execute("COMMIT")
     except Exception as e:
         print(f"[SHADOW] Promote hata: {e}")
-        conn.rollback()
     finally:
         conn.close()
 
