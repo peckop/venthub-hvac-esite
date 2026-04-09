@@ -16,3 +16,8 @@
 **Vulnerability:** A Cross-Site Scripting (XSS) vulnerability was reported in `src/components/authority/AuthorityRenderer.tsx` using `dangerouslySetInnerHTML={{ __html: rtBlock.content.html }}`.
 **Learning:** During investigation, it was discovered that the vulnerability had already been resolved using `DOMPurify.sanitize(rtBlock.content.html)` with the `isomorphic-dompurify` package.
 **Prevention:** Continue strictly enforcing the use of `isomorphic-dompurify` for all dynamic HTML rendering via `dangerouslySetInnerHTML`.
+
+## 2026-04-09 - [CRITICAL] Missing Auth and RBAC in Admin Edge Functions
+**Vulnerability:** Found admin Edge Functions (admin-iyzico-reconcile, admin-update-order) lacking required auth.getUser() and RBAC checks, exposing administrative actions to unauthenticated actors.
+**Learning:** Developers often rely on custom headers like x-admin-key instead of standard Supabase Auth, or completely omit checks, leaving endpoints publicly accessible.
+**Prevention:** Always extract the Authorization header, use auth.getUser() to verify identity, and check user_profiles.role before executing privileged SERVICE_ROLE_KEY logic.
