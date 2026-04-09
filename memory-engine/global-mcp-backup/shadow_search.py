@@ -179,7 +179,7 @@ def main():
                     meta_file = d / ".session_meta.json"
                     if meta_file.exists():
                         try:
-                            with open(meta_file, "r") as f:
+                            with open(meta_file, "r", encoding="utf-8") as f:
                                 meta = json.load(f)
                                 if meta.get("project") == args.project:
                                     sessions_to_search.append(d.name)
