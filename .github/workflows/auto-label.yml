@@ -39,11 +39,11 @@ jobs:
             if (labels.length === 0) return;
 
             // Mevcut olmayan etiketleri oluştur
-            const existingLabels = await github.rest.issues.listLabelsForRepo({
+            const existingLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            const existingNames = existingLabels.data.map(l => l.name);
+            const existingNames = existingLabels.map(l => l.name);
 
             const colorMap = {
               'security':      'e11d48',
@@ -59,12 +59,12 @@ jobs:
 
             for (const label of labels) {
               if (!existingNames.includes(label)) {
-                await github.rest.issues.createLabel({
+                try { await github.rest.issues.createLabel({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   name: label,
                   color: colorMap[label] ?? 'ededed',
-                });
+                }); } catch (e) { if (e.status !== 422) throw e; }
               }
             }
 
