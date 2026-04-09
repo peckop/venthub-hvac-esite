@@ -19,6 +19,7 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LayoutGrid, List } from 'lucide-react'
+import { useI18n } from '../i18n/I18nProvider'
 import type { Product } from '../lib/supabase'
 import type { DomainCategory } from '../lib/type-converters'
 import ProductCard from '../components/ProductCard'
@@ -51,6 +52,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
     isLoading = false
 }) => {
     const router = useRouter()
+    const { t } = useI18n()
     const [viewMode, setViewMode] = useState<ViewMode>('grid')
     const productsRef = useRef<HTMLDivElement>(null)
 
@@ -96,11 +98,11 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-10 pb-6 border-b border-slate-100">
                             <div>
                                 <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight capitalize mb-2">
-                                    Tüm Ürünlerimiz
+                                    {t('products.allProductsTitle')}
                                 </h2>
                                 {!isLoading && (
                                     <p className="text-slate-500 font-medium text-sm">
-                                        Sistemdeki tüm <span className="text-cyan-600 font-bold px-1">{products.length}</span> ürün listeleniyor
+                                        {t('products.systemTotalPrefix')} <span className="text-cyan-600 font-bold px-1">{products.length}</span> {t('products.itemsListed')}
                                     </p>
                                 )}
                             </div>
@@ -110,14 +112,14 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                     <button
                                         onClick={() => setViewMode('grid')}
                                         className={`p-2.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white shadow text-cyan-600' : 'text-slate-400 hover:text-slate-600'}`}
-                                        title="Izgara"
+                                        title={t('products.viewGrid')}
                                     >
                                         <LayoutGrid size={18} />
                                     </button>
                                     <button
                                         onClick={() => setViewMode('list')}
                                         className={`p-2.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white shadow text-cyan-600' : 'text-slate-400 hover:text-slate-600'}`}
-                                        title="Liste"
+                                        title={t('products.viewList')}
                                     >
                                         <List size={18} />
                                     </button>
@@ -131,8 +133,8 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
                                     <LayoutGrid className="w-8 h-8 text-slate-300" />
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-700 mb-2">Ürün Bulunamadı</h3>
-                                <p className="text-slate-500 mb-6 max-w-sm">Daha fazla ürün görmek için kategorilerden birini seçin.</p>
+                                <h3 className="text-xl font-bold text-slate-700 mb-2">{t('products.emptyTitle')}</h3>
+                                <p className="text-slate-500 mb-6 max-w-sm">{t('products.emptyDesc')}</p>
                             </div>
                         ) : (
                             <div className={`transition-opacity duration-300 ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'} ${
