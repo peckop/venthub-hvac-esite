@@ -35,7 +35,7 @@ async function getCategoryData(slug: string) {
     .single()
   
   if (error || !data) return null
-  return mapDatabaseCategoryToDomain(data as unknown as DbCategory)
+  return mapDatabaseCategoryToDomain(data as DbCategory)
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ categorySlug: string }> }) {
