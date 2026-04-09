@@ -13,6 +13,22 @@ interface UseApiCallOptions {
     errorMessage?: string
 }
 
+/**
+ * A custom React hook that manages the loading, data, and error states for asynchronous API calls.
+ * Provides a standardized way to handle API execution with built-in toast notifications for success and error scenarios.
+ *
+ * @param defaultOptions - Optional default settings for toast messages applied to all executions
+ * @returns An object containing the current state (data, loading, error), an `execute` method to run API calls, and a `reset` method to clear the state
+ *
+ * @example
+ * const { data, loading, execute, reset } = useApiCall<Product[]>({ errorMessage: 'Failed to load products' })
+ *
+ * const fetchProducts = async () => {
+ *   await execute(async () => {
+ *     return await api.getProducts()
+ *   }, { showToast: true, successMessage: 'Products loaded successfully' })
+ * }
+ */
 export function useApiCall<T = unknown>(defaultOptions?: UseApiCallOptions) {
     const [state, setState] = useState<ApiCallState<T>>({
         data: null,
