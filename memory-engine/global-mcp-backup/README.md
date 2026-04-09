@@ -21,6 +21,15 @@ Farklı beyin loblarını (projeleri) birbirine bağlayan, aralarında federatif
 - **Canlı Motor:** `C:\Users\alize\.gemini\antigravity\memory-engine\` dizininde çalışır.
 - **Yedek (Can Yeleği):** `global-mcp-backup` klasöründe her zaman güncel kopyası tutulur. Yeni bilgisayara geçişte bu yedek kullanılır.
 
+## Gölge Hafıza (Shadow Memory) Sistemi
+
+Sistem, anlık (session) oturumların kayıpsız korunması ve gürültü yaratmadan hatırlanabilmesi için 3 katmanlı bir Gölge Hafıza (Session Shadow) mekanizması barındırır:
+1. **Katman 1 (Ucuz Gölge - `shadow_search.py`):** Sadece güvenlik kamerası gibi metin dosyalarını arar. Sıfır API maliyeti.
+2. **Katman 2 (Geçici Beyaz Tahta):** `session_shadow` domain'i kullanılarak Corpus Callosum üzerinde saklanan 7 günlük geçici, kritik kararlar bütünüdür.
+3. **Katman 3 (Ayna - `checkpoint_mirror.py`):** Sistem check-point'lerini yakalayıp MD5 koruması ile `session_shadow` veritabanına otomatik aynalar.
+
+Daha fazla bilgi için: [SHADOW_PROTOCOL.md](SHADOW_PROTOCOL.md) okuyun.
+
 ## MCP Tool'ları (8 Adet)
 
 | Tool | Açıklama |
