@@ -40,7 +40,6 @@ export const adminSettingsLayoutClass = 'min-h-screen bg-[#0A0F1E] text-slate-20
 export const adminSettingsNavyClass = 'bg-[#0A0F1E] border-white/5 shadow-2xl'
 export const adminSettingsCardClass = 'glass rounded-[2rem] border border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden'
 export const adminSettingsSectionTitleClass = 'text-2xl font-black text-white tracking-tight uppercase'
-export const adminSettingsInputClass = 'w-full bg-[#0A0F1E]/40 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-all placeholder:text-slate-600 font-bold'
 export const adminSettingsLabelClass = 'block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1'
 export const adminSettingsSidebarItemClass = (isActive: boolean) => 
   `flex items-center gap-3 px-5 py-4 rounded-2xl text-[13px] font-bold transition-all duration-300 ${
