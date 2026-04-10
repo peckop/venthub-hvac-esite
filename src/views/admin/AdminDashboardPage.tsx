@@ -7,7 +7,6 @@ import StatCard from '../../components/admin/dashboard/StatCard'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
 import type { DbOrder } from '../../types/db-rows'
-import { toUIProductList } from '../../lib/type-converters'
 import { 
   TrendingUp, 
   ShoppingBag,
@@ -47,7 +46,7 @@ const AdminDashboardPage: React.FC = () => {
 
       const { data: ordersData, count: oCount, error: oErr } = await supabase
         .from('venthub_orders')
-        .select('*', { count: 'exact' })
+        .select('id, created_at, total_amount, status, order_number', { count: 'exact' })
         .order('created_at', { ascending: false })
         .limit(1000)
 
@@ -77,10 +76,25 @@ const AdminDashboardPage: React.FC = () => {
 
       if (productsRes.data) {
         const rawProducts = productsRes.data as unknown as import('../../types/db-rows').DbProduct[]
-        const products = toUIProductList(rawProducts)
-        const capital = products.reduce((acc, p) => acc + ((p.purchase_price || 0) * (p.stock_qty || 0)), 0)
+
+        // Use a single O(n) loop to calculate both tiedCapital and alarmCount
+        let capital = 0
+        let alarms = 0
+
+        for (let i = 0; i < rawProducts.length; i++) {
+          const p = rawProducts[i]
+          const stockQty = typeof p.stock_qty === 'number' ? p.stock_qty : 0
+          const purchasePrice = typeof p.purchase_price === 'number' ? p.purchase_price : 0
+          const lowStockThreshold = typeof p.low_stock_threshold === 'number' ? p.low_stock_threshold : 5
+
+          capital += purchasePrice * stockQty
+          if (stockQty <= lowStockThreshold) {
+            alarms++
+          }
+        }
+
         setTiedCapital(capital)
-        setAlarmCount(products.filter(p => (p.stock_qty || 0) <= (p.low_stock_threshold || 5)).length)
+        setAlarmCount(alarms)
       }
 
     } catch (err: unknown) {
