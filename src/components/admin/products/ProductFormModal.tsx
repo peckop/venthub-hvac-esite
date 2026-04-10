@@ -78,8 +78,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
 
     useEffect(() => {
         const fetchCategories = async () => {
-            const { data } = await supabase.from('categories').select('*').order('name')
-            setCategories((data as unknown as DbCategory[]) || [])
+            const { data } = await supabase.from('categories').select('*').order('name').returns<DbCategory[]>()
+            setCategories(data || [])
         }
         fetchCategories()
     }, [])
