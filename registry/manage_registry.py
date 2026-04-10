@@ -28,6 +28,25 @@ LOCKS_FILE = PROJECT_ROOT / ".gemini" / "memory" / "task_locks.json"
 
 VERBOSE = False # Varsayılan sessiz mod (Antigravity dostu)
 
+# ── ORİON KÖPRÜSÜ (FAZ 2) ──
+# ORION_IS_MASTER.lock varsa ilgili komutlar otomatik olarak Orion'a yönlendirilir.
+# Yoksa (veya Orion erişilemezse) eski davranış (kendi DB) devam eder.
+try:
+    from orion_bridge import (
+        bridge_dashboard, bridge_list_tasks, bridge_create_task,
+        bridge_normalize, bridge_update_task, orion_status
+    )
+    _ORION_BRIDGE_LOADED = True
+except ImportError:
+    _ORION_BRIDGE_LOADED = False
+    def bridge_dashboard(): return None
+    def bridge_list_tasks(**kw): return None
+    def bridge_create_task(*a, **kw): return None
+    def bridge_normalize(): return None
+    def bridge_update_task(*a, **kw): return None
+    def orion_status(): return {"orion_active": False}
+
+
 def log_info(msg: str):
     if VERBOSE: print(f"ℹ️ {msg}")
 
@@ -967,7 +986,12 @@ if __name__ == "__main__":
             log_success("REGISTRY 5.0 BAŞLATILDI (SILENT ENGINE)")
         else:
             log_success("REGISTRY YENİDEN İNDEKSLENDİ (REINDEXED)")
-    elif args.action == "normalize": normalize_registry()
+    elif args.action == "normalize":
+        # FAZ 2: Orion önce dene, fallback: yerel normalize
+        orion_result = bridge_normalize()
+        if orion_result:
+            print(orion_result)
+        normalize_registry()  # Yerel MD-sync her zaman çalışır
     elif args.action == "repair":
         if LOCKS_FILE.exists(): os.remove(LOCKS_FILE)
         normalize_registry()
@@ -998,10 +1022,16 @@ if __name__ == "__main__":
             sys.exit(1)
         update_progress(args.project_id, args.task_id, progress_val)
     elif args.action == "dashboard":
-        with RegistryDB() as db:
-            db.cursor.execute("SELECT id, title, status, progress FROM tasks WHERE state='active' ORDER BY updated_at DESC")
-            print("\n🛰️ REGISTRY DASHBOARD")
-            for t in db.cursor.fetchall(): print(f"- [{t[3]}%] {t[0]}: {t[1]} ({t[2]})")
+        # FAZ 2: Orion üzerinden cross-project PULSE
+        orion_result = bridge_dashboard()
+        if orion_result:
+            print(orion_result)
+        else:
+            # Fallback: yerel DB
+            with RegistryDB() as db:
+                db.cursor.execute("SELECT id, title, status, progress FROM tasks WHERE state='active' ORDER BY updated_at DESC")
+                print("\n🛣️ REGISTRY DASHBOARD (Yerel DB)")
+                for t in db.cursor.fetchall(): print(f"- [{t[3]}%] {t[0]}: {t[1]} ({t[2]})")
     elif args.action == "create-task":
         if not args.project_id or not args.task_id or not args.query:
             log_error("Proje ID, Görev ID ve Başlık (--query) gerekli.")
@@ -1099,5 +1129,11 @@ artifacts:
                 log_error("RAG Altyapısı (memory-engine) bulunamadı.")
         except Exception as e:
             log_error(f"RAG Hatası: {e}")
-    elif args.action == "list": list_all()
+    elif args.action == "list":
+        # FAZ 2: Orion üzerinden görev listesi
+        orion_result = bridge_list_tasks()
+        if orion_result:
+            print(orion_result)
+        else:
+            list_all()  # Fallback: yerel DB
     elif args.action == "next": next_action()
