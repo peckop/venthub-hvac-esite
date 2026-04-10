@@ -1,4 +1,0 @@
-mcp[cli]
-openai
-python-dotenv
-numpy
