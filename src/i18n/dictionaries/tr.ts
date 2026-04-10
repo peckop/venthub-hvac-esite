@@ -96,7 +96,11 @@ export const tr = {
     all: "Tümü",
     none: "Yok",
     yes: "Evet",
-    no: "Hayır"
+    no: "Hayır",
+    whatsappAriaLabel: "WhatsApp ile yaz",
+    whatsappTitle: "WhatsApp ile yaz",
+    whatsappTooltip: "Mühendislik Hattı",
+    whatsappSupportMessage: "Web sitesinden hızlı destek"
   },
   homeGallery: {
     title: 'Uygulama Vitrini',
