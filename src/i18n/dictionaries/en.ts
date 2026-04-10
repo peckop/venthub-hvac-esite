@@ -78,6 +78,10 @@ export const en = {
     next: "Next",
     remove: "Remove",
     more: "More",
+    whatsappAriaLabel: "Message on WhatsApp",
+    whatsappTitle: "Message on WhatsApp",
+    whatsappTooltip: "Engineering Line",
+    whatsappSupportMessage: "Quick support from website"
   },
   search: {
     recentSearches: "Recent Searches",
