@@ -4,7 +4,6 @@
 
 import Iyzipay from "npm:iyzipay";
 
-type JwtPayload = { sub?: string } & Record<string, unknown>;
 type PaymentTransaction = { paymentTransactionId?: string };
 type PaymentDebug = {
   refunded_total?: number;
@@ -30,18 +29,6 @@ type IyziSdk = {
   };
 };
 type IyziCtor = new (args: { apiKey: string; secretKey: string; uri: string }) => IyziSdk;
-
-function parseJwt(token?: string | null): JwtPayload | null {
-  if (!token) return null;
-  const parts = token.split(".");
-  if (parts.length !== 3) return null;
-  try {
-    const payload = atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(payload) as JwtPayload;
-  } catch {
-    return null;
-  }
-}
 
 Deno.serve(async (req) => {
   const corsHeaders: Record<string, string> = {
@@ -86,8 +73,17 @@ Deno.serve(async (req) => {
 
     // AuthN/AuthZ: allow admin or order owner
     const authHeader = req.headers.get("authorization");
-    const jwt = parseJwt(authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null);
-    const reqUserId: string | null = typeof jwt?.sub === 'string' ? jwt.sub : null;
+    let reqUserId: string | null = null;
+
+    if (authHeader) {
+      const authRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+        headers: { Authorization: authHeader, apikey: serviceKey }
+      });
+      if (authRes.ok) {
+        const userData = await authRes.json().catch(() => null);
+        reqUserId = userData?.id || null;
+      }
+    }
 
     // Load order
     const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=id,user_id,status,payment_status,total_amount,payment_debug`, {

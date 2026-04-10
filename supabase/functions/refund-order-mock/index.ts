@@ -9,18 +9,6 @@ interface RefundRequest {
   reason?: string
 }
 
-function parseJwt(token?: string | null): { sub?: string } | null {
-  if (!token) return null
-  const parts = token.split('.')
-  if (parts.length !== 3) return null
-  try {
-    const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
-    return JSON.parse(payload)
-  } catch {
-    return null
-  }
-}
-
 serve(async (req) => {
   const origin = req.headers.get('origin') ?? '*'
   const cors = {
@@ -51,8 +39,16 @@ serve(async (req) => {
 
     // Auth check: admin or owner
     const authHeader = req.headers.get('authorization')
-    const jwt = parseJwt(authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null)
-    const actorUserId = typeof jwt?.sub === 'string' ? jwt!.sub : ''
+    let actorUserId = ''
+    if (authHeader) {
+      const authRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+        headers: { Authorization: authHeader, apikey: serviceKey }
+      })
+      if (authRes.ok) {
+        const userData = await authRes.json().catch(() => null)
+        actorUserId = userData?.id || ''
+      }
+    }
 
     // Load order
     const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=id,user_id,status,payment_status,total_amount,payment_debug`, {
