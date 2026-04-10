@@ -226,15 +226,6 @@ textarea:focus-visible {
     border-radius: 30px;
     @apply bg-emerald-600 px-5 justify-start;
   }
-
-  .whatsapp-float::after {
-    content: 'Mühendislik Hattı';
-    @apply absolute left-14 opacity-0 transition-opacity duration-300 whitespace-nowrap font-bold text-sm pointer-events-none;
-  }
-
-  .whatsapp-float:hover::after {
-    @apply opacity-100;
-  }
   
   /* Keep icon stable during expansion */
   .whatsapp-float svg {
