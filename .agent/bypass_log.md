@@ -73,3 +73,27 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-09 00:39:48
+- **Commit:** `ac352615`
+- **Mesaj:** feat(memory-engine): Faz 2: 5N1K Mastar Doğrulaması ve Micro-GraphRAG
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-09 17:34:24
+- **Commit:** `3444f7fa`
+- **Mesaj:** feat(memory): shadow memory mekanizması eklendi ve mcp backup güncellendi
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-09 17:38:50
+- **Commit:** `d5593f77`
+- **Mesaj:** fix(memory): remove invalid COMMIT calls in shadow_search autocommit mode
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-09 19:00:25
+- **Commit:** `bee31b28`
+- **Mesaj:** chore(shadow-memory): fix encoding issue and remove unused import
+- **Değişen Dosyalar:**
+
+

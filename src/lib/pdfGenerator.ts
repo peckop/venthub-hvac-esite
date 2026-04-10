@@ -215,14 +215,16 @@ export async function generateProductDatasheet(
             startY: currentY,
             head: [[lang === 'tr' ? 'Özellik' : 'Property', lang === 'tr' ? 'Değer' : 'Value']],
             body: tableData,
-            theme: 'plain',
+            theme: 'grid',
             headStyles: {
                 fillColor: [248, 250, 252], // bg-slate-50
                 textColor: [27, 43, 75],
                 font: 'Roboto',
                 fontStyle: 'bold',
                 fontSize: 10,
-                cellPadding: { top: 6, right: 6, bottom: 6, left: 6 } // Premium padding
+                cellPadding: { top: 6, right: 6, bottom: 6, left: 6 }, // Premium padding
+                lineColor: [229, 231, 235],
+                lineWidth: 0.1
             },
             bodyStyles: {
                 font: 'Roboto',
@@ -230,7 +232,7 @@ export async function generateProductDatasheet(
                 textColor: [55, 65, 81],
                 cellPadding: { top: 5, right: 6, bottom: 5, left: 6 },
                 lineColor: [229, 231, 235], // border-gray-200
-                lineWidth: { bottom: 0.1 } // Very thin elegant borders
+                lineWidth: 0.1 // Very thin elegant borders
             },
             alternateRowStyles: {
                 fillColor: [255, 255, 255]
