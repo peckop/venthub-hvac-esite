@@ -12,6 +12,7 @@ import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { useCart } from '../../hooks/useCartHook'
 import { motion } from 'framer-motion'
+import { isRecord } from '../../utils/type-converters'
 
 interface CategorySeriesViewProps {
     category: DomainCategory
@@ -50,8 +51,9 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
     const heroImage = category.image_url || '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
 
     const getSpec = (p: DomainProduct, key: string) => {
-        const specs = (p.technical_specs as unknown as Record<string, string>) || {}
-        return specs[key] || specs[key.toLowerCase()] || '-'
+        const specs = isRecord(p.technical_specs) ? p.technical_specs : {}
+        const val = specs[key] || specs[key.toLowerCase()]
+        return val ? String(val) : '-'
     }
 
     return (
