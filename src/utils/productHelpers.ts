@@ -65,7 +65,25 @@ export const formatSpecValue = (key: string, value: unknown): string => {
   return stringValue;
 };
 
-// Helper function to group technical specs into logical categories
+/**
+ * Groups a flat dictionary of technical specifications into logical categories.
+ * Categorization is based on substring matches in the specification keys (e.g., 'airflow' goes to performance).
+ * Null, undefined, or empty string values in the input specs are ignored.
+ *
+ * @param specs - The raw dictionary of technical specifications, or null/undefined
+ * @returns A categorized object containing labels, icons, and matched specs per group, or null if input is missing
+ *
+ * @example
+ * const rawSpecs = { airflow_speed_max_ms: 15, size_a_mm: 500, voltage_v: 230 };
+ * const grouped = groupTechnicalSpecs(rawSpecs);
+ * // Returns:
+ * // {
+ * //   performance: { label: 'Performans Ölçüleri', icon: [Function: Settings], specs: { airflow_speed_max_ms: 15 } },
+ * //   physical: { label: 'Fiziksel Ölçüler', icon: [Function: Ruler], specs: { size_a_mm: 500 } },
+ * //   electrical: { label: 'Elektriksel Veriler', icon: [Function: Settings], specs: { voltage_v: 230 } },
+ * //   other: { label: 'Diğer Özellikler', icon: [Function: Settings], specs: {} }
+ * // }
+ */
 export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | undefined) => {
   if (!specs) return null;
 
