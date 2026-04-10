@@ -97,3 +97,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-10 12:44:14
+- **Commit:** `82bf8398`
+- **Mesaj:** chore(memory): Eski global-mcp-backup silindi ve Shadow Memory v2.0 protokolleri guncellendi
+- **Değişen Dosyalar:**
+
+
