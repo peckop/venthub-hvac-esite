@@ -24,7 +24,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
     parentCategory,
     products
 }) => {
-    const { lang } = useI18n()
+    const { lang, t } = useI18n()
     const { addToCart } = useCart()
     const { wrapCategory, groupProductsBySeries } = useCategoryViewModel()
     const [viewModes, setViewModes] = useState<Record<string, 'grid' | 'matrix'>>({})
@@ -42,7 +42,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
 
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
-        { label: 'Ana Sayfa', href: '/' },
+        { label: t('category.breadcrumbHome'), href: '/' },
         ...(parentVm ? [{ label: parentVm.displayName, href: Routes.category(parentVm.slug) }] : []),
         { label: vm?.displayName || category.name, href: '' }
     ]
@@ -154,7 +154,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                                                     <td className="px-6 py-6 font-bold text-industrial-gray">{getSpec(p, 'noise_level') || getSpec(p, 'ses')}</td>
                                                     <td className="px-6 py-6 font-bold text-industrial-gray">{getSpec(p, 'power_consumption') || getSpec(p, 'guc')}</td>
                                                     <td className="px-6 py-6"><span className="text-sm font-black text-primary-navy">{formatCurrency(p.price, lang)}</span></td>
-                                                    <td className="px-8 py-6 text-right"><button onClick={() => addToCart(p, 1)} className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-slate-900/10">EKLE</button></td>
+                                                    <td className="px-8 py-6 text-right"><button onClick={() => addToCart(p, 1)} className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-slate-900/10">{t('common.addToCart')}</button></td>
                                                 </tr>
                                             ))}
                                         </tbody>
