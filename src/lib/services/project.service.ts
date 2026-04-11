@@ -1,5 +1,6 @@
 import { supabase } from '../supabase'
 import type { DbUserProject, DbProjectItem, DbProduct } from '../../types/db-rows'
+import type { TablesInsert } from '../../types/database.types'
 import type { ProjectItem } from '../supabase'
 import { mapDatabaseProductToDomain } from '../type-converters'
 
@@ -13,9 +14,8 @@ export async function listUserProjects(): Promise<DbUserProject[]> {
   return (data as DbUserProject[]) || []
 }
 
-export async function createProject(project: Partial<DbUserProject>): Promise<DbUserProject> {
+export async function createProject(project: TablesInsert<'user_projects'>): Promise<DbUserProject> {
   const { data, error } = await supabase.from('user_projects')
-    // @ts-expect-error - REASON: Partial insert structure missing in strict mode
     .insert(project)
     .select()
     .single()

@@ -1,6 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin') || ''

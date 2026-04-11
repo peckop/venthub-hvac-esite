@@ -4,19 +4,15 @@ import { Award, Globe, Clock, Star } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
-interface BrandStat {
-    value: string
-    label: string
-}
-
 const SilentFanVorticeBrand: React.FC = () => {
-    const { t } = useI18n()
+    const { t, dict } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const tr = (key: string) => t(`categorySilentFan.brand.${key}`)
+    const bDict = dict.categorySilentFan.brand
 
     // We know the order or we can just use the icons array directly like before.
     const icons = [Clock, Globe, Award, Star]
-    const stats = (tr('stats') as unknown as BrandStat[]) || []
+    const stats = bDict.stats || []
 
     return (
         <section ref={sectionRef} className="py-20 bg-slate-900 text-white relative overflow-hidden">
@@ -42,7 +38,7 @@ const SilentFanVorticeBrand: React.FC = () => {
                         </p>
 
                         <div className="grid grid-cols-2 gap-6 mb-10">
-                            {stats.map((item: BrandStat, index: number) => {
+                            {stats.map((item, index: number) => {
                                 const Icon = icons[index % icons.length]
                                 return (
                                     <div key={index} className="flex items-center gap-4">
@@ -59,7 +55,7 @@ const SilentFanVorticeBrand: React.FC = () => {
                         </div>
 
                         <div className="flex flex-wrap gap-4">
-                            {(tr('badges') as unknown as string[] || []).map((badge: string, i: number) => (
+                            {(bDict.badges || []).map((badge: string, i: number) => (
                                 <div key={i} className={`px-6 py-3 rounded-full text-sm font-bold ${i === 0 ? 'bg-blue-600 shadow-lg shadow-blue-600/20' : 'bg-white/5 border border-white/10'}`}>
                                     {badge}
                                 </div>

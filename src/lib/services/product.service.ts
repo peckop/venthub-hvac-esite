@@ -55,8 +55,15 @@ export async function getProductsEnriched(params: GetProductsParams = {}): Promi
     return toUIProductList((fallbackData as DbProduct[]) || [])
   }
 
-  // @ts-expect-error - REASON: Generated RPC type missing meta_description and purchase_price
-  return toUIProductList((data as DbProduct[]) || [])
+  const enrichedProducts = (data || []).map(p => ({
+    ...p,
+    meta_description: null,
+    meta_title: null,
+    purchase_price: null,
+    is_category_manual: null
+  })) as DbProduct[]
+
+  return toUIProductList(enrichedProducts)
 }
 
 export async function getSearchSuggestions(q: string, limit: number = 6): Promise<SearchSuggestion[]> {

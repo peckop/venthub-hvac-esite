@@ -10,6 +10,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
 import { formatDateTime } from '../i18n/datetime'
 import { Routes } from '../utils/routes'
+import { isRecord } from '../lib/type-converters'
 
 
 interface Order {
@@ -75,37 +76,42 @@ export const OrdersPage: React.FC = () => {
       if (ordersError) {
         console.error('Error fetching orders:', ordersError)
         // 403 Forbidden error usually means RLS permission issue
-        if (ordersError.code === '42501' || (ordersError as unknown as Record<string, unknown>).status === 403) {
+        if (ordersError.code === '42501' || ('status' in ordersError && ordersError.status === 403)) {
           console.warn('RLS Permission denied. Please ensure DB migrations are applied.')
         }
         toast.error(t('orders.fetchError'))
         return
       }
 
-      const formattedOrders: Order[] = (ordersData || []).map((order: Record<string, unknown>) => {
-        const items: OrderItem[] = ((order.venthub_order_items as Record<string, unknown>[]) || []).map((it: Record<string, unknown>) => ({
-          id: String(it.id),
-          product_id: it.product_id ? String(it.product_id) : undefined,
-          product_name: String(it.product_name),
-          quantity: Number(it.quantity),
-          unit_price: Number(it.price_at_time) || 0,
-          total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
-          product_image_url: it.product_image_url ? String(it.product_image_url) : undefined,
-        }))
+      const formattedOrders: Order[] = (ordersData || []).map((rawOrder: unknown) => {
+        const order = isRecord(rawOrder) ? rawOrder : {}
+        const itemsList = Array.isArray(order.venthub_order_items) ? order.venthub_order_items : []
+        const items: OrderItem[] = itemsList.map((rawIt: unknown) => {
+          const it = isRecord(rawIt) ? rawIt : {}
+          return {
+            id: String(it.id),
+            product_id: it.product_id ? String(it.product_id) : undefined,
+            product_name: String(it.product_name || ''),
+            quantity: Number(it.quantity) || 0,
+            unit_price: Number(it.price_at_time) || 0,
+            total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
+            product_image_url: it.product_image_url ? String(it.product_image_url) : undefined,
+          }
+        })
 
         return {
           id: String(order.id),
           total_amount: Number(order.total_amount) || 0,
           status: String(order.status || 'pending'),
           payment_status: order.payment_status ? String(order.payment_status) : undefined,
-          created_at: String(order.created_at),
+          created_at: String(order.created_at || new Date().toISOString()),
           customer_name: String(order.customer_name || user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
           customer_email: String(order.customer_email || user?.email || '-'),
-          shipping_address: order.shipping_address as Record<string, unknown> | undefined,
+          shipping_address: isRecord(order.shipping_address) ? order.shipping_address : undefined,
           order_items: items,
           order_number: order.order_number ? String(order.order_number) : undefined,
           is_demo: false,
-          payment_data: order.payment_data as Record<string, unknown> | undefined,
+          payment_data: isRecord(order.payment_data) ? order.payment_data : undefined,
           conversation_id: order.conversation_id ? String(order.conversation_id) : undefined,
           carrier: order.carrier ? String(order.carrier) : undefined,
           tracking_number: order.tracking_number ? String(order.tracking_number) : undefined,

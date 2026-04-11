@@ -37,7 +37,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
     try {
       const { data, error } = await supabase.from('categories').select('*').eq('id', categoryId).single();
       if (error) throw error;
-      const cat = data as unknown as DbCategory;
+      const cat = data as DbCategory;
       setCategory(cat);
       
       let initialBlocks: AuthorityBlock[] = (cat.authority_content as AuthorityBlock[]) || [];
@@ -100,7 +100,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
       // Use DbJson (re-exported Json) to satisfy Supabase requirement without 'any'
       const { error } = await supabase
         .from('categories')
-        .update({ authority_content: blocks as unknown as DbJson })
+        .update({ authority_content: blocks as DbJson })
         .eq('id', categoryId);
       if (error) throw error;
       toast.success('Değişiklikler sisteme mühürlendi.');

@@ -53,3 +53,5 @@ src_lint.json
 
 .gemini/
 gha-creds-*.json
+
+memory-engine/data/*.db

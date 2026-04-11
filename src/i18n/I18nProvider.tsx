@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { en } from './dictionaries/en'
 import { tr } from './dictionaries/tr'
 
-import { I18nContext, type Lang } from './I18nContext'
+import { I18nContext, type Lang, type AppDictionary } from './I18nContext'
 
 export type { Lang }
 
@@ -96,7 +96,8 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [lang])
 
-  const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t])
+  const dict = useMemo(() => DICTS[lang] as AppDictionary, [lang])
+  const value = useMemo(() => ({ lang, setLang, t, dict }), [lang, setLang, t, dict])
 
   return (
     <I18nContext.Provider value={value}>
@@ -116,7 +117,8 @@ export function useI18n() {
       setLang: () => { },
       t: (key: string, paramsOrAlt?: Record<string, unknown> | string) => {
         return typeof paramsOrAlt === 'string' ? paramsOrAlt : key
-      }
+      },
+      dict: tr as AppDictionary
     }
   }
   return ctx

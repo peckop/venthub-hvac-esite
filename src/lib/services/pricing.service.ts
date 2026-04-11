@@ -46,22 +46,10 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
     const profile = (prof || {}) as UserProfileLight
     const role = (profile.role || 'individual') as UserRole
 
-    let tierLevel: number | null = null
-    if (profile.organization_id) {
-      const { data: org, error: orgErr } = await supabase
-        .from('organizations')
-        .select('id, tier_level')
-        .eq('id', profile.organization_id)
-        .maybeSingle()
-      if (!orgErr && org) {
-        tierLevel = (org as OrganizationLight)?.tier_level ?? null
-      }
-    }
-
     const now = nowIso()
     const { data: lists, error: listErr } = await supabase
       .from('price_lists')
-      .select('id, is_default, allowed_user_roles, organization_tiers, effective_from')
+      .select('id, user_type, effective_from')
       .eq('is_active', true)
       .lte('effective_from', now)
       .or(`effective_to.is.null,effective_to.gte.${now}`)
@@ -70,26 +58,23 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
 
     interface PriceListRow { 
       id: string; 
-      is_default: boolean | null; 
-      allowed_user_roles: string[] | null; 
-      organization_tiers: number[] | null; 
-      effective_from: string;
+      user_type: string | null; 
+      effective_from: string | null;
     }
 
-    // @ts-expect-error - REASON: Supabase missing generated types for price_lists missing columns
-    const typedLists = lists as PriceListRow[]
+    const typedLists: PriceListRow[] = lists
     
     // Filter and sort lists
     const matchedLists = typedLists.filter(list => {
       let match = false
-      if (list.allowed_user_roles && Array.isArray(list.allowed_user_roles) && list.allowed_user_roles.includes(role)) match = true
-      if (!match && tierLevel !== null && list.organization_tiers && Array.isArray(list.organization_tiers) && list.organization_tiers.includes(tierLevel)) match = true
-      if (!match && list.is_default) match = true
+      if (list.user_type === role) match = true
+      if (!match && !list.user_type) match = true // fallback to default (no user_type)
       return match
     })
 
     const sorted = matchedLists.sort((a, b) => {
-      if (a.is_default !== b.is_default) return a.is_default ? 1 : -1
+      // Prioritize specific user_type match over fallback
+      if (!a.user_type !== !b.user_type) return a.user_type ? -1 : 1
       const aTime = a.effective_from ? new Date(a.effective_from).getTime() : 0
       const bTime = b.effective_from ? new Date(b.effective_from).getTime() : 0
       return bTime - aTime

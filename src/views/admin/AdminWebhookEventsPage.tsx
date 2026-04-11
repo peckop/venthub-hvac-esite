@@ -43,7 +43,7 @@ const AdminWebhookEventsPage = () => {
       setLoading(true);
       
       // Use extended client for type-safe access to non-schema tables
-      const adminClient = supabase as unknown as SupabaseClient<AdminDatabase>;
+      const adminClient = supabase as SupabaseClient<AdminDatabase>;
       const query = adminClient.from('webhook_events');
       
       const { data, error: fetchErr } = await query

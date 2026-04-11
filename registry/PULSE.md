@@ -1,5 +1,5 @@
 # 🛰️ VENTHUB MISSION CONTROL (PULSE)
-> **Güncelleme:** 09.04.2026 19:46 | **İlerleme:** %66
+> **Güncelleme:** 11.04.2026 13:04 | **İlerleme:** %63
 
 ## 📁 P00-STANDALONE
 ### ⏳ Backlog
@@ -8,6 +8,8 @@
 | `034`  | Error Boundary & Resilience Layer             | ➖ -          |
 | `030`  | Gelişmiş Arama UX & Backend Optimizasyonu     | 🔥 HIGH       |
 | `031`  | SEO & Core Web Vitals (Performance) Audit     | 🔥 HIGH       |
+| `036`  | Front-End Tech Debt Eradication               | 🔥 HIGH       |
+| `900`  | Test Integration Task from AI                 | 🔥 HIGH       |
 
 ## 📁 P01-VISUAL-PAGE-BUILDER
 ### ⚡ Aktif Görevler
@@ -79,6 +81,7 @@
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
 |:---|:---|:---|
 | `007`  | Flash Guard Rails - Post-Edit Verification    | 🔥 HIGH       |
+| `333`  | Orion Detached Sync Test                      | 🔥 HIGH       |
 
 ## 📁 P07-ENTERPRISE-SEARCH
 

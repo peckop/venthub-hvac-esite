@@ -75,7 +75,7 @@ const AdminDashboardPage: React.FC = () => {
       setPendingShipments(shipRes.count)
 
       if (productsRes.data) {
-        const rawProducts = productsRes.data as unknown as import('../../types/db-rows').DbProduct[]
+        const rawProducts = productsRes.data as import('../../types/db-rows').DbProduct[]
 
         // Use a single O(n) loop to calculate both tiedCapital and alarmCount
         let capital = 0

@@ -34,7 +34,7 @@ VERBOSE = False # Varsayılan sessiz mod (Antigravity dostu)
 try:
     from orion_bridge import (
         bridge_dashboard, bridge_list_tasks, bridge_create_task,
-        bridge_normalize, bridge_update_task, orion_status
+        bridge_normalize, bridge_update_task, bridge_trigger_detached_normalize, orion_status
     )
     _ORION_BRIDGE_LOADED = True
 except ImportError:
@@ -44,6 +44,7 @@ except ImportError:
     def bridge_create_task(*a, **kw): return None
     def bridge_normalize(): return None
     def bridge_update_task(*a, **kw): return None
+    def bridge_trigger_detached_normalize(): pass
     def orion_status(): return {"orion_active": False}
 
 
@@ -1001,16 +1002,25 @@ if __name__ == "__main__":
             log_error("Proje ID ve Görev ID gerekli.")
             sys.exit(1)
         move_task(args.project_id, args.task_id, "active")
+        if _ORION_BRIDGE_LOADED:
+            bridge_update_task(args.task_id, status="executing", project_id=args.project_id)
+            bridge_trigger_detached_normalize()
     elif args.action == "backlog":
         if not args.project_id or not args.task_id:
             log_error("Proje ID ve Görev ID gerekli.")
             sys.exit(1)
         move_task(args.project_id, args.task_id, "backlog")
+        if _ORION_BRIDGE_LOADED:
+            bridge_update_task(args.task_id, status="backlog", project_id=args.project_id)
+            bridge_trigger_detached_normalize()
     elif args.action == "complete":
         if not args.project_id or not args.task_id:
             log_error("Proje ID ve Görev ID gerekli.")
             sys.exit(1)
         complete_task(args.project_id, args.task_id)
+        if _ORION_BRIDGE_LOADED:
+            bridge_update_task(args.task_id, status="completed", project_id=args.project_id)
+            bridge_trigger_detached_normalize()
     elif args.action == "progress":
         if not args.project_id or not args.task_id or args.value is None:
             log_error("Proje ID, Görev ID ve Value gerekli.")
@@ -1021,6 +1031,9 @@ if __name__ == "__main__":
             log_error(f"Progress değeri sayı olmalı: '{args.value}'")
             sys.exit(1)
         update_progress(args.project_id, args.task_id, progress_val)
+        if _ORION_BRIDGE_LOADED:
+            bridge_update_task(args.task_id, progress=progress_val, project_id=args.project_id)
+            bridge_trigger_detached_normalize()
     elif args.action == "dashboard":
         # FAZ 2: Orion üzerinden cross-project PULSE
         orion_result = bridge_dashboard()
@@ -1097,6 +1110,21 @@ artifacts:
         safe_write(task_dir / "review.md", f"# 🔍 Code Review: {args.query}\n\n## ✅ Kontrol Listesi\n- [ ] Tip güvenliği kontrol edildi\n- [ ] Testler başarılı")
         
         log_success(f"GÖREV PROTOKOLE UYGUN OLUŞTURULDU (BACKLOG): {task_folder_name}")
+        
+        # Orion Master aktifse görevi Senkronize et
+        try:
+            from orion_bridge import _is_orion_active, bridge_create_task, bridge_trigger_detached_normalize
+            if _is_orion_active():
+                bridge_create_task(
+                    title=args.query, 
+                    priority="HIGH", 
+                    project_id=args.project_id, 
+                    task_id=args.task_id.zfill(3)
+                )
+                bridge_trigger_detached_normalize()
+        except ImportError:
+            pass
+
         normalize_registry()
     elif args.action == "auto-sign":
         if not args.project_id or not args.task_id:
