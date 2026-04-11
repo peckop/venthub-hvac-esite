@@ -256,11 +256,17 @@ def create_task(
             },
         }
 
-    for filename, template in templates.items():
-        filepath = task_dir / filename
-        if not filepath.exists():
-            with open(filepath, "w", encoding="utf-8") as f:
-                json.dump(template, f, indent=2, ensure_ascii=False)
+    for name, content in templates.items():
+        with open(task_dir / name, "w", encoding="utf-8") as f:
+            json.dump(content, f, indent=2, ensure_ascii=False)
+
+    # Orion MCP Kancası (Yeni görev oluşturulduğunda merkeze bildir)
+    if bridge_create_task:
+        complexity = "low" if is_trivial else "medium"
+        try:
+            bridge_create_task(project_id, task_id, title, complexity)
+        except Exception as e:
+            print(f"⚠️ Orion arka plan bilgilendirmesi başarısız oldu: {e}")
 
     return task_dir
 
@@ -598,7 +604,12 @@ def finalize_task(task_dir: str | Path) -> None:
     """Görevi finalize eder: Git mv ile klasörü taşır, PULSE.md'yi günceller."""
     import subprocess
     import shutil
-    import re
+    from typing import Any
+
+    try:
+        from orion_bridge import bridge_create_task, bridge_update_task
+    except ImportError:
+        bridge_create_task = bridge_update_task = None
 
     task_path = Path(task_dir)
     if not task_path.is_dir():
@@ -694,6 +705,15 @@ def finalize_task(task_dir: str | Path) -> None:
                 json.dump(fdata, f, indent=2, ensure_ascii=False)
                 f.truncate()
                 
+    # Orion MCP Kancası (Görev kapatıldığında merkeze mühürle)
+    if bridge_update_task:
+        try:
+            orion_id = f"{project_prefix}/{task_id_formatted}"
+            bridge_update_task(orion_id, status="completed", progress=100)
+            print(f"🌍 Orion MCP Sync: Görev {orion_id} mühürlendi.")
+        except Exception as e:
+            print(f"⚠️ Orion mühürleme başarısız: {e}")
+
     print(f"🚀 Otonom Kapatma Başarılı! Sıradaki görev: git commit -am 'feat: complete {task_path.name}'")
 
 
