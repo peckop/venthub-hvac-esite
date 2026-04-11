@@ -55,7 +55,16 @@ export default function AccountShipmentsPage() {
             .select('id, created_at, total_amount, status, order_number')
             .eq('user_id', user?.id || '')
             .order('created_at', { ascending: false })
-          data = fallback.data as unknown[] as typeof data
+          if (fallback.data) {
+            data = fallback.data.map(item => ({
+              ...item,
+              carrier: null,
+              tracking_number: null,
+              tracking_url: null,
+              shipped_at: null,
+              delivered_at: null
+            })) as typeof data
+          }
           error = fallback.error
         }
         if (error) throw error

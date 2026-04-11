@@ -4,18 +4,13 @@ import { Microscope, Wind, ShieldCheck } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
-interface HowItWorksStep {
-    title: string
-    description: string
-}
-
 const SilentFanHowItWorks: React.FC = () => {
-    const { t } = useI18n()
+    const { t, dict } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const tr = (key: string) => t(`categorySilentFan.howItWorks.${key}`)
 
     const icons = [Microscope, Wind, ShieldCheck]
-    const steps = (tr('steps') as unknown as HowItWorksStep[]) || []
+    const steps = dict.categorySilentFan.howItWorks.steps || []
 
     return (
         <section ref={sectionRef} className="py-20 bg-slate-900 text-white relative overflow-hidden">
@@ -53,7 +48,7 @@ const SilentFanHowItWorks: React.FC = () => {
                         </p>
 
                         <div className="space-y-8">
-                            {steps.map((step: HowItWorksStep, index: number) => {
+                            {steps.map((step, index: number) => {
                                 const Icon = icons[index % icons.length]
                                 return (
                                     <div key={index} className="flex gap-5 group">

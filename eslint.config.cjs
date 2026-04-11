@@ -41,6 +41,10 @@ module.exports = [
       "no-restricted-syntax": [
         "error",
         {
+          "selector": "TSAsExpression > TSAsExpression",
+          "message": "Enterprise Kuralı: 'as unknown as Type' kullanılamaz. Güvenli dönüştürücüler (Type Converters) kullanın."
+        },
+        {
           "selector": "JSXAttribute[name.name='href'] > Literal[value^='/category']",
           "message": "Enterprise Kuralı: '/category' linklerini elle yazamazsınız. 'Routes.category()' yapısını kullanın."
         },

@@ -132,10 +132,10 @@ def bridge_list_tasks(status: str = None, project_id: str = None) -> str:
         return f"🚨 Orion Bridge Hatası (list_tasks): {e}"
 
 
-def bridge_create_task(title: str, priority: str = "MEDIUM", project_id: str = None) -> str:
+def bridge_create_task(title: str, priority: str = "MEDIUM", project_id: str = None, task_id: str = None) -> str:
     """or_create_task() → Orion'da yeni görev oluşturur.
 
-    Girdi  : title, priority (MEDIUM/HIGH/LOW/CRITICAL), project_id
+    Girdi  : title, priority (MEDIUM/HIGH/LOW/CRITICAL), project_id, task_id
     İşlem  : Orion registry_core.create_task() çağrısı yapar.
     Çıktı  : Oluşturulan görev ID'si.
     """
@@ -144,8 +144,16 @@ def bridge_create_task(title: str, priority: str = "MEDIUM", project_id: str = N
 
     try:
         core = _get_orion_core()
-        task_id = core.create_task(title, priority=priority, project_id=project_id)
-        return f"✅ Orion: Görev oluşturuldu  [ID: {task_id}]  Başlık: {title}"
+        orion_global_proj = core.get_active_project()
+        
+        # If explicitly passed, use it, else let Orion decide.
+        if task_id and project_id and "/" not in task_id:
+            orion_task_id = f"{project_id}/{task_id}"
+        else:
+            orion_task_id = task_id
+            
+        created_id = core.create_task(title, priority=priority, project_id=orion_global_proj, task_id=orion_task_id)
+        return f"✅ Orion: Görev oluşturuldu  [ID: {created_id}]  Başlık: {title}"
 
     except Exception as e:
         return f"🚨 Orion Bridge Hatası (create_task): {e}"
@@ -163,7 +171,18 @@ def bridge_update_task(task_id: str, status: str = None, progress: int = None, p
 
     try:
         core = _get_orion_core()
-        result = core.update_task(task_id, status=status, progress=progress, project_id=project_id)
+        
+        # VentHub local -> Orion DB mapper
+        # Local: args.project_id = "P06", args.task_id = "004"
+        # Orion: task_id = "P06/004", project_id = "venthubhvacesite"
+        if task_id and project_id and "/" not in task_id:
+            orion_task_id = f"{project_id}/{task_id}"
+        else:
+            orion_task_id = task_id
+            
+        orion_global_proj = core.get_active_project()
+        
+        result = core.update_task(orion_task_id, status=status, progress=progress, project_id=orion_global_proj)
         return f"✅ Orion: {result}"
 
     except Exception as e:
@@ -227,6 +246,22 @@ def bridge_set_project(project_name: str) -> str:
         return f"🚨 Orion: {e}. Kayıtlı projeler için or_list_tasks kullanın."
     except Exception as e:
         return f"🚨 Orion Bridge Hatası (set_project): {e}"
+
+def bridge_trigger_detached_normalize():
+    """Arka planda (detached) normalize işlemini tetikler. Terminali bloklamaz."""
+    if not _is_orion_active():
+        return
+    import subprocess
+    try:
+        manage_script = REGISTRY_DIR / "manage_registry.py"
+        subprocess.Popen(
+            [sys.executable, str(manage_script), "normalize"],
+            creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP,
+            cwd=str(REGISTRY_DIR.parent)
+        )
+    except Exception:
+        pass  # Otonom arka plan işleminde hata olursa sessizce geç
+
 
 
 # ── DURUM KONTROLÜ ──

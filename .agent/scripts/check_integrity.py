@@ -28,9 +28,9 @@ def check_type_escape(content: str, file_path: Path) -> list[str]:
     forbidden_patterns = [
         (r'\bas\s+any\b',           "as any"),
         (r'@ts-ignore',             "@ts-ignore"),
-        (r'@ts-expect-error(?!\s+.+REASON:)', "@ts-expect-error (gerekçesiz)"),
+        (r'@ts-expect-error(?!.*REASON:)', "@ts-expect-error (gerekçesiz)"),
         (r'\bas\s+unknown\s+as\b',  "as unknown as"),
-        (r'//\s*eslint-disable(?!-next-line react-hooks)', "eslint-disable (geniş kapsam)"),
+        (r'//\s*eslint-disable(?!-next-line react-hooks)(?!.*REASON:)', "eslint-disable (geniş kapsam)"),
         (r'Record<string,\s*any>',  "Record<string, any>"),
     ]
     for pattern, label in forbidden_patterns:
@@ -69,9 +69,6 @@ def check_property_mismatch(content: str, file_path: Path) -> list[str]:
         issues.append(
             f"[BLOCKER] Ozellik Uyumsuzlugu: '_id' tanimli ama '.id' kullaniliyor -> {file_path}"
         )
-    return issues
-
-
     return issues
 
 

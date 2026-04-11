@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import type { UserIdentity } from '@supabase/supabase-js'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -24,7 +25,8 @@ export default function AccountSecurityPage() {
     try {
       const { data, error } = await supabase.auth.getUser()
       if (!error && data?.user) {
-        const ids = (data.user as unknown as { identities?: Array<{ id?: string; provider?: string }> }).identities || []
+
+        const ids = (data.user as { identities?: Array<{ id?: string; provider?: string }> }).identities || []
         setIdentities(ids)
       }
     } catch { }
@@ -210,13 +212,11 @@ export default function AccountSecurityPage() {
                               toast.error('Google kimliği bulunamadı')
                               return
                             }
-                            type AuthWithUnlink = { unlinkIdentity?: (args: { identity_id: string }) => Promise<{ error?: unknown }> }
-                            const authMaybe = supabase.auth as unknown as AuthWithUnlink
-                            if (typeof authMaybe.unlinkIdentity !== 'function') {
+                            if (typeof supabase.auth.unlinkIdentity !== 'function') {
                               toast.error('unlinkIdentity API desteklenmiyor')
                               return
                             }
-                            const { error } = await authMaybe.unlinkIdentity({ identity_id: google.id })
+                            const { error } = await supabase.auth.unlinkIdentity(google as UserIdentity)
                             if (error) throw error
                             toast.success('Google bağlantısı kaldırıldı')
                             await refreshIdentities()
@@ -239,9 +239,11 @@ export default function AccountSecurityPage() {
                           const { data, error } = await supabase.auth.linkIdentity({
                             provider: 'google',
                             options: { redirectTo: `${window.location.origin}/auth/callback` }
-                          } as unknown as { provider: 'google'; options?: { redirectTo?: string } })
+
+                          } as { provider: 'google'; options?: { redirectTo?: string } })
                           if (error) throw error
-                          const url = (data as unknown as { url?: string })?.url
+
+                          const url = (data as { url?: string })?.url
                           if (url) {
                             router.push(url as import('next').Route)
                           } else {

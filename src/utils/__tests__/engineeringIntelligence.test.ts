@@ -12,7 +12,7 @@ describe('engineeringIntelligence', () => {
     it('returns null for zero, negative noise levels, or NaN', () => {
       expect(getNoiseInference(0)).toBeNull();
       expect(getNoiseInference(-10)).toBeNull();
-      expect(getNoiseInference(NaN as unknown as number)).toBeNull();
+      expect(getNoiseInference(NaN)).toBeNull();
     });
 
     it('returns ultraQuiet for noise levels below 30 dB with all fields', () => {
@@ -144,7 +144,7 @@ describe('engineeringIntelligence', () => {
         efficiency: 85,
         motor_tipi: 'EC'
       }
-    } as unknown as Product;
+    } as Partial<Product> as Product;
 
     it('aggregates all inferences correctly', () => {
       const inferences = generateEngineeringSummary(mockProduct);
@@ -162,7 +162,7 @@ describe('engineeringIntelligence', () => {
       const industrialProduct = {
         ...mockProduct,
         airflow_capacity: 2500
-      } as unknown as Product;
+      } as Partial<Product> as Product;
 
       const inferences = generateEngineeringSummary(industrialProduct);
       expect(inferences.find(i => i.type === 'power')?.labelKey).toBe('pdp.engineering.capacity.industrialFlow.label');
@@ -172,7 +172,7 @@ describe('engineeringIntelligence', () => {
       const productWithVerilik = {
         ...mockProduct,
         technical_specs: { verilik: '93%' }
-      } as unknown as Product;
+      } as Partial<Product> as Product;
 
       const inferences = generateEngineeringSummary(productWithVerilik);
       expect(inferences.find(i => i.type === 'efficiency')?.labelKey).toBe('pdp.engineering.efficiency.diamond.label');
@@ -183,7 +183,7 @@ describe('engineeringIntelligence', () => {
       const productWithMotorType = {
         ...mockProduct,
         technical_specs: { motor_type: 'AC' }
-      } as unknown as Product;
+      } as Partial<Product> as Product;
 
       const inferences = generateEngineeringSummary(productWithMotorType);
       expect(inferences.find(i => i.type === 'quality')?.labelKey).toBe('pdp.engineering.motor.ac.label');
@@ -192,7 +192,7 @@ describe('engineeringIntelligence', () => {
     it('returns empty array when no relevant data is present', () => {
       const emptyProduct = {
         technical_specs: {}
-      } as unknown as Product;
+      } as Partial<Product> as Product;
 
       const inferences = generateEngineeringSummary(emptyProduct);
       expect(inferences).toHaveLength(0);

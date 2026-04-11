@@ -103,3 +103,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-10 22:51:02
+- **Commit:** `c1367dd4`
+- **Mesaj:** feat(registry): Faz 2 — Orion Bridge köprüsü + Scope Police aktifleştirildi
+- **Değişen Dosyalar:**
+
+

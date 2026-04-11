@@ -4,6 +4,22 @@ import type { DomainCategory, DomainProduct } from '../types/ui-models'
 // Re-export domain types so they can be accessed through this module (as expected by other files)
 export type { DomainCategory, DomainProduct }
 
+import type { Json } from '../types/database.types'
+
+/**
+ * Safely converts complex TypeScript types to Supabase's exact Json type without unsafe casts.
+ * Achieved by using JSON parsing, which cleanly satisfies TypeScript's type inference.
+ */
+export const toSupabaseJson = <T>(data: T): Json => JSON.parse(JSON.stringify(data)) as Json
+
+/**
+ * Type guard to safely check if an unknown value is a generic Record<string, unknown>
+ */
+export const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+
 /**
  * Safely converts a Database Category row to a UI-ready Category model.
  * Centralizes the handling of potential Json/Text mismatches from Supabase.

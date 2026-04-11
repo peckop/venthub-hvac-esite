@@ -55,8 +55,12 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [user, refreshProjects])
 
   const addProject = useCallback(async (name: string, description?: string) => {
+    if (!user?.id) {
+      toast.error('Oturum açmanız gerekiyor.')
+      return null
+    }
     try {
-      const newProject = await createProject({ name, description, user_id: user?.id })
+      const newProject = await createProject({ name, description, user_id: user.id })
       setProjects(prev => [newProject, ...prev])
       toast.success('Proje başarıyla oluşturuldu.')
       return newProject

@@ -1,12 +1,6 @@
 import React from 'react'
-// @ts-expect-error - REASON: External library typing missing
-import { ErrorBoundary } from 'react-error-boundary'
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { AlertTriangle, RotateCcw } from 'lucide-react'
-
-interface FallbackProps {
-  error: Error
-  resetErrorBoundary: () => void
-}
 
 const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   return (
@@ -21,7 +15,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
       </p>
       
       <div className="bg-slate-100 p-4 rounded-lg w-full mb-6 overflow-x-auto text-left border border-slate-200">
-        <p className="text-xs font-mono text-slate-700 break-words">{error.message}</p>
+        <p className="text-xs font-mono text-slate-700 break-words">{error instanceof Error ? error.message : String(error)}</p>
       </div>
 
       <button

@@ -94,7 +94,7 @@ const AdminCategoriesPage: React.FC = () => {
         .order('name', { ascending: true })
 
       if (fetchErr) throw fetchErr
-      setRows((data as unknown as DbCategory[]) || [])
+      setRows((data as DbCategory[]) || [])
     } catch (e) {
       setError((e as Error).message || 'Kategoriler yüklenemedi')
       setRows([])

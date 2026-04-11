@@ -165,7 +165,8 @@ const AdminProductsPage: React.FC = () => {
           filtered = filtered.filter(r => r.is_featured)
         }
 
-        list = toUIProductList(filtered as unknown as DbProduct[])
+
+        list = toUIProductList(filtered as DbProduct[])
         // total_count: RPC window function üzerinden gelir
         totalCount = results.length > 0 ? Number((results[0] as { total_count?: number }).total_count || results.length) : 0
       } else {
@@ -198,7 +199,8 @@ const AdminProductsPage: React.FC = () => {
         const to = from + PAGE_SIZE - 1
         const { data, error, count } = await query.range(from, to)
         if (error) throw error
-        list = toUIProductList((data as unknown as DbProduct[]) || [])
+
+        list = toUIProductList((data as DbProduct[]) || [])
         totalCount = typeof count === 'number' ? count : 0
       }
 

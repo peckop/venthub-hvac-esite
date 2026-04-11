@@ -47,7 +47,7 @@ export type LegacyAuthorityContent = {
 export type AuthorityContent = DynamicAuthorityContent;
 
 // Metadata structure for categories
-export interface CategoryMetadata {
+export type CategoryMetadata = {
   hero_title?: string;
   hero_description?: string;
   technical_summary?: string;

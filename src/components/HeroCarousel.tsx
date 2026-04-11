@@ -193,7 +193,9 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                         <ArrowRight className="ml-2 w-5 h-5" />
                                     </Link>
                                     <button
-                                        onClick={() => ((window as unknown) as { openLeadModal?: () => void }).openLeadModal?.()}
+                                        onClick={() => {
+                                            window.openLeadModal?.()
+                                        }}
                                         className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/20 rounded-lg font-bold transition-all backdrop-blur-sm"
                                     >
                                         {t('home.hero.secondaryCta')}

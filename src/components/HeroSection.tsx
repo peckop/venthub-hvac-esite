@@ -61,8 +61,8 @@ export const HeroSection: React.FC = () => {
       if (coarse || rm) return
       
       const idle = (cb: () => void) => {
-        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-          (window as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(cb)
+        if (typeof window !== 'undefined' && window.requestIdleCallback) {
+          window.requestIdleCallback(cb)
         } else {
           setTimeout(cb, 800)
         }
@@ -171,7 +171,7 @@ export const HeroSection: React.FC = () => {
               </Link>
               <button
                 type="button"
-                onClick={() => { const w = (window as unknown) as { openLeadModal?: () => void }; if (w.openLeadModal) w.openLeadModal() }}
+                onClick={() => { if (window.openLeadModal) window.openLeadModal() }}
                 className="inline-flex items-center justify-center px-8 py-4 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold rounded-lg transition-colors"
               >
                 {t('common.getQuote')}
