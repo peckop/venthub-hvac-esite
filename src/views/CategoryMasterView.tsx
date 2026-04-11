@@ -61,7 +61,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
           <CategoryLandingView 
             category={category.raw}
             subCategories={rawSubCategories}
-            products={products as unknown as DomainProduct[]}
+            products={products as DomainProduct[]}
           />
         )
       case 'series':
@@ -70,7 +70,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
           <CategorySeriesView 
             category={category.raw}
             parentCategory={parentCategory?.raw}
-            products={products as unknown as DomainProduct[]}
+            products={products as DomainProduct[]}
           />
         )
       default:
@@ -80,7 +80,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
                 <CategorySeriesView 
                   category={category.raw}
                   parentCategory={parentCategory?.raw}
-                  products={products as unknown as DomainProduct[]}
+                  products={products as DomainProduct[]}
                 />
             )
         }

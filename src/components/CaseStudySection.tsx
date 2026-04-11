@@ -22,7 +22,9 @@ const CaseStudySection: React.FC = () => {
   ]
 
   const openLead = () => {
-    ;((window as unknown) as { openLeadModal?: () => void }).openLeadModal?.()
+    if (typeof window !== 'undefined') {
+      window.openLeadModal?.()
+    }
   }
 
   return (

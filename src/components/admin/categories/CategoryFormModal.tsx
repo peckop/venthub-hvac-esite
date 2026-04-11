@@ -12,6 +12,7 @@ import type { DbCategory, CategoryMetadata } from '../../../types/db-rows'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
 import { VentImage } from '../../ui/VentImage'
+import { toSupabaseJson } from '../../../lib/type-converters'
 
 
 type CategoryUpdate = Database['public']['Tables']['categories']['Update']
@@ -179,8 +180,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                     is_featured: values.is_featured,
                     sort_order: values.sort_order,
                     image_url: values.image_url,
-                    /* @ts-expect-error REASON: Supabase generic Json type structure mismatch with CategoryMetadata */
-                    metadata: metadata
+                    metadata: toSupabaseJson(metadata)
                 }
 
                 const { error } = await supabase
@@ -202,8 +202,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                     is_featured: values.is_featured,
                     sort_order: values.sort_order,
                     image_url: values.image_url,
-                    /* @ts-expect-error REASON: Supabase generic Json type structure mismatch with CategoryMetadata */
-                    metadata: metadata,
+                    metadata: toSupabaseJson(metadata),
                     authority_content: []
                 }
 

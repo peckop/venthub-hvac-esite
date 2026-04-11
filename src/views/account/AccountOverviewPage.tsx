@@ -55,8 +55,10 @@ export default function AccountOverviewPage() {
             .order('created_at', { ascending: false })
             .limit(50)
 
-          if (error && (error as unknown as { code: string }).code === 'PGRST100') throw error 
-          if (data) orderData = data as unknown as ShipmentRecord[]
+
+          if (error && (error as { code: string }).code === 'PGRST100') throw error 
+
+          if (data) orderData = data as ShipmentRecord[]
         } catch {
           const fallback = await supabase
             .from('venthub_orders')
@@ -65,13 +67,14 @@ export default function AccountOverviewPage() {
             .order('created_at', { ascending: false })
             .limit(50)
           if (fallback.data) {
-            orderData = (fallback.data as unknown as Record<string, unknown>[]).map(d => ({
+
+            orderData = (fallback.data as Record<string, unknown>[]).map(d => ({
               ...d,
               carrier: null,
               tracking_number: null,
               shipped_at: null,
               delivered_at: null
-            })) as unknown as ShipmentRecord[]
+            })) as ShipmentRecord[]
           }
         }
 

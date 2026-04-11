@@ -41,8 +41,14 @@ const MagneticCTA: React.FC = () => {
             className="relative"
           >
             <button
-              onClick={() => ((window as unknown) as { openLeadModal?: () => void }).openLeadModal?.()}
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.openLeadModal?.()
+                }
+              }}
               className="inline-flex items-center justify-center rounded-xl bg-white text-primary-navy font-bold px-8 py-4 shadow-lg hover:shadow-xl transition-transform"
+
+
               style={{ transform: 'translate(var(--dx, 0px), var(--dy, 0px))' }}
             >
               {t('homeCta.button')}

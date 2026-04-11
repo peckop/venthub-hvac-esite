@@ -2,7 +2,6 @@ import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import AccountReturnsPage from '../AccountReturnsPage'
-import { supabase } from '../../../lib/supabase'
 
 // Mocks
 const mockNavigate = vi.fn()
@@ -28,20 +27,25 @@ vi.mock('../../../i18n/I18nProvider', () => ({
   useI18n: () => mockI18n
 }))
 
-const mockedSupabase = supabase as unknown as { from: ReturnType<typeof vi.fn> }
-mockedSupabase.from = vi.fn().mockImplementation((table: string) => {
-  const chain = {
-    select: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
-    order: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    then: vi.fn().mockImplementation((callback) => {
-      if (table === 'venthub_returns') return callback({ data: [], error: null })
-      if (table === 'venthub_orders') return callback({ data: [{ id: 'ord1', order_number: 'VH-76543210', created_at: new Date().toISOString() }], error: null })
-      return callback({ data: [], error: null })
-    })
+vi.mock('../../../lib/supabase', () => {
+  return {
+    supabase: {
+      from: vi.fn().mockImplementation((table: string) => {
+        const chain = {
+          select: vi.fn().mockReturnThis(),
+          insert: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
+          order: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          then: vi.fn().mockImplementation((callback: (args: { data: Record<string, unknown>[], error: unknown }) => unknown) => {
+            if (table === 'venthub_returns') return callback({ data: [], error: null })
+            if (table === 'venthub_orders') return callback({ data: [{ id: 'ord1', order_number: 'VH-76543210', created_at: new Date().toISOString() }], error: null })
+            return callback({ data: [], error: null })
+          })
+        }
+        return chain
+      })
+    }
   }
-  return chain as unknown
 })
 
 beforeEach(() => {

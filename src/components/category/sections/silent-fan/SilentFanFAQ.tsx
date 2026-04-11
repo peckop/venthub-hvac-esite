@@ -3,18 +3,13 @@ import { Plus, Minus, HelpCircle } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
-interface FAQItem {
-    q: string
-    a: string
-}
-
 const SilentFanFAQ: React.FC = () => {
-    const { t } = useI18n()
+    const { t, dict } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [openIndex, setOpenIndex] = useState<number | null>(0)
     
     const tr = (key: string) => t(`categorySilentFan.faq.${key}`)
-    const items = (tr('items') as unknown as FAQItem[]) || []
+    const items = dict.categorySilentFan.faq.items || []
 
     return (
         <section ref={sectionRef} className="py-20 bg-slate-50">
@@ -29,7 +24,7 @@ const SilentFanFAQ: React.FC = () => {
                 </div>
 
                 <div className="space-y-4">
-                    {items.map((item: FAQItem, index: number) => {
+                    {items.map((item, index: number) => {
                         const isOpen = openIndex === index
                         return (
                             <div 

@@ -10,9 +10,10 @@ interface PainPoint {
 }
 
 const SilentFanProblem: React.FC = () => {
-    const { t } = useI18n()
+    const { t, dict } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const tr = (key: string) => t(`categorySilentFan.problem.${key}`)
+    const pDict = dict.categorySilentFan.problem
 
     const icons = [VolumeX, Zap, Activity, Info]
     const colors = [
@@ -22,7 +23,7 @@ const SilentFanProblem: React.FC = () => {
         { text: 'text-purple-500', bg: 'bg-purple-50' }
     ]
 
-    const painPoints = (tr('painPoints') as unknown as PainPoint[]) || []
+    const painPoints = pDict.painPoints || []
 
     return (
         <section ref={sectionRef} className="py-16 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
@@ -83,7 +84,7 @@ const SilentFanProblem: React.FC = () => {
                                         <h3 className="text-lg font-bold text-white">{String(tr('visual.without'))}</h3>
                                     </div>
                                     <ul className="space-y-2">
-                                        {Array.isArray(tr('visual.withoutPoints')) && (tr('visual.withoutPoints') as unknown as string[]).map((p: string, i: number) => (
+                                        {Array.isArray(pDict.visual.withoutPoints) && pDict.visual.withoutPoints.map((p, i) => (
                                             <li key={i} className="text-red-200 text-sm flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-red-400 rounded-full" /> {p}
                                             </li>
@@ -98,7 +99,7 @@ const SilentFanProblem: React.FC = () => {
                                         <h3 className="text-lg font-bold text-white">{String(tr('visual.with'))}</h3>
                                     </div>
                                     <ul className="space-y-2">
-                                        {Array.isArray(tr('visual.withPoints')) && (tr('visual.withPoints') as unknown as string[]).map((p: string, i: number) => (
+                                        {Array.isArray(pDict.visual.withPoints) && pDict.visual.withPoints.map((p, i) => (
                                             <li key={i} className="text-blue-100 text-sm flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" /> {p}
                                             </li>

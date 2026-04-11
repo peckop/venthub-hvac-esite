@@ -304,7 +304,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
               </h2>
             </div>
             <Link 
-              href={`/products?brand=${brand.name}`} 
+              href={Routes.products({ brand: brand.name })} 
               aria-label={t('brands.detail.allProductGroups')}
               className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-colors flex items-center gap-3 justify-center"
             >

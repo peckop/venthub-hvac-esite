@@ -10,7 +10,7 @@ const createMockItem = (
 ): CartItem => ({
   id,
   quantity,
-  product: { price: productPrice } as unknown as CartItem['product'],
+  product: { price: productPrice } as Partial<CartItem['product']> as CartItem['product'],
   unitPrice
 })
 
