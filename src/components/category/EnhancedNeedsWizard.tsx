@@ -97,6 +97,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 .select('*')
                 .eq('status', 'active')
                 .contains('category_slugs', [parentSlug])
+                .returns<DbProduct[]>()
 
             if (error) throw error
 
@@ -109,7 +110,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 application: state.usageLocation === 'cold-storage' ? 'coldRoom' : 'comfort'
             })
 
-            const rawProducts = data as unknown as DbProduct[]
+            const rawProducts = data
             const domainProducts = toUIProductList(rawProducts)
 
             const scored = domainProducts
