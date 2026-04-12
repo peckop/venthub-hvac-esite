@@ -97,7 +97,12 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
     if (editing) {
         return (
-            <div className={`inline-flex items-center gap-1 ${className}`} onClick={(e) => e.stopPropagation()}>
+            <div 
+                className={`inline-flex items-center gap-1 ${className}`} 
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                role="presentation"
+            >
                 <input
                     ref={inputRef}
                     type={type}
@@ -116,23 +121,17 @@ const EditableCell: React.FC<EditableCellProps> = ({
     }
 
     return (
-        <span
-            className={`cursor-pointer border-b border-dashed border-slate-300 hover:border-primary-navy hover:text-primary-navy transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+        <button
+            type="button"
+            disabled={disabled}
+            className={`cursor-pointer border-b border-dashed border-slate-300 hover:border-primary-navy hover:text-primary-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-left bg-transparent p-0 ${className}`}
             onClick={(e) => {
                 e.stopPropagation()
                 startEdit()
             }}
-            role="button"
-            tabIndex={disabled ? undefined : 0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    startEdit()
-                }
-            }}
         >
             {String(value ?? '') || <span className="text-slate-400">{placeholder}</span>}
-        </span>
+        </button>
     )
 }
 

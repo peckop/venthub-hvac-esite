@@ -97,6 +97,10 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') e.stopPropagation()
+                }}
+                role="presentation"
             >
                 {is3DMode ? (
                     <div className="w-full h-full relative">

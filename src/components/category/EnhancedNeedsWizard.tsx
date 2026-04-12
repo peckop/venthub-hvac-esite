@@ -152,8 +152,19 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
     const prevStep = () => setState(prev => ({ ...prev, step: (prev.step - 1) as WizardStep }))
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" onClick={onClose} />
+        <div 
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="wizard-title"
+        >
+            <button
+                type="button"
+                className="absolute inset-0 w-full h-full bg-slate-900/60 backdrop-blur-xl cursor-default border-none outline-none" 
+                onClick={onClose} 
+                aria-label="Kapat"
+                tabIndex={-1}
+            />
             
             <div className="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
                 {/* Header */}
@@ -165,7 +176,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             </button>
                         )}
                         <div>
-                            <h3 className="text-lg font-bold text-slate-900">İhtiyaç Analiz Sihirbazı</h3>
+                            <h3 id="wizard-title" className="text-lg font-bold text-slate-900">İhtiyaç Analiz Sihirbazı</h3>
                             <div className="flex gap-1 mt-1">
                                 {[1, 2, 3, 4, 5, 6].map(s => (
                                     <div key={s} className={`h-1 rounded-full transition-all duration-500 ${s <= state.step ? 'w-6 bg-cyan-500' : 'w-2 bg-slate-200'}`} />

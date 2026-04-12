@@ -50,13 +50,21 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <motion.div
+    <div 
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-to-project-title"
+    >
+      <motion.button
+        type="button"
+        aria-label="Modalı kapat"
+        tabIndex={-1}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+        className="absolute inset-0 w-full h-full bg-slate-900/60 backdrop-blur-sm cursor-default border-none outline-none"
       />
       
       <motion.div
@@ -67,7 +75,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
       >
         {/* Header */}
         <div className="px-6 py-4 border-b border-light-gray flex items-center justify-between bg-primary-navy text-white">
-          <h3 className="font-bold text-lg">Proje Listesine Ekle</h3>
+          <h3 id="add-to-project-title" className="font-bold text-lg">Proje Listesine Ekle</h3>
           <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full transition-colors">
             <X size={20} />
           </button>
@@ -135,7 +143,6 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
             >
               <div className="relative">
                 <input
-                  autoFocus
                   type="text"
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}

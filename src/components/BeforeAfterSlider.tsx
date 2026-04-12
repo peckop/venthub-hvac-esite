@@ -1,5 +1,5 @@
 import { VentImage } from '@/components/ui/VentImage'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 
 interface BeforeAfterSliderProps {
   beforeSrc: string
@@ -9,19 +9,7 @@ interface BeforeAfterSliderProps {
 
 const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({ beforeSrc, afterSrc, alt = 'before-after' }) => {
   const [pos, setPos] = useState(50) // yüzde
-  const containerRef = useRef<HTMLDivElement | null>(null)
-
-  // Klavye ile kontrol
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') setPos(p => Math.max(0, p - 5))
-      if (e.key === 'ArrowRight') setPos(p => Math.min(100, p + 5))
-    }
-    el.addEventListener('keydown', onKey)
-    return () => el.removeEventListener('keydown', onKey)
-  }, [])
+  // Native input[type="range"] klavye kontrolünü otomatik yapar.
 
   return (
     <section className="py-10">
@@ -31,8 +19,7 @@ const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({ beforeSrc, afterS
           <p className="text-steel-gray">Uygulama etkisini hızlıca görün</p>
         </div>
         <div
-          ref={containerRef}
-          tabIndex={0}
+          role="region"
           className="relative w-full h-56 sm:h-72 lg:h-80 rounded-2xl overflow-hidden border border-light-gray shadow"
           aria-label="Öncesi / sonrası karşılaştırma"
         >

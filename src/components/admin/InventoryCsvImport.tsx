@@ -258,15 +258,26 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
 
     return (
         <>
-            <div className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm" onClick={onClose} />
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <button 
+                type="button"
+                className="fixed inset-0 w-full h-full bg-black/60 z-50 backdrop-blur-sm cursor-default border-none outline-none" 
+                onClick={onClose}
+                aria-label="Kapat"
+                tabIndex={-1}
+            />
+            <div 
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="csv-import-title"
+            >
                 <div className="glass-strong rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.6)] max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col pointer-events-auto border border-white/10 animate-in zoom-in-95 duration-300">
                     <header className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                         <div className="flex items-center gap-3">
                             <div className="p-2.5 rounded-2xl bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
                                 <FileUp size={20} className="text-[#0A0F1E]" />
                             </div>
-                            <h2 className="text-xl font-black text-white uppercase tracking-tight">CSV Stok İçe Aktarma</h2>
+                            <h2 id="csv-import-title" className="text-xl font-black text-white uppercase tracking-tight">CSV Stok İçe Aktarma</h2>
                         </div>
                         <button className="w-10 h-10 flex items-center justify-center rounded-full glass border border-white/10 text-slate-400 hover:text-white transition-all hover:bg-white/5" onClick={onClose}>
                             <X size={20} />
@@ -315,12 +326,23 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                 </label>
                                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mt-0.5">Veritabanını güncellemeden önce sonuçları önizleyin.</p>
                             </div>
-                            <div 
-                                className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors ${dryRun ? 'bg-amber-400' : 'bg-white/10'}`}
+                            <button
+                                type="button"
+                                role="switch"
+                                aria-checked={dryRun}
+                                aria-label="Simülasyon modu aç kapa"
+                                tabIndex={0}
+                                className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors outline-none focus:ring-2 focus:ring-cyan-400/50 ${dryRun ? 'bg-amber-400' : 'bg-white/10'}`}
                                 onClick={() => setDryRun(!dryRun)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        setDryRun(!dryRun);
+                                    }
+                                }}
                             >
                                 <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${dryRun ? 'left-7' : 'left-1'}`} />
-                            </div>
+                            </button>
                         </div>
 
                         {csvPreview.length > 0 && (

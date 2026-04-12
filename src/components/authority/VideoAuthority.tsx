@@ -24,6 +24,7 @@ export default function VideoAuthority({ metadata, className = '' }: VideoAuthor
             case 'cloudflare':
                 return (
                     <iframe
+                        title={metadata.title || "Cloudflare Video Player"}
                         src={`https://${process.env.NEXT_PUBLIC_CLOUDFLARE_STREAM_DOMAIN || 'customer-XXXXX.cloudflarestream.com'}/${metadata.id}/iframe?autoplay=${metadata.options?.autoPlay ? 'true' : 'false'}&muted=${isMuted ? 'true' : 'false'}`}
                         className="absolute inset-0 w-full h-full"
                         allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
@@ -33,6 +34,7 @@ export default function VideoAuthority({ metadata, className = '' }: VideoAuthor
             case 'youtube':
                 return (
                     <iframe
+                        title={metadata.title || "YouTube Video Player"}
                         src={`https://www.youtube.com/embed/${metadata.id}?autoplay=${metadata.options?.autoPlay ? 1 : 0}&mute=${isMuted ? 1 : 0}&loop=${metadata.options?.loop ? 1 : 0}&controls=${metadata.options?.controls ? 1 : 0}`}
                         className="absolute inset-0 w-full h-full"
                         allowFullScreen

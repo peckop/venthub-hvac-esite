@@ -80,6 +80,8 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
       <div
         className="absolute inset-0 bg-secondary-blue/80 backdrop-blur-sm transition-opacity"
         onClick={handleClose}
+        onKeyDown={(e) => { if (e.key === 'Escape') handleClose() }}
+        role="presentation"
       />
 
       {/* Modal Content */}
@@ -87,7 +89,6 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
         role="dialog"
         aria-modal="true"
         className="relative w-full max-w-5xl bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:flex-row max-h-[100dvh] sm:max-h-[85vh] transform transition-all animate-in fade-in zoom-in-95 duration-300"
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button Mobile */}
         <button
