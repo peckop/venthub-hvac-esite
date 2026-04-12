@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { getCategories } from '../lib/supabase';
 import { toUICategoryList, DomainCategory } from '../lib/type-converters';
 import type { CategoryMetadata } from '../types/db-rows';
@@ -26,7 +26,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getCategories();
@@ -38,11 +38,11 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadCategories();
-  }, []);
+  }, [loadCategories]);
 
   // Yardımcı: Ağaç Yapısını Oluştur (Memoized)
   const categoryTree = useMemo(() => {
@@ -55,12 +55,12 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   }, [categories]);
 
-  const getCategoryBySlug = (slug: string) => categories.find(c => c.slug === slug);
-  const getSubCategories = (parentId: string) => 
+  const getCategoryBySlug = useCallback((slug: string) => categories.find(c => c.slug === slug), [categories]);
+  const getSubCategories = useCallback((parentId: string) =>
     categories.filter(c => c.parent_id === parentId)
-              .sort((a, b) => ((a.metadata as CategoryMetadata | null)?.sort_order ?? 0) - ((b.metadata as CategoryMetadata | null)?.sort_order ?? 0));
+              .sort((a, b) => ((a.metadata as CategoryMetadata | null)?.sort_order ?? 0) - ((b.metadata as CategoryMetadata | null)?.sort_order ?? 0)), [categories]);
 
-  const value = {
+  const value = useMemo(() => ({
     categories,
     categoryTree,
     loading,
@@ -68,7 +68,15 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     refresh: loadCategories,
     getCategoryBySlug,
     getSubCategories
-  };
+  }), [
+    categories,
+    categoryTree,
+    loading,
+    error,
+    loadCategories,
+    getCategoryBySlug,
+    getSubCategories
+  ]);
 
   return (
     <CategoryContext.Provider value={value}>
