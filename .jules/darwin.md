@@ -3,3 +3,6 @@
 **Action:** When testing classification functions, ensure test data covers cases where keys might accidentally overlap in substring matches, or update categorization logic to use strict equality/regex if precise matching is needed.## 2024-04-09 - Testing Faulty Implementations
 **Learning:** `parsePriceToNumber` in `categoryHelpers.ts` incorrectly parses strings like `"₺ 1.234,56"` by leaving thousands separators in place (converting to `"1.234.56"`) and allowing `parseFloat` to truncate it to `1.234` instead of `1234.56`.
 **Action:** When acting as Darwin, DO NOT fix the source code. Document the bug within the test itself and write expectations that assert the current (even if faulty) behavior to prevent CI failure and strictly adhere to the "test only, don't fix" boundary.
+## 2025-01-01 - Mocking Global Crypto Object in Vitest
+**Learning:** Testing environment-specific fallback logic for global APIs like `globalThis.crypto` requires safely capturing the original object and using `Object.defineProperty` on both `globalThis` and `global` in Node/Vitest environments to accurately mock its absence or throw errors without permanently corrupting the test runner's state.
+**Action:** Always capture `globalThis.crypto` (and `global.crypto`) during setup and restore it in an `afterEach` hook when testing features that gracefully degrade across Secure Contexts.
