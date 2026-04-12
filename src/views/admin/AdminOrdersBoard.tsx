@@ -189,8 +189,18 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
     }
 
     return (
-        <div className="fixed inset-0 bg-[#020617]/40 backdrop-blur-xl flex items-center justify-center z-[110] p-4 animate-in fade-in duration-300" onClick={onClose}>
-            <div className="glass-strong border border-white/10 rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 flex items-center justify-center z-[110] p-4 text-left">
+            <div 
+                className="absolute inset-0 bg-[#020617]/40 backdrop-blur-xl animate-in fade-in duration-300"
+                onClick={onClose}
+                onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}
+                role="presentation"
+            />
+            <div 
+                role="dialog"
+                aria-modal="true"
+                className="glass-strong border border-white/10 rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-300 relative"
+            >
                 {/* Header */}
                 <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
                     <div>
@@ -488,8 +498,8 @@ export default function AdminOrdersBoard() {
                             return (
                                 <div key={col.id} className={`flex flex-col w-full md:w-[320px] shrink-0 glass-strong border border-white/5 rounded-[2.5rem] overflow-hidden transition-all duration-300 ${!isExpanded ? 'h-auto md:h-full opacity-60 grayscale hover:opacity-100 hover:grayscale-0' : 'opacity-100 grayscale-0 shadow-2xl bg-white/[0.03]'}`} style={{ maxHeight: '100%' }}>
                                     {/* Sütun Başlık */}
-                                    <div
-                                        className={`p-6 border-b border-white/5 flex items-center justify-between ${isExpanded ? `${col.bgClass} backdrop-blur-xl` : 'bg-transparent'} transition-colors cursor-pointer md:cursor-default`}
+                                    <button
+                                        className={`w-full text-left p-6 border-b border-white/5 flex items-center justify-between ${isExpanded ? `${col.bgClass} backdrop-blur-xl` : 'bg-transparent'} transition-colors cursor-pointer md:cursor-default`}
                                         onClick={() => setExpandedCol(isExpanded ? null : col.id)}
                                     >
                                         <div className="flex items-center gap-3">
@@ -504,7 +514,7 @@ export default function AdminOrdersBoard() {
                                             </span>
                                             <ChevronDown className={`w-4 h-4 md:hidden transition-transform text-slate-500 ${isExpanded ? 'rotate-180' : ''}`} />
                                         </div>
-                                    </div>
+                                    </button>
 
                                     {/* Droppable */}
                                     <Droppable droppableId={col.id}>
@@ -523,6 +533,14 @@ export default function AdminOrdersBoard() {
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
                                                                 onClick={() => setSelectedOrder(order)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') {
+                                                                        e.stopPropagation()
+                                                                        setSelectedOrder(order)
+                                                                    }
+                                                                }}
+                                                                role="button"
+                                                                tabIndex={0}
                                                                 className={`p-5 rounded-[1.75rem] border transition-all duration-300 cursor-pointer group relative overflow-hidden
                                                                     ${snapshot.isDragging 
                                                                         ? 'bg-cyan-400 text-[#0A0F1E] border-cyan-300 shadow-[0_20px_60px_rgba(34,211,238,0.4)] scale-105 z-50' 

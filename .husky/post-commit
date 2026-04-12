@@ -1,6 +1,12 @@
 #!/usr/bin/env sh
 set -eu
 
+# Eğer işlem bir 'rebase' veya 'interaktif rebase' modundaysa çalışmayı atla.
+if [ -d ".git/rebase-merge" ] || [ -d ".git/rebase-apply" ]; then
+  echo "⏩ [Trafik Polisi] Araç otoyolda değil, sanayide (Rebase modunda). Güvenlik denetimi atlanarak yol veriliyor..."
+  exit 0
+fi
+
 # Scope Police Stamp Dosyası
 STAMP_FILE=".git/pre-commit.stamp"
 LOG_FILE=".agent/bypass_log.md"

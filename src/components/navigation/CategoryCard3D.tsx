@@ -26,7 +26,16 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
     return (
         <div
             onClick={onClick}
-            className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/20"
+            role="button"
+            tabIndex={0}
+            aria-label={`${getCategoryDisplayName(category)} kategorisine git`}
+            onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && onClick) {
+                    e.preventDefault();
+                    onClick();
+                }
+            }}
+            className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/20 outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded-2xl"
         >
             {/* Background Layer - Absolute */}
             <div className="absolute inset-0 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-2xl group-hover:shadow-[0_0_40px_-10px_rgba(56,189,248,0.25)] group-hover:border-sky-500/50 group-hover:bg-slate-800/60 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] -z-10 pointer-events-none" />
