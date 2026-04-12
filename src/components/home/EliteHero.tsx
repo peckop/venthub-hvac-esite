@@ -50,7 +50,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
           </motion.div>
 
           <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.7 }}
             className="text-5xl font-light leading-[1.05] tracking-tighter text-white sm:text-6xl lg:text-[5.5rem]"
@@ -59,7 +59,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
           </motion.h1>
 
           <motion.p 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.9 }}
             className="mt-8 max-w-xl text-lg font-light leading-relaxed text-slate-300 sm:text-2xl"
@@ -68,7 +68,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
           </motion.p>
 
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 1.1 }}
             className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-center"

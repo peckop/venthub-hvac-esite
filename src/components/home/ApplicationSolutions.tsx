@@ -42,7 +42,7 @@ const solutions: SolutionItem[] = [
 ]
 
 const containerVariants: Variants = {
-  hidden: { opacity: 0 },
+  hidden: {},
   visible: {
     opacity: 1,
     transition: {
@@ -53,7 +53,7 @@ const containerVariants: Variants = {
 }
 
 const itemVariants: Variants = {
-  hidden: { y: 20, opacity: 0 },
+  hidden: { y: 20 },
   visible: {
     y: 0,
     opacity: 1,
@@ -81,7 +81,7 @@ export const ApplicationSolutions: React.FC = () => {
               {t('home.applicationSolutions.eyebrow')}
             </motion.div>
             <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
