@@ -209,7 +209,7 @@ export const CinematicProductShowcase: React.FC = () => {
 
           <div className="flex flex-col justify-center order-1 lg:order-2">
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
+              initial={{ x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, ease: "easeOut" }}
               viewport={{ once: true }}

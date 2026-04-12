@@ -64,7 +64,7 @@ export const TrustProofSection: React.FC = () => {
               {t('home.trustProof.eyebrow')}
             </motion.div>
             <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
@@ -87,7 +87,7 @@ export const TrustProofSection: React.FC = () => {
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
           {/* Left Side: Visual & Badges */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
@@ -125,7 +125,7 @@ export const TrustProofSection: React.FC = () => {
             {proofItems.map((item, index) => (
               <motion.div
                 key={item.key}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}

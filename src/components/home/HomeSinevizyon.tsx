@@ -172,7 +172,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
           <AnimatePresence mode="wait">
             <motion.div
               key={`content-${currentSlide}`}
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.6 }}
@@ -236,7 +236,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
               {slidesData[currentSlide].products.map((p, i) => (
                 <motion.div
                   key={p.url}
-                  initial={{ opacity: 0, scale: 0.8, x: i === 0 ? -50 : 50 }}
+                  initial={{ scale: 0.95, x: i === 0 ? -30 : 30 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
                   exit={{ opacity: 0, scale: 1.1 }}
                   className={`absolute ${i === 0 ? 'z-20' : 'z-10 opacity-40 translate-x-32 translate-y-20 blur-[1px]'}`}
