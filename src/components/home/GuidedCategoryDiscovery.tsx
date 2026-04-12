@@ -48,7 +48,7 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
               DETERMİNİSTİK SİSTEMLER
             </motion.div>
             <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
@@ -77,7 +77,7 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
             return (
               <motion.div
                 key={category.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1, duration: 0.8 }}
