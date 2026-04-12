@@ -3,8 +3,8 @@
 // Idempotent, requires admin or order owner
 
 import Iyzipay from "npm:iyzipay";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
-type JwtPayload = { sub?: string } & Record<string, unknown>;
 type PaymentTransaction = { paymentTransactionId?: string };
 type PaymentDebug = {
   refunded_total?: number;
@@ -30,18 +30,6 @@ type IyziSdk = {
   };
 };
 type IyziCtor = new (args: { apiKey: string; secretKey: string; uri: string }) => IyziSdk;
-
-function parseJwt(token?: string | null): JwtPayload | null {
-  if (!token) return null;
-  const parts = token.split(".");
-  if (parts.length !== 3) return null;
-  try {
-    const payload = atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(payload) as JwtPayload;
-  } catch {
-    return null;
-  }
-}
 
 Deno.serve(async (req) => {
   const corsHeaders: Record<string, string> = {
@@ -86,8 +74,18 @@ Deno.serve(async (req) => {
 
     // AuthN/AuthZ: allow admin or order owner
     const authHeader = req.headers.get("authorization");
-    const jwt = parseJwt(authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null);
-    const reqUserId: string | null = typeof jwt?.sub === 'string' ? jwt.sub : null;
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: { code: "UNAUTHORIZED", message: "Authorization header required" } }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+    const authClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+    const { data: { user }, error: authErr } = await authClient.auth.getUser();
+    if (authErr || !user) {
+      return new Response(JSON.stringify({ error: { code: "UNAUTHORIZED", message: "Invalid or expired token" } }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const reqUserId: string | null = user.id;
 
     // Load order
     const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=id,user_id,status,payment_status,total_amount,payment_debug`, {
