@@ -3,15 +3,15 @@
 import React from 'react'
 
 import dynamic from 'next/dynamic'
-const HomeSinevizyon = dynamic(() => import('../components/home/HomeSinevizyon'), { ssr: false, loading: () => <div className="w-full h-[80vh] lg:h-[90vh] min-h-[650px] bg-slate-950 animate-pulse" /> })
-const CinematicProductShowcase = dynamic(() => import('../components/home/CinematicProductShowcase'), { ssr: false, loading: () => <div className="w-full h-[600px] bg-white animate-pulse" /> })
-const GuidedCategoryDiscovery = dynamic(() => import('../components/home/GuidedCategoryDiscovery'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
-const ApplicationSolutions = dynamic(() => import('../components/home/ApplicationSolutions'), { ssr: false, loading: () => <div className="w-full h-[500px] bg-white animate-pulse" /> })
-const TrustProofSection = dynamic(() => import('../components/home/TrustProofSection'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
-const FeaturedCommercialBlocks = dynamic(() => import('../components/home/FeaturedCommercialBlocks'), { ssr: false, loading: () => <div className="w-full h-[600px] bg-white animate-pulse" /> })
-const StrategicBrands = dynamic(() => import('../components/home/StrategicBrands'), { ssr: false, loading: () => <div className="w-full h-[300px] bg-white animate-pulse" /> })
-const KnowledgeBlock = dynamic(() => import('../components/home/KnowledgeBlock'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
-const RevealSection = dynamic(() => import('../components/home/RevealSection'), { ssr: false })
+const HomeSinevizyon = dynamic(() => import('../components/home/HomeSinevizyon'), { loading: () => <div className="w-full h-[80vh] lg:h-[90vh] min-h-[650px] bg-slate-950 animate-pulse" /> })
+const CinematicProductShowcase = dynamic(() => import('../components/home/CinematicProductShowcase'), { loading: () => <div className="w-full h-[600px] bg-white animate-pulse" /> })
+const GuidedCategoryDiscovery = dynamic(() => import('../components/home/GuidedCategoryDiscovery'), { loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
+const ApplicationSolutions = dynamic(() => import('../components/home/ApplicationSolutions'), { loading: () => <div className="w-full h-[500px] bg-white animate-pulse" /> })
+const TrustProofSection = dynamic(() => import('../components/home/TrustProofSection'), { loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
+const FeaturedCommercialBlocks = dynamic(() => import('../components/home/FeaturedCommercialBlocks'), { loading: () => <div className="w-full h-[600px] bg-white animate-pulse" /> })
+const StrategicBrands = dynamic(() => import('../components/home/StrategicBrands'), { loading: () => <div className="w-full h-[300px] bg-white animate-pulse" /> })
+const KnowledgeBlock = dynamic(() => import('../components/home/KnowledgeBlock'), { loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
+const RevealSection = dynamic(() => import('../components/home/RevealSection'))
 import HomePageClientWrapper from '../components/home/HomePageClientWrapper'
 import { Product } from '../lib/supabase'
 import { DomainCategory } from '../lib/type-converters'
