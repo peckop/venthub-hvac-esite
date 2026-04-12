@@ -349,8 +349,18 @@ export default function AccountReturnsPage() {
       )}
 
       {openModal && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setOpenModal(false)}>
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200/60 w-full max-w-md p-6 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200" 
+            onClick={() => setOpenModal(false)}
+            onKeyDown={(e) => { if (e.key === 'Escape') setOpenModal(false) }}
+            role="presentation"
+          />
+          <div 
+            role="dialog"
+            aria-modal="true"
+            className="relative bg-white rounded-2xl shadow-xl border border-slate-200/60 w-full max-w-md p-6 animate-in zoom-in-95 duration-200"
+          >
             <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <RefreshCw size={20} className="text-primary-navy" />

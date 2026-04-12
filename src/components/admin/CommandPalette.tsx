@@ -135,11 +135,19 @@ const CommandPalette: React.FC = () => {
         : navItems
 
     return (
-        <div className="fixed inset-0 z-[100]" onKeyDown={handleKeyDown}>
+        <div 
+            className="fixed inset-0 z-[100]" 
+            role="dialog"
+            aria-modal="true"
+            aria-label="Komut Paleti"
+        >
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-[#0A0F1E]/60 backdrop-blur-md"
+            <button
+                type="button"
+                className="absolute inset-0 w-full h-full bg-[#0A0F1E]/60 backdrop-blur-md cursor-default border-none outline-none"
                 onClick={() => setOpen(false)}
+                aria-label="Arama penceresini kapat"
+                tabIndex={-1}
             />
 
             {/* Dialog */}
@@ -152,7 +160,7 @@ const CommandPalette: React.FC = () => {
                         </div>
                         <input
                             ref={inputRef}
-                            autoFocus
+                            onKeyDown={handleKeyDown}
                             placeholder="Bir komut veya ürün ara..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}

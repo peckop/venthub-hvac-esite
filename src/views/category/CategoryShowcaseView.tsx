@@ -143,9 +143,9 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                     {subCategories.map((sub) => {
                         const subVm = wrapCategory(sub)
                         return (
-                            <div
+                            <button
                                 key={sub.id}
-                                className="group relative bg-white rounded-[2.5rem] p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] transition-all duration-700 cursor-pointer overflow-hidden w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1.5rem)] max-w-[420px]"
+                                className="group relative bg-white rounded-[2.5rem] p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] transition-all duration-700 cursor-pointer overflow-hidden w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1.5rem)] max-w-[420px] text-left block"
                                 onClick={() => handleSubSelect(sub.slug)}
                             >
                                 <div className="relative z-10">
@@ -159,7 +159,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                         <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-all duration-500" />
                                     </div>
                                 </div>
-                            </div>
+                            </button>
                         )
                     })}
                 </div>

@@ -396,11 +396,19 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm" onClick={handleClose}>
-      <div className="animate-in fade-in duration-300 w-full h-full flex items-start justify-center pt-4 sm:pt-16 pb-4 px-2">
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-top-4 duration-300 flex flex-col max-h-full"
-          onClick={e => e.stopPropagation()}
-        >
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-4 sm:pt-16 pb-4 px-2">
+      <div 
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" 
+        onClick={handleClose} 
+        onKeyDown={(e) => { if (e.key === 'Escape') handleClose() }}
+        role="presentation"
+      />
+      
+      <div 
+        role="dialog"
+        aria-modal="true"
+        className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-top-4 duration-300 flex flex-col max-h-full"
+      >
           {/* Header / Input */}
           <div className="flex items-center gap-3 p-4 border-b border-gray-100 bg-white relative z-10">
             <svg className="w-5 h-5 text-primary-ocean" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -454,7 +462,6 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               </span>
             </div>
           )}
-        </div>
       </div>
     </div>
   )

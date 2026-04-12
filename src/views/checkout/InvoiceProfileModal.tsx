@@ -16,9 +16,18 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
+            <div 
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" 
+                onClick={onClose}
+                onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}
+                role="presentation"
+            />
             
-            <div className="relative w-full max-w-xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div 
+                role="dialog"
+                aria-modal="true"
+                className="relative w-full max-w-xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+            >
                 <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-3">
                         <Landmark size={20} className="text-primary-navy" />

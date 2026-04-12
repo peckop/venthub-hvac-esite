@@ -47,8 +47,19 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
 
     return (
         <>
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity" onClick={() => setSelected(null)} />
-            <aside className="fixed right-0 top-0 h-full w-full sm:w-[480px] glass-strong z-50 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] border-l border-white/10 flex flex-col animate-in slide-in-from-right duration-300">
+            <button
+                type="button"
+                className="fixed inset-0 w-full h-full bg-black/60 backdrop-blur-sm z-40 transition-opacity cursor-default border-none outline-none" 
+                onClick={() => setSelected(null)} 
+                aria-label="Kapat"
+                tabIndex={-1}
+            />
+            <aside 
+                className="fixed right-0 top-0 h-full w-full sm:w-[480px] glass-strong z-50 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] border-l border-white/10 flex flex-col animate-in slide-in-from-right duration-300"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Stok Detayları"
+            >
                 <header className="px-6 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                     <div className="flex flex-col truncate pr-4">
                         <h2 className="text-xl font-black text-white truncate uppercase tracking-tight">{selected.name}</h2>

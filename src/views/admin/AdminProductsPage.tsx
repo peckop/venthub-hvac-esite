@@ -721,7 +721,6 @@ const AdminProductsPage: React.FC = () => {
                                 <div className="relative inline-block animate-in fade-in zoom-in duration-300">
                                   <input
                                     type="number"
-                                    autoFocus
                                     value={inlineEdit.value}
                                     onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
                                     onBlur={saveInlineEdit}
@@ -752,7 +751,6 @@ const AdminProductsPage: React.FC = () => {
                                 <div className="relative inline-block animate-in fade-in zoom-in duration-300">
                                   <input
                                     type="number"
-                                    autoFocus
                                     value={inlineEdit.value}
                                     onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
                                     onBlur={saveInlineEdit}
