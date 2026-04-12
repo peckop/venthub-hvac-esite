@@ -24,6 +24,9 @@ export const tr = {
     adminPanel: "Yönetim Paneli",
     goToStore: "Mağazaya Git",
     backToSite: "Siteye Dön",
+    languageSwitcher: "Dil Seçimi",
+    turkish: "Türkçe",
+    english: "İngilizce",
 
     // Existing
     discover: "Keşfet",

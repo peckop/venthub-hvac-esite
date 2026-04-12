@@ -20,6 +20,9 @@ export const en = {
     quickSearch: "Quick search...",
     allCategories: "All Categories",
     priceRange: "Price Range",
+    languageSwitcher: "Language Selection",
+    turkish: "Turkish",
+    english: "English",
 
     // Existing
     discover: "Discover",
