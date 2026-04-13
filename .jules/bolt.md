@@ -4,3 +4,7 @@
 ## 2024-06-18 - [Supabase Network Payload and Reduce Optimization]
 **Learning:** Selecting all columns (`select('*')`) on large queries (e.g., limit 1000) causes significant unnecessary network payload. Also, chaining array methods like `reduce` and `filter` on large arrays increases iterations and memory allocation compared to a single `O(n)` standard loop.
 **Action:** Always explicitly specify required columns in Supabase `select` statements instead of using `*`. When performing multiple aggregate calculations on a dataset, use a single `for` loop to compute all metrics in exactly one pass rather than chaining `.map()`, `.filter()`, or `.reduce()`.
+## 2026-04-12 - Context Memoization
+
+**Learning:** Missing memoization in top-level context providers (like `CartProvider`, `CategoryContext`, `AuthContext`) causes massive cascading re-render storms across the entire app whenever any minor state changes inside the provider.
+**Action:** Always wrap Context `value` objects in `useMemo` and context-modifying functions in `useCallback`, taking care to include all necessary state variables in dependency arrays to satisfy exhaustive-deps while maintaining stable references.
