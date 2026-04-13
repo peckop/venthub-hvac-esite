@@ -198,10 +198,16 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
         if (isFirstRender.current && initialProducts && initialProducts.length > 0) {
           // İlk yükleme: SSR verisi geldi, API isteği atla, sadece fiyat aralığını hesapla
           isFirstRender.current = false
-          const prices = initialProducts.map(p => p.price).filter((v): v is number => v != null && Number.isFinite(v))
-          if (prices.length > 0) {
-            const maxPrice = Math.ceil(Math.max(...prices))
-            setFilters(prev => ({ ...prev, priceRange: [prev.priceRange[0], Math.max(prev.priceRange[1], maxPrice)] }))
+          let maxPrice = -Infinity
+          for (let i = 0; i < initialProducts.length; i++) {
+            const p = initialProducts[i].price
+            if (p != null && Number.isFinite(p) && p > maxPrice) {
+              maxPrice = p
+            }
+          }
+          if (maxPrice !== -Infinity) {
+            const ceilMax = Math.ceil(maxPrice)
+            setFilters(prev => ({ ...prev, priceRange: [prev.priceRange[0], Math.max(prev.priceRange[1], ceilMax)] }))
           }
         } else if (categoryIds.length > 0 || !slug) {
           const productsData = await getProductsEnriched({
@@ -211,10 +217,16 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
           
           setProducts(productsData)
 
-          const prices = productsData.map(p => p.price).filter((v): v is number => v != null && Number.isFinite(v))
-          if (prices.length > 0) {
-            const maxPrice = Math.ceil(Math.max(...prices))
-            setFilters(prev => ({ ...prev, priceRange: [prev.priceRange[0], Math.max(prev.priceRange[1], maxPrice)] }))
+          let maxPrice = -Infinity
+          for (let i = 0; i < productsData.length; i++) {
+            const p = productsData[i].price
+            if (p != null && Number.isFinite(p) && p > maxPrice) {
+              maxPrice = p
+            }
+          }
+          if (maxPrice !== -Infinity) {
+            const ceilMax = Math.ceil(maxPrice)
+            setFilters(prev => ({ ...prev, priceRange: [prev.priceRange[0], Math.max(prev.priceRange[1], ceilMax)] }))
           }
         }
 
