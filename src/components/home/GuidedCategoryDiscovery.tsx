@@ -85,14 +85,14 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
                     <div 
                       className="flex flex-col items-center opacity-90 transition-opacity duration-700"
                     >
-                      <h3 className="text-xl lg:text-2xl font-extralight text-white tracking-[0.1em] uppercase mb-4 transition-transform duration-700 group-hover:-translate-y-2">
+                      <h3 className="text-xl lg:text-2xl font-extralight text-white tracking-[0.1em] mb-4 transition-transform duration-700 group-hover:-translate-y-2">
                         {category.displayName}
                       </h3>
 
                       <div className="w-12 h-[1px] bg-white/30 group-hover:w-24 group-hover:bg-cyan-500 transition-[width,background-color] duration-700" />
                       
                       <div className="mt-6 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 transition-all duration-700 overflow-hidden">
-                        <p className="text-[10px] text-slate-200 font-light leading-relaxed tracking-wider uppercase mb-6 max-w-[200px] line-clamp-2">
+                        <p className="text-[10px] text-slate-200 font-light leading-relaxed tracking-wider mb-6 max-w-[200px] line-clamp-2">
                           {category.description || 'Profesyonel Havalandırma Çözümleri'}
                         </p>
                       </div>

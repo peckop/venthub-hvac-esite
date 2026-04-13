@@ -1,0 +1,46 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "",
+  "date": "",
+  "task_id": "P00-999",
+  "task_title": "Performance Arch Refactor",
+  "description": "",
+  "files_modified": [],
+  "allowed_paths": [
+    "src/app/page.tsx",
+    "src/components/home/ApplicationSolutions.tsx",
+    "src/components/home/GuidedCategoryDiscovery.tsx",
+    "src/components/home/KnowledgeBlock.tsx",
+    "src/components/home/StrategicBrands.tsx",
+    "src/components/home/TrustProofSection.tsx",
+    "src/i18n/dictionaries/en.ts",
+    "src/views/HomePage.tsx",
+    "src/components/home/ClientLeadButton.tsx",
+    "src/components/ui/ScrollObserver.tsx",
+    ".agent/bypass_log.md",
+    "lh-after.json",
+    "lh-report.json",
+    "lh-report2.json"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": [],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "",
+      "passed": false
+    }
+  ],
+  "all_passed": false
+}

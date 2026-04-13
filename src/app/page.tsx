@@ -92,12 +92,19 @@ export default async function RootPage({ searchParams }: Props) {
     .filter((c) => !c.parent_id)
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(c => {
-      const catDict = (dict.categories[c.id as keyof typeof dict.categories] || {}) as { displayName?: string; description?: string };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let translatedName = (dict as any).common?.categoryList?.[c.slug];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!translatedName && (dict as any).common?.categoryList?.sub) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        translatedName = (dict as any).common.categoryList.sub[c.slug];
+      }
+
       return {
         id: c.id,
         slug: c.slug,
-        displayName: catDict.displayName || c.name,
-        description: catDict.description || c.description || '',
+        displayName: translatedName || c.menu_label || c.name,
+        description: c.description || '',
         image_url: c.image_url
       }
     })
