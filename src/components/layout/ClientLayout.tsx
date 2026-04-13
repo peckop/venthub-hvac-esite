@@ -108,10 +108,8 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-white" />}>
-            <ClientLayoutInner>
-                {children}
-            </ClientLayoutInner>
-        </Suspense>
+        <ClientLayoutInner>
+            {children}
+        </ClientLayoutInner>
     )
 }

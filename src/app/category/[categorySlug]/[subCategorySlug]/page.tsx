@@ -6,38 +6,6 @@ import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../../..
 import type { DomainProduct } from '../../../../lib/type-converters'
 
 
-export async function generateStaticParams() {
-  try {
-    // Veritabanından tüm kategorileri çek
-    const { data: allCategories } = await supabase
-      .from('categories')
-      .select('id, slug, parent_id')
-      .eq('is_active', true)
-
-    if (!allCategories || allCategories.length === 0) {
-      return []
-    }
-
-    // ID'leri slug'lara eşle
-    const categoryMap = new Map(allCategories.map(c => [c.id, c.slug]))
-
-    // Parent'ı olan her kategori için bir rota oluştur
-    const paths = allCategories
-      .filter(c => c.parent_id && categoryMap.has(c.parent_id))
-      .map((c) => ({
-        categorySlug: categoryMap.get(c.parent_id!) || 'generic',
-        subCategorySlug: c.slug,
-      }))
-
-    if (paths.length === 0) {
-      return []
-    }
-    return paths
-  } catch (e) {
-    console.error('generateStaticParams error for subcategories:', e)
-    return []
-  }
-}
 
 async function getCategoryData(slug: string) {
   const { data, error } = await supabase
