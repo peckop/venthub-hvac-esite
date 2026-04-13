@@ -133,3 +133,27 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-13 13:04:09
+- **Commit:** `9bc00f32`
+- **Mesaj:** feat(home): refactor monolithic use client architecture to hybrid server/client component model targeting LCP and performance bottlenecks
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-13 13:12:32
+- **Commit:** `3a9bdf16`
+- **Mesaj:** fix(perf): replace next/dynamic imports with static imports on HomePage to prevent SSR LCP trap
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-13 14:05:20
+- **Commit:** `299b2fc7`
+- **Mesaj:** perf: eliminate TTFB waterfall and LCP hydration lock on homepage
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-13 15:03:06
+- **Commit:** `2b64a1fc`
+- **Mesaj:** fix(performance): move css keyframes to global to prevent hydration render delay
+- **Değişen Dosyalar:**
+
+
