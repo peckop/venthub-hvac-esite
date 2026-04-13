@@ -109,3 +109,27 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-12 21:53:57
+- **Commit:** `22aacabb`
+- **Mesaj:** fix(a11y): resolve all jsx-a11y lint warnings and optimize keyboard navigation
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-12 22:42:45
+- **Commit:** `4fbed1c5`
+- **Mesaj:** fix(architecture): SEO/SSR bariyerleri kaldirildi ve bilesenler hibrid yapilandirildi
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-12 23:47:06
+- **Commit:** `23401622`
+- **Mesaj:** perf: hero LCP and below-fold animation refactor
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-13 13:02:14
+- **Commit:** `5343f5ba`
+- **Mesaj:** refactor(home): migrate to hybrid server/client component architecture
+- **Değişen Dosyalar:**
+
+
