@@ -1,3 +1,9 @@
 ## 2024-06-25 - [TSDoc Hook Documentation]
 **Learning:** React custom hooks in VentHub (`src/hooks/*`) often return complex states alongside mutative functions. When documenting them, ensuring accurate descriptions of how functions interact with the internal state and UI side effects (like toasts) creates a significantly better Developer Experience.
 **Action:** Always include a detailed `@returns` tag explaining the shape of the returned object and an `@example` tag demonstrating a realistic implementation pattern within a component, especially for hooks involving asynchronous side effects like `useApiCall`.
+## 2026-04-13 - [TSDoc Data Formatting]
+**Learning:** VentHub uses suffix-based type inference (e.g., '_mm', '_kg', '_v') within translation keys to automatically format strings with the correct engineering units. Documenting these hidden conventions directly on the formatting functions prevents developers from reinventing the wheel or hardcoding strings elsewhere.
+**Action:** When documenting data transformation utilities in , explicitly mention any implicit business logic like suffix-matching in the  descriptions and provide concrete s demonstrating the suffix behavior.
+## 2025-02-23 - [TSDoc Data Formatting]
+**Learning:** VentHub uses suffix-based type inference (e.g., '_mm', '_kg', '_v') within translation keys to automatically format strings with the correct engineering units. Documenting these hidden conventions directly on the formatting functions prevents developers from reinventing the wheel or hardcoding strings elsewhere.
+**Action:** When documenting data transformation utilities in `src/utils/`, explicitly mention any implicit business logic like suffix-matching in the `@param` descriptions and provide concrete `@example`s demonstrating the suffix behavior.
