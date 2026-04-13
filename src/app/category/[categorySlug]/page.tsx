@@ -6,26 +6,7 @@ import type { DomainProduct } from '../../../lib/type-converters'
 import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../../types/db-rows'
 import { SITE_URL } from '../../../config/siteUrl'
 
-export async function generateStaticParams() {
-  try {
-    const { data: categories } = await supabase
-      .from('categories')
-      .select('slug')
-      .eq('is_active', true)
 
-    const paths = (categories || []).map((c) => ({
-      categorySlug: c.slug,
-    }))
-
-    if (paths.length === 0) {
-      return []
-    }
-    return paths
-  } catch (e) {
-    console.error('generateStaticParams error for all categories:', e)
-    return []
-  }
-}
 
 async function getCategoryData(slug: string) {
   const { data, error } = await supabase
