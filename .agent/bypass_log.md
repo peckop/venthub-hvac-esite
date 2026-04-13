@@ -157,3 +157,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-13 15:58:54
+- **Commit:** `f0a2c4c4`
+- **Mesaj:** fix(i18n): correct category casing bug and dictionary mapping
+- **Değişen Dosyalar:**
+
+

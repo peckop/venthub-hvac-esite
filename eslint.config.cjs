@@ -18,6 +18,14 @@ module.exports = [
       "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
       "no-console": ["error", { "allow": ["warn", "error"] }],
       "no-empty": ["error", { "allowEmptyCatch": true }],
+      "no-warning-comments": ["error", { 
+        "terms": [
+          "eslint-disable-next-line @typescript-eslint/no-explicit-any",
+          "eslint-disable @typescript-eslint/no-explicit-any",
+          "eslint-disable-line @typescript-eslint/no-explicit-any"
+        ],
+        "location": "anywhere" 
+      }],
       "jsx-a11y/alt-text": "off",
       "jsx-a11y/label-has-associated-control": "off",
       "jsx-a11y/click-events-have-key-events": "warn",
