@@ -35,13 +35,14 @@ async function deepAnalysis() {
     log('========================================');
     log('1. CATEGORIES TABLOSU (TÜM KAYITLAR)');
     log('========================================');
-    const { _data: allCats } = await supabase
+    const { data: allCats } = await supabase
         .from('categories')
         .select('id, name, slug, level, parent_id')
         .order('level')
-        .order('name');
+        .order('name')
+        .returns<CategoryRow[]>();
 
-    const castedCats = (allCats as unknown as CategoryRow[]) || [];
+    const castedCats = allCats || [];
     const catMap = new Map<string, CategoryRow>();
     castedCats.forEach(c => catMap.set(c.id, c));
 
@@ -62,12 +63,13 @@ async function deepAnalysis() {
     log('\n========================================');
     log('2. PRODUCTS TABLOSU (TÜM KAYITLAR)');
     log('========================================');
-    const { _data: allProducts } = await supabase
+    const { data: allProducts } = await supabase
         .from('products')
         .select('id, name, sku, category_id, status')
-        .order('name');
+        .order('name')
+        .returns<ProductRow[]>();
 
-    const castedProducts = (allProducts as unknown as ProductRow[]) || [];
+    const castedProducts = allProducts || [];
     log(`Toplam ürün sayısı: ${castedProducts.length}`);
     log('');
 
