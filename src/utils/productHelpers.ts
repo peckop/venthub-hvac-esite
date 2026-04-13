@@ -42,7 +42,19 @@ export const translateSpecKey = (key: string): string => {
   ).join(' ');
 };
 
-// Helper function to extract and format units
+/**
+ * Formats a raw technical specification value by automatically appending the correct unit based on its key suffix.
+ * Returns the original string if it already contains text (e.g., '10kg') or '-' if the value is null/undefined.
+ *
+ * @param key - The specification key, typically containing a unit suffix (e.g., 'airflow_speed_max_ms', 'voltage_v')
+ * @param value - The raw value to be formatted, usually a number or numeric string
+ * @returns The formatted string with the appropriate unit appended, or '-' for missing values
+ *
+ * @example
+ * formatSpecValue('airflow_speed_max_ms', 15) // returns "15 m / s"
+ * formatSpecValue('weight_kg', 10) // returns "10 kg"
+ * formatSpecValue('voltage_v', null) // returns "-"
+ */
 export const formatSpecValue = (key: string, value: unknown): string => {
   if (value === null || value === undefined) return '-';
   const stringValue = String(value);
