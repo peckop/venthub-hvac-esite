@@ -1,9 +1,5 @@
-'use client'
-
-import { motion } from 'framer-motion'
 import React from 'react'
 import Image from 'next/image'
-import { useI18n } from '../../i18n/I18nProvider'
 
 const proofItems = [
   { 
@@ -47,55 +43,65 @@ const proofItems = [
 
 const trustStripKeys = ['authorizedBrands', 'engineeringSupport', 'nationwideDelivery', 'projectGuidance'] as const
 
-export const TrustProofSection: React.FC = () => {
-  const { t } = useI18n()
+interface TrustProofDict {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  visualAlt?: string;
+  badge?: string;
+  items?: Record<string, {
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+  }>;
+}
 
+interface TrustStripDict {
+  [key: string]: string;
+}
+
+interface TrustProofSectionProps {
+  dictionary: TrustProofDict;
+  trustStripDict: TrustStripDict;
+}
+
+export const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, trustStripDict: stripDict }) => {
   return (
     <section className="relative overflow-hidden bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-3xl">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+            <div 
+              data-observe="fade-up"
+              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
             >
-              {t('home.trustProof.eyebrow')}
-            </motion.div>
-            <motion.h2 
-              initial={{ y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
+              {t.eyebrow}
+            </div>
+            <h2 
+              data-observe="fade-up"
+              className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
             >
-              {t('home.trustProof.title')}
-            </motion.h2>
+              {t.title}
+            </h2>
           </div>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-            className="max-w-md text-lg text-slate-500 font-light leading-relaxed"
+          <p 
+            data-observe="fade-up"
+            className="opacity-0 data-[in-view=true]:opacity-100 transition-[opacity] duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
           >
-            {t('home.trustProof.subtitle')}
-          </motion.p>
+            {t.subtitle}
+          </p>
         </div>
 
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
           {/* Left Side: Visual & Badges */}
-          <motion.div
-            initial={{ x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+          <div
+            data-observe="fade-up"
+            className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out"
           >
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2.5rem] border border-slate-200 shadow-2xl">
               <Image
                 src="/images/hvac_installation_close_up_premium_3.png"
-                alt={t('home.trustProof.visualAlt')}
+                alt={t.visualAlt || 'Visual'}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
@@ -110,47 +116,49 @@ export const TrustProofSection: React.FC = () => {
               {trustStripKeys.map((key) => (
                 <div key={key} className="flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center transition-all hover:bg-white hover:shadow-xl hover:shadow-slate-200/50">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    {t('home.trustProof.badge') || 'Trusted'}
+                    {t.badge || 'Trusted'}
                   </div>
                   <div className="mt-1 text-xs font-bold text-slate-900 leading-tight">
-                    {t(`home.hero.trustStrip.${key}`)}
+                    {stripDict[key]}
                   </div>
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Side: Detailed Cards */}
           <div className="grid gap-6 sm:grid-cols-2 lg:gap-8">
-            {proofItems.map((item, index) => (
-              <motion.div
-                key={item.key}
-                initial={{ y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group relative rounded-[2rem] border border-slate-100 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-primary-navy/10 hover:shadow-2xl hover:shadow-primary-navy/5"
-              >
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-primary-navy transition-all duration-300 group-hover:bg-primary-navy group-hover:text-white group-hover:rotate-6">
-                  {item.icon}
-                </div>
-                
-                <div className="mt-6">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                    {t(`home.trustProof.items.${item.key}.eyebrow`)}
+            {proofItems.map((item, index) => {
+              const itemDict = t.items?.[item.key] || { eyebrow: '', title: '', description: '' };
+              const delayClass = ['delay-0', 'delay-100', 'delay-200', 'delay-300'][index % 4];
+              
+              return (
+                <div
+                  key={item.key}
+                  data-observe="fade-up"
+                  className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-500 ease-out ${delayClass} group relative rounded-[2rem] border border-slate-100 bg-white p-8 shadow-sm hover:-translate-y-2 hover:border-primary-navy/10 hover:shadow-2xl hover:shadow-primary-navy/5`}
+                >
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-primary-navy transition-all duration-300 group-hover:bg-primary-navy group-hover:text-white group-hover:rotate-6">
+                    {item.icon}
                   </div>
-                  <h3 className="mt-2 text-xl font-bold text-slate-950">
-                    {t(`home.trustProof.items.${item.key}.title`)}
-                  </h3>
-                  <p className="mt-3 text-[15px] leading-relaxed text-slate-500 font-light">
-                    {t(`home.trustProof.items.${item.key}.description`)}
-                  </p>
-                </div>
+                  
+                  <div className="mt-6">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                      {itemDict.eyebrow}
+                    </div>
+                    <h3 className="mt-2 text-xl font-bold text-slate-950">
+                      {itemDict.title}
+                    </h3>
+                    <p className="mt-3 text-[15px] leading-relaxed text-slate-500 font-light">
+                      {itemDict.description}
+                    </p>
+                  </div>
 
-                {/* Decorative Element */}
-                <div className="absolute top-6 right-6 h-2 w-2 rounded-full bg-slate-100 group-hover:bg-primary-navy/20" />
-              </motion.div>
-            ))}
+                  {/* Decorative Element */}
+                  <div className="absolute top-6 right-6 h-2 w-2 rounded-full bg-slate-100 group-hover:bg-primary-navy/20" />
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>

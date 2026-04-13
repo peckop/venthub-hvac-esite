@@ -6,6 +6,7 @@ import { tr } from '../i18n/dictionaries/tr'
 import { en } from '../i18n/dictionaries/en'
 import type { Metadata } from 'next'
 import { SITE_URL } from '../config/siteUrl'
+import { CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -58,9 +59,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 export default async function RootPage({ searchParams }: Props) {
-  await searchParams
+  const params = await searchParams
+  const lang = (params.lang as string) === 'en' ? 'en' : 'tr'
+  const dict = lang === 'en' ? en : tr
 
-  // Değişkenleri doğru tiplerle tanımlayarak 'never[]' hatasını engelliyoruz
   let categories: DomainCategory[] = []
   let products: Product[] = []
 
@@ -74,6 +76,20 @@ export default async function RootPage({ searchParams }: Props) {
   } catch (error) {
     console.error('SSR Data Fetch Error:', error)
   }
+
+  const displayCategories: CategoryViewModelLite[] = categories
+    .filter((c) => !c.parent_id)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(c => {
+      const catDict = (dict.categories[c.id as keyof typeof dict.categories] || {}) as { displayName?: string; description?: string };
+      return {
+        id: c.id,
+        slug: c.slug,
+        displayName: catDict.displayName || c.name,
+        description: catDict.description || c.description || '',
+        image_url: c.image_url
+      }
+    })
 
   const siteUrl = SITE_URL
 
@@ -112,7 +128,12 @@ export default async function RootPage({ searchParams }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ld).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
         />
       ))}
-      <HomePage initialCategories={categories} initialProducts={products} />
+      <HomePage 
+        initialCategories={displayCategories} 
+        rawCategories={categories}
+        initialProducts={products} 
+        dictionary={dict.home}
+      />
     </>
   )
 }
