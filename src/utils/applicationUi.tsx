@@ -55,13 +55,6 @@ export function accentOverlayClass(accent: ApplicationAccent) {
   }
 }
 
-export function gridColsClass(count: number) {
-  // Avoid dynamic class names for Tailwind purge; map to known classes
-  if (count >= 4) return 'grid grid-cols-1 md:grid-cols-4 gap-4'
-  if (count === 3) return 'grid grid-cols-1 md:grid-cols-3 gap-4'
-  if (count === 2) return 'grid grid-cols-1 md:grid-cols-2 gap-4'
-  return 'grid grid-cols-1 gap-4'
-}
 
 
 
