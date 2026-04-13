@@ -1379,7 +1379,8 @@ export const tr = {
     notFound: 'Kategori bulunamadı',
     backHome: 'Ana Sayfaya Dön',
     breadcrumbHome: 'Ana Sayfa',
-    premiumCollection: 'Premium Koleksiyon'
+    premiumCollection: 'Premium Koleksiyon',
+    findModel: 'Bana Uygun Modeli Bul'
   },
   categories: {
     title: 'Ürün Kategorileri',
