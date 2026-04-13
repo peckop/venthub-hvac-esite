@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ReactNode, useRef } from 'react'
+import React, { useEffect, useState, ReactNode, useRef, useMemo, useCallback } from 'react'
 import type { Product } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 
@@ -265,7 +265,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('storage', onStorage)
   }, [user])
 
-  const addToCart = (product: Product, quantity = 1) => {
+  const addToCart = useCallback((product: Product, quantity = 1) => {
     setItems(currentItems => {
       const existingItem = currentItems.find(item => item.product.id === product.id)
 
@@ -303,9 +303,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         import('react-hot-toast').then(({ default: toast }) => toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })).catch(() => { })
       } catch { }
     }
-  }
+  }, [user, serverCartId, items])
 
-  const removeFromCart = (_productId: string) => {
+  const removeFromCart = useCallback((_productId: string) => {
     setItems(currentItems => {
       const item = currentItems.find(item => item.product.id === _productId)
       if (item) {
@@ -319,9 +319,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return removeCartItem(serverCartId, _productId)
       }).catch(err => console.error('server removeFromCart error', err))
     }
-  }
+  }, [user, serverCartId])
 
-  const updateQuantity = (_productId: string, quantity: number) => {
+  const updateQuantity = useCallback((_productId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(_productId)
       return
@@ -350,9 +350,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }).catch(() => { })
       }
     }
-  }
+  }, [user, serverCartId, removeFromCart, items])
 
-  const clearCart = (opts?: { silent?: boolean }) => {
+  const clearCart = useCallback((opts?: { silent?: boolean }) => {
     setItems([])
 
     // Clear all localStorage cart data
@@ -382,21 +382,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return clearCartItems(serverCartId)
       }).catch(err => console.error('server clearCart error', err))
     }
-  }
+  }, [user, serverCartId])
 
-  const getCartTotal = () => {
+  const getCartTotal = useCallback(() => {
     return items.reduce((total, item) => {
       const unit = typeof item.unitPrice === 'number' ? item.unitPrice : Number(item.product.price || 0)
       return total + unit * item.quantity
     }, 0)
-  }
+  }, [items])
 
-  const getCartCount = () => {
+  const getCartCount = useCallback(() => {
     return items.reduce((count, item) => count + item.quantity, 0)
-  }
+  }, [items])
 
   // Sunucudan gelen birim fiyatları yerel sepete uygula ve (varsa) sunucu sepetine yaz
-  const applyServerPricing = (serverItems: { product_id: string, unit_price: number }[]) => {
+  const applyServerPricing = useCallback((serverItems: { product_id: string, unit_price: number }[]) => {
     if (!Array.isArray(serverItems) || serverItems.length === 0) return
 
     const to2 = (n: number) => Number(Number(n).toFixed(2))
@@ -443,9 +443,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }).catch(() => { })
       } catch { /* no-op */ }
     }
-  }
+  }, [items, user, serverCartId])
 
-  const value = {
+  const value = useMemo(() => ({
     items,
     syncing,
     addToCart,
@@ -455,7 +455,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     getCartTotal,
     getCartCount,
     applyServerPricing,
-  }
+  }), [
+    items,
+    syncing,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    getCartTotal,
+    getCartCount,
+    applyServerPricing,
+  ])
 
   return (
     <CartContext.Provider value={value}>
