@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 
 import dynamic from 'next/dynamic'
@@ -13,20 +11,27 @@ const StrategicBrands = dynamic(() => import('../components/home/StrategicBrands
 const KnowledgeBlock = dynamic(() => import('../components/home/KnowledgeBlock'), { loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
 const RevealSection = dynamic(() => import('../components/home/RevealSection'))
 import HomePageClientWrapper from '../components/home/HomePageClientWrapper'
+import { ScrollObserver } from '../components/ui/ScrollObserver'
 import { Product } from '../lib/supabase'
 import { DomainCategory } from '../lib/type-converters'
+import { CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
 
 interface HomePageProps {
-  initialCategories?: DomainCategory[]
+  initialCategories?: CategoryViewModelLite[]
+  rawCategories?: DomainCategory[]
   initialProducts?: Product[]
+  dictionary: typeof import('../i18n/dictionaries/tr').tr.home
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], initialProducts = [] }) => {
-  // SSR to Client Prop aktarım kuralı gereği, 'onQuoteClick' gibi event handlerlar Server Component'ten geçilemez.
-  // Bu nedenle butona basılınca tetiklenecek fonksiyonlar artık doğrudan Client wrapper içerisinden çağrılıyor olacak veya 'window' bazlı çağrılacak.
-
+export const HomePage: React.FC<HomePageProps> = ({ 
+  initialCategories = [], 
+  rawCategories = [],
+  initialProducts = [],
+  dictionary
+}) => {
   return (
-    <div className="min-h-screen bg-white selection:bg-cyan-100 selection:text-cyan-900">
+    <div className="min-h-screen bg-white text-slate-900 selection:bg-cyan-100 selection:text-cyan-900">
+      <ScrollObserver />
       <HomePageClientWrapper>
         <HomeSinevizyon />
 
@@ -35,36 +40,30 @@ export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], init
           <div className="absolute inset-0 bg-gradient-to-b from-slate-950 to-white h-32 lg:h-64 opacity-100" />
         </div>
 
-        <RevealSection>
-          <div className="-mt-16 relative z-10">
-            <GuidedCategoryDiscovery categories={initialCategories} />
-          </div>
-        </RevealSection>
+        <div className="-mt-16 relative z-10">
+          <GuidedCategoryDiscovery displayCategories={initialCategories} />
+        </div>
 
         <div className="space-y-32 lg:space-y-48 pb-32">
           <RevealSection>
             <CinematicProductShowcase />
           </RevealSection>
 
-          <RevealSection>
-            <ApplicationSolutions />
-          </RevealSection>
+          <ApplicationSolutions dictionary={dictionary.applicationSolutions} />
+
+          <TrustProofSection dictionary={dictionary.trustProof} trustStripDict={dictionary.hero.trustStrip} />
 
           <RevealSection>
-            <TrustProofSection />
+            <FeaturedCommercialBlocks initialProducts={initialProducts} initialCategories={rawCategories} />
           </RevealSection>
 
-          <RevealSection>
-            <FeaturedCommercialBlocks initialProducts={initialProducts} initialCategories={initialCategories} />
-          </RevealSection>
+          <StrategicBrands dictionary={dictionary.strategicBrands} />
 
-          <RevealSection>
-            <StrategicBrands />
-          </RevealSection>
-
-          <RevealSection>
-            <KnowledgeBlock />
-          </RevealSection>
+          <KnowledgeBlock 
+            dictionary={dictionary.knowledge} 
+            finalCtaDict={dictionary.finalCta}
+            statsExperience={dictionary.stats?.yearsExperience || ''}
+          />
         </div>
       </HomePageClientWrapper>
     </div>

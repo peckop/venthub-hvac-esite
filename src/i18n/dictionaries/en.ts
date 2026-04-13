@@ -228,17 +228,29 @@ export const en = {
           {
             eyebrow: 'ADVANCED AERODYNAMIC ENGINEERING',
             title: 'Industrial Ventilation Layers',
-            subtitle: 'Statically balanced and acoustically optimized solution axes in high-flow systems.'
+            subtitle: 'Statically balanced and acoustically optimized solution axes in high-flow systems.',
+            products: [
+              { label: 'Vortice Lineo', subLabel: 'Mixed Flow Duct Fan' },
+              { label: 'Lineo Quiet', subLabel: 'Ultra Quiet Performance' }
+            ]
           },
           {
             eyebrow: 'FUTURISTIC CLIMATE CONTROL',
             title: 'Vortice Lineo Quiet: The Future of Silence',
-            subtitle: 'The perfect balance of minimum energy consumption, maximum air transfer efficiency, and premium silent comfort.'
+            subtitle: 'The perfect balance of minimum energy consumption, maximum air transfer efficiency, and premium silent comfort.',
+            products: [
+              { label: 'Air Flow Technology', subLabel: 'Laminar Flow Control' },
+              { label: 'EC Motor Efficiency', subLabel: 'Low Energy Consumption' }
+            ]
           },
           {
             eyebrow: 'PRECISION HVAC SYSTEMS',
             title: 'Technical Excellence and Smart Flow',
-            subtitle: 'End-to-end deterministic ventilation engineering for industrial kitchens, parking lots, and comfort zones.'
+            subtitle: 'End-to-end deterministic ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
+            products: [
+              { label: 'Industrial Solutions', subLabel: 'High Capacity' },
+              { label: 'Smart Control', subLabel: 'Automation Integration' }
+            ]
           }
         ]
       }
@@ -420,6 +432,27 @@ export const en = {
       title: 'Make technical decision paths visible and reachable.',
       subtitle: 'Guides, calculators and support-center routes help users reach not only products, but a better decision environment.',
       cta: 'Explore',
+      hub: {
+        title: 'Knowledge is the Raw Material of Engineering',
+        subtitle: 'Discover technical guides, calculation tools, and application scenarios we prepared for right HVAC decisions.',
+        searchPlaceholder: 'Search for topic, technical term or product family...',
+        readStart: 'Start Reading',
+        calculatorsSoon: 'Calculators Soon',
+        calculatorsSoonDesc: 'Perform your engineering calculations in seconds.',
+        selectorSoon: 'Product Selector Soon',
+        selectorSoonDesc: 'Find the most suitable model for your needs with our smart algorithms.',
+        inDevelopment: 'In Development',
+        inPlanning: 'In Planning',
+        notFoundTitle: 'Couldn\'t find the technical info you\'re looking for?',
+        notFoundDesc: 'Our engineering team is ready to provide custom documentation support for your complex projects.',
+        contactExpert: 'Talk to an Expert',
+        readTime: '{{count}} min read',
+        categories: {
+          comfort: 'Comfort',
+          safety: 'Safety',
+          efficiency: 'Efficiency'
+        }
+      },
       items: {
         guides: {
           eyebrow: 'Knowledge Hub',
@@ -464,6 +497,26 @@ export const en = {
       expertText: "Our HVAC experts provide 24/7 technical support to find the best solution.",
       fastTitle: "Fast Delivery",
       fastText: "Rapid and reliable delivery across Turkey.",
+    },
+    whyVentHub: {
+      title: "Why",
+      subtitle: "Turkey's trusted HVAC e-commerce platform",
+      features: {
+        brands: { title: "Premium Brands", description: "Vortice, Casals and industry leading brands products" },
+        support: { title: "Expert Support", description: "Professional technical consultancy service" },
+        delivery: { title: "Fast Delivery", description: "Delivered to your door in 2-5 business days across Turkey" }
+      },
+      badges: {
+        premium: "Premium Brands",
+        ce: "CE Certified",
+        warranty: "2 Years Warranty",
+        shipping: "Same Day Shipping"
+      },
+      authorizedDealer: {
+        prefix: "VentHub is the authorized dealer of",
+        brand: "Vortice",
+        suffix: "products in Turkey."
+      }
     },
     stats: {
       premiumBrands: "Premium Brands",
