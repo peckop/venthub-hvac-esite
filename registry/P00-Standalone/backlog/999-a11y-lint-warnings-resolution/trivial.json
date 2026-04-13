@@ -1,0 +1,56 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "",
+  "date": "",
+  "task_id": "P00-999",
+  "task_title": "A11y Lint Warnings Resolution",
+  "description": "",
+  "files_modified": [],
+  "allowed_paths": [
+    ".husky/post-commit",
+    "eslint.config.cjs",
+    "package.json",
+    "pnpm-lock.yaml",
+    "src/components/BeforeAfterSlider.tsx",
+    "src/components/Footer.tsx",
+    "src/components/ImageGallery.tsx",
+    "src/components/LeadModal.tsx",
+    "src/components/SearchOverlay.tsx",
+    "src/components/admin/AdminRealtimeNotifications.tsx",
+    "src/components/admin/CommandPalette.tsx",
+    "src/components/admin/EditableCell.tsx",
+    "src/components/admin/InventoryCsvImport.tsx",
+    "src/components/admin/InventoryDetailDrawer.tsx",
+    "src/components/authority/VideoAuthority.tsx",
+    "src/components/category/EnhancedNeedsWizard.tsx",
+    "src/components/navigation/CategoryCard3D.tsx",
+    "src/components/navigation/CategoryHubOverlay.tsx",
+    "src/components/products/AddToProjectModal.tsx",
+    "src/views/account/AccountReturnsPage.tsx",
+    "src/views/admin/AdminOrdersBoard.tsx",
+    "src/views/admin/AdminProductsPage.tsx",
+    "src/views/category/CategoryShowcaseView.tsx",
+    "src/views/checkout/InvoiceProfileModal.tsx"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": [],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "",
+      "passed": false
+    }
+  ],
+  "all_passed": false
+}
