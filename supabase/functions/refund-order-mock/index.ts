@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
 
 // Mock refund function: no real PSP call, only DB state updates + audit insert
 // Auth: require authenticated; allow only admin or order owner
@@ -7,18 +8,6 @@ interface RefundRequest {
   order_id: string
   amount?: number
   reason?: string
-}
-
-function parseJwt(token?: string | null): { sub?: string } | null {
-  if (!token) return null
-  const parts = token.split('.')
-  if (parts.length !== 3) return null
-  try {
-    const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
-    return JSON.parse(payload)
-  } catch {
-    return null
-  }
 }
 
 serve(async (req) => {
@@ -37,7 +26,8 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-    if (!supabaseUrl || !serviceKey) {
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
+    if (!supabaseUrl || !serviceKey || !anonKey) {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
@@ -51,8 +41,20 @@ serve(async (req) => {
 
     // Auth check: admin or owner
     const authHeader = req.headers.get('authorization')
-    const jwt = parseJwt(authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null)
-    const actorUserId = typeof jwt?.sub === 'string' ? jwt!.sub : ''
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+
+    const supabaseUserClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } }
+    })
+
+    const { data: userRes, error: userErr } = await supabaseUserClient.auth.getUser()
+    if (userErr || !userRes?.user) {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+
+    const actorUserId = userRes.user.id
 
     // Load order
     const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=id,user_id,status,payment_status,total_amount,payment_debug`, {
