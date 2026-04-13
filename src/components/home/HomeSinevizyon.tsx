@@ -140,31 +140,26 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
         }
       `}</style>
 
-      <AnimatePresence initial={false} custom={direction}>
-        <motion.div
-          key={currentSlide}
-          custom={direction}
-          // LCP Optimization: Do not start with opacity 0 for the initial slide to avoid painting delays
-          initial={isInitialMount.current ? { opacity: 1 } : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1 }}
-          className="absolute inset-0 z-0"
+      {/* Background Image - Standard HTML/CSS transition instead of Framer Motion to fix LCP hydration lock */}
+      {slidesData.map((slide, idx) => (
+        <div 
+          key={slide.key}
+          className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         >
           <Image
-            src={slidesData[currentSlide].image}
-            alt={t('home.hero.sinevizyon.altMain')}
+            src={slide.image}
+            alt={t('home.hero.sinevizyon.altMain') || 'VentHub HVAC'}
             fill
             sizes="100vw"
-            priority={currentSlide === 0}
-            fetchPriority={currentSlide === 0 ? "high" : "auto"}
-            loading={currentSlide === 0 ? "eager" : "lazy"}
+            priority={idx === 0}
+            fetchPriority={idx === 0 ? "high" : "auto"}
+            loading={idx === 0 ? "eager" : "lazy"}
             className="object-cover object-center brightness-[0.4] saturate-[1.2]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      ))}
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-16">
         {/* Left Side: Content */}

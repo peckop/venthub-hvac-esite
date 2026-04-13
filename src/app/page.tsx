@@ -58,6 +58,20 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   }
 }
 
+import { unstable_cache } from 'next/cache'
+
+const getCachedHomeData = unstable_cache(
+  async () => {
+    const [catData, prodData] = await Promise.all([
+      getCategories(),
+      getProducts(12)
+    ])
+    return { catData, prodData }
+  },
+  ['home-page-data'],
+  { revalidate: 3600 } // Cache for 1 hour to fix TTFB server response waterfall
+)
+
 export default async function RootPage({ searchParams }: Props) {
   const params = await searchParams
   const lang = (params.lang as string) === 'en' ? 'en' : 'tr'
@@ -67,10 +81,7 @@ export default async function RootPage({ searchParams }: Props) {
   let products: Product[] = []
 
   try {
-    const [catData, prodData] = await Promise.all([
-      getCategories(),
-      getProducts(12)
-    ])
+    const { catData, prodData } = await getCachedHomeData()
     categories = toUICategoryList(catData)
     products = (prodData as Product[]) || []
   } catch (error) {
