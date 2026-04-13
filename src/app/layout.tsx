@@ -4,7 +4,7 @@ import '../index.css'
 import { Providers, ClientLayout } from '../components/layout/ClientLayout'
 import { SITE_URL } from '@/config/siteUrl'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
