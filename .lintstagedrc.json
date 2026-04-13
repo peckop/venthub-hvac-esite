@@ -1,0 +1,5 @@
+{
+  "*.{ts,tsx,js,cjs,mjs,jsx}": [
+    "cross-env NODE_OPTIONS='--max-old-space-size=8192' eslint --fix"
+  ]
+}

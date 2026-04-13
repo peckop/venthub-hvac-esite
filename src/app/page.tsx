@@ -92,12 +92,13 @@ export default async function RootPage({ searchParams }: Props) {
     .filter((c) => !c.parent_id)
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(c => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let translatedName = (dict as any).common?.categoryList?.[c.slug];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (!translatedName && (dict as any).common?.categoryList?.sub) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        translatedName = (dict as any).common.categoryList.sub[c.slug];
+      type CategoryDict = Record<string, string | Record<string, string>>;
+      const categoryListDict = dict.common?.categoryList as CategoryDict | undefined;
+      const subListDict = categoryListDict?.sub as Record<string, string> | undefined;
+
+      let translatedName = categoryListDict?.[c.slug] as string | undefined;
+      if (!translatedName && typeof subListDict?.[c.slug] === 'string') {
+        translatedName = subListDict[c.slug];
       }
 
       return {
