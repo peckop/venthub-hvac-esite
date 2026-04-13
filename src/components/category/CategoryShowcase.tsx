@@ -82,7 +82,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                     className="group flex items-center bg-gradient-to-r from-secondary-blue to-blue-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-lg shadow-blue-500/30 hover:scale-105"
                                 >
                                     <ThermometerSun className="mr-3" size={24} />
-                                    <span>Bana Uygun Modeli Bul</span>
+                                    <span>{t('category.findModel')}</span>
                                     <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={20} />
                                 </button>
                             )}
