@@ -4,7 +4,6 @@ import { Routes } from '@/utils/routes';
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface HomeSinevizyonProps {
@@ -55,7 +54,6 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
   const { t } = useI18n()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isMounted, setIsMounted] = useState(false)
-  const [direction, setDirection] = useState(0)
   const touchStartX = useRef<number | null>(null)
 
   const isInitialMount = useRef(true)
@@ -65,13 +63,12 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
   }, [])
 
   const paginate = useCallback((newDirection: number) => {
-    setDirection(newDirection)
     setCurrentSlide((prev) => (prev + newDirection + slidesData.length) % slidesData.length)
   }, [])
 
   useEffect(() => {
     if (!isMounted) return
-    const timer = setInterval(() => paginate(1), 12000)
+    const timer = setInterval(() => paginate(1), 120000)
     return () => clearInterval(timer)
   }, [paginate, isMounted])
 
@@ -107,8 +104,6 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
     }
   }
 
-  const currentContent = getSlideContent(currentSlide)
-
   return (
     <section 
       className="relative w-full h-[80vh] lg:h-[90vh] min-h-[650px] overflow-hidden bg-slate-950 flex items-center touch-pan-y contain-layout"
@@ -119,95 +114,103 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
       <div className="absolute inset-0 z-0 opacity-10 pointer-events-none" 
            style={{ backgroundImage: 'linear-gradient(#38BDF8 1px, transparent 1px), linear-gradient(90deg, #38BDF8 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
 
-      {/* Animated Air Flow Particles using CSS Keyframes instead of Framer Motion for better TBT */}
-      <style jsx>{`
-        @keyframes flow {
-          0% { transform: translateX(-100px); opacity: 0; }
-          20% { opacity: 0.2; }
-          80% { opacity: 0.2; }
-          100% { transform: translateX(600px); opacity: 0; }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(2deg); }
-        }
-        .particle {
-          position: absolute;
-          height: 1px;
-          width: 96px;
-          background: linear-gradient(90deg, transparent, #22D3EE, transparent);
-          animation: flow 3s linear infinite;
-        }
-      `}</style>
+      {/* Air Flow Particles CSS has been moved to index.css to prevent hydration painting delays */}
 
-      {/* Background Image - Standard HTML/CSS transition instead of Framer Motion to fix LCP hydration lock */}
-      {slidesData.map((slide, idx) => (
-        <div 
-          key={slide.key}
-          className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        >
-          <Image
-            src={slide.image}
-            alt={t('home.hero.sinevizyon.altMain') || 'VentHub HVAC'}
-            fill
-            sizes="100vw"
-            priority={idx === 0}
-            fetchPriority={idx === 0 ? "high" : "auto"}
-            loading={idx === 0 ? "eager" : "lazy"}
-            className="object-cover object-center brightness-[0.4] saturate-[1.2]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
-        </div>
-      ))}
+      {/* LCP OPTIMIZATION: The first image is placed statically outside React state mapping. This removes ANY hydration or transition delay. */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={slidesData[0].image}
+          alt={t('home.hero.sinevizyon.altMain') || 'VentHub HVAC'}
+          fill
+          sizes="100vw"
+          priority={true}
+          fetchPriority="high"
+          loading="eager"
+          decoding="sync"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-slate-950/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+      </div>
+
+      {/* Background Images for Slide 2 and 3 crossfade ON TOP of Slide 1 */}
+      {slidesData.map((slide, idx) => {
+        if (idx === 0) return null; // Skip slide 0 since it's statically rendered underneath
+        
+        return (
+          <div 
+            key={slide.key}
+            className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          >
+            <Image
+              src={slide.image}
+              alt={t('home.hero.sinevizyon.altMain') || 'VentHub HVAC'}
+              fill
+              sizes="100vw"
+              priority={false}
+              loading="lazy"
+              className="object-cover object-center"
+            />
+            {/* Performance overlay */}
+            <div className="absolute inset-0 bg-slate-950/60" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+          </div>
+        );
+      })}
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-16">
         {/* Left Side: Content */}
-        <div className="w-full lg:w-1/2">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`content-${currentSlide}`}
-              initial={{ x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="inline-flex items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.4em] text-cyan-400 backdrop-blur-md mb-8">
-                <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#22D3EE]" />
-                <span>{currentContent.eyebrow}</span>
+        <div className="w-full lg:w-1/2 relative">
+          {slidesData.map((slide, idx) => {
+            const currentContent = getSlideContent(idx);
+            return (
+              <div
+                key={`content-${idx}`}
+                className={`transition-all duration-1000 ease-in-out ${
+                  idx === currentSlide
+                    ? 'opacity-100 translate-x-0 relative z-10 pointer-events-auto delay-300'
+                    : 'opacity-0 -translate-x-8 absolute inset-0 z-0 pointer-events-none'
+                }`}
+              >
+                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.4em] text-cyan-400 backdrop-blur-md mb-8">
+                  <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#22D3EE]" />
+                  <span>{currentContent.eyebrow}</span>
+                </div>
+
+                <h1 className="text-5xl font-light leading-[1.05] tracking-tighter text-white sm:text-6xl lg:text-8xl mb-8">
+                  {currentContent.title}
+                </h1>
+
+                <p className="max-w-xl text-xl font-light leading-relaxed text-slate-300 mb-12">
+                  {currentContent.subtitle}
+                </p>
+
+                <div className="flex flex-col gap-5 sm:flex-row">
+                  <Link
+                    href={Routes.products()}
+                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl bg-cyan-500 px-12 text-[14px] font-bold uppercase tracking-widest text-slate-950 transition-all hover:bg-cyan-400 hover:shadow-[0_0_40px_rgba(34,211,238,0.4)]"
+                  >
+                    {t('home.hero.primaryCta')}
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onQuoteClick) onQuoteClick();
+                      else if (typeof window !== "undefined") {
+                        (window as typeof window & { openLeadModal?: () => void }).openLeadModal?.();
+                      }
+                    }}
+                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/5 px-12 text-[14px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all duration-300 hover:bg-white/10"
+                  >
+                    {t('home.hero.secondaryCta')}
+                  </button>
+                </div>
               </div>
-
-              <h1 className="text-5xl font-light leading-[1.05] tracking-tighter text-white sm:text-6xl lg:text-8xl mb-8">
-                {currentContent.title}
-              </h1>
-
-              <p className="max-w-xl text-xl font-light leading-relaxed text-slate-300 mb-12">
-                {currentContent.subtitle}
-              </p>
-
-              <div className="flex flex-col gap-5 sm:flex-row">
-                <Link
-                  href={Routes.products()}
-                  className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl bg-cyan-500 px-12 text-[14px] font-bold uppercase tracking-widest text-slate-950 transition-all hover:bg-cyan-400 hover:shadow-[0_0_40px_rgba(34,211,238,0.4)]"
-                >
-                  {t('home.hero.primaryCta')}
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onQuoteClick) onQuoteClick();
-                    else if (typeof window !== "undefined") {
-                      (window as typeof window & { openLeadModal?: () => void }).openLeadModal?.();
-                    }
-                  }}
-                  className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/5 px-12 text-[14px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all duration-300 hover:bg-white/10"
-                >
-                  {t('home.hero.secondaryCta')}
-                </button>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+            );
+          })}
         </div>
 
         {/* Right Side: Floating High-Tech Products */}
@@ -223,27 +226,28 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
             ))}
           </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`products-${currentSlide}`}
-              className="relative w-full h-full flex items-center justify-center"
+          {slidesData.map((slide, slideIdx) => (
+            <div
+              key={`products-${slideIdx}`}
+              className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out ${
+                slideIdx === currentSlide
+                  ? 'opacity-100 scale-100 z-10 pointer-events-auto delay-300'
+                  : 'opacity-0 scale-95 z-0 pointer-events-none'
+              }`}
             >
-              {slidesData[currentSlide].products.map((p, i) => (
-                <motion.div
+              {slide.products.map((p, i) => (
+                <div
                   key={p.url}
-                  initial={{ scale: 0.95, x: i === 0 ? -30 : 30 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 1.1 }}
-                  className={`absolute ${i === 0 ? 'z-20' : 'z-10 opacity-40 translate-x-32 translate-y-20 blur-[1px]'}`}
+                  className={`absolute transition-all duration-1000 ease-in-out ${
+                    slideIdx === currentSlide 
+                      ? i === 0 ? 'z-20 opacity-100 translate-x-0' : 'z-10 opacity-40 translate-x-32 translate-y-20 blur-[1px]'
+                      : 'opacity-0'
+                  }`}
                 >
                   <Link href={p.link as import('next').Route} className="relative block group">
                     {/* Technical HUD Label - Redesigned for High-Tech Aesthetic */}
                     <div className={`absolute ${i === 0 ? '-right-24 top-0' : '-left-24 bottom-0'} z-30 hidden lg:block`}>
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="relative"
-                      >
+                      <div className="relative">
                         {/* Connecting Line with Animated Dot */}
                         <div className={`absolute ${i === 0 ? 'right-full' : 'left-full'} top-1/2 -translate-y-1/2 flex items-center`}>
                           <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-cyan-500 to-cyan-400" />
@@ -256,11 +260,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
                           <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400/60" />
                           
                           {/* Animated Scan Line Inside HUD */}
-                          <motion.div 
-                            animate={{ top: ['-100%', '200%'] }}
-                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                            className="absolute left-0 right-0 h-px bg-cyan-400/10 pointer-events-none"
-                          />
+                          <div className="absolute left-0 right-0 h-px bg-cyan-400/10 pointer-events-none animate-[scan_3s_linear_infinite]" />
 
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
@@ -274,7 +274,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
                             </div>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     </div>
 
                     <div
@@ -288,16 +288,16 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
                         src={p.url} 
                         alt={t('home.hero.sinevizyon.altProduct')} 
                         fill 
-                        priority={currentSlide === 0}
+                        priority={slideIdx === 0}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                         className="object-contain" 
                       />
                     </div>
                   </Link>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
-          </AnimatePresence>
+            </div>
+          ))}
         </div>
       </div>
 
