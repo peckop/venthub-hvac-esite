@@ -6,3 +6,7 @@
 **Vulnerability:** Edge Functions like `iyzico-refund` were manually parsing JWTs using `atob` and `JSON.parse` to extract the `sub` (user ID) instead of validating the signature securely via `auth.getUser()`.
 **Learning:** This existed because of missing strict checks. Without signature validation, anyone could forge a JWT with an arbitrary `sub` to spoof an admin or another user.
 **Prevention:** In Supabase Edge Functions, never manually parse or base64 decode JWTs to extract user identity (`sub`). Always use `supabase.auth.getUser()` or a direct `fetch` to `${supabaseUrl}/auth/v1/user` passing the `Authorization` header to securely validate the token and extract the user ID.
+## 2025-05-24 - Insecure JWT parsing in refund-order-mock Edge Function
+**Vulnerability:** The `refund-order-mock` Edge Function was manually base64-decoding the JWT using `atob` and extracting the `sub` to determine user identity without validating the signature or expiration.
+**Learning:** This existed because of missing strict checks. Without signature validation, anyone could forge a token and impersonate any user, including an admin.
+**Prevention:** In Supabase Edge Functions, never manually parse or base64 decode JWTs to extract user identity (`sub`). Always use `supabase.auth.getUser()` passing the `Authorization` header to securely validate the token and extract the user ID.
