@@ -1,36 +1,30 @@
-## Hedef
-Ajanların halihazırda bağlı olan MCP (Model Context Protocol) sunucularını (Context7, Supabase vb.) spesifik workflow'lar çağrıldığında otonom olarak (manuel emir beklemeden) kullanmalarını sağlayacak "zorunlu talimat setlerini" ilgili `.md` dosyalarına enjekte etmek.
+### Goal
+Resolve the 'İNDUSTRİAL' English string spillover and CSS upper-case anomaly rendering bug in the `GuidedCategoryDiscovery` component, ensuring enterprise-grade TR string mapping (`dict.common.categoryList`) from Server-to-Client.
 
-## Varsayımlar
-- Ajanlar, `mcp_context7-live_query-docs` veya `mcp_supabase_list_tables` gibi fonksiyonların isimlerini direktiflerde gördüklerinde çağırmayı başarabilirler.
-- `bitir`, `yeni-ozellik` ve `supabase-bagla` workflow'ları sistem tarafından zaten başarılı bir şekilde okunmaktadır.
-- Projede mevcutta `python registry/manage_registry.py` dosyası hatasız çalışmaktadır.
+### Assumptions
+- The raw slugs inside the Supabase DB are exclusively English strings (e.g., `residential`, `industrial`).
+- The `RootLayout` rightfully sets `<html lang="tr">`.
+- Using `uppercase` in Tailwind triggers Turkish rules (`i` -> `İ`), heavily mutating any unmapped fallback English slugs.
 
-## Plan
+### Scope Limitations (Scope Police)
+- **allowed_paths**: `src/app/page.tsx`, `src/components/home/GuidedCategoryDiscovery.tsx`
+- **forbidden_paths**: `src/app/layout.tsx`, `src/lib/type-converters.ts`, `src/i18n/dictionaries/*`
+- **max_files_changed**: 2 (Plan Bypass mode: Safe)
 
-1. **`/bitir.md` Entegrasyonu**
-   - **Dosyalar:** `.agent/workflows/bitir.md`
-   - **Değişiklik:** En son adıma (Push sonrası) `python registry/manage_registry.py remember` ve ilgili görevi tamamlamak için `python registry/manage_registry.py complete [PROJ_ID] [TASK_ID]` komutlarını çalıştırma zorunluluğu getiren direktif ekle.
-   - **Doğrulama:** `cat .agent/workflows/bitir.md` veya `type` yaparak içeriği teyit et.
+### Plan
+1. Fix translation mapping in SSR Root Page
+   - **Files**: `src/app/page.tsx`
+   - **Change**: Replace faulty dictionary target `dict.categories` with `dict.common.categoryList`. Add sub-category lookup fallback (`dict.common.categoryList.sub`).
+   - **Verify**: Inspect JSON props passed to Client Component via `console.log(categories)` or evaluate output on the Next.js runtime.
 
-2. **`/yeni-ozellik.md` Context7 MCP Entegrasyonu**
-   - **Dosyalar:** `.agent/workflows/yeni-ozellik.md`
-   - **Değişiklik:** "1. Analiz & Tasarım" adımından hemen önce veya içeriğine: "Eklenecek özellik Next.js 15, React 19 veya diğer dış kütüphanelere dayanıyorsa, KOD YAZMAYA BAŞLAMADAN ÖNCE `context7-live` MCP araçlarıyla güncel best-practice dokümanlarını çek." talimatını kesin bir dille yaz.
-   - **Doğrulama:** Dosyayı okuyarak değişikliği gözden geçir.
+2. Remove Destructive CSS Uppercase from UI
+   - **Files**: `src/components/home/GuidedCategoryDiscovery.tsx`
+   - **Change**: Remove `uppercase` from Tailwind className sets inside `<h3>` and `<p>` nodes of the category overlay to prevent Turkish layout engine from mangling fallback strings and enforce Title Case localization.
+   - **Verify**: Visual check of the frontend that category descriptions and titles render correctly.
 
-3. **`/supabase-bagla.md` Supabase MCP Entegrasyonu**
-   - **Dosyalar:** `.agent/workflows/supabase-bagla.md`
-   - **Değişiklik:** "ÖNCE `mcp_supabase_list_tables` veya ilgili Supabase MCP komutlarıyla tabloların güncel şemalarını kesin olarak oku. Tahmin yürütme!" talimatını Kurallar bölümüne 4. Kural olarak ekle.
-   - **Doğrulama:** Dosyayı okuyarak kuralın eklendiğini teyit et.
+### Risks & mitigations
+- SSR Dictionary Mismatch rendering blank headers. (Mitigation: Left `c.name` and `c.menu_label` fallbacks exactly as they are).
+- Missing category maps: If `sub` object lacks the category, we gracefully degrade to DB label.
 
-4. **`superpowers-plan` SKILL'inde MCP Bilincinin Oluşturulması**
-   - **Dosyalar:** `.agent/skills/superpowers-plan/SKILL.md`
-   - **Değişiklik:** `Planning rules` başlığına şu kuralı ekle: "- If the task requires external framework knowledge, explicitly add a step to use `context7-live` MCP. If it touches DB architecture, step 1 should use Supabase MCP tools."
-   - **Doğrulama:** Dosyayı okuyarak MCP kelimesinin kurala eklendiğini doğrula.
-
-## Riskler ve Azaltmalar
-- **Risk:** Ajanın MCP talimatlarını önemsememesi.
-- **Azaltma:** Promptlar "ZORUNLUDUR", "ÖNCE BUNU ÇALIŞTIR YOKSA BAŞLAMA" gibi emredici (imperative) dille yazılacak.
-
-## Geri Dönüş (Rollback) Planı
-Git aracı ile dosyaları eski `commit` konumlarına geri al (`git checkout HEAD -- .agent/`).
+### Rollback plan
+Revert formatting to `uppercase` with `git checkout HEAD~1 -- src/components/home/GuidedCategoryDiscovery.tsx` and rollback the dictionary lookup path to previous fallback behavior.
