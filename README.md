@@ -21,7 +21,7 @@ HVAC sektörüne özel, B2B/B2C karma satış mimarisi üzerine kurulu enterpris
 | **E-posta** | Resend.dev |
 | **Paket Yöneticisi** | pnpm |
 | **Test** | Vitest + Playwright |
-| **CI/CD** | GitHub Actions → Cloudflare Pages |
+| **CI/CD** | GitHub Actions → Vercel |
 
 ---
 
@@ -163,17 +163,17 @@ pnpm supabase:gen   # src/types/database.types.ts günceller
 
 ---
 
-## Dağıtım (Cloudflare Pages)
+## Dağıtım (Vercel)
 
 | Ayar | Değer |
 |---|---|
-| Framework | Next.js (Next.js adapter) |
+| Framework | Next.js |
 | Build komutu | `pnpm run build:ci` |
 | Çıkış dizini | `.next` |
 | Node sürümü | 18+ |
 | Paket yöneticisi | pnpm |
 
-Ortam değişkenlerini Cloudflare Pages → Settings → Environment Variables bölümüne ekleyin.
+Ortam değişkenlerini Vercel Dashboard → Settings → Environment Variables bölümüne ekleyin. Muvcut deploy durumunu görmek için Vercel Dashboard'unuzu kullanabilirsiniz. Vercel otomatik olarak projenizi build edip yayınlayacaktır.
 
 ---
 
@@ -182,7 +182,7 @@ Ortam değişkenlerini Cloudflare Pages → Settings → Environment Variables b
 - **İlerleme:** %63 (bkz. [`registry/PULSE.md`](registry/PULSE.md))
 - **Aktif görevler:** Visual Page Builder (%90), Kategori Editörü (%85)
 - **Değişiklik günlüğü:** [`docs/CHANGELOG.md`](docs/CHANGELOG.md)
-- **Yol haritası:** [`docs/ROADMAP.md`](docs/ROADMAP.md)
+- **Dağıtım (Vercel):** [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
 - **Mimari:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 ---
