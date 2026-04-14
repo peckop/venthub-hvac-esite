@@ -55,3 +55,8 @@ Before suggesting or opening a Pull Request, you MUST ensure that the following 
 2. **Superpowers Discipline:** Antigravity dahil tüm ajanlar, karmaşık görevlerde `superpowers-workflow` skill'ini (Brainstorm -> Plan -> Implement -> Review -> Finish) tam kapasiteyle kullanmalıdır.
 3. **PR Boyut Limiti:** Tek bir PR 100+ satırı geçmemeli, görevler parçalanmalı.
 4. **Dosya Silme Yasağı:** Özel emir yoksa dosya SİLME, düzenleme yap.
+
+## 7. Diagnostic Protocols: Röntgen & Deep MRI
+- **Röntgen Engine (Gatekeeper):** Sistemdeki temel hataları yakalar (Lint, TSC, Strict Build, Next.js async errors). `run_rontgen.py` çalıştırıldığında `PASS` dönmesi mecburidir. Röntgen `BLOCKED` ise cerrahi (kodlama) işlemi durdurmalı ve önce blokajları çözmelisin.
+- **Deep MRI Engine (Deep Diagnostics):** Yalnızca Röntgen `PASS` durumundayken çalıştırılır (`pnpm run mri` / `run_mri.py`). Dead code bulguları, bundle optimizasyonu ve maliyetli operasyon analizlerini içerir.
+- **Kural:** MRI motoru doğrudan kodu değiştirmez. Sadece `.agent/reports/` altına HTML/TXT formatında raporlar bırakır. Ajan o raporu analiz etmeden kendi kafasına göre kod silemez.

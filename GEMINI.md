@@ -55,7 +55,12 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
 - **LCP & CLS Focus:** Her yeni görsel bileşen için `width/height` zorunludur. Her dinamik veri alanı için bir `Skeleton` (İskelet) bileşeni planlanmadan kod yazılamaz.
 - **Vite Legacy & ESLint:** Proje içindeki `react-router-dom` gibi Vite yapıları yasaktır. ESLint 9 Flat Config (`eslint.config.mjs`) standarttır.
 
-## 6. Onay ve Planlama (No-Plan-No-Code Policy)
+## 6. Diagnostic Protocols: Röntgen & Deep MRI
+- **Röntgen Engine (Gatekeeper):** Sistemdeki temel hataları yakalar (Lint, TSC, Strict Build, Next.js async errors). `run_rontgen.py` çalıştırıldığında `PASS` dönmesi mecburidir. Röntgen `BLOCKED` ise cerrahi (kodlama) işlemi durdurmalı ve önce blokajları çözmelisin.
+- **Deep MRI Engine (Deep Diagnostics):** Yalnızca Röntgen `PASS` durumundayken çalıştırılır (`pnpm run mri` / `run_mri.py`). Dead code bulguları, bundle optimizasyonu ve maliyetli operasyon analizlerini içerir.
+- **Kural:** MRI motoru doğrudan kodu değiştirmez. Sadece `.agent/reports/` altına HTML/TXT formatında raporlar bırakır. Ajan o raporu analiz etmeden kendi kafasına göre kod silemez.
+
+## 7. Onay ve Planlama (No-Plan-No-Code Policy)
 - **Planning-First:** Bir görev `backlog`'dan `active`'e çekildiğinde statüsü otomatik olarak `Planning` olur. 
 - **Zorunlu JSON Pipeline Zinciri:** Ajan, "süreci bildiğini sanarak" adım atlayamaz. Yeni V8 Otonom Motorunda planlama HİÇBİR ZAMAN tek adımda düz metin olarak yapılmaz. Aşağıdaki `JSON Schema` zinciri sırasıyla işletilmeli ve her adım `python registry/engine.py validate <dosya>` ile doğrulanmalıdır:
   1. `brainstorm.json` -> Hedefler, riskler, seçenekler.
@@ -68,7 +73,7 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
   - `max_files_changed`: Trivial için max 5, Plan için max 10'dur.
   - Bütçe aşımı veya izinsiz dosya değişimi `check-scope` (Git diff) tarafından anında bloke edilir ve Commit atılamaz.
 
-## 7. Registry Sentinel (Koruma Sistemi) - [🚨 GÜVENLİK KİLİDİ]
+## 8. Registry Sentinel (Koruma Sistemi) - [🚨 GÜVENLİK KİLİDİ]
 > [!CAUTION]
 > **Registry Güvenlik Kilidi:** `registry/` dizini altındaki hiçbir dosya veya klasör (PXX projeleri), `write_file`, `replace`, `rm` veya benzeri manuel dosya araçlarıyla manipüle edilemez.
 > - **Zorunlu Motor:** Proje başlatma, görev oluşturma, taşıma veya mühürleme işlemleri YALNIZCA `python registry/manage_registry.py` otonom motoru üzerinden yapılabilir.

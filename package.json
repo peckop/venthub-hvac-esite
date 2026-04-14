@@ -15,6 +15,8 @@
     "test:coverage": "vitest run --coverage",
     "type-check": "cross-env NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit",
     "analyze": "cross-env ANALYZE=true NODE_OPTIONS='--max-old-space-size=8192' next build",
+    "knip": "cross-env NODE_OPTIONS='--max-old-space-size=8192' knip",
+    "mri": "pnpm run knip && pnpm run analyze",
     "clean": "rimraf .next out",
     "postinstall": "pnpm run type-check",
     "supabase:gen": "npx supabase@latest gen types typescript --project-id tnofewwkwlyjsqgwjjga > src/types/database.types.ts"
@@ -89,6 +91,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@next/bundle-analyzer": "^16.2.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -106,6 +109,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
     "jsdom": "^29.0.0",
+    "knip": "^6.4.1",
     "lint-staged": "^16.4.0",
     "rimraf": "^6.0.1",
     "supabase": "^2.80.0",
