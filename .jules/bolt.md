@@ -8,3 +8,6 @@
 
 **Learning:** Missing memoization in top-level context providers (like `CartProvider`, `CategoryContext`, `AuthContext`) causes massive cascading re-render storms across the entire app whenever any minor state changes inside the provider.
 **Action:** Always wrap Context `value` objects in `useMemo` and context-modifying functions in `useCallback`, taking care to include all necessary state variables in dependency arrays to satisfy exhaustive-deps while maintaining stable references.
+## 2025-02-23 - [Single Pass Loop vs map/filter/reduce]
+**Learning:** Using chained array methods (`.map().filter()`) and spreading results into `Math.max(...prices)` can cause O(N) memory allocations, multiple iterations, and a potential 'Maximum call stack size exceeded' error on large arrays.
+**Action:** Replace `const prices = arr.map(x => x.val).filter(...); Math.max(...prices)` with a single `for` loop that safely calculates the maximum value in one pass (`O(1)` space, `O(N)` time).
