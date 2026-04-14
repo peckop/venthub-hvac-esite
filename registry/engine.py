@@ -10,6 +10,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
+
 # jsonschema opsiyonel — yoksa basit key kontrolü yapar
 try:
     import jsonschema
@@ -261,6 +266,11 @@ def create_task(
             json.dump(content, f, indent=2, ensure_ascii=False)
 
     # Orion MCP Kancası (Yeni görev oluşturulduğunda merkeze bildir)
+    try:
+        from orion_bridge import bridge_create_task
+    except ImportError:
+        bridge_create_task = None
+        
     if bridge_create_task:
         complexity = "low" if is_trivial else "medium"
         try:
