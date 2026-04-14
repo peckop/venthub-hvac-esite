@@ -1,13 +1,13 @@
 # CI/CD Dağıtım Rehberi
 
-Bu belge, GitHub Actions ve Cloudflare Pages yapılandırmasını, gerekli ortam değişkenlerini ve dağıtım adımlarını açıklar.
+Bu belge, GitHub Actions ve **Vercel** yapılandırmasını, gerekli ortam değişkenlerini ve dağıtım adımlarını açıklar.
 
 ---
 
 ## Genel Akış
 
 ```
-Kod → GitHub → GitHub Actions (lint/test/type-check) → Cloudflare Pages (build + deploy)
+Kod → GitHub → GitHub Actions (lint/type-check) → Vercel (build + deploy, otomatik)
                       │
                       └──► Supabase Migration Workflow (otomatik)
 ```
@@ -46,19 +46,24 @@ pnpm preview  # Prod benzeri test (build + start)
 
 ---
 
-## Cloudflare Pages
+## Vercel (Birincil Deploy Platformu)
 
-### Build Ayarları
+Vercel, Next.js projesini otomatik olarak tanır — ek `vercel.json` gerekmez.
+
+### Build Ayarları (Otomatik Algılanan)
 
 | Ayar | Değer |
 |---|---|
-| Framework | Next.js |
+| Framework | Next.js (otomatik) |
 | Build komutu | `pnpm run build:ci` |
-| Çıkış dizini | `.next` |
+| Çıkış dizini | `.next` (otomatik) |
 | Node sürümü | 18+ |
-| Paket yöneticisi | pnpm (`corepack enable` veya Pages ayarlarından etkinleştir) |
+| Paket yöneticisi | pnpm |
 
-### Ortam Değişkenleri (Production + Preview)
+### Ortam Değişkenleri
+
+Vercel Dashboard → Project → Settings → Environment Variables bölümüne ekleyin.  
+Her değişken için **Production**, **Preview**, **Development** ortamlarını seçin.
 
 **Frontend (Build zamanı):**
 
