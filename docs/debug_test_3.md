@@ -1,1 +1,0 @@
-Paralel Test 3 Başarılı
