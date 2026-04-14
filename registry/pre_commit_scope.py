@@ -11,6 +11,8 @@ import engine
 
 
 def main():
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
     print("\n🔍 [AI Scope Police] Pre-Commit Denetimi Başlıyor...")
 
     # 1. Staged değişiklikleri al
