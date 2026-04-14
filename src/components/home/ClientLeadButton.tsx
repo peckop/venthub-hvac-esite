@@ -20,8 +20,9 @@ export const ClientLeadButton: React.FC<ClientLeadButtonProps> = ({
         if (onQuoteClick) {
           onQuoteClick();
         } else if (typeof window !== "undefined") {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (window as any).openLeadModal?.();
+          if ('openLeadModal' in window && typeof window.openLeadModal === 'function') {
+            window.openLeadModal();
+          }
         }
       }}
       className={
