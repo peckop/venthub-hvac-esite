@@ -10,7 +10,7 @@ interface UseScrollAnimationOptions {
  * Custom hook for scroll-triggered animations using IntersectionObserver
  * Returns a ref to attach to the element and visibility state
  */
-export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
+function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
     options: UseScrollAnimationOptions = {}
 ): [React.RefObject<T | null>, boolean] {
     const { threshold = 0.1, rootMargin = '0px', triggerOnce = true } = options

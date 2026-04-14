@@ -3,7 +3,7 @@ import React from 'react'
 const commit = process.env.VITE_COMMIT_SHA as string | undefined
 const branch = process.env.VITE_BRANCH as string | undefined
 
-export const BuildTag: React.FC = () => {
+const BuildTag: React.FC = () => {
   const short = commit ? commit.slice(0, 7) : ''
   if (!short && !branch) return null
   return (

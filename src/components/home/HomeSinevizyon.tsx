@@ -50,7 +50,7 @@ const slidesData: SlideData[] = [
   }
 ]
 
-export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
+const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
   const { t } = useI18n()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isMounted, setIsMounted] = useState(false)

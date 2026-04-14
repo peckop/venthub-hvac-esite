@@ -88,7 +88,7 @@ interface Product3DViewerProps {
     onClose?: () => void
 }
 
-export const Product3DViewer: React.FC<Product3DViewerProps> = ({
+const Product3DViewer: React.FC<Product3DViewerProps> = ({
     slug,
     modelType,
     isFullscreen = false,

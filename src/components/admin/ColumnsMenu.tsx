@@ -9,7 +9,7 @@ import { Density } from '../../types/admin-shared'
 export type ColumnToggle = { key: string; label: string; checked: boolean; onChange: (v: boolean) => void }
 export type { Density }
 
-export const ColumnsMenu: React.FC<{
+const ColumnsMenu: React.FC<{
   columns: ColumnToggle[]
   density: Density
   onDensityChange: (d: Density) => void

@@ -1,6 +1,6 @@
 import React from 'react'
 import { DollarSign, Wind, Bug, Thermometer } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
 /**
  * ProblemSection - "Problemi Tanı" bölümü

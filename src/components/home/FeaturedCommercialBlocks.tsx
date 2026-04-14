@@ -25,7 +25,7 @@ const normalizeImageUrl = (url: string | null | undefined): string => {
   return `/${trimmedUrl}`;
 };
 
-export const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
+const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
   initialProducts = []
 }) => {
   const { t } = useI18n()

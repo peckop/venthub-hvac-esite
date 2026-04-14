@@ -10,7 +10,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
 import { Routes } from '../utils/routes'
 
-export const CartPage: React.FC = () => {
+const CartPage: React.FC = () => {
   const { items, updateQuantity, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart()
 
   const { t, lang } = useI18n()

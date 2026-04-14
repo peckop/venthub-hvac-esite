@@ -60,7 +60,7 @@ export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNav
     )
 }
 
-export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
+const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
     const { wrapCategory } = useCategoryViewModel()
     const [isMounted, setIsMounted] = useState(false)
 

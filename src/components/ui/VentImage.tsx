@@ -28,7 +28,7 @@ const FALLBACK_IMAGES = {
  * 3. Performans Odaklı: Next.js Image optimizasyonunu zorunlu kılar (LCP & CLS koruması).
  * 4. UX: Yükleme sırasında yumuşak bir geçiş (transition) sağlar.
  */
-export const VentImage: React.FC<VentImageProps> = ({ 
+const VentImage: React.FC<VentImageProps> = ({ 
   src, 
   alt, 
   fallbackType = 'generic',

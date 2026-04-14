@@ -1,4 +1,4 @@
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 
 interface BeforeAfterSliderProps {

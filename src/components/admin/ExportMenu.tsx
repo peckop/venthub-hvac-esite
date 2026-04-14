@@ -10,7 +10,7 @@ export type ExportMenuItem = {
   onSelect: () => void
 }
 
-export const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = ({ items, buttonLabel }) => {
+const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = ({ items, buttonLabel }) => {
   const { t: _t } = useI18n()
 
   return (

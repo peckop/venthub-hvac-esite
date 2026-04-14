@@ -8,7 +8,7 @@ interface SecurityRibbonProps {
   variant?: 'banner' | 'card'
 }
 
-export const SecurityRibbon: React.FC<SecurityRibbonProps> = ({
+const SecurityRibbon: React.FC<SecurityRibbonProps> = ({
   brandName = 'Venthub HVAC',
   providerName = 'iyzico',
   variant = 'banner',

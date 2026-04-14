@@ -10,7 +10,7 @@ interface BoxAndBaseProps {
     explode?: number
 }
 
-export const BoxAndBase: React.FC<BoxAndBaseProps> = ({
+const BoxAndBase: React.FC<BoxAndBaseProps> = ({
     isSelected,
     isIsolated,
     isHidden,

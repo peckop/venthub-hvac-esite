@@ -49,7 +49,7 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
   )
 }
 
-export const BrandsShowcase: React.FC = () => {
+const BrandsShowcase: React.FC = () => {
   const { t } = useI18n()
   const brands = HVAC_BRANDS
 

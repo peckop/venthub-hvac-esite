@@ -16,7 +16,7 @@ interface InternalFanRotorProps {
     explode?: number
 }
 
-export const InternalFanRotor: React.FC<InternalFanRotorProps> = ({
+const InternalFanRotor: React.FC<InternalFanRotorProps> = ({
     radius = 0.25,
     spinSpeed = 10,
     position = [0, 0, 0],

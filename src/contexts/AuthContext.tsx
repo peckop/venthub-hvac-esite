@@ -7,7 +7,7 @@ import type { UserRole } from '../lib/rbac';
 import { AuthContext, type AuthError } from './AuthContextDefinition';
 import { getUserRole } from '../config/admin';
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<UserRole | null>(null);

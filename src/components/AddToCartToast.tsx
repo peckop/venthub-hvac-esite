@@ -8,7 +8,7 @@ import { Routes } from '../utils/routes'
 
 const EVENT = 'vh_cart_item_added'
 
-export const AddToCartToast: React.FC = () => {
+const AddToCartToast: React.FC = () => {
   const { t } = useI18n()
   const [visible, setVisible] = React.useState(false)
   const [product, setProduct] = React.useState<Product | null>(null)

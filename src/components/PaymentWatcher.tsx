@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 
 const STORAGE_KEY = 'vh_pending_order'
 
-export const PaymentWatcher: React.FC = () => {
+const PaymentWatcher: React.FC = () => {
   const router = useRouter()
   const checkingRef = useRef(false)
   const timerRef = useRef<number | null>(null)

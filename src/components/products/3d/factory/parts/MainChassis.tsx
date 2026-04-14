@@ -32,7 +32,7 @@ function buildInnerLathePoints(): THREE.Vector2[] {
   return INNER_PROFILE_POINTS.map(([y, r]) => new THREE.Vector2(r, y))
 }
 
-export const MainChassis: React.FC<MainChassisProps> = ({
+const MainChassis: React.FC<MainChassisProps> = ({
     isSelected,
     isIsolated,
     isHidden,

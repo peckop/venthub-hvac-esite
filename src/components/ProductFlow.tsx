@@ -1,4 +1,4 @@
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { useEffect, useMemo, useState, startTransition } from 'react'
 import { fetchHomeProducts, LiteProduct } from '../lib/productsApi'
 import TickerLane from './TickerLane'

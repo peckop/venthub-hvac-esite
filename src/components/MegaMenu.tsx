@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useCategories } from '../contexts/CategoryContext'
-import { EliteMegaMenu, MobileMegaMenu } from './navigation/EliteMegaMenu'
+import EliteMegaMenu, { MobileMegaMenu } from './navigation/EliteMegaMenu'
 
 interface MegaMenuProps {
   isOpen: boolean

@@ -10,7 +10,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { supabase } from '../lib/supabase'
 import { Routes } from '../utils/routes'
 
-export const LoginPage: React.FC = () => {
+const LoginPage: React.FC = () => {
   const [isPending, setIsPending] = useState(false)
   const { signIn } = useAuth()
   const [email, setEmail] = useState('')
