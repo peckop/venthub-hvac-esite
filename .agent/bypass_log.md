@@ -163,3 +163,21 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-14 09:32:33
+- **Commit:** `874e1526`
+- **Mesaj:** Merge branch 'pr-215'
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-14 09:33:53
+- **Commit:** `4a921180`
+- **Mesaj:** Merge branch 'pr-212'
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-14 09:40:20
+- **Commit:** `3c7a2541`
+- **Mesaj:** chore(lint): disable eslint rules for parse-lh.cjs
+- **Değişen Dosyalar:**
+
+
