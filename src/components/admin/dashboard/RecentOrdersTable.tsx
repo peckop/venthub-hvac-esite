@@ -9,6 +9,8 @@ import { useDragScroll } from '../../../hooks/useDragScroll'
 import { adminTableHeadCellClass, adminTableCellClass, adminTableContainerClass } from '../../../utils/adminUi'
 import { ExternalLink, ChevronRight, PackageSearch } from 'lucide-react'
 import AdminEmptyState from '../AdminEmptyState'
+import { Routes } from '../../../utils/routes';
+
 
 interface OrderData {
     id: string
@@ -57,7 +59,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic opacity-80">Son İşlemler</p>
                     </div>
                 </div>
-                <Link href="/admin/orders" className="text-[11px] font-black text-white uppercase tracking-widest px-8 py-3 rounded-2xl glass-strong hover:bg-cyan-500 hover:text-[#0A0F1E] hover:scale-105 active:scale-95 border border-white/5 transition-all duration-300 flex items-center gap-3 group/btn shadow-2xl">
+                <Link href={Routes.admin.orders()} className="text-[11px] font-black text-white uppercase tracking-widest px-8 py-3 rounded-2xl glass-strong hover:bg-cyan-500 hover:text-[#0A0F1E] hover:scale-105 active:scale-95 border border-white/5 transition-all duration-300 flex items-center gap-3 group/btn shadow-2xl">
                     Tümünü Gör <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
                 </Link>
             </div>

@@ -229,3 +229,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-14 12:49:05
+- **Commit:** `b0d6e284`
+- **Mesaj:** feat(arch): rename audit system to rontgen and seal execution rules
+- **Değişen Dosyalar:**
+
+

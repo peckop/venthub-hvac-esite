@@ -1,0 +1,143 @@
+{
+  "audit_name": "VentHub Global Mimari Denetim (Enterprise Edition)",
+  "audit_date": "2026-04-14T12:31:20.444521",
+  "git_commit_sha": "4127fd422f86b4242ec3e9eb211417bfd37f6b5d",
+  "agent_id": "Antigravity",
+  "checks": {
+    "1_zero_tolerance_linting": {
+      "target": "ESLint kod standartlarına tam uyum sağlamalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "run",
+          "lint:ci"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "\n> venthub-hvac@0.1.0 lint:ci C:\\Users\\alize\\venthub-hvac\n> cross-env NODE_OPTIONS='--max-old-space-size=8192' eslint .\n\n"
+    },
+    "2_strict_type_checking": {
+      "target": "TypeScript denetiminden sıfır (0) hata ile geçilmeli.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "exec",
+          "tsc",
+          "-b",
+          "tsconfig.build.json"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "FAIL",
+      "evidence": "error TS5083: Cannot read file 'C:/Users/alize/venthub-hvac/tsconfig.build.json'.\n"
+    },
+    "3_lockfile_consistency_guard": {
+      "target": "pnpm-lock.yaml ve package.json tamamen senkron olmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "install",
+          "--frozen-lockfile",
+          "--prefer-offline",
+          "--dry-run"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "FAIL",
+      "evidence": " ERROR  Unknown option: 'dry-run'\nFor help, run: pnpm help install\n"
+    },
+    "4_i18n_leakage_check": {
+      "target": "JSX, TSX içindeki kullanıcıya dönük hardcoded metinler bulunmamalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "node",
+        "args": [
+          ".agent/skills/venthub-global-audit/i18n_ast_checker.mjs"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "FAIL",
+      "evidence": "[i18n AST Scanner] Tarama basliyor...\n\n[🚨 i18n LEAKAGE DETECTED]\nBulunan hardcoded metin sızıntıları:\n- src\\views\\AboutPage.tsx:57 | [JsxProp <alt>] | Text: \"VentHub Engineering\"\n- src\\views\\AboutPage.tsx:72 | [JsxText <span>] | Text: \"Engineering Excellence Since 2009\"\n- src\\views\\AboutPage.tsx:80 | [JsxText <motion.h1>] | Text: \"Havayı\"\n- src\\views\\AboutPage.tsx:80 | [JsxText <span>] | Text: \"Yeniden Tanımlıyoruz\"\n- src\\views\\AboutPage.tsx:89 | [JsxText <motion.p>] | Text: \"VentHub, modern yaşam ve endüstriyel alanlar için yüksek verimli, teknolojik ve sürdürülebilir havalandırma sistemlerinin Türkiye'deki otoritesidir.\"\n- src\\views\\AboutPage.tsx:127 | [JsxProp <alt>] | Text: \"VentHub Story\"\n- src\\views\\AboutPage.tsx:138 | [JsxText <h2>] | Text: \"Geleceğin İklimini\"\n- src\\views\\AboutPage.tsx:139 | [JsxText <span>] | Text: \"Bugün Kuruyoruz\"\n- src\\views\\AboutPage.tsx:143 | [JsxText <p>] | Text: \"VentHub, havalandırma sektöründe sadece bir tedarikçi değil, teknolojik bir çözüm ortağı olarak konumlanmaktadır. 15 yılı aşkın süredir, Avrupa'nın en prestijli markalarını Türkiye'nin en büyük projeleriyle buluşturuyoruz.\"\n- src\\views\\AboutPage.tsx:146 | [JsxText <p>] | Text: \"Teknopark İstanbul'daki merkezimizden yönettiğimiz operasyonlarımızda, mühendislik etiği ve operasyonel mükemmeliyeti her şeyin önünde tutuyoruz. Bizim için her ürün bir bileşen, her proje ise bir havalandırma sanatı eseridir.\"\n- src\\views\\AboutPage.tsx:156 | [JsxProp <alt>] | Text: \"Team\"\n- src\\views\\AboutPage.tsx:166 | [JsxText <span>] | Text: \"Teknik Operasyon Kadrosu\"\n- src\\views\\AboutPage.tsx:179 | [JsxText <h2>] | Text: \"Resmi Distribütör\"\n- src\\views\\AboutPage.tsx:179 | [JsxText <span>] | Text: \"Ağımız\"\n- src\\views\\AboutPage.tsx:224 | [JsxText <h2>] | Text: \"Mühendislik Ortağınızla\"\n- src\\views\\AboutPage.tsx:225 | [JsxText <span>] | Text: \"Tanışmaya Hazır mısınız?\"\n- src\\views\\AboutPage.tsx:232 | [JsxText <Link>] | Text: \"İletişime Geçin\"\n- src\\views\\AboutPage.tsx:238 | [JsxText <Link>] | Text:"
+    },
+    "5_build_and_bundle_size_guard": {
+      "target": "Next.js Build işleminin pürüzsüz bitmesi ve rotaların boyut ölçümü uyarısı (WARNING).",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "run",
+          "build"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "\n> venthub-hvac@0.1.0 build C:\\Users\\alize\\venthub-hvac\n> cross-env NODE_OPTIONS='--max-old-space-size=8192' next build\n\n   ▲ Next.js 15.5.7\n   - Environments: .env.local, .env\n\n   Creating an optimized production build ...\n ✓ Compiled successfully in 24.9s\n   Linting and checking validity of types ...\n   Collecting page data ...\n   Generating static pages (0/399) ...\n   Generating static pages (99/399) \n   Generating static pages (199/399) \n   Generating static pages (299/399) \n ✓ Generating static pages (399/399)\n   Finalizing page optimization ...\n   Collecting build traces ...\n\nRoute (app)                                                      Size  First Load JS\n┌ ƒ /                                                         13.5 kB         215 kB\n├ ○ /_not-found                                                 995 B         105 kB\n├ ○ /about                                                    6.39 kB         208 kB\n├ ○ /account                                                   6.5 kB         226 kB\n├ ○ /account/addresses                                        1.42 kB         105 kB\n├ ○ /account/invoices                                         1.41 kB         105 kB\n├ ○ /account/orders                                           1.41 kB         105 kB\n├ ○ /account/orders/detail                                     147 kB         376 kB\n├ ○ /account/profile                                          2.45 kB         174 kB\n├ ○ /account/returns                                          5.34 kB         226 kB\n├ ○ /account/security                                         4.94 kB         226 kB\n├ ○ /account/shipments                                         4.8 kB         226 kB\n├ ○ /admin                                                      11 kB         334 kB\n├ ○ /admin/audit-logs                                         4.63 kB         230 kB\n├ ○ /admin/categories                                         12.3 kB         282 kB\n├ ƒ /admin/categories/[id]/builder                 "
+    },
+    "6_unit_test_gate": {
+      "target": "Birim testlerin başarıyla geçilmesi.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "test",
+          "--",
+          "--run"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "\n> venthub-hvac@0.1.0 test C:\\Users\\alize\\venthub-hvac\n> vitest \"--\" \"--run\"\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv4.1.3 \u001b[39m\u001b[90mC:/Users/alize/venthub-hvac\u001b[39m\n\n \u001b[32m✓\u001b[39m src/views/checkout/__tests__/ReviewSummary.test.tsx \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 211\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/views/checkout/__tests__/buildPaymentRequest.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 13\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/passwordSecurity.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 33\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/engineeringIntelligence.test.ts \u001b[2m(\u001b[22m\u001b[2m18 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 34\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/categoryHelpers.test.ts \u001b[2m(\u001b[22m\u001b[2m18 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 25\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/lib/__tests__/hvacCalculations.test.ts \u001b[2m(\u001b[22m\u001b[2m12 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 38\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/lib/__tests__/audit.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 62\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/checkoutHelpers.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 99\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/whatsapp.test.ts \u001b[2m(\u001b[22m\u001b[2m27 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 57\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useApiCall.test.tsx \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 96\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/use-mobile.test.tsx \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 80\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useCartHook.test.tsx \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 88\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useRole.test.tsx \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 84\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/views/account/__tests__/ReturnsModalClose.test.tsx \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 224\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/components/products/__tests__/ProductsHero.test.tsx \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 474\u001b[2mms\u001b[22m\u001b[39m\n     \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m should have focus-within"
+    },
+    "7_route_ssot_enforcement": {
+      "target": "Hardcoded path kaçaklarını önleme. Merkezi SSOT rota sabitleri (Routes.xx) kullanılmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "href=\"/|\\\\.push\\('/",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "FAIL",
+      "evidence": "Bulgular:\nsrc\\views\\AboutPage.tsx:229 -> href=\"/contact\"\nsrc\\views\\BrandDetailPage.tsx:133 -> href=\"/brands\"\nsrc\\views\\BrandDetailPage.tsx:281 -> <Link href=\"/contact\">\nsrc\\views\\CartPage.tsx:33 -> href=\"/\"\nsrc\\views\\CheckoutPage.tsx:178 -> <Link href=\"/\" className=\"inline-flex items-center px-6 py-3 bg-primary-navy text-white rounded-lg\">\nsrc\\views\\LoginPage.tsx:217 -> <Link href=\"/\" className=\"group inline-flex items-center gap-3 transition-all duration-500\">\nsrc\\views\\ProductDetailPage.tsx:161 -> if (!product) return <div className=\"min-h-screen flex items-center justify-center bg-slate-50/30\"><div className=\"text-center\"><h1 className=\"text-xl font-bold text-industrial-gray mb-4\">{t('pdp.productNotFound')}</h1><Link href=\"/\" className=\"text-primary-navy hover:text-secondary-blue font-bold text-sm uppercase tracking-widest\">{t('pdp.backHome')}</Link></div></div>\nsrc\\views\\RegisterPage.tsx:116 -> href=\"/\"\nsrc\\views\\RegisterPage.tsx:138 -> href=\"/\"\nsrc\\views\\account\\AccountOverviewPage.tsx:288 -> <Link href=\"/account/orders\" className=\"text-sm font-bold text-primary-navy hover:underline inline-flex items-center gap-1\">\nsrc\\views\\admin\\AdminLayout.tsx:117 -> <Link href=\"/admin\" className=\"flex items-center gap-3\">\nsrc\\views\\knowledge\\HubPage.tsx:220 -> href=\"/contact\"\nsrc\\views\\knowledge\\TopicPage.tsx:40 -> href=\"/destek/merkez\"\nsrc\\views\\knowledge\\TopicPage.tsx:79 -> href=\"/destek/merkez\"\nsrc\\views\\knowledge\\TopicPage.tsx:151 -> href=\"/contact\"\nsrc\\components\\BrandsShowcase.tsx:93 -> href=\"/brands\"\nsrc\\components\\Footer.tsx:26 -> <Link href=\"/\" className=\"flex items-center space-x-3\">\nsrc\\components\\ResourcesSection.tsx:19 -> <Link href=\"/destek/merkez\" className=\"text-primary-navy hover:underline text-sm font-medium\">{t('resources.allGuides')} →</Link>\nsrc\\components\\UndecidedUserCTA.tsx:28 -> href=\"/contact?dept=consulting\"\nsrc\\components\\admin\\AccessDenied.tsx:27 -> href=\"/admin\"\nsrc\\components\\admin\\dashboard\\RecentOrdersTable.tsx:60 -> <Link href=\"/admin/order"
+    },
+    "8_next15_async_params_guard": {
+      "target": "Next.js 15: Dinamik rotalardaki params kesinlikle await edilmelidir.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "params\\.[a-zA-Z]+",
+          "src/app/",
+          "--exclude=await params"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "FAIL",
+      "evidence": "Bulgular:\nsrc\\app\\page.tsx:17 -> const lang = (params.lang as string) === 'en' ? 'en' : 'tr'\nsrc\\app\\page.tsx:77 -> const lang = (params.lang as string) === 'en' ? 'en' : 'tr'"
+    }
+  },
+  "overall_ship_status": "BLOCKED"
+}

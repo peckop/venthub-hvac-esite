@@ -1,0 +1,42 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "",
+  "date": "",
+  "task_id": "P00-999",
+  "task_title": "Trivial Update",
+  "description": "",
+  "files_modified": [],
+  "allowed_paths": [
+    ".agent/bypass_log.md",
+    ".agent/skills/venthub-global-audit/SKILL.md",
+    ".agent/skills/venthub-global-audit/audit-template.json",
+    ".agent/skills/venthub-global-rontgen/SKILL.md",
+    ".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs",
+    ".agent/skills/venthub-global-rontgen/rontgen-template.json",
+    ".agent/skills/venthub-global-rontgen/run_rontgen.py",
+    "registry/PULSE.md",
+    "registry/WORKFLOW_STRATEGY.md",
+    "src/middleware.ts"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": [],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "",
+      "passed": false
+    }
+  ],
+  "all_passed": false
+}

@@ -175,7 +175,7 @@ export const CheckoutPage: React.FC = () => {
       <div className="min-h-screen bg-light-gray flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-industrial-gray mb-4">{t('checkout.emptyCart.title')}</h2>
-          <Link href="/" className="inline-flex items-center px-6 py-3 bg-primary-navy text-white rounded-lg">
+          <Link href={Routes.home()} className="inline-flex items-center px-6 py-3 bg-primary-navy text-white rounded-lg">
             <ArrowLeft size={20} className="mr-2" /> {t('checkout.emptyCart.startShopping')}
           </Link>
         </div>

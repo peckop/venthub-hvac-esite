@@ -2,6 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 import { Calculator, ArrowLeft, Info, AlertTriangle } from 'lucide-react'
 import Seo from '../Seo'
+import { Routes } from '../../utils/routes';
+
 
 interface CalculatorLayoutProps {
     title: string
@@ -89,7 +91,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
                     </p>
                     <p className="mt-1 text-xs">
                         Teknik sorularınız için{' '}
-                        <Link href="/contact" className="text-primary-navy hover:underline">
+                        <Link href={Routes.contact()} className="text-primary-navy hover:underline">
                             iletişime geçin
                         </Link>
                     </p>

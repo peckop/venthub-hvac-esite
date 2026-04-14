@@ -23,7 +23,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center space-x-3">
+            <Link href={Routes.home()} className="flex items-center space-x-3">
               <div className="bg-primary-navy p-2 rounded-lg">
                 <div className="text-white font-bold text-lg">VH</div>
               </div>

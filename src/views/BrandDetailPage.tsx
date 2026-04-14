@@ -130,7 +130,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900 mb-4">{t('brands.notFound')}</h1>
           <Link 
-            href="/brands" 
+            href={Routes.brands()} 
             aria-label={t('brands.backToAll')}
             className="text-cyan-600 font-bold uppercase tracking-widest text-xs underline underline-offset-8"
           >
@@ -278,7 +278,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                     )}
                   </div>
 
-                  <Link href="/contact">
+                  <Link href={Routes.contact()}>
                     <button 
                       aria-label={t('brands.detail.requestCatalog')}
                       className="mt-12 w-full py-5 bg-white text-slate-950 font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all hover:bg-cyan-400 active:scale-95"

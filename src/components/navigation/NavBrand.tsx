@@ -1,5 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
+import { Routes } from '../../utils/routes';
+
 
 interface NavBrandProps {
     brandName: string
@@ -8,7 +10,7 @@ interface NavBrandProps {
 const NavBrand: React.FC<NavBrandProps> = React.memo(({ brandName }) => {
     return (
         <Link
-            href="/"
+            href={Routes.home()}
             className="group flex shrink-0 items-center gap-3 w-auto pr-3 sm:pr-4 lg:pr-5 transition-all duration-300"
         >
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-primary-navy to-secondary-blue text-white shadow-[0_18px_35px_-20px_rgba(37,99,235,0.7)] px-3 py-2 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-[0_22px_40px_-18px_rgba(37,99,235,0.75)]">

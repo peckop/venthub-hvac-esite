@@ -2,6 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 import { trackEvent } from '../utils/analytics'
 import { useI18n } from '../i18n/I18nProvider'
+import { Routes } from '../utils/routes';
+
 
 const ResourcesSection: React.FC = () => {
   const { t } = useI18n()
@@ -16,7 +18,7 @@ const ResourcesSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('resources.title')}</h2>
-          <Link href="/destek/merkez" className="text-primary-navy hover:underline text-sm font-medium">{t('resources.allGuides')} →</Link>
+          <Link href={Routes.destek.home()} className="text-primary-navy hover:underline text-sm font-medium">{t('resources.allGuides')} →</Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

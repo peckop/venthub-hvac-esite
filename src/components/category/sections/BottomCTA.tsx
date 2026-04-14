@@ -1,6 +1,8 @@
 import React from 'react'
 import { ArrowUp, ThermometerSun, Package, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
+import { Routes } from '../../../utils/routes';
+
 
 interface BottomCTAProps {
     /** Callback for opening the wizard (optional) */
@@ -84,7 +86,7 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
 
                     {/* Uzman Desteği */}
                     <Link
-                        href="/contact?dept=consulting"
+                        href={Routes.contact('consulting')}
                         className="group flex flex-col items-center p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all"
                     >
                         <div className="w-14 h-14 bg-emerald-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
