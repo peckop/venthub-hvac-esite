@@ -4,23 +4,14 @@ Bu klasörde projeye ait tüm dokümantasyon dosyaları bulunmaktadır.
 
 ## 📖 Ana Dokümantasyon
 
-### 🗺️ **ROADMAP.md** ⭐
+### 🏗️ **ARCHITECTURE.md** ⭐
 **Tek ve güncel kaynak** (Single Source of Truth)
-- Proje yol haritası ve sprint planları
-- Operasyonel görev listesi
-- QA kontrol listeleri
-- Son güncelleme: 2025-09-19
-
-### 🛠️ **OPERATIONS_PLAN.md**
-Stok yönetimi ve operasyonel süreçler
-- Envanter şeması ve RPC'ler
-- Admin UI spesifikasyonları
-- Müşteri UX gereksinimleri
-- WhatsApp entegrasyonu planı
+- Mimari standartlar ve kurallar
+- Model ve hook yaklaşımları
 
 ### 🚀 **DEPLOYMENT.md**
 CI/CD süreçleri ve dağıtım rehberi
-- GitHub Actions yapılandırması
+- Vercel dağıtım yapılandırması
 - Environment variables
 - Supabase migrations
 
@@ -42,40 +33,34 @@ Detaylı değişiklik günlüğü
 ```
 proje/
 ├── README.md                      # 📄 Ana proje tanıtımı
-├── NEXT_STEPS.md                  # ⚡ Kısa vadeli görevler (aktif)
-├── VENTHUB_ULTIMATE_PROMPT.md     # 📋 Proje özellikleri
 └── docs/
     ├── README.md                  # 📚 Bu dosya
-    ├── ROADMAP.md                 # 🎯 Ana yol haritası
-    ├── OPERATIONS_PLAN.md         # 🛠️ Operasyon planı (Undo/Batch Undo dâhil)
-    ├── SECURITY_AND_PERF_CHECKLIST.md # 🔐 Güvenlik ve performans rehberi (Advisor, RLS, indeksler)
-    ├── SEO_I18N.md               # 🌐 SEO ve i18n standartları + format helper kullanımı
-    ├── DEPLOYMENT.md              # 🚀 Dağıtım rehberi
+    ├── ARCHITECTURE.md            # 🏗️ Ana mimari doküman
+    ├── DEPLOYMENT.md              # 🚀 Vercel dağıtım rehberi
+    ├── SECURITY_AND_PERF_CHECKLIST.md # 🔐 Güvenlik ve performans rehberi
+    ├── SEO_I18N.md                # 🌐 SEO ve i18n standartları
     ├── WHATSAPP_SETUP_GUIDE.md    # 📱 WhatsApp kurulum
     ├── CHANGELOG.md               # 📝 Değişiklik günlüğü
+    ├── DESIGN_SYSTEM.md           # 🎨 Tasarım sistemi ve bileşen yapısı
+    ├── EMAIL_TEMPLATES.md         # 📧 Email şablonları rehberi
+    ├── MANIFESTO.md               # 📜 Proje manifestosu
+    ├── MCP_KULLANIM_REHBERI.md    # 🤖 MCP araçları ve JULES ajan rehberi
     └── archive/                   # 📦 Arşiv dosyalar
-        ├── plan-and-tasklist.md        # Eski plan (original)
-        └── plan-and-tasklist-current.md # Eski plan (son hali)
 ```
 
 ## 🎯 Hızlı Erişim
 
-- **Mevcut durumu öğrenmek**: `ROADMAP.md` → "Durum Özeti"
-- **Yeni özellik eklemek**: `ROADMAP.md` → Sprint planları
-- **Stok sistemi & Undo/Batch Undo**: `OPERATIONS_PLAN.md`
+- **Mimari yapıyı öğrenmek**: `ARCHITECTURE.md`
 - **Güvenlik & Performans**: `SECURITY_AND_PERF_CHECKLIST.md`
-- **i18n/SEO standartları**: `SEO_I18N.md`
-- **WhatsApp kurulumu**: `WHATSAPP_SETUP_GUIDE.md`
-- **Deploy işlemi**: `DEPLOYMENT.md`
-- **Son değişiklikleri görmek**: `CHANGELOG.md`
+- **Tasarım Kuralları**: `DESIGN_SYSTEM.md`
+- **Değişiklik Günlüğü (Changelog)**: `CHANGELOG.md`
+- **Ajanlar ve MCP Yönergesi**: `MCP_KULLANIM_REHBERI.md`
+- **Deploy İşlemi**: `DEPLOYMENT.md`
 
 ## ⚠️ Önemli Notlar
 
-- **ROADMAP.md** genel yol haritası ve uzun vadeli planlama için tek kaynak
-- **NEXT_STEPS.md** kısa vadeli teknik görevler ve detaylar için aktif olarak kullanılıyor
-- Her iki belge senkronize çalışıyor: ROADMAP stratejik, NEXT_STEPS operasyonel
-- WhatsApp backend sistemi hazır, sadece Twilio hesabı ve kurumsal numara gerekli
-- Deprecated dosyalar `docs/archive/` klasöründe korunuyor
+- Deprecated dosyalar ve eski planlar `docs/archive/` klasöründe korunmaktadır.
+- Projede otonom süreçleri (AI Agent workflows) desteklemek için `AGENTS.md` ve `GEMINI.md` kök dizinde bulunmaktadır.
 
 ## Yeni Doküman
 

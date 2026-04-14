@@ -181,3 +181,45 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-14 09:41:00
+- **Commit:** `f95f0e73`
+- **Mesaj:** fix(registry): correct ORION_ENGINE_DIR path in bridge
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-14 10:07:04
+- **Commit:** `d5733805`
+- **Mesaj:** perf(scroll-observer): MutationObserver(subtree:true) kaldir, hydration deadlock gider
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-14 10:20:13
+- **Commit:** `b8f3aee6`
+- **Mesaj:** docs: README tamamen yeniden yaz, ARCHITECTURE.md olustur
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-14 10:27:41
+- **Commit:** `2fdbef26`
+- **Mesaj:** docs: gereksiz ve deprecated dosyalari temizle, arsivle
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-14 10:30:45
+- **Commit:** `12e8ea91`
+- **Mesaj:** docs: DEPLOYMENT.md guncelle — Vite->Next.js, VITE_->NEXT_PUBLIC_, port 5173->3000
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-14 10:36:20
+- **Commit:** `78eb67ba`
+- **Mesaj:** docs: DEPLOYMENT.md — Cloudflare->Vercel, birincil deploy platformu guncellendi
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-14 10:40:48
+- **Commit:** `9eea495e`
+- **Mesaj:** chore: kok dizindeki cop ve deprecated dosyalar temizlendi
+- **Değişen Dosyalar:**
+
+
