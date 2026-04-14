@@ -4,9 +4,11 @@ import * as path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vitest/config"
 
+import type { PluginOption } from 'vite';
+
 export default defineConfig({
 
-  plugins: [react() as unknown as import("vite").PluginOption],
+  plugins: [react() as PluginOption],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
