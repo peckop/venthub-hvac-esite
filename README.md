@@ -1,118 +1,192 @@
-# Venthub HVAC E‑Site
+# VentHub HVAC — Enterprise E-Commerce Platform
 
 [![Supabase Migrate](https://github.com/peckop/venthub-hvac-esite/actions/workflows/supabase-migrate.yml/badge.svg)](https://github.com/peckop/venthub-hvac-esite/actions/workflows/supabase-migrate.yml)
 [![App Lint](https://github.com/peckop/venthub-hvac-esite/actions/workflows/app-lint.yml/badge.svg)](https://github.com/peckop/venthub-hvac-esite/actions/workflows/app-lint.yml)
 [![DB Advisor](https://github.com/peckop/venthub-hvac-esite/actions/workflows/db-advisor.yml/badge.svg)](https://github.com/peckop/venthub-hvac-esite/actions/workflows/db-advisor.yml)
 
-React + TypeScript + Vite tabanlı e‑ticaret uygulaması.
-
-- Yol Haritası ve durum takibi: bkz. docs/ROADMAP.md
-- CI/CD ve dağıtım rehberi: bkz. docs/DEPLOYMENT.md
-
-## Ortam Değişkenleri (Vite)
-
-Aşağıdaki değişkenler build sırasında gereklidir:
-
-- VITE_SUPABASE_URL
-- VITE_SUPABASE_ANON_KEY
-- VITE_SHOP_WHATSAPP (opsiyonel, WhatsApp desteği için)
-
-Örnek dosya: `.env.example`. Üretime secret koymayın; dağıtım ortamınızın (Vercel/Netlify/Render/Actions) env yönetimini kullanın.
-
-### WhatsApp Konfigürasyonu (Opsiyonel)
-`VITE_SHOP_WHATSAPP` ortam değişkeni ayarlanırsa, WhatsApp desteği otomatik olarak aktif hale gelir:
-
-- **Format**: `905551234567` (ülke kodu + telefon numarası, özel karakter yok)
-- **Kullanım Alanları**: 
-  - Stokta olmayan ürünlerde "Stok sor" butonu
-  - Destek sayfalarında hızlı WhatsApp iletişimi
-  - FAQ sayfasında "Bulamadınız mı?" desteği
-  - İletişim sayfasında WhatsApp hızlı erişim
-- **Fallback**: Değişken ayarlı değilse sistem e-posta iletişime geçer
-
-### Vercel
-- Project Settings → Environment Variables
-- Name: VITE_SUPABASE_URL, Value: https://<project-ref>.supabase.co
-- Name: VITE_SUPABASE_ANON_KEY, Value: <anon key>
-- Name: VITE_SHOP_WHATSAPP, Value: 905551234567 (opsiyonel)
-- Environments: Production + Preview
-- Redeploy
-
-### Netlify
-- Site settings → Environment variables → Add variable
-- Names: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_SHOP_WHATSAPP (opsiyonel)
-- Production + Deploy Previews için ekleyip yeniden yayınlayın
-
-### Cloudflare Pages
-- Project → Settings → Environment Variables
-- Name: VITE_SUPABASE_URL, Value: https://<project-ref>.supabase.co
-- Name: VITE_SUPABASE_ANON_KEY, Value: <anon key>
-- Name: VITE_SHOP_WHATSAPP, Value: 905551234567 (opsiyonel)
-- Node version: 18+ (Pages defaults uygundur)
-- Package manager: pnpm (Pages "Enable pnpm" veya corepack)
-- Build command: pnpm run build:ci
-- Output directory: dist
-- Preview ve Production ortamlarına aynı değişkenleri ekleyin
-
-### GitHub Actions ile Build
-Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets ekleyin:
-- VITE_SUPABASE_URL
-- VITE_SUPABASE_ANON_KEY
-- VITE_SHOP_WHATSAPP (opsiyonel)
-
-## Supabase Migrations (Otomatik)
-- `supabase/migrations/*.sql` push edildiğinde CI, Supabase CLI (v2.39.2) ile otomatik uygular.
-- Secrets: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` zorunludur.
-- GitHub Actions: `.github/workflows/supabase-migrate.yml` tetikleyicileri ve job’ları sizin policy’nize göre düzenlenebilir.
+HVAC sektörüne özel, B2B/B2C karma satış mimarisi üzerine kurulu enterprise e-ticaret platformu.
 
 ---
 
-## Son Gelişmeler (2025-12-15)
+## Tech Stack
 
-Proje modernizasyonu ve stabilite çalışmaları tamamlandı:
+| Katman | Teknoloji |
+|---|---|
+| **Frontend** | Next.js 15 (App Router) + React 19 |
+| **Dil** | TypeScript (Strict Mode) |
+| **Stil** | Tailwind CSS v3 |
+| **Veritabanı** | Supabase (PostgreSQL) — RLS aktif |
+| **Edge Functions** | Supabase Edge Functions (Deno) — 38 aktif |
+| **Ödeme** | İyzico (3D Secure, sandbox + prod) |
+| **E-posta** | Resend.dev |
+| **Paket Yöneticisi** | pnpm |
+| **Test** | Vitest + Playwright |
+| **CI/CD** | GitHub Actions → Cloudflare Pages |
 
-- **CI/CD Pipeline**: Tüm workflow'lar (Lint, Build, Test) yeşil (%100 başarı). `--max-warnings=0` politikası aktif.
-- **Supabase Optimizasyonu**:
-  - RLS policy'leri `initplan` sorunlarına karşı optimize edildi (`(select auth.uid())` pattern).
-  - Performans indeklemesi yapıldı, gereksiz indeksler temizlendi.
-- **UI/UX**:
-  - Yeni **Category Landing** sayfaları (metadata-driven).
-  - Ana sayfa **Hero Carousel** (otomatik kategori geçişi).
-  - Hava Perdesi **Seçim Sihirbazı**.
+---
 
-Detaylı değişiklik günlüğü için: [docs/CHANGELOG.md](docs/CHANGELOG.md)
+## Özellikler
 
-## Geliştirme
-- pnpm install
-- pnpm dev
-- pnpm lint
-- pnpm test
-- pnpm run build:ci
+- 🛒 **Tam Sipariş Döngüsü** — Sepet → Ödeme (İyzico) → Kargo → Teslimat → İade
+- 🏢 **B2B Altyapısı** — `organizations`, `price_lists`, çok katmanlı rol sistemi (super_admin / admin / warehouse / sales / viewer / user)
+- 📦 **Stok Yönetimi** — Inventory movements, geri alma (undo), batch operasyonları, düşük stok uyarısı
+- 🔍 **Gelişmiş Arama** — Edge Function tabanlı full-text search + HVAC parametrelerine göre filtreleme
+- 🧮 **Mühendislik Araçları** — Hava perdesi seçim sihirbazı (fizik formüllü), HRV hesaplayıcı
+- 🔔 **Bildirim Sistemi** — Sipariş, kargo, iade için e-posta + webhook
+- 🛡️ **Güvenlik** — Rate limiting, idempotency keys, HMAC webhook doğrulama, admin audit log
+- 📊 **Hata İzleme** — Client-side error grouping (client_errors + error_groups tabloları)
+- 🌍 **i18n** — Dictionary tabanlı Türkçe/İngilizce altyapısı
 
-## Lokal migration (psql)
-GitHub Actions yerine yerelde migration uygulamak için PowerShell scripti eklenmiştir.
+---
 
-1) Supabase panelinden Database > Connection string (URI) kopyalayın (postgresql:// ile başlar).
-2) Aşağıdaki komutu çalıştırın (Windows PowerShell):
+## Mimari
 
-```powershell path=null start=null
-# Seçenek A: URI'yi env'den okuyarak
-$env:SUPABASE_DB_URL="postgresql://postgres:PAROLA@db.tnofewwkwlyjsqgwjjga.supabase.co:5432/postgres"
-powershell -ExecutionPolicy Bypass -File .scripts/migrate.ps1
+Detaylı mimari: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
-# Seçenek B: Çalıştırınca URI'yi sizden ister
+```
+src/
+├── app/           # Next.js App Router — sayfa rotaları
+├── views/         # Sayfa içerikleri (Server + Client bileşimi)
+├── components/    # Tekrar kullanılabilir UI bileşenleri
+│   ├── ui/        # Primitif bileşenler (Button, Dialog...)
+│   ├── home/      # Anasayfa bölümleri
+│   ├── products/  # Ürün kartları, showcase
+│   └── navigation/# Header, menü, kategori navigasyonu
+├── lib/           # Servis katmanı (Supabase, RBAC, tip dönüşümleri)
+│   └── services/  # address, cart, category, invoice, pricing, product, project
+├── hooks/         # Custom React hook'ları
+├── types/         # TypeScript tip tanımları (Source of Truth: database.types.ts)
+├── i18n/          # Sözlük tabanlı çeviri sistemi
+└── utils/         # Yardımcı fonksiyonlar
+
+supabase/
+├── functions/     # Edge Functions (38 adet, Deno çalışma ortamı)
+└── migrations/    # SQL migration dosyaları (otomatik CI/CD ile uygulanır)
+```
+
+---
+
+## Hızlı Başlangıç
+
+### 1. Gereksinimler
+
+- Node.js 18+
+- pnpm (`npm install -g pnpm`)
+
+### 2. Kurulum
+
+```bash
+pnpm install
+cp .env.example .env.local
+# .env.local dosyasını doldurun (aşağıya bakın)
+pnpm dev
+```
+
+Geliştirme sunucusu: http://localhost:3000
+
+### 3. Komutlar
+
+```bash
+pnpm dev          # Geliştirme sunucusu
+pnpm build        # Üretim derlemesi
+pnpm lint         # ESLint 9 Flat Config denetimi
+pnpm type-check   # TypeScript tip kontrolü
+pnpm test         # Vitest birim testleri
+pnpm test:watch   # İzleme modunda test
+```
+
+---
+
+## Ortam Değişkenleri
+
+`.env.example` dosyasını kopyalayarak `.env.local` oluşturun:
+
+```bash
+cp .env.example .env.local
+```
+
+### Zorunlu Değişkenler
+
+| Değişken | Açıklama |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase proje URL'i |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonim (public) anahtar |
+| `NEXT_PUBLIC_SITE_URL` | Sitenin tam URL'i (prod: `https://venthub.com`) |
+
+### Ödeme (İyzico)
+
+| Değişken | Açıklama |
+|---|---|
+| `NEXT_PUBLIC_IYZICO_API_KEY` | İyzico API anahtarı |
+| `NEXT_PUBLIC_IYZICO_SECRET_KEY` | İyzico gizli anahtar |
+| `NEXT_PUBLIC_IYZICO_BASE_URL` | Sandbox: `https://sandbox-api.iyzipay.com` |
+
+### Backend / Edge Functions
+
+| Değişken | Açıklama |
+|---|---|
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase servis rolü (server-only) |
+| `RESEND_API_KEY` | E-posta gönderimi (Resend.dev) |
+
+### Opsiyonel
+
+| Değişken | Açıklama |
+|---|---|
+| `NEXT_PUBLIC_SHOP_WHATSAPP` | WhatsApp numarası — format: `905XXXXXXXXX` |
+| `NEXT_PUBLIC_CLOUDFLARE_STREAM_DOMAIN` | Cloudflare Stream video CDN |
+
+---
+
+## Veritabanı Migrasyonları
+
+### Otomatik (CI/CD)
+
+`supabase/migrations/` altına `.sql` dosyası ekleyip `master`'a push ettiğinizde GitHub Actions otomatik olarak uygular.
+
+Gerekli GitHub Secrets:
+- `SUPABASE_ACCESS_TOKEN`
+- `SUPABASE_PROJECT_REF`
+
+### Manuel (Yerel)
+
+```bash
+# Supabase Dashboard > Database > Connection string kopyalayın
+$env:SUPABASE_DB_URL="postgresql://postgres:PAROLA@db.<ref>.supabase.co:5432/postgres"
 powershell -ExecutionPolicy Bypass -File .scripts/migrate.ps1
 ```
 
-Notlar:
-- psql kurulu olmalıdır (Windows: winget install PostgreSQL.Client).
-- URI'yi paneldeki "Copy" ile alın; özel karakter varsa URL-encode gerekebilir.
-- pnpm install
-- pnpm dev
-- pnpm lint
-- pnpm test
-- pnpm run build:ci
+### TypeScript Tip Üretimi
+
+```bash
+pnpm supabase:gen   # src/types/database.types.ts günceller
+```
 
 ---
-**Infrastructure Test (2026-03-18):** GitHub Actions & API Secrets verification push.
 
+## Dağıtım (Cloudflare Pages)
+
+| Ayar | Değer |
+|---|---|
+| Framework | Next.js (Next.js adapter) |
+| Build komutu | `pnpm run build:ci` |
+| Çıkış dizini | `.next` |
+| Node sürümü | 18+ |
+| Paket yöneticisi | pnpm |
+
+Ortam değişkenlerini Cloudflare Pages → Settings → Environment Variables bölümüne ekleyin.
+
+---
+
+## Proje Durumu
+
+- **İlerleme:** %63 (bkz. [`registry/PULSE.md`](registry/PULSE.md))
+- **Aktif görevler:** Visual Page Builder (%90), Kategori Editörü (%85)
+- **Değişiklik günlüğü:** [`docs/CHANGELOG.md`](docs/CHANGELOG.md)
+- **Yol haritası:** [`docs/ROADMAP.md`](docs/ROADMAP.md)
+- **Mimari:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+
+---
+
+## Lisans
+
+Özel kullanım. Tüm hakları saklıdır.
