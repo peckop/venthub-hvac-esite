@@ -4,7 +4,7 @@
   "title": "Code Review Artifact",
   "description": "Kod denetimi çıktısı. Bu şema hem YAPISAL doğrulama hem de ANLAMSAL rehberlik sağlar. Ajan bu şemayı okuduğunda, her severity seviyesinin ne anlama geldiğini ve anti_hallucination dizisini nasıl dolduracağını bilmelidir.",
   "type": "object",
-  "required": ["blockers", "majors", "minors", "nits", "summary", "verdict"],
+  "required": ["blockers", "majors", "minors", "nits", "summary", "verdict", "post_scan_cross_checks"],
   "properties": {
     "skill": {
       "type": "string",
@@ -89,6 +89,25 @@
         }
       },
       "description": "UYDURMA KORUMA DİZİSİ (Anti-Hallucination): Review esnasında kullanılan her ORM alanı, import veya API çağrısı burada listelenmeli. Her iddia view_file ile doğrulanmalı. verified=false olan öğe otomatik olarak Blocker'a dönüşür."
+    },
+    "post_scan_cross_checks": {
+      "type": "object",
+      "required": ["hardcoded_route_leaks_checked", "slug_only_contract_verified", "mri_bundle_checked"],
+      "properties": {
+        "hardcoded_route_leaks_checked": {
+          "type": "boolean",
+          "description": "Grep search ile href='/category' ve /products kacaklarinin aranip aranmadigi."
+        },
+        "slug_only_contract_verified": {
+          "type": "boolean",
+          "description": "UI ve View katmanindan getProductBySlugOrId sızıntılarının grep ile teyit temizligi."
+        },
+        "mri_bundle_checked": {
+          "type": "boolean",
+          "description": "MRI raporundaki agir bundle sorunlarinin ve Knip gürültülerinin bypass edilmeden incelendigi (Max 400kb)."
+        }
+      },
+      "description": "Röntgen veya Python scriptleri PASS verse bile mimari disiplinin saglandigina dair elle (Grep) yapilan manuel Yorumlama Katmani yeminidir. Hepsi true olmadan Json review kapatilamaz."
     },
     "summary": {
       "type": "string",

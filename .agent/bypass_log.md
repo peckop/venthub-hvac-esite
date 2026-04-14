@@ -259,3 +259,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-14 15:50:33
+- **Commit:** `d24ebdd2`
+- **Mesaj:** chore: archive legacy productflow and remove unused splidejs dependencies
+- **Değişen Dosyalar:**
+
+

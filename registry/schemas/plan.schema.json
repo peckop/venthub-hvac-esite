@@ -4,7 +4,7 @@
   "title": "Implementation Plan Artifact",
   "description": "Uygulama planı çıktısı. Bu şema hem YAPISAL doğrulama hem de MODEL SEVKİ (dispatcher) ve ONAY MEKANİZMASI sağlar. Ajan bu şemayı okuduğunda, görevin karmaşıklığını nasıl ölçeceğini, hangi modeli önereceğini ve kullanıcıdan onay isteyip istemeyeceğini bilmelidir.",
   "type": "object",
-  "required": ["objective", "assumptions", "pre_checks", "steps", "risks", "rollback", "brainstorm_ref", "execution_complexity", "recommended_model", "requires_human_approval", "domain_ref", "allowed_paths", "forbidden_paths", "max_files_changed", "allowed_change_types"],
+  "required": ["objective", "assumptions", "pre_checks", "steps", "risks", "rollback", "brainstorm_ref", "execution_complexity", "recommended_model", "requires_human_approval", "domain_ref", "allowed_paths", "forbidden_paths", "max_files_changed", "allowed_change_types", "architectural_guardrails"],
   "properties": {
     "skill": {
       "type": "string",
@@ -61,6 +61,23 @@
       "minItems": 1,
       "items": { "type": "string" },
       "description": "Değişim türleri örn: ui_spacing, component_refactor, api_change, db_migration vb."
+    },
+    "architectural_guardrails": {
+      "type": "object",
+      "required": ["ssot_route_strategy", "bundle_size_optimization"],
+      "properties": {
+        "ssot_route_strategy": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Ajanin planladigi degisikliklerin hardcoded SSOT sızıntısı (örn: href='/category') yaratmayacagini ve Routes.ts otoritesini nasil koruyacagini izah etmesi."
+        },
+        "bundle_size_optimization": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Planlanan bilesenlerin First Load JS (Bundle) boyutunu nasil etkileyecegi. Agir (3D/Galeri) iceriklerin next/dynamic (lazy) yapilip yapilmayacagi."
+        }
+      },
+      "description": "Mimarinin ve SSOT'in ihlal edilmemesi icin plan asamasinda doldurulmasi ZORUNLU guvenlik ve performans taahhutleri."
     },
     "objective": {
       "type": "string",
