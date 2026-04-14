@@ -1,7 +1,17 @@
 import React from 'react'
 import { Settings, Ruler } from 'lucide-react'
 
-// Helper function to translate spec keys from English to Turkish
+/**
+ * Translates a technical specification key into a human-readable Turkish label.
+ * If the key is not found in the predefined translation dictionary, it falls back to formatting the key by splitting on underscores and applying Title Case.
+ *
+ * @param key - The raw specification key (e.g., 'rpm_max', 'custom_spec_name')
+ * @returns The translated or formatted display name
+ *
+ * @example
+ * translateSpecKey('airflow_speed_max_ms') // returns "2. Kademe Hava Hızı"
+ * translateSpecKey('unknown_custom_spec') // returns "Unknown Custom Spec"
+ */
 export const translateSpecKey = (key: string): string => {
   const translations: Record<string, string> = {
     'rpm_max': '2. Kademe Devir Hızı',
