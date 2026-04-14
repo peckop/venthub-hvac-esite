@@ -14,7 +14,7 @@ interface DateRangePickerProps {
     className?: string
 }
 
-export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, placeholder, className = '' }) => {
+const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, placeholder, className = '' }) => {
     const { lang } = useI18n()
     const locale = lang === 'en' ? enUS : tr
 

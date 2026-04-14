@@ -10,7 +10,7 @@ interface GreenClampsProps {
     explode?: number
 }
 
-export const GreenClamps: React.FC<GreenClampsProps> = ({
+const GreenClamps: React.FC<GreenClampsProps> = ({
     isSelected,
     isIsolated,
     isHidden,

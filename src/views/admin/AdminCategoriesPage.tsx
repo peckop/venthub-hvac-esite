@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { lazy, Suspense, useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
@@ -20,7 +20,7 @@ import {
   adminTableActionDangerClass
 } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
-import { CategoryFormModal } from '../../components/admin/categories/CategoryFormModal'
+import CategoryFormModal from '../../components/admin/categories/CategoryFormModal'
 import { Tags, Plus, Layout } from 'lucide-react'
 import EditableCell from '../../components/admin/EditableCell'
 import InfoTooltip from '../../components/admin/InfoTooltip'

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Award, Shield, Truck, Clock, CheckCircle, Star } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAnimation'
+import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import { useI18n } from '../i18n/I18nProvider'
 
 /**

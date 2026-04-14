@@ -1,6 +1,6 @@
 'use client';
 
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { useRef, useState, useEffect } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import Link from 'next/link'

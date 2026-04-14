@@ -2,7 +2,7 @@
 
 import React, { Suspense, useEffect } from 'react'
 import { CartProvider } from '../../contexts/CartProvider'
-import { AuthProvider } from '../../contexts/AuthContext'
+import AuthProvider from '../../contexts/AuthContext'
 import { CategoryProvider } from '../../contexts/CategoryContext'
 import { usePathname, useSearchParams } from 'next/navigation'
 import MainLayout from './MainLayout'

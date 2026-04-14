@@ -45,7 +45,7 @@ interface OrderItem {
 }
 
 type StatusFilter = 'all' | 'pending' | 'paid' | 'shipped' | 'delivered' | 'failed'
-export const OrdersPage: React.FC = () => {
+const OrdersPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()

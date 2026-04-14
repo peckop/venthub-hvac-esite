@@ -28,7 +28,7 @@ interface BreadcrumbProps {
  * ]} />
  * ```
  */
-export const Breadcrumb: React.FC<BreadcrumbProps> = ({
+const Breadcrumb: React.FC<BreadcrumbProps> = ({
     items,
     variant = 'white',
     className = ''

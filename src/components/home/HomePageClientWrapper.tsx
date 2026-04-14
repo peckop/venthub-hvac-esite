@@ -8,7 +8,7 @@ interface Props {
   children: React.ReactNode
 }
 
-export const HomePageClientWrapper: React.FC<Props> = ({ children }) => {
+const HomePageClientWrapper: React.FC<Props> = ({ children }) => {
   const [leadOpen, setLeadOpen] = useState(false)
 
   useEffect(() => {

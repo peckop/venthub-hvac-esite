@@ -5,7 +5,7 @@ import React from 'react'
 import type { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
 import Link from 'next/link'
-import { VentImage } from './ui/VentImage'
+import VentImage from './ui/VentImage'
 import { useCart } from '../hooks/useCartHook'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
@@ -21,7 +21,7 @@ interface ProductCardProps {
   compact?: boolean
 }
 
-export const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard({
+const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard({
   product,
   layout = 'grid',
   priority = false,

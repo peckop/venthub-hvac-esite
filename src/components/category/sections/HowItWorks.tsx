@@ -1,7 +1,7 @@
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { Wind, ArrowDown, Shield, Thermometer, ChevronDown, ChevronUp } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
 /**
  * HowItWorks - İnteraktif "Nasıl Çalışır" bölümü

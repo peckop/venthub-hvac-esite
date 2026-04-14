@@ -55,7 +55,7 @@ interface ApplicationSolutionsProps {
   dictionary: LocalizedDict;
 }
 
-export const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary: t }) => {
+const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary: t }) => {
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden bg-white">
       {/* Background Decorative Elements */}

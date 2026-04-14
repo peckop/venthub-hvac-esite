@@ -39,7 +39,7 @@ import {
   Loader2
 } from 'lucide-react'
 import ImageGallery from '../../components/ImageGallery'
-import { RichTextRenderer } from '../../components/products/RichTextRenderer'
+import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { ProductSmartInference } from '../../components/product/ProductSmartInference'
 import { AddToProjectModal } from '../../components/products'
 import { useProjectLists } from '../../hooks/useProjectLists'

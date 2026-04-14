@@ -5,7 +5,7 @@ interface RichTextRendererProps {
   content: string
 }
 
-export const RichTextRenderer: React.FC<RichTextRendererProps> = ({ content }) => {
+const RichTextRenderer: React.FC<RichTextRendererProps> = ({ content }) => {
   if (!content) return null;
 
   const sections = content.split(/\n\n+/);

@@ -52,7 +52,7 @@ export type AdminToolbarProps = {
 const defaultChipOn = 'bg-cyan-400 text-[#0A0F1E] border-cyan-400 font-bold shadow-[0_0_15px_rgba(34,211,238,0.2)]'
 const defaultChipOff = 'glass text-slate-400 border-white/5 hover:bg-white/5 hover:text-white hover:border-white/10'
 
-export const AdminToolbar: React.FC<AdminToolbarProps> = ({
+const AdminToolbar: React.FC<AdminToolbarProps> = ({
   search,
   select,
   chips,

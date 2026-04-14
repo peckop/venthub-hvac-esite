@@ -1,7 +1,7 @@
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React from 'react'
 import { Award, Globe, Clock, Star } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
+import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
 const SilentFanVorticeBrand: React.FC = () => {

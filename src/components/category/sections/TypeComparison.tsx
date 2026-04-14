@@ -1,7 +1,7 @@
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { Zap, Wind, Check, X, HelpCircle, ArrowRight } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
 interface TypeComparisonProps {
     onOpenWizard: () => void

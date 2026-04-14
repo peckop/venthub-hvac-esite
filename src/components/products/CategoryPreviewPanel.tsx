@@ -1,5 +1,5 @@
 import { Routes } from '../../utils/routes'
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronRight, Package, Tag, Info } from 'lucide-react'

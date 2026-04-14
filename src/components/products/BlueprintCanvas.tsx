@@ -116,7 +116,7 @@ interface BlueprintCanvasProps {
     image: string
 }
 
-export const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
+const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
     return (
         <div className="w-full h-full min-h-[400px] relative group overflow-hidden rounded-3xl bg-[#05070A] border border-white/5 shadow-2xl">
             {/* Dark Tech Grid Background */}

@@ -1,6 +1,6 @@
 'use client'
 
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Plus, FolderPlus, ChevronRight, Loader2 } from 'lucide-react'

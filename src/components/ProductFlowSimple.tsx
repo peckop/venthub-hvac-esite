@@ -1,4 +1,4 @@
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { useEffect, useState, useMemo } from 'react'
 import { getFeaturedProducts, getProducts, Product } from '../lib/supabase'
 

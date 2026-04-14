@@ -12,7 +12,7 @@ interface SeoProps {
   noIndex?: boolean
 }
 
-export const Seo: React.FC<SeoProps> = ({
+const Seo: React.FC<SeoProps> = ({
   title,
   description,
   canonical,
