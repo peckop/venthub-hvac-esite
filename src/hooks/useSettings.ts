@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 export interface AppSettings {
@@ -47,17 +47,4 @@ export function useSettings() {
   }, [])
 
   return { settings, loading, error }
-}
-
-export function useSetting<T>(key: keyof AppSettings, fallback: T): T {
-  const { settings, loading } = useSettings()
-
-  const value = useMemo(() => {
-    if (loading || !settings) return fallback;
-    const val = settings[key];
-    if (val === undefined || val === null) return fallback;
-    return val as (typeof val & T);
-  }, [settings, key, fallback, loading]);
-
-  return value
 }
