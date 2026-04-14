@@ -7,7 +7,6 @@ import { defineConfig } from "vitest/config"
 import type { PluginOption } from 'vite';
 
 export default defineConfig({
-
   plugins: [react() as PluginOption],
   resolve: {
     alias: {
