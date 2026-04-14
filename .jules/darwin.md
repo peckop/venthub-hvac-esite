@@ -6,3 +6,6 @@
 ## 2025-01-01 - Mocking Global Crypto Object in Vitest
 **Learning:** Testing environment-specific fallback logic for global APIs like `globalThis.crypto` requires safely capturing the original object and using `Object.defineProperty` on both `globalThis` and `global` in Node/Vitest environments to accurately mock its absence or throw errors without permanently corrupting the test runner's state.
 **Action:** Always capture `globalThis.crypto` (and `global.crypto`) during setup and restore it in an `afterEach` hook when testing features that gracefully degrade across Secure Contexts.
+## 2024-05-18 - Avoid 'any' in test mocks to satisfy strict CI rules
+**Learning:** `pnpm run lint:ci` strictly enforces the 'No-Any Policy' and fails on `// eslint-disable-next-line @typescript-eslint/no-explicit-any`. Complex objects like `mockSupabase` cannot be loosely typed with `any`.
+**Action:** Always use specific typings for mocks. For example, explicitly defining mock object properties with `ReturnType<typeof vi.fn>` ensures type safety while allowing function reassignment or tracking without violating the 'No-Any Policy'.
