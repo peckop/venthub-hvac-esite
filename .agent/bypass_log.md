@@ -223,3 +223,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-14 10:48:22
+- **Commit:** `4127fd42`
+- **Mesaj:** chore: cleanup legacy directories, update deployment documentation and fix pre-commit hook encoding
+- **Değişen Dosyalar:**
+
+

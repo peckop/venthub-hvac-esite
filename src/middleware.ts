@@ -1,7 +1,7 @@
 import { Routes } from './utils/routes'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { AUTH_COOKIE_NAME } from './config/admin'
+import { createServerClient } from '@supabase/ssr'
 
 /**
  * Edge Middleware — İki Sorumluluk:
@@ -23,43 +23,51 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const segments = pathname.split('/').filter(Boolean)
 
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  // Supabase yetkileri
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+  if (!supabaseUrl || !anonKey) {
+    return response
+  }
+
   // ── Kol 1: UUID → Slug SEO Yönlendirmesi (/products/...) ────────────────
   if (segments.length === 2 && segments[0] === 'products') {
     const identifier = segments[1]
 
     if (UUID_REGEX.test(identifier)) {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-      if (supabaseUrl && anonKey) {
-        try {
-          const res = await fetch(
-            `${supabaseUrl}/rest/v1/products?id=eq.${identifier}&select=slug`,
-            {
-              method: 'GET',
-              headers: {
-                apikey: anonKey,
-                Authorization: `Bearer ${anonKey}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          )
-
-          if (res.ok) {
-            const data = await res.json() as Array<{ slug?: string }>
-            if (data?.[0]?.slug) {
-              const url = request.nextUrl.clone()
-              url.pathname = Routes.product(data[0].slug)
-              return NextResponse.redirect(url, 308)
-            }
+      try {
+        // CSR/Veri çekme işlemi: Read-only dummy cookie (SEO hızı için)
+        const supabase = createServerClient(supabaseUrl, anonKey, {
+          cookies: {
+            getAll() { return request.cookies.getAll() },
+            setAll() { /* Redirect için session kaydetmeye gerek yok */ }
           }
-        } catch (error) {
-          console.error('[Middleware] UUID Slug Lookup Hatası:', error)
+        })
+
+        const { data } = await supabase
+          .from('products')
+          .select('slug')
+          .eq('id', identifier)
+          .single()
+
+        if (data?.slug) {
+          const url = request.nextUrl.clone()
+          url.pathname = Routes.product(data.slug)
+          return NextResponse.redirect(url, 308)
         }
+      } catch (error) {
+        console.error('[Middleware] UUID Slug Lookup Hatası:', error)
       }
     }
 
-    return NextResponse.next()
+    return response
   }
 
   // ── Kol 2: Admin RBAC Guard (/admin/...) ────────────────────────────────
@@ -70,98 +78,42 @@ export async function middleware(request: NextRequest) {
     const isLocalhost = host.startsWith('localhost') || host.startsWith('127.0.0.1')
 
     if (isDev && isLocalhost) {
-      return NextResponse.next()
+      return response
     }
 
-    // 1. Cookie'den access token'ı oku
-    const cookieHeader = request.cookies.get(AUTH_COOKIE_NAME)?.value
-
-    if (!cookieHeader) {
-      // Oturum yok — login sayfasına yönlendir
-      const loginUrl = request.nextUrl.clone()
-      loginUrl.pathname = '/auth/login'
-      loginUrl.searchParams.set('from', pathname)
-      return NextResponse.redirect(loginUrl, 302)
-    }
-
-    // Cookie değeri JSON array olabilir: ["access_token"]
-    let accessToken: string | null = null
-    try {
-      const parsed = JSON.parse(cookieHeader) as unknown
-      if (Array.isArray(parsed) && typeof parsed[0] === 'string') {
-        accessToken = parsed[0] as string
-      } else if (typeof parsed === 'string') {
-        accessToken = parsed
-      }
-    } catch {
-      // Parse başarısız → ham değeri kullan
-      accessToken = cookieHeader
-    }
-
-    if (!accessToken) {
-      const loginUrl = request.nextUrl.clone()
-      loginUrl.pathname = '/auth/login'
-      loginUrl.searchParams.set('from', pathname)
-      return NextResponse.redirect(loginUrl, 302)
-    }
-
-    // 2. Güvenli Auth Kontrolü (Supabase /auth/v1/user Fetch - JWT Kimlik Kartı Okuma)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    if (!supabaseUrl || !anonKey) {
-      const loginUrl = request.nextUrl.clone()
-      loginUrl.pathname = '/auth/login'
-      return NextResponse.redirect(loginUrl, 302)
-    }
-
-    let userId: string | undefined;
-    let jwtRole: string | undefined;
-
-    try {
-      const authRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
-        method: 'GET',
-        headers: {
-          apikey: anonKey,
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+    // Auth ve Rol doğrulaması: Çerezleri senkronize eden tam Supabase Client
+    const supabase = createServerClient(supabaseUrl, anonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
         },
-        signal: AbortSignal.timeout(3000),
-      })
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          response = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    })
 
-      if (!authRes.ok) {
-        const loginUrl = request.nextUrl.clone()
-        loginUrl.pathname = '/auth/login'
-        loginUrl.searchParams.set('from', pathname)
-        loginUrl.searchParams.set('reason', 'expired')
-        return NextResponse.redirect(loginUrl, 302)
-      }
+    // Güvenli Auth Kontrolü (Token Refresh, Initplan)
+    const { data: { user }, error } = await supabase.auth.getUser()
 
-      const authData = await authRes.json()
-      userId = authData?.id
-      // JWT user_metadata içindeki role damgasını (Claim) okuyoruz
-      jwtRole = authData?.user_metadata?.role
-    } catch {
+    if (error || !user) {
       const loginUrl = request.nextUrl.clone()
       loginUrl.pathname = '/auth/login'
       loginUrl.searchParams.set('from', pathname)
-      return NextResponse.redirect(loginUrl, 302)
-    }
-
-    if (!userId) {
-      const loginUrl = request.nextUrl.clone()
-      loginUrl.pathname = '/auth/login'
-      loginUrl.searchParams.set('from', pathname)
+      if (error) loginUrl.searchParams.set('reason', 'expired')
       return NextResponse.redirect(loginUrl, 302)
     }
 
     // 3. Rol kontrolü: Basılı Kimlik Kartı (JWT Claim) Üzerinden Yapılır
-    let hasAccess = false
+    const jwtRole = user.user_metadata?.role
 
-    if (jwtRole && ADMIN_ROLES.has(jwtRole.toLowerCase())) {
-      hasAccess = true
-    }
-
-    if (!hasAccess) {
+    if (!jwtRole || !ADMIN_ROLES.has(jwtRole.toLowerCase())) {
       // Yetkisiz — 403 benzeri: ana sayfaya yönlendir
       const homeUrl = request.nextUrl.clone()
       homeUrl.pathname = '/'
@@ -169,9 +121,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(homeUrl, 302)
     }
 
-    // Yetkili geçiş — isteği normal akışa bırak
-    return NextResponse.next()
+    // Yetkili geçiş — status quo koru
+    return response
   }
 
-  return NextResponse.next()
+  return response
 }

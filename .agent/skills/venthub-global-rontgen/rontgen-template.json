@@ -1,0 +1,141 @@
+{
+  "rontgen_name": "VentHub Global Mimari Röntgen (Enterprise Edition)",
+  "rontgen_date": "YYYY-MM-DD",
+  "git_commit_sha": "HEAD",
+  "agent_id": "Antigravity",
+  "checks": {
+    "1_zero_tolerance_linting": {
+      "target": "ESLint kod standartlarına tam uyum sağlamalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": ["run", "lint:ci"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "2_strict_type_checking": {
+      "target": "TypeScript denetiminden sıfır (0) hata ile geçilmeli.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": ["exec", "tsc", "-b", "tsconfig.build.json"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "3_lockfile_consistency_guard": {
+      "target": "pnpm-lock.yaml ve package.json tamamen senkron olmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": ["install", "--frozen-lockfile", "--prefer-offline", "--dry-run"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "4_i18n_leakage_check": {
+      "target": "JSX, TSX içindeki kullanıcıya dönük hardcoded metinler bulunmamalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "node",
+        "args": [".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "5_build_and_bundle_size_guard": {
+      "target": "Next.js Build işleminin pürüzsüz bitmesi ve rotaların boyut ölçümü uyarısı (WARNING).",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "pnpm",
+        "args": ["run", "build"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "6_unit_test_gate": {
+      "target": "Birim testlerin başarıyla geçilmesi.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": ["test", "--", "--run"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "7_route_ssot_enforcement": {
+      "target": "Hardcoded path kaçaklarını önleme. Merkezi SSOT rota sabitleri (Routes.xx) kullanılmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": ["href=\"/|\\\\.push\\('/", "src/views/", "src/components/"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "8_next15_async_params_guard": {
+      "target": "Next.js 15: Dinamik rotalardaki params kesinlikle await edilmelidir.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": ["params\\.[a-zA-Z]+", "src/app/", "--exclude=await params"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "9_modern_image_optimization": {
+      "target": "SEO ve LCP Core Web Vitals hedefleri için ham <img > etiketi kullanımı yasaktır. Kesinlikle next/image <Image> bileşeni kullanılmalıdır.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": ["<img ", "src/views/", "src/components/"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "10_seo_and_uuid_leakage": {
+      "target": "JSON-LD, SEO sitemap veya yönlendirmelerde UUID sızıntısı kalmamalı. Yalnızca 'slug' kullanılmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": ["href=\"/products/[0-9a-fA-F\\-]{36}", "src/views/", "src/components/"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "11_registry_process_integrity": {
+      "target": "Kalıcı hafıza dosyalarında (PULSE.md, plan.json) boş (placeholder '...') kullanımının engellenmesi.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": ["\\.\\.\\.", "registry/"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "12_client_boundary_rontgen": {
+      "target": "Client sızıntısı: 'use client' layout veya ana Root component'lerde değil, uç/yaprak bileşenlerde barınmalı.",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "regex_scan",
+        "args": ["use client", "src/views/", "src/app/layout.tsx"],
+        "expected_exit_codes": [0]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    }
+  },
+  "overall_ship_status": "BLOCKED | CONDITIONAL | READY"
+}
