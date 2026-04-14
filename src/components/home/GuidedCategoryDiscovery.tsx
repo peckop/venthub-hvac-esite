@@ -26,7 +26,7 @@ const normalizeImageUrl = (url: string | null | undefined): string => {
   return `${supabaseUrl}/storage/v1/object/public/category-images/${trimmed}`;
 };
 
-export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displayCategories = [] }) => {
+const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displayCategories = [] }) => {
   return (
     <section id="categories" className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">

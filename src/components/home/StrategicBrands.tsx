@@ -9,7 +9,7 @@ interface StrategicBrandsProps {
   }
 }
 
-export const StrategicBrands: React.FC<StrategicBrandsProps> = ({ dictionary: t }) => {
+const StrategicBrands: React.FC<StrategicBrandsProps> = ({ dictionary: t }) => {
   return (
     <section className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">

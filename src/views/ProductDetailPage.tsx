@@ -29,7 +29,7 @@ import {
   FolderPlus
 } from 'lucide-react'
 import ImageGallery from '../components/ImageGallery'
-import { RichTextRenderer } from '../components/products/RichTextRenderer'
+import RichTextRenderer from '../components/products/RichTextRenderer'
 import { AddToProjectModal } from '../components/products'
 import PageShell from '../components/layout/PageShell'
 import { useCategories } from '../contexts/CategoryContext'
@@ -43,7 +43,7 @@ export interface ProductDetailPageProps {
   initialProduct?: Product | null
 }
 
-export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct }) => {
+const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct }) => {
   const { t, lang } = useI18n()
   const params = useParams()
   const currentSlug = (params?.slug as string)?.replace(/cc$/, '')

@@ -1,7 +1,7 @@
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React from 'react'
 import { Award, Globe, Clock, Shield, Star } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
 /**
  * VorticeBrand - Marka Hikayesi Bölümü

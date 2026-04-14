@@ -11,7 +11,7 @@ import type { Database } from '../../../types/database.types'
 import type { DbCategory, CategoryMetadata } from '../../../types/db-rows'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
-import { VentImage } from '../../ui/VentImage'
+import VentImage from '../../ui/VentImage'
 import { toSupabaseJson } from '../../../lib/type-converters'
 
 
@@ -44,7 +44,7 @@ interface CategoryFormModalProps {
     onSuccess: () => void
 }
 
-export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
+const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     open,
     onOpenChange,
     category,

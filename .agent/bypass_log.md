@@ -241,3 +241,15 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-14 14:06:22
+- **Commit:** `1f97371d`
+- **Mesaj:** feat(diagnostics): Deep MRI engine integration with Knip & Bundle Analyzer
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-14 14:23:45
+- **Commit:** `b1be9409`
+- **Mesaj:** chore(config): disable bundle analyzer browser popup
+- **Değişen Dosyalar:**
+
+

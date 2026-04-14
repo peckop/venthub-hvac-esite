@@ -3,7 +3,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Layers, ShieldCheck, Zap } from 'lucide-react'
-import { VentImage } from '../ui/VentImage'
+import VentImage from '../ui/VentImage'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { useI18n } from '../../i18n/I18nProvider'

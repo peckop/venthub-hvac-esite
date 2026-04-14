@@ -15,7 +15,7 @@ import { Routes } from '../utils/routes'
 
 type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
 
-export const PaymentSuccessPage: React.FC = () => {
+const PaymentSuccessPage: React.FC = () => {
   const searchParams = useSearchParams()
   const { t, lang } = useI18n()
   const { clearCart } = useCart()

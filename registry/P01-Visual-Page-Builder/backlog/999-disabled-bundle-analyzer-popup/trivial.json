@@ -1,0 +1,33 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "",
+  "date": "",
+  "task_id": "P01-999",
+  "task_title": "Disabled bundle analyzer popup",
+  "description": "",
+  "files_modified": [],
+  "allowed_paths": [
+    "next.config.mjs"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": [],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "",
+      "passed": false
+    }
+  ],
+  "all_passed": false
+}

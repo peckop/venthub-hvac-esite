@@ -32,7 +32,7 @@ import { useCheckoutCoupon } from '../hooks/useCheckoutCoupon'
 import { useCheckoutPayment } from '../hooks/useCheckoutPayment'
 // No local type imports needed as we use Checkout types from db-rows
 
-export const CheckoutPage: React.FC = () => {
+const CheckoutPage: React.FC = () => {
   const { items, getCartTotal, clearCart, applyServerPricing } = useCart()
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()

@@ -1,5 +1,5 @@
 import { Routes } from '../../utils/routes'
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ThermometerSun, ChevronDown, Zap, Wind, CheckCircle2, Activity, ShieldCheck } from 'lucide-react'

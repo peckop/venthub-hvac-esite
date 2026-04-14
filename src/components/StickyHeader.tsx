@@ -34,7 +34,7 @@ interface StickyHeaderProps {
   isScrolled: boolean
 }
 
-export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHeader({ isScrolled }) {
+const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHeader({ isScrolled }) {
   const { t, lang } = useI18n()
   const router = useRouter()
   // const pathname = usePathname()

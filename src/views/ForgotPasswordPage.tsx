@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
-export const ForgotPasswordPage: React.FC = () => {
+const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)

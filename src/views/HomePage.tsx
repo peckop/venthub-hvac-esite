@@ -22,7 +22,7 @@ interface HomePageProps {
   dictionary: typeof import('../i18n/dictionaries/tr').tr.home
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ 
+const HomePage: React.FC<HomePageProps> = ({ 
   initialCategories = [], 
   rawCategories = [],
   initialProducts = [],

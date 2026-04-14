@@ -57,7 +57,7 @@ interface KnowledgeBlockProps {
   onQuoteClick?: () => void;
 }
 
-export const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCtaDict, statsExperience, onQuoteClick }) => {
+const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCtaDict, statsExperience, onQuoteClick }) => {
   return (
     <section className="relative overflow-hidden bg-slate-950 py-24 sm:py-32 text-white">
       {/* Background Elements */}

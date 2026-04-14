@@ -3,7 +3,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 
-export const RevealSection: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const RevealSection: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <motion.div
     initial={{ y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}

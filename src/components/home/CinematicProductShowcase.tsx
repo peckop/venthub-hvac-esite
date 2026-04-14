@@ -80,7 +80,7 @@ const productImages = [
   },
 ]
 
-export const CinematicProductShowcase: React.FC = () => {
+const CinematicProductShowcase: React.FC = () => {
   const { t } = useI18n()
   const [activeHotspot, setActiveHotspot] = useState<string | null>(null)
   const [activeImageIdx, setActiveImageIdx] = useState(0)

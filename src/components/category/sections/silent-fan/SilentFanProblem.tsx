@@ -1,7 +1,7 @@
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React from 'react'
 import { VolumeX, Zap, Activity, Info } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
+import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
 interface PainPoint {

@@ -7,7 +7,7 @@ interface InfoTooltipProps {
     className?: string
 }
 
-export const InfoTooltip: React.FC<InfoTooltipProps> = ({ text, size = 14, className = '' }) => {
+const InfoTooltip: React.FC<InfoTooltipProps> = ({ text, size = 14, className = '' }) => {
     return (
         <div className={`relative group inline-flex items-center justify-center ml-1 align-middle ${className}`}>
             <Info size={size} className="text-slate-400 hover:text-primary-navy cursor-help transition-colors" />

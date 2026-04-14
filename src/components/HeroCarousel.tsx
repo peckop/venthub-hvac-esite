@@ -1,7 +1,7 @@
 'use client';
 import { Routes } from '../utils/routes'
 
-import { VentImage } from '@/components/ui/VentImage'
+import VentImage from '@/components/ui/VentImage'
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import { ChevronRight, ChevronLeft, ArrowRight, Wind, Shield, Activity, Zap, Droplet, Layers, Cpu, Maximize, LucideIcon } from 'lucide-react'

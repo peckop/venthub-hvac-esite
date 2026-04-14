@@ -5,7 +5,7 @@ import { CheckCircle, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Routes } from '../utils/routes'
 
-export const AuthCallbackPage: React.FC = () => {
+const AuthCallbackPage: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
   const router = useRouter()
