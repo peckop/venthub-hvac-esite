@@ -113,7 +113,7 @@ export const RegisterPage: React.FC = () => {
                 {t('auth.backToLogin')}
               </Link>
               <Link
-                href="/"
+                href={Routes.home()}
                 className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
               >
                 {t('auth.backHome')}
@@ -135,7 +135,7 @@ export const RegisterPage: React.FC = () => {
       <div className="relative max-w-md mx-auto px-4 py-8">
         {/* Back Button */}
         <Link
-          href="/"
+          href={Routes.home()}
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />

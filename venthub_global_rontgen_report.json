@@ -1,0 +1,206 @@
+{
+  "rontgen_name": "VentHub Global Mimari Röntgen (Enterprise Edition)",
+  "rontgen_date": "2026-04-14T13:21:45.851650",
+  "git_commit_sha": "b0d6e284c032e265b8b1e775c743bf52f0f5bf2d",
+  "agent_id": "Antigravity",
+  "checks": {
+    "1_zero_tolerance_linting": {
+      "target": "ESLint kod standartlarına tam uyum sağlamalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "run",
+          "lint:ci"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "\n> venthub-hvac@0.1.0 lint:ci C:\\Users\\alize\\venthub-hvac\n> cross-env NODE_OPTIONS='--max-old-space-size=8192' eslint .\n\n"
+    },
+    "2_strict_type_checking": {
+      "target": "TypeScript denetiminden sıfır (0) hata ile geçilmeli.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "run",
+          "type-check"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "\n> venthub-hvac@0.1.0 type-check C:\\Users\\alize\\venthub-hvac\n> cross-env NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit\n\n"
+    },
+    "3_lockfile_consistency_guard": {
+      "target": "pnpm-lock.yaml ve package.json tamamen senkron olmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "install",
+          "--frozen-lockfile"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "Scope: all 2 workspace projects\nLockfile is up to date, resolution step is skipped\nAlready up to date\n WARN  Failed to create bin at C:\\Users\\alize\\venthub-hvac\\node_modules\\.bin\\supabase. ENOENT: no such file or directory, stat 'C:\\Users\\alize\\venthub-hvac\\node_modules\\.pnpm\\supabase@2.81.2\\node_modules\\supabase\\bin\\supabase.EXE'\n\n WARN  Failed to create bin at C:\\Users\\alize\\venthub-hvac\\node_modules\\.bin\\supabase. ENOENT: no such file or directory, stat 'C:\\Users\\alize\\venthub-hvac\\node_modules\\supabase\\bin\\supabase.EXE'\n. postinstall$ pnpm run type-check\n. postinstall: > venthub-hvac@0.1.0 type-check C:\\Users\\alize\\venthub-hvac\n. postinstall: > cross-env NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit\n. postinstall: Done\nDone in 22.6s using pnpm v10.15.0\n"
+    },
+    "4_i18n_leakage_check": {
+      "target": "JSX, TSX içindeki kullanıcıya dönük hardcoded metinler bulunmamalı.",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "node",
+        "args": [
+          ".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "FAIL",
+      "evidence": "[i18n AST Scanner] Tarama basliyor...\n\n[🚨 i18n LEAKAGE DETECTED]\nBulunan hardcoded metin sızıntıları:\n- src\\views\\AboutPage.tsx:57 | [JsxProp <alt>] | Text: \"VentHub Engineering\"\n- src\\views\\AboutPage.tsx:72 | [JsxText <span>] | Text: \"Engineering Excellence Since 2009\"\n- src\\views\\AboutPage.tsx:80 | [JsxText <motion.h1>] | Text: \"Havayı\"\n- src\\views\\AboutPage.tsx:80 | [JsxText <span>] | Text: \"Yeniden Tanımlıyoruz\"\n- src\\views\\AboutPage.tsx:89 | [JsxText <motion.p>] | Text: \"VentHub, modern yaşam ve endüstriyel alanlar için yüksek verimli, teknolojik ve sürdürülebilir havalandırma sistemlerinin Türkiye'deki otoritesidir.\"\n- src\\views\\AboutPage.tsx:127 | [JsxProp <alt>] | Text: \"VentHub Story\"\n- src\\views\\AboutPage.tsx:138 | [JsxText <h2>] | Text: \"Geleceğin İklimini\"\n- src\\views\\AboutPage.tsx:139 | [JsxText <span>] | Text: \"Bugün Kuruyoruz\"\n- src\\views\\AboutPage.tsx:143 | [JsxText <p>] | Text: \"VentHub, havalandırma sektöründe sadece bir tedarikçi değil, teknolojik bir çözüm ortağı olarak konumlanmaktadır. 15 yılı aşkın süredir, Avrupa'nın en prestijli markalarını Türkiye'nin en büyük projeleriyle buluşturuyoruz.\"\n- src\\views\\AboutPage.tsx:146 | [JsxText <p>] | Text: \"Teknopark İstanbul'daki merkezimizden yönettiğimiz operasyonlarımızda, mühendislik etiği ve operasyonel mükemmeliyeti her şeyin önünde tutuyoruz. Bizim için her ürün bir bileşen, her proje ise bir havalandırma sanatı eseridir.\"\n- src\\views\\AboutPage.tsx:156 | [JsxProp <alt>] | Text: \"Team\"\n- src\\views\\AboutPage.tsx:166 | [JsxText <span>] | Text: \"Teknik Operasyon Kadrosu\"\n- src\\views\\AboutPage.tsx:179 | [JsxText <h2>] | Text: \"Resmi Distribütör\"\n- src\\views\\AboutPage.tsx:179 | [JsxText <span>] | Text: \"Ağımız\"\n- src\\views\\AboutPage.tsx:224 | [JsxText <h2>] | Text: \"Mühendislik Ortağınızla\"\n- src\\views\\AboutPage.tsx:225 | [JsxText <span>] | Text: \"Tanışmaya Hazır mısınız?\"\n- src\\views\\AboutPage.tsx:232 | [JsxText <Link>] | Text: \"İletişime Geçin\"\n- src\\views\\AboutPage.tsx:238 | [JsxText <Link>] | Text:"
+    },
+    "5_build_and_bundle_size_guard": {
+      "target": "Next.js Build işleminin pürüzsüz bitmesi ve rotaların boyut ölçümü uyarısı (WARNING).",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "run",
+          "build"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "\n> venthub-hvac@0.1.0 build C:\\Users\\alize\\venthub-hvac\n> cross-env NODE_OPTIONS='--max-old-space-size=8192' next build\n\n   ▲ Next.js 15.5.7\n   - Environments: .env.local, .env\n\n   Creating an optimized production build ...\n ✓ Compiled successfully in 24.0s\n   Linting and checking validity of types ...\n   Collecting page data ...\n   Generating static pages (0/399) ...\n   Generating static pages (99/399) \n   Generating static pages (199/399) \n   Generating static pages (299/399) \n ✓ Generating static pages (399/399)\n   Finalizing page optimization ...\n   Collecting build traces ...\n\nRoute (app)                                                      Size  First Load JS\n┌ ƒ /                                                         13.5 kB         215 kB\n├ ○ /_not-found                                                 995 B         105 kB\n├ ○ /about                                                    6.39 kB         208 kB\n├ ○ /account                                                  7.41 kB         227 kB\n├ ○ /account/addresses                                        1.42 kB         105 kB\n├ ○ /account/invoices                                         1.41 kB         105 kB\n├ ○ /account/orders                                           1.41 kB         105 kB\n├ ○ /account/orders/detail                                     147 kB         376 kB\n├ ○ /account/profile                                          2.45 kB         174 kB\n├ ○ /account/returns                                          5.34 kB         226 kB\n├ ○ /account/security                                         4.94 kB         226 kB\n├ ○ /account/shipments                                         4.8 kB         226 kB\n├ ○ /admin                                                    11.9 kB         335 kB\n├ ○ /admin/audit-logs                                         4.63 kB         230 kB\n├ ○ /admin/categories                                         12.3 kB         282 kB\n├ ƒ /admin/categories/[id]/builder                 "
+    },
+    "6_unit_test_gate": {
+      "target": "Birim testlerin başarıyla geçilmesi.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "test",
+          "--",
+          "--run"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "\n> venthub-hvac@0.1.0 test C:\\Users\\alize\\venthub-hvac\n> vitest \"--\" \"--run\"\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv4.1.3 \u001b[39m\u001b[90mC:/Users/alize/venthub-hvac\u001b[39m\n\n \u001b[32m✓\u001b[39m src/views/checkout/__tests__/ReviewSummary.test.tsx \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 361\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/crypto.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 26\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/lib/__tests__/audit.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 37\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/engineeringIntelligence.test.ts \u001b[2m(\u001b[22m\u001b[2m18 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 38\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/whatsapp.test.ts \u001b[2m(\u001b[22m\u001b[2m27 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 38\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/passwordSecurity.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 52\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useRole.test.tsx \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 70\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/use-mobile.test.tsx \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 81\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useApiCall.test.tsx \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 90\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useCartHook.test.tsx \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 81\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/checkoutHelpers.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 99\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/lib/__tests__/hvacCalculations.test.ts \u001b[2m(\u001b[22m\u001b[2m12 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 43\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/views/account/__tests__/ReturnsModalClose.test.tsx \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 203\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/views/checkout/__tests__/buildPaymentRequest.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 16\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/components/products/__tests__/ProductsHero.test.tsx \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 553\u001b[2mms\u001b[22m\u001b[39m\n     \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m should have focus-within classes o"
+    },
+    "7_route_ssot_enforcement": {
+      "target": "Hardcoded path kaçaklarını önleme. Merkezi SSOT rota sabitleri (Routes.xx) kullanılmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "href=\"/|\\\\.push\\('/",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "Temiz."
+    },
+    "8_next15_async_params_guard": {
+      "target": "Next.js 15: Dinamik rotalardaki params kesinlikle await edilmelidir.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "params\\.[a-zA-Z]+",
+          "src/app/",
+          "--exclude=await params"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "Temiz."
+    },
+    "9_modern_image_optimization": {
+      "target": "SEO ve LCP Core Web Vitals hedefleri için ham <img > etiketi kullanımı yasaktır. Kesinlikle next/image <Image> bileşeni kullanılmalıdır.",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "<img ",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "FAIL",
+      "evidence": "Bulgular:\nsrc\\components\\HVACIcons.tsx:297 -> <img\nsrc\\components\\authority\\AuthorityRenderer.tsx:59 -> <img src={block.content.imageUrl} alt=\"\" className=\"w-full h-full object-cover\" />\nsrc\\components\\authority\\AuthorityRenderer.tsx:117 -> <img src={block.content.leftImage} alt={block.content.leftLabel} className=\"w-full h-full object-contain\" />\nsrc\\components\\authority\\AuthorityRenderer.tsx:125 -> <img src={block.content.rightImage} alt={block.content.rightLabel} className=\"w-full h-full object-contain brightness-0 invert\" />\nsrc\\components\\authority\\AuthorityRenderer.tsx:230 -> <img\nsrc\\components\\authority\\VideoAuthority.tsx:62 -> <img\nsrc\\components\\category\\EnhancedNeedsWizard.tsx:302 -> <img src={p.image_url || ''} alt={p.name} className=\"w-full h-full object-contain\" />"
+    },
+    "10_seo_and_uuid_leakage": {
+      "target": "JSON-LD, SEO sitemap veya yönlendirmelerde UUID sızıntısı kalmamalı. Yalnızca 'slug' kullanılmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "href=\"/products/[0-9a-fA-F\\-]{36}",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "Temiz."
+    },
+    "11_registry_process_integrity": {
+      "target": "Kalıcı hafıza dosyalarında (PULSE.md, plan.json) boş (placeholder '...') kullanımının engellenmesi.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "\\.\\.\\.",
+          "registry/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PASS",
+      "evidence": "Temiz."
+    },
+    "12_client_boundary_rontgen": {
+      "target": "Client sızıntısı: 'use client' layout veya ana Root component'lerde değil, uç/yaprak bileşenlerde barınmalı.",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "use client",
+          "src/views/",
+          "src/app/layout.tsx"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "FAIL",
+      "evidence": "Bulgular:\nsrc\\views\\AboutPage.tsx:1 -> 'use client'\nsrc\\views\\BrandDetailPage.tsx:1 -> 'use client'\nsrc\\views\\BrandsPage.tsx:1 -> 'use client'\nsrc\\views\\CartPage.tsx:1 -> 'use client'\nsrc\\views\\CategoryMasterView.tsx:1 -> 'use client'\nsrc\\views\\CategoryPage.tsx:1 -> 'use client';\nsrc\\views\\CheckoutPage.tsx:1 -> 'use client'\nsrc\\views\\ContactPage.tsx:1 -> 'use client'\nsrc\\views\\LoginPage.tsx:1 -> 'use client'\nsrc\\views\\OrdersPage.tsx:1 -> 'use client'\nsrc\\views\\PaymentSuccessPage.tsx:1 -> 'use client'\nsrc\\views\\ProductDetailPage.tsx:1 -> 'use client'\nsrc\\views\\ProductsDiscoveryView.tsx:1 -> 'use client'\nsrc\\views\\ProductsPage.tsx:1 -> 'use client'\nsrc\\views\\RegisterPage.tsx:1 -> 'use client'\nsrc\\views\\account\\AccountInvoicesPage.tsx:1 -> 'use client'\nsrc\\views\\account\\OrderDetailPage.tsx:1 -> 'use client'\nsrc\\views\\admin\\AdminInventoryPage.tsx:1 -> 'use client';\nsrc\\views\\admin\\AdminSettingsPage.tsx:1 -> 'use client'\nsrc\\views\\admin\\AdminWebhookEventsPage.tsx:1 -> 'use client';\nsrc\\views\\admin\\CategoryBuilderView.tsx:1 -> 'use client';\nsrc\\views\\category\\CategoryGridView.tsx:1 -> 'use client'\nsrc\\views\\category\\CategoryLandingView.tsx:1 -> 'use client';\nsrc\\views\\category\\CategorySeriesView.tsx:1 -> 'use client';\nsrc\\views\\category\\CategoryShowcaseView.tsx:1 -> 'use client';\nsrc\\views\\checkout\\AddressFormModal.tsx:1 -> 'use client'\nsrc\\views\\checkout\\AddressSelectModal.tsx:1 -> 'use client'\nsrc\\views\\checkout\\CheckoutProgress.tsx:1 -> 'use client'\nsrc\\views\\checkout\\InvoiceProfileModal.tsx:1 -> 'use client'\nsrc\\views\\checkout\\OrderSummarySidebar.tsx:1 -> 'use client'\nsrc\\views\\checkout\\PaymentIframeContainer.tsx:1 -> 'use client'\nsrc\\views\\checkout\\SecurePaymentOverlay.tsx:1 -> 'use client'\nsrc\\views\\checkout\\StepAddressInfo.tsx:1 -> 'use client'\nsrc\\views\\checkout\\StepCustomerInfo.tsx:1 -> 'use client'\nsrc\\views\\knowledge\\HubPage.tsx:1 -> 'use client'\nsrc\\views\\knowledge\\TopicPage.tsx:1 -> 'use client'"
+    }
+  },
+  "overall_ship_status": "READY"
+}

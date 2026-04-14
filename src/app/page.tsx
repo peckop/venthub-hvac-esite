@@ -13,8 +13,8 @@ type Props = {
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const params = await searchParams
-  const lang = (params.lang as string) === 'en' ? 'en' : 'tr'
+  const resolvedParams = await searchParams
+  const lang = (resolvedParams.lang as string) === 'en' ? 'en' : 'tr'
   const dict = lang === 'en' ? en : tr
 
   const siteUrl = SITE_URL
@@ -73,8 +73,8 @@ const getCachedHomeData = unstable_cache(
 )
 
 export default async function RootPage({ searchParams }: Props) {
-  const params = await searchParams
-  const lang = (params.lang as string) === 'en' ? 'en' : 'tr'
+  const resolvedParams = await searchParams
+  const lang = (resolvedParams.lang as string) === 'en' ? 'en' : 'tr'
   const dict = lang === 'en' ? en : tr
 
   let categories: DomainCategory[] = []

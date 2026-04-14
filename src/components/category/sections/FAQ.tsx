@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
+import { Routes } from '../../../utils/routes';
+
 
 /**
  * FAQ - Sık Sorulan Sorular Accordion
@@ -94,7 +96,7 @@ const FAQ: React.FC = () => {
                         Başka sorularınız mı var?
                     </p>
                     <a
-                        href="/contact"
+                        href={Routes.contact()}
                         className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700"
                     >
                         Bize ulaşın →

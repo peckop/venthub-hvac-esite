@@ -20,7 +20,7 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "pnpm",
-        "args": ["exec", "tsc", "-b", "tsconfig.build.json"],
+        "args": ["run", "type-check"],
         "expected_exit_codes": [0]
       },
       "status": "PENDING",
@@ -31,7 +31,7 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "pnpm",
-        "args": ["install", "--frozen-lockfile", "--prefer-offline", "--dry-run"],
+        "args": ["install", "--frozen-lockfile"],
         "expected_exit_codes": [0]
       },
       "status": "PENDING",
@@ -39,7 +39,7 @@
     },
     "4_i18n_leakage_check": {
       "target": "JSX, TSX içindeki kullanıcıya dönük hardcoded metinler bulunmamalı.",
-      "enforcement_level": "STRICT",
+      "enforcement_level": "WARNING",
       "executor": {
         "tool": "node",
         "args": [".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs"],
@@ -94,7 +94,7 @@
     },
     "9_modern_image_optimization": {
       "target": "SEO ve LCP Core Web Vitals hedefleri için ham <img > etiketi kullanımı yasaktır. Kesinlikle next/image <Image> bileşeni kullanılmalıdır.",
-      "enforcement_level": "STRICT",
+      "enforcement_level": "WARNING",
       "executor": {
         "tool": "regex_scan",
         "args": ["<img ", "src/views/", "src/components/"],

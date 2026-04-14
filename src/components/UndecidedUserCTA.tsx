@@ -1,6 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
 import { MessageSquare, ArrowRight } from 'lucide-react'
+import { Routes } from '../utils/routes';
+
 
 export const UndecidedUserCTA: React.FC = () => {
     return (
@@ -25,7 +27,7 @@ export const UndecidedUserCTA: React.FC = () => {
                 </div>
 
                 <Link
-                    href="/contact?dept=consulting"
+                    href={Routes.contact('consulting')}
                     className="group relative inline-flex items-center gap-2 bg-white text-primary-navy px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all whitespace-nowrap"
                 >
                     <span>Uzman Desteği Alın</span>
