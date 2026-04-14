@@ -31,6 +31,21 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
+    // Auth check using auth.getUser()
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'unauthenticated', message: 'Missing Authorization header' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+
+    const authClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } }
+    })
+    const { data: { user }, error: authErr } = await authClient.auth.getUser()
+    if (authErr || !user) {
+      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+    const actorUserId = user.id
+
     const body = await req.json().catch(()=>({})) as RefundRequest
     const order_id = (body.order_id || '').trim()
     const amount = typeof body.amount === 'number' && isFinite(body.amount) ? Number(body.amount) : undefined
@@ -39,22 +54,6 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'missing_fields', missing: ['order_id'] }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
-    // Auth check: admin or owner
-    const authHeader = req.headers.get('authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-
-    const supabaseUserClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } }
-    })
-
-    const { data: userRes, error: userErr } = await supabaseUserClient.auth.getUser()
-    if (userErr || !userRes?.user) {
-      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-
-    const actorUserId = userRes.user.id
 
     // Load order
     const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=id,user_id,status,payment_status,total_amount,payment_debug`, {
