@@ -1,4 +1,4 @@
-## 2024-05-18 - Resolve type escape in Category Data fetching
-**Debt:** `data as unknown as DbCategory` was used to bypass the type checker in `src/app/category/[categorySlug]/page.tsx` and `src/app/category/[categorySlug]/[subCategorySlug]/page.tsx`.
-**Root Cause:** The `data` returned from Supabase had missing or non-matching fields with `DbCategory` (like `menu_label` or `metadata` which required specific types) that made direct casting impossible.
-**Resolution:** Replaced the `unknown` cast by explicitly destructuring the returned data, applying type assertions to the conflicting string and JSON properties, and then casting the result `as DbCategory` safely without `unknown`.
+## 2025-02-14 - Type Safety in Global Window Augmentation
+**Debt:** The `as any` type escape and `// eslint-disable-next-line @typescript-eslint/no-explicit-any` on `(window as any).openLeadModal?.()` in `src/components/home/ClientLeadButton.tsx`.
+**Root Cause:** A developer likely assumed that adding properties to the `window` object in TypeScript required bypassing the type system because they were unaware that `openLeadModal` was already correctly typed via `interface Window` in `src/types/env.d.ts`.
+**Resolution:** Removed the `eslint-disable` comment and `as any` assertion. The code naturally inferred the correct types from the global declaration, ensuring full strict-mode compliance without breaking any TS definitions.
