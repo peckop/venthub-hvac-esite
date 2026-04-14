@@ -9,6 +9,8 @@ import { ArrowLeft, ArrowRight, CheckCircle2, AlertCircle, BookOpen } from 'luci
 import { useI18n } from '../../i18n/I18nProvider'
 import { getCategoryUrlFromTopic } from '../../utils/applicationLinks'
 import Seo from '../../components/Seo'
+import { Routes } from '../../utils/routes';
+
 
 interface TopicPageProps {
   slug?: string
@@ -37,7 +39,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
             {t('knowledge.topic.notFoundDesc')}
           </p>
           <Link 
-            href="/destek/merkez" 
+            href={Routes.destek.home()} 
             className="inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-cyan-600 hover:text-slate-950 transition-colors"
           >
             <ArrowLeft size={14} /> {t('knowledge.topic.backToHub')}
@@ -76,7 +78,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
         
         <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <Link 
-            href="/destek/merkez"
+            href={Routes.destek.home()}
             className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-cyan-400 hover:text-white transition-colors mb-12"
           >
             <ArrowLeft size={12} /> {t('knowledge.topic.backToHub')}
@@ -148,7 +150,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
               {t('knowledge.topic.toProducts')} <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
             </Link>
             <Link
-              href="/contact"
+              href={Routes.contact()}
               className="inline-flex items-center gap-4 bg-white border border-slate-200 text-slate-950 px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-50 transition-all active:scale-95"
             >
               {t('knowledge.topic.getQuote')}

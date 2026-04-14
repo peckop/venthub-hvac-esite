@@ -2,6 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 import { ShieldAlert, ArrowLeft } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
+import { Routes } from '../../utils/routes';
+
 
 const AccessDenied: React.FC = () => {
     const { t } = useI18n()
@@ -24,7 +26,7 @@ const AccessDenied: React.FC = () => {
 
                 <div className="flex flex-col gap-4">
                     <Link
-                        href="/admin"
+                        href={Routes.admin.dashboard()}
                         className="inline-flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-2xl font-bold transition-all border border-white/5 group"
                     >
                         <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />

@@ -226,7 +226,7 @@ const AboutPage: React.FC = () => {
           </h2>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link 
-              href="/contact" 
+              href={Routes.contact()} 
               className="bg-slate-950 text-white px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-cyan-600 transition-all shadow-xl"
             >
               İletişime Geçin

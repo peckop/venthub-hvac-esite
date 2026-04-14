@@ -214,7 +214,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Brand Footer        */}
         <div className="mt-8 text-center">
-          <Link href="/" className="group inline-flex items-center gap-3 transition-all duration-500">
+          <Link href={Routes.home()} className="group inline-flex items-center gap-3 transition-all duration-500">
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-primary-navy to-secondary-blue text-white shadow-[0_20px_40px_-15px_rgba(37,99,235,0.4)] px-4 py-3 transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_25px_50px_-15px_rgba(37,99,235,0.5)]">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3),transparent_60%)] opacity-80" />
               <span className="relative block text-sm font-bold tracking-[0.25em]">VH</span>

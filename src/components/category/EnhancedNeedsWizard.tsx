@@ -311,7 +311,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
 
                             <div className="pt-10 flex flex-col sm:flex-row gap-4 justify-center">
                                 <button onClick={() => setState(prev => ({ ...prev, step: 1 }))} className="px-10 py-5 rounded-2xl border border-slate-200 text-slate-900 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all">Yeniden Başla</button>
-                                <Link href="/contact" className="px-10 py-5 rounded-2xl bg-cyan-500 text-slate-950 font-black uppercase text-[10px] tracking-widest hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/20">Özel Teklif İste</Link>
+                                <Link href={Routes.contact()} className="px-10 py-5 rounded-2xl bg-cyan-500 text-slate-950 font-black uppercase text-[10px] tracking-widest hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/20">Özel Teklif İste</Link>
                             </div>
                         </div>
                     )}

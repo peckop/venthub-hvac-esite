@@ -6,6 +6,8 @@ import { BrandIcon } from './HVACIcons'
 import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import { motion } from 'framer-motion'
+import { Routes } from '../utils/routes';
+
 
 const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ items, durationSec = 50 }) => {
   const repeated = useMemo(() => [...items, ...items, ...items], [items])
@@ -90,7 +92,7 @@ export const BrandsShowcase: React.FC = () => {
         {/* Minimalist View All CTA */}
         <div className="mt-20 text-center">
           <Link
-            href="/brands"
+            href={Routes.brands()}
             className="group inline-flex items-center gap-4 text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-all"
           >
             <span>{t('brands.viewAll')}</span>

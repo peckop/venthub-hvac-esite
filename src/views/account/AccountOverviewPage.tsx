@@ -7,6 +7,8 @@ import { formatCurrency } from '../../i18n/format'
 import { formatDate } from '../../i18n/datetime'
 import { MapPin, Package, Clock, CheckCircle, ArrowRight, ShieldCheck, CreditCard, Truck, AlertTriangle, TrendingUp, Calendar, MapPin as MapPinIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { Routes } from '../../utils/routes';
+
 
 interface OrderRecord {
   id: string
@@ -285,7 +287,7 @@ export default function AccountOverviewPage() {
                 </div>
                 Son Siparişleriniz
               </h3>
-              <Link href="/account/orders" className="text-sm font-bold text-primary-navy hover:underline inline-flex items-center gap-1">
+              <Link href={Routes.account.orders()} className="text-sm font-bold text-primary-navy hover:underline inline-flex items-center gap-1">
                 Tümünü Gör <ArrowRight size={14} />
               </Link>
             </div>

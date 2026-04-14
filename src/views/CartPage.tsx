@@ -30,7 +30,7 @@ export const CartPage: React.FC = () => {
               {t('cart.emptyDesc')}
             </p>
             <Link
-              href="/"
+              href={Routes.home()}
               className="inline-flex items-center px-6 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
             >
               <ArrowLeft size={20} className="mr-2" />

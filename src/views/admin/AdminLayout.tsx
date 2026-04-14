@@ -26,6 +26,8 @@ import {
 } from 'lucide-react'
 import CommandPalette from '../../components/admin/CommandPalette'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
+import { Routes } from '../../utils/routes';
+
 
 const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -114,7 +116,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <Link href="/admin" className="flex items-center gap-3">
+          <Link href={Routes.admin.dashboard()} className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center">
               <Webhook size={20} className="text-cyan-400" />
             </div>

@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Search, BookOpen, Calculator, Settings, ArrowRight, Clock } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 import Seo from '../../components/Seo'
+import { Routes } from '../../utils/routes';
+
 
 const TOPIC_SLUGS = ['hava-perdesi', 'jet-fan', 'hrv'] as const
 type TopicSlug = typeof TOPIC_SLUGS[number]
@@ -217,7 +219,7 @@ const HubPage: React.FC = () => {
             {t('knowledge.hub.notFoundDesc')}
           </p>
           <Link 
-            href="/contact" 
+            href={Routes.contact()} 
             className="inline-flex items-center gap-4 bg-cyan-500 text-slate-950 px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-white transition-all shadow-2xl shadow-cyan-500/20"
           >
             {t('knowledge.hub.contactExpert')} <ArrowRight size={16} />

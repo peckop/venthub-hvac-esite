@@ -158,7 +158,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   ]
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50/30"><div className="text-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy mx-auto mb-4" /><p className="text-steel-gray text-xs font-bold uppercase tracking-widest">{t('pdp.loading')}</p></div></div>
-  if (!product) return <div className="min-h-screen flex items-center justify-center bg-slate-50/30"><div className="text-center"><h1 className="text-xl font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1><Link href="/" className="text-primary-navy hover:text-secondary-blue font-bold text-sm uppercase tracking-widest">{t('pdp.backHome')}</Link></div></div>
+  if (!product) return <div className="min-h-screen flex items-center justify-center bg-slate-50/30"><div className="text-center"><h1 className="text-xl font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1><Link href={Routes.home()} className="text-primary-navy hover:text-secondary-blue font-bold text-sm uppercase tracking-widest">{t('pdp.backHome')}</Link></div></div>
 
   const categoryMetadata = hierarchy.main?.raw?.metadata as CategoryMetadata | null
 

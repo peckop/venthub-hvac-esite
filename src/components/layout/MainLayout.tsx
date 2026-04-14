@@ -13,6 +13,8 @@ import BackToTopButton from '../BackToTopButton'
 import ScrollToTop from '../ScrollToTop'
 import LanguageSwitcher from '../LanguageSwitcher'
 import PaymentWatcher from '../PaymentWatcher'
+import { Routes } from '../../utils/routes';
+
 
 // Lazy Overlays
 const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))
@@ -59,7 +61,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <div className="min-h-screen bg-gray-50 flex flex-col">
                 <div className="bg-slate-900 text-white px-6 py-3 flex justify-between items-center shrink-0 z-[100]">
                     <span className="font-bold tracking-tighter">VH / ADMIN</span>
-                    <Link href="/" className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition-colors uppercase font-bold tracking-widest">Siteye Dön</Link>
+                    <Link href={Routes.home()} className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition-colors uppercase font-bold tracking-widest">Siteye Dön</Link>
                 </div>
                 <div className="flex-grow overflow-auto">
                     {children}
