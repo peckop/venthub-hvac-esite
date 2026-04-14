@@ -1893,5 +1893,26 @@ export const tr = {
         { label: 'Avrupa', value: '#1' }
       ]
     }
+  },
+  needsWizard: {
+    start: 'Başla',
+    close: 'Kapat',
+    insulation: 'İzolasyon ve tasarruf için',
+    centralSystem: 'Merkezi sistem varsa',
+    goBack: 'Geri Dön',
+    findSuitable: 'Bana Uygun Olanı Bul',
+    threeSteps: '3 adımda size özel ürün önerisi',
+    wizardTitle: 'İhtiyaç Analizi Sihirbazı',
+    doorHeight: 'Kapı Yüksekliğiniz Nedir?',
+    meter: 'Metre',
+    heatingNeed: 'Isıtma İhtiyacı Var mı?',
+    electricHeater: 'Elektrikli Isıtıcı',
+    winterComfort: 'Kış konforu için',
+    ambient: 'Isıtıcısız (Ortam)',
+    waterHeater: 'Sıcak Su Bataryalı',
+    mountType: 'Montaj Tipi Nasıl Olmalı?',
+    standardMount: 'Standart (Duvar/Tavan Asılı)',
+    recessedMount: 'Ankastre (Asma Tavan İçi)',
+    step: 'Adım'
   }
 };
