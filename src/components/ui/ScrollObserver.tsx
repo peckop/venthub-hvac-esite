@@ -6,25 +6,25 @@ export const ScrollObserver: React.FC = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // IntersectionObserver instance - triggers only once per element
+    // IntersectionObserver: her element için sadece bir kez tetiklenir
     const observer = new IntersectionObserver(
       (entries, obs) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.setAttribute('data-in-view', 'true')
-            // Once visible, stop tracking to save CPU
+            // Görünür olduktan sonra izlemeyi durdur — CPU tasarrufu
             obs.unobserve(entry.target)
           }
         })
       },
       {
         root: null,
-        rootMargin: '0px 0px -50px 0px', // Trigger slighly before visible
+        rootMargin: '0px 0px -50px 0px',
         threshold: 0.1,
       }
     )
 
-    // Helper to find and observe unobserved targets
+    // data-observe elementlerini bul ve IntersectionObserver'a kaydet
     const observeNodes = () => {
       document.querySelectorAll('[data-observe]:not([data-in-view]):not([data-is-observed])').forEach((el) => {
         observer.observe(el)
@@ -32,19 +32,19 @@ export const ScrollObserver: React.FC = () => {
       })
     }
 
-    // Initial check
-    observeNodes();
+    // Hydration tamamlandıktan sonra ilk tarama.
+    // 100ms beklemek: React'in DOM'u tamamen flush etmesini garantiler.
+    const timerId = setTimeout(observeNodes, 100)
 
-    // Listen for dynamically added elements (like Suspense chunks) safely
-    const mutObserver = new MutationObserver(() => {
-      observeNodes()
-    })
-    
-    mutObserver.observe(document.body, { childList: true, subtree: true })
+    // NOT: MutationObserver kaldırıldı.
+    // HomePage'deki tüm bileşenler statik import (Suspense/lazy yok).
+    // subtree:true ile document.body izlemek Hydration süresinde
+    // yüzlerce observeNodes() tetikleyerek Main Thread'i kilitliyordu.
+    // Gelecekte lazy bileşen eklenirse buraya debounce'lu MutationObserver eklenebilir.
 
     return () => {
+      clearTimeout(timerId)
       observer.disconnect()
-      mutObserver.disconnect()
     }
   }, [])
 
