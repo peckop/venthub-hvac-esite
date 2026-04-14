@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-require-imports */
 const fs = require('fs');
 
 try {
