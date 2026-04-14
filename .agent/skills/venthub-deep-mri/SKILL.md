@@ -12,6 +12,11 @@ Bu skill, VentHub'ın derin performans ve teknik borç tarayıcısıdır. `run_r
 3. **Maliyet:** MRI (Bundle analiz, dead code taraması vb.) röntgene göre daha uzun zaman alır. Bu nedenle her commit öncesi değil, performans testleri veya temizlik sprintleri öncesi çalıştırılmalıdır.
 
 ## Kullanım Cihazları
-- **Kurulum:** `package.json` içerisinde mri çalıştırılabilir komutu mevcuttur (`pnpm run mri` kullanır).
+- **Kurulum:** `package.json` içerisinde mri çalıştırılabilir komutu mevcuttur (`pnpm run mri` kullanır). İlk yapılması gereken şey MRI/Knip Config dosyasının (örn: `knip.json` veya benzeri) **exclude/entry ayarlarına bakıp `.agent/**`, `registry/**` vb. klasörlerin çıkarıldığından (temiz scope)** emin olmaktır. Gürültülü raporlar güvenilmezdir.
 - **Komut:** `python .agent/skills/venthub-deep-mri/run_mri.py` 
 - **Çıktılar:** Analiz raporları klasör yapısı olarak `.agent/reports/` altında toplanacaktır.
+
+## MRI Sonrası Değerlendirme (Post-MRI Audit)
+MRI çalıştıktan sonra rapordaki ağırlıklara (.next/analyze) bakarak şu sorular cevaplanmalıdır:
+1. Ön Yüz (Product) sayfası **First Load JS** bundle boyutu çok mu ağır (örn: >400kb)? Ağırsa 3D/Galeri gibi kısımlar `next/dynamic` (lazy load) yapılmalı mı?
+2. Gereksiz veya Rapordaki "false positive" sonuçları elediğimizde gerçekten kullanılmayan kod var mı?

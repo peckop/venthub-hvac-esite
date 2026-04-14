@@ -89,6 +89,23 @@ def check_hardcoded_routes(content: str, file_path: Path) -> list[str]:
     return issues
 
 
+def check_slug_only_contract(content: str, file_path: Path) -> list[str]:
+    """
+    Kontrol: Slug-Only Contract İhlali — BLOCKER
+    İşlem: UI, App veya Component katmanında getProductBySlugOrId kullanımını kesinlikle engeller. Sadece getProductBySlug serbesttir.
+    """
+    issues = []
+    # Servis tanımlarını atla
+    if "service" in str(file_path):
+        return []
+        
+    if "getProductBySlugOrId" in content:
+        issues.append(
+            f"[BLOCKER] Slug Contract Ihlali: UI veya View katmaninda getProductBySlugOrId kullanilamaz. Yalnizca Mimarinin otesindeki Legacy katmanda yasar -> {file_path}"
+        )
+    return issues
+
+
 def check_middleware_supabase_fetch(content: str, file_path: Path) -> list[str]:
     """
     Kontrol: Middleware DB Yorgunluğu — BLOCKER
@@ -199,6 +216,7 @@ def check_file(file_path: Path) -> tuple[list[str], list[str]]:
     blockers.extend(check_hydration_risk(content, file_path))
     blockers.extend(check_property_mismatch(content, file_path))
     blockers.extend(check_hardcoded_routes(content, file_path))
+    blockers.extend(check_slug_only_contract(content, file_path))
     blockers.extend(check_middleware_supabase_fetch(content, file_path))
     blockers.extend(check_uuid_slug_fallback(content, file_path))
 
