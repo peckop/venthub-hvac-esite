@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/knip@3/schema-json-lines.json",
+  "project": [
+    "src/**/*.{ts,tsx,js,jsx}",
+    ".agent/**/*.{ts,tsx,js,jsx,py}"
+  ],
+  "ignore": [
+    "**/*.d.ts",
+    "docs/**",
+    "registry/**",
+    ".next/**"
+  ],
+  "ignoreBinaries": [
+    "cross-env"
+  ],
+  "ignoreDependencies": [
+    "clsx",
+    "tailwind-merge",
+    "tailwindcss-animate",
+    "@types/node"
+  ]
+}

@@ -235,3 +235,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-14 13:28:01
+- **Commit:** `ff457740`
+- **Mesaj:** chore(architecture): Harden SSOT route mapping, Next.js 15 async params, and pass Röntgen diagnostic requirements
+- **Değişen Dosyalar:**
+
+
