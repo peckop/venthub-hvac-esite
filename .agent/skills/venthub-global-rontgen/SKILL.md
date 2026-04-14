@@ -21,14 +21,34 @@ Bu Röntgen skill'inin amacı, size tavsiye vermek değil, sizi fiziksel olarak 
 JSON içindeki maddeleri kafanızdan değil, `run_command` üzerinden şu komutları sırayla göndererek doldurun:
 - **Lint:** `npm run lint` veya `pnpm run lint`
 - **Compiler:** `npx tsc --noEmit`
-- **Sızıntılar (Grep):** Sabit (hardcoded) URL'leri bulmak için `grep_search` kullanarak `href="/` aramaları yapın. UUID sızıntısı var mı diye bakın (`prod.id` tarzı sızıntılar).
-- **Middleware JWT RBAC:** `src/middleware.ts` içinde `supabase.from` gibi bir sorgu var mı `grep` atın.
+- **Build:** `npm run build`
 
-### 3. Çıktı Üret (Zorunlu JSON Kanıtı)
-Tüm komutları çalıştırdıktan sonra kullanıcıya "Her şey temiz" demek yerine, doldurduğunuz (ve komut sonuçlarını, exit_code'ları kanıt olarak içeren) **JSON formatını bir Artifact olarak üreterek** sunun.
+### 3. [ZORUNLU] Post-Scan Audit Checklist (Yorumlama ve Çapraz Doğrulama)
+> [!CAUTION]
+> **YALNIZCA SCRIPT'E GÜVENMEK YASAKTIR!** Yukarıdaki `.py` scriptleri veya derleyiciler 0 hata (PASS) verebilir. Ancak kod mimari olarak delik deşik olabilir. Her röntgen/Mr taramasının ardından şu "Cross-Check" (Yorumlama) aşamasını manuel olarak yapmalısın:
 
-**Eğer bir komut (örneğin tsc) Exit Code 1 verirse:**
-Bu json objesindeki `"status"` kısmını `FAIL` yapın, `"evidence"` kısmına hata logunu anında yazın ve `overall_ship_status`'u `BLOCKED` yapın. Sorunları kendi inisiyatifinizle gizlemeyin veya "Önemsiz" diye atlamayın!
+**A. Zorunlu Grep Taramaları (`grep_search` aracıyla):**
+- `getProductBySlugOrId` (Sadece legacy katmanda kalmalı, UI/View katmanında BLOCKED sebebidir. Yerine sadece getProductBySlug kullanılmalı.)
+- `href="/category` veya `` `/category/` `` (SSOT delinmesidir, `Routes.category` kullanılmalıdır)
+- `href="/products` veya `` `/products/` `` (SSOT delinmesidir, `Routes.product` kullanılmalıdır)
+- `slug || id` benzeri fallback'ler.
+
+**B. Kritik Dosya Gözden Geçirmesi (`view_file` ile okuyun):**
+- `src/utils/routes.ts` (SSOT'in merkezi burası olmalı)
+- `src/middleware.ts` (Edge runtime, JWT vs.)
+- `src/app/products/[slug]/page.tsx`
+- `src/app/category/[categorySlug]/page.tsx`
+
+**C. Çapraz Doğrulama Soruları (Cevaplanmadan JSON kapatılamaz):**
+- `middleware.ts` içindeki login path ile `routes.ts` içerisindeki login path eşleşiyor mu?
+- Ürün route'ları kesinlikle ve sadece **slug-only** mi davranıyor?
+- `<script type="application/ld+json">` içerisindeki product url sadece slug mı üretiyor?
+
+### 4. Çıktı Üret (Zorunlu JSON Kanıtı)
+Tüm komutları ve **Post-Scan Audit Check** (Çapraz Doğrulama) aşamasını tamamladıktan sonra kullanıcıya "Her şey temiz" demek yerine, doldurduğunuz (ve komut sonuçlarını kanıt olarak içeren) **JSON formatını bir Artifact olarak üreterek** sunun.
+
+**Eğer bir komut Exit Code 1 verirse VEYA Cross-Check'te hardcoded SSOT sızıntısı yakalanırsa:**
+Bu json objesindeki `"status"` kısmını `FAIL` yapın, `"evidence"` kısmına kanıtı anında yazın ve `overall_ship_status`'u `BLOCKED` yapın. Sorunları kendi inisiyatifinizle gizlemeyin veya "Önemsiz" diye atlamayın!
 
 ## 📋 Ekstra Denetim İpuçları (JSON'ı Doldururken Rehber Al)
 Komutlarla tarama yaparken radarınızın özellikle şunları yakaladığından emin olun:
