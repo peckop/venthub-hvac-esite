@@ -34,3 +34,7 @@ Her yeni görev bu iki motorun bir "soket eklentisi" olacak şekilde global tasa
 
 ---
 *Bu strateji, projenin "Kimseye Bağımlı Kalmadan" pürüzsüz büyümesini sağlar.*
+
+## 5. Gelecek Mimari Notları (P05/P06-Next15-Modernization)
+- **PPR (Partial Prerendering)**: Sürekli stabilite sağlamak (ve test edilen mevcut render akışını korumak) adına ilk aşamalarda aktif edilmedi.
+- **Server Actions & Edge Auth**: Middleware Supabase SSR ile modernize edildi ancak, tam Server Action adaptasyonu ve "Edge Runtime-only" yetkilendirmeleri P05 kapsamında detaylandırılmak üzere bekletilmektedir. Altyapı şuan Server-Side SSR dostu olsa da, PPR + Server Actions kombinasyonu tek seferde bir bütün olarak devreye alınacaktır.

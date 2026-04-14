@@ -61,6 +61,7 @@
 | `010`  | urunleri-kesfet-sayfasi-yeniden-insa          | 🔥 HIGH       |
 
 ## 📁 P05-NEXT15-MODERNIZATION
+> **Mimari Not**: PPR, Server Actions ve Edge Auth entegrasyonu bu fazda tek seferde ve topyekün devreye alınacaktır (Aksi takdirde stabilite bozulmaktadır).
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
 |:---|:---|:---|:---|:---|
