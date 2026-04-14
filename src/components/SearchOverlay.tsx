@@ -430,7 +430,8 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             )}
             <button
               onClick={handleClose}
-              className="px-2.5 py-1.5 text-xs font-bold text-steel-gray bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-slate-900 transition-colors shadow-sm cursor-pointer"
+              className="px-2.5 py-1.5 text-xs font-bold text-steel-gray bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-slate-900 transition-colors shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
+              aria-label={t('common.close')}
             >
               ESC
             </button>
