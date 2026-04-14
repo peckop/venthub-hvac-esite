@@ -36,7 +36,7 @@ REGISTRY_DIR = Path(__file__).parent.absolute()
 LOCK_FILE = REGISTRY_DIR / "ORION_IS_MASTER.lock"
 
 # Orion engine'e path ekle
-ORION_ENGINE_DIR = Path(r"C:\Users\alize\orion-registry\engine")
+ORION_ENGINE_DIR = Path(r"C:\Users\alize\orion-registry\orion_registry\engine")
 
 def _is_orion_active() -> bool:
     """ORION_IS_MASTER.lock dosyası varsa Orion köprüsü aktiftir."""
