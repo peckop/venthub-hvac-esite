@@ -7,7 +7,7 @@ interface NeedsAnalysisWizardProps {
 }
 
 const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChange }) => {
-    const { t: _t } = useI18n()
+    const { t } = useI18n()
     const [step, setStep] = useState(1)
     const [selections, setSelections] = useState({
         maxHeight: 0,
@@ -45,11 +45,11 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                         <Filter size={24} />
                     </div>
                     <div className="text-left">
-                        <div className="font-bold">Bana Uygun Olanı Bul</div>
-                        <div className="text-xs text-blue-100">3 adımda size özel ürün önerisi</div>
+                        <div className="font-bold">{t('needsWizard.findSuitable')}</div>
+                        <div className="text-xs text-blue-100">{t('needsWizard.threeSteps')}</div>
                     </div>
                 </div>
-                <div className="bg-white text-secondary-blue px-3 py-1 rounded-full text-sm font-bold ml-4">Başla</div>
+                <div className="bg-white text-secondary-blue px-3 py-1 rounded-full text-sm font-bold ml-4">{t('needsWizard.start')}</div>
             </button>
         )
     }
@@ -57,15 +57,15 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
     return (
         <div className="bg-white border-2 border-primary-navy/10 rounded-xl p-6 shadow-xl animate-fadeIn">
             <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-primary-navy">İhtiyaç Analizi Sihirbazı</h3>
-                <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600">Kapat</button>
+                <h3 className="text-lg font-bold text-primary-navy">{t('needsWizard.wizardTitle')}</h3>
+                <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600">{t('needsWizard.close')}</button>
             </div>
 
             {step === 1 && (
                 <div className="space-y-4">
                     <div className="flex items-center space-x-2 text-secondary-blue mb-2">
                         <Ruler size={20} />
-                        <span className="font-medium">Kapı Yüksekliğiniz Nedir?</span>
+                        <span className="font-medium">{t('needsWizard.doorHeight')}</span>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {[2.5, 3, 3.5, 4, 5].map(h => (
@@ -74,7 +74,7 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                                 onClick={() => handleSelection('maxHeight', h)}
                                 className="py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
                             >
-                                {h} Metre
+                                {h} {t('needsWizard.meter')}
                             </button>
                         ))}
                     </div>
@@ -85,29 +85,29 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                 <div className="space-y-4">
                     <div className="flex items-center space-x-2 text-secondary-blue mb-2">
                         <ThermometerSun size={20} />
-                        <span className="font-medium">Isıtma İhtiyacı Var mı?</span>
+                        <span className="font-medium">{t('needsWizard.heatingNeed')}</span>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <button
                             onClick={() => handleSelection('heating', 'electric')}
                             className="py-3 px-4 border rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all text-left"
                         >
-                            <div className="font-bold text-gray-800">Elektrikli Isıtıcı</div>
-                            <div className="text-xs text-gray-500">Kış konforu için</div>
+                            <div className="font-bold text-gray-800">{t('needsWizard.electricHeater')}</div>
+                            <div className="text-xs text-gray-500">{t('needsWizard.winterComfort')}</div>
                         </button>
                         <button
                             onClick={() => handleSelection('heating', 'none')}
                             className="py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left"
                         >
-                            <div className="font-bold text-gray-800">Isıtıcısız (Ortam)</div>
-                            <div className="text-xs text-gray-500">İzolasyon ve tasarruf için</div>
+                            <div className="font-bold text-gray-800">{t('needsWizard.ambient')}</div>
+                            <div className="text-xs text-gray-500">{t('needsWizard.insulation')}</div>
                         </button>
                         <button
                             onClick={() => handleSelection('heating', 'water')}
                             className="py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left"
                         >
-                            <div className="font-bold text-gray-800">Sıcak Su Bataryalı</div>
-                            <div className="text-xs text-gray-500">Merkezi sistem varsa</div>
+                            <div className="font-bold text-gray-800">{t('needsWizard.waterHeater')}</div>
+                            <div className="text-xs text-gray-500">{t('needsWizard.centralSystem')}</div>
                         </button>
                     </div>
                 </div>
@@ -117,28 +117,28 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                 <div className="space-y-4">
                     <div className="flex items-center space-x-2 text-secondary-blue mb-2">
                         <Settings size={20} />
-                        <span className="font-medium">Montaj Tipi Nasıl Olmalı?</span>
+                        <span className="font-medium">{t('needsWizard.mountType')}</span>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <button
                             onClick={() => handleSelection('type', 'standard')}
                             className="py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
                         >
-                            Standart (Duvar/Tavan Asılı)
+                            {t('needsWizard.standardMount')}
                         </button>
                         <button
                             onClick={() => handleSelection('type', 'recessed')}
                             className="py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
                         >
-                            Ankastre (Asma Tavan İçi)
+                            {t('needsWizard.recessedMount')}
                         </button>
                     </div>
                 </div>
             )}
 
             <div className="mt-6 flex justify-between items-center text-xs text-gray-400">
-                <span>Adım {step} / 3</span>
-                {step > 1 && <button onClick={() => setStep(step - 1)} className="hover:text-gray-600 underline">Geri Dön</button>}
+                <span>{t('needsWizard.step')} {step} / 3</span>
+                {step > 1 && <button onClick={() => setStep(step - 1)} className="hover:text-gray-600 underline">{t('needsWizard.goBack')}</button>}
             </div>
         </div>
     )
