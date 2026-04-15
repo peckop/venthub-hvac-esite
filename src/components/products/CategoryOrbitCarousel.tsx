@@ -8,6 +8,7 @@ import { ArrowLeft, ChevronRight } from 'lucide-react'
 import OrbitalProductsShowcase from './OrbitalProductsShowcase'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { useI18n } from '../../i18n/I18nProvider'
 
 // Helper to determine 3D model type based on slug
 const getModelTypeForCategory = (slug?: string): string | undefined => {
@@ -51,6 +52,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
     const router = useRouter()
     const { categories, loading: categoriesLoading } = useCategories()
     const { wrapCategory } = useCategoryViewModel()
+    const { t } = useI18n()
     
     const [level, setLevel] = useState<'main' | 'subcategory'>('main')
     const [activeMainCategorySlug, setActiveMainCategorySlug] = useState<string | null>(null)
@@ -248,7 +250,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                                 whileTap={{ scale: 0.98 }}
                             >
                                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                                <span className="text-sm font-medium">Geri</span>
+                                <span className="text-sm font-medium">{t('common.back')}</span>
                                 <span className="text-sm font-bold text-cyan-400 truncate max-w-[150px] ml-2">
                                     {activeMainCategory.displayName}
                                 </span>
@@ -260,7 +262,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
-                                Tüm Ürünleri Gör
+                                {t('common.seeAllProducts')}
                                 <ChevronRight className="w-4 h-4" />
                             </motion.button>
                         </div>
