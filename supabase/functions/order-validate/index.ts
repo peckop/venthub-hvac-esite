@@ -1,3 +1,4 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
 interface CartItem { product_id: string; quantity: number | string; unit_price?: number | string; price_list_id?: string | null }
 interface Product {
   id: string;
@@ -30,8 +31,23 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-    if (!supabaseUrl || !serviceRoleKey) {
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
       return new Response(JSON.stringify({ error: 'config_error' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
+    }
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Missing Authorization header' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
+    }
+
+    const authClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: { user }, error: authErr } = await authClient.auth.getUser();
+    if (authErr || !user) {
+      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
 
     const headers = {
@@ -41,7 +57,7 @@ Deno.serve(async (req) => {
     } as Record<string,string>;
 
     const body = await req.json().catch(()=>({}));
-    const userId = (body?.user_id || body?.userId || '').toString();
+    const userId = user.id;
     let cartId = (body?.cart_id || body?.cartId || '').toString();
 
     async function getJson<T>(_path: string): Promise<T> {
