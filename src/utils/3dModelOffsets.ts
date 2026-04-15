@@ -164,6 +164,23 @@ export interface ModelPlacement {
     scale?: number
 }
 
+/**
+ * Determines the precise 3D placement configuration (position, rotation, scale) for a model based on its type or slug.
+ * It first attempts an exact match using the explicit `modelType`. If that fails, it falls back to a complex, ordered substring matching strategy on the `slug` to infer the correct configuration.
+ *
+ * @param modelType - The explicit identifier of the 3D model component (e.g., 'AirCurtainModel', 'JetFanModel')
+ * @param slug - The product slug used for fallback inference if the exact modelType is missing or not found
+ * @param context - The rendering context dictating the placement variant (defaults to 'grounded')
+ * @returns The resolved model placement containing position, rotation, and an optional scale factor
+ *
+ * @example
+ * // Exact match via modelType
+ * getModelPlacement('AirCurtainModel', undefined, 'centered') // Returns AirCurtainModel's 'centered' placement
+ *
+ * @example
+ * // Fallback inference via slug matching
+ * getModelPlacement(undefined, 'bx-150-exproof-fan', 'orbital') // Returns ExproofFanModel's 'orbital' placement
+ */
 export function getModelPlacement(
     modelType: string | undefined,
     slug: string | undefined,
