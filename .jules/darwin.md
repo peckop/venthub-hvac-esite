@@ -9,3 +9,6 @@
 ## 2024-05-18 - Avoid 'any' in test mocks to satisfy strict CI rules
 **Learning:** `pnpm run lint:ci` strictly enforces the 'No-Any Policy' and fails on `// eslint-disable-next-line @typescript-eslint/no-explicit-any`. Complex objects like `mockSupabase` cannot be loosely typed with `any`.
 **Action:** Always use specific typings for mocks. For example, explicitly defining mock object properties with `ReturnType<typeof vi.fn>` ensures type safety while allowing function reassignment or tracking without violating the 'No-Any Policy'.
+## 2024-05-19 - Strict Typing for Domain Models in Tests
+**Learning:** When mocking or instantiating strict UI models like `DomainCategory` in VentHub tests, TypeScript enforces all properties because `DomainCategory` uses `Omit<DbCategory, ...> & { ... }`. You cannot use partial objects or ignore DB-level fields like `created_at` or `status` (if inherited) unless you cast with `as DomainCategory` (which violates the 'No-Any/Unsafe Cast Policy').
+**Action:** When creating mock data for domain models in tests, meticulously fill out all required fields according to the actual type definition in `src/types/ui-models.ts` and `src/types/db-rows.ts`, even if the function under test doesn't use those fields. This ensures strict compilation without relying on escape hatches.
