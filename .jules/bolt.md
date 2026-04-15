@@ -14,3 +14,6 @@
 ## $(date +%Y-%m-%d) - Context Provider Memoization Strategy
 **Learning:** In Next.js/React architectures, recomputing complex values (like using `.reduce()` over arrays) inside getter functions stored in Context causes redundant execution during every descendant re-render. Changing these API signatures from functional getters (`getCartTotal()`) to static properties (`cartTotal`) breaks numerous consumer components.
 **Action:** When optimizing Context performance, use `useMemo` internally to cache the computation result based on its underlying dependencies, but retain the existing public functional API by wrapping the memoized result in `useCallback` (e.g., `useCallback(() => cartTotal, [cartTotal])`).
+## 2026-04-15 - Optimize repeated array lookups
+**Learning:** `Array.find()` inside a sorting function or a render loop leads to $O(N \times M)$ complexity and severe performance degradation on large lists.
+**Action:** Always pre-compute a lookup `Map` (hash map) with $O(1)$ access via `useMemo` when performing cross-reference lookups during sorting or array rendering.
