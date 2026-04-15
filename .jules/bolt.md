@@ -11,3 +11,6 @@
 ## 2025-02-23 - [Single Pass Loop vs map/filter/reduce]
 **Learning:** Using chained array methods (`.map().filter()`) and spreading results into `Math.max(...prices)` can cause O(N) memory allocations, multiple iterations, and a potential 'Maximum call stack size exceeded' error on large arrays.
 **Action:** Replace `const prices = arr.map(x => x.val).filter(...); Math.max(...prices)` with a single `for` loop that safely calculates the maximum value in one pass (`O(1)` space, `O(N)` time).
+## $(date +%Y-%m-%d) - Context Provider Memoization Strategy
+**Learning:** In Next.js/React architectures, recomputing complex values (like using `.reduce()` over arrays) inside getter functions stored in Context causes redundant execution during every descendant re-render. Changing these API signatures from functional getters (`getCartTotal()`) to static properties (`cartTotal`) breaks numerous consumer components.
+**Action:** When optimizing Context performance, use `useMemo` internally to cache the computation result based on its underlying dependencies, but retain the existing public functional API by wrapping the memoized result in `useCallback` (e.g., `useCallback(() => cartTotal, [cartTotal])`).

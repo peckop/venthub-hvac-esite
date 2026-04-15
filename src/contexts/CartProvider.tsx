@@ -384,16 +384,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [user, serverCartId])
 
-  const getCartTotal = useCallback(() => {
+  const cartTotal = useMemo(() => {
     return items.reduce((total, item) => {
       const unit = typeof item.unitPrice === 'number' ? item.unitPrice : Number(item.product.price || 0)
       return total + unit * item.quantity
     }, 0)
   }, [items])
 
-  const getCartCount = useCallback(() => {
+  const getCartTotal = useCallback(() => cartTotal, [cartTotal])
+
+  const cartCount = useMemo(() => {
     return items.reduce((count, item) => count + item.quantity, 0)
   }, [items])
+
+  const getCartCount = useCallback(() => cartCount, [cartCount])
 
   // Sunucudan gelen birim fiyatları yerel sepete uygula ve (varsa) sunucu sepetine yaz
   const applyServerPricing = useCallback((serverItems: { product_id: string, unit_price: number }[]) => {
