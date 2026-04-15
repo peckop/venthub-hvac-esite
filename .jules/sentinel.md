@@ -10,3 +10,7 @@
 **Vulnerability:** The `refund-order-mock` Edge Function was manually base64-decoding the JWT token using a `parseJwt` function to extract the `sub` (actorUserId) to authorize mock refunds without validating the token signature.
 **Learning:** This is a repeating pattern across multiple Edge Functions. The presence of `parseJwt` functions in multiple files indicates a systemic misunderstanding of secure token validation when bypassing standard auth flows.
 **Prevention:** As previously recorded, never use manual JWT parsing (`atob`). Always use `createClient` with `global: { headers: { Authorization: authHeader } }` and call `auth.getUser()` to securely retrieve the user identity, even in "mock" endpoints that modify state.
+## 2024-05-18 - Missing Authentication in Order Validate Endpoint
+**Vulnerability:** IDOR (Insecure Direct Object Reference) and missing authentication in `supabase/functions/order-validate/index.ts`. The endpoint relied on the `userId` provided in the request body to validate carts and fetch `user_profiles`, bypassing standard token checks.
+**Learning:** Edge Functions acting on behalf of a specific user must proactively verify the caller's identity via `auth.getUser()` using the `Authorization` header instead of relying entirely on the payload data, even if the primary operations are driven by a Service Role Key.
+**Prevention:** Always extract `user.id` from `auth.getUser()` securely for sensitive operations rather than trusting request payloads. Ensure early return (401 Unauthorized) when authorization headers are missing.
