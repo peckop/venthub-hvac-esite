@@ -1,15 +1,5 @@
 
 /**
- * Helper function to generate application filter URL for products page
- * 
- * @param applicationKey - Application key (e.g., 'air-curtain', 'jet-fan', 'hrv', 'parking')
- * @returns URL string with application filter and hash anchor
- */
-export function getApplicationProductsUrl(applicationKey: string): string {
-    return `/products?application=${applicationKey}#applications`
-}
-
-/**
  * Topic to application key mapping
  * Maps knowledge center topic slugs to their corresponding application keys
  */
