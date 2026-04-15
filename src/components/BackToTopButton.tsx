@@ -47,14 +47,14 @@ const BackToTopButton: React.FC = () => {
     }
   }, [])
 
-  if (!visible) return null
-
   return (
     <button
       aria-label={t('common.backToTop')}
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bg-primary-navy hover:bg-secondary-blue text-white p-3 rounded-full shadow-lg transition-all z-40 border border-white/20"
+      className={`fixed bg-primary-navy hover:bg-secondary-blue text-white p-3 rounded-full shadow-lg transition-all duration-300 z-40 border border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-navy ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none invisible'}`}
       style={{ bottom: pos.bottom, right: pos.right }}
+      tabIndex={visible ? 0 : -1}
+      aria-hidden={!visible}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <polyline points="18 15 12 9 6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
