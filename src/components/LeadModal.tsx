@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { Building2, X, CheckCircle2, ChevronRight, Mail, Phone, MapPin, Briefcase } from 'lucide-react'
 import { Routes } from '../utils/routes'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface LeadModalProps {
   open: boolean
@@ -21,6 +22,7 @@ const applicationAreas = [
 ]
 
 const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _productId: __productId }) => {
+  const { t } = useI18n()
   const [name, setName] = useState('')
   const [company, setCompany] = useState('')
   const [email, setEmail] = useState('')
@@ -88,12 +90,14 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
       <div
         role="dialog"
         aria-modal="true"
+        aria-labelledby="lead-modal-title"
         className="relative w-full max-w-5xl bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:flex-row max-h-[100dvh] sm:max-h-[85vh] transform transition-all animate-in fade-in zoom-in-95 duration-300"
       >
         {/* Close Button Mobile */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-gray-100 rounded-full text-gray-500 sm:hidden transition-colors"
+          aria-label={t('common.close')}
+          className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-gray-100 rounded-full text-gray-500 sm:hidden transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
         >
           <X className="w-5 h-5" />
         </button>
@@ -157,7 +161,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
             <div className="w-full sm:w-3/5 p-6 sm:p-10 overflow-y-auto bg-white flex flex-col">
               <div className="flex justify-between items-start mb-6 hidden sm:flex">
                 <div>
-                  <h2 className="text-2xl font-bold text-primary-navy">Teklif Al</h2>
+                  <h2 id="lead-modal-title" className="text-2xl font-bold text-primary-navy">Teklif Al</h2>
                   {productName && (
                     <p className="text-sm text-steel-gray mt-1 flex items-center gap-1">
                       <span className="px-2 py-1 bg-gray-100 rounded-md font-medium text-xs text-industrial-gray">{productName}</span>
@@ -165,7 +169,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     </p>
                   )}
                 </div>
-                <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors">
+                <button onClick={handleClose} aria-label={t('common.close')} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -296,7 +300,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                   <button
                     type="submit"
                     disabled={submitted}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary-navy hover:bg-secondary-blue text-white px-8 py-3 rounded-lg font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed group shadow-lg shadow-blue-900/10"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary-navy hover:bg-secondary-blue text-white px-8 py-3 rounded-lg font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed group shadow-lg shadow-blue-900/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-navy"
                   >
                     {submitted ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
