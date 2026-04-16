@@ -392,6 +392,14 @@ const AdminProductsPage: React.FC = () => {
   }
   const sortIndicator = (key: SortKey) => sortKey !== key ? '' : (sortDir === 'asc' ? '▲' : '▼')
 
+  const catsMap = React.useMemo(() => {
+    const map = new Map<string, string>()
+    for (const c of cats) {
+      map.set(c.id, c.name)
+    }
+    return map
+  }, [cats])
+
   const sorted = React.useMemo(() => {
     const arr = [...filtered]
     arr.sort((a, b) => {
@@ -400,8 +408,8 @@ const AdminProductsPage: React.FC = () => {
         case 'name': return dir * a.name.localeCompare(b.name, 'tr')
         case 'sku': return dir * a.sku.localeCompare(b.sku, 'tr')
         case 'category': {
-          const an = cats.find(c => c.id === a.category_id)?.name || ''
-          const bn = cats.find(c => c.id === b.category_id)?.name || ''
+          const an = a.category_id ? catsMap.get(a.category_id) || '' : ''
+          const bn = b.category_id ? catsMap.get(b.category_id) || '' : ''
           return dir * an.localeCompare(bn, 'tr')
         }
         case 'status': return dir * (String(a.status || '').localeCompare(String(b.status || ''), 'tr'))
@@ -411,7 +419,7 @@ const AdminProductsPage: React.FC = () => {
       }
     })
     return arr
-  }, [filtered, sortKey, sortDir, cats])
+  }, [filtered, sortKey, sortDir, catsMap])
 
   const statusBadge = (s?: string | null) => {
     const v = (s || '').toLowerCase()
@@ -692,7 +700,7 @@ const AdminProductsPage: React.FC = () => {
                         )}
                         {visibleCols.category && (
                           <td className={`${adminTableCellClass} ${cellPad}`}>
-                            <span className="text-xs font-black text-slate-400 uppercase tracking-tighter">{cats.find(c => c.id === r.category_id)?.name || '-'}</span>
+                            <span className="text-xs font-black text-slate-400 uppercase tracking-tighter">{r.category_id ? catsMap.get(r.category_id) || '-' : '-'}</span>
                           </td>
                         )}
                         {visibleCols.status && (
