@@ -1383,7 +1383,10 @@ export const tr = {
     backHome: 'Ana Sayfaya Dön',
     breadcrumbHome: 'Ana Sayfa',
     premiumCollection: 'Premium Koleksiyon',
-    findModel: 'Bana Uygun Modeli Bul'
+    findModel: 'Bana Uygun Modeli Bul',
+    aboutCategory: 'Kategori Hakkında',
+    productCount: 'Ürün Sayısı',
+    goToCategory: 'Kategoriye Git'
   },
   categories: {
     title: 'Ürün Kategorileri',
