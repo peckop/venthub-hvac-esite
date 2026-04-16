@@ -4,6 +4,7 @@ import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronRight, Package, Tag, Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useI18n } from '@/i18n/I18nProvider'
 
 export interface CategoryPreviewData {
     id: string
@@ -28,6 +29,7 @@ interface CategoryPreviewPanelProps {
  */
 const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, isOpen, onClose }) => {
   const router = useRouter()
+  const { t } = useI18n()
 
     const handleNavigate = () => {
         if (category) {
@@ -119,7 +121,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2 text-cyan-400 text-sm font-medium">
                                     <Info className="w-4 h-4" />
-                                    <span>Kategori Hakkında</span>
+                                    <span>{t('category.aboutCategory')}</span>
                                 </div>
                                 <p className="text-white/80 leading-relaxed">
                                     {category.description}
@@ -132,7 +134,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                                     <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                                         <div className="flex items-center gap-2 text-cyan-400 mb-1">
                                             <Package className="w-4 h-4" />
-                                            <span className="text-xs font-medium">Ürün Sayısı</span>
+                                            <span className="text-xs font-medium">{t('category.productCount')}</span>
                                         </div>
                                         <p className="text-2xl font-bold text-white">{category.productCount}</p>
                                     </div>
@@ -141,7 +143,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                                     <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                                         <div className="flex items-center gap-2 text-emerald-400 mb-1">
                                             <Tag className="w-4 h-4" />
-                                            <span className="text-xs font-medium">Fiyat Aralığı</span>
+                                            <span className="text-xs font-medium">{t('common.priceRange')}</span>
                                         </div>
                                         <p className="text-lg font-bold text-white">
                                             ₺{category.priceRange.min.toLocaleString('tr-TR')} - ₺{category.priceRange.max.toLocaleString('tr-TR')}
@@ -161,7 +163,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                                            transition-all duration-300 flex items-center justify-center gap-2
                                            group`}
                             >
-                                <span>Kategoriye Git</span>
+                                <span>{t('category.goToCategory')}</span>
                                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>
