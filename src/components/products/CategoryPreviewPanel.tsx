@@ -143,7 +143,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                                     <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                                         <div className="flex items-center gap-2 text-emerald-400 mb-1">
                                             <Tag className="w-4 h-4" />
-                                            <span className="text-xs font-medium">{t('common.priceRange')}</span>
+                                            <span className="text-xs font-medium">{t('category.priceRange')}</span>
                                         </div>
                                         <p className="text-lg font-bold text-white">
                                             ₺{category.priceRange.min.toLocaleString('tr-TR')} - ₺{category.priceRange.max.toLocaleString('tr-TR')}
