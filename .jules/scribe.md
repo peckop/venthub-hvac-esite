@@ -7,3 +7,7 @@
 ## 2025-02-23 - [TSDoc Data Formatting]
 **Learning:** VentHub uses suffix-based type inference (e.g., '_mm', '_kg', '_v') within translation keys to automatically format strings with the correct engineering units. Documenting these hidden conventions directly on the formatting functions prevents developers from reinventing the wheel or hardcoding strings elsewhere.
 **Action:** When documenting data transformation utilities in `src/utils/`, explicitly mention any implicit business logic like suffix-matching in the `@param` descriptions and provide concrete `@example`s demonstrating the suffix behavior.
+
+## 2024-05-18 - [Loose Number Parsing in safeNumber]
+**Learning:** `safeNumber` relies on `parseFloat` for strings, which extracts valid numbers even if the string ends with non-numeric characters (e.g., `'42px'` -> `42`, `'3.14.15'` -> `3.14`).
+**Action:** When documenting type converters, explicitly mention if loose string parsing (`parseFloat`/`parseInt`) is used instead of strict `Number()` coercion, as this affects CSS parsing, multi-decimal values, and potential invalid data.
