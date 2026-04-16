@@ -1,15 +1,5 @@
 
 /**
- * Topic to application key mapping
- * Maps knowledge center topic slugs to their corresponding application keys
- */
-export const TOPIC_TO_APP_KEY: Record<string, string> = {
-    'hava-perdesi': 'air-curtain',
-    'jet-fan': 'jet-fan',
-    'hrv': 'hrv'
-}
-
-/**
  * Topic to Category URL mapping
  * Maps topics directly to the definitive Category Registry paths
  */
