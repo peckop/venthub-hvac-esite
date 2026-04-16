@@ -1,3 +1,6 @@
 ## 2025-04-14 - Ensure keyboard focus indicators and hide elements correctly
 **Learning:** Replacing conditional rendering with CSS transitions creates a smoother experience, but using `opacity-0` alone leaves elements in the tab order (ghost focus). `pointer-events-none` prevents mouse clicks but not keyboard focus.
 **Action:** When hiding elements visually, always use `invisible` (visibility: hidden) along with `tabIndex={-1}` and `aria-hidden={true}` to fully remove them from the accessibility tree and keyboard navigation.
+## 2025-02-14 - Add accessibility to LeadModal Close and Submit Buttons
+**Learning:** Screen reader users rely heavily on `aria-labelledby` attributes pointing to dialogue `<h>` elements for modal dialogs to be properly identified. While individual interactive elements need `aria-label` and `focus-visible` styling (as implemented here via Tailwind `focus-visible:ring`), establishing the overall semantic context of a dialog container is arguably the most critical accessibility requirement so screen readers know what context they are within before tabbing through interactive fields.
+**Action:** Always check that modals/dialogs contain `role="dialog"`, `aria-modal="true"`, and `aria-labelledby="[id_of_heading]"` on the top-level dialog container.
