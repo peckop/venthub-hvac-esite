@@ -62,7 +62,12 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
     }
 
     // Find max count for Z axis scaling
-    const maxCount = Math.max(...chartData.map(d => d.count), 1)
+    let maxCount = 1;
+    for (let i = 0; i < chartData.length; i++) {
+        if (chartData[i].count > maxCount) {
+            maxCount = chartData[i].count;
+        }
+    }
     // zRange determines pixel size of bubbles [minArea, maxArea]
     const zRange = [20, 400]
 
