@@ -10,6 +10,7 @@ import {
   type InvoiceProfile
 } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
+import { useI18n } from '../../i18n/I18nProvider'
 import toast from 'react-hot-toast'
 import { FileText, Plus, Trash2, Edit2, CheckCircle, User, Building2, Landmark, Loader2 } from 'lucide-react'
 
@@ -17,6 +18,7 @@ type InvoiceProfileType = 'individual' | 'corporate'
 
 export default function AccountInvoicesPage() {
   const { user } = useAuth()
+  const { t } = useI18n()
   const [items, setItems] = useState<InvoiceProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -189,9 +191,9 @@ export default function AccountInvoicesPage() {
             </label>
 
             <div className="flex gap-3 pt-4 border-t border-slate-100">
-              {editingId && <button type="button" onClick={resetForm} className="flex-1 h-10 border border-slate-200 rounded-lg font-bold text-slate-600">İptal</button>}
+              {editingId && <button type="button" onClick={resetForm} className="flex-1 h-10 border border-slate-200 rounded-lg font-bold text-slate-600">{t('common.cancel')}</button>}
               <button disabled={saving} className="flex-[2] h-10 bg-primary-navy text-white rounded-lg font-bold disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (editingId ? 'Güncelle' : 'Kaydet')}
+                {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (editingId ? t('common.update') : t('common.save'))}
               </button>
             </div>
           </form>
