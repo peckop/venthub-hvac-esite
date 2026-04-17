@@ -200,7 +200,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                     onClick={() => {
                       if (onQuoteClick) onQuoteClick();
                       else if (typeof window !== "undefined") {
-                        (window as typeof window & { openLeadModal?: () => void }).openLeadModal?.();
+                        window.openLeadModal?.();
                       }
                     }}
                     className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/5 px-12 text-[14px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all duration-300 hover:bg-white/10"
