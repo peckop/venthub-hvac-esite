@@ -1,5 +1,5 @@
 'use client';
-/* eslint-disable */
+
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useI18n } from '../../i18n/I18nProvider';
@@ -14,7 +14,6 @@ import toast from 'react-hot-toast';
 import InventoryTable from '../../components/admin/InventoryTable';
 import type { Database } from '../../types/database.types';
 import { LoadState, Density } from '../../types/admin-shared';
-import type { VisibleCols } from '../../types/inventory';
 
 type InventorySummaryRow = Database['public']['Views']['inventory_summary']['Row'] & { category_id?: string | null };
 type Category = Database['public']['Tables']['categories']['Row'];
@@ -52,21 +51,6 @@ const AdminInventoryPage: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  const handleUpdateThreshold = async (productId: string, threshold: number) => {
-    try {
-      const { error } = await supabase
-        .from('products')
-        .update({ low_stock_threshold: threshold })
-        .eq('id', productId);
-
-      if (error) throw error;
-      toast.success('Eşik değeri güncellendi');
-      fetchData(); 
-    } catch {
-      toast.error('Güncelleme başarısız');
-    }
-  };
 
   const filteredData = useMemo(() => {
     return data.filter(item => {
