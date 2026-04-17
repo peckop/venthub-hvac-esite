@@ -674,6 +674,7 @@ export const tr = {
     common: {
       saveChanges: "Değişiklikleri Kaydet",
       cancel: "İptal",
+      update: "Güncelle",
       delete: "Sil",
       edit: "Düzenle",
       search: "Ara...",
