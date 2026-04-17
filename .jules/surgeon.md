@@ -6,3 +6,7 @@
 **Type Smell:** Casting Supabase response arrays blindly with `as unknown as Type[]`
 **Learning:** Using `as unknown as Type[]` for Supabase `.select()` responses is risky because it completely bypasses the type-checker's knowledge of the schema and hides potential breaking changes. The `_data` variable shadow name was also indicative of trying to sidestep the expected `data` object structure.
 **Solution:** Chained `.returns<Type[]>()` directly to the Supabase query to securely type the `data` array result without needing to cast it later, and correctly referenced the `data` property.
+## 2026-04-17 - Redundant Window Augmentation Casts
+**Type Smell:** Inline explicit casting of `window` to an augmented type (e.g., `(window as typeof window & { openLeadModal?: () => void })`).
+**Learning:** `src/types/env.d.ts` already declares the `openLeadModal?: () => void` property on the global `Window` interface, making inline casting redundant and a potential source of untracked divergence.
+**Solution:** Removed the inline casting and directly called `window.openLeadModal?.()` since TypeScript already knows about the property via the global declaration.
