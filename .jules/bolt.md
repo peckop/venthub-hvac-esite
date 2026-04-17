@@ -17,3 +17,6 @@
 ## 2026-04-15 - Optimize repeated array lookups
 **Learning:** `Array.find()` inside a sorting function or a render loop leads to $O(N \times M)$ complexity and severe performance degradation on large lists.
 **Action:** Always pre-compute a lookup `Map` (hash map) with $O(1)$ access via `useMemo` when performing cross-reference lookups during sorting or array rendering.
+## 2024-05-25 - Avoid spreading mapped arrays into Math.max
+**Learning:** Using `Math.max(...array.map(fn))` on potentially large datasets like `chartData` creates intermediate arrays and can throw `RangeError: Maximum call stack size exceeded`.
+**Action:** Use a single-pass `for` loop or `reduce` to find the maximum value, which avoids memory bloat and call stack overflow.
