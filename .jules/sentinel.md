@@ -18,3 +18,8 @@
 **Vulnerability:** The `order-housekeeping` Edge Function lacked any authentication or RBAC validation, allowing anyone to trigger database cleanup tasks unauthenticated.
 **Learning:** Cron jobs and system tasks in Supabase Edge Functions must be protected either by checking the Service Role key in the Authorization header or by enforcing `auth.getUser()` and RBAC for manual admin execution. Without this, they are vulnerable to DoS attacks or unauthorized invocations.
 **Prevention:** Always validate the `Authorization` header in cron endpoints to ensure the caller is either the system (Service Role key) or an authorized human (admin with valid token). Use a bypass pattern like `if (authHeader !== \`Bearer ${serviceRoleKey}\`)` to safely support both.
+
+## 2025-02-27 - Added RBAC checks to notification-service Edge Function
+**Vulnerability:** The notification-service Supabase Edge Function lacked authorization entirely. There was no checks for an `Authorization` header, meaning anyone could invoke the endpoint to send arbitrary WhatsApp, SMS, or Emails, resulting in abuse, phishing and Twilio/Resend cost spikes.
+**Learning:** Supabase Edge Functions default to being open and executing securely within Deno. Any custom admin API endpoint needs explicit code handling the auth/JWT validation by fetching `user_profiles.role` or trusting the `SUPABASE_SERVICE_ROLE_KEY`.
+**Prevention:** Make sure admin/internal endpoints (like `notification-service`) implement system bypass using `SUPABASE_SERVICE_ROLE_KEY` or enforce RBAC via `authClient.auth.getUser()`. Never assume a function is private just because it's undocumented.
