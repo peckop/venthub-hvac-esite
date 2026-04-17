@@ -24,7 +24,6 @@ export const adminTableActionClass = 'inline-flex justify-center items-center px
 export const adminTableActionDangerClass = 'inline-flex justify-center items-center px-4 h-9 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500/20 transition-all whitespace-nowrap'
 export const adminTableActionPrimaryClass = 'inline-flex justify-center items-center px-4 h-9 rounded-xl bg-cyan-400 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-cyan-300 transition-all whitespace-nowrap'
 export const adminTableActionWarningClass = 'inline-flex justify-center items-center px-4 h-9 rounded-xl bg-amber-500 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-amber-400 transition-all whitespace-nowrap'
-export const adminTableActionNeutralClass = 'inline-flex justify-center items-center px-4 h-9 rounded-xl bg-white/10 border border-white/5 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all whitespace-nowrap'
 
 export const adminTableIconButtonClass = 'inline-flex justify-center items-center w-10 h-10 rounded-xl glass border border-white/5 text-slate-400 hover:bg-white/5 hover:text-cyan-400 transition-all focus:outline-none focus:ring-2 focus:ring-white/5 flex-shrink-0'
 
