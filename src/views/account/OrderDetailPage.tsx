@@ -87,15 +87,18 @@ export default function OrderDetailPage() {
       try {
         setLoading(true)
 
-        // 1. Sipariş ana verilerini çek
-        const { data: orderData, error: orderError } = await (supabase
-          .from('venthub_orders'))
+        // 1. Sipariş ana verilerini ve kalemleri tek bir sorguda çek (Relational Query Optimization)
+        const { data: orderData, error: orderError } = await supabase
+          .from('venthub_orders')
           .select(`
             id, total_amount, status, payment_status, created_at, 
             customer_name, customer_email, shipping_address, order_number, 
             conversation_id, carrier, tracking_number, tracking_url, 
             shipped_at, delivered_at, shipping_method, invoice_type, 
-            invoice_info, legal_consents
+            invoice_info, legal_consents,
+            venthub_order_items (
+              id, product_id, product_name, quantity, price_at_time, product_image_url
+            )
           `)
           .eq('id', id)
           .single()
@@ -103,28 +106,19 @@ export default function OrderDetailPage() {
         if (orderError) throw orderError
         if (!orderData) throw new Error('Order not found')
 
-        // 2. Sipariş kalemlerini (items) çek
-        // Not: RLS politikası user_id bazlı koruma sağladığı için doğrudan çekiyoruz
-        const { data: itemsData, error: itemsError } = await (supabase
-          .from('venthub_order_items'))
-          .select('id, product_id, product_name, quantity, price_at_time, product_image_url')
-          .eq('order_id', id)
+        const rawItems: Record<string, unknown>[] = (orderData.venthub_order_items as Record<string, unknown>[]) || []
 
-        if (itemsError) {
-          console.error('Order items load error:', itemsError)
-        }
-
-        const mappedItems: OrderItem[] = (itemsData || []).map((it) => {
+        const mappedItems: OrderItem[] = rawItems.map((it) => {
           const unit = Number(it.price_at_time) || 0
           const qty = Number(it.quantity) || 0
           return {
-            id: it.id,
-            product_id: it.product_id ?? undefined,
-            product_name: it.product_name,
+            id: String(it.id),
+            product_id: it.product_id ? String(it.product_id) : undefined,
+            product_name: String(it.product_name),
             quantity: qty,
             unit_price: unit,
             total_price: unit * qty,
-            product_image_url: it.product_image_url,
+            product_image_url: it.product_image_url ? String(it.product_image_url) : null,
           }
         })
 
