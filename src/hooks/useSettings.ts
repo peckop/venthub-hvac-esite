@@ -21,6 +21,16 @@ export interface AppSettings {
   updated_at: string
 }
 
+/**
+ * Custom hook to fetch and hold the global application settings from the `app_settings` Supabase table.
+ * Manages loading, error, and the settings state.
+ *
+ * @returns An object containing the fetched settings, loading boolean, and error string
+ *
+ * @example
+ * const { settings, loading } = useSettings()
+ * if (!loading && settings) console.log(settings.site_title)
+ */
 export function useSettings() {
   const [settings, setSettings] = useState<AppSettings | null>(null)
   const [loading, setLoading] = useState(true)
