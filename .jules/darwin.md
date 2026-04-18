@@ -15,3 +15,10 @@
 ## 2025-04-15 - URLSearchParams Empty String Behavior
 **Learning:** `new URLSearchParams({ text: '' }).toString()` yields `text=`, not an empty string. The previous implementation of `buildWhatsAppLink` in `src/lib/utils.ts` appended this `?text=` to the base URL when `text` was falsy/empty, violating intuitive expectations but currently standard behavior. Testing the function's strict output via equality matches is crucial, capturing even somewhat counterintuitive results for safety unless fixed explicitly.
 **Action:** Always verify actual runtime behavior in node repl for browser globals like `URLSearchParams` when mocking/asserting edge case logic, and strictly write tests against the observed code behavior per "test only don't fix" rule.
+## 2025-04-18 - Mocking Environment Variables in Strict Mode
+**Learning:** In Next.js/TypeScript environments with strict read-only bindings for `process.env` properties (like `process.env.NODE_ENV`), attempting manual mutation or `Object.defineProperty` might fail compilation or runtime checks.
+**Action:** Always use Vitest's built-in `vi.stubEnv('KEY', 'value')` and cleanly restore them with `vi.unstubAllEnvs()` in an `afterEach` block to safely test logic that branches on environment values.
+
+## 2025-04-18 - Replacing `any` with Unused Parameters in Vitest Mocks
+**Learning:** In test files subjected to aggressive `no-explicit-any` and `no-unused-vars` linting rules, constructing mock classes (like `MockFileReader` or `MockImage`) requires meticulous parameter typing (e.g., `_file: unknown` or `event: unknown`) and explicit function union typings.
+**Action:** Strictly type mock callbacks (e.g. `onload: ((event: unknown) => void) | null = null`) and prefix unused positional variables with underscores to cleanly pass CI linting without disabling rules.
