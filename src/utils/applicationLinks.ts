@@ -3,7 +3,7 @@
  * Topic to Category URL mapping
  * Maps topics directly to the definitive Category Registry paths
  */
-export const TOPIC_TO_CATEGORY_URL: Record<string, string> = {
+const TOPIC_TO_CATEGORY_URL: Record<string, string> = {
     'hava-perdesi': '/category/air-curtains',
     'jet-fan': '/category/jet-fans',
     'hrv': '/category/heat-recovery-units'
