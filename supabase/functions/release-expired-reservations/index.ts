@@ -36,6 +36,14 @@ serve(async (req: Request) => {
         })
     }
 
+
+    if (req.headers.get('Authorization') !== `Bearer ${supabaseKey}`) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+    }
+
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     try {

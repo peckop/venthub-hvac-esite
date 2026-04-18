@@ -36,6 +36,14 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+
+    if (req.headers.get('Authorization') !== `Bearer ${serviceKey}`) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: { ...cors, 'Content-Type': 'application/json' }
+        })
+    }
+
     const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
     const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
 
