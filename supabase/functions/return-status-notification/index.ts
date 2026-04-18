@@ -45,7 +45,34 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 
-    if (req.headers.get('Authorization') !== `Bearer ${serviceKey}`) {
+    const authHeader = req.headers.get('Authorization')
+    let isAuthorized = false
+    if (authHeader === `Bearer ${serviceKey}`) {
+      isAuthorized = true
+    } else if (authHeader) {
+      try {
+        const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
+        const authClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
+        const { data: { user } } = await authClient.auth.getUser()
+        if (user) {
+          const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+            headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+          })
+          if (roleCheck.ok) {
+            const arr = await roleCheck.json().catch(() => [])
+            const role = arr[0]?.role
+            if (role === 'admin' || role === 'superadmin') {
+              isAuthorized = true
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Auth fallback error:', err)
+      }
+    }
+
+    if (!isAuthorized) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
             status: 401,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
