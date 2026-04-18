@@ -211,44 +211,40 @@ async function syncReturnsRecord(
 
 async function restoreStockForOrder(orderId: string): Promise<void> {
     try {
+        // Fetch order items and related products in a single relational query
         const { data: items } = await supabase
             .from('venthub_order_items')
-            .select('product_id, quantity')
+            .select('product_id, quantity, products(id, stock_qty)')
             .eq('order_id', orderId)
+
         if (!items || items.length === 0) return
 
-        // Group items by product_id to sum quantities correctly and avoid overwriting
-        const groupedItems = items.reduce((acc, item) => {
-            if (!acc[item.product_id]) {
-                acc[item.product_id] = 0
-            }
-            acc[item.product_id] += item.quantity
-            return acc
-        }, {} as Record<string, number>)
-
-        const productIds = Object.keys(groupedItems)
-        const { data: products } = await supabase.from('products').select('id, stock_qty').in('id', productIds)
-
-        if (!products) return
-
-        const productsMap = new Map(products.map(p => [p.id, p]))
         const updates: { id: string; stock_qty: number }[] = []
         const movements: { product_id: string; delta: number; reason: string; order_id: string }[] = []
 
-        for (const [productId, totalQuantity] of Object.entries(groupedItems)) {
-            const product = productsMap.get(productId)
-            if (product) {
-                updates.push({
-                    id: product.id,
-                    stock_qty: (product.stock_qty || 0) + totalQuantity
-                })
-                movements.push({
-                    product_id: productId,
-                    delta: totalQuantity,
-                    reason: 'return',
-                    order_id: orderId
-                })
+        // Group items by product_id to sum quantities correctly and avoid overwriting
+        const groupedItems = items.reduce((acc, item) => {
+            const prod = Array.isArray(item.products) ? item.products[0] : item.products;
+            if (!item.product_id || !prod) return acc;
+
+            if (!acc[item.product_id]) {
+                acc[item.product_id] = { quantity: 0, currentStock: prod.stock_qty || 0 };
             }
+            acc[item.product_id].quantity += item.quantity;
+            return acc;
+        }, {} as Record<string, { quantity: number; currentStock: number }>)
+
+        for (const [productId, data] of Object.entries(groupedItems)) {
+            updates.push({
+                id: productId,
+                stock_qty: data.currentStock + data.quantity
+            })
+            movements.push({
+                product_id: productId,
+                delta: data.quantity,
+                reason: 'return',
+                order_id: orderId
+            })
         }
 
         await Promise.all(
