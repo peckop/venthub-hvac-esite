@@ -1,0 +1,70 @@
+{
+  "skill": "superpowers-write-plan",
+  "model": "Gemini 3 Flash",
+  "date": "2026-04-14",
+  "execution_complexity": "LOW",
+  "recommended_model": "Gemini 3 Flash",
+  "requires_human_approval": false,
+  "domain_ref": "front-end-routing",
+  "brainstorm_ref": "001-ssot-and-bundle-cleanup/brainstorm.json",
+  "objective": "SSOT Route temizliğini ve bundle boyutunu optimize etmek için hardcoded linkleri tespit edip Routes nesnesiyle değiştirmek.",
+  "assumptions": [
+    "Routes dosyasında 'destek.konular' ve diğer rotaların tanımlı olduğu varsayılıyor."
+  ],
+  "pre_checks": [
+    {
+      "claim": "src/views/knowledge/HubPage.tsx, src/views/BrandsPage.tsx, src/views/admin/AdminAuditLogPage.tsx dosyalarında hardcoded linkler bulunuyor.",
+      "verified": true,
+      "source": "grep_search taramaları üzerinden tespit edildi."
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "title": "HubPage Hardlink Düzeltmesi",
+      "files": ["src/views/knowledge/HubPage.tsx"],
+      "changes": "HubPage.tsx içerisindeki topic.slug linkini (örneğin `/destek/konular/${topic.slug}`) Routes nesnesi metodlarıyla değiştirmek.",
+      "verify": "pnpm run lint başarılı olmalıdır."
+    },
+    {
+      "id": 2,
+      "title": "BrandsPage Hardlink Düzeltmesi",
+      "files": ["src/views/BrandsPage.tsx"],
+      "changes": "BrandsPage.tsx içerisindeki `/brands/${brand.slug}` linkini Routes yapısına bağlamak.",
+      "verify": "pnpm run lint başarılı olmalıdır."
+    },
+    {
+      "id": 3,
+      "title": "AdminAuditLogPage Hardlink Düzeltmesi",
+      "files": ["src/views/admin/AdminAuditLogPage.tsx"],
+      "changes": "AdminAuditLogPage.tsx içerisindeki `/admin/movements?batch=${batch}` linkini Routes yapısına bağlamak.",
+      "verify": "pnpm run rontgen hatasız dönmelidir."
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Farklı sayfalardaki tip uyumsuzlukları TS hataları oluşturabilir.",
+      "severity": "low",
+      "mitigation": "Derleme kontrolü (tsc) yapılarak anında düzeltilecek."
+    }
+  ],
+  "rollback": "'git restore src/' komutuyla geri dönülecek.",
+  "allowed_paths": [
+    "src/views/knowledge/HubPage.tsx",
+    "src/views/BrandsPage.tsx",
+    "src/views/admin/AdminAuditLogPage.tsx"
+  ],
+  "forbidden_paths": [
+    "src/lib/supabase.ts",
+    "src/types/",
+    "src/utils/routes.ts"
+  ],
+  "max_files_changed": 5,
+  "allowed_change_types": [
+    "component_refactor"
+  ],
+  "architectural_guardrails": {
+    "ssot_route_strategy": "Tüm hardcoded string URL'ler temizlenecek ve doğrudan src/utils/routes.ts içerisindeki Routes nesnesinden çağrılacaktır.",
+    "bundle_size_optimization": "Bu işlem sadece import edilen Routes nesnesinin kullanımını artıracak olup, dışa açık paket yüklerini artırmayacaktır."
+  }
+}

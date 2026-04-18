@@ -1,0 +1,44 @@
+{
+  "skill": "superpowers-brainstorm",
+  "model": "flash",
+  "date": "2026-04-14",
+  "goal": "SSOT (Single Source of Truth) rotalarının temizlenmesi ve proje bundle büyüklüğünün (ör. lucide-react gibi) tespiti ve optimize edilmesi.",
+  "constraints": [
+    "Sadece src içerisindeki Views ve Component'lerdeki hardcoded URL stringleri düzeltilecek.",
+    "Geri dönülemez değişiklik öncesi mutlaka plan.json ve dispatcher.json doldurulacak."
+  ],
+  "known_context": "Venthub projesi Enterprise bir e-ticaret yapısına geçtiği için routing SSOT yapıda olmalıdır. Şu anki durumda hardcoded link kullanım tespitleri yapıldı.",
+  "risks": [
+    {
+      "severity": "medium",
+      "description": "Bileşenler arası navigation ve params aktarımlarında TypeScript hataları veya React hydration sorunları doğabilir."
+    }
+  ],
+  "options": [
+    {
+      "id": "A",
+      "title": "Adım adım View refactoring",
+      "selected": true,
+      "reason": "Sistemli bir şekilde her sayfanın izole test edilerek SSOT yapısına alınmasını sağlar."
+    },
+    {
+      "id": "B",
+      "title": "Toplu Global Regex Replace",
+      "selected": false,
+      "reason": "Tip hatalarına ve beklenmedik derleme sorunlarına yol açabilir."
+    }
+  ],
+  "recommendation": "Adım adım View refactoring yaparak (AdminAuditLogPage, BrandsPage ve HubPage) dosyalarını refactor etmeliyiz. Bu metod izole olarak en güvenli yöntemdir.",
+  "traces": [
+    {
+      "tool": "view_file",
+      "target": "c:\\Users\\alize\\venthub-hvac\\src\\views\\knowledge\\HubPage.tsx",
+      "finding": "Hardcoded destek konulari baglantilari bulundu."
+    },
+    {
+      "tool": "grep_search",
+      "target": "c:\\Users\\alize\\venthub-hvac\\src",
+      "finding": "AdminAuditLogPage and BrandsPage hardlink bulgulari"
+    }
+  ]
+}
