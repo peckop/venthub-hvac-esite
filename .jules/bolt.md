@@ -23,3 +23,10 @@
 ## 2025-05-18 - Avoid array micro-optimizations and upserts for N+1
 **Learning:** Replacing `.map` and `.filter` with `for` loops or `reduce` degrades readability for zero macro-level gain and is rejected. Fabricating payloads to use `.upsert()` for bulk updates causes severe data corruption by overwriting missing columns with empty strings.
 **Action:** Solve N+1 queries mathematically at the network level by refactoring multiple discrete `.select()` calls into a single Supabase relational query (e.g., `supabase.from('orders').select('*, items(*)')`).
+## 2024-05-26 - [Supabase Select Network Payload]
+**Learning:** Using `.select('*')` on queries like `getCategories` or `getProducts` introduces a huge network payload, significantly impacting TTFB (Time to First Byte).
+**Action:** Always extract explicitly required fields from `src/types/database.types.ts` or `src/types/db-rows.ts` and use them in `.select('field1, field2')` instead.
+
+## 2024-05-26 - [Context O(1) Hash Map Optimization]
+**Learning:** Using `categories.find()` and `categories.filter()` inside React Context getters (like `CategoryContext`) creates $O(N \times M)$ bottlenecks on pages that render many categories.
+**Action:** Replace `.find` and `.filter` on large arrays inside Context providers with `useMemo` hash maps (`Map`) to enable $O(1)$ lookups without breaking consumer code.
