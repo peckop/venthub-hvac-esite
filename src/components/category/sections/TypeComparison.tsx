@@ -155,7 +155,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                                 {/* CTA */}
                                 <button
                                     onClick={() => onSelectType(type.id)}
-                                    className={`w-full py-3 px-6 rounded-xl text-white font-bold transition-all flex items-center justify-center gap-2 ${type.colorClasses.button}`}
+                                    className={`focus-ring w-full py-3 px-6 rounded-xl text-white font-bold transition-all flex items-center justify-center gap-2 ${type.colorClasses.button}`}
                                 >
                                     {type.title} Modelleri
                                     <ArrowRight size={18} />
@@ -176,7 +176,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                     </p>
                     <button
                         onClick={onOpenWizard}
-                        className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors inline-flex items-center gap-2"
+                        className="focus-ring px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors inline-flex items-center gap-2"
                     >
                         <HelpCircle size={20} />
                         Bana Yardım Et

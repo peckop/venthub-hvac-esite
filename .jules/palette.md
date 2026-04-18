@@ -8,3 +8,6 @@
 ## 2024-05-24 - Quick View Modal Keyboard Accessibility
 **Learning:** Quick view modals and dynamic dialogue popups in Next.js/Tailwind stack often miss distinct focus states for keyboard-only navigation. Using standard hover: modifiers is insufficient for accessibility.
 **Action:** When auditing custom modal implementations, systematically enforce focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 on all interactive closing, primary action, and secondary action buttons/links.
+## 2025-04-18 - Centralize generic element accessibility styling
+**Learning:** Adding massive focus utility classes to dozens of distinct `button` components violates DRY and pollutes JSX. Redundant `aria-label`s on elements with visible text (like "Devam Et") break screen reader semantics by repeating text.
+**Action:** Abstract complex shared focus styles (like `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2`) into a global Tailwind `@layer utilities` class (`.focus-ring`). Apply `aria-label` strictly to icon-only buttons via the `useI18n` translation hook.

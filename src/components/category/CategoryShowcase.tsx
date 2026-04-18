@@ -79,7 +79,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             {isAirCurtain && (
                                 <button
                                     onClick={() => setWizardOpen(true)}
-                                    className="group flex items-center bg-gradient-to-r from-secondary-blue to-blue-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-lg shadow-blue-500/30 hover:scale-105"
+                                    className="focus-ring group flex items-center bg-gradient-to-r from-secondary-blue to-blue-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-lg shadow-blue-500/30 hover:scale-105"
                                 >
                                     <ThermometerSun className="mr-3" size={24} />
                                     <span>{t('category.findModel')}</span>
@@ -93,8 +93,8 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                 {/* Animated Scroll Down Indicator */}
                 <button
                     onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
-                    aria-label="Devamını keşfet"
+                    className="focus-ring absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
+
                 >
                     <span className="text-xs uppercase tracking-widest font-medium">Devamını Keşfet</span>
                     <ChevronDown className="w-6 h-6" />

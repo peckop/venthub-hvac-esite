@@ -36,6 +36,41 @@ serve(async (req: Request) => {
         })
     }
 
+
+    const authHeader = req.headers.get('Authorization')
+    let isAuthorized = false
+    if (authHeader === `Bearer ${supabaseKey}`) {
+      isAuthorized = true
+    } else if (authHeader) {
+      try {
+        const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
+        const { createClient: createClientAuth } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
+        const authClient = createClientAuth(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
+        const { data: { user } } = await authClient.auth.getUser()
+        if (user) {
+          const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+            headers: { Authorization: `Bearer ${supabaseKey}`, apikey: supabaseKey }
+          })
+          if (roleCheck.ok) {
+            const arr = await roleCheck.json().catch(() => [])
+            const role = arr[0]?.role
+            if (role === 'admin' || role === 'superadmin') {
+              isAuthorized = true
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Auth fallback error:', err)
+      }
+    }
+
+    if (!isAuthorized) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+    }
+
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     try {

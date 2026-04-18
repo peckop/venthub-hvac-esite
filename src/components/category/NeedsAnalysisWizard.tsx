@@ -38,7 +38,7 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="w-full md:w-auto bg-gradient-to-r from-primary-navy to-secondary-blue text-white px-6 py-4 rounded-xl shadow-lg flex items-center justify-between hover:scale-105 transition-transform"
+                className="focus-ring w-full md:w-auto bg-gradient-to-r from-primary-navy to-secondary-blue text-white px-6 py-4 rounded-xl shadow-lg flex items-center justify-between hover:scale-105 transition-transform"
             >
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-white/20 rounded-lg">
@@ -58,7 +58,7 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
         <div className="bg-white border-2 border-primary-navy/10 rounded-xl p-6 shadow-xl animate-fadeIn">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold text-primary-navy">{t('needsWizard.wizardTitle')}</h3>
-                <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600">{t('needsWizard.close')}</button>
+                <button onClick={() => setIsOpen(false)} className="focus-ring text-gray-400 hover:text-gray-600">{t('needsWizard.close')}</button>
             </div>
 
             {step === 1 && (
@@ -72,7 +72,7 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                             <button
                                 key={h}
                                 onClick={() => handleSelection('maxHeight', h)}
-                                className="py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
+                                className="focus-ring py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
                             >
                                 {h} {t('needsWizard.meter')}
                             </button>
@@ -90,21 +90,21 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <button
                             onClick={() => handleSelection('heating', 'electric')}
-                            className="py-3 px-4 border rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all text-left"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all text-left"
                         >
                             <div className="font-bold text-gray-800">{t('needsWizard.electricHeater')}</div>
                             <div className="text-xs text-gray-500">{t('needsWizard.winterComfort')}</div>
                         </button>
                         <button
                             onClick={() => handleSelection('heating', 'none')}
-                            className="py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left"
                         >
                             <div className="font-bold text-gray-800">{t('needsWizard.ambient')}</div>
                             <div className="text-xs text-gray-500">{t('needsWizard.insulation')}</div>
                         </button>
                         <button
                             onClick={() => handleSelection('heating', 'water')}
-                            className="py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left"
                         >
                             <div className="font-bold text-gray-800">{t('needsWizard.waterHeater')}</div>
                             <div className="text-xs text-gray-500">{t('needsWizard.centralSystem')}</div>
@@ -122,13 +122,13 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <button
                             onClick={() => handleSelection('type', 'standard')}
-                            className="py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
                         >
                             {t('needsWizard.standardMount')}
                         </button>
                         <button
                             onClick={() => handleSelection('type', 'recessed')}
-                            className="py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
                         >
                             {t('needsWizard.recessedMount')}
                         </button>
@@ -138,7 +138,7 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
 
             <div className="mt-6 flex justify-between items-center text-xs text-gray-400">
                 <span>{t('needsWizard.step')} {step} / 3</span>
-                {step > 1 && <button onClick={() => setStep(step - 1)} className="hover:text-gray-600 underline">{t('needsWizard.goBack')}</button>}
+                {step > 1 && <button onClick={() => setStep(step - 1)} className="focus-ring hover:text-gray-600 underline">{t('needsWizard.goBack')}</button>}
             </div>
         </div>
     )

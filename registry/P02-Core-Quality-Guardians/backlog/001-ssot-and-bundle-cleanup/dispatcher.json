@@ -1,0 +1,21 @@
+{
+  "skill": "model-dispatcher",
+  "task_summary": "Hardcoded URL stringlerinin temizlenerek, merkezi Routes nesnesini kullanacak şekilde refactor edilmesi işlemi.",
+  "complexity": "low",
+  "recommended_model": "Gemini 3 Flash",
+  "blast_radius": 3,
+  "reasoning": "Rutin bir text değiştirme ve refactor işlemidir. Mantıksal zorlayıcı bir mimari değişiklik içermez, sadece string birleşimi olan linkleri TypeScript yardımıyla metod bağlantılarına çevireceğiz.",
+  "alternatives": [
+    {
+      "model": "Gemini 3.1 Pro (Low)",
+      "score": 60,
+      "reason": "Biraz yavaş kalabilir, basit işlem için fazladan token maliyetli olur."
+    },
+    {
+      "model": "Claude Sonnet 4.6 (Thinking)",
+      "score": 30,
+      "reason": "Çok basit bir refactor işlemi için fazlasıyla güçlü ve kotalar israf edilir."
+    }
+  ],
+  "quota_warning": "Sadece hardlink değiştirme (amelelik) görevidir, pahalı modelleri kullanmayın Flash gayet yeterlidir."
+}

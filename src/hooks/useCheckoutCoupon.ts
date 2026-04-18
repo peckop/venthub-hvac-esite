@@ -1,6 +1,17 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+/**
+ * Custom hook for managing checkout coupon application.
+ * Handles state for the input code, validates it, and securely calls the Supabase Edge Function to apply the discount.
+ *
+ * @param totalAmount - The current subtotal of the cart in Turkish Lira (TRY)
+ * @returns An object containing the coupon state, setters, and functions to apply or remove the coupon
+ *
+ * @example
+ * const { couponCode, setCouponCode, applyCoupon, removeCoupon, couponApplied } = useCheckoutCoupon(1500)
+ * <button onClick={applyCoupon}>Apply</button>
+ */
 export const useCheckoutCoupon = (totalAmount: number) => {
   const [couponCode, setCouponCode] = useState<string>('')
   const [couponApplied, setCouponApplied] = useState<{ code: string; discount: number } | null>(null)

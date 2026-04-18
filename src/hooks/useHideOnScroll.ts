@@ -11,6 +11,18 @@ interface HideOnScrollState {
     isAtTop: boolean
 }
 
+/**
+ * Custom hook to detect scroll direction and position for hiding/showing UI elements.
+ * Tracks whether the user is scrolling up/down, if they have scrolled past a threshold, and if they are at the top.
+ *
+ * @param options - Configuration options containing the threshold in pixels
+ * @param options.threshold - The scroll threshold in pixels (defaults to 50) before state updates trigger
+ * @returns {HideOnScrollState} An object containing boolean flags for scroll state
+ *
+ * @example
+ * const { isScrollingDown, isAtTop } = useHideOnScroll({ threshold: 100 })
+ * const headerClass = isScrollingDown && !isAtTop ? '-translate-y-full' : 'translate-y-0'
+ */
 export function useHideOnScroll({ threshold = 50 }: UseHideOnScrollOptions = {}): HideOnScrollState {
     const [state, setState] = useState<HideOnScrollState>({
         isScrolled: false,
