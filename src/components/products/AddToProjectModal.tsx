@@ -1,6 +1,7 @@
 'use client'
 
 import VentImage from '@/components/ui/VentImage'
+import { useI18n } from '@/i18n/I18nProvider';
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Plus, FolderPlus, ChevronRight, Loader2 } from 'lucide-react'
@@ -14,6 +15,7 @@ interface AddToProjectModalProps {
 }
 
 export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, isOpen, onClose }) => {
+  const { t } = useI18n();
   const { projects, addProject, addItemToProject } = useProjectLists()
   const [newProjectName, setNewProjectName] = useState('')
   const [isCreating, setIsCreating] = useState(false)
@@ -75,7 +77,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
       >
         {/* Header */}
         <div className="px-6 py-4 border-b border-light-gray flex items-center justify-between bg-primary-navy text-white">
-          <h3 id="add-to-project-title" className="font-bold text-lg">Proje Listesine Ekle</h3>
+          <h3 id="add-to-project-title" className="font-bold text-lg">{t('common.addToProject')}</h3>
           <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full transition-colors">
             <X size={20} />
           </button>

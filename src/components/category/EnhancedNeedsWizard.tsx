@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useI18n } from '@/i18n/I18nProvider';
 import Link from 'next/link'
-import { useI18n } from "../../i18n/I18nProvider"
 import {
     X, ChevronLeft,
     DoorOpen, Snowflake, Factory, ShoppingCart,
@@ -41,39 +41,39 @@ interface MatchedProduct extends DomainProduct {
 }
 
 // Data
-const USAGE_LOCATIONS = [
+const getUsageLocations = (t: (key: string) => string) => [
     {
         id: 'entrance',
-        title: 'Giriş Kapısı',
-        description: 'Mağaza, restoran, otel girişi',
+        title: t('needsWizard.entranceDoor'),
+        description: t('needsWizard.entranceDesc'),
         icon: DoorOpen,
-        tip: 'Müşteri konforunu artırır, enerji kaybını önler'
+        tip: t('needsWizard.entranceTip')
     },
     {
         id: 'cold-storage',
-        title: 'Soğuk Hava Deposu',
-        description: 'Soğuk zincir koruması',
+        title: t('needsWizard.coldStorage'),
+        description: t('needsWizard.coldStorageDesc'),
         icon: Snowflake,
         tip: 'Soğuk zinciri KORUR, ürün bozulmasını engeller'
     },
     {
         id: 'industrial',
-        title: 'Endüstriyel Tesis',
+        title: t('needsWizard.industrial'),
         description: 'Fabrika, lojistik tesisi',
         icon: Factory,
         tip: 'Toz, duman ve zararlı madde izolasyonu sağlar'
     },
     {
         id: 'retail',
-        title: 'Market / Süpermarket',
-        description: 'Soğutucu reyonlar',
+        title: t('needsWizard.retail'),
+        description: t('needsWizard.retailDesc'),
         icon: ShoppingCart,
-        tip: 'Soğutucu reyonlardan sıcak havayı uzak tutar'
+        tip: t('needsWizard.retailTip')
     }
 ]
 
 const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, parentSlug }) => {
-    const { t } = useI18n()
+    const { t } = useI18n();
     const [state, setState] = useState<WizardState>({
         step: 1,
         usageLocation: null,
@@ -196,11 +196,11 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                     {state.step === 1 && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
                             <div className="text-center max-w-lg mx-auto">
-                                <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Kullanım alanı neresi?</h2>
-                                <p className="text-slate-500 font-light leading-relaxed">Size en uygun teknik özellikleri belirlemek için önce uygulama alanını seçin.</p>
+                                <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">{t('needsWizard.step1Title')}</h2>
+                                <p className="text-slate-500 font-light leading-relaxed">{t('needsWizard.step1Desc')}</p>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {USAGE_LOCATIONS.map((loc) => (
+                                {getUsageLocations(t).map((loc) => (
                                     <button
                                         key={loc.id}
                                         onClick={() => { setState(prev => ({ ...prev, usageLocation: loc.id as WizardState['usageLocation'] })); nextStep() }}
@@ -220,15 +220,15 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                     {state.step === 2 && (
                         <div className="space-y-10 animate-in fade-in slide-in-from-right-4">
                             <div className="text-center max-w-lg mx-auto">
-                                <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Kapı ölçülerini girin</h2>
-                                <p className="text-slate-500 font-light leading-relaxed">Hava perdesinin tüm açıklığı kapatması kritik önemdedir.</p>
+                                <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">{t('needsWizard.step2Title')}</h2>
+                                <p className="text-slate-500 font-light leading-relaxed">{t('needsWizard.step2Desc')}</p>
                             </div>
                             
                             <div className="grid md:grid-cols-2 gap-12 max-w-2xl mx-auto">
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4 text-slate-400 mb-2">
                                         <Ruler size={20} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Genişlik (Metre)</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest">{t('needsWizard.widthMeter')}</span>
                                     </div>
                                     <input 
                                         type="range" min="0.8" max="3.0" step="0.1" 
@@ -242,7 +242,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4 text-slate-400 mb-2">
                                         <Ruler size={20} className="rotate-90" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Yükseklik (Metre)</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest">{t('needsWizard.heightMeter')}</span>
                                     </div>
                                     <input 
                                         type="range" min="2.0" max="5.0" step="0.1" 
@@ -255,29 +255,29 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             </div>
 
                             <button onClick={nextStep} className="focus-ring w-full max-w-xs mx-auto flex items-center justify-center gap-3 bg-slate-950 text-white py-5 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-cyan-600 transition-all">
-                                Devam Et <ArrowRight size={16} />
+                                {t('needsWizard.next')} <ArrowRight size={16} />
                             </button>
                         </div>
                     )}
 
                     {state.step === 3 && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 text-center">
-                            <h2 className="text-3xl font-bold text-slate-900 mb-10 tracking-tight">Isıtıcı ihtiyacı var mı?</h2>
+                            <h2 className="text-3xl font-bold text-slate-900 mb-10 tracking-tight">{t('needsWizard.step3Title')}</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                 <button onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'yes' })); nextStep() }} className="focus-ring p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-all">
                                     <div className="text-4xl mb-4">🔥</div>
-                                    <div className="font-bold">Evet</div>
-                                    <div className="text-xs text-slate-400 mt-2">Kışın konfor için</div>
+                                    <div className="font-bold">{t('admin.common.yes')}</div>
+                                    <div className="text-xs text-slate-400 mt-2">{t('needsWizard.heatingYesDesc')}</div>
                                 </button>
                                 <button onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'no' })); nextStep() }} className="focus-ring p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-all">
                                     <div className="text-4xl mb-4">🌬️</div>
-                                    <div className="font-bold">Hayır</div>
-                                    <div className="text-xs text-slate-400 mt-2">Sadece hava bariyeri</div>
+                                    <div className="font-bold">{t('admin.common.no')}</div>
+                                    <div className="text-xs text-slate-400 mt-2">{t('needsWizard.heatingNoDesc')}</div>
                                 </button>
                                 <button onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'unsure' })); nextStep() }} className="focus-ring p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-all">
                                     <div className="text-4xl mb-4">❓</div>
-                                    <div className="font-bold">Emin Değilim</div>
-                                    <div className="text-xs text-slate-400 mt-2">Bize danışın</div>
+                                    <div className="font-bold">{t('needsWizard.notSure')}</div>
+                                    <div className="text-xs text-slate-400 mt-2">{t('needsWizard.consultUs')}</div>
                                 </button>
                             </div>
                         </div>
@@ -286,12 +286,12 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                     {state.step === 6 && (
                         <div className="space-y-8 animate-in zoom-in-95 duration-500">
                             <div className="text-center">
-                                <h2 className="text-3xl font-bold text-slate-900 mb-2">Size En Uygun Modeller</h2>
-                                <p className="text-slate-500 font-light">Mühendislik kriterlerine göre filtrelenmiş öneriler.</p>
+                                <h2 className="text-3xl font-bold text-slate-900 mb-2">{t('needsWizard.step6Title')}</h2>
+                                <p className="text-slate-500 font-light">{t('needsWizard.step6Desc')}</p>
                             </div>
 
                             {loading ? (
-                                <div className="py-20 text-center text-slate-400 animate-pulse font-black uppercase tracking-widest text-[10px]">Modeller Analiz Ediliyor...</div>
+                                <div className="py-20 text-center text-slate-400 animate-pulse font-black uppercase tracking-widest text-[10px]">{t('needsWizard.analyzing')}</div>
                             ) : (
                                 <div className="grid md:grid-cols-3 gap-6">
                                     {matchedProducts.map((p: MatchedProduct) => (
@@ -303,7 +303,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                             <div className="aspect-square relative mb-6 grayscale group-hover:grayscale-0 transition-all">
                                                 <img src={p.image_url || ''} alt={p.name} className="w-full h-full object-contain" />
                                             </div>
-                                            <div className="text-[10px] font-black uppercase tracking-widest text-cyan-600 mb-2">% {p.matchScore} Uyum</div>
+                                            <div className="text-[10px] font-black uppercase tracking-widest text-cyan-600 mb-2">{t('needsWizard.matchScore', { score: p.matchScore })}</div>
                                             <h4 className="font-bold text-slate-900 mb-2 line-clamp-2">{p.name}</h4>
                                             <p className="text-xs text-slate-400 font-light">{p.brand}</p>
                                         </Link>
@@ -312,8 +312,8 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             )}
 
                             <div className="pt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                                <button onClick={() => setState(prev => ({ ...prev, step: 1 }))} className="focus-ring px-10 py-5 rounded-2xl border border-slate-200 text-slate-900 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all">Yeniden Başla</button>
-                                <Link href={Routes.contact()} className="px-10 py-5 rounded-2xl bg-cyan-500 text-slate-950 font-black uppercase text-[10px] tracking-widest hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/20">Özel Teklif İste</Link>
+                                <button onClick={() => setState(prev => ({ ...prev, step: 1 }))} className="focus-ring px-10 py-5 rounded-2xl border border-slate-200 text-slate-900 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all">{t('needsWizard.restart')}</button>
+                                <Link href={Routes.contact()} className="px-10 py-5 rounded-2xl bg-cyan-500 text-slate-950 font-black uppercase text-[10px] tracking-widest hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/20">{t('needsWizard.customOffer')}</Link>
                             </div>
                         </div>
                     )}

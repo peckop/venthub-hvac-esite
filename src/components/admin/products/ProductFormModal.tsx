@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useI18n } from '@/i18n/I18nProvider';
 import * as Dialog from '@radix-ui/react-dialog'
 import { X, Loader2, Save } from 'lucide-react'
 import { useForm } from 'react-hook-form'
@@ -36,6 +37,7 @@ interface ProductFormModalProps {
 }
 
 const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, onClose, onSuccess }) => {
+    const { t } = useI18n();
     const [loading, setLoading] = useState(false)
     const [categories, setCategories] = useState<DbCategory[]>([])
 
@@ -120,7 +122,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
             onSuccess()
             onClose()
         } catch {
-            toast.error('İşlem başarısız')
+            toast.error(t('admin.common.error'))
         } finally {
             setLoading(false)
         }
@@ -135,7 +137,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                 <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl z-[1001] p-6">
                     <div className="flex items-center justify-between mb-6">
                         <Dialog.Title className="text-xl font-bold text-industrial-gray">
-                            {_productId ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}
+                            {_productId ? t('admin.common.edit') : t('admin.common.addNewProduct')}
                         </Dialog.Title>
                         <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                             <X size={20} />
@@ -145,7 +147,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-slate-500 uppercase">Ürün Adı</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.products.form.name')}</label>
                                 <input {...register('name')} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
                                 {errors.name && <p className="text-red-500 text-[10px]">{errors.name.message}</p>}
                             </div>
@@ -158,31 +160,31 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-slate-500 uppercase">Kategori</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.products.form.category')}</label>
                                 <select {...register('category_id')} className="w-full px-4 py-2 border rounded-lg focus:outline-none">
-                                    <option value="">Seçiniz</option>
+                                    <option value="">{t('admin.products.form.select')}</option>
                                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-slate-500 uppercase">Durum</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.common.status')}</label>
                                 <select {...register('status')} className="w-full px-4 py-2 border rounded-lg focus:outline-none">
-                                    <option value="active">Aktif</option>
-                                    <option value="out_of_stock">Stok Yok</option>
-                                    <option value="inactive">Pasif</option>
+                                    <option value="active">{t('admin.common.active')}</option>
+                                    <option value="out_of_stock">{t('admin.products.form.outOfStock')}</option>
+                                    <option value="inactive">{t('admin.common.passive')}</option>
                                 </select>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-slate-500 uppercase">Fiyat</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.products.form.price')}</label>
                                 <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
                             </div>
                         </div>
 
                         <div className="flex justify-end gap-3 mt-8">
-                            <button type="button" onClick={onClose} className="px-6 py-2 border rounded-lg font-bold hover:bg-slate-50 transition-colors">Vazgeç</button>
+                            <button type="button" onClick={onClose} className="px-6 py-2 border rounded-lg font-bold hover:bg-slate-50 transition-colors">{t('admin.common.cancel')}</button>
                             <button type="submit" disabled={loading} className="px-6 py-2 bg-primary-navy text-white rounded-lg font-bold flex items-center gap-2 hover:bg-blue-700 transition-colors">
                                 {loading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-                                Kaydet
+                                {t('admin.common.save')}
                             </button>
                         </div>
                     </form>

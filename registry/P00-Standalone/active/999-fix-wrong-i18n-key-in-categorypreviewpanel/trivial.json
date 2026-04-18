@@ -1,0 +1,35 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "antigravity",
+  "date": "2026-04-16",
+  "task_id": "P00-999",
+  "task_title": "Fix wrong i18n key in CategoryPreviewPanel",
+  "description": "Fix incorrect i18n namespace: t('common.priceRange') does not exist. Correct key is t('category.priceRange') which is present in both tr.ts and en.ts.",
+  "files_modified": [
+    "src/components/products/CategoryPreviewPanel.tsx"
+  ],
+  "allowed_paths": [
+    "src/components/products/CategoryPreviewPanel.tsx"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": ["fix"],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "",
+      "passed": false
+    }
+  ],
+  "all_passed": false
+}
