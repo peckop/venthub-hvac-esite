@@ -23,3 +23,7 @@
 **Vulnerability:** The notification-service Supabase Edge Function lacked authorization entirely. There was no checks for an `Authorization` header, meaning anyone could invoke the endpoint to send arbitrary WhatsApp, SMS, or Emails, resulting in abuse, phishing and Twilio/Resend cost spikes.
 **Learning:** Supabase Edge Functions default to being open and executing securely within Deno. Any custom admin API endpoint needs explicit code handling the auth/JWT validation by fetching `user_profiles.role` or trusting the `SUPABASE_SERVICE_ROLE_KEY`.
 **Prevention:** Make sure admin/internal endpoints (like `notification-service`) implement system bypass using `SUPABASE_SERVICE_ROLE_KEY` or enforce RBAC via `authClient.auth.getUser()`. Never assume a function is private just because it's undocumented.
+## 2024-04-17 - Missing authorization checks in Edge Functions
+
+**Learning:** System-invoked Supabase Edge functions (like cron jobs or webhook endpoints acting internally) must actively verify `req.headers.get('Authorization')` strictly matches `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`. Otherwise, they are vulnerable to unauthorized external invocations that could brute force system actions or leak information.
+**Action:** Next time creating or auditing an edge function that is internal-only or cron-invoked, ensure to check for the Authorization header match before proceeding with operations.
