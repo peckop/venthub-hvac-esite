@@ -34,7 +34,7 @@ const SilentFanFAQ: React.FC = () => {
                             >
                                 <button
                                     onClick={() => setOpenIndex(isOpen ? null : index)}
-                                    className="w-full text-left px-6 py-5 flex items-center justify-between gap-4 focus:outline-none"
+                                    className="focus-ring w-full text-left px-6 py-5 flex items-center justify-between gap-4"
                                 >
                                     <span className={`text-lg font-bold ${isOpen ? 'text-blue-600' : 'text-slate-900'}`}>
                                         {item.q}
