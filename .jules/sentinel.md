@@ -27,3 +27,7 @@
 
 **Learning:** System-invoked Supabase Edge functions (like cron jobs or webhook endpoints acting internally) must actively verify `req.headers.get('Authorization')` strictly matches `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`. Otherwise, they are vulnerable to unauthorized external invocations that could brute force system actions or leak information.
 **Action:** Next time creating or auditing an edge function that is internal-only or cron-invoked, ensure to check for the Authorization header match before proceeding with operations.
+
+## 2026-04-08 - Fixed Edge Function Auth Bypass and Initplan Vulnerability
+**Learning:** System endpoints (e.g. `order-confirmation`, `stock-alert`) must not restrict callers *only* to `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` without fallback. If they do, they block legitimate admin callers using standard session tokens (which triggers 401s). The correct pattern is to check if the header matches the Service Role Key for system bypass, and if false, construct an auth client using `SUPABASE_ANON_KEY`, call `auth.getUser()`, and verify RBAC. Also, using `id = auth.uid()` in RLS policies breaks PostgreSQL initplan caching; it must always be wrapped as `id = (SELECT auth.uid())`.
+**Action:** Always implement a system bypass fallback that verifies the caller via `auth.getUser()` and role lookup when designing webhook or cron edge functions. Also, always wrap `auth.uid()` in a sub-select when defining Row Level Security.
