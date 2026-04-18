@@ -9,6 +9,17 @@ declare global {
   }
 }
 
+/**
+ * Safely tracks an analytics event by delegating to GA4 (`gtag`) or GTM (`dataLayer`).
+ * If neither is available, it gracefully falls back to a no-op or logs to the console in development/debug modes.
+ *
+ * @param name - The name of the event to track (e.g., 'add_to_cart')
+ * @param params - Additional parameters/metadata for the event (defaults to an empty object)
+ * @returns void
+ *
+ * @example
+ * trackEvent('checkout_started', { currency: 'TRY', value: 1500 })
+ */
 export function trackEvent(name: string, params: Record<string, unknown> = {}) {
   try {
     if (typeof window === 'undefined') return

@@ -11,3 +11,6 @@
 ## 2024-05-18 - [Loose Number Parsing in safeNumber]
 **Learning:** `safeNumber` relies on `parseFloat` for strings, which extracts valid numbers even if the string ends with non-numeric characters (e.g., `'42px'` -> `42`, `'3.14.15'` -> `3.14`).
 **Action:** When documenting type converters, explicitly mention if loose string parsing (`parseFloat`/`parseInt`) is used instead of strict `Number()` coercion, as this affects CSS parsing, multi-decimal values, and potential invalid data.
+## 2024-05-18 - Batch documentation truncation limits
+**Learning:** When reading files in bash with commands like `cat`, output will be truncated if the file size exceeds roughly 1000 characters. Trying to document these files based on partial knowledge violates the groundedness rule.
+**Action:** Use specific read tools (`read_file`) or specific line limits in bash (`sed -n '1,30p' <file>`) to ensure the entire function structure and return statements are explicitly verified before generating accurate TSDocs.
