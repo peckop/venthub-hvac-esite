@@ -20,3 +20,6 @@
 ## 2024-05-25 - Avoid spreading mapped arrays into Math.max
 **Learning:** Using `Math.max(...array.map(fn))` on potentially large datasets like `chartData` creates intermediate arrays and can throw `RangeError: Maximum call stack size exceeded`.
 **Action:** Use a single-pass `for` loop or `reduce` to find the maximum value, which avoids memory bloat and call stack overflow.
+## 2025-05-18 - Avoid array micro-optimizations and upserts for N+1
+**Learning:** Replacing `.map` and `.filter` with `for` loops or `reduce` degrades readability for zero macro-level gain and is rejected. Fabricating payloads to use `.upsert()` for bulk updates causes severe data corruption by overwriting missing columns with empty strings.
+**Action:** Solve N+1 queries mathematically at the network level by refactoring multiple discrete `.select()` calls into a single Supabase relational query (e.g., `supabase.from('orders').select('*, items(*)')`).

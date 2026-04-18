@@ -443,3 +443,9 @@ img {
 .tab-inactive-premium:hover {
   color: rgba(255, 255, 255, 0.75);
 }
+
+@layer utilities {
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2;
+  }
+}

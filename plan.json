@@ -1,0 +1,23 @@
+{
+  "phase_1": {
+    "endpoints": [
+      "supabase/functions/release-expired-reservations/index.ts",
+      "supabase/functions/stock-alert/index.ts",
+      "supabase/functions/delivery-notification/index.ts",
+      "supabase/functions/order-confirmation/index.ts",
+      "supabase/functions/return-status-notification/index.ts",
+      "supabase/functions/shipping-notification/index.ts"
+    ],
+    "action": "Add an exact Authorization header match check.",
+    "logic": "if (req.headers.get('Authorization') !== `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`) { return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }) }",
+    "details": "Ensures these system-invoked Edge Functions are strictly accessible only via backend systems holding the service key. It checks that the Authorization header matches exactly."
+  },
+  "phase_2": {
+    "endpoints": [
+      "supabase/functions/apply-coupon/index.ts"
+    ],
+    "action": "Add authentication requirement.",
+    "logic": "const authHeader = req.headers.get('Authorization'); const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { global: { headers: { Authorization: authHeader } } }); const { data: { user }, error } = await authClient.auth.getUser(); if (error || !user) return 401;",
+    "details": "Requires public callers to be authenticated to prevent brute forcing coupons."
+  }
+}

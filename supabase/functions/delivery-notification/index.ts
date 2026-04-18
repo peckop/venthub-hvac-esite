@@ -22,7 +22,7 @@ async function loadTemplate() {
 
 serve(async (req) => {
   const origin = req.headers.get('origin') ?? '*'
-  const cors = {
+  const corsHeaders = {
     'Access-Control-Allow-Origin': origin,
     'Vary': 'Origin',
     'Access-Control-Allow-Headers': req.headers.get('access-control-request-headers') ?? 'authorization, x-client-info, apikey, content-type',
@@ -30,12 +30,47 @@ serve(async (req) => {
     'Access-Control-Max-Age': '86400',
   }
 
-  if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
-  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...cors, 'Content-Type': 'application/json' } })
+  if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: corsHeaders })
+  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+
+    const authHeader = req.headers.get('Authorization')
+    let isAuthorized = false
+    if (authHeader === `Bearer ${serviceKey}`) {
+      isAuthorized = true
+    } else if (authHeader) {
+      try {
+        const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
+        const authClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
+        const { data: { user } } = await authClient.auth.getUser()
+        if (user) {
+          const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+            headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+          })
+          if (roleCheck.ok) {
+            const arr = await roleCheck.json().catch(() => [])
+            const role = arr[0]?.role
+            if (role === 'admin' || role === 'superadmin') {
+              isAuthorized = true
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Auth fallback error:', err)
+      }
+    }
+
+    if (!isAuthorized) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+    }
+
     const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
     const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
 
@@ -45,7 +80,7 @@ serve(async (req) => {
     let customer_name = body.customer_name
     let order_number = body.order_number
 
-    if (!order_id) return new Response(JSON.stringify({ error: 'missing_fields', missing: ['order_id'] }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
+    if (!order_id) return new Response(JSON.stringify({ error: 'missing_fields', missing: ['order_id'] }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
     // Derive info if missing
     if ((!customer_email || !customer_name || !order_number) && supabaseUrl && serviceKey) {
@@ -64,7 +99,7 @@ serve(async (req) => {
     }
 
     if (!customer_email || !customer_name) {
-      return new Response(JSON.stringify({ error: 'customer_info_missing' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ error: 'customer_info_missing' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     const prettyOrderNo = order_number ? `#${order_number.split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
@@ -86,7 +121,7 @@ serve(async (req) => {
     }
 
     if (!resendApiKey) {
-      return new Response(JSON.stringify({ disabled: true }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ disabled: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     const resp = await fetch('https://api.resend.com/emails', {
@@ -96,7 +131,7 @@ serve(async (req) => {
     })
     if (!resp.ok) {
       const t = await resp._text().catch(()=> '')
-      return new Response(JSON.stringify({ error: 'send_failed', body: t }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ error: 'send_failed', body: t }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
     const result = await resp.json().catch(()=>({}))
 
@@ -111,9 +146,9 @@ serve(async (req) => {
       }
     } catch {}
 
-    return new Response(JSON.stringify({ ok: true, order_id, subject, result }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ ok: true, order_id, subject, result }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   } catch (_e: unknown) {
     const msg = _e instanceof Error ? _e.message : String(_e)
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 })

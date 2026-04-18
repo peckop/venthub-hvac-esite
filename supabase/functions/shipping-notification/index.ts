@@ -65,6 +65,41 @@ serve(async (req) => {
 
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || ''
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+
+    const authHeader = req.headers.get('Authorization')
+    let isAuthorized = false
+    if (authHeader === `Bearer ${SERVICE_KEY}`) {
+      isAuthorized = true
+    } else if (authHeader) {
+      try {
+        const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
+        const authClient = createClient(SUPABASE_URL, anonKey, { global: { headers: { Authorization: authHeader } } })
+        const { data: { user } } = await authClient.auth.getUser()
+        if (user) {
+          const roleCheck = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+            headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
+          })
+          if (roleCheck.ok) {
+            const arr = await roleCheck.json().catch(() => [])
+            const role = arr[0]?.role
+            if (role === 'admin' || role === 'superadmin') {
+              isAuthorized = true
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Auth fallback error:', err)
+      }
+    }
+
+    if (!isAuthorized) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+    }
+
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
     const EMAIL_FROM = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
 
