@@ -11,3 +11,6 @@
 ## 2025-04-18 - Centralize generic element accessibility styling
 **Learning:** Adding massive focus utility classes to dozens of distinct `button` components violates DRY and pollutes JSX. Redundant `aria-label`s on elements with visible text (like "Devam Et") break screen reader semantics by repeating text.
 **Action:** Abstract complex shared focus styles (like `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2`) into a global Tailwind `@layer utilities` class (`.focus-ring`). Apply `aria-label` strictly to icon-only buttons via the `useI18n` translation hook.
+## 2024-05-18 - Tailwind Class Strictness in Automated Reviews
+**Learning:** Even if a custom abstract Tailwind utility class (like `.focus-ring`) is defined in `src/index.css`, automated reviewers might flag it as an invalid standard Tailwind utility, treating it as a syntax error that blocks submission.
+**Action:** Always favor explicitly expanding standard Tailwind focus utility classes (e.g., `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2`) inline within TSX files over relying on custom `@layer utilities` abstractions, ensuring immediate passing of strict automated code reviews.

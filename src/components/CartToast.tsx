@@ -68,7 +68,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                 {product.name}
               </p>
             </div>
-            <button onClick={onClose} className="text-steel-gray hover:text-industrial-gray" aria-label={t('common.close')}>
+            <button onClick={onClose} className="text-steel-gray hover:text-industrial-gray focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 rounded-md" aria-label={t('common.close')}>
               <X size={16} />
             </button>
           </div>
@@ -95,7 +95,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                 </div>
                 <button
                   onClick={() => { setShowChoiceModal(false); onClose() }}
-                  className="ml-auto text-steel-gray hover:text-industrial-gray"
+                  className="ml-auto text-steel-gray hover:text-industrial-gray focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 rounded-md"
                   aria-label={t('common.close')}
                 >
                   <X size={20} />
@@ -121,7 +121,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
               <div className="space-y-3">
                 <button
                   onClick={handleContinueShopping}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold rounded-lg transition-colors"
+                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold rounded-lg transition-colors"
                   aria-label={t('cartToast.continue')}
                 >
                   <ShoppingBag size={20} />
@@ -130,7 +130,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
 
                 <Link href={Routes.cart()} onClick={handleGoToCart}>
                   <button 
-                    className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
+                    className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
                     aria-label={t('cartToast.goToCart')}
                   >
                     <ArrowRight size={20} />
