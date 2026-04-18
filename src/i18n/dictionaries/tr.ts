@@ -1,5 +1,6 @@
 export const tr = {
   common: {
+    addToProject: 'Proje Listesine Ekle',
     loadingApp: 'VentHub yükleniyor... ',
     loading: 'Yükleniyor...',
     // Navigation & generic
@@ -671,8 +672,48 @@ export const tr = {
     }
   },
   admin: {
+    authority: {
+      leftSideEski: "Sol Taraf (Eski)",
+      labelTraditional: "Etiket (Örn: Geleneksel)",
+      rightSideYeni: "Sağ Taraf (Yeni)",
+      labelVenthub: "Etiket (Örn: VentHub Farkı)"
+    },
+    categories: {
+      imageDesc: "Kategori görselleri ana sayfa ve kategori listelerinde kullanılır.",
+      resolutionLabel: "Önerilen çözünürlük:",
+      supportedFormatsLabel: "Desteklenen formatlar:",
+      quickMetrics: "Hızlı Metrikler",
+      quickMetricsDesc: "Bu alanlar kategori kartlarında kısa teknik bilgi olarak gösterilir.",
+      metric1Label: "Metrik 1 Etiketi",
+      metric1Value: "Metrik 1 Değeri",
+      metric1LabelPlaceholder: "Örn: Kapasite",
+      metric1ValuePlaceholder: "Örn: 20.000 m³/h",
+      metric2Label: "Metrik 2 Etiketi",
+      metric2Value: "Metrik 2 Değeri",
+      metric2LabelPlaceholder: "Örn: Güç",
+      metric2ValuePlaceholder: "Örn: 1.5 kW",
+      imageLabel: "Kategori Görseli",
+      clickToUpload: "Yüklemek için tıklayın",
+      uploading: "Yükleniyor..."
+    },
+    products: {
+      form: {
+        name: "Ürün Adı",
+        category: "Kategori",
+        select: "Seçiniz",
+        outOfStock: "Stok Yok",
+        price: "Fiyat"
+      }
+    },
     common: {
+      yes: "Evet",
+      no: "Hayır",
       saveChanges: "Değişiklikleri Kaydet",
+      addLine: "Satır Ekle",
+      addCard: "Kart Ekle",
+      imageUrl: "Görsel URL",
+      imageUrlWithManual: "Görsel URL (veya Manuel Giriş)",
+      addNewProduct: "Yeni Ürün Ekle",
       cancel: "İptal",
       delete: "Sil",
       edit: "Düzenle",
@@ -1898,6 +1939,36 @@ export const tr = {
     }
   },
   needsWizard: {
+    coldStorage: "Soğuk Hava Deposu",
+    coldStorageDesc: "Soğuk zincir koruması",
+    coldStorageTip: "Gıda güvenliği ve enerji tasarrufu sağlar",
+    industrial: "Endüstriyel Tesis",
+    industrialDesc: "Fabrika, depo, lojistik",
+    industrialTip: "Endüstriyel gereksinimlere uygun güç",
+    retail: "Market / Süpermarket",
+    retailDesc: "Soğutucu reyonlar",
+    retailTip: "Soğutucu reyonlardan sıcak havayı uzak tutar",
+    step1Title: "Kullanım alanı neresi?",
+    step1Desc: "Size en uygun teknik özellikleri belirlemek için önce uygulama alanını seçin.",
+    step2Title: "Kapı ölçülerini girin",
+    step2Desc: "Hava perdesinin tüm açıklığı kapatması kritik önemdedir.",
+    widthMeter: "Genişlik (Metre)",
+    heightMeter: "Yükseklik (Metre)",
+    step3Title: "Isıtıcı ihtiyacı var mı?",
+    heatingYesDesc: "Kışın konfor için",
+    heatingNoDesc: "Sadece hava bariyeri",
+    notSure: "Emin Değilim",
+    consultUs: "Bize danışın",
+    step6Title: "Size En Uygun Modeller",
+    step6Desc: "Mühendislik kriterlerine göre filtrelenmiş öneriler.",
+    analyzing: "Modeller Analiz Ediliyor...",
+    matchScore: "% {{score}} Uyum",
+    restart: "Yeniden Başla",
+    customOffer: "Özel Teklif İste",
+    entranceDoor: 'Giriş Kapısı',
+    next: 'Devam Et',
+    entranceDesc: 'Mağaza, restoran, otel girişi',
+    entranceTip: 'Müşteri konforunu artırır, enerji kaybını önler',
     start: 'Başla',
     close: 'Kapat',
     insulation: 'İzolasyon ve tasarruf için',

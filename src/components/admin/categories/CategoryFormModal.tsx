@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useI18n } from '@/i18n/I18nProvider';
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Tabs from '@radix-ui/react-tabs'
 import { useForm } from 'react-hook-form'
@@ -50,6 +51,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     category,
     onSuccess
 }) => {
+    const { t } = useI18n();
     const [loading, setLoading] = useState(false)
     const [previewImage, setPreviewImage] = useState<string | null>(null)
     const [uploadingImage, setUploadingImage] = useState(false)
@@ -361,7 +363,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                 <Tabs.Content value="content" className="space-y-8">
                                     {/* Image Selection */}
                                     <div className="space-y-4">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Kategori Görseli</label>
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.imageLabel')}</label>
                                         <div className="flex items-start gap-8">
                                             <div className="w-48 h-48 rounded-2xl bg-white/5 border-2 border-dashed border-white/10 overflow-hidden flex items-center justify-center relative group">
                                                 {previewImage ? (
@@ -384,7 +386,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                 ) : (
                                                     <div className="text-center p-6">
                                                         <Upload size={32} className="mx-auto text-slate-600 mb-2" />
-                                                        <span className="text-[10px] font-bold text-slate-500 leading-tight">Yüklemek için tıklayın</span>
+                                                        <span className="text-[10px] font-bold text-slate-500 leading-tight">{t('admin.categories.clickToUpload')}</span>
                                                     </div>
                                                 )}
                                                 <input 
@@ -397,18 +399,18 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                 {uploadingImage && (
                                                     <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center">
                                                         <Loader2 className="animate-spin text-cyan-400 mb-2" />
-                                                        <span className="text-[8px] font-black text-white uppercase tracking-widest">Yükleniyor...</span>
+                                                        <span className="text-[8px] font-black text-white uppercase tracking-widest">{t('admin.categories.uploading')}</span>
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="flex-1 space-y-4">
                                                 <p className="text-xs text-slate-500 leading-relaxed">
-                                                    Kategori görselleri ana sayfa ve kategori listelerinde kullanılır. <br/>
-                                                    Önerilen çözünürlük: <span className="text-white font-bold">800x800px</span>. <br/>
-                                                    Desteklenen formatlar: <span className="text-white font-bold">WebP, PNG, JPG</span>.
+                                                    {t('admin.categories.imageDesc')} <br/>
+                                                    {t('admin.categories.resolutionLabel')} <span className="text-white font-bold">800x800px</span>. <br/>
+                                                    {t('admin.categories.supportedFormatsLabel')} <span className="text-white font-bold">WebP, PNG, JPG</span>.
                                                 </p>
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Görsel URL (veya Manuel Giriş)</label>
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.common.imageUrlWithManual')}</label>
                                                     <input 
                                                         {...form.register('image_url')}
                                                         className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2 text-[10px] focus:outline-none focus:border-cyan-500/50 font-mono"
@@ -423,33 +425,33 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                     <div className="space-y-4 pt-4">
                                         <div className="flex items-center gap-2 mb-2">
                                             <div className="w-1 h-4 bg-cyan-500 rounded-full" />
-                                            <label className="text-[10px] font-black text-white uppercase tracking-widest">Hızlı Metrikler</label>
+                                            <label className="text-[10px] font-black text-white uppercase tracking-widest">{t('admin.categories.quickMetrics')}</label>
                                         </div>
-                                        <p className="text-[10px] text-slate-500 uppercase font-medium tracking-tight mt-1">Bu alanlar kategori kartlarında kısa teknik bilgi olarak gösterilir.</p>
+                                        <p className="text-[10px] text-slate-500 uppercase font-medium tracking-tight mt-1">{t('admin.categories.quickMetricsDesc')}</p>
                                         
                                         <div className="grid grid-cols-2 gap-8">
                                             <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
                                                 <div className="space-y-1">
-                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Metrik 1 Etiketi</label>
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric1Label')}</label>
                                                     <input 
                                                         {...form.register('metric1_label')}
                                                         className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all font-medium"
-                                                        placeholder="Örn: Kapasite"
+                                                        placeholder={t('admin.categories.metric1LabelPlaceholder')}
                                                     />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Metrik 1 Değeri</label>
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric1Value')}</label>
                                                     <input 
                                                         {...form.register('metric1_value')}
                                                         className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all font-bold text-cyan-400"
-                                                        placeholder="Örn: 20.000 m³/h"
+                                                        placeholder={t('admin.categories.metric1ValuePlaceholder')}
                                                     />
                                                 </div>
                                             </div>
 
                                             <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
                                                 <div className="space-y-1">
-                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Metrik 2 Etiketi</label>
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric2Label')}</label>
                                                     <input 
                                                         {...form.register('metric2_label')}
                                                         className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all font-medium"
@@ -457,7 +459,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Metrik 2 Değeri</label>
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric2Value')}</label>
                                                     <input 
                                                         {...form.register('metric2_value')}
                                                         className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all font-bold text-cyan-400"

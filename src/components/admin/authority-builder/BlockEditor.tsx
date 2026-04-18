@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useI18n } from '@/i18n/I18nProvider';
 import { 
   AuthorityBlock,
   HeroBlock,
@@ -25,6 +26,7 @@ interface BlockEditorProps {
 }
 
 export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
+  const { t } = useI18n();
   const handleContentChange = (fields: Partial<Record<string, unknown>>) => {
     const updatedBlock = {
       ...block,
@@ -105,7 +107,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                   onClick={addRow}
                   className="flex items-center gap-1 text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full transition-colors"
                 >
-                  <Plus size={12} /> Satır Ekle
+                  <Plus size={12} /> {t('admin.common.addLine')}
                 </button>
               </div>
 
@@ -186,7 +188,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                   onClick={addItem}
                   className="flex items-center gap-1 text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full transition-colors"
                 >
-                  <Plus size={12} /> Kart Ekle
+                  <Plus size={12} /> {t('admin.common.addCard')}
                 </button>
               </div>
 
@@ -250,17 +252,17 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
             
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-3 p-3 bg-slate-50/50 rounded-xl border border-slate-100">
-                    <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Sol Taraf (Eski)</label>
+                    <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{t('admin.authority.leftSideEski')}</label>
                     <div className="grid gap-2">
-                        <input className={inputClass} placeholder="Etiket (Örn: Geleneksel)" value={compContent.leftLabel} onChange={(e) => handleContentChange({ leftLabel: e.target.value })} />
-                        <input className={inputClass} placeholder="Görsel URL" value={compContent.leftImage} onChange={(e) => handleContentChange({ leftImage: e.target.value })} />
+                        <input className={inputClass} placeholder={t('admin.authority.labelTraditional')} value={compContent.leftLabel} onChange={(e) => handleContentChange({ leftLabel: e.target.value })} />
+                        <input className={inputClass} placeholder={t('admin.common.imageUrl')} value={compContent.leftImage} onChange={(e) => handleContentChange({ leftImage: e.target.value })} />
                     </div>
                 </div>
                 <div className="space-y-3 p-3 bg-indigo-50/20 rounded-xl border border-indigo-100/50">
-                    <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Sağ Taraf (Yeni)</label>
+                    <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">{t('admin.authority.rightSideYeni')}</label>
                     <div className="grid gap-2">
-                        <input className={inputClass} placeholder="Etiket (Örn: VentHub Farkı)" value={compContent.rightLabel} onChange={(e) => handleContentChange({ rightLabel: e.target.value })} />
-                        <input className={inputClass} placeholder="Görsel URL" value={compContent.rightImage} onChange={(e) => handleContentChange({ rightImage: e.target.value })} />
+                        <input className={inputClass} placeholder={t('admin.authority.labelVenthub')} value={compContent.rightLabel} onChange={(e) => handleContentChange({ rightLabel: e.target.value })} />
+                        <input className={inputClass} placeholder={t('admin.common.imageUrl')} value={compContent.rightImage} onChange={(e) => handleContentChange({ rightImage: e.target.value })} />
                     </div>
                 </div>
             </div>
