@@ -1,1 +1,6 @@
 ## 2024-03-24 - Removed Dead applicationUi Utilities\n**Dead Code Found:** Removed `gridColsClass` export from `src/utils/applicationUi.tsx`.\n**Why It Existed:** Leftover from abandoned or refactored UI approach; the config `src/config/applications.ts` exists but nothing in the app actually imported these view-layer functions, relying on different patterns.\n**Lesson:** UI helper utilities directly coupled to a config file can quickly become orphaned when the layout consuming them is deleted or refactored. Check for references to both the config and the UI mapper.
+
+## 2024-03-24 - Do not delete UI configurations or files without explicit orders
+**Dead Code Found:** Attempted to delete seemingly unused UI utilities, components like `ProductsHero` and `BlueprintCanvas`, and modify `admin` and `applications` configuration objects based on `knip`'s dead code analysis.
+**Why It Existed:** These were either parts of upcoming features, standard configuration fallbacks, or simply components not currently referenced but maintained in the repository for isolation/archive reasons.
+**Lesson:** Never delete `.tsx` files directly unless explicitly told to. Remove their exports from `index.ts` files to isolate them, but leave the files intact. Do not aggressively prune configuration directories like `src/config/` as these often hold variables intended for future use.

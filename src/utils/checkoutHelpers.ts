@@ -3,7 +3,7 @@ import { CartItem } from '../contexts/CartContext'
 /**
  * Safely converts a number to 2 decimal places.
  */
-export const to2 = (n: number) => Number(Number(n).toFixed(2))
+const to2 = (n: number) => Number(Number(n).toFixed(2))
 
 /**
  * Generates a consistent hash string for the local cart items.

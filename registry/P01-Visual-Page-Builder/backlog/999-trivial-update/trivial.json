@@ -1,0 +1,50 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "",
+  "date": "",
+  "task_id": "P01-999",
+  "task_title": "Trivial Update",
+  "description": "",
+  "files_modified": [],
+  "allowed_paths": [
+    ".agent/bypass_log.md",
+    ".archive/components/ProductFlow/LazyProductFlow.tsx",
+    ".archive/components/ProductFlow/ProductFlow.tsx",
+    ".archive/components/ProductFlow/ProductFlowSimple.tsx",
+    ".archive/components/ProductFlow/ProductFlowWrapper.tsx",
+    ".archive/components/ProductFlow/TickerCardLane.tsx",
+    ".archive/components/ProductFlow/TickerLane.tsx",
+    ".archive/components/ui/SafeComponent.tsx",
+    "package.json",
+    "pnpm-lock.yaml",
+    "src/views/HomePage.tsx",
+    "src/components/ProductFlow.tsx",
+    "src/components/ProductFlowSimple.tsx",
+    "src/components/LazyProductFlow.tsx",
+    "src/components/ProductFlowWrapper.tsx",
+    "src/components/TickerLane.tsx",
+    "src/components/TickerCardLane.tsx",
+    "src/components/ui/SafeComponent.tsx"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": [],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "",
+      "passed": false
+    }
+  ],
+  "all_passed": false
+}
