@@ -48,7 +48,15 @@ serve(async (req: Request) => {
     return new Response(JSON.stringify({ error: 'Missing Supabase Config' }), { status: 500, headers: corsHeaders })
   }
 
-  const supabase = createClient(supabaseUrl, serviceRoleKey)
+
+    if (req.headers.get('Authorization') !== `Bearer ${serviceRoleKey}`) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey)
 
   try {
     let alertResults = []
