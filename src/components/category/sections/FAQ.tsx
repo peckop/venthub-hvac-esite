@@ -64,7 +64,7 @@ const FAQ: React.FC = () => {
                             >
                                 <button
                                     onClick={() => setOpenIndex(isOpen ? null : index)}
-                                    className={`w-full text-left p-5 flex items-center justify-between gap-4 transition-colors ${isOpen ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'
+                                    className={`focus-ring w-full text-left p-5 flex items-center justify-between gap-4 transition-colors ${isOpen ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'
                                         }`}
                                 >
                                     <h3 className={`font-semibold ${isOpen ? 'text-blue-700' : 'text-gray-900'}`}>

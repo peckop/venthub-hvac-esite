@@ -74,7 +74,7 @@ const HowItWorks: React.FC = () => {
                                     key={index}
                                     type="button"
                                     onClick={() => setActiveStep(isActive ? -1 : index)}
-                                    className={`relative z-10 w-full text-left p-5 rounded-xl border-2 transition-all duration-300 cursor-pointer ${isActive
+                                    className={`focus-ring relative z-10 w-full text-left p-5 rounded-xl border-2 transition-all duration-300 cursor-pointer ${isActive
                                         ? 'border-blue-500 bg-blue-50 shadow-lg'
                                         : 'border-gray-200 bg-white hover:border-blue-300'
                                         }`}
