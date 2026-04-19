@@ -581,6 +581,17 @@ const TYPICAL_JET_FAN = {
     diameter: 0.4     // m
 }
 
+/**
+ * Calculates the required volume, airflow, and fan parameters for a jet fan system in parking or tunnel applications.
+ * The calculations depend on the ventilation mode, targeting either normal air circulation or emergency smoke extraction.
+ *
+ * @param input - The dimensions, application type (parking/tunnel), and ventilation mode (normal/smoke).
+ * @returns The resulting volume, necessary airflow, required air changes per hour (ACH), total thrust, and fan count.
+ *
+ * @example
+ * calculateJetFan({ length: 50, width: 20, height: 3, applicationType: 'parking', ventilationMode: 'smoke', carCapacity: 50, trafficFlowPerHour: 100 })
+ * // returns { volume: 3000, requiredAirflow: 30000, ach: 10, totalThrust: 20, fanCount: 2, ... }
+ */
 export function calculateJetFan(input: JetFanInput): JetFanResult {
     const { length, width, height, applicationType, ventilationMode } = input
 
