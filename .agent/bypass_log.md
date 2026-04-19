@@ -325,3 +325,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-19 17:59:03
+- **Commit:** `2f1049d9`
+- **Mesaj:** feat(audit): Enterprise Audit v1.1 — MRI entegrasyonu ve --layers parametresi
+- **Değişen Dosyalar:**
+
+
