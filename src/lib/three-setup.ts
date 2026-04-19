@@ -28,15 +28,15 @@ if (typeof window !== 'undefined') {
 
     // 2. Attempt to shim THREE.Clock for functionality if possible.
     try {
-        const threeObj = THREE as typeof THREE & { Clock?: { __shimmed?: boolean } };
-        if (threeObj.Clock && !threeObj.Clock.__shimmed) {
+        const clock = THREE.Clock as unknown as { __shimmed?: boolean } | undefined;
+        if (clock && !clock.__shimmed) {
             const OriginalClock = THREE.Clock;
             const SilentClock = function() {
                 return createTimerClock();
             };
             
-            SilentClock.prototype = OriginalClock.prototype;
-            (SilentClock as typeof SilentClock & { __shimmed?: boolean }).__shimmed = true;
+            SilentClock.prototype = (OriginalClock as unknown as (...args: unknown[]) => unknown).prototype;
+            Object.defineProperty(SilentClock, '__shimmed', { value: true, writable: true, configurable: true });
 
             Object.defineProperty(THREE, 'Clock', {
                 value: SilentClock,

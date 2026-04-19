@@ -21,7 +21,8 @@ import DOMPurify from 'isomorphic-dompurify';
 // --- YARDIMCI BİLEŞENLER ---
 
 const IconRenderer = ({ name, className }: { name: string, className?: string }) => {
-  const Icon = (LucideIcons as typeof LucideIcons & Record<string, React.ComponentType<{ className?: string }>>)[name.charAt(0).toUpperCase() + name.slice(1)] || LucideIcons.Zap;
+  const iconName = (name.charAt(0).toUpperCase() + name.slice(1)) as keyof typeof LucideIcons;
+  const Icon = (LucideIcons[iconName] as React.ComponentType<{ className?: string }>) || LucideIcons.Zap;
   return <Icon className={className} />;
 };
 

@@ -25,10 +25,7 @@ const missingEnv = !SUPABASE_URL || !SUPABASE_ANON_KEY
 if (missingEnv) {
   console.error('CRITICAL: Supabase config missing. App will strictly fail on data fetch but should render UI.')
   if (typeof window !== 'undefined') {
-    interface VentHubWindow extends Window {
-      __SUPABASE_CONFIG_ERROR__?: boolean
-    }
-    (window as VentHubWindow & typeof globalThis).__SUPABASE_CONFIG_ERROR__ = true
+    window.__SUPABASE_CONFIG_ERROR__ = true
   }
 }
 
