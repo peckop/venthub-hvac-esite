@@ -307,3 +307,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-19 11:57:22
+- **Commit:** `c488511d`
+- **Mesaj:** chore: update bypass log
+- **Değişen Dosyalar:**
+
+

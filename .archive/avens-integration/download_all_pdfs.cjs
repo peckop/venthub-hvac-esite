@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 /**
  * AVenS Katalog PDF İndirici
  * Tüm kategorilerdeki PDF'leri indirir

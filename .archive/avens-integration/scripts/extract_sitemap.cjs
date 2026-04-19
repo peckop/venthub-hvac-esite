@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 /**
  * Avens Site Haritası Çıkarma Scripti
  */
