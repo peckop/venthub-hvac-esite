@@ -16,13 +16,11 @@ concurrency:
 jobs:
   migrate:
     runs-on: ubuntu-latest
+    env:
+      DB_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Prepare Database Connection
-        run: |
-          echo "DB_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
 
       - name: Install PostgreSQL client
         run: |
