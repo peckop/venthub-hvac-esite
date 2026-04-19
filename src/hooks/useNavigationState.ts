@@ -8,6 +8,17 @@ interface UseNavigationStateOptions {
     isScrolled: boolean
 }
 
+/**
+ * Manages the UI state of the application's navigation elements, including active surfaces (menu, category hub, search overlay)
+ * and display modes based on scroll position.
+ * Ensures only one major navigation surface is active at a time by closing others when opening a new one.
+ *
+ * @param options - Configuration options, notably `isScrolled` to determine compact mode.
+ * @returns An object containing the current state flags and setter callbacks for all navigation surfaces.
+ *
+ * @example
+ * const { isMenuOpen, openMenu, mode } = useNavigationState({ isScrolled: window.scrollY > 50 });
+ */
 export function useNavigationState({ isScrolled }: UseNavigationStateOptions) {
     const [activeSurface, setActiveSurface] = useState<NavigationSurface>('none')
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
