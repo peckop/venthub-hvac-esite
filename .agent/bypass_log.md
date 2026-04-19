@@ -301,3 +301,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-19 11:56:40
+- **Commit:** `749ba210`
+- **Mesaj:** chore: remove broken one-time migration scripts and orphan make_graph.mjs
+- **Değişen Dosyalar:**
+
+
