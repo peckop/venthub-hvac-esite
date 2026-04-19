@@ -1,8 +1,13 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 
 const { Client } = require('pg');
 
-const connectionString = 'postgresql://postgres:***REMOVED***@db.tnofewwkwlyjsqgwjjga.supabase.co:5432/postgres';
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+    console.error('DATABASE_URL env degiskeni eksik. .env dosyanizi kontrol edin.');
+    process.exit(1);
+}
 
 const client = new Client({
     connectionString,
