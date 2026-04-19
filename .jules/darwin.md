@@ -22,3 +22,10 @@
 ## 2025-04-18 - Replacing `any` with Unused Parameters in Vitest Mocks
 **Learning:** In test files subjected to aggressive `no-explicit-any` and `no-unused-vars` linting rules, constructing mock classes (like `MockFileReader` or `MockImage`) requires meticulous parameter typing (e.g., `_file: unknown` or `event: unknown`) and explicit function union typings.
 **Action:** Strictly type mock callbacks (e.g. `onload: ((event: unknown) => void) | null = null`) and prefix unused positional variables with underscores to cleanly pass CI linting without disabling rules.
+## 2024-04-18 - Read-only Envs in Analytics Mocks
+**Learning:** `process.env.NODE_ENV` is strictly read-only in this project's TypeScript/Vitest configuration. Direct reassignment (e.g., `process.env.NODE_ENV = 'development'`) will cause the build step `pnpm run type-check` (via `tsc`) to fail with TS2540.
+**Action:** When mutating environment variables in tests, always use Vitest's environment stubbing tools, specifically `vi.stubEnv('KEY', 'value')`, and ensure they are cleaned up with `vi.unstubAllEnvs()` in the `afterEach` hook.
+
+## 2024-04-18 - Global Type Casting in Supabase Mocking
+**Learning:** When mocking Supabase's `getSession` response data in Vitest, passing an incomplete session object triggers TS2322 (Type mismatch) because Vitest expects the full `Session` type from `@supabase/supabase-js`. Using `as any` violates the strict `@typescript-eslint/no-explicit-any` linting rule causing `pnpm run lint:ci` to fail.
+**Action:** Cast the partial session mock securely bypassing both TS and ESLint via `as unknown as Session` (e.g., `{ session: { expires_at: 1000 } as unknown as Session }`), ensuring `Session` is properly imported from `@supabase/supabase-js`.
