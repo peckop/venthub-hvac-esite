@@ -18,11 +18,34 @@ function nowIso(): string {
   return new Date().toISOString()
 }
 
+/**
+ * Retrieves the effective unit price for a given product by evaluating user roles,
+ * active price lists, and any applicable discounts.
+ *
+ * @param product - The product object containing base price information.
+ * @returns The resolved unit price as a number.
+ *
+ * @example
+ * const price = await getEffectiveUnitPrice(myProduct);
+ * console.log(price); // e.g., 149.99
+ */
 export async function getEffectiveUnitPrice(product: Product): Promise<number> {
   const info = await getEffectivePriceInfo(product)
   return info.unitPrice
 }
 
+/**
+ * Determines the most applicable pricing information for a product based on the current user's role.
+ * It queries active price lists sorted by effective dates and applies the best valid price or discount.
+ * If no matching price list is found or an error occurs, it returns a fallback based on the product's default price.
+ *
+ * @param product - The product for which to determine the price.
+ * @returns An object containing the calculated unit price and the ID of the applied price list (if any).
+ *
+ * @example
+ * const info = await getEffectivePriceInfo(myProduct);
+ * // returns { unitPrice: 120.00, priceListId: 'uuid-1234' }
+ */
 export async function getEffectivePriceInfo(product: Product): Promise<{ unitPrice: number, priceListId: string | null }> {
   const fallback = (() => {
     const v = typeof product.price === 'number' ? product.price : parseFloat(String(product.price || 0))
