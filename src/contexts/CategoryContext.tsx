@@ -12,7 +12,7 @@ interface CategoryContextType {
   error: string | null;
   refresh: () => Promise<void>;
   getCategoryBySlug: (slug: string) => DomainCategory | undefined;
-  getSubCategories: (parentId: string) => DomainCategory[];
+  getSubCategories: (_parentId: string) => DomainCategory[];
 }
 
 const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
@@ -55,10 +55,39 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   }, [categories]);
 
-  const getCategoryBySlug = useCallback((slug: string) => categories.find(c => c.slug === slug), [categories]);
-  const getSubCategories = useCallback((parentId: string) =>
-    categories.filter(c => c.parent_id === parentId)
-              .sort((a, b) => ((a.metadata as CategoryMetadata | null)?.sort_order ?? 0) - ((b.metadata as CategoryMetadata | null)?.sort_order ?? 0)), [categories]);
+  // Lookup maps for O(1) access
+  const categoriesSlugMap = useMemo(() => {
+    const map = new Map<string, DomainCategory>();
+    for (const c of categories) {
+      if (c.slug) {
+        map.set(c.slug, c);
+      }
+    }
+    return map;
+  }, [categories]);
+
+  const categoriesParentMap = useMemo(() => {
+    const map = new Map<string, DomainCategory[]>();
+    for (const c of categories) {
+      if (c.parent_id) {
+        let siblings = map.get(c.parent_id);
+        if (!siblings) {
+          siblings = [];
+          map.set(c.parent_id, siblings);
+        }
+        siblings.push(c);
+      }
+    }
+
+    // Pre-sort the arrays
+    for (const [, siblings] of map.entries()) {
+      siblings.sort((a, b) => ((a.metadata as CategoryMetadata | null)?.sort_order ?? 0) - ((b.metadata as CategoryMetadata | null)?.sort_order ?? 0));
+    }
+    return map;
+  }, [categories]);
+
+  const getCategoryBySlug = useCallback((slug: string) => categoriesSlugMap.get(slug), [categoriesSlugMap]);
+  const getSubCategories = useCallback((parentId: string) => categoriesParentMap.get(parentId) || [], [categoriesParentMap]);
 
   const value = useMemo(() => ({
     categories,
