@@ -83,7 +83,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
     if (!activeImage && !slug) {
         return (
             <div className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">
-                {t('common.noVisuals') || 'Görsel Mevcut Değil'}
+                {t('common.noVisuals')}
             </div>
         )
     }
@@ -126,7 +126,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                             />
                         </div>
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">Görsel Yok</div>
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">{t('common.noImage')}</div>
                     )
                 )}
 

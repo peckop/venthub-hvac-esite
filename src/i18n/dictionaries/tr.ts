@@ -82,6 +82,8 @@ export const tr = {
     gotoCategory: "Kategoriye git",
     cancel: "İptal",
     close: "Kapat",
+    noVisuals: "Görsel Mevcut Değil",
+    noImage: "Görsel Yok",
     viewFullscreen: "Tam ekran görüntüle",
     view3D: "3D görüntüle",
     prev: "Önceki",
@@ -608,7 +610,30 @@ export const tr = {
       happyCustomers: "Mutlu Müşteri",
     },
     galleryTitle: 'Ürün Galerisi',
-    gallerySubtitle: 'Öne çıkan ürünlere göz atın'
+    gallerySubtitle: 'Öne çıkan ürünlere göz atın',
+    caseStudies: {
+      title: 'Başarı Hikayeleri',
+      subtitle: 'Gerçek projelerden elde edilen sonuçlar',
+      viewDetails: 'Detayları İncele',
+      items: {
+        parking: {
+          title: 'Otopark Jet Fan Projesi',
+          summary: 'CO sensörlü kontrol ile enerji tüketiminde belirgin azalma ve hava kalitesinde iyileşme.',
+          metrics: {
+            energySavings: 'Enerji Tasarrufu',
+            duration: 'Süre'
+          }
+        },
+        airCurtain: {
+          title: 'Hava Perdesi Uygulaması',
+          summary: 'Giriş konforunda artış, ısı kaybında azalma ve kapı çevresinde sıcaklık stabilitesi.',
+          metrics: {
+            comfortIncrease: 'Konfor Artışı',
+            roi: 'Geri Dönüş'
+          }
+        }
+      }
+    }
   },
   megamenu: {
     navigation: 'Navigasyon Menüsü',
