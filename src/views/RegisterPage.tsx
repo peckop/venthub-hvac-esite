@@ -30,6 +30,17 @@ const RegisterPage: React.FC = () => {
     })
   }
 
+  const passwordRules = [
+    { key: 'length',  label: t('auth.pwRule.length')  || 'En az 8 karakter',     test: (p: string) => p.length >= 8 },
+    { key: 'upper',   label: t('auth.pwRule.upper')   || 'En az 1 büyük harf',   test: (p: string) => /[A-Z]/.test(p) },
+    { key: 'digit',   label: t('auth.pwRule.digit')   || 'En az 1 rakam',        test: (p: string) => /[0-9]/.test(p) },
+    { key: 'special', label: t('auth.pwRule.special') || 'En az 1 özel karakter', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+  ]
+
+  const passedRules = passwordRules.filter(r => r.test(formData.password)).length
+  const strengthColor = passedRules <= 1 ? 'bg-red-500' : passedRules === 2 ? 'bg-orange-400' : passedRules === 3 ? 'bg-yellow-400' : 'bg-green-500'
+  const strengthLabel = passedRules <= 1 ? (t('auth.pwStrength.weak') || 'Zayıf') : passedRules === 2 ? (t('auth.pwStrength.fair') || 'Orta') : passedRules === 3 ? (t('auth.pwStrength.good') || 'İyi') : (t('auth.pwStrength.strong') || 'Güçlü')
+
   const validateForm = () => {
     if (!formData.name.trim()) {
       toast.error(t('auth.errors.nameRequired') || t('auth.name'))
@@ -41,8 +52,8 @@ const RegisterPage: React.FC = () => {
       return false
     }
 
-    if (formData.password.length < 8) {
-      toast.error(t('auth.passwordMin'))
+    if (passedRules < 4) {
+      toast.error(t('auth.pwRule.allRequired') || 'Şifreniz tüm güvenlik kurallarını karşılamalıdır')
       return false
     }
 
@@ -221,6 +232,31 @@ const RegisterPage: React.FC = () => {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+              {/* Şifre Güç Göstergesi */}
+              {formData.password.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex gap-1 h-1.5">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className={`flex-1 rounded-full transition-colors duration-300 ${
+                        i <= passedRules ? strengthColor : 'bg-light-gray'
+                      }`} />
+                    ))}
+                  </div>
+                  <p className="text-xs text-steel-gray">
+                    {t('auth.pwStrength.label') || 'Güvenlik'}: <span className="font-semibold">{strengthLabel}</span>
+                  </p>
+                  <ul className="space-y-1">
+                    {passwordRules.map(rule => (
+                      <li key={rule.key} className={`flex items-center gap-1.5 text-xs transition-colors ${
+                        rule.test(formData.password) ? 'text-green-600' : 'text-steel-gray'
+                      }`}>
+                        <span>{rule.test(formData.password) ? '✓' : '○'}</span>
+                        {rule.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             {/* Confirm Password */}
