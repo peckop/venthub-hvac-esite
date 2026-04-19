@@ -295,3 +295,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-19 11:54:19
+- **Commit:** `212556a1`
+- **Mesaj:** chore: remove dead DB check scripts (replaced by Supabase MCP tools)
+- **Değişen Dosyalar:**
+
+
