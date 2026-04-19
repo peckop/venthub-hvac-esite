@@ -75,6 +75,8 @@ export const en = {
     gotoCategory: "Go to category",
     cancel: "Cancel",
     close: "Close",
+    noVisuals: "No Visual Available",
+    noImage: "No Image",
     viewFullscreen: "View fullscreen",
     view3D: "View 3D",
     prev: "Previous",
@@ -528,7 +530,30 @@ export const en = {
       happyCustomers: "Happy Customers",
     },
     galleryTitle: 'Product Gallery',
-    gallerySubtitle: 'Browse featured products'
+    gallerySubtitle: 'Browse featured products',
+    caseStudies: {
+      title: 'Success Stories',
+      subtitle: 'Results from real projects',
+      viewDetails: 'View Details',
+      items: {
+        parking: {
+          title: 'Parking Jet Fan Project',
+          summary: 'Significant reduction in energy consumption and improvement in air quality with CO sensor control.',
+          metrics: {
+            energySavings: 'Energy Savings',
+            duration: 'Duration'
+          }
+        },
+        airCurtain: {
+          title: 'Air Curtain Application',
+          summary: 'Increased entrance comfort, reduced heat loss, and temperature stability around the door.',
+          metrics: {
+            comfortIncrease: 'Comfort Increase',
+            roi: 'Return on Investment'
+          }
+        }
+      }
+    }
   },
   homeCta: {
     title: 'Let’s Talk About Your Project',
