@@ -9,6 +9,7 @@ declare global {
   }
 
   interface Window {
+    __SUPABASE_CONFIG_ERROR__?: boolean
     requestIdleCallback?: (cb: () => void) => void
     openLeadModal?: () => void
   }

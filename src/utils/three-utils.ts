@@ -5,11 +5,20 @@ import * as THREE from 'three'
  * This prevents deprecation warnings from THREE.Clock while maintaining
  * compatibility with @react-three/fiber's state.clock.
  */
-export const createTimerClock = () => {
+export interface ClockShim extends THREE.Timer {
+    getDelta: () => number;
+    getElapsedTime: () => number;
+    isClock: boolean;
+    start: () => void;
+    stop: () => void;
+    elapsedTime?: number;
+}
+
+export const createTimerClock = (): ClockShim => {
     // Check if Timer exists (it should since Three.js r163+)
     // In r183, Clock is deprecated, so Timer is the way forward.
     const timer = new THREE.Timer()
-    const clockShim = timer as typeof timer & { getDelta: () => number; getElapsedTime: () => number; isClock: boolean; start: () => void; stop: () => void; elapsedTime?: number }
+    const clockShim = timer as ClockShim
 
     // @react-three/fiber calls state.clock.getDelta() in its loop.
     // We must update the timer in getDelta to keep it ticking.

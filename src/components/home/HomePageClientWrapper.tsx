@@ -14,14 +14,9 @@ const HomePageClientWrapper: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (typeof window === 'undefined') return
     
-    interface VentHubWindow extends Window {
-      openLeadModal?: () => void
-    }
-
-    const vhWindow = window as typeof window & VentHubWindow
-    vhWindow.openLeadModal = () => setLeadOpen(true)
+    window.openLeadModal = () => setLeadOpen(true)
     
-    return () => { vhWindow.openLeadModal = undefined }
+    return () => { window.openLeadModal = undefined }
   }, [])
 
   return (

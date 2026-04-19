@@ -39,8 +39,8 @@ export function useSettings() {
   useEffect(() => {
     async function fetchSettings() {
       try {
-        const { data, error: fetchError } = await (supabase as typeof supabase & { from: (t: string) => { select: (c: string) => { single: () => Promise<{data: unknown, error: unknown}> } } })
-          .from('app_settings')
+        const { data, error: fetchError } = await supabase
+          .from('app_settings' as never)
           .select('*')
           .single()
 
