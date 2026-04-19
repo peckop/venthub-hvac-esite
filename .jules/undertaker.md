@@ -4,3 +4,8 @@
 **Dead Code Found:** Attempted to delete seemingly unused UI utilities, components like `ProductsHero` and `BlueprintCanvas`, and modify `admin` and `applications` configuration objects based on `knip`'s dead code analysis.
 **Why It Existed:** These were either parts of upcoming features, standard configuration fallbacks, or simply components not currently referenced but maintained in the repository for isolation/archive reasons.
 **Lesson:** Never delete `.tsx` files directly unless explicitly told to. Remove their exports from `index.ts` files to isolate them, but leave the files intact. Do not aggressively prune configuration directories like `src/config/` as these often hold variables intended for future use.
+
+## 2024-04-19 - Batch purge dead code rules
+**Dead Code Found:** `CategoryOrbitCarousel` in `index.ts`, `ROLE_PAGE_ACCESS`, `ROLE_WRITE_ACCESS` in `rbac.ts`, `getSiteUrl` in `siteUrl.ts`, and navigation constants in `navigationConfig.ts`.
+**Why It Existed:** Barrel exports of dynamically loaded components become orphaned, while internal constants inappropriately exported expose surface area.
+**Lesson:** Do not physically delete `.ts`/`.tsx` files; only remove the dead code lines. For configurations (e.g., `src/config/`), never delete constants; just remove the `export` keyword.

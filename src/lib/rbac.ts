@@ -3,7 +3,7 @@ export type UserRole = 'super_admin' | 'admin' | 'moderator' | 'warehouse' | 'sa
 /**
  * Sayfa Erişim Matrisi
  */
-export const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
+const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'], // Her seye erişim
     admin: ['*'], // Her seye erişim (kullanıcılar sayfası haricinde kontrol edilecek)
     moderator: ['*'],
@@ -28,7 +28,7 @@ export const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
 /**
  * Yazma (Action) İzin Matrisi
  */
-export const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
+const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
     admin: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups'],
     moderator: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups'],

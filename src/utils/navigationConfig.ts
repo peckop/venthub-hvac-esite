@@ -17,13 +17,6 @@ export interface NavigationItemConfig {
     showInCompact?: boolean
 }
 
-export const NAVIGATION_HEIGHT_CLASSES: Record<NavigationMode, string> = {
-    expanded: 'h-20',
-    compact: 'h-16',
-}
-
-export const NAVIGATION_MAIN_OFFSET_CLASS = 'pt-16'
-
 export const NAVIGATION_PRIMARY_ITEMS: NavigationItemConfig[] = [
     {
         id: 'categories',
