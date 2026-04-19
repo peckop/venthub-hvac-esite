@@ -417,7 +417,6 @@ def main():
     if verdict == "BLOCKED":
         sys.exit(1)
 
-
 def generate_md_report(data, path):
     """JSON sonuçlarından okunabilir Markdown rapor üretir."""
     lines = [
@@ -425,7 +424,7 @@ def generate_md_report(data, path):
         f"",
         f"> **Tarih:** {data.get('audit_date', 'N/A')}",
         f"> **Commit:** `{data.get('git_commit_sha', 'N/A')[:12]}`",
-        f"> **Motor:** Enterprise Audit Engine v1.0",
+        f"> **Motor:** Enterprise Audit Engine v{VERSION}",
         f"",
         f"---",
         f"",
@@ -452,6 +451,10 @@ def generate_md_report(data, path):
     lines.append(f"---")
     lines.append(f"")
 
+    # Fail listesi topla (Sonraki Adımlar için)
+    action_items_strict = []
+    action_items_warn = []
+
     for layer_id, layer_data in data.get("layers", {}).items():
         layer_name = layer_data.get("name", layer_id)
         checks = layer_data.get("checks", {})
@@ -476,6 +479,20 @@ def generate_md_report(data, path):
             icon = "✅" if status == "PASS" else "⚠️" if level == "WARNING" else "❌"
             lines.append(f"| `{check_id}` | {level} | {icon} {status} | {target[:80]} |")
 
+            # Fail listesine ekle
+            if status == "FAIL":
+                item = {
+                    "id": check_id,
+                    "layer": layer_name,
+                    "target": target,
+                    "level": level,
+                    "evidence_short": (check_data.get("evidence", "")[:120]).strip()
+                }
+                if level == "STRICT":
+                    action_items_strict.append(item)
+                else:
+                    action_items_warn.append(item)
+
         lines.append(f"")
 
         # Fail detayları
@@ -493,9 +510,41 @@ def generate_md_report(data, path):
         lines.append(f"---")
         lines.append(f"")
 
+    # Sonraki Adımlar bölümü
+    lines.append(f"## 📋 Sonraki Adımlar")
+    lines.append(f"")
+
+    if action_items_strict:
+        lines.append(f"### 🔴 Bloklayıcılar (Teslim Engeli)")
+        lines.append(f"")
+        lines.append(f"| # | Kontrol | Katman | Hedef |")
+        lines.append(f"|---|---------|--------|-------|")
+        for i, item in enumerate(action_items_strict, 1):
+            lines.append(f"| {i} | `{item['id']}` | {item['layer']} | {item['target'][:60]} |")
+        lines.append(f"")
+
+    if action_items_warn:
+        lines.append(f"### 🟡 İyileştirmeler (Uyarılar)")
+        lines.append(f"")
+        lines.append(f"| # | Kontrol | Katman | Hedef |")
+        lines.append(f"|---|---------|--------|-------|")
+        for i, item in enumerate(action_items_warn, 1):
+            lines.append(f"| {i} | `{item['id']}` | {item['layer']} | {item['target'][:60]} |")
+        lines.append(f"")
+
+    if not action_items_strict and not action_items_warn:
+        lines.append(f"✅ Tüm kontroller geçti — teslime hazır!")
+        lines.append(f"")
+
+    lines.append(f"---")
+    lines.append(f"")
+    lines.append(f"> Rapor otomatik üretilmiştir. `python .agent/skills/venthub-enterprise-audit/run_enterprise_audit.py`")
+    lines.append(f"")
+
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
 
 if __name__ == "__main__":
     main()
+
