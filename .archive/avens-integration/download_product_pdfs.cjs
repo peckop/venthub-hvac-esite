@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 const puppeteer = require('puppeteer');
 const _fs = require('_fs');
 const _path = require('_path');

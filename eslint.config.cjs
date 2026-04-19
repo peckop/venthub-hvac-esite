@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 const { FlatCompat } = require("@eslint/eslintrc");
 const js = require("@eslint/js");
 
@@ -40,6 +40,15 @@ module.exports = [
   },
   {
     ignores: [".next/**", "out/**", "public/**", "supabase/migrations/**", "node_modules/**", "next-env.d.ts", ".agent/**"]
+  },
+  {
+    // .cjs uzantılı dosyalar Node.js CommonJS kuralıyla çalışır.
+    // ESM import syntax bu dosyalarda geçersizdir, require() zorunludur.
+    files: ["**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "no-console": "off"
+    }
   },
   {
     files: ["src/middleware.ts"],
