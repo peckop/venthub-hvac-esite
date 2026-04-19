@@ -176,7 +176,7 @@ const VisualShowcase: React.FC = () => {
           <div className="absolute inset-0 flex items-center justify-between p-2 pointer-events-none z-20">
             <button
               onClick={prev}
-              className="pointer-events-auto inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
+              className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 pointer-events-auto inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
               aria-label={t('homeShowcase.prevAria')}
             >
               <ChevronLeftIcon size={18} />
@@ -184,14 +184,14 @@ const VisualShowcase: React.FC = () => {
             <div className="pointer-events-auto flex items-center gap-2">
               <button
                 onClick={() => setPlaying(p => !p)}
-                className="inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
+                className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
                 aria-label={playing ? t('homeShowcase.pauseAria') : t('homeShowcase.playAria')}
               >
                 {playing ? <PauseIcon size={18} /> : <PlayIcon size={18} />}
               </button>
               <button
                 onClick={next}
-                className="inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
+                className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
                 aria-label={t('homeShowcase.nextAria')}
               >
                 <ChevronRightIcon size={18} />
@@ -205,7 +205,7 @@ const VisualShowcase: React.FC = () => {
               <button
                 key={i}
                 onClick={() => setIndex(i)}
-                className={`h-2 rounded-full transition-all ${i === index ? 'w-6 bg-white' : 'w-2 bg-white/70 hover:bg-white'}`}
+                className={`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 h-2 rounded-full transition-all ${i === index ? 'w-6 bg-white' : 'w-2 bg-white/70 hover:bg-white'}`}
                 aria-label={`Slide ${i + 1}`}
               />
             ))}
