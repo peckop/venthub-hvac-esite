@@ -265,3 +265,33 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-19 11:23:20
+- **Commit:** `d77153b5`
+- **Mesaj:** security: use DATABASE_URL secret in supabase-migrate workflow
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-19 11:30:36
+- **Commit:** `1f5b86e7`
+- **Mesaj:** 💉 Surgeon: Batch type safety improvements across 7 files
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-19 11:40:05
+- **Commit:** `42f9d102`
+- **Mesaj:** fix: use job-level env block for DATABASE_URL secret injection
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-19 11:40:13
+- **Commit:** `e22c59ae`
+- **Mesaj:** docs: add PR base branch drift protocol to agent rules [kurumsal hafıza]
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-19 11:41:33
+- **Commit:** `5f1e5719`
+- **Mesaj:** fix: use correct secret name SUPABASE_DB_URL
+- **Değişen Dosyalar:**
+
+
