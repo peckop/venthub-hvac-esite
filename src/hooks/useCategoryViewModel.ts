@@ -36,7 +36,7 @@ export function useCategoryViewModel() {
     if (!category) return null
 
     // 1. i18n Resolution via translation_key (Advanced Standard)
-    const tKey = (category as typeof category & { translation_key?: string }).translation_key || category.slug
+    const tKey = category.translation_key || category.slug
     const translationPath = `common.categoryList.${tKey}`
     const translatedName = t(translationPath)
     
@@ -50,12 +50,11 @@ export function useCategoryViewModel() {
 
     // 3. DISPLAY MODE RESOLVER (TOTAL UNIFIED SHELL)
     // Priority: 1. DB Row (`display_mode`), 2. Metadata fallback (legacy), 3. Default ('series')
-    const typedCategory = category as typeof category & { display_mode?: string | null }
-    const meta = (category.metadata as Record<string, unknown>) || {}
+    const meta = (category.metadata && typeof category.metadata === 'object') ? (category.metadata as Record<string, unknown>) : {}
     
     let displayMode: CategoryViewModel['displayMode'] = 'series' // VARSAYILAN ARTIK ESKİ GRID DEĞİL, YENİ BEYAZ TASARIM (SERIES)
 
-    const rawDisplayMode = typedCategory.display_mode || meta.display_mode
+    const rawDisplayMode = meta.display_mode
     
     if (rawDisplayMode === 'showcase' || rawDisplayMode === 'landing') {
       displayMode = rawDisplayMode
@@ -80,7 +79,7 @@ export function useCategoryViewModel() {
   const groupProductsBySeries = useMemo(() => (products: DomainProduct[]): SeriesGroup[] => {
     const seriesMap: Record<string, SeriesGroup> = {}
     products.forEach(product => {
-      const meta = (product as typeof product & { metadata?: Record<string, unknown> }).metadata || {}
+      const meta = ('metadata' in product && typeof product.metadata === 'object' && product.metadata !== null) ? (product.metadata as Record<string, unknown>) : {}
       let seriesName = (meta.series as string) || product.name.split(' ')[0]
       if (['Vortice', 'Avens', 'Soler', 'Casals', 'Vorticel'].includes(seriesName)) {
         seriesName = product.name.split(' ')[1] || seriesName
