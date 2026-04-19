@@ -1,5 +1,15 @@
 import { useRef, useCallback } from 'react'
 
+/**
+ * Provides a callback ref that enables horizontal drag-to-scroll functionality on a container element.
+ * Manages mouse events to simulate touch-like panning, including a threshold to prevent accidental clicks while dragging.
+ *
+ * @returns A callback ref to be attached to the scrollable container element.
+ *
+ * @example
+ * const dragRef = useDragScroll<HTMLDivElement>();
+ * return <div ref={dragRef} className="overflow-x-auto flex">...</div>;
+ */
 export function useDragScroll<T extends HTMLElement = HTMLDivElement>() {
     const cleanupRef = useRef<(() => void) | null>(null)
 
