@@ -1,4 +1,4 @@
-export const getSiteUrl = () => {
+const getSiteUrl = () => {
     if (typeof process !== 'undefined') {
         if (process.env.NEXT_PUBLIC_SITE_URL) {
             return process.env.NEXT_PUBLIC_SITE_URL;
