@@ -55,10 +55,10 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
 - **LCP & CLS Focus:** Her yeni görsel bileşen için `width/height` zorunludur. Her dinamik veri alanı için bir `Skeleton` (İskelet) bileşeni planlanmadan kod yazılamaz.
 - **Vite Legacy & ESLint:** Proje içindeki `react-router-dom` gibi Vite yapıları yasaktır. ESLint 9 Flat Config (`eslint.config.mjs`) standarttır.
 
-## 6. Diagnostic Protocols: Röntgen & Deep MRI
+## 6. Diagnostic Protocols: Röntgen & Enterprise Audit
 - **Röntgen Engine (Gatekeeper):** Sistemdeki temel hataları yakalar (Lint, TSC, Strict Build, Next.js async errors). `run_rontgen.py` çalıştırıldığında `PASS` dönmesi mecburidir. Röntgen `BLOCKED` ise cerrahi (kodlama) işlemi durdurmalı ve önce blokajları çözmelisin.
-- **Deep MRI Engine (Deep Diagnostics):** Yalnızca Röntgen `PASS` durumundayken çalıştırılır (`pnpm run mri` / `run_mri.py`). Dead code bulguları, bundle optimizasyonu ve maliyetli operasyon analizlerini içerir.
-- **Kural:** MRI motoru doğrudan kodu değiştirmez. Sadece `.agent/reports/` altına HTML/TXT formatında raporlar bırakır. Ajan o raporu analiz etmeden kendi kafasına göre kod silemez.
+- **Enterprise Audit Engine (Teslim Öncesi Denetim):** 11 katmanlı kapsamlı denetim motoru. Röntgen kapsamını, eski Deep MRI kapsamını (dead code, bundle analizi) ve güvenlik/yasal/ops/performans/erişilebilirlik katmanlarını tek çatıda birleştirir. `python .agent/skills/venthub-enterprise-audit/run_enterprise_audit.py` ile çalıştırılır. `--layers L11` ile sadece teknik borç taraması yapılabilir.
+- **Kural:** Enterprise Audit motoru doğrudan kodu değiştirmez. Sadece `.agent/reports/` altına JSON+MD formatında raporlar bırakır. Ajan o raporu analiz etmeden kendi kafasına göre kod silemez.
 
 ## 7. Onay ve Planlama (No-Plan-No-Code Policy)
 - **Planning-First:** Bir görev `backlog`'dan `active`'e çekildiğinde statüsü otomatik olarak `Planning` olur. 
