@@ -34,14 +34,24 @@ export default function AccountSecurityPage() {
 
   useEffect(() => { refreshIdentities() }, [])
 
+  const passwordRules = [
+    { key: 'length',  label: 'En az 8 karakter',     test: (p: string) => p.length >= 8 },
+    { key: 'upper',   label: 'En az 1 büyük harf',   test: (p: string) => /[A-Z]/.test(p) },
+    { key: 'digit',   label: 'En az 1 rakam',        test: (p: string) => /[0-9]/.test(p) },
+    { key: 'special', label: 'En az 1 özel karakter', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+  ]
+  const passedRules = passwordRules.filter(r => r.test(password)).length
+  const strengthColor = passedRules <= 1 ? 'bg-red-500' : passedRules === 2 ? 'bg-orange-400' : passedRules === 3 ? 'bg-yellow-400' : 'bg-green-500'
+  const strengthLabel = passedRules <= 1 ? 'Zayıf' : passedRules === 2 ? 'Orta' : passedRules === 3 ? 'İyi' : 'Güçlü'
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!current) {
       toast.error(t('account.security.currentRequired') || 'Mevcut şifre zorunlu')
       return
     }
-    if (password.length < 8) {
-      toast.error(t('account.security.minLength') || 'En az 8 karakter olmalı')
+    if (passedRules < 4) {
+      toast.error('Şifreniz tüm güvenlik kurallarını karşılamalıdır')
       return
     }
     if (password !== confirm) {
@@ -125,8 +135,29 @@ export default function AccountSecurityPage() {
                     </div>
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('account.security.newLabel') || 'En az 8 karakter'} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
                   </div>
+                  {/* Güç Göstergesi */}
+                  {password.length > 0 && (
+                    <div className="mt-2 space-y-1.5">
+                      <div className="flex gap-1 h-1">
+                        {[1,2,3,4].map(i => (
+                          <div key={i} className={`flex-1 rounded-full transition-colors duration-300 ${
+                            i <= passedRules ? strengthColor : 'bg-slate-200'
+                          }`} />
+                        ))}
+                      </div>
+                      <p className="text-xs text-slate-500">Güvenlik: <span className="font-semibold">{strengthLabel}</span></p>
+                      <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                        {passwordRules.map(rule => (
+                          <li key={rule.key} className={`flex items-center gap-1 text-[11px] ${
+                            rule.test(password) ? 'text-green-600' : 'text-slate-400'
+                          }`}>
+                            <span>{rule.test(password) ? '✓' : '○'}</span>{rule.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
-
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
                     Yeni Şifre (Tekrar)
