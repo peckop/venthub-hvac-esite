@@ -313,3 +313,15 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-19 12:00:53
+- **Commit:** `dee25bcf`
+- **Mesaj:** fix: restore CJS ESLint override and clean stale disable directives
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-19 12:25:32
+- **Commit:** `286d22fc`
+- **Mesaj:** security: add password strength meter with 4-rule validation (length/upper/digit/special)
+- **Değişen Dosyalar:**
+
+
