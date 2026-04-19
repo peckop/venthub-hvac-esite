@@ -1,22 +1,24 @@
 import React from 'react'
+import { useI18n } from '@/i18n/I18nProvider'
 import { trackEvent } from '../utils/analytics'
 
 const CaseStudySection: React.FC = () => {
+  const { t } = useI18n()
   const items = [
     {
-      title: 'Otopark Jet Fan Projesi',
-      summary: 'CO sensörlü kontrol ile enerji tüketiminde belirgin azalma ve hava kalitesinde iyileşme.',
+      title: t('home.caseStudies.items.parking.title'),
+      summary: t('home.caseStudies.items.parking.summary'),
       metrics: [
-        { label: 'Enerji Tasarrufu', value: '%35' },
-        { label: 'Süre', value: '2 hafta' },
+        { label: t('home.caseStudies.items.parking.metrics.energySavings'), value: '%35' },
+        { label: t('home.caseStudies.items.parking.metrics.duration'), value: '2 hafta' },
       ],
     },
     {
-      title: 'Hava Perdesi Uygulaması',
-      summary: 'Giriş konforunda artış, ısı kaybında azalma ve kapı çevresinde sıcaklık stabilitesi.',
+      title: t('home.caseStudies.items.airCurtain.title'),
+      summary: t('home.caseStudies.items.airCurtain.summary'),
       metrics: [
-        { label: 'Konfor Artışı', value: '%+20' },
-        { label: 'Geri Dönüş', value: '< 6 ay' },
+        { label: t('home.caseStudies.items.airCurtain.metrics.comfortIncrease'), value: '%+20' },
+        { label: t('home.caseStudies.items.airCurtain.metrics.roi'), value: '< 6 ay' },
       ],
     },
   ]
@@ -31,8 +33,8 @@ const CaseStudySection: React.FC = () => {
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-industrial-gray">Başarı Hikayeleri</h2>
-          <p className="mt-2 text-steel-gray">Gerçek projelerden elde edilen sonuçlar</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-industrial-gray">{t('home.caseStudies.title')}</h2>
+          <p className="mt-2 text-steel-gray">{t('home.caseStudies.subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -52,7 +54,7 @@ const CaseStudySection: React.FC = () => {
                   onClick={() => { trackEvent('case_study_click', { title: cs.title }); openLead() }}
                   className="inline-flex items-center justify-center rounded-lg bg-primary-navy text-white px-5 py-2.5 font-semibold shadow-sm hover:bg-secondary-blue transition"
                 >
-                  Detayları İncele
+                  {t('home.caseStudies.viewDetails')}
                 </button>
               </div>
             </div>
