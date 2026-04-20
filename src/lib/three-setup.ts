@@ -28,22 +28,24 @@ if (typeof window !== 'undefined') {
 
     // 2. Attempt to shim THREE.Clock for functionality if possible.
     try {
-        const clock = THREE.Clock as unknown as { __shimmed?: boolean } | undefined;
-        if (clock && !clock.__shimmed) {
-            const OriginalClock = THREE.Clock;
-            const SilentClock = function() {
-                return createTimerClock();
-            };
-            
-            SilentClock.prototype = (OriginalClock as unknown as (...args: unknown[]) => unknown).prototype;
-            Object.defineProperty(SilentClock, '__shimmed', { value: true, writable: true, configurable: true });
+        if ('Clock' in THREE) {
+            const clock = THREE.Clock;
+            if (clock && typeof clock === 'function' && !('__shimmed' in clock)) {
+                const OriginalClock = clock;
+                const SilentClock = function() {
+                    return createTimerClock();
+                };
 
-            Object.defineProperty(THREE, 'Clock', {
-                value: SilentClock,
-                configurable: true,
-                writable: true,
-                enumerable: true
-            });
+                SilentClock.prototype = OriginalClock.prototype;
+                Object.defineProperty(SilentClock, '__shimmed', { value: true, writable: true, configurable: true });
+
+                Object.defineProperty(THREE, 'Clock', {
+                    value: SilentClock,
+                    configurable: true,
+                    writable: true,
+                    enumerable: true
+                });
+            }
         }
     } catch {
         // Fallback handled by the console interceptor above.
