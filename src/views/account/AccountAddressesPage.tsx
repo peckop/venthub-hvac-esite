@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { createAddress, deleteAddress, listAddresses, setDefaultAddress, updateAddress, UserAddress } from '../../lib/supabase'
 import toast from 'react-hot-toast'
-import { useI18n } from '../../i18n/I18nProvider'
+import { useI18n } from '@/i18n/I18nProvider'
 import { MapPin, Plus, Trash2, Edit2, CheckCircle, Truck, CreditCard, Loader2 } from 'lucide-react'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -48,7 +48,7 @@ export default function AccountAddressesPage() {
       setItems(data)
     } catch (e) {
       console.error(e)
-      toast.error(t('account.addresses.toasts.loadError') || 'Adresler yüklenemedi')
+      toast.error(t('account.addresses.toasts.loadError'))
     } finally {
       setLoading(false)
     }
@@ -83,7 +83,7 @@ export default function AccountAddressesPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.address_line || !form.city || !form.district) {
-      toast.error(t('account.addresses.toasts.requiredFields') || 'Adres, İl ve İlçe zorunludur')
+      toast.error(t('account.addresses.toasts.requiredFields'))
       return
     }
 
@@ -104,7 +104,7 @@ export default function AccountAddressesPage() {
           is_default_shipping: form.is_default_shipping,
           is_default_billing: form.is_default_billing,
         })
-        toast.success(t('account.addresses.toasts.updated') || 'Adres güncellendi')
+        toast.success(t('account.addresses.toasts.updated'))
       } else {
         await createAddress({
           user_id: user.id,
@@ -121,39 +121,39 @@ export default function AccountAddressesPage() {
           is_default_shipping: form.is_default_shipping || false,
           is_default_billing: form.is_default_billing || false,
         })
-        toast.success(t('account.addresses.toasts.created') || 'Adres eklendi')
+        toast.success(t('account.addresses.toasts.created'))
       }
       resetForm()
       await refresh()
     } catch (e) {
       console.error(e)
-      toast.error(t('account.addresses.toasts.saveError') || 'Kayıt sırasında hata oluştu')
+      toast.error(t('account.addresses.toasts.saveError'))
     } finally {
       setSaving(false)
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(t('account.addresses.toasts.confirmDelete') as string || 'Bu adresi silmek istediğinize emin misiniz?')) return
+    if (!confirm(t('account.addresses.toasts.confirmDelete') as string)) return
     try {
       await deleteAddress(id)
-      toast.success(t('account.addresses.toasts.deleted') || 'Adres silindi')
+      toast.success(t('account.addresses.toasts.deleted'))
       await refresh()
       if (form.id === id) resetForm()
     } catch (e) {
       console.error(e)
-      toast.error(t('account.addresses.toasts.deleteError') || 'Silme işlemi başarısız')
+      toast.error(t('account.addresses.toasts.deleteError'))
     }
   }
 
   async function makeDefault(id: string, kind: 'shipping' | 'billing') {
     try {
       await setDefaultAddress(kind, id)
-      toast.success(kind === 'shipping' ? (t('account.addresses.toasts.defaultSetShipping') || 'Varsayılan teslimat adresi yapıldı') : (t('account.addresses.toasts.defaultSetBilling') || 'Varsayılan fatura adresi yapıldı'))
+      toast.success(kind === 'shipping' ? (t('account.addresses.toasts.defaultSetShipping')) : (t('account.addresses.toasts.defaultSetBilling')))
       await refresh()
     } catch (e) {
       console.error(e)
-      toast.error(t('account.addresses.toasts.updateError') || 'İşlem başarısız')
+      toast.error(t('account.addresses.toasts.updateError'))
     }
   }
 
@@ -165,7 +165,7 @@ export default function AccountAddressesPage() {
         <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 sm:p-8 sticky top-[100px]">
           <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
             {isEditing ? <Edit2 className="w-5 h-5 text-primary-navy" /> : <Plus className="w-5 h-5 text-primary-navy" />}
-            {isEditing ? (t('account.addresses.formTitleEdit') || 'Adresi Düzenle') : (t('account.addresses.formTitleNew') || 'Yeni Adres Ekle')}
+            {isEditing ? (t('account.addresses.formTitleEdit')) : (t('account.addresses.formTitleNew'))}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -208,7 +208,7 @@ export default function AccountAddressesPage() {
                   <div className="absolute inset-0 bg-primary-navy opacity-0 peer-checked:opacity-100 rounded transition-opacity" />
                   <CheckCircle className="w-3 h-3 text-white absolute opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
-                <span className="text-sm font-bold text-slate-600 select-none">Varsayılan Teslimat Adresi</span>
+                <span className="text-sm font-bold text-slate-600 select-none">{t('account.addresses.toggle.shippingDefault')}</span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer group">
                 <div className="relative flex items-center justify-center w-5 h-5 rounded border border-slate-300 group-hover:border-primary-navy transition-colors bg-white">
@@ -216,19 +216,19 @@ export default function AccountAddressesPage() {
                   <div className="absolute inset-0 bg-primary-navy opacity-0 peer-checked:opacity-100 rounded transition-opacity" />
                   <CheckCircle className="w-3 h-3 text-white absolute opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
-                <span className="text-sm font-bold text-slate-600 select-none">Varsayılan Fatura Adresi</span>
+                <span className="text-sm font-bold text-slate-600 select-none">{t('account.addresses.toggle.billingDefault')}</span>
               </label>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-6 border-t border-slate-100">
               {isEditing && (
                 <button type="button" onClick={resetForm} className="w-full sm:w-auto h-10 px-5 rounded-lg border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all focus:outline-none focus:ring-2 focus:ring-slate-200">
-                  İptal
+                  {t('account.addresses.cancel')}
                 </button>
               )}
               <button disabled={saving} className="w-full h-10 bg-primary-navy hover:bg-industrial-gray text-white flex-1 px-4 rounded-lg font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-navy/50 flex items-center justify-center gap-2">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                {isEditing ? (t('account.addresses.submit.update') || 'Güncelle') : (t('account.addresses.submit.add') || 'Kaydet')}
+                {isEditing ? (t('account.addresses.submit.update')) : (t('account.addresses.submit.add'))}
               </button>
             </div>
           </form>
@@ -243,7 +243,7 @@ export default function AccountAddressesPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              {t('account.addresses.title') || 'Kayıtlı Adreslerim'}
+              {t('account.addresses.title')}
             </h1>
             <p className="text-sm text-slate-500 mt-1">Siparişlerinizde kolayca seçmek için adreslerinizi yönetin.</p>
           </div>
@@ -274,14 +274,14 @@ export default function AccountAddressesPage() {
                   <div className="flex items-start justify-between gap-3 mb-5 border-b border-slate-100 pb-4">
                     <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-primary-navy/60" />
-                      {a.label || 'Kayıtsız Başlık'}
+                      {a.label || t('account.addresses.unregistered')}
                     </h3>
 
                     <div className="flex items-center gap-2">
-                      <button onClick={() => startEdit(a)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary-navy hover:bg-primary-navy/5 transition-colors focus:outline-none" title={t('admin.ui.edit') || 'Düzenle'}>
+                      <button onClick={() => startEdit(a)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary-navy hover:bg-primary-navy/5 transition-colors focus:outline-none" title={t('admin.ui.edit')}>
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button onClick={() => handleDelete(a.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors focus:outline-none" title={t('admin.ui.delete') || 'Sil'}>
+                      <button onClick={() => handleDelete(a.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors focus:outline-none" title={t('admin.ui.delete')}>
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -311,7 +311,7 @@ export default function AccountAddressesPage() {
                         </span>
                       ) : (
                         <button onClick={() => makeDefault(a.id, 'shipping')} className="text-xs font-bold text-slate-400 hover:text-primary-navy transition-colors focus:outline-none focus:underline">
-                          Varsayılan Yap
+                          {t('account.addresses.makeDefault')}
                         </button>
                       )}
                     </div>
@@ -326,7 +326,7 @@ export default function AccountAddressesPage() {
                         </span>
                       ) : (
                         <button onClick={() => makeDefault(a.id, 'billing')} className="text-xs font-bold text-slate-400 hover:text-primary-navy transition-colors focus:outline-none focus:underline">
-                          Varsayılan Yap
+                          {t('account.addresses.makeDefault')}
                         </button>
                       )}
                     </div>
