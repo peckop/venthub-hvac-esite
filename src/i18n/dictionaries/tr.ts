@@ -1545,6 +1545,10 @@ export const tr = {
         shippingDefault: 'Teslimat için varsayılan',
         billingDefault: 'Fatura için varsayılan'
       },
+      makeDefault: 'Varsayılan Yap',
+      unregistered: 'Kayıtsız Başlık',
+      cancel: 'İptal',
+
       submit: {
         update: 'Güncelle',
         add: 'Ekle'
@@ -1587,6 +1591,19 @@ export const tr = {
       setDefaultSuccess: 'Varsayılan profil güncellendi',
       noProfiles: 'Kayıtlı fatura profili bulunmuyor'
     },
+    profile: {
+      title: 'Profil Bilgileri',
+      subtitle: 'Hesabınıza ait temel kişisel bilgileri buradan güncelleyebilirsiniz.',
+      fullName: 'Ad Soyad',
+      fullNamePlaceholder: 'Örn: Ahmet Yılmaz',
+      phone: 'Telefon Numarası',
+      phonePlaceholder: 'Örn: +90 555 123 4567',
+      saving: 'Kaydediliyor...',
+      save: 'Değişiklikleri Kaydet',
+      toastSuccess: 'Profil güncellendi',
+      toastError: 'Güncelleme sırasında hata'
+    },
+
     security: {
       title: 'Şifre Değiştir',
       currentLabel: 'Mevcut şifre',
@@ -1599,7 +1616,28 @@ export const tr = {
       pwned: 'Bu şifre veri sızıntılarında görülmüş. Lütfen daha güçlü bir şifre seçin.',
       wrongCurrent: 'Mevcut şifre hatalı',
       updated: 'Şifreniz güncellendi',
-      updateError: 'Şifre güncellenirken bir hata oluştu'
+      updateError: 'Şifre güncellenirken bir hata oluştu',
+      rulesNotMet: 'Şifreniz tüm güvenlik kurallarını karşılamalıdır',
+      saving: 'Güncelleniyor...',
+      linkedAccountsTitle: 'Bağlı Giriş Yöntemleri',
+      linkedAccountsSubtitle: 'Tek tıkla giriş yapabilmek için sosyal hesaplarınızı bağlayabilirsiniz.',
+      emailPassword: 'E-posta ve Şifre',
+      standardMethod: 'Standart giriş yöntemi',
+      connected: 'Bağlı',
+      disconnected: 'Pasif',
+      oneClickLogin: 'Tek tıkla giriş',
+      disconnect: 'Bağlantıyı Kaldır',
+      connect: 'Bağla',
+      linkedAccountsNote: 'Aynı e‑posta ile farklı giriş yöntemleri ayrı hesaplar oluşturabilir. Buradan Google hesabınızı mevcut hesabınıza bağlayarak hesap yönetimini tek bir merkezde toplayabilirsiniz.',
+      toasts: {
+        cannotRemoveLast: 'Son giriş yöntemini kaldıramazsınız',
+        googleIdNotFound: 'Google kimliği bulunamadı',
+        unlinkUnsupported: 'unlinkIdentity API desteklenmiyor',
+        googleUnlinked: 'Google bağlantısı kaldırıldı',
+        googleUnlinkFailed: 'Google bağlantısı kaldırılamadı',
+        googleLinkStarted: 'Google hesabı bağlama işlemi başlatıldı',
+        googleLinkFailed: 'Google bağlama başarısız'
+      },
     }
   },
 

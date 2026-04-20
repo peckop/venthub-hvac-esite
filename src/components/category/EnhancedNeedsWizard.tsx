@@ -95,8 +95,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
         setLoading(true)
         try {
             const { data, error } = await supabase
-                .from('products')
-                .select('*')
+                .from('products').select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
                 .eq('status', 'active')
                 .contains('category_slugs', [parentSlug])
 
