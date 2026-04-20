@@ -2009,6 +2009,10 @@ export const en = {
         shippingDefault: 'Default for shipping',
         billingDefault: 'Default for billing'
       },
+      makeDefault: 'Make Default',
+      unregistered: 'Unregistered Title',
+      cancel: 'Cancel',
+
       submit: {
         update: 'Update',
         add: 'Add'
@@ -2051,6 +2055,19 @@ export const en = {
       setDefaultSuccess: 'Default profile updated',
       noProfiles: 'No saved invoice profiles'
     },
+    profile: {
+      title: 'Profile Information',
+      subtitle: 'You can update your basic personal information here.',
+      fullName: 'Full Name',
+      fullNamePlaceholder: 'Ex: John Doe',
+      phone: 'Phone Number',
+      phonePlaceholder: 'Ex: +1 555 123 4567',
+      saving: 'Saving...',
+      save: 'Save Changes',
+      toastSuccess: 'Profile updated',
+      toastError: 'Error during update'
+    },
+
     security: {
       title: 'Change Password',
       currentLabel: 'Current password',
