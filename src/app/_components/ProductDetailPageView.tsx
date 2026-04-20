@@ -147,7 +147,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4))
         }
       } catch (error) {
-        console.error('Error fetching product:', error)
+        console.warn('Error fetching product:', error)
         setProduct(null)
       } finally {
         setLoading(false)
@@ -215,7 +215,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       )
       toast.success(t('pdp.messages.pdfStarted') || 'PDF üretiliyor...')
     } catch (error) {
-      console.error('PDF generation error:', error)
+      console.warn('PDF generation error:', error)
       toast.error(t('pdp.errors.pdfFailed') || 'PDF üretilemedi.')
     } finally {
       setIsGeneratingPdf(false)
@@ -228,7 +228,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       try {
         await navigator.share({ title: product.name, text: `${product.brand} - ${product.name}`, url: window.location.href })
       } catch (err) {
-        if ((err as Error).name !== 'AbortError') console.error('Share error:', err)
+        if ((err as Error).name !== 'AbortError') console.warn('Share error:', err)
       }
     } else {
       await navigator.clipboard.writeText(window.location.href)

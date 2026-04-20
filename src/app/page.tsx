@@ -85,7 +85,7 @@ export default async function RootPage({ searchParams }: Props) {
     categories = toUICategoryList(catData)
     products = (prodData as Product[]) || []
   } catch (error) {
-    console.error('SSR Data Fetch Error:', error)
+    console.warn('SSR Data Fetch Error:', error)
   }
 
   const displayCategories: CategoryViewModelLite[] = categories
