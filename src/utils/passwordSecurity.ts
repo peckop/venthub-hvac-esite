@@ -1,3 +1,14 @@
+/**
+ * Hashes a given input string using the SHA-1 algorithm and returns its uppercase hexadecimal representation.
+ * Primarily used to prepare passwords for HaveIBeenPwned (HIBP) k-Anonymity checks.
+ *
+ * @param input - The raw string (e.g., plain text password) to hash
+ * @returns A promise resolving to the uppercase SHA-1 hex string
+ *
+ * @example
+ * const hash = await sha1Hex('mypassword123');
+ * console.log(hash); // e.g. "C8B22..."
+ */
 export async function sha1Hex(input: string): Promise<string> {
   const enc = new TextEncoder()
   const data = enc.encode(input)
