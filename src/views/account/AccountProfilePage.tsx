@@ -1,4 +1,5 @@
 import React from 'react'
+import { useI18n } from '@/i18n/I18nProvider'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
@@ -11,6 +12,7 @@ interface UserMetadata {
 }
 
 export default function AccountProfilePage() {
+  const { t } = useI18n()
   const { user } = useAuth()
   const [fullName, setFullName] = React.useState<string>('')
   const [phone, setPhone] = React.useState<string>('')
@@ -30,10 +32,10 @@ export default function AccountProfilePage() {
         data: { full_name: fullName || undefined, phone: phone || undefined }
       })
       if (error) throw error
-      toast.success('Profil güncellendi')
+      toast.success(t('account.profile.toastSuccess'))
     } catch (e) {
       console.error(e)
-      toast.error('Güncelleme sırasında hata')
+      toast.error(t('account.profile.toastError'))
     } finally {
       setSaving(false)
     }
@@ -44,10 +46,10 @@ export default function AccountProfilePage() {
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
           <User className="w-6 h-6 text-primary-navy" />
-          Profil Bilgileri
+          {t('account.profile.title')}
         </h2>
         <p className="text-sm text-slate-500 mt-1">
-          Hesabınıza ait temel kişisel bilgileri buradan güncelleyebilirsiniz.
+          {t('account.profile.subtitle')}
         </p>
       </div>
 
@@ -58,7 +60,7 @@ export default function AccountProfilePage() {
               {/* İsim Alanı */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
-                  Ad Soyad
+                  {t('account.profile.fullName')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -67,7 +69,7 @@ export default function AccountProfilePage() {
                   <input
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
-                    placeholder="Örn: Ahmet Yılmaz"
+                    placeholder={t('account.profile.fullNamePlaceholder')}
                     className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                   />
                 </div>
@@ -76,7 +78,7 @@ export default function AccountProfilePage() {
               {/* Telefon Alanı */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
-                  Telefon Numarası
+                  {t('account.profile.phone')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -85,7 +87,7 @@ export default function AccountProfilePage() {
                   <input
                     value={phone}
                     onChange={e => setPhone(e.target.value.replace(/[^0-9+\s-]/g, ''))}
-                    placeholder="Örn: +90 555 123 4567"
+                    placeholder={t('account.profile.phonePlaceholder')}
                     className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                   />
                 </div>
@@ -99,11 +101,11 @@ export default function AccountProfilePage() {
               >
                 {saving ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Kaydediliyor...
+                    <Loader2 className="w-4 h-4 animate-spin" /> {t('account.profile.saving')}
                   </>
                 ) : (
                   <>
-                    <Check className="w-4 h-4" /> Değişiklikleri Kaydet
+                    <Check className="w-4 h-4" /> {t('account.profile.save')}
                   </>
                 )}
               </button>
