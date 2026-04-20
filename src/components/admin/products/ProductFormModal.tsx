@@ -54,7 +54,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     const loadProduct = useCallback(async (id: string) => {
         setLoading(true)
         try {
-            const { data: product, error } = await supabase.from('products').select('*').eq('id', id).single()
+            const { data: product, error } = await supabase.from('products').select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price').eq('id', id).single()
             if (error) throw error
 
             reset({
@@ -80,7 +80,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
 
     useEffect(() => {
         const fetchCategories = async () => {
-            const { data } = await supabase.from('categories').select('*').order('name').returns<DbCategory[]>()
+            const { data } = await supabase.from('categories').select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content').order('name').returns<DbCategory[]>()
             setCategories(data || [])
         }
         fetchCategories()

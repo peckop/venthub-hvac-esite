@@ -31,8 +31,8 @@ const AdminInventoryPage: React.FC = () => {
     try {
       setLoading(true);
       const [invRes, catRes] = await Promise.all([
-        supabase.from('inventory_summary').select('*').order('name'),
-        supabase.from('categories').select('*').order('name')
+        supabase.from('inventory_summary').select('product_id, name, supplier_name, warehouse_location, physical_stock, reserved_stock, available_stock').order('name'),
+        supabase.from('categories').select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content').order('name')
       ]);
 
       if (invRes.error) throw invRes.error;

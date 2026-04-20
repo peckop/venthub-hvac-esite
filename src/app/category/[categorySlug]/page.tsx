@@ -11,7 +11,7 @@ import { SITE_URL } from '../../../config/siteUrl'
 async function getCategoryData(slug: string) {
   const { data, error } = await supabase
     .from('categories')
-    .select('*')
+    .select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content')
     .eq('slug', slug)
     .single()
   
