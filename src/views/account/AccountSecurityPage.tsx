@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase'
 import type { UserIdentity } from '@supabase/supabase-js'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../hooks/useAuth'
-import { useI18n } from '../../i18n/I18nProvider'
+import { useI18n } from '@/i18n/I18nProvider'
 import { hibpPwnedCount } from '../../utils/passwordSecurity'
 import { ShieldCheck, Lock, Key, Check, Loader2, Mail, Link as LinkIcon, Unlink, Chrome } from 'lucide-react'
 
@@ -47,15 +47,15 @@ export default function AccountSecurityPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!current) {
-      toast.error(t('account.security.currentRequired') || 'Mevcut şifre zorunlu')
+      toast.error(t('account.security.currentRequired'))
       return
     }
     if (passedRules < 4) {
-      toast.error('Şifreniz tüm güvenlik kurallarını karşılamalıdır')
+      toast.error(t('account.security.rulesNotMet'))
       return
     }
     if (password !== confirm) {
-      toast.error(t('account.security.mismatch') || 'Şifreler uyuşmuyor')
+      toast.error(t('account.security.mismatch'))
       return
     }
     try {
@@ -64,26 +64,26 @@ export default function AccountSecurityPage() {
       const email = user?.email || ''
       const reauth = await supabase.auth.signInWithPassword({ email, password: current })
       if (reauth.error) {
-        toast.error(t('account.security.wrongCurrent') || 'Mevcut şifre hatalı')
+        toast.error(t('account.security.wrongCurrent'))
         return
       }
 
       // HIBP sızıntı kontrolü (k-Anonymity). Ağ hatasında geçer, sızıntıda engeller.
       const pwned = await hibpPwnedCount(password)
       if (pwned > 0) {
-        toast.error(t('account.security.pwned') || 'Bu şifre bilinen veri sızıntılarında bulundu. Lütfen daha güvenli bir şifre seçin.')
+        toast.error(t('account.security.pwned'))
         setSaving(false)
         return
       }
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
-      toast.success(t('account.security.updated') || 'Şifreniz başarıyla güncellendi')
+      toast.success(t('account.security.updated'))
       setCurrent('')
       setPassword('')
       setConfirm('')
     } catch (e) {
       console.error(e)
-      toast.error(t('account.security.updateError') || 'Güncelleme sırasında hata oluştu')
+      toast.error(t('account.security.updateError'))
     } finally {
       setSaving(false)
     }
@@ -94,7 +94,7 @@ export default function AccountSecurityPage() {
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
           <ShieldCheck className="w-6 h-6 text-primary-navy" />
-          {t('account.security.title') || 'Güvenlik Ayarları'}
+          {t('account.security.title')}
         </h2>
         <p className="text-sm text-slate-500 mt-1">
           Hesap güvenliğiniz için şifrenizi güncel tutun ve bağlı giriş yöntemlerinizi yönetin.
@@ -120,7 +120,7 @@ export default function AccountSecurityPage() {
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <Lock className="w-4 h-4 text-slate-400" />
                   </div>
-                  <input type="password" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder={t('account.security.currentLabel') || 'Mevcut şifreniz'} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+                  <input type="password" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder={t('account.security.currentLabel')} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
                 </div>
               </div>
 
@@ -133,7 +133,7 @@ export default function AccountSecurityPage() {
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                       <Key className="w-4 h-4 text-slate-400" />
                     </div>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('account.security.newLabel') || 'En az 8 karakter'} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('account.security.newLabel')} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
                   </div>
                   {/* Güç Göstergesi */}
                   {password.length > 0 && (
@@ -166,14 +166,14 @@ export default function AccountSecurityPage() {
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                       <Check className="w-4 h-4 text-slate-400" />
                     </div>
-                    <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={t('account.security.confirmLabel') || 'Şifreyi tekrar girin'} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+                    <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={t('account.security.confirmLabel')} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
                   </div>
                 </div>
               </div>
 
               <div className="pt-4 flex justify-end border-t border-slate-100 mt-2">
                 <button disabled={saving} className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-all hover:scale-[1.02] flex items-center gap-2">
-                  {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Güncelleniyor...</> : <><Check className="w-4 h-4" /> {t('account.security.save') || 'Şifreyi Güncelle'}</>}
+                  {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('account.security.saving')}</> : <><Check className="w-4 h-4" /> {t('account.security.save')}</>}
                 </button>
               </div>
             </form>
@@ -185,9 +185,9 @@ export default function AccountSecurityPage() {
           <div className="p-6 sm:p-8">
             <h3 className="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2 border-b border-slate-100 pb-3">
               <LinkIcon className="w-5 h-5 text-slate-500" />
-              Bağlı Giriş Yöntemleri
+              {t('account.security.linkedAccountsTitle')}
             </h3>
-            <p className="text-sm text-slate-500 mb-6 pt-2">Tek tıkla giriş yapabilmek için sosyal hesaplarınızı bağlayabilirsiniz.</p>
+            <p className="text-sm text-slate-500 mb-6 pt-2">{t('account.security.linkedAccountsSubtitle')}</p>
 
             <div className="space-y-4">
               {/* E-posta/Şifre */}
@@ -197,18 +197,16 @@ export default function AccountSecurityPage() {
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900">E-posta ve Şifre</h4>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Standart giriş yöntemi</p>
+                    <h4 className="text-sm font-bold text-slate-900">{t('account.security.emailPassword')}</h4>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">{t('account.security.standardMethod')}</p>
                   </div>
                 </div>
                 {hasProvider('email') ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
-                    <Check className="w-3.5 h-3.5" /> Bağlı
+                    <Check className="w-3.5 h-3.5" /> {t('account.security.connected')}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200 shadow-sm">
-                    Pasif
-                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200 shadow-sm"> {t('account.security.disconnected')} </span>
                 )}
               </div>
 
@@ -220,7 +218,7 @@ export default function AccountSecurityPage() {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-slate-900">Google</h4>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Tek tıkla giriş</p>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">{t('account.security.oneClickLogin')}</p>
                   </div>
                 </div>
 
@@ -228,36 +226,36 @@ export default function AccountSecurityPage() {
                   {hasProvider('google') ? (
                     <>
                       <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
-                        <Check className="w-3.5 h-3.5" /> Bağlı
+                        <Check className="w-3.5 h-3.5" /> {t('account.security.connected')}
                       </span>
                       <button
                         type="button"
                         onClick={async () => {
                           if (!hasProvider('email')) {
-                            toast.error('Son giriş yöntemini kaldıramazsınız')
+                            toast.error(t('account.security.toasts.cannotRemoveLast'))
                             return
                           }
                           try {
                             const google = identities.find(i => (i.provider || '').toLowerCase() === 'google')
                             if (!google?.id) {
-                              toast.error('Google kimliği bulunamadı')
+                              toast.error(t('account.security.toasts.googleIdNotFound'))
                               return
                             }
                             if (typeof supabase.auth.unlinkIdentity !== 'function') {
-                              toast.error('unlinkIdentity API desteklenmiyor')
+                              toast.error(t('account.security.toasts.unlinkUnsupported'))
                               return
                             }
                             const { error } = await supabase.auth.unlinkIdentity(google as UserIdentity)
                             if (error) throw error
-                            toast.success('Google bağlantısı kaldırıldı')
+                            toast.success(t('account.security.toasts.googleUnlinked'))
                             await refreshIdentities()
                           } catch (e) {
                             console.error(e)
-                            toast.error('Google bağlantısı kaldırılamadı')
+                            toast.error(t('account.security.toasts.googleUnlinkFailed'))
                           }
                         }}
                         className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100 focus:outline-none"
-                        title="Bağlantıyı Kaldır"
+                        title={t('account.security.disconnect')}
                       >
                         <Unlink className="w-4 h-4" />
                       </button>
@@ -278,25 +276,23 @@ export default function AccountSecurityPage() {
                           if (url) {
                             router.push(url as import('next').Route)
                           } else {
-                            toast.success('Google hesabı bağlama işlemi başlatıldı')
+                            toast.success(t('account.security.toasts.googleLinkStarted'))
                             await refreshIdentities()
                           }
                         } catch (e) {
                           console.error(e)
-                          toast.error('Google bağlama başarısız')
+                          toast.error(t('account.security.toasts.googleLinkFailed'))
                         }
                       }}
                       className="h-8 px-4 bg-white border border-slate-200 shadow-sm hover:border-primary-navy hover:text-primary-navy text-slate-700 text-xs font-bold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-navy/20"
-                    >
-                      Bağla
-                    </button>
+                    > {t('account.security.connect')} </button>
                   )}
                 </div>
               </div>
             </div>
 
             <p className="text-xs text-slate-500 mt-5 px-1 leading-relaxed">
-              Aynı e‑posta ile farklı giriş yöntemleri ayrı hesaplar oluşturabilir. Buradan Google hesabınızı mevcut hesabınıza bağlayarak hesap yönetimini tek bir merkezde toplayabilirsiniz.
+              {t('account.security.linkedAccountsNote')}
             </p>
           </div>
         </div>
