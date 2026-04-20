@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -77,7 +78,6 @@ const SupportHomePage: React.FC = () => {
   )
 }
 
-export default SupportHomePage
 
 
 

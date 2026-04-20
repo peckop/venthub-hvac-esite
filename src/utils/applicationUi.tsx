@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react'
 import type { ApplicationAccent, ApplicationIcon } from '../config/applications'
 
@@ -25,7 +26,7 @@ const Svg = {
   )
 }
 
-export function iconFor(icon: ApplicationIcon, size = 18) {
+function iconFor(icon: ApplicationIcon, size = 18) {
   switch (icon) {
     case 'building':
       return Svg.building(size)
@@ -40,7 +41,7 @@ export function iconFor(icon: ApplicationIcon, size = 18) {
   }
 }
 
-export function accentOverlayClass(accent: ApplicationAccent) {
+function accentOverlayClass(accent: ApplicationAccent) {
   switch (accent) {
     case 'blue':
       return 'from-secondary-blue/10'

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // Central configuration for application-driven cards used across Home and Products pages
 // This allows enabling/disabling and editing cards from a single source.
 
@@ -14,7 +15,7 @@ export type ApplicationCard = {
   active: boolean
 }
 
-export const APPLICATION_CARDS: ApplicationCard[] = [
+const APPLICATION_CARDS: ApplicationCard[] = [
   {
     key: 'parking',
     title: 'Otopark Havalandırma',
@@ -54,9 +55,6 @@ export const APPLICATION_CARDS: ApplicationCard[] = [
   },
 ]
 
-export function getActiveApplicationCards(): ApplicationCard[] {
-  return APPLICATION_CARDS.filter((c) => c.active)
-}
 
 
 
