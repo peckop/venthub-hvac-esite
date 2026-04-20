@@ -19,25 +19,49 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: 'Method not allowed' }, { status: 405 })
     }
 
-    const url = new URL(req.url)
-    const orderId = url.searchParams.get('order_id') || ''
-    const tracking = url.searchParams.get('tracking_number') || ''
-
-    if (!orderId && !tracking) {
-      return jsonResponse({ error: 'Provide order_id or tracking_number' }, { status: 400 })
-    }
-
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     if (!SUPABASE_URL || !SERVICE_KEY) {
       return jsonResponse({ error: 'Function misconfigured: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY' }, { status: 500 })
     }
 
+    // IP-based Rate Limiting to prevent tracking_number brute-force attacks
+    const forwarded = req.headers.get('x-forwarded-for') || ''
+    const ip = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '') || 'unknown'
+    const key = `shipping-status:${ip}`
+    try {
+      const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')
+      const { result } = await checkRateLimit(key, SUPABASE_URL, SERVICE_KEY, {
+        _limit: Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_PER_MINUTE') || 30),
+        _windowSec: Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_WINDOW_SEC') || 60)
+      })
+      if (!result.allowed) {
+        const rlHeaders = rateLimitHeaders(Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_PER_MINUTE') || 30), result.remaining, result.resetAt)
+        return jsonResponse({ error: 'too_many_requests' }, { status: 429, headers: rlHeaders as Record<string, string> })
+      }
+    } catch (e) {
+      // If rate_limit module is missing or throws, continue but log error
+      console.warn('Rate limiting failed or unavailable:', e)
+    }
+
+    const url = new URL(req.url)
+    // Option A: Explicitly reject the internal identifier `order_id` if provided and rely solely on `tracking_number`
+    if (url.searchParams.has('order_id')) {
+      return jsonResponse({ error: 'Internal identifiers (order_id) are not permitted for public tracking lookups. Please use tracking_number.' }, { status: 403 })
+    }
+
+    const tracking = url.searchParams.get('tracking_number') || ''
+
+    if (!tracking) {
+      return jsonResponse({ error: 'Provide a tracking_number' }, { status: 400 })
+    }
+
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY)
 
-    let query = supabase.from('venthub_orders').select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at').limit(1)
-    if (orderId) query = query.eq('id', orderId)
-    if (tracking) query = query.eq('tracking_number', tracking)
+    const query = supabase.from('venthub_orders')
+      .select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at')
+      .eq('tracking_number', tracking)
+      .limit(1)
 
     const { data, error } = await query.single()
     if (error) return jsonResponse({ error: error.message || 'Not found' }, { status: 404 })

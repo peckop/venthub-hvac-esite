@@ -1,0 +1,10 @@
+{
+  "id": "T040",
+  "title": "Dependency CVE Updates & Build Compatibility",
+  "status": "BACKLOG",
+  "description": "Address HIGH and MODERATE CVE vulnerabilities identified by pnpm audit. Attempting to update these packages (e.g., vite, next, minimatch, flatted) causes a cascade of typing and moduleResolution errors (e.g., Vite + TypeScript 6 / NodeNext conflicts) leading to CI pipeline failures and failed tests. Requires an isolated investigation to upgrade safely without breaking existing builds or tests.",
+  "brainstorm": {
+    "risks": "Updating dependencies indiscriminately breaks Vite test configurations, React compiler plugin, and Next.js resolution rules. The scope involves updating 13 High severity and 12 Moderate severity vulnerabilities.",
+    "audit_output": "25 vulnerabilities found (Severity: 12 moderate | 13 high). Key culprits: next, vite, lodash, happy-dom, picomatch, flatted, minimatch, brace-expansion, dompurify."
+  }
+}

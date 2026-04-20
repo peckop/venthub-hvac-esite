@@ -14,7 +14,7 @@ export async function generateStaticParams() {
     }
     return paths
   } catch (e) {
-    console.error('generateStaticParams error for brands:', e)
+    console.warn('generateStaticParams error for brands:', e)
     return []
   }
 }

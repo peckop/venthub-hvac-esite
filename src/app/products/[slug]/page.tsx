@@ -22,7 +22,7 @@ export async function generateStaticParams() {
     }
     return paths
   } catch (e) {
-    console.error('generateStaticParams error for products:', e)
+    console.warn('generateStaticParams error for products:', e)
     return []
   }
 }
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       }
     }
   } catch (e) {
-    console.error('generateMetadata error for product:', e)
+    console.warn('generateMetadata error for product:', e)
   }
 
   return {
@@ -81,7 +81,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     if (errorMsg.includes('fetch failed')) {
       console.warn(`Network fetch failed for product ${slug} (expected if Supabase env is missing)`)
     } else {
-      console.error(`Error fetching product data for ${slug}:`, err)
+      console.warn(`Error fetching product data for ${slug}:`, err)
     }
   }
 
