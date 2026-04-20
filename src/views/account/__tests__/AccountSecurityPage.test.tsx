@@ -101,7 +101,7 @@ describe('AccountSecurityPage', () => {
     await userEvent.type(confirmInput, '12345')
     await userEvent.click(saveBtn)
 
-    expect(toast.error).toHaveBeenCalledWith('Şifreniz tüm güvenlik kurallarını karşılamalıdır')
+    expect(toast.error).toHaveBeenCalledWith('Password must be at least 8 characters')
     expect(supabase.auth.signInWithPassword).not.toHaveBeenCalled()
   })
 
@@ -118,7 +118,7 @@ describe('AccountSecurityPage', () => {
     await userEvent.type(confirmInput, '87654321')
     await userEvent.click(saveBtn)
 
-    expect(toast.error).toHaveBeenCalledWith('Şifreniz tüm güvenlik kurallarını karşılamalıdır')
+    expect(toast.error).toHaveBeenCalledWith('Passwords do not match')
     expect(supabase.auth.signInWithPassword).not.toHaveBeenCalled()
   })
 
@@ -144,7 +144,7 @@ describe('AccountSecurityPage', () => {
 
     expect(supabase.auth.signInWithPassword).toHaveBeenCalled()
     expect(supabase.auth.updateUser).not.toHaveBeenCalled()
-    expect(toast.error).toHaveBeenCalledWith('account.security.wrongCurrent')
+    expect(toast.error).toHaveBeenCalledWith('Current password is incorrect')
   })
 
   it('updates password successfully', async () => {
@@ -175,7 +175,7 @@ describe('AccountSecurityPage', () => {
 
     expect(supabase.auth.signInWithPassword).toHaveBeenCalled()
     expect(supabase.auth.updateUser).toHaveBeenCalledWith({ password: '12345678' })
-    expect(toast.success).toHaveBeenCalledWith('account.security.success')
+    expect(toast.success).toHaveBeenCalledWith('Your password has been updated')
   })
 
   it('shows error when update fails', async () => {
@@ -206,7 +206,7 @@ describe('AccountSecurityPage', () => {
 
     expect(supabase.auth.signInWithPassword).toHaveBeenCalled()
     expect(supabase.auth.updateUser).toHaveBeenCalled()
-    expect(toast.error).toHaveBeenCalledWith('account.security.error')
+    expect(toast.error).toHaveBeenCalledWith('An error occurred while updating password')
   })
 })
 
