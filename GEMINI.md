@@ -7,13 +7,14 @@ Bu dosya, VentHub projesindeki tüm AI asistanları ve mühendisler için en üs
 > Ajan, her session başlangıcında veya yeni bir göreve (Task) geçerken aşağıdaki adımları **SIRAYLA** ve **EKSİKSİZ** yapmak zorundadır:
 > 1. `python registry/manage_registry.py normalize`: Otonom senkronizasyonu tetikle (MD -> DB -> PULSE).
 > 2. `registry/PULSE.md`: Güncel projenin genel nabzını ve açık görevleri gör.
-> 3. `python %USERPROFILE%/.gemini/antigravity/memory-engine/startup_recall.py`: Session açılışında aktif planı ve bağlamı otonom olarak (proaktif recall) CC'den yükle.
-> 4. `python %USERPROFILE%/.gemini/antigravity/memory-engine/checkpoint_mirror.py --session-id <bu_sessionin_idsi>`: Konuşma geçmişini Shadow Memory'e (Gölgelere) kaydet.
-> 5. `docs/CHANGELOG.md`: Projenin yakın geçmişini ve yapılan mimari değişiklikleri oku.
-> 6. `.agent/skills/venthub-integrity-guard/SKILL.md`: **[KRİTİK]** Bütünlük kalkanı kurallarını ve korunan varlık listesini oku.
+> 3. `cc_pulse` **(MCP)**: Orion Cortex'ten projenin bağımlılık grafiğini, kritik dosyalarını ve sağlık durumunu al.
+> 4. `python %USERPROFILE%/.gemini/antigravity/memory-engine/startup_recall.py`: Session açılışında aktif planı ve bağlamı otonom olarak (proaktif recall) CC'den yükle.
+> 5. `python %USERPROFILE%/.gemini/antigravity/memory-engine/checkpoint_mirror.py --session-id <bu_sessionin_idsi>`: Konuşma geçmişini Shadow Memory'e (Gölgelere) kaydet.
+> 6. `docs/CHANGELOG.md`: Projenin yakın geçmişini ve yapılan mimari değişiklikleri oku.
+> 7. `.agent/skills/venthub-integrity-guard/SKILL.md`: **[KRİTİK]** Bütünlük kalkanı kurallarını ve korunan varlık listesini oku.
 
-> 7. `registry/REGISTRY_PROTOCOL.md`: Dosya isimlendirme ve hiyerarşi kurallarını tazele.
-> 8. İlgili görevin `.md` dosyası (Örn: `033-tech-debt-cleanup.md`): Görevin GERÇEK statüsünü (TODO/Planning/Executing) teyit et.
+> 8. `registry/REGISTRY_PROTOCOL.md`: Dosya isimlendirme ve hiyerarşi kurallarını tazele.
+> 9. İlgili görevin `.md` dosyası (Örn: `033-tech-debt-cleanup.md`): Görevin GERÇEK statüsünü (TODO/Planning/Executing) teyit et.
 
 ## 1. İletişim Standartları
 - **Dil:** Tüm iletişim (planlar, raporlar, açıklamalar) **TÜRKÇE** olmalıdır.
