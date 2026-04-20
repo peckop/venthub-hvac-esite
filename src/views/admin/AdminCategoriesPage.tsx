@@ -89,7 +89,7 @@ const AdminCategoriesPage: React.FC = () => {
       await ensureSessionFresh()
       const { data, error: fetchErr } = await supabase
         .from('categories')
-        .select('*')
+        .select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content')
         .order('sort_order', { ascending: true })
         .order('name', { ascending: true })
 

@@ -35,7 +35,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.from('categories').select('*').eq('id', categoryId).single();
+      const { data, error } = await supabase.from('categories').select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content').eq('id', categoryId).single();
       if (error) throw error;
       const cat = data as DbCategory;
       setCategory(cat);
