@@ -29,3 +29,8 @@
 ## 2024-04-18 - Global Type Casting in Supabase Mocking
 **Learning:** When mocking Supabase's `getSession` response data in Vitest, passing an incomplete session object triggers TS2322 (Type mismatch) because Vitest expects the full `Session` type from `@supabase/supabase-js`. Using `as any` violates the strict `@typescript-eslint/no-explicit-any` linting rule causing `pnpm run lint:ci` to fail.
 **Action:** Cast the partial session mock securely bypassing both TS and ESLint via `as unknown as Session` (e.g., `{ session: { expires_at: 1000 } as unknown as Session }`), ensuring `Session` is properly imported from `@supabase/supabase-js`.
+## 2024-05-18 - Type-Safe Vitest Mocks for Supabase Client
+
+**Learning:** When mocking the Supabase client (`supabase.from()`) globally in `vi.mock()` within VentHub's strict TypeScript environment, utilizing the typical `(supabase.from as any).mockImplementation(...)` causes severe `eslint` failures (due to `@typescript-eslint/no-explicit-any`) and `tsc` strict errors if using `as never`.
+
+**Action:** Cast the mocked function specifically to `import('vitest').Mock` to bypass both linting and strict type checking safely. Example: `(supabase.from as import('vitest').Mock).mockImplementation(...)`. This satisfies type boundaries while permitting the inspection of deep mock chains (`select().eq().limit()`).
