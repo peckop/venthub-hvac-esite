@@ -1454,7 +1454,6 @@ export const en = {
     brands: 'Brands',
     techFilters: 'Technical Filters',
     airflow: 'Airflow (m³/h)',
-    findModel: 'Find the Right Model',
     showcase: {
       premiumTitle: 'Premium Engineering Solutions',
       catalog: 'Category Catalog',

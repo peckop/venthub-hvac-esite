@@ -26,7 +26,7 @@ const Svg = {
   )
 }
 
-function iconFor(icon: ApplicationIcon, size = 18) {
+export function iconFor(icon: ApplicationIcon, size = 18) {
   switch (icon) {
     case 'building':
       return Svg.building(size)
@@ -41,7 +41,7 @@ function iconFor(icon: ApplicationIcon, size = 18) {
   }
 }
 
-function accentOverlayClass(accent: ApplicationAccent) {
+export function accentOverlayClass(accent: ApplicationAccent) {
   switch (accent) {
     case 'blue':
       return 'from-secondary-blue/10'
