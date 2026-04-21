@@ -79,7 +79,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             {isAirCurtain && (
                                 <button
                                     onClick={() => setWizardOpen(true)}
-                                    className="focus-ring group flex items-center bg-gradient-to-r from-secondary-blue to-blue-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-lg shadow-blue-500/30 hover:scale-105"
+                                    className="focus-ring focus-visible:ring-2 focus-visible:ring-primary-navy group flex items-center bg-gradient-to-r from-secondary-blue to-blue-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-lg shadow-blue-500/30 hover:scale-105"
                                 >
                                     <ThermometerSun className="mr-3" size={24} />
                                     <span>{t('category.findModel')}</span>
@@ -93,10 +93,10 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                 {/* Animated Scroll Down Indicator */}
                 <button
                     onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="focus-ring absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
-
+                    className="focus-ring focus-visible:ring-2 focus-visible:ring-primary-navy absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
+                    aria-label={t('category.discoverMore')}
                 >
-                    <span className="text-xs uppercase tracking-widest font-medium">Devamını Keşfet</span>
+                    <span className="text-xs uppercase tracking-widest font-medium">{t('category.discoverMore')}</span>
                     <ChevronDown className="w-6 h-6" />
                 </button>
             </div>
@@ -116,9 +116,9 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                 <div className="bg-gray-50 py-16 border-b border-gray-100">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
-                            <h2 className="text-3xl font-bold text-industrial-gray mb-4">Hangi Hava Perdesini Seçmelisiniz?</h2>
+                            <h2 className="text-3xl font-bold text-industrial-gray mb-4">{t('category.whichAirCurtain')}</h2>
                             <p className="text-steel-gray max-w-2xl mx-auto">
-                                İhtiyacınıza en uygun çözümü belirlemenize yardımcı olalım.
+                                {t('category.airCurtainHelper')}
                             </p>
                         </div>
 
@@ -141,13 +141,13 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                     <div className="p-3 bg-orange-50 rounded-lg text-orange-500 group-hover:bg-orange-100 transition-colors">
                                         <Zap size={32} />
                                     </div>
-                                    <h4 className="text-xl font-bold text-industrial-gray">Elektrikli Isıtıcılı</h4>
+                                    <h4 className="text-xl font-bold text-industrial-gray">{t('category.electricHeated')}</h4>
                                 </div>
                                 <p className="text-gray-600 mb-4">
-                                    Kış aylarında kapı önünde sıcak karşılama sağlar.
+                                    {t('category.electricPoint1')}
                                 </p>
                                 <div className="flex items-center text-orange-500 font-semibold">
-                                    <span>Modelleri İncele</span>
+                                    <span>{t('category.inspectModels')}</span>
                                     <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                 </div>
                             </Link>
@@ -161,13 +161,13 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                     <div className="p-3 bg-blue-50 rounded-lg text-blue-500 group-hover:bg-blue-100 transition-colors">
                                         <Wind size={32} />
                                     </div>
-                                    <h4 className="text-xl font-bold text-industrial-gray">Ortam Havalı</h4>
+                                    <h4 className="text-xl font-bold text-industrial-gray">{t('category.ambientAir')}</h4>
                                 </div>
                                 <p className="text-gray-600 mb-4">
-                                    Soğuk depolar ve hijyen gereken alanlar için ideal.
+                                    {t('category.ambientPoint2')}
                                 </p>
                                 <div className="flex items-center text-blue-500 font-semibold">
-                                    <span>Modelleri İncele</span>
+                                    <span>{t('category.inspectModels')}</span>
                                     <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                 </div>
                             </Link>
@@ -195,14 +195,14 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                                 <div className="absolute bottom-8 left-8 right-8">
-                                    <h4 className="text-2xl font-bold text-white mb-2">Modern Yaşam Alanları</h4>
-                                    <p className="text-slate-200 text-sm">Minimalist tasarım ve fısıltı sessizliğinde konfor.</p>
+                                    <h4 className="text-2xl font-bold text-white mb-2">{t('category.modernLiving')}</h4>
+                                    <p className="text-slate-200 text-sm">{t('category.modernLivingDesc')}</p>
                                 </div>
                             </motion.div>
 
                             <div className="space-y-12">
                                 <div>
-                                    <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">Esneklik ve Estetik</h2>
+                                    <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">{t('category.flexibilityEsthetics')}</h2>
                                     <p className="text-lg text-slate-600 leading-relaxed italic">
                                         "Lineo Quiet ES, sadece bir fan değil; modern mimarinin sessiz kahramanıdır."
                                     </p>
@@ -214,8 +214,8 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                             <Activity size={24} />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-slate-900 mb-2">Akıllı Kontrol</h4>
-                                            <p className="text-slate-600 text-sm">Hava kalitesine göre otomatik hız ayarı ile kesintisiz taze hava.</p>
+                                            <h4 className="font-bold text-slate-900 mb-2">{t('category.smartControl')}</h4>
+                                            <p className="text-slate-600 text-sm">{t('category.smartControlDesc')}</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-6">
@@ -223,8 +223,8 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                             <ShieldCheck size={24} />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-slate-900 mb-2">Uzun Ömürlü Yatırım</h4>
-                                            <p className="text-slate-600 text-sm">Bakım gerektirmeyen motor teknolojisi ve dayanıklı polimer gövde.</p>
+                                            <h4 className="font-bold text-slate-900 mb-2">{t('category.longTermInvestment')}</h4>
+                                            <p className="text-slate-600 text-sm">{t('category.longTermInvestmentDesc')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -281,8 +281,8 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
             {/* Series Grid */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-industrial-gray mb-4">Tüm Seriler</h2>
-                    <p className="text-steel-gray">İhtiyacınıza uygun seriyi seçin</p>
+                    <h2 className="text-3xl font-bold text-industrial-gray mb-4">{t('category.allSeries')}</h2>
+                    <p className="text-steel-gray">{t('category.chooseSeriesDesc')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -313,7 +313,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
                             <div className="p-6">
                                 <div className="flex items-center justify-between text-primary-navy font-semibold group-hover:text-secondary-blue transition-colors">
-                                    <span>Seriyi İncele</span>
+                                    <span>{t('category.inspectSeries')}</span>
                                     <ArrowRight size={20} className="transform group-hover:translate-x-2 transition-transform" />
                                 </div>
                             </div>
@@ -326,7 +326,9 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
             <div className="bg-light-gray py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-industrial-gray mb-4">Neden {getCategoryDisplayName(category)}?</h2>
+                        <h2 className="text-3xl font-bold text-industrial-gray mb-4">
+                            {t('category.whyCategory', { category: getCategoryDisplayName(category) })}
+                        </h2>
                         <p className="text-steel-gray max-w-2xl mx-auto">
                             Endüstriyel standartlarda üretim ve yüksek mühendislik çözümleriyle projelerinize değer katıyoruz.
                         </p>
