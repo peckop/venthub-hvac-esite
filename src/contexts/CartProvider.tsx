@@ -14,7 +14,7 @@ const CURRENT_CART_SCHEMA = '2'
 
 import { CartContext, CartItem } from '../contexts/CartContext'
 
-export { CartContext }
+
 
 
 export function CartProvider({ children }: { children: ReactNode }) {

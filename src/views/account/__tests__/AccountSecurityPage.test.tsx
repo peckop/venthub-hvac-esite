@@ -114,8 +114,8 @@ describe('AccountSecurityPage', () => {
     const saveBtn = getByRole('button', { name: 'Save' })
 
     await userEvent.type(currentInput, 'oldpass')
-    await userEvent.type(newInput, 'StrongPassword1!')
-    await userEvent.type(confirmInput, 'DifferentPassword1!')
+    await userEvent.type(newInput, '12345678aA!')
+    await userEvent.type(confirmInput, '87654321bB@')
     await userEvent.click(saveBtn)
 
     expect(toast.error).toHaveBeenCalledWith('account.security.rulesNotMet')
@@ -138,8 +138,8 @@ describe('AccountSecurityPage', () => {
     const saveBtn = getByRole('button', { name: 'Save' })
 
     await userEvent.type(currentInput, 'wrongpass')
-    await userEvent.type(newInput, 'StrongPassword1!')
-    await userEvent.type(confirmInput, 'StrongPassword1!')
+    await userEvent.type(newInput, '12345678aA!')
+    await userEvent.type(confirmInput, '12345678aA!')
     await userEvent.click(saveBtn)
 
     expect(supabase.auth.signInWithPassword).toHaveBeenCalled()
@@ -169,12 +169,12 @@ describe('AccountSecurityPage', () => {
     const saveBtn = getByRole('button', { name: 'Save' })
 
     await userEvent.type(currentInput, 'oldpass')
-    await userEvent.type(newInput, 'StrongPassword1!')
-    await userEvent.type(confirmInput, 'StrongPassword1!')
+    await userEvent.type(newInput, '12345678aA!')
+    await userEvent.type(confirmInput, '12345678aA!')
     await userEvent.click(saveBtn)
 
     expect(supabase.auth.signInWithPassword).toHaveBeenCalled()
-    expect(supabase.auth.updateUser).toHaveBeenCalledWith({ password: 'StrongPassword1!' })
+    expect(supabase.auth.updateUser).toHaveBeenCalledWith({ password: '12345678aA!' })
     expect(toast.success).toHaveBeenCalledWith('Your password has been updated')
   })
 
@@ -200,8 +200,8 @@ describe('AccountSecurityPage', () => {
     const saveBtn = getByRole('button', { name: 'Save' })
 
     await userEvent.type(currentInput, 'oldpass')
-    await userEvent.type(newInput, 'StrongPassword1!')
-    await userEvent.type(confirmInput, 'StrongPassword1!')
+    await userEvent.type(newInput, '12345678aA!')
+    await userEvent.type(confirmInput, '12345678aA!')
     await userEvent.click(saveBtn)
 
     expect(supabase.auth.signInWithPassword).toHaveBeenCalled()

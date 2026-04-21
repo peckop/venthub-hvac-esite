@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import React from 'react'
@@ -11,7 +12,7 @@ interface InvoiceProfileModalProps {
     onSelect: (p: InvoiceProfile) => void
 }
 
-export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, onClose, profiles, onSelect }) => {
+const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, onClose, profiles, onSelect }) => {
     if (!open) return null
 
     return (
@@ -89,4 +90,3 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
     )
 }
 
-export default InvoiceProfileModal
