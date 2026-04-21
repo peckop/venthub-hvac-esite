@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import VentImage from '@/components/ui/VentImage'
-import React, { lazy, Suspense, useState, useEffect } from 'react'
+import React, { lazy, Suspense, useState, useEffect, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
@@ -51,6 +51,8 @@ const AdminCategoriesPage: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null)
 
   const selectedCategory = rows.find(r => r.id === editingId)
+
+  const categoryMap = useMemo(() => new Map(rows.map(r => [r.id, r.name])), [rows])
 
   // Columns & density
   const STORAGE_KEY = 'toolbar:categories'
@@ -329,7 +331,7 @@ const AdminCategoriesPage: React.FC = () => {
                     {visibleCols.parent && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">
-                          {rows.find(x => x.id === r.parent_id)?.name || '-'}
+                          {r.parent_id ? categoryMap.get(r.parent_id) || '-' : '-'}
                         </span>
                       </td>
                     )}

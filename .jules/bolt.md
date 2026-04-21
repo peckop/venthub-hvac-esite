@@ -37,3 +37,10 @@
 ## 2026-04-19 - [Supabase Select Payload Typescript Issue]
 **Learning:** When explicitly extracting fields for `.select()` to optimize network payloads, Typescript compiler might complain if columns specified in explicit interface definitions (like `DbCategory` in `db-rows.ts`) are missing from the `select` statement.
 **Action:** Always ensure that all keys mandatory in the receiving `DbRow` mapped interface are present in the `.select()` list, even if they aren't directly used in the component's render code, to satisfy strict Typescript constraints.
+## 2026-05-15 - [Single Pass Loop Optimization]
+**Learning:** To optimize heavy client-side computations on large arrays, replace chained array operations (like `.filter().map().reduce()`) with a single `O(n)` standard `for` or `for...of` loop to prevent unnecessary iterations and intermediate memory allocations.
+**Action:** Use a single-pass `for` loop when performing cross-reference lookups or aggregations during sorting or array rendering.
+
+## 2026-05-15 - [Context Memoization Blast Radius]
+**Learning:** Modifying React Context Provider files (e.g., adding `useMemo`/`useCallback` for memoization) carries a high blast radius that affects the entire application.
+**Action:** These changes should be scoped as dedicated, isolated tasks rather than included in general optimization sweeps.

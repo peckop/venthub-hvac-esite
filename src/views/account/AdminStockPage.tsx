@@ -54,20 +54,19 @@ export default function AdminStockPage() {
     return all.filter(p => [p.name, p.sku, p.brand].some(v => (v || '').toLowerCase().includes(t)))
   }, [all, q])
 
-  async function adjust(_productId: string, delta: number) {
+  async function adjust(p: Product, delta: number) {
     try {
-      setSaving(_productId)
+      setSaving(p.id)
       // Direkt UPDATE query - RPC yerine
-      const currentProduct = all.find(p => p.id === _productId)
-      const newQty = Math.max(0, (currentProduct?.stock_qty ?? 0) + delta)
+      const newQty = Math.max(0, (p.stock_qty ?? 0) + delta)
 
       const { error } = await supabase
         .from('products')
         .update({ stock_qty: newQty })
-        .eq('id', _productId)
+        .eq('id', p.id)
 
       if (error) throw error
-      setAll(prev => prev.map(p => p.id === _productId ? { ...p, stock_qty: newQty } : p))
+      setAll(prev => prev.map(item => item.id === p.id ? { ...item, stock_qty: newQty } : item))
     } catch (err) {
       console.error('Stock adjust error:', err)
     } finally {
@@ -201,8 +200,8 @@ export default function AdminStockPage() {
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
-                      <button disabled={saving === p.id} onClick={() => adjust(p.id, -1)} className="px-2 py-1 rounded border border-light-gray hover:border-primary-navy disabled:opacity-50"><Minus size={14} /></button>
-                      <button disabled={saving === p.id} onClick={() => adjust(p.id, +1)} className="px-2 py-1 rounded border border-light-gray hover:border-primary-navy disabled:opacity-50"><Plus size={14} /></button>
+                      <button disabled={saving === p.id} onClick={() => adjust(p, -1)} className="px-2 py-1 rounded border border-light-gray hover:border-primary-navy disabled:opacity-50"><Minus size={14} /></button>
+                      <button disabled={saving === p.id} onClick={() => adjust(p, +1)} className="px-2 py-1 rounded border border-light-gray hover:border-primary-navy disabled:opacity-50"><Plus size={14} /></button>
                       <input
                         value={tempQty_val}
                         onChange={(e) => setTempQty(prev => ({ ...prev, [p.id]: e.target.value === '' ? '' : Number(e.target.value) }))}

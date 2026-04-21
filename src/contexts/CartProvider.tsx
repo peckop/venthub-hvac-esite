@@ -436,13 +436,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (changedIds.size > 0 && CART_SERVER_SYNC && user && serverCartId) {
       try {
         import('../lib/supabase').then(({ upsertCartItem }) => {
-          const tasks = items.map(it => {
-            if (!changedIds.has(it.product.id)) return Promise.resolve()
+          const tasks: Promise<unknown>[] = []
+          for (let i = 0; i < items.length; i++) {
+            const it = items[i]
+            if (!changedIds.has(it.product.id)) continue
             const up = pmap.get(it.product.id)
-            if (up == null) return Promise.resolve()
-            return upsertCartItem({ cartId: serverCartId, _productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
-              .catch(e => console.warn('applyServerPricing upsert error', e))
-          })
+            if (up == null) continue
+            tasks.push(upsertCartItem({ cartId: serverCartId, _productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
+              .catch(e => console.warn('applyServerPricing upsert error', e)))
+          }
           Promise.allSettled(tasks).catch(() => { })
         }).catch(() => { })
       } catch { /* no-op */ }

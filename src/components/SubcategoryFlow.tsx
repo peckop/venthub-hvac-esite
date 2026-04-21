@@ -104,8 +104,10 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
         const mainCategories = allCategories.filter(c => !c.parent_id)
         const subCategories = allCategories.filter(c => !!c.parent_id)
 
+        const mainCategoryMap = new Map(mainCategories.map(m => [m.id, m]))
+
         return subCategories.map(sub => {
-            const parent = mainCategories.find(m => m.id === sub.parent_id)
+            const parent = mainCategoryMap.get(sub.parent_id || '')
             return {
                 subcategory: sub,
                 parentSlug: parent?.slug || ''
