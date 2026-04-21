@@ -1424,6 +1424,14 @@ export const en = {
     brands: 'Brands',
     techFilters: 'Technical Filters',
     airflow: 'Airflow (m³/h)',
+    findModel: 'Find the Right Model',
+    showcase: {
+      premiumTitle: 'Premium Engineering Solutions',
+      catalog: 'Category Catalog',
+      subGroups: 'Sub Product Groups',
+      exploreSeries: 'Explore Series',
+      guarantee: 'VentHub Guarantee'
+    },
     pressure: 'Pressure (Pa)',
     noise: 'Noise [dB(A)] (Max)',
     clearFilters: 'Clear Filters',
@@ -1742,6 +1750,7 @@ export const en = {
     securePaymentProvider: '{{provider}} with 256‑bit SSL encryption',
     summaryTitle: 'Order Summary',
     summaryThumb: 'Item',
+    couponDiscount: 'Coupon discount ({{code}})',
     paymentSectionTitle: 'Payment',
     paymentLoading: 'Payment form is loading. Please complete 3D verification. This page will refresh automatically when finished.',
     formPreparing: 'Preparing form...',
@@ -1812,7 +1821,8 @@ export const en = {
       vknPlaceholder: '10-digit Tax ID',
       taxOfficeLabel: 'Tax Office *',
       taxOfficePlaceholder: 'e.g., Kadikoy',
-      eInvoice: 'I am an e-Invoice taxpayer'
+      eInvoice: 'I am an e-Invoice taxpayer',
+      noProfile: 'No invoice profile added yet.'
     },
     consents: {
       title: 'Legal Consents',
