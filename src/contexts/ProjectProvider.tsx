@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react'
+import React, { createContext,  useEffect, useState, useMemo, useCallback } from 'react'
 import { 
   listUserProjects, 
   createProject, 
@@ -126,10 +126,3 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   )
 }
 
-export const useProjects = () => {
-  const context = useContext(ProjectContext)
-  if (context === undefined) {
-    throw new Error('useProjects must be used within a ProjectProvider')
-  }
-  return context
-}
