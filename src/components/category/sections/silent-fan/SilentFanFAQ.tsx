@@ -33,7 +33,10 @@ const SilentFanFAQ: React.FC = () => {
                                 style={{ transitionDelay: `${index * 100}ms` }}
                             >
                                 <button
+                                    type="button"
                                     onClick={() => setOpenIndex(isOpen ? null : index)}
+                                    aria-expanded={isOpen}
+                                    aria-controls={`silent-faq-content-${index}`}
                                     className="focus-ring w-full text-left px-6 py-5 flex items-center justify-between gap-4"
                                 >
                                     <span className={`text-lg font-bold ${isOpen ? 'text-blue-600' : 'text-slate-900'}`}>
@@ -45,6 +48,7 @@ const SilentFanFAQ: React.FC = () => {
                                 </button>
                                 
                                 <div 
+                                    id={`silent-faq-content-${index}`}
                                     className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
                                     <div className="px-6 pb-6 pt-0 text-slate-600 leading-relaxed border-t border-slate-50 mt-1">

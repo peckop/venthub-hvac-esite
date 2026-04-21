@@ -78,6 +78,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             {/* Quick Start Wizard Button (only for air curtains) */}
                             {isAirCurtain && (
                                 <button
+                                    type="button"
                                     onClick={() => setWizardOpen(true)}
                                     className="focus-ring focus-visible:ring-2 focus-visible:ring-primary-navy group flex items-center bg-gradient-to-r from-secondary-blue to-blue-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-lg shadow-blue-500/30 hover:scale-105"
                                 >
@@ -92,6 +93,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
                 {/* Animated Scroll Down Indicator */}
                 <button
+                    type="button"
                     onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
                     className="focus-ring focus-visible:ring-2 focus-visible:ring-primary-navy absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
                     aria-label={t('category.discoverMore')}

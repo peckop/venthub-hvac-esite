@@ -172,7 +172,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <div className="flex items-center gap-4">
                         {state.step > 1 && state.step < 6 && (
-                            <button onClick={prevStep} aria-label={t("needsWizard.goBack")} className="focus-ring p-2 hover:bg-white rounded-xl transition-colors">
+                            <button type="button" onClick={prevStep} aria-label={t("needsWizard.goBack")} className="focus-ring p-2 hover:bg-white rounded-xl transition-colors">
                                 <ChevronLeft size={20} className="text-slate-400" />
                             </button>
                         )}
@@ -202,6 +202,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                 {getUsageLocations(t).map((loc) => (
                                     <button
                                         key={loc.id}
+                                        type="button"
                                         onClick={() => { setState(prev => ({ ...prev, usageLocation: loc.id as WizardState['usageLocation'] })); nextStep() }}
                                         className="focus-ring group p-6 text-left rounded-3xl border border-slate-100 bg-slate-50 hover:border-cyan-500/30 hover:bg-white hover:shadow-xl hover:shadow-cyan-500/5 transition-all duration-500"
                                     >
@@ -253,7 +254,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                 </div>
                             </div>
 
-                            <button onClick={nextStep} className="focus-ring w-full max-w-xs mx-auto flex items-center justify-center gap-3 bg-slate-950 text-white py-5 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-cyan-600 transition-all">
+                            <button type="button" onClick={nextStep} className="focus-ring w-full max-w-xs mx-auto flex items-center justify-center gap-3 bg-slate-950 text-white py-5 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-cyan-600 transition-all">
                                 {t('needsWizard.next')} <ArrowRight size={16} />
                             </button>
                         </div>
@@ -263,17 +264,17 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 text-center">
                             <h2 className="text-3xl font-bold text-slate-900 mb-10 tracking-tight">{t('needsWizard.step3Title')}</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                <button onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'yes' })); nextStep() }} className="focus-ring p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-all">
+                                <button type="button" onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'yes' })); nextStep() }} className="focus-ring p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-all">
                                     <div className="text-4xl mb-4">🔥</div>
                                     <div className="font-bold">{t('admin.common.yes')}</div>
                                     <div className="text-xs text-slate-400 mt-2">{t('needsWizard.heatingYesDesc')}</div>
                                 </button>
-                                <button onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'no' })); nextStep() }} className="focus-ring p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-all">
+                                <button type="button" onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'no' })); nextStep() }} className="focus-ring p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-all">
                                     <div className="text-4xl mb-4">🌬️</div>
                                     <div className="font-bold">{t('admin.common.no')}</div>
                                     <div className="text-xs text-slate-400 mt-2">{t('needsWizard.heatingNoDesc')}</div>
                                 </button>
-                                <button onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'unsure' })); nextStep() }} className="focus-ring p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-all">
+                                <button type="button" onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'unsure' })); nextStep() }} className="focus-ring p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-all">
                                     <div className="text-4xl mb-4">❓</div>
                                     <div className="font-bold">{t('needsWizard.notSure')}</div>
                                     <div className="text-xs text-slate-400 mt-2">{t('needsWizard.consultUs')}</div>
@@ -311,7 +312,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             )}
 
                             <div className="pt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                                <button onClick={() => setState(prev => ({ ...prev, step: 1 }))} className="focus-ring px-10 py-5 rounded-2xl border border-slate-200 text-slate-900 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all">{t('needsWizard.restart')}</button>
+                                <button type="button" onClick={() => setState(prev => ({ ...prev, step: 1 }))} className="focus-ring px-10 py-5 rounded-2xl border border-slate-200 text-slate-900 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all">{t('needsWizard.restart')}</button>
                                 <Link href={Routes.contact()} className="px-10 py-5 rounded-2xl bg-cyan-500 text-slate-950 font-black uppercase text-[10px] tracking-widest hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/20">{t('needsWizard.customOffer')}</Link>
                             </div>
                         </div>
