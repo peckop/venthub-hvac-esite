@@ -3,6 +3,7 @@
 import React from 'react'
 import { InvoiceProfile } from '../../lib/supabase'
 import { X, User, Building2, Landmark, CheckCircle } from 'lucide-react'
+import { useI18n } from '@/i18n/I18nProvider'
 
 interface InvoiceProfileModalProps {
     open: boolean
@@ -12,6 +13,8 @@ interface InvoiceProfileModalProps {
 }
 
 export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, onClose, profiles, onSelect }) => {
+    const { t } = useI18n()
+
     if (!open) return null
 
     return (
@@ -72,7 +75,7 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
                     ))}
 
                     {profiles.length === 0 && (
-                        <div className="py-12 text-center text-slate-400 italic">Henüz fatura profili eklenmemiş.</div>
+                        <div className="py-12 text-center text-slate-400 italic">{t('checkout.invoice.noProfile')}</div>
                     )}
                 </div>
 
