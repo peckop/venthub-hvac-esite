@@ -101,7 +101,7 @@ describe('AccountSecurityPage', () => {
     await userEvent.type(confirmInput, '12345')
     await userEvent.click(saveBtn)
 
-    expect(toast.error).toHaveBeenCalledWith('account.security.rulesNotMet')
+    expect(toast.error).toHaveBeenCalledWith('Your password must meet all security rules')
     expect(supabase.auth.signInWithPassword).not.toHaveBeenCalled()
   })
 
@@ -118,7 +118,7 @@ describe('AccountSecurityPage', () => {
     await userEvent.type(confirmInput, 'DifferentPassword1!')
     await userEvent.click(saveBtn)
 
-    expect(toast.error).toHaveBeenCalledWith('account.security.rulesNotMet')
+    expect(toast.error).toHaveBeenCalledWith('Passwords do not match')
     expect(supabase.auth.signInWithPassword).not.toHaveBeenCalled()
   })
 

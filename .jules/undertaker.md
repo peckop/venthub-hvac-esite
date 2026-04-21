@@ -9,3 +9,8 @@
 **Dead Code Found:** `CategoryOrbitCarousel` in `index.ts`, `ROLE_PAGE_ACCESS`, `ROLE_WRITE_ACCESS` in `rbac.ts`, `getSiteUrl` in `siteUrl.ts`, and navigation constants in `navigationConfig.ts`.
 **Why It Existed:** Barrel exports of dynamically loaded components become orphaned, while internal constants inappropriately exported expose surface area.
 **Lesson:** Do not physically delete `.ts`/`.tsx` files; only remove the dead code lines. For configurations (e.g., `src/config/`), never delete constants; just remove the `export` keyword.
+
+## 2025-02-27 - Safely deprecating components and handling i18n
+**Dead Code Found:** `loginAction` in `src/actions/auth.ts`, unused config re-exports in `src/config/index.ts`, and unused components `UndecidedUserCTA` and `CategoryAuthoritySection`.
+**Why It Existed:** Old code and WIP features.
+**Lesson:** Do not physically delete `.ts`/`.tsx` files; instead, prepend them with `// @deprecated - Currently unused, candidate for removal` when instructed. Ensure test files that rely on i18n dictionaries are updated simultaneously when `t()` keys (like `account.security.mismatch`) are added or corrected to avoid breaking `vitest`.

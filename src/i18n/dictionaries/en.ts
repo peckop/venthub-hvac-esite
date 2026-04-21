@@ -2080,7 +2080,8 @@ export const en = {
       pwned: 'This password has appeared in data breaches. Please choose a different, stronger password.',
       wrongCurrent: 'Current password is incorrect',
       updated: 'Your password has been updated',
-      updateError: 'An error occurred while updating password'
+      updateError: 'An error occurred while updating password',
+      rulesNotMet: 'Your password must meet all security rules'
     }
   },
   returns: {
