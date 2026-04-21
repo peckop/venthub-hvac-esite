@@ -60,7 +60,7 @@ serve(async (req: Request) => {
           }
         }
       } catch (err) {
-        console.error('Auth fallback error:', err)
+        console.warn('Auth fallback error:', err)
       }
     }
 
@@ -148,7 +148,7 @@ serve(async (req: Request) => {
                         })
 
                         if (rpcErr) {
-                            console.error(`[ERROR] Could not adjust stock for product ${item.product_id}:`, rpcErr)
+                            console.warn(`[ERROR] Could not adjust stock for product ${item.product_id}:`, rpcErr)
                             continue
                         }
 
@@ -166,7 +166,7 @@ serve(async (req: Request) => {
                 
                 releasedCount++
             } catch (orderErr) {
-                console.error(`[CRITICAL] Failed to release order ${order.id}:`, orderErr)
+                console.warn(`[CRITICAL] Failed to release order ${order.id}:`, orderErr)
             }
         }
 
@@ -179,9 +179,9 @@ serve(async (req: Request) => {
         })
 
     } catch (error: unknown) {
-        console.error('[FATAL] Edge Function Error:', error)
-        const msg = error instanceof Error ? error.message : String(error)
-        return new Response(JSON.stringify({ error: msg }), { 
+        console.warn('[FATAL] Edge Function Error:', error)
+
+        return new Response(JSON.stringify({ error: 'internal_error' }), {
             status: 500, 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         })
