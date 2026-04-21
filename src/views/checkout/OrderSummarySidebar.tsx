@@ -87,7 +87,7 @@ const OrderSummarySidebar: React.FC<OrderSummarySidebarProps> = ({
                 </div>
                 {couponApplied ? (
                     <div className="flex justify-between text-success-green">
-                        <span>Kupon indirimi ({couponApplied.code})</span>
+                        <span>{t('checkout.couponDiscount', { code: couponApplied.code })}</span>
                         <span>-{formatCurrency(couponApplied.discount, lang, { maximumFractionDigits: 0 })}</span>
                     </div>
                 ) : null}
