@@ -26,6 +26,19 @@ async function ensureUserProfile(userId: string): Promise<boolean> {
   }
 }
 
+/**
+ * Retrieves an existing shopping cart for a user or creates a new one.
+ * If a new cart is created and the user lacks a profile record, it safely attempts
+ * to create the profile first to satisfy foreign key constraints before retrying.
+ *
+ * @param userId - The UUID of the authenticated user.
+ * @returns The database record for the user's shopping cart.
+ * @throws {Error} If cart creation fails or an unrecoverable database error occurs.
+ *
+ * @example
+ * const cart = await getOrCreateShoppingCart('123e4567-e89b-12d3-a456-426614174000')
+ * console.log(cart.id) // e.g., 'cart-uuid'
+ */
 export async function getOrCreateShoppingCart(userId: string): Promise<DbShoppingCart> {
   // Try existing
   const { data: existing, error: selErr } = await supabase
@@ -72,6 +85,17 @@ export async function getOrCreateShoppingCart(userId: string): Promise<DbShoppin
   return data as DbShoppingCart
 }
 
+/**
+ * Retrieves all items currently in the specified shopping cart.
+ *
+ * @param cartId - The unique identifier of the shopping cart.
+ * @returns An array of cart items, empty if the cart has no items.
+ * @throws {Error} If the database query fails.
+ *
+ * @example
+ * const items = await listCartItems('cart-123')
+ * console.log(items.length) // e.g., 2
+ */
 export async function listCartItems(cartId: string): Promise<DbCartItem[]> {
   const { data, error } = await supabase
     .from('cart_items')
@@ -81,6 +105,18 @@ export async function listCartItems(cartId: string): Promise<DbCartItem[]> {
   return (data as DbCartItem[]) || []
 }
 
+/**
+ * Retrieves cart items and enriches them with their corresponding domain product details.
+ * Useful for displaying the cart with product names, images, and prices.
+ *
+ * @param cartId - The unique identifier of the shopping cart.
+ * @returns An array of objects containing both the raw cart item and its mapped domain product.
+ * @throws {Error} If fetching items or enriching products fails.
+ *
+ * @example
+ * const cartDetails = await listCartItemsWithProducts('cart-123')
+ * cartDetails.forEach(d => console.log(`${d.product.name}: ${d.item.quantity}`))
+ */
 export async function listCartItemsWithProducts(cartId: string): Promise<{ item: DbCartItem; product: Product }[]> {
   const items = await listCartItems(cartId)
   if (items.length === 0) return []
@@ -103,6 +139,21 @@ export async function listCartItemsWithProducts(cartId: string): Promise<{ item:
     .filter(x => !!x.product)
 }
 
+/**
+ * Adds a product to the shopping cart or updates its quantity and pricing if it already exists.
+ *
+ * @param params - The cart item details to insert or update.
+ * @param params.cartId - The shopping cart identifier.
+ * @param params._productId - The product identifier to add or update.
+ * @param params.quantity - The desired quantity of the product.
+ * @param params.unitPrice - Optional override for the product's unit price.
+ * @param params.priceListId - Optional identifier for the price list applied.
+ * @returns An array containing the newly upserted cart item(s).
+ * @throws {Error} If the database upsert operation fails.
+ *
+ * @example
+ * const items = await upsertCartItem({ cartId: 'cart-1', _productId: 'prod-A', quantity: 3 })
+ */
 export async function upsertCartItem(params: { 
   cartId: string; 
   _productId: string; 
@@ -142,6 +193,17 @@ export async function upsertCartItem(params: {
   return (ins.data as DbCartItem[]) || []
 }
 
+/**
+ * Removes a specific product from a shopping cart.
+ *
+ * @param cartId - The unique identifier of the shopping cart.
+ * @param productId - The unique identifier of the product to remove.
+ * @returns True if the deletion was successful.
+ * @throws {Error} If the database deletion fails.
+ *
+ * @example
+ * await removeCartItem('cart-123', 'prod-456')
+ */
 export async function removeCartItem(cartId: string, productId: string): Promise<boolean> {
   const { error } = await supabase
     .from('cart_items')
@@ -152,6 +214,16 @@ export async function removeCartItem(cartId: string, productId: string): Promise
   return true
 }
 
+/**
+ * Removes all items from a specified shopping cart.
+ *
+ * @param cartId - The unique identifier of the shopping cart to empty.
+ * @returns True if the cart was successfully cleared.
+ * @throws {Error} If the database deletion fails.
+ *
+ * @example
+ * await clearCartItems('cart-123')
+ */
 export async function clearCartItems(cartId: string): Promise<boolean> {
   const { error } = await supabase
     .from('cart_items')
