@@ -12,6 +12,7 @@ import Breadcrumb from '@/components/navigation/Breadcrumb'
 import { DomainCategory } from '../../lib/type-converters'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { motion } from 'framer-motion'
+import { useI18n } from '@/i18n/I18nProvider'
 
 interface CategoryShowcaseProps {
     category: DomainCategory
@@ -25,6 +26,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     onSubcategorySelect
 }) => {
     const router = useRouter()
+    const { t } = useI18n()
     const { wrapCategory } = useCategoryViewModel()
     const [wizardOpen, setWizardOpen] = useState(false)
     
@@ -83,7 +85,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                         className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
                     >
                         <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">Premium Engineering Solutions</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">{t('category.showcase.premiumTitle')}</span>
                     </motion.div>
 
                     <motion.h1
@@ -112,7 +114,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                             className="group inline-flex items-center bg-white text-slate-950 px-10 py-5 rounded-full font-bold transition-all hover:bg-cyan-500 hover:text-white"
                         >
                             <ThermometerSun className="mr-3" size={20} />
-                            <span>Bana Uygun Modeli Bul</span>
+                            <span>{t('category.findModel')}</span>
                             <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
                         </motion.button>
                     )}
@@ -131,10 +133,10 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                 <div className="flex flex-col items-center text-center mb-20">
                     <div className="inline-flex items-center gap-2 text-cyan-600 font-black text-[10px] uppercase tracking-[0.3em] mb-4">
                         <Layers size={14} />
-                        <span>Kategori Katalogu</span>
+                        <span>{t('category.showcase.catalog')}</span>
                     </div>
                     <h2 className="text-4xl font-light tracking-tight text-slate-950 sm:text-5xl">
-                        Alt <span className="font-medium italic">Ürün Grupları</span>
+                        {t('category.showcase.subGroups')}
                     </h2>
                 </div>
 
@@ -155,7 +157,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                     <h3 className="text-2xl font-bold text-slate-950 mb-4 tracking-tight">{subVm?.displayName}</h3>
                                     <p className="text-slate-500 text-sm font-light leading-relaxed line-clamp-3 mb-10">{subVm?.description}</p>
                                     <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-cyan-600 transition-colors">
-                                        <span>Serileri İncele</span>
+                                        <span>{t('category.showcase.exploreSeries')}</span>
                                         <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-all duration-500" />
                                     </div>
                                 </div>
@@ -171,7 +173,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                         <div>
                             <div className="inline-flex items-center gap-2 text-cyan-400 font-black text-[10px] uppercase tracking-[0.3em] mb-6">
                                 <ShieldCheck size={16} />
-                                <span>VentHub Güvencesi</span>
+                                <span>{t('category.showcase.guarantee')}</span>
                             </div>
                             <h2 className="text-5xl font-light tracking-tight mb-12">Neden <span className="font-medium italic">VentHub Mühendisliği?</span></h2>
                             <div className="space-y-10">

@@ -1302,6 +1302,7 @@ export const tr = {
     securePaymentProvider: '{{provider}} ve 256‑bit SSL şifreleme',
     summaryTitle: 'Sipariş Özeti',
     summaryThumb: 'Ürün',
+    couponDiscount: 'Kupon indirimi ({{code}})',
     paymentSectionTitle: 'Ödeme Bilgileri',
     paymentLoading: 'Ödeme formu yükleniyor. Lütfen 3D doğrulamasını tamamlayın. İşlem bitince bu sayfa otomatik yenilenecektir.',
     formPreparing: 'Form hazırlanıyor...',
@@ -1372,7 +1373,8 @@ export const tr = {
       vknPlaceholder: '10 haneli VKN',
       taxOfficeLabel: 'Vergi Dairesi *',
       taxOfficePlaceholder: 'Örn: Kadıköy',
-      eInvoice: 'e-Fatura mükellefiyim'
+      eInvoice: 'e-Fatura mükellefiyim',
+      noProfile: 'Henüz fatura profili eklenmemiş.'
     },
     consents: {
       title: 'Yasal Onaylar',
@@ -1452,7 +1454,14 @@ export const tr = {
     findModel: 'Bana Uygun Modeli Bul',
     aboutCategory: 'Kategori Hakkında',
     productCount: 'Ürün Sayısı',
-    goToCategory: 'Kategoriye Git'
+    goToCategory: 'Kategoriye Git',
+    showcase: {
+      premiumTitle: 'Premium Engineering Solutions',
+      catalog: 'Kategori Katalogu',
+      subGroups: 'Alt Ürün Grupları',
+      exploreSeries: 'Serileri İncele',
+      guarantee: 'VentHub Güvencesi'
+    }
   },
   categories: {
     title: 'Ürün Kategorileri',
