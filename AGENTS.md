@@ -55,6 +55,7 @@ Before suggesting or opening a Pull Request, you MUST ensure that the following 
 2. **Superpowers Discipline:** Antigravity dahil tüm ajanlar, karmaşık görevlerde `superpowers-workflow` skill'ini (Brainstorm -> Plan -> Implement -> Review -> Finish) tam kapasiteyle kullanmalıdır.
 3. **PR Boyut Limiti:** Tek bir PR 100+ satırı geçmemeli, görevler parçalanmalı.
 4. **Dosya Silme Yasağı:** Özel emir yoksa dosya SİLME, düzenleme yap.
+5. **Scope Creep (Kapsam Sızıntısı) Kesinlikle Yasaktır:** Yeni bir özellik geliştirirken kendi dalında bulduğun ilgisiz bozuk bir dosyayı (özellikle ortak test dosyalarını) hedefin dışında düzeltemezsin. `plan.json` dosyasında özel olarak istenmiyorsa, sınırların dışına çıkmak ve dosyaları kendi PR'ına dahil etmek "Mühendislik Suçudur". Farklı ajanların aynı sızıntı dosyalarına dokunması devasa Git çakışmalarına (Conflict) neden olur. Sadece ve sadece görev mahalline odaklan.
 
 ## 7. Diagnostic Protocols: Röntgen & Enterprise Audit
 - **Röntgen Engine (Gatekeeper):** Sistemdeki temel hataları yakalar (Lint, TSC, Strict Build, Next.js async errors). `run_rontgen.py` çalıştırıldığında `PASS` dönmesi mecburidir. Röntgen `BLOCKED` ise cerrahi (kodlama) işlemi durdurmalı ve önce blokajları çözmelisin.
