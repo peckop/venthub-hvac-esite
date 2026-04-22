@@ -54,7 +54,8 @@ export function useCategoryViewModel() {
     
     let displayMode: CategoryViewModel['displayMode'] = 'series' // VARSAYILAN ARTIK ESKİ GRID DEĞİL, YENİ BEYAZ TASARIM (SERIES)
 
-    const rawDisplayMode = meta.display_mode
+    // Priority: 1. DB Column (`category.display_mode`), 2. Metadata JSON (legacy), 3. Default ('series')
+    const rawDisplayMode = category.display_mode || meta.display_mode
     
     if (rawDisplayMode === 'showcase' || rawDisplayMode === 'landing') {
       displayMode = rawDisplayMode
