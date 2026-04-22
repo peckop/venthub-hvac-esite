@@ -42,7 +42,7 @@ const DEFAULT_FILTERS: CategoryFilters = {
  * 2. URL State Synchronization
  * 3. Raw filtering and sorting of products
  */
-export function useCategoryGateway(initialCategory?: DomainCategory | null, initialProducts?: Product[]) {
+export function useCategoryGateway(initialCategory?: DomainCategory | null, initialProducts?: Product[], initialSubCategories?: DomainCategory[]) {
   const isMounted = useIsMounted()
   const params = useParams()
   const router = useRouter()
@@ -55,7 +55,7 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
 
   const [category, setCategory] = useState<DomainCategory | null>(initialCategory ?? null)
   const [parentCategory, setParentCategory] = useState<DomainCategory | null>(null)
-  const [subCategories, setSubCategories] = useState<DomainCategory[]>([])
+  const [subCategories, setSubCategories] = useState<DomainCategory[]>(initialSubCategories ?? [])
   const [products, setProducts] = useState<Product[]>(initialProducts ?? [])
   // Eğer slug yoksa (Örn: /products rotası), kategori yüklemeyeceğimiz için loading baştan false olmalıdır.
   // Aksi takdirde SSR'da boş ekran render edilir.
@@ -145,21 +145,6 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
     return { byId, bySlug, rootBySlug, bySlugAndParent, childrenByParentId }
   }, [globalCategories])
 
-  // Early sync: GlobalCategories hazır olduğunda, initialCategory için subCategories'i
-  // hemen resolve et. fetchData içindeki guard (categoriesLoading check) bunu bloklamadan önce
-  // alt kategorilerin ekranda görünmesini sağlar.
-  useEffect(() => {
-    if (categoriesLoading || globalCategories.length === 0) return
-    const cat = category || initialCategory
-    if (!cat || cat.parent_id) return
-    const subs = [...(categoryMaps.childrenByParentId.get(cat.id) || [])]
-      .sort((a, b) => {
-        const orderA = Number((a.metadata as Record<string, unknown>)?.sort_order ?? 0)
-        const orderB = Number((b.metadata as Record<string, unknown>)?.sort_order ?? 0)
-        return orderA !== orderB ? orderA - orderB : a.name.localeCompare(b.name)
-      })
-    setSubCategories(subs)
-  }, [categoriesLoading, globalCategories, categoryMaps, category, initialCategory])
 
   useEffect(() => {
     async function fetchData() {

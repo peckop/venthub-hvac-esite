@@ -16,9 +16,10 @@ import { DomainProduct } from '../lib/type-converters'
 interface CategoryMasterViewProps {
   initialCategory?: DomainCategory | null
   initialProducts?: DomainProduct[]
+  initialSubCategories?: DomainCategory[]
 }
 
-const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory, initialProducts }) => {
+const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory, initialProducts, initialSubCategories }) => {
   // 1. Pure Data Layer (Gateway)
   const {
     category: rawCategory,
@@ -28,7 +29,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
     loading,
     filters,
     updateFilters
-  } = useCategoryGateway(initialCategory, initialProducts)
+  } = useCategoryGateway(initialCategory, initialProducts, initialSubCategories)
 
   // 2. Presentation Layer (ViewModel)
   const { wrapCategory } = useCategoryViewModel()
