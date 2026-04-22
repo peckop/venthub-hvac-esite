@@ -74,6 +74,8 @@ const HowItWorks: React.FC = () => {
                                     key={index}
                                     type="button"
                                     onClick={() => setActiveStep(isActive ? -1 : index)}
+                                    aria-expanded={isActive}
+                                    aria-controls={`step-content-${index}`}
                                     className={`focus-ring relative z-10 w-full text-left p-5 rounded-xl border-2 transition-all duration-300 cursor-pointer ${isActive
                                         ? 'border-blue-500 bg-blue-50 shadow-lg'
                                         : 'border-gray-200 bg-white hover:border-blue-300'
@@ -92,7 +94,7 @@ const HowItWorks: React.FC = () => {
                                             </div>
                                             <p className="text-sm text-gray-600 mt-1">{step.description}</p>
                                             {isActive && (
-                                                <p className="text-sm text-blue-600 mt-3 animate-fade-in">
+                                                <p id={`step-content-${index}`} className="text-sm text-blue-600 mt-3 animate-fade-in">
                                                     💡 {step.detail}
                                                 </p>
                                             )}
