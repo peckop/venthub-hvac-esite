@@ -68,7 +68,8 @@ Deno.serve(async (req: Request) => {
 
     return jsonResponse({ ok: true, shipping: data })
   } catch (_e) {
-    return jsonResponse({ error: (_e as Error).message || 'Unexpected error' }, { status: 500 })
+    console.error('Shipping status error:', _e);
+    return jsonResponse({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })
   }
 })
 

@@ -123,6 +123,8 @@ Deno.serve(async (req) => {
     const total = Number(contentRange.split('/')[1] || '0') || 0
     return new Response(JSON.stringify({ total, page: pageParam, _limit: limitParam, rows }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   } catch (_e) {
-    return new Response(JSON.stringify({ error: String(_e?.message || _e) }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    console.error('Admin orders latest error:', _e);
+    const msg = _e instanceof Error ? _e.message : String(_e);
+    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   }
 })

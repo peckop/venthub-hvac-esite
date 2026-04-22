@@ -138,7 +138,9 @@ Deno.serve(async (req: Request) => {
     const { error } = await supabase.from('client_errors').insert(row)
     if (error) {
       // As a last resort, avoid failing the function; report error in body for observability
-      return new Response(JSON.stringify({ error: String(error?.message || error) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+      console.error('Log client error insert failed:', error);
+      const msg = error instanceof Error ? error.message : typeof error === 'object' && error !== null && 'message' in error ? String((error as any).message) : String(error);
+      return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
     // Slack notification for critical levels or first occurrence
@@ -163,14 +165,16 @@ Deno.serve(async (req: Request) => {
 
     return new Response('ok', { status: 200, headers: cors })
   } catch (_e) {
+    console.error('Log client error outer catch:', _e);
+    const msg = _e instanceof Error ? _e.message : String(_e);
     try {
       const { slackNotify } = await import('../_shared/notify.ts')
       await slackNotify('log-client-error failed', [
-        { title: 'Error', value: String((_e as unknown)?.message || _e), short: false },
+        { title: 'Error', value: msg, short: false },
         { title: 'Request-Id', value: requestId, short: true },
       ])
     } catch {}
-    return new Response(JSON.stringify({ error: String(_e?.message || _e) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
 })
 
