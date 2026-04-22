@@ -10,13 +10,7 @@
 // =============================================================================
 
 /** Standart hava yoğunluğu (kg/m³) @ 20°C, deniz seviyesi */
-export const AIR_DENSITY = 1.2
-
-/** Havanın özgül ısısı (kJ/kg·K) */
-export const AIR_SPECIFIC_HEAT = 1.005
-
-/** Yerçekimi ivmesi (m/s²) */
-export const GRAVITY = 9.81
+const AIR_DENSITY = 1.2
 
 // =============================================================================
 // HAVA PERDESİ HESAPLAMALARI
@@ -630,34 +624,6 @@ export function calculateJetFan(input: JetFanInput): JetFanResult {
     }
 }
 
-// =============================================================================
-// YARDIMCI FONKSİYONLAR
-// =============================================================================
-
-/**
- * Birim dönüşümleri
- */
-export const UnitConversion = {
-    // Debi
-    m3hToCfm: (m3h: number) => m3h * 0.5886,
-    cfmToM3h: (cfm: number) => cfm / 0.5886,
-
-    // Sıcaklık
-    celsiusToFahrenheit: (c: number) => (c * 9 / 5) + 32,
-    fahrenheitToCelsius: (f: number) => (f - 32) * 5 / 9,
-
-    // Basınç
-    paToInWg: (pa: number) => pa * 0.00401865,
-    inWgToPa: (inWg: number) => inWg / 0.00401865,
-
-    // Hız
-    msTofpm: (ms: number) => ms * 196.85,
-    fpmToMs: (fpm: number) => fpm / 196.85,
-
-    // Uzunluk
-    mmToInch: (mm: number) => mm * 0.03937,
-    inchToMm: (inch: number) => inch / 0.03937
-}
 
 
 

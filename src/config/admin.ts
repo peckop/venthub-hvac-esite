@@ -17,12 +17,6 @@ interface AdminUser {
 }
 
 /**
- * Middleware & Edge Sabitleri
- */
-export const SUPABASE_PROJECT_REF = 'tnofewwkwlyjsqgwjjga'
-export const AUTH_COOKIE_NAME = `sb-${SUPABASE_PROJECT_REF}-auth-token`
-
-/**
  * Production-ready admin email list
  * 
  * Admin rolleri artık database'den kontrol edilir:
@@ -32,7 +26,7 @@ export const AUTH_COOKIE_NAME = `sb-${SUPABASE_PROJECT_REF}-auth-token`
  * 
  * Fallback: E-posta tabanlı sistem (geliştirme veya acil durum)
  */
-export const FALLBACK_ADMIN_EMAILS: string[] = [
+const FALLBACK_ADMIN_EMAILS: string[] = [
   'admin@venthub.com',
   'info@venthub.com',
   'alize@venthub.com',
@@ -85,14 +79,6 @@ export async function getUserRole(userId: string, userEmail?: string): Promise<s
 }
 
 /**
- * Database'den admin kontrolü (async)
- */
-export async function isUserAdminAsync(userId: string): Promise<boolean> {
-  const role = await getUserRole(userId)
-  return ['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(role)
-}
-
-/**
  * E-posta tabanlı fallback admin kontrolü
  */
 export function isAdminByEmail(email?: string): boolean {
@@ -103,7 +89,7 @@ export function isAdminByEmail(email?: string): boolean {
 /**
  * Geliştirme ortamında admin kontrolü
  */
-export function isDevAdmin(): boolean {
+function isDevAdmin(): boolean {
   const isDev = process.env.NODE_ENV === 'development'
   const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
   return isDev && isLocalhost
@@ -134,34 +120,6 @@ export function checkAdminAccess(user: { email?: string; user_metadata?: { role?
   if (metadataRole && ['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(metadataRole)) {
     return true
   }
-
-  // 3) Lokal dev fallback
-  if (isDevAdmin()) return true
-
-  return false
-}
-
-/**
- * Async admin kontrolü - Database'den gerçek role verisi
- * Daha güvenli ama yavaş (database query gerektirir)
- */
-export async function checkAdminAccessAsync(user: { id?: string; email?: string } | null): Promise<boolean> {
-  if (!user) return false
-
-  // 1) DB'den gerçek rol kontrolü
-  if (user.id) {
-    try {
-      const { ensureSessionFresh } = await import('../lib/ensureSessionFresh')
-      await ensureSessionFresh()
-      const isAdmin = await isUserAdminAsync(user.id)
-      if (isAdmin) return true
-    } catch (error) {
-      console.warn('Database admin check failed:', error)
-    }
-  }
-
-  // 2) Email Fallback (Her zaman izin ver)
-  if (user.email && isAdminByEmail(user.email)) return true
 
   // 3) Lokal dev fallback
   if (isDevAdmin()) return true

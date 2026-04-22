@@ -20,7 +20,7 @@ interface InputFieldProps {
  * Premium input alanı
  * Tooltip, birim, hata gösterimi içerir
  */
-export const InputField: React.FC<InputFieldProps> = ({
+const InputField: React.FC<InputFieldProps> = ({
     label,
     value,
     onChange,
