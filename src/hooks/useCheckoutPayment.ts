@@ -32,6 +32,36 @@ interface UseCheckoutPaymentProps {
   t: (key: string) => string
 }
 
+/**
+ * Manages the checkout payment flow, integrating with the server-side validation and Iyzico payment gateway.
+ * Handles cart validation, generating payment requests, initializing the Iyzico form, and polling for successful payment.
+ *
+ * @param props - Configuration and state objects required for the checkout process
+ * @param props.items - Current items in the shopping cart
+ * @param props.getCartTotal - Function returning the total cart value
+ * @param props.user - The currently authenticated Supabase user (if any)
+ * @param props.clearCart - Function to empty the cart after successful payment
+ * @param props.applyServerPricing - Function to update cart prices if server validation detects mismatches
+ * @param props.customerInfo - Personal details of the customer
+ * @param props.shippingAddress - Delivery address information
+ * @param props.billingAddress - Invoice address information
+ * @param props.sameAsShipping - Boolean indicating if billing address equals shipping address
+ * @param props.invoiceType - Type of invoice ('individual' or 'corporate')
+ * @param props.invoiceInfo - Additional tax and company info for corporate invoices
+ * @param props.legalConsents - Boolean flags for accepted terms (TOS, privacy, etc.)
+ * @param props.shippingMethod - Selected shipping method identifier
+ * @param props.couponCode - Applied discount code (if any)
+ * @param props.t - Translation function for localized error messages
+ * @returns An object containing payment state (loading, token, URL), configuration functions, and the `initiatePayment` trigger.
+ *
+ * @example
+ * const { initiatePayment, loading, iyzToken } = useCheckoutPayment({
+ *   items, getCartTotal, user, clearCart, applyServerPricing,
+ *   customerInfo, shippingAddress, billingAddress, sameAsShipping: true,
+ *   invoiceType: 'individual', invoiceInfo, legalConsents, shippingMethod: 'standard',
+ *   couponCode: null, t
+ * });
+ */
 export const useCheckoutPayment = ({
   items,
   getCartTotal,
