@@ -37,3 +37,10 @@
 ## 2026-04-19 - [Supabase Select Payload Typescript Issue]
 **Learning:** When explicitly extracting fields for `.select()` to optimize network payloads, Typescript compiler might complain if columns specified in explicit interface definitions (like `DbCategory` in `db-rows.ts`) are missing from the `select` statement.
 **Action:** Always ensure that all keys mandatory in the receiving `DbRow` mapped interface are present in the `.select()` list, even if they aren't directly used in the component's render code, to satisfy strict Typescript constraints.
+## 2025-05-18 - Avoid over-fetching in Supabase queries
+**Learning:** By default, `.select('*')` grabs every column from the Supabase table, creating large network payloads.
+**Action:** Always explicitly specify necessary columns in Supabase queries (e.g., `.select('id, user_id, created_at')`) mapping exactly to the schema in `src/types/database.types.ts` instead of relying on wildcards.
+
+## 2025-05-18 - Replacing map-filter chains with reduce
+**Learning:** Sequential `.filter().map()` array operations traverse the data multiple times and allocate intermediate arrays, scaling poorly for large dynamic lists.
+**Action:** Combine them into a single `.reduce()` pass for O(n) complexity and zero intermediate allocations, keeping in mind the trade-off with readability on small lists.
