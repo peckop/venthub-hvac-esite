@@ -2,7 +2,7 @@ import React from 'react'
 import PageComponent from '../../../views/CategoryPage'
 import { supabase, getProductsEnriched } from '../../../lib/supabase'
 import { mapDatabaseCategoryToDomain } from '../../../lib/type-converters'
-import type { DomainProduct } from '../../../lib/type-converters'
+import type { DomainCategory, DomainProduct } from '../../../lib/type-converters'
 import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../../types/db-rows'
 import { SITE_URL } from '../../../config/siteUrl'
 
@@ -67,16 +67,30 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
   const category = await getCategoryData(categorySlug)
   
   let products: DomainProduct[] = []
+  let subCategories: DomainCategory[] = []
+
   if (category) {
-    // Kategoriye ait varsa alt kategorilerin ID'lerini topla (SSR)
+    // SSR: Alt kategorilerin tam verisini çek — client-side hydration race'ını ortadan kaldır
     const { data: subsData } = await supabase
       .from('categories')
-      .select('id')
+      .select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content')
       .eq('parent_id', category.id)
       .eq('is_active', true)
-      
-    const categoryIds = [category.id, ...(subsData?.map(s => s.id) || [])]
-    
+      .order('sort_order', { ascending: true })
+
+    subCategories = (subsData || []).map(s => mapDatabaseCategoryToDomain({
+      ...s,
+      name: s.name || '',
+      menu_label: s.menu_label as string | null,
+      marketing_title: s.marketing_title as string | null,
+      translation_key: s.translation_key as string | null,
+      description: s.description as string | null,
+      metadata: s.metadata as CategoryMetadata | null,
+      authority_content: s.authority_content as AuthorityContent | null
+    } as DbCategory))
+
+    const categoryIds = [category.id, ...subCategories.map(s => s.id)]
+
     products = await getProductsEnriched({
       categoryIds,
       limit: 100
@@ -105,7 +119,7 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
       />
-      <PageComponent initialCategory={category} initialProducts={products} />
+      <PageComponent initialCategory={category} initialProducts={products} initialSubCategories={subCategories} />
     </>
   )
 }
