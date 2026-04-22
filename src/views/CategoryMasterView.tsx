@@ -84,6 +84,18 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
                 />
             )
         }
+        
+        // Eğer ana kategori ise ve alt kategorileri varsa Landing görünümü (alt kategorileri göstermek için)
+        if (rawSubCategories && rawSubCategories.length > 0) {
+            return (
+              <CategoryLandingView 
+                category={category.raw}
+                subCategories={rawSubCategories}
+                products={products as DomainProduct[]}
+              />
+            )
+        }
+
         return (
           <CategoryGridView 
             category={category.raw}
