@@ -109,9 +109,9 @@ serve(async (req: Request) => {
     })
 
   } catch (error: unknown) {
-    const err = error as Error
-    console.error('[FATAL] Stock alert error:', err)
-    return new Response(JSON.stringify({ error: err.message, success: false }), {
+    console.error('[FATAL] Stock alert error:', error);
+    const msg = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: msg, success: false }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })

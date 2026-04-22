@@ -155,9 +155,9 @@ serve(async (req) => {
     return new Response(JSON.stringify({ success: true, order_id, result }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   } catch (error: unknown) {
-    const err = error as Error
-    console.error('Shipping notification error:', err.message)
-    try { sentryCaptureException(err) } catch {}
-    return new Response(JSON.stringify({ error: err.message, success: false }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    console.error('Shipping notification error:', error);
+    const msg = error instanceof Error ? error.message : String(error);
+    try { sentryCaptureException(error) } catch {}
+    return new Response(JSON.stringify({ error: msg, success: false }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 })

@@ -225,6 +225,7 @@ Deno.serve(async (req: Request) => {
 
     return json({ ok: true, _return_id: returnId, status: (patch['status'] || cur.status) })
   } catch (_e) {
-    return json({ error: (_e as Error).message || 'Unexpected error' }, { status: 500 })
+    console.error('Returns webhook error:', _e);
+    return json({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })
   }
 })
