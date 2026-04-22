@@ -46,7 +46,7 @@ const MagneticCTA: React.FC = () => {
                   window.openLeadModal?.()
                 }
               }}
-              className="inline-flex items-center justify-center rounded-xl bg-white text-primary-navy font-bold px-8 py-4 shadow-lg hover:shadow-xl transition-transform"
+              className="inline-flex items-center justify-center rounded-xl bg-white text-primary-navy font-bold px-8 py-4 shadow-lg hover:shadow-xl transition-transform focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-navy focus-visible:outline-none"
 
 
               style={{ transform: 'translate(var(--dx, 0px), var(--dy, 0px))' }}

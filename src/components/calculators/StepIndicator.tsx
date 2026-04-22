@@ -35,9 +35,11 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
                         <React.Fragment key={step.id}>
                             {/* Step Circle */}
                             <button
+                                type="button"
+                                aria-label={step.label}
                                 onClick={() => isClickable && onStepClick(step.id)}
                                 disabled={!isClickable}
-                                className={`flex flex-col items-center group ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
+                                className={`flex flex-col items-center group rounded-md focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:outline-none ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
                             >
                                 <div
                                     className={`

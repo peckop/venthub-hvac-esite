@@ -46,8 +46,9 @@ const ScrollLinkedProcess: React.FC = () => {
               {STEPS.map((s, i) => (
                 <button
                   key={s.key}
+                  type="button"
                   onClick={() => scrollTo(i)}
-                  className={`w-full text-left px-3 py-2 rounded-lg border transition ${i === active ? 'border-primary-navy bg-primary-navy/5 text-primary-navy' : 'border-light-gray bg-white text-industrial-gray hover:bg-gray-50'}`}
+                  className={`w-full text-left px-3 py-2 rounded-lg border transition focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:outline-none ${i === active ? 'border-primary-navy bg-primary-navy/5 text-primary-navy' : 'border-light-gray bg-white text-industrial-gray hover:bg-gray-50'}`}
                 >
                   <div className="text-sm font-semibold">{s.title}</div>
                   <div className="text-xs text-steel-gray">{s.desc}</div>

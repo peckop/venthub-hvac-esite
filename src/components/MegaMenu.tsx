@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useCategories } from '../contexts/CategoryContext'
 import EliteMegaMenu, { MobileMegaMenu } from './navigation/EliteMegaMenu'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface MegaMenuProps {
   isOpen: boolean
@@ -12,6 +13,7 @@ interface MegaMenuProps {
 const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   const { categories, loading } = useCategories()
   const [isMounted, setIsMounted] = useState(false)
+  const { t } = useI18n()
 
   useEffect(() => {
     setIsMounted(true)
@@ -31,9 +33,10 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
         </div>
         <button 
           onClick={onClose}
-          className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+          aria-label={t('common.close')}
+          className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:outline-none"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>

@@ -193,7 +193,7 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
 
     return (
       <div className="relative" ref={userMenuRef}>
-        <button type="button" onClick={toggleUserMenu} aria-expanded={isUserMenuOpen} className="group flex items-center gap-2.5 rounded-2xl px-2 py-1 text-left transition-all duration-300 hover:bg-air-blue/25">
+        <button type="button" onClick={toggleUserMenu} aria-expanded={isUserMenuOpen} className="group flex items-center gap-2.5 rounded-2xl px-2 py-1 text-left transition-all duration-300 hover:bg-air-blue/25 focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:outline-none">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue text-white shadow-md">
             <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" /></svg>
           </span>
@@ -221,7 +221,7 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
                   <span>{t('header.adminPanel')}</span>
                 </Link>
               )}
-              <button type="button" onClick={handleSignOut} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-steel-gray hover:bg-red-50 hover:text-red-600">
+              <button type="button" onClick={handleSignOut} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-steel-gray hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:outline-none">
                 <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
                 <span>{t('common.signOut')}</span>
               </button>
