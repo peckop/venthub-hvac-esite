@@ -51,5 +51,3 @@ if (typeof window !== 'undefined') {
         // Fallback handled by the console interceptor above.
     }
 }
-
-export { THREE };
