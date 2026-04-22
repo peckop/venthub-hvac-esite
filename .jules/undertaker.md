@@ -9,3 +9,8 @@
 **Dead Code Found:** `CategoryOrbitCarousel` in `index.ts`, `ROLE_PAGE_ACCESS`, `ROLE_WRITE_ACCESS` in `rbac.ts`, `getSiteUrl` in `siteUrl.ts`, and navigation constants in `navigationConfig.ts`.
 **Why It Existed:** Barrel exports of dynamically loaded components become orphaned, while internal constants inappropriately exported expose surface area.
 **Lesson:** Do not physically delete `.ts`/`.tsx` files; only remove the dead code lines. For configurations (e.g., `src/config/`), never delete constants; just remove the `export` keyword.
+
+## 2026-04-22 - Batch purge dead exports in config and calculation utilities
+**Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
+**Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
+**Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
