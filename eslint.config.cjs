@@ -18,6 +18,7 @@ module.exports = [
       "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
       "no-console": ["error", { "allow": ["warn", "error"] }],
       "no-empty": ["error", { "allowEmptyCatch": true }],
+      "@typescript-eslint/no-empty-object-type": ["error", { "allowInterfaces": "with-single-extends" }],
       "no-warning-comments": ["error", { 
         "terms": [
           "eslint-disable-next-line @typescript-eslint/no-explicit-any",
