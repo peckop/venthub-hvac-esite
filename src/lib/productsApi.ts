@@ -32,6 +32,19 @@ async function srf(path: string, params: Record<string, string | number | boolea
   })
 }
 
+/**
+ * Fetches the initial product lists required for the home page using Supabase REST API directly.
+ * It retrieves both featured products (up to 6) and a general list of active products.
+ * This function bypasses the full `supabase-js` client to reduce the initial bundle size for the home route.
+ *
+ * @param limit - The maximum number of general list products to retrieve (defaults to 36)
+ * @returns An object containing `featured` (array of up to 6 featured products) and `list` (array of general active products)
+ * @throws {Error} If the HTTP request for featured products or the general list fails
+ *
+ * @example
+ * const { featured, list } = await fetchHomeProducts(12);
+ * console.log(`Got ${featured.length} featured and ${list.length} general products`);
+ */
 export async function fetchHomeProducts(limit: number = 36) {
   // 1) featured
   const featuredRes = await srf('products', {

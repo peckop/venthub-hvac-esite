@@ -1,7 +1,14 @@
 /**
- * Generates a unique, collision-resistant identifier.
- * Uses globalThis.crypto.randomUUID() when available (Secure Contexts).
- * Provides a fallback using timestamp and Math.random() for non-secure contexts.
+ * Generates a unique, collision-resistant identifier string.
+ * It primarily relies on the native `crypto.randomUUID()` for cryptographically secure UUIDv4 generation.
+ * If the environment lacks the Web Crypto API (e.g., non-secure HTTP contexts or older runtimes),
+ * it safely falls back to a pseudo-random string based on the current timestamp and `Math.random()`.
+ *
+ * @returns A unique identifier string
+ *
+ * @example
+ * const cartId = generateId();
+ * console.log(cartId); // e.g., "550e8400-e29b-41d4-a716-446655440000" or "1698765432100-a1b2c3d4e"
  */
 export const generateId = (): string => {
     try {
