@@ -63,7 +63,10 @@ const FAQ: React.FC = () => {
                                     }`}
                             >
                                 <button
+                                    type="button"
                                     onClick={() => setOpenIndex(isOpen ? null : index)}
+                                    aria-expanded={isOpen}
+                                    aria-controls={`faq-content-${index}`}
                                     className={`focus-ring w-full text-left p-5 flex items-center justify-between gap-4 transition-colors ${isOpen ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'
                                         }`}
                                 >
@@ -78,6 +81,7 @@ const FAQ: React.FC = () => {
                                 </button>
 
                                 <div
+                                    id={`faq-content-${index}`}
                                     className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96' : 'max-h-0'
                                         }`}
                                 >
