@@ -93,11 +93,14 @@ const HowItWorks: React.FC = () => {
                                                 {isActive ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                                             </div>
                                             <p className="text-sm text-gray-600 mt-1">{step.description}</p>
-                                            {isActive && (
-                                                <p id={`step-content-${index}`} className="text-sm text-blue-600 mt-3 animate-fade-in">
+                                            <div 
+                                                id={`step-content-${index}`} 
+                                                className={`overflow-hidden transition-all duration-300 ease-in-out ${isActive ? 'max-h-24 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
+                                            >
+                                                <p className="text-sm text-blue-600 animate-fade-in">
                                                     💡 {step.detail}
                                                 </p>
-                                            )}
+                                            </div>
                                         </div>
                                     </div>
                                 </button>
