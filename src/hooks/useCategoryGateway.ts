@@ -145,6 +145,22 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
     return { byId, bySlug, rootBySlug, bySlugAndParent, childrenByParentId }
   }, [globalCategories])
 
+  // Early sync: GlobalCategories hazır olduğunda, initialCategory için subCategories'i
+  // hemen resolve et. fetchData içindeki guard (categoriesLoading check) bunu bloklamadan önce
+  // alt kategorilerin ekranda görünmesini sağlar.
+  useEffect(() => {
+    if (categoriesLoading || globalCategories.length === 0) return
+    const cat = category || initialCategory
+    if (!cat || cat.parent_id) return
+    const subs = [...(categoryMaps.childrenByParentId.get(cat.id) || [])]
+      .sort((a, b) => {
+        const orderA = Number((a.metadata as Record<string, unknown>)?.sort_order ?? 0)
+        const orderB = Number((b.metadata as Record<string, unknown>)?.sort_order ?? 0)
+        return orderA !== orderB ? orderA - orderB : a.name.localeCompare(b.name)
+      })
+    setSubCategories(subs)
+  }, [categoriesLoading, globalCategories, categoryMaps, category, initialCategory])
+
   useEffect(() => {
     async function fetchData() {
       if (categoriesLoading || globalCategories.length === 0) return
