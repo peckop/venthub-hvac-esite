@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import type { Database, Json } from '../types/database.types'
 import type { DomainCategory, DomainProduct } from '../types/ui-models'
 
@@ -30,17 +31,22 @@ if (missingEnv) {
 }
 
 // Create client with real or dummy values to prevent instant crash
-export const supabase = createClient<Database>(
-  SUPABASE_URL || 'https://placeholder.supabase.co',
-  SUPABASE_ANON_KEY || 'placeholder-key',
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
-    }
-  }
-)
+export const supabase = typeof window !== 'undefined'
+  ? createBrowserClient<Database>(
+      SUPABASE_URL || 'https://placeholder.supabase.co',
+      SUPABASE_ANON_KEY || 'placeholder-key'
+    )
+  : createClient<Database>(
+      SUPABASE_URL || 'https://placeholder.supabase.co',
+      SUPABASE_ANON_KEY || 'placeholder-key',
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false
+        }
+      }
+    )
 
 // Database types
 export type Category = DomainCategory
