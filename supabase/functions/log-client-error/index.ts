@@ -139,7 +139,7 @@ Deno.serve(async (req: Request) => {
     if (error) {
       // As a last resort, avoid failing the function; report error in body for observability
       console.error('Log client error insert failed:', error);
-      const msg = error instanceof Error ? error.message : typeof error === 'object' && error !== null && 'message' in error ? String((error as any).message) : String(error);
+      const msg = error instanceof Error ? error.message : typeof error === 'object' && error !== null && 'message' in error ? String((error as { message: unknown }).message) : String(error);
       return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
