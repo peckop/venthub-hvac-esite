@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react'
 import type { ApplicationAccent, ApplicationIcon } from '../config/applications'
 
