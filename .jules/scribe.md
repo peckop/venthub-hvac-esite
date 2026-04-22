@@ -14,3 +14,7 @@
 ## 2024-05-18 - Batch documentation truncation limits
 **Learning:** When reading files in bash with commands like `cat`, output will be truncated if the file size exceeds roughly 1000 characters. Trying to document these files based on partial knowledge violates the groundedness rule.
 **Action:** Use specific read tools (`read_file`) or specific line limits in bash (`sed -n '1,30p' <file>`) to ensure the entire function structure and return statements are explicitly verified before generating accurate TSDocs.
+
+## 2026-04-22 - [Multiple Documentation Blocks]
+**Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
+**Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
