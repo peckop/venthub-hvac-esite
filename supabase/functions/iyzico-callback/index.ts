@@ -365,8 +365,8 @@ Deno.serve(async (req) => {
           }
         }
       } catch (_e: unknown) {
-        const msg = _e instanceof Error ? _e.message : String(_e ?? '')
-        console.warn('Stock reduction RPC error:', msg);
+    console.error(_e);
+        console.warn('Stock reduction RPC error:', _e);
       }
       
       // After a successful payment, clear ALL server carts for this user (defensive against duplicates)
@@ -456,8 +456,8 @@ Deno.serve(async (req) => {
     const accept = (req.headers.get('accept') || '').toLowerCase()
     const wantsJson = accept.includes('application/json') || !!req.headers.get('x-client-info')
     if (wantsJson) {
-      const msg = error instanceof Error ? error.message : String(error);
-      return new Response(JSON.stringify({ status: 'pending', error: msg }), { status: 200, headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" } });
+
+      return new Response(JSON.stringify({ status: 'pending', error: 'Internal server error' }), { status: 200, headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" } });
     }
     try {
       const url = new URL(req.url);

@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ ok: true, cancelled_count: Array.isArray(cancelled) ? cancelled.length : 0, reconciled, failed }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
   } catch (_e) {
-    const msg = _e instanceof Error ? _e.message : String(_e ?? '')
-    return new Response(JSON.stringify({ ok: false, error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+    console.error(_e);
+    return new Response(JSON.stringify({ ok: false, error: 'Internal server error' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
   }
 })

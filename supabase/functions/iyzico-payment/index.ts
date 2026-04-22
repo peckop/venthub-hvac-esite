@@ -72,6 +72,7 @@ Deno.serve(async (req: Request) => {
                 }
             }
         } catch (_e) {
+    console.error(_e);
             if (debugEnabled) console.warn('rate_limit skipped:', _e)
         }
 
@@ -522,7 +523,7 @@ Deno.serve(async (req: Request) => {
                     })
                 }
             } catch (_e) {
-                const msg = _e instanceof Error ? _e.message : String(_e ?? '')
+    console.error(_e);
                 console.warn('payment_data token patch skipped:', msg)
             }
 

@@ -76,7 +76,7 @@ Deno.serve(async (req: Request) => {
     return new Response(JSON.stringify({ ok: !!row, rpcUrl, row }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
   } catch (_e: unknown) {
     console.error('Admin order inspect error:', _e);
-    const msg = _e instanceof Error ? _e.message : 'unknown';
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
 })

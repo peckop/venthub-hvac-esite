@@ -40,6 +40,8 @@ Deno.serve(async (req: Request) => {
         return jsonResponse({ error: 'too_many_requests' }, { status: 429, headers: rlHeaders as Record<string, string> })
       }
     } catch (e) {
+    console.error(e)
+
       // If rate_limit module is missing or throws, continue but log error
       console.warn('Rate limiting failed or unavailable:', e)
     }

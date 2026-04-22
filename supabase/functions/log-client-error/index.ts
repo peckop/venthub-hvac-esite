@@ -139,8 +139,8 @@ Deno.serve(async (req: Request) => {
     if (error) {
       // As a last resort, avoid failing the function; report error in body for observability
       console.error('Log client error insert failed:', error);
-      const msg = error instanceof Error ? error.message : typeof error === 'object' && error !== null && 'message' in error ? String((error as { message: unknown }).message) : String(error);
-      return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+
+      return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
     // Slack notification for critical levels or first occurrence
@@ -166,7 +166,7 @@ Deno.serve(async (req: Request) => {
     return new Response('ok', { status: 200, headers: cors })
   } catch (_e) {
     console.error('Log client error outer catch:', _e);
-    const msg = _e instanceof Error ? _e.message : String(_e);
+
     try {
       const { slackNotify } = await import('../_shared/notify.ts')
       await slackNotify('log-client-error failed', [
@@ -174,7 +174,7 @@ Deno.serve(async (req: Request) => {
         { title: 'Request-Id', value: requestId, short: true },
       ])
     } catch {}
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
 })
 

@@ -200,8 +200,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ success: true, return_id, new_status }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Unknown error'
-    console.error('Notification error:', msg)
-    return new Response(JSON.stringify({ error: msg, success: false }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    console.error('Notification error:', error)
+    return new Response(JSON.stringify({ error: 'Internal server error', success: false }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 })

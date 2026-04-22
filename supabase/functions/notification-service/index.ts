@@ -147,10 +147,8 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Notification service error:', error)
-    
-    const msg = error instanceof Error ? error.message : 'Unknown error'
     return new Response(JSON.stringify({ 
-      error: msg,
+      error: 'Internal server error',
       success: false 
     }), {
       status: 500,

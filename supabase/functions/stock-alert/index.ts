@@ -110,8 +110,8 @@ serve(async (req: Request) => {
 
   } catch (error: unknown) {
     console.error('[FATAL] Stock alert error:', error);
-    const msg = error instanceof Error ? error.message : String(error);
-    return new Response(JSON.stringify({ error: msg, success: false }), {
+
+    return new Response(JSON.stringify({ error: 'Internal server error', success: false }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })

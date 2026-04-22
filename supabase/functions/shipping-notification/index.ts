@@ -156,8 +156,8 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Shipping notification error:', error);
-    const msg = error instanceof Error ? error.message : String(error);
+
     try { sentryCaptureException(error) } catch {}
-    return new Response(JSON.stringify({ error: msg, success: false }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ error: 'Internal server error', success: false }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 })

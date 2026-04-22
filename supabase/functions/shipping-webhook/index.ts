@@ -250,8 +250,7 @@ Deno.serve(async (req: Request) => {
       .single()
 
     if (error) {
-      const msg = (typeof (error as { message?: unknown })?.message === 'string') ? (error as { message: string }).message : 'Update failed'
-      return jsonResponse({ error: msg }, { status: 500 })
+      return jsonResponse({ error: 'Internal server error' }, { status: 500 })
     }
 
     // Insert event audit

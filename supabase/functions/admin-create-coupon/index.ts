@@ -46,7 +46,7 @@ Deno.serve(async (req: Request) => {
       .maybeSingle()
 
     if (profErr) {
-      return new Response(JSON.stringify({ error: 'profile_error', details: profErr.message }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+      return new Response(JSON.stringify({ error: 'profile_error', details: 'Profile query failed' }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
     const userRole = profile?.role as string | undefined || 'user'
@@ -106,12 +106,12 @@ Deno.serve(async (req: Request) => {
       .single()
 
     if (insErr) {
-      return new Response(JSON.stringify({ error: 'insert_failed', details: insErr.message }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+      return new Response(JSON.stringify({ error: 'insert_failed', details: 'Insert failed' }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
     return new Response(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
   } catch (_e: unknown) {
-    const msg = _e instanceof Error ? _e.message : String(_e)
-    return new Response(JSON.stringify({ error: 'internal', details: msg }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+    console.error(_e);
+    return new Response(JSON.stringify({ error: 'internal', details: 'Internal error' }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
   }
 })

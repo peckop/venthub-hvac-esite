@@ -133,7 +133,7 @@ Deno.serve(async (req: Request) => {
     const resp: ApplyCouponResp = { val_id: true, discount_amount: Number(discount.toFixed(2)), final_total: finalTotal, normalized_code: row.code }
     return new Response(JSON.stringify(resp), { status: 200, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
   } catch (_e) {
-    const msg = _e instanceof Error ? _e.message : String(_e)
-    return new Response(JSON.stringify({ val_id: false, reason: 'internal', details: msg } satisfies ApplyCouponResp), { status: 500, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
+    console.error(_e);
+    return new Response(JSON.stringify({ val_id: false, reason: 'internal', details: 'Internal error' } satisfies ApplyCouponResp), { status: 500, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
   }
 })

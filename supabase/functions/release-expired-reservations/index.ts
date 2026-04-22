@@ -60,6 +60,7 @@ serve(async (req: Request) => {
           }
         }
       } catch (err) {
+    console.error(err);
         console.warn('Auth fallback error:', err)
       }
     }
@@ -166,6 +167,7 @@ serve(async (req: Request) => {
                 
                 releasedCount++
             } catch (orderErr) {
+    console.error(orderErr);
                 console.warn(`[CRITICAL] Failed to release order ${order.id}:`, orderErr)
             }
         }
@@ -179,6 +181,7 @@ serve(async (req: Request) => {
         })
 
     } catch (error: unknown) {
+    console.error(error);
         console.warn('[FATAL] Edge Function Error:', error)
 
         return new Response(JSON.stringify({ error: 'internal_error' }), {

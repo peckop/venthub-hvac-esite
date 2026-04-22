@@ -180,7 +180,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ ok, items: recalculated, mismatches, stock_issues: stockIssues, totals: { subtotal, subtotal_cents: subtotalCents }, cart_id: cartId }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
   } catch (_e) {
     console.error('Order validate error:', _e);
-    const msg = _e instanceof Error ? _e.message : 'unknown';
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
+
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 });

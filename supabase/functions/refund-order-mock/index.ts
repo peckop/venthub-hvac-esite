@@ -144,7 +144,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ ok: true, order_id, payment_status: newPaymentStatus, amount: target }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
   } catch (_e: unknown) {
-    const msg = _e instanceof Error ? _e.message : String(_e)
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+    console.error(_e);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
   }
 })
