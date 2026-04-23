@@ -14,6 +14,18 @@ export interface ClockShim extends THREE.Timer {
     elapsedTime?: number;
 }
 
+/**
+ * Creates and returns a shim object based on `THREE.Timer` that acts as a drop-in replacement
+ * for the deprecated `THREE.Clock`. This is primarily used to maintain compatibility
+ * with `@react-three/fiber`'s internal state without triggering deprecation warnings.
+ *
+ * @returns A `ClockShim` instance which wraps `THREE.Timer` with `THREE.Clock`-like methods
+ *
+ * @example
+ * const clock = createTimerClock();
+ * const delta = clock.getDelta();
+ * const elapsed = clock.getElapsedTime();
+ */
 export const createTimerClock = (): ClockShim => {
     // Check if Timer exists (it should since Three.js r163+)
     // In r183, Clock is deprecated, so Timer is the way forward.
