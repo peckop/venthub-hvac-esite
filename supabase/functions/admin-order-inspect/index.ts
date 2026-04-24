@@ -25,12 +25,12 @@ Deno.serve(async (req: Request) => {
     const supabaseUser = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
 
-    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
-    if (userErr || !userRes?.user) {
+    const { data: { user }, error: userErr } = await supabaseUser.auth.getUser()
+    if (userErr || !user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
-    const { data: profile, error: profErr } = await supabaseAdmin.from('user_profiles').select('role').eq('id', userRes.user.id).maybeSingle()
+    const { data: profile, error: profErr } = await supabaseAdmin.from('user_profiles').select('role').eq('id', user.id).maybeSingle()
     const userRole = profile?.role as string | undefined
     if (profErr || !userRole || !['admin', 'superadmin'].includes(userRole)) {
       return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type':'application/json' } })
