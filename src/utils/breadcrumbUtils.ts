@@ -4,7 +4,17 @@ import { getCategoryDisplayName } from './categoryHelpers'
 import { DomainCategory } from '../lib/type-converters'
 
 /**
- * Helper: Kategori sayfaları için breadcrumb items oluştur
+ * Constructs an array of breadcrumb items representing the navigation path to a category.
+ * Handles single-level and two-level (parent -> child) category hierarchies.
+ *
+ * @param category - The current target category being viewed. If null/undefined, the breadcrumb won't include it.
+ * @param parentCategory - The parent category of the target, if one exists. Generates an intermediate link.
+ * @param homeLabel - The text label to display for the root breadcrumb link (defaults to 'Ana Sayfa').
+ * @returns An ordered array of `BreadcrumbItem` objects suitable for rendering. The last item omits `href` to represent the current page.
+ *
+ * @example
+ * const items = buildCategoryBreadcrumb(childCategory, parentCategory, 'Home')
+ * // Returns: [{ label: 'Home', href: '/' }, { label: 'Parent', href: '/c/parent' }, { label: 'Child', href: undefined }]
  */
 export function buildCategoryBreadcrumb(
     category: DomainCategory | null | undefined,

@@ -25,6 +25,17 @@ const Svg = {
   )
 }
 
+/**
+ * Maps an application icon name to its corresponding SVG component.
+ *
+ * @param icon - The name of the icon to render (e.g., 'building', 'wind').
+ * @param size - The width and height of the SVG element in pixels (defaults to 18).
+ * @returns The rendered SVG React node, or null if the icon name is unrecognized.
+ *
+ * @example
+ * const MyIcon = iconFor('wind', 24)
+ * return <div>{MyIcon}</div>
+ */
 export function iconFor(icon: ApplicationIcon, size = 18) {
   switch (icon) {
     case 'building':
@@ -40,6 +51,17 @@ export function iconFor(icon: ApplicationIcon, size = 18) {
   }
 }
 
+/**
+ * Resolves an application accent color to a Tailwind CSS class for an overlay background.
+ * Uses a 'from-[color]/10' pattern to create subtle gradients.
+ *
+ * @param accent - The logical accent color name (e.g., 'blue', 'emerald').
+ * @returns A string containing the applicable Tailwind CSS class.
+ *
+ * @example
+ * const overlayClass = accentOverlayClass('emerald') // returns 'from-emerald-500/10'
+ * return <div className={`bg-gradient-to-r ${overlayClass}`}>Content</div>
+ */
 export function accentOverlayClass(accent: ApplicationAccent) {
   switch (accent) {
     case 'blue':
