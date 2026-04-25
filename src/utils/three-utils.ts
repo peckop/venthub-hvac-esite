@@ -14,6 +14,17 @@ export interface ClockShim extends THREE.Timer {
     elapsedTime?: number;
 }
 
+/**
+ * Creates and returns a shim object that behaves like THREE.Clock but internally uses THREE.Timer.
+ * Resolves deprecation warnings introduced in newer versions of Three.js while maintaining full
+ * compatibility with older libraries relying on the `state.clock` API.
+ *
+ * @returns A `ClockShim` object mimicking THREE.Clock with timer-based delta calculation
+ *
+ * @example
+ * const clock = createTimerClock()
+ * const delta = clock.getDelta() // Calculates the time since last delta request
+ */
 export const createTimerClock = (): ClockShim => {
     // Check if Timer exists (it should since Three.js r163+)
     // In r183, Clock is deprecated, so Timer is the way forward.
