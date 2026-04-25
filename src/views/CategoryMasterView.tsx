@@ -37,7 +37,13 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
   // 3. Derived UI State via ViewModel
   const category = useMemo(() => wrapCategory(rawCategory), [rawCategory, wrapCategory])
   const parentCategory = useMemo(() => wrapCategory(rawParentCategory), [rawParentCategory, wrapCategory])
-  const availableBrands = useMemo(() => Array.from(new Set(products.map(p => p.brand).filter(Boolean))), [products])
+  const availableBrands = useMemo(() => {
+    const brands = new Set<string>()
+    for (const p of products) {
+      if (p.brand) brands.add(p.brand)
+    }
+    return Array.from(brands)
+  }, [products])
 
 
 

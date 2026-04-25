@@ -197,19 +197,49 @@ export default function OrderDetailPage() {
 
   const handleReorder = async (o: Order) => {
     try {
-      const ids = Array.from(new Set((o.order_items || []).map(it => it.product_id).filter(Boolean))) as string[]
-      const names = Array.from(new Set((o.order_items || []).filter(it => !it.product_id && it.product_name).map(it => it.product_name)))
+      const idSet = new Set<string>()
+      const nameSet = new Set<string>()
+      for (const it of o.order_items || []) {
+        if (it.product_id) idSet.add(it.product_id)
+        else if (it.product_name) nameSet.add(it.product_name)
+      }
+      const ids = Array.from(idSet)
+      const names = Array.from(nameSet)
+
       const productMap: Record<string, Product> = {}
+
+      const promises = []
       if (ids.length > 0) {
-        const { data, error } = await supabase.from('products').select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price').in('id', ids)
-        if (error) throw error
-          ; ((data || []) as Product[]).forEach((p) => { productMap[p.id] = p })
+        promises.push(
+          supabase.from('products')
+            .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+            .in('id', ids)
+            .then(({ data, error }) => {
+              if (error) throw error
+              return { type: 'id', data: (data || []) as Product[] }
+            })
+        )
       }
       if (names.length > 0) {
-        const { data, error } = await supabase.from('products').select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price').in('name', names)
-        if (error) throw error
-          ; ((data || []) as Product[]).forEach((p) => { productMap[p.name] = p })
+        promises.push(
+          supabase.from('products')
+            .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+            .in('name', names)
+            .then(({ data, error }) => {
+              if (error) throw error
+              return { type: 'name', data: (data || []) as Product[] }
+            })
+        )
       }
+
+      const results = await Promise.all(promises)
+      for (const res of results) {
+        res.data.forEach((p) => {
+          if (res.type === 'id') productMap[p.id] = p
+          else productMap[p.name] = p
+        })
+      }
+
       let added = 0
       for (const it of o.order_items || []) {
         let prod: Product | undefined

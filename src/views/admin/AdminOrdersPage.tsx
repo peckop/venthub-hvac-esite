@@ -342,7 +342,12 @@ const AdminOrdersPage: React.FC = () => {
       return
     }
 
-    const targets = rows.filter(r => selectedIds.includes(r.id) && r.status !== 'shipped').map(r => r.id)
+    const targets: string[] = []
+    for (const r of rows) {
+      if (selectedIds.includes(r.id) && r.status !== 'shipped') {
+        targets.push(r.id)
+      }
+    }
     if (targets.length === 0) { setShipOpen(false); return }
     try {
       if (!advBulk) {
@@ -416,7 +421,12 @@ const AdminOrdersPage: React.FC = () => {
   }
 
   async function bulkCancelShipping() {
-    const targets = rows.filter(r => selectedIds.includes(r.id) && r.status === 'shipped').map(r => r.id)
+    const targets: string[] = []
+    for (const r of rows) {
+      if (selectedIds.includes(r.id) && r.status === 'shipped') {
+        targets.push(r.id)
+      }
+    }
     if (targets.length === 0) return
     if (!window.confirm(t('admin.orders.bulk.confirmCancelShipping', { count: String(targets.length) }))) return
     try {
@@ -424,7 +434,10 @@ const AdminOrdersPage: React.FC = () => {
         const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', { body: { order_id: id, cancel: true, send_email: false } })
         return { id, ok: !fnErr }
       }))
-      const failed = results.filter(r => !r.ok).map(r => r.id)
+      const failed: string[] = []
+      for (const r of results) {
+        if (!r.ok) failed.push(r.id)
+      }
       setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: failed.includes(r.id) ? r.status : 'confirmed' } : r))
       setSelectedIds([])
     } catch {
