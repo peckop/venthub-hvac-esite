@@ -25,6 +25,16 @@ const Svg = {
   )
 }
 
+/**
+ * Maps an ApplicationIcon literal to its corresponding SVG React element.
+ *
+ * @param icon - The icon identifier to render.
+ * @param size - The dimensions (width/height) of the SVG in pixels. Defaults to 18.
+ * @returns The rendered SVG element, or null if the icon is not found.
+ *
+ * @example
+ * const buildingIcon = iconFor('building', 24);
+ */
 export function iconFor(icon: ApplicationIcon, size = 18) {
   switch (icon) {
     case 'building':
@@ -40,6 +50,15 @@ export function iconFor(icon: ApplicationIcon, size = 18) {
   }
 }
 
+/**
+ * Maps an ApplicationAccent literal to its corresponding Tailwind gradient class.
+ *
+ * @param accent - The accent color identifier.
+ * @returns The Tailwind CSS class string for the gradient overlay.
+ *
+ * @example
+ * const className = accentOverlayClass('emerald'); // returns 'from-emerald-500/10'
+ */
 export function accentOverlayClass(accent: ApplicationAccent) {
   switch (accent) {
     case 'blue':
