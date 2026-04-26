@@ -2,6 +2,7 @@ import React from 'react'
 import { ArrowUp, ThermometerSun, Package, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { Routes } from '../../../utils/routes';
+import { useI18n } from '../../../i18n/I18nProvider'
 
 
 interface BottomCTAProps {
@@ -29,6 +30,8 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
     showWizard = true,
     categoryName = 'Ürünler'
 }) => {
+    const { t } = useI18n()
+
     const scrollToTop = () => {
         if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -47,10 +50,10 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
                 {/* Header */}
                 <div className="text-center mb-10">
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                        Sıradaki Adımınız
+                        {t('category.sections.bottomCTA.title')}
                     </h2>
                     <p className="text-gray-300 max-w-xl mx-auto">
-                        Size en uygun {categoryName.toLowerCase()} için yardımcı olalım
+                        {t('category.sections.bottomCTA.subtitle', { categoryName: categoryName.toLowerCase() })}
                     </p>
                 </div>
 
@@ -66,8 +69,8 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
                             <div className="w-14 h-14 bg-secondary-blue rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <Package className="text-white" size={28} />
                             </div>
-                            <span className="text-lg font-bold text-white mb-1">Modelleri İncele</span>
-                            <span className="text-sm text-gray-400">Tüm ürünleri görüntüle</span>
+                            <span className="text-lg font-bold text-white mb-1">{t('category.sections.bottomCTA.inspectModels')}</span>
+                            <span className="text-sm text-gray-400">{t('category.sections.bottomCTA.inspectModelsDesc')}</span>
                         </button>
                     )}
 
@@ -81,8 +84,8 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
                             <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:bg-white/30 transition-colors">
                                 <ThermometerSun className="text-yellow-300" size={28} />
                             </div>
-                            <span className="text-lg font-bold text-white mb-1">Bana Uygun Olanı Bul</span>
-                            <span className="text-sm text-blue-100">3 adımda doğru model</span>
+                            <span className="text-lg font-bold text-white mb-1">{t('category.sections.bottomCTA.findSuitable')}</span>
+                            <span className="text-sm text-blue-100">{t('category.sections.bottomCTA.findSuitableDesc')}</span>
                         </button>
                     )}
 
@@ -94,8 +97,8 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
                         <div className="w-14 h-14 bg-emerald-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                             <MessageSquare className="text-white" size={28} />
                         </div>
-                        <span className="text-lg font-bold text-white mb-1">Uzman Desteği</span>
-                        <span className="text-sm text-gray-400">Proje danışmanlığı al</span>
+                        <span className="text-lg font-bold text-white mb-1">{t('category.sections.bottomCTA.expertSupport')}</span>
+                        <span className="text-sm text-gray-400">{t('category.sections.bottomCTA.expertSupportDesc')}</span>
                     </Link>
                 </div>
 
@@ -107,7 +110,7 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
                         className="focus-ring flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
                     >
                         <ArrowUp size={18} className="group-hover:-translate-y-1 transition-transform" />
-                        <span className="text-sm">Başa Dön</span>
+                        <span className="text-sm">{t('category.sections.bottomCTA.backToTop')}</span>
                     </button>
                 </div>
             </div>
