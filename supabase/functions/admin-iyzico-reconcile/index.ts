@@ -104,14 +104,16 @@ Deno.serve(async (req) => {
         const st = cbJson?.status || 'pending'
         results.push({ id:o.id, conversation_id:o.conversation_id, status: st, from:'callback' })
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e ?? '')
+        console.error(e);
+        const msg = "Unknown error"
         results.push({ id:o.id, conversation_id:o.conversation_id, error: msg })
       }
     }
 
     return new Response(JSON.stringify({ ok:true, processed: results.length, results }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e ?? '')
+    console.error(e);
+        const msg = "Unknown error"
     return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
 })

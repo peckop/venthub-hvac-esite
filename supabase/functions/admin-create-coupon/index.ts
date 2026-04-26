@@ -32,12 +32,12 @@ Deno.serve(async (req: Request) => {
     })
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
-    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
-    if (userErr || !userRes?.user) {
+    const { data: { user }, error: userErr } = await supabaseUser.auth.getUser()
+    if (userErr || !user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
-    const userId = userRes.user.id
+    const userId = user.id
 
     const { data: profile, error: profErr } = await supabaseAdmin
       .from('user_profiles')
@@ -111,7 +111,8 @@ Deno.serve(async (req: Request) => {
 
     return new Response(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
   } catch (_e: unknown) {
-    const msg = _e instanceof Error ? _e.message : String(_e)
+    console.error(_e);
+    const msg = "Unknown error"
     return new Response(JSON.stringify({ error: 'internal', details: msg }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
   }
 })

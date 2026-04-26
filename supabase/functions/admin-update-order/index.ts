@@ -122,7 +122,7 @@ Deno.serve(async (req: Request) => {
     return new Response(JSON.stringify({ ok, response: text }), { status: ok ? 200 : 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
   } catch (_e) {
     console.error('Admin update order error:', _e);
-    return new Response(JSON.stringify({ error: _e instanceof Error ? _e.message : 'unknown' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    return new Response(JSON.stringify({ error: "Unknown error" }), { status: 500, headers: { ...cors, "Content-Type": "application/json", "X-Request-Id": requestId } });
   }
 });
 

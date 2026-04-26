@@ -36,15 +36,15 @@ Deno.serve(async (req) => {
     })
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
 
-    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
-    if (userErr || !userRes?.user) {
+    const { data: { user }, error: userErr } = await supabaseUser.auth.getUser()
+    if (userErr || !user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
     const { data: profile, error: profErr } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
-      .eq('id', userRes.user.id)
+      .eq('id', user.id)
       .maybeSingle()
 
     const userRole = profile?.role
@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ total, page: pageParam, _limit: limitParam, rows }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   } catch (_e) {
     console.error('Admin orders latest error:', _e);
-    const msg = _e instanceof Error ? _e.message : String(_e);
+    const msg = "Unknown error";
     return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   }
 })
