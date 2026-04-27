@@ -14,3 +14,7 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+## 2026-04-27 - Unused Exports Purge
+**Dead Code:** Unused constants (WHATSAPP_ICON_URL, VENTHUB_LOGO_BASE64).
+**Root Cause:** Constants were exported but never imported.
+**Resolution:** Safely purged unused exports, keeping the changes minimal and within limits. Components were left untouched for now due to strict file deletion policies.
