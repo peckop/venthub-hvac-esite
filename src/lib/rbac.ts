@@ -40,7 +40,16 @@ const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
 
 
 /**
- * Verilen rol, belirtilen sayfaya erisebilir mi?
+ * Evaluates whether a given user role has permission to access a specific page path.
+ * Relies on the `ROLE_PAGE_ACCESS` matrix. Handles wildcard accesses and strict paths (e.g., locking down `/admin/users` to super_admins).
+ *
+ * @param role - The role of the user requesting access, or null/undefined if unauthenticated.
+ * @param path - The route path the user is attempting to access (e.g., '/admin/orders').
+ * @returns True if the user role is authorized to view the path, otherwise false.
+ *
+ * @example
+ * canAccessPage('warehouse', '/admin/inventory') // returns true
+ * canAccessPage('sales', '/admin/users') // returns false
  */
 export function canAccessPage(role: UserRole | null | undefined, path: string): boolean {
     if (!role) return false;
@@ -60,7 +69,16 @@ export function canAccessPage(role: UserRole | null | undefined, path: string): 
 }
 
 /**
- * Verilen rol, belirtilen entity'de yazma/düzenleme işlemi yapabilir mi?
+ * Determines whether a given user role possesses write or edit permissions for a specific entity or domain.
+ * Evaluated against the `ROLE_WRITE_ACCESS` matrix. Prevents standard admins from modifying user permissions.
+ *
+ * @param role - The user's role.
+ * @param entity - The domain entity being checked (e.g., 'orders', 'inventory', 'users').
+ * @returns True if the user has write privileges for the given entity, otherwise false.
+ *
+ * @example
+ * canWrite('sales', 'orders') // returns true
+ * canWrite('admin', 'users') // returns false
  */
 export function canWrite(role: UserRole | null | undefined, entity: string): boolean {
     if (!role) return false;
@@ -77,7 +95,15 @@ export function canWrite(role: UserRole | null | undefined, entity: string): boo
 }
 
 /**
- * Kullanıcı salt-okunur mu?
+ * Checks if a user role is restricted to strictly read-only access within the application.
+ * Unauthenticated users (null/undefined), 'viewer' roles, and basic 'user' roles are considered read-only.
+ *
+ * @param role - The role to evaluate.
+ * @returns True if the role cannot perform administrative write actions, otherwise false.
+ *
+ * @example
+ * isReadOnly('viewer') // returns true
+ * isReadOnly('admin') // returns false
  */
 export function isReadOnly(role: UserRole | null | undefined): boolean {
     if (!role) return true;
