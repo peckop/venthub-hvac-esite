@@ -75,7 +75,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             </div>
           </div>
 
-          <button 
+          <button type="button"
             onClick={handleAddToCart} 
             className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-11 h-11 rounded-xl bg-primary-navy text-white flex items-center justify-center hover:bg-secondary-blue transition-all shadow-md active:scale-95 ml-4 flex-shrink-0"
             title={t('common.addToCart') || 'Sepete Ekle'}
@@ -143,7 +143,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
               </div>
             </div>
             
-            <button 
+            <button type="button"
               onClick={handleAddToCart} 
               className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-9 h-9 rounded-lg bg-primary-navy text-white flex items-center justify-center transition-all hover:bg-secondary-blue hover:shadow-lg active:scale-95"
               title={t('common.addToCart') || 'Sepete Ekle'}

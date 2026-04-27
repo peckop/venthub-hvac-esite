@@ -202,7 +202,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     const label = s.type === 'brand' ? `${t('search.brandPrefix')}${s.label}` : s.label
 
     return (
-      <button
+      <button type="button"
         key={`${s.type}-${Math.random()}`} // Avoid strict index mapping issues
         onMouseEnter={() => setActiveIndex(idx)}
         onClick={() => {
@@ -239,7 +239,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         <div className="mb-4">
           <div className="flex items-center justify-between px-4 mb-2">
             <h3 className="text-xs font-semibold text-steel-gray uppercase tracking-wider">{t('search.recentSearches')}</h3>
-            <button
+            <button type="button"
               onClick={() => {
                 setRecentSearches([])
                 localStorage.removeItem(RECENT_SEARCHES_KEY)
@@ -252,7 +252,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           <ul>
             {recentSearches.map((term, i) => (
               <li key={i}>
-                <button
+                <button type="button"
                   onClick={() => { setQ(term); performFullSearch(term); }}
                   className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-left text-sm text-industrial-gray group transition-colors"
                 >
@@ -269,7 +269,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         <h3 className="px-4 mb-2 text-xs font-semibold text-steel-gray uppercase tracking-wider">{t('search.popularCategories')}</h3>
         <div className="px-4 flex flex-wrap gap-2">
           {popularCategories.length > 0 ? popularCategories.map(cat => (
-            <button
+            <button type="button"
               key={String(cat.id)}
               onClick={() => { router.push(Routes.category(String(cat.slug))); handleClose(); }}
               className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-all flex items-center gap-1.5"
@@ -283,7 +283,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               { name: t('home.hero.quickChips.airCurtains'), slug: 'air-curtains' },
               { name: t('home.hero.quickChips.heatRecovery'), slug: 'heat-recovery-units' }
             ].map(cat => (
-              <button
+              <button type="button"
                 key={cat.slug}
                 onClick={() => { router.push(Routes.category(cat.slug)); handleClose(); }}
                 className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-all"
@@ -304,7 +304,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         <div className="px-4 py-12 text-center text-sm text-steel-gray flex flex-col items-center animate-in fade-in slide-in-from-bottom-2 duration-300">
           <svg className="w-12 h-12 text-slate-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           <span className="font-medium">{t('search.noResults')}</span>
-          <button
+          <button type="button"
             onClick={() => performFullSearch(debounced)}
             className="text-primary-ocean font-bold mt-2 hover:underline inline-flex items-center gap-1"
           >
@@ -320,7 +320,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         <div className="divide-y divide-gray-100">
           {suggestions.map((s, idx) => renderSuggestion(s, idx))}
         </div>
-        <button
+        <button type="button"
           onClick={() => performFullSearch(debounced)}
           className="w-full text-center py-3 text-sm text-primary-ocean font-medium hover:bg-gray-50 border-t transition-colors focus:bg-air-blue/10 focus:outline-none"
         >
@@ -357,7 +357,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             const isActive = idx === activeIndex
             return (
               <li key={r.id}>
-                <button
+                <button type="button"
                   className={`w-full text-left px-4 py-3 flex items-center justify-between group outline-none transition-all ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20' : 'hover:bg-slate-50'}`}
                   onClick={() => { router.push(Routes.product(r.slug!)); handleClose() }}
                   onMouseEnter={() => setActiveIndex(idx)}
@@ -428,7 +428,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             )}
-            <button
+            <button type="button"
               onClick={handleClose}
               className="px-2.5 py-1.5 text-xs font-bold text-steel-gray bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-slate-900 transition-colors shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
               aria-label={t('common.close')}

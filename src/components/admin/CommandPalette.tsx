@@ -168,7 +168,7 @@ const CommandPalette: React.FC = () => {
                         />
                         <div className="flex items-center gap-2 ml-auto shrink-0">
                             <kbd className="px-2.5 py-1 text-[10px] font-black text-cyan-400 bg-cyan-400/10 rounded-lg border border-cyan-400/20 shadow-[0_0_10px_rgba(34,211,238,0.1)]">ESC</kbd>
-                            <button onClick={() => setOpen(false)} className="p-2 rounded-xl hover:bg-white/5 transition-colors">
+                            <button type="button" onClick={() => setOpen(false)} className="p-2 rounded-xl hover:bg-white/5 transition-colors">
                                 <X size={20} className="text-slate-500 hover:text-white" />
                             </button>
                         </div>
@@ -192,7 +192,7 @@ const CommandPalette: React.FC = () => {
                                         const Icon = item.icon
                                         const isActive = activeIndex === idx
                                         return (
-                                            <button
+                                            <button type="button"
                                                 key={item.href}
                                                 onClick={() => { setOpen(false); router.push(item.href as import('next').Route) }}
                                                 className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-all text-left group ${
@@ -222,7 +222,7 @@ const CommandPalette: React.FC = () => {
                                         const globalIdx = filteredNav.length + idx
                                         const isActive = activeIndex === globalIdx
                                         return (
-                                            <button
+                                            <button type="button"
                                                 key={p.id}
                                                 onClick={() => { setOpen(false); router.push(`/admin/products?id=${p.id}` as import('next').Route) }}
                                                 className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-all text-left group ${

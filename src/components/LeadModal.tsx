@@ -94,7 +94,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
         className="relative w-full max-w-5xl bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:flex-row max-h-[100dvh] sm:max-h-[85vh] transform transition-all animate-in fade-in zoom-in-95 duration-300"
       >
         {/* Close Button Mobile */}
-        <button
+        <button type="button"
           onClick={handleClose}
           aria-label={t('common.close')}
           className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-gray-100 rounded-full text-gray-500 sm:hidden transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
@@ -169,7 +169,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     </p>
                   )}
                 </div>
-                <button onClick={handleClose} aria-label={t('common.close')} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
+                <button type="button" onClick={handleClose} aria-label={t('common.close')} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
                   <X className="w-6 h-6" />
                 </button>
               </div>

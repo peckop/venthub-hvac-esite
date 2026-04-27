@@ -35,7 +35,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                         {selectedCount}
                     </div>
                     <span className="text-sm font-medium">ürün seçili</span>
-                    <button onClick={onClearSelection} className="text-white/60 hover:text-white text-xs ml-1 underline">
+                    <button type="button" onClick={onClearSelection} className="text-white/60 hover:text-white text-xs ml-1 underline">
                         Temizle
                     </button>
                 </div>
@@ -43,13 +43,13 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                 <div className="h-6 w-px bg-white/20" />
 
                 {/* Status Actions */}
-                <button
+                <button type="button"
                     onClick={() => onStatusChange('active')}
                     className="px-3 py-1.5 rounded-lg bg-emerald-500/80 hover:bg-emerald-500 text-xs font-medium transition-colors"
                 >
                     Aktif Yap
                 </button>
-                <button
+                <button type="button"
                     onClick={() => onStatusChange('inactive')}
                     className="px-3 py-1.5 rounded-lg bg-gray-400/80 hover:bg-gray-400 text-xs font-medium transition-colors"
                 >
@@ -59,7 +59,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                 <div className="h-6 w-px bg-white/20" />
 
                 {/* Feature Toggle */}
-                <button
+                <button type="button"
                     onClick={() => onFeatureToggle(true)}
                     className="px-3 py-1.5 rounded-lg bg-yellow-500/80 hover:bg-yellow-500 text-xs font-medium transition-colors"
                 >
@@ -70,7 +70,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
 
                 {/* Price Adjustment */}
                 <div className="relative">
-                    <button
+                    <button type="button"
                         onClick={() => setShowPricePanel(!showPricePanel)}
                         className="px-3 py-1.5 rounded-lg bg-blue-400/80 hover:bg-blue-400 text-xs font-medium transition-colors"
                     >
@@ -80,13 +80,13 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                         <div className="absolute bottom-full mb-2 left-0 bg-white text-gray-800 rounded-xl shadow-2xl p-4 min-w-[280px] border border-gray-200">
                             <div className="text-sm font-semibold mb-3 text-primary-navy">Toplu Fiyat Güncelleme</div>
                             <div className="flex gap-2 mb-3">
-                                <button
+                                <button type="button"
                                     onClick={() => setPriceMode('percent')}
                                     className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${priceMode === 'percent' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-gray-50 border-gray-200 hover:border-primary-navy'}`}
                                 >
                                     % Yüzde
                                 </button>
-                                <button
+                                <button type="button"
                                     onClick={() => setPriceMode('fixed')}
                                     className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${priceMode === 'fixed' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-gray-50 border-gray-200 hover:border-primary-navy'}`}
                                 >
@@ -101,7 +101,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                                     placeholder={priceMode === 'percent' ? 'Örn: 15 (zam) veya -10 (indirim)' : 'Örn: 500 (ekle) veya -200 (düş)'}
                                     className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30"
                                 />
-                                <button
+                                <button type="button"
                                     onClick={() => {
                                         const v = parseFloat(priceValue)
                                         if (isNaN(v)) return alert('Geçerli bir sayı giriniz.')
@@ -126,7 +126,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                 <div className="h-6 w-px bg-white/20" />
 
                 {/* Delete */}
-                <button
+                <button type="button"
                     onClick={onDelete}
                     className="px-3 py-1.5 rounded-lg bg-red-500/80 hover:bg-red-500 text-xs font-medium transition-colors"
                 >

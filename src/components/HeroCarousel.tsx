@@ -192,7 +192,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                         {t('home.hero.primaryCta')}
                                         <ArrowRight className="ml-2 w-5 h-5" />
                                     </Link>
-                                    <button
+                                    <button type="button"
                                         onClick={() => {
                                             window.openLeadModal?.()
                                         }}
@@ -209,13 +209,13 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
 
             {/* Navigation Controls */}
             <div className="absolute bottom-10 right-10 z-30 flex gap-2">
-                <button
+                <button type="button"
                     onClick={handlePrev}
                     className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
                  aria-label={t("common.prev") as string}>
                     <ChevronLeft className="w-6 h-6" />
                 </button>
-                <button
+                <button type="button"
                     onClick={handleNext}
                     className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
                  aria-label={t("common.next") as string}>
@@ -227,7 +227,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
             {/* Progress Indicators */}
             <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 flex gap-2">
                 {mainCategoryVms.map((_, idx) => (
-                    <button
+                    <button type="button"
                         key={idx}
                         onClick={() => { setIsAutoPlaying(false); setCurrentIndex(idx) }}
                         className={`h-1.5 rounded-full transition-all duration-300 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-2 focus-visible:ring-offset-black/50 ${idx === currentIndex ? 'w-8 bg-secondary-blue' : 'w-2 bg-white/30 hover:bg-white/50'

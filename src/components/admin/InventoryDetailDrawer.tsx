@@ -66,14 +66,14 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                         <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-[0.2em] mt-1">{selected.product_id}</span>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                        <button 
+                        <button type="button"
                             disabled={printingQr} 
                             className="h-10 px-4 rounded-xl bg-cyan-400 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-cyan-300 transition-all disabled:opacity-50" 
                             onClick={() => void printQrLabel(selected, setPrintingQr)}
                         >
                             {printingQr ? '...' : 'QR'}
                         </button>
-                        <button 
+                        <button type="button"
                             className="h-10 px-4 rounded-xl glass border border-white/10 text-slate-400 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest" 
                             onClick={() => setSelected(null)}
                         >
@@ -145,14 +145,14 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                                     placeholder="Değer"
                                     className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-all font-bold"
                                 />
-                                <button
+                                <button type="button"
                                     disabled={saving}
                                     onClick={() => saveThreshold(selected.product_id)}
                                     className="h-12 px-6 rounded-2xl bg-cyan-400 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-cyan-300 transition-all shadow-lg shadow-cyan-400/10 disabled:opacity-50"
                                 >
                                     {saving ? '...' : 'Kaydet'}
                                 </button>
-                                <button
+                                <button type="button"
                                     disabled={saving}
                                     onClick={() => setSelectedThreshold('')}
                                     className="h-12 px-5 rounded-2xl glass border border-white/5 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-amber-400 hover:border-amber-400/30 transition-all"
@@ -189,7 +189,7 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                         <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
                             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Son Hareketler</h3>
                             {movements.length > 0 && hasWriteAccess && (
-                                <button 
+                                <button type="button"
                                     onClick={undoLastMovement}
                                     disabled={undoing}
                                     className="text-[9px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-400 transition-all disabled:opacity-50"

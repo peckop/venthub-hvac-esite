@@ -29,7 +29,7 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
           </div>
           <span className="font-bold text-slate-900 tracking-tight text-lg">Kategoriler</span>
         </div>
-        <button 
+        <button type="button"
           onClick={onClose}
           className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400 hover:text-slate-600"
         >

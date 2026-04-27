@@ -78,7 +78,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
         {/* Header */}
         <div className="px-6 py-4 border-b border-light-gray flex items-center justify-between bg-primary-navy text-white">
           <h3 id="add-to-project-title" className="font-bold text-lg">{t('common.addToProject')}</h3>
-          <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full transition-colors">
+          <button type="button" onClick={onClose} className="p-1 hover:bg-white/10 rounded-full transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -108,7 +108,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
                 </div>
               ) : (
                 projects.map(project => (
-                  <button
+                  <button type="button"
                     key={project.id}
                     disabled={isAdding}
                     onClick={() => handleAddToExisting(project.id)}
@@ -130,7 +130,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
 
           {/* Create new project toggle */}
           {!isCreating ? (
-            <button
+            <button type="button"
               onClick={() => setIsCreating(true)}
               className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl bg-light-gray text-industrial-gray hover:bg-secondary-blue hover:text-white transition-all font-bold text-sm"
             >
@@ -152,7 +152,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
                   className="w-full px-4 py-3 rounded-xl border border-light-gray focus:border-primary-navy focus:ring-2 focus:ring-primary-navy/10 outline-none text-sm transition-all pr-12"
                   onKeyDown={(e) => e.key === 'Enter' && handleCreateAndAdd()}
                 />
-                <button
+                <button type="button"
                   onClick={handleCreateAndAdd}
                   disabled={!newProjectName.trim() || isAdding}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-primary-navy text-white rounded-lg disabled:opacity-50"
@@ -160,7 +160,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
                   {isAdding ? <Loader2 size={18} className="animate-spin" /> : <FolderPlus size={18} />}
                 </button>
               </div>
-              <button
+              <button type="button"
                 onClick={() => setIsCreating(false)}
                 className="text-xs text-steel-gray hover:text-primary-navy font-medium underline px-1"
               >

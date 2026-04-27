@@ -44,7 +44,7 @@ const AddToCartToast: React.FC = () => {
             <div className="text-industrial-gray font-semibold truncate">{t('cartToast.added')}</div>
             <div className="text-sm text-steel-gray truncate">{product.name}</div>
           </div>
-          <button 
+          <button type="button"
             onClick={() => setVisible(false)} 
             className="text-steel-gray hover:text-industrial-gray"
             aria-label={t('common.close')}
@@ -54,7 +54,7 @@ const AddToCartToast: React.FC = () => {
         </div>
         <div className="px-3 md:px-4 pb-3 md:pb-4 pt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
-            <button
+            <button type="button"
               onClick={() => setVisible(false)}
               className="inline-flex items-center justify-center gap-2 px-3 py-3 md:py-2 border rounded-lg text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition"
               aria-label={t('cartToast.continue')}

@@ -12,13 +12,13 @@ const LanguageSwitcher: React.FC = () => {
       role="group"
       aria-label={t('common.languageSwitcher')}
     >
-      <button
+      <button type="button"
         onClick={() => setLang('tr')}
         className={`px-3 py-1 text-sm rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${lang === 'tr' ? 'bg-primary-navy text-white' : 'text-industrial-gray hover:bg-light-gray'}`}
         aria-pressed={lang === 'tr'}
         aria-label={t('common.turkish')}
       >TR</button>
-      <button
+      <button type="button"
         onClick={() => setLang('en')}
         className={`px-3 py-1 text-sm rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${lang === 'en' ? 'bg-primary-navy text-white' : 'text-industrial-gray hover:bg-light-gray'}`}
         aria-pressed={lang === 'en'}

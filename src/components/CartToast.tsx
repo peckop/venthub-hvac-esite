@@ -68,7 +68,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                 {product.name}
               </p>
             </div>
-            <button onClick={onClose} className="text-steel-gray hover:text-industrial-gray focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 rounded-md" aria-label={t('common.close')}>
+            <button type="button" onClick={onClose} className="text-steel-gray hover:text-industrial-gray focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 rounded-md" aria-label={t('common.close')}>
               <X size={16} />
             </button>
           </div>
@@ -93,7 +93,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                     {t('cartToast.whatNext')}
                   </p>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => { setShowChoiceModal(false); onClose() }}
                   className="ml-auto text-steel-gray hover:text-industrial-gray focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 rounded-md"
                   aria-label={t('common.close')}
@@ -119,7 +119,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                <button
+                <button type="button"
                   onClick={handleContinueShopping}
                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold rounded-lg transition-colors"
                   aria-label={t('cartToast.continue')}
@@ -129,7 +129,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                 </button>
 
                 <Link href={Routes.cart()} onClick={handleGoToCart}>
-                  <button 
+                  <button type="button"
                     className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
                     aria-label={t('cartToast.goToCart')}
                   >

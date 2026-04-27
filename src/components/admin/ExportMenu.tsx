@@ -16,7 +16,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button 
+        <button type="button"
           className={adminButtonSecondaryClass + " h-12 flex items-center gap-2 px-5 min-w-[140px]"}
           aria-label={_t('admin.a11y.export') || 'Dışa Aktarma Menüsü'}
         >

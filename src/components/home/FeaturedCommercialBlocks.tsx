@@ -89,7 +89,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
 
             <div className="flex p-1 bg-slate-200/50 backdrop-blur-sm rounded-xl border border-slate-200 gap-1" role="tablist">
               {tabOrder.map((tab) => (
-                <button
+                <button type="button"
                   key={tab}
                   role="tab"
                   aria-selected={activeTab === tab}

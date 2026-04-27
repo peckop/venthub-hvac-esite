@@ -192,7 +192,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                         <div className="flex items-center justify-between px-10 py-6 border-b border-slate-700/50">
                             <div className="flex items-center gap-4">
                                 {selectedParentCategory ? (
-                                    <button onClick={() => setSelectedParentCategory(null)} className="flex items-center gap-2 text-slate-400 hover:text-sky-400 transition-colors group">
+                                    <button type="button" onClick={() => setSelectedParentCategory(null)} className="flex items-center gap-2 text-slate-400 hover:text-sky-400 transition-colors group">
                                         <div className="p-2 rounded-full bg-slate-800 group-hover:bg-slate-700 transition-colors">
                                             <ArrowLeft className="w-4 h-4" />
                                         </div>
@@ -205,7 +205,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                     </h2>
                                 )}
                             </div>
-                            <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
+                            <button type="button" onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
                                 <X size={24} />
                             </button>
                         </div>

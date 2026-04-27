@@ -305,7 +305,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
       <div className="absolute left-10 bottom-10 z-20 flex items-center gap-6">
         <div className="flex gap-2">
           {slidesData.map((_, idx) => (
-            <button
+            <button type="button"
               key={idx}
               onClick={() => setCurrentSlide(idx)}
               aria-label={`Go to slide ${idx + 1}`}

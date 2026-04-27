@@ -118,7 +118,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
     return (
         <>
             <input id="prod-import-input" type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
-            <button
+            <button type="button"
                 onClick={() => document.getElementById('prod-import-input')?.click()}
                 className={`${adminButtonSecondaryClass}`}
             >
@@ -133,7 +133,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                             <h3 className="font-semibold text-slate-800">
                                 {t('admin.products.import.previewTitle', { total: importPreview.total }) ?? `CSV Önizleme (ilk 10 satır) — Toplam: ${importPreview.total}`}
                             </h3>
-                            <button
+                            <button type="button"
                                 onClick={() => { setImportPreview(null); setImportRows(null) }}
                                 className="text-slate-400 hover:text-slate-600 transition-colors"
                                 disabled={isProcessing}
@@ -163,7 +163,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                         </div>
 
                         <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center gap-3 justify-end rounded-b-2xl">
-                            <button
+                            <button type="button"
                                 className={`${adminButtonSecondaryClass} h-10`}
                                 onClick={() => { setImportPreview(null); setImportRows(null); }}
                                 disabled={isProcessing}
@@ -171,7 +171,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                                 {t('admin.products.import.close') || 'İptal'}
                             </button>
 
-                            <button
+                            <button type="button"
                                 className={`${adminButtonSecondaryClass} h-10`}
                                 onClick={handleDryRun}
                                 disabled={isProcessing}
@@ -179,7 +179,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                                 {t('admin.products.import.dryRun') || 'Hata Kontrolü'}
                             </button>
 
-                            <button
+                            <button type="button"
                                 className={`${adminButtonPrimaryClass} h-10`}
                                 onClick={handleImport}
                                 disabled={isProcessing}

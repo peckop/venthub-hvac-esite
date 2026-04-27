@@ -79,7 +79,7 @@ export default function VideoAuthority({ metadata, className = '' }: VideoAuthor
                         <span className="text-white text-[10px] font-black uppercase tracking-widest">{metadata.title}</span>
                     </div>
                     
-                    <button 
+                    <button type="button"
                         onClick={() => setIsMuted(!isMuted)}
                         className="text-white/80 hover:text-white transition-colors"
                     >

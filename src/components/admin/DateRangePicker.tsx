@@ -120,7 +120,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
     return (
         <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
             <Popover.Trigger asChild>
-                <button
+                <button type="button"
                     className={`inline-flex items-center gap-2 justify-between bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 transition-all w-full sm:w-auto max-w-full ${className}`}
                 >
                     <div className="flex items-center gap-2 text-slate-600">
@@ -150,7 +150,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                                     selectedRange?.to?.getTime() === preset.getRange().to.getTime()
 
                                 return (
-                                    <button
+                                    <button type="button"
                                         key={idx}
                                         onClick={() => handleSelect(preset.getRange())}
                                         className={`text-left px-3 py-2 rounded-lg text-sm transition-all flex items-center justify-between ${isSelected ? 'bg-primary-navy text-white font-bold shadow-md' : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-800'}`}
@@ -194,10 +194,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                                 ) : 'Tarih aralığı seçin'}
                             </span>
                             <div className="flex items-center gap-2">
-                                <button onClick={cancelSelection} className="px-5 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
+                                <button type="button" onClick={cancelSelection} className="px-5 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
                                     Vazgeç
                                 </button>
-                                <button
+                                <button type="button"
                                     onClick={applySelection}
                                     disabled={!selectedRange?.from}
                                     className="px-6 py-2 text-sm font-bold bg-primary-navy text-white hover:bg-primary-navy/90 rounded-lg shadow-md shadow-primary-navy/20 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100"

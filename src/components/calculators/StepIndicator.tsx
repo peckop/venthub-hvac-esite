@@ -34,7 +34,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
                     return (
                         <React.Fragment key={step.id}>
                             {/* Step Circle */}
-                            <button
+                            <button type="button"
                                 onClick={() => isClickable && onStepClick(step.id)}
                                 disabled={!isClickable}
                                 className={`flex flex-col items-center group ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}

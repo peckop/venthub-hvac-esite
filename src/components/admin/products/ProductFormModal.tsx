@@ -139,7 +139,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                         <Dialog.Title className="text-xl font-bold text-industrial-gray">
                             {_productId ? t('admin.common.edit') : t('admin.common.addNewProduct')}
                         </Dialog.Title>
-                        <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                        <button type="button" onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                             <X size={20} />
                         </button>
                     </div>

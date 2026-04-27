@@ -133,7 +133,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                 {/* Overlays */}
                 {!is3DMode && activeImage && (
                     <div className="absolute top-3 right-16 z-50">
-                        <button
+                        <button type="button"
                             onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(true); }}
                             className="bg-white/95 backdrop-blur-sm p-2 rounded-xl border border-gray-200 shadow-lg text-gray-700 hover:text-blue-600 hover:bg-white transition-all"
                             aria-label={t('common.viewFullscreen') || 'Tam Ekran Gör'}
@@ -144,7 +144,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                 )}
 
                 {!is3DMode && slug && (
-                    <button
+                    <button type="button"
                         onClick={(e) => { e.stopPropagation(); setIs3DMode(true); }}
                         className="absolute top-3 right-3 z-50 bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-2 py-1.5 rounded-lg shadow-lg border border-gray-200 flex flex-col items-center gap-0.5 transition-all"
                         aria-label={t('common.view3D') || '3D Model'}
@@ -156,14 +156,14 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
 
                 {!is3DMode && images.length > 1 && (
                     <>
-                        <button
+                        <button type="button"
                             onClick={prevImage}
                             className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all z-30"
                             aria-label={t('common.prev') || 'Geri'}
                         >
                             <ChevronLeft size={24} />
                         </button>
-                        <button
+                        <button type="button"
                             onClick={nextImage}
                             className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all z-30"
                             aria-label={t('common.next') || 'İleri'}
@@ -177,7 +177,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
             {/* Thumbnails */}
             <div className="flex flex-wrap gap-2">
                 {images.map((img, idx) => (
-                    <button
+                    <button type="button"
                         key={idx}
                         onClick={() => { setIs3DMode(false); setActiveIdx(idx); }}
                         className={`relative w-16 h-16 aspect-square rounded-lg overflow-hidden border-2 transition-all ${!is3DMode && activeIdx === idx
@@ -201,7 +201,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
             {/* Lightbox Portal */}
             {isLightboxOpen && createPortal(
                 <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md flex items-center justify-center">
-                    <button
+                    <button type="button"
                         onClick={() => setIsLightboxOpen(false)}
                         className="absolute top-6 right-6 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all z-50"
                         aria-label={t('common.close') || 'Kapat'}
@@ -224,16 +224,16 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
 
                     {images.length > 1 && (
                         <>
-                            <button onClick={prevImage} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all" aria-label={t('common.prev') || 'Geri'}>
+                            <button type="button" onClick={prevImage} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all" aria-label={t('common.prev') || 'Geri'}>
                                 <ChevronLeft size={32} />
                             </button>
-                            <button onClick={nextImage} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all" aria-label={t('common.next') || 'İleri'}>
+                            <button type="button" onClick={nextImage} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all" aria-label={t('common.next') || 'İleri'}>
                                 <ChevronRight size={32} />
                             </button>
 
                             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 p-2 bg-black/20 rounded-xl backdrop-blur-sm">
                                 {images.map((img, idx) => (
-                                    <button
+                                    <button type="button"
                                         key={idx}
                                         onClick={() => setActiveIdx(idx)}
                                         className={`relative w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${activeIdx === idx ? 'border-white ring-2 ring-white/20' : 'border-transparent opacity-50 hover:opacity-100'}`}

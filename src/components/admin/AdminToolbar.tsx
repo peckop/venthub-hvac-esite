@@ -178,7 +178,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
               </div>
             )}
             {hasFilters && (
-              <button
+              <button type="button"
                 onClick={() => setFiltersOpen(!filtersOpen)}
                 aria-label={_t('admin.a11y.filter') || 'Filtreleri Göster'}
                 aria-expanded={filtersOpen}

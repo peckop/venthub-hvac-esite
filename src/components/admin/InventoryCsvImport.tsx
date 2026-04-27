@@ -218,12 +218,12 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                             className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-xl bg-cyan-400 text-[#0A0F1E] hover:bg-cyan-300 transition-all"
                         >Hareketleri Gör</a>
                         {errors.length > 0 && (
-                            <button
+                            <button type="button"
                                 className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-xl glass border border-white/10 text-white hover:bg-white/10"
                                 onClick={() => { downloadErrors(); toast.dismiss(t.id) }}
                             >Hataları İndir</button>
                         )}
-                        <button
+                        <button type="button"
                             className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/20 hover:bg-rose-500/30 transition-all font-bold ml-auto"
                             onClick={async () => {
                                 if (csvUndoingRef.current) return
@@ -279,7 +279,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                             </div>
                             <h2 id="csv-import-title" className="text-xl font-black text-white uppercase tracking-tight">CSV Stok İçe Aktarma</h2>
                         </div>
-                        <button className="w-10 h-10 flex items-center justify-center rounded-full glass border border-white/10 text-slate-400 hover:text-white transition-all hover:bg-white/5" onClick={onClose}>
+                        <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full glass border border-white/10 text-slate-400 hover:text-white transition-all hover:bg-white/5" onClick={onClose}>
                             <X size={20} />
                         </button>
                     </header>
@@ -387,13 +387,13 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                     </div>
                     
                     <footer className="px-8 py-6 border-t border-white/5 flex justify-end items-center gap-4 bg-white/[0.02]">
-                        <button
+                        <button type="button"
                             onClick={onClose}
                             className="h-12 px-8 rounded-2xl glass border border-white/5 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-white transition-all"
                         >
                             İptal
                         </button>
-                        <button
+                        <button type="button"
                             onClick={processCSV}
                             disabled={csvPreview.length === 0 || csvProcessing}
                             className={`h-12 px-10 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl disabled:opacity-30 ${dryRun ? 'bg-amber-400 text-[#0A0F1E] hover:bg-amber-300 shadow-amber-400/10' : 'bg-cyan-400 text-[#0A0F1E] hover:bg-cyan-300 shadow-cyan-400/10'}`}

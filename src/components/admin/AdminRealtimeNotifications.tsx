@@ -256,7 +256,7 @@ const AdminRealtimeNotifications: React.FC = () => {
     return (
         <div className="relative z-50" ref={dropdownRef}>
             {/* Bell Trigger */}
-            <button
+            <button type="button"
                 onClick={toggleDropdown}
                 className="relative p-2.5 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow hover:bg-slate-50 transition-all text-slate-600 hover:text-primary-navy"
             >
@@ -279,11 +279,11 @@ const AdminRealtimeNotifications: React.FC = () => {
                         </h3>
                         <div className="flex items-center gap-2">
                             {notifications.length > 0 && (
-                                <button onClick={clearAll} className="text-[11px] font-medium text-slate-500 hover:text-primary-navy transition-colors">
+                                <button type="button" onClick={clearAll} className="text-[11px] font-medium text-slate-500 hover:text-primary-navy transition-colors">
                                     Tümünü Temizle
                                 </button>
                             )}
-                            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600">
+                            <button type="button" onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600">
                                 <X size={16} />
                             </button>
                         </div>

@@ -98,7 +98,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                                 )}
                                 <h2 className="text-xl font-bold text-white">{category.title}</h2>
                             </div>
-                            <button
+                            <button type="button"
                                 onClick={onClose}
                                 className="p-2 rounded-full hover:bg-white/10 transition-colors text-white/70 hover:text-white"
                             >
@@ -155,7 +155,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
 
                         {/* Footer CTA */}
                         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent">
-                            <button
+                            <button type="button"
                                 onClick={handleNavigate}
                                 className={`w-full py-4 px-6 rounded-xl font-semibold text-white
                                            bg-gradient-to-r ${category.color || 'from-cyan-500 to-blue-600'}

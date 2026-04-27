@@ -22,7 +22,7 @@ const Hotspot: React.FC<HotspotProps> = ({ x, y, label, detail, isActive, onTogg
       className="absolute z-30" 
       style={{ left: `${x}%`, top: `${y}%` }}
     >
-      <button
+      <button type="button"
         onClick={(e) => { e.stopPropagation(); onToggle(); }}
         className="relative flex items-center justify-center w-8 h-8 outline-none group"
         aria-label={label}
@@ -188,7 +188,7 @@ const CinematicProductShowcase: React.FC = () => {
 
             <div className="mt-12 flex justify-center gap-4">
               {productImages.map((img, idx) => (
-                <button
+                <button type="button"
                   key={idx}
                   onClick={() => { setActiveImageIdx(idx); setActiveHotspot(null); }}
                   aria-label={`Showcase view ${idx + 1}`}
@@ -232,7 +232,7 @@ const CinematicProductShowcase: React.FC = () => {
               </p>
 
               <div className="flex flex-wrap gap-6">
-                <button className="group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-[12px] tracking-[0.2em] rounded-2xl overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                <button type="button" className="group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-[12px] tracking-[0.2em] rounded-2xl overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]">
                   <span className="relative z-10">{t('home.cinematicShowcase.cta')}</span>
                   <div className="absolute inset-0 bg-cyan-400 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 </button>

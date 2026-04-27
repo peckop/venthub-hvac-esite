@@ -87,7 +87,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </p>
             <div className="space-y-3">
               {isChunkError ? (
-                <button
+                <button type="button"
                   onClick={this.handleRefresh}
                   className="inline-flex items-center px-6 py-2 bg-primary-navy text-white rounded-lg hover:bg-secondary-blue transition-colors"
                   aria-label="Sayfayı Yenile"
@@ -97,7 +97,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 </button>
               ) : (
                 <>
-                  <button
+                  <button type="button"
                     onClick={this.handleRetry}
                     className="inline-flex items-center px-4 py-2 bg-primary-navy text-white rounded-lg hover:bg-secondary-blue transition-colors mr-3"
                     aria-label="Tekrar Dene"
@@ -105,7 +105,7 @@ export class ErrorBoundary extends Component<Props, State> {
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Tekrar Dene
                   </button>
-                  <button
+                  <button type="button"
                     onClick={this.handleRefresh}
                     className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                     aria-label="Sayfayı Yenile"

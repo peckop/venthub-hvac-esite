@@ -26,14 +26,14 @@ export default function InventoryStockAdjust({
                     min={1}
                     onChange={(e) => setMoveQty(Math.max(1, Number(e.target.value || 1)))}
                 />
-                <button
+                <button type="button"
                     disabled={moving}
                     className="flex-1 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all disabled:opacity-50"
                     onClick={() => onAdjust(_productId, Math.abs(moveQty), 'manual_in')}
                 >
                     Stok Girişi
                 </button>
-                <button
+                <button type="button"
                     disabled={moving}
                     className="flex-1 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500/20 transition-all disabled:opacity-50"
                     onClick={() => onAdjust(_productId, -Math.abs(moveQty), 'manual_out')}

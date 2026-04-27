@@ -31,7 +31,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
       <div className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-light-gray">
           <h3 className="text-lg font-semibold text-industrial-gray">{t('quickView.title')}</h3>
-          <button onClick={onClose} aria-label={t('quickView.close')} className="p-2 rounded hover:bg-light-gray focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
+          <button type="button" onClick={onClose} aria-label={t('quickView.close')} className="p-2 rounded hover:bg-light-gray focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
             <X size={18} className="text-steel-gray" />
           </button>
         </div>
@@ -47,7 +47,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
               {product.description || t('quickView.descFallback')}
             </p>
             <div className="mt-auto flex gap-2">
-              <button onClick={handleAdd} className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
+              <button type="button" onClick={handleAdd} className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
                 <ShoppingCart size={18} className="mr-2" /> {t('quickView.addToCart')}
               </button>
               <Link href={Routes.product(product.slug!)} onClick={onClose} className="inline-flex items-center justify-center px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">

@@ -181,30 +181,30 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
             <div className={`absolute ${tb.top} left-1/2 -translate-x-1/2 z-[100] pointer-events-auto`}>
                 <div className={`flex items-center gap-1 bg-white/95 backdrop-blur-md p-1 rounded-lg border border-gray-300 shadow-xl`}>
                     {onClose && (
-                        <button onClick={onClose} className={`flex items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 hover:text-primary-navy transition-all`}>
+                        <button type="button" onClick={onClose} className={`flex items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 hover:text-primary-navy transition-all`}>
                             <ChevronLeft size={tb.icon} strokeWidth={2} /><span className={`${tb.font} font-bold leading-none`}>GERİ</span>
                         </button>
                     )}
                     <div className="relative">
-                        <button onClick={() => setShowViewMenu(!showViewMenu)} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-all`}>
+                        <button type="button" onClick={() => setShowViewMenu(!showViewMenu)} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-all`}>
                             <BoxSelect size={tb.icon} strokeWidth={1.5} /><span className={`${tb.font} font-bold leading-none`}>GÖRÜNÜM</span>
                         </button>
                         {showViewMenu && (
                             <div className="absolute top-full left-0 mt-1.5 w-40 bg-white rounded-lg border border-gray-200 shadow-2xl z-[200]">
                                 {[{ key: 'front', label: 'Ön' }, { key: 'back', label: 'Arka' }, { key: 'left', label: 'Sol' }, { key: 'right', label: 'Sağ' }, { key: 'top', label: 'Üst' }, { key: 'bottom', label: 'Alt' }].map(v => (
-                                    <button key={v.key} onClick={() => handleViewChange(v.key as 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom' | 'iso')} className="w-full text-left px-3 py-2 text-xs hover:bg-blue-50 transition-colors">{v.label}</button>
+                                    <button type="button" key={v.key} onClick={() => handleViewChange(v.key as 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom' | 'iso')} className="w-full text-left px-3 py-2 text-xs hover:bg-blue-50 transition-colors">{v.label}</button>
                                 ))}
                             </div>
                         )}
                     </div>
-                    <button onClick={handleReset} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-all`}>
+                    <button type="button" onClick={handleReset} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-all`}>
                         <RefreshCw size={tb.icon} strokeWidth={1.5} /><span className={`${tb.font} font-bold leading-none`}>RESET</span>
                     </button>
-                    <button onClick={() => setRotationMode(rotationMode === 'orbit' ? 'free' : 'orbit')} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-all ${tb.minW} ${rotationMode === 'free' ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
+                    <button type="button" onClick={() => setRotationMode(rotationMode === 'orbit' ? 'free' : 'orbit')} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-all ${tb.minW} ${rotationMode === 'free' ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
                         {rotationMode === 'orbit' ? <RotateCcw size={tb.icon} strokeWidth={1.5} /> : <Globe size={tb.icon} strokeWidth={1.5} />}
                         <span className={`${tb.font} font-bold leading-none`}>{rotationMode === 'orbit' ? 'ORBİT' : 'FREE'}</span>
                     </button>
-                    <button onClick={() => setAutoRotate(!autoRotate)} disabled={rotationMode === 'free'} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-all ${tb.minW} ${autoRotate ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
+                    <button type="button" onClick={() => setAutoRotate(!autoRotate)} disabled={rotationMode === 'free'} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-all ${tb.minW} ${autoRotate ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
                         <Repeat size={tb.icon} className={autoRotate ? 'animate-spin' : ''} strokeWidth={1.5} />
                         <span className={`${tb.font} font-bold leading-none`}>OTO</span>
                     </button>

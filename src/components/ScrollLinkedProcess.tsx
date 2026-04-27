@@ -44,7 +44,7 @@ const ScrollLinkedProcess: React.FC = () => {
           <aside className="lg:col-span-1">
             <div className="sticky top-20 space-y-2">
               {STEPS.map((s, i) => (
-                <button
+                <button type="button"
                   key={s.key}
                   onClick={() => scrollTo(i)}
                   className={`w-full text-left px-3 py-2 rounded-lg border transition ${i === active ? 'border-primary-navy bg-primary-navy/5 text-primary-navy' : 'border-light-gray bg-white text-industrial-gray hover:bg-gray-50'}`}

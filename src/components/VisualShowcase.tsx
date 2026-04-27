@@ -174,7 +174,7 @@ const VisualShowcase: React.FC = () => {
 
           {/* Controls */}
           <div className="absolute inset-0 flex items-center justify-between p-2 pointer-events-none z-20">
-            <button
+            <button type="button"
               onClick={prev}
               className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 pointer-events-auto inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
               aria-label={t('homeShowcase.prevAria')}
@@ -182,14 +182,14 @@ const VisualShowcase: React.FC = () => {
               <ChevronLeftIcon size={18} />
             </button>
             <div className="pointer-events-auto flex items-center gap-2">
-              <button
+              <button type="button"
                 onClick={() => setPlaying(p => !p)}
                 className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
                 aria-label={playing ? t('homeShowcase.pauseAria') : t('homeShowcase.playAria')}
               >
                 {playing ? <PauseIcon size={18} /> : <PlayIcon size={18} />}
               </button>
-              <button
+              <button type="button"
                 onClick={next}
                 className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
                 aria-label={t('homeShowcase.nextAria')}
@@ -202,7 +202,7 @@ const VisualShowcase: React.FC = () => {
           {/* Dots */}
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2 z-20">
             {slides.map((_, i) => (
-              <button
+              <button type="button"
                 key={i}
                 onClick={() => setIndex(i)}
                 className={`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 h-2 rounded-full transition-all ${i === index ? 'w-6 bg-white' : 'w-2 bg-white/70 hover:bg-white'}`}

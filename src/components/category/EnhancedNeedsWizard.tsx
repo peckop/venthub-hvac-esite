@@ -185,7 +185,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             </div>
                         </div>
                     </div>
-                    <button onClick={onClose} aria-label={t("common.close")} className="focus-ring p-2 hover:bg-white rounded-xl transition-colors">
+                    <button type="button" onClick={onClose} aria-label={t("common.close")} className="focus-ring p-2 hover:bg-white rounded-xl transition-colors">
                         <X size={20} className="text-slate-400" />
                     </button>
                 </div>

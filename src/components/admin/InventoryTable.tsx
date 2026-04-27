@@ -152,7 +152,7 @@ export default function InventoryTable({
                     <tr>
                         {visibleCols.name && (
                             <th className={adminTableHeadCellClass + " " + headPad}>
-                                <button onClick={() => onSort('name')} className="hover:text-cyan-400 transition-colors flex items-center gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
+                                <button type="button" onClick={() => onSort('name')} className="hover:text-cyan-400 transition-colors flex items-center gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
                                     Ürün {sortIndicator('name')}
                                 </button>
                             </th>
@@ -160,7 +160,7 @@ export default function InventoryTable({
                         {visibleCols.physical && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
-                                    <button onClick={() => onSort('physical')} className="hover:text-cyan-400 transition-colors">Fiziksel {sortIndicator('physical')}</button>
+                                    <button type="button" onClick={() => onSort('physical')} className="hover:text-cyan-400 transition-colors">Fiziksel {sortIndicator('physical')}</button>
                                     <InfoTooltip text="Depodaki gerçekte sayılan mevcut ürün adedi." />
                                 </div>
                             </th>
@@ -168,7 +168,7 @@ export default function InventoryTable({
                         {visibleCols.reserved && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
-                                    <button onClick={() => onSort('reserved')} className="hover:text-cyan-400 transition-colors">Rezerve {sortIndicator('reserved')}</button>
+                                    <button type="button" onClick={() => onSort('reserved')} className="hover:text-cyan-400 transition-colors">Rezerve {sortIndicator('reserved')}</button>
                                     <InfoTooltip text="Henüz kargolanmamış ama parası ödenmiş ürün miktarı." />
                                 </div>
                             </th>
@@ -176,7 +176,7 @@ export default function InventoryTable({
                         {visibleCols.available && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em] text-cyan-400">
-                                    <button onClick={() => onSort('available')} className="hover:opacity-80">Müsait {sortIndicator('available')}</button>
+                                    <button type="button" onClick={() => onSort('available')} className="hover:opacity-80">Müsait {sortIndicator('available')}</button>
                                     <InfoTooltip text="Satılabilir durumdaki net stok. (Fiziksel - Rezerve)" />
                                 </div>
                             </th>
@@ -184,25 +184,25 @@ export default function InventoryTable({
                         {visibleCols.threshold && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
-                                    <button onClick={() => onSort('threshold')} className="hover:text-cyan-400 transition-colors">Eşik {sortIndicator('threshold')}</button>
+                                    <button type="button" onClick={() => onSort('threshold')} className="hover:text-cyan-400 transition-colors">Eşik {sortIndicator('threshold')}</button>
                                     <InfoTooltip text="Stok bu rakamın altına indiğinde uyarı verilir." />
                                 </div>
                             </th>
                         )}
                         {visibleCols.location && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-[10px] font-black tracking-[0.2em]"}>
-                                <button onClick={() => onSort('location')} className="hover:text-cyan-400 transition-colors">Raf {sortIndicator('location')}</button>
+                                <button type="button" onClick={() => onSort('location')} className="hover:text-cyan-400 transition-colors">Raf {sortIndicator('location')}</button>
                             </th>
                         )}
                         {visibleCols.supplier && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-[10px] font-black tracking-[0.2em]"}>
-                                <button onClick={() => onSort('supplier')} className="hover:text-cyan-400 transition-colors">Tedarikçi {sortIndicator('supplier')}</button>
+                                <button type="button" onClick={() => onSort('supplier')} className="hover:text-cyan-400 transition-colors">Tedarikçi {sortIndicator('supplier')}</button>
                             </th>
                         )}
                         {visibleCols.abc && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-center"}>
                                 <div className="flex items-center justify-center gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
-                                    <button onClick={() => onSort('abc')} className="hover:text-cyan-400 transition-colors">Sınıf {sortIndicator('abc')}</button>
+                                    <button type="button" onClick={() => onSort('abc')} className="hover:text-cyan-400 transition-colors">Sınıf {sortIndicator('abc')}</button>
                                     <InfoTooltip text="A (En Popüler), B (Orta), C (Az Satan)." />
                                 </div>
                             </th>
@@ -210,7 +210,7 @@ export default function InventoryTable({
                         {visibleCols.days && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
-                                    <button onClick={() => onSort('days_empty')} className="hover:text-cyan-400 transition-colors">Tükenme {sortIndicator('days_empty')}</button>
+                                    <button type="button" onClick={() => onSort('days_empty')} className="hover:text-cyan-400 transition-colors">Tükenme {sortIndicator('days_empty')}</button>
                                     <InfoTooltip text="Eldeki stoğun kaç gün içinde biteceği tahmini." />
                                 </div>
                             </th>
