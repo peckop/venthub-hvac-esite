@@ -12,8 +12,6 @@ import { formatDateTime } from '../../i18n/datetime'
 import { Routes } from '../../utils/routes'
 import { Package, Calendar, CreditCard, ArrowLeft, Link as LinkIcon, Copy, RefreshCcw } from 'lucide-react'
 import toast from 'react-hot-toast'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 import { useCart } from '../../hooks/useCartHook'
 
 interface ShippingAddress {
@@ -166,8 +164,12 @@ export default function OrderDetailPage() {
     try { if (!text) return; await navigator.clipboard.writeText(text); toast.success(t('orders.copied')) } catch { toast.error(t('orders.copyFailed')) }
   }
 
-  const handleInvoicePdf = (o: Order) => {
+  const handleInvoicePdf = async (o: Order) => {
     try {
+      const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable')
+      ])
       const doc = new jsPDF({ unit: 'pt', format: 'a4' })
       const nf = new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US', { style: 'currency', currency: 'TRY' })
       const orderNo = o.order_number ? o.order_number.split('-')[1] : o.id.slice(-8).toUpperCase()

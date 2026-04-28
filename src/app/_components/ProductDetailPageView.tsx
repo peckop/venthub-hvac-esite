@@ -18,7 +18,6 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import LeadModal from '../../components/LeadModal'
 import toast from 'react-hot-toast'
-import { generateProductDatasheet } from '../../lib/pdfGenerator'
 import { 
   ArrowLeft,
   ShoppingCart,
@@ -207,8 +206,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     if (!product || isGeneratingPdf) return
     setIsGeneratingPdf(true)
     try {
+      const { generateProductDatasheet } = await import('../../lib/pdfGenerator')
       await generateProductDatasheet(
-        product, 
+        product,
         product.image_url || undefined,
         translateSpecKey,
         lang
