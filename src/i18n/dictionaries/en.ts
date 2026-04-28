@@ -2427,6 +2427,15 @@ export const en = {
         ]
       }
     }
+  },
+  error: {
+    chunkTitle: 'Page Update Required',
+    chunkDesc: 'The application appears to have been updated. Please refresh the page and try again.',
+    errorTitle: 'Page Failed to Load',
+    errorDesc: 'An error occurred while loading this page. Please try again.',
+    refresh: 'Refresh Page',
+    retry: 'Try Again',
+    devDetails: 'Error Details (Development)',
   }
 };
 

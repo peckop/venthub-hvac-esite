@@ -1,0 +1,48 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "opus",
+  "date": "2026-04-28",
+  "task_id": "P02-FAZ0",
+  "task_title": "FAZ 0 - Kritik Acil Düzeltmeler (RLS + ErrorBoundary i18n)",
+  "description": "RLS policy eksikliği ve ErrorBoundary hardcoded string düzeltmeleri",
+  "files_modified": [
+    "src/components/ErrorBoundary.tsx",
+    "src/i18n/dictionaries/tr.ts",
+    "src/i18n/dictionaries/en.ts",
+    "supabase/migrations/202508270945_enable_rls_public.sql",
+    "registry/P02-Core-Quality-Guardians/active/000-roadmap/faz0-plan.md"
+  ],
+  "allowed_paths": [
+    "src/components/ErrorBoundary.tsx",
+    "src/i18n/dictionaries/tr.ts",
+    "src/i18n/dictionaries/en.ts",
+    "supabase/migrations/202508270945_enable_rls_public.sql",
+    "registry/P02-Core-Quality-Guardians/active/000-roadmap/"
+  ],
+  "forbidden_paths": [
+    "src/views/",
+    "src/lib/services/",
+    "src/components/products/3d/",
+    "src/types/"
+  ],
+  "max_files_changed": 6,
+  "allowed_change_types": ["fix", "feature"],
+  "verification_commands": [
+    {
+      "command": "pnpm exec tsc --noEmit",
+      "result": "No errors",
+      "passed": true
+    },
+    {
+      "command": "pnpm run lint",
+      "result": "No errors",
+      "passed": true
+    },
+    {
+      "command": "pnpm run build",
+      "result": "Build successful",
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

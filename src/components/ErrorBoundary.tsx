@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
+import { I18nContext } from '../i18n/I18nContext'
 
 interface Props {
   children: ReactNode
@@ -66,73 +67,82 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
-    if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback
-      }
+    return (
+      <I18nContext.Consumer>
+        {(ctx) => {
+          const t = ctx?.t || ((key: string, alt?: string) => alt || key)
 
-      const { isChunkError } = this.state
+          if (this.state.hasError) {
+            if (this.props.fallback) {
+              return this.props.fallback
+            }
 
-      return (
-        <div className="min-h-[400px] flex items-center justify-center p-8">
-          <div className="text-center max-w-md">
-            <AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              {isChunkError ? 'Sayfa Güncellemesi Gerekli' : 'Sayfa Yüklenemedi'}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {isChunkError
-                ? 'Uygulama güncellenmiş görünüyor. Sayfayı yenileyip tekrar deneyin.'
-                : 'Bu sayfa yüklenirken bir hata oluştu. Lütfen tekrar deneyin.'}
-            </p>
-            <div className="space-y-3">
-              {isChunkError ? (
-                <button
-                  onClick={this.handleRefresh}
-                  className="inline-flex items-center px-6 py-2 bg-primary-navy text-white rounded-lg hover:bg-secondary-blue transition-colors"
-                  aria-label="Sayfayı Yenile"
-                >
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Sayfayı Yenile
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={this.handleRetry}
-                    className="inline-flex items-center px-4 py-2 bg-primary-navy text-white rounded-lg hover:bg-secondary-blue transition-colors mr-3"
-                    aria-label="Tekrar Dene"
-                  >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Tekrar Dene
-                  </button>
-                  <button
-                    onClick={this.handleRefresh}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                    aria-label="Sayfayı Yenile"
-                  >
-                    Sayfayı Yenile
-                  </button>
-                </>
-              )}
-            </div>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mt-6 text-left">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
-                  Hata Detayları (Geliştirme)
-                </summary>
-                <pre className="mt-2 text-xs bg-gray-100 p-3 rounded overflow-auto max-h-40">
-                  {serializeError(this.state.error)}
-                </pre>
-              </details>
-            )}
-          </div>
-        </div>
-      )
-    }
+            const { isChunkError } = this.state
 
-    return this.props.children
+            return (
+              <div className="min-h-[400px] flex items-center justify-center p-8">
+                <div className="text-center max-w-md">
+                  <AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                    {isChunkError
+                      ? t('error.chunkTitle', 'Sayfa Güncellemesi Gerekli')
+                      : t('error.errorTitle', 'Sayfa Yüklenemedi')
+                    }
+                  </h2>
+                  <p className="text-gray-600 mb-6">
+                    {isChunkError
+                      ? t('error.chunkDesc', 'Uygulama güncellenmiş görünüyor. Sayfayı yenileyip tekrar deneyin.')
+                      : t('error.errorDesc', 'Bu sayfa yüklenirken bir hata oluştu. Lütfen tekrar deneyin.')
+                    }
+                  </p>
+                  <div className="space-y-3">
+                    {isChunkError ? (
+                      <button
+                        onClick={this.handleRefresh}
+                        className="inline-flex items-center px-6 py-2 bg-primary-navy text-white rounded-lg hover:bg-secondary-blue transition-colors"
+                        aria-label={t('error.refresh', 'Sayfayı Yenile')}
+                      >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        {t('error.refresh', 'Sayfayı Yenile')}
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={this.handleRetry}
+                          className="inline-flex items-center px-4 py-2 bg-primary-navy text-white rounded-lg hover:bg-secondary-blue transition-colors mr-3"
+                          aria-label={t('error.retry', 'Tekrar Dene')}
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          {t('error.retry', 'Tekrar Dene')}
+                        </button>
+                        <button
+                          onClick={this.handleRefresh}
+                          className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                          aria-label={t('error.refresh', 'Sayfayı Yenile')}
+                        >
+                          {t('error.refresh', 'Sayfayı Yenile')}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  {process.env.NODE_ENV === 'development' && this.state.error && (
+                    <details className="mt-6 text-left">
+                      <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+                        {t('error.devDetails', 'Hata Detayları (Geliştirme)')}
+                      </summary>
+                      <pre className="mt-2 text-xs bg-gray-100 p-3 rounded overflow-auto max-h-40">
+                        {serializeError(this.state.error)}
+                      </pre>
+                    </details>
+                  )}
+                </div>
+              </div>
+            )
+          }
+
+          return this.props.children
+        }}
+      </I18nContext.Consumer>
+    )
   }
 }
-
-
-

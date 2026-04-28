@@ -2085,5 +2085,14 @@ export const tr = {
     standardMount: 'Standart (Duvar/Tavan Asılı)',
     recessedMount: 'Ankastre (Asma Tavan İçi)',
     step: 'Adım'
+  },
+  error: {
+    chunkTitle: 'Sayfa Güncellemesi Gerekli',
+    chunkDesc: 'Uygulama güncellenmiş görünüyor. Sayfayı yenileyip tekrar deneyin.',
+    errorTitle: 'Sayfa Yüklenemedi',
+    errorDesc: 'Bu sayfa yüklenirken bir hata oluştu. Lütfen tekrar deneyin.',
+    refresh: 'Sayfayı Yenile',
+    retry: 'Tekrar Dene',
+    devDetails: 'Hata Detayları (Geliştirme)',
   }
 };

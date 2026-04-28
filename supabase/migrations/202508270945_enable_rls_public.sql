@@ -113,6 +113,30 @@ select public._enable_rls_if_exists('public.product_comparisons');
 select public._enable_rls_if_exists('public.search_filters');
 select public._enable_rls_if_exists('public.product_analytics');
 
+-- ============================================
+-- EKSİK POLICY'LER (FAZ 0 DÜZELTME)
+-- ============================================
+
+-- cart_items: Kullanıcı sadece kendi sepetini görebilir
+do $$ begin
+  perform public._create_select_policy_if_absent('public','cart_items','p_user_read_own_cart','user_id = auth.uid()');
+end $$;
+
+-- payment_transactions: Kullanıcı sadece kendi ödemelerini görebilir
+do $$ begin
+  perform public._create_select_policy_if_absent('public','payment_transactions','p_user_read_own_transactions','user_id = auth.uid()');
+end $$;
+
+-- inventory_movements: Sadece admin kullanıcılar görebilir
+do $$ begin
+  perform public._create_select_policy_if_absent('public','inventory_movements','p_admin_read_inventory','auth.jwt() ->> ''role'' = ''admin''');
+end $$;
+
+-- price_lists: Aktif fiyat listeleri herkese görünür
+do $$ begin
+  perform public._create_select_policy_if_absent('public','price_lists','p_anon_read_active_price_lists','active = true');
+end $$;
+
 -- Cleanup helpers (optional keep for future use). Comment out drop if you want to reuse.
 drop function if exists public._create_select_policy_if_absent(text,text,text,text);
 drop function if exists public._enable_rls_if_exists(regclass);
