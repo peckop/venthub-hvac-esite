@@ -54,6 +54,27 @@ artifacts:
 
 ---
 
+## FAZ 0 — Kritik Acil Düzeltmeler ✅ KAPALI
+
+**Tarih:** 28 Nisan 2026
+**Kapsam:** 4 dosya (RLS migration + ErrorBoundary + i18n dictionaries)
+**Model:** Dola Seed 2.0 Pro (planlama) + Dola Seed 2.0 Code (uygulama)
+**Sonuç:** Tüm testler PASS
+
+| Değişiklik | Durum |
+|-----------|-------|
+| 4 tablo RLS SELECT policy eklendi (cart_items, payment_transactions, inventory_movements, price_lists) | ✅ |
+| ErrorBoundary `I18nContext.Consumer` ile sarmalandı (hardcoded string → i18n) | ✅ |
+| 7 çeviri anahtarı `tr.ts` + `en.ts`'e eklendi | ✅ |
+| `inventory_movements` admin-only RLS policy | ✅ |
+
+**Doğrulama:**
+- `pnpm exec tsc --noEmit` → Exit 0
+- `pnpm run lint` → PASS
+- `pnpm run build` → PASS (399 sayfa)
+
+---
+
 ## FAZ 2 — Lighthouse Baz Ölçümü + Hızlı Kazanımlar (P02-B)
 
 **Durum:** Beklemede
