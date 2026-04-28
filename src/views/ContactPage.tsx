@@ -1,17 +1,20 @@
 'use client'
 
 import React, { useState } from 'react'
-import { motion } from 'framer-motion'
 import { Phone, Mail, MapPin, Clock, CheckCircle } from 'lucide-react'
 import { useI18n } from '../i18n/I18nProvider'
 import Seo from '../components/Seo'
 import { WhatsAppIcon } from '../components/HVACIcons'
 import { getSupportLink } from '../utils/whatsapp'
+import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 
 const ContactPage: React.FC = () => {
   const { t } = useI18n()
   const [formSubmitted, setFormSubmitted] = useState(false)
   const whatsappLink = getSupportLink('İletişim Sayfası')
+  const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
+  const [contactGridRef, contactGridVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })
+  const [formSuccessRef, formSuccessVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
 
   const contactCards = [
     {
@@ -53,14 +56,10 @@ const ContactPage: React.FC = () => {
       {/* Hero: Minimalist & Dramatic */}
       <section className="pt-32 pb-20 bg-slate-50 border-b border-slate-100">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
-          >
+          <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-600">Global Connectivity</span>
-          </motion.div>
+          </div>
           <h1 className="text-5xl lg:text-8xl font-extralight tracking-tighter text-slate-900 leading-[1.1] mb-10">
             Projenizi <span className="font-medium text-slate-950 italic">Birlikte Şekillendirelim</span>
           </h1>
@@ -73,17 +72,14 @@ const ContactPage: React.FC = () => {
       {/* Quick Contact Grid */}
       <section className="py-24">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div ref={contactGridRef} className="grid md:grid-cols-3 gap-8">
             {contactCards.map((card, i) => (
-              <motion.a
+              <a
                 key={i}
                 href={card.href}
                 target={card.icon === MapPin ? "_blank" : undefined}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="group p-10 rounded-[2.5rem] bg-white border border-slate-100 transition-all duration-500 hover:border-cyan-500/20 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]"
+                className={scrollAnimationClasses.fadeUp(contactGridVisible) + " group p-10 rounded-[2.5rem] bg-white border border-slate-100 transition-all duration-500 hover:border-cyan-500/20 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]"}
+                style={scrollAnimationClasses.staggerChild(i)}
               >
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-500">
                   <card.icon size={24} strokeWidth={1.5} />
@@ -93,7 +89,7 @@ const ContactPage: React.FC = () => {
                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-cyan-600">
                   {card.label} <ArrowRight size={12} />
                 </div>
-              </motion.a>
+              </a>
             ))}
           </div>
         </div>
@@ -135,23 +131,19 @@ const ContactPage: React.FC = () => {
 
             <div className="bg-white rounded-[3rem] p-8 lg:p-12 text-slate-900 shadow-2xl">
               {formSubmitted ? (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-20"
-                >
+                <div ref={formSuccessRef} className={scrollAnimationClasses.scaleIn(formSuccessVisible) + " text-center py-20"}>
                   <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
                     <CheckCircle size={40} />
                   </div>
                   <h3 className="text-3xl font-bold tracking-tight mb-4">Mesajınız İletildi</h3>
                   <p className="text-slate-500 font-light">Mühendislik ekibimiz en kısa sürede size dönüş yapacaktır.</p>
-                  <button 
+                  <button
                     onClick={() => setFormSubmitted(false)}
                     className="mt-10 text-[10px] font-black uppercase tracking-widest text-cyan-600 hover:underline"
                   >
                     Yeni Mesaj Gönder
                   </button>
-                </motion.div>
+                </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid sm:grid-cols-2 gap-6">

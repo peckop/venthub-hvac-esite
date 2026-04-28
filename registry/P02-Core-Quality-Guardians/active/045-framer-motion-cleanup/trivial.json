@@ -1,0 +1,28 @@
+{
+  "id": "faz2-framer-motion-cleanup",
+  "title": "FAZ 2 — Framer-Motion Temizliği",
+  "status": "completed",
+  "artifacts": {
+    "plan": "registry/P02-Core-Quality-Guardians/active/000-roadmap/faz2-plan.md"
+  },
+  "scope": {
+    "max_files_changed": 8,
+    "reason": "tek lib değişikliği — framer-motion import systematically kaldırılıyor"
+  },
+  "files": [
+    "src/views/AboutPage.tsx",
+    "src/views/ContactPage.tsx",
+    "src/views/BrandsPage.tsx",
+    "src/views/BrandDetailPage.tsx",
+    "src/views/category/CategoryShowcaseView.tsx",
+    "src/components/home/EliteHero.tsx",
+    "src/components/category/CategoryHero.tsx",
+    "src/components/products/CategoryOrbitCarousel.tsx"
+  ],
+  "result": {
+    "tsc": "PASS",
+    "lint": "PASS",
+    "build": "PASS (405 sayfa)",
+    "framer_motion_import_removed": true
+  }
+}

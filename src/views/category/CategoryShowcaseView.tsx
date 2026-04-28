@@ -11,8 +11,8 @@ import { BottomCTA } from '@/components/category/sections'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
 import { DomainCategory } from '../../lib/type-converters'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
-import { motion } from 'framer-motion'
 import { useI18n } from '@/i18n/I18nProvider'
+import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 
 interface CategoryShowcaseProps {
     category: DomainCategory
@@ -32,6 +32,11 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     
     const vm = wrapCategory(category)
     const isAirCurtain = category.slug.includes('hava-perde')
+    const [breadcrumbRef, breadcrumbVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })
+    const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
+    const [heroTitleRef, heroTitleVisible] = useScrollAnimation<HTMLHeadingElement>({ threshold: 0.2 })
+    const [heroTextRef, heroTextVisible] = useScrollAnimation<HTMLParagraphElement>({ threshold: 0.2 })
+    const [airCurtainBtnRef, airCurtainBtnVisible] = useScrollAnimation<HTMLButtonElement>({ threshold: 0.2 })
 
     // Handle selection either via prop or direct routing
     const handleSubSelect = (subSlug: string) => {
@@ -71,52 +76,33 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
 
                 <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     {/* FIXED BREADCRUMB - VENTHUB SIGNATURE */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex justify-center mb-12"
-                    >
+                    <div ref={breadcrumbRef} className={scrollAnimationClasses.fadeUp(breadcrumbVisible) + " flex justify-center mb-12"}>
                         <Breadcrumb items={breadcrumbItems} variant="transparent" />
-                    </motion.div>
+                    </div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
-                    >
+                    <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
                         <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
                         <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">{t('category.showcase.premiumTitle')}</span>
-                    </motion.div>
+                    </div>
 
-                    <motion.h1
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="text-5xl lg:text-8xl font-extralight tracking-tighter leading-[1.1] mb-10"
-                    >
+                    <h1 ref={heroTitleRef} className={scrollAnimationClasses.scaleIn(heroTitleVisible) + " text-5xl lg:text-8xl font-extralight tracking-tighter leading-[1.1] mb-10"}>
                         {vm?.displayName?.split(' ').slice(0, -1).join(' ')} <span className="font-medium text-white italic">{vm?.displayName?.split(' ').slice(-1)}</span>
-                    </motion.h1>
+                    </h1>
 
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="max-w-2xl mx-auto text-xl text-slate-400 font-light leading-relaxed mb-12"
-                    >
+                    <p ref={heroTextRef} className={scrollAnimationClasses.fadeIn(heroTextVisible) + " max-w-2xl mx-auto text-xl text-slate-400 font-light leading-relaxed mb-12"}>
                         {vm?.description || 'Yüksek performanslı, akıllı ve sürdürülebilir havalandırma sistemlerinin teknik otoritesi.'}
-                    </motion.p>
+                    </p>
 
                     {isAirCurtain && (
-                        <motion.button
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.4 }}
+                        <button
+                            ref={airCurtainBtnRef}
                             onClick={() => setWizardOpen(true)}
-                            className="group inline-flex items-center bg-white text-slate-950 px-10 py-5 rounded-full font-bold transition-all hover:bg-cyan-500 hover:text-white"
+                            className={scrollAnimationClasses.fadeIn(airCurtainBtnVisible) + " group inline-flex items-center bg-white text-slate-950 px-10 py-5 rounded-full font-bold transition-all hover:bg-cyan-500 hover:text-white"}
                         >
                             <ThermometerSun className="mr-3" size={20} />
                             <span>{t('category.findModel')}</span>
                             <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
-                        </motion.button>
+                        </button>
                     )}
                 </div>
 

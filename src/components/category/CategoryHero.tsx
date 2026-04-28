@@ -8,8 +8,8 @@ import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { DomainCategory } from '../../lib/type-converters'
-import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 
 interface CategoryHeroProps {
   category: DomainCategory | null
@@ -21,6 +21,9 @@ interface CategoryHeroProps {
 const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, productCount, loading }) => {
   const { t } = useI18n()
   const navigate = useRouter()
+  const [backBtnRef, backBtnVisible] = useScrollAnimation<HTMLButtonElement>({ threshold: 0.1 })
+  const [imageRef, imageVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
+  const [textRef, textVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
 
   const handleBack = () => {
     if (typeof window !== 'undefined') {
@@ -75,25 +78,21 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
       )}
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <motion.button
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
+        <button
+          ref={backBtnRef}
           onClick={handleBack}
           className={cn(
+            scrollAnimationClasses.slideLeft(backBtnVisible),
             "inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] transition-all mb-12 group",
             isMainCategory ? "text-slate-400 hover:text-white" : "text-slate-400 hover:text-primary-navy"
           )}
         >
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           <span>{t('common.back')}</span>
-        </motion.button>
+        </button>
 
         <div className="flex flex-col md:flex-row md:items-center gap-8 lg:gap-16">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="shrink-0"
-          >
+          <div ref={imageRef} className={scrollAnimationClasses.scaleIn(imageVisible) + " shrink-0"}>
             {categoryImageUrl ? (
               <div className={cn(
                 "relative rounded-[2rem] overflow-hidden shadow-2xl border transition-all duration-500",
@@ -114,13 +113,12 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
                 {getCategoryIcon(parentCategory?.slug || category.slug, { size: isMainCategory ? 64 : 48 })}
               </div>
             )}
-          </motion.div>
-          
+          </div>
+
           <div className="flex-1">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
+            <div
+              ref={textRef}
+              className={scrollAnimationClasses.fadeUp(textVisible)}
             >
               {parentCategory && (
                 <span className={cn(
@@ -169,7 +167,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
                   </>
                 )}
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>

@@ -2,7 +2,6 @@
 import { Routes } from '../../utils/routes'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ChevronRight } from 'lucide-react'
 import OrbitalProductsShowcase from './OrbitalProductsShowcase'
@@ -233,91 +232,89 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                 />
             </div>
 
-            <AnimatePresence>
-                {level === 'subcategory' && activeMainCategory && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
+            {level === 'subcategory' && activeMainCategory && (
+                    <div
                         className="absolute top-4 left-0 right-0 z-40 container mx-auto px-4"
+                        style={{ animation: 'fadeInDown 0.3s ease-out' }}
                     >
+                        <style>{`
+                            @keyframes fadeInDown {
+                                from { opacity: 0; transform: translateY(-10px); }
+                                to { opacity: 1; transform: translateY(0); }
+                            }
+                        `}</style>
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                            <motion.button
+                            <button
                                 onClick={handleBack}
-                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group w-full sm:w-auto"
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group w-full sm:w-auto hover:scale-[1.02] active:scale-[0.98]"
                             >
                                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                                 <span className="text-sm font-medium">{t('common.back')}</span>
                                 <span className="text-sm font-bold text-cyan-400 truncate max-w-[150px] ml-2">
                                     {activeMainCategory.displayName}
                                 </span>
-                            </motion.button>
+                            </button>
 
-                            <motion.button
+                            <button
                                 onClick={handleViewAllProducts}
-                                className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium text-sm hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 w-full sm:w-auto"
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                                className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium text-sm hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 w-full sm:w-auto hover:scale-[1.02] active:scale-[0.98]"
                             >
                                 {t('common.seeAllProducts')}
                                 <ChevronRight className="w-4 h-4" />
-                            </motion.button>
+                            </button>
                         </div>
-                    </motion.div>
+                    </div>
                 )}
-            </AnimatePresence>
 
             <div className="absolute top-6 left-0 right-0 z-30 container mx-auto px-4">
-                <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                        key={level}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-center"
-                        style={{ marginTop: level === 'subcategory' ? (isMobile ? '5.5rem' : '3rem') : 0 }}
-                    >
-                        <h2 className="text-xl md:text-3xl font-bold text-white/90">
-                            {focusedItemTitle || frontCardTitle || (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.displayName} Alt Kategorileri`)}
-                        </h2>
-                        <p className="text-white/50 text-xs sm:text-sm mt-2 font-medium tracking-wide">
-                            {focusedItemTitle
-                                ? (level === 'main'
-                                    ? (isMobile ? 'Dokun: Aç • Çift Dokun: Git' : 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git')
-                                    : (isMobile ? 'Dokunarak Sayfaya Gidin' : 'Tıklayarak Ürün Sayfasına Gidin'))
-                                : ROTATING_HINTS[hintIndex]
-                            }
-                        </p>
-                    </motion.div>
-                </AnimatePresence>
+                <div
+                    key={level}
+                    className="text-center"
+                    style={{ animation: 'fadeIn 0.3s ease-out', marginTop: level === 'subcategory' ? (isMobile ? '5.5rem' : '3rem') : 0 }}
+                >
+                    <style>{`
+                        @keyframes fadeIn {
+                            from { opacity: 0; transform: translateY(-5px); }
+                            to { opacity: 1; transform: translateY(0); }
+                        }
+                    `}</style>
+                    <h2 className="text-xl md:text-3xl font-bold text-white/90">
+                        {focusedItemTitle || frontCardTitle || (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.displayName} Alt Kategorileri`)}
+                    </h2>
+                    <p className="text-white/50 text-xs sm:text-sm mt-2 font-medium tracking-wide">
+                        {focusedItemTitle
+                            ? (level === 'main'
+                                ? (isMobile ? 'Dokun: Aç • Çift Dokun: Git' : 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git')
+                                : (isMobile ? 'Dokunarak Sayfaya Gidin' : 'Tıklayarak Ürün Sayfasına Gidin'))
+                            : ROTATING_HINTS[hintIndex]
+                        }
+                    </p>
+                </div>
             </div>
 
             <div className="w-full relative z-10 flex justify-center items-center overflow-hidden" style={{ minHeight: responsiveHeight }}>
-                <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                        key={level}
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.98 }}
-                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                        className="w-full max-w-[1600px] will-change-transform"
-                    >
-                        <OrbitalProductsShowcase
-                            items={displayItems}
-                            onCardClick={handleCardClick}
-                            externalPause={isTransitioning}
-                            onFocusedItemChange={handleFocusedItemChange}
-                            onFrontCardChange={handleFrontCardChange}
-                            modelScale={responsiveModelScale}
-                            containerHeight={responsiveHeight}
-                            skipHints={level === 'subcategory'} 
-                        />
-                    </motion.div>
-                </AnimatePresence>
+                <div
+                    key={level}
+                    className="w-full max-w-[1600px] will-change-transform"
+                    style={{ animation: 'scaleIn 0.4s ease-out' }}
+                >
+                    <style>{`
+                        @keyframes scaleIn {
+                            from { opacity: 0; transform: scale(0.98); }
+                            to { opacity: 1; transform: scale(1); }
+                        }
+                    `}</style>
+                    <OrbitalProductsShowcase
+                        items={displayItems}
+                        onCardClick={handleCardClick}
+                        externalPause={isTransitioning}
+                        onFocusedItemChange={handleFocusedItemChange}
+                        onFrontCardChange={handleFrontCardChange}
+                        modelScale={responsiveModelScale}
+                        containerHeight={responsiveHeight}
+                        skipHints={level === 'subcategory'}
+                    />
+                </div>
             </div>
         </section>
     )
