@@ -37,3 +37,7 @@
 ## 2025-04-21 - [Discovered recursion bug in createTimerClock]
 **Learning:** While writing tests for `createTimerClock` in `src/utils/three-utils.ts`, I discovered a critical stack overflow recursion bug. The function assigns `clockShim = timer`, and then overrides `clockShim.getDelta = () => { timer.update(); return timer.getDelta() }`. Since `timer` and `clockShim` point to the exact same object, calling `getDelta()` calls itself infinitely, leading to a RangeError: Maximum call stack size exceeded.
 **Action:** The test uncovered that the implementation was fundamentally broken. We must use the original prototype's `getDelta` method, e.g., `return THREE.Timer.prototype.getDelta.call(this)`, rather than calling `timer.getDelta()` on the mutated object.
+
+## 2024-05-18 - Type-Safe Vitest Mocks for Supabase Select/Order Chains
+**Learning:** When mocking Supabase chains that duplicate intermediate methods like `.order().order()`, defining standard `mockReturnThis()` can cause resolution bugs depending on the exact implementation in the test runner.
+**Action:** When tests unexpectedly resolve promises prematurely in complex mocked chain calls, construct an explicit linear mock object reflecting the specific execution order (e.g., `const orderMock1 = vi.fn().mockReturnValue({ order: orderMock2 })`).
