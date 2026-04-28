@@ -198,7 +198,7 @@ const PaymentSuccessPage: React.FC = () => {
             {t('payment.failedTitle')}
           </h2>
           <p className="text-steel-gray mb-6">
-            {paymentInfo?.errorMessage || 'Ödeme sırasında bir hata oluştu.'}
+            {paymentInfo?.errorMessage || t('cart.errors.paymentError')}
           </p>
           <div className="space-y-3">
             <Link

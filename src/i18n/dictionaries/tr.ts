@@ -1402,6 +1402,7 @@ export const tr = {
       startShopping: 'Alışverişe Başla'
     },
     errors: {
+      paymentError: 'Ödeme sırasında bir hata oluştu',
       nameRequired: 'Ad Soyad gereklidir',
       emailInval_id: 'Lütfen geçerli bir e-posta adresi girin',
       phoneRequired: 'Telefon numarası gereklidir',
@@ -1549,12 +1550,21 @@ export const tr = {
       security: 'Güvenlik'
     },
     overview: {
+      greeting: 'Merhaba,',
+      welcomeMessage: 'B2B portalinize hoş geldiniz. Operasyonlarınızı buradan yönetebilirsiniz.',
+      activeOrders: 'Aktif Sipariş',
+      completedOrders: 'Tamamlanan',
+      totalVolume: 'Toplam Hacim',
       defaultAddressesTitle: 'Varsayılan Adresler',
       shippingAddress: 'Teslimat Adresi',
       billingAddress: 'Fatura Adresi',
       notSetShipping: 'Varsayılan teslimat adresi tanımlanmamış.',
       notSetBilling: 'Varsayılan fatura adresi tanımlanmamış.',
       manageAddresses: 'Adresleri yönet'
+    },
+    shipments: {
+      preparingLabel: 'Hazırlandı',
+      goToOrders: 'Siparişlerime Git'
     },
     addresses: {
       title: 'Adreslerim',
@@ -2086,6 +2096,22 @@ export const tr = {
     recessedMount: 'Ankastre (Asma Tavan İçi)',
     step: 'Adım'
   },
+  product3d: {
+    loadError: '3D Model Yüklenemedi',
+    back: 'GERİ',
+    view: 'GÖRÜNÜM',
+    reset: 'RESET',
+    orbit: 'ORBİT',
+    free: 'FREE',
+    auto: 'OTO',
+    front: 'Ön',
+    backLabel: 'Arka',
+    left: 'Sol',
+    right: 'Sağ',
+    top: 'Üst',
+    bottom: 'Alt'
+  },
+
   error: {
     chunkTitle: 'Sayfa Güncellemesi Gerekli',
     chunkDesc: 'Uygulama güncellenmiş görünüyor. Sayfayı yenileyip tekrar deneyin.',

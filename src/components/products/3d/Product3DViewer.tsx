@@ -1,5 +1,5 @@
 "use client"
- 
+
 import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react'
 import * as THREE from 'three'
 import { Canvas, useThree } from '@react-three/fiber'
@@ -15,14 +15,15 @@ import {
     Globe
 } from 'lucide-react'
 import { getModelPlacement } from '../../../utils/3dModelOffsets'
+import { useI18n } from '../../../i18n/I18nProvider'
 
 function Loader() {
     const { progress } = useProgress()
     return <Html center><div className="text-primary-navy font-bold text-sm bg-white/80 px-2 py-1 rounded">{progress.toFixed(0)}%</div></Html>
 }
 
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: Error | null }> {
-    constructor(props: { children: React.ReactNode }) {
+class ErrorBoundary extends React.Component<{ children: React.ReactNode, t: (key: string) => string }, { hasError: boolean, error: Error | null }> {
+    constructor(props: { children: React.ReactNode, t: (key: string) => string }) {
         super(props)
         this.state = { hasError: false, error: null }
     }
@@ -34,7 +35,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
             return (
                 <Html center>
                     <div className="bg-red-50 border border-red-200 p-4 rounded-lg shadow-lg text-center w-64">
-                        <div className="text-red-600 font-bold mb-1 text-sm">3D Model Yüklenemedi</div>
+                        <div className="text-red-600 font-bold mb-1 text-sm">{this.props.t('product3d.loadError')}</div>
                         <div className="text-[10px] text-red-500 break-words">{this.state.error?.message?.slice(0, 100)}</div>
                     </div>
                 </Html>
@@ -94,6 +95,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
     isFullscreen = false,
     onClose
 }) => {
+    const { t } = useI18n()
     const [showGrid, setShowGrid] = useState(true)
     const [autoRotate, setAutoRotate] = useState(false)
     const [showViewMenu, setShowViewMenu] = useState(false)
@@ -156,7 +158,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
                 <directionalLight position={[10, 15, 10]} intensity={1.5} castShadow shadow-mapSize={2048} />
                 <Environment preset="city" />
                 <Suspense fallback={<Loader />}>
-                    <ErrorBoundary>
+                    <ErrorBoundary t={t}>
                         {slug && (
                             <group position={[0, 0, 0]}>
                                 <ModelRotator enabled={rotationMode === 'free'} rotationRef={modelGroupRef}>
@@ -173,7 +175,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
                     {showGrid && <Grid infiniteGrid fadeDistance={60} fadeStrength={4} sectionColor="#1e40af" cellColor="#94a3b8" sectionThickness={1.2} cellThickness={0.6} args={[20, 20]} />}
                 </group>
                 <GizmoHelper alignment="bottom-right" margin={[70, 70]}>
-                    <GizmoViewcube font="bold 50px Inter, sans-serif" opacity={0.9} color="#ffffff" hoverColor="#f8fafc" textColor="#475569" strokeColor="#cbd5e1" faces={['Sağ', 'Sol', 'Üst', 'Alt', 'Ön', 'Arka']} />
+                    <GizmoViewcube font="bold 50px Inter, sans-serif" opacity={0.9} color="#ffffff" hoverColor="#f8fafc" textColor="#475569" strokeColor="#cbd5e1" faces={[t('product3d.right'), t('product3d.left'), t('product3d.top'), t('product3d.bottom'), t('product3d.front'), t('product3d.backLabel')]} />
                 </GizmoHelper>
                 <OrbitControls ref={controlsRef} makeDefault enableRotate={rotationMode === 'orbit'} enableZoom={true} enablePan={true} maxPolarAngle={Math.PI} autoRotate={autoRotate} autoRotateSpeed={0.5} />
             </Canvas>
@@ -182,31 +184,31 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
                 <div className={`flex items-center gap-1 bg-white/95 backdrop-blur-md p-1 rounded-lg border border-gray-300 shadow-xl`}>
                     {onClose && (
                         <button onClick={onClose} className={`flex items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 hover:text-primary-navy transition-all`}>
-                            <ChevronLeft size={tb.icon} strokeWidth={2} /><span className={`${tb.font} font-bold leading-none`}>GERİ</span>
+                            <ChevronLeft size={tb.icon} strokeWidth={2} /><span className={`${tb.font} font-bold leading-none`}>{t('product3d.back')}</span>
                         </button>
                     )}
                     <div className="relative">
                         <button onClick={() => setShowViewMenu(!showViewMenu)} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-all`}>
-                            <BoxSelect size={tb.icon} strokeWidth={1.5} /><span className={`${tb.font} font-bold leading-none`}>GÖRÜNÜM</span>
+                            <BoxSelect size={tb.icon} strokeWidth={1.5} /><span className={`${tb.font} font-bold leading-none`}>{t('product3d.view')}</span>
                         </button>
                         {showViewMenu && (
                             <div className="absolute top-full left-0 mt-1.5 w-40 bg-white rounded-lg border border-gray-200 shadow-2xl z-[200]">
-                                {[{ key: 'front', label: 'Ön' }, { key: 'back', label: 'Arka' }, { key: 'left', label: 'Sol' }, { key: 'right', label: 'Sağ' }, { key: 'top', label: 'Üst' }, { key: 'bottom', label: 'Alt' }].map(v => (
+                                {[{ key: 'front', label: t('product3d.front') }, { key: 'back', label: t('product3d.backLabel') }, { key: 'left', label: t('product3d.left') }, { key: 'right', label: t('product3d.right') }, { key: 'top', label: t('product3d.top') }, { key: 'bottom', label: t('product3d.bottom') }].map(v => (
                                     <button key={v.key} onClick={() => handleViewChange(v.key as 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom' | 'iso')} className="w-full text-left px-3 py-2 text-xs hover:bg-blue-50 transition-colors">{v.label}</button>
                                 ))}
                             </div>
                         )}
                     </div>
                     <button onClick={handleReset} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-all`}>
-                        <RefreshCw size={tb.icon} strokeWidth={1.5} /><span className={`${tb.font} font-bold leading-none`}>RESET</span>
+                        <RefreshCw size={tb.icon} strokeWidth={1.5} /><span className={`${tb.font} font-bold leading-none`}>{t('product3d.reset')}</span>
                     </button>
                     <button onClick={() => setRotationMode(rotationMode === 'orbit' ? 'free' : 'orbit')} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-all ${tb.minW} ${rotationMode === 'free' ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
                         {rotationMode === 'orbit' ? <RotateCcw size={tb.icon} strokeWidth={1.5} /> : <Globe size={tb.icon} strokeWidth={1.5} />}
-                        <span className={`${tb.font} font-bold leading-none`}>{rotationMode === 'orbit' ? 'ORBİT' : 'FREE'}</span>
+                        <span className={`${tb.font} font-bold leading-none`}>{rotationMode === 'orbit' ? t('product3d.orbit') : t('product3d.free')}</span>
                     </button>
                     <button onClick={() => setAutoRotate(!autoRotate)} disabled={rotationMode === 'free'} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-all ${tb.minW} ${autoRotate ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
                         <Repeat size={tb.icon} className={autoRotate ? 'animate-spin' : ''} strokeWidth={1.5} />
-                        <span className={`${tb.font} font-bold leading-none`}>OTO</span>
+                        <span className={`${tb.font} font-bold leading-none`}>{t('product3d.auto')}</span>
                     </button>
                 </div>
             </div>

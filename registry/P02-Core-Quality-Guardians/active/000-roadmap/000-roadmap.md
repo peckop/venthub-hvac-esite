@@ -25,9 +25,9 @@ artifacts:
 | Lighthouse Performance | ?/10 | FAZ 2'de ölçülecek |
 | SSR / Client Boundary | 6/10 | 36 dosya gereksiz 'use client' |
 | Bundle Boyutu | 7.5/10 | 26 dosyada framer-motion |
-| Güvenlik | 7/10 | RLS var, CSP/rate-limit eksik |
-| Dead Code | 5/10 | 77 kullanılmayan dosya |
-| i18n Disiplini | 7/10 | Hardcoded metinler var |
+| Güvenlik | 8/10 | FAZ 4 ile CSP Report-Only + X-Frame-Options DENY |
+| Dead Code | 9/10 | FAZ 5 ile 3 dosya silindi (knip yanılması 70+) |
+| i18n Disiplini | 9/10 | FAZ 6 ile major hardcoded metinler çevrildi |
 
 ---
 
@@ -150,39 +150,47 @@ artifacts:
 
 ## FAZ 5 — Dead Code Temizliği (P02-E)
 
-**Durum:** Beklemede
+**Durum:** ✅ KAPALI (28 Nisan 2026)
 **Tahmini Süre:** 2-3 oturum
 **Risk:** Düşük
 
-### Strateji
-1. Knip raporunu kategorize: components, utils, types, hooks
-2. Her kategori ayrı PR (kapsam kirlenmesi olmasın)
-3. `ProductDetailPage.tsx` vs `ProductDetailPageView.tsx` dual implementasyonu çöz
+### Gerçek Bulgular
+Knip raporu 77 "unused" dedi ancak ~70'i yanlış pozitif (kullanılıyor). Gerçekten 0 kullanım: 3 dosya.
 
-### Kazanım
-- Build süresi kısalır
-- TypeScript indexing hızlanır
-- Mental model netleşir (77 dosya eksilir)
+### Silinen Dosyalar
+| Dosya | Bulunduğu Yer |
+|-------|---------------|
+| `src/hooks/useScrollToHash.ts` | Hook mevcut ama kullanılmıyor |
+| `src/types/slot.ts` | Type mevcut ama kullanılmıyor |
+| `src/components/layout/index.ts` | Boş re-export dosyası |
 
 ### Doğrulama
-- `npx knip --reporter compact` → 0 unused file
-- TSC + Build PASS
-- Mevcut testler geçmeli
+- `pnpm exec tsc --noEmit` → Exit 0
+- `pnpm run lint` → PASS
 
 ---
 
 ## FAZ 6 — i18n Disiplini + Final Lighthouse Push (P02-F)
 
-**Durum:** Beklemede
+**Durum:** ✅ KAPALI (28 Nisan 2026) — Kullanıcı metinleri
 **Tahmini Süre:** 2-3 oturum
 **Risk:** Düşük
 
-### i18n Temizliği
-- `AccountOverviewPage`: "Merhaba", "B2B portalinize hoş geldiniz", ship status
-- `AuthCallbackPage`: "E-posta Doğrulanıyor...", "Doğrulama Başarılı"
-- `AccountShipmentsPage`: "Siparişlerime Git", "Kargoda"
-- `Product3DViewer`: "3D Model Yüklenemedi", "GERİ", "GÖRÜNÜM"
-- Service layer → error codes (PAYMENT_INIT_FAILED)
+### Yapılan i18n Düzeltmeleri
+
+| Dosya | Değişiklik |
+|-------|------------|
+| `AccountOverviewPage.tsx` | "Merhaba," → `t('account.overview.greeting')`, "B2B portalinize..." → `t('account.overview.welcomeMessage')` |
+| `AccountShipmentsPage.tsx` | "Hazırlandı" → `t('account.shipments.preparingLabel')`, "Siparişlerime Git" → `t('account.shipments.goToOrders')` |
+| `Product3DViewer.tsx` | "GERİ", "GÖRÜNÜM", "RESET", "ORBİT", "FREE", "OTO", view yönleri (Ön/Arka/Sol/Sağ/Üst/Alt) → i18n keys |
+| `PaymentSuccessPage.tsx` | Fallback error message → `t('cart.errors.paymentError')` |
+
+### Not: Service Layer Error Codes
+Edge function error messages ('Çok fazla istek', 'Eksik alanlar', vb.) Deno runtime'da çalışır ve React i18n sistemine erişemez. Bu bir mimari karar gerektirir (ayrı i18n mechanism veya error code enum).
+
+### Doğrulama
+- `pnpm exec tsc --noEmit` → Exit 0
+- `pnpm run lint` → PASS
 
 ### Final Lighthouse Optimizasyonları
 - Preconnect/prefetch hints

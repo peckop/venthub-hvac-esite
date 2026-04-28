@@ -136,7 +136,7 @@ export default function AccountShipmentsPage() {
   }
 
   const shipSteps = [
-    { key: 'preparing', label: 'Hazırlandı', icon: Package },
+    { key: 'preparing', label: t('account.shipments.preparingLabel'), icon: Package },
     { key: 'shipped', label: 'Kargoya Verildi', icon: Truck },
     { key: 'delivered', label: 'Teslim Edildi', icon: MapPin },
   ]
@@ -214,7 +214,7 @@ export default function AccountShipmentsPage() {
             onClick={() => router.push('/account/orders')}
             className="h-10 px-6 bg-primary-navy hover:bg-industrial-gray text-white font-bold rounded-lg shadow-sm shadow-primary-navy/20 transition-all hover:scale-[1.02] inline-flex items-center gap-2"
           >
-            <Package size={16} /> Siparişlerime Git
+            <Package size={16} /> {t('account.shipments.goToOrders')}
           </button>
         </div>
       ) : displayed.length === 0 ? (

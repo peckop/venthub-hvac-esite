@@ -27,7 +27,7 @@ interface ShipmentRecord extends OrderRecord {
 
 export default function AccountOverviewPage() {
   const { user } = useAuth()
-  const { lang } = useI18n()
+  const { lang, t } = useI18n()
   const router = useRouter()
 
   const [addresses, setAddresses] = useState<UserAddress[]>([])
@@ -163,8 +163,8 @@ export default function AccountOverviewPage() {
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
 
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold mb-2 tracking-tight">Merhaba, <br />{fullName} 👋</h2>
-            <p className="text-white/80 text-sm font-medium">B2B portalinize hoş geldiniz. Operasyonlarınızı buradan yönetebilirsiniz.</p>
+            <h2 className="text-3xl font-bold mb-2 tracking-tight">{t('account.overview.greeting')}<br />{fullName} 👋</h2>
+            <p className="text-white/80 text-sm font-medium">{t('account.overview.welcomeMessage')}</p>
           </div>
         </div>
 
@@ -176,7 +176,7 @@ export default function AccountOverviewPage() {
               <Clock className="w-6 h-6" />
             </div>
             <div className="text-4xl font-extrabold text-slate-900 tracking-tight">{activeOrders.length}</div>
-            <div className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">Aktif SipariŞ</div>
+            <div className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">{t('account.overview.activeOrders')}</div>
           </div>
 
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 flex flex-col justify-center relative overflow-hidden group hover:shadow-md transition-all hover:-translate-y-1">
@@ -185,7 +185,7 @@ export default function AccountOverviewPage() {
               <Package className="w-6 h-6" />
             </div>
             <div className="text-4xl font-extrabold text-slate-900 tracking-tight">{completedOrdersCount}</div>
-            <div className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">Tamamlanan</div>
+            <div className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">{t('account.overview.completedOrders')}</div>
           </div>
 
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 flex flex-col justify-center relative overflow-hidden group hover:shadow-md transition-all hover:-translate-y-1">
