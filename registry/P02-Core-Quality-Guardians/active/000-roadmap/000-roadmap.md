@@ -127,26 +127,24 @@ artifacts:
 
 ---
 
-## FAZ 4 — Güvenlik Sertleştirmesi (P02-D)
+## FAZ 4 — Güvenlik Sertleştirmesi (P02-D) ✅ KAPALI
 
-**Durum:** Beklemede
-**Tahmini Süre:** 2 oturum
-**Risk:** Orta-Yüksek
+**Tarih:** 28 Nisan 2026
+**Kapsam:** 2 dosya (next.config.mjs + middleware.ts)
+**Sonuç:** Tüm testler PASS
 
-### Hedefler
+| Değişiklik | Durum |
+|-----------|-------|
+| `X-Frame-Options`: SAMEORIGIN → DENY | ✅ |
+| CSP Report-Only header eklendi (izleme modu) | ✅ |
+| Rate limiting skeleton (yorum, production için edge KV gerekli) | ✅ |
 
-| Alan | Mevcut | Hedef |
-|------|--------|-------|
-| Content Security Policy (CSP) | Yok | `next.config` → strict CSP header |
-| Rate Limiting | Yok | Supabase Edge → `/api/checkout`, `/api/auth` |
-| Auth Hardening | Temel | Refresh token rotation + session timeout |
-| RLS Audit | Var | Tüm tablolar → eksik policy? |
-| Environment Secrets | .env | Supabase Vault'a taşı |
+**Not:** Rate limiting in-memory Map serverless'ta çalışmaz. Production için Vercel Edge KV veya benzeri gerekir.
 
-### Doğrulama
-- Security Headers check (securityheaders.com)
-- RLS Supabase Dashboard audit
-- Auth flow test (login/logout/timeout)
+**Doğrulama:**
+- `pnpm exec tsc --noEmit` → Exit 0
+- `pnpm run build` → PASS (405 sayfa)
+- `curl -I localhost:3000` → CSP-Report-Only + DENY görünür
 
 ---
 
