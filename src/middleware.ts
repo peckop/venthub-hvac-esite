@@ -8,6 +8,11 @@ import { createServerClient } from '@supabase/ssr'
  * 1. UUID tabanlı /products/[uuid] → slug canonical URL 308 SEO yönlendirmesi
  * 2. /admin/* yolları için JWT + Rol doğrulaması (Server-side RBAC Guard)
  */
+// ── Rate Limiting (Local/Staging only — serverless'ta edge KV gerekir) ──
+// const rateLimitMap = new Map<string, { count: number; timestamp: number }>()
+// const RATE_LIMIT = { checkout: { max: 10, windowMs: 60_000 }, auth: { max: 5, windowMs: 60_000 } }
+// function isRateLimited(key: string, config: { max: number; windowMs: number }): boolean { ... }
+
 export const config = {
   matcher: ['/products/:path*', '/admin/:path*']
 }
