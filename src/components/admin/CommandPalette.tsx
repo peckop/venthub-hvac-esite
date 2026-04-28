@@ -168,8 +168,8 @@ const CommandPalette: React.FC = () => {
                         />
                         <div className="flex items-center gap-2 ml-auto shrink-0">
                             <kbd className="px-2.5 py-1 text-[10px] font-black text-cyan-400 bg-cyan-400/10 rounded-lg border border-cyan-400/20 shadow-[0_0_10px_rgba(34,211,238,0.1)]">ESC</kbd>
-                            <button onClick={() => setOpen(false)} className="p-2 rounded-xl hover:bg-white/5 transition-colors">
-                                <X size={20} className="text-slate-500 hover:text-white" />
+                            <button onClick={() => setOpen(false)} className="p-2 rounded-xl hover:bg-white/5 transition-colors" aria-label="Kapat">
+                                <X size={20} className="text-slate-500 hover:text-white" aria-hidden="true" />
                             </button>
                         </div>
                     </div>

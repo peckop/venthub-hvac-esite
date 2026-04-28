@@ -122,7 +122,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
           src={slidesData[0].image}
           alt={t('home.hero.sinevizyon.altMain') || 'VentHub HVAC'}
           fill
-          sizes="100vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px"
           priority={true}
           fetchPriority="high"
           loading="eager"
@@ -147,7 +147,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
               src={slide.image}
               alt={t('home.hero.sinevizyon.altMain') || 'VentHub HVAC'}
               fill
-              sizes="100vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px"
               priority={false}
               loading="lazy"
               className="object-cover object-center"
