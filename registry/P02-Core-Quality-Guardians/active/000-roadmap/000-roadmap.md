@@ -22,7 +22,10 @@ artifacts:
 |--------|------|-----|
 | TSC / ESLint / Build | 10/10 | Sıfır hata |
 | SSOT Rota Disiplini | 10/10 | FAZ 1 ile kapatıldı |
-| Lighthouse Performance | ?/10 | FAZ 2'de ölçülecek |
+| Lighthouse Performance | 86/100 | FAZ 7 ile LCP 11.6s → 2.1s (desktop) |
+| Lighthouse Accessibility | 92/100 | — |
+| Lighthouse Best Practices | 96/100 | — |
+| Lighthouse SEO | 83/100 | — |
 | SSR / Client Boundary | 6/10 | 36 dosya gereksiz 'use client' |
 | Bundle Boyutu | 7.5/10 | 26 dosyada framer-motion |
 | Güvenlik | 8/10 | FAZ 4 ile CSP Report-Only + X-Frame-Options DENY |
@@ -192,6 +195,45 @@ Edge function error messages ('Çok fazla istek', 'Eksik alanlar', vb.) Deno run
 - `pnpm exec tsc --noEmit` → Exit 0
 - `pnpm run lint` → PASS
 
+## FAZ 7 — Lighthouse Performance İyileştirmesi ✅ KAPALI (28 Nisan 2026)
+
+**Durum:** ✅ KAPALI
+**Hedef:** Performance 39/100 → 70+/100, LCP <3s
+
+### Yapılan İyileştirmeler
+
+| Değişiklik | Dosya | Etki |
+|-----------|-------|------|
+| `three-setup` import kaldırıldı | `MainLayout.tsx` | Three.js (~600KB) artık sadece 3D sayfalarda |
+| Admin pages dynamic import | 14 admin page.tsx | Recharts/admin JS lazy load |
+| jsPDF dynamic import | `ProductDetailPageView.tsx`, `OrderDetailPage.tsx` | ~400KB sadece PDF oluşturulurken |
+
+### Sonuç
+
+| Metrik | Önceki | Sonraki |
+|--------|--------|---------|
+| Performance | 39/100 | **86/100** |
+| LCP | 11,629ms | **2,092ms** |
+| TBT | 1,841ms | **52ms** |
+| TTI | 21,179ms | **2,099ms** |
+
+### Doğrulama
+- `pnpm run build` → PASS
+- Lighthouse Performance 86/100 (desktop)
+
+---
+
+## FAZ 8 — SEO & Accessibility İyileştirmesi
+
+**Durum:** Beklemede
+**Hedef:** SEO 83/100 → 95+, Accessibility 92/100 → 100
+
+### Notlar
+- SEO düşük: sitemap, robots.txt, meta description kontrol edilmeli
+- Lighthouse final audit → hedef skorlar
+
+---
+
 ### Final Lighthouse Optimizasyonları
 - Preconnect/prefetch hints
 - Critical CSS inline
@@ -201,10 +243,10 @@ Edge function error messages ('Çok fazla istek', 'Eksik alanlar', vb.) Deno run
 
 | Metrik | Baz | Hedef |
 |--------|-----|-------|
-| Performance | ? | 95+ |
-| Accessibility | ? | 100 |
-| Best Practices | ? | 100 |
-| SEO | ? | 100 |
+| Performance | 86 | 95+ |
+| Accessibility | 92 | 100 |
+| Best Practices | 96 | 100 |
+| SEO | 83 | 95+ |
 
 ### Doğrulama
 - `grep -r "hardcoded-turkish" src/views/` → 0

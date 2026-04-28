@@ -4,7 +4,6 @@ import React, { Suspense, lazy, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useScrollThrottle } from '../../hooks/useScrollThrottle'
-import '@/lib/three-setup'
 
 // Bileşenler
 import StickyHeader from '../StickyHeader'
