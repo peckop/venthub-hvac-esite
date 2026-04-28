@@ -283,8 +283,8 @@ const AdminRealtimeNotifications: React.FC = () => {
                                     Tümünü Temizle
                                 </button>
                             )}
-                            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600">
-                                <X size={16} />
+                            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Bildirimleri kapat">
+                                <X size={16} aria-hidden="true" />
                             </button>
                         </div>
                     </div>

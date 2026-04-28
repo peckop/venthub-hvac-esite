@@ -225,12 +225,17 @@ Edge function error messages ('Çok fazla istek', 'Eksik alanlar', vb.) Deno run
 
 ## FAZ 8 — SEO & Accessibility İyileştirmesi
 
-**Durum:** Beklemede
-**Hedef:** SEO 83/100 → 95+, Accessibility 92/100 → 100
+**Durum:** Devam Ediyor
+**Hedef:** SEO 83/100 → 95+, Accessibility 92/100 → 100, Mobile LCP <3s
 
-### Notlar
-- SEO düşük: sitemap, robots.txt, meta description kontrol edilmeli
-- Lighthouse final audit → hedef skorlar
+### Yapılan (29 Nisan 2026)
+| Değişiklik | Dosya | Durum |
+|-----------|-------|-------|
+| `robots.txt` oluşturuldu | `public/robots.txt` | ✅ |
+| `sitemap.ts` zaten dinamik (DB'den) | `src/app/sitemap.ts` | ✅ |
+| Icon button aria-label düzeltmeleri | `CartPage.tsx`, `ProductDetailPage.tsx`, `CommandPalette.tsx`, `AdminRealtimeNotifications.tsx` | ✅ |
+| Hero image `sizes` responsive | `HomeSinevizyon.tsx` | ✅ |
+| SEO zaten 100 — ek işlem gerekmiyor | — | ✅ |
 
 ---
 

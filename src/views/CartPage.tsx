@@ -101,8 +101,9 @@ const CartPage: React.FC = () => {
                         onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                         className="p-2 hover:bg-light-gray transition-colors"
                         disabled={item.quantity <= 1}
+                        aria-label="Miktarı azalt"
                       >
-                        <Minus size={16} className="text-steel-gray" />
+                        <Minus size={16} className="text-steel-gray" aria-hidden="true" />
                       </button>
                       <span className="px-4 py-2 font-medium text-industrial-gray">
                         {item.quantity}
@@ -110,8 +111,9 @@ const CartPage: React.FC = () => {
                       <button
                         onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                         className="p-2 hover:bg-light-gray transition-colors"
+                        aria-label="Miktarı artır"
                       >
-                        <Plus size={16} className="text-steel-gray" />
+                        <Plus size={16} className="text-steel-gray" aria-hidden="true" />
                       </button>
                     </div>
 
@@ -120,8 +122,9 @@ const CartPage: React.FC = () => {
                       onClick={() => removeFromCart(item.product.id)}
                       className="p-2 text-steel-gray hover:text-red-500 transition-colors"
                       title={t('cart.removeItem')}
+                      aria-label={t('cart.removeItem')}
                     >
-                      <Trash2 size={20} />
+                      <Trash2 size={20} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
