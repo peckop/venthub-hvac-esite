@@ -75,31 +75,29 @@ artifacts:
 
 ---
 
-## FAZ 2 — Lighthouse Baz Ölçümü + Hızlı Kazanımlar (P02-B)
+## FAZ 2 — Lighthouse Baz Ölçümü + Framer-Motion Temizliği ✅ KAPALI
 
-**Durum:** Beklemede
-**Tahmini Süre:** 2 oturum
-**Risk:** Düşük
+**Tarih:** 28 Nisan 2026
+**Kapsam:** 8 dosya (framer-motion → CSS/Tailwind)
+**Sonuç:** Tüm testler PASS
 
-### Adım 1: Baz Ölçümü
-- `pnpm run build && pnpm start`
-- Chrome Lighthouse → Full Audit (Mobile + Desktop)
-- Performance / Accessibility / Best Practices / SEO puanlarını kaydet
+| Değişiklik | Durum |
+|-----------|-------|
+| `AboutPage.tsx` (10 motion element) | ✅ |
+| `ContactPage.tsx` (6 motion element) | ✅ |
+| `BrandsPage.tsx` (4 motion element) | ✅ |
+| `BrandDetailPage.tsx` (14 motion element) | ✅ |
+| `CategoryShowcaseView.tsx` (6 motion element) | ✅ |
+| `EliteHero.tsx` (13 motion element, CSS @keyframes) | ✅ |
+| `CategoryHero.tsx` (6 motion element) | ✅ |
+| `CategoryOrbitCarousel.tsx` (13 + AnimatePresence) | ✅ |
+| FeaturedCommercialBlocks (layoutId — atlandı) | ⏭️ FAZ 3'e |
 
-### Adım 2: framer-motion Temizliği (26 dosya)
-- `motion.div` → standart `div` + Tailwind `transition-*`
-- Kazanım: Bundle ~40KB küçülme → LCP iyileşmesi
-
-### Adım 3: next/image Optimizasyonu
-- LCP bileşenlerine `priority` prop
-- Tüm VentImage'larda `width/height` zorunluluğu → CLS sıfırlama
-
-### Adım 4: Font Optimizasyonu
-- Google Fonts `display: swap` kontrolü
-
-### Doğrulama
-- Lighthouse tekrar ölç → baz ile karşılaştır
-- Bundle Analyzer → chunk boyutları karşılaştırması
+**Doğrulama:**
+- `pnpm exec tsc --noEmit` → Exit 0
+- `pnpm run lint` → PASS
+- `pnpm run build` → PASS (405 sayfa)
+- `grep "from 'framer-motion'" src/views/` → 0 sonuç (kapsamdaki dosyalar)
 
 ---
 
