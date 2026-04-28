@@ -1,13 +1,13 @@
 'use client'
 
 import React from 'react'
-import { motion } from 'framer-motion'
 import { HVAC_BRANDS } from '../lib/brands'
 import { BrandIcon } from '../components/HVACIcons'
 import Link from 'next/link'
 import Image from 'next/image'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
+import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 
 /**
  * BrandsPage - Premium "Markalar" sayfası
@@ -16,6 +16,8 @@ import { useI18n } from '../i18n/I18nProvider'
 const BrandsPage: React.FC = () => {
   const { t } = useI18n()
   const brands = HVAC_BRANDS
+  const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
+  const [brandsGridRef, brandsGridVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.05 })
 
   return (
     <div className="min-h-screen bg-white">
@@ -27,16 +29,12 @@ const BrandsPage: React.FC = () => {
       {/* Hero: Ultra Minimalist Apple Style */}
       <section className="pt-32 pb-20 bg-slate-50/50 border-b border-slate-100">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
-          >
+          <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-600">
               {t('brands.sectionTitle')}
             </span>
-          </motion.div>
+          </div>
           <h1 className="text-5xl lg:text-8xl font-extralight tracking-tighter text-slate-900 leading-[1.1] mb-10">
             {t('brands.eyebrow').split(' ').map((word, i) => (
               <React.Fragment key={i}>
@@ -53,14 +51,12 @@ const BrandsPage: React.FC = () => {
       {/* Brands Gr_id: Premium Showroom */}
       <section className="py-24 sm:py-32">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          <div ref={brandsGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {brands.map((brand, index) => (
-              <motion.div
+              <div
                 key={brand.slug}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
+                className={scrollAnimationClasses.fadeUp(brandsGridVisible)}
+                style={scrollAnimationClasses.staggerChild(index)}
               >
                 <Link
                   href={`/brands/${brand.slug}`}
@@ -97,7 +93,7 @@ const BrandsPage: React.FC = () => {
                     <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-all duration-500" />
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

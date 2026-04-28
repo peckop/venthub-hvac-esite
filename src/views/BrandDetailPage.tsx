@@ -11,9 +11,9 @@ import { BrandIcon } from '../components/HVACIcons'
 import { ArrowRight, Package, ExternalLink } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
-import { motion } from 'framer-motion'
 import Breadcrumb from '../components/navigation/Breadcrumb'
 import { Routes } from '../utils/routes'
+import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 
 const BRAND_DETAILS: Record<string, {
   founded?: number
@@ -87,6 +87,10 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
   const { t } = useI18n()
   const params = useParams()
   const slug = (initialBrandSlug || params?.slug) as string
+
+  const [heroIconRef, heroIconVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
+  const [heroTitleRef, heroTitleVisible] = useScrollAnimation<HTMLHeadingElement>({ threshold: 0.2 })
+  const [heroMetaRef, heroMetaVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
   
   // Normalize slug for matching
   const brand = HVAC_BRANDS.find((b) => 
@@ -164,31 +168,17 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
         </div>
 
         <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12 flex justify-center"
-          >
+          <div ref={heroIconRef} className={scrollAnimationClasses.fadeUp(heroIconVisible) + " mb-12 flex justify-center"}>
             <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-[3rem] bg-white p-8 shadow-[0_0_50px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden">
               <BrandIcon brand={brand.name} className="w-full h-full" />
             </div>
-          </motion.div>
+          </div>
 
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-6xl lg:text-9xl font-extralight tracking-tighter leading-tight"
-          >
+          <h1 ref={heroTitleRef} className={scrollAnimationClasses.scaleIn(heroTitleVisible) + " text-6xl lg:text-9xl font-extralight tracking-tighter leading-tight"}>
             {brand.name}
-          </motion.h1>
-          
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mt-8 flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400"
-          >
+          </h1>
+
+          <div ref={heroMetaRef} className={scrollAnimationClasses.fadeIn(heroMetaVisible) + " mt-8 flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400"}>
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
               {brand.country} {t('brands.detail.originSuffix')}
@@ -201,7 +191,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
               {brand.specialty}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
