@@ -225,14 +225,16 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
 
 
             {/* Progress Indicators */}
-            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 flex gap-2">
+            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 flex gap-1">
                 {mainCategoryVms.map((_, idx) => (
                     <button
                         key={idx}
                         onClick={() => { setIsAutoPlaying(false); setCurrentIndex(idx) }}
-                        className={`h-1.5 rounded-full transition-all duration-300 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-2 focus-visible:ring-offset-black/50 ${idx === currentIndex ? 'w-8 bg-secondary-blue' : 'w-2 bg-white/30 hover:bg-white/50'
-                            }`} aria-label={`${t("common.next")} ${idx + 1}`}
-                    />
+                        className="relative flex items-center justify-center min-h-6 min-w-6 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-2 focus-visible:ring-offset-black/50"
+                        aria-label={`${t("common.next")} ${idx + 1}`}
+                    >
+                        <span className={`block h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8 bg-secondary-blue' : 'w-2 bg-white/30 hover:bg-white/50'}`} />
+                    </button>
                 ))}
             </div>
         </div>

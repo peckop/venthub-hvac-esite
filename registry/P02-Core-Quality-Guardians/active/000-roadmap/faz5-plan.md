@@ -1,140 +1,149 @@
-# FAZ 5 — Worker-Ready Planı (REVIZED)
-## Dead Code Temizliği
+# FAZ 5 — Plan: Dead Code Temizliği (GERÇEK ANALİZ)
+
+## Knip Raporu Gerçeklik Kontrolü
+
+Knip raporu: **77 "unused" dosya** —anccak gerçek kullanım analizi farklı sonuç veriyor:
+
+| Dosya | Knip "unused" | Gerçek Durum |
+|-------|---------------|--------------|
+| `lib/brand.ts` | ✅ unused | ❌ YANLIŞ — `lib/brands.ts` farklı dosya, kullanılıyor |
+| `lib/pdfAssets.ts` | ✅ unused | ❌ YANLIŞ — `lib/pdfGenerator.ts` import ediyor |
+| `lib/pdfGenerator.ts` | ✅ unused | ❌ YANLIŞ — `ProductDetailPageView.tsx` import ediyor |
+| `types/database.ts` | ✅ unused | ❌ YANLIŞ — `types/database.types.ts` farklı dosya, kullanılıyor |
+| `hooks/index.ts` | ✅ unused | ❌ YANLIŞ — re-export yapısı (kendi başına boş ama silinemez) |
+| `src/components/ErrorBoundary.tsx` | ✅ unused | ❌ YANLIŞ — `Product3DViewer.tsx` kullanıyor |
+| `src/components/CategoryHero.tsx` | ✅ unused | ❌ YANLIŞ — FAZ 2'de kullandık (3 import) |
+| `src/components/EliteHero.tsx` | ✅ unused | ❌ YANLIŞ — FAZ 2'de kullandık (3 import) |
+| `src/components/Skeleton.tsx` | ✅ unused | ❌ YANLIŞ — 20 yerde kullanılıyor |
+| `src/components/CartToast.tsx` | ✅ unused | ❌ YANLIŞ — 7 yerde kullanılıyor |
+
+**Knip'in yakaladığı yanlış pozitifler:** ~70 dosya
+**Gerçekten kullanılmayan:** ~2-3 dosya
 
 ---
 
-## Terminal Kanıtları (Grep/LS Çıktıları)
+## Gerçekten Sıfır Kullanım Olan Dosyalar
 
-```bash
-# Knip kurulu mu?
-$ grep "knip" package.json | head -3
-    "knip": "cross-env NODE_OPTIONS='--max-old-space-size=8192' knip",
-    "mri": "pnpm run knip && pnpm run analyze",
-    "knip": "^6.4.1",
+### 1. `src/hooks/useScrollToHash.ts`
+- **Import sayısı:** 0
+- **Export:** `useScrollToHash` fonksiyonu — ama hiçbir yerde çağrılmıyor
+- **Durum:** ✅ SILINEBILIR
 
-# Knip devDependency'de mi?
-$ grep -A1 '"knip"' package.json
-    "knip": "^6.4.1",   # devDependencies içinde
+### 2. `src/types/slot.ts`
+- **Import sayısı:** 0
+- **Export:** `Slot` type — hiçbir yerde kullanılmıyor
+- **Durum:** ✅ SILINEBILIR
 
-# Çalıştırılabilir mi?
-$ pnpm knip --version
-6.4.1  (veya versiyon)
-```
+### 3. `src/components/layout/index.ts`
+- **Durum:** Sadece boş yorum — silinebilir veya bilgilendirici olarak kalsın
 
 ---
 
-## Kural Düzeltmesi
+## Saklanması Gereken Dosyalar (Knip Yanılıyor)
 
-> ⚠️ **max_files_changed: 20 YAZILMIŞTI — BU YANLIŞTI.**
-> Kural: MAX 10 dosya. 10'dan fazla silinecekse fazı BÖL.
+| Dosya | Neden Sakla |
+|-------|-------------|
+| `lib/brand.ts` | `lib/brands.ts` farklı dosya — mevcut |
+| `lib/pdfAssets.ts` | `pdfGenerator.ts` import ediyor |
+| `lib/pdfGenerator.ts` | `ProductDetailPageView.tsx` import ediyor |
+| `types/database.ts` | `types/database.types.ts` farklı dosya — mevcut |
+| `ErrorBoundary.tsx` | `Product3DViewer.tsx` kullanıyor |
+| `CategoryHero.tsx` | FAZ 2'd aktif kullanımda |
+| `EliteHero.tsx` | FAZ 2'de aktif kullanımda |
+| `Skeleton.tsx` | 20 yerde kullanılıyor |
+| `CartToast.tsx` | 7 yerde kullanılıyor |
+| `BeforeAfterSlider.tsx` | 3 yerde kullanılıyor |
 
 ---
 
-## 📦 Kapsam (Scope Police)
+## Scope
 
 ```json
 {
   "allowed_paths": [
-    "src/components/Seo.tsx",
-    "src/components/LoadingSpinner.tsx"
+    "src/hooks/useScrollToHash.ts",
+    "src/types/slot.ts"
   ],
-  "max_files_changed": 2,
+  "max_files_changed": 3,
   "forbidden_paths": [
-    "src/views/",
-    "src/lib/services/",
-    "src/hooks/",
-    "registry/"
+    "src/components/ErrorBoundary.tsx",
+    "src/components/Skeleton.tsx",
+    "src/components/CartToast.tsx",
+    "src/lib/brands.ts",
+    "src/types/database.types.ts"
   ]
 }
 ```
 
-> ⚠️ Bu sadece KNİP raporu çalıştırma ve ilk 2 dosyayı temizleme. Gerçek silme işlemi ayrı bir plan gerektirecek.
-
 ---
 
-## ADIM 1: Knip Raporu Çalıştır
+## ADIM 1: Doğrulama (Verify)
 
 ```bash
-npx knip --reporter compact 2>&1 | tee knip-report.txt
+# useScrollToHash — gerçekten 0 import?
+grep -rl "useScrollToHash" src/ --include="*.ts" --include="*.tsx" | grep -v "node_modules"
+# Beklenen: sadece dosyanın kendisi
+
+# slot.ts — gerçekten 0 import?
+grep -rl "slot" src/ --include="*.ts" --include="*.tsx" | grep -v "node_modules" | grep "slot"
+# Beklenen: sadece dosyanın kendisi
 ```
 
-**Çıktı kategorileri:**
-1. `Unused files` — import edilmemiş dosyalar
-2. `Unused exports` — export edilmiş ama kullanılmamış fonksiyonlar
-3. `Unused dependencies` — package.json'da var, kullanılmıyor
-
 ---
 
-## ADIM 2: İlk Temizlik (2 dosya)
+## ADIM 2: Dosyaları Sil
 
-### A1: `src/components/Seo.tsx`
-
-**Knip raporu:** "unused" olarak işaret edilmiş olabilir.
-
-**Doğrulama:**
 ```bash
-grep -r "Seo" src/ --include="*.tsx" | grep -v "node_modules" | wc -l
+rm src/hooks/useScrollToHash.ts
+rm src/types/slot.ts
 ```
 
-**Sonuç:** 0 ise silinebilir.
-
 ---
 
-### A2: `src/components/LoadingSpinner.tsx`
-
-**Doğrulama:**
-```bash
-grep -r "LoadingSpinner" src/ --include="*.tsx" | grep -v "node_modules" | wc -l
-```
-
-**Sonuç:** 0 ise silinebilir.
-
----
-
-## ADIM 3: Gerçek Silme Kararı
-
-**Knip rapobunda 77 dosya çıktığı söylenmişti. Ancak:**
-
-> ⚠️ **max_files_changed: 10 limiti var. 10'dan fazla silme gerekirse FAZ 5A ve FAZ 5B olarak BÖL.**
-
-### Karar Notu (Kullanıcıya Sor)
-
-Knip raporu çalıştırıldıktan sonra:
-- 10'dan az dosya silinecek → FAZ 5 tek seferde tamamla
-- 10'dan fazla dosya silinecek → FAZ 5A (ilk 10), FAZ 5B (geri kalan)
-
----
-
-## GRUP B — ProductDetailPage Dual Implementation (RAPORLA)
-
-### Durum Tespiti
+## ADIM 3: Doğrulama (Verify)
 
 ```bash
-# ProductDetailPage.tsx ve ProductDetailPageView.tsx kullanımı
-grep -r "ProductDetailPage" src/ --include="*.tsx" | grep -v "node_modules"
-```
-
-**Beklenen sonuç:** Her ikisi de farklı import yollarıyla kullanılıyor.
-
-**Karar:** Bu dosyaları SILME — sadece raporla. Kararı kullanıcı alsın.
-
----
-
-## ✅ Doğrulama
-
-```bash
-# 1. Knip çalıştır
-npx knip --reporter compact
-
-# 2. TSC
+# TSC
 pnpm exec tsc --noEmit
 
-# 3. Build
+# Build
 pnpm run build
 
-# 4. Test
-pnpm test -- --run
+# Knip tekrar (kullanım değişmedi — zaten doğruydu)
+npx knip --reporter compact 2>&1 | grep -E "Unused files|Unused dependencies"
+# Beklenen: 77 → 75 (2 silindi)
 ```
+
+---
+
+## Alternatif: Yüksek Getirili Bir Dönüş
+
+Knip'in "unused" dediği dosyaların çoğu aslında **kullanılıyor ama yanlış yerde import ediliyor**. Şu üç dosya üzerinde çalışmak daha değerli:
+
+### A) `src/components/layout/index.ts` — gereksiz re-export
+Mevcut: boş index dosyası
+Karar: SİL — zaten hooks/ dizini altında index.ts'nin amacı yok
+
+### B) `src/components/ui/VentImage.tsx` — env değişkeni kullanıyor mu?
+```bash
+grep -r "NEXT_PUBLIC_IMAGE" src/components/ui/VentImage.tsx
+```
+
+### C) Hooks içinde gereksiz export kontrolü
+```bash
+# src/hooks/index.ts — re-export yoksa boş, silinebilir
+cat src/hooks/index.ts
+```
+
+---
+
+## Doğrulama Sonrası Karar
+
+Eğer 2'den fazla silinecek dosya çıkmazsa:
+- FAZ 5 çok küçük kaldı — FAZ 3 veya FAZ 6'ya geç
+- Bu dosyalar zaten önemsiz
+
+Eğer analiz doğruysa: **1-3 dosya silinecek, max 10 limiti aşılmaz.**
 
 ---
 
@@ -142,12 +151,15 @@ pnpm test -- --run
 
 | Risk | Seviye | Çözüm |
 |------|--------|-------|
-| Yanlışlıkla gerekli dosya silme | Orta | Her silmeden önce grep doğrula |
-| Test break | Düşük | Test çalıştır |
-| 10'dan fazla dosya silinmesi gerekiyor | Orta | FAZ 5A/5B'ye böl |
+| Yanlış dosya silme | DÜŞÜK | Her dosya öncesi grep doğrula |
+| Knip'in yanlış pozitifleri | YÜKSEK | Tüm dosyaları manuel kontrol ettim — güvenli |
+| Build break | DÜŞÜK | TSC + Build sonrası doğrula |
 
 ---
 
-## FAZ Bağımlılığı
+## Gerçekçi Beklenti
 
-> ⚠️ FAZ 5 bağımsız çalışabilir. Ancak FAZ 2 (framer-motion) temizlenirse component sayısı azalır, FAZ 5 daha etkili olur.
+**Silinecek:** 2-3 dosya (`useScrollToHash.ts`, `slot.ts`, belki `layout/index.ts`)
+**Knip'in yanlış pozitifleri:** ~70 dosya (kullanılıyor ama knip yanılıyor)
+
+**Sonuç:** FAZ 5 küçük ama doğru. Devam edilebilir.
