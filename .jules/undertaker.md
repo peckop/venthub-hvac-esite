@@ -14,3 +14,8 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+
+## 2025-02-28 - Purge 5 orphaned components & exports
+**Dead Code:** Removed 4 dead components (CategoryAuthoritySection, InventoryCsvImport, InventoryDetailDrawer, InvoiceProfileModal) and 2 unused constants (`VENTHUB_LOGO_BASE64` in `pdfAssets.ts` and `brand.ts` entirely).
+**Root Cause:** Heavy iteration on UI components left multiple orphaned versions. Similar leftover pieces in unused checkout/inventory modals. Constants like logo and WhatsApp link were left over after migrating to dynamic or system-level configuration without proper cleanup.
+**Resolution:** Batch deleted 5 files via `git rm` and stripped the unused `VENTHUB_LOGO_BASE64` export from `src/lib/pdfAssets.ts`. Verified with rigorous Next.js 15 checks, TS, testing and building.
