@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2026-04-29 - Supabase RPC Patterns in VentHub
+**Learning:** VentHub relies heavily on Supabase RPC functions (e.g., `get_products_enriched`, `fts_search_products`, `admin_search_products`) for complex querying, filtering, and full-text search. These functions often take specific JSON-like payloads mapping to PostgreSQL parameter names (e.g., `p_category_ids`).
+**Action:** When documenting service functions that wrap these RPCs, explicitly mention the underlying RPC name to help future developers trace the SQL logic, and accurately describe the parameters based on what the RPC expects, noting any fallback logic implemented in the service layer if the RPC fails.
