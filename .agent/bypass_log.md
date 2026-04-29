@@ -350,3 +350,45 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:** AboutPage, ContactPage, BrandsPage, BrandDetailPage, CategoryShowcaseView, CategoryHero, EliteHero, CategoryOrbitCarousel
 
 
+## Bypass: 2026-04-28 14:33:45
+- **Commit:** `70918282`
+- **Mesaj:** feat(p02-faz2): framer-motion temizliği — CSS/Tailwind dönüşümü
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-28 14:43:45
+- **Commit:** `4afa863b`
+- **Mesaj:** perf(faz2): framer-motion → CSS/Tailwind (8 dosya, ~40KB bundle kazanımı)
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-28 14:46:53
+- **Commit:** `ee9ccae3`
+- **Mesaj:** docs(p02): mark FAZ 2 closed, update FAZ 3/4 plans
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-28 15:29:47
+- **Commit:** `382391eb`
+- **Mesaj:** feat(p02-faz4): güvenlik header'ları + CSP report-only
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-28 17:13:46
+- **Commit:** `02f40c66`
+- **Mesaj:** feat(p02-faz5-faz6): dead code temizliği + i18n disiplini
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-28 23:42:11
+- **Commit:** `b629411e`
+- **Mesaj:** perf(p02-faz7): lighthouse performance 39→86 — lazy load three.js, dynamic admin, jsPDF on-demand
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-04-29 00:38:30
+- **Commit:** `b9d78f90`
+- **Mesaj:** fix(p02-faz8): accessibility aria-labels + hero responsive sizes + robots.txt
+- **Değişen Dosyalar:**
+
+

@@ -97,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
         {/* Badges Overlay */}
         <div className="absolute top-3 left-3 right-3 z-20 flex justify-between items-start pointer-events-none">
           {product.is_featured && (
-            <div className="bg-gold-accent/90 backdrop-blur-sm text-white text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm">
+            <div className="bg-gold-accent backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm">
               {t('pdp.featured') || 'ÖNE ÇIKAN'}
             </div>
           )}

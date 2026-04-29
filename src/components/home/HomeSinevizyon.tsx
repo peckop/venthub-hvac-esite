@@ -309,8 +309,10 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
               key={idx}
               onClick={() => setCurrentSlide(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={`h-1.5 rounded-full transition-all duration-500 ${idx === currentSlide ? 'w-12 bg-cyan-400' : 'w-3 bg-white/20'}`}
-            />
+              className="relative flex items-center justify-center min-h-6 min-w-6 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+            >
+              <span className={`block h-1.5 rounded-full transition-all duration-500 ${idx === currentSlide ? 'w-12 bg-cyan-400' : 'w-3 bg-white/20'}`} />
+            </button>
           ))}
         </div>
         <div className="h-px w-12 bg-white/10" />

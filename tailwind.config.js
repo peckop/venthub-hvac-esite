@@ -9,7 +9,7 @@ const tailwindConfig = {
       colors: {
         // HVAC Professional Color Palette
         'primary-navy': '#1E40AF',
-        'secondary-blue': '#38BDF8',
+        'secondary-blue': '#0284C7',
         'industrial-gray': '#374151',
         'steel-gray': '#6B7280',
         'light-gray': '#F3F4F6',
