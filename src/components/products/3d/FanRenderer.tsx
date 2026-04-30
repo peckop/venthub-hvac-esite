@@ -53,7 +53,7 @@ interface BaseModelProps {
 
 // Model tipi -> Bileşen eşleştirmesi
 const MODEL_COMPONENTS: Record<string, React.ComponentType<BaseModelProps>> = {
-    'AxialFanModel': AxialFanModel,
+    'AxialFanModel': AxialFanModel as React.ComponentType<BaseModelProps>,
     'RoofFanModel': RoofFanModel,
     'WallMountedCompactFanModel': WallMountedCompactFanModel,
     'DomesticFanModel': DomesticFanModel,
@@ -62,7 +62,7 @@ const MODEL_COMPONENTS: Record<string, React.ComponentType<BaseModelProps>> = {
     'SilentChannelFanModel': SilentChannelFanModel,
     'SmokeExhaustFanModel': SmokeExhaustFanModel,
     'NicotraFanModel': NicotraFanModel,
-    'CentrifugalFanModel': CentrifugalFanModel,
+    'CentrifugalFanModel': CentrifugalFanModel as React.ComponentType<BaseModelProps>,
     'SnailFanModel': SnailFanModel,
     'ExproofFanModel': ExproofFanModel,
     'PlugFanModel': PlugFanModel,
