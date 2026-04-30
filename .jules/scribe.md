@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## $(date +%Y-%m-%d) - Documenting Category and Invoice Services
+**Learning:** Adding TSDoc comments requires checking both the beginning and end of previously defined functions or objects closely, particularly in large service files with chained promises or DB logic, to avoid accidental syntax errors during Git Merge diff replacements.
+**Action:** Always read the full file or correctly scoped slice of the file before determining where to place TSDoc blocks.

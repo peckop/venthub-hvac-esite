@@ -3,6 +3,17 @@ import type { Category } from '../supabase'
 import type { DbCategory } from '../../types/db-rows'
 import { toUICategoryList } from '../type-converters'
 
+/**
+ * Fetches all active categories from the database and formats them for UI consumption.
+ * The categories are sorted by their hierarchical level and name.
+ *
+ * @returns A promise resolving to an array of domain-ready category objects
+ * @throws {Error} If the underlying database query fails
+ *
+ * @example
+ * const categories = await getCategories()
+ * console.log(`Found ${categories.length} active categories`)
+ */
 export async function getCategories(): Promise<Category[]> {
   const { data, error } = await supabase
     .from('categories')
