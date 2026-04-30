@@ -37,6 +37,8 @@
     "node_modules",
     "scripts",
     ".agent",
-    "supabase"
+    "supabase",
+    "threejs-skill-workspace",
+    "threejs-component-builder-workspace"
   ]
 }
