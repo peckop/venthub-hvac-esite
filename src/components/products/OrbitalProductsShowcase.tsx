@@ -498,7 +498,7 @@ const OrbitalCard: React.FC<{
                             background: 'rgba(0,0,0,0.85)',
                             backdropFilter: 'blur(8px)',
                             border: `1px solid ${hovered ? CONFIG.glowColor : 'rgba(34,211,238,0.3)'}`,
-                            color: hovered ? CONFIG.glowColor : '#fff',
+                            color: '#fff',
                             textShadow: '0 1px 3px rgba(0,0,0,0.8)',
                         }}
                     >

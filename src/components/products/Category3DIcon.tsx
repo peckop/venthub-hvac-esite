@@ -48,7 +48,6 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
     })
 
     const showTapHint = shouldShowTapHint && hintStage === 'tap'
-    const showLabel = !isFrontCard || hintStage === 'finished'
 
     return (
         <group ref={meshRef} name={`icon-container-${offsetContext || 'default'}`}>
@@ -87,15 +86,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
                 </Html>
             )}
 
-            {showLabel && (
-                <Html position={[0, -1.2, 0]} center>
-                    <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-lg border border-slate-200 shadow-sm whitespace-nowrap">
-                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
-                            {categorySlug}
-                        </span>
-                    </div>
-                </Html>
-            )}
+
         </group>
     )
 }

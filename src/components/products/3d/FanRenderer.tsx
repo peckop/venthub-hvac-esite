@@ -17,6 +17,7 @@ import { WallMountedCompactFanModel } from './types/WallMountedCompactFanModel'
 import VorticeLineoModel from './factory/VorticeLineoModel'
 import { HRVModel } from './types/HRVModel'
 import { DehumidifierModel } from './types/DehumidifierModel'
+import { CentrifugalFanModel } from './types/CentrifugalFanModel'
 import { RoundDuctFanModel } from './types/RoundDuctFanModel'
 import { AccessoryModel } from './types/AccessoryModel'
 import { SpeedControlModel } from './types/SpeedControlModel'
@@ -61,6 +62,7 @@ const MODEL_COMPONENTS: Record<string, React.ComponentType<BaseModelProps>> = {
     'SilentChannelFanModel': SilentChannelFanModel,
     'SmokeExhaustFanModel': SmokeExhaustFanModel,
     'NicotraFanModel': NicotraFanModel,
+    'CentrifugalFanModel': CentrifugalFanModel,
     'SnailFanModel': SnailFanModel,
     'ExproofFanModel': ExproofFanModel,
     'PlugFanModel': PlugFanModel,
