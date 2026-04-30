@@ -125,6 +125,11 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
         centered: { position: [0, 0, 0], scale: 1 },
         orbital: { position: [0, 0, 0], scale: 1 }
     },
+    'CentrifugalFanModel': { // Santrifüj Fan Modeli
+        grounded: { position: [0, -0.30, 0], scale: 1 },
+        centered: { position: [0, 0, 0], scale: 1 },
+        orbital: { position: [0, 0.1, 0], scale: 1 }
+    },
     'SnailFanModel': { // Salyangoz / Santrifüj Fan Modeli
         grounded: { position: [0, -0.35, 0], scale: 1 },
         centered: { position: [0, -0.2, 0], scale: 1 },

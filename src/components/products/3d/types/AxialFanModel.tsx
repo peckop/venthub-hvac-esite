@@ -3,8 +3,19 @@ import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useFanMaterials } from '../materials/useFanMaterials'
+import { Silencer } from '../parts/Silencer'
 
-export function AxialFanModel() {
+interface AxialFanModelProps {
+    hasSilencer?: boolean
+    silencerRadius?: number
+    silencerLength?: number
+}
+
+export function AxialFanModel({
+    hasSilencer = false,
+    silencerRadius = 0.58,
+    silencerLength = 0.7
+}: AxialFanModelProps) {
     const materials = useFanMaterials()
     const fanRef = useRef<THREE.Group>(null)
 
@@ -43,6 +54,17 @@ export function AxialFanModel() {
 
     return (
         <group position={[0, 0, 0]} scale={[0.85, 0.85, 0.85]} rotation={[0, -Math.PI / 4, 0]}>
+
+            {/* 0. SILENCER (Susta) - Optional sound attenuation */}
+            {hasSilencer && (
+                <group position={[0, 0, -0.7]}>
+                    <Silencer
+                        radius={silencerRadius}
+                        length={silencerLength}
+                        position={[0, 0, 0]}
+                    />
+                </group>
+            )}
 
             {/* 1. SİLİNDİRİK KOVAN (Black Casing) */}
             <group rotation={[Math.PI / 2, 0, 0]}>

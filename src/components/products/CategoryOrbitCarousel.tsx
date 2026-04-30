@@ -137,24 +137,34 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
 
     const displayItems = useMemo(() => {
         if (level === 'main') {
-            return mainCategories.map(vm => ({
-                id: vm.slug,
-                title: vm.displayName,
-                image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.png',
-                categorySlug: vm.slug,
-                modelType: getModelTypeForCategory(vm.slug)
-            }))
+            return mainCategories.map(vm => {
+                // SSOT: DB metadata.model_type öncelikli, slug-inference fallback
+                const rawCat = categories.find(c => c.slug === vm.slug)
+                const dbModelType = (rawCat?.metadata as { model_type?: string } | null)?.model_type
+                return {
+                    id: vm.slug,
+                    title: vm.displayName,
+                    image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.png',
+                    categorySlug: vm.slug,
+                    modelType: dbModelType || getModelTypeForCategory(vm.slug)
+                }
+            })
         } else if (level === 'subcategory') {
-            return subcategories.map(vm => ({
-                id: vm.slug,
-                title: vm.displayName,
-                image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.png',
-                categorySlug: vm.slug,
-                modelType: getModelTypeForCategory(vm.slug)
-            }))
+            return subcategories.map(vm => {
+                // SSOT: DB metadata.model_type öncelikli, slug-inference fallback
+                const rawCat = categories.find(c => c.slug === vm.slug)
+                const dbModelType = (rawCat?.metadata as { model_type?: string } | null)?.model_type
+                return {
+                    id: vm.slug,
+                    title: vm.displayName,
+                    image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.png',
+                    categorySlug: vm.slug,
+                    modelType: dbModelType || getModelTypeForCategory(vm.slug)
+                }
+            })
         }
         return []
-    }, [level, mainCategories, subcategories])
+    }, [level, mainCategories, subcategories, categories])
 
     const handleCardClick = useCallback((itemId: string) => {
         if (level === 'main') {
