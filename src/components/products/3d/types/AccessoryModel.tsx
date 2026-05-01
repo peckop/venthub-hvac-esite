@@ -6,7 +6,7 @@ export function AccessoryModel() {
     const materials = useFanMaterials()
 
     return (
-        <group scale={[1.5, 1.5, 1.5]} position={[0, 0, 0]}>
+        <group scale={[0.4, 0.4, 0.4]} position={[0, 0, 0]}>
             {/* Menfez Çerçevesi */}
             <mesh material={materials.brushedAluminum}>
                 <boxGeometry args={[2, 2, 0.1]} />

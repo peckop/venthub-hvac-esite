@@ -3,7 +3,7 @@
 import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { Float, Html } from '@react-three/drei'
+import { Html } from '@react-three/drei'
 import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
 import { FanRenderer } from './3d/FanRenderer'
 
@@ -51,21 +51,16 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
 
     return (
         <group ref={meshRef} name={`icon-container-${offsetContext || 'default'}`}>
-            {/* Professional Product Lighting */}
-            <ambientLight intensity={1.2} />
-            <pointLight position={[5, 5, 5]} intensity={8} />
-            <pointLight position={[-5, 2, -5]} intensity={4} color="#e2e8f0" />
-            <spotLight position={[0, 10, 0]} angle={0.15} penumbra={1} intensity={2} />
-            
-            <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5} scale={[scale, scale, scale]}>
+                        
+            <group scale={[scale, scale, scale]}>
                 {DetailedModel ? <DetailedModel /> : (
-                    <FanRenderer 
-                        slug={categorySlug} 
-                        modelType={modelType} 
+                    <FanRenderer
+                        slug={categorySlug}
+                        modelType={modelType}
                         scale={1}
                     />
                 )}
-            </Float>
+            </group>
 
             {/* UI Hints */}
             {isFrontCard && showTapHint && (
