@@ -14,3 +14,8 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+
+## 2025-02-20 - Batch purge dead code across 3 files
+**Dead Code:** Removed `ProductsGrid`, `CategoryAuthoritySection`, and `InvoiceProfileModal`.
+**Root Cause:** Orphaned or deprecated code resulting from UI revisions that were no longer referenced or dynamically imported in the current application logic.
+**Resolution:** Explicitly deleted the unused `.tsx` files via `git rm` and fully validated the codebase safety and typing integrity using `pnpm lint:ci`, `tsc --noEmit`, `vitest`, and Next.js `build`.
