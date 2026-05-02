@@ -2,6 +2,7 @@ import VentImage from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { Zap, Wind, Check, X, HelpCircle, ArrowRight } from 'lucide-react'
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import { useI18n } from '@/i18n/I18nProvider'
 
 interface TypeComparisonProps {
     onOpenWizard: () => void
@@ -13,14 +14,15 @@ interface TypeComparisonProps {
  * Detaylı fayda karşılaştırması + kararsızlar için wizard tetikleyici
  */
 const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectType }) => {
+    const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [hoveredType, setHoveredType] = useState<'elektrikli' | 'ortam' | null>(null)
 
     const types = [
         {
             id: 'elektrikli' as const,
-            title: 'Elektrikli Isıtıcılı',
-            subtitle: 'Kış kullanımı için ideal',
+            title: t('categoryAirCurtain.typeComparison.types.electric.title'),
+            subtitle: t('categoryAirCurtain.typeComparison.types.electric.subtitle'),
             icon: Zap,
             color: 'orange',
             colorClasses: {
@@ -31,18 +33,26 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                 ring: 'ring-orange-200'
             },
             benefits: [
-                'Kapı önünde sıcak hava bariyeri',
-                'Kış aylarında enerji tasarrufu',
-                'Müşteri konforunu artırır',
-                'Termostat kontrollü ısıtma'
+                t('categoryAirCurtain.typeComparison.types.electric.benefits.0'),
+                t('categoryAirCurtain.typeComparison.types.electric.benefits.1'),
+                t('categoryAirCurtain.typeComparison.types.electric.benefits.2'),
+                t('categoryAirCurtain.typeComparison.types.electric.benefits.3')
             ],
-            bestFor: ['Mağaza girişleri', 'Restoran kapıları', 'Otel lobileri', 'Soğuk iklimlerde'],
-            notFor: ['Soğuk hava depoları', 'Yaz mevsimi kullanımı']
+            bestFor: [
+                t('categoryAirCurtain.typeComparison.types.electric.bestFor.0'),
+                t('categoryAirCurtain.typeComparison.types.electric.bestFor.1'),
+                t('categoryAirCurtain.typeComparison.types.electric.bestFor.2'),
+                t('categoryAirCurtain.typeComparison.types.electric.bestFor.3')
+            ],
+            notFor: [
+                t('categoryAirCurtain.typeComparison.types.electric.notFor.0'),
+                t('categoryAirCurtain.typeComparison.types.electric.notFor.1')
+            ]
         },
         {
             id: 'ortam' as const,
-            title: 'Ortam Havalı',
-            subtitle: 'Enerji tasarrufu odaklı',
+            title: t('categoryAirCurtain.typeComparison.types.ambient.title'),
+            subtitle: t('categoryAirCurtain.typeComparison.types.ambient.subtitle'),
             icon: Wind,
             color: 'blue',
             colorClasses: {
@@ -53,13 +63,21 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                 ring: 'ring-blue-200'
             },
             benefits: [
-                'Düşük enerji tüketimi',
-                'Soğuk zincir koruması',
-                'Hijyen bariyeri',
-                'Mevcut ısıtma sistemine ek'
+                t('categoryAirCurtain.typeComparison.types.ambient.benefits.0'),
+                t('categoryAirCurtain.typeComparison.types.ambient.benefits.1'),
+                t('categoryAirCurtain.typeComparison.types.ambient.benefits.2'),
+                t('categoryAirCurtain.typeComparison.types.ambient.benefits.3')
             ],
-            bestFor: ['Soğuk hava depoları', 'Market reyonları', 'Hastaneler', 'Yazlık mekanlar'],
-            notFor: ['Isıtmasız mekanlar', 'Çok soğuk iklimlerde']
+            bestFor: [
+                t('categoryAirCurtain.typeComparison.types.ambient.bestFor.0'),
+                t('categoryAirCurtain.typeComparison.types.ambient.bestFor.1'),
+                t('categoryAirCurtain.typeComparison.types.ambient.bestFor.2'),
+                t('categoryAirCurtain.typeComparison.types.ambient.bestFor.3')
+            ],
+            notFor: [
+                t('categoryAirCurtain.typeComparison.types.ambient.notFor.0'),
+                t('categoryAirCurtain.typeComparison.types.ambient.notFor.1')
+            ]
         }
     ]
 
@@ -69,10 +87,10 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                 {/* Section Header */}
                 <div className={`text-center mb-8 sm:mb-12 ${scrollAnimationClasses.fadeUp(isVisible)}`}>
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Hangi Tip Hava Perdesi Size Uygun?
+                        {t('categoryAirCurtain.typeComparison.title')}
                     </h2>
                     <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                        İhtiyacınıza göre doğru tipi seçin. İkisi de aynı kalitede, farklı amaçlar için tasarlandı.
+                        {t('categoryAirCurtain.typeComparison.subtitle')}
                     </p>
                 </div>
 
@@ -80,7 +98,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                 <div className={`flex justify-center mb-8 sm:mb-12 ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
                     <div className="relative w-full max-w-3xl aspect-[16/9]">
                         <VentImage src="/images/category/electric-vs-ambient.png"
-                            alt="Elektrikli vs Ortam Havalı Karşılaştırma"
+                            alt={t('categoryAirCurtain.typeComparison.imageAlt')}
                             className="rounded-xl shadow-lg object-cover"
                             fill
                         />
@@ -116,7 +134,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
 
                                 {/* Benefits */}
                                 <div className="mb-6">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-3">AVANTAJLARI</h4>
+                                    <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('categoryAirCurtain.typeComparison.benefitsLabel')}</h4>
                                     <ul className="space-y-2">
                                         {type.benefits.map((benefit, i) => (
                                             <li key={i} className="flex items-start gap-2">
@@ -129,7 +147,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
 
                                 {/* Best For */}
                                 <div className="mb-6">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">EN UYGUN:</h4>
+                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('categoryAirCurtain.typeComparison.bestForLabel')}</h4>
                                     <div className="flex flex-wrap gap-2">
                                         {type.bestFor.map((item, i) => (
                                             <span key={i} className={`px-3 py-1 rounded-full text-xs font-medium ${type.colorClasses.bg} ${type.colorClasses.text}`}>
@@ -141,7 +159,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
 
                                 {/* Not For */}
                                 <div className="mb-6">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">TERCİH EDİLMEZ:</h4>
+                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('categoryAirCurtain.typeComparison.notForLabel')}</h4>
                                     <div className="flex flex-wrap gap-2">
                                         {type.notFor.map((item, i) => (
                                             <span key={i} className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
@@ -158,7 +176,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                                     onClick={() => onSelectType(type.id)}
                                     className={`focus-ring w-full py-3 px-6 rounded-xl text-white font-bold transition-all flex items-center justify-center gap-2 ${type.colorClasses.button}`}
                                 >
-                                    {type.title} Modelleri
+                                    {type.title} {t('categoryAirCurtain.typeComparison.modelsBtn')}
                                     <ArrowRight size={18} />
                                 </button>
                             </div>
@@ -170,10 +188,10 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                 <div className="text-center p-8 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border border-purple-100">
                     <HelpCircle className="mx-auto text-purple-500 mb-4" size={40} />
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        Hala kararsız mısınız?
+                        {t('categoryAirCurtain.typeComparison.wizardCta.title')}
                     </h3>
                     <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                        2 dakikalık ihtiyaç analizi sihirbazımız size en uygun tipi ve modeli önerecek.
+                        {t('categoryAirCurtain.typeComparison.wizardCta.subtitle')}
                     </p>
                     <button
                         type="button"
@@ -181,7 +199,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                         className="focus-ring px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors inline-flex items-center gap-2"
                     >
                         <HelpCircle size={20} />
-                        Bana Yardım Et
+                        {t('categoryAirCurtain.typeComparison.wizardCta.btn')}
                     </button>
                 </div>
             </div>
@@ -190,6 +208,3 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
 }
 
 export default TypeComparison
-
-
-

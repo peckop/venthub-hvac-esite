@@ -11,3 +11,7 @@
 ## 2026-05-18 - Replacing Fallback Strings with Regex
 **Learning:** Using regex (e.g. `sed -E "s/ || '[^']*'//g"`) to remove `t('key') || 'Fallback'` patterns across components is dangerous. It strips necessary JavaScript logic defaults (like `|| ''` or `|| 'TR'`) from non-translation code, causing uncontrolled input errors and breaking application logic.
 **Action:** Use specific, targeted replacements or tools like `jscodeshift` when updating translation keys, and never run arbitrary `|| '...'` removal regex commands against the codebase. Always manually verify form state and hook dependencies after localization sweeps.
+
+## 2025-02-14 - Added new namespace for category components
+**Learning:** For category page specific components, translation strings were entirely hardcoded. Instead of reusing vague, loose keys, an entire new `categoryAirCurtain` root namespace is the safest way to maintain exact matches to the UI hierarchy in `tr.ts`.
+**Action:** When localizing highly specialized marketing sections (like `ProblemSection`, `TypeComparison`), always verify the target tree structure and, if missing, build a full, nested object in the dictionary rather than mapping to arbitrary generic keys.

@@ -2120,5 +2120,156 @@ export const tr = {
     refresh: 'Sayfayı Yenile',
     retry: 'Tekrar Dene',
     devDetails: 'Hata Detayları (Geliştirme)',
+  },
+
+  categoryAirCurtain: {
+    problem: {
+      title: 'Kapınızdan Ne Kadar Enerji Kaçıyor?',
+      subtitle: 'Açık kapı = Açık cüzdan. Her gün farkında olmadan enerji ve para kaybediyorsunuz.',
+      energyLoss: {
+        title: 'Enerji Kaybı',
+        description: 'Açık kapıdan kaçan ısının yıllık ortalama maliyeti'
+      },
+      temperature: {
+        title: 'Sıcaklık Farkı',
+        description: 'Kapı açıldığında iç-dış ortam sıcaklık farkı'
+      },
+      airflow: {
+        title: 'Hava Akışı',
+        description: 'Kontrolsüz rüzgar ve toz girişi'
+      },
+      bugs: {
+        title: 'Zararlı Girişi',
+        description: 'Böcek ve toz partiküllerinin serbest geçişi'
+      },
+      without: {
+        title: 'Hava Perdesi Olmadan',
+        points: {
+          '0': 'Isı kaybı sürekli',
+          '1': 'Enerji faturası yüksek',
+          '2': 'Konfor düşük',
+          '3': 'Zararlı girişi kolay'
+        }
+      },
+      with: {
+        title: 'Hava Perdesi İle',
+        points: {
+          '0': 'Görünmez enerji bariyeri',
+          '1': '%30\'a varan tasarruf',
+          '2': 'Konforlu iç ortam',
+          '3': 'Zararlılara karşı kalkan'
+        }
+      }
+    },
+    howItWorks: {
+      title: 'Hava Perdesi Nasıl Çalışır?',
+      subtitle: 'Basit ama etkili bir prensip: Görünmez hava duvarı',
+      steps: {
+        '0': { title: 'Güçlü Hava Akışı', description: 'Cihaz, yüksek hızda kontrollü bir hava akışı oluşturur.', detail: 'Özel tasarımlı fan ve kanatlar sayesinde düzgün ve güçlü bir hava akımı sağlanır.' },
+        '1': { title: 'Görünmez Bariyer', description: 'Hava akışı, kapı açıklığında görünmez bir perde oluşturur.', detail: 'Bu hava perdesi, iç ve dış ortamı fiziksel bir engel olmadan birbirinden ayırır.' },
+        '2': { title: 'İzolasyon', description: 'Dış hava, toz, böcek ve koku içeri giremez.', detail: 'İç ortam sıcaklığı korunur, hijyen standartları sağlanır.' },
+        '3': { title: 'Konfor', description: 'Müşteriler ve çalışanlar için ideal ortam sağlanır.', detail: 'Kapı açık kalsa bile iç mekan konforu bozulmaz.' }
+      },
+      diagramAlt: 'Hava Perdesi Çalışma Prensibi'
+    },
+    typeComparison: {
+      title: 'Hangi Tip Hava Perdesi Size Uygun?',
+      subtitle: 'İhtiyacınıza göre doğru tipi seçin. İkisi de aynı kalitede, farklı amaçlar için tasarlandı.',
+      imageAlt: 'Elektrikli vs Ortam Havalı Karşılaştırma',
+      benefitsLabel: 'AVANTAJLARI',
+      bestForLabel: 'EN UYGUN:',
+      notForLabel: 'TERCİH EDİLMEZ:',
+      modelsBtn: 'Modelleri',
+      types: {
+        electric: {
+          title: 'Elektrikli Isıtıcılı',
+          subtitle: 'Kış kullanımı için ideal',
+          benefits: { '0': 'Kapı önünde sıcak hava bariyeri', '1': 'Kış aylarında enerji tasarrufu', '2': 'Müşteri konforunu artırır', '3': 'Termostat kontrollü ısıtma' },
+          bestFor: { '0': 'Mağaza girişleri', '1': 'Restoran kapıları', '2': 'Otel lobileri', '3': 'Soğuk iklimlerde' },
+          notFor: { '0': 'Soğuk hava depoları', '1': 'Yaz mevsimi kullanımı' }
+        },
+        ambient: {
+          title: 'Ortam Havalı',
+          subtitle: 'Enerji tasarrufu odaklı',
+          benefits: { '0': 'Düşük enerji tüketimi', '1': 'Soğuk zincir koruması', '2': 'Hijyen bariyeri', '3': 'Mevcut ısıtma sistemine ek' },
+          bestFor: { '0': 'Soğuk hava depoları', '1': 'Market reyonları', '2': 'Hastaneler', '3': 'Yazlık mekanlar' },
+          notFor: { '0': 'Isıtmasız mekanlar', '1': 'Çok soğuk iklimlerde' }
+        }
+      },
+      wizardCta: {
+        title: 'Hala kararsız mısınız?',
+        subtitle: '2 dakikalık ihtiyaç analizi sihirbazımız size en uygun tipi ve modeli önerecek.',
+        btn: 'Bana Yardım Et'
+      }
+    },
+    faq: {
+      title: 'Sık Sorulan Sorular',
+      subtitle: 'Hava perdeleri hakkında en çok merak edilenler',
+      items: {
+        '0': { q: 'Hava perdesi gerçekten enerji tasarrufu sağlar mı?', a: 'Evet, hava perdesi kapı açıkken iç ortamın sıcaklığını koruyarak %30\'a varan enerji tasarrufu sağlayabilir. Özellikle sık kapı açılışı olan işletmelerde (mağaza, restoran, market) bu tasarruf çok belirgindir.' },
+        '1': { q: 'Elektrikli mi yoksa ortam havalı mı tercih etmeliyim?', a: 'Bu, kullanım yerinize bağlıdır. Kış aylarında kapı önünde ısıtma istiyorsanız elektrikli isıtıcılı model idealdir. Soğuk hava deposu veya mevcut ısıtma sisteminiz varsa ortam havalı model yeterlidir ve daha ekonomiktir.' },
+        '2': { q: 'Hava perdesi hangi boyutta olmalı?', a: 'Hava perdesi genişliği, kapı genişliğine eşit veya biraz daha geniş olmalıdır. Örneğin 120 cm\'lik bir kapı için 120 cm veya 150 cm\'lik model uygundur. Montaj yüksekliği de önemlidir - cihazın teknik özelliklerinde belirtilen maksimum yüksekliğe dikkat edin.' },
+        '3': { q: 'Kurulum zor mu?', a: 'Hava perdeleri genellikle kapı üstüne asılarak monte edilir. Profesyonel montaj önerilir ancak temel elektrik bilgisi olan bir teknisyen kolayca kurabilir. Kurulum kiti ve montaj kılavuzu ürünle birlikte gelir.' },
+        '4': { q: 'Bakım gerektirir mi?', a: 'Minimal bakım yeterlidir. Yılda 1-2 kez filtrelerin temizlenmesi ve fan kanatlarının toz alınması önerilir. Düzenli bakım, cihazın ömrünü uzatır ve performansını korur.' },
+        '5': { q: 'Vortice garantisi ne kadar?', a: 'Vortice ürünleri 2 yıl üretici garantisi ile satılmaktadır. Garanti kapsamında üretim hatalarından kaynaklanan arızalar ücretsiz onarılır veya değiştirilir. Yetkili bayi olarak garanti işlemlerinizi hızlıca yönetiyoruz.' }
+      },
+      moreQuestions: 'Başka sorularınız mı var?',
+      contactBtn: 'Bize ulaşın →'
+    },
+    brand: {
+      tag: 'İtalyan Mühendisliği',
+      titleHighlight: 'Neden',
+      titleSpan: 'Vortice',
+      questionMark: '?',
+      desc1: '1954 yılında Milano\'da kurulan Vortice, 70 yılı aşkın süredir dünya genelinde havalandırma teknolojisinin öncüsü olmuştur.',
+      desc2Part1: 'Attilio Pagani tarafından kurulan şirket, ilk ürünüyle İtalya\'nın en prestijli tasarım ödülü',
+      desc2Highlight: 'Compasso d\'Oro',
+      desc2Part2: '\'yu kazanmıştır. Bugün 90\'dan fazla ülkede milyonlarca kullanıcıya hizmet vermektedir.',
+      badges: {
+        authorized: 'Yetkili Bayi',
+        certified: 'CE Sertifikalı',
+        warranty: '2 Yıl Garanti'
+      },
+      imageAlt: 'Vortice Air Curtain Application',
+      premiumLabel: 'Premium Konfor',
+      stats: {
+        '0': { value: '70+', label: 'Yıl Deneyim' },
+        '1': { value: '90+', label: 'Ülke' },
+        '2': { value: '3x', label: 'Compasso d\'Oro' },
+        '3': { value: '#1', label: 'Avrupa' }
+      },
+      footerTextPart1: 'VentHub,',
+      footerHighlight: 'Vortice',
+      footerTextPart2: 'ürünlerinin Türkiye yetkili satıcısıdır.'
+    },
+    trustSignals: {
+      items: {
+        '0': { title: 'Yetkili Bayi', description: 'Vortice Türkiye yetkili satıcısı' },
+        '1': { title: '2 Yıl Garanti', description: 'Üretici garantisi' },
+        '2': { title: 'Güvenli Ödeme', description: 'SSL şifreli işlem' },
+        '3': { title: 'Hızlı Kargo', description: 'Stoktan teslimat' },
+        '4': { title: 'Taksit İmkanı', description: '12 aya varan taksit' },
+        '5': { title: 'Teknik Destek', description: 'Uzman danışmanlık' }
+      },
+      certifications: {
+        ce: 'CE',
+        certified: 'Sertifikalı',
+        iso: 'ISO 9001',
+        quality: 'Kalite',
+        compasso: 'Compasso d\'Oro',
+        designAward: 'Tasarım Ödülü'
+      }
+    },
+    bottomCta: {
+      title: 'Sıradaki Adımınız',
+      subtitle: 'Size en uygun {{categoryName}} için yardımcı olalım',
+      viewModelsTitle: 'Modelleri İncele',
+      viewModelsDesc: 'Tüm ürünleri görüntüle',
+      wizardTitle: 'Bana Uygun Olanı Bul',
+      wizardDesc: '3 adımda doğru model',
+      consultingTitle: 'Uzman Desteği',
+      consultingDesc: 'Proje danışmanlığı al',
+      backToTop: 'Başa Dön'
+    }
   }
 };

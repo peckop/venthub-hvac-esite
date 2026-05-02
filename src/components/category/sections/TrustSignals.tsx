@@ -1,41 +1,44 @@
 import React from 'react'
 import { Shield, Award, Lock, Truck, CreditCard, Phone } from 'lucide-react'
+import { useI18n } from '@/i18n/I18nProvider'
 
 /**
  * TrustSignals - Güven sinyalleri bölümü
  * Yeni site için Vortice itibarını ön plana çıkarır
  */
 const TrustSignals: React.FC = () => {
+    const { t } = useI18n()
+
     const signals = [
         {
             icon: Award,
-            title: 'Yetkili Bayi',
-            description: 'Vortice Türkiye yetkili satıcısı'
+            title: t('categoryAirCurtain.trustSignals.items.0.title'),
+            description: t('categoryAirCurtain.trustSignals.items.0.description')
         },
         {
             icon: Shield,
-            title: '2 Yıl Garanti',
-            description: 'Üretici garantisi'
+            title: t('categoryAirCurtain.trustSignals.items.1.title'),
+            description: t('categoryAirCurtain.trustSignals.items.1.description')
         },
         {
             icon: Lock,
-            title: 'Güvenli Ödeme',
-            description: 'SSL şifreli işlem'
+            title: t('categoryAirCurtain.trustSignals.items.2.title'),
+            description: t('categoryAirCurtain.trustSignals.items.2.description')
         },
         {
             icon: Truck,
-            title: 'Hızlı Kargo',
-            description: 'Stoktan teslimat'
+            title: t('categoryAirCurtain.trustSignals.items.3.title'),
+            description: t('categoryAirCurtain.trustSignals.items.3.description')
         },
         {
             icon: CreditCard,
-            title: 'Taksit İmkanı',
-            description: '12 aya varan taksit'
+            title: t('categoryAirCurtain.trustSignals.items.4.title'),
+            description: t('categoryAirCurtain.trustSignals.items.4.description')
         },
         {
             icon: Phone,
-            title: 'Teknik Destek',
-            description: 'Uzman danışmanlık'
+            title: t('categoryAirCurtain.trustSignals.items.5.title'),
+            description: t('categoryAirCurtain.trustSignals.items.5.description')
         }
     ]
 
@@ -63,18 +66,18 @@ const TrustSignals: React.FC = () => {
                 {/* Certifications */}
                 <div className="mt-8 pt-8 border-t border-gray-200 flex flex-wrap items-center justify-center gap-6 opacity-60">
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-gray-500">CE</span>
-                        <span className="text-xs text-gray-400">Sertifikalı</span>
+                        <span className="text-xs font-bold text-gray-500">{t('categoryAirCurtain.trustSignals.certifications.ce')}</span>
+                        <span className="text-xs text-gray-400">{t('categoryAirCurtain.trustSignals.certifications.certified')}</span>
                     </div>
                     <div className="w-px h-4 bg-gray-300" />
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-gray-500">ISO 9001</span>
-                        <span className="text-xs text-gray-400">Kalite</span>
+                        <span className="text-xs font-bold text-gray-500">{t('categoryAirCurtain.trustSignals.certifications.iso')}</span>
+                        <span className="text-xs text-gray-400">{t('categoryAirCurtain.trustSignals.certifications.quality')}</span>
                     </div>
                     <div className="w-px h-4 bg-gray-300" />
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-gray-500">Compasso d'Oro</span>
-                        <span className="text-xs text-gray-400">Tasarım Ödülü</span>
+                        <span className="text-xs font-bold text-gray-500">{t('categoryAirCurtain.trustSignals.certifications.compasso')}</span>
+                        <span className="text-xs text-gray-400">{t('categoryAirCurtain.trustSignals.certifications.designAward')}</span>
                     </div>
                 </div>
             </div>
@@ -83,6 +86,3 @@ const TrustSignals: React.FC = () => {
 }
 
 export default TrustSignals
-
-
-

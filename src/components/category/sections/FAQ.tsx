@@ -1,39 +1,40 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
-import { Routes } from '../../../utils/routes';
-
+import { Routes } from '../../../utils/routes'
+import { useI18n } from '@/i18n/I18nProvider'
 
 /**
  * FAQ - Sık Sorulan Sorular Accordion
  * Hava perdeleri hakkında en çok sorulan sorular
  */
 const FAQ: React.FC = () => {
+    const { t } = useI18n()
     const [openIndex, setOpenIndex] = useState<number | null>(0)
 
     const faqs = [
         {
-            question: 'Hava perdesi gerçekten enerji tasarrufu sağlar mı?',
-            answer: 'Evet, hava perdesi kapı açıkken iç ortamın sıcaklığını koruyarak %30\'a varan enerji tasarrufu sağlayabilir. Özellikle sık kapı açılışı olan işletmelerde (mağaza, restoran, market) bu tasarruf çok belirgindir.'
+            question: t('categoryAirCurtain.faq.items.0.q'),
+            answer: t('categoryAirCurtain.faq.items.0.a')
         },
         {
-            question: 'Elektrikli mi yoksa ortam havalı mı tercih etmeliyim?',
-            answer: 'Bu, kullanım yerinize bağlıdır. Kış aylarında kapı önünde ısıtma istiyorsanız elektrikli isıtıcılı model idealdir. Soğuk hava deposu veya mevcut ısıtma sisteminiz varsa ortam havalı model yeterlidir ve daha ekonomiktir.'
+            question: t('categoryAirCurtain.faq.items.1.q'),
+            answer: t('categoryAirCurtain.faq.items.1.a')
         },
         {
-            question: 'Hava perdesi hangi boyutta olmalı?',
-            answer: 'Hava perdesi genişliği, kapı genişliğine eşit veya biraz daha geniş olmalıdır. Örneğin 120 cm\'lik bir kapı için 120 cm veya 150 cm\'lik model uygundur. Montaj yüksekliği de önemlidir - cihazın teknik özelliklerinde belirtilen maksimum yüksekliğe dikkat edin.'
+            question: t('categoryAirCurtain.faq.items.2.q'),
+            answer: t('categoryAirCurtain.faq.items.2.a')
         },
         {
-            question: 'Kurulum zor mu?',
-            answer: 'Hava perdeleri genellikle kapı üstüne asılarak monte edilir. Profesyonel montaj önerilir ancak temel elektrik bilgisi olan bir teknisyen kolayca kurabilir. Kurulum kiti ve montaj kılavuzu ürünle birlikte gelir.'
+            question: t('categoryAirCurtain.faq.items.3.q'),
+            answer: t('categoryAirCurtain.faq.items.3.a')
         },
         {
-            question: 'Bakım gerektirir mi?',
-            answer: 'Minimal bakım yeterlidir. Yılda 1-2 kez filtrelerin temizlenmesi ve fan kanatlarının toz alınması önerilir. Düzenli bakım, cihazın ömrünü uzatır ve performansını korur.'
+            question: t('categoryAirCurtain.faq.items.4.q'),
+            answer: t('categoryAirCurtain.faq.items.4.a')
         },
         {
-            question: 'Vortice garantisi ne kadar?',
-            answer: 'Vortice ürünleri 2 yıl üretici garantisi ile satılmaktadır. Garanti kapsamında üretim hatalarından kaynaklanan arızalar ücretsiz onarılır veya değiştirilir. Yetkili bayi olarak garanti işlemlerinizi hızlıca yönetiyoruz.'
+            question: t('categoryAirCurtain.faq.items.5.q'),
+            answer: t('categoryAirCurtain.faq.items.5.a')
         }
     ]
 
@@ -44,10 +45,10 @@ const FAQ: React.FC = () => {
                 <div className="text-center mb-12">
                     <HelpCircle className="mx-auto text-blue-500 mb-4" size={40} />
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Sık Sorulan Sorular
+                        {t('categoryAirCurtain.faq.title')}
                     </h2>
                     <p className="text-lg text-gray-600">
-                        Hava perdeleri hakkında en çok merak edilenler
+                        {t('categoryAirCurtain.faq.subtitle')}
                     </p>
                 </div>
 
@@ -97,13 +98,13 @@ const FAQ: React.FC = () => {
                 {/* Contact CTA */}
                 <div className="mt-12 text-center p-6 bg-gray-50 rounded-xl">
                     <p className="text-gray-600 mb-4">
-                        Başka sorularınız mı var?
+                        {t('categoryAirCurtain.faq.moreQuestions')}
                     </p>
                     <a
                         href={Routes.contact()}
                         className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700"
                     >
-                        Bize ulaşın →
+                        {t('categoryAirCurtain.faq.contactBtn')}
                     </a>
                 </div>
             </div>
@@ -112,6 +113,3 @@ const FAQ: React.FC = () => {
 }
 
 export default FAQ
-
-
-

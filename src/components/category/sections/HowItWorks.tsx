@@ -2,39 +2,41 @@ import VentImage from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { Wind, ArrowDown, Shield, Thermometer, ChevronDown, ChevronUp } from 'lucide-react'
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import { useI18n } from '@/i18n/I18nProvider'
 
 /**
  * HowItWorks - İnteraktif "Nasıl Çalışır" bölümü
  * Hava perdesinin çalışma prensibini görselleştirir
  */
 const HowItWorks: React.FC = () => {
+    const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [activeStep, setActiveStep] = useState(0)
 
     const steps = [
         {
             icon: Wind,
-            title: 'Güçlü Hava Akışı',
-            description: 'Cihaz, yüksek hızda kontrollü bir hava akışı oluşturur.',
-            detail: 'Özel tasarımlı fan ve kanatlar sayesinde düzgün ve güçlü bir hava akımı sağlanır.'
+            title: t('categoryAirCurtain.howItWorks.steps.0.title'),
+            description: t('categoryAirCurtain.howItWorks.steps.0.description'),
+            detail: t('categoryAirCurtain.howItWorks.steps.0.detail')
         },
         {
             icon: ArrowDown,
-            title: 'Görünmez Bariyer',
-            description: 'Hava akışı, kapı açıklığında görünmez bir perde oluşturur.',
-            detail: 'Bu hava perdesi, iç ve dış ortamı fiziksel bir engel olmadan birbirinden ayırır.'
+            title: t('categoryAirCurtain.howItWorks.steps.1.title'),
+            description: t('categoryAirCurtain.howItWorks.steps.1.description'),
+            detail: t('categoryAirCurtain.howItWorks.steps.1.detail')
         },
         {
             icon: Shield,
-            title: 'İzolasyon',
-            description: 'Dış hava, toz, böcek ve koku içeri giremez.',
-            detail: 'İç ortam sıcaklığı korunur, hijyen standartları sağlanır.'
+            title: t('categoryAirCurtain.howItWorks.steps.2.title'),
+            description: t('categoryAirCurtain.howItWorks.steps.2.description'),
+            detail: t('categoryAirCurtain.howItWorks.steps.2.detail')
         },
         {
             icon: Thermometer,
-            title: 'Konfor',
-            description: 'Müşteriler ve çalışanlar için ideal ortam sağlanır.',
-            detail: 'Kapı açık kalsa bile iç mekan konforu bozulmaz.'
+            title: t('categoryAirCurtain.howItWorks.steps.3.title'),
+            description: t('categoryAirCurtain.howItWorks.steps.3.description'),
+            detail: t('categoryAirCurtain.howItWorks.steps.3.detail')
         }
     ]
 
@@ -44,10 +46,10 @@ const HowItWorks: React.FC = () => {
                 {/* Section Header */}
                 <div className={`text-center mb-8 sm:mb-12 ${scrollAnimationClasses.fadeUp(isVisible)}`}>
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Hava Perdesi Nasıl Çalışır?
+                        {t('categoryAirCurtain.howItWorks.title')}
                     </h2>
                     <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                        Basit ama etkili bir prensip: Görünmez hava duvarı
+                        {t('categoryAirCurtain.howItWorks.subtitle')}
                     </p>
                 </div>
 
@@ -55,7 +57,7 @@ const HowItWorks: React.FC = () => {
                     {/* Technical Diagram Image */}
                     <div className={`relative rounded-2xl overflow-hidden shadow-xl ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
                         <VentImage src="/images/category/air-curtain-diagram.png"
-                            alt="Hava Perdesi Çalışma Prensibi"
+                            alt={t('categoryAirCurtain.howItWorks.diagramAlt')}
                             className="w-full h-auto"
                             width={1200}
                             height={800}
@@ -114,6 +116,3 @@ const HowItWorks: React.FC = () => {
 }
 
 export default HowItWorks
-
-
-

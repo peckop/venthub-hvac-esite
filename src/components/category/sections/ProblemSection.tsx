@@ -1,43 +1,45 @@
 import React from 'react'
 import { DollarSign, Wind, Bug, Thermometer } from 'lucide-react'
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import { useI18n } from '@/i18n/I18nProvider'
 
 /**
  * ProblemSection - "Problemi Tanı" bölümü
  * Kullanıcıya hava perdesi ihtiyacını hissettiren empati bölümü
  */
 const ProblemSection: React.FC = () => {
+    const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const problems = [
         {
             icon: DollarSign,
-            title: 'Enerji Kaybı',
+            title: t('categoryAirCurtain.problem.energyLoss.title'),
             stat: '%30',
-            description: 'Açık kapıdan kaçan ısının yıllık ortalama maliyeti',
+            description: t('categoryAirCurtain.problem.energyLoss.description'),
             color: 'text-red-500',
             bgColor: 'bg-red-50'
         },
         {
             icon: Thermometer,
-            title: 'Sıcaklık Farkı',
+            title: t('categoryAirCurtain.problem.temperature.title'),
             stat: '15°C',
-            description: 'Kapı açıldığında iç-dış ortam sıcaklık farkı',
+            description: t('categoryAirCurtain.problem.temperature.description'),
             color: 'text-orange-500',
             bgColor: 'bg-orange-50'
         },
         {
             icon: Wind,
-            title: 'Hava Akışı',
+            title: t('categoryAirCurtain.problem.airflow.title'),
             stat: '2.5 m/s',
-            description: 'Kontrolsüz rüzgar ve toz girişi',
+            description: t('categoryAirCurtain.problem.airflow.description'),
             color: 'text-blue-500',
             bgColor: 'bg-blue-50'
         },
         {
             icon: Bug,
-            title: 'Zararlı Girişi',
+            title: t('categoryAirCurtain.problem.bugs.title'),
             stat: '7/24',
-            description: 'Böcek ve toz partiküllerinin serbest geçişi',
+            description: t('categoryAirCurtain.problem.bugs.description'),
             color: 'text-green-500',
             bgColor: 'bg-green-50'
         }
@@ -49,10 +51,10 @@ const ProblemSection: React.FC = () => {
                 {/* Section Header */}
                 <div className={`text-center mb-12 ${scrollAnimationClasses.fadeUp(isVisible)}`}>
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Kapınızdan Ne Kadar Enerji Kaçıyor?
+                        {t('categoryAirCurtain.problem.title')}
                     </h2>
                     <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-                        Açık kapı = Açık cüzdan. Her gün farkında olmadan enerji ve para kaybediyorsunuz.
+                        {t('categoryAirCurtain.problem.subtitle')}
                     </p>
                 </div>
 
@@ -97,12 +99,12 @@ const ProblemSection: React.FC = () => {
                             <div className="w-20 h-20 bg-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-300">
                                 <span className="text-4xl">❌</span>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Hava Perdesi Olmadan</h3>
+                            <h3 className="text-xl font-bold text-white mb-2">{t('categoryAirCurtain.problem.without.title')}</h3>
                             <ul className="text-red-100 text-sm space-y-1">
-                                <li>• Isı kaybı sürekli</li>
-                                <li>• Enerji faturası yüksek</li>
-                                <li>• Konfor düşük</li>
-                                <li>• Zararlı girişi kolay</li>
+                                <li>• {t('categoryAirCurtain.problem.without.points.0')}</li>
+                                <li>• {t('categoryAirCurtain.problem.without.points.1')}</li>
+                                <li>• {t('categoryAirCurtain.problem.without.points.2')}</li>
+                                <li>• {t('categoryAirCurtain.problem.without.points.3')}</li>
                             </ul>
                         </div>
 
@@ -111,12 +113,12 @@ const ProblemSection: React.FC = () => {
                             <div className="w-20 h-20 bg-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-blue-300">
                                 <span className="text-4xl">✓</span>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Hava Perdesi İle</h3>
+                            <h3 className="text-xl font-bold text-white mb-2">{t('categoryAirCurtain.problem.with.title')}</h3>
                             <ul className="text-blue-100 text-sm space-y-1">
-                                <li>• Görünmez enerji bariyeri</li>
-                                <li>• %30'a varan tasarruf</li>
-                                <li>• Konforlu iç ortam</li>
-                                <li>• Zararlılara karşı kalkan</li>
+                                <li>• {t('categoryAirCurtain.problem.with.points.0')}</li>
+                                <li>• {t('categoryAirCurtain.problem.with.points.1')}</li>
+                                <li>• {t('categoryAirCurtain.problem.with.points.2')}</li>
+                                <li>• {t('categoryAirCurtain.problem.with.points.3')}</li>
                             </ul>
                         </div>
                     </div>
@@ -127,6 +129,3 @@ const ProblemSection: React.FC = () => {
 }
 
 export default ProblemSection
-
-
-
