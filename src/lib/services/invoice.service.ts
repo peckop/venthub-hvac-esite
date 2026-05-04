@@ -1,6 +1,17 @@
 import { supabase } from '../supabase'
 import type { DbInvoiceProfile, DbInvoiceProfileInsert, DbInvoiceProfileUpdate } from '../../types/db-rows'
 
+/**
+ * Retrieves all invoice profiles associated with the current user.
+ * Profiles are ordered by default status first, then by creation date descending.
+ *
+ * @returns A promise that resolves to an array of invoice profiles, or an empty array if none exist or table is missing.
+ * @throws {Error} If a database query fails due to an unexpected error.
+ *
+ * @example
+ * const profiles = await listInvoiceProfiles();
+ * console.log(`User has ${profiles.length} invoice profiles.`);
+ */
 export async function listInvoiceProfiles(): Promise<DbInvoiceProfile[]> {
   const { data, error } = await supabase
     .from('user_invoice_profiles')
@@ -19,6 +30,16 @@ export async function listInvoiceProfiles(): Promise<DbInvoiceProfile[]> {
   return (data as DbInvoiceProfile[]) || []
 }
 
+/**
+ * Creates a new invoice profile for the currently authenticated user.
+ *
+ * @param payload - The data required to create a new invoice profile (excluding user_id).
+ * @returns A promise that resolves to the newly created invoice profile.
+ * @throws {Error} If the user is not authenticated or the database insert fails.
+ *
+ * @example
+ * const newProfile = await createInvoiceProfile({ title: 'Company Address', tax_no: '1234567890', tax_office: 'Sisli' });
+ */
 export async function createInvoiceProfile(payload: DbInvoiceProfileInsert): Promise<DbInvoiceProfile> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
@@ -40,6 +61,17 @@ export async function createInvoiceProfile(payload: DbInvoiceProfileInsert): Pro
   return data as DbInvoiceProfile
 }
 
+/**
+ * Updates an existing invoice profile by its ID.
+ *
+ * @param id - The unique identifier of the invoice profile to update.
+ * @param payload - The partial data to update in the invoice profile.
+ * @returns A promise that resolves to the updated invoice profile.
+ * @throws {Error} If the database update operation fails.
+ *
+ * @example
+ * const updatedProfile = await updateInvoiceProfile('profile-123', { title: 'Updated Office Address' });
+ */
 export async function updateInvoiceProfile(id: string, payload: DbInvoiceProfileUpdate): Promise<DbInvoiceProfile> {
   const { data, error } = await supabase
     .from('user_invoice_profiles')
@@ -52,6 +84,16 @@ export async function updateInvoiceProfile(id: string, payload: DbInvoiceProfile
   return data as DbInvoiceProfile
 }
 
+/**
+ * Deletes a specific invoice profile by its ID.
+ *
+ * @param id - The unique identifier of the invoice profile to delete.
+ * @returns A promise that resolves to true if the deletion was successful.
+ * @throws {Error} If the database delete operation fails.
+ *
+ * @example
+ * await deleteInvoiceProfile('profile-123');
+ */
 export async function deleteInvoiceProfile(id: string): Promise<boolean> {
   const { error } = await supabase
     .from('user_invoice_profiles')
@@ -61,6 +103,18 @@ export async function deleteInvoiceProfile(id: string): Promise<boolean> {
   return true
 }
 
+/**
+ * Sets a specific invoice profile as the default for the currently authenticated user.
+ * It removes the default flag from all other profiles belonging to the user.
+ *
+ * @param id - The unique identifier of the invoice profile to set as default.
+ * @returns A promise that resolves to the updated invoice profile that is now the default.
+ * @throws {Error} If the user is not authenticated or the database updates fail.
+ *
+ * @example
+ * const defaultProfile = await setDefaultInvoiceProfile('profile-123');
+ * console.log(`Profile ${defaultProfile.id} is now the default.`);
+ */
 export async function setDefaultInvoiceProfile(id: string): Promise<DbInvoiceProfile> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
@@ -86,6 +140,16 @@ export async function setDefaultInvoiceProfile(id: string): Promise<DbInvoicePro
   return data as DbInvoiceProfile
 }
 
+/**
+ * Retrieves the default invoice profile for the currently authenticated user.
+ *
+ * @returns A promise that resolves to the default invoice profile, or null if none is found or the table is missing.
+ * @throws {Error} If the user is not authenticated or an unexpected database error occurs.
+ *
+ * @example
+ * const defaultProfile = await fetchDefaultInvoiceProfile();
+ * if (defaultProfile) console.log(`Default profile tax office: ${defaultProfile.tax_office}`);
+ */
 export async function fetchDefaultInvoiceProfile(): Promise<DbInvoiceProfile | null> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError

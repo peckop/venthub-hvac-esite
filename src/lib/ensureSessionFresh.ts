@@ -14,6 +14,18 @@ import { supabase } from './supabase'
 
 const REFRESH_MARGIN_SEC = 60 // 60 saniye kala yenile
 
+/**
+ * Automatically checks the current Supabase session and refreshes the authentication token
+ * if it is expired or within 60 seconds of expiring. Designed to be called right before
+ * critical database operations.
+ *
+ * @returns A promise that resolves when the session check (and potential refresh) is complete.
+ * Does not throw errors on failure to prevent blocking the UI, but will log a warning.
+ *
+ * @example
+ * await ensureSessionFresh();
+ * const { data } = await supabase.from('secure_table').select();
+ */
 export async function ensureSessionFresh(): Promise<void> {
     try {
         const { data: { session } } = await supabase.auth.getSession()

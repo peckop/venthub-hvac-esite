@@ -25,6 +25,16 @@ const Svg = {
   )
 }
 
+/**
+ * Resolves the appropriate SVG icon component for a given application icon identifier.
+ *
+ * @param icon - The specific application icon key (e.g., 'building', 'wind').
+ * @param size - The size of the icon in pixels (defaults to 18).
+ * @returns The corresponding JSX SVG element, or null if the icon is unrecognized.
+ *
+ * @example
+ * const WindIcon = iconFor('wind', 24);
+ */
 export function iconFor(icon: ApplicationIcon, size = 18) {
   switch (icon) {
     case 'building':
@@ -40,6 +50,16 @@ export function iconFor(icon: ApplicationIcon, size = 18) {
   }
 }
 
+/**
+ * Maps an application accent color key to its corresponding Tailwind CSS background overlay class.
+ * Provides a translucent gradient overlay commonly used for application cards.
+ *
+ * @param accent - The application accent color key (e.g., 'blue', 'emerald').
+ * @returns A Tailwind CSS class string representing a gradient from the accent color.
+ *
+ * @example
+ * const overlayClass = accentOverlayClass('emerald'); // returns "from-emerald-500/10"
+ */
 export function accentOverlayClass(accent: ApplicationAccent) {
   switch (accent) {
     case 'blue':

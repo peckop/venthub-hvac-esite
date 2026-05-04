@@ -66,6 +66,18 @@ export async function getProductsEnriched(params: GetProductsParams = {}): Promi
   return toUIProductList(enrichedProducts)
 }
 
+/**
+ * Fetches search suggestions for products based on a query string.
+ * Uses a remote procedure call (RPC) to retrieve lightweight suggestion data.
+ *
+ * @param q - The search query string.
+ * @param limit - The maximum number of suggestions to return (defaults to 6).
+ * @returns A promise that resolves to an array of search suggestions, or an empty array if the query fails.
+ *
+ * @example
+ * const suggestions = await getSearchSuggestions('fan', 5);
+ * console.log(`Found ${suggestions.length} suggestions.`);
+ */
 export async function getSearchSuggestions(q: string, limit: number = 6): Promise<SearchSuggestion[]> {
   const { data, error } = await supabase.rpc('get_search_suggestions', {
     p_q: q,
@@ -80,7 +92,19 @@ export async function getSearchSuggestions(q: string, limit: number = 6): Promis
   return (data as SearchSuggestion[]) || []
 }
 
-// Full‑text search (Turkish) via RPC; returns lightweight fields + rank
+/**
+ * Performs a full-text search (optimized for Turkish) via RPC.
+ * Returns lightweight fields and search ranking for accurate product matching.
+ *
+ * @param q - The full-text search query.
+ * @param limit - The maximum number of results to return (defaults to 20).
+ * @param filters - Optional filters to apply to the search (e.g., category_id).
+ * @returns A promise that resolves to an array of full-text search product results.
+ * @throws {Error} If the database RPC call fails.
+ *
+ * @example
+ * const results = await ftsSearchProducts('endüstriyel fan', 10, { category_id: 'cat-123' });
+ */
 export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }): Promise<FtsProductResult[]> {
   const payload = { p_q: q, p_limit: limit, p_filters: filters || {} }
   const { data, error } = await supabase.rpc('fts_search_products', payload)
@@ -105,7 +129,17 @@ export async function getProducts(limit?: number): Promise<Product[]> {
   return toUIProductList((data as DbProduct[]) || [])
 }
 
-// Get all products without limit
+/**
+ * Retrieves all active products from the database without any limits.
+ * Products are ordered by featured status first, then alphabetically by name.
+ *
+ * @returns A promise that resolves to an array of all active domain-mapped Product objects.
+ * @throws {Error} If the database query fails.
+ *
+ * @example
+ * const allActiveProducts = await getAllProducts();
+ * console.log(`Total active products: ${allActiveProducts.length}`);
+ */
 export async function getAllProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
@@ -118,6 +152,17 @@ export async function getAllProducts(): Promise<Product[]> {
   return toUIProductList((data as DbProduct[]) || [])
 }
 
+/**
+ * Fetches all active products belonging to a specific category or subcategory.
+ * Matches the provided ID against both `category_id` and `subcategory_id` columns.
+ *
+ * @param categoryId - The unique identifier of the category or subcategory.
+ * @returns A promise that resolves to an array of domain-mapped Product objects for the category.
+ * @throws {Error} If the database query fails.
+ *
+ * @example
+ * const categoryProducts = await getProductsByCategory('cat-123');
+ */
 export async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
@@ -182,6 +227,17 @@ export async function getFeaturedProducts(): Promise<Product[]> {
   return toUIProductList((data as DbProduct[]) || [])
 }
 
+/**
+ * Searches for active products using a simple `ilike` substring match across multiple fields.
+ * Matches against name, brand, sku, model_code, and description.
+ *
+ * @param query - The substring query to search for.
+ * @returns A promise that resolves to an array of up to 20 domain-mapped Product objects.
+ * @throws {Error} If the database query fails.
+ *
+ * @example
+ * const searchResults = await searchProducts('axial');
+ */
 export async function searchProducts(query: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
