@@ -87,47 +87,6 @@ export function isAdminByEmail(email?: string): boolean {
 }
 
 /**
- * Geliştirme ortamında admin kontrolü
- */
-function isDevAdmin(): boolean {
-  const isDev = process.env.NODE_ENV === 'development'
-  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-  return isDev && isLocalhost
-}
-
-/**
- * Senkron admin kontrolü (cache tabанлı)
- * 
- * Bu fonksiyon önceki auth state'den role bilgisini kullanır.
- * Eğer role bilgisi yoksa fallback olarak e-posta kontrolü yapar.
- */
-export function checkAdminAccess(user: { email?: string; user_metadata?: { role?: string } } | null): boolean {
-  if (!user?.email) return false
-
-  // Lokal geliştirmede tam yetki
-  const lowerEmail = user.email.toLowerCase()
-  if (process.env.NODE_ENV === 'development') {
-    if (lowerEmail === 'recep.varlik@gmail.com' || lowerEmail.includes('alize') || lowerEmail.includes('admin')) {
-      return true
-    }
-  }
-
-  // 1) Email Fallback (En yüksek öncelikli güvenlik ağı - her zaman çalışmalı)
-  if (isAdminByEmail(user.email)) return true
-
-  // 2) Supabase metadata rolü
-  const metadataRole = user.user_metadata?.role
-  if (metadataRole && ['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(metadataRole)) {
-    return true
-  }
-
-  // 3) Lokal dev fallback
-  if (isDevAdmin()) return true
-
-  return false
-}
-
-/**
  * Kullanıcıya admin rolü ata (sadece client tarafında bilgi için)
  * Gerçek database güncellemesi için admin paneli gerekir
  */

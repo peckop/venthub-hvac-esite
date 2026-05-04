@@ -14,3 +14,7 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+## 2025-05-04 - Next.js Implicit Dependencies
+**Dead Code:** Unused default export in `Silencer.tsx`, orphaned `AdminStockPage.tsx`, unused `checkAdminAccess` in `admin.ts`, unused `Constants` export in `database.types.ts`, and `react-error-boundary` dependency.
+**Root Cause:** The components, exports, and dependencies were either replaced by other features, never completed, or left over after refactoring.
+**Resolution:** Safely purged via static analysis. Importantly, learned that `sharp` must never be removed based on `knip` static analysis as Next.js 15 requires it dynamically for `next/image` optimization.
