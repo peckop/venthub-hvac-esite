@@ -41,7 +41,7 @@ const SecurePaymentOverlay: React.FC<SecurePaymentOverlayProps> = ({
                     </div>
                     <div className="text-right">
                         <div className="text-sm font-semibold text-primary-navy">Venthub HVAC</div>
-                        <div className="text-[11px] text-steel-gray">iyzico ile güvenli ödeme</div>
+                        <div className="text-[11px] text-steel-gray">{t('checkout.overlay.iyzico')}</div>
                     </div>
                 </div>
                 {/* Body */}

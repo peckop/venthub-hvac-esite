@@ -59,15 +59,15 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod === 'standard' ? 'border-primary-navy' : 'border-light-gray'}`}>
                         <div>
-                            <div className="text-sm font-medium text-industrial-gray">Standart</div>
-                            <div className="text-xs text-steel-gray">3–5 iş günü</div>
+                            <div className="text-sm font-medium text-industrial-gray">{t('checkout.shipping.standard')}</div>
+                            <div className="text-xs text-steel-gray">{t('checkout.shipping.standardTime')}</div>
                         </div>
                         <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod === 'standard'} onChange={() => setShippingMethod('standard')} />
                     </label>
                     <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod === 'express' ? 'border-primary-navy' : 'border-light-gray'}`}>
                         <div>
-                            <div className="text-sm font-medium text-industrial-gray">Ekspres</div>
-                            <div className="text-xs text-steel-gray">1–2 iş günü</div>
+                            <div className="text-sm font-medium text-industrial-gray">{t('checkout.shipping.express')}</div>
+                            <div className="text-xs text-steel-gray">{t('checkout.shipping.expressTime')}</div>
                         </div>
                         <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod === 'express'} onChange={() => setShippingMethod('express')} />
                     </label>

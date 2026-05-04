@@ -1303,6 +1303,9 @@ export const tr = {
     summaryTitle: 'Sipariş Özeti',
     summaryThumb: 'Ürün',
     couponDiscount: 'Kupon indirimi ({{code}})',
+    couponPlaceholder: 'Kupon kodu',
+    applyCoupon: 'Uygula',
+    removeCoupon: 'Kaldır',
     paymentSectionTitle: 'Ödeme Bilgileri',
     paymentLoading: 'Ödeme formu yükleniyor. Lütfen 3D doğrulamasını tamamlayın. İşlem bitince bu sayfa otomatik yenilenecektir.',
     formPreparing: 'Form hazırlanıyor...',
@@ -1318,7 +1321,8 @@ export const tr = {
       stageInit: 'Başlatılıyor',
       stageForm: 'Güvenli form',
       stageBank: 'Banka 3D',
-      dontClose: 'İşlem sırasında bu sayfayı kapatmayın veya geri gitmeyin. Birkaç saniye sürebilir.'
+      dontClose: 'İşlem sırasında bu sayfayı kapatmayın veya geri gitmeyin. Birkaç saniye sürebilir.',
+      iyzico: 'iyzico ile güvenli ödeme'
     },
     help: {
       smsTitle: "Kod gelmedi mi?",
@@ -1339,6 +1343,10 @@ export const tr = {
     },
     shipping: {
       methodTitle: 'Teslimat Yöntemi',
+      standard: 'Standart',
+      standardTime: '3–5 iş günü',
+      express: 'Ekspres',
+      expressTime: '1–2 iş günü',
       title: 'Teslimat Adresi',
       addressLabel: 'Açık Adres *',
       addressPlaceholder: 'Sokak, bina, kapı no, daire no',
