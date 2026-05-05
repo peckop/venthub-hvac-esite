@@ -49,5 +49,23 @@ export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => 
 /**
  * List converters for bulk data.
  */
+/**
+ * Bulk converts an array of database category rows into UI-ready DomainCategory models.
+ *
+ * @param cats - Array of raw database category objects
+ * @returns Array of fully mapped Category domain models
+ *
+ * @example
+ * const domainCategories = toUICategoryList(dbResults)
+ */
 export const toUICategoryList = (cats: DbCategory[]): DomainCategory[] => cats.map(mapDatabaseCategoryToDomain)
+/**
+ * Bulk converts an array of database product rows into UI-ready DomainProduct models.
+ *
+ * @param prods - Array of raw database product objects
+ * @returns Array of fully mapped Product domain models
+ *
+ * @example
+ * const domainProducts = toUIProductList(dbResults)
+ */
 export const toUIProductList = (prods: DbProduct[]): DomainProduct[] => prods.map(mapDatabaseProductToDomain)
