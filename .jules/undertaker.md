@@ -14,3 +14,7 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+## 2024-05-06 - Batch remove 8 unused components
+**Dead Code:** Removed 8 strictly unused visual, skeleton, and category components (BeforeAfterSlider, BentoGrid, CaseStudySection, CategoriesShowcase, CategoryAuthoritySection, EducationalGuide, ProductsSkeleton, UndecidedUserCTA).
+**Root Cause:** These components were either from older UI versions, redundant layout implementations, or replaced with dynamic modules. No indirect imports or active component usages were present.
+**Resolution:** Successfully deleted the components from the source tree without breaking any build pipelines or tests.
