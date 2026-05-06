@@ -3,6 +3,18 @@ import type { DbProduct, DbAdminSearchResult } from '../../types/db-rows'
 import type { Product, SearchSuggestion, FtsProductResult, GetProductsParams } from '../supabase'
 import { toUIProductList, mapDatabaseProductToDomain } from '../type-converters'
 
+/**
+ * Fetches an enriched list of products, primarily using the `get_products_enriched` RPC.
+ * Automatically resolves category slugs to database IDs if needed.
+ * Includes fallback logic to fetch basic product data directly from the `products` table
+ * if the RPC call or advanced filtering fails.
+ *
+ * @param params - Optional filter, search, and pagination parameters
+ * @returns Array of fully mapped UI products
+ *
+ * @example
+ * const products = await getProductsEnriched({ limit: 10, brand: ['BrandA'] })
+ */
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
   let resolvedCategoryIds = params.categoryIds;
 
@@ -66,6 +78,17 @@ export async function getProductsEnriched(params: GetProductsParams = {}): Promi
   return toUIProductList(enrichedProducts)
 }
 
+/**
+ * Retrieves autocomplete search suggestions based on a query string via RPC.
+ * Returns an empty array if the query fails or encounters an error.
+ *
+ * @param q - The search query text
+ * @param limit - Maximum number of suggestions to return (default: 6)
+ * @returns Array of matching search suggestions
+ *
+ * @example
+ * const suggestions = await getSearchSuggestions('fan', 5)
+ */
 export async function getSearchSuggestions(q: string, limit: number = 6): Promise<SearchSuggestion[]> {
   const { data, error } = await supabase.rpc('get_search_suggestions', {
     p_q: q,
@@ -80,7 +103,19 @@ export async function getSearchSuggestions(q: string, limit: number = 6): Promis
   return (data as SearchSuggestion[]) || []
 }
 
-// Full‑text search (Turkish) via RPC; returns lightweight fields + rank
+/**
+ * Performs a full-text search (optimized for Turkish language) via RPC.
+ * Returns lightweight product fields combined with a search rank score.
+ *
+ * @param q - The search query text
+ * @param limit - Maximum number of results to return (default: 20)
+ * @param filters - Optional filters, such as category_id
+ * @returns Array of lightweight product search results with their rank score
+ * @throws {Error} If the database RPC call fails
+ *
+ * @example
+ * const results = await ftsSearchProducts('vantilatör', 10, { category_id: 'abc' })
+ */
 export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }): Promise<FtsProductResult[]> {
   const payload = { p_q: q, p_limit: limit, p_filters: filters || {} }
   const { data, error } = await supabase.rpc('fts_search_products', payload)
@@ -88,6 +123,17 @@ export async function ftsSearchProducts(q: string, limit = 20, filters?: { categ
   return (data as FtsProductResult[]) || []
 }
 
+/**
+ * Fetches a list of active products directly from the database table.
+ * Results are ordered with featured products first, then alphabetically by name.
+ *
+ * @param limit - Optional maximum number of products to return
+ * @returns Array of mapped UI products
+ * @throws {Error} If the database query fails
+ *
+ * @example
+ * const featured = await getProducts(10)
+ */
 export async function getProducts(limit?: number): Promise<Product[]> {
   let query = supabase
     .from('products')

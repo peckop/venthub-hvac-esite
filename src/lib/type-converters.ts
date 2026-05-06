@@ -50,4 +50,16 @@ export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => 
  * List converters for bulk data.
  */
 export const toUICategoryList = (cats: DbCategory[]): DomainCategory[] => cats.map(mapDatabaseCategoryToDomain)
+
+/**
+ * Maps an array of database product rows into the unified UI domain model.
+ * Uses `mapDatabaseProductToDomain` internally for each element.
+ *
+ * @param prods - Array of database products directly from Supabase
+ * @returns An array of properly mapped DomainProduct objects
+ *
+ * @example
+ * const dbProducts = await getProductsFromDb()
+ * const uiProducts = toUIProductList(dbProducts)
+ */
 export const toUIProductList = (prods: DbProduct[]): DomainProduct[] => prods.map(mapDatabaseProductToDomain)
