@@ -15,7 +15,14 @@ export interface EngineeringInference {
 }
 
 /**
- * Ses basınç seviyesini insan algısına göre yorumlar.
+ * Interprets a sound pressure level (dB) into a human-readable noise inference category.
+ * Returns categorization ranging from 'ultraQuiet' to 'industrial' based on standard acoustic thresholds.
+ *
+ * @param db - The sound pressure level in decibels (dB), expected to be a positive number
+ * @returns An engineering inference object detailing the noise level category, or null if the input is invalid or <= 0
+ *
+ * @example
+ * getNoiseInference(40) // returns { labelKey: '...', value: '40 dB(A)', type: 'noise', ... }
  */
 export const getNoiseInference = (db: number): EngineeringInference | null => {
   if (!db || db <= 0) return null;
@@ -55,7 +62,14 @@ export const getNoiseInference = (db: number): EngineeringInference | null => {
 };
 
 /**
- * Enerji verimliliğini yorumlar (HRV Isı Geri Kazanımı için).
+ * Interprets the energy efficiency percentage, specifically for Heat Recovery Ventilation (HRV) units.
+ * Returns a classification (Diamond, Platinum, Gold) for efficiency levels of 80% and above.
+ *
+ * @param efficiency - The efficiency percentage (0-100), optional
+ * @returns An engineering inference object for the efficiency class, or null if below 80% or invalid
+ *
+ * @example
+ * getEfficiencyInference(90) // returns { labelKey: '...', value: '%90', type: 'efficiency', ... }
  */
 export const getEfficiencyInference = (efficiency?: number): EngineeringInference | null => {
   if (!efficiency || efficiency <= 0) return null;
@@ -89,7 +103,14 @@ export const getEfficiencyInference = (efficiency?: number): EngineeringInferenc
 };
 
 /**
- * Motor tipine göre teknoloji analizi yapar.
+ * Interprets the motor technology type based on its textual description.
+ * Identifies high-efficiency Electronically Commutated (EC) or standard Alternating Current (AC) motors.
+ *
+ * @param motorType - A string describing the motor type (e.g., 'EC Motor', 'AC Fan')
+ * @returns An engineering inference object highlighting the motor technology, or null if unrecognized
+ *
+ * @example
+ * getMotorInference('EC Motor') // returns { labelKey: '...', value: 'EC', type: 'quality', ... }
  */
 export const getMotorInference = (motorType?: string): EngineeringInference | null => {
   if (!motorType) return null;
@@ -116,7 +137,14 @@ export const getMotorInference = (motorType?: string): EngineeringInference | nu
 };
 
 /**
- * Ürün için tam bir mühendislik özeti üretir.
+ * Generates a comprehensive engineering summary by extracting and interpreting technical specifications from a product.
+ * Analyzes noise level, efficiency, motor type, and airflow capacity to provide actionable engineering insights.
+ *
+ * @param product - The product object containing raw technical data and specifications
+ * @returns An array of engineering inference objects detailing the product's performance and quality attributes
+ *
+ * @example
+ * generateEngineeringSummary(myProduct) // returns [{ type: 'noise', ... }, { type: 'power', ... }]
  */
 export const generateEngineeringSummary = (product: Product): EngineeringInference[] => {
   const inferences: EngineeringInference[] = [];
