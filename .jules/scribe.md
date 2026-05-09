@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2024-05-19 - TypeScript Strict Types Documentation Override
+**Learning:** Documenting functions that simply re-export or lightly wrap dependencies (like `createTimerClock` over `THREE.Timer`) requires explicitly mentioning the underlying interface (like `@returns A ClockShim object implementing both THREE.Timer and THREE.Clock interfaces`) to prevent developers from bypassing strict type constraints.
+**Action:** Always cross-reference the return types in documentation to match the explicitly defined custom generic interfaces instead of just the native fallback types.

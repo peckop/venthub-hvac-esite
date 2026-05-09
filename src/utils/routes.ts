@@ -29,6 +29,15 @@ function assertProductSlug(slug: string): string {
 
 import type { Route } from 'next';
 
+/**
+ * Centralized Route Authority object.
+ * Defines all valid application URL paths safely and prevents hardcoded strings scattered across components.
+ * Functions wrap routing logic like URL parameter encoding and query string construction.
+ *
+ * @example
+ * const path = Routes.product('sessiz-fan') // returns "/products/sessiz-fan"
+ * const loginPath = Routes.auth.login('/checkout') // returns "/auth/login?redirect=%2Fcheckout"
+ */
 export const Routes = {
   home: () => '/' as Route,
   
