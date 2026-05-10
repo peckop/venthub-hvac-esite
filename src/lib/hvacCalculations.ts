@@ -103,10 +103,15 @@ function getAdjustmentFactor(wind: WindCondition, traffic: TrafficIntensity): nu
 }
 
 /**
- * Hava Perdesi Boyutlandırma Hesaplaması
- * 
- * Formül: CFM = Hız × Çıkış Alanı
- * Çıkış Alanı = Kapı Genişliği × Nozül Yüksekliği (tipik 50-100mm)
+ * Calculates the required specifications for an air curtain based on door dimensions, application type, and environmental factors.
+ * Uses ISO 27327-1 principles to determine necessary nozzle velocity, airflow volume, and estimated motor power to maintain a physical air barrier.
+ *
+ * @param input - The calculation parameters including door dimensions, application context (e.g., 'comfort', 'coldRoom'), wind, and traffic conditions
+ * @returns The computed requirements including airflow, nozzle/floor velocities, suggested power, and system recommendations
+ *
+ * @example
+ * calculateAirCurtain({ doorWidth: 2, doorHeight: 2.5, application: 'comfort', windCondition: 'light', trafficIntensity: 'medium' })
+ * // returns { requiredAirflow: 5806, nozzleVelocity: 9.6, floorVelocity: 1.18, suggestedPower: 1104, ... }
  */
 export function calculateAirCurtain(input: AirCurtainInput): AirCurtainResult {
     const { doorWidth, doorHeight, application, windCondition, trafficIntensity } = input
@@ -292,7 +297,15 @@ function suggestDimensions(airflow: number, targetVelocity: number = 6): { width
 }
 
 /**
- * Kanal Boyutlandırma Hesaplaması
+ * Calculates aerodynamic properties and pressure losses for HVAC ductwork based on physical dimensions and airflow.
+ * Employs simplified Darcy-Weisbach formulas to determine air velocity, friction losses per meter, and total pressure drop.
+ *
+ * @param input - The physical and flow parameters of the duct including type (circular/rectangular), dimensions, material, and airflow rate
+ * @returns A comprehensive result containing air velocity evaluation, pressure loss data, equivalent diameters, and sizing recommendations
+ *
+ * @example
+ * calculateDuct({ airflow: 1000, ductType: 'circular', diameter: 250, length: 10, material: 'galvanized' })
+ * // returns { velocity: 5.66, velocityStatus: 'optimal', pressureLossPerMeter: 1.63, totalPressureLoss: 16.29, ... }
  */
 export function calculateDuct(input: DuctInput): DuctResult {
     const { airflow, ductType, diameter, width, height, length, material } = input
@@ -422,11 +435,15 @@ function getClimateDeltaT(zone: ClimateZone): { heating: number; cooling: number
 }
 
 /**
- * HRV Isı Geri Kazanımı Hesaplaması
- * 
- * Formül: Q = ṁ × Cp × ΔT × η
- * Q (W) = Debi (m³/h) × 0.34 × ΔT × Verimlilik
- * 0.34 = ρ × Cp / 3600 = 1.2 × 1005 / 3600
+ * Calculates the energy recovery potential and financial payback for Heat/Energy Recovery Ventilation (HRV/ERV) systems.
+ * Evaluates required fresh air based on building type/occupancy (ASHRAE 62.1) and estimates heating/cooling energy savings based on climate zones.
+ *
+ * @param input - The environmental, building, and device performance parameters used to evaluate the recovery system
+ * @returns A detailed analysis of required airflow, thermal recovery rates, total efficiency, annual savings (energy/cost), and payback period
+ *
+ * @example
+ * calculateHRV({ recoveryType: 'erv', buildingType: 'office', climateZone: 'temperate', area: 500, occupancy: 50, sensibleEfficiency: 80, latentEfficiency: 60, operatingHoursPerDay: 10, electricityCostPerKWh: 2.5 })
+ * // returns { requiredAirflow: 1800, heatingRecovery: 10771, coolingRecovery: 6365, annualEnergySaving: 8050, annualCostSaving: 20125, paybackPeriod: 1.1, ... }
  */
 export function calculateHRV(input: HRVInput): HRVResult {
     const {

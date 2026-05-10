@@ -25,9 +25,16 @@ export interface SeriesGroup {
 }
 
 /**
- * ADVANCED SCALE VIEWMODEL HOOK
- * 
- * THE ONLY SOURCE OF TRUTH FOR UI REPRESENTATION
+ * Transforms raw category and product data into optimized presentation models tailored for the UI layer.
+ * Resolves internationalization (i18n) keys, computes marketing titles, determines display modes,
+ * and handles the grouping of related products into distinctive product series.
+ *
+ * @returns An object containing the `wrapCategory` utility and the `groupProductsBySeries` function
+ *
+ * @example
+ * const { wrapCategory, groupProductsBySeries } = useCategoryViewModel();
+ * const viewModel = wrapCategory(rawCategory);
+ * const productSeries = groupProductsBySeries(rawProducts);
  */
 export function useCategoryViewModel() {
   const { t } = useI18n()
