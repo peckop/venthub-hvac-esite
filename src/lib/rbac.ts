@@ -40,7 +40,17 @@ const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
 
 
 /**
- * Verilen rol, belirtilen sayfaya erisebilir mi?
+ * Evaluates whether a specific role has permission to access a given application path.
+ *
+ * Verifies against the predefined role-to-page access matrix, automatically handling exact matches
+ * or wildcard prefix matches. Ensures 'super_admin' remains the only role with users-page access.
+ *
+ * @param role - The current user's role identifier, or null/undefined
+ * @param path - The application URL path being requested
+ * @returns True if the role permits accessing the page, false otherwise
+ *
+ * @example
+ * if (!canAccessPage('warehouse', '/admin/orders')) { redirect('/unauthorized'); }
  */
 export function canAccessPage(role: UserRole | null | undefined, path: string): boolean {
     if (!role) return false;
@@ -60,7 +70,16 @@ export function canAccessPage(role: UserRole | null | undefined, path: string): 
 }
 
 /**
- * Verilen rol, belirtilen entity'de yazma/düzenleme işlemi yapabilir mi?
+ * Evaluates whether a specific role has permission to perform write or edit actions on an entity.
+ *
+ * Checks against the write-access matrix. Explicitly prevents 'admin' roles from modifying user configurations.
+ *
+ * @param role - The current user's role identifier, or null/undefined
+ * @param entity - The target database or domain entity string identifier (e.g., 'orders', 'products')
+ * @returns True if the role permits writing to the entity, false otherwise
+ *
+ * @example
+ * const isEditable = canWrite(user.role, 'products');
  */
 export function canWrite(role: UserRole | null | undefined, entity: string): boolean {
     if (!role) return false;
@@ -77,7 +96,16 @@ export function canWrite(role: UserRole | null | undefined, entity: string): boo
 }
 
 /**
- * Kullanıcı salt-okunur mu?
+ * Determines if a user's role falls under strictly read-only capabilities.
+ *
+ * Read-only roles are inherently blocked from making destructive or state-changing actions.
+ * Missing or null roles default to being completely read-only.
+ *
+ * @param role - The current user's role identifier, or null/undefined
+ * @returns True if the role is 'viewer' or 'user', or if no role is provided
+ *
+ * @example
+ * const hideSaveButton = isReadOnly(currentUser.role);
  */
 export function isReadOnly(role: UserRole | null | undefined): boolean {
     if (!role) return true;

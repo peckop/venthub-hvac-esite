@@ -63,7 +63,17 @@ function resolveDbFields(uiStatus: string): { status: string; payment_status?: s
 }
 
 /**
- * Merkezi sipariş statüsü güncelleme fonksiyonu.
+ * Updates the central order status and optionally syncs it with the returns table.
+ *
+ * Maps UI-provided statuses to database constraints, updates the primary `venthub_orders` record,
+ * syncs with `venthub_returns` for cancellation or refund flows, restores product stock if needed,
+ * and writes to the admin audit log.
+ *
+ * @param input - The payload containing the order ID, target status, and context flags
+ * @returns An object indicating success or failure with an optional error message
+ *
+ * @example
+ * const result = await updateOrderStatus({ orderId: 'ord-123', newStatus: 'refunded', reason: 'Customer requested' });
  */
 export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<UpdateOrderStatusResult> {
     const {
@@ -127,8 +137,17 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
 }
 
 /**
- * Returns tablosundan statü değiştiğinde Orders tablosunu da günceller.
- * (İki yönlü senkronizasyon — Returns→Orders tarafı)
+ * Synchronizes the primary order record based on a status change in the returns table.
+ *
+ * This provides two-way synchronization from `venthub_returns` back to `venthub_orders`,
+ * mapping return-specific statuses to their corresponding main order and payment states.
+ *
+ * @param orderId - The unique identifier of the order to synchronize
+ * @param returnStatus - The newly applied status in the returns table
+ * @returns An object indicating success or failure with an optional error message
+ *
+ * @example
+ * const res = await syncOrderFromReturn('ord-123', 'received');
  */
 export async function syncOrderFromReturn(orderId: string, returnStatus: string): Promise<UpdateOrderStatusResult> {
     // Returns statülerini Orders statülerine map'le (DB kısıtlamalarına uygun)

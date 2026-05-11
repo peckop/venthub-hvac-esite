@@ -2,11 +2,17 @@ import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 
 /**
- * Async veri yüklenen sayfalarda "Geri" (POP) navigasyonu sonrası scroll pozisyonunu geri yükler.
- * Tarayıcı native restorasyonunun yetersiz kaldığı (skeleton loading vb.) durumlarda gereklidir.
+ * Manually restores the scroll position upon "Back" (POP) navigation in pages with async data loading.
  * 
+ * Required when the browser's native scroll restoration falls short, such as during skeleton loading.
+ * It hijacks the native history scroll restoration and relies on tracking scroll positions in sessionStorage.
  *
- * @param loading Verinin yüklenme durumu. True ise restorasyon beklemede kalır.
+ * @param loading - The data loading state; if true, scroll restoration is paused
+ * @returns void
+ *
+ * @example
+ * const { loading } = useData();
+ * useManualScrollRestoration(loading);
  */
 export const useManualScrollRestoration = (loading: boolean) => {
     const pathname = usePathname()
