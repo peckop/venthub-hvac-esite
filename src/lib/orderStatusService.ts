@@ -63,7 +63,29 @@ function resolveDbFields(uiStatus: string): { status: string; payment_status?: s
 }
 
 /**
- * Merkezi sipariş statüsü güncelleme fonksiyonu.
+ * Centralized service function for updating an order's status and handling related side effects.
+ * It maps the requested UI status to valid database constraints, optionally syncs with the returns table,
+ * restores inventory stock if cancelled/refunded, and records the action in the audit log.
+ *
+ * @param input - Configuration object for the status update
+ * @param input.orderId - The UUID of the order to update
+ * @param input.newStatus - The target status from the UI (e.g., 'shipped', 'refunded')
+ * @param input.oldStatus - The order's current status before the update (used for stock logic)
+ * @param input.userId - The ID of the user performing or owning the action (for return tracking)
+ * @param input.reason - Optional text reason if the status triggers a return or cancellation
+ * @param input.auditComment - Custom comment for the admin audit log
+ * @param input.skipReturnsSync - If true, bypasses creating or updating the returns record
+ * @param input.skipOrdersSync - If true, bypasses updating the main orders table (useful for isolated syncs)
+ * @returns A promise resolving to an object indicating success (`ok: true`) or failure with an error message
+ *
+ * @example
+ * const result = await updateOrderStatus({
+ *   orderId: '123-abc',
+ *   newStatus: 'refunded',
+ *   oldStatus: 'processing',
+ *   reason: 'Customer requested cancellation'
+ * });
+ * if (!result.ok) console.error(result.error);
  */
 export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<UpdateOrderStatusResult> {
     const {
@@ -127,8 +149,17 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
 }
 
 /**
- * Returns tablosundan statü değiştiğinde Orders tablosunu da günceller.
- * (İki yönlü senkronizasyon — Returns→Orders tarafı)
+ * Synchronizes the main orders table when a change originates from the returns workflow.
+ * Maps return-specific statuses (e.g., 'approved', 'received') to valid order statuses and payment statuses,
+ * updating the orders table and generating an audit log entry.
+ *
+ * @param orderId - The UUID of the order associated with the return
+ * @param returnStatus - The new status of the return record (e.g., 'refunded', 'rejected')
+ * @returns A promise resolving to a success boolean and an optional error message
+ *
+ * @example
+ * const syncResult = await syncOrderFromReturn('123-abc', 'received');
+ * // The order status becomes 'cancelled' and payment_status becomes 'refunded'
  */
 export async function syncOrderFromReturn(orderId: string, returnStatus: string): Promise<UpdateOrderStatusResult> {
     // Returns statülerini Orders statülerine map'le (DB kısıtlamalarına uygun)
