@@ -14,3 +14,8 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+
+## 2026-05-13 - Do not trust static analysis blindly
+**Dead Code:** Removed `Constants` export from `src/types/database.types.ts`.
+**Root Cause:** The export was completely unused and flagged by static analysis, but other flagged exports like `SPEC_SORT_ORDER` were actually in use but falsely flagged.
+**Resolution:** Manually verified all static analysis reports with `grep` before removal. Removed only the truly dead `Constants` export.
