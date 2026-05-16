@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2025-02-28 - Supabase Default Table Response Errors
+**Learning:** Supabase's `select()` queries that target non-existent tables or views (such as `user_invoice_profiles` if unmigrated) return distinct error codes like `PGRST205`. These must be carefully intercepted and ignored in getter functions to avoid breaking the frontend during incomplete deployments.
+**Action:** Always inspect the actual logic and current error handling within a Supabase query builder before writing `@throws` documentation, as many functions handle specific errors silently instead of bubbling them up.

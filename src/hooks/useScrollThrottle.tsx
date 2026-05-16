@@ -1,13 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 
-/**
- * Scroll event'lerini throttle ederek optimize eden hook.
- * Histerezis (showAt/hideBelow) ve ilk gösterim için kısa gecikme destekler.
- * 
- * Kullanım:
- * - useScrollThrottle(100, 16) → eski uyumlu; showAt=100, hideBelow=60
- * - useScrollThrottle({ showAt: 120, hideBelow: 80, throttleMs: 16, initialDelayMs: 180 })
- */
 export type ScrollThrottleOptions = {
   showAt?: number
   hideBelow?: number
@@ -16,6 +8,18 @@ export type ScrollThrottleOptions = {
   syncKey?: unknown
 }
 
+/**
+ * Throttles scroll events and provides a boolean state indicating if the scroll position is past a threshold.
+ * Includes hysteresis logic to prevent flickering when scrolling near the threshold.
+ *
+ * @param thresholdOrOptions - The scroll threshold in pixels or an options object configuring hysteresis and delays.
+ * @param throttleMsParam - Legacy parameter for throttle delay (if the first parameter is a number).
+ * @returns A boolean state `isScrolled` which is true when scrolled past the defined threshold.
+ *
+ * @example
+ * const isScrolled = useScrollThrottle(100, 16)
+ * const isScrolledAdvanced = useScrollThrottle({ showAt: 120, hideBelow: 80, throttleMs: 16 })
+ */
 export const useScrollThrottle = (
   thresholdOrOptions: number | ScrollThrottleOptions = 100,
   throttleMsParam: number = 16

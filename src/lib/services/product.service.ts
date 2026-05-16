@@ -3,6 +3,17 @@ import type { DbProduct, DbAdminSearchResult } from '../../types/db-rows'
 import type { Product, SearchSuggestion, FtsProductResult, GetProductsParams } from '../supabase'
 import { toUIProductList, mapDatabaseProductToDomain } from '../type-converters'
 
+/**
+ * Fetches products matching given filter parameters using a Supabase RPC call.
+ * Automatically resolves category slugs to their respective database IDs before querying.
+ *
+ * @param params - Configuration object including optional filters like category IDs, search query, brand, price limits, pagination limit, and offset.
+ * @returns A promise resolving to an array of enriched product objects (including resolved stock and pricing data).
+ * @throws {Error} If the database RPC call fails.
+ *
+ * @example
+ * const products = await getProductsEnriched({ categoryIds: ['hvac'], limit: 10 })
+ */
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
   let resolvedCategoryIds = params.categoryIds;
 

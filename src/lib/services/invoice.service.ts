@@ -1,6 +1,16 @@
 import { supabase } from '../supabase'
 import type { DbInvoiceProfile, DbInvoiceProfileInsert, DbInvoiceProfileUpdate } from '../../types/db-rows'
 
+/**
+ * Retrieves a list of all invoice profiles for the authenticated user.
+ * Profiles are ordered by default status first, then by creation date.
+ *
+ * @returns A promise resolving to an array of invoice profiles, or an empty array if none exist.
+ * @throws {Error} If the database query fails.
+ *
+ * @example
+ * const profiles = await listInvoiceProfiles()
+ */
 export async function listInvoiceProfiles(): Promise<DbInvoiceProfile[]> {
   const { data, error } = await supabase
     .from('user_invoice_profiles')
@@ -19,6 +29,16 @@ export async function listInvoiceProfiles(): Promise<DbInvoiceProfile[]> {
   return (data as DbInvoiceProfile[]) || []
 }
 
+/**
+ * Creates a new invoice profile for the currently authenticated user.
+ *
+ * @param payload - The invoice profile data to insert.
+ * @returns A promise resolving to the newly created invoice profile.
+ * @throws {Error} If the user is not authenticated or the insertion fails.
+ *
+ * @example
+ * const newProfile = await createInvoiceProfile({ title: 'Company Profile', tax_id: '123' })
+ */
 export async function createInvoiceProfile(payload: DbInvoiceProfileInsert): Promise<DbInvoiceProfile> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
@@ -40,6 +60,17 @@ export async function createInvoiceProfile(payload: DbInvoiceProfileInsert): Pro
   return data as DbInvoiceProfile
 }
 
+/**
+ * Updates an existing invoice profile with the provided data.
+ *
+ * @param id - The unique identifier of the invoice profile to update.
+ * @param payload - Partial data to update on the profile.
+ * @returns A promise resolving to the updated invoice profile.
+ * @throws {Error} If the update operation fails.
+ *
+ * @example
+ * const updated = await updateInvoiceProfile('profile-uuid', { title: 'Updated Title' })
+ */
 export async function updateInvoiceProfile(id: string, payload: DbInvoiceProfileUpdate): Promise<DbInvoiceProfile> {
   const { data, error } = await supabase
     .from('user_invoice_profiles')
@@ -52,6 +83,16 @@ export async function updateInvoiceProfile(id: string, payload: DbInvoiceProfile
   return data as DbInvoiceProfile
 }
 
+/**
+ * Deletes an invoice profile by its identifier.
+ *
+ * @param id - The unique identifier of the invoice profile to delete.
+ * @returns A promise resolving to true upon successful deletion.
+ * @throws {Error} If the deletion operation fails.
+ *
+ * @example
+ * await deleteInvoiceProfile('profile-uuid')
+ */
 export async function deleteInvoiceProfile(id: string): Promise<boolean> {
   const { error } = await supabase
     .from('user_invoice_profiles')
