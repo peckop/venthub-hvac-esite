@@ -14,3 +14,7 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+## 2026-05-16 - Component Purge Sweep
+**Dead Code:** 4 orphaned components in `src/components/` (`TiltCard.tsx`, `UndecidedUserCTA.tsx`, `VisualShowcase.tsx`, `WhyVentHubEnhanced.tsx`) and `TrustSection.tsx`.
+**Root Cause:** Components developed for previous UI iterations or feature explorations that were never integrated or subsequently removed from layouts, remaining in the codebase without any usages.
+**Resolution:** Verified entirely unused state via `ts-prune` and `grep` full text search. Deleted files safely.
