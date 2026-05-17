@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2023-10-27 - [Product Service RPC Dependency Insight]
+**Learning:** Functions like `getProductsEnriched`, `getSearchSuggestions`, and `ftsSearchProducts` within `src/lib/services/product.service.ts` rely heavily on complex PostgreSQL RPC calls (e.g., `get_products_enriched`, `fts_search_products`) rather than standard ORM-style queries, meaning their error throwing behavior differs.
+**Action:** When documenting Supabase service layers, explicitly note the use of RPCs in the TSDoc and clarify error boundaries (e.g., some functions swallow errors and provide fallbacks rather than throwing).
