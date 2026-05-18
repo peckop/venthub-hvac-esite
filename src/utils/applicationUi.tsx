@@ -25,6 +25,16 @@ const Svg = {
   )
 }
 
+/**
+ * Resolves and renders the corresponding SVG icon for a given application type.
+ *
+ * @param icon - The application icon identifier (e.g., 'building', 'wind', 'layers', 'factory')
+ * @param size - The width and height in pixels for the rendered SVG icon, defaults to 18
+ * @returns The SVG React element for the requested icon, or null if the icon is not recognized
+ *
+ * @example
+ * iconFor('factory', 24) // renders the factory SVG scaled to 24x24 pixels
+ */
 export function iconFor(icon: ApplicationIcon, size = 18) {
   switch (icon) {
     case 'building':
@@ -40,6 +50,17 @@ export function iconFor(icon: ApplicationIcon, size = 18) {
   }
 }
 
+/**
+ * Returns the corresponding Tailwind CSS class for an application accent color overlay.
+ *
+ * Provides a semi-transparent background gradient step based on the application's assigned theme color.
+ *
+ * @param accent - The accent color string (e.g., 'blue', 'navy', 'emerald', 'gray')
+ * @returns The Tailwind utility class string for the gradient color overlay
+ *
+ * @example
+ * accentOverlayClass('emerald') // returns 'from-emerald-500/10'
+ */
 export function accentOverlayClass(accent: ApplicationAccent) {
   switch (accent) {
     case 'blue':

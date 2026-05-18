@@ -12,6 +12,18 @@ import {
 
 type IconProps = { className?: string; size?: number }
 
+/**
+ * Returns the corresponding React component icon for a given HVAC category slug.
+ *
+ * Falls back to the generic FanIcon if the category slug is unknown.
+ *
+ * @param categorySlug - The unique string identifier for the product category (e.g., 'fans', 'air-curtains')
+ * @param props - Optional properties like className and size to apply to the rendered SVG icon
+ * @returns A React functional component rendering the corresponding SVG icon
+ *
+ * @example
+ * getCategoryIcon('air-curtains', { size: 24, className: 'text-blue-500' }) // returns <AirCurtainIcon size={24} className="text-blue-500" />
+ */
 export const getCategoryIcon = (categorySlug: string, props: IconProps = {}) => {
   switch (categorySlug) {
     case 'fans':
