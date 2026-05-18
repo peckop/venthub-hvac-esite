@@ -14,3 +14,11 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+## 2026-05-18 - Safe deletion of unused components
+**Dead Code:** Removed `CategoryAuthoritySection.tsx`, `SeriesCard.tsx`, `Skeleton.tsx`, and `InvoiceProfileModal.tsx`.
+**Root Cause:** These components were fully unused and orphaned; verified with  and codebase searches.
+**Resolution:** Explicitly skipped dynamically imported `@react-three/fiber` 3D components as they cause Next.js SSR crashes when imported statically, successfully deleting only the truly dead code.
+## 2026-05-18 - Safe deletion of unused components
+**Dead Code:** Removed CategoryAuthoritySection.tsx, SeriesCard.tsx, Skeleton.tsx, and InvoiceProfileModal.tsx.
+**Root Cause:** These components were fully unused and orphaned; verified with ts-prune and codebase searches.
+**Resolution:** Explicitly skipped dynamically imported @react-three/fiber 3D components as they cause Next.js SSR crashes when imported statically, successfully deleting only the truly dead code.
