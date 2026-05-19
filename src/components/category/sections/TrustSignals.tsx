@@ -1,4 +1,5 @@
 import React from 'react'
+import { useI18n } from '@/i18n/I18nProvider'
 import { Shield, Award, Lock, Truck, CreditCard, Phone } from 'lucide-react'
 
 /**
@@ -6,36 +7,37 @@ import { Shield, Award, Lock, Truck, CreditCard, Phone } from 'lucide-react'
  * Yeni site için Vortice itibarını ön plana çıkarır
  */
 const TrustSignals: React.FC = () => {
+    const { t } = useI18n()
     const signals = [
         {
             icon: Award,
-            title: 'Yetkili Bayi',
-            description: 'Vortice Türkiye yetkili satıcısı'
+            title: t('category.trustSignals.authorizedDealer'),
+            description: t('category.trustSignals.authorizedDealerDesc')
         },
         {
             icon: Shield,
-            title: '2 Yıl Garanti',
-            description: 'Üretici garantisi'
+            title: t('category.trustSignals.warranty'),
+            description: t('category.trustSignals.warrantyDesc')
         },
         {
             icon: Lock,
-            title: 'Güvenli Ödeme',
-            description: 'SSL şifreli işlem'
+            title: t('category.trustSignals.securePayment'),
+            description: t('category.trustSignals.securePaymentDesc')
         },
         {
             icon: Truck,
-            title: 'Hızlı Kargo',
-            description: 'Stoktan teslimat'
+            title: t('category.trustSignals.fastShipping'),
+            description: t('category.trustSignals.fastShippingDesc')
         },
         {
             icon: CreditCard,
-            title: 'Taksit İmkanı',
-            description: '12 aya varan taksit'
+            title: t('category.trustSignals.installments'),
+            description: t('category.trustSignals.installmentsDesc')
         },
         {
             icon: Phone,
-            title: 'Teknik Destek',
-            description: 'Uzman danışmanlık'
+            title: t('category.trustSignals.techSupport'),
+            description: t('category.trustSignals.techSupportDesc')
         }
     ]
 
@@ -63,18 +65,18 @@ const TrustSignals: React.FC = () => {
                 {/* Certifications */}
                 <div className="mt-8 pt-8 border-t border-gray-200 flex flex-wrap items-center justify-center gap-6 opacity-60">
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-gray-500">CE</span>
-                        <span className="text-xs text-gray-400">Sertifikalı</span>
+                        <span className="text-xs font-bold text-gray-500">{t('category.trustSignals.ce')}</span>
+                        <span className="text-xs text-gray-400">{t('category.trustSignals.ceDesc')}</span>
                     </div>
                     <div className="w-px h-4 bg-gray-300" />
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-gray-500">ISO 9001</span>
-                        <span className="text-xs text-gray-400">Kalite</span>
+                        <span className="text-xs font-bold text-gray-500">{t('category.trustSignals.iso')}</span>
+                        <span className="text-xs text-gray-400">{t('category.trustSignals.isoDesc')}</span>
                     </div>
                     <div className="w-px h-4 bg-gray-300" />
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-gray-500">Compasso d'Oro</span>
-                        <span className="text-xs text-gray-400">Tasarım Ödülü</span>
+                        <span className="text-xs font-bold text-gray-500">{t('category.trustSignals.compasso')}</span>
+                        <span className="text-xs text-gray-400">{t('category.trustSignals.compassoDesc')}</span>
                     </div>
                 </div>
             </div>

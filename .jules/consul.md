@@ -11,3 +11,6 @@
 ## 2026-05-18 - Replacing Fallback Strings with Regex
 **Learning:** Using regex (e.g. `sed -E "s/ || '[^']*'//g"`) to remove `t('key') || 'Fallback'` patterns across components is dangerous. It strips necessary JavaScript logic defaults (like `|| ''` or `|| 'TR'`) from non-translation code, causing uncontrolled input errors and breaking application logic.
 **Action:** Use specific, targeted replacements or tools like `jscodeshift` when updating translation keys, and never run arbitrary `|| '...'` removal regex commands against the codebase. Always manually verify form state and hook dependencies after localization sweeps.
+## 2025-02-21 - Array Structures in Dictionary
+**Learning:** Returning array configurations directly from `tr.ts` causes TypeScript issues because the dictionary system does not natively type-cast generic arrays. This led to 'Type Converters' enterprise rule failures when trying to use `as unknown as Record<string, string>`.
+**Action:** When adding configurations containing arrays to `tr.ts`, structure them as string-indexed objects (e.g. `withoutList: { '0': 'Item 1', '1': 'Item 2' }`). In the component, retrieve them as individual strings directly (e.g. `t('category.problemSection.withoutList.0')`) or map over a static array of keys to prevent TypeScript type errors.

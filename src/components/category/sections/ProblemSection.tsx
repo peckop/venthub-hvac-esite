@@ -1,4 +1,5 @@
 import React from 'react'
+import { useI18n } from '@/i18n/I18nProvider'
 import { DollarSign, Wind, Bug, Thermometer } from 'lucide-react'
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
@@ -7,37 +8,38 @@ import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useSc
  * Kullanıcıya hava perdesi ihtiyacını hissettiren empati bölümü
  */
 const ProblemSection: React.FC = () => {
+    const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const problems = [
         {
             icon: DollarSign,
-            title: 'Enerji Kaybı',
+            title: t('category.problemSection.energyLoss'),
             stat: '%30',
-            description: 'Açık kapıdan kaçan ısının yıllık ortalama maliyeti',
+            description: t('category.problemSection.energyLossDesc'),
             color: 'text-red-500',
             bgColor: 'bg-red-50'
         },
         {
             icon: Thermometer,
-            title: 'Sıcaklık Farkı',
+            title: t('category.problemSection.tempDiff'),
             stat: '15°C',
-            description: 'Kapı açıldığında iç-dış ortam sıcaklık farkı',
+            description: t('category.problemSection.tempDiffDesc'),
             color: 'text-orange-500',
             bgColor: 'bg-orange-50'
         },
         {
             icon: Wind,
-            title: 'Hava Akışı',
+            title: t('category.problemSection.airflow'),
             stat: '2.5 m/s',
-            description: 'Kontrolsüz rüzgar ve toz girişi',
+            description: t('category.problemSection.airflowDesc'),
             color: 'text-blue-500',
             bgColor: 'bg-blue-50'
         },
         {
             icon: Bug,
-            title: 'Zararlı Girişi',
+            title: t('category.problemSection.pestEntry'),
             stat: '7/24',
-            description: 'Böcek ve toz partiküllerinin serbest geçişi',
+            description: t('category.problemSection.pestEntryDesc'),
             color: 'text-green-500',
             bgColor: 'bg-green-50'
         }
@@ -49,10 +51,10 @@ const ProblemSection: React.FC = () => {
                 {/* Section Header */}
                 <div className={`text-center mb-12 ${scrollAnimationClasses.fadeUp(isVisible)}`}>
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Kapınızdan Ne Kadar Enerji Kaçıyor?
+                        {t('category.problemSection.title')}
                     </h2>
                     <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-                        Açık kapı = Açık cüzdan. Her gün farkında olmadan enerji ve para kaybediyorsunuz.
+                        {t('category.problemSection.subtitle')}
                     </p>
                 </div>
 
@@ -97,12 +99,16 @@ const ProblemSection: React.FC = () => {
                             <div className="w-20 h-20 bg-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-300">
                                 <span className="text-4xl">❌</span>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Hava Perdesi Olmadan</h3>
+                            <h3 className="text-xl font-bold text-white mb-2">{t('category.problemSection.withoutAirCurtain')}</h3>
                             <ul className="text-red-100 text-sm space-y-1">
-                                <li>• Isı kaybı sürekli</li>
-                                <li>• Enerji faturası yüksek</li>
-                                <li>• Konfor düşük</li>
-                                <li>• Zararlı girişi kolay</li>
+                                {[
+                                    t('category.problemSection.withoutList.0'),
+                                    t('category.problemSection.withoutList.1'),
+                                    t('category.problemSection.withoutList.2'),
+                                    t('category.problemSection.withoutList.3')
+                                ].map((item: string, i: number) => (
+                                    <li key={i}>• {item}</li>
+                                ))}
                             </ul>
                         </div>
 
@@ -111,12 +117,16 @@ const ProblemSection: React.FC = () => {
                             <div className="w-20 h-20 bg-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-blue-300">
                                 <span className="text-4xl">✓</span>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Hava Perdesi İle</h3>
+                            <h3 className="text-xl font-bold text-white mb-2">{t('category.problemSection.withAirCurtain')}</h3>
                             <ul className="text-blue-100 text-sm space-y-1">
-                                <li>• Görünmez enerji bariyeri</li>
-                                <li>• %30'a varan tasarruf</li>
-                                <li>• Konforlu iç ortam</li>
-                                <li>• Zararlılara karşı kalkan</li>
+                                {[
+                                    t('category.problemSection.withList.0'),
+                                    t('category.problemSection.withList.1'),
+                                    t('category.problemSection.withList.2'),
+                                    t('category.problemSection.withList.3')
+                                ].map((item: string, i: number) => (
+                                    <li key={i}>• {item}</li>
+                                ))}
                             </ul>
                         </div>
                     </div>
