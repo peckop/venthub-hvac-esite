@@ -4,7 +4,17 @@ import { getCategoryDisplayName } from './categoryHelpers'
 import { DomainCategory } from '../lib/type-converters'
 
 /**
- * Helper: Kategori sayfaları için breadcrumb items oluştur
+ * Constructs an array of breadcrumb items specifically formatted for category pages.
+ * Handles the inclusion of a parent category, the current category (without a link, as it's the active page),
+ * and an optional custom home label.
+ *
+ * @param category - The current active domain category
+ * @param parentCategory - The parent domain category, if applicable
+ * @param homeLabel - The localized label for the root navigation item (defaults to 'Ana Sayfa')
+ * @returns An array of `BreadcrumbItem` objects suitable for the `<Breadcrumb />` component
+ *
+ * @example
+ * buildCategoryBreadcrumb(currentCat, parentCat, 'Home') // returns [{ label: 'Home', href: '/' }, { label: 'Parent', href: '/kategori/parent' }, { label: 'Current' }]
  */
 export function buildCategoryBreadcrumb(
     category: DomainCategory | null | undefined,

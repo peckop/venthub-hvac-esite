@@ -15,7 +15,14 @@ export interface EngineeringInference {
 }
 
 /**
- * Ses basınç seviyesini insan algısına göre yorumlar.
+ * Interprets a decibel noise level into a human-readable engineering inference category.
+ * Categorizes noise into ultra quiet (< 30dB), office comfort (< 45dB), standard (< 60dB), or industrial.
+ *
+ * @param db - The sound pressure level in decibels (dB)
+ * @returns An `EngineeringInference` object containing localization keys and values, or null if invalid
+ *
+ * @example
+ * getNoiseInference(40) // returns { type: 'noise', labelKey: 'pdp.engineering.noise.officeComfort.label', ... }
  */
 export const getNoiseInference = (db: number): EngineeringInference | null => {
   if (!db || db <= 0) return null;
@@ -55,7 +62,14 @@ export const getNoiseInference = (db: number): EngineeringInference | null => {
 };
 
 /**
- * Enerji verimliliğini yorumlar (HRV Isı Geri Kazanımı için).
+ * Evaluates an energy efficiency percentage and assigns it a premium tier badge.
+ * Tiers are diamond (>= 92%), platinum (>= 88%), and gold (>= 80%).
+ *
+ * @param efficiency - The efficiency percentage number
+ * @returns An `EngineeringInference` object with the corresponding tier badge, or null if below 80% or invalid
+ *
+ * @example
+ * getEfficiencyInference(90) // returns { type: 'efficiency', labelKey: 'pdp.engineering.efficiency.platinum.label', ... }
  */
 export const getEfficiencyInference = (efficiency?: number): EngineeringInference | null => {
   if (!efficiency || efficiency <= 0) return null;
@@ -89,7 +103,14 @@ export const getEfficiencyInference = (efficiency?: number): EngineeringInferenc
 };
 
 /**
- * Motor tipine göre teknoloji analizi yapar.
+ * Analyzes a motor type string to determine its underlying technology quality inference.
+ * Matches substrings for 'EC' (Electronically Commutated) and 'AC' (Alternating Current) motors.
+ *
+ * @param motorType - The raw motor type string from technical specifications
+ * @returns An `EngineeringInference` object categorizing the motor quality, or null if unmatched
+ *
+ * @example
+ * getMotorInference('EC Motor') // returns { type: 'quality', value: 'EC', ... }
  */
 export const getMotorInference = (motorType?: string): EngineeringInference | null => {
   if (!motorType) return null;
@@ -116,7 +137,14 @@ export const getMotorInference = (motorType?: string): EngineeringInference | nu
 };
 
 /**
- * Ürün için tam bir mühendislik özeti üretir.
+ * Orchestrates a complete engineering summary by extracting and analyzing technical specifications from a product.
+ * Evaluates noise levels, efficiency, motor technology, and airflow capacity to generate an array of structured insights.
+ *
+ * @param product - The database product record containing technical specifications
+ * @returns An array of actionable `EngineeringInference` objects detailing the product's engineering merits
+ *
+ * @example
+ * generateEngineeringSummary(product) // returns [{ type: 'noise', ... }, { type: 'power', ... }]
  */
 export const generateEngineeringSummary = (product: Product): EngineeringInference[] => {
   const inferences: EngineeringInference[] = [];

@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2025-02-23 - [Scroll Restoration Patterns in Next.js 15]
+**Learning:** Next.js native `scrollRestoration` conflicts heavily with asynchronous data loading (like skeletons) during POP navigations. VentHub handles this via `useManualScrollRestoration.ts`, which seizes browser control (`window.history.scrollRestoration = 'manual'`) and implements a precise polling mechanism using `sessionStorage` and delayed DOM height checks.
+**Action:** When documenting advanced UI/lifecycle hooks, ensure the `@param` and top-level descriptions clearly articulate the 'Why' (bypassing native browser behavior) alongside the 'What' to prevent future developers from unknowingly refactoring away critical manual overrides.
