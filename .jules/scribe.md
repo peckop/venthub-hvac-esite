@@ -18,3 +18,7 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+
+## 2025-05-20 - Batch Documentation of Services
+**Learning:** Supabase service functions typically return `Data | null` or default to `[]` when casting arrays. Documenting the explicit `@throws {PostgrestError}` helps developers remember to catch database errors explicitly, as many RPC and basic `.from` queries throw if the payload fails or table is missing.
+**Action:** Always include `@throws {PostgrestError}` or `@throws {Error}` when documenting direct Supabase queries, and highlight whether the fallback is `null` or an empty array `[]`.

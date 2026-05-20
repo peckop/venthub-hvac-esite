@@ -50,4 +50,16 @@ export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => 
  * List converters for bulk data.
  */
 export const toUICategoryList = (cats: DbCategory[]): DomainCategory[] => cats.map(mapDatabaseCategoryToDomain)
+
+/**
+ * Safely converts an array of Database Product rows to UI-ready Product models.
+ * Maps over the provided array and applies `mapDatabaseProductToDomain` to each item.
+ *
+ * @param prods - The array of raw database product rows
+ * @returns An array of domain product objects ready for UI consumption
+ *
+ * @example
+ * const dbProducts = await getProductsFromDb()
+ * const uiProducts = toUIProductList(dbProducts)
+ */
 export const toUIProductList = (prods: DbProduct[]): DomainProduct[] => prods.map(mapDatabaseProductToDomain)
