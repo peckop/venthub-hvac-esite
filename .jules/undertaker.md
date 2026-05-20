@@ -14,3 +14,7 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+## 2026-05-20 - Dead Code Batch Removal (AdminStockPage, Constants, SPEC_SORT_ORDER, react-error-boundary)
+**Dead Code:** Removed `src/views/account/AdminStockPage.tsx`, unused `Constants` export in `src/types/database.types.ts`, unused `react-error-boundary` dependency, unused duplicate `Silencer` export, and unused `checkAdminAccess` in `src/config/admin.ts`.
+**Root Cause:** Code was lingering from earlier implementations, refactoring, and static data arrays no longer referenced by active Next.js App Router views or the live DB schema type logic.
+**Resolution:** Explicitly deleted the unused TSX file, removed dead exports and functions, cleanly uninstalled the unused npm package, and verified builds pass and `tsc` strictly matches the updated application structure.
