@@ -1,19 +1,17 @@
-/**
- * ensureSessionFresh — Akıllı oturum yenileme yardımcısı
- *
- * Girdi: Yok (Supabase client'ı modül seviyesinde import eder)
- * İşlem: Token'ın expires_at değerini kontrol eder. Son 60 saniyeye
- *        girildiyse veya süresi zaten dolmuşsa refreshSession() çağırır.
- * Çıktı: void (hata varsa sessizce loglar, uygulamayı bloklayamaz)
- *
- * Kullanım: Veri çekmeden hemen önce çağrılır.
- *   await ensureSessionFresh()
- *   const { data } = await supabase.from('table').select()
- */
 import { supabase } from './supabase'
 
 const REFRESH_MARGIN_SEC = 60 // 60 saniye kala yenile
 
+/**
+ * Ensures the active Supabase authentication session remains valid by silently refreshing the token if it is close to expiration.
+ * It checks the `expires_at` timestamp and triggers a refresh if the token will expire within the next 60 seconds, preventing unexpected authentication failures during subsequent database queries.
+ *
+ * @returns A promise that resolves when the check (and potential refresh) completes; catches and logs errors internally to avoid crashing the caller
+ *
+ * @example
+ * await ensureSessionFresh();
+ * const { data } = await supabase.from('venthub_orders').select('*');
+ */
 export async function ensureSessionFresh(): Promise<void> {
     try {
         const { data: { session } } = await supabase.auth.getSession()

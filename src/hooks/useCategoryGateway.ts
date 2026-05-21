@@ -35,12 +35,18 @@ const DEFAULT_FILTERS: CategoryFilters = {
 }
 
 /**
- * PURE DATA GATEWAY HOOK
+ * Acts as the primary data and state manager for category and product listing pages.
+ * Handles fetching hierarchy data, synchronizing UI filters with URL search parameters, and providing structured category metadata.
  * 
- * Responsible ONLY for:
- * 1. Data retrieval from Supabase/Store
- * 2. URL State Synchronization
- * 3. Raw filtering and sorting of products
+ * @param initialCategory - An optional category object pre-fetched during Server-Side Rendering (SSR) to avoid client-side waterfalls
+ * @param initialProducts - An optional array of products pre-fetched during SSR to immediately populate the initial grid
+ * @param initialSubCategories - An optional array of child categories belonging to the active parent, pre-fetched for navigation
+ * @returns An object containing the active category, its parent and children, the product list, current loading state, applied filters, and an update function
+ *
+ * @example
+ * const { category, products, filters, updateFilters, loading } = useCategoryGateway(serverCategory, serverProducts, serverSubCategories);
+ * if (loading) return <Spinner />;
+ * return <ProductGrid items={products} onSort={(sortBy) => updateFilters({ sortBy })} />;
  */
 export function useCategoryGateway(initialCategory?: DomainCategory | null, initialProducts?: Product[], initialSubCategories?: DomainCategory[]) {
   const isMounted = useIsMounted()
