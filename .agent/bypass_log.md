@@ -392,3 +392,27 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-04-29 10:30:55
+- **Commit:** `1e268e96`
+- **Mesaj:** fix(a11y): contrast ratio and touch target improvements for 100/100 score
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-05-01 00:18:57
+- **Commit:** `de95abbe`
+- **Mesaj:** feat(3d): SSOT kategori-model eslestirmesi + UI temizlikleri
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-05-01 00:30:49
+- **Commit:** `19aa77c3`
+- **Mesaj:** fix(ci): TS tip hatasi + benchmark klasoru TSC exclusion
+- **Değişen Dosyalar:**
+
+
+## Bypass: 2026-05-01 08:59:45
+- **Commit:** `695adc37`
+- **Mesaj:** fix(3d): AccessoryModel scale düzelt + Category3DIcon 48 ışık → 0 optimizasyon
+- **Değişen Dosyalar:**
+
+

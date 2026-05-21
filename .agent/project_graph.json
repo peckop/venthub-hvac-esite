@@ -1,47 +1,44 @@
 {
+  "src/middleware.ts": [
+    "src/utils/routes.ts"
+  ],
   "src/actions/auth.ts": [
     "src/lib/supabase.ts"
   ],
-  "src/app/_components/ProductDetailPageView.tsx": [
-    "src/components/HVACIcons.tsx",
-    "src/components/ImageGallery.tsx",
-    "src/components/LeadModal.tsx",
-    "src/components/ProductCard.tsx",
-    "src/components/Seo.tsx",
-    "src/components/product/ProductSmartInference.tsx",
-    "src/components/products/RichTextRenderer.tsx",
-    "src/components/products/index.ts",
-    "src/contexts/CategoryContext.tsx",
-    "src/hooks/useCartHook.ts",
-    "src/hooks/useProjectLists.ts",
-    "src/i18n/I18nProvider.tsx",
-    "src/i18n/format.ts",
-    "src/lib/pdfGenerator.ts",
+  "src/app/layout.tsx": [
+    "src/components/layout/ClientLayout.tsx",
+    "src/config/siteUrl.ts"
+  ],
+  "src/app/page.tsx": [
+    "src/components/home/GuidedCategoryDiscovery.tsx",
+    "src/config/siteUrl.ts",
+    "src/i18n/dictionaries/en.ts",
+    "src/i18n/dictionaries/tr.ts",
     "src/lib/supabase.ts",
-    "src/types/db-rows.ts",
-    "src/utils/productHelpers.ts",
+    "src/lib/type-converters.ts",
+    "src/views/HomePage.tsx"
+  ],
+  "src/app/robots.ts": [
+    "src/config/siteUrl.ts"
+  ],
+  "src/app/sitemap.ts": [
+    "src/config/siteUrl.ts",
+    "src/lib/brands.ts",
+    "src/lib/supabase.ts",
     "src/utils/routes.ts"
   ],
   "src/app/about/page.tsx": [
     "src/views/AboutPage.tsx"
   ],
-  "src/app/account/addresses/page.tsx": [
-    "src/views/account/AccountAddressesPage.tsx"
-  ],
-  "src/app/account/invoices/page.tsx": [
-    "src/views/account/AccountInvoicesPage.tsx"
-  ],
   "src/app/account/layout.tsx": [
     "src/views/account/AccountLayout.tsx"
   ],
-  "src/app/account/orders/detail/page.tsx": [
-    "src/views/account/OrderDetailPage.tsx"
-  ],
-  "src/app/account/orders/page.tsx": [
-    "src/views/OrdersPage.tsx"
-  ],
   "src/app/account/page.tsx": [
     "src/views/account/AccountOverviewPage.tsx"
+  ],
+  "src/app/account/orders/detail/page.tsx": [
+    "src/i18n/dictionaries/tr.ts",
+    "src/views/account/OrderDetailPage.tsx"
   ],
   "src/app/account/profile/page.tsx": [
     "src/views/account/AccountProfilePage.tsx"
@@ -55,62 +52,20 @@
   "src/app/account/shipments/page.tsx": [
     "src/views/account/AccountShipmentsPage.tsx"
   ],
-  "src/app/admin/audit-logs/page.tsx": [
-    "src/views/admin/AdminAuditLogPage.tsx"
+  "src/app/admin/layout.tsx": [
+    "src/views/admin/AdminLayout.tsx"
   ],
   "src/app/admin/categories/[id]/builder/page.tsx": [
     "src/views/admin/CategoryBuilderView.tsx"
   ],
-  "src/app/admin/categories/page.tsx": [
-    "src/views/admin/AdminCategoriesPage.tsx"
-  ],
-  "src/app/admin/coupons/page.tsx": [
-    "src/views/admin/AdminCouponsPage.tsx"
-  ],
-  "src/app/admin/error-groups/page.tsx": [
-    "src/views/admin/AdminErrorGroupsPage.tsx"
-  ],
-  "src/app/admin/errors/page.tsx": [
-    "src/views/admin/AdminErrorsPage.tsx"
-  ],
-  "src/app/admin/inventory/page.tsx": [
-    "src/views/admin/AdminInventoryPage.tsx"
-  ],
-  "src/app/admin/inventory/report/page.tsx": [
-    "src/views/admin/AdminInventoryReportPage.tsx"
-  ],
   "src/app/admin/inventory/settings/page.tsx": [
     "src/views/admin/AdminInventorySettingsPage.tsx"
   ],
-  "src/app/admin/layout.tsx": [
-    "src/views/admin/AdminLayout.tsx"
-  ],
-  "src/app/admin/logistics/page.tsx": [
-    "src/views/admin/AdminLogisticsPage.tsx"
-  ],
-  "src/app/admin/movements/page.tsx": [
-    "src/views/admin/AdminMovementsPage.tsx"
-  ],
   "src/app/admin/orders/page.tsx": [
-    "src/views/admin/AdminOrdersPage.tsx"
-  ],
-  "src/app/admin/page.tsx": [
-    "src/views/admin/AdminDashboardPage.tsx"
-  ],
-  "src/app/admin/products/page.tsx": [
-    "src/views/admin/AdminProductsPage.tsx"
-  ],
-  "src/app/admin/returns/page.tsx": [
-    "src/views/admin/AdminReturnsPage.tsx"
+    "src/i18n/I18nProvider.tsx"
   ],
   "src/app/admin/settings/page.tsx": [
     "src/views/admin/AdminSettingsPage.tsx"
-  ],
-  "src/app/admin/users/page.tsx": [
-    "src/views/admin/AdminUsersPage.tsx"
-  ],
-  "src/app/admin/webhook-events/page.tsx": [
-    "src/views/admin/AdminWebhookEventsPage.tsx"
   ],
   "src/app/auth/callback/page.tsx": [
     "src/views/AuthCallbackPage.tsx"
@@ -124,25 +79,25 @@
   "src/app/auth/register/page.tsx": [
     "src/views/RegisterPage.tsx"
   ],
+  "src/app/brands/page.tsx": [
+    "src/views/BrandsPage.tsx"
+  ],
   "src/app/brands/[slug]/page.tsx": [
     "src/config/siteUrl.ts",
     "src/lib/brands.ts",
     "src/views/BrandDetailPage.tsx"
   ],
-  "src/app/brands/page.tsx": [
-    "src/views/BrandsPage.tsx"
-  ],
   "src/app/cart/page.tsx": [
     "src/views/CartPage.tsx"
   ],
-  "src/app/category/[categorySlug]/[subCategorySlug]/page.tsx": [
+  "src/app/category/[categorySlug]/page.tsx": [
+    "src/config/siteUrl.ts",
     "src/lib/supabase.ts",
     "src/lib/type-converters.ts",
     "src/types/db-rows.ts",
     "src/views/CategoryPage.tsx"
   ],
-  "src/app/category/[categorySlug]/page.tsx": [
-    "src/config/siteUrl.ts",
+  "src/app/category/[categorySlug]/[subCategorySlug]/page.tsx": [
     "src/lib/supabase.ts",
     "src/lib/type-converters.ts",
     "src/types/db-rows.ts",
@@ -185,11 +140,6 @@
   "src/app/destek/teslimat-kargo/page.tsx": [
     "src/views/support/ShippingPage.tsx"
   ],
-  "src/app/layout.tsx": [
-    "src/components/layout/ClientLayout.tsx",
-    "src/config/siteUrl.ts",
-    "src/index.css"
-  ],
   "src/app/legal/cerez-politikasi/page.tsx": [
     "src/views/legal/CookiePolicyPage.tsx"
   ],
@@ -208,35 +158,36 @@
   "src/app/legal/on-bilgilendirme-formu/page.tsx": [
     "src/views/legal/PreInformationPage.tsx"
   ],
-  "src/app/page.tsx": [
-    "src/components/home/GuidedCategoryDiscovery.tsx",
-    "src/config/siteUrl.ts",
-    "src/i18n/dictionaries/en.ts",
-    "src/i18n/dictionaries/tr.ts",
-    "src/lib/supabase.ts",
-    "src/lib/type-converters.ts",
-    "src/views/HomePage.tsx"
-  ],
   "src/app/payment-success/page.tsx": [
     "src/views/PaymentSuccessPage.tsx"
-  ],
-  "src/app/products/[slug]/page.tsx": [
-    "src/config/siteUrl.ts",
-    "src/lib/supabase.ts",
-    "src/views/ProductDetailPage.tsx"
   ],
   "src/app/products/page.tsx": [
     "src/lib/supabase.ts",
     "src/lib/type-converters.ts",
     "src/views/CategoryMasterView.tsx"
   ],
-  "src/app/robots.ts": [
-    "src/config/siteUrl.ts"
-  ],
-  "src/app/sitemap.ts": [
+  "src/app/products/[slug]/page.tsx": [
     "src/config/siteUrl.ts",
-    "src/lib/brands.ts",
     "src/lib/supabase.ts",
+    "src/views/ProductDetailPage.tsx"
+  ],
+  "src/app/_components/ProductDetailPageView.tsx": [
+    "src/components/HVACIcons.tsx",
+    "src/components/ImageGallery.tsx",
+    "src/components/LeadModal.tsx",
+    "src/components/ProductCard.tsx",
+    "src/components/Seo.tsx",
+    "src/components/product/ProductSmartInference.tsx",
+    "src/components/products/RichTextRenderer.tsx",
+    "src/components/products/index.ts",
+    "src/contexts/CategoryContext.tsx",
+    "src/hooks/useCartHook.ts",
+    "src/hooks/useProjectLists.ts",
+    "src/i18n/I18nProvider.tsx",
+    "src/i18n/format.ts",
+    "src/lib/supabase.ts",
+    "src/types/db-rows.ts",
+    "src/utils/productHelpers.ts",
     "src/utils/routes.ts"
   ],
   "src/components/AddToCartToast.tsx": [
@@ -261,7 +212,6 @@
     "src/lib/brands.ts",
     "src/utils/routes.ts"
   ],
-  "src/components/BuildTag.tsx": [],
   "src/components/CartToast.tsx": [
     "src/components/HVACIcons.tsx",
     "src/i18n/I18nProvider.tsx",
@@ -270,6 +220,7 @@
     "src/utils/routes.ts"
   ],
   "src/components/CaseStudySection.tsx": [
+    "src/i18n/I18nProvider.tsx",
     "src/utils/analytics.ts"
   ],
   "src/components/CategoriesShowcase.tsx": [
@@ -285,7 +236,9 @@
     "src/utils/categoryHelpers.ts",
     "src/utils/routes.ts"
   ],
-  "src/components/ErrorBoundary.tsx": [],
+  "src/components/ErrorBoundary.tsx": [
+    "src/i18n/I18nContext.ts"
+  ],
   "src/components/FAQShortSection.tsx": [
     "src/i18n/I18nProvider.tsx",
     "src/utils/analytics.ts",
@@ -297,7 +250,6 @@
     "src/i18n/I18nProvider.tsx",
     "src/utils/routes.ts"
   ],
-  "src/components/HVACIcons.tsx": [],
   "src/components/HeroCarousel.tsx": [
     "src/components/ui/VentImage.tsx",
     "src/hooks/useCategoryViewModel.ts",
@@ -306,27 +258,20 @@
     "src/utils/routes.ts"
   ],
   "src/components/HeroSection.tsx": [
-    "src/components/InViewCounter.tsx",
     "src/components/LazyInView.tsx",
-    "src/components/SpotlightHeroOverlay.tsx",
     "src/i18n/I18nProvider.tsx",
     "src/utils/routes.ts"
   ],
-  "src/components/HeroSkeleton.tsx": [],
   "src/components/ImageGallery.tsx": [
-    "src/components/products/3d/Product3DViewer.tsx",
     "src/components/ui/VentImage.tsx",
     "src/i18n/I18nProvider.tsx"
   ],
-  "src/components/InViewCounter.tsx": [],
   "src/components/LanguageSwitcher.tsx": [
     "src/i18n/I18nProvider.tsx"
   ],
   "src/components/LazyBrandsShowcase.tsx": [
-    "src/components/BrandsShowcase.tsx",
     "src/components/LazyInView.tsx"
   ],
-  "src/components/LazyInView.tsx": [],
   "src/components/LeadModal.tsx": [
     "src/i18n/I18nProvider.tsx",
     "src/utils/routes.ts"
@@ -340,9 +285,6 @@
   "src/components/MegaMenu.tsx": [
     "src/components/navigation/EliteMegaMenu.tsx",
     "src/contexts/CategoryContext.tsx"
-  ],
-  "src/components/PaymentWatcher.tsx": [
-    "src/lib/supabase.ts"
   ],
   "src/components/ProductCard.tsx": [
     "src/components/HVACIcons.tsx",
@@ -368,7 +310,6 @@
   "src/components/ScrollLinkedProcess.tsx": [
     "src/i18n/I18nProvider.tsx"
   ],
-  "src/components/ScrollToTop.tsx": [],
   "src/components/SearchOverlay.tsx": [
     "src/contexts/CategoryContext.tsx",
     "src/i18n/I18nProvider.tsx",
@@ -384,15 +325,13 @@
   "src/components/Seo.tsx": [
     "src/config/siteUrl.ts"
   ],
-  "src/components/SimpleProductGallery.tsx": [],
-  "src/components/SpotlightHeroOverlay.tsx": [],
+  "src/components/SimpleProductGallery.tsx": [
+    "src/i18n/I18nProvider.tsx"
+  ],
   "src/components/SpotlightList.tsx": [
     "src/i18n/I18nProvider.tsx"
   ],
   "src/components/StickyHeader.tsx": [
-    "src/components/MegaMenu.tsx",
-    "src/components/SearchOverlay.tsx",
-    "src/components/navigation/CategoryHubOverlay.tsx",
     "src/components/navigation/NavActionButton.tsx",
     "src/components/navigation/NavBrand.tsx",
     "src/components/navigation/NavPrimaryRail.tsx",
@@ -419,7 +358,6 @@
     "src/utils/categoryHelpers.ts",
     "src/utils/routes.ts"
   ],
-  "src/components/TiltCard.tsx": [],
   "src/components/TrustSection.tsx": [
     "src/i18n/I18nProvider.tsx"
   ],
@@ -442,7 +380,6 @@
     "src/i18n/I18nProvider.tsx",
     "src/utils/routes.ts"
   ],
-  "src/components/admin/AdminEmptyState.tsx": [],
   "src/components/admin/AdminRealtimeNotifications.tsx": [
     "src/i18n/datetime.ts",
     "src/lib/supabase.ts"
@@ -465,17 +402,11 @@
   "src/components/admin/CommandPalette.tsx": [
     "src/lib/supabase.ts"
   ],
-  "src/components/admin/DateRangePicker.tsx": [
-    "src/i18n/I18nProvider.tsx"
-  ],
-  "src/components/admin/EditableCell.tsx": [],
   "src/components/admin/ExportMenu.tsx": [
     "src/i18n/I18nProvider.tsx",
     "src/utils/adminUi.ts"
   ],
-  "src/components/admin/InfoTooltip.tsx": [],
   "src/components/admin/InventoryCsvImport.tsx": [
-    "src/lib/audit.ts",
     "src/lib/supabase.ts",
     "src/utils/crypto.ts"
   ],
@@ -489,11 +420,9 @@
   "src/components/admin/InventoryMovementHistory.tsx": [
     "src/i18n/datetime.ts"
   ],
-  "src/components/admin/InventoryQrLabel.tsx": [],
   "src/components/admin/InventoryReservedTable.tsx": [
     "src/i18n/datetime.ts"
   ],
-  "src/components/admin/InventoryStockAdjust.tsx": [],
   "src/components/admin/InventoryTable.tsx": [
     "src/components/admin/AdminEmptyState.tsx",
     "src/components/admin/AdminSkeleton.tsx",
@@ -503,7 +432,6 @@
     "src/types/inventory.ts",
     "src/utils/adminUi.ts"
   ],
-  "src/components/admin/JsonDiffViewer.tsx": [],
   "src/components/admin/authority-builder/AuthorityBuilder.tsx": [
     "src/components/admin/authority-builder/BlockEditor.tsx",
     "src/types/authority.ts"
@@ -554,7 +482,6 @@
     "src/lib/supabase.ts",
     "src/types/db-rows.ts"
   ],
-  "src/components/admin/products/ProductHealthBadge.tsx": [],
   "src/components/authority/AuthorityRenderer.tsx": [
     "src/components/authority/TechnicalDrawingAuthority.tsx",
     "src/components/authority/ThreeDAuthority.tsx",
@@ -575,15 +502,6 @@
     "src/components/Seo.tsx",
     "src/utils/routes.ts"
   ],
-  "src/components/calculators/InputField.tsx": [],
-  "src/components/calculators/ResultCard.tsx": [],
-  "src/components/calculators/StepIndicator.tsx": [],
-  "src/components/calculators/index.ts": [
-    "src/components/calculators/CalculatorLayout.tsx",
-    "src/components/calculators/InputField.tsx",
-    "src/components/calculators/ResultCard.tsx",
-    "src/components/calculators/StepIndicator.tsx"
-  ],
   "src/components/category/CategoryAuthoritySection.tsx": [
     "src/components/authority/AuthorityRenderer.tsx",
     "src/types/authority.ts"
@@ -598,6 +516,7 @@
   ],
   "src/components/category/CategoryHero.tsx": [
     "src/components/ui/VentImage.tsx",
+    "src/hooks/useScrollAnimation.ts",
     "src/i18n/I18nProvider.tsx",
     "src/lib/type-converters.ts",
     "src/lib/utils.ts",
@@ -616,7 +535,9 @@
     "src/utils/getCategoryIcon.tsx",
     "src/utils/routes.ts"
   ],
-  "src/components/category/EducationalGuide.tsx": [],
+  "src/components/category/EducationalGuide.tsx": [
+    "src/i18n/I18nProvider.tsx"
+  ],
   "src/components/category/EnhancedNeedsWizard.tsx": [
     "src/i18n/I18nProvider.tsx",
     "src/lib/hvacCalculations.ts",
@@ -634,6 +555,10 @@
   "src/components/category/sections/FAQ.tsx": [
     "src/utils/routes.ts"
   ],
+  "src/components/category/sections/HowItWorks.test.tsx": [
+    "src/components/category/sections/HowItWorks.tsx",
+    "src/utils/testA11y.tsx"
+  ],
   "src/components/category/sections/HowItWorks.tsx": [
     "src/components/ui/VentImage.tsx",
     "src/hooks/useScrollAnimation.ts"
@@ -641,7 +566,6 @@
   "src/components/category/sections/ProblemSection.tsx": [
     "src/hooks/useScrollAnimation.ts"
   ],
-  "src/components/category/sections/TrustSignals.tsx": [],
   "src/components/category/sections/TypeComparison.tsx": [
     "src/components/ui/VentImage.tsx",
     "src/hooks/useScrollAnimation.ts"
@@ -649,20 +573,6 @@
   "src/components/category/sections/VorticeBrand.tsx": [
     "src/components/ui/VentImage.tsx",
     "src/hooks/useScrollAnimation.ts"
-  ],
-  "src/components/category/sections/index.ts": [
-    "src/components/category/sections/BottomCTA.tsx",
-    "src/components/category/sections/FAQ.tsx",
-    "src/components/category/sections/HowItWorks.tsx",
-    "src/components/category/sections/ProblemSection.tsx",
-    "src/components/category/sections/TrustSignals.tsx",
-    "src/components/category/sections/TypeComparison.tsx",
-    "src/components/category/sections/VorticeBrand.tsx",
-    "src/components/category/sections/silent-fan/SilentFanFAQ.tsx",
-    "src/components/category/sections/silent-fan/SilentFanHowItWorks.tsx",
-    "src/components/category/sections/silent-fan/SilentFanProblem.tsx",
-    "src/components/category/sections/silent-fan/SilentFanTypeComparison.tsx",
-    "src/components/category/sections/silent-fan/SilentFanVorticeBrand.tsx"
   ],
   "src/components/category/sections/silent-fan/SilentFanFAQ.tsx": [
     "src/hooks/useScrollAnimation.ts",
@@ -694,7 +604,6 @@
   "src/components/home/CinematicProductShowcase.tsx": [
     "src/i18n/I18nProvider.tsx"
   ],
-  "src/components/home/ClientLeadButton.tsx": [],
   "src/components/home/EliteHero.tsx": [
     "src/i18n/I18nProvider.tsx",
     "src/utils/routes.ts"
@@ -711,9 +620,6 @@
   "src/components/home/GuidedCategoryDiscovery.tsx": [
     "src/utils/routes.ts"
   ],
-  "src/components/home/HomePageClientWrapper.tsx": [
-    "src/components/LeadModal.tsx"
-  ],
   "src/components/home/HomeSinevizyon.tsx": [
     "src/i18n/I18nProvider.tsx",
     "src/utils/routes.ts"
@@ -726,11 +632,9 @@
     "src/i18n/I18nProvider.tsx",
     "src/utils/routes.ts"
   ],
-  "src/components/home/RevealSection.tsx": [],
   "src/components/home/StrategicBrands.tsx": [
     "src/components/BrandsShowcase.tsx"
   ],
-  "src/components/home/TrustProofSection.tsx": [],
   "src/components/layout/ClientLayout.tsx": [
     "src/components/layout/MainLayout.tsx",
     "src/contexts/AuthContext.tsx",
@@ -740,28 +644,12 @@
     "src/i18n/I18nProvider.tsx"
   ],
   "src/components/layout/MainLayout.tsx": [
-    "src/components/AddToCartToast.tsx",
-    "src/components/BackToTopButton.tsx",
-    "src/components/Footer.tsx",
-    "src/components/LanguageSwitcher.tsx",
-    "src/components/PaymentWatcher.tsx",
-    "src/components/ScrollToTop.tsx",
-    "src/components/StickyHeader.tsx",
-    "src/components/WhatsAppFloat.tsx",
-    "src/hooks/useScrollThrottle.tsx",
-    "src/lib/three-setup.ts",
-    "src/utils/routes.ts"
-  ],
-  "src/components/layout/PageShell.tsx": [],
-  "src/components/layout/index.ts": [
-    "src/components/layout/MainLayout.tsx",
-    "src/components/layout/PageShell.tsx"
+    "src/hooks/useScrollThrottle.tsx"
   ],
   "src/components/navigation/Breadcrumb.tsx": [
     "src/config/siteUrl.ts"
   ],
   "src/components/navigation/CategoryCard3D.tsx": [
-    "src/components/products/Category3DIcon.tsx",
     "src/lib/supabase.ts",
     "src/utils/categoryHelpers.ts"
   ],
@@ -798,23 +686,68 @@
   "src/components/navigation/NavSearchTrigger.tsx": [
     "src/lib/utils.ts"
   ],
-  "src/components/navigation/NavSecondaryRail.tsx": [],
   "src/components/navigation/NavShell.tsx": [
     "src/lib/utils.ts"
   ],
-  "src/components/navigation/NavUtilityRail.tsx": [],
   "src/components/product/ProductSmartInference.tsx": [
     "src/i18n/I18nProvider.tsx",
     "src/lib/supabase.ts",
     "src/utils/engineeringIntelligence.ts"
   ],
-  "src/components/products/3d/AutoCenter.tsx": [],
+  "src/components/products/AddToProjectModal.tsx": [
+    "src/components/ui/VentImage.tsx",
+    "src/hooks/useProjectLists.ts",
+    "src/i18n/I18nProvider.tsx",
+    "src/lib/supabase.ts"
+  ],
+  "src/components/products/BentPlaneGeometry.tsx": [
+    "src/utils/routes.ts"
+  ],
+  "src/components/products/Category3DIcon.tsx": [
+    "src/components/products/3d/FanRenderer.tsx"
+  ],
+  "src/components/products/CategoryOrbitCarousel.tsx": [
+    "src/components/products/OrbitalProductsShowcase.tsx",
+    "src/contexts/CategoryContext.tsx",
+    "src/hooks/useCategoryViewModel.ts",
+    "src/i18n/I18nProvider.tsx",
+    "src/utils/routes.ts"
+  ],
+  "src/components/products/CategoryPreviewPanel.tsx": [
+    "src/components/ui/VentImage.tsx",
+    "src/i18n/I18nProvider.tsx",
+    "src/utils/routes.ts"
+  ],
+  "src/components/products/CategoryShowcaseCards.tsx": [
+    "src/utils/routes.ts"
+  ],
+  "src/components/products/InfiniteProductsShowcase.tsx": [
+    "src/utils/routes.ts"
+  ],
+  "src/components/products/OrbitalProductsShowcase.tsx": [
+    "src/components/products/Category3DIcon.tsx",
+    "src/config/index.ts",
+    "src/utils/routes.ts"
+  ],
+  "src/components/products/ProductsGrid.tsx": [
+    "src/components/ProductCard.tsx",
+    "src/i18n/I18nProvider.tsx",
+    "src/lib/supabase.ts"
+  ],
+  "src/components/products/ProductsHero.tsx": [
+    "src/i18n/I18nProvider.tsx"
+  ],
+  "src/components/products/SeriesCard.tsx": [
+    "src/i18n/I18nProvider.tsx",
+    "src/i18n/format.ts"
+  ],
   "src/components/products/3d/FanRenderer.tsx": [
     "src/components/products/3d/factory/VorticeLineoModel.tsx",
     "src/components/products/3d/types/AccessoryModel.tsx",
     "src/components/products/3d/types/AirCurtainModel.tsx",
     "src/components/products/3d/types/AirPurifierModel.tsx",
     "src/components/products/3d/types/AxialFanModel.tsx",
+    "src/components/products/3d/types/CentrifugalFanModel.tsx",
     "src/components/products/3d/types/DehumidifierModel.tsx",
     "src/components/products/3d/types/DomesticFanModel.tsx",
     "src/components/products/3d/types/DuctFanModel.tsx",
@@ -834,10 +767,9 @@
   ],
   "src/components/products/3d/Product3DViewer.tsx": [
     "src/components/products/3d/FanRenderer.tsx",
+    "src/i18n/I18nProvider.tsx",
     "src/utils/3dModelOffsets.ts"
   ],
-  "src/components/products/3d/SmartCenterScale.tsx": [],
-  "src/components/products/3d/factory/Assembler.tsx": [],
   "src/components/products/3d/factory/VorticeLineoModel.tsx": [
     "src/components/products/3d/factory/Assembler.tsx",
     "src/components/products/3d/factory/parts/BoxAndBase.tsx",
@@ -857,7 +789,6 @@
   "src/components/products/3d/factory/parts/MainChassis.tsx": [
     "src/components/products/3d/materials/useFanMaterials.ts"
   ],
-  "src/components/products/3d/materials/useFanMaterials.ts": [],
   "src/components/products/3d/parts/Housing.tsx": [
     "src/components/products/3d/materials/useFanMaterials.ts"
   ],
@@ -865,6 +796,9 @@
     "src/components/products/3d/materials/useFanMaterials.ts"
   ],
   "src/components/products/3d/parts/Motor.tsx": [
+    "src/components/products/3d/materials/useFanMaterials.ts"
+  ],
+  "src/components/products/3d/parts/Silencer.tsx": [
     "src/components/products/3d/materials/useFanMaterials.ts"
   ],
   "src/components/products/3d/types/AccessoryModel.tsx": [
@@ -877,6 +811,10 @@
     "src/components/products/3d/materials/useFanMaterials.ts"
   ],
   "src/components/products/3d/types/AxialFanModel.tsx": [
+    "src/components/products/3d/materials/useFanMaterials.ts",
+    "src/components/products/3d/parts/Silencer.tsx"
+  ],
+  "src/components/products/3d/types/CentrifugalFanModel.tsx": [
     "src/components/products/3d/materials/useFanMaterials.ts"
   ],
   "src/components/products/3d/types/DehumidifierModel.tsx": [
@@ -924,84 +862,12 @@
   "src/components/products/3d/types/SpeedControlModel.tsx": [
     "src/components/products/3d/materials/useFanMaterials.ts"
   ],
-  "src/components/products/3d/types/WallMountedCompactFanModel.tsx": [],
-  "src/components/products/AddToProjectModal.tsx": [
-    "src/components/ui/VentImage.tsx",
-    "src/hooks/useProjectLists.ts",
-    "src/i18n/I18nProvider.tsx",
-    "src/lib/supabase.ts"
-  ],
-  "src/components/products/ApplicationCards.tsx": [],
-  "src/components/products/BentPlaneGeometry.tsx": [
-    "src/utils/routes.ts"
-  ],
-  "src/components/products/BlueprintCanvas.tsx": [],
-  "src/components/products/Category3DIcon.tsx": [
-    "src/components/products/3d/FanRenderer.tsx"
-  ],
-  "src/components/products/CategoryOrbitCarousel.tsx": [
-    "src/components/products/OrbitalProductsShowcase.tsx",
-    "src/contexts/CategoryContext.tsx",
-    "src/hooks/useCategoryViewModel.ts",
-    "src/i18n/I18nProvider.tsx",
-    "src/utils/routes.ts"
-  ],
-  "src/components/products/CategoryPreviewPanel.tsx": [
-    "src/components/ui/VentImage.tsx",
-    "src/i18n/I18nProvider.tsx",
-    "src/utils/routes.ts"
-  ],
-  "src/components/products/CategoryShowcaseCards.tsx": [
-    "src/utils/routes.ts"
-  ],
-  "src/components/products/InfiniteProductsShowcase.tsx": [
-    "src/utils/routes.ts"
-  ],
-  "src/components/products/OrbitalProductsShowcase.tsx": [
-    "src/components/products/Category3DIcon.tsx",
-    "src/config/index.ts",
-    "src/utils/routes.ts"
-  ],
-  "src/components/products/ProductsGrid.tsx": [
-    "src/components/ProductCard.tsx",
-    "src/i18n/I18nProvider.tsx",
-    "src/lib/supabase.ts"
-  ],
-  "src/components/products/ProductsHero.tsx": [
-    "src/i18n/I18nProvider.tsx"
-  ],
-  "src/components/products/ProductsSkeleton.tsx": [],
-  "src/components/products/RadialActionMenu.tsx": [],
-  "src/components/products/RichTextRenderer.tsx": [],
-  "src/components/products/SeriesCard.tsx": [
-    "src/i18n/I18nProvider.tsx",
-    "src/i18n/format.ts"
-  ],
-  "src/components/products/index.ts": [
-    "src/components/products/AddToProjectModal.tsx",
-    "src/components/products/CategoryOrbitCarousel.tsx"
-  ],
-  "src/components/ui/ScrollObserver.tsx": [],
   "src/components/ui/Skeleton.tsx": [
     "src/lib/utils.ts"
-  ],
-  "src/components/ui/VentImage.tsx": [],
-  "src/config/admin.ts": [
-    "src/lib/ensureSessionFresh.ts",
-    "src/lib/supabase.ts"
-  ],
-  "src/config/applications.ts": [],
-  "src/config/index.ts": [
-    "src/config/admin.ts",
-    "src/config/applications.ts",
-    "src/config/legal.ts",
-    "src/config/orbitalCarouselConfig.ts"
   ],
   "src/config/legal.ts": [
     "src/config/siteUrl.ts"
   ],
-  "src/config/orbitalCarouselConfig.ts": [],
-  "src/config/siteUrl.ts": [],
   "src/contexts/AuthContext.tsx": [
     "src/config/admin.ts",
     "src/contexts/AuthContextDefinition.ts",
@@ -1031,9 +897,6 @@
     "src/hooks/useAuth.ts",
     "src/lib/supabase.ts"
   ],
-  "src/hooks/index.ts": [],
-  "src/hooks/use-mobile.tsx": [],
-  "src/hooks/useApiCall.ts": [],
   "src/hooks/useAuth.ts": [
     "src/contexts/AuthContextDefinition.ts"
   ],
@@ -1051,19 +914,13 @@
     "src/i18n/I18nProvider.tsx",
     "src/lib/type-converters.ts"
   ],
-  "src/hooks/useCheckoutCoupon.ts": [],
   "src/hooks/useCheckoutPayment.ts": [
     "src/contexts/CartContext.tsx",
     "src/lib/order.ts",
     "src/lib/supabase.ts",
     "src/types/db-rows.ts",
-    "src/utils/checkoutHelpers.ts",
-    "src/views/checkout/buildPaymentRequest.ts"
+    "src/utils/checkoutHelpers.ts"
   ],
-  "src/hooks/useDragScroll.ts": [],
-  "src/hooks/useHideOnScroll.ts": [],
-  "src/hooks/useIsMounted.ts": [],
-  "src/hooks/useManualScrollRestoration.ts": [],
   "src/hooks/useNavigationState.ts": [
     "src/utils/navigationConfig.ts"
   ],
@@ -1074,11 +931,11 @@
     "src/hooks/useAuth.ts",
     "src/lib/rbac.ts"
   ],
-  "src/hooks/useScrollAnimation.ts": [],
-  "src/hooks/useScrollThrottle.tsx": [],
-  "src/hooks/useScrollToHash.ts": [],
   "src/hooks/useSettings.ts": [
     "src/lib/supabase.ts"
+  ],
+  "src/i18n/format.ts": [
+    "src/i18n/I18nContext.ts"
   ],
   "src/i18n/I18nContext.ts": [
     "src/i18n/dictionaries/tr.ts"
@@ -1088,35 +945,24 @@
     "src/i18n/dictionaries/en.ts",
     "src/i18n/dictionaries/tr.ts"
   ],
-  "src/i18n/datetime.ts": [],
-  "src/i18n/dictionaries/en.ts": [],
-  "src/i18n/dictionaries/tr.ts": [],
-  "src/i18n/format.ts": [
-    "src/i18n/I18nContext.ts"
-  ],
-  "src/index.css": [],
-  "src/lib/audit.ts": [],
-  "src/lib/brand.ts": [],
-  "src/lib/brands.ts": [],
-  "src/lib/ensureSessionFresh.ts": [
-    "src/lib/supabase.ts"
-  ],
-  "src/lib/errorReporter.ts": [],
-  "src/lib/hvacCalculations.ts": [],
-  "src/lib/order.ts": [],
-  "src/lib/orderStatusService.ts": [
-    "src/lib/audit.ts",
-    "src/lib/supabase.ts",
-    "src/types/database.types.ts"
-  ],
-  "src/lib/pdfAssets.ts": [],
   "src/lib/pdfGenerator.ts": [
     "src/config/siteUrl.ts",
     "src/lib/pdfAssets.ts",
     "src/lib/supabase.ts"
   ],
-  "src/lib/productsApi.ts": [],
-  "src/lib/rbac.ts": [],
+  "src/lib/supabase.ts": [
+    "src/types/database.types.ts",
+    "src/types/db-rows.ts",
+    "src/types/ui-models.ts"
+  ],
+  "src/lib/three-setup.ts": [
+    "src/utils/three-utils.ts"
+  ],
+  "src/lib/type-converters.ts": [
+    "src/types/database.types.ts",
+    "src/types/db-rows.ts",
+    "src/types/ui-models.ts"
+  ],
   "src/lib/services/address.service.ts": [
     "src/lib/supabase.ts",
     "src/types/db-rows.ts"
@@ -1150,58 +996,20 @@
     "src/types/database.types.ts",
     "src/types/db-rows.ts"
   ],
-  "src/lib/supabase.ts": [
-    "src/lib/services/address.service.ts",
-    "src/lib/services/cart.service.ts",
-    "src/lib/services/category.service.ts",
-    "src/lib/services/invoice.service.ts",
-    "src/lib/services/pricing.service.ts",
-    "src/lib/services/product.service.ts",
-    "src/lib/services/project.service.ts",
-    "src/types/database.types.ts",
-    "src/types/db-rows.ts",
-    "src/types/ui-models.ts"
-  ],
-  "src/lib/three-setup.ts": [
-    "src/utils/three-utils.ts"
-  ],
-  "src/lib/type-converters.ts": [
-    "src/types/database.types.ts",
-    "src/types/db-rows.ts",
-    "src/types/ui-models.ts"
-  ],
-  "src/lib/utils.ts": [],
-  "src/middleware.ts": [
-    "src/utils/routes.ts"
-  ],
-  "src/next-env.d.ts": [],
-  "src/test/setup.d.ts": [],
-  "src/types/admin-shared.ts": [],
-  "src/types/authority.ts": [],
   "src/types/database.ts": [
     "src/types/database.types.ts"
   ],
-  "src/types/database.types.ts": [],
   "src/types/db-rows.ts": [
     "src/types/authority.ts",
     "src/types/database.types.ts"
   ],
-  "src/types/env.d.ts": [],
-  "src/types/imagetools.d.ts": [],
   "src/types/inventory.ts": [
     "src/lib/supabase.ts",
     "src/types/admin-shared.ts"
   ],
-  "src/types/isomorphic-dompurify.d.ts": [],
-  "src/types/media.types.ts": [],
-  "src/types/slot.ts": [],
   "src/types/ui-models.ts": [
     "src/types/db-rows.ts"
   ],
-  "src/utils/3dModelOffsets.ts": [],
-  "src/utils/adminUi.ts": [],
-  "src/utils/analytics.ts": [],
-  "src/utils/applicationLinks.ts": [],
   "src/utils/applicationUi.tsx": [
     "src/config/applications.ts"
   ],
@@ -1217,31 +1025,16 @@
   "src/utils/checkoutHelpers.ts": [
     "src/contexts/CartContext.tsx"
   ],
-  "src/utils/crypto.ts": [],
-  "src/utils/engineeringIntelligence.ts": [
-    "src/lib/supabase.ts",
-    "src/utils/type-converters.ts"
-  ],
   "src/utils/getCategoryIcon.tsx": [
     "src/components/HVACIcons.tsx"
   ],
-  "src/utils/imageUtils.ts": [],
-  "src/utils/navigationConfig.ts": [],
-  "src/utils/passwordSecurity.ts": [],
-  "src/utils/prefetch.ts": [
-    "src/views/ProductsPage.tsx"
-  ],
-  "src/utils/productHelpers.ts": [],
-  "src/utils/routes.ts": [],
-  "src/utils/searchHighlight.tsx": [],
-  "src/utils/three-utils.ts": [],
-  "src/utils/type-converters.ts": [],
   "src/utils/whatsapp.ts": [
     "src/lib/utils.ts"
   ],
   "src/views/AboutPage.tsx": [
     "src/components/HVACIcons.tsx",
     "src/components/Seo.tsx",
+    "src/hooks/useScrollAnimation.ts",
     "src/i18n/I18nProvider.tsx",
     "src/lib/brands.ts",
     "src/utils/routes.ts"
@@ -1255,6 +1048,7 @@
     "src/components/Seo.tsx",
     "src/components/navigation/Breadcrumb.tsx",
     "src/components/ui/VentImage.tsx",
+    "src/hooks/useScrollAnimation.ts",
     "src/i18n/I18nProvider.tsx",
     "src/lib/brands.ts",
     "src/lib/supabase.ts",
@@ -1263,6 +1057,7 @@
   "src/views/BrandsPage.tsx": [
     "src/components/HVACIcons.tsx",
     "src/components/Seo.tsx",
+    "src/hooks/useScrollAnimation.ts",
     "src/i18n/I18nProvider.tsx",
     "src/lib/brands.ts"
   ],
@@ -1310,6 +1105,7 @@
   "src/views/ContactPage.tsx": [
     "src/components/HVACIcons.tsx",
     "src/components/Seo.tsx",
+    "src/hooks/useScrollAnimation.ts",
     "src/i18n/I18nProvider.tsx",
     "src/utils/whatsapp.ts"
   ],
@@ -1330,7 +1126,6 @@
     "src/components/home/StrategicBrands.tsx",
     "src/components/home/TrustProofSection.tsx",
     "src/components/ui/ScrollObserver.tsx",
-    "src/i18n/dictionaries/tr.ts",
     "src/lib/supabase.ts",
     "src/lib/type-converters.ts"
   ],
@@ -1377,11 +1172,6 @@
     "src/utils/routes.ts"
   ],
   "src/views/ProductsDiscoveryView.tsx": [
-    "src/components/ProductCard.tsx",
-    "src/components/products/CategoryOrbitCarousel.tsx",
-    "src/i18n/I18nProvider.tsx",
-    "src/lib/supabase.ts",
-    "src/lib/type-converters.ts",
     "src/utils/routes.ts"
   ],
   "src/views/ProductsPage.tsx": [
@@ -1419,6 +1209,7 @@
   ],
   "src/views/account/AccountProfilePage.tsx": [
     "src/hooks/useAuth.ts",
+    "src/i18n/I18nProvider.tsx",
     "src/lib/supabase.ts"
   ],
   "src/views/account/AccountReturnsPage.tsx": [
@@ -1474,14 +1265,12 @@
     "src/components/admin/AdminToolbar.tsx",
     "src/components/admin/ColumnsMenu.tsx",
     "src/components/admin/EditableCell.tsx",
-    "src/components/admin/ExportMenu.tsx",
     "src/components/admin/InfoTooltip.tsx",
     "src/components/admin/categories/CategoryFormModal.tsx",
     "src/components/ui/VentImage.tsx",
     "src/hooks/useDragScroll.ts",
     "src/hooks/useRole.ts",
     "src/i18n/I18nProvider.tsx",
-    "src/lib/audit.ts",
     "src/lib/ensureSessionFresh.ts",
     "src/lib/supabase.ts",
     "src/types/db-rows.ts",
@@ -1626,7 +1415,6 @@
     "src/components/admin/AdminToolbar.tsx",
     "src/components/admin/BulkActionToolbar.tsx",
     "src/components/admin/ColumnsMenu.tsx",
-    "src/components/admin/ExportMenu.tsx",
     "src/components/admin/products/ProductCsvImport.tsx",
     "src/components/admin/products/ProductFormModal.tsx",
     "src/components/admin/products/ProductHealthBadge.tsx",
@@ -1635,7 +1423,6 @@
     "src/hooks/useRole.ts",
     "src/i18n/I18nProvider.tsx",
     "src/i18n/format.ts",
-    "src/lib/audit.ts",
     "src/lib/ensureSessionFresh.ts",
     "src/lib/supabase.ts",
     "src/lib/type-converters.ts",
@@ -1654,7 +1441,6 @@
     "src/i18n/I18nProvider.tsx",
     "src/i18n/datetime.ts",
     "src/i18n/format.ts",
-    "src/lib/audit.ts",
     "src/lib/orderStatusService.ts",
     "src/lib/supabase.ts",
     "src/utils/adminUi.ts",
@@ -1675,7 +1461,6 @@
     "src/hooks/useRole.ts",
     "src/i18n/I18nProvider.tsx",
     "src/i18n/datetime.ts",
-    "src/lib/audit.ts",
     "src/lib/ensureSessionFresh.ts",
     "src/lib/supabase.ts",
     "src/utils/adminUi.ts",
@@ -1747,6 +1532,8 @@
     "src/components/navigation/Breadcrumb.tsx",
     "src/components/ui/VentImage.tsx",
     "src/hooks/useCategoryViewModel.ts",
+    "src/hooks/useScrollAnimation.ts",
+    "src/i18n/I18nProvider.tsx",
     "src/lib/type-converters.ts",
     "src/utils/getCategoryIcon.tsx",
     "src/utils/routes.ts"
@@ -1757,22 +1544,25 @@
   "src/views/checkout/AddressSelectModal.tsx": [
     "src/lib/supabase.ts"
   ],
+  "src/views/checkout/buildPaymentRequest.ts": [
+    "src/lib/supabase.ts",
+    "src/utils/type-converters.ts"
+  ],
   "src/views/checkout/CheckoutProgress.tsx": [
     "src/components/SecurityRibbon.tsx"
   ],
   "src/views/checkout/InvoiceProfileModal.tsx": [
+    "src/i18n/I18nProvider.tsx",
     "src/lib/supabase.ts"
   ],
   "src/views/checkout/OrderSummarySidebar.tsx": [
     "src/i18n/I18nContext.ts",
     "src/i18n/format.ts"
   ],
-  "src/views/checkout/PaymentIframeContainer.tsx": [],
   "src/views/checkout/ReviewSummary.tsx": [
     "src/i18n/I18nProvider.tsx",
     "src/types/db-rows.ts"
   ],
-  "src/views/checkout/SecurePaymentOverlay.tsx": [],
   "src/views/checkout/StepAddressInfo.tsx": [
     "src/lib/supabase.ts",
     "src/types/db-rows.ts",
@@ -1780,10 +1570,6 @@
   ],
   "src/views/checkout/StepCustomerInfo.tsx": [
     "src/types/db-rows.ts"
-  ],
-  "src/views/checkout/buildPaymentRequest.ts": [
-    "src/lib/supabase.ts",
-    "src/utils/type-converters.ts"
   ],
   "src/views/knowledge/HubPage.tsx": [
     "src/components/Seo.tsx",
@@ -1815,25 +1601,5 @@
   ],
   "src/views/legal/TermsOfUsePage.tsx": [
     "src/config/legal.ts"
-  ],
-  "src/views/support/FAQPage.tsx": [
-    "src/components/HVACIcons.tsx",
-    "src/i18n/I18nProvider.tsx",
-    "src/utils/whatsapp.ts"
-  ],
-  "src/views/support/ReturnsPage.tsx": [
-    "src/i18n/I18nProvider.tsx"
-  ],
-  "src/views/support/ShippingPage.tsx": [
-    "src/i18n/I18nProvider.tsx"
-  ],
-  "src/views/support/SupportHomePage.tsx": [
-    "src/components/HVACIcons.tsx",
-    "src/i18n/I18nProvider.tsx",
-    "src/utils/routes.ts",
-    "src/utils/whatsapp.ts"
-  ],
-  "src/views/support/WarrantyPage.tsx": [
-    "src/i18n/I18nProvider.tsx"
   ]
 }

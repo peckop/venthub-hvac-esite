@@ -9,7 +9,7 @@ description: >
 # VentHub Enterprise Audit Skill (v1.1)
 
 > **Amaç:** Proje lideri "10/10 — teslime hazır" demeden önce çalıştırılan
-> bütünleşik denetim motoru. Röntgen'in üst versiyonu, Deep MRI'ın mirasçısı.
+> bütünleşik denetim motoru. Röntgen'in üst versiyonudur.
 > Her katman terminal kanıtına dayanır. Tahmin, varsayım veya zihinsel tarama yasaktır.
 
 ---
@@ -32,14 +32,9 @@ description: >
 │  Enterprise Audit     → Teslim öncesi          (10-15dk)    │
 │  "Müşteriye teslim      11 katman: kod + güvenlik + yasal   │
 │   edilebilir mi?"        + ops + performans + erişilebilirlik│
-│                          + teknik borç (eski MRI)            │
+│                          + teknik borç                       │
 └──────────────────────────────────────────────────────────────┘
 ```
-
-> [!NOTE]
-> **Deep MRI (venthub-deep-mri) artık DEPRECATED.**
-> MRI'ın tüm kapsamı (Knip + Bundle Analyzer) bu skill'in L11 katmanına taşınmıştır.
-> Eski MRI'ı çalıştırmak istersen: `--layers L11`
 
 ---
 
@@ -67,7 +62,7 @@ $env:PYTHONIOENCODING="utf-8"; python .agent/skills/venthub-enterprise-audit/run
 
 ### Sadece Belirli Katmanlar
 ```powershell
-# Sadece teknik borç taraması (eski MRI yerine)
+# Sadece teknik borç taraması
 python run_enterprise_audit.py --layers L11
 
 # Sadece güvenlik
@@ -208,8 +203,7 @@ Kod derlenebiliyor mu? Testler geçiyor mu?
 
 ---
 
-### L11 — Teknik Borç & Ölü Kod (Eski MRI Kapsamı)
-> Deep MRI'dan devralındı. Dead code, unused dependency ve bundle bileşim analizi.
+### L11 — Teknik Borç & Ölü Kod
 
 | Kontrol | Komut | Seviye |
 |---------|-------|--------|
