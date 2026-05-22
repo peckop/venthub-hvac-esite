@@ -14,3 +14,7 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+## 2026-05-22 - Cleaned Dead Code
+**Dead Code:** Removed unused views (`AdminStockPage.tsx`, `AddressFormModal.tsx`, `InvoiceProfileModal.tsx`, `SupportHomePage.tsx`) and unused constants (`Silencer` default export, `isDevAdmin`, `checkAdminAccess` in `src/config/admin.ts`, `Constants` in `src/types/database.types.ts`, `SPEC_SORT_ORDER` in `src/utils/productHelpers.ts`).
+**Root Cause:** These views and constants were no longer used in the codebase after refactoring or were never fully implemented.
+**Resolution:** Deleted the unused files and removed the dead exports and functions from their respective files. Note: `SPEC_SORT_ORDER` was found to be used so its removal was reverted.

@@ -101,5 +101,3 @@ export const Silencer: React.FC<SilencerProps> = ({
         </group>
     )
 }
-
-export default Silencer

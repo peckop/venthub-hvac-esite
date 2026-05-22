@@ -2628,12 +2628,3 @@ export type CompositeTypes<
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
-export const Constants = {
-  public: {
-    Enums: {
-      contact_department: ["sales", "support", "consulting"],
-      contact_status: ["new", "read", "archived"],
-    },
-  },
-} as const
-
