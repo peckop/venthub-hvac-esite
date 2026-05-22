@@ -739,6 +739,7 @@ export const tr = {
       imageUrl: "Görsel URL",
       imageUrlWithManual: "Görsel URL (veya Manuel Giriş)",
       addNewProduct: "Yeni Ürün Ekle",
+      createNewProject: "Yeni Proje Oluştur",
       cancel: "İptal",
       delete: "Sil",
       edit: "Düzenle",
@@ -1208,6 +1209,12 @@ export const tr = {
       originSuffix: 'Menşei',
       estPrefix: 'Kuruluş'
     }
+  },
+
+  undecidedUser: {
+    title: 'Hangi ürünün projenize uygun olduğundan emin değil misiniz?',
+    description: 'Projenizin detaylarını uzman mühendislerimizle paylaşın. Hava debisi, basınç kayıpları ve yönetmeliklere uygun en doğru fan seçimini sizin için yapalım.',
+    cta: 'Uzman Desteği Alın'
   },
 
   contactPage: {
@@ -1790,6 +1797,20 @@ export const tr = {
     submit: 'Gönder',
     submitting: 'Gönderiliyor...',
     cancel: 'İptal',
+    benefits: {
+      freeDesign: 'Ücretsiz Projelendirme Desteği',
+      fastPricing: 'Hızlı Fiyatlandırma ve Stok Bilgisi',
+      b2bAdvantage: "B2B'ye Özel Avantajlı Koşullar"
+    },
+    areas: {
+      parking: 'Otopark Havalandırma',
+      kitchen: 'Endüstriyel Mutfak',
+      hospital: 'Hastane/Temiz Oda',
+      retail: 'AVM/Perakende',
+      office: 'Ofis/Plaza',
+      warehouse: 'Depo/Üretim Tesisi',
+      other: 'Diğer'
+    },
     errors: {
       name: 'Lütfen ad soyad girin',
       contact: 'E-posta veya telefon gereklidir',

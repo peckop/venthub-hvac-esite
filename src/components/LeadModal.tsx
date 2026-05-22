@@ -12,13 +12,13 @@ interface LeadModalProps {
 }
 
 const applicationAreas = [
-  'Otopark Havalandırma',
-  'Endüstriyel Mutfak',
-  'Hastane/Temiz Oda',
-  'AVM/Perakende',
-  'Ofis/Plaza',
-  'Depo/Üretim Tesisi',
-  'Diğer'
+  { id: 'parking', label: 'Otopark Havalandırma' },
+  { id: 'kitchen', label: 'Endüstriyel Mutfak' },
+  { id: 'hospital', label: 'Hastane/Temiz Oda' },
+  { id: 'retail', label: 'AVM/Perakende' },
+  { id: 'office', label: 'Ofis/Plaza' },
+  { id: 'warehouse', label: 'Depo/Üretim Tesisi' },
+  { id: 'other', label: 'Diğer' }
 ]
 
 const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _productId: __productId }) => {
@@ -136,15 +136,15 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                 <div className="space-y-4 text-sm text-blue-100/80">
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-secondary-blue" />
-                    <span>Ücretsiz Projelendirme Desteği</span>
+                    <span>{t('lead.benefits.freeDesign')}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-secondary-blue" />
-                    <span>Hızlı Fiyatlandırma ve Stok Bilgisi</span>
+                    <span>{t('lead.benefits.fastPricing')}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-secondary-blue" />
-                    <span>B2B'ye Özel Avantajlı Koşullar</span>
+                    <span>{t('lead.benefits.b2bAdvantage')}</span>
                   </div>
                 </div>
               </div>
@@ -263,8 +263,8 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       value={appArea} onChange={(e) => setAppArea(e.target.value)}
                       className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                     >
-                      <option value="">Seçiniz...</option>
-                      {applicationAreas.map(a => <option key={a} value={a}>{a}</option>)}
+                      <option value="">{t('lead.select')}...</option>
+                      {applicationAreas.map(a => <option key={a.id} value={a.label}>{t(`lead.areas.${a.id}` as Parameters<typeof t>[0])}</option>)}
                     </select>
                   </div>
                 </div>

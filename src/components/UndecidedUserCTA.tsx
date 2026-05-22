@@ -2,9 +2,11 @@ import React from 'react'
 import Link from 'next/link'
 import { MessageSquare, ArrowRight } from 'lucide-react'
 import { Routes } from '../utils/routes';
+import { useI18n } from '@/i18n/I18nProvider';
 
 
 export const UndecidedUserCTA: React.FC = () => {
+    const { t } = useI18n();
     return (
         <div className="mt-8 mb-12 relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-navy to-secondary-blue p-6 sm:p-10 text-white shadow-xl">
             {/* Background decoration */}
@@ -18,10 +20,10 @@ export const UndecidedUserCTA: React.FC = () => {
                     </div>
                     <div>
                         <h3 className="text-xl sm:text-2xl font-bold mb-2">
-                            Hangi ürünün projenize uygun olduğundan emin değil misiniz?
+                            {t('undecidedUser.title')}
                         </h3>
                         <p className="text-white/80 leading-relaxed text-sm sm:text-base">
-                            Projenizin detaylarını uzman mühendislerimizle paylaşın. Hava debisi, basınç kayıpları ve yönetmeliklere uygun en doğru fan seçimini sizin için yapalım.
+                            {t('undecidedUser.description')}
                         </p>
                     </div>
                 </div>
@@ -30,7 +32,7 @@ export const UndecidedUserCTA: React.FC = () => {
                     href={Routes.contact('consulting')}
                     className="group relative inline-flex items-center gap-2 bg-white text-primary-navy px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all whitespace-nowrap"
                 >
-                    <span>Uzman Desteği Alın</span>
+                    <span>{t('undecidedUser.cta')}</span>
                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
             </div>

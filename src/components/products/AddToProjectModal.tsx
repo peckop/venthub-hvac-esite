@@ -135,7 +135,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
               className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl bg-light-gray text-industrial-gray hover:bg-secondary-blue hover:text-white transition-all font-bold text-sm"
             >
               <Plus size={18} />
-              <span>Yeni Proje Oluştur</span>
+              <span>{t('common.createNewProject')}</span>
             </button>
           ) : (
             <motion.div
