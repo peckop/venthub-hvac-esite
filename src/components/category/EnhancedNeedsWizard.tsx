@@ -177,7 +177,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             </button>
                         )}
                         <div>
-                            <h3 id="wizard-title" className="text-lg font-bold text-slate-900">İhtiyaç Analiz Sihirbazı</h3>
+                            <h3 id="wizard-title" className="text-lg font-bold text-slate-900">{t("category.wizardTitle")}</h3>
                             <div className="flex gap-1 mt-1">
                                 {[1, 2, 3, 4, 5, 6].map(s => (
                                     <div key={s} className={`h-1 rounded-full transition-all duration-500 ${s <= state.step ? 'w-6 bg-cyan-500' : 'w-2 bg-slate-200'}`} />

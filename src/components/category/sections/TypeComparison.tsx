@@ -2,6 +2,7 @@ import VentImage from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { Zap, Wind, Check, X, HelpCircle, ArrowRight } from 'lucide-react'
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import { useI18n } from '@/i18n/I18nProvider'
 
 interface TypeComparisonProps {
     onOpenWizard: () => void
@@ -13,6 +14,7 @@ interface TypeComparisonProps {
  * Detaylı fayda karşılaştırması + kararsızlar için wizard tetikleyici
  */
 const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectType }) => {
+  const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [hoveredType, setHoveredType] = useState<'elektrikli' | 'ortam' | null>(null)
 
@@ -116,7 +118,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
 
                                 {/* Benefits */}
                                 <div className="mb-6">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-3">AVANTAJLARI</h4>
+                                    <h4 className="text-sm font-semibold text-gray-700 mb-3">{t("category.advantages")}</h4>
                                     <ul className="space-y-2">
                                         {type.benefits.map((benefit, i) => (
                                             <li key={i} className="flex items-start gap-2">

@@ -1,12 +1,14 @@
 import React from 'react'
 import { DollarSign, Wind, Bug, Thermometer } from 'lucide-react'
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import { useI18n } from '@/i18n/I18nProvider'
 
 /**
  * ProblemSection - "Problemi Tanı" bölümü
  * Kullanıcıya hava perdesi ihtiyacını hissettiren empati bölümü
  */
 const ProblemSection: React.FC = () => {
+  const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const problems = [
         {
@@ -97,7 +99,7 @@ const ProblemSection: React.FC = () => {
                             <div className="w-20 h-20 bg-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-300">
                                 <span className="text-4xl">❌</span>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Hava Perdesi Olmadan</h3>
+                            <h3 className="text-xl font-bold text-white mb-2">{t("category.withoutAirCurtain")}</h3>
                             <ul className="text-red-100 text-sm space-y-1">
                                 <li>• Isı kaybı sürekli</li>
                                 <li>• Enerji faturası yüksek</li>
@@ -111,7 +113,7 @@ const ProblemSection: React.FC = () => {
                             <div className="w-20 h-20 bg-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-blue-300">
                                 <span className="text-4xl">✓</span>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Hava Perdesi İle</h3>
+                            <h3 className="text-xl font-bold text-white mb-2">{t("category.withAirCurtain")}</h3>
                             <ul className="text-blue-100 text-sm space-y-1">
                                 <li>• Görünmez enerji bariyeri</li>
                                 <li>• %30'a varan tasarruf</li>
