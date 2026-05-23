@@ -14,3 +14,8 @@
 **Dead Code:** Unused exports in `src/config/admin.ts`, `src/lib/hvacCalculations.ts`, `src/lib/three-setup.ts`, and `src/components/calculators/InputField.tsx`.
 **Root Cause:** Utilities and components were exported by default even when they were only used internally within the same file (e.g., `AIR_DENSITY`, `isUserAdminAsync`) or were completely unused/deprecated (e.g., `GRAVITY`, `THREE`).
 **Resolution:** Removed the `export` keyword from internally used functions/constants to encapsulate them, and safely purged completely dead code (`GRAVITY`, `AIR_SPECIFIC_HEAT`, `UnitConversion`) without deleting any files.
+
+## 2024-05-23 - Batch purge unused components and modals
+**Dead Code:** `AddressFormModal.tsx`, `InvoiceProfileModal.tsx`, `SupportHomePage.tsx`, `ProductsSkeleton.tsx`, `TrustSection.tsx`, `AutoCenter.tsx`, `CategorySpotlightScene.tsx`.
+**Root Cause:** Completely unused views, modals, and components that are no longer imported anywhere in the project or configuration. Static analysis accurately identified them as unreferenced.
+**Resolution:** Safely deleted the unreferenced UI components and views. Confirmed they were not dynamically imported or used indirectly in config files like `tailwind.config.ts`.
