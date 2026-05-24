@@ -84,6 +84,7 @@ Bu ağaç `cli/docs_tree.py` tarafından otonom olarak üretilmiştir.
 │   │   ├── ⚪ `plan-and-tasklist-current.md`
 │   │   ├── ⚪ `plan-and-tasklist.md`
 │   │   └── ⚪ `project_state_and_skills_audit.md`
+│   ├── ⚪ `database_schema_master.md`
 │   ├── 📂 **products/**
 │   │   ├── ⚪ `AIR_DOOR_AD_900_MASTER.md`
 │   │   └── ⚪ `AIR_DOOR_AD_900_SEO.md`
@@ -669,37 +670,65 @@ Bu ağaç `cli/docs_tree.py` tarafından otonom olarak üretilmiştir.
 ├── 📂 **supabase/**
 │   ├── 📂 **functions/**
 │   │   ├── 📂 **_shared/**
+│   │   │   ├── ⚠️ `notify.md`
+│   │   │   ├── ⚠️ `rate_limit.md`
+│   │   │   └── ⚠️ `sentry.md`
 │   │   ├── 📂 **admin-create-coupon/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **admin-iyzico-reconcile/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **admin-order-inspect/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **admin-orders-latest/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **admin-update-order/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **admin-update-shipping/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **apply-coupon/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **delivery-notification/**
+│   │   │   ├── ⚠️ `index.md`
 │   │   │   └── 📂 **templates/**
 │   │   │       └── 📂 **email/**
 │   │   ├── 📂 **healthz/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **iyzico-callback/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **iyzico-payment/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **iyzico-refund/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **log-client-error/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **notification-service/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **order-confirmation/**
+│   │   │   ├── ⚠️ `index.md`
 │   │   │   └── 📂 **templates/**
 │   │   │       └── 📂 **email/**
 │   │   ├── 📂 **order-housekeeping/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **order-validate/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **refund-order-mock/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **release-expired-reservations/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **return-status-notification/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **returns-webhook/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **shipping-notification/**
+│   │   │   ├── ⚠️ `index.md`
 │   │   │   └── 📂 **templates/**
 │   │   │       └── 📂 **email/**
 │   │   ├── 📂 **shipping-status/**
+│   │   │   └── ⚠️ `index.md`
 │   │   ├── 📂 **shipping-webhook/**
+│   │   │   └── ⚠️ `index.md`
 │   │   └── 📂 **stock-alert/**
+│   │       └── ⚠️ `index.md`
 │   └── 📂 **migrations/**
 └── 📂 **support/**
 ```
@@ -1180,6 +1209,34 @@ Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `
 - [⚠️] `src\views\support\ShippingPage.md`
 - [⚠️] `src\views\support\SupportHomePage.md`
 - [⚠️] `src\views\support\WarrantyPage.md`
+- [⚠️] `supabase\functions\_shared\notify.md`
+- [⚠️] `supabase\functions\_shared\rate_limit.md`
+- [⚠️] `supabase\functions\_shared\sentry.md`
+- [⚠️] `supabase\functions\admin-create-coupon\index.md`
+- [⚠️] `supabase\functions\admin-iyzico-reconcile\index.md`
+- [⚠️] `supabase\functions\admin-order-inspect\index.md`
+- [⚠️] `supabase\functions\admin-orders-latest\index.md`
+- [⚠️] `supabase\functions\admin-update-order\index.md`
+- [⚠️] `supabase\functions\admin-update-shipping\index.md`
+- [⚠️] `supabase\functions\apply-coupon\index.md`
+- [⚠️] `supabase\functions\delivery-notification\index.md`
+- [⚠️] `supabase\functions\healthz\index.md`
+- [⚠️] `supabase\functions\iyzico-callback\index.md`
+- [⚠️] `supabase\functions\iyzico-payment\index.md`
+- [⚠️] `supabase\functions\iyzico-refund\index.md`
+- [⚠️] `supabase\functions\log-client-error\index.md`
+- [⚠️] `supabase\functions\notification-service\index.md`
+- [⚠️] `supabase\functions\order-confirmation\index.md`
+- [⚠️] `supabase\functions\order-housekeeping\index.md`
+- [⚠️] `supabase\functions\order-validate\index.md`
+- [⚠️] `supabase\functions\refund-order-mock\index.md`
+- [⚠️] `supabase\functions\release-expired-reservations\index.md`
+- [⚠️] `supabase\functions\return-status-notification\index.md`
+- [⚠️] `supabase\functions\returns-webhook\index.md`
+- [⚠️] `supabase\functions\shipping-notification\index.md`
+- [⚠️] `supabase\functions\shipping-status\index.md`
+- [⚠️] `supabase\functions\shipping-webhook\index.md`
+- [⚠️] `supabase\functions\stock-alert\index.md`
 
 ## Geçersiz Şablon (Invalid Format)
 Harika! Tüm MD belgeleri Enterprise-Ready (5N1K + Axioms) şablonuna uygun. ✅

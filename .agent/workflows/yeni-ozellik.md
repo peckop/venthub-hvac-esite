@@ -12,7 +12,7 @@ Bu workflow, Manifesto'da belirtilen "Fiziksel/Ticari Mantık -> Kod" akışın�
    - `.agent/skills/model-dispatcher/SKILL.md` kurallarını oku ve bu özelliğin ağırlığına göre uygun model (Flash/High/Sonnet) tavsiyesini ekrana basarak kullanıcıdan onay bekle.
 
 1. **Analiz & Tasarım (Planning)**
-   - Kullanıcının isteğini "Girdi -> İşlem -> Çıktı" mantığına göre analiz et.
+   - Kullanıcının isteğini iş mantığı ve teknik gereksinimler açısından analiz et.
    - Hangi fizik kuralları veya ticari kurallar geçerli? (Örn: Stok eksiye düşemez, debi 0 olamaz).
    - Veritabanı şeması veya API değişikliği gerekiyor mu?
    - **[MCP ZORUNLULUĞU]:** Eğer görev yeni bir framework/kütüphane eklemeyi veya kullanmayı gerektiriyorsa, ezberden kod yazma! ZORUNLU olarak `context7-live` MCP aracını (`resolve-library-id` ve ardından `live_query-docs`) kullanarak güncel dökümantasyonu ve en iyi pratikleri (best practices) sorgula.

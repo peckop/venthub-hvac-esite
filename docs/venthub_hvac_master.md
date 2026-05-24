@@ -1,13 +1,9 @@
-# CORPUS CALLOSUM MASTER ARCHITECTURE DOCUMENTATION
+# VENTHUB HVAC MASTER DOCUMENTATION
 
 ---
-project_name: venthub-hvac
-compiled_at: 2026-05-24T05:14:53.925549+00:00
-total_compiled_files: 431
-standard: Enterprise-Ready (5N1K + Axioms)
+compiled_at: 2026-05-24T08:47:59.665148+00:00
+total_files: 432
 ---
-
-Bu belge, otonom derleyici tarafından 2026-05-24T05:14:53.925549+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -2001,6 +1997,70 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+# FILE: src\app\admin\logistics\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\admin\logistics\page.tsx
+skeleton_hash: 517c236f99fadd9e
+generated_at: 2026-05-23T21:48:03Z
+---
+
+## Genel Bakış
+Bu modül, yönetim panelindeki Lojistik sayfasının kök bileşenini tanımlar. Sayfanın temel düzenini oluşturur, gerekli veri akışını yönetir ve lojistik işlemlerine ait arayüzü alt bileşenler aracılığıyla sunar. Uygulamada lojistik yönetimi için tek bir giriş noktası görevi görür.
+
+## Fonksiyon Grupları
+### Sayfa Yapılandırma ve Sunum
+Sayfanın iskeletini oluşturur, gerekli yapılandırmaları yapar ve içeriği ilgili alt görünüme yönlendirerek kullanıcı arayüzünü sağlar.
+- LogisticsPage
+
+---
+
+## AXI
+
+---
+
+## FONKSIYON DETAYLARI
+
+### LogisticsPage
+**Ne yapar**: Uygulamanın lojistik yönetim sayfasını oluşturan React bileşenidir. `AdminLogisticsPage` bileşenini döndürerek sayfanın görüntülenmesini sağlar.
+**Nasıl yapar**: Herhangi bir prop veya state kullanmaz; doğrudan `AdminLogisticsPage` bileşenini render eder. Bu sayede lojistik modülü ile ilgili içerik ana uygulamaya eklenir.
+**Parametreler**: Yok.
+**Dönüş**: `AdminLogisticsPage` adlı React bileşeni (JSX öğesi).
+
+---
+
+## SABİTLER
+- **AdminLogisticsPage** (call) — `dynamic(
+
+  () => import('../../../views/admin/AdminLogisticsPage'),
+
+  { ssr...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/admin/logistics/page.tsx::LogisticsPage
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\admin\logistics\page.tsx
+  function: src\app\admin\logistics\page.tsx::LogisticsPage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: LogisticsPage
 
 ---
 # FILE: src\app\admin\movements\page.md
