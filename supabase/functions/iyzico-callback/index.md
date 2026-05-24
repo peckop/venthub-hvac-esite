@@ -4,15 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-callback\index.ts
 skeleton_hash: 828e661b626678aa
-generated_at: 2026-05-24T07:35:33Z
+generated_at: 2026-05-24T10:46:37Z
 ---
 
 ## Genel Bakış
-Bu modül, İyzico ödeme sağlayıcısından gelen geri dönüş isteklerini yakalayıp işleyen bir Supabase Edge fonksiyonudur. Tek bir ana işleyici fonksiyon üzerinden, İyzico tarafından gönderilen veri paketini alır, gerekli doğrulama ve işleme adımlarını gerçekleştirir ve uygun HTTP yanıtını döndürür.
+Bu modül, VentHub HVAC projesi için tasarlanmış Supabase Edge Fonksiyonudur ve İyzico ödeme sağlayıcısından gelen webhook geri çağrı isteklerini işler. Tek bir ana işleyici aracılığıyla gelen istekleri doğrular, ödeme durumuna göre gerekli güncellemeler yapar ve uygun HTTP yanıtlarını döndürür.
 
 ## Fonksiyon Grupları
 ### İyzico Callback İşleme
-Modülün tek sorumluluğu, İyzico webhook çağrılarını kabul etmek ve işlemektir.
+Bu grup, modülün tek sorumluluğunu kapsar: Gelen İyzico webhook isteklerini alır, gönderilen verileri doğrular, ödeme durumunu kontrol eder, ilgili veritabanı kayıtlarını günceller ve işlem sonucuna göre uygun HTTP yanıtını döndürür.
 - iyzico-callback_handler
 
 ---
@@ -20,18 +20,18 @@ Modülün tek sorumluluğu, İyzico webhook çağrılarını kabul etmek ve işl
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `req` parametresi sağlanmazsa, fonksiyon iyzico callback verilerini işleyemez ve beklenen yanıt üretilemez.
+[Aksiyom 1]: Eğer `iyzico-callback_handler` fonksiyonuna `req` parametresi sağlanmazsa, fonksiyon iyzico callback verilerini işleyemez ve beklenen yanıt üretilemez.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### iyzico-callback_handler
-**Ne yapar**: iyzico ödeme sisteminden gelen geri çağrı (webhook) isteğini işler, ödeme durumunu kontrol eder ve gerekli işlemleri yapar.  
-**Nasıl yapar**: İstekten gerekli verileri (örneğin token, paymentId, status) çıkarır, iyzico tarafından sağlanan imzayı doğrular, başarılı veya başarısız ödeme durumuna göre veritabanını günceller ve uygun HTTP yanıtı döndürür.  
-**Parametreler**:  
-- req: Request — iyzico tarafından gönderilen HTTP isteği, genellikle query parametreleri veya JSON gövdesi içerir.  
-**Dönüş**: Response — işlem sonucunu temsil eden HTTP yanıtı (örneğin 200 OK veya hata durumunda 4xx/5xx).
+**Ne yapar**: VentHub HVAC projesinin Supabase altyapısında barındırılan, Iyzico ödeme sağlayıcısından gelen tüm callback isteklerini işleyen ana giriş fonksiyonudur. Gelen ödeme durum bildirimlerini alır, doğrular ve sistemdeki ilgili sipariş, kullanıcı ve ödeme kayıtlarını güncellemek için gerekli tüm iş süreçlerini yönetir.
+**Nasıl yapar**: İlk olarak gelen isteğin yetkili kaynaklı olduğunu teyit etmek için Iyzico’nun standart imza doğrulama protokolünü uygular, isteğin başlıkları ve gövdesindeki güvenlik verilerini eşleştirerek sahte istekleri engeller. Doğrulama süreci başarılı olursa istek gövdesindeki ödeme bilgilerini ayrıştırır, Supabase veritabanı üzerinden ilgili kayıtlara erişerek ödeme durumunu (başarılı, başarısız, beklemede vb.) günceller. Tüm işlem akışı sonunda isteğin sonucuna uygun bir HTTP cevabı oluşturarak döndürür.
+**Parametreler**:
+- name: req, type: HTTP Request (Supabase Edge Function Request nesnesi) — Iyzico ödeme servisinden gelen callback isteğinin tüm meta verilerini, HTTP başlıklarını ve işlenecek ödeme bilgilerini içeren gövdesini barındıran istek nesnesi
+**Dönüş**: Standart HTTP Response nesnesi. İsteğin işlenme durumuna uygun HTTP durum kodu, ilgili cevap başlıkları ve metin içeriği barındırır. Başarısız doğrulama durumunda 403 Yetkisiz Erişim, eksik veya hatalı istek verisinde 400 Hatalı İstek, sunucu tarafı işlem hatalarında 500 Sunucu Hatası kodları döndürür. Tüm süreçlerin başarılı tamamlanması halinde 200 Başarılı durum kodu ile Iyzico’ya onay mesajı içeren cevap gönderir.
 
 ---
 
@@ -54,39 +54,34 @@ type CheckoutRetrieveResponse = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::<anonymous>
+### [N1_NASIL] AST Pointer: iyzico-callback/index.ts::<anonymous>
 - **params**: resolve, reject
-- **ic_degiskenler**:
-  - `resolve` — Fonksiyonun başarılı sonuçta çağrılması gereken Promise resolve callback'i
-  - `reject` — Fonksiyonun hata durumunda çağrılması gereken Promise reject callback'i
-  - `retrieveReq` — Iyzico checkout formunu almak için gönderilen istek nesnesi
-  - `sdk` — Iyzipay entegrasyonu için başlatılmış SDK nesnesi (Iyzipay)
+- **ic_degiskenler**: 
+  - `retrieveReq` — the request payload sent to Iyzipay checkoutForm.retrieve to retrieve payment details.
+  - `sdk` — the initialized Iyzipay SDK instance used to call checkoutForm.retrieve.
 - **Dönüş**: yok
 
-### [N2_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::<anonymous>
+### [N2_NASIL] AST Pointer: iyzico-callback/index.ts::<anonymous>
 - **params**: err, res
-- **ic_degiskenler**:
-  - `err` — Iyzico retrieve işlemi sırasında oluşan hata nesnesi (unknown tipinde)
-  - `res` — Iyzico checkout form retrieve yanıtı (CheckoutRetrieveResponse tipinde)
-  - `resolve` — Dış fonksiyondan alınan Promise resolve callback'i
-  - `reject` — Dış fonksiyondan alınan Promise reject callback'i
+- **ic_degiskenler**: 
+  - `reject` — function to reject the outer Promise when Iyzipay retrieval fails.
+  - `resolve` — function to resolve the outer Promise with the retrieval result.
 - **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::patchStatus
+### [N3_NASIL] AST Pointer: iyzico-callback/index.ts::patchStatus
 - **params**: newStatus
-- **ic_degiskenler**:
-  - `newStatus` — Güncellenecek sipariş durumu ('paid', 'failed' veya 'confirmed')
-  - `orderId` — Venthub orders tablosunda güncellenecek siparişin benzersiz kimliği (string veya undefined)
-  - `result` — Iyzico callback yanıtından elde edilen nesne, conversationId içerebilir
-  - `conversationId` — Iyzico işlemiyle ilişkili konuşma kimliği (string veya undefined)
-  - `supabaseUrl` — Supabase projesinin REST API endpoint URL'si (string)
-  - `serviceRoleKey` — Supabase service role anahtarı, admin yetkileriyle isteklerde kullanılır
-  - `debugInfo` — Ödeme hata ayıklama bilgisi, yanıtın body kısmına eklenir
-  - `filterById` — orderId varsa oluşturulan filtre sorgusu (string)
-  - `filterByConv` — orderId yoksa conversationId üzerinden oluşturulan filtre sorgusu (string)
-  - `filter` — Kullanılacak final filtre (filterById veya filterByConv)
-  - `resp` — Supabase PATCH isteğinin cevabı (Response nesnesi)
-- **Dönüş**: Response — Supabase PATCH isteğinin ham Response nesnesi (veya null eğer filtre yok)
+- **ic_degiskenler**: 
+  - `orderId` — the unique identifier of the order whose payment status is being updated.
+  - `result` — the Iyzipay payment response object that may contain a conversationId.
+  - `conversationId` — fallback conversation ID used when orderId is not available.
+  - `supabaseUrl` — base URL of the Supabase project's REST API.
+  - `serviceRoleKey` — Supabase service role key used for authenticating API requests.
+  - `debugInfo` — additional debugging information to store in the payment_debug column.
+  - `filterById` — Supabase filter string for matching by order ID; empty if orderId is falsy.
+  - `filterByConv` — Supabase filter string for matching by conversation ID; empty if conditions not satisfied.
+  - `filter` — combined filter string (filterById || filterByConv) used to construct the request URL; if empty, the function returns null.
+  - `resp` — the Response object returned by the fetch call that patches the order status.
+- **Dönüş**: Response | null
 
 ---
 

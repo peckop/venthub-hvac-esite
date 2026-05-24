@@ -4,82 +4,88 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-orders-latest\index.ts
 skeleton_hash: b282b0917505ca5b
-generated_at: 2026-05-24T07:29:37Z
+generated_at: 2026-05-24T10:45:32Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici paneli üzerinden en son siparişlerin getirilmesini sağlayan bir işlev içerir. Tek bir ana handler fonksiyonu, gelen HTTP isteğini işleyerek Supabase veritabanından güncel sipariş verilerini çek ve istemciye yanıt olarak döndürür.
+Bu modül, yönetici paneli üzerinden en son siparişlerin getirilmesini sağlayan tek bir işlev içerir. Gelen HTTP isteğini işleyerek Supabase veritabanından güncel sipariş verilerini çeker ve bu veriyi bir HTTP yanıtı olarak döndürür.
 
 ## Fonksiyon Grupları
 ### Ana İşlev
-Modülün tek işlevi, yönetici tarafından istenen en son siparişleri listelemek ve bu veriyi istemciye iletmektir.
+Modülün tek sorumluluğu, yönetici tarafından istenen en son siparişleri listelemek ve bu veriyi istemciye iletmektir.
 - admin-orders-latest_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, bir istek nesnesi (req) parametresi ile çalışır.
+Bu modül, tek bir zorunlu req parametresi alan admin-orders-latest_handler işlevini içerir.
 
-[Aksiyom 1]: Eğer req parametresi sağlanmazsa, fonksiyon çağrılırken TypeError hatası oluşur.
-[Aksiyom 2]: Eğer req null veya undefined ise, fonksiyonun davranışı belirsizdir ve hata fırlatabilir.
+[Aksiyom 1]: Eğer admin-orders-latest_handler fonksiyonu çağrılırken req parametresi sağlanmazsa, fonksiyonun çalışma zamanı davranışı bilinmiyor ve hata fırlatılabilir.
+[Aksiyom 2]: Eğer admin-orders-latest_handler fonksiyonuna verilen req parametresi null veya undefined ise, fonksiyonun davranışı belirsizdir ve hata fırlatılabilir.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### admin-orders-latest_handler
-**Ne yapar**: Admin tarafından yapılan son siparişleri getiren bir işleyici fonksiyonudur.  
-**Nasıl yapar**: Gelen `req` isteğini işleyerek en güncel admin sipariş verilerini alır ve bu verileri bir `Response` nesnesi içinde döndürür.  
+**Ne yapar**: Fonksiyonun amacı kod içinde açıklanmadığı için belirlenememiştir.  
+**Nasıl yapar**: İç mantığı kodda tanımlanmadığı için açıklanamaz.  
 **Parametreler**:
-- req: belirtilmemiş — İşlenecek HTTP isteği nesnesi.  
-**Dönüş**: Response — İşlem sonucu oluşturulan HTTP yanıtı nesnesi.
+- req: any — Fonksiyonun işleyebilmesi için gelen istek nesnesi.  
+**Dönüş**: Response — Fonksiyonun ürettiği yanıt nesnesi.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\admin-orders-latest\index.ts::admin-orders-latest_handler
-- **params**: (req)
+- **params**: `req`
 - **ic_degiskenler**:
-  - `origin` — request header 'origin' value or empty string.
-  - `allowed` — array of allowed origins from env var ALLOWED_ORIGINS (split, trimmed, filtered).
-  - `okOrigin` — boolean true if origin is allowed (empty allowed list or origin present).
-  - `requestId` — unique request identifier (UUID or timestamp).
-  - `cors` — object containing CORS response headers.
-  - `supabaseUrl` — Supabase project URL from env SUPABASE_URL.
-  - `serviceRoleKey` — Supabase service role key from env SUPABASE_SERVICE_ROLE_KEY.
-  - `authHeader` — value of the Authorization request header.
-  - `anonKey` — Supabase anon key from env SUPABASE_ANON_KEY.
-  - `supabaseUser` — Supabase client initialized with anon key and per‑request auth header.
-  - `supabaseAdmin` — Supabase client initialized with service role key.
-  - `userRes` — data object from supabaseUser.auth.getUser() containing the authenticated user.
-  - `userErr` — error object from supabaseUser.auth.getUser().
-  - `profile` — row from user_profiles table for the user (contains role).
-  - `profErr` — error from fetching the user profile.
-  - `userRole` — role string extracted from profile (e.g., 'admin' or 'superadmin').
-  - `url` — URL object built from the request URL for reading query parameters.
-  - `status` — trimmed status query parameter (empty string if absent).
-  - `from` — trimmed from date query parameter (empty string if absent).
-  - `to` — trimmed to date query parameter (empty string if absent).
-  - `q` — trimmed search query parameter (empty string if absent).
-  - `preset` — trimmed preset query parameter (empty string if absent).
-  - `limitParam` — number limit for pagination, clamped to 1‑100, default 50.
-  - `pageParam` — number page for pagination, clamped to minimum 1, default 1.
-  - `offset` — calculated offset = (pageParam‑1) * limitParam.
-  - `params` — URLSearchParams holding Supabase query arguments (select, order, filters).
-  - `isPendingShipments` — true when preset equals 'pendingShipments'.
-  - `requestUrl` — full Supabase REST endpoint URL with encoded query string.
-  - `resp` — Response from fetch to the Supabase endpoint.
-  - `rows` — array of order objects parsed from resp.json() (empty array on parse failure).
-  - `contentRange` — value of the content‑range header from resp (default '0‑0/0').
-  - `total` — total number of matching orders extracted from content‑range.
-  - `_e` — caught exception in the try/catch block.
-  - `msg` — string representation of _e used for error response.
-  - `isUuid` — boolean indicating whether q matches a UUID pattern.
-  - `like` — SQL‑style wildcard pattern (*q*) used for ilike matching.
-  - `normalizeDateStart` — helper function converting YYYY‑MM‑DD or ISO string to ISO start‑of‑day UTC.
-  - `normalizeDateEnd` — helper function converting YYYY‑MM‑DD or ISO string to ISO end‑of‑day UTC.
-- **Dönüş**: Response (JSON body with orders data or error).
+  - `origin` — request header `origin` value or empty string if not present
+  - `allowed` — array of allowed origins parsed from `ALLOWED_ORIGINS` environment variable
+  - `okOrigin` — boolean indicating whether the request origin is allowed
+  - `requestId` — unique identifier for the request, generated by `crypto.randomUUID()` or fallback to current timestamp
+  - `cors` — object containing CORS headers to be applied to all responses
+  - `supabaseUrl` — Supabase project URL from `SUPABASE_URL` environment variable
+  - `serviceRoleKey` — Supabase service role key from `SUPABASE_SERVICE_ROLE_KEY` environment variable
+  - `authHeader` — `Authorization` header value from the request
+  - `anonKey` — Supabase anonymous key from `SUPABASE_ANON_KEY` environment variable
+  - `supabaseUser` — Supabase client instance authenticated with the request's `Authorization` header
+  - `supabaseAdmin` — Supabase client instance authenticated with the service role key
+  - `userRes` — result of `supabaseUser.auth.getUser()` containing user information
+  - `userErr` — error returned from `supabaseUser.auth.getUser()`
+  - `profile` — result of querying `user_profiles` table for the current user’s role
+  - `profErr` — error returned from the profile query
+  - `userRole` — role of the current user extracted from `profile`
+  - `url` — `URL` object constructed from the request URL
+  - `status` — `status` query parameter value trimmed or empty string
+  - `from` — `from` query parameter value trimmed or empty string
+  - `to` — `to` query parameter value trimmed or empty string
+  - `q` — `q` query parameter value trimmed or empty string
+  - `preset` — `preset` query parameter value trimmed or empty string
+  - `limitParam` — numeric limit for pagination, clamped between 1 and 100
+  - `pageParam` — numeric page number, at least 1
+  - `offset` — offset for pagination calculated from `pageParam` and `limitParam`
+  - `params` — `URLSearchParams` instance used to build the Supabase REST query
+  - `isPendingShipments` — boolean indicating if the `preset` is `pendingShipments`
+  - `requestUrl` — full URL for the Supabase REST request including query parameters
+  - `resp` — response object returned by `fetch(requestUrl, …)`
+  - `rows` — array of order records parsed from the response body
+  - `contentRange` — `content-range` header value from the response
+  - `total` — total number of matching records extracted from `content-range`
+- **Dönüş**: `Response` object containing JSON payload `{ total, page, _limit, rows }` with status 200, or error responses with appropriate status codes and CORS headers.
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\admin-orders-latest\index.ts::normalizeDateStart
+- **params**: `d`
+- **ic_degiskenler**:
+  - `d` — date string in either `YYYY-MM-DD` or ISO format
+- **Dönüş**: ISO string representing the start of the day (`YYYY-MM-DDT00:00:00Z`) if `d` matches `YYYY-MM-DD`; otherwise returns `d` unchanged.
+
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\admin-orders-latest\index.ts::normalizeDateEnd
+- **params**: `d`
+- **ic_degiskenler**:
+  - `d` — date string in either `YYYY-MM-DD` or ISO format
+- **Dönüş**: ISO string representing the end of the day (`YYYY-MM-DDT23:59:59Z`) if `d` matches `YYYY-MM-DD`; otherwise returns `d` unchanged.
 
 ---
 

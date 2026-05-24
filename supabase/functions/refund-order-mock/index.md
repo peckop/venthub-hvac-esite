@@ -4,16 +4,16 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\refund-order-mock\index.ts
 skeleton_hash: f6440556e54dc688
-generated_at: 2026-05-24T07:51:47Z
+generated_at: 2026-05-24T10:46:22Z
 ---
 
 ## Genel Bakış
-Bu modül, bir siparişin iade işlemini simüle eden bir Supabase fonksiyonudur. Tek bir ana işleyici fonksiyon üzerinden gelen HTTP isteklerini alır, gerekli doğrulama ve mock iade işlemini gerçekleştirir ve istemciye uygun bir yanıt döndürür.
+Bu modül, Supabase ortamında çalışan bir HTTP endpoint’i olarak tasarlanmıştır; amacı, bir siparişin iade sürecini taklit eden (mock) bir yanıt üretmektir. Tek bir asenkron işleyici fonksiyon (`refund-order-mock_handler`) gelen isteği alır, gerekli doğrulamaları (varsa) yapar ve önceden tanımlanmış mock veriyle bir `Response` döndürür.
 
 ## Fonksiyon Grupları
-### İstek İşleme ve Yanıt Üretimi
-Bu grup, dışarıdan gelen istekleri işleyip mock iade sürecini başlatan ve sonuç olarak HTTP yanıtı oluşturan fonksiyonu içerir.
-- refund-order-mock_handler
+### İstek İşleme ve Mock Yanıt Üretimi
+Bu grup, dışarıdan gelen HTTP isteğini alıp mock iade mantığını çalıştırarak HTTP yanıtı oluşturan tek sorumluluğu taşır.  
+- refund-order-mock_handler   (tek giriş‑çıkış noktası)
 
 ---
 
@@ -26,14 +26,19 @@ Bu modül, tek bir parametre olan `req` ile çalışan bir handler fonksiyonunu 
 
 ---
 
+---
+
 ## FONKSIYON DETAYLARI
 
 ### refund-order-mock_handler
-**Ne yapar**: Gelen HTTP isteğini alarak iade işlemi için sahte (mock) bir yanıt üretir.  
-**Nasıl yapar**: Fonksiyon, isteği işler ve önceden tanımlanmış mock veri yapısını içeren bir `Response` nesnesi döndürür; gerçek bir veritabanı veya dış servis etkileşimi yapmaz.  
+**Ne yapar**: Gelen `req` (istek) nesnesini işleyerek bir iade (refund) siparişine ait taklit (mock) yanıtı üretir ve `Response` nesnesi olarak döndürür.  
+
+**Nasıl yapar**: Fonksiyon, `req` içeriğini alır, iade siparişine ilişkin iş mantığını taklit eder ve uygun HTTP durum kodu, başlık ve gövdeyle bir `Response` nesnesi oluşturur.  
+
 **Parametreler**:
-- req: Request — İşlenecek gelen HTTP isteği (başlıklar, gövde vb. içerir).  
-**Dönüş**: Response — Mock iade işlemi sonucunu içeren HTTP yanıtı (durum kodu, başlıklar ve JSON gövde).
+- `req`: *any* — İade siparişinin taklit edilmesi için gelen istek nesnesi.  
+
+**Dönüş**: `Response` — İsteğe karşılık oluşturulan HTTP yanıtını temsil eden nesne.
 
 ---
 
@@ -48,47 +53,46 @@ Bu modül, tek bir parametre olan `req` ile çalışan bir handler fonksiyonunu 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: refund-order-mock/index.ts::refund-order-mock_handler
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\refund-order-mock\index.ts::refund-order-mock_handler
 - **params**: (req)
 - **ic_degiskenler**:
-  - `origin` — value of the Origin request header, defaulted to '*' if missing; used to set CORS Allow-Origin.
-  - `cors` — object containing CORS response headers (Allow-Origin, Vary, Allow-Headers, Allow-Methods, Max-Age) built from request headers and defaults.
-  - `supabaseUrl` — Supabase project URL read from environment variable SUPABASE_URL (empty string if unset).
-  - `serviceKey` — Supabase service role key read from SUPABASE_SERVICE_ROLE_KEY (empty if unset).
-  - `anonKey` — Supabase anon/public key read from SUPABASE_ANON_KEY (empty if unset).
-  - `authHeader` — raw Authorization header value from the incoming request.
-  - `authClient` — Supabase client initialized with anonKey and per‑request Authorization header for user‑level calls.
-  - `user` — user object returned by auth.getUser(); contains the authenticated user's ID and metadata.
-  - `authErr` — error object from auth.getUser(); non‑null indicates token validation failure.
-  - `actorUserId` — authenticated user's ID (user.id) used for ownership and admin checks.
-  - `body` — parsed JSON payload of the request, typed as RefundRequest; fallback to empty object on parse error.
-  - `order_id` — trimmed order_id string from body; used to fetch the specific order.
-  - `amount` — numeric refund amount from body if valid and finite; otherwise undefined.
-  - `reason` — refund reason string truncated to 140 characters if provided; otherwise undefined.
-  - `ordResp` — HTTP response from fetching the order record via Supabase REST endpoint.
-  - `arr` — JSON array parsed from ordResp; expected to contain zero or one order objects.
-  - `order` — first element of arr if it is an array, otherwise null; represents the order row.
-  - `isAdmin` — boolean flag, initially false, set to true if the actor's profile role is 'admin' or 'superadmin'.
-  - `prof` — HTTP response from fetching the actor's user_profile row.
-  - `prows` — JSON array parsed from prof; expected zero or one profile objects.
-  - `prow` — first element of prows if array, otherwise null; the profile record.
-  - `isOwner` — boolean indicating whether actorUserId matches the order's user_id.
-  - `totalAmount` — numeric value of order.total_amount (default 0) used as the full order total.
-  - `target` — amount to refund: the validated amount if positive, otherwise the totalAmount.
-  - `isFull` — true when target >= totalAmount, indicating a full refund.
-  - `newPaymentStatus` — 'refunded' for full refund, 'partial_refunded' otherwise.
-  - `newOrderStatus` — for full refund: preserve shipped/delivered status, else set to 'cancelled'; for partial refund: keep original order status.
-  - `dbg` — existing payment_debug field from the order (or empty object) used as base for debug info.
-  - `newDebug` — updated payment_debug object adding mock refund flags, reason, type, amount, and aggregated totals/partial refunds.
-  - `itemsResp` — HTTP response fetching order items for the given order_id.
-  - `items` — JSON array of order items (product_id, quantity) from itemsResp.
-  - `it` — loop variable representing each order item during stock restoration mock.
-  - `upd` — HTTP PATCH response updating the order with new payment_status, status, and payment_debug.
-  - `txt` — text body of upd response if the request fails; used for error reporting.
-  - `payload` — object inserted into order_refund_events audit table (order_id, amount, reason, actor_user_id).
-  - `_e` — caught unknown error from the outer try block.
-  - `msg` — string representation of _e, either its message property or fallback toString.
-- **Dönüş**: Response object (either success JSON with `{ok:true, order_id, payment_status, amount}` or error JSON with appropriate status code and CORS headers).
+  - `origin` — `req.headers.get('origin')` sonucundan gelen değer; yoksa `'*'` kullanılır, CORS başlıkları için.
+  - `cors` — CORS yanıt başlıklarını içeren nesne; `origin` ve istek başlıklarından türetilir.
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ortam değişkeni; boş ise hata döner.
+  - `serviceKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ortam değişkeni; boş ise hata döner.
+  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ortam değişkeni; boş ise hata döner.
+  - `authHeader` — `req.headers.get('authorization')` sonucu; yoksa yetkisiz yanıt döner.
+  - `authClient` — `createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })` ile oluşturulan Supabase istemcisi.
+  - `user` — `authClient.auth.getUser()` çağrısının başarılı sonucunda elde edilen kullanıcı nesnesi.
+  - `authErr` — `authClient.auth.getUser()` çağrısının hata nesnesi.
+  - `actorUserId` — `user.id`; işlem yapan kullanıcının kimliği.
+  - `body` — `await req.json().catch(()=>({}))` ile elde edilen istek gövdesi, `RefundRequest` tipinde.
+  - `order_id` — `body.order_id` değerinin boşlukları temizlenmiş hali; zorunlu alan.
+  - `amount` — `body.amount` sayısal ve geçerli ise `Number(body.amount)`; aksi takdirde `undefined`.
+  - `reason` — `body.reason` string ise ilk 140 karakteri; aksi takdirde `undefined`.
+  - `ordResp` — Sipariş bilgilerini getirmek için yapılan `fetch` isteği.
+  - `arr` — `ordResp.json()` sonucunda elde edilen dizi; hata durumunda boş dizi.
+  - `order` — `arr[0]` (ilk eleman) eğer dizi ise; yoksa `null`.
+  - `isAdmin` — Başlangıçta `false`; profil sorgulaması sonrası admin/superadmin rolü varsa `true`.
+  - `prof` — Kullanıcı profilini getirmek için yapılan `fetch` isteği.
+  - `prows` — `prof.json()` sonucunda elde edilen dizi; hata durumunda boş dizi.
+  - `prow` — `prows[0]` (ilk eleman) eğer dizi ise; yoksa `null`.
+  - `isOwner` — `actorUserId` mevcut ve `order.user_id` ile eşleşiyorsa `true`.
+  - `totalAmount` — `order.total_amount` değerinin sayısal karşılığı; yoksa `0`.
+  - `target` — `amount` pozitif bir sayı ise `amount`; aksi takdirde `totalAmount`.
+  - `isFull` — `target >= totalAmount`; tam iade mi yoksa kısmi iade mi olduğunu belirler.
+  - `newPaymentStatus` — `isFull` ise `'refunded'`, değilse `'partial_refunded'`.
+  - `newOrderStatus` — `isFull` ve sipariş durumu `shipped`/`delivered` değilse `'cancelled'`, aksi takdirde mevcut `order.status`.
+  - `dbg` — `order.payment_debug` nesnesi; yoksa boş nesne.
+  - `newDebug` — Güncellenmiş ödeme debug nesnesi; iade türü, miktarı, neden vb. bilgileri içerir.
+  - `itemsResp` — Tam iade durumunda stok geri eklemek için sipariş öğelerini getiren `fetch` isteği.
+  - `items` — `itemsResp.json()` sonucunda elde edilen dizi; hata durumunda boş dizi.
+  - `it` — `items` dizisindeki tek bir öğe; `product_id` ve `quantity` alanları vardır.
+  - `upd` — Siparişin `payment_status`, `status` ve `payment_debug` alanlarını güncelleyen `PATCH` `fetch` isteği.
+  - `txt` — `upd._text()` çağrısının sonucu; güncelleme hatası mesajı.
+  - `payload` — Audit kaydı için oluşturulan nesne: `{ order_id, amount: target, reason, actor_user_id }`.
+  - `msg` — `catch` bloğunda yakalanan hata mesajı; `Error` ise `message`, değilse `String(_e)`.
+- **Dönüş**: `Response` nesnesi. Fonksiyon, CORS başlıkları eklenmiş JSON yanıtları döner; başarılı işlemde `{ ok: true, order_id, payment_status, amount }`, hata durumlarında ilgili hata kodu ve mesajı içerir.
 
 ---
 
