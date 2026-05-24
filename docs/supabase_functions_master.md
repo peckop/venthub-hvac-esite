@@ -1,13 +1,11 @@
-# SUPABASE EDGE FUNCTIONS MASTER DOCUMENTATION
+# SUPABASE FUNCTIONS MASTER
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-24T11:09:54.259997+00:00
+compiled_at: 2026-05-24T11:59:47.306311+00:00
 total_compiled_files: 28
-standard: Enterprise-Ready (5N1K + Axioms)
+source: supabase/functions
 ---
-
-Bu belge, otonom derleyici tarafından 2026-05-24T11:09:54.259997+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 

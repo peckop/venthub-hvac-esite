@@ -1,0 +1,16 @@
+{
+  "skill": "superpowers-review",
+  "model": "Gemini 3.1 Pro (High)",
+  "date": "2026-05-24",
+  "blockers": [],
+  "majors": [],
+  "minors": [],
+  "nits": [],
+  "post_scan_cross_checks": {
+    "hardcoded_route_leaks_checked": true,
+    "slug_only_contract_verified": true,
+    "mri_bundle_checked": true
+  },
+  "summary": "This review placeholder is set during the planning phase. The changes are yet to be executed and verified.",
+  "verdict": "needs_changes"
+}

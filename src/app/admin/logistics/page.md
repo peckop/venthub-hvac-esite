@@ -17,7 +17,11 @@ Sayfanın iskeletini oluşturur, gerekli yapılandırmaları yapar ve içeriği 
 
 ---
 
-## AXI
+## AXIOMS – Mimari Varsayımlar
+Bu bileşenin hatasız çalışması, React tabanlı sunum ortamına ve dinamik yüklenen `AdminLogisticsPage` bileşeninin sorunsuz içe aktarılmasına bağlıdır.
+
+[Aksiyom 1]: Eğer dinamik olarak yüklenmeye çalışılan AdminLogisticsPage bileşeni belirlenen yolda mevcut değilse, dinamik yükleme işlemi başarısız olur ve sayfa yükleme hatası alınır.
+[Aksiyom 2]: Eğer istemci tarafında dynamic import'ları çözümleyecek bir Next.js çalışma zamanı ortamı yoksa, kod tarayıcıda çalışmaz.
 
 ---
 

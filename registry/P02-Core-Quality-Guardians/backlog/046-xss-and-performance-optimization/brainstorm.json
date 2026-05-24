@@ -1,0 +1,49 @@
+{
+  "skill": "superpowers-brainstorm",
+  "model": "Gemini 3.1 Pro (High)",
+  "date": "2026-05-24",
+  "goal": "Resolve P1 security vulnerabilities (XSS in AdminLogisticsPage.tsx) and optimize performance (N+1 query resolution in stock-alert Edge Function).",
+  "constraints": [
+    "Must preserve the visual aesthetics of the AdminLogisticsPage.",
+    "Must retain strict TypeScript type-safety (no-any).",
+    "Must ensure full backward-compatibility for Edge Functions and page components."
+  ],
+  "known_context": "The AdminLogisticsPage.tsx processes tracking number text inputs raw without dynamic sanitation. The stock-alert Edge Function fetches alert recipients inside a loop for each low stock product, generating redundant database queries.",
+  "risks": [
+    {
+      "severity": "medium",
+      "description": "XSS sanitization in input field might accidentally truncate valid tracking numbers if characters are too restricted."
+    },
+    {
+      "severity": "low",
+      "description": "Edge function caching of recipients could fail if inventory settings change mid-run (highly unlikely to affect correct alerts)."
+    }
+  ],
+  "options": [
+    {
+      "id": "A",
+      "title": "Strict input-level alphanumeric dynamic sanitization and pre-submit payload filtering",
+      "selected": true,
+      "reason": "This guarantees that no malicious character is ever processed or saved to the DB, preventing both stored and DOM-based XSS cleanly."
+    },
+    {
+      "id": "B",
+      "title": "Edge-Function-only sanitization",
+      "selected": false,
+      "reason": "While safe for backend, it still allows un-sanitized states on the client-side which is vulnerable to DOM-based XSS."
+    }
+  ],
+  "recommendation": "Option A is selected because input-level dynamic sanitization combined with pre-submit payload sanitization provides double-layered security.",
+  "traces": [
+    {
+      "tool": "view_file",
+      "target": "src/views/admin/AdminLogisticsPage.tsx",
+      "finding": "Found that updateRow updates state tracking_number directly from event value and handleBulkSubmit uses tracking_number directly without regex sanitization."
+    },
+    {
+      "tool": "view_file",
+      "target": "supabase/functions/stock-alert/index.ts",
+      "finding": "Found that processProductAlert queries getAlertRecipients (which makes a database query to inventory_settings) in every iteration of the loop over all low stock products."
+    }
+  ]
+}
