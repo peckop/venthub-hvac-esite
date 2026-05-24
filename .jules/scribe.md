@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2023-10-27 - Supabase Service Documentation
+**Learning:** Documenting functions that interact with Supabase (like `fetchDefaultInvoiceProfile`) requires explicitly stating potential database-specific throw conditions (e.g., table missing) to warn consumers.
+**Action:** When documenting Supabase service functions, explicitly describe the expected Supabase errors that the function might throw rather than just generic errors.

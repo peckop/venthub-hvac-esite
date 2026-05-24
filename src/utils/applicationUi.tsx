@@ -25,6 +25,17 @@ const Svg = {
   )
 }
 
+/**
+ * Retrieves the specific inline SVG element corresponding to an application icon identifier.
+ * Useful for UI components that need dynamic, fast-loading icons without external dependencies.
+ *
+ * @param icon - The application icon identifier mapped to an internal SVG
+ * @param size - The width and height of the SVG element in pixels (defaults to 18)
+ * @returns The SVG element or null if the icon is not found
+ *
+ * @example
+ * const WindIcon = iconFor('wind', 24);
+ */
 export function iconFor(icon: ApplicationIcon, size = 18) {
   switch (icon) {
     case 'building':
@@ -40,6 +51,15 @@ export function iconFor(icon: ApplicationIcon, size = 18) {
   }
 }
 
+/**
+ * Maps an application accent color name to its corresponding Tailwind gradient class.
+ *
+ * @param accent - The application accent identifier
+ * @returns The Tailwind utility class for the accent gradient
+ *
+ * @example
+ * const className = `bg-gradient-to-br ${accentOverlayClass('blue')}`;
+ */
 export function accentOverlayClass(accent: ApplicationAccent) {
   switch (accent) {
     case 'blue':
