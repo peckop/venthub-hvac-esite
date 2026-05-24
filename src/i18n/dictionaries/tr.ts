@@ -263,6 +263,35 @@ export const tr = {
     }
   },
   home: {
+    fallbackMetadata: {
+      industrialVentilation: {
+        hero_title: 'Endüstriyel Havalandırma Çözümleri',
+        hero_description: 'Yüksek performanslı, enerji verimli ve uzun ömürlü fan teknolojileri.',
+        technical_summary: '20+ Yıl Tecrübe',
+        features: {
+          performance: 'Yüksek Performans',
+          energy: 'Enerji Tasarrufu'
+        }
+      },
+      residentialVentilation: {
+        hero_title: 'Profesyonel Konut Havalandırması',
+        hero_description: 'İşletmeniz ve eviniz için sessiz konfor bariyeri ve enerji tasarrufu.',
+        technical_summary: 'Sessizlik',
+        features: {
+          barrier: 'Hava Bariyeri',
+          climate: 'İklim Koruma'
+        }
+      },
+      default: {
+        hero_title: 'Profesyonel İklimlendirme',
+        hero_description: 'En son teknoloji HVAC çözümleri ile tanışın.',
+        technical_summary: 'Premium Kalite',
+        features: {
+          durable: 'Uzun Ömürlü',
+          guaranteed: 'Garantili'
+        }
+      }
+    },
     seoTitle: "VentHub - Premium HVAC Çözümleri | Fan, Hız Kontrol, Isıtma & Soğutma",
     seoDesc: "VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.",
     hero: {

@@ -27,27 +27,7 @@ interface CategoryMetadataExtended {
     [key: string]: unknown;
 }
 
-// Fallback data for when DB metadata is missing
-const FALLBACK_METADATA: Record<string, CategoryMetadataExtended> = {
-    'industrial-ventilation': {
-        hero_title: 'Endüstriyel Havalandırma Çözümleri',
-        hero_description: 'Yüksek performanslı, enerji verimli ve uzun ömürlü fan teknolojileri.',
-        technical_summary: '20+ Yıl Tecrübe',
-        features: [{ icon: 'wind', title: 'Yüksek Performans' }, { icon: 'zap', title: 'Enerji Tasarrufu' }]
-    },
-    'residential-ventilation': {
-        hero_title: 'Profesyonel Konut Havalandırması',
-        hero_description: 'İşletmeniz ve eviniz için sessiz konfor bariyeri ve enerji tasarrufu.',
-        technical_summary: 'Sessizlik',
-        features: [{ icon: 'shield', title: 'Hava Bariyeri' }, { icon: 'activity', title: 'İklim Koruma' }]
-    },
-    'default': {
-        hero_title: 'Profesyonel İklimlendirme',
-        hero_description: 'En son teknoloji HVAC çözümleri ile tanışın.',
-        technical_summary: 'Premium Kalite',
-        features: [{ icon: 'activity', title: 'Uzun Ömürlü' }, { icon: 'shield', title: 'Garantili' }]
-    }
-}
+// Fallback data for when DB metadata is missing is generated dynamically inside component via i18n
 
 // Icon mapper
 const IconMap: Record<string, LucideIcon> = {
@@ -111,12 +91,33 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
 
     if (mainCategoryVms.length === 0) return null
 
+    const fallbackMetadata: Record<string, CategoryMetadataExtended> = {
+        'industrial-ventilation': {
+            hero_title: t('home.fallbackMetadata.industrialVentilation.hero_title'),
+            hero_description: t('home.fallbackMetadata.industrialVentilation.hero_description'),
+            technical_summary: t('home.fallbackMetadata.industrialVentilation.technical_summary'),
+            features: [{ icon: 'wind', title: t('home.fallbackMetadata.industrialVentilation.features.performance') }, { icon: 'zap', title: t('home.fallbackMetadata.industrialVentilation.features.energy') }]
+        },
+        'residential-ventilation': {
+            hero_title: t('home.fallbackMetadata.residentialVentilation.hero_title'),
+            hero_description: t('home.fallbackMetadata.residentialVentilation.hero_description'),
+            technical_summary: t('home.fallbackMetadata.residentialVentilation.technical_summary'),
+            features: [{ icon: 'shield', title: t('home.fallbackMetadata.residentialVentilation.features.barrier') }, { icon: 'activity', title: t('home.fallbackMetadata.residentialVentilation.features.climate') }]
+        },
+        'default': {
+            hero_title: t('home.fallbackMetadata.default.hero_title'),
+            hero_description: t('home.fallbackMetadata.default.hero_description'),
+            technical_summary: t('home.fallbackMetadata.default.technical_summary'),
+            features: [{ icon: 'activity', title: t('home.fallbackMetadata.default.features.durable') }, { icon: 'shield', title: t('home.fallbackMetadata.default.features.guaranteed') }]
+        }
+    }
+
     return (
         <div className="relative h-[600px] lg:h-[700px] w-full overflow-hidden bg-zinc-900 text-white group">
             {mainCategoryVms.map((vm, idx) => {
                 const isActive = idx === currentIndex
                 const cat = vm.raw
-                const meta = (cat.metadata as CategoryMetadataExtended) || FALLBACK_METADATA[vm.slug] || FALLBACK_METADATA['default']
+                const meta = (cat.metadata as CategoryMetadataExtended) || fallbackMetadata[vm.slug] || fallbackMetadata['default']
 
                 // Construct image URL
                 let bgImage = `/images/category/hero-${vm.slug}.png`

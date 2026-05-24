@@ -183,6 +183,35 @@ export const en = {
     }
   },
   home: {
+    fallbackMetadata: {
+      industrialVentilation: {
+        hero_title: 'Industrial Ventilation Solutions',
+        hero_description: 'High performance, energy efficient and long lasting fan technologies.',
+        technical_summary: '20+ Years Experience',
+        features: {
+          performance: 'High Performance',
+          energy: 'Energy Saving'
+        }
+      },
+      residentialVentilation: {
+        hero_title: 'Professional Residential Ventilation',
+        hero_description: 'Silent comfort barrier and energy saving for your home and business.',
+        technical_summary: 'Silence',
+        features: {
+          barrier: 'Air Barrier',
+          climate: 'Climate Protection'
+        }
+      },
+      default: {
+        hero_title: 'Professional Climate Control',
+        hero_description: 'Meet the latest technology HVAC solutions.',
+        technical_summary: 'Premium Quality',
+        features: {
+          durable: 'Long Lasting',
+          guaranteed: 'Guaranteed'
+        }
+      }
+    },
     seoTitle: "VentHub - Premium HVAC Solutions | Fans, Speed Control, Heating & Cooling",
     seoDesc: "Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.",
     hero: {
