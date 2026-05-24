@@ -1,0 +1,7 @@
+# CC Docs Pipeline Config (otomatik üretildi)
+source_dirs: [src]
+master_md: "docs/venthub_hvac_master.md"
+notebook_id: "2aa4fc16-acf6-47c6-90a8-c02fe5bb28f8"
+standalone_files: [README.md]
+skip_dirs: [__pycache__, .git, .agent, .venv, venv, mcp-env, node_modules, tests, .pytest_cache, .ruff_cache, build, dist, egg-info]
+skip_files: [venthub_hvac_master.md, system_tree.md]

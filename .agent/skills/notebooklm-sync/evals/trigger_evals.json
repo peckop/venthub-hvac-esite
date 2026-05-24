@@ -1,0 +1,82 @@
+[
+  {
+    "query": "Bütün dokümantasyonları güncelledim, NotebookLM tarafına yeni halini yollar mısın?",
+    "should_trigger": true
+  },
+  {
+    "query": "Sisteme yeni bir mimari belgesi ekledim. Bunun notebook'a yansımasını sağla lütfen.",
+    "should_trigger": true
+  },
+  {
+    "query": "NLM'yi güncelleyelim, az önce yaptığımız değişiklikler oraya da geçsin.",
+    "should_trigger": true
+  },
+  {
+    "query": "Docs klasöründeki her şeyi baştan sona NLM ile eşitle.",
+    "should_trigger": true
+  },
+  {
+    "query": "Ağaç röntgenini çıkar ve ardından nlm'ye hard reset atıp master md'yi yükle.",
+    "should_trigger": true
+  },
+  {
+    "query": "Senkronizasyon yapma zamanı geldi, hafızayı tazele.",
+    "should_trigger": true
+  },
+  {
+    "query": "Az önceki task başarıyla bitti. Şimdi tüm bu yeni bilgilerin AI tarafından da bilinmesi için NotebookLM aktarımını tetikle.",
+    "should_trigger": true
+  },
+  {
+    "query": "Eski kaynakları sil ve yerine en güncel master MD dosyasını senkronize et.",
+    "should_trigger": true
+  },
+  {
+    "query": "NotebookLM hafızası eskimiş olabilir, en güncel dosyalarla bir yenileme (sync) işlemi gerçekleştir.",
+    "should_trigger": true
+  },
+  {
+    "query": "Projeyi notebooklm ile senkronize edebilir misin?",
+    "should_trigger": true
+  },
+  {
+    "query": "NotebookLM'deki 'corpus-callosum-Proje Hafızası' defterinin ID'sini bulup getirebilir misin?",
+    "should_trigger": false
+  },
+  {
+    "query": "Senkronizasyon (sync) işlemleri için kullandığımız docs_tree.py kodunu bana göster.",
+    "should_trigger": false
+  },
+  {
+    "query": "Google Drive'daki bir dokümanı NotebookLM'e eklemek istiyorum, bunu nasıl yaparım?",
+    "should_trigger": false
+  },
+  {
+    "query": "NotebookLM defterinde VentHub ile ilgili ne yazıyor, oradan arama yapıp sonucu getir.",
+    "should_trigger": false
+  },
+  {
+    "query": "Şu markdown dosyasının içeriğini düzenler misin, bazı yazım hataları var.",
+    "should_trigger": false
+  },
+  {
+    "query": "NotebookLM'den bir sesli özet (audio overview) indirmemiz lazım.",
+    "should_trigger": false
+  },
+  {
+    "query": "Docs klasöründeki architecture.md dosyasına yeni bir bölüm ekle.",
+    "should_trigger": false
+  },
+  {
+    "query": "Ekranda açık olan merge_mds.py betiğini silebilirsin.",
+    "should_trigger": false
+  },
+  {
+    "query": "NotebookLM'de yeni bir defter oluştur (create notebook) ve adını test koy.",
+    "should_trigger": false
+  },
+  {
+    "query": "Projedeki tüm markdown dosyalarının sayısını hesapla.",
+    "should_trigger": false
+  }
+]
