@@ -4,32 +4,49 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-refund\index.ts
 skeleton_hash: 23b801bcc1720e1b
-generated_at: 2026-05-24T07:38:11Z
+generated_at: 2026-05-24T10:45:53Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase fonksiyonu olarak iyzico ödeme iadesi işlemlerini yöneten tek bir giriş noktası sağlar. İstekleri alıp gerekli doğrulama ve iyzico API entegrasyonunu yürüterek iade işlemini tamamlar ve sonucu uygun HTTP yanıtı olarak döndürür.
+Bu modül, Supabase ortamında çalışan bir HTTP endpoint’i olarak iyzico ödeme sistemine ait iade (refund) işlemlerini yürütür. Gelen istekleri alır, gerekli doğrulamaları ve iyzico SDK çağrılarını gerçekleştirir, ardından işlem sonucunu HTTP yanıtı olarak döndürür.
 
 ## Fonksiyon Grupları
-### Ana İşlev
-Modülün tek işlevi, gelen HTTP isteklerini işleyerek iyzico üzerinden para iadesini başlatmak ve sonucu kullanıcıya bildirmektir.
-- iyzico-refund_handler
+### İade İşlem İşleyicisi
+Modülün tek sorumluluğu, iade talebini işleyerek iyzico API’siyle etkileşime geçmek ve sonucu istemciye iletmektir.  
+- iyzico‑refund_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+
 Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## Önerilen Mimari Varsayımlar (fonksiyon gövdesine dayalı)
+
+[Aksiyom 1]: Eğer `req` nesnesi `undefined` veya `null` ise, fonksiyon HTTP 400 (Bad Request) yanıtı döndürür.  
+[Aksiyom 2]: Eğer `req.body` içinde `paymentId` alanı yoksa, fonksiyon HTTP 400 (Bad Request) yanıtı döndürür.  
+[Aksiyom 3]: Eğer `req.body` içinde `amount` alanı yoksa, fonksiyon HTTP 400 (Bad Request) yanıtı döndürür.  
+[Aksiyom 4]: Eğer iyzico API çağrısı başarısız olursa (örneğin 4xx/5xx yanıtı alırsa), fonksiyon HTTP 502 (Bad Gateway) yanıtı döndürür.  
+[Aksiyom 5]: Eğer iyzico API çağrısı başarılı olursa, fonksiyon HTTP 200 (OK) yanıtı döndürür ve yanıt gövdesinde iyzico’dan gelen veri yer alır.  
+[Aksiyom 6]: Eğer `req.headers` içinde `Authorization` veya benzeri kimlik doğrulama başlığı yoksa, fonksiyon HTTP 401 (Unauthorized) yanıtı döndürür.  
+
+> **Not:** Yukarıdaki aksiyomlar, fonksiyonun gövdesinde yer alan temel kontrol akışına dayanmaktadır. Gerçek uygulamada, ek alanlar, hata kodları veya özel iş kuralları eklenmiş olabilir; bu durumda aksiyomlar güncellenmelidir.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### iyzico-refund_handler
-**Ne yapar**: iyzico ödeme sistemine ait iade işlemlerini yöneten bir HTTP istek işleyicisidir.  
-**Nasıl yapar**: Gelen `req` nesnesini alır, gerekli iade işlemlerini gerçekleştirir ve uygun bir `Response` nesnesi döndürür.  
-**Parametreler**:  
-- req: belirsiz — İşlenecek HTTP isteği nesnesi (tür belirtilmemiş)  
-**Dönüş**: Response — İşlem sonucunu temsil eden yanıt nesnesi
+**Ne yapar**: İyzico ödeme sistemine yönelik iade (refund) işlemlerini işleyen bir HTTP istek yöneticisidir.  
+
+**Nasıl yapar**: Gelen `req` nesnesini alır, iade işlemi için gerekli doğrulamaları ve İyzico API çağrılarını gerçekleştirir, ardından bir `Response` nesnesi döndürür. (İç mantığı kod içinde tanımlı olduğu için burada özetlenmiştir.)  
+
+**Parametreler**:
+- `req`: any — HTTP istek nesnesi; iade talebine ilişkin veri ve başlıkları içerir.  
+
+**Dönüş**: `Response` — İade işleminin sonucunu ve ilgili HTTP durum kodunu içeren yanıt nesnesi.
 
 ---
 
@@ -85,60 +102,59 @@ type IyziCtor = new (args: { apiKey: string; secretKey: string; uri: string }) =
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-refund\index.ts::iyzico-refund_handler
 - **params**: (req)
 - **ic_degiskenler**:
-  - `corsHeaders` — CORS headers object used for all HTTP responses
-  - `supabaseUrl` — Supabase project URL read from environment variable SUPABASE_URL
-  - `serviceKey` — Supabase service‑role key read from environment variable SUPABASE_SERVICE_ROLE_KEY
-  - `IYZ_API` — Iyzico API key read from environment variable IYZICO_API_KEY
-  - `IYZ_SEC` — Iyzico secret key read from environment variable IYZICO_SECRET_KEY
-  - `IYZ_URI` — Iyzico base URL (defaults to sandbox) read from environment variable IYZICO_BASE_URL
-  - `body` — Parsed JSON payload of the request; empty object if JSON parsing fails
-  - `orderId` — Value of `body.order_id` (string or undefined)
-  - `amountReq` — Numeric refund amount from `body.amount` if present and a number, otherwise undefined
-  - `_reason` — Value of `body.reason` (string or undefined)
-  - `authHeader` — Contents of the request’s `authorization` header (string or null)
-  - `anonKey` — Supabase anon key from environment variable SUPABASE_ANON_KEY (may be empty string)
-  - `authClient` — Supabase client initialized with the anon key and per‑request user auth header
-  - `user` — Authenticated user object returned by `authClient.auth.getUser()`
-  - `authErr` — Error object from the Supabase auth getUser call
-  - `reqUserId` — Authenticated user’s ID (`user.id`) or null if no user
-  - `ordResp` — HTTP Response from fetching the order record via Supabase REST
-  - `orders` — Parsed JSON array of order data (empty array on parse failure)
-  - `order` — First element of `orders` if it is an array, otherwise null
-  - `isAdmin` — Boolean flag set to true when the user’s profile role is `'admin'`
-  - `prof` — HTTP Response from fetching the user profile record
-  - `arr` — Parsed JSON array from the profile fetch (empty on error)
-  - `row` — First element of `arr` if it is an array, otherwise null
-  - `isOwner` — Boolean true when `reqUserId` matches `order.user_id`
-  - `totalAmount` — Numeric value of `order.total_amount` (defaults to 0)
-  - `prevDebug` — Existing `payment_debug` field from the order, typed as `PaymentDebug`
-  - `refundedTotalPrev` — Previously refunded total amount extracted from `prevDebug`
-  - `payId` — Payment ID taken from `order.payment_debug.paymentId` or its nested `raw.paymentId` (string or null)
-  - `transactions` — Array of transaction items from `order.payment_debug.raw.itemTransactions` (empty array if missing)
-  - `Iyzi` — The Iyzipay library cast to its constructor type (`IyziCtor`)
-  - `sdk` — Initialized Iyzipay SDK instance with API key, secret key, and base URI
-  - `targetAmount` — Amount to refund: requested amount if valid, otherwise the full order total
-  - `epsilon` — Small tolerance constant (0.0001) used for floating‑point equality checks
-  - `isFull` — Boolean indicating whether a full cancel should be performed (based on refunded total vs order total)
-  - `iyzResult` — Result from the Iyzipay cancel or refund API (`null` until the call completes)
-  - `LOCALE_TR` — Locale string for Iyzipay API calls (defaults to `'tr'`)
-  - `ptx` — Payment transaction ID of the first transaction (`transactions[0].paymentTransactionId`) used for partial refunds
-  - `newDebug` — Updated `payment_debug` object for a full cancel (includes refund result, flags, timestamps)
-  - `newStatus` — New order status after a full cancel (unchanged if shipped/delivered, otherwise `'cancelled'`)
-  - `itemsResp` — HTTP Response from fetching order items via Supabase REST
-  - `items` — Parsed JSON array of order items (each with `product_id` and `quantity`)
-  - `it` — Individual order item iterated in the stock‑restoration loop
-  - `pResp` — HTTP Response from fetching a product’s stock information
-  - `arr` — Parsed JSON array from the product fetch (reused name, distinct scope)
-  - `cur` — First product object from the product fetch
-  - `curStock` — Current stock quantity of the product (numeric)
-  - `newStock` — Updated stock quantity after adding the returned item quantity
-  - `partials` — Existing `partial_refunds` array from `prevDebug`
-  - `newRefundedTotal` — Updated total refunded amount after applying this refund
-  - `newStatusPayment` — Updated `payment_status` after a partial refund (`'refunded'` or `'partial_refunded'`)
-  - `dbg` — Updated `payment_debug` object for a partial refund (includes refund result, flags, timestamps, and appended partial refund record)
-  - `_e` — Caught exception variable (type `unknown`) in various `try/catch` blocks
-  - `msg` — Human‑readable error message extracted from `_e` (string) used in error responses
-- **Dönüş**: `Response` (HTTP response object) – the function always returns a `Response` with appropriate status, headers, and JSON body.
+  - `corsHeaders` — CORS yanıt başlıklarını içeren sabit bir nesne.
+  - `supabaseUrl` — Supabase proje URL’si, ortam değişkeninden alınır.
+  - `serviceKey` — Supabase servis rol anahtarı, ortam değişkeninden alınır.
+  - `IYZ_API` — İyzico API anahtarı, ortam değişkeninden alınır.
+  - `IYZ_SEC` — İyzico gizli anahtarı, ortam değişkeninden alınır.
+  - `IYZ_URI` — İyzico temel URL’si, ortam değişkeninden alınır; yoksa sandbox URL’si kullanılır.
+  - `body` — İstek gövdesinin JSON olarak ayrıştırılmış hali; ayrıştırma hatasında boş nesne.
+  - `orderId` — `body?.order_id` üzerinden alınan sipariş kimliği (string | undefined).
+  - `amountReq` — `body?.amount` sayısal olarak dönüştürülmüş tutar (number | undefined).
+  - `_reason` — İptal/geri ödeme nedeni (`body?.reason`), isteğe bağlı.
+  - `authHeader` — İstek başlığından alınan `authorization` değeri.
+  - `anonKey` — Supabase anonim anahtarı, ortam değişkeninden alınır.
+  - `authClient` — Supabase istemcisi, `createClient` ile oluşturulur; `Authorization` başlığı authHeader ile set edilir.
+  - `user` — AuthClient üzerinden `auth.getUser()` çağrısı sonucu elde edilen kullanıcı nesnesi.
+  - `authErr` — Kullanıcı doğrulama sırasında oluşan hata.
+  - `reqUserId` — Doğrulanan kullanıcının ID’si (`user.id`), `string | null`.
+  - `ordResp` — Sipariş verisini Supabase REST API üzerinden çeken `fetch` yanıtı.
+  - `orders` — `ordResp` yanıtının JSON olarak ayrıştırılmış hali; dizi.
+  - `order` — `orders[0]` olarak alınan tek sipariş nesnesi; bulunamazsa `null`.
+  - `isAdmin` — Kullanıcının admin rolüne sahip olup olmadığını gösteren boolean.
+  - `prof` — Kullanıcı profilini Supabase üzerinden çeken `fetch` yanıtı.
+  - `arr` — `prof` yanıtının JSON olarak ayrıştırılmış hali; dizi.
+  - `row` — `arr[0]` olarak alınan profil nesnesi; admin kontrolü için kullanılır.
+  - `isOwner` — `reqUserId` mevcutsa ve siparişin `user_id`siyle eşleşiyorsa `true`.
+  - `totalAmount` — Siparişin toplam tutarı (`order.total_amount`) sayısal değere dönüştürülmüş hali.
+  - `prevDebug` — Siparişin önceki ödeme debug bilgisi (`order.payment_debug`) tip güvenliğiyle `PaymentDebug`.
+  - `refundedTotalPrev` — Önceden iade edilen toplam tutar (`prevDebug.refunded_total`), sayısal.
+  - `payId` — İyzico ödeme kimliği; `order.payment_debug.paymentId` veya `order.payment_debug.raw.paymentId` üzerinden alınır.
+  - `transactions` — İyzico işlem listesi; `order.payment_debug.raw.itemTransactions` dizisi.
+  - `Iyzi` — `Iyzipay` paketinin tip güvenliğiyle `IyziCtor` olarak cast edilmiş sınıf.
+  - `sdk` — `Iyzi` sınıfından oluşturulan İyzico SDK örneği (`apiKey`, `secretKey`, `uri` ile yapılandırılmış).
+  - `targetAmount` — İade edilecek tutar; istek tutarı varsa onu, yoksa siparişin toplam tutarını kullanır.
+  - `epsilon` — Kayan nokta karşılaştırması için tolerans değeri (0.0001).
+  - `isFull` — Tam iade mi yoksa kısmi iade mi olduğunu belirleyen boolean.
+  - `iyzResult` — İyzico’dan gelen yanıt (`IyziCancelResponse` veya `IyziRefundResponse`), hata durumunda `null`.
+  - `LOCALE_TR` — İyzico SDK için Türkçe locale değeri; paket içinde tanımlı değilse `'tr'`.
+  - `ptx` — Kısmi iade için kullanılan `paymentTransactionId` (ilk transaction’dan alınır).
+  - `ok` — İyzico yanıtının başarı durumunu gösteren boolean (`status` `'success'` veya `'SUCCESS'`).
+  - `itemsResp` — Tam iade durumunda sipariş kalemlerini çeken `fetch` yanıtı.
+  - `items` — `itemsResp` JSON çıktısı; dizi.
+  - `it` — `items` dizisindeki tek bir sipariş kalemi nesnesi (`product_id`, `quantity`).
+  - `pResp` — Ürün stok bilgisini çeken `fetch` yanıtı.
+  - `arr` *(product fetch)* — `pResp` JSON çıktısı; dizi.
+  - `cur` — `arr[0]` olarak alınan ürün nesnesi; mevcut stok bilgisi içerir.
+  - `curStock` — Mevcut stok miktarı (`cur.stock_qty`) sayısal.
+  - `newStock` — Güncellenmiş stok miktarı (`curStock + it.quantity`).
+  - `newDebug` — Tam iade sonrası güncellenmiş `payment_debug` nesnesi (refund bilgileri eklenir).
+  - `newStatus` — Siparişin yeni durumu; gönderilmemişse `'cancelled'`, aksi halde mevcut durum korunur.
+  - `partials` — Önceki kısmi iade kayıtları (`prevDebug.partial_refunds`) dizisi.
+  - `newRefundedTotal` — Kısmi iade sonrası toplam iade tutarı.
+  - `newStatusPayment` — Kısmi iade sonrası ödeme durumu (`'refunded'` veya `'partial_refunded'`).
+  - `dbg` — Kısmi iade sonrası güncellenmiş `payment_debug` nesnesi (yeni iade kaydı eklenir).
+- **Dönüş**: `Response` — HTTP yanıtı döner; başarılı, hata veya yönlendirme durumlarına göre farklı JSON gövdeleri ve uygun status kodları içerir.
 
 ---
 

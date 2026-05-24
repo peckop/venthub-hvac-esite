@@ -6,68 +6,11 @@ Bu ağaç `cli/docs_tree.py` tarafından otonom olarak üretilmiştir.
 ## Dokümantasyon Durumu
 ```text
 📂 venthub-hvac/
+├── ⚪ `CONTEXT.md`
 ├── ⚪ `README.md`
 ├── 📂 **artifacts/**
-│   └── 📂 **superpowers/**
-│       ├── ⚠️ `007-brainstorm.md`
-│       ├── ⚠️ `007-plan.md`
-│       ├── ⚠️ `007-review.md`
-│       ├── ⚠️ `008-brainstorm.md`
-│       ├── ⚠️ `008-plan.md`
-│       ├── ⚠️ `008-review.md`
-│       ├── ⚠️ `009-brainstorm.md`
-│       ├── ⚠️ `009-plan.md`
-│       ├── ⚠️ `architectural_cleansing.md`
-│       ├── ⚠️ `brainstorm.md`
-│       ├── ⚠️ `clean_code_brainstorm.md`
-│       ├── ⚠️ `execution.md`
-│       ├── ⚠️ `final_cleanup_strategy.md`
-│       ├── ⚠️ `finish.md`
-│       ├── ⚠️ `homepage-fix-plan.md`
-│       ├── ⚠️ `homepage-fix-summary.md`
-│       ├── ⚠️ `pdp-overhaul-brainstorm.md`
-│       ├── ⚠️ `pdp-redesign-brainstorm.md`
-│       ├── ⚠️ `plan.md`
-│       ├── 📂 **subagent-053e2886/**
-│       │   └── ⚠️ `cart-strategy-plan.md`
-│       ├── 📂 **subagent-14078a86/**
-│       │   └── ⚠️ `analysis_plan.md`
-│       ├── 📂 **subagent-2e88a7fc/**
-│       │   └── ⚠️ `response.md`
-│       ├── 📂 **subagent-365a68f9/**
-│       ├── 📂 **subagent-43cdb373/**
-│       │   └── ⚠️ `implementation_plan.md`
-│       ├── 📂 **subagent-560a5ed3/**
-│       │   └── ⚠️ `test_final_3.md`
-│       ├── 📂 **subagent-57fa2b43/**
-│       │   └── ❌ `automation.py`
-│       ├── 📂 **subagent-689bbcb2/**
-│       │   └── ❌ `automation.py`
-│       ├── 📂 **subagent-7df1084b/**
-│       │   └── ⚠️ `test_final_1.md`
-│       ├── 📂 **subagent-7f1aefe2/**
-│       ├── 📂 **subagent-a0138dc1/**
-│       │   └── ⚠️ `sentez-raporu.md`
-│       ├── 📂 **subagent-a29f9021/**
-│       │   └── ⚠️ `plan.md`
-│       ├── 📂 **subagent-a3c41c28/**
-│       │   └── ⚠️ `review.md`
-│       ├── 📂 **subagent-b022b5e5/**
-│       │   └── ⚠️ `implementation_plan.md`
-│       ├── 📂 **subagent-b79cf8a0/**
-│       │   └── ⚠️ `analysis.md`
-│       ├── 📂 **subagent-d9e2d966/**
-│       │   └── ⚠️ `review-report.md`
-│       ├── 📂 **subagent-e4f9ee42/**
-│       └── 📂 **subagents/**
-├── ⚠️ `clean_health_certificate.md`
 ├── 📂 **deploy/**
 ├── 📂 **docs/**
-│   ├── ⚪ `01_manifesto_and_pulse.md`
-│   ├── ⚪ `02_architecture_and_design.md`
-│   ├── ⚪ `03_ai_operating_protocols.md`
-│   ├── ⚪ `04_operations_and_deployment.md`
-│   ├── ⚪ `05_domain_knowledge.md`
 │   ├── ⚪ `CHANGELOG.md`
 │   ├── 📂 **archive/**
 │   │   ├── ⚪ `014-kategori-ssr-plan.md`
@@ -88,6 +31,7 @@ Bu ağaç `cli/docs_tree.py` tarafından otonom olarak üretilmiştir.
 │   ├── 📂 **products/**
 │   │   ├── ⚪ `AIR_DOOR_AD_900_MASTER.md`
 │   │   └── ⚪ `AIR_DOOR_AD_900_SEO.md`
+│   ├── ⚪ `supabase_functions_master.md`
 │   ├── ⚪ `system_tree.md`
 │   └── ⚪ `venthub_hvac_master.md`
 ├── 📂 **logs/**
@@ -105,9 +49,7 @@ Bu ağaç `cli/docs_tree.py` tarafından otonom olarak üretilmiştir.
 │       ├── 📂 **products/**
 │       └── 📂 **vortice/**
 ├── 📂 **scripts/**
-│   ├── ❌ `approve_dream.py`
 │   ├── 📂 **archive/**
-│   ├── ❌ `auto_dream.py`
 │   ├── 📂 **db/**
 │   │   ├── 📂 **backups/**
 │   │   ├── 📂 **checks/**
@@ -119,8 +61,6 @@ Bu ağaç `cli/docs_tree.py` tarafından otonom olarak üretilmiştir.
 │   │   └── 📂 **migrations/**
 │   │       └── ❌ `apply_migration.py`
 │   ├── 📂 **generate/**
-│   ├── ❌ `link_cli_session.py`
-│   ├── ❌ `setup_autodream.py`
 │   └── 📂 **tools/**
 │       ├── ❌ `extract_brands.py`
 │       ├── ❌ `extract_pdf.py`
@@ -734,17 +674,11 @@ Bu ağaç `cli/docs_tree.py` tarafından otonom olarak üretilmiştir.
 ```
 
 ## Eksik Dokümantasyonlar
-- [ ] `artifacts\superpowers\subagent-57fa2b43\automation.py`
-- [ ] `artifacts\superpowers\subagent-689bbcb2\automation.py`
-- [ ] `scripts\approve_dream.py`
-- [ ] `scripts\auto_dream.py`
 - [ ] `scripts\db\checks\check_category_id.py`
 - [ ] `scripts\db\checks\check_product_fields.py`
 - [ ] `scripts\db\checks\check_rls.py`
 - [ ] `scripts\db\checks\simulate_frontend.py`
 - [ ] `scripts\db\migrations\apply_migration.py`
-- [ ] `scripts\link_cli_session.py`
-- [ ] `scripts\setup_autodream.py`
 - [ ] `scripts\tools\extract_brands.py`
 - [ ] `scripts\tools\extract_pdf.py`
 - [ ] `scripts\tools\fix_aria_labels.py`
@@ -753,38 +687,6 @@ Bu ağaç `cli/docs_tree.py` tarafından otonom olarak üretilmiştir.
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
-- [⚠️] `artifacts\superpowers\007-brainstorm.md`
-- [⚠️] `artifacts\superpowers\007-plan.md`
-- [⚠️] `artifacts\superpowers\007-review.md`
-- [⚠️] `artifacts\superpowers\008-brainstorm.md`
-- [⚠️] `artifacts\superpowers\008-plan.md`
-- [⚠️] `artifacts\superpowers\008-review.md`
-- [⚠️] `artifacts\superpowers\009-brainstorm.md`
-- [⚠️] `artifacts\superpowers\009-plan.md`
-- [⚠️] `artifacts\superpowers\architectural_cleansing.md`
-- [⚠️] `artifacts\superpowers\brainstorm.md`
-- [⚠️] `artifacts\superpowers\clean_code_brainstorm.md`
-- [⚠️] `artifacts\superpowers\execution.md`
-- [⚠️] `artifacts\superpowers\final_cleanup_strategy.md`
-- [⚠️] `artifacts\superpowers\finish.md`
-- [⚠️] `artifacts\superpowers\homepage-fix-plan.md`
-- [⚠️] `artifacts\superpowers\homepage-fix-summary.md`
-- [⚠️] `artifacts\superpowers\pdp-overhaul-brainstorm.md`
-- [⚠️] `artifacts\superpowers\pdp-redesign-brainstorm.md`
-- [⚠️] `artifacts\superpowers\plan.md`
-- [⚠️] `artifacts\superpowers\subagent-053e2886\cart-strategy-plan.md`
-- [⚠️] `artifacts\superpowers\subagent-14078a86\analysis_plan.md`
-- [⚠️] `artifacts\superpowers\subagent-2e88a7fc\response.md`
-- [⚠️] `artifacts\superpowers\subagent-43cdb373\implementation_plan.md`
-- [⚠️] `artifacts\superpowers\subagent-560a5ed3\test_final_3.md`
-- [⚠️] `artifacts\superpowers\subagent-7df1084b\test_final_1.md`
-- [⚠️] `artifacts\superpowers\subagent-a0138dc1\sentez-raporu.md`
-- [⚠️] `artifacts\superpowers\subagent-a29f9021\plan.md`
-- [⚠️] `artifacts\superpowers\subagent-a3c41c28\review.md`
-- [⚠️] `artifacts\superpowers\subagent-b022b5e5\implementation_plan.md`
-- [⚠️] `artifacts\superpowers\subagent-b79cf8a0\analysis.md`
-- [⚠️] `artifacts\superpowers\subagent-d9e2d966\review-report.md`
-- [⚠️] `clean_health_certificate.md`
 - [⚠️] `src\actions\auth.md`
 - [⚠️] `src\app\_components\ProductDetailPageView.md`
 - [⚠️] `src\app\about\page.md`

@@ -110,6 +110,3 @@ BEGIN
 END;
 $$;
 
--- Grant permissions
-GRANT EXECUTE ON FUNCTION public.process_order_stock_reduction(text) TO service_role;
-GRANT EXECUTE ON FUNCTION public.process_order_stock_reduction(text) TO anon;

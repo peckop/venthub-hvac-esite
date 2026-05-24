@@ -301,7 +301,7 @@ Deno.serve(async (req) => {
               'apikey': serviceRoleKey,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ p__order_id: orderId })
+            body: JSON.stringify({ p_order_id: orderId })
           });
 
           if (rpcResp.ok) {

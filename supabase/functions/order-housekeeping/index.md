@@ -4,15 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-housekeeping\index.ts
 skeleton_hash: ef1bd632b4cee85c
-generated_at: 2026-05-24T07:43:27Z
+generated_at: 2026-05-24T10:45:43Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase fonksiyonu olarak sipariş temizlik işlemlerini yöneten tek bir giriş noktası sağlar. İstekleri alır, gerekli işlemleri yürütür ve uygun bir yanıt döndürür.
+Bu modül, Supabase üzerinde çalışan bir sunucu fonksiyonu olarak siparişlerle ilgili temizlik/idame (order housekeeping) işlemlerini yöneten tek giriş noktası sağlar. Gelen HTTP isteklerini alır, CORS yönetimi, kimlik doğrulama ve Supabase ile entegrasyon gibi gerekli adımları tamamlayıp uygun bir yanıt döndürür.
 
 ## Fonksiyon Grupları
 ### Sipariş Temizlik İşleyici
-Modülün temel sorumluluğu, gelen HTTP isteklerini işleyip sipariş temliğiyle ilgili gerekli işlemleri gerçekleştirmektir.
+Modülün tek sorumluluğu, gelen HTTP isteklerini işleyip sipariş temizliğiyle ilgili işlemleri (CORS başlıkları yönetimi, Supabase servis anahtarları ile entegrasyon, kimlik doğrulama kontrolü gibi) gerçekleştirmektir.
 - order-housekeeping_handler
 
 ---
@@ -25,47 +25,47 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSIYON DETAYLARI
 
 ### order-housekeeping_handler
-**Ne yapar**: Order housekeeping ile ilgili gelen istekleri işler ve uygun bir `Response` nesnesi döndürür.  
-**Nasıl yapar**: Fonksiyon, `req` parametresi olarak alınan HTTP isteğini okur, içindeki veriyi değerlendirerek order housekeeping işlemlerini gerçekleştirir ve işlem sonucunu bir `Response` objesi olarak geri döndürür.  
+**Ne yapar**: Bu fonksiyon, Supabase Edge Function olarak dağıtılan sipariş temizliği işlevinin ana işleyicisidir. Gelen HTTP isteklerini alır, sipariş temizliği ile ilgili tüm yönetimsel ve operasyonel görevleri yürütmek için gerekli adımları başlatır ve sonucunda uygun bir HTTP yanıtı döndürür.
+**Nasıl yapar**: Öncelikle gelen istek nesnesini alır, isteğin geçerliliğini, yetkilendirme durumunu ve istenen işlem türünü doğrular. Ardından tanımlanmış sipariş temizliği prosedürlerini çalıştırarak gereken temizlik işlemlerini gerçekleştirir. İşlem sonucuna göre başarılı veya hata durumlarını belirten bir HTTP yanıtı formatlar ve istemciye iletir.
 **Parametreler**:
-- req: Request — İşlenecek HTTP isteği; housekeeping işlemi için gerekli veriyi (örneğin kimlik, komut veya veri yükü) içerir.  
-**Dönüş**: Response — Order housekeeping işleminin sonucunu taşıyan HTTP yanıtı; durum kodu, başlıklar ve gövde gibi bilgileri içerir.
+- req: Request — Fonksiyona iletilen standart HTTP isteği nesnesi, isteğin HTTP yöntemi, başlıkları, gövdesi ve yol bilgilerini içerir.
+**Dönüş**: Response — İşlem sonucunu temsil eden standart HTTP yanıt nesnesi. Başarılı işlemler için genellikle 200 aralığında durum kodları ve işlem detayları içeren bir gövde döndürür, hata durumlarında ise 400 veya 500 aralığında durum kodları ve ilgili hata açıklamaları içerir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/order-housekeeping/index.ts::order-housekeeping_handler
-- **params**: req
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\order-housekeeping\index.ts::order-housekeeping_handler
+- **params**: (req)
 - **ic_degiskenler**:
-  - `cors` — CORS header nesnesi, tüm originlere izin ver ve belirli başlıklar/metodlar için önceden tanımlanmış değerler
-  - `supabaseUrl` — Supabase proje URL’si, Deno ortam değişkenlerinden okunur (boş string varsayılan)
-  - `serviceRoleKey` — Supabase service_role anahtarı, admin işlemleri için kullanılır
-  - `anonKey` — Supabase anonim anahtarı, istemci tarafı çağrılarında kullanılır
-  - `authHeader` — İstekteki Authorization başlığının değeri (Bearer token)
-  - `authClient` — Supabase istemcisi, anonKey ve authHeader ile kullanıcı bilgilerini almak için oluşturulur
-  - `user` — authClient.auth.getUser() çağrısından dönen Supabase kullanıcı nesnesi
-  - `authErr` — Kullanıcı bilgisi alınırken oluşan hata nesnesi
-  - `roleCheck` — Kullanıcının rolünü kontrol etmek için user_profiles tablosuna yapılan HTTP isteğinin Response nesnesi
-  - `arr` — roleCheck yanıtının JSON olarak ayrıştırılmış hali (boş dizi varsayılan)
-  - `role` — Kullanıcının rolü (admin/superadmin gibi), arr[0]?.role dan elde edilir
-  - `now` — Şu anki Unix milisaniye zaman damgası (Date.now())
-  - `th30` — 30 dakika önceki zamanın ISO 8601 stringi, pending ve token olmayan siparişleri iptal etmek için kullanılır
-  - `th15` — 15 dakika önceki zamanın ISO 8601 stringi, token olan bekleyen siparişleri listelemek için kullanılır
-  - `cancelResp` — 30 dakikadan eski ve payment_token null olan siparişlerin statusunu cancelled olarak güncelleme PATCH isteğinin Response nesnesi
-  - `cancelled` — cancelRespから返却された JSON 配列（キャンセルされた注文のリスト）、失敗時は空配列
-  - `listResp` — payment_tokenが存在し、15分以前のpending注文を取得するGETリクエストのResponse
-  - `pendWithToken` — listRespから返却された JSON 配列（トークンありの保留注文リスト）、失敗時は空配列
-  - `fnHost` — supabaseUrlから導き出された関数ホスト URL（例：https://<project>.functions.supabase.co）
-  - `reconciled` — iyzico 콜백에서 status が 'success' だった注文 ID の文字列配列
-  - `failed` — iyzico 콜백에서 status が success でなかったり、エラーがあった注文 ID の文字列配列（ステータスを failed に更新）
-  - `cb` — iyzico-callback 関数への POST リクエストの Response
-  - `body` — cb の JSON 本体（status フィールドを含む可能性があるオブジェクト）、失敗時は空オブジェクト
-  - `_e` — 外部 try/catch で捕捉された例外オブジェクト（またはその文字列表現）
-  - `host` — fnHost を生成する IIFE 内での supabaseUrl のホスト部分（例：project.supabase.co）
-  - `ref` — host の最初のラベル（サブプロジェクト名）
-  - `o` — pendWithToken 配列を for...of でイテレーションする際の各注文オブジェクト（{ id: string }）
-- **Dönüş**: Response
+  - `cors` — CORS başlıklarını içeren sabit nesne, tüm yanıtlar için kullanılacak.
+  - `req.method` — Gelen isteğin HTTP metodunu belirler; `OPTIONS` ise erken dönen yanıt.
+  - `supabaseUrl` — `SUPABASE_URL` ortam değişkeninden alınan Supabase URL’si; yoksa boş string.
+  - `serviceRoleKey` — `SUPABASE_SERVICE_ROLE_KEY` ortam değişkeninden alınan servis rolü anahtarı; yoksa boş string.
+  - `anonKey` — `SUPABASE_ANON_KEY` ortam değişkeninden alınan anonim anahtar; yoksa boş string.
+  - `authHeader` — İstek başlıklarından `Authorization` değeri; yoksa 401 yanıtı döner.
+  - `authClient` — `createClient` ile oluşturulan Supabase istemcisi, anonim anahtar ve gelen auth header ile yapılandırılmış.
+  - `data.user` — `authClient.auth.getUser()` çağrısının döndürdüğü kullanıcı nesnesi.
+  - `authErr` — `authClient.auth.getUser()` çağrısının hatası.
+  - `roleCheck` — Kullanıcının rolünü sorgulayan `fetch` isteğinin yanıt nesnesi.
+  - `arr` — `roleCheck.json()` ile elde edilen dizi; rol bilgisi içerir.
+  - `role` — `arr[0]?.role` ifadesiyle elde edilen kullanıcı rolü.
+  - `now` — `Date.now()` ile elde edilen milisaniye cinsinden zaman damgası.
+  - `th30` — 30 dakika öncesi ISO stringi; `cancelResp` için filtre.
+  - `th15` — 15 dakika öncesi ISO stringi; `listResp` için filtre.
+  - `cancelResp` — 30 dk önce oluşturulmuş ve tokeni olmayan pending siparişleri `cancelled` olarak işaretleyen `fetch` isteğinin yanıtı.
+  - `cancelled` — `cancelResp.ok` ise JSON olarak parse edilen dizi; aksi halde boş dizi.
+  - `listResp` — 15 dk önce oluşturulmuş ve tokeni olan pending siparişlerin listesi için `fetch` isteğinin yanıtı.
+  - `pendWithToken` — `listResp.ok` ise JSON olarak parse edilen dizi; aksi halde boş dizi.
+  - `fnHost` — `supabaseUrl`’dan türetilen fonksiyon host URL’si; hatalı URL durumunda boş string.
+  - `reconciled` — Başarılı olarak reconcile edilen sipariş ID’lerini tutan dizi.
+  - `failed` — Başarısız veya hatalı olarak işaretlenen sipariş ID’lerini tutan dizi.
+  - `o` — `pendWithToken` dizisindeki her sipariş nesnesi; `id` alanı kullanılır.
+  - `cb` — `fnHost/iyzico-callback`’a yapılan POST isteğinin yanıtı.
+  - `body` — `cb.json()` ile parse edilen nesne; `status` alanı kontrol edilir.
+  - `_e` — `try...catch` bloğunda yakalanan hata nesnesi.
+  - `msg` — `_e`’nin mesajı veya string temsili; hata yanıtında kullanılır.
+- **Dönüş**: `Response` nesnesi; başarılı ise `{ ok: true, cancelled_count, reconciled, failed }`, hata durumunda `{ ok: false, error: msg }`.
 
 ---
 

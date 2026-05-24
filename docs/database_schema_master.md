@@ -1,10 +1,10 @@
 # Veritabani Semasi — venthub-hvac
 
 ---
-compiled_at: 2026-05-24T07:19:24.515279+00:00
+compiled_at: 2026-05-24T10:44:54.525179+00:00
 tables: 26
 policies: 108
-functions: 51
+functions: 52
 indexes: 26
 ---
 
@@ -6155,6 +6155,234 @@ END $$;
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.enforce_role_change()` → trigger
+
+### `get_products_enriched(p_category_ids uuid[] DEFAULT NULL, p_limit int DEFAULT 50, p_offset int DEFAULT 0, p_search_query text DEFAULT NULL, p_sort_by text DEFAULT 'name', p_brand text DEFAULT NULL, p_min_price numeric DEFAULT NULL, p_max_price numeric DEFAULT NULL
+)
+RETURNS TABLE (
+  id uuid, name text, brand text, price numeric, sku text, slug text, model_code text, category_id uuid, subcategory_id uuid, status text, is_featured boolean, description text, image_url text, image_alt text, stock_qty int, low_stock_threshold int, low_stock_override boolean, technical_specs jsonb, airflow_capacity numeric, noise_level numeric, pressure_rating numeric, created_at timestamptz, updated_at timestamptz, warehouse_location text, supplier_name text
+) 
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN QUERY
+  WITH first_images AS (
+    -- Her ürün için sadece ilk (en düşük sort_order) resmi seç
+    SELECT DISTINCT ON (product_id)
+      product_id, path, alt
+    FROM product_images
+    ORDER BY product_id, sort_order ASC
+  )
+  SELECT 
+    p.id, p.name, p.brand, p.price::numeric, p.sku, p.slug, p.model_code, p.category_id, p.subcategory_id, p.status, p.is_featured, p.description, CASE 
+      WHEN fi.path IS NOT NULL THEN 'product-images/' || fi.path 
+      ELSE p.image_url -- Eğer tablodaki image_url alanı kullanılıyorsa fallback
+    END as image_url, fi.alt as image_alt, p.stock_qty, p.low_stock_threshold, p.low_stock_override, p.technical_specs, p.airflow_capacity::numeric, p.noise_level::numeric, p.pressure_rating::numeric, p.created_at, p.updated_at, p.warehouse_location, p.supplier_name
+  FROM products p
+  LEFT JOIN first_images fi ON fi.product_id = p.id
+  WHERE p.status = 'active'
+    -- Filtreleme Lojiği
+    AND (p_category_ids IS NULL OR p.category_id = ANY(p_category_ids) OR p.subcategory_id = ANY(p_category_ids))
+    AND (p_brand IS NULL OR p.brand = p_brand)
+    AND (p_min_price IS NULL OR p.price >= p_min_price)
+    AND (p_max_price IS NULL OR p.price <= p_max_price)
+    AND (p_search_query IS NULL OR 
+         p.name ILIKE '%' || p_search_query || '%' OR 
+         p.brand ILIKE '%' || p_search_query || '%' OR 
+         p.sku ILIKE '%' || p_search_query || '%' OR
+         p.model_code ILIKE '%' || p_search_query || '%')
+  ORDER BY 
+    CASE WHEN p_sort_by = 'featured' THEN p.is_featured END DESC, CASE WHEN p_sort_by = 'price-low' THEN p.price END ASC, CASE WHEN p_sort_by = 'price-high' THEN p.price END DESC, CASE WHEN p_sort_by = 'name' THEN p.name END ASC, p.created_at DESC
+  LIMIT p_limit
+  OFFSET p_offset;
+END;
+$$;
+
+
+-- FILE: 20260401000000_add_categories_display_mode.sql
+-- Migration: Add display_mode column to Categories and seed data
+
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS display_mode TEXT DEFAULT 'series';
+
+-- Update showcase slugs
+UPDATE public.categories 
+SET display_mode = 'showcase' 
+WHERE slug IN (
+    'residential-ventilation', 'industrial-ventilation', 'commercial-ventilation', 'heat-recovery-vmc', 'air-treatment', 'hygiene-sanitizer', 'summer-ventilation', 'air-conditioning', 'electric-heating', 'industrial-ceiling-fans', 'accessories-components', 'smart-home'
+);
+
+-- Update landing slugs
+UPDATE public.categories 
+SET display_mode = 'landing' 
+WHERE slug IN (
+    'hava-perdeleri', 'sessiz-kanal-tipi-fanlar', 'nem-alma-cihazlari'
+);
+
+
+-- FILE: 20260401175136_update_categories_slug.sql
+-- ============================================================
+-- KATEGORI SLUG INGILIZCE GUNCELLEMESI (P04-016)
+-- ============================================================
+-- Bu migration tablodaki mevcut Turkce sluglari uluslararası
+-- standardlara gecirmek icin cevirir. products tablosu UUID ile
+-- category_id referansi kullandigindan Foreign Key'ler bozulmaz. 
+-- ============================================================
+
+BEGIN;
+
+UPDATE categories SET slug = 'fans', name = 'Fans' WHERE slug = 'fanlar';
+UPDATE categories SET slug = 'air-curtains', name = 'Air Curtains' WHERE slug = 'hava-perdeleri';
+UPDATE categories SET slug = 'heat-recovery-units', name = 'Heat Recovery Units' WHERE slug = 'isi-geri-kazanim-cihazlari';
+UPDATE categories SET slug = 'air-purifiers', name = 'Air Purifiers' WHERE slug = 'hava-temizleyiciler-anti-viral-urunler';
+UPDATE categories SET slug = 'speed-controllers', name = 'Speed Controllers' WHERE slug = 'hiz-kontrolu-cihazlari';
+UPDATE categories SET slug = 'accessories', name = 'Accessories' WHERE slug = 'aksesuarlar';
+UPDATE categories SET slug = 'flexible-air-ducts', name = 'Flexible Air Ducts' WHERE slug = 'flexible-hava-kanallari';
+UPDATE categories SET slug = 'dehumidifiers', name = 'Dehumidifiers' WHERE slug = 'nem-alma-cihazlari';
+
+-- Zaten onceki migrationlarda olan veya taslak olan alt kategoriler icin (opsiyonel guvenlik guncellemeleri):
+UPDATE categories SET slug = 'industrial-ventilation', name = 'Industrial Ventilation' WHERE slug = 'endustriyel-havalandirma';
+UPDATE categories SET slug = 'commercial-ventilation', name = 'Commercial Ventilation' WHERE slug = 'ticari-havalandirma';
+UPDATE categories SET slug = 'residential-ventilation', name = 'Residential Ventilation' WHERE slug = 'konut-tipi-havalandirma';
+UPDATE categories SET slug = 'smoke-exhaust-fans', name = 'Smoke Exhaust Fans' WHERE slug = 'duman-egzoz-fanlari';
+UPDATE categories SET slug = 'jet-fans', name = 'Jet Fans' WHERE slug = 'otopark-jet-fanlari';
+
+COMMIT;
+
+
+-- FILE: 20260402000000_security_and_performance_hardening.sql
+-- =============================================================================
+-- VentHub: Güvenlik Sertleştirme ve Performans Optimizasyonu
+-- Tarih: 2026-04-02
+-- Kaynak: Supabase Advisor Audit (2026-04-01)
+-- =============================================================================
+
+BEGIN;
+
+-- -----------------------------------------------------------------------------
+-- 1. SECURITY DEFINER VIEW → SECURITY INVOKER
+-- Sorun: View yaratıcısının RLS'i sorgulayan kullanıcıya dayatıyordu
+-- Çözüm: security_invoker = true ile sorgulayanın yetkileri geçerli olur
+-- -----------------------------------------------------------------------------
+
+DROP VIEW IF EXISTS public.inventory_summary;
+CREATE VIEW public.inventory_summary
+  WITH (security_invoker = true)
+AS
+ WITH movement_stats AS (
+         SELECT inventory_movements.product_id, COALESCE(sum(abs(inventory_movements.delta)), (0)::bigint) AS total_out_30d
+           FROM inventory_movements
+          WHERE ((inventory_movements.delta < 0)
+            AND ((inventory_movements.reason = 'sale'::text) OR (inventory_movements.reason = 'manual_out'::text))
+            AND (inventory_movements.created_at >= (now() - '30 days'::interval)))
+          GROUP BY inventory_movements.product_id
+        )
+ SELECT p.id AS product_id, p.stock_qty, COALESCE(m.total_out_30d, (0)::bigint) AS total_out_30d, round(((COALESCE(m.total_out_30d, (0)::bigint))::numeric / 30.0), 2) AS daily_velocity, CASE
+        WHEN (COALESCE(m.total_out_30d, (0)::bigint) = 0) THEN (9999)::numeric
+        ELSE round(((p.stock_qty)::numeric / ((COALESCE(m.total_out_30d, (0)::bigint))::numeric / 30.0)))
+    END AS days_until_empty, (COALESCE(p.purchase_price, (0)::numeric) * (p.stock_qty)::numeric) AS capital_tied_up, CASE
+        WHEN (COALESCE(m.total_out_30d, (0)::bigint) >= 10) THEN 'A'::text
+        WHEN (COALESCE(m.total_out_30d, (0)::bigint) >= 3) THEN 'B'::text
+        ELSE 'C'::text
+    END AS abc_class
+   FROM (products p
+     LEFT JOIN movement_stats m ON ((p.id = m.product_id)));
+
+DROP VIEW IF EXISTS public.inventory_velocity;
+CREATE VIEW public.inventory_velocity
+  WITH (security_invoker = true)
+AS
+ WITH reserved AS (
+         SELECT voi.product_id, (sum(voi.quantity))::integer AS reserved_qty
+           FROM (venthub_order_items voi
+             JOIN venthub_orders o ON ((o.id = voi.order_id)))
+          WHERE ((o.status = ANY (ARRAY['confirmed'::text, 'paid'::text, 'processing'::text]))
+            AND (o.shipped_at IS NULL))
+          GROUP BY voi.product_id
+        )
+ SELECT p.id AS product_id, p.name, COALESCE(p.stock_qty, 0) AS physical_stock, COALESCE(r.reserved_qty, 0) AS reserved_stock, (COALESCE(p.stock_qty, 0) - COALESCE(r.reserved_qty, 0)) AS available_stock, p.warehouse_location, p.supplier_name
+   FROM (products p
+     LEFT JOIN reserved r ON ((r.product_id = p.id)));
+
+-- -----------------------------------------------------------------------------
+-- 2. FUNCTION SEARCH_PATH SABİTLEME
+-- Sorun: Mutable search_path → saldırgan sahte tablo yerleştirebilir
+-- Çözüm: search_path = public, extensions ile kilitlendi
+-- -----------------------------------------------------------------------------
+
+ALTER FUNCTION public.get_products_enriched(
+  uuid[], integer, integer, text, text, text, numeric, numeric
+)
+SET search_path = public, extensions;
+
+-- -----------------------------------------------------------------------------
+-- 3. ÇAKIŞAN RLS POLICY TEMİZLİĞİ
+-- Sorun: Her sorgu için birden fazla permissive policy çalışıyordu
+-- Çözüm: merged_ prefix'li şişirilmiş policy'ler kaldırıldı
+--         admins_read_* ve _v2 olanlar (sade ve doğru) korundu
+-- -----------------------------------------------------------------------------
+
+DROP POLICY IF EXISTS merged_admin_audit_log_authenticated_insert ON public.admin_audit_log;
+DROP POLICY IF EXISTS merged_admin_audit_log_authenticated_select ON public.admin_audit_log;
+DROP POLICY IF EXISTS merged_error_groups_authenticated_select ON public.error_groups;
+DROP POLICY IF EXISTS merged_returns_webhook_events_authenticated_select ON public.returns_webhook_events;
+DROP POLICY IF EXISTS merged_shipping_email_events_authenticated_select ON public.shipping_email_events;
+DROP POLICY IF EXISTS merged_shipping_webhook_events_authenticated_select ON public.shipping_webhook_events;
+-- product_authorities: ALL policy SELECT'i zaten kapsıyor
+DROP POLICY IF EXISTS "Product authorities are viewable by everyone." ON public.product_authorities;
+
+COMMIT;
+
+-- -----------------------------------------------------------------------------
+-- 4. EKSİK FK İNDEKSLERİ
+-- Sorun: FK kolonlarında index yoktu → JOIN full table scan yapıyordu
+-- Not: CONCURRENTLY transaction dışında çalışır, tablo kilitlenmez
+-- -----------------------------------------------------------------------------
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_category_mapping_rules_target_subcategory
+  ON public.category_mapping_rules(target_subcategory_id);
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_project_items_product_id
+  ON public.project_items(product_id);
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_site_settings_updated_by
+  ON public.site_settings(updated_by);
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_user_projects_user_id
+  ON public.user_projects(user_id);
+
+
+-- FILE: 20260408100000_fix_contact_messages_rls.sql
+-- =============================================================================
+-- Migration: Fix contact_messages RLS
+-- Date: 2026-04-08
+-- Description: Replaces auth.uid() with (SELECT auth.uid()) to trigger
+-- PostgreSQL's initplan caching and reduce row-by-row execution times, -- fixing the initplan performance vulnerability and type linting issues.
+-- =============================================================================
+
+BEGIN;
+
+DROP POLICY IF EXISTS "Admins can view messages" ON public.contact_messages;
+
+CREATE POLICY "Admins can view messages"
+ON public.contact_messages
+FOR SELECT
+TO authenticated
+USING (
+    EXISTS (
+        SELECT 1 FROM public.user_profiles
+        WHERE id = (SELECT auth.uid())
+        AND role IN ('admin', 'superadmin')
+    )
+);
+
+COMMIT;
+
+
+-- FILE: 20260524_idempotent_stock_reduction.sql
+-- Migration: Add idempotency and row-level locking to process_order_stock_reduction
+-- Objective: Eliminate race conditions during concurrent webhook requests and enforce transaction isolation.
+
+CREATE OR REPLACE FUNCTION public.process_order_stock_reduction(p_order_id text)` → jsonb
 
 ### `get_user_role(user_id UUID)` → TEXT
 

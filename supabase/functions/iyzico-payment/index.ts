@@ -87,8 +87,28 @@ Deno.serve(async (req: Request) => {
         });
         if (debugEnabled) console.warn('İyzico Payment Request Started');
 
-        // Parse request body
-        const requestData = await req.json();
+        // Parse request body safely
+        let requestData: any = null;
+        try {
+            const bodyText = await req.text();
+            if (!bodyText || bodyText.trim().length === 0) {
+                return new Response(JSON.stringify({
+                    error: { code: 'VALIDATION_ERROR', message: 'İstek gövdesi boş olamaz' }
+                }), {
+                    status: 400,
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
+                });
+            }
+            requestData = JSON.parse(bodyText);
+        } catch (e) {
+            return new Response(JSON.stringify({
+                error: { code: 'VALIDATION_ERROR', message: 'Geçersiz JSON formatı', details: e instanceof Error ? e.message : String(e) }
+            }), {
+                status: 400,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
+            });
+        }
+
         const amount = requestData?.amount
         const cartItems = requestData?.cartItems
         const user_id = requestData?.user_id
@@ -96,6 +116,17 @@ Deno.serve(async (req: Request) => {
         const invoiceType = requestData?.invoiceType
         const legalConsents = requestData?.legalConsents
         const shippingMethod = requestData?.shippingMethod
+
+        // Enforce user_id validation
+        if (!user_id) {
+            return new Response(JSON.stringify({
+                error: { code: 'VALIDATION_ERROR', message: 'user_id alanı zorunludur' }
+            }), {
+                status: 400,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
+            });
+        }
+
         // Coalesce customer/shipping/billing from alternative keys and apply fallbacks
         let ci = requestData?.customerInfo || requestData?.customer || {}
         let shipAddr = requestData?.shippingAddress || requestData?.shipping || requestData?.shipping_address || null

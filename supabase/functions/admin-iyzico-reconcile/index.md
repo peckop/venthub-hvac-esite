@@ -4,15 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-iyzico-reconcile\index.ts
 skeleton_hash: a45e063ea3065638
-generated_at: 2026-05-24T07:23:43Z
+generated_at: 2026-05-24T10:44:24Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase üzerindeki bir admin fonksiyonudur ve Iyzico ödeme sistemiyle veri karşılaştırma (reconcile) işlemlerini yönetir. Gelen HTTP isteklerini alır, gerekli eşleştirme ve doğrulama adımlarını gerçekleştirir ve işlem sonucunu istemciye yanıt olarak döndürür.
+Bu modül, Supabase Edge Functions altyapısı üzerinde çalışan, yalnızca yetkilendirilmiş yöneticilerin Iyzico ödeme sistemi ile iç sistem kayıtları arasındaki veri tutarlılığını denetlemek için kullandığı bir API uç noktasıdır. Gelen HTTP isteğini alarak önce güvenlik katmanından (CORS yönetimi, kullanıcı doğrulama ve yetkilendirme) geçirir, ardından belirlenen uzlaştırma (reconcile) mantığını yürütür ve işlem sonucunu istemciye döndürür.
 
 ## Fonksiyon Grupları
-### İstek İşleme ve Yanıt Üretimi
-Bu grup, dışarıdan gelen istekleri alıp işlemeyi ve uygun HTTP yanıtını üretmeyi担当lar.
+### Güvenlik ve Reconciliasyon Orkestrasyonu
+Bu grup, gelen admin API çağrılarının güvenli bir şekilde işlenmesini sağlar. Kimlik doğrulama, yetkilendirme, CORS başlıklarının yönetimi ve Iyzico ile sistem arasındaki veri uzlaştırma işlemlerini koordine eder.
 - admin-iyzico-reconcile_handler
 
 ---
@@ -22,56 +22,59 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+---
+
 ## FONKSIYON DETAYLARI
 
 ### admin-iyzico-reconcile_handler
-**Ne yapar**: Admin Iyzico reconciliasyon işlemini yöneten bir handler fonksiyonudur.  
-**Nasıl yapar**: Gelen `req` parametresini işleyerek gerekli reconciliasyon mantığını uygular ve sonucu bir `Response` nesnesi olarak döndürür.  
+**Ne yapar**: VentHub HVAC projesinde Supabase altyapısında çalışan, sadece yetkili admin kullanıcıların erişebildiği Iyzico ödeme sistemi mutabakat işlemini yöneten ana giriş noktasıdır. Iyzico üzerinden gerçekleşen tüm ödeme işlemleri ile sistemde kayıtlı yerel ödeme verilerini karşılaştırarak ödeme mutabakatı sağlama iş akışını başlatır ve sonuçlarını kullanıcıya iletir.
+**Nasıl yapar**: Öncelikle gelen HTTP talebini işleyerek talep sahibinin admin yetkisine sahip olup olmadığını doğrular. Yetki kontrolü başarılı olduğunda Iyzico ödeme servisinin API'lerini kullanarak mutabakat için gerekli tüm işlem kayıtlarını çeker, ardından bu kayıtları sistemdeki yerel veritabanında kayıtlı ödeme verileriyle eşleştirir. Eşleşme ve doğrulama süreçleri sonrası oluşan mutabakat raporunu standart HTTP yanıt formatında döndürür, yetkisiz erişim denemelerinde ise erişim engeli yanıtı üretir.
 **Parametreler**:
-- req: unknown — Handler'a gelen istek nesnesi.  
-**Dönüş**: Response — İşlem sonucu oluşturulan yanıt nesnesi.
+- name: req — type: Request — Gelen HTTP isteği nesnesi, isteğin kimlik doğrulama başlıklarını, istek gövdesinde iletilen özel filtreleme parametrelerini ve talep sahibi kullanıcının sistemdeki kimlik bilgilerini içerir.
+**Dönüş**: Response — İşlem sonucu oluşan standart HTTP yanıt nesnesi. Mutabakat işlemi başarılı olursa işlemin özeti, eşleşen ve eşleşmeyen kayıt sayıları gibi detayları içeren JSON yükünü; hata oluşması halinde hata kodu ve açıklamasını içeren yanıtı döndürür.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\admin-iyzico-reconcile\index.ts::admin-iyzico-reconcile_handler
-- **params**: req — incoming HTTP request object
+- **params**: (req)
 - **ic_degiskenler**:
-  - `cors` — CORS header object used for all responses
-  - `supabaseUrl` — Supabase project URL read from environment
-  - `serviceRoleKey` — Supabase service role key for privileged operations
-  - `anonKey` — Supabase anon key for client‑side auth
-  - `authHeader` — value of the Authorization header from the request
-  - `authClient` — Supabase client initialized with anon key and user‑level auth header
-  - `user` — authenticated user object returned by `authClient.auth.getUser()`
-  - `authErr` — error from the Supabase auth getUser call
-  - `roleCheck` — fetch response checking the user's role in the `user_profiles` table
-  - `arr` — parsed JSON array from the role check response (expected to contain role data)
-  - `role` — role string extracted from the first element of `arr`
-  - `_id` — order ID filter extracted from request body (POST) or query string (GET)
-  - `conv` — conversation ID filter extracted from request body (POST) or query string (GET)
-  - `body` — parsed JSON payload of a POST request
-  - `url` — URL object built from `req.url` for extracting query parameters in non‑POST requests
-  - `_limit` — maximum number of orders to fetch via RPC (hard‑coded to 10)
-  - `rpcListUrl` — full URL of the Supabase RPC endpoint `fn_admin_get_orders`
-  - `listBody` — payload sent to the RPC, containing `_id`, `conv`, `_limit`, and optional `p_status`
-  - `listResp` — fetch response from the RPC call
-  - `text` — plain‑text body of a failed RPC response (used for error reporting)
-  - `orders` — array of order records returned by the RPC
-  - `fnHost` — derived Supabase functions host URL constructed from `supabaseUrl`
-  - `results` — accumulator array storing the outcome of each order's callback processing
-  - `o` — current order object being iterated over in the `for...of` loop
-  - `token` — payment token extracted from the current order (`o.payment_token`)
-  - `cbUrl` — full URL of the iyzico‑callback function
-  - `cbResp` — fetch response from the iyzico‑callback POST request
-  - `cbJson` — parsed JSON payload returned by the callback
-  - `st` — status value from the callback JSON (defaults to `'pending'`)
-  - `msg` — error message string extracted from a caught exception (either `Error.message` or stringified value)
-  - `e` — caught exception value in the per‑order `try/catch` block
-  - `e` — caught exception value in the outer `try/catch` block (handles unexpected errors)
-  - `msg` — error message string derived from the outer catch’s exception `e` (same handling as above)
-- **Dönüş**: Response — a Promise resolving to an HTTP Response object (JSON payload with appropriate status, CORS headers, and content type)
+  - `cors` — CORS header set returned in every `Response`.
+  - `supabaseUrl` — Supabase project URL read from environment variable `SUPABASE_URL`.
+  - `serviceRoleKey` — Supabase service‑role key read from environment variable `SUPABASE_SERVICE_ROLE_KEY`.
+  - `anonKey` — Supabase anon key read from environment variable `SUPABASE_ANON_KEY`.
+  - `authHeader` — Value of the `Authorization` header from the incoming request.
+  - `authClient` — Supabase client created with `supabaseUrl`, `anonKey`, and the request’s `Authorization` header.
+  - `user` — Authenticated user object returned by `authClient.auth.getUser()`.
+  - `authErr` — Error object returned by `authClient.auth.getUser()` if authentication fails.
+  - `roleCheck` — `Response` from the fetch call that verifies the user’s role.
+  - `arr` — Parsed JSON array from `roleCheck` containing role information.
+  - `role` — Role string extracted from `arr[0]?.role`.
+  - `body` — Parsed JSON body of the request when `req.method === 'POST'`.
+  - `_id` — Order identifier extracted from request body or query string; `null` if absent.
+  - `conv` — Conversation identifier extracted from request body or query string; `null` if absent.
+  - `url` — `URL` instance built from `req.url` when the method is not `POST`.
+  - `_limit` — Fixed pagination limit (`10`) used for the RPC call.
+  - `rpcListUrl` — Full URL string for the Supabase RPC endpoint `fn_admin_get_orders`.
+  - `listBody` — Payload object sent to the RPC endpoint; contains `p_id`, `p_conv`, `p_limit`, and conditional `p_status`.
+  - `listResp` — `Response` from the RPC fetch request.
+  - `text` — Textual body of a failed RPC response (fallback to empty string).
+  - `orders` — Array of order records returned by the RPC call.
+  - `su` — Temporary variable holding `supabaseUrl!` inside the IIFE that builds `fnHost`.
+  - `host` — `URL` object created from `su` inside the IIFE.
+  - `ref` — Subdomain part of `host.host` used to construct the function host URL.
+  - `fnHost` — Base URL of the Supabase Edge Function host derived from the project URL.
+  - `results` — Accumulator array that stores processing outcome for each order.
+  - `o` — Individual order object iterated from `orders`.
+  - `token` — Payment token extracted from the current order; `null` if missing.
+  - `cbUrl` — Callback endpoint URL constructed from `fnHost`.
+  - `cbResp` — `Response` from the callback POST request.
+  - `cbJson` — Parsed JSON body of the callback response.
+  - `st` — Status string obtained from `cbJson?.status`; defaults to `'pending'`.
+  - `e` — Caught error object in both outer and inner `try‑catch` blocks.
+  - `msg` — Human‑readable error message derived from `e`.
+- **Dönüş**: `Response` object containing a JSON payload and appropriate HTTP status; the function performs external fetches, role verification, RPC calls, and callback invocations before returning the final response.
 
 ---
 

@@ -4,15 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts
 skeleton_hash: bf6740246d4dc074
-generated_at: 2026-05-24T07:46:05Z
+generated_at: 2026-05-24T10:46:38Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase üzerindeki bir HTTP işlevi olarak sipariş verilerinin geçerliliğini kontrol eden bir işleyici sağlar. Gelen istekleri alır, sipariş bilgilerini doğrular ve uygun bir HTTP yanıtı döndürerek işlemi tamamlar.
+Bu modül, Supabase ortamında çalışan bir HTTP işlevidir. Gelen sipariş doğrulama isteklerini alır, gerekli kontrolleri yapar ve sonucu bir HTTP yanıtı olarak döndürür. Tek bir işleyici ile sipariş geçerliliğini sağlamak için merkezi bir nokta sunar.
 
 ## Fonksiyon Grupları
 ### Sipariş Doğrulama İşlemi
-Sipariş verilerinin alınması, gerekli kontrollerin yapılması ve sonuçların istemciye iletilmesi sorumluluğunu üstlenir.
+Sipariş verilerinin alınması, doğrulanması ve istemciye uygun yanıtın iletilmesi sorumluluğunu üstlenir.
 - order-validate_handler
 
 ---
@@ -25,11 +25,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSIYON DETAYLARI
 
 ### order-validate_handler
-**Ne yapar**: Gelen istekteki sipariş verisini doğrular ve doğrulama sonucunu bir `Response` nesnesi olarak döndürür.  
-**Nasıl yapar**: İstek gövdesindeki sipariş verisini okur, gerekli doğrulama kurallarını uygular ve sonuçta uygun HTTP durum kodunu ve mesajı içeren bir yanıt üretir.  
+**Ne yapar**: VentHub HVAC projesi bünyesinde Supabase üzerinde çalışan sipariş doğrulama fonksiyonunun ana giriş noktasıdır. İstemciden gelen sipariş doğrulama isteklerini alıp işleyerek, ilgili siparişin tüm sistem kurallarına ve iş mantığına uygun olup olmadığını tespit eder. Doğrulama işleminin sonucunu standart HTTP yanıtı formatında istemciye iletir.
+**Nasıl yapar**: Gelen HTTP isteği üzerinden tüm gerekli bilgileri ayrıştırır, öncelikle isteği gönderen kullanıcının yetkilendirme kontrollerini yapar. Ardından istek gövdesindeki sipariş verilerini okuyarak sırasıyla zorunlu alan dolulukları, sipariş tutarı hesaplamalarının doğruluğu, siparişteki ürünlerin stok durumu gibi tüm doğrulama adımlarını çalıştırır. Tüm kontrollerden geçen siparişler için başarılı yanıt, hatası tespit edilen siparişler için uygun hata kodlu yanıt üretir.
 **Parametreler**:
-- `req`: Request — İşlenecek gelen HTTP isteği; sipariş verisi genellikle isteğin gövdesinde bulunur.  
-**Dönüş**: `Response` — İşlem sonucunu gösteren HTTP yanıtı; başarılı doğrulama durumunda genellikle 200 OK, başarısızlık durumunda 400 Bad Request veya başka uygun hata kodu döner.
+- req: Request — Supabase Edge Function standartlarına uygun, fonksiyona gelen tüm HTTP isteği verilerini barındıran Request nesnesidir. İsteğin başlıkları, gövdesi, kaynak adresi gibi tüm bilgilere erişim sağlar.
+**Dönüş**: Response — Doğrulama işleminin sonucunu içeren standart HTTP Response nesnesidir. Başarılı doğrulama durumunda 200 OK durum koduyla birlikte onaylanmış sipariş detaylarını, hata durumunda 400 (geçersiz istek), 401 (yetkisiz erişim), 500 (sunucu hatası) gibi uygun HTTP durum kodu ve açıklayıcı hata mesajını içerir.
 
 ---
 
@@ -198,6 +198,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   - `v` - İndirim uygulandıktan sonra hesaplanan ara fiyat değeri
   - `fb` - Hiçbir uygun fiyat bulunamazsa ürün nesnesindeki varsayılan fiyat
 - **Dönüş**: Promise<{unit: number, listId: string|null}>, Hesaplanan birim fiyatı ve kullanılan fiyat listesi ID'sini içeren nesne
+
+---
 
 ---
 

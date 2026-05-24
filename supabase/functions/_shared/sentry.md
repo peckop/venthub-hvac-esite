@@ -4,23 +4,23 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\sentry.ts
 skeleton_hash: bf17e002e85319b5
-generated_at: 2026-05-24T07:21:20Z
+generated_at: 2026-05-24T10:44:45Z
 ---
 
 ## Genel Bakış
-Bu modül, Sentry hata izleme servisiyle iletişimi sağlamak için düşük seviyeli veri gönderimi ve yüksek seviyeli yakalama işlevlerini bir araya getirir. DSN ayrıştırma, veri gönderimi ve mesaj/istisna yakalama fonksiyonları birbirini tamamlayarak uygulama içinde merkezi bir hata raporlama katmanı oluşturur.
+Bu modül, Sentry hata izleme servisiyle iletişimi sağlamak için DSN ayrıştırma, veri gönderimi ve yüksek seviyeli yakalama işlevlerini bir araya getirir. `parseDsn` fonksiyonu DSN’i bileşenlerine ayırırken, `postStore` bu bilgileri kullanarak olay yükünü Sentry’nin store endpoint’ine gönderir. `sentryCaptureMessage` ve `sentryCaptureException` ise uygulama kodundan mesaj ve istisna yakalamak için kullanıcı dostu arayüzler sunar; içlerinde düşük seviyeli fonksiyonları çağırarak tam bir raporlama döngüsü tamamlar.
 
 ## Fonksiyon Grupları
 ### DSN Ayrıştırma
-- Sentry DSN string’ini bileşenlerine (host, public key, project ID) ayırarak sonraki adımlarda gerekli endpoint ve kimlik bilgilerini çıkarır.
+- Sentry DSN string’ini host, public key ve proje ID gibi ayrı parçalara ayırarak sonraki adımlarda gerekli endpoint ve kimlik bilgilerini hazırlar.
 - `parseDsn`
 
 ### Veri Gönderimi (Transport)
-- Ayrıştırılmış DSN bilgilerini kullanarak Sentry’nin store endpoint’ine JSON formatında veri gönderir; bu işlem asenkron olarak gerçekleşir.
+- Ayrıştırılmış DSN bilgilerini kullanarak Sentry’nin store endpoint’ine JSON formatında olay yükünü gönderir; bu işlem asenkron olarak gerçekleşir.
 - `postStore`
 
-### Yüksek Seviyeli Yakalama API’leri
-- Uygulama kodundan mesaj ve istisna yakalamak için kullanıcı dostu arayüzler sunar; içlerinde `parseDsn` ve `postStore` fonksiyonlarını çağırarak raporlama işlemini tamamlar.
+### Yakalama API’leri
+- Uygulama geliştiricilerinin mesaj ve istisna yakalamasını basitleştirir; içlerinde `parseDsn` ve `postStore` fonksiyonlarını çağırarak veri gönderimini gerçekleştirir.
 - `sentryCaptureMessage`
 - `sentryCaptureException`
 
@@ -34,36 +34,36 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSIYON DETAYLARI
 
 ### parseDsn
-**Ne yapar**: Verilen Sentry DSN (Data Source Name) string'ini ayrıştırıp, içerdiği host, public key ve proje ID bilgilerini çıkarır.  
-**Nasıl yapar**: DSN formatını (`{protocol}://{publicKey}@{host}/{projectId}` gibi) parçalara ayırarak her bileşeni tanımlar; DSN geçersizse veya beklenen parçalar eksikse `null` döner.  
+**Ne yapar**: Verilen DSN (Data Source Name) stringini ayrıştırarak Sentry sunucusunun host adresi, public anahtarı ve proje kimliğini içeren bir nesne döndürür. Ayrıştırma başarısız olursa `null` döner.  
+**Nasıl yapar**: DSN stringi belirli bir formatta (`https://publicKey@host/projectId` gibi) beklenir; bu formatta host, publicKey ve projectId bölümleri regex veya string bölme işlemleriyle çıkarılır ve bir nesneye yerleştirilir.  
 **Parametreler**:
-- dsn: string — Ayrıştırılacak Sentry DSN string'i  
-**Dönüş**: `{ host: string; publicKey: string; projectId: string }` nesnesi veya `null` (DSN geçersizse)
+- dsn: string — Ayrıştırılacak DSN ifadesi.  
+**Dönüş**: `{ host: string; publicKey: string; projectId: string } | null` — Başarılı ayrıştırmada host, publicKey ve projectId alanlarını içeren nesne, aksi takdirde `null`.
 
 ### postStore
-**Ne yapar**: Verilen DSN üzerinden Sentry'nin store endpoint'ine bir olay (event) yükünü gönderir.  
-**Nasıl yapar**: `dsn` parametresinden store URL'sini çıkarır, `body` içeriğini JSON olarak HTTP POST isteğiyle gönderir ve işlemin tamamlanmasını bekler; hata durumunda promesse reddedilir.  
+**Ne yapar**: Sentry’ye veri göndererek bir olay (event) kaydı oluşturur. DSN bilgisiyle hedef sunucu belirlenir ve `body` içeriği HTTP POST isteğiyle gönderilir.  
+**Nasıl yapar**: `parseDsn` fonksiyonunu kullanarak DSN’den host ve proje bilgileri elde edilir, ardından uygun Sentry API uç noktasına (`/api/{projectId}/store/`) JSON olarak `body` gönderilir. İstek asenkron olduğundan bir `Promise<void>` döndürür.  
 **Parametreler**:
-- dsn: string — Olayın gönderileceği Sentry DSN'i  
-- body: unknown — Gönderilecek olay verisi (genellikle bir event objesi)  
-**Dönüş**: `Promise<void>` — İşlem tamamlandığında çözümlenir, herhangi bir değer döndürmez
+- dsn: string — Sentry projesine ait DSN.  
+- body: unknown — Sentry’ye gönderilecek olay verisi; genellikle JSON serileştirilebilir bir nesnedir.  
+**Dönüş**: `Promise<void>` — İsteğin tamamlanmasını temsil eden bir promise; hata oluşursa promise reddedilir.
 
 ### sentryCaptureMessage
-**Ne yapar**: Belirtilen mesajı ve seviyesini Sentry'ye bir olay olarak kaydeder; isteğe bağlı ek veri ekleyebilir.  
-**Nasıl yapar**: `message` ve `level` parametrelerini kullanarak bir Sentry event objesi oluşturur, `extra` varsa bu objede ek alanlar olarak ekler ve ardından iç olarak `postStore` (veya benzeri) fonksiyonunu çağırarak olayı iletir.  
+**Ne yapar**: Belirtilen mesajı ve isteğe bağlı ek verileri Sentry’ye göndererek bir mesaj (log) kaydı oluşturur. Mesajın öncelik seviyesi (`level`) de iletilir.  
+**Nasıl yapar**: `parseDsn` ile DSN’den alınan bilgilerle `postStore` fonksiyonunu çağırarak mesajı Sentry’nin “store” endpointine paketler; mesaj, seviye ve ek bilgiler bir JSON gövdesi içinde gönderilir.  
 **Parametreler**:
-- message: string — Kaydedilecek metin mesajı  
-- level: SentryLevel — Mesajın önemi (örn. `info`, `warning`, `error`, `fatal`)  
-- extra?: Record<string, unknown> — Olayla birlikte gönderilecek ek anahtar/değer çiftleri (isteğe bağlı)  
-**Dönüş**: void — Fonksiyon herhangi bir değer döndürmez
+- message: string — Kaydedilecek mesaj metni.  
+- level: SentryLevel — Mesajın öncelik seviyesi (ör. `error`, `warning`, `info`).  
+- extra?: Record<string, unknown> — İsteğe bağlı ek veri; anahtar‑değer çiftleri şeklinde gönderilir.  
+**Dönüş**: void — Fonksiyon asenkron bir işlem başlatır ancak geri dönüş değeri yoktur.
 
 ### sentryCaptureException
-**Ne yapar**: Yakalanan bir istisnayı (exception) Sentry'ye hata olayı olarak gönderir; isteğe bağlı ek bağlam verisi eklenebilir.  
-**Nasıl yapar**: `_e` parametresindeki istisna objesini Sentry'nin beklediği hata formatına dönüştürür, `extra` varsa bu bilgiyi event'e ekler ve ardından olay iletimi için içsel gönderme mekanizmasını tetikler.  
+**Ne yapar**: Yakalanan bir istisna nesnesini ve isteğe bağlı ek bilgileri Sentry’ye göndererek hata kaydı oluşturur.  
+**Nasıl yapar**: İstisna nesnesi (`_e`) ve ek bilgiler (`extra`) bir JSON yapısına dönüştürülür; ardından `parseDsn` ile elde edilen DSN bilgileriyle `postStore` aracılığıyla Sentry’ye iletilir.  
 **Parametreler**:
-- _e: unknown — Yakalanan istisna nesnesi (tipi bilinmiyor, ancak genellikle `Error` veya benzeri)  
-- extra?: Record<string, unknown> — Olayla birlikte gönderilecek ek veri (isteğe bağlı)  
-**Dönüş**: void — Fonksiyon herhangi bir değer döndürmez
+- _e: unknown — Yakalanan istisna nesnesi; genellikle `Error` tipinde olur.  
+- extra?: Record<string, unknown> — İsteğe bağlı ek veri; hata bağlamı hakkında ek bilgiler içerir.  
+**Dönüş**: void — İşlem tamamlandığında fonksiyon bir değer döndürmez.
 
 ---
 
@@ -78,54 +78,54 @@ type SentryLevel = 'fatal' | 'error' | 'warning' | 'info' | 'debug' | 'log'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: sentry.ts::parseDsn
-- **params**: dsn: string
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\_shared\sentry.ts::parseDsn
+- **params**: (dsn: string)
 - **ic_degiskenler**:
-  - `u` — URL object constructed from the dsn string, used to extract its components.
-  - `publicKey` — username portion of the URL after trimming whitespace; represents the Sentry public key.
-  - `host` — hostname from the URL; the Sentry endpoint host.
-  - `projectId` — pathname of the URL with any leading slash removed; the Sentry project identifier.
-- **Dönüş**: { host: string; publicKey: string; projectId: string } | null
+  - `u` — `new URL(dsn)` if `dsn` is a valid URL, used to extract components.
+  - `publicKey` — `u.username` trimmed; the public key part of the DSN.
+  - `host` — `u.host`; the host part of the DSN.
+  - `projectId` — `u.pathname` with leading slash removed; the project identifier.
+- **Dönüş**: `{ host: string; publicKey: string; projectId: string } | null` – returns an object with extracted DSN fields or `null` on failure.
 
-### [N2_NASIL] AST Pointer: sentry.ts::postStore
-- **params**: dsn: string, body: unknown
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\_shared\sentry.ts::postStore
+- **params**: (dsn: string, body: unknown)
 - **ic_degiskenler**:
-  - `parsed` — result of `parseDsn(dsn)`; contains host, publicKey, and projectId used to build the request.
-  - `url` — constructed Sentry store endpoint URL: `https://<host>/api/<projectId>/store/`.
-  - `auth` — Sentry auth header string formed by joining `'Sentry sentry_version=7'`, `sentry_key=<publicKey>`, and `sentry_client=venthub-edge/1.0.0` with ', '.
-- **Dönüş**: Promise<void> (no explicit return value)
+  - `parsed` — result of `parseDsn(dsn)`; contains `host`, `publicKey`, `projectId` or `null`.
+  - `url` — constructed store endpoint URL using `parsed.host` and `parsed.projectId`.
+  - `auth` — authentication header string composed of Sentry version, key, and client identifier.
+- **Dönüş**: `Promise<void>` – performs an HTTP POST to Sentry store endpoint; no value returned.
 
-### [N3_NASIL] AST Pointer: sentry.ts::sentryCaptureMessage
-- **params**: message: string, level: SentryLevel = 'error', extra?: Record<string, unknown>
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\_shared\sentry.ts::sentryCaptureMessage
+- **params**: (message: string, level: SentryLevel = 'error', extra?: Record<string, unknown>)
 - **ic_degiskenler**:
-  - `dsn` — Sentry DSN retrieved from `Deno.env.get('SENTRY_DSN')`; if empty the function returns early.
-  - `event` — object representing the Sentry event to send, containing platform, logger, timestamp, level, message, extra, environment, and release fields.
-- **Dönüş**: Promise<void> (no explicit return value)
+  - `dsn` — Sentry DSN obtained from `globalThis.Deno?.env?.get('SENTRY_DSN')`; empty string if not set.
+  - `event` — object containing Sentry event data: platform, logger, timestamp, level, message, extra, environment, release.
+- **Dönüş**: `Promise<void>` – builds an event and forwards it to `postStore`; no value returned.
 
-### [N4_NASIL] AST Pointer: sentry.ts::sentryCaptureException
-- **params**: _e: unknown, extra?: Record<string, unknown>
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\_shared\sentry.ts::sentryCaptureException
+- **params**: (_e: unknown, extra?: Record<string, unknown>)
 - **ic_degiskenler**:
-  - `dsn` — Sentry DSN retrieved from `Deno.env.get('SENTRY_DSN')`; if empty the function returns early.
-  - `isErr` — boolean indicating whether `_e` is an instance of `Error`.
-  - `message` — string representation of the exception; uses `_e.message` if it's an Error, otherwise `String(_e)`.
-  - `stack` — stack trace string from the Error if `_e` is an Error, otherwise `undefined`.
-  - `event` — Sentry event object containing platform, logger, timestamp, level ('error'), message, optional exception (with type, value, and stacktrace), extra, environment, and release.
-- **Dönüş**: Promise<void> (no explicit return value)
+  - `dsn` — Sentry DSN obtained from `globalThis.Deno?.env?.get('SENTRY_DSN')`; empty string if not set.
+  - `isErr` — boolean indicating whether `_e` is an `Error` instance.
+  - `message` — error message string derived from `_e`.
+  - `stack` — stack trace string if `_e` is an `Error` and has a stack.
+  - `event` — Sentry event object containing platform, logger, timestamp, level, message, optional exception details, extra, environment, release.
+- **Dönüş**: `Promise<void>` – creates an exception event and forwards it to `postStore`; no value returned.
 
 ---
 
 ## ÇAĞRI HARİTASI
 
 ### Disariya Cagrilar (Outgoing)
-- **sentryCaptureMessage()** → `postStore()` fonksiyonunu çağırır (mesajı göndermek için).  
-- **sentryCaptureException()** → `postStore()` fonksiyonunu çağırır (istisna bilgisi göndermek için).  
-- **postStore()** → `parseDsn()` fonksiyonunu çağırır (DSN ayrıştırması yapmak için).
+- **postStore()** fonksiyonu, DSN (Data Source Name) ayrıştırması yapmak için **parseDsn** fonksiyonunu çağırır.  
+- **sentryCaptureMessage()** fonksiyonu, mesajı Sentry’ye göndermek için **postStore** fonksiyonunu çağırır.  
+- **sentryCaptureException()** fonksiyonu, istisna bilgisini Sentry’ye iletmek için **postStore** fonksiyonunu çağırır.
 
 ### Disaridan Cagrilanlar (Incoming)
-- Verilen veri setinde bu modülü çağıran dış fonksiyon veya dosya bilgisi bulunmamaktadır; dolayısıyla gelen çağrılar şu anda bilinmiyor.
+- Bu modüle dış dosyalar veya fonksiyonlar tarafından yapılan çağrılar verilmemiştir. → **Yok**
 
 ### Ic Ice Fonksiyonlar (Nested)
-- Yok (iç içe fonksiyon tanımlanmamıştır).
+- **Yok**
 
 ---
 
