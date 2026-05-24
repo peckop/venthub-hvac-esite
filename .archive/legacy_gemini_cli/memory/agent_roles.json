@@ -1,0 +1,13 @@
+{
+  "A": {
+    "role": "Builder / Architect",
+    "focus": "Feature construction, UI modernization, P04-005 Gateway Implementation",
+    "last_sync": "2026-03-19 20:45:00"
+  },
+  "B": {
+    "role": "Sentinel / Auditor",
+    "focus": "Full project scan, P00-033 Validation, Performance & A11y Audit",
+    "last_sync": "2026-03-19 20:45:00"
+  },
+  "protocol": "Terminal A builds, Terminal B validates. Only A can write to src/ until B confirms clean state."
+}
