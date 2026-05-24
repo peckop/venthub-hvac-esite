@@ -1,13 +1,13 @@
-# CORPUS CALLOSUM MASTER ARCHITECTURE DOCUMENTATION
+# VENTHUB HVAC MASTER ARCHITECTURE DOCUMENTATION
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-24T11:09:53.687503+00:00
-total_compiled_files: 427
+compiled_at: 2026-05-24T11:57:52.635668+00:00
+total_compiled_files: 432
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-24T11:09:53.687503+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-24T11:57:52.635668+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -2024,7 +2024,11 @@ Sayfanın iskeletini oluşturur, gerekli yapılandırmaları yapar ve içeriği 
 
 ---
 
-## AXI
+## AXIOMS – Mimari Varsayımlar
+Bu bileşenin hatasız çalışması, React tabanlı sunum ortamına ve dinamik yüklenen `AdminLogisticsPage` bileşeninin sorunsuz içe aktarılmasına bağlıdır.
+
+[Aksiyom 1]: Eğer dinamik olarak yüklenmeye çalışılan AdminLogisticsPage bileşeni belirlenen yolda mevcut değilse, dinamik yükleme işlemi başarısız olur ve sayfa yükleme hatası alınır.
+[Aksiyom 2]: Eğer istemci tarafında dynamic import'ları çözümleyecek bir Next.js çalışma zamanı ortamı yoksa, kod tarayıcıda çalışmaz.
 
 ---
 
@@ -2040,9 +2044,7 @@ Sayfanın iskeletini oluşturur, gerekli yapılandırmaları yapar ve içeriği 
 
 ## SABİTLER
 - **AdminLogisticsPage** (call) — `dynamic(
-
   () => import('../../../views/admin/AdminLogisticsPage'),
-
   { ssr...`
 
 ---
@@ -53059,6 +53061,362 @@ Bu React fonksiyonel bileşeni, VentHub HVAC uygulamasının yasal içerikler b�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: TermsOfUsePage
+
+---
+# FILE: src\views\support\FAQPage.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx
+skeleton_hash: 3afe3b019d6c8aed
+generated_at: 2026-05-23T22:41:52Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC projesinin destek bölümünde yer alan Sıkça Sorulan Sorular (FAQ) sayfasını oluşturan temel React bileşenidir. Platform kullanıcılarının karşılaşabileceği yaygın sorulara tek bir noktadan erişmesini sağlamak üzere tasarlanmış, kullanıcı deneyimini destekleyen bir arayüz bileşenidir.
+
+## Fonksiyon Grupları
+### Ana Sayfa Bileşeni
+Destek rotası altında çağrılarak FAQ sayfasının tüm kullanıcı arayüzü yapısını ve içerik sunumunu üstlenen tek ana bileşendir, sayfanın proje içinde çalışmasını sağlar.
+- FAQPage
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu projenin frontend mimarisinde yer alan FAQ sayfası görünüm bileşeninin sorunsuz çalışması, React tabanlı çalışma ortamı, rota yönetimi altyapısı, tüm bağımlı bileşenler ve içerik kaynağının erişilebilir olmasına bağlıdır.
+
+[Aksiyom 1]: Eğer FAQPage bileşeninin çalıştığı ortamda TSX/JSX sözdizimini destekleyen React kütüphanesi yoksa, bileşen hiçbir şekilde derlenemez, render edilemez ve uygulama çalışma zamanı hatası alır.
+[Aksiyom 2]: Eğer uygulamanın istemci tarafı rota yönetim sistemi tarafından FAQPage için tanımlı rota üzerinden yönlendirme yapılamazsa, son kullanıcılar bu FAQ sayfasına hiçbir şekilde erişemez.
+[Aksiyom 3]: Eğer FAQPage bileşeninin içe aktardığı tüm bağımlı alt bileşenler (temel sayfa şablonu, arayüz elemanları vb.) proje yapısında erişilebilir durumda değilse, bileşen derleme zamanında başarısız olur.
+[Aksiyom 4]: Eğer FAQPage'de gösterilecek sıkça sorulan sorular içeriği, kullanılacak veri kaynağından (statik dosya veya API) getirilemez veya geçerli formatta iletilemezse, sayfada hiçbir içerik görüntülenmez ve kullanıcıya boş arayüz sunulur.
+[Aksiyom 5]: Eğer FAQPage için gerekli stil dosyaları projeye dahil edilmemiş ve erişilebilir değilse, sayfa düzensiz, kullanılamaz bir görünüme sahip olur.
+
+---
+
+## FONKSIYON DETAYLARI
+
+### FAQPage
+**Ne yapar**: VentHub HVAC projesinin destek kategorisi altındaki Sıkça Sorulan Sorular (FAQ) sayfasını oluşturan React işlevsel bileşenidir. Kullanıcıların platformla ilgili en yaygın karşılaştıkları soruların cevaplarına tek bir merkezden erişmesini, destek ekibine başvurmadan önce kendi sorunlarını çözmelerini kolaylaştırır.
+**Nasıl yapar**: Projenin src/views/support dizininde tanımlanan bir sayfa bileşeni olarak, React'in standart işlevsel bileşen mimarisine uygun şekilde çalışır. Uygulamanın yönlendirme sistemi tarafından ilgili rota tetiklendiğinde FAQ içeriklerini barındıran arayüzü ekrana render eder, projenin diğer sayfa bileşenleriyle aynı geliştirme standartlarını paylaşır.
+**Parametreler**:
+Bu fonksiyon herhangi bir giriş parametresi almamaktadır, tanımında dış girdi olarak kullanılabilecek herhangi bir parametre tanımı bulunmaz.
+**Dönüş**: React.FC türünde bir React işlevsel bileşeni döndürür. Bu dönüş değeri, uygulamanın yönlendirme akışında FAQ sayfasının ilgili adres altında kullanıcıya sunulmasını sağlar.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx::FAQPage
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, arayüzdeki tüm metinlerin yerel ayara göre çevrilmesini sağlar
+  - `faqs` - SSS soru ve cevap nesnelerini tutan dizi, ekrana basılmak üzere map fonksiyonu ile işlenir
+  - `router` — Next.js useRouter hook'undan alınan yönlendirme nesnesi, önceki sayfaya dönüş işlemi için kullanılır
+- **Dönüş**: FAQ sayfasının tamamını oluşturan React JSX elementi
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx::FAQPage.faqs_map_callback
+- **params**: item, idx
+- **ic_degiskenler**:
+  - `item` — faqs dizisindeki tekil SSS nesnesi, içindeki q (soru) ve a (cevap) property'leri ekrana basılır
+  - `idx` — faqs dizisindeki elemanın sıra numarası, React listeleme key değeri olarak kullanılır
+- **Dönüş**: Tekil SSS bloğunu oluşturan React JSX details elementi
+
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx::FAQPage.whatsapp_render_callback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `whatsappLink` — getSupportLink utility fonksiyonundan oluşturulan WhatsApp iletişim linki, iletişime geç butonunun hedef adresi olarak kullanılır
+- **Dönüş**: whatsappLink null ise null, aksi takdirde WhatsApp destek bloğunu oluşturan React JSX div elementi
+
+---
+
+## NODE ID STANDARD
+
+  file: src\views\support\FAQPage.tsx
+  function: src\views\support\FAQPage.tsx::FAQPage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: FAQPage
+
+---
+# FILE: src\views\support\ReturnsPage.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\views\support\ReturnsPage.tsx
+skeleton_hash: 5e7613c20eb0ce3f
+generated_at: 2026-05-23T22:42:04Z
+---
+
+## Genel Bakış
+VentHub HVAC projesinin destek bölümüne ait bu React modülü, platformdaki iade işlemlerini yönetmek için kullanılan arayüz sayfasını barındırır. Kullanıcıların iade taleplerini görüntülemesi ve işlemlerini yürütebilmesi için destek paneli içerisinde yer alan özel bir sayfa bileşeni sunar.
+
+## Fonksiyon Grupları
+### Ana Sayfa Bileşeni
+Modülün temel sorumluluğunu üstlenen, iade işlemleri sayfasının tüm React arayüz yapısını ve temel çalışma mantığını oluşturan ana bileşendir.
+- ReturnsPage
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu React tabanlı iade işlemleri sayfa modülü, VentHub HVAC platformunun destek panelinin ayrılmaz bir parçasıdır, çalışması için üst mimarideki React çalışma zamanı, yönlendirme, yetkilendirme ve ortak UI bağımlılıklarının tam ve erişilebilir olması zorunludur.
+
+[Aksiyom 1]: Eğer projenin ana React çalışma zamanı ortamı mevcut değilse, bu sayfa bileşeni hiçbir şekilde kullanıcıya sunulamaz olur.
+[Aksiyom 2]: Eğer bu sayfaya erişim sağlayacak uygulama içi rota (routing) yapılandırması tanımlanmamışsa, kullanıcılar iade işlemleri sayfasına ulaşamaz olur.
+[Aksiyom 3]: Eğer platformun genel yetkilendirme ve oturum yönetimi servisi bu bileşen tarafından erişilebilir değilse, kullanıcı erişim hakları doğrulanamaz, yetkisiz erişim engellenemez veya kullanıcıya özel iade verileri gösterilemez olur.
+[Aksiyom 4]: Eğer destek paneli genelinde kullanılan ortak UI bileşenleri kütüphanesi yüklenmemişse, ReturnsPage bileşeninin kullanıcı arayüzü bozuk render edilir veya hiç görüntülenemez olur.
+[Aksiyom 5]: Eğer bu sayfanın iade verilerini çekeceği arka uç API entegrasyonu erişilemez durumdaysa, sayfada herhangi bir işlem listelenemez ve hiçbir iade işlemi gerçekleştirilemez olur.
+
+---
+
+## FONKSIYON DETAYLARI
+
+### ReturnsPage
+**Ne yapar**: VentHub HVAC projesinin destek modülü kapsamında yer alan iadeler sayfasını oluşturan ana React bileşenidir. Kullanıcıların iade işlemlerini erişebileceği, görüntüleyebileceği ve yönetebileceği özel kullanıcı arayüzünü sunmakla görevlidir. Genel domainli proje dokümantasyonu kapsamında destek sayfaları ailesinin bir parçası olarak çalışır.
+**Nasıl yapar**: Typescript ile tip güvenliği sağlanmış bir fonksiyonel React bileşeni olarak tanımlanmıştır, projenin `C:\Users\alize\venthub-hvac\src\views\support\ReturnsPage.tsx` dosyası içinde barınır. Bağımsız bir sayfa bileşeni olarak rota sisteminden çağrılarak çalışır, harici bir yapılandırma veya giriş olmadan kendi içindeki iade işlevleri ve arayüzünü render eder.
+**Parametreler**: Bu fonksiyonel React bileşenine herhangi bir parametre veya React prop'u iletilmez, bağımsız sayfa yapısı gereği doğrudan kendi işlevlerini yerine getirir.
+**Dönüş**: React.FC tipinde, iadeler sayfasının tüm kullanıcı arayüzünü ve işlevlerini barındıran geçerli bir React bileşeni döndürür.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\ReturnsPage.tsx::ReturnsPage
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `router` — Next.js `useRouter` hook'undan alınan yönlendirme nesnesi, geri dönüş butonunun tıklama olayında `router.back()` ile önceki sayfaya yönlendirme yapmak için kullanılır
+  - `t` — `useI18n` hook'undan alınan çeviri fonksiyonu, sayfadaki tüm metinsel içerikleri (geri butonu etiketi, sayfa başlığı, açıklama metinleri) çevirmek için kullanılır
+- **Dönüş**: React JSX elementi (React.FC uyumlu sayfa bileşeni)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\views\support\ReturnsPage.tsx
+  function: src\views\support\ReturnsPage.tsx::ReturnsPage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: ReturnsPage
+
+---
+# FILE: src\views\support\ShippingPage.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\views\support\ShippingPage.tsx
+skeleton_hash: 8fbd46e3bbbcb13e
+generated_at: 2026-05-23T22:42:05Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC platformunun destek bölümünde yer alan kargo işlemleri sayfasını uygulayan React tabanlı bir görünüm modülüdür. Platform kullanıcılarının destek süreçleri kapsamındaki kargo ile ilgili işlemleri görüntülemesi ve yönetmesi için gereken kullanıcı arayüzünü tek bir ana bileşen üzerinden sunar.
+
+## Fonksiyon Grupları
+### Ana Sayfa Bileşeni
+Modülün temel sorumluluğu olan kargo yönetimi sayfasının tüm görünüm ve mantığını üstlenen tek ana React bileşenidir. Tüm sayfa içeriğini ve gerekli kullanıcı etkileşimlerini yöneterek hedeflenen arayüzü ziyaretçilere sunar.
+- ShippingPage
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu VentHub HVAC projesinin destek modülünde yer alan React tabanlı ShippingPage (Kargo Detay Sayfası) bileşeninin sorunsuz çalışması için uygulamanın rota yönetimi, oturum doğrulama mekanizması, backend entegrasyonu ve ortak UI bağımlılıklarının sürekli erişilebilir olması zorunludur.
+
+[Aksiyom 1]: Eğer ana uygulama React Router yapısı bu sayfa için tanımlanmış rotayı barındırmıyorsa, kullanıcılar hiçbir şekilde ShippingPage içeriğine erişemez.
+[Aksiyom 2]: Eğer proje genelinde kullanılan oturum doğrulama (authentication) mekanizması bu sayfa erişiminde devreye alınmamışsa, yetkisiz kullanıcılar müşterilere ait özel kargo ve teslimat bilgilerine erişebilir, veri gizliliği ihlali ortaya çıkar.
+[Aksiyom 3]: Eğer kullanıcıların kargo detaylarını çekmek için kullanılan backend API servisi erişilemez durumdaysa, sayfa üzerinde hiçbir kullanıcıya özel teslimat verisi gösterilemez, kullanıcı deneyimi tamamen bozulur.
+[Aksiyom 4]: Eğer bu sayfanın bağımlı olduğu ortak proje bileşenleri (sayfa şablonu, yükleme göstergesi, hata bildirim bileşeni) import edilebilir veya erişilebilir değilse, ShippingPage hiçbir şekilde doğru şekilde render edilemez.
+
+---
+
+## FONKSIYON DETAYLARI
+
+### ShippingPage
+**Ne yapar**: Venthub HVAC projesinin destek modülü kapsamında yer alan kargo işlemleri sayfasını oluşturan React fonksiyonel bileşenidir. Kullanıcıların destek sürecindeki gönderim takibi, kargo yönetimi gibi tüm ilgili işlevleri barındıran kullanıcı arayüzünü sunmakla görevli olan bu bileşen, uygulamanın destek bölümündeki kargo sayfasının temel yapı taşını oluşturur.
+**Nasıl yapar**: TypeScript ile geliştirilmiş React tabanlı bir fonksiyonel bileşen olarak çalışır, proje kaynak kodlarının belirtilen src/views/support/ShippingPage.tsx konumunda tanımlıdır. Sayfaya ait tüm içerik, stil ve temel iş mantığını tek bir bileşen altında toplayarak, uygulamanın yönlendirme sistemi tarafından çağrıldığında render edilmek üzere React çalışma zamanına sunulur.
+**Parametreler**:
+- Bu fonksiyonel bileşen tanımında herhangi bir giriş parametresi bulunmamaktadır, harici prop veya harici veri girişi almak üzere yapılandırılmamıştır.
+**Dönüş**: React.FC tipinde bir React fonksiyonel bileşiği döndürür. Bu dönen değer, React'in DOM yönetim mekanizması tarafından işlenerek tarayıcıda kargo işlemleri sayfasının kullanıcıya görünür hale gelmesini sağlar.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/views/support/ShippingPage.tsx::ShippingPage
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `router` — Next.js `useRouter` hook'u ile alınan yönlendirme nesnesi, geri dönüş butonunun tıklama olayında `router.back()` çağrılarak önceki sayfaya dönmek için kullanılır
+  - `t` — `useI18n` hook'undan alınan çeviri fonksiyonu, sayfadaki tüm metinleri i18n anahtarları üzerinden lokalize etmek için kullanılır
+- **Dönüş**: React JSX elementi (kargo bilgilerini içeren destek sayfasının arayüzü)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\views\support\ShippingPage.tsx
+  function: src\views\support\ShippingPage.tsx::ShippingPage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: ShippingPage
+
+---
+# FILE: src\views\support\SupportHomePage.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\views\support\SupportHomePage.tsx
+skeleton_hash: a7680126eb44d722
+generated_at: 2026-05-23T22:42:07Z
+---
+
+## Genel Bakış
+Bu modül, Venthub HVAC projesinin destek bölümünün ana giriş sayfasını oluşturan React tabanlı ön yüz bileşenini barındırır. Kullanıcıların destek kaynaklarına, yardım araçlarına ve iletişim kanallarına erişmesini sağlayan ana arayüzü hayata geçirmekle sorumludur.
+
+## Fonksiyon Grupları
+### Ana Destek Sayfası Bileşeni
+Destek bölümünün kullanıcıyla ilk karşılaşılan ana arayüzünü oluşturur, tüm destek içeriklerini bir araya getirerek eksiksiz bir deneyim sunar.
+- SupportHomePage
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu React tabanlı destek ana sayfası görüntüleme bileşeninin doğru şekilde render edilmesi ve çalışması için projenin frontend derleme ve çalışma zamanı altyapısının belirli zorunlu koşulları sağlaması gerekmektedir.
+
+[Aksiyom 1]: Eğer uygulama çalışma ortamında React runtime ortamı aktif ve erişilebilir değilse, bu fonksiyonel bileşen hiçbir şekilde DOM'a eklenip kullanıcıya sunulamaz, çalışma zamanı hatası oluşur.
+[Aksiyom 2]: Eğer uygulamanın rota yönetim (routing) mekanizması bu bileşeni destek ana sayfası için yapılandırılmış rota ile ilişkilendirmediği takdirde, kullanıcı bu sayfaya hiçbir şekilde erişemez.
+[Aksiyom 3]: Eğer projenin TypeScript derleyicisi bu TSX modülünü hatasız derleyemiyorsa, modül üretim ortamına aktarılamaz, derleme aşamasında süreç sonlanır.
+[Aksiyom 4]: Eğer bu modülün proje içindeki `src/views/support/` dosya yolu, proje derleme yapılandırmasında tanımlı kaynak yolları arasında yer almıyorsa, modül uygulama tarafından import edilemez, hiçbir yerde çağrılamaz.
+
+---
+
+## FONKSIYON DETAYLARI
+
+### SupportHomePage
+**Ne yapar**: VentHub HVAC projesinin destek modülünün ana giriş sayfasını oluşturan React fonksiyonel bileşenidir. Genel domain kapsamında yer alan projenin destek süreçlerinin kullanıcıya sunulduğu ana arayüz olarak görev alır, destek sistemiyle ilgili tüm içerik ve alt işlevlerin barındığı ana sayfayı oluşturur.
+**Nasıl yapar**: TypeScript ile tanımlanmış bir React bileşeni olarak projenin kaynak kod ağacında `src/views/support` dizini altında konumlanmıştır. Projenin dosya organizasyon standartlarına uygun şekilde destek modülünün ana bileşeni olarak yapılandırılmıştır, yalnızca kendi kapsamındaki React elementlerini render edecek şekilde tasarlanmıştır.
+**Parametreler**: Bu fonksiyona herhangi bir parametre aktarılmaz.
+**Dönüş**: React.FC türünde bir değer döndürür. Bu dönüş değeri, tarayıcıda render edilebilir React elementlerini barındıran standart React fonksiyonel bileşen nesnesidir.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\SupportHomePage.tsx::SupportHomePage
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, tüm arayüz metinlerinin yerelleştirilmesi için kullanılır
+  - `cards` — destek sayfasında gösterilen yönlendirme kartlarını içeren dizi, her elemanın başlık, açıklama, rota ve ikon alanları bulunur
+  - `router` — useRouter hook'undan alınan Next.js yönlendirme nesnesi, geri dönüş butonunda `router.back()` çağrısı için kullanılır
+- **Dönüş**: JSX React elementi (Support ana sayfa arayüzü)
+
+---
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\SupportHomePage.tsx::cards_map_callback
+- **params**: `{ title, desc, to, icon: Icon }` — döngüdeki tek kart nesnesinin yıkımlanmış alanları
+- **ic_degiskenler**:
+  - `title` — kartın başlık metni, arayüzde kullanıcılara gösterilir
+  - `desc` — kartın açıklama metni, arayüzde kullanıcılara gösterilir
+  - `to` — kart tıklandığında yönlendirilecek uygulama rotası
+  - `Icon` — kartta gösterilecek Lucide ikon bileşeni
+- **Dönüş**: Link sarmalında tek kart JSX bileşeni
+
+---
+
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\SupportHomePage.tsx::whatsapp_render_callback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `whatsappLink` — `getSupportLink` fonksiyonu ile oluşturulan WhatsApp iletişim linki, iletişim butonunun href özelliğine atanır
+- **Dönüş**: WhatsApp destek bloğu JSX elementi veya link geçersizse null
+
+---
+
+## NODE ID STANDARD
+
+  file: src\views\support\SupportHomePage.tsx
+  function: src\views\support\SupportHomePage.tsx::SupportHomePage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: SupportHomePage
+
+---
+# FILE: src\views\support\WarrantyPage.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\views\support\WarrantyPage.tsx
+skeleton_hash: 376a0032fc5a64a2
+generated_at: 2026-05-23T22:42:20Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC platformunun destek bölümünde yer alan garanti sayfasını oluşturan React tabanlı kullanıcı arayüzü bileşenidir. Kullanıcılara garanti süreçleri, kapsamları ve ilgili bilgilere erişim sunacak arayüzü yüklemekle sorumludur. Destek bölümünün gezinme yapısı içinde garanti ekranını kullanıcılara sunan tek bileşen modülünü barındırır.
+
+## Fonksiyon Grupları
+### Ana Garanti Sayfası Bileşeni
+Modülün temel sorumluluğu olan garanti sayfasının oluşturulması ve kullanıcıya sunulması için gerekli ana React bileşenini içerir. Tüm sayfa arayüzünü ve işlevselliğini yöneten tek bileşen bu grupta yer alır.
+- WarrantyPage
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu React tabanlı frontend garanti sayfası bileşeninin, HVAC platformu içerisinde sorunsuz çalışması için kendi çalışma zamanı ortamına, tüm proje içi paylaşılan bağımlılıklarına ve erişmesi gereken servislere sürekli erişebilmesi zorunludur.
+
+[Aksiyom 1]: Eğer React 16.8+ sürümü (Hooks desteği içeren temel çalışma zamanı ortamı) yoksa, bu bileşen hiçbir şekilde render edilemez, sayfa yüklenememe hatası oluşur.
+[Aksiyom 2]: Eğer bu bileşenin kullanması gereken proje genelindeki paylaşılan UI bileşenleri (header, footer, navigasyon elemanları vb.) erişilemez durumdaysa, WarrantyPage düzeni bozulur, eksik görsel öğelerle kullanıcıya sunulur.
+[Aksiyom 3]: Eğer platformun kullanıcı oturum doğrulama (auth) servisine erişim yoksa, yetkili kullanıcı tanımlaması yapılamadığı için kişiye özel garanti verileri çekilemez, ya yetkisiz erişime açık hale gelir ya da hata mesajıyla kullanıcıyı karşılar.
+[Aksiyom 4]: Eğer garanti verilerini sunan backend API servisine erişim yoksa, sayfada hiçbir geçerli garanti bilgisi gösterilemez, kullanıcı boş veya hata içeren bir ekranla karşılaşır.
+[Aksiyom 5]: Eğer TypeScript derleme sürecinde bu modül için gerekli tüm tip tanımları sağlanmamışsa, proje derlemesi başarısız olur, bu sayfa üretim ortamına aktarılamaz.
+
+---
+
+## FONKSIYON DETAYLARI
+
+### WarrantyPage
+**Ne yapar**: VentHub HVAC projesinin destek modülü kapsamında sunulan garanti sayfasını oluşturan ana React bileşenidir. Kullanıcılara HVAC cihazlarının garanti koşulları, garanti sorgulama, garanti talebi oluşturma gibi garanti ile ilgili tüm hizmetleri sunan arayüzü işletir, projenin destek rotasında yüklenen ana sayfa bileşeni olarak görev alır.
+**Nasıl yapar**: TypeScript tabanlı React fonksiyonel bileşeni olarak yapılandırılmış, projenin src/views/support/WarrantyPage.tsx dosyasında konumlanmıştır. Kendi kapsamında gerekli state, veri çekme işlemleri ve kullanıcı etkileşimi işleyicilerini yöneterek garanti sayfasının tüm içeriklerini oluşturur, React'in bileşen yaşam döngüsüne uygun olarak sayfa yüklendiğinde gerekli hazırlıkları tamamlayıp arayüzü kullanıcıya sunar.
+**Parametreler**:
+- Herhangi bir giriş parametresi almaz.
+**Dönüş**: React.FC tipinde React fonksiyonel bileşen nesnesi döndürür. Bu döndürülen bileşen, garanti sayfasının tüm DOM yapısını ve işlevselliğini içerir, uygulamanın yönlendirme sistemi tarafından çağrıldığında tarayıcıda ilgili garanti sayfası içeriğinin görüntülenmesini sağlar.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\WarrantyPage.tsx::WarrantyPage
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `router` — Next.js `useRouter` hook'u ile oluşturulan yönlendirme nesnesi, geri butonuna tıklandığında önceki sayfaya dönmek için `router.back()` metodu çağrılır
+  - `t` — `useI18n` hook'undan alınan çeviri fonksiyonu, tüm UI metinlerini ilgili dilde getirmek için kullanılır; `t('auth.back')`, `t('support.links.warranty')`, `t('support.warranty.desc1')`, `t('support.warranty.desc2')` anahtarları ile çeviri çağrıları yapılır
+  - `ArrowLeft` — lucide-react'ten import edilen ok ikonu bileşeni, geri dönüş butonunda gösterilir
+- **Dönüş**: Garanti sayfası arayüzünü oluşturan React JSX yapısı
+
+---
+
+## NODE ID STANDARD
+
+  file: src\views\support\WarrantyPage.tsx
+  function: src\views\support\WarrantyPage.tsx::WarrantyPage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: WarrantyPage
 
 ---
 # FILE: src\views\__tests__\OrdersPage.test.md

@@ -1,0 +1,70 @@
+{
+  "skill": "superpowers-write-plan",
+  "model": "Gemini 3.1 Pro (High)",
+  "date": "2026-05-24",
+  "execution_complexity": "LOW",
+  "recommended_model": "Gemini 3.1 Pro (Low)",
+  "requires_human_approval": true,
+  "brainstorm_ref": "046-xss-and-performance-optimization/brainstorm.json",
+  "objective": "Address P1 security XSS vulnerability in AdminPanel logistics inputs and optimize N+1 query performance in stock-alert Edge Function.",
+  "assumptions": [
+    "The admin logistics page can restrict input tracking numbers to alphanumeric characters and dashes/spaces/underscores.",
+    "The stock-alert Edge Function has database access via service role key."
+  ],
+  "pre_checks": [
+    {
+      "claim": "AdminLogisticsPage processes tracking number text inputs raw without sanitization.",
+      "verified": true,
+      "source": "src/views/admin/AdminLogisticsPage.tsx"
+    },
+    {
+      "claim": "stock-alert Edge Function runs getAlertRecipients inside the product iteration loop.",
+      "verified": true,
+      "source": "supabase/functions/stock-alert/index.ts"
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "title": "Sanitize tracking number inputs in AdminLogisticsPage.tsx",
+      "files": [
+        "src/views/admin/AdminLogisticsPage.tsx"
+      ],
+      "changes": "Apply alphanumeric and dash/space validation filtering in updateRow and handleBulkSubmit.",
+      "verify": "npm run build"
+    },
+    {
+      "id": 2,
+      "title": "Consolidate database queries in stock-alert Edge Function",
+      "files": [
+        "supabase/functions/stock-alert/index.ts"
+      ],
+      "changes": "Pull getAlertRecipients call outside the products loop in checkAllProducts and pass cachedRecipients into processProductAlert.",
+      "verify": "npx tsc --noEmit"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Input validation blocks valid tracking numbers from foreign carrier systems that might have custom symbols.",
+      "severity": "medium",
+      "mitigation": "Allow alphanumeric, dash, space, and underscore characters which covers 99.9% of global tracking codes."
+    }
+  ],
+  "rollback": "Use git checkout -- src/views/admin/AdminLogisticsPage.tsx supabase/functions/stock-alert/index.ts to restore previous code states.",
+  "domain_ref": "",
+  "allowed_paths": [
+    "src/views/admin/AdminLogisticsPage.tsx",
+    "supabase/functions/stock-alert/index.ts"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 2,
+  "allowed_change_types": [
+    "component_refactor",
+    "security_hardening",
+    "performance_optimization"
+  ],
+  "architectural_guardrails": {
+    "ssot_route_strategy": "This update makes zero changes to routes, preserving the existing admin dashboard routing architecture fully.",
+    "bundle_size_optimization": "The changes only use light native inline functions, adding negligible bundle weight."
+  }
+}
