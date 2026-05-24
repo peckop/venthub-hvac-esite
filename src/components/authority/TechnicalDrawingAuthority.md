@@ -1,0 +1,90 @@
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\authority\TechnicalDrawingAuthority.tsx
+skeleton_hash: c25fd098e9856261
+generated_at: 2026-05-23T21:55:07Z
+---
+
+## Genel Bakış
+`TechnicalDrawingAuthority` bileşeni, teknik çizim verilerini alıp bunları stil sınıflarıyla birlikte görsel bir temsile dönüştürür. Çizim listesini ve isteğe bağlı CSS sınıflarını kullanarak UI’da uygun bir şekilde render eder.
+
+## Fonksiyon Grupları
+### Render ve Görsel Oluşturma
+Bu grup, bileşenin aldığı `drawings` ve `className` parametrelerini kullanarak JSX çıktısını üretir; her bir çizimi uygun HTML öğelerine yerleştirerek ve ek stiller uygulayarak görsel temsili sağlar.  
+- TechnicalDrawingAuthority
+
+---
+
+## AXIOMS – Mimari Varsayımlar  
+Bu modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
+
+[Aksiyom 1]: Eğer `drawings` tanımlı değilse (undefined veya null), `TechnicalDrawingAuthority` bileşeni `drawings` üzerinde iterasyon yapamadığından hata fırlatır veya hiçbir çizim render etmez.  
+[Aksiyom 2]: Eğer `drawings` bir dizi (iterable) değilse, bileşen `map` gibi yöntemleri kullanamadığından render sırasında bir istisna oluşur.  
+[Aksiyom 3]: Eğer `className` prop’u string türünde değilse, bileşene geçirilen sınıf özniteliği beklenildiği gibi uygulanmayabilir ve DOM’da sınıf ataması başarısız olabilir.  
+[Aksiyom 4]: Eğer `formatColors` sabiti tanımlı değilse (undefined veya null), bileşen stil tanımlarını bu nesnedan alamadığı için renk stilleri uygulanamaz veya varsayılan stillere döner.  
+[Aksiyom 5]: Eğer `formatColors` bir obje değilse, stil özelliklerine erişim çalışma zamanında başarısız olur ve görsel çıktı beklenen renkleri gösteremeyebilir.
+
+---
+
+## FONKSIYON DETAYLARI
+
+### TechnicalDrawingAuthority
+**Ne yapar**: Teknik doküman ve çizimlerin otorite standartlarına uygun olarak görüntülenmesini sağlar; versiyon takibi ve format bazlı görsel ayrıştırma işlevini içerir.  
+**Nasıl yapar**: `drawings` prop’undan gelen teknik çizim listesini yineleyerek her bir çizimini versiyon bilgisi ve format türüne göre uygun stil ve bileşenlerle render eder; ayrıca `className` prop’uyla dış stil sınıflarını kabul ederek bileşenin görünümünü özelleştirmeye olanak tanır.  
+
+**Parametreler**:
+- drawings: type not specified — Görüntülenecek teknik çizimlerin koleksiyonu; her eleman versiyon ve format bilgisi içerir.  
+- className: string — Bileşene ek CSS sınıfları eklemek için kullanılan isteğe bağlı string; varsayılan değeri boş string ('') olup, stil özelleştirmesi sağlar.  
+
+**Dönüş**: void (fonksiyon bir JSX elementi render eder ve açık bir değer döndürmez).
+
+---
+
+## INTERFACES
+
+### TechnicalDrawingAuthorityProps
+- `drawings: TechnicalDrawingMetadata[]`
+- `className?: string`
+
+---
+
+## SABİTLER
+- **formatColors** (object) — `{
+    pdf: 'bg-red-50 text-red-600 border-red-100',
+    dwg: 'bg-blue-50 te...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/authority/TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
+- **params**: drawings, className = ''
+- **ic_degiskenler**:
+  - `formatColors` — object mapping drawing format strings to CSS class strings used to style the format indicator.
+- **Dönüş**: JSX.Element
+
+### [N2_NASIL] AST Pointer: src/components/authority/TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority.map
+- **params**: doc, idx
+- **ic_degiskenler**:
+  - `doc` — object containing drawing metadata (id, format, category, version, title, url, lastUpdated).
+  - `idx` — numeric index of the drawing in the drawings array, used to calculate animation delay.
+  - `formatColors` — object mapping format strings to CSS class strings for styling the format badge.
+  - `FileText` — icon component from lucide-react representing a file, used to display the drawing type.
+  - `Download` — icon component from lucide-react representing a download action, used in the download link.
+  - `Clock` — icon component from lucide-react representing a clock, used to show last updated timestamp.
+  - `Info` — icon component from lucide-react representing an info symbol, used to prefix the format label.
+- **Dönüş**: JSX.Element
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\authority\TechnicalDrawingAuthority.tsx
+  function: src\components\authority\TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: TechnicalDrawingAuthority

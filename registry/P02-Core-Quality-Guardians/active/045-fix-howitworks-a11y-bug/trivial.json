@@ -1,0 +1,33 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "sonnet",
+  "date": "2026-04-22",
+  "task_id": "P02-045",
+  "task_title": "Fix HowItWorks a11y bug",
+  "description": "Fix aria-controls referencing unmounted element in HowItWorks.tsx",
+  "files_modified": ["src/components/category/sections/HowItWorks.tsx"],
+  "allowed_paths": [
+    "src/components/category/sections/HowItWorks.tsx"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": ["BUGFIX"],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "No lint errors found. exit code 0",
+      "passed": true
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "TypeScript compiled successfully with no emit errors.",
+      "passed": true
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "Tests passed: 297 passed | 2 skipped (299)",
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

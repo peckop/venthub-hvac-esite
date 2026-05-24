@@ -1,0 +1,77 @@
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\authority\VideoAuthority.tsx
+skeleton_hash: 3a9367f9d49670fc
+generated_at: 2026-05-23T21:54:50Z
+---
+
+## Genel Bakış
+`VideoAuthority` bileşeni, video içeriğiyle ilişkili meta verileri alarak uygun video oynatıcı öğesini oluşturur ve isteğe bağlı stil sınıflarını ekleyerek kullanıcı arayüzünde gösterir. Tek bir fonksiyon üzerinden çalışır ve dışarıdan gelen `metadata` ve opsiyonel `className` prop'larını işler.
+
+## Fonksiyon Grupları
+### Render ve Veri İşleme
+Bu grup, bileşenin aldığı video meta verilerini UI elemanlarına dönüştürmek ve ekstra CSS sınıflarını uygulamaktan sorumludur.
+- VideoAuthority
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+[Aksiyom 1]: Eğer `metadata` undefined veya null ise, component render sırasında özellik erişimi yapmaya çalıştığı için çalışma zamanında hata oluşur.  
+[Aksiyom 2]: Eğer `metadata` nesnesi, component tarafından render sırasında kullanılan gerekli alanları (örn. `id`, `title`, `url` vb.) içermiyorsa, bu alanlar `undefined` olarak görüntülenerek UI’da eksik veya hatalı veri gösterilir.  
+[Aksiyom 3]: Eğer `className` prop’u string olmayan bir değer (sayı, obje, vb.) olarak geçirilirse, JSX’te `className` özelliği beklenmeyen türde bir değer alır ve stil uygulanamayabilir; varsayılan `''` string değeri bu riski azaltır.  
+[Aksiyom 4]: Eğer `className` prop’u hiç geçirilmezse, varsayılan boş string (`''`) kullanılır ve ek bir stil sınıfı uygulanmaz; bu durumda yalnızca kendi iç stilleri veya diğer stiller etkili olur.
+
+---
+
+## FONKSIYON DETAYLARI
+
+### VideoAuthority
+**Ne yapar**: P01-012: VideoAuthority Merkezi video yönetim bileşeni. Farklı sağlayıcılardan (Cloudflare, YouTube) gelen videoları tek bir standartta render eder.  
+**Nasıl yapar**: `metadata` prop'undan video kaynağı ve sağlayıcı bilgilerini okur, sağlayıcıya göre uygun video gömme yöntemini (iframe, embed vb.) seçer ve `className` prop'unu kök elemana uygular.  
+**Parametreler**:
+- metadata: VideoAuthorityProps — Video kaynağı, sağlayıcı tipi ve ek ayarları içeren nesne  
+- className: string — Bileşenin kök elemanına ek CSS sınıfı eklemek için kullanılır, varsayılan boş string  
+**Dönüş**: Belirtilmemiş (React bileşeni olarak JSX elementi döner)
+
+---
+
+## INTERFACES
+
+### VideoAuthorityProps
+- `metadata: VideoMetadata`
+- `className?: string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/authority/VideoAuthority.tsx::VideoAuthority
+- **params**: metadata: VideoMetadata, className: string = ''
+- **ic_degiskenler**:
+  - `isLoaded` — boolean state indicating whether the video iframe has finished loading; used to conditionally render thumbnail fallback and to set via `setIsLoaded(true)` on iframe `onLoad`.
+  - `setIsLoaded` — setter function for `isLoaded` state; called when the iframe loads to update the loading state.
+  - `isMuted` — boolean state reflecting whether the video is muted; initialized from `metadata.options?.muted ?? true`; used to control the `muted` query parameter in the iframe `src` and toggled by the mute/unmute button.
+  - `setIsMuted` — setter for `isMuted` state; toggled by the button `onClick` to mute or unmute the video.
+  - `renderPlayer` — function that returns the appropriate iframe JSX based on `metadata.provider`; encapsulates provider‑specific logic for Cloudflare and YouTube.
+- **Dönüş**: JSX.Element
+
+### [N2_NASIL] AST Pointer: src/components/authority/VideoAuthority.tsx::renderPlayer
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\authority\VideoAuthority.tsx
+  function: src\components\authority\VideoAuthority.tsx::VideoAuthority
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: VideoAuthority

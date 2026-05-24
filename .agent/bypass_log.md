@@ -422,3 +422,9 @@ Bu dosya `--no-verify` ile kaçak geçilen commitleri ML Sentinel davranış mod
 - **Değişen Dosyalar:**
 
 
+## Bypass: 2026-05-21 21:40:09
+- **Commit:** `512ab1b2`
+- **Mesaj:** chore(logs): clean up archived lint reports and temporary PR diff logs
+- **Değişen Dosyalar:**
+
+

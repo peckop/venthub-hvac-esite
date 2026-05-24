@@ -9,3 +9,6 @@ tmp-*/
 *.txt
 .git/
 brain/
+docs/archive/
+registry/_legacy/
+registry/sabah_brifing/
