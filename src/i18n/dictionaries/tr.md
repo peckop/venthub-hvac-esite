@@ -3,12 +3,15 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: 45a0b72e2472593c
-generated_at: 2026-05-23T22:30:32Z
+skeleton_hash: 0ef5baec42ff8847
+generated_at: 2026-05-25T09:09:35Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin uluslararaslaştırma (i18n) altyapısı için hazırlanmış statik Türkçe çeviri sözlüğü modülüdür. İçerisinde herhangi bir çalıştırılabilir fonksiyon veya dış bağımlılık bulunmayan, sadece proje arayüzünde kullanılacak tüm metinlerin Türkçe karşılıklarını barındıran `tr` adında bir sabit değişken barındırır. Herhangi bir ortam değişkeni, harici API veya veri tabanı sorgulaması yapmayan tamamen statik bir sözlük dosyasıdır.
+VentHub HVAC projesinin uluslararaslaştırma (i18n) altyapısı için hazırlanmış tamamen statik Türkçe çeviri sözlüğü modülüdür. Uygulama arayüzünde kullanılacak tüm metinlerin Türkçe karşılıklarını barındıran tek bir sabit nesne içerir, hiçbir çalıştırılabilir fonksiyon, dış bağımlılık, ortam değişkeni, harici API veya veri tabanı sorgulaması barındırmaz. Projenin dil yükleme mekanizması tarafından içe aktarılarak Türkçe kullanıcı arayüzünün oluşturulmasını sağlayan temel veri modülüdür.
+
+## Modül İçeriği Notu
+Bu modülde herhangi bir fonksiyon, metot veya sınıf tanımı bulunmamaktadır. Yalnızca tüm Türkçe çeviri anahtar ve değerlerini tutan `tr` adında bir sabit nesne tanımı mevcuttur, proje yapısındaki sabit konumundan taşınması veya içindeki eksik çeviri anahtarları uygulamanın çalışmasını veya Türkçe arayüzün kullanılmasını engeller.
 
 ---
 
@@ -25,6 +28,12 @@ Bu modül, VentHub HVAC projesinin uluslararasılaştırma (i18n) altyapısı i�
 
 ---
 
+---
+
+
+
+---
+
 ## SABİTLER
 - **tr** (object) — `{
   common: {
@@ -34,8 +43,6 @@ Bu modül, VentHub HVAC projesinin uluslararasılaştırma (i18n) altyapısı i�
 ---
 
 ## AST POINTERS
-
-Analiz edilen kaynak dosya `C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts` üzerinde herhangi bir fonksiyon, metot veya sınıf tabanlı üye fonksiyonu tanımlanmamıştır. Dosyada yalnızca `tr` adında nesne (object) türünde bir sabit tanımı mevcuttur, yürütülebilir herhangi bir fonksiyon gövdesi bulunmamaktadır.
 
 ---
 

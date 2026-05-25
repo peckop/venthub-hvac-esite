@@ -3,23 +3,17 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\db-rows.ts
-skeleton_hash: 1ad6e65787a8f1b5
-generated_at: 2026-05-23T22:33:04Z
+skeleton_hash: e7958ace534d8ee4
+generated_at: 2026-05-25T09:09:25Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin TypeScript tiplerini yöneten src/types dizininde yer alan bu modül, proje genelinde veritabanı etkileşimleri sırasında kullanılacak standartlaştırılmış veritabanı satır tiplerini tanımlamak amacıyla oluşturulmuştur. Hiçbir çalıştırılabilir kod, fonksiyon veya çalışma zamanı değeri barındırmayan, sadece tip seviyesinde tanımlamalar yapan bir modüldür.
-
-Modül yalnızca proje içindeki başka tip tanımı dosyalarından dış tipler import eder; veritabanı temel tiplerini barındıran `database.types` dosyasından temel veri tiplerini, yetkilendirme ile ilgili tipleri içeren `authority` dosyasından dinamik içerik tipini alarak kendi içindeki tip tanımları için temel oluşturur. Doğrudan herhangi bir ortam değişkeni kullanmaz, çalışma zamanında hiçbir harici API veya veritabanı tablosu ile etkileşim kurmaz, sadece tüm proje bileşenleri için tek tip standardı sunar.
+`src/types/db-rows.ts` modülü, VentHub HVAC projesinde veritabanı satırlarının tip güvenliğini sağlamak amacıyla tanımlanan TypeScript tiplerini içerir. Modül yalnızca tip seviyesinde tanımlamalar yapar; çalıştırılabilir kod, fonksiyon veya değişken barındırmaz. Proje içinde `database.types` ve `authority` dosyalarından tip import edilerek, bu tipler üzerinden standart veritabanı satır yapıları oluşturulur. Çalışma zamanı ortam değişkeni, dış API veya veritabanı tablo sorgulaması bulunmaz; sadece derleme aşamasında tip denetimi için hizmet verir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu TypeScript tip tanımlama modülü, projedeki veritabanı satırı yapılarının tip güvenliğiyle kullanılmasını sağlamak için tasarlanmıştır, çalışmasının temel koşulu projenin TypeScript altyapısıyla tam uyumlu olmasıdır.
-
-[Aksiyom 1]: Eğer bu modül projenin TypeScript derleme zincirine dahil edilmezse, tanımlanan tipler üzerinden hiçbir derleme zamanı tip denetimi gerçekleştirilemez, çalışma zamanı veri uyumsuzlukları riski ortaya çıkar.
-[Aksiyom 2]: Eğer bu modülde tanımlanan tip yapıları, kullanılan veritabanının gerçek şema yapısıyla eşleşmiyorsa, veritabanı okuma/yazma işlemlerinde çalışma zamanında veri kaybı, bozulması veya beklenmedik hatalar meydana gelir.
-[Aksiyom 3]: Eğer bu modülü içe aktaran proje bileşenlerinin kullandığı TypeScript sürümü, bu modüldeki tip sözdizimini desteklemiyorsa, projenin derleme süreci başarısız olur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -187,6 +181,14 @@ type CategoryMetadata = {
   features?: Ar
 ```
 
+### LocalizedCategoryMetadata
+```typescript
+type LocalizedCategoryMetadata = {
+  tr?: CategoryMetadata;
+  en?: CategoryMetadata;
+} & CategoryMetadata
+```
+
 ### DbProduct
 ```typescript
 type DbProduct = Omit<Tables['products']['Row'], 'technical_specs'> & {
@@ -273,8 +275,6 @@ type DbInvoiceProfileUpdate = Tables['user_invoice_profiles']['Update']
 ---
 
 ## AST POINTERS
-*Analiz edilen `C:\Users\alize\venthub-hvac\src\types\db-rows.ts` dosyasında herhangi bir uygulanmış fonksiyon, sınıf metodu veya analiz edilebilir yürütülebilir kod bloğu tespit edilmemiştir. Dosya yalnızca TypeScript tip importları içermektedir:*
-- İçe aktarılan tipler: `Database`, `Json` (`./database.types` modülünden), `DynamicAuthorityContent` (`./authority` modülünden)
 
 ---
 
@@ -316,6 +316,7 @@ type DbInvoiceProfileUpdate = Tables['user_invoice_profiles']['Update']
   export: DbWebhookEvent
   export: Enums
   export: LegacyAuthorityContent
+  export: LocalizedCategoryMetadata
   export: PublicSchema
   export: Tables
 
