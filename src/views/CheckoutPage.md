@@ -3,65 +3,70 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx
-skeleton_hash: 61aa2b041e6d0127
-generated_at: 2026-05-23T22:41:06Z
+skeleton_hash: bc12516bdac28145
+generated_at: 2026-05-24T20:09:43Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun sipariş tamamlama (ödeme) sürecini yöneten React tabanlı bir ön yüz bileşenidir. Müşteri bilgilerinin doğrulanması, adres kontrolü ve adım adım ilerleme mantığını barındıran modül, sipariş sürecinin hatasız ilerlemesini sağlar.
+`CheckoutPage` modülü, VentHub HVAC uygulamasının sipariş tamamlama ekranını sağlayan ana React bileşenidir. Kullanıcıdan alınan müşteri ve teslimat bilgilerini doğrular, adım‑adım ilerleme mantığını yönetir ve sonraki adıma geçişi tetikler.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-Ödeme sayfasının temel giriş noktası olarak tüm kullanıcı arayüzünü ve işlevsel akışın bütünleşik yönetimini üstlenir.
+### Bileşen Girişi
+Bileşenin kendisini tanımlar, UI’yı render eder ve tüm alt fonksiyonların yaşam döngüsünü koordine eder.  
 - CheckoutPage
 
-### Girdi Doğrulama Fonksiyonları
-Müşteri tarafından girilen kişisel bilgiler ile teslimat adresinin sistem gereksinimlerine uygunluğunu kontrol eder, olası giriş hatalarını tespit eder.
+### Veri Seçimi ve İşleme
+Kullanıcı tarafından seçilen fatura profili gibi verileri alır, ilgili durumu günceller ve diğer fonksiyonların kullanımı için hazır hâle getirir.  
+- handleSelectInvoiceProfile
+
+### Girdi Doğrulama
+Müşteri bilgileri ve teslimat adresi gibi kritik alanların geçerliliğini kontrol eder; hatalı girişlerde kullanıcıyı uyararak sürecin ilerlemesini engeller.  
 - validateCustomerInfo, validateAddress
 
-### Süreç Yönetimi Fonksiyonu
-Ödeme sürecinin adımları arası geçişi yönetir, tüm doğrulamaların başarılı olmasının ardından sonraki adıma geçişi tetikler.
+### Süreç Kontrolü
+Tüm doğrulamalar başarılı olduğunda bir sonraki adımın başlatılmasını sağlar; asenkron işlem olduğu için API çağrıları ve yanıt yönetimini de içerir.  
 - handleNextStep
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC projesinin ödeme akışındaki Checkout (ödeme) sayfasını yönetir; müşteri ve adres doğrulama, adım geçiş işlevlerinin sorunsuz çalışması için tüm bağımlı servislere erişim ve sayfaya iletilen zorunlu girdilerin varlığı zorunludur.
-
-[Aksiyom 1]: Eğer CheckoutPage ana bileşenine alışveriş sepeti verisi, yetkili kullanıcı kimliği ve ödeme servisi bağlantısı gibi zorunlu prop'lar iletilmezse, ödeme akışı başlatılamaz, kullanıcı boş veya hatalı yüklenen bir sayfa ile karşılaşır.
-[Aksiyom 2]: Eğer müşteri bilgilerini doğrulayan validateCustomerInfo() fonksiyonunun çalışması için gereken doğrulama mantığına erişim sağlanamazsa, müşteri bilgileri geçerli olsa bile ödeme süreci ilerleyemez, kullanıcı kalıcı bir hatayla karşılaşır.
-[Aksiyom 3]: Eğer validateAddress() fonksiyonuna parametre olarak iletilen CheckoutAddressInfo tipindeki adres nesnesi, adres doğrulaması için gereken tüm zorunlu alanları içermezse, adres doğrulaması başarısız olur, kullanıcı bir sonraki adıma geçemez.
-[Aksiyom 4]: Eğer handleNextStep() fonksiyonu içinde önceki adımlardaki tüm doğrulamaların (müşteri, adres) başarı durumunu kontrol eden mekanizma yoksa, eksik veya hatalı bilgiyle ödeme adımına geçilir, sipariş hatalı olarak kaydedilir.
-[Aksiyom 5]: Eğer CheckoutAddressInfo nesnesinin tip uyumluluğunu denetleyen mekanizma yoksa, yanlış yapıda adres verisiyle validateAddress() fonksiyonu çalıştırıldığında runtime hatası oluşur, ödeme akışı tamamen kesintiye uğrar.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### CheckoutPage
-**Ne yapar**: VentHub HVAC projesinin src/views dizininde yer alan ödeme süreci ana sayfa bileşenidir, siparişin tamamlanması için tüm kullanıcı arayüzü katmanlarını ve temel iş akışlarını tek bir çatı altında toplar. Kullanıcıların müşteri bilgilerini, adresini ve ödeme detaylarını girdiği ödeme akışının ana bileşeni olarak çalışır.
-**Nasıl yapar**: React.FC olarak tanımlanmış ana sayfa bileşeni olarak, sayfa içi state yönetimini, alt bileşenlerin entegrasyonunu ve ödeme adımlarının sıralı işleyişini koordine eder. Tüm ödeme sürecinde kullanılacak yardımcı doğrulama ve adım yönetimi fonksiyonlarını bünyesinde barındırarak kullanıcı deneyimini sürekli kılar.
-**Parametreler**: Hiçbir parametre almaz.
-**Dönüş**: React.FC tipinde, ödeme sayfasının tüm yapısını oluşturan React fonksiyonel bileşeni döndürür.
+**Ne yapar**: Bu fonksiyon, ödeme sayfası (checkout page) React bileşenini tanımlar. Sayfanın tüm alt bileşenlerini (adres formu, fatura profili seçimi, ödeme adımları vb.) bir araya getirerek kullanıcıya sunar ve adım adım ilerleyen bir ödeme akışını yönetir.
+**Nasıl yapar**: İçerisinde `useState` ve gerekli durum yönetimi hook’larını kullanarak mevcut adımı, müşteri bilgilerini, seçilen fatura profilini ve adres bilgilerini tutar. Her adım için ilgili form bileşenlerini koşullu olarak render eder ve adımlar arası geçişleri `handleNextStep` gibi fonksiyonlarla kontrol eder.
+**Parametreler**: Parametre almaz.
+**Dönüş**: `React.FC` tipinde bir fonksiyonel bileşen döndürür. Bu bileşen JSX elemanı olarak ödeme sayfasının tamamını render eder.
+
+### handleSelectInvoiceProfile
+**Ne yapar**: Kullanıcının fatura profili seçimini işler. Seçilen profili bileşenin durumuna kaydederek sonraki adımlarda kullanılmak üzere hazır hale getirir.
+**Nasıl yapar**: Parametre olarak gelen `InvoiceProfile` nesnesini alır ve ilgili state güncelleme fonksiyonunu çağırarak seçili profil bilgisini günceller. Genellikle bir dropdown veya listeden seçim yapıldığında tetiklenir.
+**Parametreler**:
+- `p: InvoiceProfile` — Seçilen fatura profilini temsil eden nesne. Fatura adı, adresi, vergi bilgileri gibi alanları içerir.
+**Dönüş**: `void` — Herhangi bir değer döndürmez; yan etki olarak bileşen durumunu günceller.
 
 ### validateCustomerInfo
-**Ne yapar**: Ödeme sürecinde kullanıcının girdiği kişisel müşteri bilgilerinin geçerliliğini ve eksiksizliğini kontrol eder, hatalı veya eksik bilgi durumunda kullanıcıya gösterilecek uyarıların tetiklenmesini sağlar. Zorunlu alanların doldurulması, iletişim bilgilerinin format kurallarına uyması gibi temel doğrulamaları gerçekleştirir.
-**Nasıl yapar**: Mevcut sayfa state'inde tutulan müşteri bilgilerini okuyarak, önceden tanımlanmış format ve doluluk kurallarına uygunluğunu denetler. Doğrulama başarısız olduğunda oluşan hata mesajlarını sayfa içi hata state'ine yazarak kullanıcı arayüzünde gösterilmesini sağlar.
-**Parametreler**: Hiçbir parametre almaz.
-**Dönüş**: Tanımlanmış bir dönüş tipi bulunmamaktadır, tüm işlevini sayfa içi state güncellemeleri ile yerine getirir, doğrudan herhangi bir değer döndürmez.
+**Ne yapar**: Müşteri bilgilerinin (ad, soyad, e-posta, telefon vb.) geçerliliğini kontrol eder. Formdaki alanların boş veya hatalı olup olmadığını denetler.
+**Nasıl yapar**: Genellikle form alanlarının değerlerini bir doğrulama kuralları seti ile karşılaştırır. Eksik veya hatalı alanlar varsa ilgili hata mesajlarını state’e kaydeder. Doğrulama sonucuna göre kullanıcıya geri bildirim sağlar.
+**Parametreler**: Parametre almaz; bileşen içindeki müşteri bilgisi state’ini okur.
+**Dönüş**: `void` — Doğrudan bir değer döndürmez; doğrulama sonuçlarını hata mesajı state’inde saklar.
 
 ### validateAddress
-**Ne yapar**: Ödeme sürecinde kullanıcının girdiği teslimat veya fatura adres bilgilerinin geçerliliğini denetler, adres alanlarının eksiksiz ve format kurallarına uygun olmasını garanti eder. Adresle ilgili tüm doğrulama işlemlerini tek bir fonksiyon altında toplar.
-**Nasıl yapar**: Girdi olarak aldığı adres nesnesi içindeki il, ilçe, posta kodu, açık adres gibi alanları tek tek kontrol eder, posta kodu formatı, zorunlu alanların boş bırakılmaması gibi kuralları uygular. Doğrulama sonuçlarını hata state'ine ileterek kullanıcının eksiklerini görmesini sağlar.
+**Ne yapar**: Verilen adres bilgilerinin (sokak, şehir, posta kodu, ülke) doğruluğunu ve eksiksizliğini kontrol eder.
+**Nasıl yapar**: Parametre olarak aldığı `CheckoutAddressInfo` nesnesindeki alanları önceden tanımlanmış kurallara göre inceler. Zorunlu alanların doldurulup doldurulmadığını, format uygunluğunu (örneğin posta kodu) test eder. Geçersiz alanlar varsa hata listesi oluşturur.
 **Parametreler**:
-- name: address, type: CheckoutAddressInfo — Doğrulanması gereken teslimat veya fatura adresini içeren, projede tanımlanmış özel CheckoutAddressInfo tipinde nesnedir
-**Dönüş**: Tanımlanmış bir dönüş tipi bulunmamaktadır, doğrulama işlemlerinin sonuçlarını sayfa içi state mekanizması ile iletir, doğrudan herhangi bir değer döndürmez.
+- `address: CheckoutAddressInfo` — Doğrulanacak adres bilgilerini içeren nesne. Adres satırı, şehir, eyalet/bölge, posta kodu ve ülke gibi alanlardan oluşur.
+**Dönüş**: `void` — Geriye değer döndürmez; doğrulama sonucuna göre hata durumunu günceller.
 
 ### handleNextStep
-**Ne yapar**: Ödeme sürecinin sıralı adımlarını yönetir, mevcut adımdaki tüm doğrulamaların başarılı olması halinde kullanıcının bir sonraki ödeme adımına geçmesini sağlar. Ödeme akışının adım değişikliği işlemini tek bir noktadan koordine eder.
-**Nasıl yapar**: Kullanıcı bir sonraki adıma geçmek istediğinde öncelikle mevcut adımdaki zorunlu tüm doğrulama fonksiyonlarını tetikler. Tüm doğrulamaların hatasız tamamlanmasının ardından sayfanın adım tutan state'ini güncelleyerek bir sonraki adımın kullanıcıya sunulmasını sağlar.
-**Parametreler**: Hiçbir parametre almaz.
-**Dönüş**: Tanımlanmış bir dönüş tipi bulunmamaktadır, sadece adım yönetimi ve state güncelleme işlemlerini gerçekleştirir, doğrudan herhangi bir değer döndürmez.
+**Ne yapar**: Ödeme akışında bir sonraki adıma geçiş işlemini gerçekleştirir. Mevcut adımın doğrulamalarını tetikleyerek geçişin uygun olup olmadığını denetler.
+**Nasıl yapar**: Öncelikle bulunulan adıma ait doğrulama fonksiyonlarını (örneğin `validateCustomerInfo`, `validateAddress`) çağırır. Doğrulama başarılıysa adım sayacını artırarak bir sonraki adımın render edilmesini sağlar. Aksi halde kullanıcıyı hataları düzeltmeye yönlendirir.
+**Parametreler**: Parametre almaz; mevcut adım durumunu ve ilgili state’leri kullanır.
+**Dönüş**: `void` — Herhangi bir değer döndürmez; adım durumunu güncelleyerek bileşenin yeniden render edilmesine neden olur.
 
 ---
 
@@ -225,16 +230,18 @@ Bu modül, VentHub HVAC projesinin ödeme akışındaki Checkout (ödeme) sayfas
 
 ---
 
+---
+
 ## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-CheckoutPage() fonksiyonu, ödeme sürecinde zorunlu bilgi kontrollerini yapmak için dosya içindeki validateCustomerInfo ve validateAddress fonksiyonlarını çağırır.
+### Disariya Çağrılar (Outgoing)
+- **CheckoutPage** fonksiyonu, müşteri bilgilerini ve adresi doğrulamak için sırasıyla **validateCustomerInfo** ve **validateAddress** fonksiyonlarını çağırır.
 
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veri setinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi paylaşılmamıştır.
+### Disaridan Çağrılanlar (Incoming)
+- Bu modülü kullanan dış dosyalar ve fonksiyonlar belirtilmemiştir; yalnızca verilen intra‑file ilişkiler kullanılmaktadır.
 
-### Ic Ice Fonksiyonlar (Nested)
-Yok
+### İç İç Fonksiyonlar (Nested)
+- Yok.
 
 ---
 
@@ -254,6 +261,7 @@ graph LR
 
   file: src\views\CheckoutPage.tsx
   function: src\views\CheckoutPage.tsx::CheckoutPage
+  function: src\views\CheckoutPage.tsx::handleSelectInvoiceProfile
   function: src\views\CheckoutPage.tsx::validateCustomerInfo
   function: src\views\CheckoutPage.tsx::validateAddress
   function: src\views\CheckoutPage.tsx::handleNextStep

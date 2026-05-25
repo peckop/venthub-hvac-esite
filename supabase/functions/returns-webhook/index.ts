@@ -50,6 +50,8 @@ async function sha256Base64(input: string): Promise<string> {
   return btoa(String.fromCharCode(...new Uint8Array(hash)))
 }
 
+const SKEW_MS = 5 * 60 * 1000 // 5 minutes tolerance
+
 Deno.serve(async (req: Request) => {
   try {
     if (req.method !== 'POST') return json({ error: 'Method not allowed' }, { status: 405 })
@@ -66,6 +68,22 @@ Deno.serve(async (req: Request) => {
     if (secret && sign) ok = await hmacValid(secret, raw, sign)
     if (!ok && token && tok && tok === token) ok = true
     if (!ok) return json({ error: 'Unauthorized' }, { status: 401 })
+
+    // Optional replay guard — enforce only if timestamp header present
+    const tsHeader = req.headers.get('x-timestamp') || req.headers.get('x-event-time') || ''
+    if (tsHeader) {
+      let t = 0
+      // support epoch ms or ISO
+      if (/^\d+$/.test(tsHeader.trim())) {
+        t = parseInt(tsHeader.trim(), 10)
+      } else {
+        const d = Date.parse(tsHeader)
+        t = Number.isFinite(d) ? d : 0
+      }
+      if (!t || Math.abs(Date.now() - t) > SKEW_MS) {
+        return json({ error: 'Stale or invalid timestamp' }, { status: 401 })
+      }
+    }
 
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
