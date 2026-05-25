@@ -76,7 +76,7 @@ Deno.serve(async (req: Request) => {
       const ip = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '') || 'unknown'
       const key = `coupon:${ip}`
       const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')
-      const { result } = await checkRateLimit(key, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { _limit: Number(Deno.env.get('COUPON_RATE_LIMIT_PER_MINUTE') || 60), _windowSec: Number(Deno.env.get('COUPON_RATE_LIMIT_WINDOW_SEC') || 60) })
+      const { result } = await checkRateLimit(key, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { limit: Number(Deno.env.get('COUPON_RATE_LIMIT_PER_MINUTE') || 60), windowSec: Number(Deno.env.get('COUPON_RATE_LIMIT_WINDOW_SEC') || 60) })
       if (!result.allowed) {
         const rl = rateLimitHeaders(Number(Deno.env.get('COUPON_RATE_LIMIT_PER_MINUTE') || 60), result.remaining, result.resetAt)
         return new Response(JSON.stringify({ error: 'rate_limited' }), { status: 429, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId, ...rl } })

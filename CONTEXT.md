@@ -306,7 +306,10 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 5. **Audit Trail:** Admin işlemleri `admin_audit_log` tablosuna kaydedilir
 6. **HMAC Doğrulama:** Webhook endpoint'leri HMAC-SHA256 ile korunur
 7. **i18n-Ready:** Tüm kullanıcıya görünen metinler sözlük dosyalarından gelir
+8. **Webhook Replay Guard:** Tüm webhook'lar (iade/kargo) HMAC doğrulamasına ek olarak zaman damgası (`x-timestamp`) veya idempotency koruması içermelidir (Tekrar oynatma saldırılarına karşı)
+9. **MVVM & Gateway Prensibi:** UI bileşenleri ham veri çekme (fetch/supabase) mantığından izole edilmeli; veri akışları Gateway hook'larına soyutlanmalıdır
 
 ---
 
-*Son güncelleme: 2026-05-24*
+*Son güncelleme: 2026-05-25*
+

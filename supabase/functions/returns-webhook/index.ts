@@ -69,21 +69,24 @@ Deno.serve(async (req: Request) => {
     if (!ok && token && tok && tok === token) ok = true
     if (!ok) return json({ error: 'Unauthorized' }, { status: 401 })
 
-    // Optional replay guard — enforce only if timestamp header present
+    // Enforce replay guard - mandatory timestamp header
     const tsHeader = req.headers.get('x-timestamp') || req.headers.get('x-event-time') || ''
-    if (tsHeader) {
-      let t = 0
-      // support epoch ms or ISO
-      if (/^\d+$/.test(tsHeader.trim())) {
-        t = parseInt(tsHeader.trim(), 10)
-      } else {
-        const d = Date.parse(tsHeader)
-        t = Number.isFinite(d) ? d : 0
-      }
-      if (!t || Math.abs(Date.now() - t) > SKEW_MS) {
-        return json({ error: 'Stale or invalid timestamp' }, { status: 401 })
-      }
+    if (!tsHeader) {
+      return json({ error: 'Missing timestamp header' }, { status: 401 })
     }
+
+    let t = 0
+    // support epoch ms or ISO
+    if (/^\d+$/.test(tsHeader.trim())) {
+      t = parseInt(tsHeader.trim(), 10)
+    } else {
+      const d = Date.parse(tsHeader)
+      t = Number.isFinite(d) ? d : 0
+    }
+    if (!t || Math.abs(Date.now() - t) > SKEW_MS) {
+      return json({ error: 'Stale or invalid timestamp' }, { status: 401 })
+    }
+
 
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')

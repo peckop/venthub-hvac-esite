@@ -1,4 +1,16 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { z } from 'https://esm.sh/zod@3.23.8'
+
+const clientErrorSchema = z.object({
+  msg: z.string().default(''),
+  stack: z.string().default(''),
+  url: z.string().default(''),
+  ua: z.string().default(''),
+  release: z.string().default(''),
+  env: z.string().default(''),
+  level: z.string().default('error'),
+  extra: z.record(z.unknown()).nullable().default(null)
+})
 
 Deno.serve(async (req: Request) => {
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
@@ -48,10 +60,16 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    const body = await req.json().catch(()=>null) as unknown
-    if (!body || typeof body !== 'object') {
+    const rawBody = await req.json().catch(() => null) as unknown
+    if (!rawBody || typeof rawBody !== 'object') {
       return new Response('Bad Request', { status: 400, headers: cors })
     }
+
+    const parsed = clientErrorSchema.safeParse(rawBody)
+    if (!parsed.success) {
+      return new Response('Bad Request', { status: 400, headers: cors })
+    }
+    const payload = parsed.data
 
     // Very small sanitizer to mask potential PII
     const mask = (s: string) => String(s)
@@ -59,7 +77,6 @@ Deno.serve(async (req: Request) => {
       .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+/gi, '***@***')
       .replace(/[A-Za-z0-9_\-]{20,}/g, '***')
 
-    const payload = body as Record<string, unknown>
 
     // Build signature from message + first stack line + url _path
     const firstLine = String(payload.stack || '').split('\n')[0] || ''

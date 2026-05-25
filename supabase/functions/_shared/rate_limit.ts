@@ -5,8 +5,16 @@
 export type RateLimitResult = { allowed: boolean; remaining: number; resetAt: string };
 
 export async function checkRateLimit(key: string, fetchBase: string, serviceRoleKey: string, opts?: { limit?: number; windowSec?: number }) {
-  const limit = Math.max(1, Number(opts?.limit ?? Number((globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('RATE_LIMIT_PER_MINUTE') ?? 60)));
-  const windowSec = Math.max(1, Number(opts?.windowSec ?? Number((globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('RATE_LIMIT_WINDOW_SEC') ?? 60)));
+  let limit = Number(opts?.limit ?? Number((globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('RATE_LIMIT_PER_MINUTE') ?? 60));
+  if (!Number.isFinite(limit) || limit <= 0) {
+    limit = 60;
+  }
+
+  let windowSec = Number(opts?.windowSec ?? Number((globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('RATE_LIMIT_WINDOW_SEC') ?? 60));
+  if (!Number.isFinite(windowSec) || windowSec <= 0) {
+    windowSec = 60;
+  }
+
   const body = { p_key: key, p_limit: limit, p_window_seconds: windowSec } as Record<string, unknown>
   const resp = await fetch(`${fetchBase}/rest/v1/rpc/bump_rate_limit`, {
     method: 'POST',
