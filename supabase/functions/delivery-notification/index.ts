@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
 
 interface DeliveryRequest {
   order_id: string
@@ -44,7 +45,6 @@ serve(async (req) => {
     } else if (authHeader) {
       try {
         const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
-        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
         const authClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
         const { data: { user } } = await authClient.auth.getUser()
         if (user) {
