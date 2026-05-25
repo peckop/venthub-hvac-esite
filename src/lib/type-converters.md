@@ -4,119 +4,118 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts
 skeleton_hash: fb495ef68efc8209
-generated_at: 2026-05-23T22:32:47Z
+generated_at: 2026-05-24T20:10:54Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin farklı yazılım katmanları arasında tip güvenliği sağlayan veri dönüşümleri gerçekleştiren merkezi bir yardımcı modülüdür. Supabase gibi harici servisler, veritabanı katmanı, uygulama domaini ve kullanıcı arayüzü arasında kullanılan uyumsuz veri tiplerinin birbirine dönüştürülmesi, tip doğrulaması ve model eşleme işlemlerini üstlenir. Tüm dönüşüm süreçlerini tek bir noktada toplayarak kod tekrarını önler ve tip kaynaklı hataları engeller.
+Bu modül, uygulamanın farklı katmanları ve dış servisler arasında veri yapılarını dönüştürmek için kullanılan tip dönüştürücü fonksiyonlar koleksiyonudur. Özellikle veritabanı tiplerini uygulamanın iş katmanı (domain) tiplerine çevirme ve Supabase gibi dış servisler için uyumlu veri formatı oluşturma işlemlerini üstlenir.
 
 ## Fonksiyon Grupları
-### Temel Tip Kontrolü ve Serileştirme
-Genel amaçlı tip doğrulama ve harici servisler için veri serileştirme işlemlerini gerçekleştirir, tüm dönüşüm süreçlerinde kullanılan temel yardımcı fonksiyonları barındırır.
+### Genel Dönüşüm ve Yardımcı Kontroller
+Genel veri formatı dönüşümleri ve tip doğrulama işlemleri yapan yardımcı fonksiyonlardır.
 - isRecord, toSupabaseJson
 
-### Veritabanı-Domain Tekil Eşleme Fonksiyonları
-Veritabanından gelen tekil kategori ve ürün nesnelerini, uygulamanın iç işleyişinde kullanılan domain model tiplerine dönüştüren eşleme fonksiyonlarını içerir. Veritabanı şeması ile domain modeli arasındaki farklılıkları gidererek güvenli veri aktarımı sağlar.
-- mapDatabaseCategoryToDomain, mapDatabaseProductToDomain
-
-### Kullanıcı Arayüzü için Toplu Dönüşüm Fonksiyonları
-Veritabanından gelen çoklu öğe içeren kategori ve ürün listelerini, kullanıcı arayüzünde doğrudan kullanılabilecek domain tiplerine toplu olarak dönüştürür. Arayüz katmanının veri hazırlama ihtiyacını tek seferde karşılar.
-- toUICategoryList, toUIProductList
+### Veritabanı-Domain Veri Dönüşümleri
+Veritabanından gelen kategori ve ürün verilerini, uygulamanın arayüz ve iş katmanında kullanılabilir domain tiplerine dönüştürür. Tekil varlıklar ve listeler için ayrı dönüşüm seçenekleri sunar.
+- mapDatabaseCategoryToDomain, mapDatabaseProductToDomain, toUICategoryList, toUIProductList
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, Supabase veritabanından gelen veri tiplerini domain ve UI katmanlarında kullanılabilecek formata dönüştüren, ayrıca domain verilerini Supabase ile uyumlu JSON formatına çeviren tip dönüşüm modülüdür; tüm dönüşüm fonksiyonlarının hatasız çalışması için girdi olarak alınan nesnelerin ilgili türlerin gerektirdiği tüm zorunlu alanlara sahip olması şarttır.
+Bu modüldeki tüm fonksiyonlar, girdi parametrelerinin imzada belirtilen türlerde olması durumunda doğru çalışma eğilimindedir.
 
-[Aksiyom 1]: Eğer toSupabaseJson fonksiyonuna girdi verilen data nesnesinin T tipinin tüm zorunlu alanlarına sahip olma koşulu yoksa, Supabase tarafından reddedilen veya eksik alanlı veritabanı kaydı oluşturulmasına neden olur.
-[Aksiyom 2]: Eğer isRecord tip kontrol fonksiyonuna girdi verilen value nesnesinin geçerli nesne türünde olma koşulu yoksa, modül içi tüm tip koruma mekanizmalarının devre dışı kalması ve runtime hataları oluşmasına yol açar.
-[Aksiyom 3]: Eğer mapDatabaseCategoryToDomain fonksiyonuna girdi verilen dbCat nesnesinin DbCategory tipinin tüm zorunlu alanlarına sahip olma koşulu yoksa, domain katmanında kullanılacak kategori nesnesinin eksik veriler içermesine ve kategori bazlı tüm iş süreçlerinde hata oluşmasına neden olur.
-[Aksiyom 4]: Eğer mapDatabaseProductToDomain fonksiyonuna girdi verilen dbProd nesnesinin DbProduct tipinin tüm zorunlu alanlarına sahip olma koşulu yoksa, domain katmanındaki ürün nesnesinin veri tutarsızlığı içermesine ve ürün iş akışlarında hatalar ortaya çıkmasına yol açar.
-[Aksiyom 5]: Eğer toUICategoryList fonksiyonuna girdi verilen cats dizisinin tüm öğelerinin geçerli DbCategory nesnesi olma koşulu yoksa, UI tarafında görüntülenecek kategori listesinin eksik veya hatalı öğeler içermesine, kullanıcı arayüzünde yanlış veri gösterilmesine neden olur.
-[Aksiyom 6]: Eğer toUIProductList fonksiyonuna girdi verilen prods dizisinin tüm öğelerinin geçerli DbProduct nesnesi olma koşulu yoksa, UI'da görüntülenecek ürün listesinin bozuk oluşmasına, kullanıcı tarafından ürünler üzerinde işlem yapılamamasına veya doğru görüntülenememesine yol açar.
+[Aksiyom 1]: Eğer toSupabaseJson fonksiyonuna geçirilen data parametresi imzada belirtilen T türünde değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
+[Aksiyom 2]: Eğer isRecord fonksiyonuna geçirilen value parametresi geçerli bir TypeScript değeri değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
+[Aksiyom 3]: Eğer mapDatabaseCategoryToDomain fonksiyonuna geçirilen dbCat parametresi imzada belirtilen DbCategory türünde değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
+[Aksiyom 4]: Eğer mapDatabaseProductToDomain fonksiyonuna geçirilen dbProd parametresi imzada belirtilen DbProduct türünde değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
+[Aksiyom 5]: Eğer toUICategoryList fonksiyonuna geçirilen cats parametresi imzada belirtilen DbCategory dizisi değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
+[Aksiyom 6]: Eğer toUIProductList fonksiyonuna geçirilen prods parametresi imzada belirtilen DbProduct dizisi değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### toSupabaseJson
-**Ne yapar**: Karmaşık TypeScript tiplerini Supabase'in gerektirdiği tam Json tipine güvenli bir şekilde dönüştürür, güvenli olmayan manuel tip dönüşümlerini tamamen ortadan kaldırır. TypeScript'in tip çıkarım mekanizmasını tam olarak karşılayan bir dönüşüm süreci sunar.
-**Nasıl yapar**: Yerleşik JSON ayrıştırma mekanizmasını kullanarak tip uyumluluğunu sağlar, manuel olarak `as` operatörüyle yapılan unsafe cast işlemlerine gerek bırakmadan TypeScript'in tip kontrolünden sorunsuz geçecek bir çıktı üretir.
+**Ne yapar**: Karmaşık TypeScript tiplerini Supabase’in kesin `Json` tipine güvenli bir şekilde dönüştürür.  
+**Nasıl yapar**: Gelen veri önce `JSON.stringify` ile metin haline getirilir, ardından `JSON.parse` ile yeniden nesneye çevrilir; bu işlem tip güvenliğini korur ve tehlikeli tip atamalarını önler.  
 **Parametreler**:
-- name: data, type: T — Dönüştürülmek istenen, generic T tipinde herhangi bir TypeScript verisi
-**Dönüş**: Json — Supabase tarafından kabul edilen standart Json tipinde, güvenli şekilde dönüştürülmüş veri
+- `data`: `T` — Dönüştürülmek istenen, herhangi bir TypeScript tipi.
+**Dönüş**: `Json` — Supabase’in beklediği JSON yapısı.
 
 ### isRecord
-**Ne yapar**: Türü bilinmeyen herhangi bir değerin genel `Record<string, unknown>` tipinde olup olmadığını güvenli bir şekilde doğrulayan bir tip koruyucusudur (type guard). Gelen bilinmeyen verilerin tiplerini TypeScript tarafında güvenle daraltmak için kullanılır.
-**Nasıl yapar**: TypeScript'in type guard yapısını kullanarak, değerin nesne yapısına sahip olup olmadığını, string tipinde anahtarlar barındırıp barındırmadığını kontrol eder, bu sayede tip daraltma işlemini TypeScript derleyicisinin de tanıyacağı şekilde güvenli hale getirir.
+**Ne yapar**: Bilinmeyen bir değerin `Record<string, unknown>` tipine uygun olup olmadığını kontrol eder.  
+**Nasıl yapar**: Değerin `typeof` kontrolü `object` ve `null` olmaması, ayrıca `Object.prototype.toString` çıktısının `[object Object]` olması gibi temel nesne kontrolleri yapılır; ardından tüm anahtarların string ve değerlerin `unknown` tipinde olduğu doğrulanır.  
 **Parametreler**:
-- name: value, type: unknown — Türü doğrulanmak istenen, bilinmeyen türündeki herhangi bir değer
-**Dönüş**: Doğrulama sonucunu yansıtan boolean bir değer; değer `Record<string, unknown>` tipiyle uyumluysa true, aksi halde false döndürür
+- `value`: `unknown` — Tipi kontrol edilecek değer.
+**Dönüş**: Belirtilmemiş (fonksiyonun dönüş tipi dokümantasyonda yer almıyor).
 
 ### mapDatabaseCategoryToDomain
-**Ne yapar**: Veritabanından gelen ham kategori satırını, arayüz (UI) tarafında kullanıma hazır kategori modeline güvenli şekilde dönüştürür. Supabase kaynaklı olası Json/Metin format uyuşmazlıklarını tek merkezden yöneterek tüm projede tutarlı veri formatı sağlar.
-**Nasıl yapar**: Veritabanından gelen ham verinin tüm alanlarını UI'nin ihtiyaç duyduğu standartlara uygun şekilde eşler, olası format uyuşmazlıklarını bu merkezileştirilmiş fonksiyonda gidererek, dönüşümün projenin her yerinde aynı şekilde gerçekleşmesini garanti eder.
+**Ne yapar**: Veritabanı katmanı (`DbCategory`) satırını UI katmanının kullandığı `DomainCategory` modeline dönüştürür.  
+**Nasıl yapar**: Gelen `DbCategory` nesnesindeki alanlar tek tek okunur; JSON veya metin tipindeki alanlar gerektiğinde `toSupabaseJson` ile normalize edilerek `DomainCategory` nesnesine atanır.  
 **Parametreler**:
-- name: dbCat, type: DbCategory — Supabase veritabanından gelen, ham DbCategory tipindeki kategori verisi
-**Dönüş**: DomainCategory — Arayüz tarafında kullanıma hazır, formatı uyarlanmış DomainCategory tipindeki kategori modeli
+- `dbCat`: `DbCategory` — Veritabanından gelen kategori kaydı.
+**Dönüş**: `DomainCategory` — UI’da kullanılabilecek kategori modeli.
 
 ### mapDatabaseProductToDomain
-**Ne yapar**: Veritabanından gelen ham ürün satırını, arayüz tarafında kullanıma hazır ürün modeline güvenli şekilde dönüştürür. Tüm ürün dönüşümlerini tek bir merkezde toplayarak projede tutarsız veri formatlarının oluşmasını engeller.
-**Nasıl yapar**: Ham veritabanı ürününün tüm alanlarını UI'nin ihtiyaç duyduğu standartlara uygun şekilde eşler, olası alan uyumsuzluklarını bu fonksiyonda gidererek tekrar eden dönüşüm kodlarının projeye dağılmasının önüne geçer.
+**Ne yapar**: Veritabanı ürün satırını (`DbProduct`) UI katmanının beklediği `DomainProduct` modeline dönüştürür.  
+**Nasıl yapar**: `DbProduct` nesnesindeki her alan okunur; tip uyumsuzlukları (örneğin JSON/Text alanları) `toSupabaseJson` yardımıyla düzeltilir ve yeni `DomainProduct` nesnesine aktarılır.  
 **Parametreler**:
-- name: dbProd, type: DbProduct — Supabase veritabanından gelen, ham DbProduct tipindeki ürün verisi
-**Dönüş**: DomainProduct — Arayüz tarafında kullanıma hazır, formatı uyarlanmış DomainProduct tipindeki ürün modeli
+- `dbProd`: `DbProduct` — Veritabanından gelen ürün kaydı.
+**Dönüş**: `DomainProduct` — UI’da kullanılabilecek ürün modeli.
 
 ### toUICategoryList
-**Ne yapar**: Birden fazla veritabanı kategori verisini toplu halde, arayüz kullanımına uygun kategori listesine dönüştüren toplu veri dönüştürme fonksiyonudur. Büyük ölçekli kategori listelerini tek bir fonksiyon çağrısıyla UI kullanımına hazır hale getirir.
-**Nasıl yapar**: Gelen `DbCategory` dizisindeki her bir öğe için `mapDatabaseCategoryToDomain` fonksiyonunu çağırarak, tüm elemanları tek tek güvenli şekilde dönüştürür ve toplu dönüşümde bile tüm standartların korunmasını sağlar.
+**Ne yapar**: Bir dizi `DbCategory` kaydını `DomainCategory` dizisine dönüştürerek toplu veri işleme sağlar.  
+**Nasıl yapar**: Gelen `cats` dizisi `mapDatabaseCategoryToDomain` fonksiyonuna tek tek geçirilir; sonuçlar yeni bir dizi olarak toplanır.  
 **Parametreler**:
-- name: cats, type: DbCategory[] — Supabase veritabanından gelen, birden fazla ham kategori verisini içeren DbCategory tipi dizi
-**Dönüş**: DomainCategory[] — Tüm elemanları UI kullanımına hazır hale getirilmiş DomainCategory tipi dizi
+- `cats`: `DbCategory[]` — Veritabanından gelen kategori listesi.
+**Dönüş**: `DomainCategory[]` — UI’da kullanılabilecek kategori listesi.
 
 ### toUIProductList
-**Ne yapar**: Birden fazla veritabanı ürün verisini toplu halde, arayüz kullanımına uygun ürün listesine dönüştüren toplu veri dönüştürme fonksiyonudur. Toplu olarak gelen ürün verilerini tek bir çağrı ile UI tarafında kullanılabilecek formata dönüştürür.
-**Nasıl yapar**: Gelen `DbProduct` dizisindeki her bir öğe için `mapDatabaseProductToDomain` fonksiyonunu çağırarak tüm ürünleri tek tek güvenli şekilde dönüştürür, toplu işlem sırasında da tekil dönüşüm standartlarının korunmasını garanti eder.
+**Ne yapar**: Bir dizi `DbProduct` kaydını `DomainProduct` dizisine dönüştürür.  
+**Nasıl yapar**: Gelen `prods` dizisi `mapDatabaseProductToDomain` fonksiyonuna sırayla uygulanır; elde edilen `DomainProduct` nesneleri yeni bir dizi içinde toplanır.  
 **Parametreler**:
-- name: prods, type: DbProduct[] — Supabase veritabanından gelen, birden fazla ham ürün verisini içeren DbProduct tipi dizi
-**Dönüş**: DomainProduct[] — Tüm elemanları UI kullanımına hazır hale getirilmiş DomainProduct tipi dizi
+- `prods`: `DbProduct[]` — Veritabanından gelen ürün listesi.
+**Dönüş**: `DomainProduct[]` — UI’da kullanılabilecek ürün listesi.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::isRecord
-- **params**: [value: unknown]
+### [N1_NASIL] AST Pointer: src/lib/type-converters.ts::toSupabaseJson
+- **params**: (data: T)
 - **ic_degiskenler**:
-  - `value` — Tür kontrolü yapılacak giriş değeri, nesne olup olmadığı doğrulanır
-- **Dönüş**: boolean (type guard: value is Record<string, unknown>)
+  - `data` — generic input data to be converted into a JSON-compatible structure
+- **Dönüş**: Json — deep-cloned JSON representation of the input
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::mapDatabaseCategoryToDomain
-- **params**: [dbCat: DbCategory]
+### [N2_NASIL] AST Pointer: src/lib/type-converters.ts::isRecord
+- **params**: (value: unknown)
 - **ic_degiskenler**:
-  - `dbCat` — Veritabanından okunan kategori satırı, UI uyumlu domain kategorisine dönüştürülmek için kullanılan giriş verisi, tüm özellikleri spread ile aktarılır, name, menu_label, marketing_title, description özelliklerine erişilerek standart string formatına dönüştürülür
-- **Dönüş**: DomainCategory
+  - `value` — value to test whether it is a plain object
+- **Dönüş**: yok — returns a boolean type guard indicating if `value` is a `Record<string, unknown>`
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::mapDatabaseProductToDomain
-- **params**: [dbProd: DbProduct]
+### [N3_NASIL] AST Pointer: src/lib/type-converters.ts::mapDatabaseCategoryToDomain
+- **params**: (dbCat: DbCategory)
 - **ic_degiskenler**:
-  - `dbProd` — Veritabanından okunan ürün satırı, UI uyumlu domain ürününe dönüştürülmek için kullanılan giriş verisi, tüm özellikleri spread ile aktarılır, name, description, brand özelliklerine erişilerek standart string formatına dönüştürülür
-- **Dönüş**: DomainProduct
+  - `dbCat` — database row representing a category
+- **Dönüş**: DomainCategory — domain model object with stringified fields and defaults
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::toSupabaseJson
-- **params**: [data: T]
-- **ic_degiskenler**: (gövde verisi mevcut değil)
-- **Dönüş**: Json
+### [N4_NASIL] AST Pointer: src/lib/type-converters.ts::mapDatabaseProductToDomain
+- **params**: (dbProd: DbProduct)
+- **ic_degiskenler**:
+  - `dbProd` — database row representing a product
+- **Dönüş**: DomainProduct — domain model object with stringified fields and default brand
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::toUICategoryList
-- **params**: [cats: DbCategory[]]
-- **ic_degiskenler**: (gövde verisi mevcut değil)
-- **Dönüş**: DomainCategory[]
+### [N5_NASIL] AST Pointer: src/lib/type-converters.ts::toUICategoryList
+- **params**: (cats: DbCategory[])
+- **ic_degiskenler**:
+  - `cats` — array of database category rows
+- **Dönüş**: DomainCategory[] — array of domain category objects produced by mapping each element with `mapDatabaseCategoryToDomain`
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::toUIProductList
-- **params**: [prods: DbProduct[]]
-- **ic_degiskenler**: (gövde verisi mevcut değil)
-- **Dönüş**: DomainProduct[]
+### [N6_NASIL] AST Pointer: src/lib/type-converters.ts::toUIProductList
+- **params**: (prods: DbProduct[])
+- **ic_degiskenler**:
+  - `prods` — array of database product rows
+- **Dönüş**: DomainProduct[] — array of domain product objects produced by mapping each element with `mapDatabaseProductToDomain`
 
 ---
 

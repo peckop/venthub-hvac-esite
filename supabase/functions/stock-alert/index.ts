@@ -131,9 +131,12 @@ async function checkAllProducts(supabase: SupabaseClient) {
   const productsToAlert = ((allLowStock || []) as Product[]).filter(p => p.stock_qty <= (p.low_stock_threshold || 5))
   console.warn(`[JOB] Found ${productsToAlert.length} products requiring alerts`)
 
+  // Fetch recipients once globally (N+1 query optimization)
+  const recipients = await getAlertRecipients(supabase)
+
   const results = []
   for (const product of productsToAlert) {
-    results.push(await processProductAlert(supabase, product))
+    results.push(await processProductAlert(supabase, product, recipients))
   }
   return results
 }
@@ -151,11 +154,13 @@ async function checkSpecificProduct(supabase: SupabaseClient, _productId: string
     return [{ product: product.name, message: 'Stock above threshold' }]
   }
 
-  return [await processProductAlert(supabase, product as Product)]
+  // Fetch recipients once (N+1 query optimization)
+  const recipients = await getAlertRecipients(supabase)
+
+  return [await processProductAlert(supabase, product as Product, recipients)]
 }
 
-async function processProductAlert(supabase: SupabaseClient, product: Product) {
-  const recipients = await getAlertRecipients(supabase)
+async function processProductAlert(supabase: SupabaseClient, product: Product, recipients: AlertRecipient[]) {
   const alertType = product.stock_qty <= 0 ? 'out_of_stock' : 'low_stock'
   const priority = product.stock_qty <= 0 ? 'critical' : 'high'
 

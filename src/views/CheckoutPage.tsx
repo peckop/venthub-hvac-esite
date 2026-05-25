@@ -8,8 +8,11 @@ import { useRouter } from 'next/navigation'
 import { Routes } from '../utils/routes'
 import { 
   listAddresses, 
-  UserAddress 
+  UserAddress,
+  InvoiceProfile
 } from '../lib/supabase'
+import { listInvoiceProfiles } from '../lib/services/invoice.service'
+import { InvoiceProfileModal } from './checkout/InvoiceProfileModal'
 import { 
   CheckoutCustomerInfo, 
   CheckoutAddressInfo, 
@@ -120,6 +123,48 @@ const CheckoutPage: React.FC = () => {
   const [showAddressModal, setShowAddressModal] = useState(false)
   const [addressPickTarget, setAddressPickTarget] = useState<'shipping' | 'billing'>('shipping')
 
+  // Invoice profile book management
+  const [savedInvoiceProfiles, setSavedInvoiceProfiles] = useState<InvoiceProfile[]>([])
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false)
+
+  useEffect(() => {
+    async function loadInvoiceProfiles() {
+      if (!user) return
+      try {
+        const rows = await listInvoiceProfiles()
+        setSavedInvoiceProfiles(rows)
+        // Find default or first profile to pre-fill
+        const defProfile = rows.find(r => r.is_default) || rows[0]
+        if (defProfile) {
+          const pType = (defProfile.profile_type === 'corporate' ? 'corporate' : 'individual') as 'individual' | 'corporate'
+          setInvoiceType(pType)
+          setInvoiceInfo({
+            type: pType,
+            tckn: defProfile.tax_number || '',
+            companyName: defProfile.company_name || '',
+            taxOffice: defProfile.tax_office || '',
+            taxNumber: defProfile.tax_number || ''
+          })
+        }
+      } catch {}
+    }
+    loadInvoiceProfiles()
+  }, [user])
+
+  const handleSelectInvoiceProfile = (p: InvoiceProfile) => {
+    const pType = (p.profile_type === 'corporate' ? 'corporate' : 'individual') as 'individual' | 'corporate'
+    setInvoiceType(pType)
+    setInvoiceInfo({
+      type: pType,
+      tckn: pType === 'individual' ? p.tax_number || '' : '',
+      companyName: p.company_name || '',
+      taxOffice: p.tax_office || '',
+      taxNumber: p.tax_number || ''
+    })
+    setShowInvoiceModal(false)
+    toast.success('Fatura profili başarıyla seçildi.')
+  }
+
 
   useEffect(() => {
     async function loadAddresses() {
@@ -220,6 +265,15 @@ const CheckoutPage: React.FC = () => {
         />
       )}
 
+      {showInvoiceModal && (
+        <InvoiceProfileModal
+          open={showInvoiceModal}
+          onClose={() => setShowInvoiceModal(false)}
+          profiles={savedInvoiceProfiles}
+          onSelect={handleSelectInvoiceProfile}
+        />
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <CheckoutProgress step={step} t={t} onBackToCart={() => router.push(Routes.cart())} />
 
@@ -240,7 +294,7 @@ const CheckoutPage: React.FC = () => {
                   savedAddresses={savedAddresses}
                   onOpenAddressModal={(target) => { setAddressPickTarget(target); setShowAddressModal(true) }}
                   onOpenInvoiceModal={async () => {
-                    // Logic for opening invoice modal
+                    setShowInvoiceModal(true)
                   }}
                   t={t} tf={(key, fallback) => getTranslationWithFallback(t, key, fallback)}
                 />
