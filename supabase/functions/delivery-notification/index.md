@@ -3,51 +3,56 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\delivery-notification\index.ts
-skeleton_hash: 473b7b92de417933
-generated_at: 2026-05-25T12:35:26Z
+skeleton_hash: 43bb5a40d783a90f
+generated_at: 2026-05-25T12:53:42Z
 ---
 
 ## Genel Bakış
-Bu modül, teslimat işlemleri tamamlandığında müşterilere e-posta bildirimi göndermek üzere geliştirilmiş bir Supabase Edge Function'dır. Sipariş bilgilerini veritabanından alır, dinamik e-posta şablonları işler, harici e-posta servisi aracılığıyla gönderim sağlar ve işlem sonrası denetim kayıtları oluşturur.
+Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında müşterilere otomatik e‑posta bildirimi gönderir. Sipariş verilerini veritabanından çeker, önceden hazırlanmış şablonları doldurur ve harici bir e‑posta servisi üzerinden mesajı iletir; işlem sonucu ise denetim amaçlı kaydedilir.
 
 ## Fonksiyon Grupları
 ### Şablon İşleme
-E-posta şablonlarının dosya sisteminden yüklenmesini ve sipariş verileriyle dinamik olarak doldurulmasını sağlar.
+E‑posta şablonlarının dosya sisteminden okunmasını ve sipariş bilgileriyle dinamik olarak doldurulmasını sağlar.
 - loadTemplate, render
 
 ### Ana İstek İşleyici
-Gelen HTTP isteklerini karşılar, yetkilendirme kontrolleri yapar, sipariş verilerini veritabanından çeker, e-posta gönderimini koordine eder ve işlem sonuçlarını kaydeder.
+Gelen HTTP isteklerini alır, yetkilendirmeyi kontrol eder, sipariş verilerini veritabanından çeker, şablon doldurma ve e‑posta gönderimi adımlarını koordine eder ve işlem sonuçlarını loglar.
 - delivery-notification_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modülün doğru çalışması için veritabanı bağlantısı, harici e-posta servisi yapılandırması ve dosya sistemi üzerinde şablon dosyasının varlığı gereklidir.
+
+[Veritabanı Bağlantısı]: Eğer veritabanı erişimi yoksa, sipariş bilgileri çekilemez ve işlem denetim kaydı oluşturulamaz.
+[E-posta Servisi]: Eğer harici e-posta servisi yapılandırması (API anahtarı vb.) yoksa, müşteriye bildirim gönderilemez.
+[Şablon Dosyası]: Eğer `loadTemplate` fonksiyonu tarafından hedeflenen şablon dosyası yoksa, e-posta içeriği oluşturulamaz.
+[İstek Nesnesi]: Eğer `delivery-notification_handler` fonksiyonuna geçerli bir istek nesnesi (`req`) sağlanmazsa, işlem başlatılamaz.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### render
-**Ne yapar**: Bir metin şablonundaki çift süslü parantezle sarılmış yer tutucuları, verilen veri nesnesindeki karşılık gelen değerlerle değiştirerek şablonu işleyen basit bir yardımcı fonksiyondur. Genellikle e-posta veya metin bildirimleri için dinamik içerik oluşturmak amacıyla kullanılır.
-**Nasıl yapar**: Tüm {{anahtar}} formatındaki yer tutucuları bulmak için global bir düzenli ifade kullanır. Her bulunan yer tutucunun anahtarını alır, bu anahtarın veri nesnesindeki değerini string tipine çevirir. Eğer anahtar veri nesnede mevcut değilse boş string ile değiştirir.
+**Ne yapar**: Dinamik içerikli metin şablonlarındaki placeholder'ları verilen veri nesnesindeki değerlerle değiştirerek, kullanıma hazır işlenmiş bir metin oluşturur. Temel olarak bildirim e-postası gibi dinamik içeriklerin üretilmesi için geliştirilmiş küçük şablon motorudur.
+**Nasıl yapar**: JavaScript'in yerel replace metodu ve `/{{(\w+)}}/g` regex'i ile şablon metnindeki tüm `{{anahtar}}` formatındaki placeholder'ları bulur. Her eşleşen anahtar için veri nesnesindeki karşılığı alır, eğer veri nesnesinde ilgili anahtar yoksa varsayılan olarak boş string kullanır. Orijinal şablon metnini değiştirmeden yeni bir işlenmiş string döndürür.
 **Parametreler**:
-- tpl: string — İçerisinde dinamik yer tutucular barındıran orijinal şablon metni
-- _data: Record<string, unknown> — Yer tutucuların yerine geçecek değerleri içeren anahtar-değer çiftleri nesnesi
-**Dönüş**: string — Tüm yer tutucuları ilgili değerlerle değiştirilmiş son hali olan şablon metni, eksik anahtarlar için boş string ile doldurulmuş hali
+- name: tpl — type: string — İşlenecek placeholder'ları içeren ham şablon metni, içeriğinde `{{ornek_anahtar}}` formatında dinamik alanlar barındırır
+- name: _data — type: Record<string, unknown> — Şablondaki placeholder anahtarlarının değerlerini tutan nesne, şablondaki her kelime anahtarı bu nesnede karşılık bir değere sahip olmalıdır
+**Dönüş**: string — Tüm placeholder'ları veri nesnesindeki değerlerle değiştirilmiş, kullanıma hazır işlenmiş şablon metni
 
 ### loadTemplate
-**Ne yapar**: Proje içindeki e-posta şablon dizininde saklanan teslimat bildirimi HTML şablon dosyasının içeriğini asenkron olarak okuyan ve döndüren fonksiyondur. Şablon dosyasının bulunamaması veya okuma hatası durumunda hatayı sessizce ele alır.
-**Nasıl yapar**: import.meta.url değeri kullanarak şablon dosyasının göreli yolundan tam URL'sini oluşturur. Oluşturulan URL üzerinden Deno'nun yerleşik readTextFile metodunu kullanarak dosyanın metin içeriğini okur. Herhangi bir okuma hatası oluştuğunda hatayı yakalar ve yerine null değeri döndürür.
-**Parametreler**: Bu fonksiyon herhangi bir dış parametre almaz, sabit olarak ./templates/email/delivered.html yolundaki dosyayı hedefler.
-**Dönüş**: Promise<string | null> — Başarılı bir şekilde şablon dosyası okunduysa dosyanın metin içeriğini, okuma sırasında hata oluşursa null değerini döndüren bir söz (promise) nesnesi
+**Ne yapar**: Proje dizininde yer alan teslimat bildirimi e-posta şablonunu dosya sisteminden okuyup ham metin olarak döndürür, şablonun render fonksiyonu tarafından işlenmeden önce yüklenmesini sağlar. Sadece proje içindeki sabit e-posta şablonunu okumak için tasarlanmıştır.
+**Nasıl yapar**: `import.meta.url` referansını kullanarak şablon dosyasının proje içindeki konumunu doğru bir şekilde çözümler, `./templates/email/delivered.html` yolunu mutlak URL'ye dönüştürür. Deno çalışma zamanının `readTextFile` metodu ile dosya içeriğini asenkron olarak okur, herhangi bir okuma hatası veya dosyanın bulunamaması durumunda hata fırlatmak yerine null döndürerek hata durumunu yönetir.
+**Parametreler**: Bu fonksiyonun herhangi bir parametresi bulunmamaktadır
+**Dönüş**: Promise<string | null> — Başarılı dosya okuma işlemi sonucunda şablonun ham metin içeriğini içeren string, herhangi bir hatada null döndüren asenkron promise nesnesi
 
 ### delivery-notification_handler
-**Ne yapar**: Supabase Edge Fonksiyonu olarak çalışan teslimat bildirimi servisinin ana istek işleyicisidir. Gelen HTTP isteklerini alır, gerekli bildirim gönderme adımlarını yürütür ve sonucuna uygun bir HTTP yanıtı döndürür.
-**Nasıl yapar**: Standart Edge Function istek modeline göre gelen Request nesnesini alır. İç iş mantığı için loadTemplate ve render fonksiyonlarını kullanarak e-posta şablonunu yükler ve dinamik içerikle doldurur. Oluşturulan e-posta içeriğini alıcıya gönderme işlemlerini gerçekleştirir ve sonucuna uygun durum kodu ve içerik içeren bir Response nesnesi oluşturarak döndürür.
+**Ne yapar**: Supabase Edge Function olarak çalışan teslimat bildirimi servisinin ana giriş noktasıdır, servise gelen tüm HTTP isteklerini alır, iş akışını yönetir ve kullanıcıya uygun bir HTTP yanıtı döndürür. Tüm bildirim gönderimi sürecinin merkezi yönetim fonksiyonudur.
+**Nasıl yapar**: Gelen isteği alarak gerekli doğrulamaları yapar, ardından bildirim için gerekli kullanıcı ve teslimat verilerini toplar, loadTemplate fonksiyonu ile e-posta şablonunu yükler, render fonksiyonu ile şablonu dinamik verilerle işler, son olarak bildirimin ilgili kanallardan gönderilmesini sağlar. Tüm iş akışı sırasında oluşabilecek hataları yakalayıp uygun HTTP durum kodlarıyla yanıt döndürerek hata yönetimini gerçekleştirir.
 **Parametreler**:
-- req: Request — Fonksiyona gönderilen gelen HTTP istek nesnesi, isteğin başlıkları, gövdesi ve diğer meta verilerini içerir
-**Dönüş**: Response — İşlem sonucuna göre yapılandırılmış standart HTTP yanıt nesnesi, başarılı veya başarısız durum kodları ve gerekli yanıt içeriği barındırır
+- name: req — type: Request — Servise gelen HTTP isteği nesnesi, isteğin metodu, başlıkları, gövdesi ve kaynak bilgileri gibi tüm isteğe ait verileri içerir
+**Dönüş**: Response — İsteğin işlenme sonucunu içeren HTTP yanıtı nesnesi, başarılı işlemde 200 gibi başarı durum kodlarıyla, oluşan hatalarda ise uygun hata durum kodlarıyla yanıt döndürür
 
 ---
 
@@ -109,6 +114,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   - `result` — `await resp.json().catch(()=>({}))` ile alınan Resend API yanıtı.
   - `msg` — Yakalanan istisna durumunda hata mesajı.
 - **Dönüş**: Response (HTTP yanıtı, başarılı, hata veya yetkilendirme durumuna göre farklı içerik ve durum kodları).
+
+---
 
 ---
 
