@@ -31,10 +31,29 @@ RULES = {
         "description": "Geliştirme çöpü (console.log kalıntısı)",
         "pattern": re.compile(r'^\+.*\bconsole\.log\s*\('),
         "severity": "MINOR"
+    },
+    "HARDCODED_URL": {
+        "description": "Hardcoded dev URL sızıntısı (localhost)",
+        "pattern": re.compile(r'^\+.*\blocalhost[:\d]*'),
+        "severity": "MAJOR"
+    },
+    "SECRET_LEAK": {
+        "description": "Supabase service_role anahtarı client koda sızıyor",
+        "pattern": re.compile(r'^\+.*\b(service_role|SUPABASE_SERVICE_ROLE_KEY)\b'),
+        "severity": "BLOCKER"
+    },
+    "MOCK_DATA": {
+        "description": "Mock/test verisi production koda sızıyor",
+        "pattern": re.compile(r'^\+.*\[\s*\{\s*(id|name|title)\s*:'),
+        "severity": "MAJOR"
     }
 }
 
 IGNORE_FLAG = "diff-ignore"
+
+# Taramadan hariç tutulan dosya uzantıları ve yollar
+EXCLUDED_EXTENSIONS = (".md", ".json", ".yml", ".yaml")
+EXCLUDED_PATHS = (".agent/",)
 
 def run_git_diff() -> str:
     """Gets the combined diff of staged and unstaged changes."""
@@ -59,10 +78,26 @@ def run_git_diff() -> str:
 def analyze_diff(diff_output: str) -> list:
     violations = []
     current_file = None
+    skip_file = False
     
     for line in diff_output.splitlines():
         if line.startswith("diff --git"):
             current_file = line.split(" b/")[-1] if " b/" in line else "Bilinmeyen Dosya"
+            # Dosya yolunu veya uzantısını kontrol et — skip flag'i ayarla
+            skip_file = False
+            if current_file:
+                for ep in EXCLUDED_PATHS:
+                    if current_file.startswith(ep):
+                        skip_file = True
+                        break
+                for ext in EXCLUDED_EXTENSIONS:
+                    if current_file.endswith(ext):
+                        skip_file = True
+                        break
+            continue
+
+        # Hariç tutulan dosyayı atla
+        if skip_file:
             continue
             
         if IGNORE_FLAG in line:

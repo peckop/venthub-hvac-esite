@@ -9,8 +9,13 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "pnpm",
-        "args": ["run", "lint:ci"],
-        "expected_exit_codes": [0]
+        "args": [
+          "run",
+          "lint:ci"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -20,8 +25,13 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "pnpm",
-        "args": ["run", "type-check"],
-        "expected_exit_codes": [0]
+        "args": [
+          "run",
+          "type-check"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -31,8 +41,13 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "pnpm",
-        "args": ["install", "--frozen-lockfile"],
-        "expected_exit_codes": [0]
+        "args": [
+          "install",
+          "--frozen-lockfile"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -42,8 +57,12 @@
       "enforcement_level": "WARNING",
       "executor": {
         "tool": "node",
-        "args": [".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs"],
-        "expected_exit_codes": [0]
+        "args": [
+          ".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -53,8 +72,13 @@
       "enforcement_level": "WARNING",
       "executor": {
         "tool": "pnpm",
-        "args": ["run", "build"],
-        "expected_exit_codes": [0]
+        "args": [
+          "run",
+          "build"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -64,8 +88,14 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "pnpm",
-        "args": ["test", "--", "--run"],
-        "expected_exit_codes": [0]
+        "args": [
+          "test",
+          "--",
+          "--run"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -75,8 +105,14 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "regex_scan",
-        "args": ["href=\"/|\\\\.push\\('/", "src/views/", "src/components/"],
-        "expected_exit_codes": [0]
+        "args": [
+          "href=\"/|\\\\.push\\('/",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -86,8 +122,14 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "regex_scan",
-        "args": ["params\\.[a-zA-Z]+", "src/app/", "--exclude=await params"],
-        "expected_exit_codes": [0]
+        "args": [
+          "params\\.[a-zA-Z]+",
+          "src/app/",
+          "--exclude=await params"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -97,8 +139,14 @@
       "enforcement_level": "WARNING",
       "executor": {
         "tool": "regex_scan",
-        "args": ["<img ", "src/views/", "src/components/"],
-        "expected_exit_codes": [0]
+        "args": [
+          "<img ",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -108,8 +156,14 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "regex_scan",
-        "args": ["href=\"/products/[0-9a-fA-F\\-]{36}", "src/views/", "src/components/"],
-        "expected_exit_codes": [0]
+        "args": [
+          "href=\"/products/[0-9a-fA-F\\-]{36}",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -119,8 +173,13 @@
       "enforcement_level": "STRICT",
       "executor": {
         "tool": "regex_scan",
-        "args": ["\\.\\.\\.", "registry/"],
-        "expected_exit_codes": [0]
+        "args": [
+          "\\.\\.\\.",
+          "registry/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""
@@ -130,8 +189,101 @@
       "enforcement_level": "WARNING",
       "executor": {
         "tool": "regex_scan",
-        "args": ["use client", "src/views/", "src/app/layout.tsx"],
-        "expected_exit_codes": [0]
+        "args": [
+          "use client",
+          "src/views/",
+          "src/app/layout.tsx"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "13_cors_wildcard_guard": {
+      "target": "Auth endpoint lerde Access-Control-Allow-Origin: * kullanilmamali.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "Access-Control-Allow-Origin.*\\\\*",
+          "supabase/functions/",
+          "src/app/api/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "14_service_role_leak": {
+      "target": "service_role anahtari NEXT_PUBLIC_ prefixi ile client a sizmamali.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "NEXT_PUBLIC.*service_role|NEXT_PUBLIC.*SERVICE_ROLE",
+          "src/",
+          ".env"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "15_hardcoded_localhost": {
+      "target": "Production kodunda localhost URL kalintisi bulunmamali.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "localhost[:\\\\d]*",
+          "src/",
+          "supabase/functions/",
+          "--exclude=\\\\.env|\\\\.example|__tests__"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "16_stripe_idempotency": {
+      "target": "Stripe checkout.sessions.create cagrilarinda idempotencyKey kullanilmali.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "sessions\\.create",
+          "supabase/functions/",
+          "src/app/api/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Varlik kontrolu."
+    },
+    "17_ui_data_integrity": {
+      "target": "UI da NaN, undefined, [object Object] gibi ham veri sizintisi olmamali.",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "NaN|undefined|object Object",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
       },
       "status": "PENDING",
       "evidence": ""

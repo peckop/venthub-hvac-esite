@@ -29,3 +29,7 @@ Eğer haklı bir gerekçe (Örn: Veritabanı masayı *bilerek* drop etmeli) vars
 ```ts
 const foo: any = parseUnknownData(); // diff-ignore: Dış API'den gelen veriye Type uygulanamadı.
 ```
+4. **Console.log kalıntısı:** Geliştirme çöpünün production'a sızması engellenir.
+5. **Hardcoded URL sızıntısı (localhost:3000):** Geliştirme ortamı URL'si production bundle'a gitmemeli.
+6. **Mock data sızıntısı:** app/ path'lerinde inline object array kalıntıları (geçici test verisi).
+7. **Secret sızıntısı (service_role):** Supabase service_role anahtarının client bundle'a sızması.

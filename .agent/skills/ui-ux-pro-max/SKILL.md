@@ -290,3 +290,21 @@ Before delivering UI code, verify these items:
 - [ ] Form inputs have labels
 - [ ] Color is not the only indicator
 - [ ] `prefers-reduced-motion` respected
+
+### CTA (Call-to-Action) Kalitesi
+- [ ] Sayfa başına tek primary CTA — scroll olmadan görünür
+- [ ] Zayıf CTA metni YASAK: "Gönder", "Öğren", "Tıkla"
+- [ ] Değer odaklı CTA: "Ücretsiz Teklif Al", "Fiyatları Gör", "Hemen Başla"
+- [ ] CTA hiyerarşisi: Primary (solid) → Secondary (outline) → Tertiary (text)
+
+### Veri Bütünlüğü (UI'da Sızıntı Kontrolü)
+- [ ] "NaN", "undefined", "null", "[object Object]" UI'da yok
+- [ ] Sonsuz skeleton/loading durumu yok — timeout ile fallback gösterilmeli
+- [ ] Boş durum (empty state) kasıtlı ve mesaj içermeli
+
+### Accessibility Ek (WCAG 2.2 AA)
+- [ ] Dokunma hedefleri ≥ 44×44px (mobil)
+- [ ] Her sayfada tam 1 adet h1
+- [ ] main veya [role="main"] landmark mevcut
+- [ ] nav elementlerinde aria-label var
+- [ ] div onclick YASAK → button veya a kullanılmalı
