@@ -1,4 +1,17 @@
-# SUPABASE FUNCTIONS MASTER\n\n---\ncompiled_at: 2026-05-25T13:13:25.035937+00:00\ntotal_compiled_files: 28\n---\n\n\n\n---\n# FILE: supabase\functions\admin-create-coupon\index.md\n\n---
+# SUPABASE FUNCTIONS MASTER
+
+---
+compiled_at: 2026-05-25T13:24:50.787601+00:00
+total_compiled_files: 28
+---
+
+
+
+
+---
+# FILE: supabase\functions\admin-create-coupon\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -88,7 +101,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: admin-create-coupon_handler\n\n---\n# FILE: supabase\functions\admin-iyzico-reconcile\index.md\n\n---
+  export: admin-create-coupon_handler
+
+---
+# FILE: supabase\functions\admin-iyzico-reconcile\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -176,7 +194,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: admin-iyzico-reconcile_handler\n\n---\n# FILE: supabase\functions\admin-order-inspect\index.md\n\n---
+  export: admin-iyzico-reconcile_handler
+
+---
+# FILE: supabase\functions\admin-order-inspect\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -254,7 +277,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: admin-order-inspect_handler\n\n---\n# FILE: supabase\functions\admin-orders-latest\index.md\n\n---
+  export: admin-order-inspect_handler
+
+---
+# FILE: supabase\functions\admin-orders-latest\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -353,7 +381,12 @@ Bu modül, tek bir zorunlu req parametresi alan admin-orders-latest_handler işl
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: admin-orders-latest_handler\n\n---\n# FILE: supabase\functions\admin-update-order\index.md\n\n---
+  export: admin-orders-latest_handler
+
+---
+# FILE: supabase\functions\admin-update-order\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -468,7 +501,12 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: admin-update-order_handler\n\n---\n# FILE: supabase\functions\admin-update-shipping\index.md\n\n---
+  export: admin-update-order_handler
+
+---
+# FILE: supabase\functions\admin-update-shipping\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -605,7 +643,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: admin-update-shipping_handler\n\n---\n# FILE: supabase\functions\apply-coupon\index.md\n\n---
+  export: admin-update-shipping_handler
+
+---
+# FILE: supabase\functions\apply-coupon\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -763,7 +806,12 @@ type ApplyCouponResp = {
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: apply-coupon_handler
-  export: buildCors\n\n---\n# FILE: supabase\functions\delivery-notification\index.md\n\n---
+  export: buildCors
+
+---
+# FILE: supabase\functions\delivery-notification\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -905,7 +953,12 @@ graph TD
 ## DISA AKTARILANLAR (EXPORTS)
   export: delivery-notification_handler
   export: loadTemplate
-  export: render\n\n---\n# FILE: supabase\functions\healthz\index.md\n\n---
+  export: render
+
+---
+# FILE: supabase\functions\healthz\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -974,7 +1027,12 @@ Bu modülün çalışması için bir **Request** nesnesi sağlanması gerekir.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: healthz_handler\n\n---\n# FILE: supabase\functions\iyzico-callback\index.md\n\n---
+  export: healthz_handler
+
+---
+# FILE: supabase\functions\iyzico-callback\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -1077,7 +1135,12 @@ type CheckoutRetrieveResponse = {
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: iyzico-callback_handler\n\n---\n# FILE: supabase\functions\iyzico-payment\index.md\n\n---
+  export: iyzico-callback_handler
+
+---
+# FILE: supabase\functions\iyzico-payment\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -1129,7 +1192,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: iyzico-payment_handler\n\n---\n# FILE: supabase\functions\iyzico-refund\index.md\n\n---
+  export: iyzico-payment_handler
+
+---
+# FILE: supabase\functions\iyzico-refund\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -1310,7 +1378,12 @@ type IyziCtor = new (args: { apiKey: string; secretKey: string; uri: string }) =
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: iyzico-refund_handler\n\n---\n# FILE: supabase\functions\log-client-error\index.md\n\n---
+  export: iyzico-refund_handler
+
+---
+# FILE: supabase\functions\log-client-error\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -1422,7 +1495,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: log-client-error_handler\n\n---\n# FILE: supabase\functions\notification-service\index.md\n\n---
+  export: log-client-error_handler
+
+---
+# FILE: supabase\functions\notification-service\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -1686,7 +1764,12 @@ graph LR
   export: notification-service_handler
   export: sendEmail
   export: sendSMS
-  export: sendWhatsApp\n\n---\n# FILE: supabase\functions\order-confirmation\index.md\n\n---
+  export: sendWhatsApp
+
+---
+# FILE: supabase\functions\order-confirmation\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -1844,7 +1927,12 @@ graph TD
 ## DISA AKTARILANLAR (EXPORTS)
   export: loadTemplate
   export: order-confirmation_handler
-  export: renderTemplate\n\n---\n# FILE: supabase\functions\order-housekeeping\index.md\n\n---
+  export: renderTemplate
+
+---
+# FILE: supabase\functions\order-housekeeping\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -1923,7 +2011,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: order-housekeeping_handler\n\n---\n# FILE: supabase\functions\order-validate\index.md\n\n---
+  export: order-housekeeping_handler
+
+---
+# FILE: supabase\functions\order-validate\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -2136,7 +2229,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: order-validate_handler\n\n---\n# FILE: supabase\functions\refund-order-mock\index.md\n\n---
+  export: order-validate_handler
+
+---
+# FILE: supabase\functions\refund-order-mock\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -2242,7 +2340,12 @@ Bu modül, tek bir parametre olan `req` ile çalışan bir handler fonksiyonunu 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: refund-order-mock_handler\n\n---\n# FILE: supabase\functions\release-expired-reservations\index.md\n\n---
+  export: refund-order-mock_handler
+
+---
+# FILE: supabase\functions\release-expired-reservations\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -2356,7 +2459,12 @@ Bu modül, Supabase Edge Functions ortamında bir HTTP isteği (`req`) alıp, s�
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: release-expired-reservations_handler\n\n---\n# FILE: supabase\functions\return-status-notification\index.md\n\n---
+  export: release-expired-reservations_handler
+
+---
+# FILE: supabase\functions\return-status-notification\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -2481,7 +2589,12 @@ Bu fonksiyon, `return-status-notification` Supabase Edge Function'ına gelen HTT
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: return-status-notification_handler\n\n---\n# FILE: supabase\functions\returns-webhook\index.md\n\n---
+  export: return-status-notification_handler
+
+---
+# FILE: supabase\functions\returns-webhook\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -2682,7 +2795,12 @@ graph TD
   export: mapReturnStatus
   export: normalizePayload
   export: returns-webhook_handler
-  export: sha256Base64\n\n---\n# FILE: supabase\functions\shipping-notification\index.md\n\n---
+  export: sha256Base64
+
+---
+# FILE: supabase\functions\shipping-notification\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -2838,7 +2956,12 @@ graph TD
 ## DISA AKTARILANLAR (EXPORTS)
   export: loadShippingTemplate
   export: renderTemplate
-  export: shipping-notification_handler\n\n---\n# FILE: supabase\functions\shipping-status\index.md\n\n---
+  export: shipping-notification_handler
+
+---
+# FILE: supabase\functions\shipping-status\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -2932,7 +3055,12 @@ Bu modül, sağlanan iki fonksiyonun imzalarına uygun olarak çalışacak şeki
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: jsonResponse
-  export: shipping-status_handler\n\n---\n# FILE: supabase\functions\shipping-webhook\index.md\n\n---
+  export: shipping-status_handler
+
+---
+# FILE: supabase\functions\shipping-webhook\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -3107,7 +3235,12 @@ graph TD
   export: mapCarrierStatus
   export: normalizePayload
   export: sha256Base64
-  export: shipping-webhook_handler\n\n---\n# FILE: supabase\functions\stock-alert\index.md\n\n---
+  export: shipping-webhook_handler
+
+---
+# FILE: supabase\functions\stock-alert\index.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -3355,7 +3488,12 @@ graph LR
   export: getAlertRecipients
   export: processProductAlert
   export: sendNotification
-  export: stock-alert_handler\n\n---\n# FILE: supabase\functions\_shared\notify.md\n\n---
+  export: stock-alert_handler
+
+---
+# FILE: supabase\functions\_shared\notify.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -3548,7 +3686,12 @@ graph LR
   export: getSlackWebhook
   export: notify
   export: sendEmail
-  export: sendSlack\n\n---\n# FILE: supabase\functions\_shared\rate_limit.md\n\n---
+  export: sendSlack
+
+---
+# FILE: supabase\functions\_shared\rate_limit.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
@@ -3652,7 +3795,12 @@ type RateLimitResult = { allowed: boolean; remaining: number; resetAt: string }
 ## DISA AKTARILANLAR (EXPORTS)
   export: RateLimitResult
   export: checkRateLimit
-  export: rateLimitHeaders\n\n---\n# FILE: supabase\functions\_shared\sentry.md\n\n---
+  export: rateLimitHeaders
+
+---
+# FILE: supabase\functions\_shared\sentry.md
+
+---
 domain: general
 source_type: doc
 namespace_type: module
