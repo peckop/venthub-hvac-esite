@@ -1,0 +1,48 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "antigravity",
+  "date": "2026-05-25",
+  "task_id": "P02-046",
+  "task_title": "E2E i18n and Strict Type Refactoring",
+  "description": "Implement E2E i18n (localization) and Strict Type-Safety refactoring across the VentHub HVAC B2B portal",
+  "files_modified": [
+    "src/components/LeadModal.tsx",
+    "src/hooks/useCategoryViewModel.ts",
+    "src/i18n/dictionaries/en.ts",
+    "src/i18n/dictionaries/tr.ts",
+    "src/lib/type-converters.ts",
+    "src/types/db-rows.ts",
+    "src/utils/__tests__/categoryHelpers.test.ts",
+    "src/views/ContactPage.tsx",
+    "src/views/support/FAQPage.tsx",
+    "src/views/support/SupportHomePage.tsx"
+  ],
+  "allowed_paths": [
+    "src/**",
+    "docs/**"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 5,
+  "allowed_change_types": [
+    "component_refactor",
+    "i18n"
+  ],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "No lint errors found. exit code 0",
+      "passed": true
+    },
+    {
+      "command": "pnpm run type-check",
+      "result": "TypeScript compiled successfully with no emit errors.",
+      "passed": true
+    },
+    {
+      "command": "pnpm run build",
+      "result": "Production build succeeded with 0 errors.",
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}
