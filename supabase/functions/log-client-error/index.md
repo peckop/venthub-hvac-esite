@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\log-client-error\index.ts
-skeleton_hash: 1e58fde4da6828be
-generated_at: 2026-05-24T10:45:26Z
+skeleton_hash: 9f88485c49506986
+generated_at: 2026-05-25T09:15:00Z
 ---
 
 ## Genel Bakış
-Bu modül, istemci tarafında meydana gelen hataların merkezi olarak kaydedilmesini sağlayan bir Supabase Edge Functions'tır. Gelen HTTP isteklerinden hata bilgilerini çıkarır, loglama işlemlerini gerçekleştirir ve CORS uyumlu güvenli yanıtlar döndürür.
+Bu modül, istemci tarafında oluşan hataları merkezi bir uç noktada toplamak ve kaydetmek için kullanılan bir Supabase Edge Function'dur. Gelen HTTP isteğindeki hata verisini ayrıştırır, geçerliliğini denetler, sisteme kaydeder ve sonuç olarak uygun bir HTTP yanıtı döndürür.
 
 ## Fonksiyon Grupları
 ### Hata Kaydı ve HTTP Yanıt Yönetimi
-Bu grup, istemciden gelen hata bildirimlerini işler, sistem günlüğüne kaydeder ve istemciye uygun, CORS başlıkları içeren HTTP yanıtı hazırlar.
+Gelen hata bildirimini işleyen tek bir işleyici; istek gövdesinden veriyi çıkarır, doğrular, kalıcı depolamaya yazar ve CORS başlıkları dahil uygun bir yanıt oluşturur.
 - log-client-error_handler
 
 ---
@@ -25,62 +25,77 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+---
+
 ## FONKSIYON DETAYLARI
 
 ### log-client-error_handler
-**Ne yapar**: Bu fonksiyon, istemci tarafında oluşan hataları kayıt altına almak için tasarlanmış bir HTTP istek işleyicisidir. Gelen istek üzerinden hata verilerini alır, işler ve kalıcı bir depolama alanına kaydeder, ardından işlem sonucunu belirten uygun bir yanıt döndürür.
-**Nasıl yapar**: Öncelikle istemciden gelen HTTP isteğini alır ve isteğin gövdesinden gönderilen hata verilerini çıkarır. Çıkarılan verinin geçerliliğini kontrol ederek gerekli doğrulama adımlarını gerçekleştirir. Doğrulama başarılı olursa, hata kaydını depolamak için gerekli işlemleri tamamlar ve son olarak işlem sonucuna göre uygun bir HTTP yanıtı oluşturup döndürür.
+**Ne yapar**: Bu fonksiyon, istemci tarafında oluşan hataları kaydetmek için gelen HTTP isteğini ele alır. İstemci uygulamasından gönderilen hata verilerini almak ve işlemek üzere tasarlanmıştır.
+**Nasıl yapar**: Fonksiyon, `req` parametresi üzerinden gelen isteği kabul eder ve işleyerek bir `Response` nesnesi döner. İstek içeriğini analiz ederek uygun bir yanıt oluşturur.
 **Parametreler**:
-- req: Request — İstemciden gelen tam HTTP isteği nesnesi, hata verilerini ve ilgili meta bilgileri içerir.
-**Dönüş**: Response — İşlem sonucunu temsil eden HTTP yanıt nesnesi. Başarılı kayıt durumunda 200 OK durum kodu ile işlem başarılı bilgisi içerir, geçersiz veri veya depolama hatası durumlarında uygun hata durum kodları ve hata açıklaması ile yanıt döndürür.
+- req: Request — Gelen HTTP isteği nesnesidir.
+**Dönüş**: Response — İşlem sonucunda oluşturulan HTTP yanıt nesnesidir.
+
+---
+
+## SABİTLER
+- **clientErrorSchema** (call) — `z.object({
+  msg: z.string().default(''),
+  stack: z.string().default(''),...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\log-client-error\index.ts::log-client-error_handler
-- **params**: (req)
+- **params**: (req: Request) — Gelen HTTP isteği nesnesi
 - **ic_degiskenler**:
-  - `requestId` — `crypto.randomUUID()` veya zaman damgası ile oluşturulan istek kimliği.
-  - `cors` — CORS başlıklarını içeren `Record<string,string>` nesnesi; tüm yanıtların `headers` alanına eklenir.
-  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile alınan Supabase proje URL’si.
-  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile alınan servis rol anahtarı.
-  - `allowedOrigins` — `ALLOWED_ORIGINS` ortam değişkeninden virgülle ayrılmış ve temizlenmiş izin verilen origin listesi.
-  - `originHeader` — İsteğin `origin` başlığının değeri.
-  - `originToCheck` — `originHeader` veya `referer` başlığından türetilen kontrol edilecek origin.
-  - `ref` — `referer` başlığının değeri; `originToCheck` oluşturulurken URL’den origin alınmak için kullanılır.
-  - `requireAuth` — `REQUIRE_AUTH` ortam değişkenine göre kimlik doğrulamanın zorunlu olup olmadığını belirten boolean.
-  - `supabase` — `createClient(supabaseUrl, serviceRoleKey)` ile oluşturulan Supabase istemcisi.
-  - `authHeader` — `authorization`/`Authorization` başlığının değeri.
-  - `accessToken` — `authHeader` içinden `Bearer ` önekini kaldırarak elde edilen erişim token’ı.
-  - `authData` — `supabase.auth.getUser(accessToken)` çağrısının başarılı yanıtı (`data` alanı).
-  - `authErr` — `supabase.auth.getUser` çağrısının hata yanıtı (`error` alanı).
-  - `body` — `await req.json()` ile elde edilen ve `null` dönüşüne karşı yakalanan istek gövdesi.
-  - `mask` — PII gizlemek için kullanılan, 4000 karaktere kadar kesen ve e‑posta/uzun dizileri maskeler bir fonksiyon.
-  - `payload` — `body` nesnesinin `Record<string, unknown>` tipine dönüştürülmüş hali.
-  - `firstLine` — `payload.stack` içindeki ilk satır (stack trace’in ilk satırı).
-  - `urlObj` — `payload.url` değerinden oluşturulan `URL` nesnesi (başarısız olursa `null`).
-  - `_path` — `urlObj?.pathname` değeri; URL’nin yol kısmı.
-  - `signature` — `mask` uygulanmış mesaj, stack ilk satırı ve yolun birleştirilmesiyle oluşturulan grup imzası.
-  - `groupPayload` — `signature` ve diğer maskelenmiş alanları içeren `error_groups` tablosu için upsert verisi.
-  - `upsertRow` — Upsert işleminden dönen satır (id ve _count).
-  - `groupId` — Hata grubunun kimliği (`string` veya `null`).
-  - `q` — `signature` eşleşmesiyle grup id’si sorgulama sonucunda dönen veri.
-  - `dedupSeconds` — `DEDUP_SECONDS` ortam değişkeninden okunan, aynı grup içinde tekrarları önlemek için kullanılan saniye değeri.
-  - `since` — `dedupSeconds` kadar geriye dönük ISO zaman damgası.
-  - `recent` — Aynı grup ve zaman aralığında daha önce kaydedilmiş `client_errors` satırları.
-  - `row` — `client_errors` tablosuna eklenecek kayıt; maskelenmiş alanlar ve isteğe bağlı `grou_p_id`.
-  - `error` — `supabase.from('client_errors').insert(row)` çağrısının hata nesnesi (varsa).
-  - `msg` — `error` nesnesinden türetilen hata mesajı (log ve yanıt için).
-  - `level` — `payload.level` değerinin küçük harfe dönüştürülmüş hali.
-  - `env` — `payload.env` değeri.
-  - `notifyEnabled` — `SLACK_WEBHOOK_URL` ortam değişkeninin boş olmaması durumunda `true`.
-  - `isCritical` — `level` değeri `fatal` veya `error` ise `true`.
-  - `slackNotify` — `../_shared/notify.ts` dosyasından dinamik olarak içe aktarılan Slack bildirim fonksiyonu.
-  - `shortMsg` — `payload.msg` değerinin 200 karaktere kesilmiş hali (Slack mesajı için).
-  - `fields` — Slack mesajında gösterilecek alanları tanımlayan nesne dizisi (Signature, Level, Env, URL, Request‑Id).
-  - `_e` — dış `catch` bloğunda yakalanan hata nesnesi.
-- **Dönüş**: `Response` (HTTP yanıtı; başarılı durumda 200/ok, hata durumlarında ilgili status kodları ve JSON gövde)
+  - `requestId` — İsteği takip etmek için üretilen benzersiz kimlik, tüm response header'larına eklenir
+  - `cors` — CORS politikalarını tanımlayan header nesnesi, izin verilen origin, header ve methodları içerir
+  - `supabaseUrl` — Supabase proje URL'si, ortam değişkeninden alınır
+  - `serviceRoleKey` — Supabase servis rolü yetki anahtarı, ortam değişkeninden alınır
+  - `allowedOrigins` — İsteğe izin verilen origin listesi, ortam değişkeninden virgülle ayrılmış şekilde işlenir
+  - `originHeader` — İsteğin origin header değerini, origin kontrolü için kullanılır
+  - `originToCheck` — Doğrulanacak origin değeri, origin header yoksa referer URL'sinden çıkarılır
+  - `ref` — İsteğin referer header değeri, origin header eksikse origin çıkarmak için kullanılır
+  - `requireAuth` — Kimlik doğrulama zorunluluğunu belirten bayrak, ortam değişkeninden alınır, varsayılan true
+  - `supabase` — Oluşturulan Supabase istemcisi, tüm veritabanı ve kimlik doğrulama işlemleri için kullanılır
+  - `authHeader` — İsteğin authorization header değeri, kullanıcı doğrulamak için kullanılır
+  - `accessToken` — Bearer token'dan çıkarılan erişim anahtarı, Supabase kullanıcı doğrulaması için gönderilir
+  - `authData` — Supabase'den dönen kullanıcı doğrulama verisi, token geçerliliğini kontrol etmek için kullanılır
+  - `authErr` — Kullanıcı doğrulama sırasında oluşan hata nesnesi
+  - `rawBody` — İsteğin ham JSON gövdesi, parse başarısız olursa null döner
+  - `parsed` — Zod şemasıyla doğrulanmış istek verisi, başarı durumu ve işlenmiş veriyi içerir
+  - `payload` — Doğrulama sonrası geçerli hata verisi, tüm istemci hata detaylarını barındırır
+  - `mask` — PII verilerini (e-posta, uzun tokenler) maskelemek için kullanılan iç yardımcı fonksiyon
+  - `firstLine` — Hata stack izininin ilk satırı, hata grubu imzası oluşturmak için kullanılır
+  - `urlObj` — İstekten gelen URL'den oluşturulan URL nesnesi, pathname çıkarmak için kullanılır
+  - `_path` — URL'den çıkarılan pathname, hata grubu imzası oluşturulurken kullanılır
+  - `signature` — Hata grubunu benzersiz tanımlayan imza, mesaj, stack ilk satırı ve path'ten oluşturulur
+  - `groupId` - Hatanın ait olduğu hata grubu kayıt kimliği, veritabanı upsert sonrası alınır
+  - `groupPayload` — `error_groups` tablosuna eklenecek hata grubu verisi, tüm grup metriklerini içerir
+  - `upsertRow` — `error_groups` tablosuna upsert işlemi sonrası dönen kayıt verisi, grup kimliği almak için kullanılır
+  - `q` — Upsert sonrası grup kimliği alınamazsa imzaya göre yapılan sorgudan dönen kayıt verisi
+  - `dedupSeconds` — Yinelenen hata kayıtlarını engellemek için bekleme süresi, ortam değişkeninden alınır, varsayılan 5 saniye
+  - `since` — Son eklenen hataları sorgulamak için zaman aralığı başlangıcı, dedup süresine göre hesaplanır
+  - `recent` — Dedup süresi içinde aynı gruba ait kayıt olup olmadığını kontrol etmek için dönen veritabanı sonucu
+  - `row` — `client_errors` tablosuna eklenecek bireysel hata kaydı, tüm hata detaylarını içerir
+  - `error` — `client_errors` tablosuna ekleme sırasında oluşan hata nesnesi
+  - `level` — Hata seviyesi, Slack bildirimi gönderim koşulunu kontrol etmek için kullanılır
+  - `env` — Hatanın oluştuğu ortam değeri, Slack bildiriminde kullanılır
+  - `notifyEnabled` — Slack bildirimlerinin etkin olup olmadığını belirten bayrak, webhook URL varlığına göre ayarlanır
+  - `isCritical` — Hata seviyesinin kritik olup olmadığını kontrol eden bayrak (fatal/error)
+  - `slackNotify` — Slack'e bildirim göndermek için import edilen yardımcı fonksiyon
+  - `shortMsg` — Slack bildiriminde kullanılacak kısaltılmış hata mesajı, ilk 200 karakteri alınır
+  - `fields` — Slack bildirimine eklenen ek detay alanları, imza, seviye, ortam gibi bilgileri içerir
+  - `_e` — Dış try-catch bloğunda yakalanan genel hata nesnesi, fonksiyonun genel hatasını loglamak için kullanılır
+  - `msg` — Yakalanan hatanın kullanıcıya dönülecek mesajı, log ve cevap olarak kullanılır
+- **Dönüş**: HTTP Response nesnesi, tüm isteklere uygun durum kodu ve header'larla döner
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\log-client-error\index.ts::mask
+- **params**: (s: string) — Maskeleme işlemi uygulanacak girdi metni
+- **ic_degiskenler**: (yok)
+- **Dönüş**: PII verileri masklenmiş, uzunluğu kırpılmış string değeri
 
 ---
 

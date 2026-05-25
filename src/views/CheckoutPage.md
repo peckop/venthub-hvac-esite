@@ -3,29 +3,21 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx
-skeleton_hash: bc12516bdac28145
-generated_at: 2026-05-24T20:09:43Z
+skeleton_hash: c6b3de86c015dae5
+generated_at: 2026-05-25T09:58:29Z
 ---
 
 ## Genel Bakış
-`CheckoutPage` modülü, VentHub HVAC uygulamasının sipariş tamamlama ekranını sağlayan ana React bileşenidir. Kullanıcıdan alınan müşteri ve teslimat bilgilerini doğrular, adım‑adım ilerleme mantığını yönetir ve sonraki adıma geçişi tetikler.
+Bu modül, VentHub HVAC uygulamasının sipariş tamamlama ekranını sağlayan ana React bileşenidir. Kullanıcıdan müşteri ve teslimat bilgilerini toplar, ödeme sürecinin adım adım ilerlemesini yönetir ve gerekli adım geçişlerini gerçekleştirir.
 
 ## Fonksiyon Grupları
-### Bileşen Girişi
-Bileşenin kendisini tanımlar, UI’yı render eder ve tüm alt fonksiyonların yaşam döngüsünü koordine eder.  
+### Ana Bileşen
+Modülün temel yapısını oluşturur, checkout ekranının tüm UI bileşenlerini bir araya getirir ve genel akışı koordine eder.
 - CheckoutPage
 
-### Veri Seçimi ve İşleme
-Kullanıcı tarafından seçilen fatura profili gibi verileri alır, ilgili durumu günceller ve diğer fonksiyonların kullanımı için hazır hâle getirir.  
-- handleSelectInvoiceProfile
-
-### Girdi Doğrulama
-Müşteri bilgileri ve teslimat adresi gibi kritik alanların geçerliliğini kontrol eder; hatalı girişlerde kullanıcıyı uyararak sürecin ilerlemesini engeller.  
-- validateCustomerInfo, validateAddress
-
-### Süreç Kontrolü
-Tüm doğrulamalar başarılı olduğunda bir sonraki adımın başlatılmasını sağlar; asenkron işlem olduğu için API çağrıları ve yanıt yönetimini de içerir.  
-- handleNextStep
+### Süreç Geçiş Yönetimi
+Ödeme sürecindeki bir sonraki adıma geçiş işlemlerini yönetir, ana bileşen tarafından çağrılarak kullanılır.
+- onNextStep
 
 ---
 
@@ -37,223 +29,117 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSIYON DETAYLARI
 
 ### CheckoutPage
-**Ne yapar**: Bu fonksiyon, ödeme sayfası (checkout page) React bileşenini tanımlar. Sayfanın tüm alt bileşenlerini (adres formu, fatura profili seçimi, ödeme adımları vb.) bir araya getirerek kullanıcıya sunar ve adım adım ilerleyen bir ödeme akışını yönetir.
-**Nasıl yapar**: İçerisinde `useState` ve gerekli durum yönetimi hook’larını kullanarak mevcut adımı, müşteri bilgilerini, seçilen fatura profilini ve adres bilgilerini tutar. Her adım için ilgili form bileşenlerini koşullu olarak render eder ve adımlar arası geçişleri `handleNextStep` gibi fonksiyonlarla kontrol eder.
-**Parametreler**: Parametre almaz.
-**Dönüş**: `React.FC` tipinde bir fonksiyonel bileşen döndürür. Bu bileşen JSX elemanı olarak ödeme sayfasının tamamını render eder.
-
-### handleSelectInvoiceProfile
-**Ne yapar**: Kullanıcının fatura profili seçimini işler. Seçilen profili bileşenin durumuna kaydederek sonraki adımlarda kullanılmak üzere hazır hale getirir.
-**Nasıl yapar**: Parametre olarak gelen `InvoiceProfile` nesnesini alır ve ilgili state güncelleme fonksiyonunu çağırarak seçili profil bilgisini günceller. Genellikle bir dropdown veya listeden seçim yapıldığında tetiklenir.
+**Ne yapar**: CheckoutPage, venthub-hvac uygulamasının ödeme sayfasının temel React fonksiyonel bileşenini tanımlar. Ödeme akışının görüntülenmesini ve yönetilmesini sağlayan ana bileşen olarak görev yapar. Kullanıcının ödeme işlemlerini yürüttüğü sayfanın temel yapısını oluşturur.
+**Nasıl yapar**: Verilen belgelere göre iç işleyiş detayları (render edilen alt bileşenler, durum yönetimi, olay dinleyiciler gibi) belirtilmemiştir. Yalnızca React.FC tipiyle bir bileşen döndürmek üzere yapılandırıldığı bilgisi mevcuttur.
 **Parametreler**:
-- `p: InvoiceProfile` — Seçilen fatura profilini temsil eden nesne. Fatura adı, adresi, vergi bilgileri gibi alanları içerir.
-**Dönüş**: `void` — Herhangi bir değer döndürmez; yan etki olarak bileşen durumunu günceller.
+- Verilen bilgide herhangi bir parametre tanımlanmamıştır.
+**Dönüş**: React.FC tipi — Ödeme sayfasının render edilebilir React bileşen örneğini döndürür.
 
-### validateCustomerInfo
-**Ne yapar**: Müşteri bilgilerinin (ad, soyad, e-posta, telefon vb.) geçerliliğini kontrol eder. Formdaki alanların boş veya hatalı olup olmadığını denetler.
-**Nasıl yapar**: Genellikle form alanlarının değerlerini bir doğrulama kuralları seti ile karşılaştırır. Eksik veya hatalı alanlar varsa ilgili hata mesajlarını state’e kaydeder. Doğrulama sonucuna göre kullanıcıya geri bildirim sağlar.
-**Parametreler**: Parametre almaz; bileşen içindeki müşteri bilgisi state’ini okur.
-**Dönüş**: `void` — Doğrudan bir değer döndürmez; doğrulama sonuçlarını hata mesajı state’inde saklar.
-
-### validateAddress
-**Ne yapar**: Verilen adres bilgilerinin (sokak, şehir, posta kodu, ülke) doğruluğunu ve eksiksizliğini kontrol eder.
-**Nasıl yapar**: Parametre olarak aldığı `CheckoutAddressInfo` nesnesindeki alanları önceden tanımlanmış kurallara göre inceler. Zorunlu alanların doldurulup doldurulmadığını, format uygunluğunu (örneğin posta kodu) test eder. Geçersiz alanlar varsa hata listesi oluşturur.
+### onNextStep
+**Ne yapar**: onNextStep, CheckoutPage bileşeninde kullanılan ve ödeme akışındaki adım ilerletme işlemini gerçekleştiren fonksiyondur. Mevcut ödeme adımından bir sonrakine geçişi tetiklemek üzere tasarlanmıştır. Ödeme akışının düzenli ve sıralı bir şekilde ilerlemesini sağlamak için kullanılır.
+**Nasıl yapar**: Verilen belgelere göre iç işleyiş detayları (adım doğrulaması, durum güncellemesi gibi) belirtilmemiştir. Dönüş tipinin void veya bilinmiyor olduğu bilgisi mevcuttur.
 **Parametreler**:
-- `address: CheckoutAddressInfo` — Doğrulanacak adres bilgilerini içeren nesne. Adres satırı, şehir, eyalet/bölge, posta kodu ve ülke gibi alanlardan oluşur.
-**Dönüş**: `void` — Geriye değer döndürmez; doğrulama sonucuna göre hata durumunu günceller.
-
-### handleNextStep
-**Ne yapar**: Ödeme akışında bir sonraki adıma geçiş işlemini gerçekleştirir. Mevcut adımın doğrulamalarını tetikleyerek geçişin uygun olup olmadığını denetler.
-**Nasıl yapar**: Öncelikle bulunulan adıma ait doğrulama fonksiyonlarını (örneğin `validateCustomerInfo`, `validateAddress`) çağırır. Doğrulama başarılıysa adım sayacını artırarak bir sonraki adımın render edilmesini sağlar. Aksi halde kullanıcıyı hataları düzeltmeye yönlendirir.
-**Parametreler**: Parametre almaz; mevcut adım durumunu ve ilgili state’leri kullanır.
-**Dönüş**: `void` — Herhangi bir değer döndürmez; adım durumunu güncelleyerek bileşenin yeniden render edilmesine neden olur.
+- Verilen bilgide herhangi bir parametre tanımlanmamıştır.
+**Dönüş**: void veya bilinmiyor — Herhangi bir değer döndürmez veya dönüş tipi açıkça belirtilmemiştir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::CheckoutPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src\views\CheckoutPage.tsx::CheckoutPage
+- **params**: (none)
 - **ic_degiskenler**:
-  - `items` — useCart hook'undan alınan sepetteki ürün listesi
-  - `getCartTotal` — useCart hook'undan alınan sepet toplamını hesaplayan fonksiyon
-  - `clearCart` — useCart hook'undan alınan sepeti temizleyen fonksiyon
-  - `applyServerPricing` — useCart hook'undan alınan sunucu tarafı fiyatlandırma uygulayan fonksiyon
-  - `user` — useAuth hook'undan alınan oturum açmış kullanıcı nesnesi
-  - `authLoading` — useAuth hook'undan alınan kimlik doğrulama yükleme durumu
-  - `router` — Next.js useRouter hook'undan alınan yönlendirme nesnesi
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
-  - `lang` — useI18n hook'undan alınan mevcut dil kodu
-  - `step` — useState ile yönetilen ödeme akışı adımını tutan state (1: Bilgi, 2: Adres, 3: İnceleme, 4: Ödeme)
-  - `setStep` — adım state'ini güncelleyen setter fonksiyonu
-  - `customerInfo` — Müşteri kişisel bilgilerini tutan form state'i
-  - `setCustomerInfo` — customerInfo state'ini güncelleyen setter
-  - `shippingAddress` — Teslimat adresi bilgilerini tutan form state'i
-  - `setShippingAddress` — shippingAddress state'ini güncelleyen setter
-  - `billingAddress` — Fatura adresi bilgilerini tutan form state'i
-  - `setBillingAddress` — billingAddress state'ini güncelleyen setter
-  - `invoiceType` — Fatura türünü (bireysel/kurumsal) tutan state
-  - `setInvoiceType` — invoiceType state'ini güncelleyen setter
-  - `invoiceInfo` — Fatura detay bilgilerini tutan form state'i
-  - `setInvoiceInfo` — invoiceInfo state'ini güncelleyen setter
-  - `legalConsents` — Yasal izinleri (KVKK, satış sözleşmesi vb.) tutan state
-  - `setLegalConsents` — legalConsents state'ini güncelleyen setter
-  - `sameAsShipping` — Fatura adresinin teslimat adresiyle aynı olduğunu belirten boolean state
-  - `setSameAsShipping` — sameAsShipping state'ini güncelleyen setter
-  - `shippingMethod` — Kargo yöntemini (standart/ekspres) tutan state
-  - `setShippingMethod` — shippingMethod state'ini güncelleyen setter
-  - `showHelp` — Yardım penceresinin görünürlüğünü tutan state
-  - `setShowHelp` — showHelp state'ini güncelleyen setter
-  - `couponCode` — Kupon kodunu tutan state (useCheckoutCoupon'dan)
-  - `setCouponCode` — couponCode state'ini güncelleyen setter
-  - `couponApplied` — Uygulanmış kupon bilgilerini tutan nesne
-  - `applyCoupon` — Kuponu sepete uygulayan fonksiyon
-  - `removeCoupon` - Uygulanmış kuponu kaldıran fonksiyon
-  - `payment` — useCheckoutPayment hook'undan dönen ödeme işlemlerini yöneten nesne
-  - `savedAddresses` — Kullanıcının kayıtlı adreslerini tutan state
-  - `setSavedAddresses` — savedAddresses state'ini güncelleyen setter
-  - `showAddressModal` — Adres seçme modalının görünürlüğünü tutan state
-  - `setShowAddressModal` — showAddressModal state'ini güncelleyen setter
-  - `addressPickTarget` — Hangi adres (teslimat/fatura) için modal açıldığını belirten state
-  - `setAddressPickTarget` — addressPickTarget state'ini güncelleyen setter
-  - `totalAmount` — Sepetin vergi öncesi toplam tutarı
-  - `vatAmount` — Sepet toplamı üzerinden hesaplanan KDV tutarı
-  - `finalAmount` — Kupon indirimi uygulandıktan sonraki son ödeme tutarı
-- **Dönüş**: React JSX elementi (sayfa arayüzü)
+  - `items` — array of cart items from `useCart()`
+  - `getCartTotal` — function to calculate cart total from `useCart()`
+  - `clearCart` — function to clear cart from `useCart()`
+  - `applyServerPricing` — function to apply server‑side pricing from `useCart()`
+  - `user` — authenticated user object from `useAuth()`
+  - `authLoading` — boolean indicating auth loading state from `useAuth()`
+  - `router` — Next.js router instance from `useRouter()`
+  - `t` — translation function from `useI18n()`
+  - `lang` — current language code from `useI18n()`
+  - `orchestrator` — checkout orchestrator object from `useCheckoutOrchestrator()`
+  - `step` — current checkout step from orchestrator
+  - `setStep` — function to update step from orchestrator
+  - `customerInfo` — customer information object from orchestrator
+  - `setCustomerInfo` — function to update customer info from orchestrator
+  - `shippingAddress` — shipping address object from orchestrator
+  - `setShippingAddress` — function to update shipping address from orchestrator
+  - `billingAddress` — billing address object from orchestrator
+  - `setBillingAddress` — function to update billing address from orchestrator
+  - `invoiceType` — type of invoice from orchestrator
+  - `setInvoiceType` — function to update invoice type from orchestrator
+  - `invoiceInfo` — invoice information object from orchestrator
+  - `setInvoiceInfo` — function to update invoice info from orchestrator
+  - `legalConsents` — legal consents object from orchestrator
+  - `setLegalConsents` — function to update legal consents from orchestrator
+  - `sameAsShipping` — boolean indicating if billing equals shipping from orchestrator
+  - `setSameAsShipping` — function to update sameAsShipping from orchestrator
+  - `shippingMethod` — selected shipping method from orchestrator
+  - `setShippingMethod` — function to update shipping method from orchestrator
+  - `showHelp` — boolean to show help overlay from orchestrator
+  - `setShowHelp` — function to update showHelp from orchestrator
+  - `savedAddresses` — array of saved addresses from orchestrator
+  - `showAddressModal` — boolean to show address modal from orchestrator
+  - `setShowAddressModal` — function to update showAddressModal from orchestrator
+  - `addressPickTarget` — target address type ('shipping' or 'billing') from orchestrator
+  - `setAddressPickTarget` — function to update addressPickTarget from orchestrator
+  - `savedInvoiceProfiles` — array of saved invoice profiles from orchestrator
+  - `showInvoiceModal` — boolean to show invoice modal from orchestrator
+  - `setShowInvoiceModal` — function to update showInvoiceModal from orchestrator
+  - `handleSelectInvoiceProfile` — handler to select an invoice profile from orchestrator
+  - `handleNextStep` — handler to proceed to next step from orchestrator
+  - `couponCode` — current coupon code string from `useCheckoutCoupon()`
+  - `setCouponCode` — function to update coupon code from `useCheckoutCoupon()`
+  - `couponApplied` — object containing applied coupon details from `useCheckoutCoupon()`
+  - `applyCoupon` — function to apply coupon from `useCheckoutCoupon()`
+  - `removeCoupon` — function to remove coupon from `useCheckoutCoupon()`
+  - `payment` — payment object returned by `useCheckoutPayment()`
+  - `totalAmount` — numeric total cart amount calculated by `getCartTotal()`
+  - `vatAmount` — numeric VAT amount derived from `totalAmount`
+  - `finalAmount` — numeric final amount after coupon discount
+  - `onNextStep` — function defined within component that calls `handleNextStep(payment.initiatePayment)`
+- **Dönüş**: React element tree (JSX)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::authCheckEffect
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src\views\CheckoutPage.tsx::onNextStep
+- **params**: (none)
 - **ic_degiskenler**:
-  - `authLoading` — Kimlik doğrulama yükleme durumu
-  - `user` — Oturum açmış kullanıcı nesnesi
-  - `router` — Next.js yönlendirme nesnesi
-  - `Routes.auth.login` — Giriş sayfası rotasını oluşturan fonksiyon
-- **Dönüş**: yok (yan etki: kullanıcı girişi yoksa login sayfasına yönlendirir)
+  - `handleNextStep` — function from orchestrator
+  - `payment` — payment object from `useCheckoutPayment()`
+- **Dönüş**: void (triggers navigation to next step)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::prefillCustomerInfoEffect
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src\views\CheckoutPage.tsx::useEffect callback
+- **params**: (none)
 - **ic_degiskenler**:
-  - `user` — Oturum açmış kullanıcı nesnesi
-  - `user.user_metadata?.full_name` — Kullanıcının kayıtlı tam adı
-  - `fullName` — Kullanıcı tam adından elde edilen tam isim stringi
-  - `parts` — Tam ismi boşluğa göre ayırarak oluşturulan isim parçaları dizisi
-  - `parts[0]` — İsim dizisinin ilk elemanı (kullanıcının ilk adı)
-  - `parts.slice(1).join(' ')` — İsim dizisinin geri kalanını birleştirerek oluşturulan soyadı
-  - `user.email` — Kullanıcının kayıtlı e-posta adresi
-  - `user.user_metadata?.phone` — Kullanıcının kayıtlı telefon numarası
-  - `setCustomerInfo` — Müşteri bilgi formunu önceden doldurmak için kullanılan setter
-- **Dönüş**: yok (yan etki: kullanıcı bilgilerini müşteri formuna önceden doldurur)
+  - `authLoading` — boolean from `useAuth()`
+  - `user` — user object from `useAuth()`
+  - `router` — router instance from `useRouter()`
+  - `Routes` — routes utility
+- **Dönüş**: void (side‑effect: redirects to login if unauthenticated)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::loadAddressesWrapperEffect
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: src\views\CheckoutPage.tsx::address pick callback
+- **params**: `a` (address object)
 - **ic_degiskenler**:
-  - `loadAddresses` — Kayıtlı adresleri yükleyen async iç fonksiyon
-  - `user` — Oturum açmış kullanıcı nesnesi
-  - `sameAsShipping` — Fatura adresinin teslimatla aynı olma durumu
-- **Dönüş**: yok (yan etki: kullanıcının kayıtlı adreslerini yükler)
+  - `addressPickTarget` — string from orchestrator
+  - `setShippingAddress` — function from orchestrator
+  - `setBillingAddress` — function from orchestrator
+  - `setShowAddressModal` — function from orchestrator
+- **Dönüş**: void (updates address state and closes modal)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::loadAddresses
-- **params**: (parametre yok)
+### [N5_NASIL] AST Pointer: src\views\CheckoutPage.tsx::async setShowInvoiceModal callback
+- **params**: (none)
 - **ic_degiskenler**:
-  - `user` — Oturum açmış kullanıcı nesnesi
-  - `listAddresses` — Kullanıcının kayıtlı adreslerini getiren API fonksiyonu
-  - `rows` — API'den dönen adres listesi
-  - `setSavedAddresses` — Kayıtlı adresler state'ini güncelleyen setter
-  - `defShip` — Varsayılan teslimat adresini bulan dizi elemanı
-  - `defShip.is_default_shipping` — Adresin varsayılan teslimat adresi olma durumu
-  - `addr` — API'den gelen adres formatını form formatına dönüştüren adres nesnesi
-  - `defShip.address_line` — Kayıtlı adresin tam açık adres stringi
-  - `defShip.city` — Kayıtlı adresin şehri
-  - `defShip.district` — Kayıtlı adresin ilçesi
-  - `defShip.postal_code` — Kayıtlı adresin posta kodu
-  - `defShip.full_name` — Adresin alıcısının tam adı
-  - `defShip.phone` — Adresin alıcısının telefon numarası
-  - `setShippingAddress` — Teslimat adresi formunu güncelleyen setter
-  - `sameAsShipping` — Fatura adresinin teslimatla aynı olma durumu
-  - `setBillingAddress` — Fatura adresi formunu güncelleyen setter
-- **Dönüş**: yok (yan etki: kullanıcının varsayılan teslimat adresini formlara yükler)
+  - `setShowInvoiceModal` — function from orchestrator
+- **Dönüş**: void (opens invoice modal)
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::validateCustomerInfo
-- **params**: (parametre yok)
+### [N6_NASIL] AST Pointer: src\views\CheckoutPage.tsx::empty auth check function
+- **params**: (none)
 - **ic_degiskenler**:
-  - `customerInfo.name` — Müşteri isim alanı
-  - `customerInfo.email` — Müşteri e-posta alanı
-  - `customerInfo.phone` — Müşteri telefon alanı
-  - `toast` — Bildirim göstermek için kullanılan react-hot-toast fonksiyonu
-  - `t` — Çeviri fonksiyonu, hata mesajlarını çevirmek için kullanılır
-- **Dönüş**: Boolean (doğrulama başarılıysa true, başarısızsa false)
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::validateAddress
-- **params**: address: CheckoutAddressInfo
-- **ic_degiskenler**:
-  - `address.full_address` — Adresin tam açık adres alanı
-  - `address.fullAddress` — Alternatif formatta tam açık adres alanı
-  - `full` — İki adres alanından birini seçerek oluşturulan temizlenmiş adres stringi
-  - `address.city` — Adresin şehir alanı
-  - `address.district` — Adresin ilçe alanı
-  - `toast` — Bildirim fonksiyonu
-  - `t` — Hata mesajlarını çeviren çeviri fonksiyonu
-- **Dönüş**: Boolean (doğrulama başarılıysa true, başarısızsa false)
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::handleNextStep
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `step` — Mevcut ödeme adımı
-  - `validateCustomerInfo` — Müşteri bilgilerini doğrulayan fonksiyon
-  - `setStep` — Adım state'ini güncelleyen setter
-  - `validateAddress` — Adres bilgilerini doğrulayan fonksiyon
-  - `shippingAddress` — Kullanıcının girdiği teslimat adresi
-  - `payment.initiatePayment` — Ödeme işlemini başlatan async fonksiyon
-  - `success` — Ödeme başlatma işleminin başarı durumu
-- **Dönüş**: yok (yan etki: ödeme akışı adımını ilerletir, 3. adımdaysa ödemeyi başlatır)
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::AddressSelectModal_onPick
-- **params**: a: UserAddress
-- **ic_degiskenler**:
-  - `a.address_line` — Seçilen kayıtlı adresin açık adresi
-  - `a.city` — Seçilen adresin şehri
-  - `a.district` — Seçilen adresin ilçesi
-  - `a.postal_code` — Seçilen adresin posta kodu
-  - `a.full_name` — Seçilen adresin alıcısının tam adı
-  - `a.phone` — Seçilen adresin alıcısının telefon numarası
-  - `addr` — Kayıtlı adresi form formatına dönüştüren adres nesnesi
-  - `addressPickTarget` — Hangi adrese (teslimat/fatura) atama yapılacağını belirten state
-  - `setShippingAddress` — Teslimat adresi formunu güncelleyen setter
-  - `setBillingAddress` — Fatura adresi formunu güncelleyen setter
-  - `setShowAddressModal` — Adres seçme modalını kapatan setter
-- **Dönüş**: yok (yan etki: seçilen adresi ilgili forma atar, modalı kapatır)
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx::StepAddressInfo_onOpenInvoiceModal
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (henüz implement edilmemiş boş async fonksiyon)
-
----
-
----
-
-## ÇAĞRI HARİTASI
-
-### Disariya Çağrılar (Outgoing)
-- **CheckoutPage** fonksiyonu, müşteri bilgilerini ve adresi doğrulamak için sırasıyla **validateCustomerInfo** ve **validateAddress** fonksiyonlarını çağırır.
-
-### Disaridan Çağrılanlar (Incoming)
-- Bu modülü kullanan dış dosyalar ve fonksiyonlar belirtilmemiştir; yalnızca verilen intra‑file ilişkiler kullanılmaktadır.
-
-### İç İç Fonksiyonlar (Nested)
-- Yok.
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  CheckoutPage() → validateAddress()
-  CheckoutPage() → validateCustomerInfo()
-
-```mermaid
-graph LR
-    CheckoutPage["CheckoutPage()"] --> validateAddress["validateAddress()"]
-    CheckoutPage["CheckoutPage()"] --> validateCustomerInfo["validateCustomerInfo()"]
-```
+  - `authLoading` — boolean from `useAuth()`
+  - `user` — user object from `useAuth()`
+  - `router` — router instance from `useRouter()`
+  - `Routes` — routes utility
+- **Dönüş**: void (redirects to login if unauthenticated)
 
 ---
 
@@ -261,10 +147,7 @@ graph LR
 
   file: src\views\CheckoutPage.tsx
   function: src\views\CheckoutPage.tsx::CheckoutPage
-  function: src\views\CheckoutPage.tsx::handleSelectInvoiceProfile
-  function: src\views\CheckoutPage.tsx::validateCustomerInfo
-  function: src\views\CheckoutPage.tsx::validateAddress
-  function: src\views\CheckoutPage.tsx::handleNextStep
+  function: src\views\CheckoutPage.tsx::onNextStep
 
 ---
 
