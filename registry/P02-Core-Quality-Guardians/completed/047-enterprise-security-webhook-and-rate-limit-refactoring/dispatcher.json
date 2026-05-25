@@ -1,0 +1,21 @@
+{
+  "skill": "model-dispatcher",
+  "date": "2026-05-25",
+  "task_summary": "Enterprise level security audit and refactoring of Deno functions webhook validation and rate limiting",
+  "complexity": "medium",
+  "recommended_model": "Claude Sonnet 4.6 (Thinking)",
+  "blast_radius": 7,
+  "reasoning": "This task requires cross-module security analysis of Supabase Deno Edge functions, webhook replay attack mitigation and strict type-safety enforcement, which requires advanced logic reasoning.",
+  "alternatives": [
+    {
+      "model": "Gemini 3.1 Pro (High)",
+      "score": 90,
+      "reason": "Very good at code modifications and Deno API usage, but may lack some security edge cases compared to Sonnet."
+    },
+    {
+      "model": "Claude Opus 4.6 (Thinking)",
+      "score": 85,
+      "reason": "Exemplary reasoning capabilities, but might be overkill for this specific refactoring scope."
+    }
+  ]
+}

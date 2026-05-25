@@ -1,0 +1,92 @@
+{
+  "skill": "superpowers-write-plan",
+  "model": "Claude Sonnet 4.6 (Thinking)",
+  "date": "2026-05-25",
+  "execution_complexity": "MEDIUM",
+  "recommended_model": "Claude Sonnet 4.6 (Thinking)",
+  "requires_human_approval": false,
+  "brainstorm_ref": "047-enterprise-security-webhook-and-rate-limit-refactoring/brainstorm.json",
+  "objective": "Enforce strict enterprise architecture and security policies, implement replay attack webhook guards, defensively check rate limiter bounds, and ensure zero type-safety bypasses.",
+  "assumptions": [
+    "Deno runtime is available for running edge functions.",
+    "Git is available for pre-commit hooks and RAG digital twin generation."
+  ],
+  "pre_checks": [
+    {
+      "claim": "The file returns-webhook/index.ts is present and has an optional timestamp check.",
+      "verified": true,
+      "source": "supabase/functions/returns-webhook/index.ts"
+    },
+    {
+      "claim": "The file CONTEXT.md is present and contains general development guidelines.",
+      "verified": true,
+      "source": "CONTEXT.md"
+    },
+    {
+      "claim": "The file supabase/functions/_shared/rate_limit.ts is present and defines checkRateLimit.",
+      "verified": true,
+      "source": "supabase/functions/_shared/rate_limit.ts"
+    },
+    {
+      "claim": "The file supabase/functions/apply-coupon/index.ts is present.",
+      "verified": true,
+      "source": "supabase/functions/apply-coupon/index.ts"
+    },
+    {
+      "claim": "The file supabase/functions/log-client-error/index.ts is present.",
+      "verified": true,
+      "source": "supabase/functions/log-client-error/index.ts"
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "title": "Update CONTEXT.md with development rules",
+      "files": ["CONTEXT.md"],
+      "changes": "Added Rule 8 for Webhook Replay Guard and Rule 9 for MVVM & Gateway pattern.",
+      "verify": "git diff CONTEXT.md"
+    },
+    {
+      "id": 2,
+      "title": "Refactor webhook and rate limiter code",
+      "files": [
+        "supabase/functions/returns-webhook/index.ts",
+        "supabase/functions/log-client-error/index.ts",
+        "supabase/functions/apply-coupon/index.ts",
+        "supabase/functions/_shared/rate_limit.ts"
+      ],
+      "changes": "Added strict x-timestamp verification in returns-webhook, clamped rate limit inputs defensively, fixed option key naming mismatch, and added strict body validation using Zod.",
+      "verify": "pnpm run type-check && pnpm exec vitest run"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Incorrect types could lead to compilation failure.",
+      "severity": "medium",
+      "mitigation": "Enforced absolutely zero any and as any types, verified with type-check."
+    },
+    {
+      "risk": "Webhook endpoints are vulnerable to replay attacks due to optional verification.",
+      "severity": "critical",
+      "mitigation": "Refactor returns-webhook to enforce a mandatory strict 5-minute x-timestamp validation."
+    }
+  ],
+  "rollback": "Use git checkout -- . to discard all changes.",
+  "domain_ref": "None",
+  "allowed_paths": [
+    "CONTEXT.md",
+    "docs/**",
+    "supabase/functions/**"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 10,
+  "allowed_change_types": [
+    "security_patch",
+    "architecture_alignment",
+    "type_safety"
+  ],
+  "architectural_guardrails": {
+    "ssot_route_strategy": "The changes do not modify the route definitions, keeping existing routes and ensuring SSOT.",
+    "bundle_size_optimization": "No changes are made to the frontend bundle files, so the bundle size remains untouched."
+  }
+}
