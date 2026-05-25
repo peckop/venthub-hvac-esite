@@ -20,14 +20,16 @@ interface UseCheckoutPaymentProps {
   user: User | null
   clearCart: (options?: { silent: boolean }) => void
   applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
-  customerInfo: CheckoutCustomerInfo
-  shippingAddress: CheckoutAddressInfo
-  billingAddress: CheckoutAddressInfo
-  sameAsShipping: boolean
-  invoiceType: 'individual' | 'corporate'
-  invoiceInfo: CheckoutInvoiceInfo
-  legalConsents: CheckoutLegalConsents
-  shippingMethod: string
+  orchestrator: {
+    customerInfo: CheckoutCustomerInfo
+    shippingAddress: CheckoutAddressInfo
+    billingAddress: CheckoutAddressInfo
+    sameAsShipping: boolean
+    invoiceType: 'individual' | 'corporate'
+    invoiceInfo: CheckoutInvoiceInfo
+    legalConsents: CheckoutLegalConsents
+    shippingMethod: string
+  }
   couponCode: string | null
   t: (key: string) => string
 }
@@ -42,14 +44,7 @@ interface UseCheckoutPaymentProps {
  * @param props.user - The currently authenticated Supabase user (if any)
  * @param props.clearCart - Function to empty the cart after successful payment
  * @param props.applyServerPricing - Function to update cart prices if server validation detects mismatches
- * @param props.customerInfo - Personal details of the customer
- * @param props.shippingAddress - Delivery address information
- * @param props.billingAddress - Invoice address information
- * @param props.sameAsShipping - Boolean indicating if billing address equals shipping address
- * @param props.invoiceType - Type of invoice ('individual' or 'corporate')
- * @param props.invoiceInfo - Additional tax and company info for corporate invoices
- * @param props.legalConsents - Boolean flags for accepted terms (TOS, privacy, etc.)
- * @param props.shippingMethod - Selected shipping method identifier
+ * @param props.orchestrator - Grouped states for form elements from useCheckoutOrchestrator
  * @param props.couponCode - Applied discount code (if any)
  * @param props.t - Translation function for localized error messages
  * @returns An object containing payment state (loading, token, URL), configuration functions, and the `initiatePayment` trigger.
@@ -57,9 +52,7 @@ interface UseCheckoutPaymentProps {
  * @example
  * const { initiatePayment, loading, iyzToken } = useCheckoutPayment({
  *   items, getCartTotal, user, clearCart, applyServerPricing,
- *   customerInfo, shippingAddress, billingAddress, sameAsShipping: true,
- *   invoiceType: 'individual', invoiceInfo, legalConsents, shippingMethod: 'standard',
- *   couponCode: null, t
+ *   orchestrator, couponCode: null, t
  * });
  */
 export const useCheckoutPayment = ({
@@ -68,14 +61,7 @@ export const useCheckoutPayment = ({
   user,
   clearCart,
   applyServerPricing,
-  customerInfo,
-  shippingAddress,
-  billingAddress,
-  sameAsShipping,
-  invoiceType,
-  invoiceInfo,
-  legalConsents,
-  shippingMethod,
+  orchestrator,
   couponCode,
   t
 }: UseCheckoutPaymentProps) => {
@@ -119,15 +105,15 @@ export const useCheckoutPayment = ({
       const requestData = buildPaymentRequest({
         amount: authoritativeTotal,
         items: items,
-        customer: customerInfo,
-        shipping: shippingAddress,
-        billing: billingAddress,
-        sameAsShipping,
+        customer: orchestrator.customerInfo,
+        shipping: orchestrator.shippingAddress,
+        billing: orchestrator.billingAddress,
+        sameAsShipping: orchestrator.sameAsShipping,
         userId: user?.id || null,
-        invoiceType,
-        invoiceInfo,
-        legalConsents,
-        shippingMethod,
+        invoiceType: orchestrator.invoiceType,
+        invoiceInfo: orchestrator.invoiceInfo,
+        legalConsents: orchestrator.legalConsents,
+        shippingMethod: orchestrator.shippingMethod,
         couponCode,
       })
 

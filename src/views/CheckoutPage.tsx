@@ -1,26 +1,13 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Routes } from '../utils/routes'
-import { 
-  listAddresses, 
-  UserAddress,
-  InvoiceProfile
-} from '../lib/supabase'
-import { listInvoiceProfiles } from '../lib/services/invoice.service'
 import { InvoiceProfileModal } from './checkout/InvoiceProfileModal'
-import { 
-  CheckoutCustomerInfo, 
-  CheckoutAddressInfo, 
-  CheckoutInvoiceInfo, 
-  CheckoutLegalConsents 
-} from '../types/db-rows'
 import { ArrowLeft } from 'lucide-react'
-import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import ReviewSummary from './checkout/ReviewSummary'
 import CheckoutProgress from './checkout/CheckoutProgress'
@@ -33,64 +20,61 @@ import AddressSelectModal from './checkout/AddressSelectModal'
 import { getTranslationWithFallback } from '../utils/checkoutHelpers'
 import { useCheckoutCoupon } from '../hooks/useCheckoutCoupon'
 import { useCheckoutPayment } from '../hooks/useCheckoutPayment'
-// No local type imports needed as we use Checkout types from db-rows
+import { useCheckoutOrchestrator } from '../hooks/useCheckoutOrchestrator'
+import { CheckoutAddressInfo } from '../types/db-rows'
 
 const CheckoutPage: React.FC = () => {
   const { items, getCartTotal, clearCart, applyServerPricing } = useCart()
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const { t, lang } = useI18n()
-  const [step, setStep] = useState(1) // 1: Info, 2: Address, 3: Review, 4: Payment
 
-  // Form states
-  const [customerInfo, setCustomerInfo] = useState<CheckoutCustomerInfo>({
-    name: '', firstName: '', lastName: '', email: '', phone: '', identityNumber: ''
-  })
-  const [shippingAddress, setShippingAddress] = useState<CheckoutAddressInfo>({
-    full_name: '', phone: '', full_address: '', fullAddress: '', city: '', district: '', postalCode: '', postal_code: ''
-  })
-  const [billingAddress, setBillingAddress] = useState<CheckoutAddressInfo>({
-    full_name: '', phone: '', full_address: '', fullAddress: '', city: '', district: '', postalCode: '', postal_code: ''
-  })
+  // Central Orchestrator
+  const orchestrator = useCheckoutOrchestrator()
+  const {
+    step,
+    setStep,
+    customerInfo,
+    setCustomerInfo,
+    shippingAddress,
+    setShippingAddress,
+    billingAddress,
+    setBillingAddress,
+    invoiceType,
+    setInvoiceType,
+    invoiceInfo,
+    setInvoiceInfo,
+    legalConsents,
+    setLegalConsents,
+    sameAsShipping,
+    setSameAsShipping,
+    shippingMethod,
+    setShippingMethod,
+    showHelp,
+    setShowHelp,
+    savedAddresses,
+    showAddressModal,
+    setShowAddressModal,
+    addressPickTarget,
+    setAddressPickTarget,
+    savedInvoiceProfiles,
+    showInvoiceModal,
+    setShowInvoiceModal,
+    handleSelectInvoiceProfile,
+    handleNextStep
+  } = orchestrator
 
-  const [invoiceType, setInvoiceType] = useState<'individual' | 'corporate'>('individual')
-  const [invoiceInfo, setInvoiceInfo] = useState<CheckoutInvoiceInfo>({ 
-    type: 'individual', 
-    tckn: '', 
-    companyName: '', 
-    taxOffice: '', 
-    taxNumber: '' 
-  })
-  const [legalConsents, setLegalConsents] = useState<CheckoutLegalConsents>({ 
-    kvkk: false, 
-    sales_agreement: false, 
-    privacy_policy: false,
-    distanceSales: false, 
-    preInfo: false, 
-    orderConfirm: false, 
-    marketing: false 
-  })
-  const [sameAsShipping, setSameAsShipping] = useState(true)
-  const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard')
-  const [showHelp, setShowHelp] = useState(false)
-
-  // Hooks
+  // Coupon hook
   const { couponCode, setCouponCode, couponApplied, applyCoupon, removeCoupon } = useCheckoutCoupon(getCartTotal())
   
+  // Payment hook
   const payment = useCheckoutPayment({
     items,
     getCartTotal,
     user,
     clearCart,
     applyServerPricing,
-    customerInfo,
-    shippingAddress,
-    billingAddress,
-    sameAsShipping,
-    invoiceType,
-    invoiceInfo,
-    legalConsents,
-    shippingMethod,
+    orchestrator,
     couponCode: couponApplied?.code || null,
     t
   })
@@ -102,118 +86,7 @@ const CheckoutPage: React.FC = () => {
     }
   }, [user, authLoading, router])
 
-  // Pre-fill customer info
-  useEffect(() => {
-    if (user) {
-      const fullName = user.user_metadata?.full_name || ''
-      const parts = fullName.split(' ')
-      setCustomerInfo({
-        name: fullName,
-        firstName: parts[0] || '',
-        lastName: parts.slice(1).join(' ') || '',
-        email: user.email || '',
-        phone: user.user_metadata?.phone || '',
-        identityNumber: ''
-      })
-    }
-  }, [user])
-
-  // Address book management
-  const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([])
-  const [showAddressModal, setShowAddressModal] = useState(false)
-  const [addressPickTarget, setAddressPickTarget] = useState<'shipping' | 'billing'>('shipping')
-
-  // Invoice profile book management
-  const [savedInvoiceProfiles, setSavedInvoiceProfiles] = useState<InvoiceProfile[]>([])
-  const [showInvoiceModal, setShowInvoiceModal] = useState(false)
-
-  useEffect(() => {
-    async function loadInvoiceProfiles() {
-      if (!user) return
-      try {
-        const rows = await listInvoiceProfiles()
-        setSavedInvoiceProfiles(rows)
-        // Find default or first profile to pre-fill
-        const defProfile = rows.find(r => r.is_default) || rows[0]
-        if (defProfile) {
-          const pType = (defProfile.profile_type === 'corporate' ? 'corporate' : 'individual') as 'individual' | 'corporate'
-          setInvoiceType(pType)
-          setInvoiceInfo({
-            type: pType,
-            tckn: defProfile.tax_number || '',
-            companyName: defProfile.company_name || '',
-            taxOffice: defProfile.tax_office || '',
-            taxNumber: defProfile.tax_number || ''
-          })
-        }
-      } catch {}
-    }
-    loadInvoiceProfiles()
-  }, [user])
-
-  const handleSelectInvoiceProfile = (p: InvoiceProfile) => {
-    const pType = (p.profile_type === 'corporate' ? 'corporate' : 'individual') as 'individual' | 'corporate'
-    setInvoiceType(pType)
-    setInvoiceInfo({
-      type: pType,
-      tckn: pType === 'individual' ? p.tax_number || '' : '',
-      companyName: p.company_name || '',
-      taxOffice: p.tax_office || '',
-      taxNumber: p.tax_number || ''
-    })
-    setShowInvoiceModal(false)
-    toast.success('Fatura profili başarıyla seçildi.')
-  }
-
-
-  useEffect(() => {
-    async function loadAddresses() {
-      if (!user) return
-      try {
-        const rows = await listAddresses()
-        setSavedAddresses(rows)
-        const defShip = rows.find(r => r.is_default_shipping)
-        if (defShip) {
-          const addr: CheckoutAddressInfo = {
-            full_address: defShip.address_line || '',
-            city: defShip.city || '',
-            district: defShip.district || '',
-            postalCode: defShip.postal_code || '',
-            full_name: defShip.full_name || '',
-            phone: defShip.phone || ''
-          }
-          setShippingAddress(addr)
-          if (sameAsShipping) setBillingAddress(addr)
-        }
-      } catch { }
-    }
-    loadAddresses()
-     
-  }, [user, sameAsShipping])
-
-  // Validation functions
-  const validateCustomerInfo = () => {
-    if (!customerInfo.name.trim()) return !!toast.error(t('checkout.errors.nameRequired'))
-    if (!customerInfo.email.trim() || !customerInfo.email.includes('@')) return !!toast.error(t('checkout.errors.emailInvalid'))
-    if (!customerInfo.phone.trim()) return !!toast.error(t('checkout.errors.phoneRequired'))
-    return true
-  }
-
-  const validateAddress = (address: CheckoutAddressInfo) => {
-    const full = (address.full_address || address.fullAddress || '').trim()
-    if (!full) return !!toast.error(t('checkout.errors.addressRequired'))
-    if (!address.city.trim() || !address.district.trim()) return !!toast.error(t('checkout.errors.locationRequired'))
-    return true
-  }
-
-  const handleNextStep = async () => {
-    if (step === 1 && validateCustomerInfo()) setStep(2)
-    else if (step === 2 && validateAddress(shippingAddress)) setStep(3)
-    else if (step === 3) {
-      const success = await payment.initiatePayment()
-      if (success) setStep(4)
-    }
-  }
+  const onNextStep = () => handleNextStep(payment.initiatePayment)
 
   if (items.length === 0) {
     return (
@@ -329,7 +202,7 @@ const CheckoutPage: React.FC = () => {
                     <button onClick={() => setStep(step - 1)} disabled={step === 1} className="px-6 py-3 border-2 border-light-gray rounded-lg disabled:opacity-50">
                       {t('checkout.nav.back')}
                     </button>
-                    <button onClick={handleNextStep} className="px-8 py-3 bg-primary-navy text-white font-semibold rounded-lg">
+                    <button onClick={onNextStep} className="px-8 py-3 bg-primary-navy text-white font-semibold rounded-lg">
                       {step === 3 ? t('checkout.nav.proceedPayment') : t('checkout.nav.next')}
                     </button>
                   </>
