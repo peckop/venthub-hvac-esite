@@ -1,0 +1,29 @@
+{
+  "skill": "superpowers-finish",
+  "model": "Claude Sonnet 4.6 (Thinking)",
+  "date": "2026-05-25",
+  "plan_ref": "registry/P02-Core-Quality-Guardians/active/047-enterprise-security-webhook-and-rate-limit-refactoring/plan.json",
+  "verification_commands": [
+    {
+      "command": "pnpm run type-check",
+      "result": "TypeScript type check passed successfully with 0 errors.",
+      "passed": true
+    },
+    {
+      "command": "pnpm exec vitest run",
+      "result": "299/299 tests passed successfully.",
+      "passed": true
+    }
+  ],
+  "all_passed": true,
+  "changes_summary": [
+    "CONTEXT.md - Added Rule 8 Webhook Replay Guard and Rule 9 MVVM & Gateway pattern.",
+    "supabase/functions/_shared/rate_limit.ts - Reinforced rate limit defensive checks for safe limits.",
+    "supabase/functions/apply-coupon/index.ts - Fixed option key typo from _limit/_windowSec to limit/windowSec.",
+    "supabase/functions/log-client-error/index.ts - Added body validation using Zod.",
+    "supabase/functions/returns-webhook/index.ts - Added mandatory timestamp webhook replay guard."
+  ],
+  "follow_ups": [],
+  "pulse_updated": false,
+  "folder_moved": true
+}
