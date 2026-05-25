@@ -1,0 +1,40 @@
+{
+  "skill": "superpowers-brainstorm",
+  "model": "Claude Sonnet 4.6 (Thinking)",
+  "date": "2026-05-25",
+  "goal": "Refactor CheckoutPage.tsx state management by moving 15+ React states, Supabase fetch methods, and form validation functions into a dedicated custom hook `useCheckoutOrchestrator.ts` to follow MVVM patterns.",
+  "constraints": [
+    "No any or as any tiplemeleri allowed.",
+    "Do not break existing checkout page workflows (customer info, address selection, review, payment iframe).",
+    "Reduce parameter count on useCheckoutPayment."
+  ],
+  "known_context": "CheckoutPage.tsx currently holds 15+ React states and passes all of them to useCheckoutPayment hook, creating a massive parameter surface.",
+  "risks": [
+    {
+      "severity": "high",
+      "description": "Refactoring state hooks could break references or callback timings in payment polling."
+    }
+  ],
+  "options": [
+    {
+      "id": "A",
+      "title": "Decouple state via useCheckoutOrchestrator hook",
+      "selected": true,
+      "reason": "Successfully extracts UI state orchestration from checkout page, aligning with CONTEXT.md Kural 9."
+    },
+    {
+      "id": "B",
+      "title": "Keep state inline in CheckoutPage.tsx",
+      "selected": false,
+      "reason": "Violates MVVM principle and maintains 15+ parameters smell on useCheckoutPayment."
+    }
+  ],
+  "recommendation": "Option A is highly recommended to improve readability, maintainability, and clean architecture.",
+  "traces": [
+    {
+      "tool": "view_file",
+      "target": "src/views/CheckoutPage.tsx",
+      "finding": "Found 15+ separate react state declarations and direct Supabase load calls."
+    }
+  ]
+}
