@@ -106,7 +106,12 @@ export const tr = {
     whatsappAriaLabel: "WhatsApp ile yaz",
     whatsappTitle: "WhatsApp ile yaz",
     whatsappTooltip: "Mühendislik Hattı",
-    whatsappSupportMessage: "Web sitesinden hızlı destek"
+    whatsappSupportMessage: "Web sitesinden hızlı destek",
+    whatsapp: {
+      faqSupportMessage: 'Sıkça Sorulan Sorular sayfasında aradığım cevabı bulamadım...',
+      supportMessageDefault: 'Merhaba, VentHub HVAC destek ekibiyle iletişime geçmek istiyorum.',
+      technicalQuoteMessage: '{{productName}} için teknik teklif ve projelendirme talep ediyorum. Proje detayları: {{projectInfo}}'
+    }
   },
   homeGallery: {
     title: 'Uygulama Vitrini',
@@ -1786,15 +1791,55 @@ export const tr = {
     timeframe: 'Zaman Çizelgesi',
     contactPref: 'İletişim Tercihi',
     contactTime: 'Uygun saatler (örneğin: 10:00–12:00)',
-    consent: 'Gizlilik bildirimini okudum ve kabul ediyorum. ',
+    consent: {
+      text: 'okudum ve kabul ediyorum.'
+    },
     submit: 'Gönder',
     submitting: 'Gönderiliyor...',
     cancel: 'İptal',
-    errors: {
-      name: 'Lütfen ad soyad girin',
-      contact: 'E-posta veya telefon gereklidir',
-      consent: 'Onay gereklidir'
+    appAreas: {
+      parking: 'Otopark Havalandırma',
+      kitchen: 'Endüstriyel Mutfak',
+      cleanroom: 'Hastane/Temiz Oda',
+      retail: 'AVM/Perakende',
+      office: 'Ofis/Plaza',
+      warehouse: 'Depo/Üretim Tesisi',
+      other: 'Diğer'
     },
+    valueProp: {
+      badge: 'VENTHUB B2B',
+      title: 'Projeleriniz İçin\nProfesyonel Çözümler',
+      description: 'Endüstriyel havalandırma ihtiyaçlarınız için doğrudan üretici/distribütör fiyatlarıyla özel teklif alın. Mühendislik destek ekibimiz hızlıca size dönecektir.',
+      feature1: 'Ücretsiz Projelendirme Desteği',
+      feature2: 'Hızlı Fiyatlandırma ve Stok Bilgisi',
+      feature3: "B2B'ye Özel Avantajlı Koşullar"
+    },
+    success: {
+      title: 'Talebiniz Alındı!',
+      description: 'Teklif talebiniz mühendislik ekibimize başarıyla ulaştı. Sizinle en kısa sürede iletişime geçeceğiz.'
+    },
+    form: {
+      title: 'Teklif Al',
+      nameLabel: 'Ad Soyad *',
+      companyLabel: 'Firma Adı',
+      emailLabel: 'E-Posta',
+      phoneLabel: 'Telefon',
+      cityLabel: 'Şehir',
+      appAreaLabel: 'Uygulama Alanı',
+      selectPlaceholder: 'Seçiniz...',
+      messageLabel: 'Proje / Talep Detayı',
+      messagePlaceholder: 'İhtiyacınız olan ürünler...',
+      submit: 'Gönder',
+      productContext: 'için teklif oluşturuluyor',
+      productLabel: 'İlgilenilen Ürün:',
+      corporateContact: 'Kurumsal İletişim'
+    },
+    errors: {
+      name: 'Ad Soyad zorunludur',
+      contact: 'E-posta veya telefon numarası girmelisiniz',
+      consent: 'KVKK metnini onaylamalısınız'
+    },
+    defaultMessage: '{{productName}} için detaylı teknik teklif...',
     aboutPage: {
       stats: {
         yearsExperience: 'Proje Hattı'

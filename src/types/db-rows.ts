@@ -70,6 +70,11 @@ export type CategoryMetadata = {
   [key: string]: Json | AuthorityContent | undefined; 
 }
 
+export type LocalizedCategoryMetadata = {
+  tr?: CategoryMetadata;
+  en?: CategoryMetadata;
+} & CategoryMetadata;
+
 // Common Table Row Aliases
 export type DbProduct = Omit<Tables['products']['Row'], 'technical_specs'> & {
   technical_specs: Record<string, Json> | null;
@@ -82,7 +87,7 @@ export type DbCategory = Omit<Tables['categories']['Row'], 'name' | 'description
   marketing_title: string | null;
   translation_key: string | null;
   description: string | null;
-  metadata: CategoryMetadata | null;
+  metadata: LocalizedCategoryMetadata | null;
   authority_content: AuthorityContent | null;
 };
 

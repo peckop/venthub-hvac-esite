@@ -32,7 +32,7 @@ const FAQPage: React.FC = () => {
 
       {/* WhatsApp Support for unresolved questions */}
       {isWhatsAppAvailable() && (() => {
-        const whatsappLink = getSupportLink('SSS sayfasında bulamadığım bilgi')
+        const whatsappLink = getSupportLink(t('common.whatsapp.faqSupportMessage'))
         if (!whatsappLink) return null
 
         return (

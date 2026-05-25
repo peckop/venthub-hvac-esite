@@ -48,7 +48,7 @@ const SupportHomePage: React.FC = () => {
 
       {/* WhatsApp Support */}
       {isWhatsAppAvailable() && (() => {
-        const whatsappLink = getSupportLink('Destek talebi')
+        const whatsappLink = getSupportLink(t('common.whatsapp.supportMessageDefault'))
         if (!whatsappLink) return null
 
         return (

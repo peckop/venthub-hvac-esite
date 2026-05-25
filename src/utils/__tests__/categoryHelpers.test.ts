@@ -74,7 +74,7 @@ describe('categoryHelpers', () => {
          })
 
          it('should return hero_description from metadata if present', () => {
-             const cat = { metadata: { hero_description: 'Hero Desc' }, description: 'Normal Desc' } as DbCategory
+             const cat = { metadata: { hero_description: 'Hero Desc' }, description: 'Normal Desc' } as unknown as DbCategory
              expect(getCategoryDescription(cat)).toBe('Hero Desc')
          })
 

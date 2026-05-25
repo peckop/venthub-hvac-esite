@@ -86,7 +86,12 @@ export const en = {
     whatsappAriaLabel: "Message on WhatsApp",
     whatsappTitle: "Message on WhatsApp",
     whatsappTooltip: "Engineering Line",
-    whatsappSupportMessage: "Quick support from website"
+    whatsappSupportMessage: "Quick support from website",
+    whatsapp: {
+      faqSupportMessage: 'I could not find the answer I was looking for on the FAQ page...',
+      supportMessageDefault: 'Hello, I would like to contact the VentHub HVAC support team.',
+      technicalQuoteMessage: 'I request a technical quote and project design for {{productName}}. Project details: {{projectInfo}}'
+    }
   },
   search: {
     recentSearches: "Recent Searches",
@@ -2169,15 +2174,55 @@ export const en = {
     timeframe: 'Timeframe',
     contactPref: 'Contact Preference',
     contactTime: 'Available time (e.g., 10:00–12:00)',
-    consent: 'I have read and accept the privacy statement. ',
+    consent: {
+      text: 'I have read and agree.'
+    },
     submit: 'Submit',
     submitting: 'Submitting...',
     cancel: 'Cancel',
-    errors: {
-      name: 'Please enter full name',
-      contact: 'Email or phone is required',
-      consent: 'Consent is required'
+    appAreas: {
+      parking: 'Parking Ventilation',
+      kitchen: 'Industrial Kitchen',
+      cleanroom: 'Hospital/Clean Room',
+      retail: 'Mall/Retail',
+      office: 'Office/Plaza',
+      warehouse: 'Warehouse/Production Facility',
+      other: 'Other'
     },
+    valueProp: {
+      badge: 'VENTHUB B2B',
+      title: 'Professional Solutions\nFor Your Projects',
+      description: 'Get special quotes directly with manufacturer/distributor prices for your industrial ventilation needs. Our engineering support team will get back to you quickly.',
+      feature1: 'Free Project Support',
+      feature2: 'Fast Pricing & Stock Information',
+      feature3: 'Exclusive B2B Conditions'
+    },
+    success: {
+      title: 'Request Received!',
+      description: 'Your quote request has been successfully sent to our engineering team. We will contact you as soon as possible.'
+    },
+    form: {
+      title: 'Get a Quote',
+      nameLabel: 'Full Name *',
+      companyLabel: 'Company Name',
+      emailLabel: 'Email',
+      phoneLabel: 'Phone',
+      cityLabel: 'City',
+      appAreaLabel: 'Application Area',
+      selectPlaceholder: 'Select...',
+      messageLabel: 'Project / Request Details',
+      messagePlaceholder: 'Products you need...',
+      submit: 'Submit',
+      productContext: 'quote is being generated',
+      productLabel: 'Product of Interest:',
+      corporateContact: 'Corporate Contact'
+    },
+    errors: {
+      name: 'Full Name is required',
+      contact: 'You must provide an email or phone number',
+      consent: 'You must accept the KVKK text'
+    },
+    defaultMessage: 'Detailed technical quote for {{productName}}...',
     aboutPage: {
       stats: {
         yearsExperience: 'Project Pipeline'
