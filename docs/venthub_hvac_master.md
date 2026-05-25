@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-24T20:15:08.922204+00:00
+compiled_at: 2026-05-25T07:30:26.995706+00:00
 total_compiled_files: 432
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-24T20:15:08.922204+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-25T07:30:26.995706+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -7566,12 +7566,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx
-skeleton_hash: 8c6f7014ab1d2f2a
-generated_at: 2026-05-23T22:13:07Z
+skeleton_hash: e05ac99c5e8bf5bc
+generated_at: 2026-05-25T07:29:15Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıdan potenci müşteri bilgilerini toplama amaçlı bir açılır pencere (modal) bileşenini tanımlar. Modalın görünürlüğü, kapatılması ve formun doğrulama‑gönderme işlevleri içindeki fonksiyonlarla koordine edilerek kullanıcı deneyimi sağlanır.
+Bu modül, kullanıcıdan potansiyel müşteri bilgilerini toplama amacıyla bir açılır pencere (modal) bileşeni tanımlar. Modalın görünürlüğü, kapatılması ve formun doğrulama‑gönderme işlevleri içindeki fonksiyonlarla koordine edilerek kullanıcı deneyimi sağlanır.
 
 ## Fonksiyon Grupları
 ### Modal Görünümü ve Kapatma İşlemleri
@@ -7598,36 +7598,38 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ---
 
+---
+
 ## FONKSIYON DETAYLARI
 
 ### LeadModal
-**Ne yapar**: LeadModal bileşeni, bir ürünle ilgili lead toplamak için kullanılan modalı görüntüler ve yönetir.  
-**Nasıl yapar**: `open` prop'una göre modalın görünürlüğünü kontrol eder, `onClose` callback'ini kapatma işlemi için çağırır, `productName` ve `_productId` (alias `__productId`) değerlerini göstererek kullanıcıya ürün bilgisi sunar.  
+**Ne yapar**: Potansiyel müşteri (lead) oluşturmak için kullanılan veri giriş formunu içeren bir React modal bileşenidir.
+**Nasıl yapar**: `open` prop'u ile görünürlüğü kontrol eder, `productName` ve `_productId` bilgilerini kullanarak form içeriğini bağlama duyarlı hale getirir ve kullanıcı etkileşimlerini yönetir.
 **Parametreler**:
-- open: boolean — modalın açık olup olmadığını belirler  
-- onClose: () => void — modal kapatıldığında çalışacak fonksiyon  
-- productName: string — gösterilecek ürünün adı  
-- _productId: string — (alias __productId) ürünün benzersiz kimliği  
-**Dönüş**: React.FC<LeadModalProps> — bileşenin render ettiği JSX elementi  
+- open: boolean — Modalın açık veya kapalı olduğunu belirten durum bayrağı.
+- onClose: function — Modalın kapatılması gerektiğinde çalıştırılan geri çağırım fonksiyonu.
+- productName: string — Lead ile ilişkilendirilecek ürünün adı.
+- _productId: string | number — Lead ile ilişkilendirilecek ürünün benzersiz tanımlayıcısı.
+**Dönüş**: React.FC<LeadModalProps> — React bileşeni yapısı döner.
 
 ### validate
-**Ne yapar**: Form girişlerinin geçerliliğini kontrol etmek üzere tasarlanmış bir işlev (adına dayanarak tahmin edilir).  
-**Nasıl yapar**: Sağlanan kod parçacığında uygulama detayı bulunmadığından davranışı net olarak açıklanamaz.  
-**Parametreler**: *(yok)*  
-**Dönüş**: void veya bilinmiyor — dönüş tipi belirtilmemiştir  
+**Ne yapar**: Form içindeki kullanıcı girdilerinin gerekli kriterlere uygun olup olmadığını denetleyen doğrulama fonksiyonudur.
+**Nasıl yapar**: Form alanlarını (muhtemelen isim, e-posta vb.) kontrol ederek, eksik veya hatalı veri varsa hata durumlarını ayarlar.
+**Parametreler**: Yok
+**Dönüş**: void — Herhangi bir değer döndürmez, genellikle durum (state) güncellemesi yapar.
 
 ### submit
-**Ne yapar**: Formun gönderilmesini işleyen olay işleyicisi (adına dayanarak tahmin edilir).  
-**Nasıl yapar**: Sağlanan kod parçacığında uygulama detayı bulunmadığından davranışı net olarak açıklanamaz.  
+**Ne yapar**: Formun gönderilme olayını ele alan ve lead oluşturma işlemini başlatan fonksiyondur.
+**Nasıl yapar**: Tarayıcının varsayılan form gönderme davranışını engeller, verileri doğrular (`validate`) ve başarılıysa ilgili işlemleri gerçekleştirir.
 **Parametreler**:
-- e: React.FormEvent — form submit olayı nesnesi  
-**Dönüş**: void veya bilinmiyor — dönüş tipi belirtilmemiştir  
+- e: React.FormEvent — Form gönderildiğinde oluşan olay nesnesi.
+**Dönüş**: void — Herhangi bir değer döndürmez.
 
 ### handleClose
-**Ne yapar**: Modalın kapatılmasını sağlayan işlev (adına dayanarak tahmin edilir).  
-**Nasıl yapar**: Sağlanan kod parçacığında uygulama detayı bulunmadığından davranışı net olarak açıklanamaz.  
-**Parametreler**: *(yok)*  
-**Dönüş**: void veya bilinmiyor — dönüş tipi belirtilmemiştir
+**Ne yapar**: Modal penceresini kapatma işlemini tetikleyen ve gerekli temizlik işlemlerini yapan fonksiyondur.
+**Nasıl yapar**: Üst bileşenden gelen `onClose` prop'unu çağırarak modalın ekrandan kaldırılmasını sağlar.
+**Parametreler**: Yok
+**Dönüş**: void — Herhangi bir değer döndürmez.
 
 ---
 
@@ -7641,62 +7643,55 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ---
 
-## SABİTLER
-- **applicationAreas** (array) — `[
-
-  'Otopark Havalandırma',
-
-  'Endüstriyel Mutfak',
-
-  'Hastane/Temiz Oda',...`
-
----
-
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx::LeadModal
 - **params**: open, onClose, productName, _productId
-- **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini çevirmek için kullanılır
-  - `name` — kullanıcının adı soyadı giriş alanının durum durumu
-  - `setName` — `name` durumunu güncelleyen setter fonksiyonu
-  - `company` — firma adı giriş alanının durum durumu
-  - `setCompany` — `company` durumunu güncelleyen setter fonksiyonu
-  - `email` — e-posta giriş alanının durum durumu
-  - `setEmail` — `email` durumunu güncelleyen setter fonksiyonu
-  - `phone` — telefon giriş alanının durum durumu
-  - `setPhone` — `phone` durumunu güncelleyen setter fonksiyonu
-  - `city` — şehir giriş alanının durum durumu
-  - `setCity` — `city` durumunu güncelleyen setter fonksiyonu
-  - `appArea` — seçilen uygulama alanı'nın durum durumu
-  - `setAppArea` — `appArea` durumunu güncelleyen setter fonksiyonu
-  - `message` — proje/talept Detayı metin alanı'nın durum durumu, productName'a göre başlangıç değeri ayarlanır
-  - `setMessage` — `message` durumunu güncelleyen setter fonksiyonu
-  - `consent` — KVKK onay kutusunun işaretlenip işaretlenmediğini tutan boolean durum
-  - `setConsent` — `consent` durumunu güncelleyen setter fonksiyonu
-  - `submitted` — form gönderimi sırasında bekleme/gönderim durumu
-  - `setSubmitted` — `submitted` durumunu güncelleyen setter fonksiyonu
-  - `isSuccess` — gönderim başarılı olduğunda gösterilen durum
-  - `setIsSuccess` — `isSuccess` durumunu güncelleyen setter fonksiyonu
-  - `errors` — alan bazlı doğrulama hatalarını tutan Record<string, string> nesnesi
-  - `setErrors` — `errors` durumunu güncelleyen setter fonksiyonu
-- **Dönüş**: JSX elementi (React node)
+- **ic_degiskenler**: 
+  - `__productId` — _productId parametresinin dahili yeniden isimlendirilmiş hali
+  - `useState` hook türevli state setterları: setName, setCompany, setEmail, setPhone, setCity, setAppArea, setConsent, setMessage, setIsSuccess, setSubmitted, setErrors
+  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
+- **Dönüş**: React.FC<LeadModalProps> tipinde React bileşeni
 
 ### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx::validate
-- **params**: yok
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `e` — doğrulama hatalarını toplamak için geçici Record<string, string> nesnesi
-- **Dönüş**: Record<string, string> (hata nesnesi)
+  - `e` — Form doğrulama hatalarını tutan Record<string, string> tipinde nesne
+  - `name` — Formdaki isim alanı değeri, boşluk kontrolü için kullanılır
+  - `email` — Formdaki e-posta alanı değeri, iletişim bilgisi kontrolü için kullanılır
+  - `phone` — Formdaki telefon alanı değeri, iletişim bilgisi kontrolü için kullanılır
+  - `consent` — Kullanıcı onay durumu, onay kontrolü için kullanılır
+  - `t` — i18n çeviri fonksiyonu, çevrilmiş hata mesajları almak için kullanılır
+- **Dönüş**: Doğrulama hatalarını içeren Record<string, string> nesnesi
 
 ### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx::submit
 - **params**: e: React.FormEvent
 - **ic_degiskenler**:
-  - `v` — `validate()` fonksiyonundan dönen hata nesnesi
+  - `e` — Form gönderim olay nesnesi, varsayılan form davranışını engellemek için kullanılır
+  - `v` — validate() fonksiyonundan dönen hata nesnesi
+  - `setErrors` — Form hata state'ini güncelleyen setter fonksiyonu
+  - `Object.keys` — Yerel JavaScript nesne metodu, hata nesnesinin anahtar sayısını almak için kullanılır
+  - `setSubmitted` — Form gönderim durumu state'ini güncelleyen setter
+  - `setIsSuccess` — Başarı durumu state'ini güncelleyen setter
+  - `handleClose` — Modal kapatma işlemini yürüten dahili fonksiyon
 - **Dönüş**: yok
 
 ### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx::handleClose
-- **params**: yok
-- **ic_degiskenler**: yok
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `onClose` — Prop olarak alınan üst bileşen kapatma callback fonksiyonu
+  - `setIsSuccess` — Başarı durumu state'ini sıfırlayan setter
+  - `setName` — İsim alanı state'ini sıfırlayan setter
+  - `setCompany` — Şirket alanı state'ini sıfırlayan setter
+  - `setEmail` — E-posta alanı state'ini sıfırlayan setter
+  - `setPhone` — Telefon alanı state'ini sıfırlayan setter
+  - `setCity` — Şehir alanı state'ini sıfırlayan setter
+  - `setAppArea` — Uygulama alanı state'ini sıfırlayan setter
+  - `setConsent` — Kullanıcı onay state'ini sıfırlayan setter
+  - `setMessage` — Mesaj alanı state'ini varsayılan değere sıfırlayan setter
+  - `productName` — Prop olarak alınan ürün ismi, varsayılan mesaj oluşturmak için kullanılır
+  - `t` — i18n çeviri fonksiyonu, varsayılan mesajın çevirisini almak için kullanılır
+  - `setErrors` — Form hata state'ini sıfırlayan setter
 - **Dönüş**: yok
 
 ---
@@ -7704,13 +7699,13 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 ## ÇAĞRI HARİTASI
 
 ### Disariya Cagrilar (Outgoing)
-- `LeadModal()` fonksiyonu, form doğrulaması için `validate()` ve pencereyi kapatmak için `handleClose()` fonksiyonlarını çağırır.
+LeadModal() fonksiyonu, kapatma ve doğrulama işlemleri için sırasıyla handleClose ve validate fonksiyonlarını çağırıyor.
 
 ### Disaridan Cagrilanlar (Incoming)
-- Verilen veri setinde bu modülü çağıran dış bir fonksiyon veya modül bulunmamaktadır.
+Bu modüle ait dışarıdan gelen çağrı bilgisi verilmemiştir.
 
 ### Ic Ice Fonksiyonlar (Nested)
-- Yok
+Veri bulunmamaktadır.
 
 ---
 
@@ -29709,56 +29704,32 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts
-skeleton_hash: e4dacaed6135c161
-generated_at: 2026-05-23T22:29:38Z
+skeleton_hash: 9eca81db7f1ae739
+generated_at: 2026-05-25T07:28:27Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin frontend katmanında kategori yönetimi işlevlerini merkezileştirmek üzere geliştirilmiş özel bir React view model hook'udur. Uygulamanın görüntü (view) katmanı ile veri işleme katmanı arasında köprü kurarak, tüm kategori ile ilgili işlemlerin tutarlı bir şekilde yönetilmesini sağlar. Tek bir giriş noktası sunarak kategori state'inin, iş mantığının ve erişim metodlarının tek yerden kontrol edilmesini mümkün kılar.
+Bu modül, VentHub HVAC projesinde kategori yönetimini tek bir noktadan kontrol eden özel bir React hook’udur. Kullanıcı arayüzü ile veri katmanı arasında köprü kurarak, kategori verilerinin durum yönetimini, iş mantığını ve erişim metodlarını tek bir arayüzde toplar. Böylece uygulamanın farklı bileşenleri aynı işlevselliği paylaşır ve tutarlı bir deneyim sunar.
 
 ## Fonksiyon Grupları
 ### Ana View Model Hook'u
-Kategori yönetimi için ihtiyaç duyulan tüm durum takibi, iş mantığını ve görüntü katmanının kullanabileceği tüm metot ve verileri tek bir arayüz altında sunar, uygulamanın ilgili bölümlerinde kolayca entegre edilebilir.
+Kategori yönetimi için gerekli tüm durum takibi, iş mantığı ve bileşenlerin erişebileceği metotları tek bir arayüzde sunar.  
 - useCategoryViewModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React özel view model hook'u, kategori odaklı kullanıcı arayüzü işlevlerinin state yönetimini ve iş mantığını barındırmak için tasarlanmıştır, çalışması için React çalışma ortamı ve uygulama içi bağımlılıklarının eksiksiz olması zorunludur.
-
-[Aksiyom 1]: Eğer bu hook sadece React bileşenleri veya diğer özel React hookları içinde çağrılmıyorsa (React hook kullanım kuralları ihlal ediliyorsa), hookun state ve yaşam döngüsü yönetimi bozulur, çalışma zamanı hataları fırlatır.
-[Aksiyom 2]: Eğer hookun kullandığı kategori verilerini sağlayan API entegrasyonu, merkezi state yapısı veya bağlam (context) nesnesi uygulama içinde tanımlı ve erişilebilir değilse, hiçbir kategori odaklı işlem yürütülemez, kullanıcı arayüzü boş veya hatalı görünür.
-[Aksiyom 3]: Eğer modülün import ettiği temel React hookları (useState, useEffect, useContext gibi) çalıştığı ortamda mevcut değilse, hook hiçbir şekilde çalışmaz, uygulama başlatılamaz.
-[Aksiyom 4]: Eğer bu hooku kullanan üst bileşenler, hookun döndürdüğü state ve işlevleri doğru şekilde tüketmiyorsa, kategori seçimi, filtreleme gibi temel işlevler çalışmaz, kullanıcı deneyimi başarısız olur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### useCategoryViewModel
-**Ne yapar**: VentHub HVAC projesinin kategori yönetimi süreçleri için tasarlanmış gelişmiş ölçekli ViewModel hook'udur. Tüm UI katmanının kategori ile ilgili işlemleri için tek doğru kaynak (source of truth) olarak görev yapar, UI temsilinde tutarlılığı garanti eder. Kategori ve ürün gruplama iş mantığını tek bir noktada merkezileştirerek, proje genelinde dağınık işlevlerin önüne geçer.
-**Nasıl yapar**: React hook standardında tasarlanmış yapısı ile, kategori yönetimi için ihtiyaç duyulan tüm yardımcı işlevleri içerir ve bu işlevleri dışa açarak UI katmanının erişimini sağlar. Tüm kategori ile ilgili veri işleme mantığını kendi bünyesinde barındırarak, UI katmanının ham veri ile uğraşmasına gerek bırakmaz, tutarlı bir işleyiş sunar.
-**Parametreler**:
-Bu fonksiyon herhangi bir girdi parametresi almaz.
-**Dönüş**: İki adet işlev barındıran bir JavaScript nesnesi döndürür. Nesne içerisinde kategori verisini sarmalayan `wrapCategory` ve ürünleri serilere göre gruplayan `groupProductsBySeries` fonksiyonları yer alır, UI katmanı bu fonksiyonları doğrudan kullanabilir.
-
----
-
-### wrapCategory
-**Ne yapar**: useCategoryViewModel hook'u tarafından dışa açılan, ham kategori verisini UI kullanımına uygun şekilde standartlaştıran yardımcı fonksiyondur. Farklı kaynaklardan gelen düzensiz kategori verilerini tek bir formata sokarak UI'da tutarlı temsil sağlar. Eksik veri alanlarını tamamlayarak olası UI hatalarının önüne geçer.
-**Nasıl yapar**: Gelen ham kategori verisini alarak tüm doğrulama, dönüşüm ve standartlaştırma işlemlerini uygular. UI'da kullanılacak formatlamaları önceden hesaplar, veri tiplerini normalize eder, eksik olabilecek zorunlu alanları varsayılan değerlerle doldurarak işlenmiş veriyi geri döndürür.
-**Parametreler**:
-- name: rawCategoryData, type: object — İşlenmemiş, herhangi bir kaynaktan gelen ham kategori verisini içeren nesne, kategori kimliği, adı, açıklaması gibi temel alanları barındırır.
-**Dönüş**: Tüm UI katmanları tarafından aynı standartta kullanılabilecek, doğrulanmış ve standartlaştırılmış kategori nesnesi döndürür.
-
----
-
-### groupProductsBySeries
-**Ne yapar**: useCategoryViewModel hook'u tarafından dışa açılan, kategori altındaki HVAC ürünlerini ait oldukları serilere göre gruplayan yardımcı fonksiyondur. Ürünlerin seri bazında düzenlenerek UI'da sunulmasını sağlar, büyük ürün listelerinin okunabilirliğini artırır.
-**Nasıl yapar**: Gelen ürün listesini her bir ürünün serisi bilgisine göre sınıflandırır, aynı seriye ait tüm ürünleri tek bir grup altında toplar. Opsiyonel olarak seri isimlerine göre alfabetik sıralama işlemini uygulayarak gruplanmış veriyi UI kullanımına hazır hale getirir.
-**Parametreler**:
-- name: productList, type: array<object> — Gruplanması gereken tüm HVAC ürünlerini içeren nesne dizisi, her bir ürün nesnesi kendi ait olduğu seri bilgisini barındırır.
-**Dönüş**: Seri isimlerini anahtar olarak kullanan, her anahtar altında o seriye ait tüm ürünlerin listesini barındıran bir JavaScript nesnesi döndürür, bu nesne doğrudan UI listelemelerinde kullanılabilir.
+**Ne yapar**: Bu fonksiyon, kullanıcı arayüzü (UI) temsili için tek doğruluk kaynağı olarak görev yapan gelişmiş ölçekli bir ViewModel hook'udur. Kategori verilerini UI için uygun hale getirme ve ürünleri ait oldukları serilere göre gruplama gibi UI odaklı veri hazırlama işlemleri için gerekli yardımcı fonksiyonları sağlar. Bu hook, UI bileşenlerinin ihtiyaç duyduğu veri yapılarının tutarlı ve standart olmasını garanti eder.
+**Nasıl yapar**: Bu hook, kaynak dosyasının hooks klasöründe bulunması ve `use` öneki ile adlandırılması nedeniyle React hook yapısını kullanarak çalışır. UI ile iş mantığı arasında bir ara katman (ViewModel) olarak görev yapar, kategori sarmalama ve ürün gruplama işlemlerini kendi içinde kapsüller ve bu işlemleri gerçekleştiren fonksiyonları dışa açar. Bu sayede iş mantığı UI bileşenlerinden ayrılmış olur ve docstring'de belirtildiği gibi tek bir doğruluk kaynağı sağlanır.
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+**Dönüş**: İki adet yardımcı fonksiyonu içeren bir obje döndürür. Dönüş objesindeki özellikler şunlardır: `wrapCategory`, kategori verilerini UI için işleyen/sarmalayan fonksiyon; `groupProductsBySeries`, ürün listesini ait oldukları serilere göre gruplayan fonksiyon. Bu fonksiyonlar UI bileşenleri tarafından doğrudan kullanılmak üzere tasarlanmıştır.
 
 ---
 
@@ -29789,38 +29760,43 @@ Bu fonksiyon herhangi bir girdi parametresi almaz.
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts::useCategoryViewModel
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan, metinleri çevirmek için kullanılan i18n fonksiyonu
-  - `wrapCategory` — useMemo ile önbelleğe alınan, DomainCategory nesnesini CategoryViewModel formatına dönüştüren fonksiyon
-  - `groupProductsBySeries` — useMemo ile önbelleğe alınan, DomainProduct listesini serilerine göre gruplayan fonksiyon
-- **Dönüş**: İki adet dönüşüm fonksiyonu (`wrapCategory`, `groupProductsBySeries`) içeren nesne
+  - `t` — useI18n hook tarafından döndürülen çeviri fonksiyonu
+  - `lang` — useI18n hook tarafından döndürülen geçerli dil kodu
+  - `wrapCategory` — useMemo ile önbelleğe alınmış kategori işleme fonksiyonu
+  - `groupProductsBySeries` — useMemo ile önbelleğe alınmış ürün gruplama fonksiyonu
+- **Dönüş**: `{ wrapCategory: Function, groupProductsBySeries: Function }` — iki yardımcı fonksiyon içeren nesne
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts::wrapCategory_callback
-- **params**: (category: DomainCategory | null | undefined)
-- **ic_degiskenler**:
-  - `tKey` — Kategori için çeviri anahtarı, `category.translation_key` mevcut değilse `category.slug` kullanılır
-  - `translationPath` — Çeviri için kullanılan tam i18n yol ifadesi, `common.categoryList.${tKey}` formatında oluşturulur
-  - `translatedName` — `t()` fonksiyonu ile alınan çevrilmiş kategori adı
-  - `displayName` - Kullanıcıya gösterilecek kategori adı, çeviri başarısız olursa `category.menu_label` veya `category.name` kullanılır
-  - `marketingTitle` — Pazarlama amaçlı kullanılan başlık, `category.marketing_title` mevcut değilse `displayName` kullanılır
-  - `meta` — Kategorinin metadata nesnesi, geçersiz/boşsa boş nesne atanır
-  - `displayMode` — Kategorinin UI'deki görünüm modu, varsayılan olarak `series` atanır
-  - `rawDisplayMode` — Ham görünüm modu değeri, önce `category.display_mode` sonra `meta.display_mode` değerleri alınır
-- **Dönüş**: CategoryViewModel | null
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts::groupProductsBySeries_callback
-- **params**: (products: DomainProduct[])
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts::wrapCategory
+- **params**: `category: DomainCategory | null | undefined` — işlenecek kategori nesnesi
 - **ic_degiskenler**:
-  - `seriesMap` — Ürünleri seri isimlerine göre gruplamak için kullanılan anahtar-değer nesnesi
-- **Dönüş**: İsme göre sıralanmış SeriesGroup nesnelerinden oluşan dizi
+  - `localizedCategory` — mapCategoryWithLocale ile yerelleştirilmiş DbCategory tipindeki kategori nesnesi
+  - `tKey` — çeviri anahtarı, localizedCategory.translation_key veya slug alanından alınır
+  - `translationPath` — çeviri yolu formatında string: `common.categoryList.${tKey}`
+  - `translatedName` — t fonksiyonu ile çevrilen kategori ismi
+  - `displayName` — kullanıcıya gösterilecek kategori ismi, çevrilen isim geçerliyse o, yoksa menu_label/name kullanılır
+  - `marketingTitle` — kategori pazarlama başlığı, marketing_title varsa o, yoksa displayName kullanılır
+  - `meta` — kategori metadata alanı, nesne tipindeyse cast edilmiş hali, değilse boş nesne
+  - `displayMode` — kategori görüntüleme modu, varsayılan değer 'series'
+  - `rawDisplayMode` — ham görüntüleme modu değeri, DB veya metadata'dan alınır
+- **Dönüş**: `CategoryViewModel | null` — kategori görünüm modeli nesnesi veya null
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts::products_forEach_callback
-- **params**: (product: DomainProduct)
+---
+
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts::groupProductsBySeries
+- **params**: `products: DomainProduct[]` — gruplandırılacak ürün dizisi
 - **ic_degiskenler**:
-  - `meta` — Ürünün metadata nesnesi, geçersiz/boşsa boş nesne atanır
-  - `seriesName` — Ürünün ait olduğu seri adı, önce `meta.series` sonra ürün isminin ilk kelimesi kullanılır
-  - `product.name.split(' ')[0]` — Ürün isminin ilk kelimesi, seri adı yedeği olarak kullanılır
-  - `product.name.split(' ')[1]` — Ürün isminin ikinci kelimesi, ilk kelime marka ise seri adı olarak kullanılır
-  - `seriesMap` — Üst fonksiyonda tanımlanan serileri gruplayan kayıt nesnesi
+  - `seriesMap` — seri isimlerini anahtar olarak kullanan nesne, grup verileri saklar
+- **Dönüş**: `SeriesGroup[]` — alfabetik sıralanmış seri grupları dizisi
+
+---
+
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts::groupProductsBySeries~forEachCallback
+- **params**: `product: DomainProduct` — işlenecek tek ürün nesnesi
+- **ic_degiskenler**:
+  - `meta` — ürünün metadata alanı, nesne tipindeyse cast edilmiş hali, değilse boş nesne
+  - `seriesName` — ürünün ait olduğu seri ismi, metadata veya ürün isminin ilk kelimesinden alınır
 - **Dönüş**: yok
 
 ---
@@ -33814,133 +33790,165 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts
-skeleton_hash: fb495ef68efc8209
-generated_at: 2026-05-24T20:10:54Z
+skeleton_hash: 1ee7cdb2fc5748ed
+generated_at: 2026-05-25T07:27:36Z
 ---
 
 ## Genel Bakış
 Bu modül, uygulamanın farklı katmanları ve dış servisler arasında veri yapılarını dönüştürmek için kullanılan tip dönüştürücü fonksiyonlar koleksiyonudur. Özellikle veritabanı tiplerini uygulamanın iş katmanı (domain) tiplerine çevirme ve Supabase gibi dış servisler için uyumlu veri formatı oluşturma işlemlerini üstlenir.
 
-## Fonksiyon Grupları
-### Genel Dönüşüm ve Yardımcı Kontroller
-Genel veri formatı dönüşümleri ve tip doğrulama işlemleri yapan yardımcı fonksiyonlardır.
-- isRecord, toSupabaseJson
-
-### Veritabanı-Domain Veri Dönüşümleri
-Veritabanından gelen kategori ve ürün verilerini, uygulamanın arayüz ve iş katmanında kullanılabilir domain tiplerine dönüştürür. Tekil varlıklar ve listeler için ayrı dönüşüm seçenekleri sunar.
-- mapDatabaseCategoryToDomain, mapDatabaseProductToDomain, toUICategoryList, toUIProductList
-
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modüldeki tüm fonksiyonlar, girdi parametrelerinin imzada belirtilen türlerde olması durumunda doğru çalışma eğilimindedir.
+## AXIOMS – Mimari Varsayımlar  
 
-[Aksiyom 1]: Eğer toSupabaseJson fonksiyonuna geçirilen data parametresi imzada belirtilen T türünde değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
-[Aksiyom 2]: Eğer isRecord fonksiyonuna geçirilen value parametresi geçerli bir TypeScript değeri değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
-[Aksiyom 3]: Eğer mapDatabaseCategoryToDomain fonksiyonuna geçirilen dbCat parametresi imzada belirtilen DbCategory türünde değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
-[Aksiyom 4]: Eğer mapDatabaseProductToDomain fonksiyonuna geçirilen dbProd parametresi imzada belirtilen DbProduct türünde değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
-[Aksiyom 5]: Eğer toUICategoryList fonksiyonuna geçirilen cats parametresi imzada belirtilen DbCategory dizisi değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
-[Aksiyom 6]: Eğer toUIProductList fonksiyonuna geçirilen prods parametresi imzada belirtilen DbProduct dizisi değilse, beklenmeyen çalışma zamanı davranışı veya hata oluşur.
+Bu modül için özel aksiyom tanımlanmamıştır. Ancak fonksiyon imzalarından ve tip bilgilerinden hareketle, modülün doğru çalışması için aşağıdaki koşulların sağlanması gerekir.
+
+**Aksiyom 1**: Eğer `toSupabaseJson` fonksiyonuna verilen `data` nesnesi **JSON‑serileştirilebilir** değilse, Supabase’a gönderilebilecek geçerli bir JSON nesnesi oluşturulamaz ve hata oluşur.  
+
+**Aksiyom 2**: Eğer `isRecord` fonksiyonuna verilen `value` `null` ya da `Array` tipindeyse, fonksiyon `false` döndürür; aksi takdirde `value` bir `object` (record) ise `true` döndürür.  
+
+**Aksiyom 3**: Eğer `mapDatabaseCategoryToDomain` fonksiyonuna verilen `dbCat` `DbCategory` tipinde **geçerli bir kayıt** (tüm zorunlu alanlar tanımlı) değilse, dönüşüm sırasında eksik alan hatası ortaya çıkar ve fonksiyon beklenen `DomainCategory` nesnesini üretmez.  
+
+**Aksiyom 4**: Eğer `mapDatabaseProductToDomain` fonksiyonuna verilen `dbProd` `DbProduct` tipinde **geçerli bir kayıt** (zorunlu alanlar eksiksiz) değilse, dönüşüm başarısız olur ve fonksiyon `undefined`/hata fırlatır.  
+
+**Aksiyom 5**: Eğer `toUICategoryList` fonksiyonuna verilen `cats` dizisi içinde **her bir eleman** `DbCategory` tipinde değilse, fonksiyon geçerli bir `UICategory[]` listesi oluşturamaz ve tip uyumsuzluğu hatası oluşur.  
+
+**Aksiyom 6**: Eğer `toUIProductList` fonksiyonuna verilen `prods` dizisi içinde **her bir eleman** `DbProduct` tipinde değilse, fonksiyon geçerli bir `UIProduct[]` listesi oluşturamaz ve tip uyumsuzluğu hatası oluşur.  
+
+**Aksiyom 7**: Eğer `mapCategoryWithLocale` fonksiyonuna verilen `lang` değeri `'tr'` ya da `'en'` dışındaki bir string ise, fonksiyon locale‑spesifik dönüşüm yapamaz ve varsayılan (bilinmeyen) dil işleme mantığı uygulanır (genellikle `'en'` tercih edilir).  
+
+**Domain‑specific kurallar**  
+- `mapCategoryWithLocale` için kabul edilen dil kodları kesinlikle `'tr'` veya `'en'` olmalıdır; başka bir değer **bilinmiyor** ve tanımsız davranışa yol açar.  
+- Liste dönüşüm fonksiyonları (`toUICategoryList`, `toUIProductList`) **dizinin boş olması** durumunda da geçerli bir boş UI listesi (`[]`) döndürmelidir; aksi takdirde `null`/`undefined` döndürülmesi hatalı kabul edilir.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### toSupabaseJson
-**Ne yapar**: Karmaşık TypeScript tiplerini Supabase’in kesin `Json` tipine güvenli bir şekilde dönüştürür.  
-**Nasıl yapar**: Gelen veri önce `JSON.stringify` ile metin haline getirilir, ardından `JSON.parse` ile yeniden nesneye çevrilir; bu işlem tip güvenliğini korur ve tehlikeli tip atamalarını önler.  
+**Ne yapar**: Karmaşık TypeScript tiplerini Supabase'in kesin `Json` tipine, güvensiz cast'ler kullanmadan güvenli bir şekilde dönüştürür.
+**Nasıl yapar**: JSON ayrıştırma (JSON.parse/JSON.stringify) kullanarak TypeScript tip çıkarımını karşılar, böylece tip güvenliği sağlanır.
 **Parametreler**:
-- `data`: `T` — Dönüştürülmek istenen, herhangi bir TypeScript tipi.
-**Dönüş**: `Json` — Supabase’in beklediği JSON yapısı.
+- data: T — Dönüştürülecek kaynak veri
+**Dönüş**: `Json` — Dönüştürülmüş, Supabase uyumlu JSON nesnesi
 
 ### isRecord
-**Ne yapar**: Bilinmeyen bir değerin `Record<string, unknown>` tipine uygun olup olmadığını kontrol eder.  
-**Nasıl yapar**: Değerin `typeof` kontrolü `object` ve `null` olmaması, ayrıca `Object.prototype.toString` çıktısının `[object Object]` olması gibi temel nesne kontrolleri yapılır; ardından tüm anahtarların string ve değerlerin `unknown` tipinde olduğu doğrulanır.  
+**Ne yapar**: Bilinmeyen bir değerin genel `Record<string, unknown>` türünde olup olmadığını güvenli bir şekilde kontrol eden bir tip koruyucusudur.
+**Nasıl yapar**: İç mantığı belirtilmemiştir; bir tip koruyucusu olarak derleme zamanında tip daraltma sağlar.
 **Parametreler**:
-- `value`: `unknown` — Tipi kontrol edilecek değer.
-**Dönüş**: Belirtilmemiş (fonksiyonun dönüş tipi dokümantasyonda yer almıyor).
+- value: unknown — Kontrol edilecek değer
+**Dönüş**: Belirtilmemiştir (tip koruyucusu olduğundan `value is Record<string, unknown>` döndürmesi beklenir, ancak resmi dönüş tipi verilmemiştir)
 
 ### mapDatabaseCategoryToDomain
-**Ne yapar**: Veritabanı katmanı (`DbCategory`) satırını UI katmanının kullandığı `DomainCategory` modeline dönüştürür.  
-**Nasıl yapar**: Gelen `DbCategory` nesnesindeki alanlar tek tek okunur; JSON veya metin tipindeki alanlar gerektiğinde `toSupabaseJson` ile normalize edilerek `DomainCategory` nesnesine atanır.  
+**Ne yapar**: Veritabanındaki bir `DbCategory` satırını, UI katmanında kullanılmak üzere `DomainCategory` modeline güvenli bir şekilde dönüştürür. Supabase'den gelebilecek `Json`/`Text` tip uyumsuzluklarını merkezi olarak yönetir.
+**Nasıl yapar**: Dönüşüm mantığı belirtilmemiştir ancak bu fonksiyon, veritabanı ile domain modeli arasındaki tip farklılıklarını soyutlar.
 **Parametreler**:
-- `dbCat`: `DbCategory` — Veritabanından gelen kategori kaydı.
-**Dönüş**: `DomainCategory` — UI’da kullanılabilecek kategori modeli.
+- dbCat: DbCategory — Dönüştürülecek veritabanı kategori satırı
+**Dönüş**: `DomainCategory` — UI için hazırlanmış domain kategorisi modeli
 
 ### mapDatabaseProductToDomain
-**Ne yapar**: Veritabanı ürün satırını (`DbProduct`) UI katmanının beklediği `DomainProduct` modeline dönüştürür.  
-**Nasıl yapar**: `DbProduct` nesnesindeki her alan okunur; tip uyumsuzlukları (örneğin JSON/Text alanları) `toSupabaseJson` yardımıyla düzeltilir ve yeni `DomainProduct` nesnesine aktarılır.  
+**Ne yapar**: Veritabanındaki bir `DbProduct` satırını, UI katmanında kullanılmak üzere `DomainProduct` modeline güvenli bir şekilde dönüştürür.
+**Nasıl yapar**: Dönüşüm mantığı belirtilmemiştir; veritabanı alanlarını domain modelinin beklediği yapıya eşler.
 **Parametreler**:
-- `dbProd`: `DbProduct` — Veritabanından gelen ürün kaydı.
-**Dönüş**: `DomainProduct` — UI’da kullanılabilecek ürün modeli.
+- dbProd: DbProduct — Dönüştürülecek veritabanı ürün satırı
+**Dönüş**: `DomainProduct` — UI için hazırlanmış domain ürün modeli
 
 ### toUICategoryList
-**Ne yapar**: Bir dizi `DbCategory` kaydını `DomainCategory` dizisine dönüştürerek toplu veri işleme sağlar.  
-**Nasıl yapar**: Gelen `cats` dizisi `mapDatabaseCategoryToDomain` fonksiyonuna tek tek geçirilir; sonuçlar yeni bir dizi olarak toplanır.  
+**Ne yapar**: Toplu veri işleme için bir liste dönüştürücüsüdür; birden fazla `DbCategory` nesnesini `DomainCategory` dizisine dönüştürür.
+**Nasıl yapar**: İç mantığı belirtilmemiştir; büyük olasılıkla `mapDatabaseCategoryToDomain` fonksiyonunu her bir öğe üzerinde çağırır.
 **Parametreler**:
-- `cats`: `DbCategory[]` — Veritabanından gelen kategori listesi.
-**Dönüş**: `DomainCategory[]` — UI’da kullanılabilecek kategori listesi.
+- cats: DbCategory[] — Dönüştürülecek kategorilerin listesi
+**Dönüş**: `DomainCategory[]` — UI için hazır domain kategorileri dizisi
 
 ### toUIProductList
-**Ne yapar**: Bir dizi `DbProduct` kaydını `DomainProduct` dizisine dönüştürür.  
-**Nasıl yapar**: Gelen `prods` dizisi `mapDatabaseProductToDomain` fonksiyonuna sırayla uygulanır; elde edilen `DomainProduct` nesneleri yeni bir dizi içinde toplanır.  
+**Ne yapar**: Toplu veri işleme için bir liste dönüştürücüsüdür; birden fazla `DbProduct` nesnesini `DomainProduct` dizisine dönüştürür.
+**Nasıl yapar**: İç mantığı belirtilmemiştir; büyük olasılıkla `mapDatabaseProductToDomain` fonksiyonunu her bir öğe üzerinde çağırır.
 **Parametreler**:
-- `prods`: `DbProduct[]` — Veritabanından gelen ürün listesi.
-**Dönüş**: `DomainProduct[]` — UI’da kullanılabilecek ürün listesi.
+- prods: DbProduct[] — Dönüştürülecek ürünlerin listesi
+**Dönüş**: `DomainProduct[]` — UI için hazır domain ürünleri dizisi
+
+### mapCategoryWithLocale
+**Ne yapar**: Bir `DbCategory` nesnesini `DomainCategory` modeline dönüştürür ve bu sırada aktif dile (`'tr'` veya `'en'`) göre yerelleştirilmiş kategori metaveri alanlarını çözümleyerek runtime `undefined` hatalarını önler.
+**Nasıl yapar**: Dönüşüm mantığı belirtilmemiştir; `lang` parametresini kullanarak doğru dildeki metin alanlarını seçer ve domain modeline atar.
+**Parametreler**:
+- dbCat: DbCategory — Dönüştürülecek veritabanı kategori satırı
+- lang: `'tr' | 'en'` — Kullanılacak aktif dil (Türkçe veya İngilizce)
+**Dönüş**: `DomainCategory` — UI için hazırlanmış ve yerelleştirilmiş domain kategorisi modeli
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/lib/type-converters.ts::toSupabaseJson
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::toSupabaseJson
 - **params**: (data: T)
 - **ic_degiskenler**:
-  - `data` — generic input data to be converted into a JSON-compatible structure
-- **Dönüş**: Json — deep-cloned JSON representation of the input
+  - `data` — dönüştürülmek istenen herhangi bir tipteki değer; JSON uyumlu bir nesne haline getirilir.
+- **Dönüş**: Json — `JSON.parse(JSON.stringify(data))` ifadesiyle elde edilen derin kopya JSON nesnesi.
 
-### [N2_NASIL] AST Pointer: src/lib/type-converters.ts::isRecord
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::isRecord
 - **params**: (value: unknown)
 - **ic_degiskenler**:
-  - `value` — value to test whether it is a plain object
-- **Dönüş**: yok — returns a boolean type guard indicating if `value` is a `Record<string, unknown>`
+  - `value` — tip kontrolü yapılan değişken; nesne olup olmadığı ve dizi olmaması kontrol edilir.
+- **Dönüş**: yok — tip koruyucu `value is Record<string, unknown>` ifadesiyle `value`'nun bir kayıt (record) olduğunu belirtir.
 
-### [N3_NASIL] AST Pointer: src/lib/type-converters.ts::mapDatabaseCategoryToDomain
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::mapDatabaseCategoryToDomain
 - **params**: (dbCat: DbCategory)
 - **ic_degiskenler**:
-  - `dbCat` — database row representing a category
-- **Dönüş**: DomainCategory — domain model object with stringified fields and defaults
+  - `dbCat` — veritabanından gelen kategori nesnesi; alanları dönüştürülerek domain modeline aktarılır.
+- **Dönüş**: DomainCategory — `dbCat` nesnesinin kopyası üzerine string dönüşümleri uygulanmış yeni nesne.
 
-### [N4_NASIL] AST Pointer: src/lib/type-converters.ts::mapDatabaseProductToDomain
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::mapDatabaseProductToDomain
 - **params**: (dbProd: DbProduct)
 - **ic_degiskenler**:
-  - `dbProd` — database row representing a product
-- **Dönüş**: DomainProduct — domain model object with stringified fields and default brand
+  - `dbProd` — veritabanından gelen ürün nesnesi; alanları dönüştürülerek domain modeline aktarılır.
+- **Dönüş**: DomainProduct — `dbProd` nesnesinin kopyası üzerine string dönüşümleri uygulanmış yeni nesne.
 
-### [N5_NASIL] AST Pointer: src/lib/type-converters.ts::toUICategoryList
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::toUICategoryList
 - **params**: (cats: DbCategory[])
 - **ic_degiskenler**:
-  - `cats` — array of database category rows
-- **Dönüş**: DomainCategory[] — array of domain category objects produced by mapping each element with `mapDatabaseCategoryToDomain`
+  - `cats` — veritabanı kategorileri dizisi; her eleman `mapDatabaseCategoryToDomain` fonksiyonuna gönderilir.
+- **Dönüş**: DomainCategory[] — `cats.map(mapDatabaseCategoryToDomain)` sonucu elde edilen domain kategori listesi.
 
-### [N6_NASIL] AST Pointer: src/lib/type-converters.ts::toUIProductList
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::toUIProductList
 - **params**: (prods: DbProduct[])
 - **ic_degiskenler**:
-  - `prods` — array of database product rows
-- **Dönüş**: DomainProduct[] — array of domain product objects produced by mapping each element with `mapDatabaseProductToDomain`
+  - `prods` — veritabanı ürünleri dizisi; her eleman `mapDatabaseProductToDomain` fonksiyonuna gönderilir.
+- **Dönüş**: DomainProduct[] — `prods.map(mapDatabaseProductToDomain)` sonucu elde edilen domain ürün listesi.
+
+### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts::mapCategoryWithLocale
+- **params**: (dbCat: DbCategory, lang: 'tr' | 'en' = 'tr')
+- **ic_degiskenler**:
+  - `dbCat` — veritabanı kategorisi; temel domain nesnesi oluşturulur ve locale metadata eklenir.
+  - `lang` — istenen dil kodu; varsayılan `'tr'`.
+  - `base` — `mapDatabaseCategoryToDomain(dbCat)` çağrısıyla elde edilen temel domain kategori nesnesi.
+  - `meta` — `dbCat.metadata` ifadesiyle alınan metadata nesnesi; mevcutsa kullanılır.
+  - `localized` — `meta[lang] || meta['tr'] || meta` ifadesiyle seçilen locale-specific metadata; `CategoryMetadata` tipinde.
+- **Dönüş**: DomainCategory — `base` nesnesine locale‑specific metadata birleştirilerek döndürülür.
 
 ---
 
+## ÇAĞRI HARİTASI
 
-## MERMAID CALL GRAPH
+### Disariya Çağrılar (Outgoing)  
+- **mapCategoryWithLocale** fonksiyonu, veri tabanı kategorisini alan modeline dönüştürmek için **mapDatabaseCategoryToDomain** fonksiyonunu çağırır.
+
+### Disarıdan Çağrılanlar (Incoming)  
+- Bu modülü kullanan dış dosya veya fonksiyon bilgisi verilmemiştir.
+
+### İç İç Fonksiyonlar (Nested)  
+- Yok.
+
+---
+
+## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
+  mapCategoryWithLocale() → mapDatabaseCategoryToDomain()
+
 ```mermaid
-graph TD
-    type-converters_ts__isRecord["isRecord"]
-    type-converters_ts__mapDatabaseCategoryToDomain["mapDatabaseCategoryToDomain"]
-    type-converters_ts__mapDatabaseProductToDomain["mapDatabaseProductToDomain"]
-    type-converters_ts__toSupabaseJson["toSupabaseJson"]
-    type-converters_ts__toUICategoryList["toUICategoryList"]
-    type-converters_ts__toUIProductList["toUIProductList"]
+graph LR
+    mapCategoryWithLocale["mapCategoryWithLocale()"] --> mapDatabaseCategoryToDomain["mapDatabaseCategoryToDomain()"]
 ```
+
+---
 
 ## NODE ID STANDARD
 
@@ -33951,11 +33959,13 @@ graph TD
   function: src\lib\type-converters.ts::mapDatabaseProductToDomain
   function: src\lib\type-converters.ts::toUICategoryList
   function: src\lib\type-converters.ts::toUIProductList
+  function: src\lib\type-converters.ts::mapCategoryWithLocale
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: isRecord
+  export: mapCategoryWithLocale
   export: mapDatabaseCategoryToDomain
   export: mapDatabaseProductToDomain
   export: toSupabaseJson
