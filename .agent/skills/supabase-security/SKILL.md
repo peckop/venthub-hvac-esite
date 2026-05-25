@@ -122,3 +122,18 @@ CREATE POLICY "policy_name" ON table_name ...;
 - `20260101_rls_consolidation.sql` — Ana konsolidasyon
 - `20251212_fix_rls_performance.sql` — Performans düzeltmeleri
 - `docs/SECURITY_AND_PERF_CHECKLIST.md` — Detaylı kontrol listesi
+
+## ⚠️ İleri Düzey Güvenlik Tuzakları
+
+### JWT & Metadata
+- **`user_metadata` YASAK** — JWT yetkilendirme kararlarında `raw_user_meta_data` kullanılamaz (kullanıcı tarafından düzenlenebilir). Her zaman `app_metadata` kullan
+- **Token ömrü** — Kullanıcı silmek aktif token'ı geçersiz kılmaz → önce `auth.signOut()` çağır
+
+### RLS İleri Kuralları
+- **`TO authenticated` tek başına yetmez** — Bu kimlik doğrulamadır (authn), yetkilendirme (authz) değildir. `USING` ile satır sahipliği kontrolü şart
+- **UPDATE politikası: USING + WITH CHECK birlikte zorunlu** — `WITH CHECK` olmadan kullanıcı `user_id`'yi başka birine atayabilir
+- **View'lar RLS'i bypass eder** — Postgres 15+'da `CREATE VIEW ... WITH (security_invoker = true)` kullan
+- **`SECURITY DEFINER` → public schema'da tehlikeli** — Postgres `EXECUTE` yetkisini `PUBLIC`'e otomatik verir
+
+### Migration'da FK İndeks Kontrolü
+Her `REFERENCES` (Foreign Key) tanımında karşılık gelen index'in varlığını doğrula.

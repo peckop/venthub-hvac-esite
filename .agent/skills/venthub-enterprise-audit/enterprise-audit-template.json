@@ -4,7 +4,6 @@
   "audit_date": "YYYY-MM-DD",
   "git_commit_sha": "HEAD",
   "agent_id": "Antigravity",
-
   "layers": {
     "L1_build_quality": {
       "name": "Teknik Kalite (Build & Code)",
@@ -12,378 +11,974 @@
         "L1_01_typescript": {
           "target": "TypeScript strict mode derleme hatası sıfır olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "pnpm", "args": ["exec", "tsc", "--noEmit"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "exec",
+              "tsc",
+              "--noEmit"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L1_02_eslint": {
           "target": "ESLint 0 hata, 0 warning.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "pnpm", "args": ["run", "lint"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "lint"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L1_03_unit_tests": {
           "target": "Tüm birim testler geçmeli.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "pnpm", "args": ["test", "--", "--run", "--reporter=dot"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "test",
+              "--",
+              "--run",
+              "--reporter=dot"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L1_04_build": {
           "target": "Production build 0 hata ile tamamlanmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "pnpm", "args": ["run", "build"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "build"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L1_05_lockfile": {
           "target": "pnpm-lock.yaml ve package.json senkron olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "pnpm", "args": ["install", "--frozen-lockfile"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "install",
+              "--frozen-lockfile"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L1_06_bundle_size": {
           "target": "Hiçbir JS chunk 500 KB (gzip öncesi) üstünde olmamalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["__BUNDLE_SIZE_CHECK__"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "__BUNDLE_SIZE_CHECK__"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         }
       }
     },
-
     "L2_security": {
       "name": "Güvenlik (OWASP + Supabase)",
       "checks": {
         "L2_01_dependency_cve": {
           "target": "pnpm audit 0 HIGH ve 0 CRITICAL.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "pnpm", "args": ["audit", "--audit-level", "high"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "audit",
+              "--audit-level",
+              "high"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L2_02_hardcoded_secrets": {
           "target": "Kod tabanında hardcoded şifre/token/secret bulunmamalı (i18n/test dosyaları hariç).",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "regex_scan", "args": ["(password|secret|token|api_key)\\s*[:=]\\s*['\"][^'\"]{8,}", "src/lib/", "src/views/", "scripts/", "supabase/functions/", "--exclude=test\\.ts|dictionaries|__tests__"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "(password|secret|token|api_key)\\s*[:=]\\s*['\"][^'\"]{8,}",
+              "src/lib/",
+              "src/views/",
+              "scripts/",
+              "supabase/functions/",
+              "--exclude=test\\.ts|dictionaries|__tests__"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L2_03_security_headers": {
           "target": "HSTS, X-Frame-Options, nosniff, Referrer-Policy, CSP header mevcut olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "regex_scan", "args": ["Strict-Transport-Security|X-Frame-Options|Content-Security-Policy|nosniff|Referrer-Policy", "next.config.mjs"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "Strict-Transport-Security|X-Frame-Options|Content-Security-Policy|nosniff|Referrer-Policy",
+              "next.config.mjs"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü — header'lar bulunmalı."
         },
         "L2_04_console_leak": {
           "target": "Console.log/warn içinde hassas değişken (password/token/secret değeri) doğrudan yazdırılmamalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["console\\.log\\(.*(?:password|token|secret|apiKey|credentials)", "src/", "--exclude=error\\(|__tests__"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "console\\.log\\(.*(?:password|token|secret|apiKey|credentials)",
+              "src/",
+              "--exclude=error\\(|__tests__"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L2_05_rate_limiting": {
           "target": "Kritik endpoint'lerde (ödeme, auth) rate limiting aktif olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["checkRateLimit|rate_limit|rateLimit", "supabase/functions/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "checkRateLimit|rate_limit|rateLimit",
+              "supabase/functions/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Bu kontrol varlığı arar — bulunamazsa FAIL, bulunursa PASS (inverted). Runner'da özel mantık."
         },
         "L2_06_password_strength": {
           "target": "Kayıt ve şifre değişiminde güç kuralları zorlanmalı (min 8, büyük harf, rakam, özel karakter).",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "regex_scan", "args": ["passwordRules|pwRule|hibpPwnedCount", "src/views/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "passwordRules|pwRule|hibpPwnedCount",
+              "src/views/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü — bulunamazsa FAIL."
+        },
+        "L2_07_cors_wildcard": {
+          "target": "Auth endpoint lerde Access-Control-Allow-Origin: * kullanilmamali.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "Access-Control-Allow-Origin.*\\\\*",
+              "supabase/functions/",
+              "src/app/api/",
+              "--exclude=__tests__"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
+        },
+        "L2_08_service_role_leak": {
+          "target": "service_role anahtari client bundle a sizmamali (NEXT_PUBLIC_ prefix kontrolu).",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "NEXT_PUBLIC.*service_role|NEXT_PUBLIC.*SERVICE_ROLE",
+              "src/",
+              ".env",
+              ".env.local"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         }
       }
     },
-
     "L3_legal": {
       "name": "Yasal Uyumluluk (KVKK / GDPR)",
       "checks": {
         "L3_01_account_deletion": {
           "target": "Kullanıcı hesap silme hakkı mevcut olmalı (KVKK Madde 7).",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "regex_scan", "args": ["deleteUser|deleteAccount|hesabimiSil|account.*delet", "src/", "supabase/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "deleteUser|deleteAccount|hesabimiSil|account.*delet",
+              "src/",
+              "supabase/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü."
         },
         "L3_02_cookie_consent": {
           "target": "Cookie consent teknik implementasyonu mevcut olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "regex_scan", "args": ["CookieConsent|cookieConsent|cookie.*consent|gdpr", "src/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "CookieConsent|cookieConsent|cookie.*consent|gdpr",
+              "src/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü."
         },
         "L3_03_legal_pages": {
           "target": "KVKK, Gizlilik, Çerez politikası sayfaları fiziksel olarak mevcut olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "file_exists", "args": ["src/app/legal/kvkk/page.tsx", "src/app/legal/gizlilik-politikasi/page.tsx", "src/app/legal/cerez-politikasi/page.tsx"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "src/app/legal/kvkk/page.tsx",
+              "src/app/legal/gizlilik-politikasi/page.tsx",
+              "src/app/legal/cerez-politikasi/page.tsx"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L3_04_license_file": {
           "target": "LICENSE dosyası proje kökünde mevcut olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "file_exists", "args": ["LICENSE"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "LICENSE"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L3_05_gpl_risk": {
           "target": "Ticari üründe pure GPL lisanslı bağımlılık bulunmamalı (LGPL hariç).",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "pnpm", "args": ["licenses", "list"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "licenses",
+              "list"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Çıktıda 'GPL-2.0' veya 'GPL-3.0' (LGPL hariç) aranır."
         }
       }
     },
-
     "L4_ops": {
       "name": "Operasyonel Hazırlık (DevOps)",
       "checks": {
         "L4_01_health_check": {
           "target": "/api/health endpoint mevcut olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "file_exists", "args": ["src/app/api/health/route.ts"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "src/app/api/health/route.ts"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L4_02_monitoring": {
           "target": "Error monitoring (Sentry/benzeri) entegrasyonu mevcut olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "regex_scan", "args": ["@sentry|Sentry\\.init|posthog|datadog|opentelemetry", "src/", "package.json"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "@sentry|Sentry\\.init|posthog|datadog|opentelemetry",
+              "src/",
+              "package.json"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü."
         },
         "L4_03_ci_pipeline": {
           "target": "CI/CD pipeline (GitHub Actions) lint + test + build adımlarını içermeli.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "file_exists", "args": [".github/workflows"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              ".github/workflows"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L4_04_env_template": {
           "target": ".env.example dosyası mevcut ve kapsamlı olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "file_exists", "args": [".env.example"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              ".env.example"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L4_05_dockerfile": {
           "target": "Containerize edilebilir Dockerfile mevcut olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "file_exists", "args": ["deploy/Dockerfile", "Dockerfile"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "deploy/Dockerfile",
+              "Dockerfile"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "OR logic — herhangi biri yeterli."
         },
         "L4_06_security_md": {
           "target": "SECURITY.md güvenlik açığı bildirim kılavuzu mevcut olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "file_exists", "args": ["SECURITY.md", ".github/SECURITY.md"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "SECURITY.md",
+              ".github/SECURITY.md"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "OR logic."
         }
       }
     },
-
     "L5_data": {
       "name": "Veri & Veritabanı Bütünlüğü",
       "checks": {
         "L5_01_rls": {
           "target": "Tüm public tablolarda Row Level Security aktif olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "supabase_mcp", "args": ["rls_check"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "supabase_mcp",
+            "args": [
+              "rls_check"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "MCP aracıyla doğrulanır. Runner'da özel fonksiyon."
         },
         "L5_02_supabase_security_advisors": {
           "target": "Supabase güvenlik danışmanları 0 WARN/ERROR raporlamalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "supabase_mcp", "args": ["security_advisors"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "supabase_mcp",
+            "args": [
+              "security_advisors"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "MCP aracıyla doğrulanır."
         },
         "L5_03_input_validation": {
           "target": "Server-side form/API input validation şeması (Zod/Yup) mevcut olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["z\\.object|z\\.string|zodSchema|safeParse|yup\\.object|joi\\.object", "src/", "supabase/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "z\\.object|z\\.string|zodSchema|safeParse|yup\\.object|joi\\.object",
+              "src/",
+              "supabase/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü."
+        },
+        "L5_04_fk_index": {
+          "target": "Foreign Key sutunlarinda eslesen CREATE INDEX mevcut olmali.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "REFERENCES.*\\\\(.*\\\\)",
+              "supabase/migrations/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
+          "note": "Varlik kontrolu."
+        },
+        "L5_05_grant_select": {
+          "target": "Yeni migration sutununda GRANT SELECT eksikligi olmamali.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "supabase_mcp",
+            "args": [
+              "grant_check"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
+          "note": "MCP araciyla dogrulanir."
         }
       }
     },
-
     "L6_docs": {
       "name": "Dokümantasyon",
       "checks": {
         "L6_01_readme": {
           "target": "README.md 200+ satır, kurulum/deployment/konfigürasyon bölümleri içermeli.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "file_line_count", "args": ["README.md", 200], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "file_line_count",
+            "args": [
+              "README.md",
+              200
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L6_02_changelog": {
           "target": "CHANGELOG aktif tutuluyor olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "file_exists", "args": ["docs/CHANGELOG.md", "CHANGELOG.md"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "docs/CHANGELOG.md",
+              "CHANGELOG.md"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "OR logic."
         },
         "L6_03_contributing": {
           "target": "CONTRIBUTING.md mevcut olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "file_exists", "args": ["CONTRIBUTING.md"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "CONTRIBUTING.md"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         }
       }
     },
-
     "L7_product": {
       "name": "Ürün Tamamlığı",
       "checks": {
         "L7_01_critical_routes": {
           "target": "Tüm kritik e-ticaret rotaları fiziksel olarak mevcut olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "file_exists", "args": [
-            "src/app/products/[slug]/page.tsx",
-            "src/app/cart/page.tsx",
-            "src/app/checkout/page.tsx",
-            "src/app/auth/login/page.tsx",
-            "src/app/auth/register/page.tsx",
-            "src/app/account/orders/page.tsx",
-            "src/app/admin/page.tsx"
-          ], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "src/app/products/[slug]/page.tsx",
+              "src/app/cart/page.tsx",
+              "src/app/checkout/page.tsx",
+              "src/app/auth/login/page.tsx",
+              "src/app/auth/register/page.tsx",
+              "src/app/account/orders/page.tsx",
+              "src/app/admin/page.tsx"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L7_02_e2e_tests": {
           "target": "Kritik akışlar (kayıt→sepet→ödeme) için E2E test mevcut olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["\\.spec\\.ts$|\\.e2e\\.ts$", "tests/", "e2e/", "src/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "\\.spec\\.ts$|\\.e2e\\.ts$",
+              "tests/",
+              "e2e/",
+              "src/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü. node_modules hariç tutulur."
         },
         "L7_03_sitemap_robots": {
           "target": "sitemap.ts ve robots.ts mevcut olmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "file_exists", "args": ["src/app/sitemap.ts", "src/app/robots.ts"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "src/app/sitemap.ts",
+              "src/app/robots.ts"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L7_04_error_boundary": {
           "target": "Global ErrorBoundary bileşeni mevcut ve kullanılıyor olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["ErrorBoundary", "src/components/", "src/app/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "ErrorBoundary",
+              "src/components/",
+              "src/app/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü."
+        },
+        "L7_05_stripe_idempotency": {
+          "target": "Stripe checkout.sessions.create cagrilarinda idempotencyKey mevcut olmali.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "sessions\\.create",
+              "supabase/functions/",
+              "src/app/api/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
+          "note": "Varlik kontrolu."
+        },
+        "L7_06_webhook_signature": {
+          "target": "Stripe webhook larinda imza dogrulamasi (Stripe-Signature) mevcut olmali.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "Stripe-Signature|stripe\\.webhooks\\.constructEvent|verifySignature",
+              "supabase/functions/",
+              "src/app/api/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
+          "note": "Varlik kontrolu."
+        },
+        "L7_07_ui_data_leak": {
+          "target": "UI da NaN, undefined, [object Object] gibi ham veri sizintisi olmamali.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "\"NaN\"|\"undefined\"|\"[object Object]\"|\"null\"",
+              "src/views/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         }
       }
     },
-
     "L8_performance": {
       "name": "Performans & Core Web Vitals",
       "checks": {
         "L8_01_image_optimization": {
           "target": "Ham <img> etiketi yerine next/image kullanılmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["<img ", "src/views/", "src/components/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "<img ",
+              "src/views/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L8_02_client_boundary": {
           "target": "'use client' layout veya page wrapper'larında değil, yaprak bileşenlerde olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["use client", "src/app/layout.tsx", "src/app/page.tsx"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "use client",
+              "src/app/layout.tsx",
+              "src/app/page.tsx"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L8_03_lighthouse": {
           "target": "Lighthouse Performance >= 60, Accessibility >= 80, Best Practices >= 80, SEO >= 80.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "lighthouse", "args": ["--only-categories=performance,accessibility,best-practices,seo"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "lighthouse",
+            "args": [
+              "--only-categories=performance,accessibility,best-practices,seo"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Canlı site veya local dev üzerinde çalıştırılır. Playwright/browser tool gerekir."
         },
         "L8_04_skeleton_coverage": {
           "target": "Dinamik veri yüklenen sayfalarda Skeleton/loading state mevcut olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["Skeleton|loading\\.tsx|Loading", "src/app/", "src/components/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "Skeleton|loading\\.tsx|Loading",
+              "src/app/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü."
         }
       }
     },
-
     "L9_accessibility": {
       "name": "Erişilebilirlik (WCAG 2.1 AA)",
       "checks": {
         "L9_01_aria_usage": {
           "target": "Etkileşimli bileşenlerde aria-label / aria-describedby / role mevcut olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["aria-label|aria-describedby|role=", "src/components/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "aria-label|aria-describedby|role=",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü. Sayısal yoğunluk raporlanır."
         },
         "L9_02_alt_text": {
           "target": "Tüm görsellerde alt text mevcut olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["<Image[^>]*(?!alt=)[^>]*/>|<img[^>]*(?!alt=)[^>]*>", "src/views/", "src/components/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "<Image[^>]*(?!alt=)[^>]*/>|<img[^>]*(?!alt=)[^>]*>",
+              "src/views/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Alt text eksik görselleri arar."
         },
         "L9_03_keyboard_navigation": {
           "target": "Kritik etkileşimli elemanlarda tabIndex / onKeyDown desteği olmalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["tabIndex|onKeyDown|onKeyUp|onKeyPress", "src/components/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "tabIndex|onKeyDown|onKeyUp|onKeyPress",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "Varlık kontrolü."
         }
       }
     },
-
     "L10_nextjs_discipline": {
       "name": "Next.js 15 / React 19 Disiplini (VentHub Özel)",
       "checks": {
         "L10_01_async_params": {
           "target": "Next.js 15: Dinamik route params mutlaka await edilmeli.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "regex_scan", "args": ["params\\.[a-zA-Z]+", "src/app/", "--exclude=await params"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "params\\.[a-zA-Z]+",
+              "src/app/",
+              "--exclude=await params"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L10_02_route_ssot": {
           "target": "Hardcoded href path yerine Routes.xxx helper kullanılmalı.",
           "enforcement_level": "STRICT",
-          "executor": { "tool": "regex_scan", "args": ["href=\"/category|href=\"/products|href=\"/cart|href=\"/auth", "src/views/", "src/components/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "href=\"/category|href=\"/products|href=\"/cart|href=\"/auth",
+              "src/views/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L10_03_i18n_leakage": {
           "target": "JSX içinde hardcoded Türkçe/İngilizce metin sızıntısı olmamalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "node", "args": [".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "node",
+            "args": [
+              ".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L10_04_framer_motion": {
           "target": "Performans katili framer-motion sızıntısı kalmamalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "regex_scan", "args": ["framer-motion|from 'motion'", "src/"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "framer-motion|from 'motion'",
+              "src/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         }
       }
     },
-
     "L11_technical_debt": {
       "name": "Teknik Borç & Ölü Kod (Eski MRI Kapsamı)",
       "checks": {
         "L11_01_dead_code": {
           "target": "Kullanılmayan dosya, export ve dependency sıfır olmalı (Knip).",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "pnpm", "args": ["run", "knip", "--reporter", "compact"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "knip",
+              "--reporter",
+              "compact"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         },
         "L11_02_bundle_analyzer": {
           "target": "Bundle bileşim analizi yapılmalı — hangi modül kaç KB, tree-shaking etkisi.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "pnpm", "args": ["run", "analyze"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": "",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "analyze"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
           "note": "HTML rapor .next/analyze/ altına üretilir. Detaylı inceleme gerekir."
         },
         "L11_03_unused_dependencies": {
           "target": "package.json'da kullanılmayan dependency kalmamalı.",
           "enforcement_level": "WARNING",
-          "executor": { "tool": "pnpm", "args": ["run", "knip", "--include", "unlisted,unresolved", "--reporter", "compact"], "expected_exit_codes": [0] },
-          "status": "PENDING", "evidence": ""
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "knip",
+              "--include",
+              "unlisted,unresolved",
+              "--reporter",
+              "compact"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         }
       }
     }
   },
-
   "summary": {
     "total_checks": 0,
     "passed": 0,

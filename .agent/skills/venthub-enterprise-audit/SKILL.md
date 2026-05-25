@@ -242,3 +242,23 @@ BLOCKED    → Herhangi bir 🔴 STRICT kontrol FAIL → teslim yapılamaz
 - Bu skill kodu **değiştirmez** — sadece denetler ve raporlar
 - Her kontrol **terminal çıktısıyla kanıtlanmalıdır**
 - Rapor `.agent/reports/` altına kaydedilir — tarihle versiyonlanır
+
+### Eklenen Denetim Maddeleri (Enrichment v2)
+
+#### L2 Güvenlik Ek
+| CORS Wildcard (Access-Control-Allow-Origin: *) auth endpoint'lerde | 🔴 STRICT |
+| service_role client bundle sızıntısı | 🔴 STRICT |
+
+#### L5 Veri Ek
+| İndekslenmemiş FK sütunları (REFERENCES vs CREATE INDEX) | 🟡 WARNING |
+| Column GRANT SELECT uyuşmazlığı (yeni sütun, eksik GRANT) | 🔴 STRICT |
+
+#### L7 Ürün Ek
+| Stripe idempotencyKey (checkout.sessions.create) | 🔴 STRICT |
+| Webhook Signature doğrulaması (Stripe-Signature) | 🔴 STRICT |
+| UI veri sızıntısı ("NaN", "undefined", "[object Object]") | 🟡 WARNING |
+
+#### L8 Performans Ek
+| LCP < 2.5s | 🔴 STRICT |
+| INP < 200ms (FID yerini aldı — Mart 2024) | 🔴 STRICT |
+| CLS < 0.1 | 🔴 STRICT |

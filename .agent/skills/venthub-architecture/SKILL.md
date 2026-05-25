@@ -101,3 +101,24 @@ export function ProductCard({ product, onSelect }: ProductCardProps) {
 5. **Hook mu?** → `src/hooks/`
 6. **Veritabanı değişikliği mi?** → `supabase/migrations/`
 7. **Tek seferlik script mi?** → `scripts/`
+
+## SEO Mimari Kuralları
+
+### JSON-LD Schema Markup
+E-ticaret sayfalarında aşağıdaki yapılandırılmış veriler zorunludur:
+
+| Sayfa Türü | Schema Tipi | Gerekli Alan |
+|------------|-------------|--------------|
+| Ana sayfa | Organization + WebSite | name, url, logo |
+| Ürün sayfası | Product | name, image, offers (price, currency, availability) |
+| Kategori | BreadcrumbList | itemListElement |
+| Blog/Bilgi | Article | headline, image, datePublished, author |
+
+### SSR Zorunluluğu
+- Schema markup ve meta etiketleri Server Component veya generateMetadata ile render edilmeli
+- CSR-only sayfalar botlara boş HTML gösterir → SEO sıfır
+
+### Canonical URL Tutarlılığı
+- www vs non-www: tek bir tercih ve yönlendirme
+- Trailing slash tutarlılığı
+- HTTP → HTTPS yönlendirmesi zorunlu

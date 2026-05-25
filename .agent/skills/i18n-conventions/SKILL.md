@@ -128,3 +128,32 @@ common: {
 - Aynı metin farklı yerlerde kullanılıyorsa `common` altına al
 - Dinamik değerler için `{{placeholder}}` kullan: `"{{count}} ürün"`
 - Çoğul formlar için ayrı anahtar: `item` vs `items`
+
+## Hreflang Kuralları (Uluslararası SEO)
+
+VentHub `/tr` ve `/en` yolları kullandığı için hreflang düzgün uygulanmalıdır:
+
+1. **Self-referencing zorunlu** — Her sayfa hreflang setinde kendini içermeli
+2. **Reciprocal links** — A→B varsa B→A da olmalı (yoksa Google ikisini de yok sayar)
+3. **ISO kodları** — `en-GB` ✅ | `en-UK` ❌ (ISO 3166-1 Alpha 2)
+4. **x-default** — Dil seçici veya varsayılan locale'e yönlenmeli
+5. **Hedef URL'ler** — Tümü 200 dönmeli, canonical ile eşleşmeli
+6. **Yerleştirme** — HTML `<link>`, HTTP Header veya XML Sitemap (10+ locale'de sitemap tercih)
+
+```tsx
+// layout.tsx veya head bileşeninde
+<link rel="alternate" hreflang="tr" href="https://venthub.com/tr/urunler" />
+<link rel="alternate" hreflang="en" href="https://venthub.com/en/products" />
+<link rel="alternate" hreflang="x-default" href="https://venthub.com/tr/urunler" />
+```
+
+## i18n Doğrulama Checklist'i (Canlı Ortam)
+
+UI'da aşağıdaki hatalar asla görünmemelidir:
+
+- [ ] Ham anahtar sızıntısı yok: `t('key')`, `('key')`, `KEY 'FOO.BAR'`
+- [ ] Çözülmemiş placeholder yok: `{{variable}}`, `{variable}`
+- [ ] Tarih/sayı formatı aktif locale ile eşleşiyor
+- [ ] Dil değiştirince tüm görünen metin güncelleniyor
+- [ ] `"NaN"`, `"undefined"`, `"null"` gibi ham değerler UI'da yok
+- [ ] Boş çeviri anahtarı yok (anahtar var ama değer boş string)

@@ -67,3 +67,8 @@ Kullanıcı "Röntgeni Çek" veya "Enterprise düzeyde değerlendir" dediğinde 
 ---
 **Özet Kural:** 
 Sisteme yalan söyleyemezsin. Gözle baktığın hiçbir şeye `PASS` verme, yalnızca `run_command`, `grep_search` verilerine ve terminal loglarına güven!
+6. **CORS Wildcard:** Auth endpoint'lerde Access-Control-Allow-Origin: * varsa → BLOCKED.
+7. **service_role Sızıntısı:** NEXT_PUBLIC_ prefix'i ile service_role anahtarı kullanılıyorsa → BLOCKED.
+8. **Hreflang Kontrolü:** /tr ve /en sayfalar varsa hreflang self-referencing ve reciprocal olmalı.
+9. **Veri Bütünlüğü:** UI'da "NaN", "undefined", "[object Object]" kalıntısı → WARNING.
+10. **Stripe İdempotency:** checkout.sessions.create çağrılarında idempotencyKey yoksa → BLOCKED.
