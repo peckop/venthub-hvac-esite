@@ -1,0 +1,21 @@
+{
+  "skill": "model-dispatcher",
+  "date": "2026-05-25",
+  "task_summary": "Refactor CheckoutPage state orchestration by introducing useCheckoutOrchestrator VM hook to decouple UI from business state.",
+  "complexity": "medium",
+  "recommended_model": "Claude Sonnet 4.6 (Thinking)",
+  "blast_radius": 3,
+  "reasoning": "This requires high logical reasoning to extract complex React state, Supabase hooks, and validations from a major page component without breaking runtime behavior.",
+  "alternatives": [
+    {
+      "model": "Gemini 3.1 Pro (High)",
+      "score": 90,
+      "reason": "Strong capabilities in refactoring and React hook design, but Sonnet excels at state-tracking detail."
+    },
+    {
+      "model": "Claude Opus 4.6 (Thinking)",
+      "score": 80,
+      "reason": "Exemplary logic, but medium complexity does not strictly warrant the slower latency of Opus."
+    }
+  ]
+}

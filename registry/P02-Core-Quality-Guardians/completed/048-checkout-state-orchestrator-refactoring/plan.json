@@ -1,0 +1,79 @@
+{
+  "skill": "superpowers-write-plan",
+  "model": "Claude Sonnet 4.6 (Thinking)",
+  "date": "2026-05-25",
+  "execution_complexity": "MEDIUM",
+  "recommended_model": "Claude Sonnet 4.6 (Thinking)",
+  "requires_human_approval": false,
+  "brainstorm_ref": "048-checkout-state-orchestrator-refactoring/brainstorm.json",
+  "objective": "Refactor CheckoutPage.tsx state management by moving 15+ React states, Supabase fetch methods, and form validation functions into a dedicated custom hook `useCheckoutOrchestrator.ts` to follow MVVM patterns.",
+  "assumptions": [
+    "Deno and Next.js are available to test compilation.",
+    "Git hook validates scope correctly."
+  ],
+  "pre_checks": [
+    {
+      "claim": "CheckoutPage.tsx contains 15+ React states and direct Supabase load calls.",
+      "verified": true,
+      "source": "src/views/CheckoutPage.tsx"
+    },
+    {
+      "claim": "useCheckoutPayment.ts accepts UseCheckoutPaymentProps with 15 fields.",
+      "verified": true,
+      "source": "src/hooks/useCheckoutPayment.ts"
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "title": "Create useCheckoutOrchestrator hook",
+      "files": [
+        "src/hooks/useCheckoutOrchestrator.ts"
+      ],
+      "changes": "Implement state orchestration, address/invoice loaders, validation functions, and step transition handlers.",
+      "verify": "pnpm run type-check"
+    },
+    {
+      "id": 2,
+      "title": "Update useCheckoutPayment signature",
+      "files": [
+        "src/hooks/useCheckoutPayment.ts"
+      ],
+      "changes": "Simplify Props structure to use grouped state structures instead of raw flat parameters.",
+      "verify": "pnpm run type-check"
+    },
+    {
+      "id": 3,
+      "title": "Refactor CheckoutPage component",
+      "files": [
+        "src/views/CheckoutPage.tsx"
+      ],
+      "changes": "Integrate useCheckoutOrchestrator VM hook, delete direct state/effects, and bind UI props directly.",
+      "verify": "pnpm run type-check && pnpm exec vitest run"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Incorrect callback wiring could disrupt the state updates or payment form render.",
+      "severity": "high",
+      "mitigation": "Ensure exact mapping of state setter bindings and verify vitest unit test runs."
+    }
+  ],
+  "rollback": "Use git checkout -- . to discard all changes.",
+  "domain_ref": "None",
+  "allowed_paths": [
+    "src/hooks/useCheckoutOrchestrator.ts",
+    "src/hooks/useCheckoutPayment.ts",
+    "src/views/CheckoutPage.tsx"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 3,
+  "allowed_change_types": [
+    "component_refactor",
+    "performance_optimization"
+  ],
+  "architectural_guardrails": {
+    "ssot_route_strategy": "The changes only optimize state orchestration inside the page views without affecting routing tables.",
+    "bundle_size_optimization": "No foreign libraries are imported. Bundle size remains completely unaffected."
+  }
+}
