@@ -11,7 +11,7 @@ import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAn
 const ContactPage: React.FC = () => {
   const { t } = useI18n()
   const [formSubmitted, setFormSubmitted] = useState(false)
-  const whatsappLink = getSupportLink('İletişim Sayfası')
+  const whatsappLink = getSupportLink(t('common.whatsapp.supportMessageDefault'))
   const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
   const [contactGridRef, contactGridVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })
   const [formSuccessRef, formSuccessVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })

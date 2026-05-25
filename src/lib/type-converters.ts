@@ -1,8 +1,8 @@
-import type { DbCategory, DbProduct } from '../types/db-rows'
+import type { DbCategory, DbProduct, CategoryMetadata, LocalizedCategoryMetadata } from '../types/db-rows'
 import type { DomainCategory, DomainProduct } from '../types/ui-models'
 
 // Re-export domain types so they can be accessed through this module (as expected by other files)
-export type { DomainCategory, DomainProduct }
+export type { DomainCategory, DomainProduct, CategoryMetadata, LocalizedCategoryMetadata }
 
 import type { Json } from '../types/database.types'
 
@@ -56,4 +56,28 @@ export const toUICategoryList = (cats: DbCategory[]): DomainCategory[] => {
 }
 export const toUIProductList = (prods: DbProduct[]): DomainProduct[] => {
   return prods.map(mapDatabaseProductToDomain)
+}
+
+/**
+ * Maps a DbCategory to DomainCategory while resolving localized category metadata fields
+ * based on the active language ('tr' | 'en') to avoid runtime undefined errors.
+ */
+export const mapCategoryWithLocale = (
+  dbCat: DbCategory,
+  lang: 'tr' | 'en' = 'tr'
+): DomainCategory => {
+  const base = mapDatabaseCategoryToDomain(dbCat)
+  if (!dbCat.metadata) return base
+
+  const meta = dbCat.metadata
+  // Retrieve the localized object or fallback to base metadata fields
+  const localized = (meta[lang] || meta['tr'] || meta) as CategoryMetadata
+
+  return {
+    ...base,
+    metadata: {
+      ...meta,
+      ...localized,
+    } as LocalizedCategoryMetadata
+  }
 }
