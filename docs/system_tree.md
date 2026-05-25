@@ -6,14 +6,20 @@ Bu ağaç `cli/docs_tree.py` tarafından otonom olarak üretilmiştir.
 ## Dokümantasyon Durumu
 ```text
 📂 venthub-hvac/
-└── 📂 **src/**
-    └── 📂 **views/**
-        └── 📂 **support/**
-            ├── ✅ `FAQPage.tsx`
-            ├── ✅ `ReturnsPage.tsx`
-            ├── ✅ `ShippingPage.tsx`
-            ├── ✅ `SupportHomePage.tsx`
-            └── ✅ `WarrantyPage.tsx`
+├── 📂 **src/**
+│   └── 📂 **views/**
+│       └── 📂 **support/**
+│           ├── ✅ `FAQPage.tsx`
+│           ├── ✅ `ReturnsPage.tsx`
+│           ├── ✅ `ShippingPage.tsx`
+│           ├── ✅ `SupportHomePage.tsx`
+│           └── ✅ `WarrantyPage.tsx`
+└── 📂 **supabase/**
+    └── 📂 **functions/**
+        └── 📂 **_shared/**
+            ├── ✅ `notify.ts`
+            ├── ✅ `rate_limit.ts`
+            └── ✅ `sentry.ts`
 ```
 
 ## Eksik Dokümantasyonlar
