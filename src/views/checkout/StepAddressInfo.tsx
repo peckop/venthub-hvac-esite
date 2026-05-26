@@ -105,7 +105,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                         <textarea
                             value={shippingAddress.fullAddress || shippingAddress.full_address || ''}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, fullAddress: e.target.value })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                             rows={3}
                             placeholder={t('checkout.shipping.addressPlaceholder')}
                         />
@@ -118,7 +118,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             type="text"
                             value={shippingAddress.city || ''}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                             placeholder={t('checkout.shipping.cityPlaceholder')}
                         />
                     </div>
@@ -130,7 +130,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             type="text"
                             value={shippingAddress.district || ''}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, district: e.target.value })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                             placeholder={t('checkout.shipping.districtPlaceholder')}
                         />
                     </div>
@@ -146,7 +146,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                                 const v = e.target.value.replace(/\D/g, '').slice(0, 10)
                                 setShippingAddress({ ...shippingAddress, postalCode: v })
                             }}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                             placeholder={t('checkout.shipping.postalPlaceholder')}
                         />
                     </div>
@@ -186,7 +186,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             <textarea
                                 value={billingAddress.fullAddress}
                                 onChange={(e) => setBillingAddress({ ...billingAddress, fullAddress: e.target.value })}
-                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                                 rows={3}
                                 placeholder={t('checkout.billing.addressPlaceholder')}
                             />
@@ -199,7 +199,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                                 type="text"
                                 value={billingAddress.city}
                                 onChange={(e) => setBillingAddress({ ...billingAddress, city: e.target.value })}
-                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                                 placeholder={t('checkout.billing.cityPlaceholder')}
                             />
                         </div>
@@ -211,7 +211,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                                 type="text"
                                 value={billingAddress.district}
                                 onChange={(e) => setBillingAddress({ ...billingAddress, district: e.target.value })}
-                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                                 placeholder={t('checkout.billing.districtPlaceholder')}
                             />
                         </div>
@@ -227,7 +227,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                                     const v = e.target.value.replace(/\D/g, '').slice(0, 10)
                                     setBillingAddress({ ...billingAddress, postalCode: v })
                                 }}
-                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                                 placeholder={t('checkout.billing.postalPlaceholder')}
                             />
                         </div>
@@ -277,7 +277,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                                 inputMode="numeric"
                                 value={invoiceInfo.tckn || ''}
                                 onChange={(e) => setInvoiceInfo({ ...invoiceInfo, tckn: e.target.value.replace(/\D/g, '').slice(0, 11) })}
-                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                                 placeholder={t('checkout.invoice.tcknPlaceholder')}
                                 maxLength={11}
                             />
@@ -291,7 +291,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                                 type="text"
                                 value={invoiceInfo.companyName || ''}
                                 onChange={(e) => setInvoiceInfo({ ...invoiceInfo, companyName: e.target.value })}
-                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                                 placeholder={t('checkout.invoice.companyPlaceholder')}
                             />
                         </div>
@@ -302,7 +302,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                                 inputMode="numeric"
                                 value={invoiceInfo.vkn || ''}
                                 onChange={(e) => setInvoiceInfo({ ...invoiceInfo, vkn: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                                 placeholder={t('checkout.invoice.vknPlaceholder')}
                                 maxLength={10}
                             />
@@ -313,7 +313,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                                 type="text"
                                 value={invoiceInfo.taxOffice || ''}
                                 onChange={(e) => setInvoiceInfo({ ...invoiceInfo, taxOffice: e.target.value })}
-                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                                className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                                 placeholder={t('checkout.invoice.taxOfficePlaceholder')}
                             />
                         </div>

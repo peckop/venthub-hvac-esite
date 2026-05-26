@@ -101,11 +101,11 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Teknik Satırlar</label>
+                <label className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400">Teknik Satırlar</label>
                 <button 
                   type="button" 
                   onClick={addRow}
-                  className="flex items-center gap-1 text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full transition-colors"
+                  className="flex items-center gap-1 text-xs font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full transition-colors"
                 >
                   <Plus size={12} /> {t('admin.common.addLine')}
                 </button>
@@ -182,11 +182,11 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Özellik Kartları</label>
+                <label className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400">Özellik Kartları</label>
                 <button 
                   type="button" 
                   onClick={addItem}
-                  className="flex items-center gap-1 text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full transition-colors"
+                  className="flex items-center gap-1 text-xs font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full transition-colors"
                 >
                   <Plus size={12} /> {t('admin.common.addCard')}
                 </button>
@@ -205,7 +205,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                     
                     <div className="grid gap-3">
                         <div className="grid gap-1">
-                            <label className="text-[9px] font-bold text-slate-400 uppercase">İkon Adı (Lucide)</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase">İkon Adı (Lucide)</label>
                             <input 
                                 className={inputClass} 
                                 value={item.icon || 'zap'} 
@@ -213,7 +213,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                             />
                         </div>
                         <div className="grid gap-1">
-                            <label className="text-[9px] font-bold text-slate-400 uppercase">Başlık</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase">Başlık</label>
                             <input 
                                 className={inputClass} 
                                 value={item.title || ''} 
@@ -221,7 +221,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                             />
                         </div>
                         <div className="grid gap-1">
-                            <label className="text-[9px] font-bold text-slate-400 uppercase">Açıklama</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase">Açıklama</label>
                             <textarea 
                                 className={textareaClass} 
                                 value={item.description || ''} 
@@ -252,14 +252,14 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
             
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-3 p-3 bg-slate-50/50 rounded-xl border border-slate-100">
-                    <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{t('admin.authority.leftSideEski')}</label>
+                    <label className="text-xs font-black text-indigo-400 uppercase tracking-widest">{t('admin.authority.leftSideEski')}</label>
                     <div className="grid gap-2">
                         <input className={inputClass} placeholder={t('admin.authority.labelTraditional')} value={compContent.leftLabel} onChange={(e) => handleContentChange({ leftLabel: e.target.value })} />
                         <input className={inputClass} placeholder={t('admin.common.imageUrl')} value={compContent.leftImage} onChange={(e) => handleContentChange({ leftImage: e.target.value })} />
                     </div>
                 </div>
                 <div className="space-y-3 p-3 bg-indigo-50/20 rounded-xl border border-indigo-100/50">
-                    <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">{t('admin.authority.rightSideYeni')}</label>
+                    <label className="text-xs font-black text-indigo-600 uppercase tracking-widest">{t('admin.authority.rightSideYeni')}</label>
                     <div className="grid gap-2">
                         <input className={inputClass} placeholder={t('admin.authority.labelVenthub')} value={compContent.rightLabel} onChange={(e) => handleContentChange({ rightLabel: e.target.value })} />
                         <input className={inputClass} placeholder={t('admin.common.imageUrl')} value={compContent.rightImage} onChange={(e) => handleContentChange({ rightImage: e.target.value })} />

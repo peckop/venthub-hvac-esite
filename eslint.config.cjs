@@ -1,6 +1,7 @@
  
 const { FlatCompat } = require("@eslint/eslintrc");
 const js = require("@eslint/js");
+const tailwindcss = require("eslint-plugin-tailwindcss");
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -9,6 +10,14 @@ const compat = new FlatCompat({
 
 module.exports = [
   ...compat.extends("next/core-web-vitals", "next/typescript", "plugin:jsx-a11y/recommended"),
+  {
+    plugins: {
+      tailwindcss: tailwindcss,
+    },
+    rules: {
+      "tailwindcss/no-arbitrary-value": "warn",
+    }
+  },
   {
     rules: {
       "react/no-unescaped-entities": "off",
@@ -40,7 +49,7 @@ module.exports = [
     }
   },
   {
-    ignores: [".next/**", "out/**", "public/**", "supabase/migrations/**", "node_modules/**", "next-env.d.ts", ".agent/**"]
+    ignores: [".next/**", "out/**", "public/**", "supabase/**", "node_modules/**", "next-env.d.ts", ".agent/**"]
   },
   {
     // .cjs uzantılı dosyalar Node.js CommonJS kuralıyla çalışır.

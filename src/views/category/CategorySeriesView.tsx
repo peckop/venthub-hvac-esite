@@ -60,7 +60,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
         <div className="bg-white min-h-screen">
             {/* HERO SECTION - VENTHUB SIGNATURE (WHITE CLEAN) */}
             <section className="pt-32 pb-20 bg-slate-50 border-b border-slate-100">
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     {/* FIXED BREADCRUMB - VENTHUB SIGNATURE */}
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
@@ -76,7 +76,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                         className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
                     >
                         <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-600">Technical Product Family</span>
+                        <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-600">Technical Product Family</span>
                     </motion.div>
 
                     <motion.h1
@@ -118,11 +118,11 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                                 
                                 <div className="flex flex-wrap items-center gap-4">
                                     <div className="bg-slate-100 p-1 rounded-2xl flex border border-slate-200 shadow-inner">
-                                        <button onClick={() => toggleViewMode(series.name)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all ${!isMatrix ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}><LayoutGrid size={16} /> <span>VİTRİN</span></button>
-                                        <button onClick={() => toggleViewMode(series.name)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all ${isMatrix ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}><TableIcon size={16} /> <span>MATRİS</span></button>
+                                        <button onClick={() => toggleViewMode(series.name)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-colors ${!isMatrix ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}><LayoutGrid size={16} /> <span>VİTRİN</span></button>
+                                        <button onClick={() => toggleViewMode(series.name)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-colors ${isMatrix ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}><TableIcon size={16} /> <span>MATRİS</span></button>
                                     </div>
                                     <div className="bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-xl shadow-slate-900/20">
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Başlangıç</p>
+                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Başlangıç</p>
                                         <p className="text-xl font-black">{series.minPrice !== Infinity ? formatCurrency(series.minPrice, lang) : 'Teklif Alın'}</p>
                                     </div>
                                 </div>
@@ -133,7 +133,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                                     {series.products.map((product) => <ProductCard key={product.id} product={product} layout="grid" />)}
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto rounded-[2.5rem] border border-slate-100 shadow-2xl bg-white">
+                                <div className="overflow-x-auto rounded-hvac-2xl border border-slate-100 shadow-2xl bg-white">
                                     <table className="w-full text-left border-collapse min-w-[1000px]">
                                         <thead>
                                             <tr className="bg-slate-50">
@@ -150,13 +150,13 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                                                 <tr key={p.id} className="hover:bg-slate-50/50 transition-colors group">
                                                     <td className="px-8 py-6 flex items-center gap-4">
                                                         <div className="relative w-12 h-12 rounded-xl bg-white border border-slate-100 overflow-hidden shrink-0"><Image src={p.image_url || heroImage} alt={p.name} fill className="object-contain p-1" /></div>
-                                                        <div><p className="text-sm font-black text-industrial-gray uppercase tracking-tight">{p.name}</p><p className="text-[10px] font-bold text-slate-400">SKU: {p.sku}</p></div>
+                                                        <div><p className="text-sm font-black text-industrial-gray uppercase tracking-tight">{p.name}</p><p className="text-xs font-bold text-slate-400">SKU: {p.sku}</p></div>
                                                     </td>
                                                     <td className="px-6 py-6 font-bold text-industrial-gray">{getSpec(p, 'airflow_capacity') || getSpec(p, 'debi')}</td>
                                                     <td className="px-6 py-6 font-bold text-industrial-gray">{getSpec(p, 'noise_level') || getSpec(p, 'ses')}</td>
                                                     <td className="px-6 py-6 font-bold text-industrial-gray">{getSpec(p, 'power_consumption') || getSpec(p, 'guc')}</td>
                                                     <td className="px-6 py-6"><span className="text-sm font-black text-primary-navy">{formatCurrency(p.price, lang)}</span></td>
-                                                    <td className="px-8 py-6 text-right"><button onClick={() => addToCart(p, 1)} className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-slate-900/10">{t('common.addToCart')}</button></td>
+                                                    <td className="px-8 py-6 text-right"><button onClick={() => addToCart(p, 1)} className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase shadow-lg shadow-slate-900/10">{t('common.addToCart')}</button></td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -170,7 +170,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
 
             {/* TRUST STRIP */}
             <div className="bg-slate-950 py-32 text-white overflow-hidden relative">
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid md:grid-cols-3 gap-16 text-center">
                         <div className="space-y-6"><Activity className="mx-auto text-cyan-400" size={40} /><h4 className="text-xl font-bold">Teknik Performans</h4><p className="text-slate-400 font-light">Tüm veriler fabrikasyon test raporlarıyla %100 doğrulanmıştır.</p></div>
                         <div className="space-y-6"><Wind className="mx-auto text-cyan-400" size={40} /><h4 className="text-xl font-bold">Hassas Mühendislik</h4><p className="text-slate-400 font-light">Projeniz için en doğru hava debisi ve basınç eşleşmesi.</p></div>

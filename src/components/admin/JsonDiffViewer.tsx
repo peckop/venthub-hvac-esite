@@ -30,7 +30,7 @@ const JsonDiffViewer: React.FC<JsonDiffViewerProps> = ({ before, after }) => {
                     Yeni Değer (After)
                 </div>
             </div>
-            <div className="p-3 text-[12px] font-mono leading-relaxed overflow-x-auto max-h-[400px]">
+            <div className="p-3 text-xs font-mono leading-relaxed overflow-x-auto max-h-[400px]">
                 {allKeys.map(key => {
                     const valB = bObj[key]
                     const valA = aObj[key]

@@ -152,10 +152,10 @@ const AdminErrorsPage: React.FC = () => {
               style={adminSelectStyle}
               title={t('admin.errors.envTitle') as string}
             >
-              <option value="production" className="bg-[#0A0F1E]">production</option>
-              <option value="preview" className="bg-[#0A0F1E]">preview</option>
-              <option value="development" className="bg-[#0A0F1E]">development</option>
-              <option value="" className="bg-[#0A0F1E]">({t('admin.ui.all')})</option>
+              <option value="production" className="bg-surface-deep">production</option>
+              <option value="preview" className="bg-surface-deep">preview</option>
+              <option value="development" className="bg-surface-deep">development</option>
+              <option value="" className="bg-surface-deep">({t('admin.ui.all')})</option>
             </select>
             <input 
               type="date" 
@@ -177,13 +177,13 @@ const AdminErrorsPage: React.FC = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-3 mb-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
           {t('admin.ui.prev')}
         </button>
-        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
+        <span className="text-xs font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
           {t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}
         </span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
           {t('admin.ui.next')}
         </button>
       </div>
@@ -238,18 +238,18 @@ const AdminErrorsPage: React.FC = () => {
                      {expandedId === r.id && (
                       <tr className="bg-white/[0.03]">
                         <td colSpan={5} className="p-6">
-                          <div className="grid md:grid-cols-2 gap-6 text-[11px]">
+                          <div className="grid md:grid-cols-2 gap-6 text-xs">
                             <div>
                               <div className="font-black text-slate-500 mb-3 uppercase tracking-widest">{t('admin.errors.labels.stack')}</div>
-                              <pre className="bg-[#0A0F1E]/80 text-amber-300/80 font-mono p-4 rounded-2xl border border-white/5 overflow-auto max-h-80 leading-relaxed custom-scrollbar">{String(r.stack || '').slice(0, 8000)}</pre>
+                              <pre className="bg-surface-deep/80 text-amber-300/80 font-mono p-4 rounded-2xl border border-white/5 overflow-auto max-h-80 leading-relaxed custom-scrollbar">{String(r.stack || '').slice(0, 8000)}</pre>
                             </div>
                             <div className="space-y-6">
                               <div>
                                 <div className="font-black text-slate-500 mb-3 uppercase tracking-widest">{t('admin.errors.detailsTitle')}</div>
-                                <div className="space-y-3 bg-[#0A0F1E]/40 p-4 rounded-2xl border border-white/5">
+                                <div className="space-y-3 bg-surface-deep/40 p-4 rounded-2xl border border-white/5">
                                   <div className="flex justify-between items-center border-b border-white/5 pb-2">
                                     <span className="text-slate-500 uppercase font-bold tracking-tighter">{t('admin.errors.labels.ua')}</span>
-                                    <span className="text-slate-300 font-mono text-[10px] text-right ml-4">{r.user_agent || '-'}</span>
+                                    <span className="text-slate-300 font-mono text-xs text-right ml-4">{r.user_agent || '-'}</span>
                                   </div>
                                   <div className="flex justify-between items-center border-b border-white/5 pb-2">
                                     <span className="text-slate-500 uppercase font-bold tracking-tighter">{t('admin.errors.labels.release')}</span>

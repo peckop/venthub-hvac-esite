@@ -99,7 +99,7 @@ const LoginPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-clean-white border border-light-gray rounded-xl focus:ring-2 focus:ring-primary-ocean/20 focus:border-primary-ocean transition-all placeholder:text-gray-400"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-clean-white border border-light-gray rounded-xl focus:ring-2 focus:ring-primary-ocean/20 focus:border-primary-ocean transition-[border-color,box-shadow] placeholder:text-gray-400"
                   placeholder="name@company.com"
                 />
               </div>
@@ -119,7 +119,7 @@ const LoginPage: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-2.5 bg-clean-white border border-light-gray rounded-xl focus:ring-2 focus:ring-primary-ocean/20 focus:border-primary-ocean transition-all placeholder:text-gray-400"
+                  className="block w-full pl-10 pr-10 py-2.5 bg-clean-white border border-light-gray rounded-xl focus:ring-2 focus:ring-primary-ocean/20 focus:border-primary-ocean transition-[border-color,box-shadow] placeholder:text-gray-400"
                   placeholder="••••••••"
                 />
                 <button
@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-primary-navy text-white py-3 rounded-xl font-bold hover:bg-industrial-gray active:scale-[0.98] transition-all shadow-hvac-sm flex items-center justify-center space-x-2 disabled:opacity-70"
+              className="w-full bg-primary-navy text-white py-3 rounded-xl font-bold hover:bg-industrial-gray active:scale-[0.98] transition-[background-color,transform,box-shadow] shadow-hvac-sm flex items-center justify-center space-x-2 disabled:opacity-70"
             >
               {isPending && <Loader2 size={20} className="animate-spin" />}
               <span>{isPending ? t('auth.loggingIn') : t('auth.login')}</span>
@@ -175,7 +175,7 @@ const LoginPage: React.FC = () => {
             <button
               onClick={handleGoogleSignIn}
               type="button"
-              className="w-full bg-white border border-light-gray text-industrial-gray py-2.5 rounded-xl font-medium hover:bg-light-gray/30 active:scale-[0.98] transition-all flex items-center justify-center space-x-3"
+              className="w-full bg-white border border-light-gray text-industrial-gray py-2.5 rounded-xl font-medium hover:bg-light-gray/30 active:scale-[0.98] transition-[background-color,transform] flex items-center justify-center space-x-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -214,14 +214,14 @@ const LoginPage: React.FC = () => {
 
         {/* Brand Footer        */}
         <div className="mt-8 text-center">
-          <Link href={Routes.home()} className="group inline-flex items-center gap-3 transition-all duration-500">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-primary-navy to-secondary-blue text-white shadow-[0_20px_40px_-15px_rgba(37,99,235,0.4)] px-4 py-3 transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_25px_50px_-15px_rgba(37,99,235,0.5)]">
+          <Link href={Routes.home()} className="group inline-flex items-center gap-3 transition-colors duration-500">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-primary-navy to-secondary-blue text-white shadow-[0_20px_40px_-15px_rgba(37,99,235,0.4)] px-4 py-3 transition-[transform,box-shadow] duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_25px_50px_-15px_rgba(37,99,235,0.5)]">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3),transparent_60%)] opacity-80" />
               <span className="relative block text-sm font-bold tracking-[0.25em]">VH</span>
             </div>
             <div className="text-left">
               <div className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-primary-navy transition-colors">VentHub</div>
-              <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400">Ventilation & HVAC</div>
+              <div className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Ventilation & HVAC</div>
             </div>
           </Link>
           <p className="text-xs text-steel-gray font-medium">

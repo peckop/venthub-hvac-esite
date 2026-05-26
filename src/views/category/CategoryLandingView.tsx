@@ -99,13 +99,13 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                             <div className="mt-10 flex gap-4">
                                 <button 
                                     onClick={() => handleScrollToTarget('landing-content')}
-                                    className="bg-primary-navy text-white px-8 py-4 rounded-2xl font-bold transition-all hover:bg-secondary-blue shadow-xl shadow-primary-navy/20 active:scale-95"
+                                    className="bg-primary-navy text-white px-8 py-4 rounded-2xl font-bold transition-transform hover:bg-secondary-blue shadow-xl shadow-primary-navy/20 active:scale-95"
                                 >
                                     Detaylı İncele
                                 </button>
                                 <button 
                                     onClick={handleShowProducts}
-                                    className="bg-white border-2 border-slate-200 text-industrial-gray px-8 py-4 rounded-2xl font-bold transition-all hover:border-primary-navy active:scale-95"
+                                    className="bg-white border-2 border-slate-200 text-industrial-gray px-8 py-4 rounded-2xl font-bold transition-transform hover:border-primary-navy active:scale-95"
                                 >
                                     Modelleri Gör
                                 </button>
@@ -113,7 +113,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                         </div>
                         <div className="relative">
                             <div className="absolute -inset-10 bg-secondary-blue/5 rounded-full blur-3xl" />
-                            <div className="relative aspect-square rounded-[4rem] overflow-hidden shadow-2xl border-[16px] border-white group">
+                            <div className="relative aspect-square rounded-hvac-3xl overflow-hidden shadow-2xl border-[16px] border-white group">
                                 <Image src={heroImage} alt={vm?.displayName || ''} fill className="object-cover group-hover:scale-105 transition-transform duration-[2s]" priority />
                             </div>
                         </div>
@@ -150,7 +150,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                 {isDehumidifier && (
                     <div className="py-24 bg-white">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="bg-slate-900 rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden">
+                            <div className="bg-slate-900 rounded-hvac-3xl p-12 md:p-20 text-white relative overflow-hidden">
                                 <div className="relative z-10 max-w-2xl">
                                     <h2 className="text-4xl md:text-5xl font-black mb-8">Nem Kontrolünde Mühendislik Hassasiyeti</h2>
                                     <p className="text-xl text-slate-400 leading-relaxed mb-12">
@@ -172,7 +172,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
             <div
                 ref={productListRef}
-                className={`${disableAnimation ? '' : 'transition-all duration-500 ease-in-out'} ${showProducts ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+                className={`${disableAnimation ? '' : 'transition-colors duration-500 ease-in-out'} ${showProducts ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
                 style={{ maxHeight: showProducts ? '20000px' : '0' }}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -189,7 +189,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 <button
                                     key={f.key}
                                     onClick={() => setActiveFilter(f.key)}
-                                    className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${activeFilter === f.key ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                                    className={`px-6 py-2 rounded-xl text-xs font-black transition-colors ${activeFilter === f.key ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                                 >
                                     {f.label}
                                 </button>

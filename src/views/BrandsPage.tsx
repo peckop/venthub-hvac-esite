@@ -28,10 +28,10 @@ const BrandsPage: React.FC = () => {
 
       {/* Hero: Ultra Minimalist Apple Style */}
       <section className="pt-32 pb-20 bg-slate-50/50 border-b border-slate-100">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-600">
+            <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-600">
               {t('brands.sectionTitle')}
             </span>
           </div>
@@ -50,7 +50,7 @@ const BrandsPage: React.FC = () => {
 
       {/* Brands Gr_id: Premium Showroom */}
       <section className="py-24 sm:py-32">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div ref={brandsGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {brands.map((brand, index) => (
               <div
@@ -61,10 +61,10 @@ const BrandsPage: React.FC = () => {
                 <Link
                   href={`/brands/${brand.slug}`}
                   aria-label={`${t('brands.aboutBrand')} ${brand.name}`}
-                  className="group block relative h-full rounded-[2.5rem] border border-slate-100 bg-white p-10 transition-all duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
+                  className="group block relative h-full rounded-hvac-2xl border border-slate-100 bg-white p-10 transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
                 >
                   {/* Floating Logo Container */}
-                  <div className="aspect-[3/2] relative flex items-center justify-center mb-12 grayscale opacity-40 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110">
+                  <div className="aspect-[3/2] relative flex items-center justify-center mb-12 grayscale opacity-40 transition-transform duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110">
                     <BrandIcon brand={brand.name} className="w-full h-full max-h-24" />
                   </div>
 
@@ -73,12 +73,12 @@ const BrandsPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{brand.name}</h2>
                       <div className="h-px flex-1 mx-4 bg-slate-100 group-hover:bg-cyan-500/20 transition-colors" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      <span className="text-xs font-black uppercase tracking-widest text-slate-400">
                         {brand.country}
                       </span>
                     </div>
                     
-                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-600/80">
+                    <div className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-600/80">
                       {brand.specialty}
                     </div>
                     
@@ -88,9 +88,9 @@ const BrandsPage: React.FC = () => {
                   </div>
 
                   {/* Animated Reveal Arrow */}
-                  <div className="mt-10 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-cyan-600 transition-colors">
+                  <div className="mt-10 flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-cyan-600 transition-colors">
                     <span>{t('brands.exploreBrand')}</span>
-                    <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-all duration-500" />
+                    <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-colors duration-500" />
                   </div>
                 </Link>
               </div>
@@ -101,10 +101,10 @@ const BrandsPage: React.FC = () => {
 
       {/* Trust & Network Section */}
       <section className="py-24 bg-slate-950 text-white overflow-hidden">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div>
-              <div className="text-cyan-400 text-[10px] font-black uppercase tracking-[0.5em] mb-8">
+              <div className="text-cyan-400 text-xs font-black uppercase tracking-[0.5em] mb-8">
                 {t('brands.trust.eyebrow')}
               </div>
               <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-8">
@@ -120,20 +120,20 @@ const BrandsPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-8">
                 <div className="border-l border-white/10 pl-6">
                   <div className="text-3xl font-bold mb-1">100%</div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  <div className="text-xs font-black uppercase tracking-widest text-slate-500">
                     {t('brands.trust.original')}
                   </div>
                 </div>
                 <div className="border-l border-white/10 pl-6">
                   <div className="text-3xl font-bold mb-1">Global</div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  <div className="text-xs font-black uppercase tracking-widest text-slate-500">
                     {t('brands.trust.standard')}
                   </div>
                 </div>
               </div>
             </div>
             
-            <div className="relative aspect-square lg:aspect-video rounded-[3rem] overflow-hidden border border-white/5">
+            <div className="relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden border border-white/5">
               <Image 
                 src="/images/hvac_installation_close_up_premium_3.png" 
                 alt="Technical Network" 

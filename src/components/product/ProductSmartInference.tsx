@@ -39,14 +39,14 @@ export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = React
   return (
     <div className="space-y-4 py-8 border-y border-slate-100/80 my-8 animate-in fade-in slide-in-from-top-4 duration-700">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+        <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-[0.2em] text-slate-400">
           <div className="flex h-1.5 w-1.5 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-navy opacity-75"></span>
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-navy"></span>
           </div>
           {t('pdp.labels.engineeringAnalysis')}
         </div>
-        <div className="px-2 py-0.5 bg-slate-100 rounded text-[8px] font-bold text-slate-500 uppercase tracking-widest">
+        <div className="px-2 py-0.5 bg-slate-100 rounded text-xs font-bold text-slate-500 uppercase tracking-widest">
           AI INSIGHT V2.1
         </div>
       </div>
@@ -55,7 +55,7 @@ export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = React
         {summaries.map((item, idx) => (
           <div 
             key={idx} 
-            className={`group relative flex items-start gap-5 p-5 rounded-2xl border bg-gradient-to-br ${getThemeColor(item.type)} transition-all hover:shadow-md hover:-translate-y-0.5 duration-300 overflow-hidden`}
+            className={`group relative flex items-start gap-5 p-5 rounded-2xl border bg-gradient-to-br ${getThemeColor(item.type)} transition-transform hover:shadow-md hover:-translate-y-0.5 duration-300 overflow-hidden`}
           >
             {/* Background Accent Decorative element */}
             <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:scale-110 transition-transform duration-700">
@@ -75,7 +75,7 @@ export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = React
                   {item.value}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-600 mt-2 leading-relaxed font-medium">
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed font-medium">
                 {item.isI18n ? t(item.descriptionKey) : item.descriptionKey}
               </p>
             </div>

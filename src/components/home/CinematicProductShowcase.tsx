@@ -32,7 +32,7 @@ const Hotspot: React.FC<HotspotProps> = ({ x, y, label, detail, isActive, onTogg
         <span className="absolute inset-[-4px] rounded-full border border-cyan-500/30 scale-110 group-hover:scale-125 transition-transform duration-500" />
         
         {/* Center Dot */}
-        <span className={`relative w-3.5 h-3.5 rounded-full border-2 border-white transition-all duration-500 shadow-[0_0_15px_#22D3EE] ${isActive ? 'bg-white scale-125' : 'bg-cyan-500'}`} />
+        <span className={`relative w-3.5 h-3.5 rounded-full border-2 border-white transition-colors duration-500 shadow-[0_0_15px_#22D3EE] ${isActive ? 'bg-white scale-125' : 'bg-cyan-500'}`} />
         
         <AnimatePresence>
           {isActive && (
@@ -42,7 +42,7 @@ const Hotspot: React.FC<HotspotProps> = ({ x, y, label, detail, isActive, onTogg
               exit={{ opacity: 0, y: 10, scale: 0.9 }}
               className="absolute bottom-full mb-4 w-64 bg-slate-900/95 backdrop-blur-xl border border-cyan-500/30 p-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 pointer-events-none"
             >
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400 mb-1">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-cyan-400 mb-1">
                 {t('home.cinematicShowcase.componentLabel') || 'System Component'}
               </div>
               <div className="text-white text-sm font-bold mb-2">{label}</div>
@@ -149,7 +149,7 @@ const CinematicProductShowcase: React.FC = () => {
                     animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                     exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
                     transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                    className="relative w-full h-full flex items-center justify-center p-12 bg-white/[0.01] border border-white/5 rounded-[3rem] backdrop-blur-3xl overflow-hidden shadow-2xl"
+                    className="relative w-full h-full flex items-center justify-center p-12 bg-white/[0.01] border border-white/5 rounded-hvac-3xl backdrop-blur-3xl overflow-hidden shadow-2xl"
                   >
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="w-[70%] h-[70%] rounded-full bg-cyan-500/20 blur-3xl opacity-20 animate-pulse" />
@@ -192,7 +192,7 @@ const CinematicProductShowcase: React.FC = () => {
                   key={idx}
                   onClick={() => { setActiveImageIdx(idx); setActiveHotspot(null); }}
                   aria-label={`Showcase view ${idx + 1}`}
-                  className={`group relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all duration-500 ${activeImageIdx === idx ? 'border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.4)] scale-110' : 'border-white/10 opacity-40 hover:opacity-100 hover:scale-105'}`}
+                  className={`group relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-colors duration-500 ${activeImageIdx === idx ? 'border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.4)] scale-110' : 'border-white/10 opacity-40 hover:opacity-100 hover:scale-105'}`}
                 >
                   <Image 
                     src={img.src} 
@@ -216,7 +216,7 @@ const CinematicProductShowcase: React.FC = () => {
             >
               <div className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400">{t('home.cinematicShowcase.eyebrow')}</span>
+                <span className="text-xs font-bold uppercase tracking-[0.3em] text-cyan-400">{t('home.cinematicShowcase.eyebrow')}</span>
               </div>
 
               <h2 className="text-5xl lg:text-7xl font-extralight text-white leading-[1.1] tracking-tighter mb-8">
@@ -232,14 +232,14 @@ const CinematicProductShowcase: React.FC = () => {
               </p>
 
               <div className="flex flex-wrap gap-6">
-                <button className="group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-[12px] tracking-[0.2em] rounded-2xl overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                <button className="group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-xs tracking-[0.2em] rounded-2xl overflow-hidden transition-shadow hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]">
                   <span className="relative z-10">{t('home.cinematicShowcase.cta')}</span>
                   <div className="absolute inset-0 bg-cyan-400 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 </button>
                 
                 <div className="flex items-center gap-4 text-white/40">
                   <div className="h-px w-12 bg-white/10" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest italic">
+                  <span className="text-xs font-bold uppercase tracking-widest italic">
                     {t('home.cinematicShowcase.badge') || 'Industrial Grade'}
                   </span>
                 </div>

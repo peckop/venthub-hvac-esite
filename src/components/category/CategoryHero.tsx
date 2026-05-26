@@ -41,7 +41,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
   if (loading || !category) {
     return (
       <div className="bg-slate-900 text-white min-h-[300px] flex items-center border-b border-white/5 relative overflow-hidden">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="animate-pulse space-y-6">
             <div className="h-4 w-24 bg-white/10 rounded-full" />
             <div className="flex gap-8 items-center">
@@ -65,7 +65,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
 
   return (
     <div className={cn(
-      "relative overflow-hidden border-b border-slate-100 transition-all duration-700",
+      "relative overflow-hidden border-b border-slate-100 transition-colors duration-700",
       isMainCategory ? "bg-slate-900 text-white pt-16 pb-20 lg:pt-24 lg:pb-32" : "bg-white text-slate-900 py-12"
     )}>
       {/* Background Decor (Main Category Only) */}
@@ -77,13 +77,13 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
         </div>
       )}
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <button
           ref={backBtnRef}
           onClick={handleBack}
           className={cn(
             scrollAnimationClasses.slideLeft(backBtnVisible),
-            "inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] transition-all mb-12 group",
+            "inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] transition-colors mb-12 group",
             isMainCategory ? "text-slate-400 hover:text-white" : "text-slate-400 hover:text-primary-navy"
           )}
         >
@@ -95,7 +95,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
           <div ref={imageRef} className={scrollAnimationClasses.scaleIn(imageVisible) + " shrink-0"}>
             {categoryImageUrl ? (
               <div className={cn(
-                "relative rounded-[2rem] overflow-hidden shadow-2xl border transition-all duration-500",
+                "relative rounded-hvac-xl overflow-hidden shadow-2xl border transition-colors duration-500",
                 isMainCategory ? "w-32 h-32 lg:w-48 lg:h-48 border-white/10" : "w-24 h-24 lg:w-32 lg:h-32 border-slate-100"
               )}>
                 <VentImage 
@@ -107,7 +107,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
               </div>
             ) : (
               <div className={cn(
-                "flex items-center justify-center rounded-[2rem] border transition-all duration-500",
+                "flex items-center justify-center rounded-hvac-xl border transition-colors duration-500",
                 isMainCategory ? "w-32 h-32 lg:w-48 lg:h-48 bg-white/5 border-white/10 text-cyan-400" : "w-24 h-24 lg:w-32 lg:h-32 bg-slate-50 border-slate-100 text-indigo-600"
               )}>
                 {getCategoryIcon(parentCategory?.slug || category.slug, { size: isMainCategory ? 64 : 48 })}
@@ -122,7 +122,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
             >
               {parentCategory && (
                 <span className={cn(
-                  "text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block",
+                  "text-xs font-bold uppercase tracking-[0.4em] mb-4 block",
                   isMainCategory ? "text-cyan-400" : "text-indigo-600"
                 )}>
                   {getCategoryDisplayName(parentCategory)}
@@ -147,7 +147,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
               <div className="flex flex-wrap gap-4">
                 {productCount !== undefined && (
                   <div className={cn(
-                    "inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                    "inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border",
                     isMainCategory ? "bg-white/5 border-white/10 text-white" : "bg-slate-50 border-slate-100 text-slate-600"
                   )}>
                     <Layers size={12} className={isMainCategory ? "text-cyan-400" : "text-indigo-600"} />
@@ -156,11 +156,11 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
                 )}
                 {isMainCategory && (
                   <>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest">
                       <ShieldCheck size={12} className="text-cyan-400" />
                       {t('common.officialGuarantee') || 'Resmi Garanti'}
                     </div>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest">
                       <Zap size={12} className="text-cyan-400" />
                       {t('common.fastDelivery') || 'Hızlı Teslimat'}
                     </div>

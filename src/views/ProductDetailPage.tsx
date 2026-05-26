@@ -170,7 +170,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
       
       {/* HERO SECTION - VENTHUB SIGNATURE (WHITE PRODUCT) */}
       <section className="pt-32 pb-20 bg-slate-50 border-b border-slate-100">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* FIXED BREADCRUMB - VENTHUB SIGNATURE */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -186,7 +186,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
             className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
           >
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-600">Premium Product Specifications</span>
+            <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-600">Premium Product Specifications</span>
           </motion.div>
 
           <motion.h1
@@ -211,7 +211,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
       <PageShell spacing="none" className="py-12 sm:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           <div className="lg:col-span-7 xl:col-span-8">
-            <div className="relative group bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden p-2">
+            <div className="relative group bg-white rounded-hvac-3xl border border-slate-100 shadow-sm overflow-hidden p-2">
               <ImageGallery images={images} productName={product.name} slug={product.slug || product.name} modelType={categoryMetadata?.model_type} />
             </div>
           </div>
@@ -220,39 +220,39 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
             <div className="flex items-center gap-4 mb-8">
               <BrandIcon brand={product.brand} className="w-12 h-12" />
               <div className="flex flex-col">
-                <span className="text-cyan-600 font-black text-[10px] tracking-[0.2em] uppercase">{product.brand} Official</span>
-                <span className="text-slate-400 text-[8px] font-medium tracking-[0.2em]">{t('pdp.officialDistributor')}</span>
+                <span className="text-cyan-600 font-black text-xs tracking-[0.2em] uppercase">{product.brand} Official</span>
+                <span className="text-slate-400 text-xs font-medium tracking-[0.2em]">{t('pdp.officialDistributor')}</span>
               </div>
             </div>
 
-            <div className="mb-10 p-10 bg-slate-50 rounded-[2.5rem] border border-slate-100 relative overflow-hidden group">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 block">{t('pdp.priceAvailability')}</span>
+            <div className="mb-10 p-10 bg-slate-50 rounded-hvac-2xl border border-slate-100 relative overflow-hidden group">
+              <span className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-4 block">{t('pdp.priceAvailability')}</span>
               <div className="flex flex-col">
                 <div className="text-4xl sm:text-5xl font-black text-slate-950 tracking-tighter mb-2">
                   {categoryMetadata?.hide_price ? t('common.requestQuote') : formatCurrency(product.price, lang)}
                 </div>
-                {!categoryMetadata?.hide_price && <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('pdp.vatIncluded')}</span>}
+                {!categoryMetadata?.hide_price && <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('pdp.vatIncluded')}</span>}
               </div>
             </div>
 
             <div className="space-y-6">
-              <div className="bg-white rounded-[2.5rem] border border-slate-100 p-10 space-y-8 shadow-sm">
+              <div className="bg-white rounded-hvac-2xl border border-slate-100 p-10 space-y-8 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('pdp.qty')}</span>
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('pdp.qty')}</span>
                   <div className="flex items-center bg-slate-50 rounded-2xl p-1.5 border border-slate-100">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl transition-all text-xl font-bold text-slate-900">-</button>
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl transition-colors text-xl font-bold text-slate-900">-</button>
                     <span className="w-12 text-center font-black text-slate-950 text-base">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl transition-all text-xl font-bold text-slate-900">+</button>
+                    <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl transition-colors text-xl font-bold text-slate-900">+</button>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-4">
                   {categoryMetadata?.hide_price ? (
-                    <button onClick={() => setLeadOpen(true)} className="w-full bg-slate-950 hover:bg-cyan-600 text-white font-black py-5 px-8 rounded-2xl transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 group"><Settings size={20} aria-hidden="true" className="group-hover:rotate-90 transition-transform duration-500" /><span className="text-xs uppercase tracking-[0.2em]">{t('pdp.techQuote')}</span></button>
+                    <button onClick={() => setLeadOpen(true)} className="w-full bg-slate-950 hover:bg-cyan-600 text-white font-black py-5 px-8 rounded-2xl transition-[background-color,box-shadow] shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 group"><Settings size={20} aria-hidden="true" className="group-hover:rotate-90 transition-transform duration-500" /><span className="text-xs uppercase tracking-[0.2em]">{t('pdp.techQuote')}</span></button>
                   ) : (
-                    <button onClick={handleAddToCart} disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')} className="w-full bg-slate-950 hover:bg-cyan-600 text-white font-black py-5 px-8 rounded-2xl transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 disabled:opacity-50 group active:scale-95"><ShoppingCart size={20} aria-hidden="true" className="group-hover:translate-x-1 transition-transform" /><span className="text-xs uppercase tracking-[0.2em]">{t('pdp.addToCart')}</span></button>
+                    <button onClick={handleAddToCart} disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')} className="w-full bg-slate-950 hover:bg-cyan-600 text-white font-black py-5 px-8 rounded-2xl transition-[background-color,opacity,box-shadow,transform] shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 disabled:opacity-50 group active:scale-95"><ShoppingCart size={20} aria-hidden="true" className="group-hover:translate-x-1 transition-transform" /><span className="text-xs uppercase tracking-[0.2em]">{t('pdp.addToCart')}</span></button>
                   )}
-                  <button onClick={() => setIsProjectModalOpen(true)} className="w-full bg-white border-2 border-slate-100 hover:border-slate-900 text-slate-950 font-bold py-5 px-8 rounded-2xl transition-all flex items-center justify-center gap-3 group active:scale-95"><FolderPlus size={20} aria-hidden="true" /><span className="text-xs uppercase tracking-[0.2em]">{t('pdp.actions.addToProject')}</span></button>
+                  <button onClick={() => setIsProjectModalOpen(true)} className="w-full bg-white border-2 border-slate-100 hover:border-slate-900 text-slate-950 font-bold py-5 px-8 rounded-2xl transition-[border-color,transform] flex items-center justify-center gap-3 group active:scale-95"><FolderPlus size={20} aria-hidden="true" /><span className="text-xs uppercase tracking-[0.2em]">{t('pdp.actions.addToProject')}</span></button>
                 </div>
               </div>
             </div>
@@ -263,11 +263,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
       <AddToProjectModal product={product} isOpen={isProjectModalOpen} onClose={() => setIsProjectModalOpen(false)} />
       <div ref={navTriggerRef} className="h-0" />
 
-      <div id="pdp-sticky-nav" className={`transition-all duration-500 z-[40] bg-white/90 backdrop-blur-2xl border-b border-slate-100 ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0 shadow-xl shadow-slate-900/5' : 'relative mt-12'}`}>
+      <div id="pdp-sticky-nav" className={`transition-[top,box-shadow] duration-500 z-dropdown bg-white/90 backdrop-blur-2xl border-b border-slate-100 ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0 shadow-xl shadow-slate-900/5' : 'relative mt-12'}`}>
         <PageShell spacing="none" className="flex items-center justify-between">
           <nav className="flex space-x-2 overflow-x-auto py-4 no-scrollbar">
             {sections.map((section) => (
-              <button key={section.id} onClick={() => scrollToSection(section.id)} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap transition-all ${activeSection === section.id ? 'bg-slate-950 text-white shadow-lg' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}>
+              <button key={section.id} onClick={() => scrollToSection(section.id)} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-[0.2em] whitespace-nowrap transition-[color,background-color,box-shadow] ${activeSection === section.id ? 'bg-slate-950 text-white shadow-lg' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}>
                 <section.icon size={14} /> <span>{section.title}</span>
               </button>
             ))}
@@ -277,13 +277,13 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
 
       <div className="space-y-0">
         {sections.map((section) => (
-          <PageShell key={section.id} ref={(el) => { sectionRefs.current[section.id] = el }} data-section={section.id} spacing="lg" className={`${section.bgClass} transition-all duration-500 border-b border-slate-50 last:border-0`}>
+          <PageShell key={section.id} ref={(el) => { sectionRefs.current[section.id] = el }} data-section={section.id} spacing="lg" className={`${section.bgClass} transition-colors duration-500 border-b border-slate-50 last:border-0`}>
             <div className="flex items-center gap-6 mb-16">
               <div className="bg-slate-950 text-white p-4 rounded-2xl shadow-xl shadow-slate-900/10"><section.icon size={24} /></div>
               <h2 className="text-3xl font-black text-slate-950 tracking-tighter uppercase">{section.title}</h2>
             </div>
             {section.id === 'genel' && (
-              <div className="bg-white rounded-[3rem] p-12 border border-slate-100 shadow-sm">
+              <div className="bg-white rounded-hvac-3xl p-12 border border-slate-100 shadow-sm">
                 <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed text-lg font-light italic"><RichTextRenderer content={product.description || t('pdp.descFallback')} /></div>
               </div>
             )}

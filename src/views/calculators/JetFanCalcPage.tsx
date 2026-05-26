@@ -231,7 +231,7 @@ const JetFanCalcPage: React.FC = () => {
                 })}
 
                 {/* Dimensions */}
-                <text x="140" y="110" textAnchor="middle" className="text-[9px] fill-steel-gray">
+                <text x="140" y="110" textAnchor="middle" className="text-xs fill-steel-gray">
                   {length}m × {width}m × {height}m
                 </text>
 

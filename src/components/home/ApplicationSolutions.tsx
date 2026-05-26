@@ -61,12 +61,12 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
       {/* Background Decorative Elements */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50/50 -skew-x-12 translate-x-1/4" />
       
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <div className="max-w-2xl">
             <div 
               data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-xs font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
             >
               {t.eyebrow}
             </div>
@@ -119,7 +119,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
                   
                   <div className="absolute inset-0 p-8 flex flex-col justify-end">
                     <div className="mb-4 overflow-hidden">
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-2 translate-y-4 group-hover:translate-y-0 transition-[transform] duration-500">
+                      <div className="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-2 translate-y-4 group-hover:translate-y-0 transition-[transform] duration-500">
                         {itemDict.eyebrow}
                       </div>
                       <h3 className="text-2xl font-bold text-white tracking-tight">
@@ -132,10 +132,10 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
                     </p>
                     
                     <div className="flex flex-wrap gap-2 opacity-0 group-hover:opacity-100 transition-[opacity] duration-700 delay-100">
-                      <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] text-white font-medium">
+                      <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-xs text-white font-medium">
                         {itemDict.point1}
                       </span>
-                      <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] text-white font-medium">
+                      <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-xs text-white font-medium">
                         {itemDict.point2}
                       </span>
                     </div>
@@ -161,7 +161,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
             <span className="text-sm font-bold uppercase tracking-widest text-slate-400 group-hover:text-cyan-600 transition-colors">
               {t.viewAll}
             </span>
-            <div className="w-12 h-[1px] bg-slate-200 group-hover:w-20 group-hover:bg-cyan-600 transition-all duration-500" />
+            <div className="w-12 h-[1px] bg-slate-200 group-hover:w-20 group-hover:bg-cyan-600 transition-colors duration-500" />
           </Link>
         </div>
       </div>

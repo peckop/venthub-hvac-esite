@@ -31,7 +31,7 @@ export default function TechnicalDrawingAuthority({ drawings, className = '' }: 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-200 hover:border-primary-navy/30 hover:shadow-md transition-all group"
+                    className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-200 hover:border-primary-navy/30 hover:shadow-md transition-shadow group"
                 >
                     <div className="flex items-center space-x-4">
                         <div className={`w-12 h-12 rounded-xl border flex items-center justify-center ${formatColors[doc.format] || 'bg-slate-50 text-slate-600 border-slate-100'}`}>
@@ -40,15 +40,15 @@ export default function TechnicalDrawingAuthority({ drawings, className = '' }: 
                         
                         <div className="flex flex-col">
                             <div className="flex items-center space-x-2">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{doc.category}</span>
+                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{doc.category}</span>
                                 {doc.version && (
-                                    <span className="bg-slate-100 text-slate-500 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">v{doc.version}</span>
+                                    <span className="bg-slate-100 text-slate-500 text-xs font-bold px-1.5 py-0.5 rounded uppercase">v{doc.version}</span>
                                 )}
                             </div>
                             <h4 className="text-sm font-black text-industrial-gray leading-tight group-hover:text-primary-navy transition-colors">
                                 {doc.title}
                             </h4>
-                            <div className="flex items-center space-x-3 mt-1 text-[9px] text-slate-400 font-bold uppercase tracking-tight">
+                            <div className="flex items-center space-x-3 mt-1 text-xs text-slate-400 font-bold uppercase tracking-tight">
                                 <span className="flex items-center"><Info size={10} className="mr-1" /> {doc.format.toUpperCase()}</span>
                                 {doc.lastUpdated && <span className="flex items-center"><Clock size={10} className="mr-1" /> {doc.lastUpdated}</span>}
                             </div>
@@ -58,7 +58,7 @@ export default function TechnicalDrawingAuthority({ drawings, className = '' }: 
                     <a
                         href={doc.url}
                         download
-                        className="p-3 bg-slate-50 hover:bg-primary-navy text-slate-400 hover:text-white rounded-xl transition-all shadow-sm"
+                        className="p-3 bg-slate-50 hover:bg-primary-navy text-slate-400 hover:text-white rounded-xl transition-shadow shadow-sm"
                         title="Download Drawing"
                     >
                         <Download size={18} />

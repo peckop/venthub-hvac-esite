@@ -48,7 +48,7 @@ function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
  */
 export const scrollAnimationClasses = {
     fadeUp: (isVisible: boolean) =>
-        `transition-all duration-700 ease-out ${isVisible
+        `transition-colors duration-700 ease-out ${isVisible
             ? 'opacity-100 translate-y-0'
             : 'opacity-0 translate-y-8'
         }`,
@@ -56,17 +56,17 @@ export const scrollAnimationClasses = {
         `transition-opacity duration-700 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'
         }`,
     scaleIn: (isVisible: boolean) =>
-        `transition-all duration-500 ease-out ${isVisible
+        `transition-colors duration-500 ease-out ${isVisible
             ? 'opacity-100 scale-100'
             : 'opacity-0 scale-95'
         }`,
     slideLeft: (isVisible: boolean) =>
-        `transition-all duration-700 ease-out ${isVisible
+        `transition-colors duration-700 ease-out ${isVisible
             ? 'opacity-100 translate-x-0'
             : 'opacity-0 translate-x-8'
         }`,
     slideRight: (isVisible: boolean) =>
-        `transition-all duration-700 ease-out ${isVisible
+        `transition-colors duration-700 ease-out ${isVisible
             ? 'opacity-100 translate-x-0'
             : 'opacity-0 -translate-x-8'
         }`,

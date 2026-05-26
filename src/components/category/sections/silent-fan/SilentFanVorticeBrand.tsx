@@ -21,9 +21,9 @@ const SilentFanVorticeBrand: React.FC = () => {
                     <div className={scrollAnimationClasses.slideRight(isVisible)}>
                         <div className="flex items-center gap-3 mb-8">
                             <div className="flex h-6 rounded-sm overflow-hidden shadow-lg ring-1 ring-white/20">
-                                <div className="w-4 bg-[#009246]" />
+                                <div className="w-4 bg-vortice-green" />
                                 <div className="w-4 bg-white" />
-                                <div className="w-4 bg-[#ce2b37]" />
+                                <div className="w-4 bg-italian-red" />
                             </div>
                             <span className="text-sm font-bold tracking-[0.2em] text-slate-400 uppercase">{String(tr('eyebrow'))}</span>
                         </div>
@@ -64,7 +64,7 @@ const SilentFanVorticeBrand: React.FC = () => {
                     </div>
 
                     <div className={`${scrollAnimationClasses.slideLeft(isVisible)} relative`}>
-                        <div className="relative z-10 rounded-[2.5rem] overflow-hidden border-8 border-slate-800 shadow-2xl">
+                        <div className="relative z-10 rounded-hvac-2xl overflow-hidden border-8 border-slate-800 shadow-2xl">
                             <VentImage src="/images/vortice/vortice_lineo_hero.png"
                                 alt="Vortice Lineo Heritage"
                                 className="w-full h-auto"

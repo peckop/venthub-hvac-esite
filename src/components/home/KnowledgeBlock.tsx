@@ -65,13 +65,13 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
         <div className="absolute top-0 left-0 h-full w-full bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.1),transparent_70%)]" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-page px-4 sm:px-6 lg:px-8">
         {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-3xl">
             <div 
               data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-4"
+              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-xs font-bold uppercase tracking-[0.3em] text-cyan-400 mb-4"
             >
               {t.eyebrow}
             </div>
@@ -104,13 +104,13 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
               >
                 <Link
                   href={item.href as import('next').Route}
-                  className="group relative block h-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.02] p-10 backdrop-blur-md transition-all duration-500 hover:border-cyan-500/40 hover:bg-white/[0.05]"
+                  className="group relative block h-full overflow-hidden rounded-hvac-2xl border border-white/10 bg-white/[0.02] p-10 backdrop-blur-md transition-colors duration-500 hover:border-cyan-500/40 hover:bg-white/[0.05]"
                 >
                   <div className="absolute top-8 right-10 text-4xl font-black text-white/5 transition-colors group-hover:text-cyan-500/10">
                     0{index + 1}
                   </div>
 
-                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-400 transition-all duration-500 group-hover:bg-cyan-500 group-hover:text-slate-950">
+                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-400 transition-colors duration-500 group-hover:bg-cyan-500 group-hover:text-slate-950">
                     {item.icon}
                   </div>
 
@@ -123,7 +123,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                     </p>
                   </div>
 
-                  <div className="mt-10 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
+                  <div className="mt-10 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
                     <span className="h-px w-6 bg-cyan-400/40" />
                     {t.cta}
                     <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-transform group-hover:translate-x-1">
@@ -147,7 +147,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
             <Link
               href="https://wa.me/905442450205"
               target="_blank"
-              className="inline-flex items-center justify-center gap-4 h-16 px-10 rounded-2xl border border-white/10 bg-white/5 text-white font-bold uppercase text-[11px] tracking-[0.2em] hover:bg-white/10 transition-all"
+              className="inline-flex items-center justify-center gap-4 h-16 px-10 rounded-2xl border border-white/10 bg-white/5 text-white font-bold uppercase text-xs tracking-[0.2em] hover:bg-white/10 transition-colors"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               {finalCtaDict.secondaryCta}
@@ -155,12 +155,12 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
           </div>
 
           <div className="relative" data-observe="fade-up">
-            <div className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-700 ease-out delay-200 relative rounded-[2rem] border border-white/10 bg-white/[0.02] p-8 backdrop-blur-3xl overflow-hidden max-w-md lg:ml-auto">
+            <div className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-700 ease-out delay-200 relative rounded-hvac-xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-3xl overflow-hidden max-w-md lg:ml-auto">
               <div className="flex items-center gap-8">
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-cyan-400 mb-1">Project Pipeline</div>
+                  <div className="text-xs font-bold uppercase tracking-[0.4em] text-cyan-400 mb-1">Project Pipeline</div>
                   <div className="text-4xl font-black text-white tracking-tighter">15<span className="text-cyan-400">+</span></div>
-                  <div className="text-[8px] font-bold uppercase tracking-[0.2em] text-slate-500 mt-1">
+                  <div className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mt-1">
                     {statsExperience}
                   </div>
                 </div>
@@ -168,7 +168,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                   <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                     <div className="h-full w-[92%] bg-gradient-to-r from-cyan-600 to-cyan-400" />
                   </div>
-                  <div className="text-[8px] font-bold uppercase tracking-widest text-slate-500">92% Optimization</div>
+                  <div className="text-xs font-bold uppercase tracking-widest text-slate-500">92% Optimization</div>
                 </div>
               </div>
             </div>

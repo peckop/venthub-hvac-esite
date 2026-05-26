@@ -58,7 +58,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
     if (isAdmin) {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col">
-                <div className="bg-slate-900 text-white px-6 py-3 flex justify-between items-center shrink-0 z-[100]">
+                <div className="bg-slate-900 text-white px-6 py-3 flex justify-between items-center shrink-0 z-modal">
                     <span className="font-bold tracking-tighter">VH / ADMIN</span>
                     <Link href={Routes.home()} className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition-colors uppercase font-bold tracking-widest">Siteye Dön</Link>
                 </div>
@@ -78,7 +78,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             {/* Sayfa Geçişleri için Animasyonu kapattık (Sorun kaynağı buydu) */}
             <main 
                 id="main-content" 
-                className="flex-grow transition-all duration-300"
+                className="flex-grow transition-colors duration-300"
             >
                 {children}
             </main>

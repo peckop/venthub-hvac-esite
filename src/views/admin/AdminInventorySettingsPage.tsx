@@ -105,7 +105,7 @@ const AdminInventorySettingsPage: React.FC = () => {
       </header>
 
       {!hasWriteAccess && (
-        <div className="glass-strong border border-rose-500/20 bg-rose-500/5 p-6 rounded-[2rem] flex items-center gap-4 text-rose-500">
+        <div className="glass-strong border border-rose-500/20 bg-rose-500/5 p-6 rounded-hvac-xl flex items-center gap-4 text-rose-500">
           <ShieldAlert size={24} />
           <div className="text-sm font-black uppercase tracking-widest">
             Bu sayfada değişiklik yapmak için yetkiniz bulunmuyor.
@@ -149,16 +149,16 @@ const AdminInventorySettingsPage: React.FC = () => {
 
                 <div className="space-y-3">
                   <label className={adminSettingsLabelClass}>Toplu Uygulama</label>
-                  <label className="flex items-start gap-4 p-4 rounded-2xl bg-[#0A0F1E]/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-all">
+                  <label className="flex items-start gap-4 p-4 rounded-2xl bg-surface-deep/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
                     <input 
                       type="checkbox" 
-                      className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus:ring-cyan-400/20 transition-all" 
+                      className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus:ring-cyan-400/20 transition-colors" 
                       checked={resetAll} 
                       onChange={(e) => setResetAll(e.target.checked)} 
                     />
                     <div className="space-y-1">
                       <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">Tüm Ürünlere Uygula</span>
-                      <span className="block text-[11px] font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                      <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
                         Ürün bazlı özel eşikleri temizleyerek her şeyde varsayılanı kullanır.
                       </span>
                     </div>
@@ -167,7 +167,7 @@ const AdminInventorySettingsPage: React.FC = () => {
               </div>
 
               <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
-                <p className="text-[11px] font-bold text-amber-500/80 leading-relaxed uppercase tracking-widest text-center">
+                <p className="text-xs font-bold text-amber-500/80 leading-relaxed uppercase tracking-widest text-center">
                   Bu işlem ürün veritabanında toplu güncelleme yapar ve geri alınamaz.
                 </p>
               </div>
@@ -192,7 +192,7 @@ const AdminInventorySettingsPage: React.FC = () => {
             <div className="space-y-4">
               <label className={adminSettingsLabelClass}>E-Posta Bildirimleri</label>
               <div className="space-y-2">
-                <label className="block text-[11px] font-bold text-slate-400 ml-1 uppercase">Kritik Stok Alıcı Adresi</label>
+                <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">Kritik Stok Alıcı Adresi</label>
                 <input
                   type="email"
                   className={adminInputClass}
@@ -200,14 +200,14 @@ const AdminInventorySettingsPage: React.FC = () => {
                   value={alertEmail}
                   onChange={e => setAlertEmail(e.target.value)}
                 />
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Kritik seviyelerde bu adrese mail gönderilir.</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Kritik seviyelerde bu adrese mail gönderilir.</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <label className={adminSettingsLabelClass}>Webhook Entegrasyonu</label>
               <div className="space-y-2">
-                <label className="block text-[11px] font-bold text-slate-400 ml-1 uppercase">Webhook URL (Slack/ERP)</label>
+                <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">Webhook URL (Slack/ERP)</label>
                 <input
                   type="url"
                   className={adminInputClass}
@@ -215,7 +215,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                   value={alertWebhook}
                   onChange={e => setAlertWebhook(e.target.value)}
                 />
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Anlık veri iletimi için HTTP POST endpoint.</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Anlık veri iletimi için HTTP POST endpoint.</p>
               </div>
             </div>
           </div>
@@ -241,7 +241,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                 />
               </div>
               <div className="flex-1 pb-1">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
                   Ödemesi tamamlanmayan ürünlerin stoktan düşme süresidir.
                 </p>
               </div>

@@ -51,7 +51,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           value={filters.catSearch}
           onChange={(e) => onUpdateFilters({ catSearch: e.target.value })}
           placeholder={t('category.localSearchPlaceholder') as string || 'Bu kategoride ara...'}
-          className="w-full pl-4 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-ocean/20 focus:border-primary-ocean transition-all placeholder:text-slate-400"
+          className="w-full pl-4 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-ocean/20 focus:border-primary-ocean transition-colors placeholder:text-slate-400"
         />
       </div>
 
@@ -110,7 +110,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                     type="checkbox"
                     checked={filters.selectedBrands.includes(brand)}
                     onChange={() => toggleBrand(brand)}
-                    className="peer w-5 h-5 appearance-none border border-slate-300 rounded focus:ring-2 focus:ring-primary-ocean/20 checked:bg-primary-ocean checked:border-primary-ocean transition-all cursor-pointer"
+                    className="peer w-5 h-5 appearance-none border border-slate-300 rounded focus:ring-2 focus:ring-primary-ocean/20 checked:bg-primary-ocean checked:border-primary-ocean transition-colors cursor-pointer"
                   />
                   <svg 
                     className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" 

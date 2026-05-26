@@ -51,7 +51,7 @@ const BackToTopButton: React.FC = () => {
     <button
       aria-label={t('common.backToTop')}
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className={`fixed bg-primary-navy hover:bg-secondary-blue text-white p-3 rounded-full shadow-lg transition-all duration-300 z-40 border border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-navy ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none invisible'}`}
+      className={`fixed bg-primary-navy hover:bg-secondary-blue text-white p-3 rounded-full shadow-lg transition-shadow duration-300 z-40 border border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-navy ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none invisible'}`}
       style={{ bottom: pos.bottom, right: pos.right }}
       tabIndex={visible ? 0 : -1}
       aria-hidden={!visible}

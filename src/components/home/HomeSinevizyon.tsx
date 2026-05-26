@@ -168,13 +168,13 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
             return (
               <div
                 key={`content-${idx}`}
-                className={`transition-all duration-1000 ease-in-out ${
+                className={`transition-colors duration-1000 ease-in-out ${
                   idx === currentSlide
                     ? 'opacity-100 translate-x-0 relative z-10 pointer-events-auto delay-300'
                     : 'opacity-0 -translate-x-8 absolute inset-0 z-0 pointer-events-none'
                 }`}
               >
-                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.4em] text-cyan-400 backdrop-blur-md mb-8">
+                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.4em] text-cyan-400 backdrop-blur-md mb-8">
                   <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#22D3EE]" />
                   <span>{currentContent.eyebrow}</span>
                 </div>
@@ -190,7 +190,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                 <div className="flex flex-col gap-5 sm:flex-row">
                   <Link
                     href={Routes.products()}
-                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl bg-cyan-500 px-12 text-[14px] font-bold uppercase tracking-widest text-slate-950 transition-all hover:bg-cyan-400 hover:shadow-[0_0_40px_rgba(34,211,238,0.4)]"
+                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl bg-cyan-500 px-12 text-sm font-bold uppercase tracking-widest text-slate-950 transition-shadow hover:bg-cyan-400 hover:shadow-[0_0_40px_rgba(34,211,238,0.4)]"
                   >
                     {t('home.hero.primaryCta')}
                   </Link>
@@ -203,7 +203,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                         window.openLeadModal?.();
                       }
                     }}
-                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/5 px-12 text-[14px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all duration-300 hover:bg-white/10"
+                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/5 px-12 text-sm font-bold uppercase tracking-widest text-white backdrop-blur-md transition-colors duration-300 hover:bg-white/10"
                   >
                     {t('home.hero.secondaryCta')}
                   </button>
@@ -229,7 +229,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
           {slidesData.map((slide, slideIdx) => (
             <div
               key={`products-${slideIdx}`}
-              className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out ${
+              className={`absolute inset-0 flex items-center justify-center transition-colors duration-1000 ease-in-out ${
                 slideIdx === currentSlide
                   ? 'opacity-100 scale-100 z-10 pointer-events-auto delay-300'
                   : 'opacity-0 scale-95 z-0 pointer-events-none'
@@ -238,7 +238,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
               {slide.products.map((p, i) => (
                 <div
                   key={p.url}
-                  className={`absolute transition-all duration-1000 ease-in-out ${
+                  className={`absolute transition-colors duration-1000 ease-in-out ${
                     slideIdx === currentSlide 
                       ? i === 0 ? 'z-20 opacity-100 translate-x-0' : 'z-10 opacity-40 translate-x-32 translate-y-20 blur-[1px]'
                       : 'opacity-0'
@@ -254,7 +254,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                           <div className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22D3EE] animate-pulse" />
                         </div>
 
-                        <div className="relative group/hud overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-900/40 p-4 backdrop-blur-xl transition-all duration-500 hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(34,211,238,0.15)]">
+                        <div className="relative group/hud overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-900/40 p-4 backdrop-blur-xl transition-shadow duration-500 hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(34,211,238,0.15)]">
                           {/* HUD Corner Accents */}
                           <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-400/60" />
                           <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400/60" />
@@ -265,11 +265,11 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
                               <div className="h-1 w-1 bg-cyan-400 rounded-full" />
-                              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400/80">System.Data.Live</div>
+                              <div className="text-xs font-black uppercase tracking-[0.2em] text-cyan-400/80">System.Data.Live</div>
                             </div>
-                            <div className="text-[15px] font-bold text-white tracking-tight leading-tight">{t(p.labelKey)}</div>
+                            <div className="text-base font-bold text-white tracking-tight leading-tight">{t(p.labelKey)}</div>
                             <div className="flex items-center gap-2 mt-1">
-                              <div className="text-[9px] font-medium uppercase tracking-widest text-slate-400">{t(p.subLabelKey)}</div>
+                              <div className="text-xs font-medium uppercase tracking-widest text-slate-400">{t(p.subLabelKey)}</div>
                               <div className="h-px flex-1 bg-white/5" />
                             </div>
                           </div>
@@ -311,12 +311,12 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
               aria-label={`Go to slide ${idx + 1}`}
               className="relative flex items-center justify-center min-h-6 min-w-6 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
             >
-              <span className={`block h-1.5 rounded-full transition-all duration-500 ${idx === currentSlide ? 'w-12 bg-cyan-400' : 'w-3 bg-white/20'}`} />
+              <span className={`block h-1.5 rounded-full transition-colors duration-500 ${idx === currentSlide ? 'w-12 bg-cyan-400' : 'w-3 bg-white/20'}`} />
             </button>
           ))}
         </div>
         <div className="h-px w-12 bg-white/10" />
-        <div className="text-[10px] font-bold text-white/40 tracking-[0.3em]">0{currentSlide + 1} / 0{slidesData.length}</div>
+        <div className="text-xs font-bold text-white/40 tracking-[0.3em]">0{currentSlide + 1} / 0{slidesData.length}</div>
       </div>
     </section>
   )

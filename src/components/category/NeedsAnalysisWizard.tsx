@@ -72,7 +72,7 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                             <button
                                 key={h}
                                 onClick={() => handleSelection('maxHeight', h)}
-                                className="focus-ring py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
+                                className="focus-ring py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-colors font-medium text-gray-700"
                             >
                                 {h} {t('needsWizard.meter')}
                             </button>
@@ -90,21 +90,21 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <button
                             onClick={() => handleSelection('heating', 'electric')}
-                            className="focus-ring py-3 px-4 border rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all text-left"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors text-left"
                         >
                             <div className="font-bold text-gray-800">{t('needsWizard.electricHeater')}</div>
                             <div className="text-xs text-gray-500">{t('needsWizard.winterComfort')}</div>
                         </button>
                         <button
                             onClick={() => handleSelection('heating', 'none')}
-                            className="focus-ring py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
                         >
                             <div className="font-bold text-gray-800">{t('needsWizard.ambient')}</div>
                             <div className="text-xs text-gray-500">{t('needsWizard.insulation')}</div>
                         </button>
                         <button
                             onClick={() => handleSelection('heating', 'water')}
-                            className="focus-ring py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
                         >
                             <div className="font-bold text-gray-800">{t('needsWizard.waterHeater')}</div>
                             <div className="text-xs text-gray-500">{t('needsWizard.centralSystem')}</div>
@@ -122,13 +122,13 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <button
                             onClick={() => handleSelection('type', 'standard')}
-                            className="focus-ring py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-colors font-medium text-gray-700"
                         >
                             {t('needsWizard.standardMount')}
                         </button>
                         <button
                             onClick={() => handleSelection('type', 'recessed')}
-                            className="focus-ring py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-all font-medium text-gray-700"
+                            className="focus-ring py-3 px-4 border rounded-lg hover:border-secondary-blue hover:bg-blue-50 transition-colors font-medium text-gray-700"
                         >
                             {t('needsWizard.recessedMount')}
                         </button>

@@ -76,7 +76,7 @@ export default function VideoAuthority({ metadata, className = '' }: VideoAuthor
                         <span className="bg-primary-navy/80 text-white p-2 rounded-full backdrop-blur-md">
                             <Play size={12} fill="currentColor" />
                         </span>
-                        <span className="text-white text-[10px] font-black uppercase tracking-widest">{metadata.title}</span>
+                        <span className="text-white text-xs font-black uppercase tracking-widest">{metadata.title}</span>
                     </div>
                     
                     <button 

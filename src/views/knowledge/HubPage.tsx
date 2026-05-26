@@ -66,14 +66,14 @@ const HubPage: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950 to-slate-950" />
         </div>
 
-        <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
           >
             <BookOpen size={14} className="text-cyan-400" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">
+            <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400">
               {t('knowledge.hub.eyebrow')}
             </span>
           </motion.div>
@@ -109,7 +109,7 @@ const HubPage: React.FC = () => {
 
       {/* Filters & Content */}
       <section className="py-20 lg:py-32">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           {/* Tag Navigation */}
           <div className="flex flex-wrap justify-center gap-4 mb-20">
             {TAGS.map((tag) => (
@@ -117,7 +117,7 @@ const HubPage: React.FC = () => {
                 key={tag.key}
                 onClick={() => setActiveTag(tag.key)}
                 aria-label={t(tag.labelKey)}
-                className={`px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                className={`px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-colors ${
                   activeTag === tag.key 
                     ? 'bg-slate-950 text-white shadow-xl' 
                     : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
@@ -142,13 +142,13 @@ const HubPage: React.FC = () => {
                 >
                   <Link 
                     href={`/destek/konular/${topic.slug}`}
-                    className="group block h-full bg-white rounded-[2.5rem] border border-slate-100 p-10 transition-all duration-500 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.06)]"
+                    className="group block h-full bg-white rounded-hvac-2xl border border-slate-100 p-10 transition-shadow duration-500 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.06)]"
                   >
                     <div className="flex justify-between items-start mb-12">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-cyan-600 px-4 py-2 bg-cyan-50 rounded-full">
+                      <div className="text-xs font-black uppercase tracking-widest text-cyan-600 px-4 py-2 bg-cyan-50 rounded-full">
                         {topic.category}
                       </div>
-                      <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-tighter">
+                      <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-tighter">
                         <Clock size={12} /> {topic.time}
                       </div>
                     </div>
@@ -161,7 +161,7 @@ const HubPage: React.FC = () => {
                       {topic.summary}
                     </p>
                     
-                    <div className="flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-slate-950">
+                    <div className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-slate-950">
                       {t('knowledge.hub.readStart')} <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
                     </div>
                   </Link>
@@ -172,8 +172,8 @@ const HubPage: React.FC = () => {
 
           {/* Tools & Future Section */}
           <div className="grid lg:grid-cols-2 gap-12">
-            <div className="relative group overflow-hidden rounded-[3rem] bg-slate-900 p-12 text-white">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[100px] rounded-full group-hover:bg-cyan-500/20 transition-all" />
+            <div className="relative group overflow-hidden rounded-hvac-3xl bg-slate-900 p-12 text-white">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[100px] rounded-full group-hover:bg-cyan-500/20 transition-colors" />
               <div className="relative z-10">
                 <Calculator className="text-cyan-400 mb-8" size={40} strokeWidth={1.5} />
                 <h3 className="text-3xl font-bold tracking-tight mb-4">{t('knowledge.hub.calculatorsSoon')}</h3>
@@ -182,14 +182,14 @@ const HubPage: React.FC = () => {
                 </p>
                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">
+                  <span className="text-xs font-bold uppercase tracking-widest">
                     {t('knowledge.hub.inDevelopment')}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="relative group overflow-hidden rounded-[3rem] bg-slate-50 p-12 text-slate-900 border border-slate-100">
+            <div className="relative group overflow-hidden rounded-hvac-3xl bg-slate-50 p-12 text-slate-900 border border-slate-100">
               <div className="absolute top-0 right-0 w-64 h-64 bg-slate-200/50 blur-[100px] rounded-full" />
               <div className="relative z-10">
                 <Settings className="text-slate-950 mb-8" size={40} strokeWidth={1.5} />
@@ -199,7 +199,7 @@ const HubPage: React.FC = () => {
                 </p>
                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-slate-200/50 border border-slate-200 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-widest text-slate-500">
                     {t('knowledge.hub.inPlanning')}
                   </span>
                 </div>
@@ -220,7 +220,7 @@ const HubPage: React.FC = () => {
           </p>
           <Link 
             href={Routes.contact()} 
-            className="inline-flex items-center gap-4 bg-cyan-500 text-slate-950 px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-white transition-all shadow-2xl shadow-cyan-500/20"
+            className="inline-flex items-center gap-4 bg-cyan-500 text-slate-950 px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white transition-shadow shadow-2xl shadow-cyan-500/20"
           >
             {t('knowledge.hub.contactExpert')} <ArrowRight size={16} />
           </Link>

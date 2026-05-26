@@ -43,7 +43,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           <div
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white shadow-sm backdrop-blur-md mb-8"
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white shadow-sm backdrop-blur-md mb-8"
             style={{ animation: 'fadeInUp 0.8s ease-out 0.5s both' }}
           >
             <style>{`
@@ -76,7 +76,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
           >
             <Link
               href={Routes.products()}
-              className="inline-flex h-16 items-center justify-center rounded-none bg-white px-10 text-[15px] font-bold uppercase tracking-widest text-slate-950 transition-all duration-500 hover:bg-cyan-400 hover:scale-105"
+              className="inline-flex h-16 items-center justify-center rounded-none bg-white px-10 text-base font-bold uppercase tracking-widest text-slate-950 transition-transform duration-500 hover:bg-cyan-400 hover:scale-105"
             >
               {t('home.hero.primaryCta')}
             </Link>
@@ -84,7 +84,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
             <button
               type="button"
               onClick={onQuoteClick}
-              className="inline-flex h-16 items-center justify-center rounded-none border border-white/30 bg-white/5 px-10 text-[15px] font-bold uppercase tracking-widest text-white backdrop-blur-sm transition-all duration-500 hover:bg-white/10 hover:border-white/60 hover:scale-105"
+              className="inline-flex h-16 items-center justify-center rounded-none border border-white/30 bg-white/5 px-10 text-base font-bold uppercase tracking-widest text-white backdrop-blur-sm transition-transform duration-500 hover:bg-white/10 hover:border-white/60 hover:scale-105"
             >
               {t('home.hero.secondaryCta')}
             </button>
@@ -107,7 +107,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
             50% { transform: translateY(10px); }
           }
         `}</style>
-        <span className="text-[10px] uppercase tracking-[0.3em] text-white/60">Explore</span>
+        <span className="text-xs uppercase tracking-[0.3em] text-white/60">Explore</span>
         <div
           className="w-[1px] h-12 bg-gradient-to-b from-cyan-400 to-transparent"
           style={{ animation: 'bounce 2s infinite' }}

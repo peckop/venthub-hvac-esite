@@ -28,9 +28,9 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
         <DropdownMenu.Content 
           sideOffset={8} 
           align="end"
-          className="z-50 min-w-[200px] glass-strong rounded-[1.5rem] border border-white/10 p-2 shadow-[0_30px_60px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in-95 duration-200"
+          className="z-50 min-w-[200px] glass-strong rounded-hvac-lg border border-white/10 p-2 shadow-[0_30px_60px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in-95 duration-200"
         >
-          <div className="px-3 pt-2 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2 mb-1">
+          <div className="px-3 pt-2 pb-2 text-xs font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2 mb-1">
             <FileDown size={12} />
             {_t('admin.inventory.fileFormat') || 'Dosya Formatı'}
           </div>
@@ -38,7 +38,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
           {(items && items.length > 0) ? items.map(item => (
             <DropdownMenu.Item
               key={item.key}
-              className="flex items-center gap-3 px-3 py-2.5 text-[11px] font-bold text-slate-300 rounded-xl hover:bg-white/5 hover:text-white cursor-pointer transition-all outline-none"
+              className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-slate-300 rounded-xl hover:bg-white/5 hover:text-white cursor-pointer transition-colors outline-none"
               onSelect={(e) => { e.preventDefault(); item.onSelect() }}
               aria-label={item.label}
             >
@@ -48,7 +48,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
               {item.label}
             </DropdownMenu.Item>
           )) : (
-            <div className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase italic">
+            <div className="px-4 py-3 text-xs font-bold text-slate-500 uppercase italic">
               {_t('admin.common.noOptions') || 'Seçenek bulunamadı'}
             </div>
           )}

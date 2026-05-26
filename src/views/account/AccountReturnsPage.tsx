@@ -218,7 +218,7 @@ export default function AccountReturnsPage() {
           </h1>
           <p className="text-sm text-slate-500 mt-1">İade taleplerinizi oluşturun ve süreç durumunu takip edin.</p>
         </div>
-        <button onClick={() => setOpenModal(true)} className="bg-primary-navy hover:bg-industrial-gray text-white font-bold h-10 px-6 rounded-lg shadow-sm shadow-primary-navy/20 transition-all hover:scale-[1.02] flex items-center gap-2 self-start sm:self-auto">
+        <button onClick={() => setOpenModal(true)} className="bg-primary-navy hover:bg-industrial-gray text-white font-bold h-10 px-6 rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-[1.02] flex items-center gap-2 self-start sm:self-auto">
           {t('returns.new')}
         </button>
       </div>
@@ -239,7 +239,7 @@ export default function AccountReturnsPage() {
               <button
                 key={opt.value}
                 onClick={() => setStatusFilter(opt.value)}
-                className={`h-8 px-3.5 rounded-lg text-xs font-bold transition-all border ${statusFilter === opt.value
+                className={`h-8 px-3.5 rounded-lg text-xs font-bold transition-colors border ${statusFilter === opt.value
                   ? 'bg-primary-navy text-white border-primary-navy shadow-sm shadow-primary-navy/20'
                   : 'bg-white text-slate-600 border-slate-200 hover:border-primary-navy hover:text-primary-navy'
                   }`}
@@ -316,7 +316,7 @@ export default function AccountReturnsPage() {
                       <React.Fragment key={step.key}>
                         <div className="flex flex-col items-center min-w-[80px]">
                           <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm text-xs font-bold transition-all ${step.completed
+                            className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm text-xs font-bold transition-colors ${step.completed
                               ? step.isTerminal && (step.key === 'rejected' || step.key === 'cancelled')
                                 ? 'bg-red-500 text-white'
                                 : 'bg-primary-navy text-white'
@@ -329,7 +329,7 @@ export default function AccountReturnsPage() {
                                 : '✓'
                             ) : index + 1}
                           </div>
-                          <span className={`mt-2 text-[10px] uppercase font-bold tracking-wider text-center ${step.completed ? 'text-primary-navy' : 'text-slate-400'
+                          <span className={`mt-2 text-xs uppercase font-bold tracking-wider text-center ${step.completed ? 'text-primary-navy' : 'text-slate-400'
                             }`}>
                             {step.label}
                           </span>
@@ -349,7 +349,7 @@ export default function AccountReturnsPage() {
       )}
 
       {openModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200" 
             onClick={() => setOpenModal(false)}
@@ -374,7 +374,7 @@ export default function AccountReturnsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{t('returns.order')}</label>
-                <select value={form.order_id} onChange={e => setForm(s => ({ ...s, order_id: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all">
+                <select value={form.order_id} onChange={e => setForm(s => ({ ...s, order_id: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors">
                   <option value="">{t('returns.selectOrder')}</option>
                   {orders.map(o => (
                     <option key={o.id} value={o.id}>{o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`} • {formatDate(o.created_at, lang)}</option>
@@ -383,20 +383,20 @@ export default function AccountReturnsPage() {
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{t('returns.reason')}</label>
-                <select value={form.reason} onChange={e => setForm(s => ({ ...s, reason: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all">
+                <select value={form.reason} onChange={e => setForm(s => ({ ...s, reason: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors">
                   <option value="">{t('returns.selectReason')}</option>
                   {reasonOptions.map(r => (<option key={r} value={r}>{r}</option>))}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{t('returns.description')}</label>
-                <textarea value={form.description} onChange={e => setForm(s => ({ ...s, description: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all resize-none" rows={4} placeholder={t('returns.descriptionPh')} />
+                <textarea value={form.description} onChange={e => setForm(s => ({ ...s, description: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors resize-none" rows={4} placeholder={t('returns.descriptionPh')} />
               </div>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-3">
-              <button onClick={() => setOpenModal(false)} className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-slate-200">{t('common.cancel') || 'İptal'}</button>
-              <button onClick={handleCreate} className="h-10 px-5 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-navy/50">{t('returns.submit')}</button>
+              <button onClick={() => setOpenModal(false)} className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200">{t('common.cancel') || 'İptal'}</button>
+              <button onClick={handleCreate} className="h-10 px-5 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-navy/50">{t('returns.submit')}</button>
             </div>
           </div>
         </div>

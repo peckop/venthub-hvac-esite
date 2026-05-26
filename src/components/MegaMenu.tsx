@@ -20,7 +20,7 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   if (!isMounted || !isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-white overflow-hidden animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-modal flex flex-col bg-white overflow-hidden animate-in fade-in duration-300">
       {/* Header Area */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white sticky top-0 z-10">
         <div className="flex items-center gap-2">

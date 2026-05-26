@@ -205,7 +205,7 @@ const VisualShowcase: React.FC = () => {
               <button
                 key={i}
                 onClick={() => setIndex(i)}
-                className={`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 h-2 rounded-full transition-all ${i === index ? 'w-6 bg-white' : 'w-2 bg-white/70 hover:bg-white'}`}
+                className={`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 h-2 rounded-full transition-colors ${i === index ? 'w-6 bg-white' : 'w-2 bg-white/70 hover:bg-white'}`}
                 aria-label={`Slide ${i + 1}`}
               />
             ))}

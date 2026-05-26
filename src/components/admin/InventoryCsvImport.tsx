@@ -215,16 +215,16 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                     <div className="flex items-center gap-2">
                         <a
                             href={`/admin/movements?batch=${batchId}`}
-                            className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-xl bg-cyan-400 text-[#0A0F1E] hover:bg-cyan-300 transition-all"
+                            className="px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-xl bg-cyan-400 text-surface-deep hover:bg-cyan-300 transition-colors"
                         >Hareketleri Gör</a>
                         {errors.length > 0 && (
                             <button
-                                className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-xl glass border border-white/10 text-white hover:bg-white/10"
+                                className="px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-xl glass border border-white/10 text-white hover:bg-white/10"
                                 onClick={() => { downloadErrors(); toast.dismiss(t.id) }}
                             >Hataları İndir</button>
                         )}
                         <button
-                            className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/20 hover:bg-rose-500/30 transition-all font-bold ml-auto"
+                            className="px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/20 hover:bg-rose-500/30 transition-colors font-bold ml-auto"
                             onClick={async () => {
                                 if (csvUndoingRef.current) return
                                 csvUndoingRef.current = true
@@ -271,23 +271,23 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                 aria-modal="true"
                 aria-labelledby="csv-import-title"
             >
-                <div className="glass-strong rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.6)] max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col pointer-events-auto border border-white/10 animate-in zoom-in-95 duration-300">
+                <div className="glass-strong rounded-hvac-2xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col pointer-events-auto border border-white/10 animate-in zoom-in-95 duration-300">
                     <header className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                         <div className="flex items-center gap-3">
                             <div className="p-2.5 rounded-2xl bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-                                <FileUp size={20} className="text-[#0A0F1E]" />
+                                <FileUp size={20} className="text-surface-deep" />
                             </div>
                             <h2 id="csv-import-title" className="text-xl font-black text-white uppercase tracking-tight">CSV Stok İçe Aktarma</h2>
                         </div>
-                        <button className="w-10 h-10 flex items-center justify-center rounded-full glass border border-white/10 text-slate-400 hover:text-white transition-all hover:bg-white/5" onClick={onClose}>
+                        <button className="w-10 h-10 flex items-center justify-center rounded-full glass border border-white/10 text-slate-400 hover:text-white transition-colors hover:bg-white/5" onClick={onClose}>
                             <X size={20} />
                         </button>
                     </header>
                     
                     <div className="p-8 space-y-8 overflow-y-auto custom-scrollbar">
                         <div className="space-y-4">
-                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">CSV Dosyası Seç</label>
-                            <div className="border-2 border-dashed border-white/10 rounded-[2rem] p-12 text-center hover:border-cyan-400/40 hover:bg-cyan-400/[0.02] transition-all group cursor-pointer relative bg-[#0A0F1E]/20">
+                            <label className="block text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">CSV Dosyası Seç</label>
+                            <div className="border-2 border-dashed border-white/10 rounded-hvac-xl p-12 text-center hover:border-cyan-400/40 hover:bg-cyan-400/[0.02] transition-colors group cursor-pointer relative bg-surface-deep/20">
                                 <input
                                     type="file"
                                     accept=".csv"
@@ -298,20 +298,20 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                 />
                                 <div className="flex flex-col items-center gap-4">
-                                    <div className="w-16 h-16 rounded-full glass border border-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-400 transition-all duration-300">
-                                        <FileUp size={24} className="text-slate-400 group-hover:text-[#0A0F1E]" />
+                                    <div className="w-16 h-16 rounded-full glass border border-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-400 transition-transform duration-300">
+                                        <FileUp size={24} className="text-slate-400 group-hover:text-surface-deep" />
                                     </div>
                                     <div className="text-slate-500 group-hover:text-slate-300 transition-colors">
                                         <p className="text-sm font-bold">Dosyayı buraya sürükleyin veya <span className="text-cyan-400 underline decoration-cyan-400/30 underline-offset-4">bilgisayarınızdan seçin</span></p>
-                                        <p className="text-[10px] uppercase font-black tracking-widest mt-2 opacity-50">Format: SKU, Miktar (örn: PRD001, 25)</p>
+                                        <p className="text-xs uppercase font-black tracking-widest mt-2 opacity-50">Format: SKU, Miktar (örn: PRD001, 25)</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="glass rounded-[1.5rem] border border-white/5 p-5 flex items-center gap-4 hover:border-white/10 transition-colors">
+                        <div className="glass rounded-hvac-lg border border-white/5 p-5 flex items-center gap-4 hover:border-white/10 transition-colors">
                             <div className={`p-2 rounded-lg transition-colors ${dryRun ? 'bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.3)]' : 'bg-white/5'}`}>
-                                <Info size={18} className={dryRun ? 'text-[#0A0F1E]' : 'text-slate-500'} />
+                                <Info size={18} className={dryRun ? 'text-surface-deep' : 'text-slate-500'} />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="dryRun" className="text-sm font-bold text-slate-300 select-none cursor-pointer flex items-center gap-2">
@@ -324,7 +324,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                         className="sr-only"
                                     />
                                 </label>
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mt-0.5">Veritabanını güncellemeden önce sonuçları önizleyin.</p>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-tight mt-0.5">Veritabanını güncellemeden önce sonuçları önizleyin.</p>
                             </div>
                             <button
                                 type="button"
@@ -348,28 +348,28 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                         {csvPreview.length > 0 && (
                             <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
                                 <div className="flex items-center justify-between ml-1">
-                                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
                                         <Search size={12} />
                                         Önizleme ({csvPreview.length} Ürün)
                                     </h3>
                                 </div>
-                                <div className="glass rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
+                                <div className="glass rounded-hvac-xl border border-white/5 overflow-hidden shadow-2xl">
                                     <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                                         <table className="w-full text-xs border-separate border-spacing-0">
-                                            <thead className="sticky top-0 bg-[#0D1225] z-10">
+                                            <thead className="sticky top-0 bg-surface-midnight z-10">
                                                 <tr>
-                                                    <th className="px-5 py-4 text-left font-black text-slate-500 uppercase tracking-widest text-[9px] border-b border-white/5">Ürün Bilgisi</th>
-                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-[9px] border-b border-white/5">Mevcut</th>
-                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-[9px] border-b border-white/5">Yeni</th>
-                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-[9px] border-b border-white/5">Değişim</th>
+                                                    <th className="px-5 py-4 text-left font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">Ürün Bilgisi</th>
+                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">Mevcut</th>
+                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">Yeni</th>
+                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">Değişim</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-transparent">
                                                 {csvPreview.map((item, idx) => (
                                                     <tr key={idx} className="hover:bg-white/[0.03] transition-colors group">
                                                         <td className="px-5 py-3 border-b border-white/5 group-last:border-0">
-                                                            <div className="font-bold text-white uppercase text-[11px] truncate max-w-[200px]">{item.name || item.sku}</div>
-                                                            <div className="text-[9px] text-cyan-400 font-mono tracking-tighter uppercase mt-0.5">{item.sku}</div>
+                                                            <div className="font-bold text-white uppercase text-xs truncate max-w-[200px]">{item.name || item.sku}</div>
+                                                            <div className="text-xs text-cyan-400 font-mono tracking-tighter uppercase mt-0.5">{item.sku}</div>
                                                         </td>
                                                         <td className="px-5 py-3 text-right text-slate-500 font-bold border-b border-white/5 group-last:border-0">{item.current}</td>
                                                         <td className="px-5 py-3 text-right font-black text-white border-b border-white/5 group-last:border-0">{item.new}</td>
@@ -389,18 +389,18 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                     <footer className="px-8 py-6 border-t border-white/5 flex justify-end items-center gap-4 bg-white/[0.02]">
                         <button
                             onClick={onClose}
-                            className="h-12 px-8 rounded-2xl glass border border-white/5 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-white transition-all"
+                            className="h-12 px-8 rounded-2xl glass border border-white/5 text-slate-400 text-xs font-black uppercase tracking-widest hover:text-white transition-colors"
                         >
                             İptal
                         </button>
                         <button
                             onClick={processCSV}
                             disabled={csvPreview.length === 0 || csvProcessing}
-                            className={`h-12 px-10 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl disabled:opacity-30 ${dryRun ? 'bg-amber-400 text-[#0A0F1E] hover:bg-amber-300 shadow-amber-400/10' : 'bg-cyan-400 text-[#0A0F1E] hover:bg-cyan-300 shadow-cyan-400/10'}`}
+                            className={`h-12 px-10 rounded-2xl text-xs font-black uppercase tracking-widest transition-colors shadow-xl disabled:opacity-30 ${dryRun ? 'bg-amber-400 text-surface-deep hover:bg-amber-300 shadow-amber-400/10' : 'bg-cyan-400 text-surface-deep hover:bg-cyan-300 shadow-cyan-400/10'}`}
                         >
                             {csvProcessing ? (
                                 <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 border-2 border-[#0A0F1E]/20 border-t-[#0A0F1E] rounded-full animate-spin" />
+                                    <div className="w-3 h-3 border-2 border-surface-deep/20 border-t-[#0A0F1E] rounded-full animate-spin" />
                                     {Math.round(csvProgress * 100)}%
                                 Montaj yapılıyor.
                                 </div>

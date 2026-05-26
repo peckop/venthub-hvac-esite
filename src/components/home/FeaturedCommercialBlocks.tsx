@@ -52,7 +52,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
 
   return (
     <section className="relative py-24 lg:py-32 bg-white overflow-hidden">
-      <div className="max-w-[1600px] mx-auto px-6">
+      <div className="max-w-page mx-auto px-6">
         
         {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
@@ -61,7 +61,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+              className="text-xs font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
             >
               {t('home.featuredCommercial.eyebrow')}
             </motion.div>
@@ -95,7 +95,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
                   aria-selected={activeTab === tab}
                   aria-label={t(`home.featuredCommercial.tabs.${tab}`)}
                   onClick={() => setActiveTab(tab)}
-                  className={`relative px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all duration-500 rounded-lg ${
+                  className={`relative px-6 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors duration-500 rounded-lg ${
                     activeTab === tab ? 'text-white' : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
@@ -143,13 +143,13 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
           <aside className="relative">
             <motion.div 
               layout
-              className="sticky top-32 p-10 rounded-[2.5rem] bg-slate-950 text-white overflow-hidden"
+              className="sticky top-32 p-10 rounded-hvac-2xl bg-slate-950 text-white overflow-hidden"
             >
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-3xl rounded-full" />
               
               <div className="relative z-10">
-                <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8 flex items-center gap-3">
+                <div className="text-xs font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8 flex items-center gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                   {t('home.featuredCommercial.panelEyebrow')}
                 </div>
@@ -160,30 +160,30 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
                     alt={activeProducts[0]?.name || "Product Focus"}
                     fill
                     sizes="300px"
-                    className="object-contain opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700 p-8"
+                    className="object-contain opacity-60 grayscale group-hover:grayscale-0 transition-transform duration-700 p-8"
                   />
                   <div className="absolute inset-0 border border-cyan-500/10 rounded-full animate-pulse" />
                 </div>
 
                 <h3 className="text-xl font-bold mb-4 tracking-tight">{t(`home.featuredCommercial.panelTitles.${activeTab}`)}</h3>
-                <p className="text-[13px] text-slate-400 leading-relaxed mb-8 font-light italic">
+                <p className="text-sm text-slate-400 leading-relaxed mb-8 font-light italic">
                   {t(`home.featuredCommercial.panelDescriptions.${activeTab}`)}
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
-                    <div className="text-[8px] text-slate-500 uppercase mb-1 font-bold">Grade</div>
+                    <div className="text-xs text-slate-500 uppercase mb-1 font-bold">Grade</div>
                     <div className="text-xl font-black text-cyan-400">A++</div>
                   </div>
                   <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
-                    <div className="text-[8px] text-slate-500 uppercase mb-1 font-bold">Standard</div>
+                    <div className="text-xs text-slate-500 uppercase mb-1 font-bold">Standard</div>
                     <div className="text-xl font-black text-white">ERP</div>
                   </div>
                 </div>
 
                 <Link 
                   href={Routes.products()}
-                  className="flex items-center justify-center gap-3 w-full py-5 bg-white text-slate-950 font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all hover:bg-cyan-400 hover:scale-[1.02] active:scale-95 shadow-xl"
+                  className="flex items-center justify-center gap-3 w-full py-5 bg-white text-slate-950 font-black uppercase text-xs tracking-widest rounded-2xl transition-transform hover:bg-cyan-400 hover:scale-[1.02] active:scale-95 shadow-xl"
                 >
                   {t('home.featuredCommercial.cta')}
                 </Link>

@@ -46,7 +46,7 @@ function CategoryCard({ category }: { category: DomainCategory }) {
                 relative overflow-hidden rounded-2xl p-5 sm:p-6 
                 bg-gradient-to-br ${gradient}
                 shadow-lg hover:shadow-xl 
-                transform transition-all duration-300 
+                transform transition-transform duration-300 
                 hover:scale-105 hover:-translate-y-1
             `}>
                 {/* Background Pattern */}

@@ -21,7 +21,7 @@ function SubcategoryCard({ subcategory, parentSlug }: SubcategoryCardProps) {
                 rounded-xl p-4 
                 bg-white border border-gray-200
                 shadow-sm hover:shadow-md
-                transform transition-all duration-300
+                transform transition-transform duration-300
                 hover:scale-105 hover:border-blue-300
             ">
                 {/* Icon circle */}

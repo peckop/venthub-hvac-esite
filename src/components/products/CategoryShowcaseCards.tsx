@@ -17,7 +17,7 @@ const CategoryShowcaseCards: React.FC = () => {
                 {/* Hava Perdeleri Card */}
                 <Link
                     href={Routes.category("air-curtains")}
-                    className="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-600/50 bg-gradient-to-b from-slate-700/80 via-slate-800 to-slate-900 hover:border-slate-400/50 transition-all duration-300 hover:shadow-2xl"
+                    className="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-600/50 bg-gradient-to-b from-slate-700/80 via-slate-800 to-slate-900 hover:border-slate-400/50 transition-shadow duration-300 hover:shadow-2xl"
                 >
                     <div className="p-6 pb-2 text-center">
                         {/* Icon - Door with air flow lines */}
@@ -50,7 +50,7 @@ const CategoryShowcaseCards: React.FC = () => {
 
                     {/* CTA Button */}
                     <div className="p-5 pt-2">
-                        <div className="flex items-center justify-center gap-2 py-2.5 px-5 bg-white/5 border border-white/20 rounded-full text-white font-medium text-sm hover:bg-white/10 transition-all">
+                        <div className="flex items-center justify-center gap-2 py-2.5 px-5 bg-white/5 border border-white/20 rounded-full text-white font-medium text-sm hover:bg-white/10 transition-colors">
                             <span>Keşfet</span>
                             <ChevronRight size={16} />
                         </div>
@@ -60,7 +60,7 @@ const CategoryShowcaseCards: React.FC = () => {
                 {/* Endüstriyel Fanlar Card */}
                 <Link
                     href={Routes.category("fans")}
-                    className="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-600/50 bg-gradient-to-b from-slate-700/80 via-slate-800 to-slate-900 hover:border-slate-400/50 transition-all duration-300 hover:shadow-2xl"
+                    className="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-600/50 bg-gradient-to-b from-slate-700/80 via-slate-800 to-slate-900 hover:border-slate-400/50 transition-shadow duration-300 hover:shadow-2xl"
                 >
                     <div className="p-6 pb-2 text-center">
                         {/* Icon - Fan Symbol */}
@@ -93,7 +93,7 @@ const CategoryShowcaseCards: React.FC = () => {
 
                     {/* CTA Button */}
                     <div className="p-5 pt-2">
-                        <div className="flex items-center justify-center gap-2 py-2.5 px-5 bg-white/5 border border-white/20 rounded-full text-white font-medium text-sm hover:bg-white/10 transition-all">
+                        <div className="flex items-center justify-center gap-2 py-2.5 px-5 bg-white/5 border border-white/20 rounded-full text-white font-medium text-sm hover:bg-white/10 transition-colors">
                             <span>Keşfet</span>
                             <ChevronRight size={16} />
                         </div>
@@ -103,7 +103,7 @@ const CategoryShowcaseCards: React.FC = () => {
                 {/* Isı Geri Kazanım Card */}
                 <Link
                     href={Routes.category("heat-recovery-units")}
-                    className="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-600/50 bg-gradient-to-b from-slate-700/80 via-slate-800 to-slate-900 hover:border-slate-400/50 transition-all duration-300 hover:shadow-2xl"
+                    className="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-600/50 bg-gradient-to-b from-slate-700/80 via-slate-800 to-slate-900 hover:border-slate-400/50 transition-shadow duration-300 hover:shadow-2xl"
                 >
                     <div className="p-6 pb-2 text-center">
                         {/* Icon - Heat Exchange Arrows */}
@@ -134,7 +134,7 @@ const CategoryShowcaseCards: React.FC = () => {
 
                     {/* CTA Button */}
                     <div className="p-5 pt-2">
-                        <div className="flex items-center justify-center gap-2 py-2.5 px-5 bg-white/5 border border-white/20 rounded-full text-white font-medium text-sm hover:bg-white/10 transition-all">
+                        <div className="flex items-center justify-center gap-2 py-2.5 px-5 bg-white/5 border border-white/20 rounded-full text-white font-medium text-sm hover:bg-white/10 transition-colors">
                             <span>Keşfet</span>
                             <ChevronRight size={16} />
                         </div>

@@ -148,7 +148,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
 
                         {/* Content Layer */}
                         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
-                            <div className={`max-w-2xl transition-all duration-1000 transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                            <div className={`max-w-2xl transition-colors duration-1000 transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                                 {/* Category Badge */}
                                 <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/10">
                                     <Activity className="text-secondary-blue w-4 h-4" />
@@ -187,7 +187,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                 <div className="flex flex-wrap gap-4">
                                     <Link
                                         href={Routes.category(vm.slug)}
-                                        className="px-8 py-4 bg-secondary-blue hover:bg-blue-600 text-white rounded-lg font-bold transition-all flex items-center shadow-lg shadow-blue-500/30"
+                                        className="px-8 py-4 bg-secondary-blue hover:bg-blue-600 text-white rounded-lg font-bold transition-shadow flex items-center shadow-lg shadow-blue-500/30"
                                     >
                                         {t('home.hero.primaryCta')}
                                         <ArrowRight className="ml-2 w-5 h-5" />
@@ -196,7 +196,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                         onClick={() => {
                                             window.openLeadModal?.()
                                         }}
-                                        className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/20 rounded-lg font-bold transition-all backdrop-blur-sm"
+                                        className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/20 rounded-lg font-bold transition-colors backdrop-blur-sm"
                                     >
                                         {t('home.hero.secondaryCta')}
                                     </button>
@@ -211,13 +211,13 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
             <div className="absolute bottom-10 right-10 z-30 flex gap-2">
                 <button
                     onClick={handlePrev}
-                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-colors border border-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
                  aria-label={t("common.prev") as string}>
                     <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
                     onClick={handleNext}
-                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-colors border border-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
                  aria-label={t("common.next") as string}>
                     <ChevronRight className="w-6 h-6" />
                 </button>
@@ -233,7 +233,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                         className="relative flex items-center justify-center min-h-6 min-w-6 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-2 focus-visible:ring-offset-black/50"
                         aria-label={`${t("common.next")} ${idx + 1}`}
                     >
-                        <span className={`block h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8 bg-secondary-blue' : 'w-2 bg-white/30 hover:bg-white/50'}`} />
+                        <span className={`block h-1.5 rounded-full transition-colors duration-300 ${idx === currentIndex ? 'w-8 bg-secondary-blue' : 'w-2 bg-white/30 hover:bg-white/50'}`} />
                     </button>
                 ))}
             </div>

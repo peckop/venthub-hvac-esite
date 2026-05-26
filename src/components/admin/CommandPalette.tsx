@@ -136,7 +136,7 @@ const CommandPalette: React.FC = () => {
 
     return (
         <div 
-            className="fixed inset-0 z-[100]" 
+            className="fixed inset-0 z-modal" 
             role="dialog"
             aria-modal="true"
             aria-label="Komut Paleti"
@@ -144,7 +144,7 @@ const CommandPalette: React.FC = () => {
             {/* Backdrop */}
             <button
                 type="button"
-                className="absolute inset-0 w-full h-full bg-[#0A0F1E]/60 backdrop-blur-md cursor-default border-none outline-none"
+                className="absolute inset-0 w-full h-full bg-surface-deep/60 backdrop-blur-md cursor-default border-none outline-none"
                 onClick={() => setOpen(false)}
                 aria-label="Arama penceresini kapat"
                 tabIndex={-1}
@@ -152,7 +152,7 @@ const CommandPalette: React.FC = () => {
 
             {/* Dialog */}
             <div className="relative flex items-start justify-center pt-[15vh]">
-                <div className="w-full max-w-[640px] glass-strong rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden mx-4 animate-in zoom-in-95 duration-200">
+                <div className="w-full max-w-[640px] glass-strong rounded-hvac-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden mx-4 animate-in zoom-in-95 duration-200">
                     {/* Search Input */}
                     <div className="flex items-center border-b border-white/5 px-6 py-5">
                         <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center mr-4 cyan-glow">
@@ -167,7 +167,7 @@ const CommandPalette: React.FC = () => {
                             className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-slate-500 text-lg font-medium"
                         />
                         <div className="flex items-center gap-2 ml-auto shrink-0">
-                            <kbd className="px-2.5 py-1 text-[10px] font-black text-cyan-400 bg-cyan-400/10 rounded-lg border border-cyan-400/20 shadow-[0_0_10px_rgba(34,211,238,0.1)]">ESC</kbd>
+                            <kbd className="px-2.5 py-1 text-xs font-black text-cyan-400 bg-cyan-400/10 rounded-lg border border-cyan-400/20 shadow-[0_0_10px_rgba(34,211,238,0.1)]">ESC</kbd>
                             <button onClick={() => setOpen(false)} className="p-2 rounded-xl hover:bg-white/5 transition-colors" aria-label="Kapat">
                                 <X size={20} className="text-slate-500 hover:text-white" aria-hidden="true" />
                             </button>
@@ -179,14 +179,14 @@ const CommandPalette: React.FC = () => {
                         {loading && (
                             <div className="p-8 text-center">
                                 <Activity className="animate-spin text-cyan-400 mx-auto mb-2" size={24} />
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic tracking-widest">Sistem Taranıyor...</p>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest italic tracking-widest">Sistem Taranıyor...</p>
                             </div>
                         )}
 
                         {/* Navigation Group */}
                         {filteredNav.length > 0 && (
                             <div className="mb-4">
-                                <div className="px-4 mb-3 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Navigasyon</div>
+                                <div className="px-4 mb-3 text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Navigasyon</div>
                                 <div className="space-y-1">
                                     {filteredNav.map((item, idx) => {
                                         const Icon = item.icon
@@ -195,17 +195,17 @@ const CommandPalette: React.FC = () => {
                                             <button
                                                 key={item.href}
                                                 onClick={() => { setOpen(false); router.push(item.href as import('next').Route) }}
-                                                className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-all text-left group ${
+                                                className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-colors text-left group ${
                                                     isActive 
-                                                        ? 'bg-cyan-400 text-[#0A0F1E] shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
+                                                        ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
                                                         : 'text-slate-400 hover:bg-white/5 hover:text-white'
                                                 }`}
                                             >
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-[#0A0F1E]/10' : 'bg-white/5 text-slate-500 group-hover:text-cyan-400'}`}>
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-surface-deep/10' : 'bg-white/5 text-slate-500 group-hover:text-cyan-400'}`}>
                                                     <Icon size={18} className="shrink-0" />
                                                 </div>
                                                 <span className="flex-1">{item.label}</span>
-                                                {isActive && <ArrowRight size={16} className="text-[#0A0F1E]" />}
+                                                {isActive && <ArrowRight size={16} className="text-surface-deep" />}
                                             </button>
                                         )
                                     })}
@@ -216,7 +216,7 @@ const CommandPalette: React.FC = () => {
                         {/* Products Group */}
                         {products.length > 0 && (
                             <div className="mt-2">
-                                <div className="px-4 my-3 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Ürün Kataloğu</div>
+                                <div className="px-4 my-3 text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Ürün Kataloğu</div>
                                 <div className="space-y-1">
                                     {products.map((p, idx) => {
                                         const globalIdx = filteredNav.length + idx
@@ -225,20 +225,20 @@ const CommandPalette: React.FC = () => {
                                             <button
                                                 key={p.id}
                                                 onClick={() => { setOpen(false); router.push(`/admin/products?id=${p.id}` as import('next').Route) }}
-                                                className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-all text-left group ${
+                                                className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-colors text-left group ${
                                                     isActive 
-                                                        ? 'bg-cyan-400 text-[#0A0F1E] shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
+                                                        ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
                                                         : 'text-slate-400 hover:bg-white/5 hover:text-white'
                                                 }`}
                                             >
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-[#0A0F1E]/10' : 'bg-white/5 text-slate-500 group-hover:text-cyan-400'}`}>
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-surface-deep/10' : 'bg-white/5 text-slate-500 group-hover:text-cyan-400'}`}>
                                                     <Package size={18} className="shrink-0" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="truncate">{p.name}</div>
-                                                    <div className={`text-[10px] font-mono mt-0.5 ${isActive ? 'text-[#0A0F1E]/60' : 'text-slate-500'}`}>SKU: {p.sku}</div>
+                                                    <div className={`text-xs font-mono mt-0.5 ${isActive ? 'text-surface-deep/60' : 'text-slate-500'}`}>SKU: {p.sku}</div>
                                                 </div>
-                                                {isActive && <ArrowRight size={16} className="text-[#0A0F1E]" />}
+                                                {isActive && <ArrowRight size={16} className="text-surface-deep" />}
                                             </button>
                                         )
                                     })}
@@ -253,7 +253,7 @@ const CommandPalette: React.FC = () => {
                                     <Search size={32} className="text-slate-600" />
                                 </div>
                                 <p className="text-sm font-bold text-slate-400">"{search}" için sonuç bulunamadı.</p>
-                                <p className="text-[11px] text-slate-600 mt-2 font-medium">Lütfen farklı anahtar kelimeler deneyin.</p>
+                                <p className="text-xs text-slate-600 mt-2 font-medium">Lütfen farklı anahtar kelimeler deneyin.</p>
                             </div>
                         )}
                     </div>
@@ -261,16 +261,16 @@ const CommandPalette: React.FC = () => {
                     {/* Footer hint */}
                     <div className="bg-white/5 px-6 py-4 flex items-center justify-between border-t border-white/5">
                         <div className="flex items-center gap-4">
-                             <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest">
                                 <kbd className="px-1.5 py-0.5 glass rounded border border-white/10 text-white">⏎</kbd>
                                 Seç
                             </div>
-                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest">
                                 <kbd className="px-1.5 py-0.5 glass rounded border border-white/10 text-white">↑↓</kbd>
                                 Gezin
                             </div>
                         </div>
-                        <div className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
+                        <div className="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
                              <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
                              VentHub AI Search Engine
                         </div>

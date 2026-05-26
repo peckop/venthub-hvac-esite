@@ -22,9 +22,9 @@ export default function InventoryMovementHistory({
             <table className="w-full text-xs border-separate border-spacing-0">
                 <thead>
                     <tr className="bg-white/[0.02]">
-                        <th className="text-left px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Tarih</th>
-                        <th className="text-left px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Sebep</th>
-                        <th className="text-right px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Delta</th>
+                        <th className="text-left px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Tarih</th>
+                        <th className="text-left px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Sebep</th>
+                        <th className="text-right px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Delta</th>
                     </tr>
                 </thead>
                 <tbody className="bg-transparent">

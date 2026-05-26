@@ -98,7 +98,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                                 key={type.id}
                                 onMouseEnter={() => setHoveredType(type.id)}
                                 onMouseLeave={() => setHoveredType(null)}
-                                className={`relative rounded-2xl p-8 border-2 transition-all duration-300 ${isHovered
+                                className={`relative rounded-2xl p-8 border-2 transition-colors duration-300 ${isHovered
                                     ? `${type.colorClasses.border} ${type.colorClasses.bg} shadow-xl ring-4 ${type.colorClasses.ring}`
                                     : 'border-gray-200 bg-white hover:border-gray-300'
                                     }`}
@@ -156,7 +156,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                                 <button
                                     type="button"
                                     onClick={() => onSelectType(type.id)}
-                                    className={`focus-ring w-full py-3 px-6 rounded-xl text-white font-bold transition-all flex items-center justify-center gap-2 ${type.colorClasses.button}`}
+                                    className={`focus-ring w-full py-3 px-6 rounded-xl text-white font-bold transition-colors flex items-center justify-center gap-2 ${type.colorClasses.button}`}
                                 >
                                     {type.title} Modelleri
                                     <ArrowRight size={18} />

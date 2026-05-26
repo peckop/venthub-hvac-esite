@@ -72,7 +72,7 @@ const AdminSettingsPage: React.FC = () => {
           <button 
             onClick={handleSave}
             disabled={saving}
-            className="group relative flex items-center justify-center gap-2 px-8 py-3 bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-700 text-[#0A0F1E] rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.2)]"
+            className="group relative flex items-center justify-center gap-2 px-8 py-3 bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-700 text-surface-deep rounded-xl font-bold transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.2)]"
           >
             {saving ? <Activity className="animate-spin" size={18} /> : <Save size={18} />}
             <span>{saving ? (_t('common.saving') || 'Kaydediliyor...') : (_t('common.saveChanges') || 'Değişiklikleri Kaydet')}</span>
@@ -95,9 +95,9 @@ const AdminSettingsPage: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-colors whitespace-nowrap ${
                 activeTab === tab.id 
-                  ? 'bg-cyan-400 text-[#0A0F1E] shadow-lg shadow-cyan-400/20' 
+                  ? 'bg-cyan-400 text-surface-deep shadow-lg shadow-cyan-400/20' 
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >

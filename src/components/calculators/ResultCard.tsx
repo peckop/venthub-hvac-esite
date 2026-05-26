@@ -72,7 +72,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
         <div
             className={`
         ${config.bgColor} ${config.borderColor}
-        border rounded-xl p-4 transition-all duration-300
+        border rounded-xl p-4 transition-shadow duration-300
         hover:shadow-md
         ${large ? 'col-span-full md:col-span-2' : ''}
       `}

@@ -160,7 +160,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                                 className={`w-full py-4 px-6 rounded-xl font-semibold text-white
                                            bg-gradient-to-r ${category.color || 'from-cyan-500 to-blue-600'}
                                            hover:shadow-lg hover:shadow-cyan-500/25 
-                                           transition-all duration-300 flex items-center justify-center gap-2
+                                           transition-colors duration-300 flex items-center justify-center gap-2
                                            group`}
                             >
                                 <span>{t('category.goToCategory')}</span>

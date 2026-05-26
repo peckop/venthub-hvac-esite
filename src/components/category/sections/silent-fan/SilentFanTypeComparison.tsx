@@ -38,7 +38,7 @@ const SilentFanTypeComparison: React.FC = () => {
                     <div className="lg:col-span-1 bg-slate-900 flex flex-col justify-center py-8">
                         {features.map((f, i: number) => (
                             <div key={i} className="py-4 px-2 text-center border-b border-white/5 last:border-0">
-                                <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold block mb-1">
+                                <span className="text-xs uppercase tracking-widest text-slate-500 font-bold block mb-1">
                                     {f.label}
                                 </span>
                             </div>
@@ -88,14 +88,14 @@ const SilentFanTypeComparison: React.FC = () => {
                 <div className="lg:hidden mt-8 space-y-4">
                     {features.map((f, i: number) => (
                         <div key={i} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                            <span className="text-[10px] uppercase font-bold text-slate-400 mb-2 block">{f.label}</span>
+                            <span className="text-xs uppercase font-bold text-slate-400 mb-2 block">{f.label}</span>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Standart:</span>
+                                    <span className="text-xs font-bold text-slate-400 uppercase">Standart:</span>
                                     <p className="text-sm font-medium text-slate-600">{f.standard}</p>
                                 </div>
                                 <div>
-                                    <span className="text-[10px] font-bold text-blue-500 uppercase">Quiet:</span>
+                                    <span className="text-xs font-bold text-blue-500 uppercase">Quiet:</span>
                                     <p className="text-sm font-bold text-slate-900">{f.quiet}</p>
                                 </div>
                             </div>

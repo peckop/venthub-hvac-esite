@@ -312,7 +312,7 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
                                                                group-hover:shadow-xl group-hover:shadow-cyan-500/30
                                                                border-2 border-white/20
                                                                group-hover:border-cyan-400/50
-                                                               transition-all duration-300"
+                                                               transition-shadow duration-300"
                                                 >
                                                     <Package className="w-5 h-5" />
                                                 </motion.div>

@@ -167,9 +167,9 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.1),transparent_70%)]" />
         </div>
 
-        <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div ref={heroIconRef} className={scrollAnimationClasses.fadeUp(heroIconVisible) + " mb-12 flex justify-center"}>
-            <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-[3rem] bg-white p-8 shadow-[0_0_50px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden">
+            <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-hvac-3xl bg-white p-8 shadow-[0_0_50px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden">
               <BrandIcon brand={brand.name} className="w-full h-full" />
             </div>
           </div>
@@ -178,7 +178,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
             {brand.name}
           </h1>
 
-          <div ref={heroMetaRef} className={scrollAnimationClasses.fadeIn(heroMetaVisible) + " mt-8 flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400"}>
+          <div ref={heroMetaRef} className={scrollAnimationClasses.fadeIn(heroMetaVisible) + " mt-8 flex flex-wrap justify-center gap-8 text-xs font-black uppercase tracking-[0.4em] text-cyan-400"}>
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
               {brand.country} {t('brands.detail.originSuffix')}
@@ -197,10 +197,10 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
 
       {/* Brand Identity & Vision */}
       <section className="py-24 lg:py-32">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-[1fr,450px] gap-24 items-start">
             <div>
-              <div className="text-cyan-600 text-[10px] font-black uppercase tracking-[0.5em] mb-8 text-center lg:text-left">
+              <div className="text-cyan-600 text-xs font-black uppercase tracking-[0.5em] mb-8 text-center lg:text-left">
                 {t('brands.detail.heritage')}
               </div>
               <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-12 text-center lg:text-left text-slate-900">
@@ -214,13 +214,13 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
               </p>
               
               <div className="grid sm:grid-cols-2 gap-12">
-                <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100">
+                <div className="p-8 rounded-hvac-xl bg-slate-50 border border-slate-100">
                   <h3 className="text-lg font-bold text-slate-900 mb-4">{t('brands.detail.globalVision')}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed font-light">
                     {brand.name}, {t('brands.detail.globalVisionDesc')}
                   </p>
                 </div>
-                <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100">
+                <div className="p-8 rounded-hvac-xl bg-slate-50 border border-slate-100">
                   <h3 className="text-lg font-bold text-slate-900 mb-4">{t('brands.detail.technicalExcellence')}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed font-light">
                     {t('brands.detail.technicalExcellenceDesc')}
@@ -230,29 +230,29 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
             </div>
 
             <aside className="sticky top-32 space-y-8">
-              <div className="rounded-[2.5rem] bg-slate-950 p-10 text-white overflow-hidden relative">
+              <div className="rounded-hvac-2xl bg-slate-950 p-10 text-white overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-3xl" />
                 <div className="relative z-10">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8">
+                  <div className="text-xs font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8">
                     {t('brands.detail.corporateSnapshot')}
                   </div>
                   
                   <div className="space-y-6">
                     {detail?.stats?.map((stat, i) => (
                       <div key={i} className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">{stat.label}</span>
+                        <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">{stat.label}</span>
                         <span className="text-sm font-medium">{stat.value}</span>
                       </div>
                     ))}
                     <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">
+                      <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
                         {t('brands.detail.headquarters')}
                       </span>
                       <span className="text-sm font-medium">{brand.headquarters}</span>
                     </div>
                     {brand.website && (
                       <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">
+                        <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
                           {t('brands.detail.webAuthority')}
                         </span>
                         <a 
@@ -271,7 +271,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                   <Link href={Routes.contact()}>
                     <button 
                       aria-label={t('brands.detail.requestCatalog')}
-                      className="mt-12 w-full py-5 bg-white text-slate-950 font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all hover:bg-cyan-400 active:scale-95"
+                      className="mt-12 w-full py-5 bg-white text-slate-950 font-black uppercase text-xs tracking-widest rounded-2xl transition-transform hover:bg-cyan-400 active:scale-95"
                     >
                       {t('brands.detail.requestCatalog')}
                     </button>
@@ -285,10 +285,10 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
 
       {/* Featured Brand Products Grid */}
       <section className="py-24 bg-slate-50 border-y border-slate-100">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 text-center md:text-left">
             <div>
-              <div className="text-cyan-600 text-[10px] font-black uppercase tracking-[0.5em] mb-4">Curated Solutions</div>
+              <div className="text-cyan-600 text-xs font-black uppercase tracking-[0.5em] mb-4">Curated Solutions</div>
               <h2 className="text-4xl font-light tracking-tighter text-slate-950">
                 {t('brands.detail.featuredSystems').split(' ').slice(0, 2).join(' ')} <span className="font-medium">{t('brands.detail.featuredSystems').split(' ').slice(2).join(' ')}</span>
               </h2>
@@ -296,7 +296,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
             <Link 
               href={Routes.products({ brand: brand.name })} 
               aria-label={t('brands.detail.allProductGroups')}
-              className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-colors flex items-center gap-3 justify-center"
+              className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-colors flex items-center gap-3 justify-center"
             >
               <span>{t('brands.detail.allProductGroups')}</span>
               <ArrowRight size={14} />
@@ -305,7 +305,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
 
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[1, 2, 3, 4].map(i => <div key={i} className="aspect-square bg-slate-200 rounded-[2rem] animate-pulse" />)}
+              {[1, 2, 3, 4].map(i => <div key={i} className="aspect-square bg-slate-200 rounded-hvac-xl animate-pulse" />)}
             </div>
           ) : products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -314,18 +314,18 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                   key={product.id} 
                   href={Routes.product(product.slug!)}
                   aria-label={`${product.name} ${t('pdp.details')}`}
-                  className="group block bg-white rounded-[2.5rem] p-8 border border-white transition-all duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
+                  className="group block bg-white rounded-hvac-2xl p-8 border border-white transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
                 >
-                  <div className="aspect-square relative flex items-center justify-center mb-8 grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105">
+                  <div className="aspect-square relative flex items-center justify-center mb-8 grayscale group-hover:grayscale-0 transition-transform duration-700 group-hover:scale-105">
                     <VentImage src={product.image_url} alt={product.name} className="w-full h-full object-contain" />
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-2 line-clamp-2">{product.name}</h3>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{product.sku}</div>
+                  <div className="text-xs font-bold uppercase tracking-widest text-slate-400">{product.sku}</div>
                 </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-20 bg-white rounded-[3rem] border border-dashed border-slate-200">
+            <div className="text-center py-20 bg-white rounded-hvac-3xl border border-dashed border-slate-200">
               <Package className="mx-auto text-slate-200 mb-4" size={48} />
               <p className="text-slate-400 font-light italic">{t('brands.detail.noProducts')}</p>
             </div>

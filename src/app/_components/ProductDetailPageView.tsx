@@ -293,7 +293,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       {/* Seamless Integrated Breadcrumb */}
       <div className="relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-          <nav className="flex items-center space-x-2 text-[10px] sm:text-xs uppercase tracking-widest font-bold text-steel-gray/60">
+          <nav className="flex items-center space-x-2 text-xs sm:text-xs uppercase tracking-widest font-bold text-steel-gray/60">
             <Link href="/" className="hover:text-primary-navy transition-colors">
               {t('category.breadcrumbHome')}
             </Link>
@@ -334,7 +334,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             else if (mainCategory) { router.push(Routes.category(mainCategory.slug), { scroll: false }) }
             else { router.push('/' as import('next').Route, { scroll: false }) }
           }}
-          className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 sm:mb-8 transition-all group font-bold text-xs uppercase tracking-widest"
+          className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 sm:mb-8 transition-colors group font-bold text-xs uppercase tracking-widest"
         >
           <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
           <span>{t('pdp.back')}</span>
@@ -359,7 +359,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-navy opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-navy"></span>
                     </div>
-                    <span className="text-[9px] font-bold text-primary-navy uppercase tracking-widest">
+                    <span className="text-xs font-bold text-primary-navy uppercase tracking-widest">
                       {t('pdp.actions.interactive3D')}
                     </span>
                   </div>
@@ -376,11 +376,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <BrandIcon brand={product.brand || ''} className="w-8 h-8" />
                 <div className="flex flex-col">
                   <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">{product.brand}</span>
-                  <span className="text-steel-gray text-[8px] font-medium tracking-[0.2em]">{t('pdp.officialDistributor')}</span>
+                  <span className="text-steel-gray text-xs font-medium tracking-[0.2em]">{t('pdp.officialDistributor')}</span>
                 </div>
               </div>
               {product.is_featured && (
-                <div className="bg-gold-accent/10 text-gold-accent px-2.5 py-1 rounded-lg text-[9px] font-bold flex items-center space-x-1 border border-gold-accent/20">
+                <div className="bg-gold-accent/10 text-gold-accent px-2.5 py-1 rounded-lg text-xs font-bold flex items-center space-x-1 border border-gold-accent/20">
                   <Star size={10} fill="currentColor" />
                   <span>{t('pdp.featured')}</span>
                 </div>
@@ -401,7 +401,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <button
                   key={`jump-${s.id}`}
                   onClick={() => scrollToSection(s.id)}
-                  className="px-3 py-1.5 bg-air-blue/30 hover:bg-air-blue text-primary-navy rounded-lg text-[9px] font-black uppercase tracking-widest transition-all border border-secondary-blue/10"
+                  className="px-3 py-1.5 bg-air-blue/30 hover:bg-air-blue text-primary-navy rounded-lg text-xs font-black uppercase tracking-widest transition-colors border border-secondary-blue/10"
                   aria-label={`${s.title} ${t('common.scrollTo') || 'bölümüne git'}`}
                 >
                   {s.title}
@@ -412,7 +412,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
-                <span className="text-[9px] font-bold text-steel-gray uppercase tracking-[0.2em] mb-1 opacity-60">{t('pdp.priceAvailability') || 'Price & Availability'}</span>
+                <span className="text-xs font-bold text-steel-gray uppercase tracking-[0.2em] mb-1 opacity-60">{t('pdp.priceAvailability') || 'Price & Availability'}</span>
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
@@ -423,17 +423,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       )}
                     </div>
                     {!(mainCategory?.metadata as CategoryMetadata | null)?.hide_price && (
-                      <span className="text-[9px] font-bold text-steel-gray uppercase mt-1">
+                      <span className="text-xs font-bold text-steel-gray uppercase mt-1">
                         {t('pdp.vatIncluded')}
                       </span>
                     )}
                   </div>
                   <div className="flex flex-col items-end">
-                    <div className={`px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider flex items-center space-x-1.5 ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green/10 text-success-green border border-success-green/20' : 'bg-warning-orange/10 text-warning-orange border border-warning-orange/20'}`}>
+                    <div className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green/10 text-success-green border border-success-green/20' : 'bg-warning-orange/10 text-warning-orange border border-warning-orange/20'}`}>
                       <div className={`w-1 h-1 rounded-full ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green' : 'bg-warning-orange'}`} />
                       <span>{typeof product.stock_qty === 'number' && product.stock_qty > 0 ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
                     </div>
-                    <span className="text-[9px] text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">SKU: {product.sku}</span>
+                    <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">SKU: {product.sku}</span>
                   </div>
                 </div>
               </div>
@@ -444,11 +444,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <div className="bg-white rounded-2xl border border-light-gray p-5 space-y-5">
                 {/* Quantity Control */}
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-industrial-gray uppercase tracking-widest">{t('pdp.qty')}</span>
+                  <span className="text-xs font-bold text-industrial-gray uppercase tracking-widest">{t('pdp.qty')}</span>
                   <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-light-gray/50">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-all text-lg font-bold text-industrial-gray" aria-label={t('common.decrease')}>-</button>
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-lg font-bold text-industrial-gray" aria-label={t('common.decrease')}>-</button>
                     <span className="w-10 text-center font-black text-primary-navy text-sm">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-all text-lg font-bold text-industrial-gray" aria-label={t('common.increase')}>+</button>
+                    <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-lg font-bold text-industrial-gray" aria-label={t('common.increase')}>+</button>
                   </div>
                 </div>
 
@@ -457,7 +457,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {(mainCategory?.metadata as CategoryMetadata | null)?.hide_price ? (
                     <button
                       onClick={() => setLeadOpen(true)}
-                      className="w-full bg-industrial-gray hover:bg-primary-navy text-white font-black py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group"
+                      className="w-full bg-industrial-gray hover:bg-primary-navy text-white font-black py-3.5 px-6 rounded-xl transition-shadow shadow-md flex items-center justify-center space-x-3 group"
                     >
                       <Settings size={16} className="group-hover:rotate-90 transition-transform duration-500" />
                       <span className="text-xs uppercase tracking-[0.15em]">{t('pdp.techQuote')}</span>
@@ -466,7 +466,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <button
                       onClick={handleAddToCart}
                       disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                      className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-black py-3.5 px-6 rounded-xl transition-all shadow-lg hover:shadow-primary-navy/20 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-[0.98]"
+                      className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-black py-3.5 px-6 rounded-xl transition-transform shadow-lg hover:shadow-primary-navy/20 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-[0.98]"
                     >
                       <ShoppingCart size={16} className="group-hover:translate-x-1 transition-transform" />
                       <span className="text-xs uppercase tracking-[0.15em]">{t('pdp.addToCart')}</span>
@@ -475,7 +475,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   
                   <button
                     onClick={() => setIsProjectModalOpen(true)}
-                    className="w-full bg-white border-2 border-primary-navy/10 hover:border-primary-navy text-primary-navy font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center space-x-2 group active:scale-[0.98]"
+                    className="w-full bg-white border-2 border-primary-navy/10 hover:border-primary-navy text-primary-navy font-bold py-3.5 px-6 rounded-xl transition-transform flex items-center justify-center space-x-2 group active:scale-[0.98]"
                   >
                     <FolderPlus size={16} className="group-hover:scale-110 transition-transform" />
                     <span className="text-xs uppercase tracking-[0.15em]">{t('pdp.actions.addToProject')}</span>
@@ -486,7 +486,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
-                    className={`flex-1 flex items-center justify-center space-x-2 py-2.5 border rounded-xl font-bold text-[9px] uppercase tracking-widest transition-all ${isWishlisted
+                    className={`flex-1 flex items-center justify-center space-x-2 py-2.5 border rounded-xl font-bold text-xs uppercase tracking-widest transition-colors ${isWishlisted
                       ? 'border-red-500 text-red-500 bg-red-50'
                       : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
                       }`}
@@ -498,7 +498,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                   <button
                     onClick={handleShare}
-                    className="flex-1 flex items-center justify-center space-x-2 py-2.5 border border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-xl font-bold text-[9px] uppercase tracking-widest transition-all"
+                    className="flex-1 flex items-center justify-center space-x-2 py-2.5 border border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-xl font-bold text-xs uppercase tracking-widest transition-colors"
                     aria-label={t('common.share') || 'Paylaş'}
                   >
                     <Share2 size={14} />
@@ -511,15 +511,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <div className="grid grid-cols-3 gap-2.5">
                 <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
                   <Truck className="text-success-green mb-1.5" size={18} />
-                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.freeShipping')}</p>
+                  <p className="text-xs font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.freeShipping')}</p>
                 </div>
                 <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
                   <Shield className="text-primary-navy mb-1.5" size={18} />
-                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.securePayment')}</p>
+                  <p className="text-xs font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.securePayment')}</p>
                 </div>
                 <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
                   <Award className="text-secondary-blue mb-1.5" size={18} />
-                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.warranty')}</p>
+                  <p className="text-xs font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.warranty')}</p>
                 </div>
               </div>
 
@@ -527,13 +527,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <button
                 onClick={handleDownloadPdf}
                 disabled={isGeneratingPdf}
-                className="w-full bg-slate-900 hover:bg-primary-navy text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-between group disabled:opacity-50"
+                className="w-full bg-slate-900 hover:bg-primary-navy text-white font-bold py-3.5 px-6 rounded-xl transition-opacity flex items-center justify-between group disabled:opacity-50"
               >
                 <div className="flex items-center space-x-3 text-left">
                   {isGeneratingPdf ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} className="group-hover:animate-bounce" />}
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-wider">{t('pdp.labels.technicalDatasheet')}</span>
-                    <span className="text-[8px] text-white/50 font-medium uppercase tracking-[0.2em]">DATASHEET (PDF)</span>
+                    <span className="text-xs uppercase tracking-wider">{t('pdp.labels.technicalDatasheet')}</span>
+                    <span className="text-xs text-white/50 font-medium uppercase tracking-[0.2em]">DATASHEET (PDF)</span>
                   </div>
                 </div>
                 <ChevronRight size={16} className="opacity-30 group-hover:opacity-100 transition-opacity" />
@@ -577,7 +577,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       {/* Section Navigation - Airy Integrated Design */}
       <div
         id="pdp-sticky-nav"
-        className={`transition-all duration-500 z-[40] bg-white/80 backdrop-blur-xl border-b border-light-gray/50 ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0 shadow-lg shadow-primary-navy/5' : 'relative mt-8 sm:mt-12'
+        className={`transition-colors duration-500 z-dropdown bg-white/80 backdrop-blur-xl border-b border-light-gray/50 ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0 shadow-lg shadow-primary-navy/5' : 'relative mt-8 sm:mt-12'
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -586,7 +586,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-[9px] sm:text-[10px] uppercase tracking-[0.2em] whitespace-nowrap transition-all ${activeSection === section.id
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs sm:text-xs uppercase tracking-[0.2em] whitespace-nowrap transition-colors ${activeSection === section.id
                   ? 'bg-primary-navy text-white shadow-hvac scale-105'
                   : 'text-industrial-gray/60 hover:text-primary-navy hover:bg-air-blue/50'
                   }`}
@@ -600,8 +600,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           {isNavSticky && (
             <div className="hidden lg:flex items-center space-x-3 pl-6 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-8 duration-500">
               <div className="flex flex-col items-end mr-2">
-                <span className="text-[10px] font-black text-industrial-gray line-clamp-1 max-w-[120px] uppercase tracking-tight">{product.name}</span>
-                <span className="text-[10px] text-primary-navy font-black tracking-widest">
+                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-[120px] uppercase tracking-tight">{product.name}</span>
+                <span className="text-xs text-primary-navy font-black tracking-widest">
                   {(mainCategory?.metadata as CategoryMetadata)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                 </span>
               </div>
@@ -609,7 +609,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <button
                 onClick={handleAddToCart}
                 disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                className="bg-primary-navy hover:bg-secondary-blue text-white text-[9px] font-black uppercase tracking-widest py-2.5 px-5 rounded-xl transition-all shadow-md active:scale-95 flex items-center space-x-2"
+                className="bg-primary-navy hover:bg-secondary-blue text-white text-xs font-black uppercase tracking-widest py-2.5 px-5 rounded-xl transition-transform shadow-md active:scale-95 flex items-center space-x-2"
               >
                 <ShoppingCart size={14} />
                 <span>{t('pdp.addToCart')}</span>
@@ -627,7 +627,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               key={section.id}
               ref={(el) => { sectionRefs.current[section.id] = el }}
               data-section={section.id}
-              className={`${section.bgClass} py-12 sm:py-20 transition-all duration-500 border-b border-light-gray/20 last:border-0`}
+              className={`${section.bgClass} py-12 sm:py-20 transition-colors duration-500 border-b border-light-gray/20 last:border-0`}
             >
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center space-x-4 mb-10 sm:mb-12">
@@ -646,8 +646,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {section.id === 'genel' && (
                     <>
                       <div className="lg:col-span-7 xl:col-span-8 space-y-8">
-                        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm hover:shadow-md transition-all">
-                          <h4 className="font-black text-industrial-gray mb-6 flex items-center text-[10px] uppercase tracking-[0.2em] opacity-60">
+                        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm hover:shadow-md transition-shadow">
+                          <h4 className="font-black text-industrial-gray mb-6 flex items-center text-xs uppercase tracking-[0.2em] opacity-60">
                             <Info className="text-primary-navy mr-2.5" size={16} />
                             {t('pdp.labels.productDescription')}
                           </h4>
@@ -659,7 +659,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                       <div className="lg:col-span-5 xl:col-span-4">
                         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm sticky top-36">
-                          <h4 className="font-black text-industrial-gray mb-6 text-[10px] uppercase tracking-[0.2em] opacity-60">{t('common.quickDetails')}</h4>
+                          <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-[0.2em] opacity-60">{t('common.quickDetails')}</h4>
                           <div className="space-y-4">
                             {[
                               { label: t('pdp.brand'), value: product.brand },
@@ -667,12 +667,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                               { label: t('pdp.labels.category'), value: mainCategory?.name || '-' }
                             ].map((item, i) => (
                               <div key={i} className="flex justify-between items-center py-3 border-b border-light-gray/30 group">
-                                <span className="text-[10px] font-bold text-steel-gray uppercase tracking-widest">{item.label}</span>
+                                <span className="text-xs font-bold text-steel-gray uppercase tracking-widest">{item.label}</span>
                                 <span className="text-xs font-black text-industrial-gray group-hover:text-primary-navy transition-colors">{item.value}</span>
                               </div>
                             ))}
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
-                              <span className="text-[10px] font-bold text-steel-gray uppercase tracking-[0.2em]">{t('common.listingPrice')}</span>
+                              <span className="text-xs font-bold text-steel-gray uppercase tracking-[0.2em]">{t('common.listingPrice')}</span>
                               <span className="text-lg font-black text-primary-navy">
                                 {(mainCategory?.metadata as CategoryMetadata | null)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                               </span>
@@ -687,15 +687,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <div className="col-span-full">
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[1, 2, 3].map((variant) => (
-                          <div key={variant} className="bg-white rounded-2xl p-6 border border-light-gray shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
-                            <div className="aspect-square bg-slate-50 rounded-xl mb-4 flex items-center justify-center border border-light-gray/30 group-hover:bg-air-blue/10 transition-all">
-                              <BrandIcon brand={product.brand} className="scale-125 grayscale group-hover:grayscale-0 transition-all duration-500" />
+                          <div key={variant} className="bg-white rounded-2xl p-6 border border-light-gray shadow-sm hover:shadow-md transition-shadow group overflow-hidden relative">
+                            <div className="aspect-square bg-slate-50 rounded-xl mb-4 flex items-center justify-center border border-light-gray/30 group-hover:bg-air-blue/10 transition-colors">
+                              <BrandIcon brand={product.brand} className="scale-125 grayscale group-hover:grayscale-0 transition-transform duration-500" />
                             </div>
                             <h4 className="font-black text-industrial-gray mb-1 text-sm uppercase tracking-tight">{product.sku}-{variant}</h4>
-                            <p className="text-steel-gray text-[10px] font-medium mb-4">{t('pdp.variantDetails')}</p>
+                            <p className="text-steel-gray text-xs font-medium mb-4">{t('pdp.variantDetails')}</p>
                             <div className="flex items-center justify-between pt-3 border-t border-light-gray/50">
                               <div className="text-primary-navy font-black text-sm">{formatCurrency((product.price + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}</div>
-                              <button className="p-1.5 bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white rounded-lg transition-all" aria-label={t('common.next')}><ChevronRight size={14} /></button>
+                              <button className="p-1.5 bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white rounded-lg transition-colors" aria-label={t('common.next')}><ChevronRight size={14} /></button>
                             </div>
                           </div>
                         ))}
@@ -712,18 +712,18 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             const Icon = group.icon;
                             return (
                               <div key={groupKey} className="border border-light-gray/40 rounded-2xl overflow-hidden">
-                                <button onClick={() => toggleSpecSection(groupKey)} className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-air-blue/10 transition-all group">
+                                <button onClick={() => toggleSpecSection(groupKey)} className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-air-blue/10 transition-colors group">
                                   <div className="flex items-center space-x-3">
                                     <div className="p-1.5 bg-white rounded-lg shadow-xs group-hover:shadow-sm border border-light-gray/50"><Icon size={18} className="text-primary-navy" /></div>
                                     <span className="font-black text-industrial-gray text-xs uppercase tracking-widest">{t(`pdp.specGroups.${groupKey}`) || groupKey}</span>
                                   </div>
                                   <div className={`p-1.5 rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-primary-navy text-white' : 'bg-white text-primary-navy'}`}><ChevronDown size={16} /></div>
                                 </button>
-                                <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
+                                <div className={`transition-colors duration-500 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
                                   <div className="p-5 bg-white grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-1">
                                     {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
                                       <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
-                                        <span className="text-[10px] font-bold text-steel-gray uppercase tracking-wider">{t(`pdp.specs.${key}`) || translateSpecKey(key)}</span>
+                                        <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{t(`pdp.specs.${key}`) || translateSpecKey(key)}</span>
                                         <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val)}</span>
                                       </div>
                                     ))}
@@ -740,31 +740,31 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {section.id === 'diagrams' && (
                     <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                        <h4 className="font-black text-industrial-gray mb-6 text-[10px] uppercase tracking-[0.2em] opacity-60">{t('pdp.diagramsExtra.technicalDiagrams')}</h4>
+                        <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-[0.2em] opacity-60">{t('pdp.diagramsExtra.technicalDiagrams')}</h4>
                         <div className="space-y-4">
                           {['mounting', 'electrical'].map(type => (
-                            <div key={type} className="group relative aspect-video bg-slate-50 rounded-2xl flex items-center justify-center border-2 border-dashed border-light-gray hover:border-primary-navy/30 transition-all cursor-pointer overflow-hidden">
+                            <div key={type} className="group relative aspect-video bg-slate-50 rounded-2xl flex items-center justify-center border-2 border-dashed border-light-gray hover:border-primary-navy/30 transition-colors cursor-pointer overflow-hidden">
                               <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
                                 <div className="p-2.5 bg-primary-navy text-white rounded-full shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform"><Download size={20} /></div>
                               </div>
                               <div className="text-center">
                                 <FileText size={28} className="text-primary-navy/40 mx-auto mb-2" />
-                                <p className="text-industrial-gray font-black text-[10px] uppercase tracking-widest">{t(`pdp.diagramsExtra.${type}`)}</p>
-                                <p className="text-[8px] text-steel-gray font-bold mt-1 uppercase tracking-tighter">PDF {t('common.pdfDatasheet')}</p>
+                                <p className="text-industrial-gray font-black text-xs uppercase tracking-widest">{t(`pdp.diagramsExtra.${type}`)}</p>
+                                <p className="text-xs text-steel-gray font-bold mt-1 uppercase tracking-tighter">PDF {t('common.pdfDatasheet')}</p>
                               </div>
                             </div>
                           ))}
                         </div>
                       </div>
                       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                        <h4 className="font-black text-industrial-gray mb-6 text-[10px] uppercase tracking-[0.2em] opacity-60">{t('pdp.diagramsExtra.threeDViews')}</h4>
+                        <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-[0.2em] opacity-60">{t('pdp.diagramsExtra.threeDViews')}</h4>
                         <div className="space-y-4">
                           {[ { icon: Settings, label: 'view3DModel', sub: 'interactiveModel' }, { icon: Ruler, label: 'dimensionedDrawing', sub: 'CAD/DWG AVAILABLE' } ].map((item, i) => (
-                            <div key={i} className="p-5 bg-slate-50 rounded-2xl border border-light-gray/50 flex items-center space-x-5 group hover:bg-white hover:shadow-md transition-all">
-                              <div className="w-12 h-12 bg-white rounded-xl shadow-xs flex items-center justify-center flex-shrink-0 group-hover:bg-primary-navy group-hover:text-white transition-all"><item.icon size={22} /></div>
+                            <div key={i} className="p-5 bg-slate-50 rounded-2xl border border-light-gray/50 flex items-center space-x-5 group hover:bg-white hover:shadow-md transition-shadow">
+                              <div className="w-12 h-12 bg-white rounded-xl shadow-xs flex items-center justify-center flex-shrink-0 group-hover:bg-primary-navy group-hover:text-white transition-shadow"><item.icon size={22} /></div>
                               <div>
                                 <p className="text-xs font-black text-industrial-gray uppercase tracking-tight">{t(`pdp.diagramsExtra.${item.label}`)}</p>
-                                <p className="text-[9px] text-steel-gray font-bold uppercase tracking-widest mt-1">{item.sub.startsWith('CAD') ? t('pdp.diagramsExtra.cadDwgAvailable') : t(`pdp.diagramsExtra.${item.sub}`)}</p>
+                                <p className="text-xs text-steel-gray font-bold uppercase tracking-widest mt-1">{item.sub.startsWith('CAD') ? t('pdp.diagramsExtra.cadDwgAvailable') : t(`pdp.diagramsExtra.${item.sub}`)}</p>
                               </div>
                             </div>
                           ))}
@@ -776,10 +776,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {section.id === 'documents' && (
                     <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                       {['installationGuide', 'userManual', 'maintenanceManual', 'safetyInfo', 'warrantyTerms', 'technicalSpecsDoc'].map((doc, i) => (
-                        <div key={i} className="bg-white rounded-3xl p-6 border border-light-gray shadow-sm hover:shadow-md transition-all group text-center">
-                          <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:bg-air-blue/20 transition-all"><FileText size={32} className="text-primary-navy/40" /></div>
+                        <div key={i} className="bg-white rounded-3xl p-6 border border-light-gray shadow-sm hover:shadow-md transition-shadow group text-center">
+                          <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:bg-air-blue/20 transition-colors"><FileText size={32} className="text-primary-navy/40" /></div>
                           <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-4 min-h-[2rem]">{t(`pdp.docs.${doc}`)}</h4>
-                          <button className="w-full bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white py-3 px-4 rounded-xl transition-all font-black text-[9px] uppercase tracking-widest flex items-center justify-center space-x-2">
+                          <button className="w-full bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white py-3 px-4 rounded-xl transition-colors font-black text-xs uppercase tracking-widest flex items-center justify-center space-x-2">
                             <Download size={14} /> <span>{t('pdp.actions.download')}</span>
                           </button>
                         </div>
@@ -791,9 +791,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-8">
                       {['productCatalog', 'technicalBrochure'].map(type => (
                         <div key={type} className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                          <h4 className="font-black text-industrial-gray mb-6 text-[10px] uppercase tracking-[0.2em] opacity-60">{t(`pdp.docs.${type}`)}</h4>
+                          <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-[0.2em] opacity-60">{t(`pdp.docs.${type}`)}</h4>
                           <div className="aspect-[4/3] bg-slate-50 rounded-xl mb-6 flex items-center justify-center border border-light-gray/30"><Download size={40} className="text-primary-navy/20" /></div>
-                          <button onClick={type === 'technicalBrochure' ? handleDownloadPdf : undefined} className="w-full bg-slate-900 hover:bg-primary-navy text-white py-3.5 px-6 rounded-xl transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center space-x-2">
+                          <button onClick={type === 'technicalBrochure' ? handleDownloadPdf : undefined} className="w-full bg-slate-900 hover:bg-primary-navy text-white py-3.5 px-6 rounded-xl transition-colors font-black text-xs uppercase tracking-widest flex items-center justify-center space-x-2">
                             <Download size={18} /> <span>{t(`pdp.actions.download${type === 'productCatalog' ? 'Catalog' : 'Brochure'}`)}</span>
                           </button>
                         </div>
@@ -805,9 +805,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                       {['ceCertificate', 'iso9001', 'tseCertificate', 'energyStar', 'ulCertificate', 'ecoFriendly'].map((cert, i) => (
                         <div key={i} className="bg-white rounded-3xl p-6 border border-light-gray shadow-sm text-center">
-                          <div className="bg-slate-50 rounded-2xl p-5 mb-5 group-hover:bg-air-blue/10 transition-all"><Award size={36} className="text-primary-navy/30 mx-auto" /></div>
+                          <div className="bg-slate-50 rounded-2xl p-5 mb-5 group-hover:bg-air-blue/10 transition-colors"><Award size={36} className="text-primary-navy/30 mx-auto" /></div>
                           <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-3">{t(`pdp.cert.${cert}`)}</h4>
-                          <div className="text-[9px] text-steel-gray space-y-1 font-bold uppercase tracking-widest opacity-60">
+                          <div className="text-xs text-steel-gray space-y-1 font-bold uppercase tracking-widest opacity-60">
                             <p>{t('pdp.certLabels.certificateNo')}: {cert.toUpperCase()}-2024</p>
                             <p>{t('pdp.certLabels.standard')}: ISO/EN-STD</p>
                           </div>

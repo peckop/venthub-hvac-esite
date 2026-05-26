@@ -94,37 +94,37 @@ const StatCard: React.FC<StatCardProps> = ({
     const content = (
         <div className="flex items-start justify-between relative z-10 h-full">
             <div className="flex-1 min-w-0 pr-2">
-                <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] leading-tight mb-4 truncate group-hover:text-slate-400 transition-colors" title={title}>
+                <div className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] leading-tight mb-4 truncate group-hover:text-slate-400 transition-colors" title={title}>
                     {title}
                 </div>
                 <div className="flex items-baseline gap-2 flex-wrap">
                     <span
-                        className="text-3xl lg:text-4xl font-black text-white tracking-tighter transition-all duration-500 group-hover:scale-105 origin-left truncate"
+                        className="text-3xl lg:text-4xl font-black text-white tracking-tighter transition-transform duration-500 group-hover:scale-105 origin-left truncate"
                         title={typeof displayValue === 'string' ? displayValue : undefined}
                     >
                         {displayValue}
                     </span>
                     {trend && !loading && (
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ring-1 ring-inset inline-flex items-center gap-0.5 ${trend.value >= 0 ? 'bg-emerald-400/10 text-emerald-400 ring-emerald-400/20' : 'bg-rose-400/10 text-rose-400 ring-rose-400/20'}`}>
+                        <span className={`text-xs font-black px-2 py-0.5 rounded-full ring-1 ring-inset inline-flex items-center gap-0.5 ${trend.value >= 0 ? 'bg-emerald-400/10 text-emerald-400 ring-emerald-400/20' : 'bg-rose-400/10 text-rose-400 ring-rose-400/20'}`}>
                             {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}%
                         </span>
                     )}
                 </div>
                 {subtitle && !loading && (
-                    <div className="mt-2 text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] truncate opacity-50 italic">
+                    <div className="mt-2 text-xs font-black text-slate-500 uppercase tracking-[0.3em] truncate opacity-50 italic">
                         {subtitle}
                     </div>
                 )}
             </div>
             {icon && (
-                <div className={`flex shrink-0 w-14 h-14 rounded-2xl ${currentAccent.iconBg} items-center justify-center border border-white/5 shadow-2xl ml-auto transition-all duration-700 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]`}>
+                <div className={`flex shrink-0 w-14 h-14 rounded-2xl ${currentAccent.iconBg} items-center justify-center border border-white/5 shadow-2xl ml-auto transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]`}>
                     {React.cloneElement(icon as React.ReactElement<{ size?: number, strokeWidth?: number }>, { size: 24, strokeWidth: 2.5 })}
                 </div>
             )}
         </div>
     )
 
-    const baseClass = `glass-strong !p-8 relative overflow-hidden group transition-all duration-500 shadow-2xl border ${currentAccent.border} hover:border-white/20`
+    const baseClass = `glass-strong !p-8 relative overflow-hidden group transition-colors duration-500 shadow-2xl border ${currentAccent.border} hover:border-white/20`
 
     if (href) {
         return (

@@ -70,7 +70,7 @@ export default function AccountProfilePage() {
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
                     placeholder={t('account.profile.fullNamePlaceholder')}
-                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                   />
                 </div>
               </div>
@@ -88,7 +88,7 @@ export default function AccountProfilePage() {
                     value={phone}
                     onChange={e => setPhone(e.target.value.replace(/[^0-9+\s-]/g, ''))}
                     placeholder={t('account.profile.phonePlaceholder')}
-                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                   />
                 </div>
               </div>
@@ -97,7 +97,7 @@ export default function AccountProfilePage() {
             <div className="pt-4 border-t border-slate-100 flex justify-end mt-2">
               <button
                 disabled={saving}
-                className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-all hover:scale-[1.02] flex items-center gap-2"
+                className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-transform hover:scale-[1.02] flex items-center gap-2"
               >
                 {saving ? (
                   <>

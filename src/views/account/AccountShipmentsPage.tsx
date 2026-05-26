@@ -116,19 +116,19 @@ export default function AccountShipmentsPage() {
     switch (status) {
       case 'delivered':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
             <CheckCircle className="w-3.5 h-3.5" /> Teslim Edildi
           </span>
         )
       case 'shipped':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200 shadow-sm">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200 shadow-sm">
             <Truck className="w-3.5 h-3.5" /> Kargoda
           </span>
         )
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
             <Clock className="w-3.5 h-3.5" /> Hazırlanıyor
           </span>
         )
@@ -190,7 +190,7 @@ export default function AccountShipmentsPage() {
               <button
                 key={opt.value}
                 onClick={() => setFilter(opt.value)}
-                className={`h-8 px-4 rounded-lg text-xs font-bold transition-all border ${filter === opt.value
+                className={`h-8 px-4 rounded-lg text-xs font-bold transition-colors border ${filter === opt.value
                   ? 'bg-primary-navy text-white border-primary-navy shadow-sm shadow-primary-navy/20'
                   : 'bg-white text-slate-600 border-slate-200 hover:border-primary-navy hover:text-primary-navy'
                   }`}
@@ -212,7 +212,7 @@ export default function AccountShipmentsPage() {
           <p className="text-sm text-slate-500 mb-6">{t('orders.noShippingInfo') || 'Siparişlerinize kargo bilgisi eklendiğinde burada görünecektir.'}</p>
           <button
             onClick={() => router.push('/account/orders')}
-            className="h-10 px-6 bg-primary-navy hover:bg-industrial-gray text-white font-bold rounded-lg shadow-sm shadow-primary-navy/20 transition-all hover:scale-[1.02] inline-flex items-center gap-2"
+            className="h-10 px-6 bg-primary-navy hover:bg-industrial-gray text-white font-bold rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-[1.02] inline-flex items-center gap-2"
           >
             <Package size={16} /> {t('account.shipments.goToOrders')}
           </button>
@@ -251,7 +251,7 @@ export default function AccountShipmentsPage() {
                       {getShipStatusBadge(shipStatus)}
                       <button
                         onClick={() => router.push(`/account/orders/detail?id=${o.id}`)}
-                        className="h-8 px-3 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 hover:border-primary-navy hover:text-primary-navy rounded-lg transition-all shadow-sm"
+                        className="h-8 px-3 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 hover:border-primary-navy hover:text-primary-navy rounded-lg transition-shadow shadow-sm"
                       >
                         Detay
                       </button>
@@ -268,11 +268,11 @@ export default function AccountShipmentsPage() {
                       return (
                         <React.Fragment key={step.key}>
                           <div className="flex flex-col items-center min-w-[80px]">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-all ${active ? 'bg-primary-navy text-white' : 'bg-white border border-slate-200 text-slate-400'
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${active ? 'bg-primary-navy text-white' : 'bg-white border border-slate-200 text-slate-400'
                               }`}>
                               <StepIcon size={14} />
                             </div>
-                            <span className={`mt-2 text-[10px] font-bold uppercase tracking-wider ${active ? 'text-primary-navy' : 'text-slate-400'}`}>
+                            <span className={`mt-2 text-xs font-bold uppercase tracking-wider ${active ? 'text-primary-navy' : 'text-slate-400'}`}>
                               {step.label}
                             </span>
                           </div>
@@ -290,13 +290,13 @@ export default function AccountShipmentsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {/* Kargo Firması */}
                     <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-3.5">
-                      <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.carrier') || 'Kargo Firması'}</span>
+                      <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.carrier') || 'Kargo Firması'}</span>
                       <span className="text-sm font-bold text-slate-900">{o.carrier || '-'}</span>
                     </div>
 
                     {/* Takip Numarası */}
                     <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-3.5">
-                      <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.trackingNumber') || 'Takip No'}</span>
+                      <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.trackingNumber') || 'Takip No'}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-slate-900 break-all">{o.tracking_number || '-'}</span>
                         {o.tracking_number && (
@@ -309,7 +309,7 @@ export default function AccountShipmentsPage() {
 
                     {/* Takip Linki */}
                     <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-3.5">
-                      <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.trackingLink') || 'Takip Bağlantısı'}</span>
+                      <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.trackingLink') || 'Takip Bağlantısı'}</span>
                       {o.tracking_url ? (
                         <a href={o.tracking_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary-navy hover:underline">
                           <ExternalLink size={13} /> Kargoyu Takip Et
@@ -321,13 +321,13 @@ export default function AccountShipmentsPage() {
 
                     {/* Kargoya Verilme */}
                     <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-3.5">
-                      <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.shippedAt') || 'Kargoya Verildi'}</span>
+                      <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.shippedAt') || 'Kargoya Verildi'}</span>
                       <span className="text-sm font-bold text-slate-900">{formatDate(o.shipped_at)}</span>
                     </div>
 
                     {/* Teslim Tarihi */}
                     <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-3.5">
-                      <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.deliveredAt') || 'Teslim Edildi'}</span>
+                      <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.deliveredAt') || 'Teslim Edildi'}</span>
                       <span className="text-sm font-bold text-slate-900">{formatDate(o.delivered_at)}</span>
                     </div>
                   </div>

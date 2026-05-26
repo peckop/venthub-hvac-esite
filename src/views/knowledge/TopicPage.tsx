@@ -40,7 +40,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
           </p>
           <Link 
             href={Routes.destek.home()} 
-            className="inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-cyan-600 hover:text-slate-950 transition-colors"
+            className="inline-flex items-center gap-3 text-xs font-black uppercase tracking-widest text-cyan-600 hover:text-slate-950 transition-colors"
           >
             <ArrowLeft size={14} /> {t('knowledge.topic.backToHub')}
           </Link>
@@ -76,10 +76,10 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
           />
         </div>
         
-        <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <Link 
             href={Routes.destek.home()}
-            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-cyan-400 hover:text-white transition-colors mb-12"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-cyan-400 hover:text-white transition-colors mb-12"
           >
             <ArrowLeft size={12} /> {t('knowledge.topic.backToHub')}
           </Link>
@@ -90,7 +90,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
           >
             <div className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8">
               <BookOpen size={14} className="text-cyan-400" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">Technical Intelligence</span>
+              <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400">Technical Intelligence</span>
             </div>
             
             <h1 className="text-5xl lg:text-7xl font-extralight tracking-tighter leading-tight mb-8 max-w-4xl">
@@ -106,10 +106,10 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
 
       {/* Content Grid */}
       <section className="py-24">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 mb-20">
             {/* Steps Card */}
-            <div className="p-12 rounded-[3rem] bg-slate-50 border border-slate-100">
+            <div className="p-12 rounded-hvac-3xl bg-slate-50 border border-slate-100">
               <h2 className="text-2xl font-bold text-slate-950 tracking-tight mb-10 flex items-center gap-4">
                 <span className="w-8 h-8 rounded-full bg-cyan-500 text-white flex items-center justify-center text-xs">1</span>
                 {t('knowledge.topic.stepsTitle')}
@@ -125,7 +125,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
             </div>
 
             {/* Pitfalls Card */}
-            <div className="p-12 rounded-[3rem] bg-amber-50/30 border border-amber-100/50">
+            <div className="p-12 rounded-hvac-3xl bg-amber-50/30 border border-amber-100/50">
               <h2 className="text-2xl font-bold text-slate-950 tracking-tight mb-10 flex items-center gap-4">
                 <span className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs">!</span>
                 {t('knowledge.topic.pitfallsTitle')}
@@ -145,13 +145,13 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link
               href={(currentSlug ? getCategoryUrlFromTopic(currentSlug) : '/products') as import('next').Route}
-              className="group inline-flex items-center gap-4 bg-slate-950 text-white px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-cyan-600 transition-all shadow-2xl active:scale-95"
+              className="group inline-flex items-center gap-4 bg-slate-950 text-white px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-transform shadow-2xl active:scale-95"
             >
               {t('knowledge.topic.toProducts')} <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
             </Link>
             <Link
               href={Routes.contact()}
-              className="inline-flex items-center gap-4 bg-white border border-slate-200 text-slate-950 px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-50 transition-all active:scale-95"
+              className="inline-flex items-center gap-4 bg-white border border-slate-200 text-slate-950 px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 transition-transform active:scale-95"
             >
               {t('knowledge.topic.getQuote')}
             </Link>

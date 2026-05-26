@@ -59,7 +59,7 @@ const FAQ: React.FC = () => {
                         return (
                             <div
                                 key={index}
-                                className={`border rounded-xl overflow-hidden transition-all ${isOpen ? 'border-blue-200 shadow-md' : 'border-gray-200'
+                                className={`border rounded-xl overflow-hidden transition-colors ${isOpen ? 'border-blue-200 shadow-md' : 'border-gray-200'
                                     }`}
                             >
                                 <button
@@ -82,7 +82,7 @@ const FAQ: React.FC = () => {
 
                                 <div
                                     id={`faq-content-${index}`}
-                                    className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96' : 'max-h-0'
+                                    className={`overflow-hidden transition-colors duration-300 ${isOpen ? 'max-h-96' : 'max-h-0'
                                         }`}
                                 >
                                     <div className="p-5 pt-0 text-gray-600 leading-relaxed">

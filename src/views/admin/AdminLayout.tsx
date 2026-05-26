@@ -66,7 +66,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-[#0A0F1E]">
+      <div className="h-screen flex items-center justify-center bg-surface-deep">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400" />
       </div>
     )
@@ -101,17 +101,17 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   ]
 
   return (
-    <div className="h-screen flex flex-col font-sans bg-[#0A0F1E] text-slate-200 overflow-hidden">
+    <div className="h-screen flex flex-col font-sans bg-surface-deep text-slate-200 overflow-hidden">
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary-navy/20 blur-[120px] rounded-full opacity-50" />
         <div className="absolute top-[20%] -right-[10%] w-[30%] h-[50%] bg-secondary-blue/10 blur-[100px] rounded-full opacity-30" />
       </div>
 
-      <header className="h-16 flex-none border-b border-white/5 bg-[#0A0F1E]/60 backdrop-blur-xl relative z-50 px-4 md:px-8 flex items-center justify-between">
+      <header className="h-16 flex-none border-b border-white/5 bg-surface-deep/60 backdrop-blur-xl relative z-50 px-4 md:px-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             type="button"
-            className="p-2 text-cyan-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all active:scale-95"
+            className="p-2 text-cyan-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-transform active:scale-95"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
@@ -134,19 +134,19 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
       <div className="flex-1 flex overflow-hidden relative z-10">
         {/* Sidebar KatmanÄ± */}
         <aside className={`
-          absolute lg:relative inset-y-0 left-0 z-40 w-[280px] bg-[#0A0F1E] border-r border-white/5 transition-all duration-300 ease-in-out
+          absolute lg:relative inset-y-0 left-0 z-40 w-[280px] bg-surface-deep border-r border-white/5 transition-colors duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
         `}>
           <nav className="h-full overflow-y-auto p-4 space-y-8 py-8 custom-scrollbar">
             {navGroups.map((group, gi) => (
               <div key={gi}>
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 px-3 opacity-60">{group.label}</h3>
+                <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 px-3 opacity-60">{group.label}</h3>
                 <div className="space-y-1">
                   {group.items.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href as import('next').Route}
-                      className={`flex items-center gap-3 px-3 py-2.5 text-sm font-bold transition-all rounded-xl ${
+                      className={`flex items-center gap-3 px-3 py-2.5 text-sm font-bold transition-colors rounded-xl ${
                         pathname === item.href ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'
                       }`}
                       onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
@@ -163,10 +163,10 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
 
         {/* Ana Ä°Ã§erik KatmanÄ± */}
         <main className="flex-1 overflow-y-auto relative custom-scrollbar flex flex-col bg-white/[0.02]">
-            <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 md:p-8">
+            <div className="flex-1 w-full max-w-page mx-auto p-4 md:p-8">
                 {children}
             </div>
-            <footer className="px-8 py-6 text-slate-600 text-[10px] font-bold uppercase tracking-widest flex justify-between opacity-50 border-t border-white/5">
+            <footer className="px-8 py-6 text-slate-600 text-xs font-bold uppercase tracking-widest flex justify-between opacity-50 border-t border-white/5">
                 <span>Â© 2026 VentHub Platinum</span>
                 <span className="text-cyan-400/40">Secure Node</span>
             </footer>

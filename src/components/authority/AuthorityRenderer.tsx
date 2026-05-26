@@ -94,7 +94,7 @@ const FeaturesGridBlock: React.FC<{ block: FeaturesGridBlockType }> = ({ block }
         )}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {block.content.items.map((item, i) => (
-                <div key={i} className="group p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
+                <div key={i} className="group p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:-translate-y-2 transition-transform duration-500">
                     <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white mb-6 shadow-lg shadow-indigo-200">
                         <IconRenderer name={item.icon} className="w-7 h-7" />
                     </div>
@@ -111,9 +111,9 @@ const ComparisonBlock: React.FC<{ block: ComparisonBlockType }> = ({ block }) =>
         {block.content.title && (
             <h3 className="text-3xl font-black text-center mb-16 tracking-tight text-slate-900">{block.content.title}</h3>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-1 px-4 md:px-0 bg-slate-100 rounded-[40px] overflow-hidden border-8 border-slate-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1 px-4 md:px-0 bg-slate-100 rounded-hvac-2xl overflow-hidden border-8 border-slate-100">
             <div className="relative aspect-video bg-white flex flex-col items-center justify-center p-8 text-center group">
-                <span className="absolute top-6 left-6 px-4 py-1 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400">{block.content.leftLabel}</span>
+                <span className="absolute top-6 left-6 px-4 py-1 rounded-full bg-slate-100 text-xs font-black uppercase tracking-widest text-slate-400">{block.content.leftLabel}</span>
                 {block.content.leftImage ? (
                     <img src={block.content.leftImage} alt={block.content.leftLabel} className="w-full h-full object-contain" />
                 ) : (
@@ -121,7 +121,7 @@ const ComparisonBlock: React.FC<{ block: ComparisonBlockType }> = ({ block }) =>
                 )}
             </div>
             <div className="relative aspect-video bg-indigo-600 flex flex-col items-center justify-center p-8 text-center group">
-                <span className="absolute top-6 right-6 px-4 py-1 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-widest text-white">{block.content.rightLabel}</span>
+                <span className="absolute top-6 right-6 px-4 py-1 rounded-full bg-white/20 text-xs font-black uppercase tracking-widest text-white">{block.content.rightLabel}</span>
                 {block.content.rightImage ? (
                     <img src={block.content.rightImage} alt={block.content.rightLabel} className="w-full h-full object-contain brightness-0 invert" />
                 ) : (
@@ -139,7 +139,7 @@ const ComparisonBlock: React.FC<{ block: ComparisonBlockType }> = ({ block }) =>
 
 const CtaBannerBlock: React.FC<{ block: CtaBannerBlockType }> = ({ block }) => (
     <div className="max-w-7xl mx-auto py-12 px-6">
-        <div className="relative rounded-[40px] bg-indigo-600 p-12 md:p-20 overflow-hidden text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-12">
+        <div className="relative rounded-hvac-2xl bg-indigo-600 p-12 md:p-20 overflow-hidden text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-12">
             <div className="relative z-10 max-w-2xl">
                 <h3 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tight leading-tight">{block.content.title}</h3>
                 <p className="text-indigo-100 text-lg md:text-xl font-medium opacity-80">{block.content.description}</p>
@@ -147,7 +147,7 @@ const CtaBannerBlock: React.FC<{ block: CtaBannerBlockType }> = ({ block }) => (
             <div className="relative z-10 shrink-0">
                 <a 
                     href={block.content.buttonLink} 
-                    className="inline-flex h-16 items-center justify-center rounded-3xl bg-white px-10 text-lg font-black text-indigo-600 hover:bg-indigo-50 hover:scale-105 transition-all shadow-2xl shadow-black/20 active:scale-95"
+                    className="inline-flex h-16 items-center justify-center rounded-3xl bg-white px-10 text-lg font-black text-indigo-600 hover:bg-indigo-50 hover:scale-105 transition-transform shadow-2xl shadow-black/20 active:scale-95"
                 >
                     {block.content.buttonLabel}
                     <LucideIcons.ArrowRight className="ml-3 w-6 h-6" />

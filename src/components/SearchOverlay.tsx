@@ -210,7 +210,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           addToRecent(q)
           handleClose()
         }}
-        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 group outline-none hover:scale-[1.01] hover:shadow-md hover:z-10 relative ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20 shadow-sm' : 'hover:bg-gray-50'}`}
+        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-transform duration-200 group outline-none hover:scale-[1.01] hover:shadow-md hover:z-10 relative ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20 shadow-sm' : 'hover:bg-gray-50'}`}
       >
         <div className={`p-2 rounded-lg border transition-colors flex items-center justify-center ${isActive ? 'bg-white border-primary-ocean/30 shadow-sm' : 'bg-gray-50 border-transparent group-hover:bg-white group-hover:border-gray-200'}`}>
           {icon}
@@ -226,7 +226,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           )}
         </div>
         <div className={`transition-opacity flex items-center gap-1.5 ${isActive ? 'opacity-100 text-primary-navy' : 'opacity-0 text-primary-ocean group-hover:opacity-100'}`}>
-          <span className="text-[10px] font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 hidden xs:inline-block shadow-sm">Enter ↵</span>
+          <span className="text-xs font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 hidden xs:inline-block shadow-sm">Enter ↵</span>
         </div>
       </button>
     )
@@ -272,7 +272,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             <button
               key={String(cat.id)}
               onClick={() => { router.push(Routes.category(String(cat.slug))); handleClose(); }}
-              className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-all flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-colors flex items-center gap-1.5"
             >
               {getCategoryIcon(String(cat.slug), { size: 14 })}
               {String(cat.name)}
@@ -286,7 +286,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               <button
                 key={cat.slug}
                 onClick={() => { router.push(Routes.category(cat.slug)); handleClose(); }}
-                className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-all"
+                className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-colors"
               >
                 {cat.name}
               </button>
@@ -358,7 +358,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             return (
               <li key={r.id}>
                 <button
-                  className={`w-full text-left px-4 py-3 flex items-center justify-between group outline-none transition-all ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20' : 'hover:bg-slate-50'}`}
+                  className={`w-full text-left px-4 py-3 flex items-center justify-between group outline-none transition-colors ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20' : 'hover:bg-slate-50'}`}
                   onClick={() => { router.push(Routes.product(r.slug!)); handleClose() }}
                   onMouseEnter={() => setActiveIndex(idx)}
                 >
@@ -382,7 +382,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
                     </div>
                   </div>
                   <div className={`transition-opacity flex items-center gap-2 ${isActive ? 'opacity-100 text-primary-navy' : 'opacity-0 text-primary-ocean group-hover:opacity-100'}`}>
-                    <span className="text-[10px] font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 hidden sm:inline-block shadow-sm">Enter ↵</span>
+                    <span className="text-xs font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 hidden sm:inline-block shadow-sm">Enter ↵</span>
                   </div>
                 </button>
               </li>
@@ -396,7 +396,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-4 sm:pt-16 pb-4 px-2">
+    <div className="fixed inset-0 z-modal flex items-start justify-center pt-4 sm:pt-16 pb-4 px-2">
       <div 
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" 
         onClick={handleClose} 

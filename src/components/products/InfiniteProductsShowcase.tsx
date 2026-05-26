@@ -219,7 +219,7 @@ const InfiniteProductsShowcase: React.FC<InfiniteProductsShowcaseProps> = ({ ite
     if (!items || items.length === 0) return null
 
     return (
-        <div className="w-full h-[550px] relative bg-[#020617] overflow-hidden group/canvas">
+        <div className="w-full h-[550px] relative bg-surface-darker overflow-hidden group/canvas">
             <Canvas
                 shadows={false}
                 gl={{ 
@@ -249,7 +249,7 @@ const InfiniteProductsShowcase: React.FC<InfiniteProductsShowcaseProps> = ({ ite
 
             {/* Overlay Instructions */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none transition-opacity duration-500 opacity-60 group-hover/canvas:opacity-100">
-                <div className="px-4 py-2 bg-slate-900/50 backdrop-blur-md rounded-full border border-slate-800 text-cyan-400 text-[10px] font-mono tracking-[0.2em] uppercase flex items-center gap-3">
+                <div className="px-4 py-2 bg-slate-900/50 backdrop-blur-md rounded-full border border-slate-800 text-cyan-400 text-xs font-mono tracking-[0.2em] uppercase flex items-center gap-3">
                     <span className="relative flex h-2 w-2">
                         <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75 ${isPaused ? 'hidden' : ''}`}></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
@@ -259,8 +259,8 @@ const InfiniteProductsShowcase: React.FC<InfiniteProductsShowcaseProps> = ({ ite
             </div>
 
             {/* Cinematic Gradient Masking */}
-            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#020617] via-[#020617]/40 to-transparent pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#020617] via-[#020617]/40 to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-surface-darker via-surface-darker/40 to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-surface-darker via-surface-darker/40 to-transparent pointer-events-none" />
         </div>
     )
 }

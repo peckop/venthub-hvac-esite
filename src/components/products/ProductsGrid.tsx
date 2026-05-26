@@ -43,7 +43,7 @@ const ProductsGrid: React.FC<ProductsGridProps> = ({
               <button 
                 type="button"
                 onClick={() => onViewModeChange('grid')}
-                className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                 title={t('category.view.grid') || 'Izgara Görünümü'}
               >
                 <Grid size={18} />
@@ -51,7 +51,7 @@ const ProductsGrid: React.FC<ProductsGridProps> = ({
               <button 
                 type="button"
                 onClick={() => onViewModeChange('list')}
-                className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                 title={t('category.view.list') || 'Liste Görünümü'}
               >
                 <List size={18} />
@@ -64,7 +64,7 @@ const ProductsGrid: React.FC<ProductsGridProps> = ({
               <select 
                 value={sortBy}
                 onChange={(e) => onSortChange(e.target.value)}
-                className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus:ring-primary-ocean/20 transition-all shadow-sm appearance-none"
+                className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus:ring-primary-ocean/20 transition-colors shadow-sm appearance-none"
                 aria-label={t('category.sort.title') || 'Sıralama'}
               >
                 <option value="name">{t('category.sort.name') || 'İsim'}</option>
@@ -94,7 +94,7 @@ const ProductsGrid: React.FC<ProductsGridProps> = ({
       </div>
 
       {products.length === 0 && !loading && (
-        <div className="py-20 text-center bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
+        <div className="py-20 text-center bg-slate-50 rounded-hvac-xl border border-dashed border-slate-200">
           <p className="text-slate-400 font-medium">{t('category.noProductsFound') || 'Ürün bulunamadı.'}</p>
         </div>
       )}

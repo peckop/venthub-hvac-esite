@@ -36,7 +36,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode, t: (key
                 <Html center>
                     <div className="bg-red-50 border border-red-200 p-4 rounded-lg shadow-lg text-center w-64">
                         <div className="text-red-600 font-bold mb-1 text-sm">{this.props.t('product3d.loadError')}</div>
-                        <div className="text-[10px] text-red-500 break-words">{this.state.error?.message?.slice(0, 100)}</div>
+                        <div className="text-xs text-red-500 break-words">{this.state.error?.message?.slice(0, 100)}</div>
                     </div>
                 </Html>
             )
@@ -105,7 +105,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
     const modelGroupRef = useRef<THREE.Group | null>(null)
 
     const tb = isFullscreen
-        ? { icon: 18, font: 'text-[8px]', pad: 'p-1.5', minW: 'min-w-[40px]', div: 'h-7', top: 'top-4' }
+        ? { icon: 18, font: 'text-xs', pad: 'p-1.5', minW: 'min-w-[40px]', div: 'h-7', top: 'top-4' }
         : { icon: 13, font: 'text-[6px]', pad: 'p-1', minW: 'min-w-[28px]', div: 'h-5', top: 'top-2' }
 
     const handleReset = useCallback(() => {
@@ -152,7 +152,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
     const placement = getModelPlacement(modelType, slug, 'grounded')
 
     return (
-        <div className={`relative w-full h-full bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#cde0f5_100%)] ${isFullscreen ? 'fixed inset-0 z-[10000]' : 'rounded-xl overflow-hidden border border-light-gray'}`}>
+        <div className={`relative w-full h-full bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#cde0f5_100%)] ${isFullscreen ? 'fixed inset-0 z-toast' : 'rounded-xl overflow-hidden border border-light-gray'}`}>
             <Canvas shadows dpr={[1, 2]} camera={{ position: [2, 2, 2.8], fov: 40 }} gl={{ alpha: true }}>
                 <ambientLight intensity={0.7} />
                 <directionalLight position={[10, 15, 10]} intensity={1.5} castShadow shadow-mapSize={2048} />
@@ -180,33 +180,33 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
                 <OrbitControls ref={controlsRef} makeDefault enableRotate={rotationMode === 'orbit'} enableZoom={true} enablePan={true} maxPolarAngle={Math.PI} autoRotate={autoRotate} autoRotateSpeed={0.5} />
             </Canvas>
 
-            <div className={`absolute ${tb.top} left-1/2 -translate-x-1/2 z-[100] pointer-events-auto`}>
+            <div className={`absolute ${tb.top} left-1/2 -translate-x-1/2 z-modal pointer-events-auto`}>
                 <div className={`flex items-center gap-1 bg-white/95 backdrop-blur-md p-1 rounded-lg border border-gray-300 shadow-xl`}>
                     {onClose && (
-                        <button onClick={onClose} className={`flex items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 hover:text-primary-navy transition-all`}>
+                        <button onClick={onClose} className={`flex items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 hover:text-primary-navy transition-colors`}>
                             <ChevronLeft size={tb.icon} strokeWidth={2} /><span className={`${tb.font} font-bold leading-none`}>{t('product3d.back')}</span>
                         </button>
                     )}
                     <div className="relative">
-                        <button onClick={() => setShowViewMenu(!showViewMenu)} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-all`}>
+                        <button onClick={() => setShowViewMenu(!showViewMenu)} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-colors`}>
                             <BoxSelect size={tb.icon} strokeWidth={1.5} /><span className={`${tb.font} font-bold leading-none`}>{t('product3d.view')}</span>
                         </button>
                         {showViewMenu && (
-                            <div className="absolute top-full left-0 mt-1.5 w-40 bg-white rounded-lg border border-gray-200 shadow-2xl z-[200]">
+                            <div className="absolute top-full left-0 mt-1.5 w-40 bg-white rounded-lg border border-gray-200 shadow-2xl z-modal">
                                 {[{ key: 'front', label: t('product3d.front') }, { key: 'back', label: t('product3d.backLabel') }, { key: 'left', label: t('product3d.left') }, { key: 'right', label: t('product3d.right') }, { key: 'top', label: t('product3d.top') }, { key: 'bottom', label: t('product3d.bottom') }].map(v => (
                                     <button key={v.key} onClick={() => handleViewChange(v.key as 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom' | 'iso')} className="w-full text-left px-3 py-2 text-xs hover:bg-blue-50 transition-colors">{v.label}</button>
                                 ))}
                             </div>
                         )}
                     </div>
-                    <button onClick={handleReset} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-all`}>
+                    <button onClick={handleReset} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded hover:bg-gray-100 text-gray-600 ${tb.minW} transition-colors`}>
                         <RefreshCw size={tb.icon} strokeWidth={1.5} /><span className={`${tb.font} font-bold leading-none`}>{t('product3d.reset')}</span>
                     </button>
-                    <button onClick={() => setRotationMode(rotationMode === 'orbit' ? 'free' : 'orbit')} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-all ${tb.minW} ${rotationMode === 'free' ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
+                    <button onClick={() => setRotationMode(rotationMode === 'orbit' ? 'free' : 'orbit')} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-colors ${tb.minW} ${rotationMode === 'free' ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
                         {rotationMode === 'orbit' ? <RotateCcw size={tb.icon} strokeWidth={1.5} /> : <Globe size={tb.icon} strokeWidth={1.5} />}
                         <span className={`${tb.font} font-bold leading-none`}>{rotationMode === 'orbit' ? t('product3d.orbit') : t('product3d.free')}</span>
                     </button>
-                    <button onClick={() => setAutoRotate(!autoRotate)} disabled={rotationMode === 'free'} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-all ${tb.minW} ${autoRotate ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
+                    <button onClick={() => setAutoRotate(!autoRotate)} disabled={rotationMode === 'free'} className={`flex flex-col items-center gap-0.5 ${tb.pad} rounded transition-colors ${tb.minW} ${autoRotate ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}>
                         <Repeat size={tb.icon} className={autoRotate ? 'animate-spin' : ''} strokeWidth={1.5} />
                         <span className={`${tb.font} font-bold leading-none`}>{t('product3d.auto')}</span>
                     </button>

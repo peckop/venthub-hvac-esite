@@ -256,7 +256,7 @@ const OrdersPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.status')}</label>
-              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as StatusFilter)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all">
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as StatusFilter)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors">
                 <option value="all">{t('orders.all')}</option>
                 <option value="pending">{t('orders.pending')}</option>
                 <option value="paid">{t('orders.paid')}</option>
@@ -267,19 +267,19 @@ const OrdersPage: React.FC = () => {
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.startDate')}</label>
-              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.endDate')}</label>
-              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.orderCode')}</label>
-              <input type="text" placeholder={t('orders.orderCodePlaceholder')} value={searchCode} onChange={e => setSearchCode(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+              <input type="text" placeholder={t('orders.orderCodePlaceholder')} value={searchCode} onChange={e => setSearchCode(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.product')}</label>
-              <input type="text" placeholder={t('orders.productSearchPlaceholder')} value={productFilter} onChange={e => setProductFilter(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+              <input type="text" placeholder={t('orders.productSearchPlaceholder')} value={productFilter} onChange={e => setProductFilter(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
             </div>
           </div>
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
@@ -325,7 +325,7 @@ const OrdersPage: React.FC = () => {
                           <React.Fragment key={s}>
                             <div className="flex flex-col items-center min-w-[80px]">
                               <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors shadow-sm ${active ? 'bg-primary-navy text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>{idx + 1}</div>
-                              <span className={`mt-2 text-[10px] font-bold uppercase tracking-wider ${active ? 'text-primary-navy' : 'text-slate-400'}`}>{stepLabel[s]}</span>
+                              <span className={`mt-2 text-xs font-bold uppercase tracking-wider ${active ? 'text-primary-navy' : 'text-slate-400'}`}>{stepLabel[s]}</span>
                             </div>
                             {idx < steps.length - 1 && (
                               <div className={`flex-1 h-1 rounded-full ${activeIdx >= idx + 1 ? 'bg-primary-navy' : 'bg-slate-100'}`}></div>
@@ -343,7 +343,7 @@ const OrdersPage: React.FC = () => {
                           <Package className="text-primary-navy" size={20} />
                           Sipariş #{order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase()}
                           {order.is_demo && (
-                            <span className="ml-2 px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-[10px] uppercase font-bold tracking-wider rounded-lg shadow-sm">
+                            <span className="ml-2 px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-xs uppercase font-bold tracking-wider rounded-lg shadow-sm">
                               DEMO
                             </span>
                           )}
@@ -371,7 +371,7 @@ const OrdersPage: React.FC = () => {
                       )}
                       <button
                         onClick={() => router.push(`/account/orders/detail?id=${order.id}`)}
-                        className="flex items-center space-x-1 bg-slate-50 hover:bg-slate-100 text-primary-navy border border-slate-200 h-10 px-4 rounded-lg text-sm font-bold shadow-sm transition-all hover:scale-[1.02]"
+                        className="flex items-center space-x-1 bg-slate-50 hover:bg-slate-100 text-primary-navy border border-slate-200 h-10 px-4 rounded-lg text-sm font-bold shadow-sm transition-transform hover:scale-[1.02]"
                       >
                         <Eye size={16} />
                         <span>{t('orders.details')}</span>

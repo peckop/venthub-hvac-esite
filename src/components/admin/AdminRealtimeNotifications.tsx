@@ -258,7 +258,7 @@ const AdminRealtimeNotifications: React.FC = () => {
             {/* Bell Trigger */}
             <button
                 onClick={toggleDropdown}
-                className="relative p-2.5 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow hover:bg-slate-50 transition-all text-slate-600 hover:text-primary-navy"
+                className="relative p-2.5 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow hover:bg-slate-50 transition-shadow text-slate-600 hover:text-primary-navy"
             >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -268,18 +268,18 @@ const AdminRealtimeNotifications: React.FC = () => {
 
             {/* Dropdown Panel */}
             {isOpen && (
-                <div className="absolute top-12 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col transform origin-top-right transition-all animate-in fade-in zoom-in-95">
+                <div className="absolute top-12 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col transform origin-top-right transition-colors animate-in fade-in zoom-in-95">
                     {/* Header */}
                     <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                         <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                             Bildirim Merkezi
                             {unreadCount > 0 && (
-                                <span className="bg-rose-100 text-rose-700 text-[10px] px-2 py-0.5 rounded-full font-bold">{unreadCount} Yeni</span>
+                                <span className="bg-rose-100 text-rose-700 text-xs px-2 py-0.5 rounded-full font-bold">{unreadCount} Yeni</span>
                             )}
                         </h3>
                         <div className="flex items-center gap-2">
                             {notifications.length > 0 && (
-                                <button onClick={clearAll} className="text-[11px] font-medium text-slate-500 hover:text-primary-navy transition-colors">
+                                <button onClick={clearAll} className="text-xs font-medium text-slate-500 hover:text-primary-navy transition-colors">
                                     Tümünü Temizle
                                 </button>
                             )}
@@ -333,7 +333,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                                             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                                                 {notif.message}
                                             </p>
-                                            <div className="flex items-center gap-1 mt-2 text-[10px] text-slate-400 font-medium">
+                                            <div className="flex items-center gap-1 mt-2 text-xs text-slate-400 font-medium">
                                                 <Clock size={10} />
                                                 {formatDateTime(notif.timestamp, 'tr')}
                                             </div>
