@@ -1,5 +1,10 @@
 # VentHub HVAC — Project Context
 
+> [!CAUTION]
+> **Bu dosyanın genel içeriği NotebookLM tarafından oluşturulur ve güncellenir.**
+> LLM'ler bu dosyayı kafalarına göre yeniden yazmamalı veya iyileştirme adı altında müdahale etmemelidir.
+> Önemli notlar ve ilaveler eklenebilir, ancak genel içerik revizyonu NLM üzerinden yapılır.
+
 > Bu belge, VentHub HVAC projesine ilk kez dahil olan bir geliştiricinin veya AI ajanının projeyi uçtan uca anlaması için hazırlanmış tek kapsamlı referans noktasıdır.
 
 ---

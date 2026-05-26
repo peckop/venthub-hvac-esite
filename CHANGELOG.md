@@ -1,5 +1,20 @@
 # Changelog
 
+### [2026-05-26] Enterprise Design Token System — Tam Migrasyon
+**Özet:** Projedeki tüm hardcoded tasarım değerleri (renk, font, radius, z-index, max-width, animasyon) merkezi bir Design Token Sistemi'ne taşındı. `src/design-system/` modülü oluşturuldu, `tailwind.config.js` tamamen yeniden yazıldı, `src/index.css`'teki çift `:root` bloğu birleştirildi.
+**Değişiklik Kapsamı:**
+- **580 satır** arbitrary font boyutu → Tailwind standart (`text-xs/sm/base/lg/xl`)
+- **103 satır** arbitrary radius → `rounded-hvac-sm/md/lg/xl/2xl/3xl` namespace token
+- **32 satır** arbitrary z-index → 5 semantik katman (`z-raised/dropdown/sticky/modal/toast`)
+- **93+ TSX + 6 CSS** `transition-all` → property-spesifik transition
+- **33 dosya** hardcoded HEX renk → 15 HSL CSS Custom Property token
+- **28 satır** opacity modifier uyumluluğu → `<alpha-value>` placeholder
+- **Yeni:** `eslint-plugin-tailwindcss` guard (`tailwindcss/no-arbitrary-value: warn`)
+- **Yeni:** `src/design-system/` (tokens.js + tokens.d.ts + index.ts)
+- **Yeni:** `.light` / `.dark` tema değişkenleri (runtime tema değişimi hazır)
+**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ (0 error) | `pnpm run build` ✅ (334+ sayfa)
+---
+
 ### [2026-03-19] P00-Standalone - Task 033: Checkout Type Safety & CI Unblocking
 **Özet:** `CheckoutPage.tsx` ve bağlı bileşenlerdeki (`StepCustomerInfo`, `StepAddressInfo`, `ReviewSummary`) TypeScript ve Lint hataları tamamen giderildi. `Record<string, unknown>` ve `as unknown as` gibi "güvensiz" tiplemeler, merkezi `db-rows.ts` tabanlı yeni bir tip mimarisiyle değiştirildi.
 **Notlar:** - `CheckoutAddressInfo`, `CheckoutInvoiceInfo` ve `CheckoutCustomerInfo` tipleri hem veritabanı (snake_case) hem de UI (camelCase) standartlarına tam uyumlu hale getirildi.

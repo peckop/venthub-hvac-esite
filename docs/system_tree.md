@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-25T16:28:53.976186+00:00
+compiled_at: 2026-05-26T12:32:04.290955+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-25T16:28:53.976186+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-26T12:32:04.290955+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -241,8 +241,7 @@ Bu belge, otonom derleyici tarafından 2026-05-25T16:28:53.976186+00:00 tarihind
 │   │   │   ├── ✅ `CalculatorLayout.tsx`
 │   │   │   ├── ✅ `InputField.tsx`
 │   │   │   ├── ✅ `ResultCard.tsx`
-│   │   │   ├── ✅ `StepIndicator.tsx`
-│   │   │   └── ❌ `index.ts`
+│   │   │   └── ✅ `StepIndicator.tsx`
 │   │   ├── 📂 **category/**
 │   │   │   ├── ✅ `CategoryAuthoritySection.tsx`
 │   │   │   ├── ✅ `CategoryFilters.tsx`
@@ -254,13 +253,11 @@ Bu belge, otonom derleyici tarafından 2026-05-25T16:28:53.976186+00:00 tarihind
 │   │   │   └── 📂 **sections/**
 │   │   │       ├── ✅ `BottomCTA.tsx`
 │   │   │       ├── ✅ `FAQ.tsx`
-│   │   │       ├── ❌ `HowItWorks.test.tsx`
 │   │   │       ├── ✅ `HowItWorks.tsx`
 │   │   │       ├── ✅ `ProblemSection.tsx`
 │   │   │       ├── ✅ `TrustSignals.tsx`
 │   │   │       ├── ✅ `TypeComparison.tsx`
 │   │   │       ├── ✅ `VorticeBrand.tsx`
-│   │   │       ├── ❌ `index.ts`
 │   │   │       └── 📂 **silent-fan/**
 │   │   │           ├── ✅ `SilentFanFAQ.tsx`
 │   │   │           ├── ✅ `SilentFanHowItWorks.tsx`
@@ -362,7 +359,6 @@ Bu belge, otonom derleyici tarafından 2026-05-25T16:28:53.976186+00:00 tarihind
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
 │   │   │   ├── ✅ `SeriesCard.tsx`
-│   │   │   ├── ❌ `index.ts`
 │   │   │   └── 📂 **visual-models/**
 │   │   └── 📂 **ui/**
 │   │       ├── ✅ `ScrollObserver.tsx`
@@ -371,7 +367,6 @@ Bu belge, otonom derleyici tarafından 2026-05-25T16:28:53.976186+00:00 tarihind
 │   ├── 📂 **config/**
 │   │   ├── ✅ `admin.ts`
 │   │   ├── ✅ `applications.ts`
-│   │   ├── ❌ `index.ts`
 │   │   ├── ✅ `legal.ts`
 │   │   ├── ✅ `orbitalCarouselConfig.ts`
 │   │   └── ✅ `siteUrl.ts`
@@ -383,8 +378,9 @@ Bu belge, otonom derleyici tarafından 2026-05-25T16:28:53.976186+00:00 tarihind
 │   │   ├── ✅ `CategoryContext.tsx`
 │   │   ├── ✅ `ProjectContext.tsx`
 │   │   └── ✅ `ProjectProvider.tsx`
+│   ├── 📂 **design-system/**
+│   │   └── ✅ `tokens.js`
 │   ├── 📂 **hooks/**
-│   │   ├── ❌ `index.ts`
 │   │   ├── ✅ `use-mobile.tsx`
 │   │   ├── ✅ `useApiCall.ts`
 │   │   ├── ✅ `useAuth.ts`
@@ -414,7 +410,6 @@ Bu belge, otonom derleyici tarafından 2026-05-25T16:28:53.976186+00:00 tarihind
 │   │   └── ✅ `format.ts`
 │   ├── 📂 **lib/**
 │   │   ├── ✅ `audit.ts`
-│   │   ├── ❌ `brand.ts`
 │   │   ├── ✅ `brands.ts`
 │   │   ├── ✅ `ensureSessionFresh.ts`
 │   │   ├── ✅ `errorReporter.ts`
@@ -434,26 +429,19 @@ Bu belge, otonom derleyici tarafından 2026-05-25T16:28:53.976186+00:00 tarihind
 │   │   │   ├── ✅ `product.service.ts`
 │   │   │   └── ✅ `project.service.ts`
 │   │   ├── ✅ `supabase.ts`
-│   │   ├── ❌ `three-setup.ts`
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `utils.ts`
 │   ├── ✅ `middleware.ts`
-│   ├── ❌ `next-env.d.ts`
 │   ├── 📂 **test/**
-│   │   └── ❌ `setup.d.ts`
 │   ├── 📂 **types/**
 │   │   ├── ✅ `admin-shared.ts`
 │   │   ├── ✅ `authority.ts`
 │   │   ├── ✅ `database.ts`
 │   │   ├── ✅ `database.types.ts`
 │   │   ├── ✅ `db-rows.ts`
-│   │   ├── ❌ `env.d.ts`
-│   │   ├── ❌ `imagetools.d.ts`
 │   │   ├── ✅ `inventory.ts`
-│   │   ├── ❌ `isomorphic-dompurify.d.ts`
 │   │   ├── ✅ `media.types.ts`
-│   │   ├── ✅ `ui-models.ts`
-│   │   └── ❌ `vitest-axe.d.ts`
+│   │   └── ✅ `ui-models.ts`
 │   ├── 📂 **utils/**
 │   │   ├── ✅ `3dModelOffsets.ts`
 │   │   ├── ✅ `adminUi.ts`
@@ -573,80 +561,40 @@ Bu belge, otonom derleyici tarafından 2026-05-25T16:28:53.976186+00:00 tarihind
         │   ├── ✅ `rate_limit.ts`
         │   └── ✅ `sentry.ts`
         ├── 📂 **admin-create-coupon/**
-        │   └── ✅ `index.ts`
         ├── 📂 **admin-iyzico-reconcile/**
-        │   └── ✅ `index.ts`
         ├── 📂 **admin-order-inspect/**
-        │   └── ✅ `index.ts`
         ├── 📂 **admin-orders-latest/**
-        │   └── ✅ `index.ts`
         ├── 📂 **admin-update-order/**
-        │   └── ✅ `index.ts`
         ├── 📂 **admin-update-shipping/**
-        │   └── ✅ `index.ts`
         ├── 📂 **apply-coupon/**
-        │   └── ✅ `index.ts`
         ├── 📂 **delivery-notification/**
-        │   ├── ✅ `index.ts`
         │   └── 📂 **templates/**
         │       └── 📂 **email/**
         ├── 📂 **healthz/**
-        │   └── ✅ `index.ts`
         ├── 📂 **iyzico-callback/**
-        │   └── ✅ `index.ts`
         ├── 📂 **iyzico-payment/**
-        │   ├── ✅ `index.ts`
-        │   └── ❌ `iyzico-real.ts`
         ├── 📂 **iyzico-refund/**
-        │   └── ✅ `index.ts`
         ├── 📂 **log-client-error/**
-        │   └── ✅ `index.ts`
         ├── 📂 **notification-service/**
-        │   └── ✅ `index.ts`
         ├── 📂 **order-confirmation/**
-        │   ├── ✅ `index.ts`
         │   └── 📂 **templates/**
         │       └── 📂 **email/**
         ├── 📂 **order-housekeeping/**
-        │   └── ✅ `index.ts`
         ├── 📂 **order-validate/**
-        │   └── ✅ `index.ts`
         ├── 📂 **refund-order-mock/**
-        │   └── ✅ `index.ts`
         ├── 📂 **release-expired-reservations/**
-        │   └── ✅ `index.ts`
         ├── 📂 **return-status-notification/**
-        │   └── ✅ `index.ts`
         ├── 📂 **returns-webhook/**
-        │   └── ✅ `index.ts`
         ├── 📂 **shipping-notification/**
-        │   ├── ✅ `index.ts`
         │   └── 📂 **templates/**
         │       └── 📂 **email/**
         ├── 📂 **shipping-status/**
-        │   └── ✅ `index.ts`
         ├── 📂 **shipping-webhook/**
-        │   └── ✅ `index.ts`
         └── 📂 **stock-alert/**
-            └── ✅ `index.ts`
 ```
 
 ## Eksik Dokümantasyonlar
-- [ ] `src\components\calculators\index.ts`
-- [ ] `src\components\category\sections\HowItWorks.test.tsx`
-- [ ] `src\components\category\sections\index.ts`
-- [ ] `src\components\products\index.ts`
-- [ ] `src\config\index.ts`
-- [ ] `src\hooks\index.ts`
-- [ ] `src\lib\brand.ts`
-- [ ] `src\lib\three-setup.ts`
-- [ ] `src\next-env.d.ts`
-- [ ] `src\test\setup.d.ts`
-- [ ] `src\types\env.d.ts`
-- [ ] `src\types\imagetools.d.ts`
-- [ ] `src\types\isomorphic-dompurify.d.ts`
-- [ ] `src\types\vitest-axe.d.ts`
-- [ ] `supabase\functions\iyzico-payment\iyzico-real.ts`
+Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
