@@ -68,3 +68,18 @@ Bu modül, props almayan bir React fonksiyon bileşeni olarak tasarlanmıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: VorticeBrand
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-b`, `bg-gradient-to-t`, `bg-green-500`, `bg-red-500`, `bg-white`, `bg-white/10`, `bg-white/5`, `border-t`, `border-white/10`, `from-black/70`, `from-slate-900`, `md:text-4xl`, `sm:text-3xl`, `sm:text-base`, `sm:text-lg`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-wrap`, `from-black/70`, `from-slate-900`, `gap-1.5`, `gap-2`, `gap-8`, `grid`, `grid-cols-4`, `h-5`, `h-auto`, `hidden`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

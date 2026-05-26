@@ -103,3 +103,18 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SilentFanHowItWorks
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-500/10`, `bg-gradient-to-r`, `bg-slate-800`, `bg-slate-900`, `border-blue-500/20`, `border-white/5`, `from-blue-500`, `md:text-5xl`, `sm:text-4xl`, `text-3xl`, `text-blue-400`, `text-lg`, `text-slate-400`, `text-sm`, `text-white`
+- **Layout:** `absolute`, `block`, `flex`, `flex-shrink-0`, `from-blue-500`, `gap-12`, `gap-5`, `grid`, `group-hover:bg-blue-500/20`, `group-hover:opacity-30`, `group-hover:text-blue-300`, `h-12`, `h-auto`, `items-center`, `justify-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

@@ -81,3 +81,22 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: QuickEntryRail
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_18px_35px_-30px_rgba(15,23,42,0.45)]`
+- **height:** `min-h-[88px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `bg-[linear-gradient(135deg,rgba(15,23,42,0.02),rgba(37,99,235,0.06))]`, `hover:shadow-[0_22px_40px_-28px_rgba(37,99,235,0.45)]`, `tracking-[0.24em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-primary-navy/[0.06]`, `bg-white`, `bg-white/95`, `border-b`, `border-primary-navy/10`, `border-primary-navy/15`, `border-slate-200`, `border-slate-200/75`, `sm:text-xl`, `text-left`, `text-lg`, `text-primary-navy`, `text-slate-950`, `text-sm`
+- **Layout:** `block`, `flex`, `gap-3`, `grid`, `group-hover:bg-primary-navy/10`, `group-hover:bg-secondary-blue`, `group-hover:border-primary-navy/20`, `h-11`, `hidden`, `inline-flex`, `items-center`, `items-start`, `justify-between`, `justify-center`, `lg:block`
+- **Responsive:** `lg:`, `sm:`, `xl:` prefix kullanımları

@@ -112,3 +112,18 @@ Her iki bileşen de etiket, mevcut değer ve değişiklik bildirimi gibi temel �
 ## DISA AKTARILANLAR (EXPORTS)
   export: InputField
   export: RadioGroup
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-danger-red/5`, `bg-gray-100`, `bg-industrial-gray`, `bg-primary-navy/5`, `bg-white`, `border-4`, `border-danger-red`, `border-light-gray`, `border-primary-navy`, `border-t-industrial-gray`, `border-transparent`, `text-danger-red`, `text-industrial-gray`, `text-left`, `text-primary-navy`
+- **Layout:** `absolute`, `bottom-full`, `flex`, `gap-2`, `gap-3`, `grid`, `group-hover:opacity-100`, `items-center`, `left-1/2`, `max-w-xs`, `p-4`, `relative`, `right-4`, `sm:grid-cols-${columns`, `top-1/2`
+- **Responsive:** `sm:` prefix kullanımları

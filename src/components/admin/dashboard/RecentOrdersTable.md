@@ -188,3 +188,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: RecentOrdersTable
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `blur-[100px]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-current`, `bg-cyan-500`, `bg-cyan-500/0`, `bg-cyan-500/5`, `bg-white/5`, `bg-white/[0.02]`, `border-collapse`, `border-white/5`, `text-center`, `text-cyan-400/90`, `text-left`, `text-right`, `text-slate-400`, `text-slate-500`, `text-sm`
+- **Layout:** `-right-24`, `-top-24`, `absolute`, `backdrop-blur-md`, `custom-scrollbar`, `flex`, `flex-col`, `gap-2`, `gap-3`, `group-hover/btn:translate-x-1`, `group-hover/link:opacity-100`, `group-hover/row:bg-cyan-500`, `group-hover/row:bg-white/10`, `group-hover/row:opacity-100`, `group-hover/row:scale-105`
+- **Responsive:** (yok)

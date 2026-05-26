@@ -60,3 +60,18 @@ CategorySpotlightScene componentunun doğru çalışabilmesi için categorySlug 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategorySpotlightScene
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** `absolute`
+- **Responsive:** (yok)

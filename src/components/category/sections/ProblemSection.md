@@ -61,3 +61,18 @@ ProblemSection bileşeni dışarıdan prop almayı beklemez.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProblemSection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-blue-500/30`, `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-red-500/30`, `bg-white`, `border-2`, `border-blue-300`, `border-gray-100`, `border-red-300`, `from-gray-50`, `from-red-500`, `md:text-4xl`, `sm:text-3xl`, `sm:text-4xl`
+- **Layout:** `absolute`, `flex`, `from-gray-50`, `from-red-500`, `gap-4`, `gap-8`, `grid`, `grid-cols-2`, `group-hover:scale-110`, `h-10`, `h-20`, `hidden`, `hover:shadow-lg`, `items-center`, `justify-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

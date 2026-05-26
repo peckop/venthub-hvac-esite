@@ -62,3 +62,18 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: MegaMenu3DBackground
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `from-white/60`, `to-transparent`, `via-transparent`
+- **Layout:** `absolute`, `from-white/60`, `h-3/4`, `left-0`, `right-0`, `top-0`
+- **Responsive:** (yok)

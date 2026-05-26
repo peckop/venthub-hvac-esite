@@ -63,3 +63,22 @@ Bu modül, `categorySlug` propunun mevcut ve geçerli bir string olduğu varsay�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: EducationalGuide
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[48px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-50`, `bg-gray-50`, `bg-orange-50`, `bg-white`, `border-gray-100`, `border-y`, `text-2xl`, `text-center`, `text-gray-600`, `text-gray-700`, `text-green-500`, `text-industrial-gray`, `text-orange-500`, `text-secondary-blue`, `text-sm`
+- **Layout:** `absolute`, `flex`, `flex-shrink-0`, `gap-8`, `grid`, `grid-cols-1`, `group-hover:opacity-20`, `items-center`, `items-start`, `max-w-4xl`, `max-w-7xl`, `md:grid-cols-2`, `overflow-hidden`, `p-3`, `p-4`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

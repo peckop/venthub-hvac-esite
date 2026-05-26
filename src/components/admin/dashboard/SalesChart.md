@@ -65,3 +65,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SalesChart
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_15px_rgba(244,63,94,0.6)]`, `shadow-[0_0_15px_rgba(34,211,238,0.6)]`
+- **height:** `h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-rose-500`, `border-l`, `border-white/10`, `border-white/5`, `text-slate-300`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
+- **Layout:** `backdrop-blur-2xl`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `group-hover/chart:text-cyan-400`, `h-2.5`, `items-center`, `justify-between`, `justify-center`, `min-h-0`, `p-1.5`, `p-8`, `shadow-2xl`
+- **Responsive:** (yok)

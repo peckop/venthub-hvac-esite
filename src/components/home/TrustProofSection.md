@@ -45,7 +45,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `subtitle?: string`
 - `visualAlt?: string`
 - `badge?: string`
-- `items?: Record<string, {`
+- `items?: Record<string, {
+`
 
 ### TrustStripDict
 
@@ -105,3 +106,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: TrustProofSection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `aspect-[16/9]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/50`, `bg-white`, `border-slate-100`, `border-slate-200`, `from-slate-900/60`, `sm:text-6xl`, `text-4xl`, `text-base`, `text-center`, `text-cyan-600`, `text-lg`, `text-primary-navy`
+- **Layout:** `absolute`, `flex`, `flex-col`, `from-slate-900/60`, `gap-16`, `gap-3`, `gap-6`, `grid`, `grid-cols-2`, `group-hover:bg-primary-navy`, `group-hover:bg-primary-navy/20`, `group-hover:rotate-6`, `group-hover:text-white`, `h-12`, `h-2`
+- **Responsive:** `lg:`, `md:`, `sm:`, `xl:` prefix kullanımları

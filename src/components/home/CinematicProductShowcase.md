@@ -172,3 +172,22 @@ graph TD
 ## DISA AKTARILANLAR (EXPORTS)
   export: CinematicProductShowcase
   export: Hotspot
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_15px_#22D3EE]`, `shadow-[0_0_20px_rgba(34,211,238,0.4)]`, `shadow-[0_20px_50px_rgba(0,0,0,0.5)]`
+- **height:** `h-[500px]`, `h-[600px]`, `h-[70%]`
+- **width:** `w-[500px]`, `w-[600px]`, `w-[70%]`
+- **spacing:** (yok)
+- **diğer:** `bg-[linear-gradient(rgba(56,189,248,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.03)_1px,transparent_1px)]`, `bg-[size:100px_100px]`, `blur-[120px]`, `blur-[150px]`, `drop-shadow-[0_50px_100px_rgba(0,0,0,0.8)]`, `hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]`, `inset-[-4px]`, `leading-[1.1]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-3xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-cyan-500/50`, `bg-gradient-to-r`, `bg-indigo-500/10`, `bg-slate-900`, `bg-slate-900/95`, `bg-slate-950`, `bg-white`, `bg-white/10`, `bg-white/[0.01]`, `border-2`, `border-b`
+- **Layout:** `absolute`, `backdrop-blur-3xl`, `backdrop-blur-xl`, `bottom-0`, `bottom-10`, `bottom-full`, `flex`, `flex-col`, `flex-wrap`, `from-transparent`, `gap-20`, `gap-3`, `gap-4`, `gap-6`, `grid`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

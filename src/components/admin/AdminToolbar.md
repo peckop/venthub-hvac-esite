@@ -177,3 +177,22 @@ type AdminToolbarProps = {
   export: AdminToolbarProps
   export: AdminToolbarSelectOption
   export: AdminToolbarToggle
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `min-w-[1.25rem]`, `min-w-[120px]`, `min-w-[200px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-rose-500`, `bg-surface-deep`, `bg-surface-deep/20`, `bg-surface-deep/40`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/5`, `bg-white/[0.03]`, `border-cyan-400`, `border-l`, `border-surface-deep`, `border-t`, `border-white/10`
+- **Layout:** `${sticky`, `-right-1`, `-top-1`, `absolute`, `backdrop-blur-2xl`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-2.5`, `gap-3`, `gap-4`, `gap-5`
+- **Responsive:** `lg:`, `md:` prefix kullanımları

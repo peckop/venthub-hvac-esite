@@ -70,3 +70,22 @@ type ColumnToggle = { key: string; label: string; checked: boolean; onChange: (v
 ## DISA AKTARILANLAR (EXPORTS)
   export: ColumnToggle
   export: ColumnsMenu
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_10px_rgba(34,211,238,0.3)]`, `shadow-[0_20px_50px_rgba(0,0,0,0.5)]`
+- **height:** `max-h-[300px]`
+- **width:** `min-w-[140px]`, `min-w-[240px]`
+- **spacing:** (yok)
+- **diğer:** `stroke-[4px]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-surface-deep`, `bg-white/5`, `border-b`, `border-cyan-400`, `border-white/10`, `border-white/5`, `text-cyan-400`, `text-slate-300`, `text-slate-500`, `text-surface-deep`, `text-xs`
+- **Layout:** `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `h-1.5`, `h-12`, `h-4`, `h-px`, `items-center`, `justify-between`, `justify-center`, `overflow-y-auto`, `p-2`, `w-1.5`, `w-4`
+- **Responsive:** (yok)

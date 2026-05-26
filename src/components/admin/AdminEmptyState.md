@@ -46,7 +46,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `icon: LucideIcon`
 - `title: string`
 - `description: string`
-- `action?: {`
+- `action?: {
+`
 - `compact?: boolean`
 
 ---
@@ -76,3 +77,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminEmptyState
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_15px_rgba(34,211,238,0.3),0_0_30px_rgba(16,185,129,0.1)]`, `shadow-[0_0_25px_rgba(34,211,238,0.4),0_0_50px_rgba(16,185,129,0.2)]`
+- **height:** (yok)
+- **width:** `max-w-[200px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-gradient-to-b`, `bg-white/5`, `border-dashed`, `border-white/10`, `border-white/20`, `from-cyan-400/[0.03]`, `text-center`, `text-cyan-400`, `text-lg`, `text-slate-300`, `text-slate-400`, `text-surface-deep`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `flex`, `flex-col`, `from-cyan-400/[0.03]`, `group-hover:opacity-100`, `group-hover:scale-110`, `h-14`, `h-20`, `items-center`, `justify-center`, `max-w-sm`, `overflow-hidden`, `relative`, `shadow-cyan-400/20`, `shadow-xl`
+- **Responsive:** (yok)

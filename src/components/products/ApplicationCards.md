@@ -88,3 +88,18 @@ Bu uygulamalara özel kartları render eden React tabanlı bileşen, yalnızca m
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ApplicationCards
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-100`, `bg-white`, `bg-white/90`, `border-gray-100`, `text-base`, `text-gray-500`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-6`, `grid`, `grid-cols-1`, `group-hover:opacity-100`, `group-hover:scale-105`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `group-hover:translate-x-1`, `h-10`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

@@ -91,3 +91,18 @@ Breadcrumb bileşeni, `items` prop'ının mevcut olmasını ve `variant` ile `cl
 ## DISA AKTARILANLAR (EXPORTS)
   export: Breadcrumb
   export: BreadcrumbItem
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-sm`
+- **Layout:** `flex`, `flex-wrap`, `gap-y-1`, `inline`, `items-center`, `max-w-7xl`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

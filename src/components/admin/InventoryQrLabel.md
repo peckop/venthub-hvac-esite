@@ -84,3 +84,18 @@ Bu varsayımlar, fonksiyon gövdesindeki dış bağımlılıklar ve veri akış�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: printQrLabel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

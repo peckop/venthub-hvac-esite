@@ -280,3 +280,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: HomeSinevizyon
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_10px_#22D3EE]`, `shadow-[0_0_8px_#22D3EE]`
+- **height:** `h-[1px]`, `h-[450px]`, `h-[80vh]`, `lg:h-[90vh]`, `min-h-[650px]`, `sm:h-[550px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `animate-[scan_3s_linear_infinite]`, `blur-[1px]`, `drop-shadow-[0_30px_60px_rgba(0,0,0,0.9)]`, `hover:shadow-[0_0_20px_rgba(34,211,238,0.15)]`, `hover:shadow-[0_0_40px_rgba(34,211,238,0.4)]`, `leading-[1.05]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `tracking-[0.4em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-slate-900/40`, `bg-slate-950`, `bg-slate-950/60`, `bg-white/10`, `bg-white/20`, `bg-white/5`, `border-b`, `border-cyan-400/60`, `border-cyan-500/20`
+- **Layout:** `-left-24`, `-right-24`, `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `block`, `bottom-0`, `bottom-10`, `flex`, `flex-1`, `flex-col`, `from-slate-950/80`, `from-slate-950/90`, `from-transparent`, `gap-1`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

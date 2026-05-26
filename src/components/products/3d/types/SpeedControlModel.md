@@ -88,3 +88,18 @@ Bu modül, VentHub HVAC projesinin 3B ürün bileşenleri katmanında hız kontr
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SpeedControlModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

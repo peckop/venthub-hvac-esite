@@ -103,3 +103,22 @@ CategoryHero bileşeninin render edilmesi ve `handleBack()` fonksiyonunun çağr
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryHero
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[300px]`, `h-[500px]`, `min-h-[300px]`
+- **width:** `w-[300px]`, `w-[500px]`
+- **spacing:** (yok)
+- **diğer:** `bg-[url('/images/grid-white.svg')]`, `opacity-[0.03]`, `tracking-[0.3em]`, `tracking-[0.4em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500/10`, `bg-indigo-600/10`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/10`, `bg-white/5`, `border-b`, `border-slate-100`, `border-white/10`, `border-white/5`, `lg:text-5xl`, `lg:text-8xl`, `lg:text-xl`, `text-3xl`
+- **Layout:** `absolute`, `block`, `bottom-0`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-4`, `gap-8`, `group-hover:-translate-x-1`, `h-12`, `h-24`, `h-32`, `h-4`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

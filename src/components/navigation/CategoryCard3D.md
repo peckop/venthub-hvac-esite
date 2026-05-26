@@ -78,3 +78,22 @@ Bu modülün doğru çalışması için aşağıdaki koşullar sağlanmalıdır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryCard3D
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `ease-[cubic-bezier(0.16,1,0.3,1)]`, `group-hover:shadow-[0_0_40px_-10px_rgba(56,189,248,0.25)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-800/40`, `border-slate-700/50`, `text-lg`, `text-sm`, `text-white`, `text-white/50`, `text-white/70`
+- **Layout:** `-z-10`, `absolute`, `backdrop-blur-md`, `flex`, `group-hover:bg-slate-800/60`, `group-hover:border-sky-500/50`, `group-hover:text-sky-400`, `group-hover:text-white`, `group-hover:translate-x-1`, `h-5`, `h-56`, `hover:shadow-2xl`, `hover:shadow-sky-500/20`, `items-center`, `justify-between`
+- **Responsive:** (yok)

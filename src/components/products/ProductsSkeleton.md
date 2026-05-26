@@ -71,3 +71,18 @@ Bu React tabanlı ürün listesi yükleme iskeleti (ProductsSkeleton) bileşeni,
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProductsSkeleton
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-100`, `bg-gray-200`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`, `h-12`, `h-4`, `h-5`, `hidden`, `lg:block`, `lg:flex-row`, `lg:grid-cols-3`
+- **Responsive:** `lg:`, `sm:`, `xl:` prefix kullanımları

@@ -186,3 +186,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryHubOverlay
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)]`
+- **height:** `h-[600px]`, `max-h-[calc(100vh-96px)]`, `min-h-[250px]`, `min-h-[40px]`
+- **width:** `lg:w-[58%]`, `max-w-[280px]`, `w-[42%]`
+- **spacing:** (yok)
+- **diğer:** `before:w-[3px]`, `blur-[2px]`, `duration-[600ms]`, `ease-[cubic-bezier(0.16,1,0.3,1)]`, `top-[96px]`, `tracking-[0.15em]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-sky-400/10`, `bg-slate-800`, `bg-slate-800/50`, `bg-slate-900/30`, `bg-slate-900/90`, `bg-slate-950/60`, `border-2`, `border-b`, `border-r`, `border-sky-400/20`, `border-sky-500/30`, `border-slate-700/50`, `border-t-sky-500`, `from-transparent`
+- **Layout:** `absolute`, `backdrop-blur-2xl`, `backdrop-blur-sm`, `backdrop-blur-xl`, `before:absolute`, `before:h-0`, `before:left-0`, `before:top-1/2`, `bottom-10`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-transparent`, `gap-2`
+- **Responsive:** `lg:`, `md:` prefix kullanımları

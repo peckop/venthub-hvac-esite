@@ -291,3 +291,22 @@ graph LR
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryOrbitCarousel
   export: getModelTypeForCategory
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[400px]`
+- **width:** `max-w-[150px]`
+- **spacing:** (yok)
+- **diğer:** `active:scale-[0.98]`, `bg-[radial-gradient(circle_at_center,rgba(30,41,59,0.5)_0%,rgb(2,6,23)_70%)]`, `bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.15)_0%,rgb(2,6,23)_70%)]`, `hover:scale-[1.02]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-surface-darker`, `bg-white/10`, `border-white/20`, `from-cyan-500`, `md:text-3xl`, `sm:text-sm`, `text-center`, `text-cyan-400`, `text-sm`, `text-white`, `text-white/50`, `text-white/90`, `text-xl`, `text-xs`
+- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-col`, `from-cyan-500`, `gap-2`, `gap-3`, `group-hover:-translate-x-1`, `h-4`, `hover:shadow-cyan-500/30`, `hover:shadow-lg`, `items-center`, `justify-between`, `justify-center`, `left-0`
+- **Responsive:** `md:`, `sm:` prefix kullanımları

@@ -85,3 +85,22 @@ NavShell bileşeni, dışarıdan gelen özelliklere göre düzeni ve görünüml
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: NavShell
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_18px_45px_-28px_rgba(15,23,42,0.15)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `duration-[600ms]`, `ease-[cubic-bezier(0.16,1,0.3,1)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-gradient-to-r`, `bg-primary-navy`, `bg-slate-200/60`, `bg-white/95`, `border-b`, `border-slate-200/50`, `from-primary-navy`, `text-white`, `to-air-blue`, `via-secondary-blue`
+- **Layout:** `absolute`, `backdrop-blur-xl`, `fixed`, `flex`, `from-primary-navy`, `gap-3`, `h-0`, `h-1`, `h-16`, `h-full`, `items-center`, `justify-between`, `max-w-7xl`, `md:h-8`, `overflow-hidden`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

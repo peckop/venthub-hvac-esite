@@ -80,3 +80,22 @@ React.FC<NavSearchTriggerProps> türünde bir fonksiyonel bileşen döndürür; 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: NavSearchTrigger
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_14px_30px_-26px_rgba(15,23,42,0.45)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:shadow-[0_18px_36px_-24px_rgba(37,99,235,0.45)]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-50`, `bg-white/80`, `border-slate-200`, `border-slate-200/80`, `text-left`, `text-sm`, `text-steel-gray`, `text-xs`
+- **Layout:** `flex-1`, `gap-3`, `hidden`, `inline-flex`, `items-center`, `lg:block`, `md:block`, `min-w-0`, `shadow-sm`, `w-full`
+- **Responsive:** `lg:`, `md:` prefix kullanımları

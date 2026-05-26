@@ -111,3 +111,18 @@ Bu React tabanlı 3D duman egzoz fanı modeli bileşeninin doğru çalışması,
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SmokeExhaustFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

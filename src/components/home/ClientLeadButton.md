@@ -79,3 +79,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ClientLeadButton
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-white`, `text-slate-950`, `text-xs`
+- **Layout:** `absolute`, `group-hover:translate-y-0`, `h-16`, `overflow-hidden`, `relative`, `z-10`
+- **Responsive:** (yok)

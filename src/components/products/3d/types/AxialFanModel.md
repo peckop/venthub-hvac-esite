@@ -109,3 +109,18 @@ Bu modül, silencer özelliğinin etkinliği `hasSilencer` bayrağıyla kontrol 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AxialFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

@@ -172,3 +172,18 @@ Bu 3B jet fan modelleme bileşenleri paketi, yalnızca tanımlı tip bağımlıl
 ## DISA AKTARILANLAR (EXPORTS)
   export: FlexibleCable
   export: JetFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

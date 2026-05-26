@@ -68,3 +68,18 @@ Bu React tabanlı UI yükleme iskeleti (Skeleton) bileşeninin doğru görsel ve
 ## DISA AKTARILANLAR (EXPORTS)
   export: Skeleton
   export: SkeletonProps
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

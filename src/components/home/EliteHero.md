@@ -62,3 +62,22 @@ EliteHero bileşeni, onQuoteClick prop'ı üzerinden bir işlev alarak quote but
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: EliteHero
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[100vh]`, `min-h-[700px]`
+- **width:** `w-[1px]`
+- **spacing:** (yok)
+- **diğer:** `brightness-[0.6]`, `leading-[1.05]`, `lg:text-[5.5rem]`, `saturate-[1.1]`, `tracking-[0.24em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-slate-950`, `bg-white`, `bg-white/10`, `bg-white/5`, `border-white/20`, `border-white/30`, `from-cyan-400`, `from-slate-950/80`, `from-slate-950/95`, `sm:text-2xl`, `sm:text-6xl`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-10`, `flex`, `flex-col`, `from-cyan-400`, `from-slate-950/80`, `from-slate-950/95`, `gap-2`, `gap-3`, `gap-5`, `h-12`, `h-16`, `h-2`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

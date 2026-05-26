@@ -111,3 +111,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryDetailDrawer
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[-20px_0_50px_rgba(0,0,0,0.5)]`, `shadow-[0_0_10px_rgba(34,211,238,0.8)]`, `shadow-[0_0_15px_rgba(245,158,11,0.5)]`, `shadow-[0_0_15px_rgba(34,211,238,0.5)]`, `shadow-[0_0_30px_rgba(34,211,238,0.05)]`
+- **height:** (yok)
+- **width:** `sm:w-[480px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`, `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-500`, `bg-black/60`, `bg-cyan-400`, `bg-cyan-400/10`, `bg-white/[0.02]`, `bg-white/[0.03]`, `border-b`, `border-cyan-400/20`, `border-l`, `border-none`, `border-white/10`, `border-white/5`, `text-3xl`, `text-base`, `text-cyan-300`
+- **Layout:** `-right-8`, `-top-8`, `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`
+- **Responsive:** `sm:` prefix kullanımları

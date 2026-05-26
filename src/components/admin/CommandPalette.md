@@ -219,3 +219,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CommandPalette
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_10px_rgba(34,211,238,0.1)]`, `shadow-[0_0_20px_rgba(34,211,238,0.3)]`, `shadow-[0_0_50px_rgba(0,0,0,0.5)]`
+- **height:** `max-h-[450px]`
+- **width:** `max-w-[640px]`
+- **spacing:** `pt-[15vh]`
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-surface-deep/10`, `bg-surface-deep/60`, `bg-transparent`, `bg-white/5`, `border-b`, `border-cyan-400/20`, `border-none`, `border-t`, `border-white/10`, `border-white/5`, `text-center`, `text-cyan-400`, `text-left`
+- **Layout:** `absolute`, `backdrop-blur-md`, `fixed`, `flex`, `flex-1`, `gap-1.5`, `gap-2`, `gap-4`, `group-hover:text-cyan-400`, `h-1.5`, `h-10`, `h-16`, `h-5`, `h-8`, `h-full`
+- **Responsive:** (yok)

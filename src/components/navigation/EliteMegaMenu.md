@@ -162,3 +162,22 @@ graph LR
 ## DISA AKTARILANLAR (EXPORTS)
   export: EliteMegaMenu
   export: MobileMegaMenu
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_2px_10px]`, `shadow-[0_38.5px_64.1px_-10px_rgba(0,0,0,0.1),0_20.1px_33.5px_-10px_rgba(0,0,0,0.07)]`
+- **height:** `h-[var(--radix-navigation-menu-viewport-height)]`
+- **width:** `lg:w-[700px]`, `md:w-[600px]`, `sm:w-[500px]`, `sm:w-[var(--radix-navigation-menu-viewport-width)]`
+- **spacing:** `gap-[2px]`, `mb-[7px]`, `mt-[10px]`, `p-[25px]`, `p-[32px]`
+- **diğer:** `duration-[250ms]`, `focus:shadow-[0_0_0_2px]`, `gap-x-[30px]`, `leading-[1.2]`, `leading-[1.5]`, `origin-[top_center]`, `perspective-[2000px]`, `sm:grid-cols-[0.75fr_1fr]`, `top-[1px]`, `transition-[width,height]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-sm`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-opacity-95`, `bg-slate-50/80`, `bg-white`, `border-slate-100/50`, `border-slate-200/50`, `text-base`, `text-primary-navy`, `text-secondary-blue`, `text-slate-600`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-xl`, `text-xs`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `col-span-1`, `data-[motion=from-end]:animate-enterFromRight`, `data-[motion=from-start]:animate-enterFromLeft`, `flex`, `flex-col`, `focus:shadow-slate-300`, `gap-2`, `gap-4`, `grid`, `grid-cols-2`, `group-data-[state=open]:-rotate-180`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
