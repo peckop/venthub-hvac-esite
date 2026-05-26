@@ -244,3 +244,18 @@ graph TD
   export: HeatRecoveryIcon
   export: SpeedControlIcon
   export: WhatsAppIcon
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-100`, `text-slate-400`, `text-xs`
+- **Layout:** `flex`, `items-center`, `justify-center`, `p-2`
+- **Responsive:** (yok)

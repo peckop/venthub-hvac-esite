@@ -64,3 +64,18 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Footer
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-industrial-gray`, `bg-primary-navy`, `bg-white/5`, `border-steel-gray`, `border-t`, `text-gray-300`, `text-lg`, `text-secondary-blue`, `text-sm`, `text-steel-gray`, `text-white`, `text-xl`, `text-xs`
+- **Layout:** `flex`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-8`, `gap-x-6`, `gap-y-2`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `justify-center`, `lg:grid-cols-4`, `max-w-7xl`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

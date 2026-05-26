@@ -55,3 +55,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: HeroSkeleton
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[600px]`, `lg:h-[700px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-zinc-700`, `bg-zinc-800`, `bg-zinc-900`
+- **Layout:** `absolute`, `flex`, `flex-col`, `gap-4`, `h-12`, `h-14`, `h-16`, `h-4`, `h-8`, `h-full`, `justify-center`, `max-w-2xl`, `max-w-7xl`, `overflow-hidden`, `relative`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

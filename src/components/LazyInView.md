@@ -114,3 +114,22 @@ Bu modül için özel aksiyomlar tanımlanmıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LazyInView
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[160px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

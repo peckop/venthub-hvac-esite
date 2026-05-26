@@ -437,3 +437,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SearchOverlay
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:scale-[1.01]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-air-blue/10`, `bg-amber-50`, `bg-gray-100`, `bg-gray-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-900/40`, `bg-transparent`, `bg-white`, `border-amber-100`, `border-b`, `border-gray-100`, `border-gray-200`, `border-primary-ocean/30`, `border-slate-100`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-white`
+- **Responsive:** `sm:` prefix kullanımları

@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-26T12:32:04.557963+00:00
+compiled_at: 2026-05-26T19:23:29.021415+00:00
 total_compiled_files: 434
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-26T12:32:04.557963+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-26T19:23:29.021415+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -5113,6 +5113,26 @@ Bu grup, toast’ın ekranda gösterilmesi, otomatik kapanması ve kullanıcı e
   export: AddToCartToast
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `max-w-[92vw]`, `md:w-[360px]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-light-gray`, `border-primary-navy`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`, `text-white`, `text-xs`
+- **Layout:** `bottom-3`, `fixed`, `flex`, `flex-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `items-start`, `justify-center`, `md:bottom-6`, `md:gap-3`, `md:grid-cols-2`
+- **Responsive:** `md:` prefix kullanımları
+
+
+---
 # FILE: src\components\BackToTopButton.md
 
 ---
@@ -5207,6 +5227,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: BackToTopButton
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `border-white/20`, `text-white`
+- **Layout:** `fixed`, `p-3`, `shadow-lg`, `z-40`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\BeforeAfterSlider.md
 
 ---
@@ -5279,6 +5315,22 @@ Bu modül, gerekli görüntü özelliklerinin sağlandığını ve alt özelliğ
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: BeforeAfterSlider
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `accent-primary-navy`, `bg-white`, `border-light-gray`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-steel-gray`
+- **Layout:** `absolute`, `bottom-3`, `h-56`, `h-full`, `left-1/2`, `lg:h-80`, `max-w-7xl`, `overflow-hidden`, `relative`, `sm:h-72`, `top-0`, `w-1`, `w-3/4`, `w-full`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\BentoGrid.md
@@ -5385,6 +5437,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: BentoGrid
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `auto-rows-[140px]`, `md:auto-rows-[180px]`, `sm:auto-rows-[160px]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `bg-white/20`, `bg-white/90`, `border-light-gray`, `from-black/50`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-lg`, `text-sm`, `text-steel-gray`, `text-white`, `text-white/90`, `text-xs`, `to-transparent`
+- **Layout:** `absolute`, `bottom-3`, `drop-shadow`, `flex`, `flex-col`, `from-black/50`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `group-hover:opacity-100`, `h-full`, `inline-flex`, `items-center`, `left-3`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\BrandsShowcase.md
 
 ---
@@ -5472,6 +5544,26 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
   export: Lane
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `bg-[radial-gradient(circle_at_center,rgba(248,250,252,1)_0%,rgba(255,255,255,1)_100%)]`, `tracking-[0.3em]`, `tracking-[0.4em]`, `tracking-[0.5em]`, `transition-[filter,transform,opacity]`, `transition-[width,background-color]`, `transition-[width]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500/40`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-slate-200`, `bg-white`, `from-white`, `sm:text-5xl`, `text-3xl`, `text-center`, `text-cyan-600`, `text-slate-400`, `text-slate-900`, `text-slate-950`, `text-xs`, `to-transparent`
+- **Layout:** `absolute`, `flex`, `flex-col`, `from-white`, `gap-20`, `gap-4`, `gap-6`, `group-hover/brand:grayscale-0`, `group-hover/brand:opacity-100`, `group-hover/brand:scale-110`, `group-hover/brand:w-12`, `group-hover:bg-cyan-500`, `group-hover:w-16`, `h-24`, `h-px`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\BuildTag.md
 
 ---
@@ -5536,6 +5628,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: BuildTag
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-steel-gray`, `text-xs`
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\CartToast.md
@@ -5615,6 +5723,22 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CartToast
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black`, `bg-light-gray`, `bg-opacity-50`, `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-2`, `border-primary-navy`, `border-success-green`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-shrink-0`, `items-center`, `items-start`, `justify-center`, `max-w-md`, `max-w-sm`, `min-w-0`, `p-2`, `p-3`, `p-4`, `p-6`, `right-4`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\CaseStudySection.md
@@ -5733,6 +5857,22 @@ graph LR
   export: CaseStudySection
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-light-gray`, `bg-primary-navy`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-4xl`, `text-3xl`, `text-center`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-white`, `text-xl`, `to-white`
+- **Layout:** `flex`, `flex-wrap`, `from-gray-50`, `gap-2`, `gap-6`, `grid`, `grid-cols-1`, `hover:shadow-md`, `inline-flex`, `items-center`, `justify-center`, `max-w-7xl`, `md:grid-cols-2`, `p-6`, `shadow-sm`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\CategoriesShowcase.md
 
 ---
@@ -5820,6 +5960,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoriesShowcase
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-light-gray`, `from-air-blue`, `md:text-4xl`, `text-2xl`, `text-3xl`, `text-center`, `text-gold-accent`, `text-industrial-gray`, `text-primary-navy`, `text-secondary-blue`, `text-sm`, `text-steel-gray`
+- **Layout:** `flex`, `flex-1`, `from-air-blue`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `group-hover:text-secondary-blue`, `group-hover:translate-x-1`, `hover:shadow-hvac`, `hover:shadow-sm`, `inline-flex`, `items-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\CategoryFlow.md
@@ -5975,6 +6131,22 @@ graph TD
   export: CategoryCard
   export: CategoryFlow
   export: ScrollingLane
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-b`, `bg-gradient-to-br`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-gray-100`, `bg-white/10`, `bg-white/20`, `from-gray-50`, `sm:text-3xl`, `sm:text-lg`, `sm:text-sm`, `text-2xl`, `text-base`, `text-center`, `text-gray-600`
+- **Layout:** `-bottom-4`, `-left-4`, `-right-4`, `-top-4`, `absolute`, `bottom-4`, `flex`, `flex-shrink-0`, `from-gray-50`, `gap-4`, `group-hover:opacity-100`, `group-hover:scale-110`, `h-24`, `h-32`, `h-40`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\ErrorBoundary.md
@@ -6163,6 +6335,26 @@ graph TD
   contains: State>
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-100`, `bg-primary-navy`, `border-gray-300`, `text-amber-500`, `text-center`, `text-gray-500`, `text-gray-600`, `text-gray-700`, `text-gray-800`, `text-left`, `text-sm`, `text-white`, `text-xl`, `text-xs`
+- **Layout:** `flex`, `h-16`, `h-4`, `inline-flex`, `items-center`, `justify-center`, `max-h-40`, `max-w-md`, `overflow-auto`, `p-3`, `p-8`, `w-16`, `w-4`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\FAQShortSection.md
 
 ---
@@ -6229,6 +6421,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FAQShortSection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `to-white`
+- **Layout:** `flex`, `from-gray-50`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-start`, `max-w-7xl`, `md:grid-cols-3`, `p-5`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\Footer.md
@@ -6299,6 +6507,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Footer
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-industrial-gray`, `bg-primary-navy`, `bg-white/5`, `border-steel-gray`, `border-t`, `text-gray-300`, `text-lg`, `text-secondary-blue`, `text-sm`, `text-steel-gray`, `text-white`, `text-xl`, `text-xs`
+- **Layout:** `flex`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-8`, `gap-x-6`, `gap-y-2`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `justify-center`, `lg:grid-cols-4`, `max-w-7xl`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\HVACIcons.md
@@ -6551,6 +6775,22 @@ graph TD
   export: WhatsAppIcon
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-100`, `text-slate-400`, `text-xs`
+- **Layout:** `flex`, `items-center`, `justify-center`, `p-2`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\HeroCarousel.md
 
 ---
@@ -6613,18 +6853,12 @@ HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her
 
 ## SABİTLER
 - **FALLBACK_METADATA** (object) — `{
-
     'industrial-ventilation': {
-
         hero_title: 'Endüstriyel Havaland...`
 - **IconMap** (object) — `{
-
     wind: Wind,
-
     shield: Shield,
-
     activity: Activity,
-
     zap: Za...`
 
 ---
@@ -6728,6 +6962,26 @@ HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: HeroCarousel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[600px]`, `lg:h-[700px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `duration-[2000ms]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-gradient-to-r`, `bg-secondary-blue`, `bg-white/10`, `bg-white/30`, `bg-white/5`, `bg-zinc-900`, `border-white/10`, `border-white/20`, `from-black/80`, `lg:text-7xl`, `text-5xl`, `text-gray-200`, `text-gray-400`, `text-secondary-blue`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `bottom-10`, `flex`, `flex-col`, `flex-wrap`, `from-black/80`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `h-1.5`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\HeroSection.md
@@ -6926,6 +7180,22 @@ graph TD
   export: TruckIcon
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-primary-navy`, `bg-white`, `border-2`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `from-primary-navy/20`, `lg:text-6xl`, `md:text-5xl`, `text-4xl`, `text-center`, `text-industrial-gray`
+- **Layout:** `absolute`, `bottom-0`, `flex`, `flex-col`, `flex-shrink-0`, `from-air-blue`, `from-primary-navy/20`, `gap-12`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `grid-cols-2`, `group-hover:translate-x-1`, `h-20`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\HeroSkeleton.md
 
 ---
@@ -6985,6 +7255,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: HeroSkeleton
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[600px]`, `lg:h-[700px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-zinc-700`, `bg-zinc-800`, `bg-zinc-900`
+- **Layout:** `absolute`, `flex`, `flex-col`, `gap-4`, `h-12`, `h-14`, `h-16`, `h-4`, `h-8`, `h-full`, `justify-center`, `max-w-2xl`, `max-w-7xl`, `overflow-hidden`, `relative`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\ImageGallery.md
@@ -7178,6 +7468,26 @@ graph TD
   export: ImageGallery
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[90vh]`
+- **width:** `max-w-[90vw]`, `md:max-w-[55vh]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/20`, `bg-black/95`, `bg-gray-100`, `bg-white`, `bg-white/10`, `bg-white/80`, `bg-white/95`, `border-2`, `border-gray-200`, `border-primary-navy`, `border-transparent`, `border-white`, `text-blue-600`, `text-gray-400`, `text-gray-700`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-6`, `cursor-zoom-in`, `fixed`, `flex`, `flex-col`, `flex-wrap`, `gap-0.5`, `gap-2`, `group-hover:opacity-100`, `h-14`, `h-16`, `h-full`
+- **Responsive:** `md:` prefix kullanımları
+
+
+---
 # FILE: src\components\InViewCounter.md
 
 ---
@@ -7322,6 +7632,22 @@ Bu varsayımlar, modülün fonksiyon imzalarından ve tipik React davranışlar�
   export: InViewCounter
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `border-light-gray`, `text-4xl`, `text-center`, `text-primary-navy`, `text-steel-gray`
+- **Layout:** `p-6`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\LanguageSwitcher.md
 
 ---
@@ -7382,6 +7708,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: LanguageSwitcher
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-white/90`, `border-light-gray`, `text-industrial-gray`, `text-sm`, `text-white`
+- **Layout:** `backdrop-blur`, `bottom-4`, `fixed`, `flex`, `gap-1`, `items-center`, `p-1`, `right-4`, `shadow-sm`, `z-50`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\LazyBrandsShowcase.md
 
 ---
@@ -7437,6 +7779,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LazyBrandsShowcase
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[120px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\LazyInView.md
@@ -7557,6 +7919,26 @@ Bu modül için özel aksiyomlar tanımlanmıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LazyInView
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[160px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\LeadModal.md
@@ -7735,6 +8117,26 @@ graph LR
   export: LeadModal
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[100dvh]`, `sm:max-h-[85vh]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-gray-100`, `bg-gray-50`, `bg-gray-50/50`, `bg-green-100`, `bg-primary-navy`, `bg-secondary-blue/80`, `bg-white`, `bg-white/10`, `border-2`, `border-gray-100`, `border-gray-200`, `border-gray-300`, `border-red-400`, `border-t`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-blue-600/20`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`
+- **Responsive:** `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\LoadingSpinner.md
 
 ---
@@ -7805,6 +8207,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LoadingSpinner
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-2`, `border-primary-navy`, `border-t-transparent`
+- **Layout:** `flex`, `inline-block`, `items-center`, `justify-center`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\MagneticCTA.md
@@ -7923,6 +8345,22 @@ graph TD
   export: MagneticCTA
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-white`, `border-light-gray`, `from-primary-navy`, `text-2xl`, `text-primary-navy`, `text-white`, `text-white/90`, `to-secondary-blue`
+- **Layout:** `flex`, `flex-col`, `from-primary-navy`, `gap-4`, `hover:shadow-xl`, `inline-flex`, `items-center`, `items-start`, `justify-between`, `justify-center`, `max-w-7xl`, `p-8`, `relative`, `shadow-lg`, `sm:flex-row`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\MegaMenu.md
 
 ---
@@ -8001,6 +8439,22 @@ MegaMenu component'inin görüntülenmesi ve kapatılması için `isOpen` ve `on
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: MegaMenu
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50/30`, `bg-white`, `border-4`, `border-b`, `border-primary-navy/20`, `border-slate-100`, `border-t-primary-navy`, `text-lg`, `text-slate-400`, `text-slate-900`, `text-white`, `text-xs`
+- **Layout:** `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `h-6`, `h-8`, `hidden`, `items-center`, `justify-between`, `justify-center`, `max-w-7xl`, `overflow-hidden`
+- **Responsive:** `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\PaymentWatcher.md
@@ -8102,6 +8556,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: PaymentWatcher
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\ProductCard.md
 
 ---
@@ -8142,11 +8612,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **ProductCard** (call) — `React.memo(function ProductCard({
-
   product,
-
   layout = 'grid',
-
   priority...`
 
 ---
@@ -8166,6 +8633,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## NODE ID STANDARD
 
   file: src\components\ProductCard.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[2.5rem]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gold-accent`, `bg-light-gray/30`, `bg-light-gray/50`, `bg-primary-navy`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `sm:text-lg`, `text-base`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-secondary-blue`, `text-sm`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-3`, `group-hover:bg-light-gray/50`, `group-hover:opacity-100`, `group-hover:scale-105`, `group-hover:text-primary-navy`, `h-11`, `h-28`, `h-9`
+- **Responsive:** `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\QuickViewModal.md
@@ -8278,6 +8765,26 @@ Bu modül, seçilen ürünün hızlı inceleme modalını doğru şekilde görü
   export: QuickViewModal
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `w-[92%]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-2`, `border-b`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `text-2xl`, `text-6xl`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-secondary-blue/30`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `from-air-blue`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `line-clamp-2`, `line-clamp-4`
+- **Responsive:** `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\ResourcesSection.md
 
 ---
@@ -8386,6 +8893,22 @@ graph TD
   export: BookOpenIcon
   export: FileTextIcon
   export: ResourcesSection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `to-white`
+- **Layout:** `flex`, `from-gray-50`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `group-hover:text-primary-navy`, `hover:shadow-md`, `items-center`, `items-start`, `justify-between`, `max-w-7xl`, `md:grid-cols-3`, `p-5`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\ScrollLinkedProcess.md
@@ -8537,6 +9060,22 @@ graph LR
   export: ScrollLinkedProcess
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy/5`, `bg-white`, `border-light-gray`, `border-primary-navy`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-left`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`
+- **Layout:** `gap-6`, `grid`, `grid-cols-1`, `lg:col-span-1`, `lg:col-span-3`, `lg:grid-cols-4`, `max-w-7xl`, `p-6`, `shadow-sm`, `sticky`, `top-20`, `w-full`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\ScrollToTop.md
 
 ---
@@ -8613,6 +9152,22 @@ Bu frontend ScrollToTop bileşeni, uygulama içi istemci tarafı rota değişikl
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ScrollToTop
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\SearchOverlay.md
@@ -9058,6 +9613,26 @@ graph LR
   export: SearchOverlay
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:scale-[1.01]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-air-blue/10`, `bg-amber-50`, `bg-gray-100`, `bg-gray-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-900/40`, `bg-transparent`, `bg-white`, `border-amber-100`, `border-b`, `border-gray-100`, `border-gray-200`, `border-primary-ocean/30`, `border-slate-100`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-white`
+- **Responsive:** `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\SecurityRibbon.md
 
 ---
@@ -9132,6 +9707,22 @@ React tabanlı SecurityRibbon UI bileşeni, marka ve ödeme sağlayıcısı bilg
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SecurityRibbon
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy/10`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xs`
+- **Layout:** `flex`, `flex-wrap`, `gap-2`, `gap-3`, `h-9`, `items-center`, `justify-between`, `justify-center`, `w-9`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\Seo.md
@@ -9224,6 +9815,22 @@ Bu React tabanlı SEO bileşeni, web sayfalarının arama motorları tarafından
   export: Seo
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\SimpleProductGallery.md
 
 ---
@@ -9292,6 +9899,22 @@ React tabanlı basit ürün galerisi bileşeni SimpleProductGallery, çalışma 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SimpleProductGallery
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-200`, `border-gray-300`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-steel-gray`
+- **Layout:** `gap-3`, `grid`, `grid-cols-3`, `max-w-7xl`, `md:grid-cols-6`, `sm:grid-cols-4`, `w-full`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\SpotlightHeroOverlay.md
@@ -9369,6 +9992,22 @@ Bu React bileşeni, web arayüzünde kullanıcının imlecinin olduğu bölgeyi 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SpotlightHeroOverlay
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** `absolute`, `z-10`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\SpotlightList.md
@@ -9466,6 +10105,22 @@ Bu React UI bileşeni, üst bileşenler tarafından iletilen prop'lar, proje iç
   export: SpotlightList
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `border-light-gray`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xs`
+- **Layout:** `absolute`, `gap-3`, `grid`, `grid-cols-1`, `hover:shadow-md`, `lg:grid-cols-4`, `max-w-7xl`, `p-4`, `relative`, `sm:grid-cols-2`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\StickyHeader.md
 
 ---
@@ -9509,7 +10164,6 @@ Bu modül, HVAC projesi için geliştirilmiş, kullanıcı arayüzünde sabit du
 - **MegaMenu** (call) — `React.lazy(() => import('./MegaMenu'))`
 - **CategoryHubOverlay** (call) — `React.lazy(() => import('./navigation/CategoryHubOverlay'))`
 - **StickyHeader** (call) — `React.memo(function StickyHeader({ isScrolled }) {
-
   const { t, lang } = use...`
 
 ---
@@ -9643,6 +10297,26 @@ Bu modül, HVAC projesi için geliştirilmiş, kullanıcı arayüzünde sabit du
 ## NODE ID STANDARD
 
   file: src\components\StickyHeader.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_18px_35px_-20px_rgba(37,99,235,0.7)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `transition-[opacity,transform]`, `transition-[transform,box-shadow]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `from-primary-navy`, `text-left`, `text-slate-900`, `text-sm`, `text-steel-gray`, `text-white`, `text-xs`, `to-secondary-blue`
+- **Layout:** `-right-2`, `-top-2`, `absolute`, `backdrop-blur-md`, `block`, `flex`, `flex-1`, `from-primary-navy`, `gap-1.5`, `gap-2.5`, `gap-3`, `h-16`, `h-5`, `h-8`, `hidden`
+- **Responsive:** `lg:`, `md:`, `sm:`, `xl:` prefix kullanımları
+
 
 ---
 # FILE: src\components\SubcategoryFlow.md
@@ -9794,6 +10468,22 @@ graph TD
   export: ScrollingLane
   export: SubcategoryCard
   export: SubcategoryFlow
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-gray-50`, `bg-white`, `border-gray-200`, `from-blue-50`, `from-white`, `sm:text-xl`, `text-blue-500`, `text-blue-600`, `text-center`, `text-gray-800`, `text-lg`, `text-sm`
+- **Layout:** `absolute`, `bottom-3`, `flex`, `flex-shrink-0`, `from-blue-50`, `from-white`, `gap-3`, `group-hover:from-blue-100`, `group-hover:opacity-100`, `group-hover:text-blue-700`, `group-hover:to-blue-200`, `h-10`, `h-24`, `hover:shadow-md`, `items-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\TiltCard.md
@@ -9972,6 +10662,22 @@ graph LR
   export: clamp
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** `absolute`, `group-hover:opacity-100`, `relative`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\TrustSection.md
 
 ---
@@ -10047,6 +10753,22 @@ Venthub HVAC projesindeki React tabanlı frontend TrustSection bileşeninin soru
   export: TrustSection
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`, `text-warning-orange`, `to-white`
+- **Layout:** `flex`, `from-gray-50`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `hover:shadow-md`, `items-start`, `lg:grid-cols-3`, `max-w-7xl`, `p-5`, `sm:grid-cols-2`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\UndecidedUserCTA.md
 
 ---
@@ -10112,6 +10834,26 @@ Bu istemci tarafı React bileşeni, kararsız kullanıcılara yönelik harekete 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: UndecidedUserCTA
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:scale-[1.02]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-white`, `bg-white/10`, `bg-white/20`, `from-primary-navy`, `sm:text-2xl`, `sm:text-base`, `text-primary-navy`, `text-sm`, `text-white`, `text-white/80`, `text-xl`, `to-secondary-blue`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-col`, `from-primary-navy`, `gap-2`, `gap-5`, `gap-6`, `group-hover:translate-x-1`, `h-12`, `h-32`, `h-64`, `hover:shadow-xl`, `inline-flex`
+- **Responsive:** `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\VisualShowcase.md
@@ -10364,6 +11106,22 @@ graph LR
   export: usePrefersReducedMotion
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-white`, `bg-white/10`, `bg-white/70`, `bg-white/80`, `lg:text-4xl`, `sm:text-3xl`, `sm:text-lg`, `text-2xl`, `text-base`, `text-center`, `text-industrial-gray`, `text-white`, `text-white/90`
+- **Layout:** `-bottom-12`, `-left-16`, `-right-20`, `-top-10`, `absolute`, `bottom-2`, `drop-shadow-sm`, `flex`, `gap-2`, `h-10`, `h-2`, `h-48`, `h-64`, `h-80`, `h-full`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\WhatsAppFloat.md
 
 ---
@@ -10431,6 +11189,22 @@ Bu React TypeScript ile geliştirilmiş WhatsApp iletişim float butonu bileşen
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: WhatsAppFloat
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-sm`
+- **Layout:** `absolute`, `group-hover:opacity-100`, `hidden`, `left-14`, `lg:block`, `whatsapp-float`
+- **Responsive:** `lg:` prefix kullanımları
+
 
 ---
 # FILE: src\components\WhyVentHubEnhanced.md
@@ -10524,6 +11298,22 @@ Bu React tabanlı WhyVentHubEnhanced arayüz bileşeninin projeye entegre edilme
   export: WhyVentHubEnhanced
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-white/5`, `border-t`, `border-white/10`, `from-primary-navy`, `md:text-4xl`, `sm:text-3xl`, `sm:text-base`, `sm:text-lg`, `sm:text-sm`, `text-2xl`, `text-base`, `text-center`, `text-gold-accent`, `text-gray-200`
+- **Layout:** `backdrop-blur-sm`, `flex`, `from-primary-navy`, `gap-2`, `gap-4`, `gap-6`, `grid`, `grid-cols-2`, `h-16`, `items-center`, `justify-center`, `max-w-2xl`, `max-w-7xl`, `md:grid-cols-3`, `md:grid-cols-4`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\admin\AccessDenied.md
 
 ---
@@ -10584,6 +11374,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AccessDenied
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_30px_rgba(244,63,94,0.1)]`, `shadow-[0_0_50px_rgba(0,0,0,0.4)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-rose-500/10`, `bg-surface-deep`, `bg-white/5`, `border-rose-500/20`, `border-white/5`, `text-3xl`, `text-center`, `text-rose-500`, `text-slate-400`, `text-slate-600`, `text-slate-700`, `text-white`, `text-xs`
+- **Layout:** `block`, `flex`, `flex-col`, `gap-3`, `gap-4`, `group-hover:-translate-x-1`, `h-12`, `h-24`, `inline-flex`, `items-center`, `justify-center`, `max-w-lg`, `min-h-screen`, `p-12`, `p-6`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\AdminEmptyState.md
@@ -10667,6 +11477,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminEmptyState
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_15px_rgba(34,211,238,0.3),0_0_30px_rgba(16,185,129,0.1)]`, `shadow-[0_0_25px_rgba(34,211,238,0.4),0_0_50px_rgba(16,185,129,0.2)]`
+- **height:** (yok)
+- **width:** `max-w-[200px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-gradient-to-b`, `bg-white/5`, `border-dashed`, `border-white/10`, `border-white/20`, `from-cyan-400/[0.03]`, `text-center`, `text-cyan-400`, `text-lg`, `text-slate-300`, `text-slate-400`, `text-surface-deep`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `flex`, `flex-col`, `from-cyan-400/[0.03]`, `group-hover:opacity-100`, `group-hover:scale-110`, `h-14`, `h-20`, `items-center`, `justify-center`, `max-w-sm`, `overflow-hidden`, `relative`, `shadow-cyan-400/20`, `shadow-xl`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\AdminRealtimeNotifications.md
@@ -10828,6 +11658,26 @@ graph TD
   export: AdminRealtimeNotifications
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[70vh]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-50`, `bg-blue-50/30`, `bg-emerald-50`, `bg-emerald-500/10`, `bg-primary-navy`, `bg-primary-navy/10`, `bg-rose-100`, `bg-rose-500`, `bg-slate-100`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-500/10`, `bg-white`, `border-2`
+- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-1`, `gap-2`, `gap-3`, `h-10`, `h-12`, `h-2`, `h-2.5`, `items-center`, `justify-between`, `justify-center`
+- **Responsive:** `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\admin\AdminSkeleton.md
 
 ---
@@ -10907,6 +11757,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: AdminSkeleton
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `max-w-[120px]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400/10`, `bg-cyan-500/5`, `bg-gradient-to-br`, `bg-transparent`, `bg-white/10`, `bg-white/5`, `bg-white/[0.02]`, `bg-white/[0.03]`, `bg-white/[0.05]`, `border-b`, `border-cyan-400/20`, `border-t`, `border-white/5`, `from-cyan-500/5`, `text-left`
+- **Layout:** `absolute`, `flex`, `from-cyan-500/5`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `group-hover:opacity-100`, `h-10`, `h-12`, `h-14`, `h-3`, `h-32`, `h-4`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
+
+---
 # FILE: src\components\admin\AdminToolbar.md
 
 ---
@@ -10964,38 +11834,24 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### AdminToolbarChip
 ```typescript
 type AdminToolbarChip = {
-
   key: string
-
   label: string
-
   active: boolean
-
   onToggle: () => void
-
   classOn?: string
-
   classOff?: string
-
   title?: string
-
 }
 ```
 
 ### AdminToolbarToggle
 ```typescript
 type AdminToolbarToggle = {
-
   key: string
-
   label: string
-
   checked: boolean
-
   onChange: (checked: boolean) => void
-
   title?: string
-
 }
 ```
 
@@ -11007,25 +11863,15 @@ type AdminToolbarSelectOption = { value: string; label: string }
 ### AdminToolbarProps
 ```typescript
 type AdminToolbarProps = {
-
   search?: {
-
     value: string
-
     onChange: (v: string) => void
-
     placeholder?: string
-
     title?: string
-
     focusShortcut?: string // default '/'
-
   }
-
   select?: {
-
     value: string
-
   
 ```
 
@@ -11112,6 +11958,26 @@ type AdminToolbarProps = {
   export: AdminToolbarProps
   export: AdminToolbarSelectOption
   export: AdminToolbarToggle
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `min-w-[1.25rem]`, `min-w-[120px]`, `min-w-[200px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-rose-500`, `bg-surface-deep`, `bg-surface-deep/20`, `bg-surface-deep/40`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/5`, `bg-white/[0.03]`, `border-cyan-400`, `border-l`, `border-surface-deep`, `border-t`, `border-white/10`
+- **Layout:** `${sticky`, `-right-1`, `-top-1`, `absolute`, `backdrop-blur-2xl`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-2.5`, `gap-3`, `gap-4`, `gap-5`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
 
 ---
 # FILE: src\components\admin\BulkActionToolbar.md
@@ -11211,6 +12077,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: BulkActionToolbar
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `min-w-[280px]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-400/80`, `bg-emerald-500/80`, `bg-gray-400/80`, `bg-gray-50`, `bg-primary-navy`, `bg-red-500/80`, `bg-white`, `bg-white/20`, `bg-yellow-500/80`, `border-gray-200`, `border-primary-navy`, `text-gray-400`, `text-gray-800`, `text-primary-navy`, `text-sm`
+- **Layout:** `absolute`, `bg-yellow-500/80`, `bottom-4`, `bottom-full`, `fixed`, `flex`, `flex-1`, `flex-wrap`, `gap-2`, `gap-3`, `h-6`, `h-8`, `hover:bg-yellow-500`, `items-center`, `justify-center`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\ColumnsMenu.md
 
 ---
@@ -11285,6 +12171,26 @@ type ColumnToggle = { key: string; label: string; checked: boolean; onChange: (v
 ## DISA AKTARILANLAR (EXPORTS)
   export: ColumnToggle
   export: ColumnsMenu
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_10px_rgba(34,211,238,0.3)]`, `shadow-[0_20px_50px_rgba(0,0,0,0.5)]`
+- **height:** `max-h-[300px]`
+- **width:** `min-w-[140px]`, `min-w-[240px]`
+- **spacing:** (yok)
+- **diğer:** `stroke-[4px]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-surface-deep`, `bg-white/5`, `border-b`, `border-cyan-400`, `border-white/10`, `border-white/5`, `text-cyan-400`, `text-slate-300`, `text-slate-500`, `text-surface-deep`, `text-xs`
+- **Layout:** `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `h-1.5`, `h-12`, `h-4`, `h-px`, `items-center`, `justify-between`, `justify-center`, `overflow-y-auto`, `p-2`, `w-1.5`, `w-4`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\CommandPalette.md
@@ -11512,6 +12418,26 @@ graph LR
   export: CommandPalette
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_10px_rgba(34,211,238,0.1)]`, `shadow-[0_0_20px_rgba(34,211,238,0.3)]`, `shadow-[0_0_50px_rgba(0,0,0,0.5)]`
+- **height:** `max-h-[450px]`
+- **width:** `max-w-[640px]`
+- **spacing:** `pt-[15vh]`
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-surface-deep/10`, `bg-surface-deep/60`, `bg-transparent`, `bg-white/5`, `border-b`, `border-cyan-400/20`, `border-none`, `border-t`, `border-white/10`, `border-white/5`, `text-center`, `text-cyan-400`, `text-left`
+- **Layout:** `absolute`, `backdrop-blur-md`, `fixed`, `flex`, `flex-1`, `gap-1.5`, `gap-2`, `gap-4`, `group-hover:text-cyan-400`, `h-1.5`, `h-10`, `h-16`, `h-5`, `h-8`, `h-full`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\DateRangePicker.md
 
 ---
@@ -11701,6 +12627,26 @@ graph LR
   export: DateRangePicker
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[60vh]`, `max-h-[85vh]`
+- **width:** `w-[calc(100vw-32px)]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `md:border-b-0`, `md:border-r`, `text-left`, `text-primary-navy`, `text-slate-400`, `text-slate-500`
+- **Layout:** `backdrop-blur-xl`, `flex`, `flex-col`, `gap-1`, `gap-2`, `inline-flex`, `items-center`, `justify-between`, `max-w-full`, `md:flex-row`, `md:max-h-none`, `md:w-48`, `md:w-auto`, `overflow-hidden`, `overflow-y-auto`
+- **Responsive:** `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\admin\EditableCell.md
 
 ---
@@ -11826,6 +12772,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: EditableCell
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-transparent`, `border-2`, `border-b`, `border-dashed`, `border-primary-navy`, `border-primary-navy/30`, `border-slate-300`, `border-t-primary-navy`, `text-left`, `text-slate-400`, `text-sm`
+- **Layout:** `gap-1`, `h-3.5`, `inline-block`, `inline-flex`, `items-center`, `p-0`, `w-3.5`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\ExportMenu.md
 
 ---
@@ -11871,13 +12833,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### ExportMenuItem
 ```typescript
 type ExportMenuItem = {
-
   key: string
-
   label: string
-
   onSelect: () => void
-
 }
 ```
 
@@ -11910,6 +12868,26 @@ type ExportMenuItem = {
 ## DISA AKTARILANLAR (EXPORTS)
   export: ExportMenu
   export: ExportMenuItem
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_30px_60px_rgba(0,0,0,0.5)]`
+- **height:** (yok)
+- **width:** `min-w-[140px]`, `min-w-[200px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-emerald-500/10`, `border-white/10`, `text-emerald-400`, `text-slate-300`, `text-slate-500`, `text-xs`
+- **Layout:** `flex`, `gap-2`, `gap-3`, `h-12`, `h-8`, `items-center`, `justify-center`, `p-2`, `w-8`, `z-50`, `zoom-in-95`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\InfoTooltip.md
@@ -11989,6 +12967,22 @@ Fonksiyonel bir React bileşeni olarak tanımlanmıştır. Gelen `text`, `size` 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: InfoTooltip
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-800`, `border-4`, `border-t-slate-800`, `border-transparent`, `text-left`, `text-slate-400`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `bottom-full`, `group-hover:opacity-100`, `group-hover:visible`, `inline-flex`, `items-center`, `justify-center`, `left-1/2`, `relative`, `shadow-xl`, `top-full`, `w-64`, `z-50`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\InventoryCsvImport.md
@@ -12201,6 +13195,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: InventoryCsvImport
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_10px_rgba(245,158,11,0.3)]`, `shadow-[0_0_20px_rgba(34,211,238,0.3)]`, `shadow-[0_40px_100px_rgba(0,0,0,0.6)]`
+- **height:** `max-h-[300px]`, `max-h-[85vh]`
+- **width:** `max-w-[200px]`
+- **spacing:** (yok)
+- **diğer:** `border-t-[#0A0F1E]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-lg`, `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-400`, `bg-black/60`, `bg-cyan-400`, `bg-rose-500/20`, `bg-surface-deep/20`, `bg-surface-midnight`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/5`, `bg-white/[0.02]`, `border-2`, `border-b`, `border-dashed`, `border-none`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-cyan-400`, `group-hover:scale-110`, `group-hover:text-slate-300`, `group-hover:text-surface-deep`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\InventoryDetailDrawer.md
 
 ---
@@ -12318,6 +13332,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: InventoryDetailDrawer
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[-20px_0_50px_rgba(0,0,0,0.5)]`, `shadow-[0_0_10px_rgba(34,211,238,0.8)]`, `shadow-[0_0_15px_rgba(245,158,11,0.5)]`, `shadow-[0_0_15px_rgba(34,211,238,0.5)]`, `shadow-[0_0_30px_rgba(34,211,238,0.05)]`
+- **height:** (yok)
+- **width:** `sm:w-[480px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`, `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-500`, `bg-black/60`, `bg-cyan-400`, `bg-cyan-400/10`, `bg-white/[0.02]`, `bg-white/[0.03]`, `border-b`, `border-cyan-400/20`, `border-l`, `border-none`, `border-white/10`, `border-white/5`, `text-3xl`, `text-base`, `text-cyan-300`
+- **Layout:** `-right-8`, `-top-8`, `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`
+- **Responsive:** `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\admin\InventoryMovementHistory.md
 
 ---
@@ -12394,6 +13428,26 @@ Bu modül, `movements` prop'una dayalı olarak çalışır; bu prop'un varlığ�
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryMovementHistory
   export: Movement
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `max-w-[140px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-transparent`, `bg-white/[0.02]`, `border-b`, `border-separate`, `border-spacing-0`, `border-white/5`, `text-emerald-400`, `text-left`, `text-right`, `text-rose-400`, `text-slate-300`, `text-slate-500`, `text-xs`
+- **Layout:** `group-last:border-0`, `overflow-hidden`, `w-full`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\InventoryQrLabel.md
@@ -12486,6 +13540,22 @@ Bu varsayımlar, fonksiyon gövdesindeki dış bağımlılıklar ve veri akış�
   export: printQrLabel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\InventoryReservedTable.md
 
 ---
@@ -12544,17 +13614,11 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 ### ReservedRow
 ```typescript
 type ReservedRow = {
-
     order_id: string;
-
     created_at: string;
-
     status: string;
-
     payment_status: string | null;
-
     quantity: number
-
 }
 ```
 
@@ -12586,6 +13650,26 @@ type ReservedRow = {
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryReservedTable
   export: ReservedRow
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-transparent`, `bg-white/[0.02]`, `border-b`, `border-separate`, `border-spacing-0`, `border-white/5`, `text-cyan-400`, `text-left`, `text-right`, `text-slate-300`, `text-slate-500`, `text-xs`
+- **Layout:** `group-last:border-0`, `overflow-hidden`, `w-full`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\InventoryStockAdjust.md
@@ -12664,6 +13748,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryStockAdjust
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/[0.03]`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-sm`, `text-white`, `text-xs`
+- **Layout:** `flex`, `flex-1`, `gap-3`, `h-12`, `items-center`, `w-24`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\InventoryTable.md
@@ -12805,6 +13909,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: InventoryTable
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_10px_rgba(34,211,238,0.5)]`
+- **height:** (yok)
+- **width:** `max-w-[120px]`, `min-w-[1000px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-500/10`, `bg-blue-500/10`, `bg-cyan-400`, `bg-cyan-500/[0.05]`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-transparent`, `bg-white/[0.02]`, `border-amber-500/20`, `border-b`, `border-b-0`, `border-blue-500/20`, `border-emerald-500/20`, `border-rose-500/20`
+- **Layout:** `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `gap-1`, `gap-3`, `group-hover:text-cyan-400`, `h-4`, `h-6`, `inline-flex`, `items-center`, `justify-center`, `justify-end`, `overflow-x-auto`, `p-0`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\JsonDiffViewer.md
 
 ---
@@ -12927,6 +14051,26 @@ graph LR
   export: JsonDiffViewer
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-emerald-500`, `bg-emerald-500/10`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-800/30`, `bg-slate-800/80`, `bg-slate-900`, `border-b`, `border-r`, `border-slate-700`, `border-slate-800`, `text-center`, `text-emerald-300`, `text-rose-300`, `text-slate-400`
+- **Layout:** `flex`, `flex-1`, `gap-2`, `h-2`, `items-center`, `overflow-hidden`, `overflow-x-auto`, `p-3`, `shadow-xl`, `w-2`, `w-full`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\authority-builder\AuthorityBuilder.md
 
 ---
@@ -12997,9 +14141,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - **btnOutline** (template) — ``${btnBase} border border-slate-200 bg-white shadow-sm hover:bg-slate-100 hov...`
 - **btnSecondary** (template) — ``${btnBase} bg-slate-100 text-slate-900 shadow-sm hover:bg-slate-100/80``
 - **BLOCK_TYPES** (array) — `[
-
   { type: 'hero', label: 'Hero / Banner', icon: Layers },
-
   { type: 'spec...`
 
 ---
@@ -13050,6 +14192,26 @@ graph LR
 ## DISA AKTARILANLAR (EXPORTS)
   export: AuthorityBuilder
   export: getInitialContent
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[500px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-indigo-600`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-900`, `bg-white`, `border-2`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `text-center`, `text-indigo-300`, `text-lg`, `text-red-500`, `text-slate-300`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `group-hover:opacity-100`, `h-10`, `h-4`, `h-5`, `h-6`, `h-8`, `h-auto`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
 
 ---
 # FILE: src\components\admin\authority-builder\BlockEditor.md
@@ -13208,6 +14370,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: BlockEditor
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-indigo-50`, `bg-indigo-50/20`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-white`, `border-indigo-100/50`, `border-slate-100`, `text-center`, `text-indigo-400`, `text-indigo-600`, `text-slate-300`, `text-slate-400`, `text-slate-500`, `text-sm`
+- **Layout:** `absolute`, `flex`, `flex-1`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-32`, `h-7`, `h-9`, `items-center`, `items-start`, `justify-between`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\categories\CategoryFormModal.md
 
 ---
@@ -13343,6 +14525,26 @@ graph TD
   export: CategoryFormModal
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[90vh]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `backdrop-blur-[2px]`, `group-hover:translate-y-[-1px]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-black/60`, `bg-cyan-500`, `bg-red-500`, `bg-surface-deep`, `bg-white/5`, `bg-white/[0.01]`, `bg-white/[0.02]`, `bg-white/[0.03]`, `border-2`, `border-b`, `border-b-2`, `border-dashed`, `border-t`, `border-transparent`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`, `group-hover:opacity-100`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\dashboard\AbcPieChart.md
 
 ---
@@ -13422,6 +14624,26 @@ Fonksiyon bir React bileşeni olduğundan genellikle `JSX.Element` döndürür; 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AbcPieChart
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[300px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500/10`, `bg-cyan-500/30`, `bg-slate-900/40`, `border-white/5`, `text-4xl`, `text-slate-500`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `group-hover/pie:text-cyan-400`, `group-hover/pie:w-20`, `h-0.5`, `h-full`, `items-center`, `justify-center`, `left-1/2`, `p-10`, `relative`, `top-1/2`, `w-12`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\dashboard\ActivityHeatmap.md
@@ -13543,6 +14765,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ActivityHeatmap
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_15px_rgba(34,211,238,0.7)]`, `shadow-[0_20px_50px_rgba(0,0,0,0.5)]`
+- **height:** `min-h-[300px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `blur-[80px]`, `drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500/30`, `bg-cyan-500/5`, `border-cyan-400/20`, `border-white/10`, `border-white/5`, `text-cyan-400`, `text-slate-500`, `text-slate-600`, `text-sm`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `group-hover/heatmap:text-cyan-400`, `group-hover/heatmap:w-20`, `h-0.5`, `h-2.5`, `h-48`, `h-full`, `items-center`, `justify-center`, `justify-end`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\dashboard\RecentOrdersTable.md
@@ -13739,6 +14981,26 @@ graph LR
   export: RecentOrdersTable
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `blur-[100px]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-current`, `bg-cyan-500`, `bg-cyan-500/0`, `bg-cyan-500/5`, `bg-white/5`, `bg-white/[0.02]`, `border-collapse`, `border-white/5`, `text-center`, `text-cyan-400/90`, `text-left`, `text-right`, `text-slate-400`, `text-slate-500`, `text-sm`
+- **Layout:** `-right-24`, `-top-24`, `absolute`, `backdrop-blur-md`, `custom-scrollbar`, `flex`, `flex-col`, `gap-2`, `gap-3`, `group-hover/btn:translate-x-1`, `group-hover/link:opacity-100`, `group-hover/row:bg-cyan-500`, `group-hover/row:bg-white/10`, `group-hover/row:opacity-100`, `group-hover/row:scale-105`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\dashboard\SalesChart.md
 
 ---
@@ -13808,6 +15070,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SalesChart
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_15px_rgba(244,63,94,0.6)]`, `shadow-[0_0_15px_rgba(34,211,238,0.6)]`
+- **height:** `h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-rose-500`, `border-l`, `border-white/10`, `border-white/5`, `text-slate-300`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
+- **Layout:** `backdrop-blur-2xl`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `group-hover/chart:text-cyan-400`, `h-2.5`, `items-center`, `justify-between`, `justify-center`, `min-h-0`, `p-1.5`, `p-8`, `shadow-2xl`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\dashboard\StatCard.md
@@ -13912,6 +15194,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: StatCard
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_15px_rgba(34,211,238,0.5)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `group-hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-emerald-400/10`, `bg-gradient-to-br`, `bg-rose-400/10`, `border-white/5`, `from-white/5`, `lg:text-4xl`, `text-3xl`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-white`, `text-xs`, `to-transparent`
+- **Layout:** `-right-12`, `-top-12`, `absolute`, `block`, `bottom-0`, `flex`, `flex-1`, `flex-wrap`, `from-white/5`, `gap-0.5`, `gap-2`, `group-hover:rotate-6`, `group-hover:scale-105`, `group-hover:scale-110`, `group-hover:scale-150`
+- **Responsive:** `lg:` prefix kullanımları
+
 
 ---
 # FILE: src\components\admin\products\ProductCsvImport.md
@@ -14062,6 +15364,26 @@ Bu modülün doğru çalışması için bazı prop varsayımları gereklidir.
   export: ProductCsvImport
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[90vh]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-50`, `bg-slate-50`, `bg-slate-900/50`, `border-b`, `border-gray-200`, `border-slate-200`, `border-t`, `text-center`, `text-left`, `text-slate-400`, `text-slate-500`, `text-slate-800`, `text-xs`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `gap-3`, `h-10`, `hidden`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `max-w-4xl`, `overflow-x-auto`, `overflow-y-auto`, `p-2`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\admin\products\ProductFormModal.md
 
 ---
@@ -14141,9 +15463,7 @@ type ProductFormValues = z.infer<typeof productSchema>
 
 ## SABİTLER
 - **productSchema** (call) — `z.object({
-
     name: z.string().min(3, 'İsim en az 3 karakter olmalı'),
-
    ...`
 
 ---
@@ -14203,6 +15523,26 @@ type ProductFormValues = z.infer<typeof productSchema>
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProductFormModal
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[90vh]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/50`, `bg-primary-navy`, `bg-white`, `text-industrial-gray`, `text-red-500`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
+- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-center`, `justify-between`, `justify-end`, `left-1/2`, `max-w-2xl`, `md:grid-cols-2`, `md:grid-cols-3`
+- **Responsive:** `md:` prefix kullanımları
+
 
 ---
 # FILE: src\components\admin\products\ProductHealthBadge.md
@@ -14289,6 +15629,22 @@ type HealthScore = 'A' | 'B' | 'C' | 'D' | 'N/A'
 ## DISA AKTARILANLAR (EXPORTS)
   export: HealthScore
   export: ProductHealthBadge
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-xs`
+- **Layout:** `h-6`, `inline-flex`, `items-center`, `justify-center`, `shadow-sm`, `w-6`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\authority\AuthorityRenderer.md
@@ -14485,6 +15841,22 @@ graph TD
   export: SpecsBlock
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/10`, `bg-indigo-600`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/20`, `bg-white/5`, `border-2`, `border-8`, `border-dashed`, `border-red-100`, `border-slate-100`, `border-slate-200`, `md:text-5xl`
+- **Layout:** `absolute`, `bottom-0`, `bottom-6`, `flex`, `flex-col`, `gap-1`, `gap-12`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`, `h-12`, `h-14`, `h-16`, `h-6`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
+
+---
 # FILE: src\components\authority\README.md
 
 # 🛰️ Medya Otoritesi (Media Authority) - P01-012
@@ -14603,9 +15975,7 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
 
 ## SABİTLER
 - **formatColors** (object) — `{
-
     pdf: 'bg-red-50 text-red-600 border-red-100',
-
     dwg: 'bg-blue-50 te...`
 
 ---
@@ -14641,6 +16011,22 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: TechnicalDrawingAuthority
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-100`, `bg-slate-50`, `bg-white`, `border-slate-100`, `border-slate-200`, `text-industrial-gray`, `text-slate-400`, `text-slate-500`, `text-slate-600`, `text-sm`, `text-xs`
+- **Layout:** `flex`, `flex-col`, `gap-4`, `grid`, `grid-cols-1`, `group-hover:text-primary-navy`, `h-12`, `hover:shadow-md`, `items-center`, `justify-between`, `justify-center`, `md:grid-cols-2`, `p-3`, `p-4`, `shadow-sm`
+- **Responsive:** `md:` prefix kullanımları
+
 
 ---
 # FILE: src\components\authority\ThreeDAuthority.md
@@ -14743,6 +16129,26 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir:
   export: ThreeDAuthority
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `opacity-[0.03]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/50`, `bg-white/90`, `border-2`, `border-primary-navy`, `border-slate-200`, `border-t-transparent`, `border-white`, `text-center`, `text-industrial-gray`, `text-slate-400`, `text-slate-500`, `text-steel-gray`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-4`, `flex`, `flex-col`, `group-hover:block`, `group-hover:scale-110`, `h-16`, `h-2`, `h-4`, `h-8`, `hidden`, `items-center`, `justify-center`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\authority\VideoAuthority.md
 
 ---
@@ -14822,6 +16228,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: VideoAuthority
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `bg-primary-navy/80`, `bg-slate-100`, `bg-slate-900`, `from-black/60`, `text-slate-400`, `text-white`, `text-white/80`, `text-xs`, `to-transparent`
+- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-col`, `from-black/60`, `group-hover:opacity-100`, `h-full`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `overflow-hidden`, `p-2`, `p-4`, `relative`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\calculators\CalculatorLayout.md
@@ -14911,6 +16333,22 @@ Eğer `backLink` prop'u verilmezse, varsayılan değer `'/products'` kullanılı
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CalculatorLayout
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-b`, `bg-primary-navy`, `bg-secondary-blue/10`, `bg-warning-orange/10`, `bg-white/10`, `border-light-gray`, `border-secondary-blue/20`, `border-t`, `border-warning-orange/20`, `from-light-gray`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`
+- **Layout:** `flex`, `flex-shrink-0`, `from-light-gray`, `gap-2`, `gap-3`, `gap-4`, `inline-flex`, `items-center`, `items-start`, `max-w-5xl`, `min-h-screen`, `p-3`, `p-4`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\calculators\InputField.md
@@ -15029,6 +16467,22 @@ Her iki bileşen de etiket, mevcut değer ve değişiklik bildirimi gibi temel �
 ## DISA AKTARILANLAR (EXPORTS)
   export: InputField
   export: RadioGroup
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-danger-red/5`, `bg-gray-100`, `bg-industrial-gray`, `bg-primary-navy/5`, `bg-white`, `border-4`, `border-danger-red`, `border-light-gray`, `border-primary-navy`, `border-t-industrial-gray`, `border-transparent`, `text-danger-red`, `text-industrial-gray`, `text-left`, `text-primary-navy`
+- **Layout:** `absolute`, `bottom-full`, `flex`, `gap-2`, `gap-3`, `grid`, `group-hover:opacity-100`, `items-center`, `left-1/2`, `max-w-xs`, `p-4`, `relative`, `right-4`, `sm:grid-cols-${columns`, `top-1/2`
+- **Responsive:** `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\calculators\ResultCard.md
@@ -15210,6 +16664,22 @@ graph LR
   export: ResultGrid
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-secondary-blue/5`, `border-secondary-blue/20`, `text-2xl`, `text-3xl`, `text-industrial-gray`, `text-primary-navy`, `text-secondary-blue`, `text-sm`, `text-steel-gray`, `text-xs`
+- **Layout:** `col-span-full`, `flex`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `hover:shadow-md`, `items-baseline`, `items-center`, `items-start`, `justify-between`, `lg:grid-cols-3`, `md:col-span-2`, `md:grid-cols-2`, `p-4`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
+
+---
 # FILE: src\components\calculators\StepIndicator.md
 
 ---
@@ -15299,6 +16769,22 @@ StepIndicator bileşeni, steps, currentStep ve onStepClick prop'larının belirl
   export: StepIndicator
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-200`, `bg-primary-navy`, `bg-success-green`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-steel-gray/70`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `h-0.5`, `h-10`, `h-2`, `h-full`, `hidden`, `items-center`, `justify-between`, `justify-center`, `left-0`, `lg:block`, `md:flex`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\CategoryAuthoritySection.md
 
 ---
@@ -15366,6 +16852,22 @@ Bu modül, `content` propunun sağlanması ve belirli bir yapıda olması üzeri
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryAuthoritySection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\category\CategoryFilters.md
@@ -15500,6 +17002,22 @@ graph LR
   export: CategoryFilters
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `accent-primary-ocean`, `bg-slate-50`, `bg-white`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-300`, `text-primary-ocean`, `text-slate-300`, `text-slate-400`, `text-slate-500`, `text-slate-600`, `text-slate-900`, `text-sm`, `text-white`
+- **Layout:** `absolute`, `block`, `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `group-hover:text-slate-900`, `h-3`, `h-5`, `items-center`, `justify-between`, `justify-center`, `max-h-48`, `overflow-y-auto`, `p-6`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\category\CategoryHero.md
 
 ---
@@ -15609,6 +17127,26 @@ CategoryHero bileşeninin render edilmesi ve `handleBack()` fonksiyonunun çağr
   export: CategoryHero
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[300px]`, `h-[500px]`, `min-h-[300px]`
+- **width:** `w-[300px]`, `w-[500px]`
+- **spacing:** (yok)
+- **diğer:** `bg-[url('/images/grid-white.svg')]`, `opacity-[0.03]`, `tracking-[0.3em]`, `tracking-[0.4em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500/10`, `bg-indigo-600/10`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/10`, `bg-white/5`, `border-b`, `border-slate-100`, `border-white/10`, `border-white/5`, `lg:text-5xl`, `lg:text-8xl`, `lg:text-xl`, `text-3xl`
+- **Layout:** `absolute`, `block`, `bottom-0`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-4`, `gap-8`, `group-hover:-translate-x-1`, `h-12`, `h-24`, `h-32`, `h-4`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\CategoryShowcase.md
 
 ---
@@ -15698,6 +17236,26 @@ Bu modülün doğru çalışması için gerekli props sağlanmalıdır.
   export: CategoryShowcase
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[600px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `aspect-[16/9]`, `aspect-[4/3]`, `aspect-[4/5]`, `duration-[2s]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-50`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-gray-50`, `bg-light-gray`, `bg-orange-50`, `bg-primary-navy`, `bg-primary-navy/10`, `bg-secondary-blue/20`, `bg-slate-50`, `bg-slate-900/50`, `bg-white`, `border-4`, `border-b`, `border-gray-100`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-4`, `bottom-8`, `flex`, `flex-col`, `flex-shrink-0`, `from-black/60`, `from-primary-navy/80`, `from-secondary-blue`, `from-slate-950/80`, `gap-16`, `gap-2`, `gap-6`, `gap-8`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\EducationalGuide.md
 
 ---
@@ -15765,6 +17323,26 @@ Bu modül, `categorySlug` propunun mevcut ve geçerli bir string olduğu varsay�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: EducationalGuide
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[48px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-50`, `bg-gray-50`, `bg-orange-50`, `bg-white`, `border-gray-100`, `border-y`, `text-2xl`, `text-center`, `text-gray-600`, `text-gray-700`, `text-green-500`, `text-industrial-gray`, `text-orange-500`, `text-secondary-blue`, `text-sm`
+- **Layout:** `absolute`, `flex`, `flex-shrink-0`, `gap-8`, `grid`, `grid-cols-1`, `group-hover:opacity-20`, `items-center`, `items-start`, `max-w-4xl`, `max-w-7xl`, `md:grid-cols-2`, `overflow-hidden`, `p-3`, `p-4`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\category\EnhancedNeedsWizard.md
@@ -16052,6 +17630,26 @@ graph LR
   contains: DomainProduct
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[90vh]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `accent-cyan-500`, `bg-cyan-500`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50`, `bg-slate-50/50`, `bg-slate-900/60`, `bg-slate-950`, `bg-white`, `border-b`, `border-none`, `border-slate-100`, `border-slate-200`, `text-3xl`, `text-4xl`
+- **Layout:** `absolute`, `backdrop-blur-xl`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-12`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`
+- **Responsive:** `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\NeedsAnalysisWizard.md
 
 ---
@@ -16184,6 +17782,22 @@ graph LR
   export: NeedsAnalysisWizard
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-white`, `bg-white/20`, `border-2`, `border-primary-navy/10`, `from-primary-navy`, `text-blue-100`, `text-gray-400`, `text-gray-500`, `text-gray-700`, `text-gray-800`, `text-left`, `text-lg`, `text-primary-navy`, `text-secondary-blue`
+- **Layout:** `flex`, `from-primary-navy`, `gap-3`, `grid`, `grid-cols-1`, `grid-cols-2`, `items-center`, `justify-between`, `md:grid-cols-2`, `md:grid-cols-3`, `md:grid-cols-4`, `md:w-auto`, `p-2`, `p-6`, `shadow-lg`
+- **Responsive:** `md:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\sections\BottomCTA.md
 
 ---
@@ -16278,6 +17892,22 @@ Bu modül, gerekli callback fonksiyonlarının ve `categoryN` propunun sağland�
   export: BottomCTA
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-400`, `bg-emerald-500`, `bg-gradient-to-br`, `bg-secondary-blue`, `bg-white/10`, `bg-white/20`, `border-blue-400/30`, `border-white/20`, `from-primary-navy`, `from-secondary-blue`, `md:text-4xl`, `text-3xl`, `text-blue-100`, `text-center`, `text-gray-300`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-col`, `from-primary-navy`, `from-secondary-blue`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `group-hover:-translate-y-1`, `group-hover:bg-white/30`, `group-hover:scale-110`, `h-14`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\sections\FAQ.md
 
 ---
@@ -16344,6 +17974,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FAQ
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-50`, `bg-gray-50`, `bg-white`, `border-blue-200`, `border-gray-200`, `md:text-4xl`, `text-3xl`, `text-blue-500`, `text-blue-600`, `text-blue-700`, `text-center`, `text-gray-400`, `text-gray-600`, `text-gray-900`, `text-left`
+- **Layout:** `flex`, `flex-shrink-0`, `gap-2`, `gap-4`, `inline-flex`, `items-center`, `justify-between`, `max-h-0`, `max-h-96`, `max-w-3xl`, `overflow-hidden`, `p-5`, `p-6`, `shadow-md`, `w-full`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\category\sections\HowItWorks.md
@@ -16414,6 +18060,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: HowItWorks
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-50`, `bg-blue-500`, `bg-gray-100`, `bg-white`, `border-2`, `border-blue-500`, `border-gray-200`, `md:text-4xl`, `sm:text-3xl`, `sm:text-lg`, `text-2xl`, `text-base`, `text-blue-600`, `text-blue-700`, `text-center`
+- **Layout:** `flex`, `flex-1`, `gap-4`, `gap-8`, `grid`, `h-auto`, `items-center`, `items-start`, `justify-between`, `lg:gap-12`, `lg:grid-cols-2`, `max-h-0`, `max-h-24`, `max-w-2xl`, `max-w-7xl`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\sections\ProblemSection.md
 
 ---
@@ -16481,6 +18143,22 @@ ProblemSection bileşeni dışarıdan prop almayı beklemez.
   export: ProblemSection
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-blue-500/30`, `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-red-500/30`, `bg-white`, `border-2`, `border-blue-300`, `border-gray-100`, `border-red-300`, `from-gray-50`, `from-red-500`, `md:text-4xl`, `sm:text-3xl`, `sm:text-4xl`
+- **Layout:** `absolute`, `flex`, `from-gray-50`, `from-red-500`, `gap-4`, `gap-8`, `grid`, `grid-cols-2`, `group-hover:scale-110`, `h-10`, `h-20`, `hidden`, `hover:shadow-lg`, `items-center`, `justify-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\sections\TrustSignals.md
 
 ---
@@ -16542,6 +18220,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: TrustSignals
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-300`, `bg-gray-50`, `bg-white`, `border-gray-200`, `border-t`, `border-y`, `text-blue-600`, `text-center`, `text-gray-400`, `text-gray-500`, `text-gray-900`, `text-sm`, `text-xs`
+- **Layout:** `flex`, `flex-wrap`, `gap-2`, `gap-6`, `grid`, `grid-cols-2`, `h-12`, `h-4`, `items-center`, `justify-center`, `lg:grid-cols-6`, `max-w-7xl`, `md:grid-cols-3`, `shadow-sm`, `w-12`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\category\sections\TypeComparison.md
@@ -16642,6 +18336,26 @@ Bu modül, `onOpenWizard` ve `onSelectType` prop'larının fonksiyon olarak sağ
   export: TypeComparison
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `aspect-[16/9]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-gray-100`, `bg-purple-600`, `border-2`, `border-purple-100`, `from-purple-50`, `from-white`, `md:text-4xl`, `sm:text-3xl`, `sm:text-lg`, `text-2xl`, `text-base`, `text-center`, `text-gray-500`
+- **Layout:** `flex`, `flex-shrink-0`, `flex-wrap`, `from-purple-50`, `from-white`, `gap-2`, `gap-4`, `gap-6`, `grid`, `inline`, `inline-flex`, `items-center`, `items-start`, `justify-center`, `max-w-2xl`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\sections\VorticeBrand.md
 
 ---
@@ -16714,6 +18428,22 @@ Bu modül, props almayan bir React fonksiyon bileşeni olarak tasarlanmıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: VorticeBrand
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-b`, `bg-gradient-to-t`, `bg-green-500`, `bg-red-500`, `bg-white`, `bg-white/10`, `bg-white/5`, `border-t`, `border-white/10`, `from-black/70`, `from-slate-900`, `md:text-4xl`, `sm:text-3xl`, `sm:text-base`, `sm:text-lg`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-wrap`, `from-black/70`, `from-slate-900`, `gap-1.5`, `gap-2`, `gap-8`, `grid`, `grid-cols-4`, `h-5`, `h-auto`, `hidden`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\category\sections\silent-fan\SilentFanFAQ.md
@@ -16828,6 +18558,26 @@ graph LR
   export: SilentFanFAQ
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[500px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-100`, `bg-blue-600`, `bg-slate-100`, `bg-slate-50`, `bg-white`, `border-blue-500`, `border-slate-200`, `border-slate-50`, `border-t`, `md:text-4xl`, `text-3xl`, `text-blue-600`, `text-center`, `text-left`, `text-lg`
+- **Layout:** `flex`, `flex-shrink-0`, `gap-4`, `h-16`, `h-8`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `max-h-0`, `max-w-4xl`, `overflow-hidden`, `shadow-blue-500/5`, `shadow-sm`, `shadow-xl`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\sections\silent-fan\SilentFanHowItWorks.md
 
 ---
@@ -16935,6 +18685,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SilentFanHowItWorks
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-500/10`, `bg-gradient-to-r`, `bg-slate-800`, `bg-slate-900`, `border-blue-500/20`, `border-white/5`, `from-blue-500`, `md:text-5xl`, `sm:text-4xl`, `text-3xl`, `text-blue-400`, `text-lg`, `text-slate-400`, `text-sm`, `text-white`
+- **Layout:** `absolute`, `block`, `flex`, `flex-shrink-0`, `from-blue-500`, `gap-12`, `gap-5`, `grid`, `group-hover:bg-blue-500/20`, `group-hover:opacity-30`, `group-hover:text-blue-300`, `h-12`, `h-auto`, `items-center`, `justify-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\category\sections\silent-fan\SilentFanProblem.md
@@ -17071,6 +18837,26 @@ graph LR
   export: SilentFanProblem
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `md:aspect-[21/9]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/20`, `bg-blue-400`, `bg-blue-500`, `bg-blue-500/20`, `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-red-400`, `bg-red-500`, `bg-white`, `border-blue-400/30`, `border-gray-100`, `border-white/10`, `from-black/80`, `from-gray-50`, `md:text-4xl`
+- **Layout:** `absolute`, `backdrop-blur-md`, `block`, `flex`, `from-black/80`, `from-gray-50`, `gap-2`, `gap-4`, `gap-8`, `grid`, `grid-cols-2`, `group-hover:scale-110`, `h-1.5`, `h-10`, `h-8`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\sections\silent-fan\SilentFanTypeComparison.md
 
 ---
@@ -17199,6 +18985,26 @@ graph LR
   export: SilentFanTypeComparison
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[73px]`, `min-h-[300px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `backdrop-blur-[2px]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-600`, `bg-blue-900/40`, `bg-center`, `bg-cover`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/80`, `border-b`, `border-slate-100`, `border-slate-200`, `border-white/5`, `md:text-5xl`, `text-2xl`
+- **Layout:** `absolute`, `backdrop-blur`, `block`, `flex`, `flex-col`, `gap-0`, `gap-12`, `gap-4`, `grid`, `grid-cols-2`, `group-hover:scale-110`, `h-full`, `hidden`, `items-center`, `justify-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\category\sections\silent-fan\SilentFanVorticeBrand.md
 
 ---
@@ -17315,6 +19121,26 @@ graph LR
   export: SilentFanVorticeBrand
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-600`, `bg-blue-600/20`, `bg-italian-red`, `bg-slate-900`, `bg-vortice-green`, `bg-white`, `bg-white/5`, `border-8`, `border-slate-800`, `border-white/10`, `md:text-5xl`, `text-2xl`, `text-4xl`, `text-blue-400`, `text-blue-500`
+- **Layout:** `-bottom-10`, `-right-10`, `-z-10`, `absolute`, `flex`, `flex-wrap`, `gap-16`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-2`, `h-12`, `h-6`, `h-64`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\home\ApplicationSolutions.md
 
 ---
@@ -17394,11 +19220,8 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ## SABİTLER
 - **solutions** (array) — `[
-
   { 
-
     id: 'parking', 
-
     href: '/category/industrial-ventilation/jet...`
 
 ---
@@ -17432,6 +19255,26 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ApplicationSolutions
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[1px]`, `h-[300px]`, `lg:h-[450px]`, `sm:h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`, `transition-[transform]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50/50`, `bg-white`, `bg-white/10`, `border-white/10`, `border-white/20`, `from-slate-950/90`, `sm:text-6xl`, `text-2xl`, `text-4xl`, `text-center`, `text-cyan-400`, `text-cyan-600`
+- **Layout:** `-skew-x-12`, `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `flex-wrap`, `from-slate-950/90`, `gap-2`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\home\CinematicProductShowcase.md
@@ -17612,6 +19455,26 @@ graph TD
   export: Hotspot
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_15px_#22D3EE]`, `shadow-[0_0_20px_rgba(34,211,238,0.4)]`, `shadow-[0_20px_50px_rgba(0,0,0,0.5)]`
+- **height:** `h-[500px]`, `h-[600px]`, `h-[70%]`
+- **width:** `w-[500px]`, `w-[600px]`, `w-[70%]`
+- **spacing:** (yok)
+- **diğer:** `bg-[linear-gradient(rgba(56,189,248,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.03)_1px,transparent_1px)]`, `bg-[size:100px_100px]`, `blur-[120px]`, `blur-[150px]`, `drop-shadow-[0_50px_100px_rgba(0,0,0,0.8)]`, `hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]`, `inset-[-4px]`, `leading-[1.1]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-3xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-cyan-500/50`, `bg-gradient-to-r`, `bg-indigo-500/10`, `bg-slate-900`, `bg-slate-900/95`, `bg-slate-950`, `bg-white`, `bg-white/10`, `bg-white/[0.01]`, `border-2`, `border-b`
+- **Layout:** `absolute`, `backdrop-blur-3xl`, `backdrop-blur-xl`, `bottom-0`, `bottom-10`, `bottom-full`, `flex`, `flex-col`, `flex-wrap`, `from-transparent`, `gap-20`, `gap-3`, `gap-4`, `gap-6`, `grid`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\home\ClientLeadButton.md
 
 ---
@@ -17697,6 +19560,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: ClientLeadButton
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-white`, `text-slate-950`, `text-xs`
+- **Layout:** `absolute`, `group-hover:translate-y-0`, `h-16`, `overflow-hidden`, `relative`, `z-10`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\home\EliteHero.md
 
 ---
@@ -17763,6 +19646,26 @@ EliteHero bileşeni, onQuoteClick prop'ı üzerinden bir işlev alarak quote but
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: EliteHero
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[100vh]`, `min-h-[700px]`
+- **width:** `w-[1px]`
+- **spacing:** (yok)
+- **diğer:** `brightness-[0.6]`, `leading-[1.05]`, `lg:text-[5.5rem]`, `saturate-[1.1]`, `tracking-[0.24em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-slate-950`, `bg-white`, `bg-white/10`, `bg-white/5`, `border-white/20`, `border-white/30`, `from-cyan-400`, `from-slate-950/80`, `from-slate-950/95`, `sm:text-2xl`, `sm:text-6xl`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-10`, `flex`, `flex-col`, `from-cyan-400`, `from-slate-950/80`, `from-slate-950/95`, `gap-2`, `gap-3`, `gap-5`, `h-12`, `h-16`, `h-2`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\home\FeaturedCommercialBlocks.md
@@ -17909,6 +19812,26 @@ graph LR
   export: normalizeImageUrl
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:scale-[1.02]`, `lg:grid-cols-[1fr,320px]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500/10`, `bg-slate-200/50`, `bg-slate-900`, `bg-slate-950`, `bg-white`, `bg-white/5`, `border-cyan-500/10`, `border-slate-200`, `border-white/10`, `border-white/5`, `sm:text-6xl`, `text-4xl`, `text-center`, `text-cyan-400`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `gap-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `grid-cols-2`, `group-hover:grayscale-0`, `h-1.5`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\home\FinalCTA.md
 
 ---
@@ -17959,11 +19882,8 @@ Bu modülün doğru çalışması için bazı temel varsayımlar gereklidir.
 
 ## SABİTLER
 - **revealVariants** (object) — `{
-
   hidden: { opacity: 0, y: 20 },
-
   visible: (i: number) => ({
-
     opacit...`
 
 ---
@@ -17997,6 +19917,26 @@ Bu modülün doğru çalışması için bazı temel varsayımlar gereklidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FinalCTA
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[600px]`, `h-[800px]`
+- **width:** `w-[600px]`, `w-[800px]`
+- **spacing:** (yok)
+- **diğer:** `blur-[120px]`, `blur-[150px]`, `hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]`, `opacity-[0.03]`, `skew-x-[45deg]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `tracking-[0.4em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-3xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-gradient-to-r`, `bg-indigo-500/10`, `bg-slate-950`, `bg-white`, `bg-white/5`, `bg-white/[0.02]`, `border-b`, `border-cyan-500/30`, `border-l`, `border-l-2`, `border-r`, `border-t`
+- **Layout:** `absolute`, `backdrop-blur-3xl`, `bottom-0`, `bottom-6`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `from-cyan-600`, `gap-10`, `gap-12`, `gap-4`, `gap-6`, `gap-8`, `grid`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\home\GuidedCategoryDiscovery.md
@@ -18124,6 +20064,26 @@ graph LR
   export: normalizeImageUrl
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[1px]`
+- **width:** `max-w-[200px]`, `sm:w-[320px]`, `w-[280px]`
+- **spacing:** (yok)
+- **diğer:** `duration-[1.5s]`, `grayscale-[0.3]`, `lg:aspect-[0.85/1]`, `tracking-[0.1em]`, `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`, `transition-[width,background-color]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-950`, `bg-slate-950/40`, `bg-white`, `bg-white/30`, `border-b`, `border-l`, `border-r`, `border-t`, `border-white/20`, `from-slate-950/80`, `lg:text-2xl`, `sm:text-6xl`, `text-4xl`
+- **Layout:** `absolute`, `block`, `bottom-8`, `flex`, `flex-col`, `flex-shrink-0`, `from-slate-950/80`, `gap-4`, `gap-6`, `group-hover:-translate-y-2`, `group-hover:bg-cyan-500`, `group-hover:bg-slate-950/20`, `group-hover:border-cyan-500/50`, `group-hover:grayscale-0`, `group-hover:max-h-24`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\home\HomePageClientWrapper.md
 
 ---
@@ -18204,6 +20164,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: HomePageClientWrapper
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\home\HomeSinevizyon.md
@@ -18300,11 +20276,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **slidesData** (array) — `[
-
   {
-
     image: '/images/hero_hvac_industrial_premium_1.png',
-
     product...`
 
 ---
@@ -18495,6 +20468,26 @@ graph LR
   export: HomeSinevizyon
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_10px_#22D3EE]`, `shadow-[0_0_8px_#22D3EE]`
+- **height:** `h-[1px]`, `h-[450px]`, `h-[80vh]`, `lg:h-[90vh]`, `min-h-[650px]`, `sm:h-[550px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `animate-[scan_3s_linear_infinite]`, `blur-[1px]`, `drop-shadow-[0_30px_60px_rgba(0,0,0,0.9)]`, `hover:shadow-[0_0_20px_rgba(34,211,238,0.15)]`, `hover:shadow-[0_0_40px_rgba(34,211,238,0.4)]`, `leading-[1.05]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `tracking-[0.4em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-slate-900/40`, `bg-slate-950`, `bg-slate-950/60`, `bg-white/10`, `bg-white/20`, `bg-white/5`, `border-b`, `border-cyan-400/60`, `border-cyan-500/20`
+- **Layout:** `-left-24`, `-right-24`, `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `block`, `bottom-0`, `bottom-10`, `flex`, `flex-1`, `flex-col`, `from-slate-950/80`, `from-slate-950/90`, `from-transparent`, `gap-1`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\home\KnowledgeBlock.md
 
 ---
@@ -18556,15 +20549,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **knowledgeItems** (array) — `[
-
   { 
-
     id: 'guides', 
-
     href: Routes.destek.home(),
-
     icon: (
-
   ...`
 
 ---
@@ -18603,6 +20591,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: KnowledgeBlock
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `w-[92%]`
+- **spacing:** (yok)
+- **diğer:** `bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.1),transparent_70%)]`, `leading-[1.1]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `tracking-[0.4em]`, `transition-[opacity,transform]`, `transition-[opacity]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-clip-text`, `bg-cyan-400/40`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-gradient-to-r`, `bg-slate-950`, `bg-white/5`, `bg-white/[0.02]`, `border-cyan-500/30`, `border-l-2`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-400`, `from-cyan-600`
+- **Layout:** `absolute`, `backdrop-blur-3xl`, `backdrop-blur-md`, `bg-clip-text`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `from-cyan-400`, `from-cyan-600`, `gap-12`, `gap-3`, `gap-4`, `gap-6`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\home\QuickEntryRail.md
@@ -18654,15 +20662,10 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ## SABİTLER
 - **quickEntryItems** (as_expression) — `[
-
   {
-
     id: 'category',
-
     href: '#categories',
-
     icon: (
-
       <sv...`
 
 ---
@@ -18695,6 +20698,26 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: QuickEntryRail
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_18px_35px_-30px_rgba(15,23,42,0.45)]`
+- **height:** `min-h-[88px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `bg-[linear-gradient(135deg,rgba(15,23,42,0.02),rgba(37,99,235,0.06))]`, `hover:shadow-[0_22px_40px_-28px_rgba(37,99,235,0.45)]`, `tracking-[0.24em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-primary-navy/[0.06]`, `bg-white`, `bg-white/95`, `border-b`, `border-primary-navy/10`, `border-primary-navy/15`, `border-slate-200`, `border-slate-200/75`, `sm:text-xl`, `text-left`, `text-lg`, `text-primary-navy`, `text-slate-950`, `text-sm`
+- **Layout:** `block`, `flex`, `gap-3`, `grid`, `group-hover:bg-primary-navy/10`, `group-hover:bg-secondary-blue`, `group-hover:border-primary-navy/20`, `h-11`, `hidden`, `inline-flex`, `items-center`, `items-start`, `justify-between`, `justify-center`, `lg:block`
+- **Responsive:** `lg:`, `sm:`, `xl:` prefix kullanımları
+
 
 ---
 # FILE: src\components\home\RevealSection.md
@@ -18759,6 +20782,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: RevealSection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\home\StrategicBrands.md
@@ -18846,6 +20885,26 @@ Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağı
   export: StrategicBrands
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `sm:text-6xl`, `text-4xl`, `text-cyan-600`, `text-lg`, `text-slate-500`, `text-slate-950`, `text-xs`
+- **Layout:** `flex`, `flex-col`, `gap-6`, `justify-between`, `max-w-3xl`, `max-w-md`, `max-w-page`, `md:flex-row`, `md:items-end`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\home\TrustProofSection.md
 
 ---
@@ -18908,13 +20967,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **proofItems** (as_expression) — `[
-
   { 
-
     key: 'brands', 
-
     icon: (
-
       <svg width="20" height="20" ...`
 - **trustStripKeys** (as_expression) — `['authorizedBrands', 'engineeringSupport', 'nationwideDelivery', 'projectGuid...`
 
@@ -18960,6 +21015,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: TrustProofSection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `aspect-[16/9]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/50`, `bg-white`, `border-slate-100`, `border-slate-200`, `from-slate-900/60`, `sm:text-6xl`, `text-4xl`, `text-base`, `text-center`, `text-cyan-600`, `text-lg`, `text-primary-navy`
+- **Layout:** `absolute`, `flex`, `flex-col`, `from-slate-900/60`, `gap-16`, `gap-3`, `gap-6`, `grid`, `grid-cols-2`, `group-hover:bg-primary-navy`, `group-hover:bg-primary-navy/20`, `group-hover:rotate-6`, `group-hover:text-white`, `h-12`, `h-2`
+- **Responsive:** `lg:`, `md:`, `sm:`, `xl:` prefix kullanımları
+
 
 ---
 # FILE: src\components\layout\ClientLayout.md
@@ -19097,6 +21172,22 @@ graph TD
   export: Providers
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\layout\MainLayout.md
 
 ---
@@ -19202,6 +21293,22 @@ MainLayout işlevinin doğru çalışması için `children` propunun sağlanmas�
   export: MainLayout
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-50`, `bg-slate-900`, `bg-white`, `bg-white/10`, `text-white`, `text-xs`
+- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-grow`, `gap-3`, `items-center`, `justify-between`, `min-h-screen`, `overflow-auto`, `relative`, `right-6`, `z-50`, `z-modal`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\layout\PageShell.md
 
 ---
@@ -19238,23 +21345,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **widthStyles** (object) — `{
-
     contained: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
-
     wide: 'max-w...`
 - **spacingStyles** (object) — `{
-
     none: '',
-
     sm: 'py-4 sm:py-6',
-
     md: 'py-8 sm:py-12',
-
     lg: ...`
 - **PageShell** (call) — `forwardRef<HTMLElement, PageShellProps>(({ 
-
     children, 
-
     width = 'con...`
 
 ---
@@ -19279,6 +21378,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## NODE ID STANDARD
 
   file: src\components\layout\PageShell.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\navigation\Breadcrumb.md
@@ -19378,6 +21493,22 @@ Breadcrumb bileşeni, `items` prop'ının mevcut olmasını ve `variant` ile `cl
   export: BreadcrumbItem
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-sm`
+- **Layout:** `flex`, `flex-wrap`, `gap-y-1`, `inline`, `items-center`, `max-w-7xl`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\navigation\CategoryCard3D.md
 
 ---
@@ -19460,6 +21591,26 @@ Bu modülün doğru çalışması için aşağıdaki koşullar sağlanmalıdır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryCard3D
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `ease-[cubic-bezier(0.16,1,0.3,1)]`, `group-hover:shadow-[0_0_40px_-10px_rgba(56,189,248,0.25)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-800/40`, `border-slate-700/50`, `text-lg`, `text-sm`, `text-white`, `text-white/50`, `text-white/70`
+- **Layout:** `-z-10`, `absolute`, `backdrop-blur-md`, `flex`, `group-hover:bg-slate-800/60`, `group-hover:border-sky-500/50`, `group-hover:text-sky-400`, `group-hover:text-white`, `group-hover:translate-x-1`, `h-5`, `h-56`, `hover:shadow-2xl`, `hover:shadow-sky-500/20`, `items-center`, `justify-between`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\navigation\CategoryHubOverlay.md
@@ -19654,6 +21805,26 @@ graph LR
   export: CategoryHubOverlay
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)]`
+- **height:** `h-[600px]`, `max-h-[calc(100vh-96px)]`, `min-h-[250px]`, `min-h-[40px]`
+- **width:** `lg:w-[58%]`, `max-w-[280px]`, `w-[42%]`
+- **spacing:** (yok)
+- **diğer:** `before:w-[3px]`, `blur-[2px]`, `duration-[600ms]`, `ease-[cubic-bezier(0.16,1,0.3,1)]`, `top-[96px]`, `tracking-[0.15em]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-sky-400/10`, `bg-slate-800`, `bg-slate-800/50`, `bg-slate-900/30`, `bg-slate-900/90`, `bg-slate-950/60`, `border-2`, `border-b`, `border-r`, `border-sky-400/20`, `border-sky-500/30`, `border-slate-700/50`, `border-t-sky-500`, `from-transparent`
+- **Layout:** `absolute`, `backdrop-blur-2xl`, `backdrop-blur-sm`, `backdrop-blur-xl`, `before:absolute`, `before:h-0`, `before:left-0`, `before:top-1/2`, `bottom-10`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-transparent`, `gap-2`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
+
+---
 # FILE: src\components\navigation\CategorySpotlightScene.md
 
 ---
@@ -19718,6 +21889,22 @@ CategorySpotlightScene componentunun doğru çalışabilmesi için categorySlug 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategorySpotlightScene
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** `absolute`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\navigation\EliteMegaMenu.md
@@ -19888,6 +22075,26 @@ graph LR
   export: MobileMegaMenu
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_2px_10px]`, `shadow-[0_38.5px_64.1px_-10px_rgba(0,0,0,0.1),0_20.1px_33.5px_-10px_rgba(0,0,0,0.07)]`
+- **height:** `h-[var(--radix-navigation-menu-viewport-height)]`
+- **width:** `lg:w-[700px]`, `md:w-[600px]`, `sm:w-[500px]`, `sm:w-[var(--radix-navigation-menu-viewport-width)]`
+- **spacing:** `gap-[2px]`, `mb-[7px]`, `mt-[10px]`, `p-[25px]`, `p-[32px]`
+- **diğer:** `duration-[250ms]`, `focus:shadow-[0_0_0_2px]`, `gap-x-[30px]`, `leading-[1.2]`, `leading-[1.5]`, `origin-[top_center]`, `perspective-[2000px]`, `sm:grid-cols-[0.75fr_1fr]`, `top-[1px]`, `transition-[width,height]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-sm`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-opacity-95`, `bg-slate-50/80`, `bg-white`, `border-slate-100/50`, `border-slate-200/50`, `text-base`, `text-primary-navy`, `text-secondary-blue`, `text-slate-600`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-xl`, `text-xs`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `col-span-1`, `data-[motion=from-end]:animate-enterFromRight`, `data-[motion=from-start]:animate-enterFromLeft`, `flex`, `flex-col`, `focus:shadow-slate-300`, `gap-2`, `gap-4`, `grid`, `grid-cols-2`, `group-data-[state=open]:-rotate-180`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\navigation\MegaMenu3DBackground.md
 
 ---
@@ -19954,6 +22161,22 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: MegaMenu3DBackground
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `from-white/60`, `to-transparent`, `via-transparent`
+- **Layout:** `absolute`, `from-white/60`, `h-3/4`, `left-0`, `right-0`, `top-0`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\navigation\NavActionButton.md
@@ -20033,7 +22256,6 @@ type NavActionTone = 'default' | 'accent' | 'success' | 'warning'
 
 ## SABİTLER
 - **toneClasses** (object) — `{
-
     default: 'text-steel-gray hover:text-primary-navy hover:bg-air-blue/30...`
 
 ---
@@ -20058,6 +22280,22 @@ type NavActionTone = 'default' | 'accent' | 'success' | 'warning'
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: NavActionButton
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-transparent`, `text-sm`
+- **Layout:** `gap-2`, `group-hover:scale-105`, `inline-flex`, `items-center`, `min-w-0`, `relative`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\navigation\NavBrand.md
@@ -20094,11 +22332,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **NavBrand** (call) — `React.memo(({ brandName }) => {
-
     return (
-
         <Link
-
             hre...`
 
 ---
@@ -20116,6 +22351,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## NODE ID STANDARD
 
   file: src\components\navigation\NavBrand.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_18px_35px_-20px_rgba(37,99,235,0.7)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3),transparent_55%)]`, `group-hover:shadow-[0_22px_40px_-18px_rgba(37,99,235,0.75)]`, `tracking-[0.08em]`, `tracking-[0.22em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `border-r`, `border-slate-200/80`, `from-primary-navy`, `text-lg`, `text-slate-900`, `text-white`, `text-xs`, `to-secondary-blue`, `via-primary-navy`
+- **Layout:** `absolute`, `block`, `flex`, `from-primary-navy`, `gap-3`, `group-hover:-translate-y-0.5`, `group-hover:text-primary-navy`, `items-center`, `min-w-0`, `overflow-hidden`, `relative`, `w-auto`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\navigation\NavPrimaryRail.md
@@ -20162,13 +22417,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## SABİTLER
 - **itemBaseClass** (str) — `'group relative inline-flex items-center justify-center gap-2 rounded-2xl bor...`
 - **NavPrimaryRail** (call) — `React.memo(({
-
     items,
-
     isCategoriesLoading,
-
     isCategoryHubOpen,
-
 ...`
 
 ---
@@ -20196,6 +22447,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## NODE ID STANDARD
 
   file: src\components\navigation\NavPrimaryRail.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-air-blue/40`, `border-primary-navy/15`, `text-primary-navy`
+- **Layout:** `flex-1`, `gap-2`, `group-hover:rotate-180`, `h-4`, `hidden`, `items-center`, `lg:flex`, `min-w-0`, `w-4`
+- **Responsive:** `lg:`, `xl:` prefix kullanımları
+
 
 ---
 # FILE: src\components\navigation\NavSearchTrigger.md
@@ -20284,6 +22551,26 @@ React.FC<NavSearchTriggerProps> türünde bir fonksiyonel bileşen döndürür; 
   export: NavSearchTrigger
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_14px_30px_-26px_rgba(15,23,42,0.45)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:shadow-[0_18px_36px_-24px_rgba(37,99,235,0.45)]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-50`, `bg-white/80`, `border-slate-200`, `border-slate-200/80`, `text-left`, `text-sm`, `text-steel-gray`, `text-xs`
+- **Layout:** `flex-1`, `gap-3`, `hidden`, `inline-flex`, `items-center`, `lg:block`, `md:block`, `min-w-0`, `shadow-sm`, `w-full`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
+
+---
 # FILE: src\components\navigation\NavSecondaryRail.md
 
 ---
@@ -20339,7 +22626,6 @@ Bu modülün doğru çalışması için `getIconForId` fonksiyonuna geçirilen `
 
 ## SABİTLER
 - **NavSecondaryRail** (call) — `React.memo(({ items }) => {
-
     // Separate left-aligned corporate links fro...`
 
 ---
@@ -20379,6 +22665,22 @@ Bu modülün doğru çalışması için `getIconForId` fonksiyonuna geçirilen `
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: getIconForId
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-sm`, `text-white/80`, `text-white/90`
+- **Layout:** `flex`, `gap-2`, `gap-6`, `group-hover:opacity-100`, `items-center`, `justify-between`, `w-full`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\navigation\NavShell.md
@@ -20472,6 +22774,26 @@ NavShell bileşeni, dışarıdan gelen özelliklere göre düzeni ve görünüml
   export: NavShell
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_18px_45px_-28px_rgba(15,23,42,0.15)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `duration-[600ms]`, `ease-[cubic-bezier(0.16,1,0.3,1)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-gradient-to-r`, `bg-primary-navy`, `bg-slate-200/60`, `bg-white/95`, `border-b`, `border-slate-200/50`, `from-primary-navy`, `text-white`, `to-air-blue`, `via-secondary-blue`
+- **Layout:** `absolute`, `backdrop-blur-xl`, `fixed`, `flex`, `from-primary-navy`, `gap-3`, `h-0`, `h-1`, `h-16`, `h-full`, `items-center`, `justify-between`, `max-w-7xl`, `md:h-8`, `overflow-hidden`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\navigation\NavUtilityRail.md
 
 ---
@@ -20539,6 +22861,26 @@ Bu modül, `children` prop'una dayalı olarak render işlemi yapar ve bu prop'un
   export: NavUtilityRail
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_14px_30px_-26px_rgba(15,23,42,0.45)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white/80`, `border-slate-200/80`
+- **Layout:** `backdrop-blur-md`, `flex`, `gap-1`, `items-center`, `justify-end`, `p-1`, `sm:gap-1.5`, `sm:p-1.5`
+- **Responsive:** `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\product\ProductSmartInference.md
 
 ---
@@ -20573,9 +22915,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **ProductSmartInference** (call) — `React.memo(({ product }) => {
-
   const { t } = useI18n()
-
   const summaries =...`
 
 ---
@@ -20616,6 +22956,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProductSmartInference
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `opacity-[0.03]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-primary-navy`, `bg-slate-100`, `bg-slate-300`, `bg-white`, `bg-white/60`, `border-inherit`, `border-slate-100/80`, `border-white/80`, `border-y`, `text-amber-600`, `text-blue-600`, `text-emerald-600`, `text-purple-600`, `text-slate-400`
+- **Layout:** `-bottom-4`, `-right-4`, `absolute`, `flex`, `flex-wrap`, `gap-2.5`, `gap-3`, `gap-4`, `gap-5`, `grid`, `grid-cols-1`, `group-hover:scale-110`, `h-1`, `h-1.5`, `h-full`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\AddToProjectModal.md
@@ -20749,6 +23109,22 @@ Bu React tabanlı modal bileşeni, ürünleri mevcut projelere ekleme işlemini 
   export: AddToProjectModal
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-light-gray`, `bg-light-gray/30`, `bg-primary-navy`, `bg-slate-900/60`, `bg-white`, `border-b`, `border-dashed`, `border-light-gray`, `border-none`, `text-center`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-secondary-blue`, `text-sm`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `fixed`, `flex`, `flex-shrink-0`, `group-hover:text-primary-navy`, `group-hover:translate-x-0.5`, `h-16`, `h-full`, `items-center`, `items-start`, `justify-between`, `justify-center`, `line-clamp-2`, `max-h-48`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\ApplicationCards.md
 
 ---
@@ -20804,13 +23180,9 @@ Bu uygulamalara özel kartları render eden React tabanlı bileşen, yalnızca m
 
 ## SABİTLER
 - **applications** (array) — `[
-
     {
-
         id: 'restoran',
-
         title: 'Restoran Uygulamaları',
-
  ...`
 
 ---
@@ -20845,6 +23217,22 @@ Bu uygulamalara özel kartları render eden React tabanlı bileşen, yalnızca m
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ApplicationCards
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-100`, `bg-white`, `bg-white/90`, `border-gray-100`, `text-base`, `text-gray-500`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-6`, `grid`, `grid-cols-1`, `group-hover:opacity-100`, `group-hover:scale-105`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `group-hover:translate-x-1`, `h-10`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları
+
 
 ---
 # FILE: src\components\products\BentPlaneGeometry.md
@@ -20914,11 +23302,8 @@ Bu react-three-fiber tabanlı 3B geometri bileşeni, sahnelerde bükülmüş dü
 
 ## SABİTLER
 - **BentPlaneMaterial** (call) — `shaderMaterial(
-
     {
-
         uTime: 0,
-
         uTexture: new THREE.Textur...`
 
 ---
@@ -20978,6 +23363,22 @@ Bu react-three-fiber tabanlı 3B geometri bileşeni, sahnelerde bükülmüş dü
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: BentPlaneGeometry
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\BlueprintCanvas.md
@@ -21041,13 +23442,9 @@ Bu React tabanlı ürün bileşenleri modülü, içerdiği iki arayüz bileşeni
 
 ## SABİTLER
 - **HolographicMaterial** (call) — `shaderMaterial(
-
     {
-
         uTime: 0,
-
         uTexture: null,
-
         u...`
 
 ---
@@ -21089,6 +23486,26 @@ Bu React tabanlı ürün bileşenleri modülü, içerdiği iki arayüz bileşeni
 ## DISA AKTARILANLAR (EXPORTS)
   export: BlueprintCanvas
   export: CinematicCard
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]`
+- **height:** `h-[1px]`, `h-[2px]`, `min-h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500`, `bg-surface-darkest`, `bg-white/10`, `bg-white/20`, `border-white/5`, `text-cyan-500`, `text-right`, `text-slate-500`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `bottom-6`, `flex`, `flex-col`, `gap-1`, `gap-2`, `h-1.5`, `h-full`, `items-center`, `items-end`, `justify-between`, `justify-end`, `left-6`, `overflow-hidden`, `relative`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\Category3DIcon.md
@@ -21180,6 +23597,22 @@ Bu React bileşeni, HVAC ürünleri kategorileri için 3B görsel ikonlar render
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Category3DIcon
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-900/80`, `bg-white/90`, `border-primary-navy/20`, `border-white/10`, `text-cyan-400`, `text-primary-navy`, `text-white`, `text-xs`
+- **Layout:** `backdrop-blur-sm`, `flex`, `gap-4`, `items-center`, `p-2`, `shadow-lg`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\CategoryOrbitCarousel.md
@@ -21479,6 +23912,26 @@ graph LR
   export: getModelTypeForCategory
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[400px]`
+- **width:** `max-w-[150px]`
+- **spacing:** (yok)
+- **diğer:** `active:scale-[0.98]`, `bg-[radial-gradient(circle_at_center,rgba(30,41,59,0.5)_0%,rgb(2,6,23)_70%)]`, `bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.15)_0%,rgb(2,6,23)_70%)]`, `hover:scale-[1.02]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-surface-darker`, `bg-white/10`, `border-white/20`, `from-cyan-500`, `md:text-3xl`, `sm:text-sm`, `text-center`, `text-cyan-400`, `text-sm`, `text-white`, `text-white/50`, `text-white/90`, `text-xl`, `text-xs`
+- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-col`, `from-cyan-500`, `gap-2`, `gap-3`, `group-hover:-translate-x-1`, `h-4`, `hover:shadow-cyan-500/30`, `hover:shadow-lg`, `items-center`, `justify-between`, `justify-center`, `left-0`
+- **Responsive:** `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\products\CategoryPreviewPanel.md
 
 ---
@@ -21640,6 +24093,26 @@ graph TD
   export: CategoryPreviewPanel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[calc(100vh-200px)]`
+- **width:** `sm:w-[420px]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/60`, `bg-gradient-to-b`, `bg-gradient-to-br`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-slate-800`, `bg-white/5`, `border-b`, `border-l`, `border-white/10`, `from-cyan-500`, `from-cyan-500/5`, `from-slate-900`, `from-slate-900/80`, `from-slate-900/95`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `backdrop-blur-xl`, `bottom-0`, `fixed`, `flex`, `from-cyan-500`, `from-cyan-500/5`, `from-slate-900`, `from-slate-900/80`, `from-slate-900/95`, `gap-2`, `gap-3`, `gap-4`, `grid`
+- **Responsive:** `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\products\CategoryShowcaseCards.md
 
 ---
@@ -21703,6 +24176,26 @@ Bu modül, VentHub HVAC projesinde ürün kategorilerini kullanıcıya kart form
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryShowcaseCards
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[140px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-b`, `bg-white/5`, `border-slate-600/50`, `border-white/20`, `from-slate-700/80`, `text-center`, `text-cyan-400`, `text-gray-400`, `text-lg`, `text-sm`, `text-white`, `to-slate-900`, `via-slate-800`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `from-slate-700/80`, `gap-2`, `gap-5`, `grid`, `grid-cols-1`, `group-hover:scale-105`, `hover:shadow-2xl`, `items-center`, `justify-center`, `md:grid-cols-3`, `overflow-hidden`, `p-5`
+- **Responsive:** `md:` prefix kullanımları
+
 
 ---
 # FILE: src\components\products\InfiniteProductsShowcase.md
@@ -21936,6 +24429,26 @@ graph LR
   export: ProductCard
   export: SceneContent
   export: getOptimizedImageUrl
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[550px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-slate-900/50`, `bg-surface-darker`, `border-slate-800`, `from-surface-darker`, `text-cyan-400`, `text-xs`, `to-transparent`, `via-surface-darker/40`
+- **Layout:** `absolute`, `backdrop-blur-md`, `bottom-6`, `flex`, `from-surface-darker`, `gap-3`, `group-hover/canvas:opacity-100`, `h-2`, `h-full`, `hidden`, `inline-flex`, `items-center`, `left-0`, `left-1/2`, `overflow-hidden`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\OrbitalProductsShowcase.md
@@ -22330,6 +24843,26 @@ graph LR
   export: SuspendedCardMaterial
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[72px]`
+- **width:** `w-[72px]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500/20`, `bg-cyan-950/30`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-slate-900/70`, `bg-slate-900/80`, `border-2`, `border-cyan-400/40`, `border-cyan-500/50`, `border-cyan-500/60`, `border-slate-700/50`, `from-surface-darker`, `md:text-sm`, `text-cyan-300`, `text-slate-200`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `from-surface-darker`, `gap-24`, `gap-3`, `h-16`, `h-8`, `h-9`, `items-center`, `justify-center`, `left-0`, `relative`, `right-0`
+- **Responsive:** `md:`, `sm:` prefix kullanımları
+
+
+---
 # FILE: src\components\products\ProductsGrid.md
 
 ---
@@ -22421,6 +24954,22 @@ Bu React tabanlı ürün listeleme grid bileşeni, tüm çalışması için gere
   export: ProductsGrid
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
+- **Layout:** `absolute`, `flex`, `flex-col`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `p-1`, `p-2`, `relative`, `right-3`
+- **Responsive:** `sm:`, `xl:` prefix kullanımları
+
+
+---
 # FILE: src\components\products\ProductsHero.md
 
 ---
@@ -22495,6 +25044,26 @@ Bu React tabanlı ürünler sayfası üst (hero) bileşeni, çalışması için 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProductsHero
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[320px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-b`, `bg-surface-navy`, `bg-transparent`, `bg-white`, `bg-white/10`, `border-0`, `from-surface-navy/80`, `lg:text-5xl`, `md:text-4xl`, `md:text-lg`, `text-3xl`, `text-base`, `text-center`, `text-gray-400`, `text-gray-800`
+- **Layout:** `absolute`, `drop-shadow-md`, `flex`, `flex-col`, `from-surface-navy/80`, `group-focus-within:bg-cyan-400/10`, `group-focus-within:text-cyan-500`, `h-80`, `h-full`, `items-center`, `justify-center`, `left-4`, `max-w-3xl`, `max-w-xl`, `overflow-hidden`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
 
 ---
 # FILE: src\components\products\ProductsSkeleton.md
@@ -22572,6 +25141,22 @@ Bu React tabanlı ürün listesi yükleme iskeleti (ProductsSkeleton) bileşeni,
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProductsSkeleton
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-100`, `bg-gray-200`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`, `h-12`, `h-4`, `h-5`, `hidden`, `lg:block`, `lg:flex-row`, `lg:grid-cols-3`
+- **Responsive:** `lg:`, `sm:`, `xl:` prefix kullanımları
+
 
 ---
 # FILE: src\components\products\RadialActionMenu.md
@@ -22832,6 +25417,26 @@ graph LR
   export: RadialMenuItem
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `max-w-[120px]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-gradient-to-br`, `bg-gradient-to-t`, `bg-slate-900/90`, `border-2`, `border-white/10`, `border-white/20`, `border-white/30`, `from-cyan-500/20`, `from-slate-600`, `from-transparent`, `text-white`, `text-white/70`, `text-xs`, `to-purple-500/20`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `fixed`, `flex`, `flex-col`, `from-cyan-500/20`, `from-slate-600`, `from-transparent`, `gap-2`, `group-hover:border-cyan-400/50`, `group-hover:shadow-2xl`, `group-hover:shadow-cyan-500/30`, `group-hover:shadow-xl`, `h-14`, `h-16`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\RichTextRenderer.md
 
 ---
@@ -22931,6 +25536,22 @@ React tabanlı bu zengin metin renderlayıcı bileşen, yalnızca üst bileşen 
   export: RichTextRenderer
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-industrial-gray`, `text-lg`, `text-steel-gray`, `text-success-green`
+- **Layout:** `flex`, `flex-shrink-0`, `items-start`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\SeriesCard.md
 
 ---
@@ -23015,6 +25636,26 @@ Bu sunum bileşeni olan SeriesCard, ürün serilerini kullanıcıya eksiksiz gö
   export: SeriesCard
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `aspect-[4/3]`, `hover:shadow-[0_20px_40px_-15px_rgba(30,41,59,0.1)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-air-blue/10`, `bg-slate-100`, `bg-slate-50`, `bg-white`, `bg-white/90`, `border-slate-100`, `border-slate-50`, `border-t`, `text-lg`, `text-primary-navy`, `text-slate-300`, `text-slate-900`, `text-sm`, `text-steel-gray`, `text-steel-gray/60`
+- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-1`, `flex-col`, `group-hover:bg-primary-navy`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `group-hover:text-white`, `h-10`, `h-full`, `items-center`, `justify-between`, `justify-center`, `left-4`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\AutoCenter.md
 
 ---
@@ -23090,6 +25731,22 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AutoCenter
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\FanRenderer.md
@@ -23171,7 +25828,6 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 
 ## SABİTLER
 - **MODEL_COMPONENTS** (object) — `{
-
     'AxialFanModel': AxialFanModel as React.ComponentType<BaseModelProps>,...`
 
 ---
@@ -23206,6 +25862,22 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FanRenderer
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\Product3DViewer.md
@@ -23449,6 +26121,26 @@ graph LR
   contains: { hasError: boolean
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#cde0f5_100%)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-50`, `bg-red-50`, `bg-white`, `bg-white/80`, `bg-white/90`, `bg-white/95`, `border-gray-200`, `border-gray-300`, `border-light-gray`, `border-red-200`, `fill-current`, `text-blue-600`, `text-center`, `text-gray-600`, `text-left`
+- **Layout:** `absolute`, `backdrop-blur-md`, `bottom-4`, `fixed`, `flex`, `flex-col`, `gap-0.5`, `gap-1`, `gap-2`, `h-full`, `items-center`, `left-0`, `left-1/2`, `left-4`, `overflow-hidden`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\SmartCenterScale.md
 
 ---
@@ -23561,6 +26253,22 @@ Bu modülün davranışı, prop tanımlarına ve varsayılan değerlerine bağl�
   export: SmartCenterScale
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\factory\Assembler.md
 
 ---
@@ -23659,6 +26367,22 @@ Assembler component'ın render edilmesi ve etkileşim sağlanması için belirli
   export: Assembler
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\factory\VorticeLineoModel.md
 
 ---
@@ -23724,6 +26448,22 @@ VorticeLineoModel componentinin beklendiği gibi çalışabilmesi için aşağı
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: VorticeLineoModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\factory\parts\BoxAndBase.md
@@ -23814,6 +26554,22 @@ Bu grup, bileşenin görsel temsilini oluşturur ve dışardan gelen özellikler
   export: BoxAndBase
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\factory\parts\GreenClamps.md
 
 ---
@@ -23897,6 +26653,22 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: GreenClamps
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\factory\parts\InternalFanRotor.md
@@ -24001,6 +26773,22 @@ Bu modülün doğru çalışması için prop değerlerinin belirli varsayılanla
   export: InternalFanRotor
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\factory\parts\MainChassis.md
 
 ---
@@ -24083,10 +26871,8 @@ Bu varsayımlar, modülün mevcut fonksiyon imzaları ve sabitleri çerçevesind
 
 ## SABİTLER
 - **PROFILE_POINTS** (array) — `[
-
   [-0.76, 0.485], [-0.74, 0.496], [-0.72, 0.500], [-0.70, 0.497], [-0.66, ...`
 - **INNER_PROFILE_POINTS** (array) — `[
-
   [-0.72, 0.460], [-0.60, 0.455], [-0.45, 0.445], [-0.30, 0.432], [-0.15, ...`
 
 ---
@@ -24173,6 +26959,22 @@ graph LR
   export: MainChassis
   export: buildInnerLathePoints
   export: buildLathePoints
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\materials\useFanMaterials.md
@@ -24387,6 +27189,22 @@ graph TD
   export: SnailHousing
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\parts\Impeller.md
 
 ---
@@ -24491,6 +27309,22 @@ Impeller componentunun doğru çalışması için aşağıdaki varsayımlar geç
   export: Impeller
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\parts\Motor.md
 
 ---
@@ -24566,6 +27400,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Motor
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\parts\Silencer.md
@@ -24675,6 +27525,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Silencer
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\AccessoryModel.md
 
 ---
@@ -24736,6 +27602,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AccessoryModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\types\AirCurtainModel.md
@@ -24897,6 +27779,22 @@ graph LR
   export: showHeatedParts
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-600`, `bg-white`, `border-blue-200`, `text-primary-navy`, `text-xs`
+- **Layout:** `flex`, `gap-1`, `h-2`, `items-center`, `shadow-inner`, `w-2`
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\AirPurifierModel.md
 
 ---
@@ -24972,6 +27870,22 @@ Bu modülün temel varsayımı, `AirPurifierModel` fonksiyonunun parametre almad
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AirPurifierModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\types\AxialFanModel.md
@@ -25089,6 +28003,22 @@ Bu modül, silencer özelliğinin etkinliği `hasSilencer` bayrağıyla kontrol 
   export: AxialFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\CentrifugalFanModel.md
 
 ---
@@ -25191,6 +28121,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: CentrifugalFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\DehumidifierModel.md
 
 ---
@@ -25272,6 +28218,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: DehumidifierModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\DomesticFanModel.md
 
 ---
@@ -25351,6 +28313,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: DomesticFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\types\DuctFanModel.md
@@ -25462,6 +28440,22 @@ Bu modül, dışarıdan parametre almayan iki React bileşeni tanımlar; bu yüz
   export: RectangularDuctFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\ExproofFanModel.md
 
 ---
@@ -25571,6 +28565,22 @@ Bu React tabanlı 3D ürün modeli bileşeni, exproof (patlamaya dayanıklı) s�
   export: ExproofFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\FlexibleDuctModel.md
 
 ---
@@ -25675,6 +28685,22 @@ Venthub HVAC platformunun 3D ürün görselleştirme katmanında kullanılan, es
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FlexibleDuctModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\types\HRVModel.md
@@ -25789,6 +28815,22 @@ Bu React tabanlı 3B bileşen, HRV tipi HVAC cihazının kullanıcı arayüzünd
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: HRVModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\types\JetFanModel.md
@@ -25969,6 +29011,22 @@ Bu 3B jet fan modelleme bileşenleri paketi, yalnızca tanımlı tip bağımlıl
   export: JetFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\NicotraFanModel.md
 
 ---
@@ -26101,6 +29159,22 @@ Venthub projesi kapsamında geliştirilen 3D HVAC ürün modeli olan NicotraFanM
   export: NicotraFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\PlugFanModel.md
 
 ---
@@ -26183,6 +29257,22 @@ Bu React TypeScript ile geliştirilen 3D fan modeli bileşeninin doğru çalış
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: PlugFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\types\RoofFanModel.md
@@ -26319,6 +29409,22 @@ Bu modül, VentHub HVAC projesinin ürünler bölümünde kullanılan çatı tip
   export: RoofFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\RoundDuctFanModel.md
 
 ---
@@ -26400,6 +29506,22 @@ Bu React tabanlı 3D yuvarlak kanal fanı modelleme modülünün sorunsuz çalı
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: RoundDuctFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\types\SilentChannelFanModel.md
@@ -26661,6 +29783,22 @@ graph TD
   export: SilentChannelFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\SmokeExhaustFanModel.md
 
 ---
@@ -26776,6 +29914,22 @@ Bu React tabanlı 3D duman egzoz fanı modeli bileşeninin doğru çalışması,
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SmokeExhaustFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\types\SnailFanModel.md
@@ -26896,6 +30050,22 @@ Tarayıcıda çalışan React tabanlı 3D HVAC ürün modeli bileşenidir, proje
   export: SnailFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\products\3d\types\SpeedControlModel.md
 
 ---
@@ -26988,6 +30158,22 @@ Bu modül, VentHub HVAC projesinin 3B ürün bileşenleri katmanında hız kontr
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SpeedControlModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\products\3d\types\WallMountedCompactFanModel.md
@@ -27200,6 +30386,22 @@ Venthub HVAC projesinin 3D ürün bileşenleri kategorisinde yer alan bu TypeScr
   export: WallMountedCompactFanModel
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\ui\ScrollObserver.md
 
 ---
@@ -27324,6 +30526,22 @@ VentHub HVAC projesinin UI katmanında çalışan ScrollObserver modülü, taray
   export: ScrollObserver
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\ui\Skeleton.md
 
 ---
@@ -27398,6 +30616,22 @@ Bu React tabanlı UI yükleme iskeleti (Skeleton) bileşeninin doğru görsel ve
   export: SkeletonProps
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
+
+
+---
 # FILE: src\components\ui\VentImage.md
 
 ---
@@ -27464,9 +30698,7 @@ Bu React UI bileşeni, resim yükleme hatalarında önceden tanımlanmış yedek
 
 ## SABİTLER
 - **FALLBACK_IMAGES** (object) — `{
-
   product: '/images/placeholders/product-placeholder.png',
-
   category: '/...`
 
 ---
@@ -27540,6 +30772,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: VentImage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-100/50`
+- **Layout:** `absolute`, `h-auto`, `transform-gpu`, `w-full`, `z-0`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\config\admin.md

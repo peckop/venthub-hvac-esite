@@ -68,3 +68,18 @@ Bu modül, gerekli görüntü özelliklerinin sağlandığını ve alt özelliğ
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: BeforeAfterSlider
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `accent-primary-navy`, `bg-white`, `border-light-gray`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-steel-gray`
+- **Layout:** `absolute`, `bottom-3`, `h-56`, `h-full`, `left-1/2`, `lg:h-80`, `max-w-7xl`, `overflow-hidden`, `relative`, `sm:h-72`, `top-0`, `w-1`, `w-3/4`, `w-full`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

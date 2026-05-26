@@ -63,3 +63,18 @@ Bu React TypeScript ile geliştirilmiş WhatsApp iletişim float butonu bileşen
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: WhatsAppFloat
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-sm`
+- **Layout:** `absolute`, `group-hover:opacity-100`, `hidden`, `left-14`, `lg:block`, `whatsapp-float`
+- **Responsive:** `lg:` prefix kullanımları

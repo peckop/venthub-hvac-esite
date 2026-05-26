@@ -57,3 +57,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## NODE ID STANDARD
 
   file: src\components\ProductCard.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[2.5rem]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gold-accent`, `bg-light-gray/30`, `bg-light-gray/50`, `bg-primary-navy`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `sm:text-lg`, `text-base`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-secondary-blue`, `text-sm`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-3`, `group-hover:bg-light-gray/50`, `group-hover:opacity-100`, `group-hover:scale-105`, `group-hover:text-primary-navy`, `h-11`, `h-28`, `h-9`
+- **Responsive:** `sm:` prefix kullanımları

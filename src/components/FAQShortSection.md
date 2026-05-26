@@ -62,3 +62,18 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FAQShortSection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `to-white`
+- **Layout:** `flex`, `from-gray-50`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-start`, `max-w-7xl`, `md:grid-cols-3`, `p-5`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

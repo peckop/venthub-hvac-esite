@@ -54,3 +54,18 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LanguageSwitcher
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-white/90`, `border-light-gray`, `text-industrial-gray`, `text-sm`, `text-white`
+- **Layout:** `backdrop-blur`, `bottom-4`, `fixed`, `flex`, `gap-1`, `items-center`, `p-1`, `right-4`, `shadow-sm`, `z-50`
+- **Responsive:** (yok)

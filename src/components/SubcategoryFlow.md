@@ -145,3 +145,18 @@ graph TD
   export: ScrollingLane
   export: SubcategoryCard
   export: SubcategoryFlow
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-gray-50`, `bg-white`, `border-gray-200`, `from-blue-50`, `from-white`, `sm:text-xl`, `text-blue-500`, `text-blue-600`, `text-center`, `text-gray-800`, `text-lg`, `text-sm`
+- **Layout:** `absolute`, `bottom-3`, `flex`, `flex-shrink-0`, `from-blue-50`, `from-white`, `gap-3`, `group-hover:from-blue-100`, `group-hover:opacity-100`, `group-hover:text-blue-700`, `group-hover:to-blue-200`, `h-10`, `h-24`, `hover:shadow-md`, `items-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

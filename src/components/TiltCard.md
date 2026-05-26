@@ -170,3 +170,18 @@ graph LR
 ## DISA AKTARILANLAR (EXPORTS)
   export: TiltCard
   export: clamp
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** `absolute`, `group-hover:opacity-100`, `relative`
+- **Responsive:** (yok)

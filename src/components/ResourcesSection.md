@@ -104,3 +104,18 @@ graph TD
   export: BookOpenIcon
   export: FileTextIcon
   export: ResourcesSection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `to-white`
+- **Layout:** `flex`, `from-gray-50`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `group-hover:text-primary-navy`, `hover:shadow-md`, `items-center`, `items-start`, `justify-between`, `max-w-7xl`, `md:grid-cols-3`, `p-5`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

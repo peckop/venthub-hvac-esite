@@ -190,3 +190,18 @@ graph TD
   export: PhoneIcon
   export: ShieldIcon
   export: TruckIcon
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-primary-navy`, `bg-white`, `border-2`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `from-primary-navy/20`, `lg:text-6xl`, `md:text-5xl`, `text-4xl`, `text-center`, `text-industrial-gray`
+- **Layout:** `absolute`, `bottom-0`, `flex`, `flex-col`, `flex-shrink-0`, `from-air-blue`, `from-primary-navy/20`, `gap-12`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `grid-cols-2`, `group-hover:translate-x-1`, `h-20`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

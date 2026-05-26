@@ -185,3 +185,22 @@ graph TD
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ImageGallery
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[90vh]`
+- **width:** `max-w-[90vw]`, `md:max-w-[55vh]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/20`, `bg-black/95`, `bg-gray-100`, `bg-white`, `bg-white/10`, `bg-white/80`, `bg-white/95`, `border-2`, `border-gray-200`, `border-primary-navy`, `border-transparent`, `border-white`, `text-blue-600`, `text-gray-400`, `text-gray-700`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-6`, `cursor-zoom-in`, `fixed`, `flex`, `flex-col`, `flex-wrap`, `gap-0.5`, `gap-2`, `group-hover:opacity-100`, `h-14`, `h-16`, `h-full`
+- **Responsive:** `md:` prefix kullanımları

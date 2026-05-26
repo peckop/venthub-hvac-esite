@@ -66,3 +66,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LoadingSpinner
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-2`, `border-primary-navy`, `border-t-transparent`
+- **Layout:** `flex`, `inline-block`, `items-center`, `justify-center`
+- **Responsive:** (yok)

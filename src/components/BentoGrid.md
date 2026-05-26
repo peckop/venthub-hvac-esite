@@ -98,3 +98,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## DISA AKTARILANLAR (EXPORTS)
   export: BentoCard
   export: BentoGrid
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `auto-rows-[140px]`, `md:auto-rows-[180px]`, `sm:auto-rows-[160px]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `bg-white/20`, `bg-white/90`, `border-light-gray`, `from-black/50`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-lg`, `text-sm`, `text-steel-gray`, `text-white`, `text-white/90`, `text-xs`, `to-transparent`
+- **Layout:** `absolute`, `bottom-3`, `drop-shadow`, `flex`, `flex-col`, `from-black/50`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `group-hover:opacity-100`, `h-full`, `inline-flex`, `items-center`, `left-3`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
