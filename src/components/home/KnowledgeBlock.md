@@ -46,8 +46,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `icon: React.ReactNode`
 
 ### KnowledgeBlockProps
-- `dictionary: {`
-- `finalCtaDict: {`
+- `dictionary: {
+`
+- `finalCtaDict: {
+`
 - `statsExperience: string`
 - `onQuoteClick?: () => void`
 
@@ -97,3 +99,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: KnowledgeBlock
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `w-[92%]`
+- **spacing:** (yok)
+- **diğer:** `bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.1),transparent_70%)]`, `leading-[1.1]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `tracking-[0.4em]`, `transition-[opacity,transform]`, `transition-[opacity]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-clip-text`, `bg-cyan-400/40`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-gradient-to-r`, `bg-slate-950`, `bg-white/5`, `bg-white/[0.02]`, `border-cyan-500/30`, `border-l-2`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-400`, `from-cyan-600`
+- **Layout:** `absolute`, `backdrop-blur-3xl`, `backdrop-blur-md`, `bg-clip-text`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `from-cyan-400`, `from-cyan-600`, `gap-12`, `gap-3`, `gap-4`, `gap-6`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

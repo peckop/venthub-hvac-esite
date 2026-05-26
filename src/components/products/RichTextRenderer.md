@@ -93,3 +93,18 @@ React tabanlı bu zengin metin renderlayıcı bileşen, yalnızca üst bileşen 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: RichTextRenderer
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-industrial-gray`, `text-lg`, `text-steel-gray`, `text-success-green`
+- **Layout:** `flex`, `flex-shrink-0`, `items-start`
+- **Responsive:** (yok)

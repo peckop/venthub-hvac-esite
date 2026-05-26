@@ -204,3 +204,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryCsvImport
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_10px_rgba(245,158,11,0.3)]`, `shadow-[0_0_20px_rgba(34,211,238,0.3)]`, `shadow-[0_40px_100px_rgba(0,0,0,0.6)]`
+- **height:** `max-h-[300px]`, `max-h-[85vh]`
+- **width:** `max-w-[200px]`
+- **spacing:** (yok)
+- **diğer:** `border-t-[#0A0F1E]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-lg`, `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-400`, `bg-black/60`, `bg-cyan-400`, `bg-rose-500/20`, `bg-surface-deep/20`, `bg-surface-midnight`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/5`, `bg-white/[0.02]`, `border-2`, `border-b`, `border-dashed`, `border-none`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-cyan-400`, `group-hover:scale-110`, `group-hover:text-slate-300`, `group-hover:text-surface-deep`
+- **Responsive:** (yok)

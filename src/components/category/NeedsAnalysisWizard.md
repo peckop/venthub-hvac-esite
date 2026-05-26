@@ -126,3 +126,18 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: NeedsAnalysisWizard
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-white`, `bg-white/20`, `border-2`, `border-primary-navy/10`, `from-primary-navy`, `text-blue-100`, `text-gray-400`, `text-gray-500`, `text-gray-700`, `text-gray-800`, `text-left`, `text-lg`, `text-primary-navy`, `text-secondary-blue`
+- **Layout:** `flex`, `from-primary-navy`, `gap-3`, `grid`, `grid-cols-1`, `grid-cols-2`, `items-center`, `justify-between`, `md:grid-cols-2`, `md:grid-cols-3`, `md:grid-cols-4`, `md:w-auto`, `p-2`, `p-6`, `shadow-lg`
+- **Responsive:** `md:` prefix kullanımları

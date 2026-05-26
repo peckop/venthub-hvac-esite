@@ -138,3 +138,22 @@ graph LR
 ## DISA AKTARILANLAR (EXPORTS)
   export: FeaturedCommercialBlocks
   export: normalizeImageUrl
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:scale-[1.02]`, `lg:grid-cols-[1fr,320px]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500/10`, `bg-slate-200/50`, `bg-slate-900`, `bg-slate-950`, `bg-white`, `bg-white/5`, `border-cyan-500/10`, `border-slate-200`, `border-white/10`, `border-white/5`, `sm:text-6xl`, `text-4xl`, `text-center`, `text-cyan-400`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `gap-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `grid-cols-2`, `group-hover:grayscale-0`, `h-1.5`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

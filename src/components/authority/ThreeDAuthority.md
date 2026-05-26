@@ -94,3 +94,22 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir:
 ## DISA AKTARILANLAR (EXPORTS)
   export: Model
   export: ThreeDAuthority
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `opacity-[0.03]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/50`, `bg-white/90`, `border-2`, `border-primary-navy`, `border-slate-200`, `border-t-transparent`, `border-white`, `text-center`, `text-industrial-gray`, `text-slate-400`, `text-slate-500`, `text-steel-gray`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-4`, `flex`, `flex-col`, `group-hover:block`, `group-hover:scale-110`, `h-16`, `h-2`, `h-4`, `h-8`, `hidden`, `items-center`, `justify-center`
+- **Responsive:** (yok)

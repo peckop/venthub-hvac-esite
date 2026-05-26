@@ -101,3 +101,22 @@ Bu React tabanlı ürün bileşenleri modülü, içerdiği iki arayüz bileşeni
 ## DISA AKTARILANLAR (EXPORTS)
   export: BlueprintCanvas
   export: CinematicCard
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]`
+- **height:** `h-[1px]`, `h-[2px]`, `min-h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500`, `bg-surface-darkest`, `bg-white/10`, `bg-white/20`, `border-white/5`, `text-cyan-500`, `text-right`, `text-slate-500`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `bottom-6`, `flex`, `flex-col`, `gap-1`, `gap-2`, `h-1.5`, `h-full`, `items-center`, `items-end`, `justify-between`, `justify-end`, `left-6`, `overflow-hidden`, `relative`
+- **Responsive:** (yok)

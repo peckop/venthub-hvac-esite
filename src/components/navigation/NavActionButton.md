@@ -97,3 +97,18 @@ type NavActionTone = 'default' | 'accent' | 'success' | 'warning'
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: NavActionButton
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-transparent`, `text-sm`
+- **Layout:** `gap-2`, `group-hover:scale-105`, `inline-flex`, `items-center`, `min-w-0`, `relative`
+- **Responsive:** (yok)

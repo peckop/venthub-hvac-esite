@@ -103,3 +103,18 @@ Bu modül, dışarıdan parametre almayan iki React bileşeni tanımlar; bu yüz
 ## DISA AKTARILANLAR (EXPORTS)
   export: DuctFanModel
   export: RectangularDuctFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

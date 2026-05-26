@@ -135,3 +135,22 @@ type ProductFormValues = z.infer<typeof productSchema>
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProductFormModal
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[90vh]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/50`, `bg-primary-navy`, `bg-white`, `text-industrial-gray`, `text-red-500`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
+- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-center`, `justify-between`, `justify-end`, `left-1/2`, `max-w-2xl`, `md:grid-cols-2`, `md:grid-cols-3`
+- **Responsive:** `md:` prefix kullanımları

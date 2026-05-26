@@ -136,3 +136,18 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: VentImage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-100/50`
+- **Layout:** `absolute`, `h-auto`, `transform-gpu`, `w-full`, `z-0`
+- **Responsive:** (yok)

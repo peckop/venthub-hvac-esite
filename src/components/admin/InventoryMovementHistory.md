@@ -72,3 +72,22 @@ Bu modül, `movements` prop'una dayalı olarak çalışır; bu prop'un varlığ�
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryMovementHistory
   export: Movement
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `max-w-[140px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-transparent`, `bg-white/[0.02]`, `border-b`, `border-separate`, `border-spacing-0`, `border-white/5`, `text-emerald-400`, `text-left`, `text-right`, `text-rose-400`, `text-slate-300`, `text-slate-500`, `text-xs`
+- **Layout:** `group-last:border-0`, `overflow-hidden`, `w-full`
+- **Responsive:** (yok)

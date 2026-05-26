@@ -81,3 +81,22 @@ Bu modülün doğru çalışması için bazı temel varsayımlar gereklidir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FinalCTA
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[600px]`, `h-[800px]`
+- **width:** `w-[600px]`, `w-[800px]`
+- **spacing:** (yok)
+- **diğer:** `blur-[120px]`, `blur-[150px]`, `hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]`, `opacity-[0.03]`, `skew-x-[45deg]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `tracking-[0.4em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-3xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-gradient-to-r`, `bg-indigo-500/10`, `bg-slate-950`, `bg-white`, `bg-white/5`, `bg-white/[0.02]`, `border-b`, `border-cyan-500/30`, `border-l`, `border-l-2`, `border-r`, `border-t`
+- **Layout:** `absolute`, `backdrop-blur-3xl`, `bottom-0`, `bottom-6`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `from-cyan-600`, `gap-10`, `gap-12`, `gap-4`, `gap-6`, `gap-8`, `grid`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

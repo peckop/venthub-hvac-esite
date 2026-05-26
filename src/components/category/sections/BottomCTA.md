@@ -88,3 +88,18 @@ Bu modül, gerekli callback fonksiyonlarının ve `categoryN` propunun sağland�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: BottomCTA
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-400`, `bg-emerald-500`, `bg-gradient-to-br`, `bg-secondary-blue`, `bg-white/10`, `bg-white/20`, `border-blue-400/30`, `border-white/20`, `from-primary-navy`, `from-secondary-blue`, `md:text-4xl`, `text-3xl`, `text-blue-100`, `text-center`, `text-gray-300`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-col`, `from-primary-navy`, `from-secondary-blue`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `group-hover:-translate-y-1`, `group-hover:bg-white/30`, `group-hover:scale-110`, `h-14`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

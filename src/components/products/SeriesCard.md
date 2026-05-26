@@ -78,3 +78,22 @@ Bu sunum bileşeni olan SeriesCard, ürün serilerini kullanıcıya eksiksiz gö
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SeriesCard
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `aspect-[4/3]`, `hover:shadow-[0_20px_40px_-15px_rgba(30,41,59,0.1)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-air-blue/10`, `bg-slate-100`, `bg-slate-50`, `bg-white`, `bg-white/90`, `border-slate-100`, `border-slate-50`, `border-t`, `text-lg`, `text-primary-navy`, `text-slate-300`, `text-slate-900`, `text-sm`, `text-steel-gray`, `text-steel-gray/60`
+- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-1`, `flex-col`, `group-hover:bg-primary-navy`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `group-hover:text-white`, `h-10`, `h-full`, `items-center`, `justify-between`, `justify-center`, `left-4`
+- **Responsive:** (yok)

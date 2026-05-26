@@ -76,3 +76,22 @@ type ExportMenuItem = {
 ## DISA AKTARILANLAR (EXPORTS)
   export: ExportMenu
   export: ExportMenuItem
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_30px_60px_rgba(0,0,0,0.5)]`
+- **height:** (yok)
+- **width:** `min-w-[140px]`, `min-w-[200px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-emerald-500/10`, `border-white/10`, `text-emerald-400`, `text-slate-300`, `text-slate-500`, `text-xs`
+- **Layout:** `flex`, `gap-2`, `gap-3`, `h-12`, `h-8`, `items-center`, `justify-center`, `p-2`, `w-8`, `z-50`, `zoom-in-95`
+- **Responsive:** (yok)

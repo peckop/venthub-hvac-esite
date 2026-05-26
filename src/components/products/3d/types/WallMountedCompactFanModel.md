@@ -204,3 +204,18 @@ Venthub HVAC projesinin 3D ürün bileşenleri kategorisinde yer alan bu TypeScr
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: WallMountedCompactFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

@@ -119,3 +119,22 @@ graph LR
   export: CategoryViewModelLite
   export: GuidedCategoryDiscovery
   export: normalizeImageUrl
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[1px]`
+- **width:** `max-w-[200px]`, `sm:w-[320px]`, `w-[280px]`
+- **spacing:** (yok)
+- **diğer:** `duration-[1.5s]`, `grayscale-[0.3]`, `lg:aspect-[0.85/1]`, `tracking-[0.1em]`, `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`, `transition-[width,background-color]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-950`, `bg-slate-950/40`, `bg-white`, `bg-white/30`, `border-b`, `border-l`, `border-r`, `border-t`, `border-white/20`, `from-slate-950/80`, `lg:text-2xl`, `sm:text-6xl`, `text-4xl`
+- **Layout:** `absolute`, `block`, `bottom-8`, `flex`, `flex-col`, `flex-shrink-0`, `from-slate-950/80`, `gap-4`, `gap-6`, `group-hover:-translate-y-2`, `group-hover:bg-cyan-500`, `group-hover:bg-slate-950/20`, `group-hover:border-cyan-500/50`, `group-hover:grayscale-0`, `group-hover:max-h-24`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

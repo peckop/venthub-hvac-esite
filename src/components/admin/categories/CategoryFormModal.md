@@ -129,3 +129,22 @@ graph TD
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryFormModal
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[90vh]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `backdrop-blur-[2px]`, `group-hover:translate-y-[-1px]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-black/60`, `bg-cyan-500`, `bg-red-500`, `bg-surface-deep`, `bg-white/5`, `bg-white/[0.01]`, `bg-white/[0.02]`, `bg-white/[0.03]`, `border-2`, `border-b`, `border-b-2`, `border-dashed`, `border-t`, `border-transparent`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`, `group-hover:opacity-100`
+- **Responsive:** (yok)

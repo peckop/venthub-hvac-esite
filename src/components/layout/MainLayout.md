@@ -99,3 +99,18 @@ MainLayout işlevinin doğru çalışması için `children` propunun sağlanmas�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: MainLayout
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-50`, `bg-slate-900`, `bg-white`, `bg-white/10`, `text-white`, `text-xs`
+- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-grow`, `gap-3`, `items-center`, `justify-between`, `min-h-screen`, `overflow-auto`, `relative`, `right-6`, `z-50`, `z-modal`
+- **Responsive:** (yok)

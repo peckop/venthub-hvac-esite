@@ -61,3 +61,22 @@ Bu modül, `children` prop'una dayalı olarak render işlemi yapar ve bu prop'un
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: NavUtilityRail
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_14px_30px_-26px_rgba(15,23,42,0.45)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-lg`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white/80`, `border-slate-200/80`
+- **Layout:** `backdrop-blur-md`, `flex`, `gap-1`, `items-center`, `justify-end`, `p-1`, `sm:gap-1.5`, `sm:p-1.5`
+- **Responsive:** `sm:` prefix kullanımları

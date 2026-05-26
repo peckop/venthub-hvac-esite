@@ -83,3 +83,22 @@ Bu modülün doğru çalışması için gerekli props sağlanmalıdır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryShowcase
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[600px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `aspect-[16/9]`, `aspect-[4/3]`, `aspect-[4/5]`, `duration-[2s]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-50`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-gray-50`, `bg-light-gray`, `bg-orange-50`, `bg-primary-navy`, `bg-primary-navy/10`, `bg-secondary-blue/20`, `bg-slate-50`, `bg-slate-900/50`, `bg-white`, `border-4`, `border-b`, `border-gray-100`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-4`, `bottom-8`, `flex`, `flex-col`, `flex-shrink-0`, `from-black/60`, `from-primary-navy/80`, `from-secondary-blue`, `from-slate-950/80`, `gap-16`, `gap-2`, `gap-6`, `gap-8`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

@@ -72,3 +72,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryStockAdjust
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/[0.03]`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-sm`, `text-white`, `text-xs`
+- **Layout:** `flex`, `flex-1`, `gap-3`, `h-12`, `items-center`, `w-24`
+- **Responsive:** (yok)

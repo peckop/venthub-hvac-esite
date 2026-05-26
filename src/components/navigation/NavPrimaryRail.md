@@ -70,3 +70,18 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## NODE ID STANDARD
 
   file: src\components\navigation\NavPrimaryRail.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-air-blue/40`, `border-primary-navy/15`, `text-primary-navy`
+- **Layout:** `flex-1`, `gap-2`, `group-hover:rotate-180`, `h-4`, `hidden`, `items-center`, `lg:flex`, `min-w-0`, `w-4`
+- **Responsive:** `lg:`, `xl:` prefix kullanımları

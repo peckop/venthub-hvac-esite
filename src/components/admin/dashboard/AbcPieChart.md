@@ -75,3 +75,22 @@ Fonksiyon bir React bileşeni olduğundan genellikle `JSX.Element` döndürür; 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AbcPieChart
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[300px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500/10`, `bg-cyan-500/30`, `bg-slate-900/40`, `border-white/5`, `text-4xl`, `text-slate-500`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `group-hover/pie:text-cyan-400`, `group-hover/pie:w-20`, `h-0.5`, `h-full`, `items-center`, `justify-center`, `left-1/2`, `p-10`, `relative`, `top-1/2`, `w-12`
+- **Responsive:** (yok)

@@ -115,3 +115,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ActivityHeatmap
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_0_15px_rgba(34,211,238,0.7)]`, `shadow-[0_20px_50px_rgba(0,0,0,0.5)]`
+- **height:** `min-h-[300px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `blur-[80px]`, `drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500/30`, `bg-cyan-500/5`, `border-cyan-400/20`, `border-white/10`, `border-white/5`, `text-cyan-400`, `text-slate-500`, `text-slate-600`, `text-sm`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `group-hover/heatmap:text-cyan-400`, `group-hover/heatmap:w-20`, `h-0.5`, `h-2.5`, `h-48`, `h-full`, `items-center`, `justify-center`, `justify-end`
+- **Responsive:** (yok)

@@ -122,3 +122,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SilentFanTypeComparison
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[73px]`, `min-h-[300px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `backdrop-blur-[2px]`, `tracking-[0.2em]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-600`, `bg-blue-900/40`, `bg-center`, `bg-cover`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/80`, `border-b`, `border-slate-100`, `border-slate-200`, `border-white/5`, `md:text-5xl`, `text-2xl`
+- **Layout:** `absolute`, `backdrop-blur`, `block`, `flex`, `flex-col`, `gap-0`, `gap-12`, `gap-4`, `grid`, `grid-cols-2`, `group-hover:scale-110`, `h-full`, `hidden`, `items-center`, `justify-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

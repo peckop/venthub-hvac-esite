@@ -63,3 +63,18 @@ Bu modül, `content` propunun sağlanması ve belirli bir yapıda olması üzeri
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryAuthoritySection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

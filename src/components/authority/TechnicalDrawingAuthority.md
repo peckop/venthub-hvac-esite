@@ -88,3 +88,18 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: TechnicalDrawingAuthority
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-100`, `bg-slate-50`, `bg-white`, `border-slate-100`, `border-slate-200`, `text-industrial-gray`, `text-slate-400`, `text-slate-500`, `text-slate-600`, `text-sm`, `text-xs`
+- **Layout:** `flex`, `flex-col`, `gap-4`, `grid`, `grid-cols-1`, `group-hover:text-primary-navy`, `h-12`, `hover:shadow-md`, `items-center`, `justify-between`, `justify-center`, `md:grid-cols-2`, `p-3`, `p-4`, `shadow-sm`
+- **Responsive:** `md:` prefix kullanımları

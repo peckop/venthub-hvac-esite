@@ -155,3 +155,22 @@ graph TD
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryPreviewData
   export: CategoryPreviewPanel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[calc(100vh-200px)]`
+- **width:** `sm:w-[420px]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/60`, `bg-gradient-to-b`, `bg-gradient-to-br`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-slate-800`, `bg-white/5`, `border-b`, `border-l`, `border-white/10`, `from-cyan-500`, `from-cyan-500/5`, `from-slate-900`, `from-slate-900/80`, `from-slate-900/95`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `backdrop-blur-xl`, `bottom-0`, `fixed`, `flex`, `from-cyan-500`, `from-cyan-500/5`, `from-slate-900`, `from-slate-900/80`, `from-slate-900/95`, `gap-2`, `gap-3`, `gap-4`, `grid`
+- **Responsive:** `sm:` prefix kullanımları

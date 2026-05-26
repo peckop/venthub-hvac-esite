@@ -59,3 +59,22 @@ Bu modül, VentHub HVAC projesinde ürün kategorilerini kullanıcıya kart form
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryShowcaseCards
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `min-h-[140px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-b`, `bg-white/5`, `border-slate-600/50`, `border-white/20`, `from-slate-700/80`, `text-center`, `text-cyan-400`, `text-gray-400`, `text-lg`, `text-sm`, `text-white`, `to-slate-900`, `via-slate-800`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `from-slate-700/80`, `gap-2`, `gap-5`, `grid`, `grid-cols-1`, `group-hover:scale-105`, `hover:shadow-2xl`, `items-center`, `justify-center`, `md:grid-cols-3`, `overflow-hidden`, `p-5`
+- **Responsive:** `md:` prefix kullanımları

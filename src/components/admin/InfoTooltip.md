@@ -73,3 +73,18 @@ Fonksiyonel bir React bileşeni olarak tanımlanmıştır. Gelen `text`, `size` 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: InfoTooltip
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-slate-800`, `border-4`, `border-t-slate-800`, `border-transparent`, `text-left`, `text-slate-400`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `bottom-full`, `group-hover:opacity-100`, `group-hover:visible`, `inline-flex`, `items-center`, `justify-center`, `left-1/2`, `relative`, `shadow-xl`, `top-full`, `w-64`, `z-50`
+- **Responsive:** (yok)

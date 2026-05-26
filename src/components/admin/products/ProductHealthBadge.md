@@ -80,3 +80,18 @@ type HealthScore = 'A' | 'B' | 'C' | 'D' | 'N/A'
 ## DISA AKTARILANLAR (EXPORTS)
   export: HealthScore
   export: ProductHealthBadge
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-xs`
+- **Layout:** `h-6`, `inline-flex`, `items-center`, `justify-center`, `shadow-sm`, `w-6`
+- **Responsive:** (yok)

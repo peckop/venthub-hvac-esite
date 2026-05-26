@@ -90,3 +90,18 @@ Bu modülün doğru çalışması için `getIconForId` fonksiyonuna geçirilen `
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: getIconForId
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-sm`, `text-white/80`, `text-white/90`
+- **Layout:** `flex`, `gap-2`, `gap-6`, `group-hover:opacity-100`, `items-center`, `justify-between`, `w-full`
+- **Responsive:** (yok)

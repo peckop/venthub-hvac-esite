@@ -52,7 +52,8 @@ Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağı
 ## INTERFACES
 
 ### StrategicBrandsProps
-- `dictionary: {`
+- `dictionary: {
+`
 
 ---
 
@@ -78,3 +79,22 @@ Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağı
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: StrategicBrands
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `sm:text-6xl`, `text-4xl`, `text-cyan-600`, `text-lg`, `text-slate-500`, `text-slate-950`, `text-xs`
+- **Layout:** `flex`, `flex-col`, `gap-6`, `justify-between`, `max-w-3xl`, `max-w-md`, `max-w-page`, `md:flex-row`, `md:items-end`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

@@ -65,7 +65,8 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - `title: string`
 - `subtitle: string`
 - `viewAll: string`
-- `items: Record<string, {`
+- `items: Record<string, {
+`
 
 ### ApplicationSolutionsProps
 - `dictionary: LocalizedDict`
@@ -109,3 +110,22 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ApplicationSolutions
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[1px]`, `h-[300px]`, `lg:h-[450px]`, `sm:h-[400px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`, `transition-[transform]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50/50`, `bg-white`, `bg-white/10`, `border-white/10`, `border-white/20`, `from-slate-950/90`, `sm:text-6xl`, `text-2xl`, `text-4xl`, `text-center`, `text-cyan-400`, `text-cyan-600`
+- **Layout:** `-skew-x-12`, `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `flex-wrap`, `from-slate-950/90`, `gap-2`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

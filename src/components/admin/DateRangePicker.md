@@ -183,3 +183,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: DateRangePicker
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `max-h-[60vh]`, `max-h-[85vh]`
+- **width:** `w-[calc(100vw-32px)]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `md:border-b-0`, `md:border-r`, `text-left`, `text-primary-navy`, `text-slate-400`, `text-slate-500`
+- **Layout:** `backdrop-blur-xl`, `flex`, `flex-col`, `gap-1`, `gap-2`, `inline-flex`, `items-center`, `justify-between`, `max-w-full`, `md:flex-row`, `md:max-h-none`, `md:w-48`, `md:w-auto`, `overflow-hidden`, `overflow-y-auto`
+- **Responsive:** `md:`, `sm:` prefix kullanımları

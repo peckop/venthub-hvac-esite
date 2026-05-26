@@ -82,3 +82,18 @@ Bu grup, bileşenin görsel temsilini oluşturur ve dışardan gelen özellikler
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: BoxAndBase
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)
