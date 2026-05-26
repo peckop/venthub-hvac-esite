@@ -56,7 +56,7 @@ const AboutPage: React.FC = () => {
       />
 
       {/* Cinematic Hero */}
-      <section className="relative h-[70vh] flex items-center justify-center overflow-hidden bg-slate-950 text-white">
+      <section className="relative h-70vh flex items-center justify-center overflow-hidden bg-slate-950 text-white">
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/hvac_installation_close_up_premium_3.png"
@@ -71,10 +71,10 @@ const AboutPage: React.FC = () => {
         <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400">Engineering Excellence Since 2009</span>
+            <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-400">Engineering Excellence Since 2009</span>
           </div>
 
-          <h1 ref={heroTitleRef} className={scrollAnimationClasses.scaleIn(heroTitleVisible) + " text-5xl lg:text-8xl font-extralight tracking-tighter leading-[1.1] mb-10"}>
+          <h1 ref={heroTitleRef} className={scrollAnimationClasses.scaleIn(heroTitleVisible) + " text-5xl lg:text-8xl font-extralight tracking-tighter leading-hvac-11 mb-10"}>
             Havayı <span className="font-medium text-white italic">Yeniden Tanımlıyoruz</span>
           </h1>
 
@@ -95,7 +95,7 @@ const AboutPage: React.FC = () => {
                 style={scrollAnimationClasses.staggerChild(i)}
               >
                 <div className="text-5xl lg:text-7xl font-bold text-slate-900 tracking-tighter mb-4">{stat.value}</div>
-                <div className="text-xs font-black uppercase tracking-[0.3em] text-cyan-600">{stat.label}</div>
+                <div className="text-xs font-black uppercase tracking-hvac-relaxed text-cyan-600">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -118,8 +118,8 @@ const AboutPage: React.FC = () => {
             </div>
 
             <div>
-              <div className="text-cyan-600 text-xs font-black uppercase tracking-[0.5em] mb-8">Our Vision</div>
-              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-12 text-slate-900">
+              <div className="text-cyan-600 text-xs font-black uppercase tracking-hvac-wide mb-8">Our Vision</div>
+              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-hvac-11 mb-12 text-slate-900">
                 Geleceğin İklimini <br />
                 <span className="font-medium text-slate-950 italic">Bugün Kuruyoruz</span>
               </h2>
@@ -160,7 +160,7 @@ const AboutPage: React.FC = () => {
       <section className="py-24 bg-slate-950 text-white">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <div className="text-cyan-400 text-xs font-black uppercase tracking-[0.5em] mb-6">Strategic Partnerships</div>
+            <div className="text-cyan-400 text-xs font-black uppercase tracking-hvac-wide mb-6">Strategic Partnerships</div>
             <h2 className="text-3xl lg:text-5xl font-extralight tracking-tight">Resmi Distribütör <span className="text-cyan-400 font-medium italic">Ağımız</span></h2>
           </div>
           

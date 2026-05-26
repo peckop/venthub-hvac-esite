@@ -161,8 +161,8 @@ export default function AccountAddressesPage() {
     <div className="flex flex-col lg:flex-row gap-8">
 
       {/* Address Form (Sidebar layout on Desktop) */}
-      <section className="w-full lg:w-[380px] shrink-0 order-first lg:order-last">
-        <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 sm:p-8 sticky top-[100px]">
+      <section className="w-full lg:w-380px shrink-0 order-first lg:order-last">
+        <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 sm:p-8 sticky top-100px">
           <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
             {isEditing ? <Edit2 className="w-5 h-5 text-primary-navy" /> : <Plus className="w-5 h-5 text-primary-navy" />}
             {isEditing ? (t('account.addresses.formTitleEdit')) : (t('account.addresses.formTitleNew'))}
@@ -187,7 +187,7 @@ export default function AccountAddressesPage() {
 
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Açık Adres</label>
-              <textarea value={form.address_line} onChange={(e) => setForm(f => ({ ...f, address_line: e.target.value }))} placeholder="Mahalle, sokak, bina ve daire no..." className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy min-h-[100px] resize-y transition-colors" required />
+              <textarea value={form.address_line} onChange={(e) => setForm(f => ({ ...f, address_line: e.target.value }))} placeholder="Mahalle, sokak, bina ve daire no..." className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy min-h-100px resize-y transition-colors" required />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -226,7 +226,7 @@ export default function AccountAddressesPage() {
                   {t('account.addresses.cancel')}
                 </button>
               )}
-              <button disabled={saving} className="w-full h-10 bg-primary-navy hover:bg-industrial-gray text-white flex-1 px-4 rounded-lg font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-navy/50 flex items-center justify-center gap-2">
+              <button disabled={saving} className="w-full h-10 bg-primary-navy hover:bg-industrial-gray text-white flex-1 px-4 rounded-lg font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed transition-transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-primary-navy/50 flex items-center justify-center gap-2">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 {isEditing ? (t('account.addresses.submit.update')) : (t('account.addresses.submit.add'))}
               </button>
@@ -250,14 +250,14 @@ export default function AccountAddressesPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center min-h-[300px]">
+          <div className="flex items-center justify-center min-h-300px">
             <div className="flex flex-col items-center gap-3">
               <Loader2 className="w-8 h-8 animate-spin text-primary-navy" />
               <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Adresler yükleniyor...</span>
             </div>
           </div>
         ) : items.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-12 text-center min-h-[300px] flex flex-col items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-12 text-center min-h-300px flex flex-col items-center justify-center">
             <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 shadow-sm border border-slate-100">
               <MapPin className="w-8 h-8 text-slate-300" />
             </div>
@@ -289,7 +289,7 @@ export default function AccountAddressesPage() {
 
                   <div className="bg-slate-50/80 rounded-xl p-4 mb-5 flex-1 border border-slate-100">
                     {a.full_name && <div className="text-sm font-bold text-slate-900 mb-1.5">{a.full_name}</div>}
-                    <div className="text-sm text-slate-600 font-medium leading-relaxed min-h-[40px] break-words whitespace-pre-line">
+                    <div className="text-sm text-slate-600 font-medium leading-relaxed min-h-10 break-words whitespace-pre-line">
                       {a.address_line}
                     </div>
                     <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-3 flex items-center gap-1.5 pt-3 border-t border-slate-200/60">

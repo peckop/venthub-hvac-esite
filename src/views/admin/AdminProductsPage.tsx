@@ -529,7 +529,7 @@ const AdminProductsPage: React.FC = () => {
       <div className={adminTableContainerClass}>
         {error && <div className="p-4 text-rose-400 text-xs font-bold bg-rose-500/10 border-b border-white/5 animate-pulse flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-rose-500" />{error}</div>}
         
-        <div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
+        <div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/2">
           <div className="text-xs font-black text-slate-500 uppercase tracking-widest">{t('admin.ui.total') ?? 'Toplam'}: <span className="text-cyan-400">{total}</span> Ürün</div>
           <div className="flex items-center gap-2">
             <button 
@@ -539,7 +539,7 @@ const AdminProductsPage: React.FC = () => {
             >
               <ChevronRight size={16} className="rotate-180" />
             </button>
-            <span className="text-xs font-black text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 min-w-[100px] text-center uppercase tracking-tighter">
+            <span className="text-xs font-black text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 min-w-100px text-center uppercase tracking-tighter">
               {t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}
             </span>
             <button 
@@ -553,7 +553,7 @@ const AdminProductsPage: React.FC = () => {
         </div>
 
         <div ref={dragScrollRef} className="overflow-x-auto w-full custom-scrollbar">
-          <table className="w-full min-w-[1200px]">
+          <table className="w-full min-w-1200px">
             <thead>
               <tr className="glass-strong">
                 <th className={`${adminTableHeadCellClass} ${headPad} w-10 text-center py-4`}>
@@ -649,7 +649,7 @@ const AdminProductsPage: React.FC = () => {
                   const isSelected = selectedIds.has(r.id);
                   return (
                     <React.Fragment key={r.id}>
-                      <tr className={`group transition-colors duration-300 ${isSelected ? 'bg-cyan-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
+                      <tr className={`group transition-colors duration-300 ${isSelected ? 'bg-cyan-400/3' : 'hover:bg-white/2'}`}>
                         <td className={`${adminTableCellClass} ${cellPad} w-10 text-center`}>
                           {hasWriteAccess && (
                             <input 
@@ -739,7 +739,7 @@ const AdminProductsPage: React.FC = () => {
                               ) : (
                                 <button
                                   onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
-                                  className="group/btn relative bg-white/[0.03] hover:bg-cyan-400/10 px-3 py-1.5 rounded-xl border border-white/5 hover:border-cyan-400/30 transition-colors duration-300 flex flex-col items-end gap-0.5 ml-auto"
+                                  className="group/btn relative bg-white/3 hover:bg-cyan-400/10 px-3 py-1.5 rounded-xl border border-white/5 hover:border-cyan-400/30 transition-colors duration-300 flex flex-col items-end gap-0.5 ml-auto"
                                 >
                                   <span className="text-sm font-black text-slate-100 group-hover/btn:text-cyan-400 transition-colors">
                                     {r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
@@ -772,7 +772,7 @@ const AdminProductsPage: React.FC = () => {
                                   className={`group/btn relative px-3 py-1.5 rounded-xl border transition-colors duration-300 flex flex-col items-end gap-0.5 ml-auto ${
                                     Number(r.stock_qty) < (r.low_stock_threshold || 10) 
                                       ? 'bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20' 
-                                      : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.08] hover:border-white/10'
+                                      : 'bg-white/3 border-white/5 hover:bg-white/8 hover:border-white/10'
                                   }`}
                                 >
                                   <span className={`text-sm font-black ${Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-400' : 'text-slate-100'}`}>
@@ -804,12 +804,12 @@ const AdminProductsPage: React.FC = () => {
                         )}
                       </tr>
                       {isExpanded && (
-                        <tr className="bg-white/[0.01]">
-                          <td colSpan={11} className="px-12 py-8 bg-gradient-to-r from-transparent via-cyan-400/[0.02] to-transparent">
+                        <tr className="bg-white/1">
+                          <td colSpan={11} className="px-12 py-8 bg-gradient-to-r from-transparent via-cyan-400/2 to-transparent">
                             <div className="max-w-4xl mx-auto">
                               <div className="flex items-center gap-3 mb-6">
                                 <div className="w-8 h-0.5 bg-cyan-400" />
-                                <h4 className="text-xs font-black text-cyan-400 uppercase tracking-[0.3em]">Teknik Ürün Parametreleri</h4>
+                                <h4 className="text-xs font-black text-cyan-400 uppercase tracking-hvac-relaxed">Teknik Ürün Parametreleri</h4>
                               </div>
                               {techSpecs[r.id] && Object.keys(techSpecs[r.id]).length > 0 ? (
                                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

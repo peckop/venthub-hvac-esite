@@ -12,7 +12,7 @@ export default function AbcPieChart({ data, title }: AbcPieChartProps) {
         return (
             <div className="flex flex-col h-full bg-slate-900/40 rounded-hvac-2xl border border-white/5 p-10 group/pie">
                 <div className="mb-10">
-                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] group-hover/pie:text-cyan-400 transition-colors uppercase">{title || "ABC Ürün Sınıflandırması"}</h3>
+                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed group-hover/pie:text-cyan-400 transition-colors uppercase">{title || "ABC Ürün Sınıflandırması"}</h3>
                     <div className="h-0.5 w-12 bg-cyan-500/30 mt-2 rounded-full group-hover/pie:w-20 transition-colors duration-700" />
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center">
@@ -32,11 +32,11 @@ export default function AbcPieChart({ data, title }: AbcPieChartProps) {
     return (
         <div className="flex flex-col h-full group/pie">
             <div className="mb-10">
-                <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] group-hover/pie:text-cyan-400 transition-colors uppercase">{title || "ABC Ürün Sınıflandırması"}</h3>
+                <h3 className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed group-hover/pie:text-cyan-400 transition-colors uppercase">{title || "ABC Ürün Sınıflandırması"}</h3>
                 <div className="h-0.5 w-12 bg-cyan-500/30 mt-2 rounded-full group-hover/pie:w-20 transition-colors duration-700" />
             </div>
 
-            <div className="flex-1 w-full min-h-[300px] relative">
+            <div className="flex-1 w-full min-h-300px relative">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
@@ -88,10 +88,10 @@ export default function AbcPieChart({ data, title }: AbcPieChartProps) {
                 {/* Merkezdeki Toplam Metni */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-4 flex flex-col items-center justify-center pointer-events-none">
                     <div className="absolute inset-0 bg-cyan-500/10 blur-3xl rounded-full scale-150 pointer-events-none" />
-                    <span className="text-4xl font-black text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] relative z-10">
+                    <span className="text-4xl font-black text-white tracking-tighter drop-shadow-pie-chart-glow relative z-10">
                         {totalValue}
                     </span>
-                    <span className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] mt-1 relative z-10 italic">Toplam Stok</span>
+                    <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed mt-1 relative z-10 italic">Toplam Stok</span>
                 </div>
             </div>
         </div>

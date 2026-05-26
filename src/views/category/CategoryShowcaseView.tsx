@@ -62,7 +62,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     return (
         <div className="bg-white">
             {/* HERO SECTION - VENTHUB SIGNATURE (DARK CINEMATIC) */}
-            <section className="relative h-[75vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-950 text-white">
+            <section className="relative h-75vh min-h-600px flex items-center justify-center overflow-hidden bg-slate-950 text-white">
                 <div className="absolute inset-0 z-0">
                     <VentImage
                         src={heroImage}
@@ -82,10 +82,10 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
 
                     <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
                         <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                        <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400">{t('category.showcase.premiumTitle')}</span>
+                        <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-400">{t('category.showcase.premiumTitle')}</span>
                     </div>
 
-                    <h1 ref={heroTitleRef} className={scrollAnimationClasses.scaleIn(heroTitleVisible) + " text-5xl lg:text-8xl font-extralight tracking-tighter leading-[1.1] mb-10"}>
+                    <h1 ref={heroTitleRef} className={scrollAnimationClasses.scaleIn(heroTitleVisible) + " text-5xl lg:text-8xl font-extralight tracking-tighter leading-hvac-11 mb-10"}>
                         {vm?.displayName?.split(' ').slice(0, -1).join(' ')} <span className="font-medium text-white italic">{vm?.displayName?.split(' ').slice(-1)}</span>
                     </h1>
 
@@ -117,7 +117,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
 
             <div id="content-start" className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 py-24">
                 <div className="flex flex-col items-center text-center mb-20">
-                    <div className="inline-flex items-center gap-2 text-cyan-600 font-black text-xs uppercase tracking-[0.3em] mb-4">
+                    <div className="inline-flex items-center gap-2 text-cyan-600 font-black text-xs uppercase tracking-hvac-relaxed mb-4">
                         <Layers size={14} />
                         <span>{t('category.showcase.catalog')}</span>
                     </div>
@@ -133,7 +133,8 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                         return (
                             <button
                                 key={sub.id}
-                                className="group relative bg-white rounded-hvac-2xl p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] transition-shadow duration-700 cursor-pointer overflow-hidden w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1.5rem)] max-w-modal text-left block"
+                                className="group relative bg-white rounded-hvac-2xl p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-hvac-card-hover transition-shadow duration-700 cursor-pointer overflow-hidden max-w-modal text-left block"
+                                style={{ width: typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'calc(33.33% - 1.5rem)' : typeof window !== 'undefined' && window.innerWidth >= 768 ? 'calc(50% - 1rem)' : '100%' }}
                                 onClick={() => handleSubSelect(sub.slug)}
                             >
                                 <div className="relative z-10">
@@ -142,7 +143,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                     </div>
                                     <h3 className="text-2xl font-bold text-slate-950 mb-4 tracking-tight">{subVm?.displayName}</h3>
                                     <p className="text-slate-500 text-sm font-light leading-relaxed line-clamp-3 mb-10">{subVm?.description}</p>
-                                    <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-cyan-600 transition-colors">
+                                    <div className="flex items-center gap-3 text-xs font-black uppercase tracking-hvac-relaxed text-slate-400 group-hover:text-cyan-600 transition-colors">
                                         <span>{t('category.showcase.exploreSeries')}</span>
                                         <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-colors duration-500" />
                                     </div>
@@ -157,7 +158,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                 <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
                         <div>
-                            <div className="inline-flex items-center gap-2 text-cyan-400 font-black text-xs uppercase tracking-[0.3em] mb-6">
+                            <div className="inline-flex items-center gap-2 text-cyan-400 font-black text-xs uppercase tracking-hvac-relaxed mb-6">
                                 <ShieldCheck size={16} />
                                 <span>{t('category.showcase.guarantee')}</span>
                             </div>

@@ -290,7 +290,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                     </div>
 
                     {/* Notification List */}
-                    <div className="max-h-[70vh] overflow-y-auto w-full">
+                    <div className="max-h-70vh overflow-y-auto w-full">
                         {notifications.length === 0 ? (
                             <div className="flex flex-col items-center justify-center p-8 text-center bg-slate-50/30">
                                 <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-3">

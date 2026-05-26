@@ -56,7 +56,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                     <h3 className="text-xl font-black text-white tracking-tighter uppercase leading-none group-hover/table:text-cyan-400 transition-colors uppercase">{title}</h3>
                     <div className="flex items-center gap-2 mt-3 italic opacity-60">
                         <div className="h-0.5 w-8 bg-cyan-500 rounded-full" />
-                        <p className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] italic opacity-80">Son İşlemler</p>
+                        <p className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed italic opacity-80">Son İşlemler</p>
                     </div>
                 </div>
                 <Link href={Routes.admin.orders()} className="text-xs font-black text-white uppercase tracking-widest px-8 py-3 rounded-2xl glass-strong hover:bg-cyan-500 hover:text-surface-deep hover:scale-105 active:scale-95 border border-white/5 transition-transform duration-300 flex items-center gap-3 group/btn shadow-2xl">
@@ -67,11 +67,11 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
             <div className={`${adminTableContainerClass} glass-strong border border-white/5 rounded-hvac-2xl overflow-hidden shadow-2xl`}>
                 <div ref={dragScrollRef} className="overflow-x-auto custom-scrollbar relative">
                     {/* Decorative glow inside table */}
-                    <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/5 blur-[100px] pointer-events-none" />
+                    <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/5 blur-100 pointer-events-none" />
                     
                     <table className="w-full text-sm text-left whitespace-nowrap border-collapse">
                         <thead>
-                            <tr className="bg-white/[0.02]">
+                            <tr className="bg-white/2">
                                 <th className={`${adminTableHeadCellClass} py-6 first:pl-8`}>Sipariş / Teklif No</th>
                                 <th className={adminTableHeadCellClass}>Tarih</th>
                                 <th className={`${adminTableHeadCellClass} text-right`}>Tutar</th>
@@ -94,7 +94,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                             ) : orders.map((r, index) => (
                                 <tr 
                                     key={r.id} 
-                                    className="group/row hover:bg-white/[0.03] transition-colors duration-500 animate-in fade-in slide-in-from-left-4 duration-500"
+                                    className="group/row hover:bg-white/3 transition-colors duration-500 animate-in fade-in slide-in-from-left-4 duration-500"
                                     style={{ animationDelay: `${index * 50}ms` }}
                                 >
                                     <td className={`${adminTableCellClass} py-6 first:pl-8 font-black text-xs text-cyan-400/90 tracking-wider group-hover/row:text-white transition-colors`}>
@@ -120,7 +120,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                                     <td className={`${adminTableCellClass} text-right last:pr-8`}>
                                         <Link 
                                             href={`/admin/orders/${r.id}` as import('next').Route} 
-                                            className="inline-flex items-center gap-3 text-white text-xs font-black uppercase tracking-[0.2em] bg-white/5 px-6 py-3 rounded-xl hover:bg-cyan-500 hover:text-surface-deep border border-white/5 transition-shadow duration-500 shadow-lg"
+                                            className="inline-flex items-center gap-3 text-white text-xs font-black uppercase tracking-hvac-normal bg-white/5 px-6 py-3 rounded-xl hover:bg-cyan-500 hover:text-surface-deep border border-white/5 transition-shadow duration-500 shadow-lg"
                                         >
                                             Detay <ExternalLink size={14} className="opacity-60 group-hover/link:opacity-100" />
                                         </Link>

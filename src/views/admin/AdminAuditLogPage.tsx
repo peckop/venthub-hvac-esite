@@ -187,7 +187,7 @@ const AdminAuditLogPage: React.FC = () => {
           )}
         />
 
-        <div className="flex items-center justify-between gap-4 px-6 py-4 border-t border-white/5 bg-white/[0.02]">
+        <div className="flex items-center justify-between gap-4 px-6 py-4 border-t border-white/5 bg-white/2">
           <div className="flex items-center gap-2">
             <History size={16} className="text-cyan-400" />
             <span className="text-xs font-black uppercase tracking-widest text-slate-400">Denetim Geçmişi</span>
@@ -249,7 +249,7 @@ const AdminAuditLogPage: React.FC = () => {
                 ) : (
                   rows.map(r => (
                     <React.Fragment key={r.id}>
-                      <tr className={`group transition-colors ${expandedId === r.id ? 'bg-cyan-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
+                      <tr className={`group transition-colors ${expandedId === r.id ? 'bg-cyan-400/3' : 'hover:bg-white/2'}`}>
                         <td className={`${adminTableCellClass} whitespace-nowrap opacity-60`}>{formatDateTime(r.at, lang)}</td>
                         <td className={adminTableCellClass}>
                           <span className={`px-2 py-0.5 rounded-lg text-xs font-black uppercase tracking-wider border transition-colors ${
@@ -278,7 +278,7 @@ const AdminAuditLogPage: React.FC = () => {
                           <td colSpan={6} className="p-6 bg-black/40 shadow-inner">
                             <div className="flex items-center gap-3 mb-4">
                               <Terminal size={14} className="text-cyan-400" />
-                              <div className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em]">İşlem Detayları</div>
+                              <div className="text-xs font-black text-cyan-400 uppercase tracking-hvac-normal">İşlem Detayları</div>
                             </div>
                             <div className="rounded-2xl border border-white/5 bg-surface-deep/60 p-1">
                               <JsonDiffViewer before={r.before} after={r.after} />

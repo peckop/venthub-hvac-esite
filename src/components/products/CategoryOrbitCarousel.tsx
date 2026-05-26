@@ -225,7 +225,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
     }, [])
 
     if (categoriesLoading) {
-        return <div className="h-[400px] flex items-center justify-center bg-surface-darker w-full" />
+        return <div className="h-hvac-panel flex items-center justify-center bg-surface-darker w-full" />
     }
 
     const responsiveHeight = compact ? (isMobile ? 220 : 280) : (isMobile ? 380 : 500)
@@ -235,10 +235,10 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
         <section className="bg-surface-darker overflow-hidden relative">
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <div 
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-[radial-gradient(circle_at_center,rgba(30,41,59,0.5)_0%,rgb(2,6,23)_70%)] ${level === 'main' ? 'opacity-100' : 'opacity-0'}`} 
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-orbit-radial-1 ${level === 'main' ? 'opacity-100' : 'opacity-0'}`} 
                 />
                 <div 
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.15)_0%,rgb(2,6,23)_70%)] ${level === 'subcategory' ? 'opacity-100' : 'opacity-0'}`} 
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-orbit-radial-2 ${level === 'subcategory' ? 'opacity-100' : 'opacity-0'}`} 
                 />
             </div>
 
@@ -256,18 +256,18 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                             <button
                                 onClick={handleBack}
-                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-transform duration-300 group w-full sm:w-auto hover:scale-[1.02] active:scale-[0.98]"
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-transform duration-300 group w-full sm:w-auto hover:scale-102 active:scale-98"
                             >
                                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                                 <span className="text-sm font-medium">{t('common.back')}</span>
-                                <span className="text-sm font-bold text-cyan-400 truncate max-w-[150px] ml-2">
+                                <span className="text-sm font-bold text-cyan-400 truncate max-w-150px ml-2">
                                     {activeMainCategory.displayName}
                                 </span>
                             </button>
 
                             <button
                                 onClick={handleViewAllProducts}
-                                className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium text-sm hover:shadow-lg hover:shadow-cyan-500/30 transition-transform duration-300 w-full sm:w-auto hover:scale-[1.02] active:scale-[0.98]"
+                                className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium text-sm hover:shadow-lg hover:shadow-cyan-500/30 transition-transform duration-300 w-full sm:w-auto hover:scale-102 active:scale-98"
                             >
                                 {t('common.seeAllProducts')}
                                 <ChevronRight className="w-4 h-4" />

@@ -53,11 +53,11 @@ const PaymentIframeContainer: React.FC<PaymentIframeContainerProps> = ({
 
             <div className="mt-4">
                 {iyzToken ? (
-                    <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-[520px]">
+                    <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-520px">
                         <div id="iyzipay-checkout-form" className="responsive" data-pay-with-iyzico="true" data-token={iyzToken} />
                     </div>
                 ) : paymentFrameContent ? (
-                    <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-[520px]" dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
+                    <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-520px" dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
                 ) : (
                     <div className="flex items-center gap-3 text-steel-gray">
                         <CheckCircle className="animate-pulse" />

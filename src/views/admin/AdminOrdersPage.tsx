@@ -463,9 +463,9 @@ const AdminOrdersPage: React.FC = () => {
         <div className="flex items-center gap-1 glass-strong p-1 rounded-2xl border border-white/5 shrink-0 shadow-2xl">
           <button
             onClick={() => setViewMode('list')}
-            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-colors duration-500 ${
+            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-hvac-normal flex items-center gap-2 transition-colors duration-500 ${
               viewMode === 'list' 
-                ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
+                ? 'bg-cyan-400 text-surface-deep shadow-glow-md' 
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -473,9 +473,9 @@ const AdminOrdersPage: React.FC = () => {
           </button>
           <button
             onClick={() => setViewMode('board')}
-            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-colors duration-500 ${
+            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-hvac-normal flex items-center gap-2 transition-colors duration-500 ${
               viewMode === 'board' 
-                ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
+                ? 'bg-cyan-400 text-surface-deep shadow-glow-md' 
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -521,7 +521,7 @@ const AdminOrdersPage: React.FC = () => {
             <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
               {t('admin.ui.prev')}
             </button>
-            <span className="text-xs font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
+            <span className="text-xs font-black text-white/40 uppercase tracking-hvac-normal bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
               {t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}
             </span>
             <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
@@ -531,7 +531,7 @@ const AdminOrdersPage: React.FC = () => {
 
           <section className={adminTableContainerClass}>
             <div ref={dragScrollRef} className="overflow-x-auto w-full">
-              <table className="min-w-[900px] w-full text-sm">
+              <table className="min-w-900px w-full text-sm">
                 <thead>
                   <tr>
                     <th className={`${adminTableHeadCellClass} ${headPad} w-10`}></th>
@@ -562,7 +562,7 @@ const AdminOrdersPage: React.FC = () => {
                     </tr>
                   ) : (
                     sorted.map((r) => (
-                      <tr key={r.id} className="border-t border-white/5 hover:bg-white/[0.02] transition-colors group">
+                      <tr key={r.id} className="border-t border-white/5 hover:bg-white/2 transition-colors group">
                         <td className="px-6 py-5">
                           <input 
                             type="checkbox" 
@@ -604,9 +604,9 @@ const AdminOrdersPage: React.FC = () => {
             </div>
             {/* Toplu İşlem Toolbar */}
             {bulkMode && hasWriteAccess && (
-              <div className="mx-6 mb-6 px-6 py-4 rounded-hvac-xl bg-cyan-500 text-white flex items-center justify-between shadow-[0_0_50px_rgba(34,211,238,0.2)] animate-in slide-in-from-bottom-4 duration-500">
+              <div className="mx-6 mb-6 px-6 py-4 rounded-hvac-xl bg-cyan-500 text-white flex items-center justify-between shadow-admin-orders-glow-1 animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center gap-4">
-                  <span className="text-xs font-black uppercase tracking-[0.2em]">{selectedIds.length} {t('admin.orders.bulk.selected')}</span>
+                  <span className="text-xs font-black uppercase tracking-hvac-normal">{selectedIds.length} {t('admin.orders.bulk.selected')}</span>
                   <button onClick={() => setSelectedIds([])} className="text-xs font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors underline underline-offset-4 decoration-white/20">
                     {t('admin.orders.bulk.clearSelection')}
                   </button>
@@ -614,7 +614,7 @@ const AdminOrdersPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={() => { setShipOpen(true); setBulkMode(true) }} 
-                    className="px-6 py-2.5 text-xs font-black uppercase tracking-[0.2em] rounded-xl bg-cyan-400 text-surface-deep hover:bg-cyan-300 shadow-lg shadow-cyan-400/20 transition-transform flex items-center gap-2 active:scale-95"
+                    className="px-6 py-2.5 text-xs font-black uppercase tracking-hvac-normal rounded-xl bg-cyan-400 text-surface-deep hover:bg-cyan-300 shadow-lg shadow-cyan-400/20 transition-transform flex items-center gap-2 active:scale-95"
                   >
                     <Truck size={14} /> {t('admin.orders.bulk.shipSelected')}
                   </button>
@@ -642,7 +642,7 @@ const AdminOrdersPage: React.FC = () => {
             <div className="p-10 space-y-8">
               <div className="grid grid-cols-1 gap-8">
                 <div className="space-y-3">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
                   <select 
                     value={carrier} 
                     onChange={e => setCarrier(e.target.value)} 
@@ -657,16 +657,16 @@ const AdminOrdersPage: React.FC = () => {
                   </select>
                 </div>
                 <div className="space-y-3">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.trackingLabel')}</label>
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1">{t('admin.orders.modals.shipping.trackingLabel')}</label>
                   <input value={tracking} onChange={e => setTracking(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-colors placeholder:text-slate-600" placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')} />
                 </div>
               </div>
             </div>
-            <div className="px-10 py-8 bg-white/[0.02] border-t border-white/5 flex justify-end gap-4">
+            <div className="px-10 py-8 bg-white/2 border-t border-white/5 flex justify-end gap-4">
               <button onClick={closeShipModal} className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors">
                 {t('admin.orders.modals.shipping.cancel')}
               </button>
-              <button onClick={submitShip} className="px-8 py-3 text-xs font-black uppercase tracking-widest bg-cyan-500 text-white rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:scale-105 active:scale-95 transition-transform">
+              <button onClick={submitShip} className="px-8 py-3 text-xs font-black uppercase tracking-widest bg-cyan-500 text-white rounded-xl shadow-glow-md hover:scale-105 active:scale-95 transition-transform">
                 {t('admin.orders.modals.shipping.save')}
               </button>
             </div>
@@ -686,27 +686,27 @@ const AdminOrdersPage: React.FC = () => {
               </button>
             </div>
             <div className="p-10">
-              <div className="max-h-[50vh] overflow-y-auto rounded-hvac-xl border border-white/10 bg-white/[0.02] overflow-hidden custom-scrollbar">
+              <div className="max-h-50vh overflow-y-auto rounded-hvac-xl border border-white/10 bg-white/2 overflow-hidden custom-scrollbar">
                 {logsLoading ? (
                   <div className="p-20 text-center flex flex-col items-center gap-4">
                     <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
-                    <span className="text-xs font-black uppercase tracking-[0.3em] text-slate-500">{t('admin.common.loading')}</span>
+                    <span className="text-xs font-black uppercase tracking-hvac-relaxed text-slate-500">{t('admin.common.loading')}</span>
                   </div>
                 ) : (
                   <div className="overflow-x-auto w-full">
                     <table className="min-w-full text-sm divide-y divide-white/5">
                       <thead className="bg-white/5 sticky top-0 backdrop-blur-xl">
                         <tr>
-                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-[0.2em]">{t('admin.orders.modals.logs.table.date')}</th>
-                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-[0.2em]">{t('admin.orders.modals.logs.subjectLabel') || 'Konu'}</th>
+                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-hvac-normal">{t('admin.orders.modals.logs.table.date')}</th>
+                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-hvac-normal">{t('admin.orders.modals.logs.subjectLabel') || 'Konu'}</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-white/[0.02]">
+                      <tbody className="divide-y divide-white/2">
                         {emailLogs.map((l, i) => (
-                          <tr key={i} className="hover:bg-white/[0.03] transition-colors group">
+                          <tr key={i} className="hover:bg-white/3 transition-colors group">
                             <td className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">{safeDate(l.created_at)}</td>
                             <td className="px-8 py-5 text-xs text-white font-medium flex items-center gap-3">
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-admin-orders-glow-3" />
                               {l.subject}
                             </td>
                           </tr>
@@ -716,7 +716,7 @@ const AdminOrdersPage: React.FC = () => {
                             <td colSpan={2} className="px-8 py-20 text-center">
                               <div className="flex flex-col items-center gap-4 text-slate-500">
                                 <Info size={32} className="opacity-20" />
-                                <span className="text-xs font-black uppercase tracking-[0.3em] italic">E-posta kaydı bulunamadı</span>
+                                <span className="text-xs font-black uppercase tracking-hvac-relaxed italic">E-posta kaydı bulunamadı</span>
                               </div>
                             </td>
                           </tr>
@@ -727,7 +727,7 @@ const AdminOrdersPage: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="px-10 py-8 bg-white/[0.02] border-t border-white/5 flex justify-end">
+            <div className="px-10 py-8 bg-white/2 border-t border-white/5 flex justify-end">
               <button onClick={closeLogsModal} className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors">
                 {t('admin.ui.close') || 'Kapat'}
               </button>
@@ -757,14 +757,14 @@ const AdminOrdersPage: React.FC = () => {
                 />
                 <button
                   onClick={addNote}
-                  className="px-8 py-4 bg-cyan-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:scale-105 active:scale-95 transition-transform"
+                  className="px-8 py-4 bg-cyan-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-glow-md hover:scale-105 active:scale-95 transition-transform"
                 >
                   Ekle
                 </button>
               </div>
-              <div className="max-h-[40vh] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+              <div className="max-h-40vh overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 {notes.map(n => (
-                  <div key={n.id} className="p-6 bg-white/[0.02] rounded-2xl border border-white/5 group hover:border-white/10 transition-colors">
+                  <div key={n.id} className="p-6 bg-white/2 rounded-2xl border border-white/5 group hover:border-white/10 transition-colors">
                     <div className="flex justify-between items-start gap-4">
                       <div className="flex-1 text-sm text-slate-300 leading-relaxed font-medium">{n.note}</div>
                       <button
@@ -774,15 +774,15 @@ const AdminOrdersPage: React.FC = () => {
                         SİL
                       </button>
                     </div>
-                    <div className="text-xs text-slate-500 mt-4 font-black uppercase tracking-[0.2em]">{safeDate(n.created_at)}</div>
+                    <div className="text-xs text-slate-500 mt-4 font-black uppercase tracking-hvac-normal">{safeDate(n.created_at)}</div>
                   </div>
                 ))}
                 {notes.length === 0 && (
-                  <div className="text-center py-16 text-slate-500 font-black uppercase tracking-[0.2em] text-xs">Henüz bir not eklenmemiş.</div>
+                  <div className="text-center py-16 text-slate-500 font-black uppercase tracking-hvac-normal text-xs">Henüz bir not eklenmemiş.</div>
                 )}
               </div>
             </div>
-            <div className="px-10 py-8 bg-white/[0.02] border-t border-white/5 flex justify-end">
+            <div className="px-10 py-8 bg-white/2 border-t border-white/5 flex justify-end">
               <button onClick={closeNotesModal} className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors">
                 Kapat
               </button>
@@ -820,8 +820,8 @@ function prettyStatus(s: string, t: (key: string, params?: Record<string, unknow
 }
 
 function badgeClass(s: string) {
-  if (!s) return 'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border bg-white/5 text-slate-400 border-white/5 ring-1 ring-white/10 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-colors'
-  const base = 'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border group-hover:scale-105 transition-colors shadow-[0_0_15px_rgba(0,0,0,0.1)]'
+  if (!s) return 'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-hvac-snug px-3 py-1.5 rounded-full border bg-white/5 text-slate-400 border-white/5 ring-1 ring-white/10 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-colors'
+  const base = 'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-hvac-snug px-3 py-1.5 rounded-full border group-hover:scale-105 transition-colors shadow-[0_0_15px_rgba(0,0,0,0.1)]'
   const key = s.toLowerCase()
   switch (key) {
     case 'pending':

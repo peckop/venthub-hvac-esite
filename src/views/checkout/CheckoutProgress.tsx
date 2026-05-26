@@ -36,7 +36,7 @@ const CheckoutProgress: React.FC<CheckoutProgressProps> = ({ step, t, onBackToCa
                 <div className="flex flex-wrap items-center gap-2">
                     {[1, 2, 3, 4].map((n, idx) => (
                         <React.Fragment key={n}>
-                            <div className="flex flex-col items-center min-w-[110px]">
+                            <div className="flex flex-col items-center min-w-110px">
                                 <div className={`w-8 h-8 rounded-full font-semibold text-sm flex items-center justify-center ${step >= n ? 'bg-primary-navy text-white' : 'bg-light-gray text-steel-gray border-2 border-light-gray'}`}>{n}</div>
                                 <span className={`mt-1 text-sm ${step >= n ? 'text-primary-navy font-medium' : 'text-steel-gray'}`}>
                                     {n === 1 ? t('checkout.steps.step1') : n === 2 ? t('checkout.steps.step2') : n === 3 ? t('checkout.steps.step3') : t('checkout.steps.step4')}

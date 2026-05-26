@@ -482,14 +482,14 @@ export default function AdminReturnsPage() {
       ) : (
         <div className={`${adminCardClass} overflow-hidden group`}>
           <div ref={dragScrollRef} className="overflow-x-auto custom-scrollbar">
-            <table className="w-full min-w-[800px] text-sm border-collapse">
+            <table className="w-full min-w-800px text-sm border-collapse">
               <thead className="glass-strong">
                 <tr>
-                  {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('order')}>{_t('admin.returns.table.order')} {sortIndicator('order')}</button></th>)}
-                  {visibleCols.customer && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('customer')}>{_t('admin.returns.table.customer')} {sortIndicator('customer')}</button></th>)}
-                  {visibleCols.reason && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('reason')}>{_t('admin.returns.table.reason')} {sortIndicator('reason')}</button></th>)}
-                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('status')}>{_t('admin.returns.table.status')} {sortIndicator('status')}</button></th>)}
-                  {visibleCols.date && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('date')}>{_t('admin.returns.table.date')} {sortIndicator('date')}</button></th>)}
+                  {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('order')}>{_t('admin.returns.table.order')} {sortIndicator('order')}</button></th>)}
+                  {visibleCols.customer && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('customer')}>{_t('admin.returns.table.customer')} {sortIndicator('customer')}</button></th>)}
+                  {visibleCols.reason && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('reason')}>{_t('admin.returns.table.reason')} {sortIndicator('reason')}</button></th>)}
+                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('status')}>{_t('admin.returns.table.status')} {sortIndicator('status')}</button></th>)}
+                  {visibleCols.date && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('date')}>{_t('admin.returns.table.date')} {sortIndicator('date')}</button></th>)}
                   <th className={adminTableHeadCellClass}>{_t('admin.returns.table.actions')}</th>
                 </tr>
               </thead>
@@ -502,7 +502,7 @@ export default function AdminReturnsPage() {
                   return (
                     <tr 
                       key={returnItem.id} 
-                      className="group/row border-b border-white/5 hover:bg-white/[0.02] transition-colors duration-300"
+                      className="group/row border-b border-white/5 hover:bg-white/2 transition-colors duration-300"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       {visibleCols.order && (
@@ -516,7 +516,7 @@ export default function AdminReturnsPage() {
                             </button>
                             {returnItem.total_amount && (
                               <span className="text-xs font-black text-white/50 uppercase tracking-widest flex items-center gap-1">
-                                <div className="w-1 h-[1px] bg-white/10"></div>
+                                <div className="w-1 h-px bg-white/10"></div>
                                 {formatCurrency(Number(returnItem.total_amount), lang)}
                               </span>
                             )}
@@ -556,7 +556,7 @@ export default function AdminReturnsPage() {
                           <div className="flex flex-col gap-0.5">
                             <span className="font-black text-white tracking-widest text-xs uppercase">{formatDate(returnItem.created_at, lang)}</span>
                             <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
-                              <div className="inline-block w-1.5 h-[1px] bg-white/10 mr-1 align-middle"></div>
+                              <div className="inline-block w-1.5 h-px bg-white/10 mr-1 align-middle"></div>
                               {formatTime(returnItem.created_at, lang)}
                             </span>
                           </div>

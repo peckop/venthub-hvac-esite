@@ -400,7 +400,7 @@ const AdminErrorGroupsPage: React.FC = () => {
         <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
           {t('admin.ui.prev')}
         </button>
-        <span className="text-xs font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
+        <span className="text-xs font-black text-white/40 uppercase tracking-hvac-normal bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
           {t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}
         </span>
         <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
@@ -440,29 +440,29 @@ const AdminErrorGroupsPage: React.FC = () => {
           <table className="min-w-full text-sm">
             <thead className="glass-strong sticky top-0 z-10">
               <tr>
-                <th className={`${adminTableHeadCellClass} ${headPad} min-w-[40px]`}></th>
+                <th className={`${adminTableHeadCellClass} ${headPad} min-w-40px`}></th>
                 {visibleCols.lastSeen && (
-                  <th className={`${adminTableHeadCellClass} ${headPad} min-w-[160px]`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad} min-w-160px`}>
                     <button type="button" onClick={() => toggleSort('last_seen')} className="inline-flex items-center gap-1">
                       <span>{t('admin.errorGroups.table.lastSeen')}</span>
                       {sortBy === 'last_seen' && <span aria-hidden>{sortDir === 'asc' ? '▲' : '▼'}</span>}
                     </button>
                   </th>
                 )}
-                {visibleCols.level && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[90px]`}>{t('admin.errorGroups.table.level')}</th>}
-                {visibleCols.signature && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[320px]`}>{t('admin.errorGroups.table.signature')}</th>}
-                {visibleCols.lastMsg && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[420px]`}>{t('admin.errorGroups.table.lastMsg')}</th>}
+                {visibleCols.level && <th className={`${adminTableHeadCellClass} ${headPad} min-w-90px`}>{t('admin.errorGroups.table.level')}</th>}
+                {visibleCols.signature && <th className={`${adminTableHeadCellClass} ${headPad} min-w-320px`}>{t('admin.errorGroups.table.signature')}</th>}
+                {visibleCols.lastMsg && <th className={`${adminTableHeadCellClass} ${headPad} min-w-420px`}>{t('admin.errorGroups.table.lastMsg')}</th>}
                 {visibleCols.count && (
-                  <th className={`${adminTableHeadCellClass} ${headPad} min-w-[80px]`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad} min-w-80px`}>
                     <button type="button" onClick={() => toggleSort('count')} className="inline-flex items-center gap-1">
                       <span>{t('admin.errorGroups.table.count')}</span>
                       {sortBy === 'count' && <span aria-hidden>{sortDir === 'asc' ? '▲' : '▼'}</span>}
                     </button>
                   </th>
                 )}
-                {visibleCols.status && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[120px]`}>{t('admin.errorGroups.table.status')}</th>}
-                {visibleCols.assigned && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[220px]`}>{t('admin.errorGroups.table.assigned')}</th>}
-                {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[80px]`}></th>}
+                {visibleCols.status && <th className={`${adminTableHeadCellClass} ${headPad} min-w-120px`}>{t('admin.errorGroups.table.status')}</th>}
+                {visibleCols.assigned && <th className={`${adminTableHeadCellClass} ${headPad} min-w-220px`}>{t('admin.errorGroups.table.assigned')}</th>}
+                {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} min-w-80px`}></th>}
               </tr>
             </thead>
             <tbody>
@@ -485,7 +485,7 @@ const AdminErrorGroupsPage: React.FC = () => {
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
-                    <tr className="border-t border-white/5 hover:bg-white/[0.02] transition-colors group">
+                    <tr className="border-t border-white/5 hover:bg-white/2 transition-colors group">
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => toggleSelect(r.id, e.target.checked)} />
                       </td>
@@ -507,7 +507,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                       </td>}
                       {visibleCols.lastMsg && <td className={`${adminTableCellClass} ${cellPad} max-w-modal whitespace-normal break-words`} title={r.last_message || ''}>{r.last_message || '-'}</td>}
                       {visibleCols.count && <td className={`${adminTableCellClass} text-center`}>
-                        <span className="inline-flex items-center justify-center min-w-[28px] h-[28px] rounded-lg bg-cyan-500/10 text-cyan-400 text-xs font-black border border-cyan-500/20">
+                        <span className="inline-flex items-center justify-center min-w-28px h-7 rounded-lg bg-cyan-500/10 text-cyan-400 text-xs font-black border border-cyan-500/20">
                           {r.count}
                         </span>
                       </td>}

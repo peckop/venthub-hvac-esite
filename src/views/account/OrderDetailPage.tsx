@@ -293,8 +293,8 @@ export default function OrderDetailPage() {
               {order.payment_status?.toLowerCase() === 'partial_refunded' && (
                 <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
               )}
-              <button onClick={() => router.push(`/account/returns?new=${order.id}`)} className="h-10 px-4 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-transform hover:scale-[1.02] shadow-sm">{t('returns.requestReturn')}</button>
-              <button onClick={() => handleReorder(order)} className="h-10 px-4 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 flex items-center gap-2 transition-transform hover:scale-[1.02]"><RefreshCcw size={16} />{t('orders.reorder')}</button>
+              <button onClick={() => router.push(`/account/returns?new=${order.id}`)} className="h-10 px-4 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-transform hover:scale-102 shadow-sm">{t('returns.requestReturn')}</button>
+              <button onClick={() => handleReorder(order)} className="h-10 px-4 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 flex items-center gap-2 transition-transform hover:scale-102"><RefreshCcw size={16} />{t('orders.reorder')}</button>
             </div>
           </div>
           {/* Detailed Stepper */}
@@ -302,7 +302,7 @@ export default function OrderDetailPage() {
             <div className="flex items-center gap-2 max-w-2xl mx-auto">
               {steps.map((s, idx) => (
                 <React.Fragment key={s}>
-                  <div className="flex flex-col items-center min-w-[80px]">
+                  <div className="flex flex-col items-center min-w-80px">
                     <div className={`w-8 h-8 rounded-full text-xs font-bold flex items-center justify-center transition-colors shadow-sm ${idx <= activeIdx ? 'bg-primary-navy text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>{idx + 1}</div>
                     <span className={`mt-2 text-xs uppercase font-bold tracking-wider ${idx <= activeIdx ? 'text-primary-navy' : 'text-slate-400'}`}>{getStatusText(s)}</span>
                   </div>
@@ -315,7 +315,7 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 min-h-[400px]">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 min-h-400px">
           <div className="mb-8">
             <nav className="flex flex-wrap gap-1 p-1 bg-slate-100/80 rounded-xl max-w-fit">
               {(['overview', 'items', 'shipping', 'invoice'] as const).map(tt => (
@@ -414,10 +414,10 @@ export default function OrderDetailPage() {
                           {item.product_image_url ? (
                             item.product_id ? (
                               <Link href={Routes.legacyProduct(item.product_id)}>
-                                <VentImage src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:opacity-80 transition-opacity"  />
+                                <VentImage src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-hvac-light-shadow hover:opacity-80 transition-opacity"  />
                               </Link>
                             ) : (
-                              <VentImage src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)]"  />
+                              <VentImage src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-hvac-light-shadow"  />
                             )
                           ) : (
                             <div className="w-12 h-12 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center text-xs font-bold text-slate-400 uppercase tracking-wider">{t('orders.noImage')}</div>
@@ -502,7 +502,7 @@ export default function OrderDetailPage() {
                       if ((order.invoice_type || '').toLowerCase() === 'corporate') {
                         return (
                           <div className="space-y-3">
-                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">Ünvan:</span> <span className="text-sm font-medium text-slate-900 text-right max-w-[60%] truncate" title={iv('companyName')}>{iv('companyName')}</span></div>
+                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">Ünvan:</span> <span className="text-sm font-medium text-slate-900 text-right max-w-60% truncate" title={iv('companyName')}>{iv('companyName')}</span></div>
                             <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">VKN:</span> <span className="text-sm font-medium text-slate-900">{iv('vkn')}</span></div>
                             <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">Vergi Dairesi:</span> <span className="text-sm font-medium text-slate-900">{iv('taxOffice')}</span></div>
                           </div>

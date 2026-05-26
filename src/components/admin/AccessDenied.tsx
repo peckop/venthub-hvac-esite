@@ -10,8 +10,8 @@ const AccessDenied: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-surface-deep flex flex-col items-center justify-center p-6">
-            <div className="glass-strong rounded-hvac-2xl border border-white/5 p-12 max-w-lg w-full text-center shadow-[0_0_50px_rgba(0,0,0,0.4)] animate-in fade-in zoom-in-95 duration-500">
-                <div className="w-24 h-24 bg-rose-500/10 rounded-3xl border border-rose-500/20 flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(244,63,94,0.1)]">
+            <div className="glass-strong rounded-hvac-2xl border border-white/5 p-12 max-w-lg w-full text-center shadow-access-denied-black animate-in fade-in zoom-in-95 duration-500">
+                <div className="w-24 h-24 bg-rose-500/10 rounded-3xl border border-rose-500/20 flex items-center justify-center mx-auto mb-8 shadow-access-denied-rose">
                     <ShieldAlert className="w-12 h-12 text-rose-500" />
                 </div>
 
@@ -33,7 +33,7 @@ const AccessDenied: React.FC = () => {
                         {t('admin.ui.backToDashboard') || 'Ana Panele Dön'}
                     </Link>
                     
-                    <div className="text-xs font-bold text-slate-700 uppercase tracking-[0.3em] mt-2">
+                    <div className="text-xs font-bold text-slate-700 uppercase tracking-hvac-relaxed mt-2">
                         VentHub Security Protocol 7.1
                     </div>
                 </div>

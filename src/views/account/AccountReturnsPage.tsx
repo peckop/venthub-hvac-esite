@@ -207,7 +207,7 @@ export default function AccountReturnsPage() {
   }
 
   return (
-    <div className="min-h-[50vh]">
+    <div className="min-h-50vh">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
@@ -218,7 +218,7 @@ export default function AccountReturnsPage() {
           </h1>
           <p className="text-sm text-slate-500 mt-1">İade taleplerinizi oluşturun ve süreç durumunu takip edin.</p>
         </div>
-        <button onClick={() => setOpenModal(true)} className="bg-primary-navy hover:bg-industrial-gray text-white font-bold h-10 px-6 rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-[1.02] flex items-center gap-2 self-start sm:self-auto">
+        <button onClick={() => setOpenModal(true)} className="bg-primary-navy hover:bg-industrial-gray text-white font-bold h-10 px-6 rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-102 flex items-center gap-2 self-start sm:self-auto">
           {t('returns.new')}
         </button>
       </div>
@@ -252,7 +252,7 @@ export default function AccountReturnsPage() {
       )}
 
       {loading ? (
-        <div className="min-h-[20vh] flex items-center justify-center">
+        <div className="min-h-20vh flex items-center justify-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy" />
         </div>
       ) : rows.length === 0 ? (
@@ -314,7 +314,7 @@ export default function AccountReturnsPage() {
                   <div className="flex items-center justify-between max-w-2xl mx-auto">
                     {timeline.map((step, index) => (
                       <React.Fragment key={step.key}>
-                        <div className="flex flex-col items-center min-w-[80px]">
+                        <div className="flex flex-col items-center min-w-80px">
                           <div
                             className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm text-xs font-bold transition-colors ${step.completed
                               ? step.isTerminal && (step.key === 'rejected' || step.key === 'cancelled')
@@ -396,7 +396,7 @@ export default function AccountReturnsPage() {
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-3">
               <button onClick={() => setOpenModal(false)} className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200">{t('common.cancel') || 'İptal'}</button>
-              <button onClick={handleCreate} className="h-10 px-5 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-navy/50">{t('returns.submit')}</button>
+              <button onClick={handleCreate} className="h-10 px-5 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-primary-navy/50">{t('returns.submit')}</button>
             </div>
           </div>
         </div>

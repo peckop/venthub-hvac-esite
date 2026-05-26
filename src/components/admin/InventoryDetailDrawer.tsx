@@ -55,15 +55,15 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                 tabIndex={-1}
             />
             <aside 
-                className="fixed right-0 top-0 h-full w-full sm:w-[480px] glass-strong z-50 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] border-l border-white/10 flex flex-col animate-in slide-in-from-right duration-300"
+                className="fixed right-0 top-0 h-full w-full sm:w-480px glass-strong z-50 shadow-drawer-left border-l border-white/10 flex flex-col animate-in slide-in-from-right duration-300"
                 role="dialog"
                 aria-modal="true"
                 aria-label="Stok Detayları"
             >
-                <header className="px-6 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                <header className="px-6 py-6 border-b border-white/5 flex items-center justify-between bg-white/2">
                     <div className="flex flex-col truncate pr-4">
                         <h2 className="text-xl font-black text-white truncate uppercase tracking-tight">{selected.name}</h2>
-                        <span className="text-xs font-mono text-cyan-400 uppercase tracking-[0.2em] mt-1">{selected.product_id}</span>
+                        <span className="text-xs font-mono text-cyan-400 uppercase tracking-hvac-normal mt-1">{selected.product_id}</span>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                         <button 
@@ -86,37 +86,40 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                     {/* Özet Kartları */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="glass rounded-hvac-lg border border-white/5 p-4 relative overflow-hidden group">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
-                            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Güncel Stok</div>
+                            <div className="absolute top-0 left-0 w-1 h-full bg-cyan-400 shadow-glow-md"></div>
+                            <div className="text-xs font-black uppercase tracking-hvac-normal text-slate-500 mb-2">Güncel Stok</div>
                             <div className="text-3xl font-black text-white">{selectedStock ?? '-'}</div>
                         </div>
                         <div className="glass rounded-hvac-lg border border-white/5 p-4 relative overflow-hidden group">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]"></div>
-                            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Eşik (Alarm)</div>
+                            <div className="absolute top-0 left-0 w-1 h-full bg-amber-500" style={{ boxShadow: '0 0 15px rgba(245,158,11,0.5)' }}></div>
+                            <div className="text-xs font-black uppercase tracking-hvac-normal text-slate-500 mb-2">Eşik (Alarm)</div>
                             <div className="text-3xl font-black text-white">{(selectedThreshold === '' ? (defaultThreshold ?? '-') : selectedThreshold) as string | number}</div>
                         </div>
                     </div>
 
                     {/* Zeki Öneri Bölümü */}
                     {selected.daily_velocity !== undefined && selected.daily_velocity > 0 && (
-                        <section className="glass-strong rounded-hvac-xl border border-cyan-400/20 p-6 relative overflow-hidden shadow-[0_0_30px_rgba(34,211,238,0.05)]">
+                        <section 
+                            className="glass-strong rounded-hvac-xl border border-cyan-400/20 p-6 relative overflow-hidden"
+                            style={{ boxShadow: '0 0 30px rgba(34,211,238,0.05)' }}
+                        >
                             <div className="absolute -right-8 -top-8 w-32 h-32 bg-cyan-400/10 rounded-full blur-3xl"></div>
-                            <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
+                            <h3 className="text-xs font-black text-cyan-400 uppercase tracking-hvac-normal mb-4 flex items-center gap-3">
                                 <span className="relative flex h-2.5 w-2.5">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400" style={{ boxShadow: '0 0 10px rgba(34,211,238,0.8)' }}></span>
                                 </span>
                                 Zeki Satın Alma Önerisi
                             </h3>
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <div className="text-xs text-slate-500 uppercase tracking-[0.2em] mb-2 font-black">Satış Hızı (30 Gün)</div>
+                                    <div className="text-xs text-slate-500 uppercase tracking-hvac-normal mb-2 font-black">Satış Hızı (30 Gün)</div>
                                     <div className="font-mono text-base font-bold text-white tracking-tight">{selected.daily_velocity.toFixed(2)} <span className="text-xs text-slate-500 uppercase">/ g</span></div>
                                     <div className="text-xs text-slate-600 mt-1 uppercase font-black">~ {Math.ceil(selected.daily_velocity * 30)} adet/ay</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-cyan-400 font-black uppercase tracking-[0.2em] mb-2">Önerilen Sipariş</div>
+                                    <div className="text-xs text-cyan-400 font-black uppercase tracking-hvac-normal mb-2">Önerilen Sipariş</div>
                                     <div className="font-mono text-3xl font-black text-white leading-none">
                                         {Math.max(0, Math.ceil((selected.daily_velocity * 30)) - selected.available_stock)} <span className="text-xs font-bold text-slate-500 uppercase">ADET</span>
                                     </div>
@@ -136,14 +139,14 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                     {/* Eşik Düzenleme */}
                     {hasWriteAccess && (
                         <section className="space-y-4">
-                            <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Eşik Seviyesini Güncelle</h3>
+                            <h3 className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1">Eşik Seviyesini Güncelle</h3>
                             <div className="flex items-center gap-3">
                                 <input
                                     type="number"
                                     value={selectedThreshold}
                                     onChange={(e) => setSelectedThreshold(e.target.value === '' ? '' : Number(e.target.value))}
                                     placeholder="Değer"
-                                    className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-colors font-bold"
+                                    className="w-full bg-white/3 border border-white/5 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-colors font-bold"
                                 />
                                 <button
                                     disabled={saving}
@@ -178,16 +181,16 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
 
                     {/* Rezerve Siparişler */}
                     <div className="glass rounded-hvac-xl border border-white/5 overflow-hidden">
-                        <div className="p-5 border-b border-white/5 bg-white/[0.02]">
-                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Rezerve Siparişler</h3>
+                        <div className="p-5 border-b border-white/5 bg-white/2">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-hvac-normal">Rezerve Siparişler</h3>
                         </div>
                         <InventoryReservedTable reservedOrders={reservedOrders} />
                     </div>
 
                     {/* Hareket Geçmişi */}
                     <div className="glass rounded-hvac-xl border border-white/5 overflow-hidden">
-                        <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
-                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Son Hareketler</h3>
+                        <div className="p-5 border-b border-white/5 bg-white/2 flex items-center justify-between">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-hvac-normal">Son Hareketler</h3>
                             {movements.length > 0 && hasWriteAccess && (
                                 <button 
                                     onClick={undoLastMovement}

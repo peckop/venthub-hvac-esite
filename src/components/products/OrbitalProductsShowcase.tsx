@@ -435,7 +435,7 @@ const OrbitalCard: React.FC<{
                                 {/* Sol ok */}
                                 <div className="relative">
                                     <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
-                                    <div className="relative w-[72px] h-[72px] rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                    <div className="relative w-18 h-18 rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
                                         <div className="w-9 h-9 text-cyan-300 animate-pulse">
                                             <ChevronLeft strokeWidth={2.5} />
                                         </div>
@@ -445,7 +445,7 @@ const OrbitalCard: React.FC<{
                                 {/* Sağ ok */}
                                 <div className="relative">
                                     <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
-                                    <div className="relative w-[72px] h-[72px] rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                    <div className="relative w-18 h-18 rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
                                         <div className="w-9 h-9 text-cyan-300 animate-pulse">
                                             <ChevronRight strokeWidth={2.5} />
                                         </div>

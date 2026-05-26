@@ -99,7 +99,7 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
 
         {/* Content */}
         <main className="flex-1 min-w-0">
-          <div className="bg-white rounded-2xl md:border md:border-slate-200/60 md:shadow-sm md:p-8 min-h-[500px]">
+          <div className="bg-white rounded-2xl md:border md:border-slate-200/60 md:shadow-sm md:p-8 min-h-500px">
             {children}
           </div>
         </main>

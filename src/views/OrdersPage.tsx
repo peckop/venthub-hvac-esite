@@ -323,7 +323,7 @@ const OrdersPage: React.FC = () => {
                         const active = idx <= activeIdx
                         return (
                           <React.Fragment key={s}>
-                            <div className="flex flex-col items-center min-w-[80px]">
+                            <div className="flex flex-col items-center min-w-80px">
                               <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors shadow-sm ${active ? 'bg-primary-navy text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>{idx + 1}</div>
                               <span className={`mt-2 text-xs font-bold uppercase tracking-wider ${active ? 'text-primary-navy' : 'text-slate-400'}`}>{stepLabel[s]}</span>
                             </div>
@@ -371,7 +371,7 @@ const OrdersPage: React.FC = () => {
                       )}
                       <button
                         onClick={() => router.push(`/account/orders/detail?id=${order.id}`)}
-                        className="flex items-center space-x-1 bg-slate-50 hover:bg-slate-100 text-primary-navy border border-slate-200 h-10 px-4 rounded-lg text-sm font-bold shadow-sm transition-transform hover:scale-[1.02]"
+                        className="flex items-center space-x-1 bg-slate-50 hover:bg-slate-100 text-primary-navy border border-slate-200 h-10 px-4 rounded-lg text-sm font-bold shadow-sm transition-transform hover:scale-102"
                       >
                         <Eye size={16} />
                         <span>{t('orders.details')}</span>

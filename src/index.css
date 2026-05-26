@@ -291,6 +291,9 @@ textarea:focus-visible {
     --clean-white: 0 0% 100%;
     --font-size-display: clamp(2.5rem, 1rem + 5vw, 5.5rem);
 
+    /* ── Glow Color CSS Variable (Kütüphaneci Onaylı) ── */
+    --glow-color: rgba(34, 211, 238, 0.3);
+
     /* ── Legacy Variables (backward compat) ──────────── */
     --navy-900: #0A0F1E;
     --navy-800: #0D1426;
@@ -505,4 +508,9 @@ p, li {
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2;
   }
+  .mask-radial-ellipse {
+    mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+  }
 }
+

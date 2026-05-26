@@ -31,11 +31,11 @@ const BrandsPage: React.FC = () => {
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-600">
+            <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-600">
               {t('brands.sectionTitle')}
             </span>
           </div>
-          <h1 className="text-5xl lg:text-8xl font-extralight tracking-tighter text-slate-900 leading-[1.1] mb-10">
+          <h1 className="text-5xl lg:text-8xl font-extralight tracking-tighter text-slate-900 leading-hvac-11 mb-10">
             {t('brands.eyebrow').split(' ').map((word, i) => (
               <React.Fragment key={i}>
                 {i === 2 ? <span className="font-medium text-slate-950 italic">{word} </span> : word + ' '}
@@ -61,10 +61,10 @@ const BrandsPage: React.FC = () => {
                 <Link
                   href={`/brands/${brand.slug}`}
                   aria-label={`${t('brands.aboutBrand')} ${brand.name}`}
-                  className="group block relative h-full rounded-hvac-2xl border border-slate-100 bg-white p-10 transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
+                  className="group block relative h-full rounded-hvac-2xl border border-slate-100 bg-white p-10 transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-hvac-card-hover"
                 >
                   {/* Floating Logo Container */}
-                  <div className="aspect-[3/2] relative flex items-center justify-center mb-12 grayscale opacity-40 transition-transform duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110">
+                  <div className="aspect-3/2 relative flex items-center justify-center mb-12 grayscale opacity-40 transition-transform duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110">
                     <BrandIcon brand={brand.name} className="w-full h-full max-h-24" />
                   </div>
 
@@ -78,7 +78,7 @@ const BrandsPage: React.FC = () => {
                       </span>
                     </div>
                     
-                    <div className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-600/80">
+                    <div className="text-xs font-bold uppercase tracking-hvac-normal text-cyan-600/80">
                       {brand.specialty}
                     </div>
                     
@@ -88,7 +88,7 @@ const BrandsPage: React.FC = () => {
                   </div>
 
                   {/* Animated Reveal Arrow */}
-                  <div className="mt-10 flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-cyan-600 transition-colors">
+                  <div className="mt-10 flex items-center gap-3 text-xs font-black uppercase tracking-hvac-relaxed text-slate-400 group-hover:text-cyan-600 transition-colors">
                     <span>{t('brands.exploreBrand')}</span>
                     <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-colors duration-500" />
                   </div>
@@ -104,10 +104,10 @@ const BrandsPage: React.FC = () => {
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div>
-              <div className="text-cyan-400 text-xs font-black uppercase tracking-[0.5em] mb-8">
+              <div className="text-cyan-400 text-xs font-black uppercase tracking-hvac-wide mb-8">
                 {t('brands.trust.eyebrow')}
               </div>
-              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-8">
+              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-hvac-11 mb-8">
                 {t('brands.trust.title').split(' ').slice(0, 2).join(' ')} <br />
                 <span className="font-medium text-cyan-400 italic">
                   {t('brands.trust.title').split(' ').slice(2).join(' ')}

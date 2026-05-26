@@ -15,7 +15,7 @@ interface LazyInViewProps<T extends Record<string, unknown> = Record<string, unk
 // Does NOT render children until loaded, so the chunk isn't fetched early.
 const LazyInView = <T extends Record<string, unknown> = Record<string, unknown>>({
   loader,
-  placeholder = <div className="min-h-[160px]" aria-hidden="true" />,
+  placeholder = <div className="min-h-160px" aria-hidden="true" />,
   rootMargin = '200px 0px',
   once = true,
   className,

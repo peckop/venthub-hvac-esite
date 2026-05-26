@@ -17,20 +17,20 @@ const StrategicBrands: React.FC<StrategicBrandsProps> = ({ dictionary: t }) => {
           <div className="max-w-3xl">
             <div 
               data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-xs font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
             >
               {t.eyebrow}
             </div>
             <h2 
               data-observe="fade-up"
-              className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
+              className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
             >
               {t.title}
             </h2>
           </div>
           <p 
             data-observe="fade-up"
-            className="opacity-0 data-[in-view=true]:opacity-100 transition-[opacity] duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
+            className="opacity-0 data-[in-view=true]:opacity-100 transition-opacity duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
           >
             {t.subtitle}
           </p>

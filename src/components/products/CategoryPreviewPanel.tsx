@@ -80,7 +80,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: '100%', opacity: 0 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed right-0 top-0 bottom-0 w-full sm:w-[420px] z-50 
+                        className="fixed right-0 top-0 bottom-0 w-full sm:w-420px z-50 
                                    bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95
                                    backdrop-blur-xl border-l border-white/10 
                                    shadow-2xl shadow-black/50 overflow-hidden"
@@ -107,7 +107,7 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                         </div>
 
                         {/* Content */}
-                        <div className="relative p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-200px)]">
+                        <div className="relative p-6 space-y-6 overflow-y-auto max-h-hvac-modal">
                             {/* Category Image */}
                             <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-800">
                                 <VentImage src={category.image}

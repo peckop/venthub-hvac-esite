@@ -324,7 +324,7 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
                                                     className="text-xs font-medium text-white
                                                                bg-slate-900/90 backdrop-blur-sm px-2 py-1 rounded-md
                                                                whitespace-nowrap shadow-lg border border-white/10
-                                                               max-w-[120px] truncate"
+                                                               max-w-120px truncate"
                                                 >
                                                     {sub.label}
                                                 </motion.span>

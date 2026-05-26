@@ -31,7 +31,7 @@ const AdminSettingsPage: React.FC = () => {
 
   if (loading || !formData) {
     return (
-      <div className="flex-1 flex items-center justify-center min-h-[400px]">
+      <div className="flex-1 flex items-center justify-center min-h-hvac-section">
         <div className="relative">
           <div className="w-16 h-16 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin"></div>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -59,8 +59,8 @@ const AdminSettingsPage: React.FC = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs tracking-[0.2em] uppercase mb-2">
-            <span className="w-8 h-[2px] bg-cyan-400/30"></span>
+          <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs tracking-hvac-normal uppercase mb-2">
+            <span className="w-8 h-0.5 bg-cyan-400/30"></span>
             {_t('admin.menu.groupSystem')}
           </div>
           <h2 className="text-4xl font-black text-white tracking-tight">
@@ -72,7 +72,7 @@ const AdminSettingsPage: React.FC = () => {
           <button 
             onClick={handleSave}
             disabled={saving}
-            className="group relative flex items-center justify-center gap-2 px-8 py-3 bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-700 text-surface-deep rounded-xl font-bold transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.2)]"
+            className="group relative flex items-center justify-center gap-2 px-8 py-3 bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-700 text-surface-deep rounded-xl font-bold transition-transform hover:scale-102 active:scale-98 shadow-admin-orders-glow-2"
           >
             {saving ? <Activity className="animate-spin" size={18} /> : <Save size={18} />}
             <span>{saving ? (_t('common.saving') || 'Kaydediliyor...') : (_t('common.saveChanges') || 'Değişiklikleri Kaydet')}</span>

@@ -138,7 +138,7 @@ export default function AccountOverviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4">
+      <div className="min-h-50vh flex flex-col items-center justify-center gap-4">
         <div className="w-12 h-12 rounded-full border-4 border-slate-100 border-t-primary-navy animate-spin"></div>
         <div className="text-sm font-bold text-slate-500 uppercase tracking-wider animate-pulse">Dashboard Hazırlanıyor...</div>
       </div>
@@ -150,15 +150,15 @@ export default function AccountOverviewPage() {
 
       {/* Background Mesh (Sadece üst kısım için dekoratif) */}
       <div className="absolute top-0 left-0 right-0 h-96 overflow-hidden -z-10 bg-slate-50/50 rounded-3xl pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[150%] bg-primary-navy/5 rounded-full blur-3xl opacity-70"></div>
-        <div className="absolute top-[10%] right-[-10%] w-[40%] h-[120%] bg-blue-400/5 rounded-full blur-3xl opacity-70"></div>
+        <div className="absolute -top-20% -left-10% w-1/2 h-150% bg-primary-navy/5 rounded-full blur-3xl opacity-70"></div>
+        <div className="absolute top-10% -right-10% w-2/5 h-120% bg-blue-400/5 rounded-full blur-3xl opacity-70"></div>
       </div>
 
       {/* Dynamic Welcome & Top Metrics */}
       <div className="flex flex-col lg:flex-row gap-6">
 
         {/* Welcome Box */}
-        <div className="lg:w-1/3 relative overflow-hidden bg-primary-navy text-white rounded-3xl p-8 shadow-xl shadow-primary-navy/10 flex flex-col justify-end min-h-[220px]">
+        <div className="lg:w-1/3 relative overflow-hidden bg-primary-navy text-white rounded-3xl p-8 shadow-xl shadow-primary-navy/10 flex flex-col justify-end min-h-220px">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
 
@@ -379,7 +379,7 @@ export default function AccountOverviewPage() {
 
           {/* Güvenlik & Profil Kısa Yolları */}
           <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-transform">
-            <div className="absolute top-[-50%] right-[-20%] w-[150%] h-[150%] bg-gradient-to-br from-primary-navy/40 to-transparent rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-1/2 -right-20% w-150% h-150% bg-gradient-to-br from-primary-navy/40 to-transparent rounded-full blur-3xl pointer-events-none" />
             <ShieldCheck className="absolute -right-4 -bottom-4 w-32 h-32 text-white/5 group-hover:scale-110 transition-transform duration-500" />
 
             <div className="relative z-10">

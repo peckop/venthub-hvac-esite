@@ -22,10 +22,10 @@ const SilentFanTypeComparison: React.FC = () => {
 
                 <div className="grid lg:grid-cols-5 gap-0 rounded-3xl overflow-hidden border border-slate-200 shadow-2xl relative">
                     {/* Left: Background visual for standard (dimmed) */}
-                    <div className="lg:col-span-2 relative min-h-[300px] flex items-center justify-center bg-slate-100">
-                        <div className="absolute inset-0 opacity-20 grayscale bg-[url('https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800')] bg-cover bg-center" />
+                    <div className="lg:col-span-2 relative min-h-300px flex items-center justify-center bg-slate-100">
+                        <div className="absolute inset-0 opacity-20 grayscale bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800')" }} />
                         <div className="relative text-center z-10 p-8">
-                            <h3 className="text-2xl font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">
+                            <h3 className="text-2xl font-bold text-slate-400 uppercase tracking-hvac-normal mb-4">
                                 {String(tr('standard'))}
                             </h3>
                             <div className="text-slate-300">
@@ -46,15 +46,15 @@ const SilentFanTypeComparison: React.FC = () => {
                     </div>
 
                     {/* Right: Neon Visual for Lineo Quiet */}
-                    <div className="lg:col-span-2 relative min-h-[300px] flex items-center justify-center group overflow-hidden">
+                    <div className="lg:col-span-2 relative min-h-300px flex items-center justify-center group overflow-hidden">
                         <VentImage src="/images/vortice/vortice_lineo_neon.png"
                             alt="Neon Engineering"
                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             fill
                          />
-                        <div className="absolute inset-0 bg-blue-900/40 backdrop-blur-[2px]" />
+                        <div className="absolute inset-0 bg-blue-900/40 backdrop-blur-2" />
                         <div className="relative text-center z-10 p-8">
-                            <h3 className="text-2xl font-bold text-white uppercase tracking-[0.2em] mb-4">
+                            <h3 className="text-2xl font-bold text-white uppercase tracking-hvac-normal mb-4">
                                 {String(tr('quiet'))}
                             </h3>
                             <div className="text-blue-400">
@@ -68,7 +68,7 @@ const SilentFanTypeComparison: React.FC = () => {
                         <div className="grid lg:grid-cols-5 h-full">
                             <div className="lg:col-start-3 lg:col-span-1 flex flex-col justify-center">
                                 {features.map((f, i: number) => (
-                                    <div key={i} className="h-[73px] flex items-center justify-center gap-12 -mx-48">
+                                    <div key={i} className="h-73px flex items-center justify-center gap-12 -mx-48">
                                         {/* Standard value (Left side of middle col) */}
                                         <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-slate-500 w-32 text-center">
                                             {f.standard}

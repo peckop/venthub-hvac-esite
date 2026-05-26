@@ -23,7 +23,7 @@ const AddressSelectModal: React.FC<AddressSelectModalProps> = ({
     t
 }) => (
     <div className="fixed inset-0 z-dropdown bg-black/40 flex items-center justify-center">
-        <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
+        <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-11/12 max-w-2xl max-h-80vh overflow-hidden">
             <div className="px-5 py-4 border-b flex items-center justify-between">
                 <div className="text-industrial-gray font-semibold">{title}</div>
                 <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>

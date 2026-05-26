@@ -180,7 +180,7 @@ const AdminErrorsPage: React.FC = () => {
         <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
           {t('admin.ui.prev')}
         </button>
-        <span className="text-xs font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
+        <span className="text-xs font-black text-white/40 uppercase tracking-hvac-normal bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
           {t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}
         </span>
         <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
@@ -223,7 +223,7 @@ const AdminErrorsPage: React.FC = () => {
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
-                    <tr className="border-t border-white/5 hover:bg-white/[0.02] transition-colors group">
+                    <tr className="border-t border-white/5 hover:bg-white/2 transition-colors group">
                       <td className={`${adminTableCellClass}`}>{formatDateTime(r.at, lang)}</td>
                       <td className={`${adminTableCellClass}`}><span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${r.level === 'error' ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20' : r.level === 'warn' ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-600/20' : 'bg-sky-50 text-sky-700 ring-1 ring-sky-600/20'}`}>{r.level || 'error'}</span></td>
                       <td className={`${adminTableCellClass}`}>{r.message}</td>
@@ -236,7 +236,7 @@ const AdminErrorsPage: React.FC = () => {
                       </td>
                     </tr>
                      {expandedId === r.id && (
-                      <tr className="bg-white/[0.03]">
+                      <tr className="bg-white/3">
                         <td colSpan={5} className="p-6">
                           <div className="grid md:grid-cols-2 gap-6 text-xs">
                             <div>

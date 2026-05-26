@@ -128,7 +128,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             <span className="text-xs text-steel-gray font-medium">{product.sku}</span>
           </div>
           
-          <h3 className="text-sm font-bold text-industrial-gray leading-snug min-h-[2.5rem] line-clamp-2 mb-4 group-hover:text-primary-navy transition-colors">
+          <h3 className="text-sm font-bold text-industrial-gray leading-snug min-h-10 line-clamp-2 mb-4 group-hover:text-primary-navy transition-colors">
             {product.name}
           </h3>
 

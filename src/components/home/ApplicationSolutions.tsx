@@ -66,20 +66,20 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
           <div className="max-w-2xl">
             <div 
               data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-xs font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
             >
               {t.eyebrow}
             </div>
             <h2 
               data-observe="fade-up"
-              className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
+              className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
             >
               {t.title}
             </h2>
           </div>
           <p 
             data-observe="fade-up"
-            className="opacity-0 data-[in-view=true]:opacity-100 transition-[opacity] duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
+            className="opacity-0 data-[in-view=true]:opacity-100 transition-opacity duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
           >
             {t.subtitle}
           </p>
@@ -103,7 +103,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
               <div
                 key={item.id}
                 data-observe="fade-up"
-                className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-700 ease-out ${delayClass} group relative overflow-hidden rounded-3xl bg-slate-100 h-[300px] sm:h-[400px] lg:h-[450px] ${item.span}`}
+                className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass} group relative overflow-hidden rounded-3xl bg-slate-100 h-300px sm:h-400px lg:h-450px ${item.span}`}
               >
                 <Link href={item.href as import('next').Route} className="block w-full h-full relative">
                   <Image
@@ -119,7 +119,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
                   
                   <div className="absolute inset-0 p-8 flex flex-col justify-end">
                     <div className="mb-4 overflow-hidden">
-                      <div className="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-2 translate-y-4 group-hover:translate-y-0 transition-[transform] duration-500">
+                      <div className="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                         {itemDict.eyebrow}
                       </div>
                       <h3 className="text-2xl font-bold text-white tracking-tight">
@@ -127,11 +127,11 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
                       </h3>
                     </div>
                     
-                    <p className="text-sm text-slate-300 font-light leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-[opacity] duration-500 line-clamp-2">
+                    <p className="text-sm text-slate-300 font-light leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 line-clamp-2">
                       {itemDict.description}
                     </p>
                     
-                    <div className="flex flex-wrap gap-2 opacity-0 group-hover:opacity-100 transition-[opacity] duration-700 delay-100">
+                    <div className="flex flex-wrap gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
                       <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-xs text-white font-medium">
                         {itemDict.point1}
                       </span>
@@ -142,7 +142,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
                   </div>
 
                   {/* Corner Arrow */}
-                  <div className="absolute top-8 right-8 w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center opacity-0 -translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,transform] duration-500">
+                  <div className="absolute top-8 right-8 w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center opacity-0 -translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-opacity-transform duration-500">
                     <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -161,7 +161,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
             <span className="text-sm font-bold uppercase tracking-widest text-slate-400 group-hover:text-cyan-600 transition-colors">
               {t.viewAll}
             </span>
-            <div className="w-12 h-[1px] bg-slate-200 group-hover:w-20 group-hover:bg-cyan-600 transition-colors duration-500" />
+            <div className="w-12 h-px bg-slate-200 group-hover:w-20 group-hover:bg-cyan-600 transition-colors duration-500" />
           </Link>
         </div>
       </div>

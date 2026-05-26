@@ -345,32 +345,32 @@ const AdminMovementsPage: React.FC = () => {
 
       <div className={`${adminCardClass} overflow-hidden`}>
         <div ref={dragScrollRef} className="overflow-x-auto w-full">
-          <table className="w-full min-w-[700px]">
+          <table className="w-full min-w-700px">
             <thead className="glass-strong">
               <tr>
                 {visibleCols.date && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('date')}>{t('admin.movements.table.date')} {sortIndicator('date')}</button>
+                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('date')}>{t('admin.movements.table.date')} {sortIndicator('date')}</button>
                   </th>
                 )}
                 {visibleCols.product && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('product')}>{t('admin.movements.table.product')} {sortIndicator('product')}</button>
+                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('product')}>{t('admin.movements.table.product')} {sortIndicator('product')}</button>
                   </th>
                 )}
                 {visibleCols.delta && (
                   <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
-                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('delta')}>{t('admin.movements.table.delta')} {sortIndicator('delta')}</button>
+                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('delta')}>{t('admin.movements.table.delta')} {sortIndicator('delta')}</button>
                   </th>
                 )}
                 {visibleCols.reason && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('reason')}>{t('admin.movements.table.reason')} {sortIndicator('reason')}</button>
+                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('reason')}>{t('admin.movements.table.reason')} {sortIndicator('reason')}</button>
                   </th>
                 )}
                 {visibleCols.ref && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('ref')}>{t('admin.movements.table.ref')} {sortIndicator('ref')}</button>
+                    <button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-hvac-normal" onClick={() => toggleSort('ref')}>{t('admin.movements.table.ref')} {sortIndicator('ref')}</button>
                   </th>
                 )}
               </tr>
@@ -400,7 +400,7 @@ const AdminMovementsPage: React.FC = () => {
                 </tr>
               ) : (
                 sorted.map((m) => (
-                  <tr key={m.id} className="group border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <tr key={m.id} className="group border-b border-white/5 hover:bg-white/2 transition-colors">
                     {visibleCols.date && (
                       <td className={`${adminTableCellClass} ${cellPad} font-black text-slate-400 text-xs uppercase tracking-widest`}>{formatDateTime(m.created_at, lang)}</td>
                     )}
@@ -431,7 +431,7 @@ const AdminMovementsPage: React.FC = () => {
                       </td>
                     )}
                     {visibleCols.ref && (
-                      <td className={`${adminTableCellClass} ${cellPad} font-black font-mono text-white/60 text-xs uppercase tracking-[0.1em]`}>{m.order_id ? (
+                      <td className={`${adminTableCellClass} ${cellPad} font-black font-mono text-white/60 text-xs uppercase tracking-hvac-tight`}>{m.order_id ? (
                         <span className="bg-white/5 px-2 py-1 rounded border border-white/5">
                           #{m.order_id.slice(-8).toUpperCase()}
                         </span>
@@ -445,9 +445,9 @@ const AdminMovementsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-8 px-4 py-6 border-t border-white/5 bg-white/[0.02] rounded-3xl">
+      <div className="flex items-center justify-between mt-8 px-4 py-6 border-t border-white/5 bg-white/2 rounded-3xl">
         <button className={adminButtonSecondaryClass} disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>{t('admin.ui.prev')}</button>
-        <span className="text-xs font-black text-slate-400 bg-white/5 px-6 py-3 rounded-2xl border border-white/5 uppercase tracking-[0.2em]">{t('admin.movements.pageLabel', { page: String(page) })}</span>
+        <span className="text-xs font-black text-slate-400 bg-white/5 px-6 py-3 rounded-2xl border border-white/5 uppercase tracking-hvac-normal">{t('admin.movements.pageLabel', { page: String(page) })}</span>
         <button className={adminButtonSecondaryClass} disabled={!hasMore} onClick={() => setPage(p => p + 1)}>{t('admin.ui.next')}</button>
       </div>
     </div>

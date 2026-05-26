@@ -5,7 +5,7 @@ const LazyBrandsShowcase: React.FC = () => {
   return (
     <LazyInView
       loader={() => import('./BrandsShowcase')}
-      placeholder={<div className="min-h-[120px]" aria-hidden="true" />}
+      placeholder={<div className="min-h-120px" aria-hidden="true" />}
       rootMargin="100px 0px"
       once
       className=""

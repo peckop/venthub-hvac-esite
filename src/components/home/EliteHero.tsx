@@ -14,7 +14,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
   const { t } = useI18n()
 
   return (
-    <section className="relative w-full h-[100vh] min-h-[700px] overflow-hidden bg-slate-950 flex items-center">
+    <section className="relative w-full h-screen min-h-700px overflow-hidden bg-slate-950 flex items-center">
       {/* Background Image & Overlay with Motion */}
       <div
         className="absolute inset-0 z-0"
@@ -33,7 +33,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
           priority
           sizes="100vw"
           fetchPriority="high"
-          className="object-cover object-center brightness-[0.6] saturate-[1.1]"
+          className="object-cover object-center brightness-60 saturate-110"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
@@ -43,7 +43,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           <div
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white shadow-sm backdrop-blur-md mb-8"
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-hvac-24 text-white shadow-sm backdrop-blur-md mb-8"
             style={{ animation: 'fadeInUp 0.8s ease-out 0.5s both' }}
           >
             <style>{`
@@ -57,7 +57,7 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
           </div>
 
           <h1
-            className="text-5xl font-light leading-[1.05] tracking-tighter text-white sm:text-6xl lg:text-[5.5rem]"
+            className="text-5xl font-light leading-hvac-105 tracking-tighter text-white sm:text-6xl lg:text-5.5rem"
             style={{ animation: 'fadeInUp 1s ease-out 0.7s both' }}
           >
             {t('home.hero.title')}
@@ -107,9 +107,9 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
             50% { transform: translateY(10px); }
           }
         `}</style>
-        <span className="text-xs uppercase tracking-[0.3em] text-white/60">Explore</span>
+        <span className="text-xs uppercase tracking-hvac-relaxed text-white/60">Explore</span>
         <div
-          className="w-[1px] h-12 bg-gradient-to-b from-cyan-400 to-transparent"
+          className="w-px h-12 bg-gradient-to-b from-cyan-400 to-transparent"
           style={{ animation: 'bounce 2s infinite' }}
         />
       </div>

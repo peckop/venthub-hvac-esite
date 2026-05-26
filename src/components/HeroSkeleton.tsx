@@ -2,7 +2,7 @@ import React from 'react'
 
 export const HeroSkeleton: React.FC = () => {
     return (
-        <div className="relative h-[600px] lg:h-[700px] w-full overflow-hidden bg-zinc-900 animate-pulse">
+        <div className="relative h-hvac-hero lg:h-hvac-hero-lg w-full overflow-hidden bg-zinc-900 animate-pulse">
             {/* Background Placeholder */}
             <div className="absolute inset-0 bg-zinc-800" />
 

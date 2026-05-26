@@ -103,8 +103,8 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   return (
     <div className="h-screen flex flex-col font-sans bg-surface-deep text-slate-200 overflow-hidden">
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary-navy/20 blur-[120px] rounded-full opacity-50" />
-        <div className="absolute top-[20%] -right-[10%] w-[30%] h-[50%] bg-secondary-blue/10 blur-[100px] rounded-full opacity-30" />
+        <div className="absolute -top-10% -left-10% w-2/5 h-2/5 bg-primary-navy/20 blur-120 rounded-full opacity-50" />
+        <div className="absolute top-20% -right-10% w-3/10 h-1/2 bg-secondary-blue/10 blur-100 rounded-full opacity-30" />
       </div>
 
       <header className="h-16 flex-none border-b border-white/5 bg-surface-deep/60 backdrop-blur-xl relative z-50 px-4 md:px-8 flex items-center justify-between">
@@ -134,7 +134,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
       <div className="flex-1 flex overflow-hidden relative z-10">
         {/* Sidebar KatmanÄ± */}
         <aside className={`
-          absolute lg:relative inset-y-0 left-0 z-40 w-[280px] bg-surface-deep border-r border-white/5 transition-colors duration-300 ease-in-out
+          absolute lg:relative inset-y-0 left-0 z-40 w-280px bg-surface-deep border-r border-white/5 transition-colors duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
         `}>
           <nav className="h-full overflow-y-auto p-4 space-y-8 py-8 custom-scrollbar">
@@ -162,7 +162,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
         </aside>
 
         {/* Ana Ä°Ã§erik KatmanÄ± */}
-        <main className="flex-1 overflow-y-auto relative custom-scrollbar flex flex-col bg-white/[0.02]">
+        <main className="flex-1 overflow-y-auto relative custom-scrollbar flex flex-col bg-white/2">
             <div className="flex-1 w-full max-w-page mx-auto p-4 md:p-8">
                 {children}
             </div>

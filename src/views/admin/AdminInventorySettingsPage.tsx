@@ -132,7 +132,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <input 
                       type="number" 
-                      className={`${adminInputClass} max-w-[120px] !h-12 !text-center !text-lg !font-black`}
+                      className={`${adminInputClass} max-w-120px !h-12 !text-center !text-lg !font-black`}
                       value={defaultThreshold} 
                       onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} 
                       placeholder="0" 

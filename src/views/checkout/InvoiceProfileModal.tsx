@@ -28,7 +28,7 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
             <div 
                 role="dialog"
                 aria-modal="true"
-                className="relative w-full max-w-xl bg-white rounded-hvac-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+                className="relative w-full max-w-xl bg-white rounded-hvac-xl shadow-2xl overflow-hidden flex flex-col max-h-80vh"
             >
                 <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-3">

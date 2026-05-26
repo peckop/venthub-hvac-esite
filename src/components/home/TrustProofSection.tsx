@@ -73,20 +73,20 @@ const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, tr
           <div className="max-w-3xl">
             <div 
               data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-xs font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
             >
               {t.eyebrow}
             </div>
             <h2 
               data-observe="fade-up"
-              className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
+              className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
             >
               {t.title}
             </h2>
           </div>
           <p 
             data-observe="fade-up"
-            className="opacity-0 data-[in-view=true]:opacity-100 transition-[opacity] duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
+            className="opacity-0 data-[in-view=true]:opacity-100 transition-opacity duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
           >
             {t.subtitle}
           </p>
@@ -96,9 +96,9 @@ const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, tr
           {/* Left Side: Visual & Badges */}
           <div
             data-observe="fade-up"
-            className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out"
+            className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out"
           >
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-hvac-2xl border border-slate-200 shadow-2xl">
+            <div className="relative aspect-video w-full overflow-hidden rounded-hvac-2xl border border-slate-200 shadow-2xl">
               <Image
                 src="/images/hvac_installation_close_up_premium_3.png"
                 alt={t.visualAlt || 'Visual'}
@@ -136,14 +136,14 @@ const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, tr
                 <div
                   key={item.key}
                   data-observe="fade-up"
-                  className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-500 ease-out ${delayClass} group relative rounded-hvac-xl border border-slate-100 bg-white p-8 shadow-sm hover:-translate-y-2 hover:border-primary-navy/10 hover:shadow-2xl hover:shadow-primary-navy/5`}
+                  className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-500 ease-out ${delayClass} group relative rounded-hvac-xl border border-slate-100 bg-white p-8 shadow-sm hover:-translate-y-2 hover:border-primary-navy/10 hover:shadow-2xl hover:shadow-primary-navy/5`}
                 >
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-primary-navy transition-transform duration-300 group-hover:bg-primary-navy group-hover:text-white group-hover:rotate-6">
                     {item.icon}
                   </div>
                   
                   <div className="mt-6">
-                    <div className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+                    <div className="text-xs font-bold uppercase tracking-hvac-normal text-slate-400">
                       {itemDict.eyebrow}
                     </div>
                     <h3 className="mt-2 text-xl font-bold text-slate-950">

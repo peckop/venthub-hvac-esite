@@ -80,7 +80,7 @@ export class ErrorBoundary extends Component<Props, State> {
             const { isChunkError } = this.state
 
             return (
-              <div className="min-h-[400px] flex items-center justify-center p-8">
+              <div className="min-h-400px flex items-center justify-center p-8">
                 <div className="text-center max-w-md">
                   <AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
                   <h2 className="text-xl font-semibold text-gray-800 mb-2">

@@ -61,7 +61,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="text-xs font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+              className="text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
             >
               {t('home.featuredCommercial.eyebrow')}
             </motion.div>
@@ -114,7 +114,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
         </div>
 
         {/* Main Showcase Grid + Sidebar */}
-        <div className="grid gap-10 lg:grid-cols-[1fr,320px]">
+        <div className="grid gap-10 lg:grid-cols-hvac-layout-sidebar">
           <div className="space-y-12">
             <AnimatePresence mode="wait">
               <motion.div
@@ -149,7 +149,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
               <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-3xl rounded-full" />
               
               <div className="relative z-10">
-                <div className="text-xs font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8 flex items-center gap-3">
+                <div className="text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-400 mb-8 flex items-center gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                   {t('home.featuredCommercial.panelEyebrow')}
                 </div>
@@ -183,7 +183,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
 
                 <Link 
                   href={Routes.products()}
-                  className="flex items-center justify-center gap-3 w-full py-5 bg-white text-slate-950 font-black uppercase text-xs tracking-widest rounded-2xl transition-transform hover:bg-cyan-400 hover:scale-[1.02] active:scale-95 shadow-xl"
+                  className="flex items-center justify-center gap-3 w-full py-5 bg-white text-slate-950 font-black uppercase text-xs tracking-widest rounded-2xl transition-transform hover:bg-cyan-400 hover:scale-102 active:scale-95 shadow-xl"
                 >
                   {t('home.featuredCommercial.cta')}
                 </Link>

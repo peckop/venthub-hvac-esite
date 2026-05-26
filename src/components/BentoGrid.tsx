@@ -96,7 +96,7 @@ const BentoGrid: React.FC = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('homeGallery.title')}</h2>
           <p className="text-steel-gray">{t('homeGallery.subtitle')}</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-[140px] sm:auto-rows-[160px] md:auto-rows-[180px]">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-140 sm:auto-rows-160 md:auto-rows-180">
           <BentoCard item={items[0]} large />
           <BentoCard item={items[1]} />
           <BentoCard item={items[2]} />

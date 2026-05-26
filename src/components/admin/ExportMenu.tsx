@@ -17,7 +17,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button 
-          className={adminButtonSecondaryClass + " h-12 flex items-center gap-2 px-5 min-w-[140px]"}
+          className={adminButtonSecondaryClass + " h-12 flex items-center gap-2 px-5 min-w-140px"}
           aria-label={_t('admin.a11y.export') || 'Dışa Aktarma Menüsü'}
         >
           <Download size={16} className="text-emerald-400" />
@@ -28,9 +28,9 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
         <DropdownMenu.Content 
           sideOffset={8} 
           align="end"
-          className="z-50 min-w-[200px] glass-strong rounded-hvac-lg border border-white/10 p-2 shadow-[0_30px_60px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in-95 duration-200"
+          className="z-50 min-w-200px glass-strong rounded-hvac-lg border border-white/10 p-2 shadow-elevation-5 animate-in fade-in zoom-in-95 duration-200"
         >
-          <div className="px-3 pt-2 pb-2 text-xs font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2 mb-1">
+          <div className="px-3 pt-2 pb-2 text-xs font-black uppercase tracking-hvac-normal text-slate-500 flex items-center gap-2 mb-1">
             <FileDown size={12} />
             {_t('admin.inventory.fileFormat') || 'Dosya Formatı'}
           </div>

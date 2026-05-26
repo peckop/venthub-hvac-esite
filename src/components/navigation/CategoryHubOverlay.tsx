@@ -116,10 +116,13 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                 role="presentation"
             />
 
-            <div className={`absolute left-0 w-full top-[96px] bg-slate-900/90 backdrop-blur-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] border-b border-slate-700/50 overflow-hidden transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] origin-top z-sticky ${isAnimating ? 'max-h-[calc(100vh-96px)] scale-y-100 opacity-100 blur-none' : 'max-h-0 scale-y-95 opacity-0 blur-[2px] pointer-events-none'}`}>
-                <div className="flex h-[600px] max-w-page mx-auto">
+            <div 
+                className={`absolute left-0 w-full top-96px bg-slate-900/90 backdrop-blur-2xl shadow-elevation-5 border-b border-slate-700/50 overflow-hidden transition-colors duration-hvac-slow ease-hvac-ease origin-top z-sticky ${isAnimating ? 'scale-y-100 opacity-100 blur-none' : 'scale-y-95 opacity-0 blur-2 pointer-events-none'}`}
+                style={isAnimating ? { maxHeight: 'calc(100vh - 96px)' } : { maxHeight: '0px' }}
+            >
+                <div className="flex h-hvac-hero max-w-page mx-auto">
 
-                    <div className="w-[42%] relative hidden lg:flex flex-col justify-between p-10 bg-gradient-to-r from-transparent to-slate-800/20 border-r border-slate-700/50 overflow-hidden shrink-0">
+                    <div className="w-5/12 relative hidden lg:flex flex-col justify-between p-10 bg-gradient-to-r from-transparent to-slate-800/20 border-r border-slate-700/50 overflow-hidden shrink-0">
                         <div
                             className="absolute inset-0 opacity-40 pointer-events-none"
                             style={{
@@ -131,18 +134,18 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                         {hoveredCategory ? (
                             <>
                                 <div className="relative z-10 animate-in fade-in slide-in-from-top-4 duration-500">
-                                    <span className="inline-block mb-4 text-xs font-bold tracking-[0.2em] uppercase text-sky-400 font-mono border border-sky-400/20 bg-sky-400/10 rounded-sm px-2.5 py-1">
+                                    <span className="inline-block mb-4 text-xs font-bold tracking-hvac-normal uppercase text-sky-400 font-mono border border-sky-400/20 bg-sky-400/10 rounded-sm px-2.5 py-1">
                                         ÖNE ÇIKAN TEKNOLOJİ
                                     </span>
                                     <h3 className="text-3xl font-extrabold leading-none tracking-tight text-white mb-3" style={{ fontVariantNumeric: "tabular-nums" }}>
                                         {hoveredVm?.displayName}
                                     </h3>
-                                    <p className="text-sm leading-relaxed text-slate-400 max-w-[280px]">
+                                    <p className="text-sm leading-relaxed text-slate-400 max-w-280px">
                                         {hoveredVm?.description || 'Yüksek performanslı, akıllı endüstriyel çözüm.'}
                                     </p>
                                 </div>
 
-                                <div className="relative z-10 flex-1 flex justify-center items-center min-h-[250px] -mt-8">
+                                <div className="relative z-10 flex-1 flex justify-center items-center min-h-250px -mt-8">
                                     <div
                                         className="absolute bottom-10 inset-x-8 h-12 rounded-full blur-2xl opacity-50"
                                         style={{ background: "rgba(56, 189, 248, 0.2)" }}
@@ -167,7 +170,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                     </div>
                                 </div>
 
-                                <div className="relative z-10 flex gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[40px]">
+                                <div className="relative z-10 flex gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-10">
                                     {(() => {
                                         const metadata = hoveredCategory?.metadata as CategoryMetadata | null;
                                         const metric1 = metadata?.metric1 as { value?: string | number, label?: string } | null;
@@ -175,7 +178,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                         return (
                                             <div>
                                                 <p className="text-2xl font-bold tabular-nums leading-none text-white">{String(metric1.value || '')}</p>
-                                                <p className="mt-1 text-xs font-semibold tracking-[0.15em] uppercase text-slate-500">{String(metric1.label || '')}</p>
+                                                <p className="mt-1 text-xs font-semibold tracking-hvac-snug uppercase text-slate-500">{String(metric1.label || '')}</p>
                                             </div>
                                         )
                                     })()}
@@ -188,7 +191,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                         )}
                     </div>
 
-                    <div className="w-full lg:w-[58%] flex flex-col h-full bg-slate-900/30 backdrop-blur-xl">
+                    <div className="w-full lg:w-58% flex flex-col h-full bg-slate-900/30 backdrop-blur-xl">
                         <div className="flex items-center justify-between px-10 py-6 border-b border-slate-700/50">
                             <div className="flex items-center gap-4">
                                 {selectedParentCategory ? (
@@ -223,8 +226,8 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                             type="button"
                                             onMouseEnter={() => !isSelected && setHoveredCategory(cat)}
                                             onClick={() => { if (isSelected) { handleSubCategoryClick(cat); } else { handleCategoryClick(cat); } }}
-                                            className="group/item relative flex items-center justify-between px-5 py-4 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-colors duration-200 overflow-hidden w-full text-left
-                                                       before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-0 before:w-[3px] before:rounded-r-full before:bg-sky-400 before:transition-transform before:duration-300 hover:before:h-2/3"
+                                            className="group/item relative flex items-center justify-between px-5 py-4 rounded-xl text-slate-400 hover:text-white hover:bg-white/3 transition-colors duration-200 overflow-hidden w-full text-left
+                                                       before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-0 before:w-3px before:rounded-r-full before:bg-sky-400 before:transition-transform before:duration-300 hover:before:h-2/3"
                                         >
                                             <div>
                                                 <div className="text-base font-bold text-slate-200 group-hover/item:text-white transition-colors flex items-center gap-3">

@@ -90,7 +90,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
           >
             <div className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8">
               <BookOpen size={14} className="text-cyan-400" />
-              <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400">Technical Intelligence</span>
+              <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-400">Technical Intelligence</span>
             </div>
             
             <h1 className="text-5xl lg:text-7xl font-extralight tracking-tighter leading-tight mb-8 max-w-4xl">

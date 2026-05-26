@@ -93,7 +93,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
             {/* Main Container */}
             <div
                 ref={imageContainerRef}
-                className={`relative w-full md:max-w-[55vh] mx-auto aspect-square bg-white rounded-xl overflow-hidden border border-gray-200 group ${!is3DMode ? 'cursor-zoom-in' : ''}`}
+                className={`relative w-full md:max-w-55vh mx-auto aspect-square bg-white rounded-xl overflow-hidden border border-gray-200 group ${!is3DMode ? 'cursor-zoom-in' : ''}`}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 onClick={(e) => e.stopPropagation()}
@@ -217,7 +217,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                                 fallbackType="product"
                                 width={1200}
                                 height={1200}
-                                className="object-contain max-h-[90vh] max-w-[90vw]"
+                                className="object-contain max-h-90vh max-w-90vw"
                             />
                         )}
                     </div>

@@ -97,7 +97,7 @@ export default function AccountProfilePage() {
             <div className="pt-4 border-t border-slate-100 flex justify-end mt-2">
               <button
                 disabled={saving}
-                className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-transform hover:scale-[1.02] flex items-center gap-2"
+                className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-transform hover:scale-102 flex items-center gap-2"
               >
                 {saving ? (
                   <>

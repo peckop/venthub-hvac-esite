@@ -22,7 +22,7 @@ const ProductsHero: React.FC<ProductsHeroProps> = ({
     const { t } = useI18n()
 
     return (
-        <section className="relative min-h-[320px] rounded-2xl overflow-hidden bg-surface-navy">
+        <section className="relative min-h-320px rounded-2xl overflow-hidden bg-surface-navy">
             {/* Background Image - Optimized for LCP */}
             <div className="absolute inset-0 z-0">
                 <Image

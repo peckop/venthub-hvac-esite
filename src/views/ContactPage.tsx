@@ -58,9 +58,9 @@ const ContactPage: React.FC = () => {
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-600">Global Connectivity</span>
+            <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-600">Global Connectivity</span>
           </div>
-          <h1 className="text-5xl lg:text-8xl font-extralight tracking-tighter text-slate-900 leading-[1.1] mb-10">
+          <h1 className="text-5xl lg:text-8xl font-extralight tracking-tighter text-slate-900 leading-hvac-11 mb-10">
             Projenizi <span className="font-medium text-slate-950 italic">Birlikte Şekillendirelim</span>
           </h1>
           <p className="max-w-2xl mx-auto text-xl text-slate-500 font-light leading-relaxed">
@@ -98,15 +98,15 @@ const ContactPage: React.FC = () => {
       {/* Main Action Area */}
       <section className="py-24 bg-slate-950 text-white overflow-hidden relative">
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/20 blur-[120px] rounded-full" />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full" />
+          <div className="absolute top-0 right-0 w-500px h-500px bg-cyan-500/20 blur-120 rounded-full" />
+          <div className="absolute bottom-0 left-0 w-500px h-500px bg-blue-500/10 blur-120 rounded-full" />
         </div>
 
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div>
-              <div className="text-cyan-400 text-xs font-black uppercase tracking-[0.5em] mb-8">Direct Access</div>
-              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-8">
+              <div className="text-cyan-400 text-xs font-black uppercase tracking-hvac-wide mb-8">Direct Access</div>
+              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-hvac-11 mb-8">
                 Teknik Destek <br />
                 <span className="font-medium text-cyan-400 italic">Her An Yanınızda</span>
               </h2>
@@ -164,7 +164,7 @@ const ContactPage: React.FC = () => {
                     <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">Mesajınız</label>
                     <textarea required rows={4} className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus:ring-2 focus:ring-cyan-500 transition-colors resize-none" placeholder="İhtiyaçlarınızı buraya yazın..." />
                   </div>
-                  <button className="w-full bg-slate-950 text-white py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-transform shadow-xl active:scale-[0.98]">
+                  <button className="w-full bg-slate-950 text-white py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-transform shadow-xl active:scale-98">
                     Talebi Gönder
                   </button>
                 </form>

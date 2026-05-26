@@ -15,7 +15,7 @@ module.exports = [
       tailwindcss: tailwindcss,
     },
     rules: {
-      "tailwindcss/no-arbitrary-value": "off",
+      "tailwindcss/no-arbitrary-value": "error",
     }
   },
   {

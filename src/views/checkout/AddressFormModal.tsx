@@ -61,7 +61,7 @@ const AddressFormModal: React.FC<AddressFormModalProps> = ({
 
     return (
         <div className="fixed inset-0 z-sticky bg-black/40 flex items-center justify-center">
-            <div className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-lg overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl w-11/12 max-w-lg overflow-hidden">
                 <div className="px-5 py-4 border-b flex items-center justify-between">
                     <div className="text-industrial-gray font-semibold">{t('checkout.saved.edit')}</div>
                     <button type="button" onClick={onClose} className="text-sm text-steel-gray hover:text-primary-navy">{t('checkout.saved.cancel')}</button>

@@ -230,7 +230,7 @@ export default function AdminUsersPage() {
 
   if (!isAdmin) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-50vh space-y-4">
         <div className="p-6 bg-red-500/10 rounded-3xl border border-red-500/20 shadow-xl shadow-red-500/5">
           <AlertCircle className="text-red-500" size={48} />
         </div>
@@ -263,7 +263,7 @@ export default function AdminUsersPage() {
           <button
             onClick={() => setActiveTab('admins')}
             className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors duration-300 ${activeTab === 'admins'
-              ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.4)]'
+              ? 'bg-cyan-400 text-surface-deep shadow-glow-md'
               : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
           >
@@ -272,7 +272,7 @@ export default function AdminUsersPage() {
           <button
             onClick={() => setActiveTab('all')}
             className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors duration-300 ${activeTab === 'all'
-              ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.4)]'
+              ? 'bg-cyan-400 text-surface-deep shadow-glow-md'
               : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
           >
@@ -306,7 +306,7 @@ export default function AdminUsersPage() {
 
       <div className={adminTableContainerClass}>
         <div ref={dragScrollRef} className="overflow-x-auto custom-scrollbar">
-          <table className="w-full min-w-[900px] text-left">
+          <table className="w-full min-w-900px text-left">
             <thead>
               <tr className="glass-strong">
                 {visibleCols.user && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.user') || 'Kullanıcı'}</th>)}
@@ -335,7 +335,7 @@ export default function AdminUsersPage() {
                 </tr>
               ) : (
                 (activeTab === 'admins' ? filteredAdminUsers : filteredAllUsers).map((userItem) => (
-                  <tr key={userItem.id} className="group hover:bg-white/[0.02] transition-colors duration-300">
+                  <tr key={userItem.id} className="group hover:bg-white/2 transition-colors duration-300">
                     {visibleCols.user && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center gap-4">
@@ -446,48 +446,48 @@ export default function AdminUsersPage() {
 
       {/* Bilgilendirme Kartı */}
       <div className="glass-strong p-8 lg:p-10 rounded-hvac-2xl border border-white/5 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/5 blur-[120px] rounded-full -mr-48 -mt-48 group-hover:bg-cyan-400/10 transition-colors duration-1000" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/5 blur-120 rounded-full -mr-48 -mt-48 group-hover:bg-cyan-400/10 transition-colors duration-1000" />
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
           <div className="w-16 h-16 rounded-hvac-lg glass-strong border border-white/10 flex items-center justify-center text-cyan-400 shrink-0 shadow-xl group-hover:scale-110 transition-transform duration-700">
             <Shield size={32} />
           </div>
           <div className="flex-1">
             <h4 className="font-black text-white text-xl uppercase tracking-tight tracking-widest">{_t('admin.users.info.title') || 'Rol Yetkilendirme Rehberi'}</h4>
-            <p className="text-slate-500 text-sm mt-2 mb-8 font-bold uppercase tracking-[0.15em]">{_t('admin.users.info.subtitle') || 'Sistem güvenliği için rollerin yetki seviyelerini kontrol edin.'}</p>
+            <p className="text-slate-500 text-sm mt-2 mb-8 font-bold uppercase tracking-hvac-snug">{_t('admin.users.info.subtitle') || 'Sistem güvenliği için rollerin yetki seviyelerini kontrol edin.'}</p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 transition-transform"><Crown size={16} /></div>
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white">{_t('roles.superadmin') || 'Süperadmin'}</span>
+                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">{_t('roles.superadmin') || 'Süperadmin'}</span>
                 </div>
                 <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.superadmin') || 'Tüm sistem ayarlarına ve rol yönetimine tam erişim.'}</p>
               </div>
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-indigo-400 group-hover/item:scale-110 transition-transform"><Shield size={16} /></div>
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white">{_t('roles.admin') || 'Admin'}</span>
+                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">{_t('roles.admin') || 'Admin'}</span>
                 </div>
                 <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.admin') || 'Ürün, sipariş ve içerik yönetimi için yetki.'}</p>
               </div>
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-orange-400 group-hover/item:scale-110 transition-transform"><Package size={16} /></div>
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white">{_t('roles.warehouse') || 'Depo'}</span>
+                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">{_t('roles.warehouse') || 'Depo'}</span>
                 </div>
                 <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.warehouse') || 'Stok yönetimi ve envanter hareketleri yetkisi.'}</p>
               </div>
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-blue-400 group-hover/item:scale-110 transition-transform"><Tag size={16} /></div>
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white">{_t('roles.sales') || 'Satış'}</span>
+                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">{_t('roles.sales') || 'Satış'}</span>
                 </div>
                 <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.sales') || 'Sipariş, kargo, iade ve kupon yönetimi yetkisi.'}</p>
               </div>
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-emerald-400 group-hover/item:scale-110 transition-transform"><Eye size={16} /></div>
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white">{_t('roles.viewer') || 'İzleyici'}</span>
+                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">{_t('roles.viewer') || 'İzleyici'}</span>
                 </div>
                 <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.viewer') || 'Tüm modülleri salt-okunur (view-only) yetkisi.'}</p>
               </div>

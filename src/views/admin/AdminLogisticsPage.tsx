@@ -164,7 +164,7 @@ export default function AdminLogisticsPage() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-cyan-500/10" />
                 
                 <div className="flex-1 space-y-3 relative z-10">
-                    <label className="block text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
+                    <label className="block text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
                     <div className="relative max-w-xs">
                         <select
                             value={globalCarrier}
@@ -221,8 +221,8 @@ export default function AdminLogisticsPage() {
                                         key={row.id} 
                                         className={`group border-b border-white/5 transition-colors duration-300 ${
                                             row.saved 
-                                                ? 'bg-emerald-500/[0.03] hover:bg-emerald-500/[0.06]' 
-                                                : 'hover:bg-white/[0.02]'
+                                                ? 'bg-emerald-500/3 hover:bg-emerald-500/6' 
+                                                : 'hover:bg-white/2'
                                         }`}
                                         style={{ animationDelay: `${idx * 50}ms` }}
                                     >
@@ -233,7 +233,7 @@ export default function AdminLogisticsPage() {
                                         </td>
                                         <td className={`${adminTableCellClass} font-black text-white uppercase tracking-tight`}>{row.customer_name}</td>
                                         <td className={adminTableCellClass}>
-                                            <div className="relative min-w-[140px]">
+                                            <div className="relative min-w-140px">
                                                 <select
                                                     disabled={!hasWriteAccess || row.saved || saving}
                                                     value={row.carrier}
@@ -256,7 +256,7 @@ export default function AdminLogisticsPage() {
                                                 value={row.tracking_number}
                                                 onChange={e => updateRow(row.id, 'tracking_number', e.target.value)}
                                                 placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
-                                                className={`${adminInputClass} !py-2 !text-xs !rounded-xl !bg-surface-deep/60 !font-mono focus:!bg-white/[0.03] disabled:opacity-40`}
+                                                className={`${adminInputClass} !py-2 !text-xs !rounded-xl !bg-surface-deep/60 !font-mono focus:!bg-white/3 disabled:opacity-40`}
                                             />
                                         </td>
                                         <td className={`${adminTableCellClass} text-center`}>
@@ -276,7 +276,7 @@ export default function AdminLogisticsPage() {
                 )}
 
                 {rows.length > 0 && (
-                    <div className="p-6 bg-white/[0.02] border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-0 z-10 backdrop-blur-xl">
+                    <div className="p-6 bg-white/2 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-0 z-10 backdrop-blur-xl">
                         <div className="text-sm font-bold text-slate-400">
                             <span className="text-cyan-400 font-black text-base">{rows.filter(r => r.tracking_number).length}</span> / {rows.length} {t('admin.titles.orders')} {t('admin.ui.ready') || 'Ready'}
                         </div>
@@ -284,7 +284,7 @@ export default function AdminLogisticsPage() {
                             <button
                                 disabled={saving || rows.filter(r => r.tracking_number && !r.saved).length === 0}
                                 onClick={handleBulkSubmit}
-                                className={`${adminButtonPrimaryClass} w-full sm:w-auto px-10 relative overflow-hidden group/submit active:scale-[0.98]`}
+                                className={`${adminButtonPrimaryClass} w-full sm:w-auto px-10 relative overflow-hidden group/submit active:scale-98`}
                             >
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/submit:translate-y-0 transition-transform duration-300" />
                                 <Truck size={18} className="relative z-10 group-hover/submit:animate-bounce" />

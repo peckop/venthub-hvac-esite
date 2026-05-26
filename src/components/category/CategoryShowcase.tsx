@@ -47,7 +47,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
             <Breadcrumb items={breadcrumbItems} variant="white" />
 
             {/* Hero Section */}
-            <div className="relative h-[600px] w-full overflow-hidden bg-primary-navy">
+            <div className="relative h-hvac-hero w-full overflow-hidden bg-primary-navy">
                 {heroImage && (
                     <div className="absolute inset-0">
                         <Image
@@ -186,14 +186,14 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 initial={{ opacity: 0, x: -30 }}
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
-                                className="relative aspect-[4/5] rounded-hvac-2xl overflow-hidden shadow-2xl group"
+                                className="relative aspect-4/5 rounded-hvac-2xl overflow-hidden shadow-2xl group"
                             >
                                 <Image
                                     src="/images/vortice/vortice_lineo_loft.png"
                                     alt="Modern Loft Uygulaması"
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 600px"
-                                    className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                                    className="object-cover transition-transform duration-hvac-glacial group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                                 <div className="absolute bottom-8 left-8 right-8">
@@ -266,7 +266,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             </p>
                         </div>
                         <div className="flex justify-center">
-                            <div className="relative w-full max-w-4xl aspect-[16/9] rounded-xl overflow-hidden shadow-2xl">
+                            <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-2xl">
                                 <Image
                                     src={isQuietFan ? '/images/vortice/vortice_lineo_technical.png' : '/images/category/air-curtain-diagram.png'}
                                     alt={isQuietFan ? 'Linieo Quiet Teknik Detay' : 'Hava Perdesi Çalışma Prensibi'}
@@ -294,7 +294,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             href={Routes.category(category.slug, sub.slug)}
                             className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 border border-gray-100"
                         >
-                            <div className="aspect-[4/3] bg-light-gray relative overflow-hidden">
+                            <div className="aspect-4/3 bg-light-gray relative overflow-hidden">
                                 {sub.image_url ? (
                                     <VentImage src={`${(process.env.NEXT_PUBLIC_SUPABASE_URL || '')}/storage/v1/object/public/product-images/${sub.image_url}`}
                                         alt={getCategoryDisplayName(sub)}

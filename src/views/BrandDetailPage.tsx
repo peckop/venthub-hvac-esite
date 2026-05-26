@@ -153,7 +153,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
       <Breadcrumb items={breadcrumbItems} variant="transparent" className="pt-6" />
 
       {/* Brand Hero: Ultra Premium Cinema Look */}
-      <section className="relative h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden bg-slate-950 text-white">
+      <section className="relative h-60vh lg:h-70vh flex items-center justify-center overflow-hidden bg-slate-950 text-white">
         <div className="absolute inset-0 z-0">
           <Image 
             src="/images/hvac_installation_close_up_premium_3.png" 
@@ -164,12 +164,12 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.1),transparent_70%)]" />
+          <div className="absolute inset-0 bg-brand-detail-radial" />
         </div>
 
         <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div ref={heroIconRef} className={scrollAnimationClasses.fadeUp(heroIconVisible) + " mb-12 flex justify-center"}>
-            <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-hvac-3xl bg-white p-8 shadow-[0_0_50px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden">
+            <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-hvac-3xl bg-white p-8 shadow-white-glow-lg flex items-center justify-center overflow-hidden">
               <BrandIcon brand={brand.name} className="w-full h-full" />
             </div>
           </div>
@@ -178,17 +178,17 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
             {brand.name}
           </h1>
 
-          <div ref={heroMetaRef} className={scrollAnimationClasses.fadeIn(heroMetaVisible) + " mt-8 flex flex-wrap justify-center gap-8 text-xs font-black uppercase tracking-[0.4em] text-cyan-400"}>
+          <div ref={heroMetaRef} className={scrollAnimationClasses.fadeIn(heroMetaVisible) + " mt-8 flex flex-wrap justify-center gap-8 text-xs font-black uppercase tracking-hvac-loose text-cyan-400"}>
             <div className="flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
               {brand.country} {t('brands.detail.originSuffix')}
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
               {t('brands.detail.estPrefix')} {brand.founded}
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
               {brand.specialty}
             </div>
           </div>
@@ -198,12 +198,12 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
       {/* Brand Identity & Vision */}
       <section className="py-24 lg:py-32">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-[1fr,450px] gap-24 items-start">
+          <div className="grid lg:grid-cols-hvac-layout-detail gap-24 items-start">
             <div>
-              <div className="text-cyan-600 text-xs font-black uppercase tracking-[0.5em] mb-8 text-center lg:text-left">
+              <div className="text-cyan-600 text-xs font-black uppercase tracking-hvac-wide mb-8 text-center lg:text-left">
                 {t('brands.detail.heritage')}
               </div>
-              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-12 text-center lg:text-left text-slate-900">
+              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-hvac-11 mb-12 text-center lg:text-left text-slate-900">
                 {t('brands.detail.authorityTitle').split(' ').slice(0, 1).join(' ')} <br />
                 <span className="font-medium text-slate-950 italic">
                   {t('brands.detail.authorityTitle').split(' ').slice(1).join(' ')}
@@ -233,7 +233,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
               <div className="rounded-hvac-2xl bg-slate-950 p-10 text-white overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-3xl" />
                 <div className="relative z-10">
-                  <div className="text-xs font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8">
+                  <div className="text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-400 mb-8">
                     {t('brands.detail.corporateSnapshot')}
                   </div>
                   
@@ -288,7 +288,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 text-center md:text-left">
             <div>
-              <div className="text-cyan-600 text-xs font-black uppercase tracking-[0.5em] mb-4">Curated Solutions</div>
+              <div className="text-cyan-600 text-xs font-black uppercase tracking-hvac-wide mb-4">Curated Solutions</div>
               <h2 className="text-4xl font-light tracking-tighter text-slate-950">
                 {t('brands.detail.featuredSystems').split(' ').slice(0, 2).join(' ')} <span className="font-medium">{t('brands.detail.featuredSystems').split(' ').slice(2).join(' ')}</span>
               </h2>
@@ -296,7 +296,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
             <Link 
               href={Routes.products({ brand: brand.name })} 
               aria-label={t('brands.detail.allProductGroups')}
-              className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-colors flex items-center gap-3 justify-center"
+              className="text-xs font-bold uppercase tracking-hvac-relaxed text-slate-400 hover:text-cyan-600 transition-colors flex items-center gap-3 justify-center"
             >
               <span>{t('brands.detail.allProductGroups')}</span>
               <ArrowRight size={14} />
@@ -314,7 +314,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                   key={product.id} 
                   href={Routes.product(product.slug!)}
                   aria-label={`${product.name} ${t('pdp.details')}`}
-                  className="group block bg-white rounded-hvac-2xl p-8 border border-white transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
+                  className="group block bg-white rounded-hvac-2xl p-8 border border-white transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-hvac-card-hover"
                 >
                   <div className="aspect-square relative flex items-center justify-center mb-8 grayscale group-hover:grayscale-0 transition-transform duration-700 group-hover:scale-105">
                     <VentImage src={product.image_url} alt={product.name} className="w-full h-full object-contain" />

@@ -68,7 +68,7 @@ const SilentFanProblem: React.FC = () => {
 
                 {/* Visual Comparison */}
                 <div className={`relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '400ms' }}>
-                    <div className="aspect-video md:aspect-[21/9] relative">
+                    <div className="aspect-video md:aspect-21/9 relative">
                         <VentImage src="/images/vortice/vortice_lineo_loft.png"
                             alt="Silent Comfort"
                             className="absolute inset-0 w-full h-full object-cover"

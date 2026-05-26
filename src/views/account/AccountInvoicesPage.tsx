@@ -147,8 +147,8 @@ export default function AccountInvoicesPage() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
-      <section className="w-full lg:w-[400px] shrink-0 order-first lg:order-last">
-        <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 sm:p-8 sticky top-[100px]">
+      <section className="w-full lg:w-400px shrink-0 order-first lg:order-last">
+        <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 sm:p-8 sticky top-100px">
           <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
             {editingId ? <Edit2 className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
             {editingId ? 'Profili Düzenle' : 'Yeni Fatura Profili'}
@@ -192,7 +192,7 @@ export default function AccountInvoicesPage() {
 
             <div className="flex gap-3 pt-4 border-t border-slate-100">
               {editingId && <button type="button" onClick={resetForm} className="flex-1 h-10 border border-slate-200 rounded-lg font-bold text-slate-600">{t('common.cancel')}</button>}
-              <button disabled={saving} className="flex-[2] h-10 bg-primary-navy text-white rounded-lg font-bold disabled:opacity-50">
+              <button disabled={saving} className="flex-2 h-10 bg-primary-navy text-white rounded-lg font-bold disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (editingId ? t('common.update') : t('common.save'))}
               </button>
             </div>
