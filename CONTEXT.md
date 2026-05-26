@@ -311,5 +311,18 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 
 ---
 
-*Son güncelleme: 2026-05-25*
+## 15. Geliştirici Oturumu & Sohbet Yönetimi (Session Shortcuts)
+
+Bu projede kullanılan Antigravity CLI (`agy.exe`) konuşmalarını isimlendirmek ve yönetmek için Windows PowerShell Profilinde (`$PROFILE`) bir sistem entegrasyonu kurulmuştur:
+
+- **Erişim & Yönetim:** Geliştiricinin terminalindeki `$PROFILE` dosyasında `$AGY_SESSIONS` adında sıralı bir hashtable bulunmaktadır.
+- **Komutlar:** 
+  - `agy-list` — Kayıtlı tüm kısa isimli konuşmaları tablo halinde listeler.
+  - `go <isim>` — Belirtilen isme ait konuşmayı doğrudan açar (Örn: `go font`, `go i18n`).
+- **AI Ajanları İçin Talimat:** Kullanıcı sizden yeni bir konuşma ID'sini listeye eklemenizi, silmenizi veya ismini güncellemenizi isterse; doğrudan kullanıcının `$PROFILE` dosyasını (`C:\Users\alize\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`) okuyun, `$AGY_SESSIONS` hashtable'ını güncelleyin ve yazın. Kullanıcıya işlem sonrası `. $PROFILE` yazarak terminalini yenilemesini hatırlatın.
+
+---
+
+*Son güncelleme: 2026-05-26*
+
 
