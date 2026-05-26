@@ -81,3 +81,22 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 ## DISA AKTARILANLAR (EXPORTS)
   export: BrandsShowcase
   export: Lane
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `bg-[radial-gradient(circle_at_center,rgba(248,250,252,1)_0%,rgba(255,255,255,1)_100%)]`, `tracking-[0.3em]`, `tracking-[0.4em]`, `tracking-[0.5em]`, `transition-[filter,transform,opacity]`, `transition-[width,background-color]`, `transition-[width]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500/40`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-slate-200`, `bg-white`, `from-white`, `sm:text-5xl`, `text-3xl`, `text-center`, `text-cyan-600`, `text-slate-400`, `text-slate-900`, `text-slate-950`, `text-xs`, `to-transparent`
+- **Layout:** `absolute`, `flex`, `flex-col`, `from-white`, `gap-20`, `gap-4`, `gap-6`, `group-hover/brand:grayscale-0`, `group-hover/brand:opacity-100`, `group-hover/brand:scale-110`, `group-hover/brand:w-12`, `group-hover:bg-cyan-500`, `group-hover:w-16`, `h-24`, `h-px`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

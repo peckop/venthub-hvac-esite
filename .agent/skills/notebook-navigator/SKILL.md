@@ -38,6 +38,7 @@ Aşağıdaki tablodan sorulan sorunun kategorisine uygun defteri seçin.
 | 5. AI 3D / CAD / RECONSTRUCTION RESEARCH | `fa147b33-2b43-4bc4-8f42-2f07256dcba5` | 20 | 3D model reconstruct, Hunyuan3D, NeRF |
 | 6. AUTOMATION / DEVOPS / ORCHESTRATION | `07be9fb3-8c54-4575-a4e3-35a487b476c4` | 4 | CI/CD, Docker, deployment |
 | 7. RADAR NOTEBOOK | `f79dbb9c-4238-46c3-b29b-20a982fdf2bc` | 4 | Yeni teknoloji izleme |
+| 8. VENTHUB DESIGN SYSTEM | `a1ca5476-c6c6-42aa-b5b8-3eb565b3f100` | 16 | Tasarım token'ları, typography, shadow/spacing standartları, bileşen stil envanteri |
 
 ### 🏭 Vortice Ürün Katalogları
 | Defter | ID | Kaynak |

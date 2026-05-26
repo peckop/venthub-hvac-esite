@@ -84,3 +84,18 @@ Bu React tabanlı SEO bileşeni, web sayfalarının arama motorları tarafından
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Seo
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Responsive:** (yok)

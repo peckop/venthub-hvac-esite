@@ -64,3 +64,18 @@ React tabanlı basit ürün galerisi bileşeni SimpleProductGallery, çalışma 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SimpleProductGallery
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-200`, `border-gray-300`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-steel-gray`
+- **Layout:** `gap-3`, `grid`, `grid-cols-3`, `max-w-7xl`, `md:grid-cols-6`, `sm:grid-cols-4`, `w-full`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

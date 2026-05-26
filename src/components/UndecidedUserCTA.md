@@ -61,3 +61,22 @@ Bu istemci tarafı React bileşeni, kararsız kullanıcılara yönelik harekete 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: UndecidedUserCTA
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:scale-[1.02]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-white`, `bg-white/10`, `bg-white/20`, `from-primary-navy`, `sm:text-2xl`, `sm:text-base`, `text-primary-navy`, `text-sm`, `text-white`, `text-white/80`, `text-xl`, `to-secondary-blue`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-col`, `from-primary-navy`, `gap-2`, `gap-5`, `gap-6`, `group-hover:translate-x-1`, `h-12`, `h-32`, `h-64`, `hover:shadow-xl`, `inline-flex`
+- **Responsive:** `md:`, `sm:` prefix kullanımları

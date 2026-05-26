@@ -167,3 +167,22 @@ HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: HeroCarousel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** `h-[600px]`, `lg:h-[700px]`
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `duration-[2000ms]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-gradient-to-r`, `bg-secondary-blue`, `bg-white/10`, `bg-white/30`, `bg-white/5`, `bg-zinc-900`, `border-white/10`, `border-white/20`, `from-black/80`, `lg:text-7xl`, `text-5xl`, `text-gray-200`, `text-gray-400`, `text-secondary-blue`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `bottom-10`, `flex`, `flex-col`, `flex-wrap`, `from-black/80`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `h-1.5`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

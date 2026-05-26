@@ -74,3 +74,18 @@ MegaMenu component'inin görüntülenmesi ve kapatılması için `isOpen` ve `on
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: MegaMenu
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50/30`, `bg-white`, `border-4`, `border-b`, `border-primary-navy/20`, `border-slate-100`, `border-t-primary-navy`, `text-lg`, `text-slate-400`, `text-slate-900`, `text-white`, `text-xs`
+- **Layout:** `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `h-6`, `h-8`, `hidden`, `items-center`, `justify-between`, `justify-center`, `max-w-7xl`, `overflow-hidden`
+- **Responsive:** `sm:` prefix kullanımları

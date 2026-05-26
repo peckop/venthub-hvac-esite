@@ -85,3 +85,18 @@ Bu React tabanlı WhyVentHubEnhanced arayüz bileşeninin projeye entegre edilme
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: WhyVentHubEnhanced
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-white/5`, `border-t`, `border-white/10`, `from-primary-navy`, `md:text-4xl`, `sm:text-3xl`, `sm:text-base`, `sm:text-lg`, `sm:text-sm`, `text-2xl`, `text-base`, `text-center`, `text-gold-accent`, `text-gray-200`
+- **Layout:** `backdrop-blur-sm`, `flex`, `from-primary-navy`, `gap-2`, `gap-4`, `gap-6`, `grid`, `grid-cols-2`, `h-16`, `items-center`, `justify-center`, `max-w-2xl`, `max-w-7xl`, `md:grid-cols-3`, `md:grid-cols-4`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

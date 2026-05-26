@@ -172,3 +172,22 @@ Bu modül, HVAC projesi için geliştirilmiş, kullanıcı arayüzünde sabit du
 ## NODE ID STANDARD
 
   file: src\components\StickyHeader.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** `shadow-[0_18px_35px_-20px_rgba(37,99,235,0.7)]`
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `transition-[opacity,transform]`, `transition-[transform,box-shadow]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-r`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `from-primary-navy`, `text-left`, `text-slate-900`, `text-sm`, `text-steel-gray`, `text-white`, `text-xs`, `to-secondary-blue`
+- **Layout:** `-right-2`, `-top-2`, `absolute`, `backdrop-blur-md`, `block`, `flex`, `flex-1`, `from-primary-navy`, `gap-1.5`, `gap-2.5`, `gap-3`, `h-16`, `h-5`, `h-8`, `hidden`
+- **Responsive:** `lg:`, `md:`, `sm:`, `xl:` prefix kullanımları

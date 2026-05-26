@@ -83,3 +83,18 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoriesShowcase
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-light-gray`, `from-air-blue`, `md:text-4xl`, `text-2xl`, `text-3xl`, `text-center`, `text-gold-accent`, `text-industrial-gray`, `text-primary-navy`, `text-secondary-blue`, `text-sm`, `text-steel-gray`
+- **Layout:** `flex`, `flex-1`, `from-air-blue`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `group-hover:text-secondary-blue`, `group-hover:translate-x-1`, `hover:shadow-hvac`, `hover:shadow-sm`, `inline-flex`, `items-center`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

@@ -89,3 +89,18 @@ Bu React UI bileşeni, üst bileşenler tarafından iletilen prop'lar, proje iç
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SpotlightList
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `border-light-gray`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xs`
+- **Layout:** `absolute`, `gap-3`, `grid`, `grid-cols-1`, `hover:shadow-md`, `lg:grid-cols-4`, `max-w-7xl`, `p-4`, `relative`, `sm:grid-cols-2`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

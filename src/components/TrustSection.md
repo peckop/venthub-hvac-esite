@@ -69,3 +69,18 @@ Venthub HVAC projesindeki React tabanlı frontend TrustSection bileşeninin soru
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: TrustSection
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`, `text-warning-orange`, `to-white`
+- **Layout:** `flex`, `from-gray-50`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `hover:shadow-md`, `items-start`, `lg:grid-cols-3`, `max-w-7xl`, `p-5`, `sm:grid-cols-2`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

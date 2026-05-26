@@ -138,3 +138,18 @@ Bu varsayımlar, modülün fonksiyon imzalarından ve tipik React davranışlar�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: InViewCounter
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `border-light-gray`, `text-4xl`, `text-center`, `text-primary-navy`, `text-steel-gray`
+- **Layout:** `p-6`
+- **Responsive:** (yok)

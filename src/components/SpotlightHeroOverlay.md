@@ -71,3 +71,18 @@ Bu React bileşeni, web arayüzünde kullanıcının imlecinin olduğu bölgeyi 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SpotlightHeroOverlay
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** `absolute`, `z-10`
+- **Responsive:** (yok)

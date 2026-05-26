@@ -55,3 +55,22 @@ Bu grup, toast’ın ekranda gösterilmesi, otomatik kapanması ve kullanıcı e
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AddToCartToast
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `max-w-[92vw]`, `md:w-[360px]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-light-gray`, `border-primary-navy`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`, `text-white`, `text-xs`
+- **Layout:** `bottom-3`, `fixed`, `flex`, `flex-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `items-start`, `justify-center`, `md:bottom-6`, `md:gap-3`, `md:grid-cols-2`
+- **Responsive:** `md:` prefix kullanımları

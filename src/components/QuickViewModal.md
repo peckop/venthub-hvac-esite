@@ -104,3 +104,22 @@ Bu modül, seçilen ürünün hızlı inceleme modalını doğru şekilde görü
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: QuickViewModal
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** `w-[92%]`
+- **spacing:** (yok)
+- **diğer:** (yok)
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-2`, `border-b`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `text-2xl`, `text-6xl`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-secondary-blue/30`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `from-air-blue`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `line-clamp-2`, `line-clamp-4`
+- **Responsive:** `sm:` prefix kullanımları
