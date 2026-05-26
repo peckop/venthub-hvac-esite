@@ -3,36 +3,52 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx
-skeleton_hash: 9c98f4bb854d9145
-generated_at: 2026-05-23T22:04:04Z
+skeleton_hash: 72b54455bc94e755
+generated_at: 2026-05-26T11:43:52Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulama çözümlerini gösteren bir React bileşeni içerir. Bileşen, çeviri sözlüğünü prop olarak alarak arayüz metinlerini dinamik olarak doldurur ve kullanıcıya ilgili çözümleri sunar.
+Bu modül, ana sayfada dört farklı uygulama çözümünü (park, mutfak, giriş, konfor) kullanıcıya sunan bir React fonksiyonel bileşeni içerir. Bileşen, dışarıdan aldığı çeviri sözlüğü sayesinde tüm metinleri dinamik olarak doldurur ve çözüm kartlarını görsel bir düzen içinde render eder.
 
 ## Fonksiyon Grupları
-### Kullanıcı Arayüzü Renderlama
-Bileşen, uygulama çözümlerini görsel olarak düzenler ve görüntüler.
+### Arayüz Bileşeni
+Bu grup, çözüm kartlarını düzenleyerek ekrana basan ana bileşeni kapsar; çeviri desteği ile arayüz metinleri dinamik hale getirilir.
 - ApplicationSolutions
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
+Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması gerekir.
 
-[Aksiyom 1]: Eğer `dictionary` prop’u sağlanmazsa, `t` tanımsız olur ve çeviri fonksiyonu çağrıldığında çalışma zamanı hatası oluşur.  
-[Aksiyom 2]: Eğer `solutions` dizisi boşsa, bileşen herhangi bir çözüm öğesi render etmez ve boş bir alan gösterir.
+**Aksiyom 1**: Eğer `dictionary` (prop) sağlanmazsa, `t` tanımsız olur ve çeviri fonksiyonu (`t(...)`) çağrıldığında çalışma zamanı hatası oluşur.  
+
+**Aksiyom 2**: Eğer `solutions` sabiti (dizi) tanımlı değilse veya `undefined`/`null` ise, bileşen render aşamasında `solutions.map` gibi bir işlem yapılmaya çalışıldığında tip hatası ortaya çıkar.  
+
+**Aksiyom 3**: Eğer `solutions` dizisi boş (`[]`) ise, bileşen hiçbir çözüm öğesi render etmez ve kullanıcı arayüzünde boş bir alan (veya varsayılan placeholder) gösterilir.  
+
+**Aksiyom 4**: Eğer `solutions` dizisi içinde beklenen alanlar (ör. `title`, `description`, `icon` vb.) eksikse, ilgili UI öğeleri render edilemez ve bu alanlar için boş değerler gösterilir; ancak bileşenin genel render süreci kesilmez.  
+
+**Aksiyom 5**: Eğer `dictionary` içinde istenen çeviri anahtarları bulunmazsa, `t` fonksiyonu varsayılan olarak anahtar adını döndürür (veya boş string) ve UI’da eksik metin gösterilir; uygulama çökmez.  
+
+**Aksiyom 6**: Eğer `solutions` dizisi çok büyük (ör. binlerce öğe) ise, render performansı düşer; bu durum modülün tasarım sınırları içinde kabul edilir (performans eşiği belirtilmemiştir).  
+
+**Aksiyom 7**: Eğer `dictionary` bir fonksiyon değilse (ör. nesne veya başka bir tip), `t` çağrısı sırasında tip hatası oluşur ve bileşen render edilemez.  
+
+> **Not:** Bu aksiyomlar yalnızca fonksiyon imzası ve modül sabitlerinden (`solutions` dizisi) türetilmiştir; kod gövdesi, yorumlar veya docstring’lerden ek bilgi çıkarılmamıştır.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### ApplicationSolutions
-**Ne yapar**: ApplicationSolutions fonksiyonu, dictionary propunu alarak bir React bileşeni oluşturur.  
-**Nasıl yapar**: Fonksiyon, gelen `t` (dictionary) propunu kullanarak çeviri sağlayacak JSX döndürür; bu sayede bileşen ekrana renders edilir.  
-**Parametreler**:  
-- dictionary: t — çeviri fonksiyonunu içeren nesne, genellikle i18n veya benzeri bir kütüphaneden gelir  
-**Dönüş**: React.FC<ApplicationSolutionsProps> türünde bir React fonksiyonel bileşeni, UI'yi render eder.
+**Ne yapar**: Bu bileşen, uygulamanın "Uygulama Çözümleri" bölümünü oluşturmak ve görüntülemekle sorumludur. Kullanıcıya sunulacak çözümlerin listesini veya detaylarını içeren arayüzü temsil eder. Genellikle ana sayfa veya ilgili sayfalarda yer alarak ürün veya hizmet çözümlerini sergiler.
+
+**Nasıl yapar**: Bileşen, dışarıdan `dictionary` adında bir prop (genellikle `t` olarak aliaslanır) alarak içerik yönetimi veya çoklu dil desteği sağlar. Bu veriyi kullanarak JSX yapısını oluşturur ve `ApplicationSolutionsProps` tipine uygun bir React bileşeni döndürür. İçerik, prop olarak gelen sözlüğe dinamik olarak bağlanır.
+
+**Parametreler**:
+- dictionary: object (t olarak aliaslanmıştır) — Bileşen içindeki metinlerin, başlıkların veya verilerin yerelleştirilmesi veya sağlanması için kullanılan nesne.
+
+**Dönüş**: `React.FC<ApplicationSolutionsProps>` — Uygulama çözümleri arayüzünü tanımlayan ve render eden bir React Fonksiyonel Bileşeni.
 
 ---
 
@@ -49,7 +65,7 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 - `title: string`
 - `subtitle: string`
 - `viewAll: string`
-- `items: Record<string, {`
+- `items: Record<string, {`
 
 ### ApplicationSolutionsProps
 - `dictionary: LocalizedDict`
@@ -60,24 +76,27 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 - **solutions** (array) — `[
   { 
     id: 'parking', 
-    href: '/category/industrial-ventilation/jet-fa...`
+    href: '/category/industrial-ventilation/jet...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx::ApplicationSolutions
-- **params**: dictionary: t
-- **ic_degiskenler**: 
-  - *yok* — fonksiyon gövdesinde yeni bir değişken tanımı bulunmamaktadır; dışarıdan `solutions` sabiti ve `t` parametresi kullanılır.
-- **Dönüş**: React.FC<ApplicationSolutionsProps> (JSX elementi döner)
+- **params**: ({ dictionary: t })
+- **ic_degiskenler**:
+  - `t` — dışarıdan gelen çeviri nesnesi; `t.eyebrow`, `t.title`, `t.subtitle`, `t.viewAll` ve `t.items` gibi alanları içerir.
+  - `solutions` — dosya üstünde tanımlı sabit dizi; her eleman `id`, `href`, `image`, `span` gibi alanlar taşır.
+- **Dönüş**: React element (JSX) – bir `<section>` yapısı döner; yan etkisi yoktur, sadece UI üretir.
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx::(item, index) => {}
-- **params**: item, index
-- **ic_degiskenler**: 
-  - `itemDict` — `t.items[item.id]` değerini alır; tanımsızsa `{ title: '', eyebrow: '', description: '', point1: '', point2: '' }` varsayılan nesnesini kullanarak kartın başlık, altyazı, açıklama ve iki özellik metni için veri kaynağı sağlar.
-  - `delayClass` — `['delay-0','delay-150','delay-300','delay-500','delay-700'][index % 5]` ifadesiyle indekse göre 0, 150, 300, 500, 700 ms gecikme sınıfı seçer; bu sınıf öğeye stagger (dağınık) fade‑up animasyonu uygulanmasını sağlar.
-- **Dönüş**: JSX.Element (map içinde döndürülen `<div>` kartı)
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx::(item, index) => { … }
+- **params**: (item, index)
+- **ic_degiskenler**:
+  - `item` — `solutions` dizisinden gelen tek bir öğe; `id`, `href`, `image`, `span` vb. alanları vardır.
+  - `index` — `solutions.map` içinde öğenin sırası, gecikme sınıfı hesaplamak için kullanılır.
+  - `itemDict` — `t.items[item.id]` üzerinden alınan çeviri nesnesi; bulunamazsa `{ title: '', eyebrow: '', description: '', point1: '', point2: '' }` varsayılanı kullanılır.
+  - `delayClass` — `index % 5` sonucuna göre `'delay-0' | 'delay-150' | 'delay-300' | 'delay-500' | 'delay-700'` değerlerinden birini alır; animasyon gecikmesini belirler.
+- **Dönüş**: React element (JSX) – bir `<div>` içinde `<Link>` ve `<Image>` bileşenleriyle kart UI’sı döner; yan etkisi yoktur.
 
 ---
 

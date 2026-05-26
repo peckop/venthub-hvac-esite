@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-25T16:28:54.304230+00:00
-total_compiled_files: 433
+compiled_at: 2026-05-26T12:32:04.557963+00:00
+total_compiled_files: 434
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-25T16:28:54.304230+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-26T12:32:04.557963+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -17322,36 +17322,52 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx
-skeleton_hash: 9c98f4bb854d9145
-generated_at: 2026-05-23T22:04:04Z
+skeleton_hash: 72b54455bc94e755
+generated_at: 2026-05-26T11:43:52Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulama çözümlerini gösteren bir React bileşeni içerir. Bileşen, çeviri sözlüğünü prop olarak alarak arayüz metinlerini dinamik olarak doldurur ve kullanıcıya ilgili çözümleri sunar.
+Bu modül, ana sayfada dört farklı uygulama çözümünü (park, mutfak, giriş, konfor) kullanıcıya sunan bir React fonksiyonel bileşeni içerir. Bileşen, dışarıdan aldığı çeviri sözlüğü sayesinde tüm metinleri dinamik olarak doldurur ve çözüm kartlarını görsel bir düzen içinde render eder.
 
 ## Fonksiyon Grupları
-### Kullanıcı Arayüzü Renderlama
-Bileşen, uygulama çözümlerini görsel olarak düzenler ve görüntüler.
+### Arayüz Bileşeni
+Bu grup, çözüm kartlarını düzenleyerek ekrana basan ana bileşeni kapsar; çeviri desteği ile arayüz metinleri dinamik hale getirilir.
 - ApplicationSolutions
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
+Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması gerekir.
 
-[Aksiyom 1]: Eğer `dictionary` prop’u sağlanmazsa, `t` tanımsız olur ve çeviri fonksiyonu çağrıldığında çalışma zamanı hatası oluşur.  
-[Aksiyom 2]: Eğer `solutions` dizisi boşsa, bileşen herhangi bir çözüm öğesi render etmez ve boş bir alan gösterir.
+**Aksiyom 1**: Eğer `dictionary` (prop) sağlanmazsa, `t` tanımsız olur ve çeviri fonksiyonu (`t(...)`) çağrıldığında çalışma zamanı hatası oluşur.  
+
+**Aksiyom 2**: Eğer `solutions` sabiti (dizi) tanımlı değilse veya `undefined`/`null` ise, bileşen render aşamasında `solutions.map` gibi bir işlem yapılmaya çalışıldığında tip hatası ortaya çıkar.  
+
+**Aksiyom 3**: Eğer `solutions` dizisi boş (`[]`) ise, bileşen hiçbir çözüm öğesi render etmez ve kullanıcı arayüzünde boş bir alan (veya varsayılan placeholder) gösterilir.  
+
+**Aksiyom 4**: Eğer `solutions` dizisi içinde beklenen alanlar (ör. `title`, `description`, `icon` vb.) eksikse, ilgili UI öğeleri render edilemez ve bu alanlar için boş değerler gösterilir; ancak bileşenin genel render süreci kesilmez.  
+
+**Aksiyom 5**: Eğer `dictionary` içinde istenen çeviri anahtarları bulunmazsa, `t` fonksiyonu varsayılan olarak anahtar adını döndürür (veya boş string) ve UI’da eksik metin gösterilir; uygulama çökmez.  
+
+**Aksiyom 6**: Eğer `solutions` dizisi çok büyük (ör. binlerce öğe) ise, render performansı düşer; bu durum modülün tasarım sınırları içinde kabul edilir (performans eşiği belirtilmemiştir).  
+
+**Aksiyom 7**: Eğer `dictionary` bir fonksiyon değilse (ör. nesne veya başka bir tip), `t` çağrısı sırasında tip hatası oluşur ve bileşen render edilemez.  
+
+> **Not:** Bu aksiyomlar yalnızca fonksiyon imzası ve modül sabitlerinden (`solutions` dizisi) türetilmiştir; kod gövdesi, yorumlar veya docstring’lerden ek bilgi çıkarılmamıştır.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### ApplicationSolutions
-**Ne yapar**: ApplicationSolutions fonksiyonu, dictionary propunu alarak bir React bileşeni oluşturur.  
-**Nasıl yapar**: Fonksiyon, gelen `t` (dictionary) propunu kullanarak çeviri sağlayacak JSX döndürür; bu sayede bileşen ekrana renders edilir.  
-**Parametreler**:  
-- dictionary: t — çeviri fonksiyonunu içeren nesne, genellikle i18n veya benzeri bir kütüphaneden gelir  
-**Dönüş**: React.FC<ApplicationSolutionsProps> türünde bir React fonksiyonel bileşeni, UI'yi render eder.
+**Ne yapar**: Bu bileşen, uygulamanın "Uygulama Çözümleri" bölümünü oluşturmak ve görüntülemekle sorumludur. Kullanıcıya sunulacak çözümlerin listesini veya detaylarını içeren arayüzü temsil eder. Genellikle ana sayfa veya ilgili sayfalarda yer alarak ürün veya hizmet çözümlerini sergiler.
+
+**Nasıl yapar**: Bileşen, dışarıdan `dictionary` adında bir prop (genellikle `t` olarak aliaslanır) alarak içerik yönetimi veya çoklu dil desteği sağlar. Bu veriyi kullanarak JSX yapısını oluşturur ve `ApplicationSolutionsProps` tipine uygun bir React bileşeni döndürür. İçerik, prop olarak gelen sözlüğe dinamik olarak bağlanır.
+
+**Parametreler**:
+- dictionary: object (t olarak aliaslanmıştır) — Bileşen içindeki metinlerin, başlıkların veya verilerin yerelleştirilmesi veya sağlanması için kullanılan nesne.
+
+**Dönüş**: `React.FC<ApplicationSolutionsProps>` — Uygulama çözümleri arayüzünü tanımlayan ve render eden bir React Fonksiyonel Bileşeni.
 
 ---
 
@@ -17368,7 +17384,8 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 - `title: string`
 - `subtitle: string`
 - `viewAll: string`
-- `items: Record<string, {`
+- `items: Record<string, {
+`
 
 ### ApplicationSolutionsProps
 - `dictionary: LocalizedDict`
@@ -17377,26 +17394,32 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 
 ## SABİTLER
 - **solutions** (array) — `[
+
   { 
+
     id: 'parking', 
-    href: '/category/industrial-ventilation/jet-fa...`
+
+    href: '/category/industrial-ventilation/jet...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx::ApplicationSolutions
-- **params**: dictionary: t
-- **ic_degiskenler**: 
-  - *yok* — fonksiyon gövdesinde yeni bir değişken tanımı bulunmamaktadır; dışarıdan `solutions` sabiti ve `t` parametresi kullanılır.
-- **Dönüş**: React.FC<ApplicationSolutionsProps> (JSX elementi döner)
+- **params**: ({ dictionary: t })
+- **ic_degiskenler**:
+  - `t` — dışarıdan gelen çeviri nesnesi; `t.eyebrow`, `t.title`, `t.subtitle`, `t.viewAll` ve `t.items` gibi alanları içerir.
+  - `solutions` — dosya üstünde tanımlı sabit dizi; her eleman `id`, `href`, `image`, `span` gibi alanlar taşır.
+- **Dönüş**: React element (JSX) – bir `<section>` yapısı döner; yan etkisi yoktur, sadece UI üretir.
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx::(item, index) => {}
-- **params**: item, index
-- **ic_degiskenler**: 
-  - `itemDict` — `t.items[item.id]` değerini alır; tanımsızsa `{ title: '', eyebrow: '', description: '', point1: '', point2: '' }` varsayılan nesnesini kullanarak kartın başlık, altyazı, açıklama ve iki özellik metni için veri kaynağı sağlar.
-  - `delayClass` — `['delay-0','delay-150','delay-300','delay-500','delay-700'][index % 5]` ifadesiyle indekse göre 0, 150, 300, 500, 700 ms gecikme sınıfı seçer; bu sınıf öğeye stagger (dağınık) fade‑up animasyonu uygulanmasını sağlar.
-- **Dönüş**: JSX.Element (map içinde döndürülen `<div>` kartı)
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx::(item, index) => { … }
+- **params**: (item, index)
+- **ic_degiskenler**:
+  - `item` — `solutions` dizisinden gelen tek bir öğe; `id`, `href`, `image`, `span` vb. alanları vardır.
+  - `index` — `solutions.map` içinde öğenin sırası, gecikme sınıfı hesaplamak için kullanılır.
+  - `itemDict` — `t.items[item.id]` üzerinden alınan çeviri nesnesi; bulunamazsa `{ title: '', eyebrow: '', description: '', point1: '', point2: '' }` varsayılanı kullanılır.
+  - `delayClass` — `index % 5` sonucuna göre `'delay-0' | 'delay-150' | 'delay-300' | 'delay-500' | 'delay-700'` değerlerinden birini alır; animasyon gecikmesini belirler.
+- **Dönüş**: React element (JSX) – bir `<div>` içinde `<Link>` ve `<Image>` bileşenleriyle kart UI’sı döner; yan etkisi yoktur.
 
 ---
 
@@ -18479,16 +18502,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\KnowledgeBlock.tsx
-skeleton_hash: eb2f6a9da217d8e6
-generated_at: 2026-05-23T22:06:53Z
+skeleton_hash: 6f7ef05f64566f7e
+generated_at: 2026-05-26T11:44:16Z
 ---
 
 ## Genel Bakış
-KnowledgeBlock, ana sayfada bilgi kartlarını gösteren yeniden kullanılabilir bir React bileşenidir. Çeviri sözlüğü, deneyim istatistikleri ve çağrı‑eylem butonu gibi verileri alarak kullanıcıya özelleştirilmiş bir içerik bloğu sunar.
+KnowledgeBlock, ana sayfada bilgi kartlarını görüntüleyen, yeniden kullanılabilir bir React bileşenidir. Çeviri sözlüğü, deneyim istatistikleri ve çağrı-eylem butonu gibi verileri prop olarak alır ve kullanıcıya özelleştirilmiş bir içerik bloğu sunar.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Bileşenin render mantığını ve prop'larıyla etkileşimini yönetir.
+Bileşenin render mantığını ve prop’larla etkileşimini yönetir.
 - KnowledgeBlock
 
 ---
@@ -18498,17 +18521,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+---
+
 ## FONKSIYON DETAYLARI
 
 ### KnowledgeBlock
-**Ne yapar**: KnowledgeBlock bileşeni, verilen çeviri fonksiyonu, final CTA verileri, istatistik ve deneyim bilgileri ve quote tıklama olayını işleyen callback ile bir bilgi bloğu render eder.  
-**Nasıl yapar**: Props olarak alınan dictionary (t) ile metinleri yerelleştirir, finalCtaDict ve statsExperience verilerini kullanarak ilgili bölümleri doldurur ve onQuoteClick fonksiyonunu quote öğelerine bağlayarak kullanıcı etkileşimini yönetir.  
-**Parametreler**:  
-- dictionary: t — Çeviri fonksiyonu, component içindeki metinleri yerelleştirmek için kullanılır.  
-- finalCtaDict: — Final çağrı-eylem (CTA) verileri, genellikle buton metni, link ve benzeri içerikleri içerir.  
-- statsExperience: — İstatistik ve deneyim verileri, bileşenin içinde gösterilecek sayısal veya metinsel bilgileri taşır.  
-- onQuoteClick: — Quote öğelerine tıklandığında çağrılacak callback fonksiyonu, genellikle quote detayını göstermek veya başka bir eylem tetiklemek için kullanılır.  
-**Dönüş**: React.FC<KnowledgeBlockProps> — Render edilen KnowledgeBlock bileşenini döndürür, JSX elementi olarak kullanıma hazır.
+**Ne yapar**: VentHub HVAC projesinin ana sayfasında kullanılan, kullanıcılara sektör deneyimi istatistiklerini ve harekete geçme çağrılarını sunan React bilgi bloğu bileşenidir. Kullanıcıların teklif alma sürecine başlamasını sağlayan tıklama olayını yönetir, arayüzdeki tüm metinleri dinamik olarak kendisine aktarılan sözlüklerden çekerek görüntüler.
+**Nasıl yapar**: Tanımlı tipteki propsları alarak içerdiği metin ve veri kaynaklarını yapılandırır, sektör deneyimi verisini kullanıcı arayüzüne yansıtır. Kullanıcı teklif alma butonuna tıkladığında kendisine aktarılan geri çağırma fonksiyonunu tetikleyerek ilgili akışı başlatır, React.FC yapısı ile tip güvenliği sağlar.
+**Parametreler**:
+- dictionary: t — Bileşen içerisinde kullanılacak tüm arayüz metinlerini barındıran, çok dilli destek sağlayan ana sözlük objesidir
+- finalCtaDict: Bilgi bloğunun sonunda yer alan harekete geçme çağrısı (CTA) bölümündeki metinleri içeren özel sözlük yapısıdır
+- statsExperience: Kullanıcılara gösterilecek şirketin sektör deneyimini, başarı istatistiklerini içeren veri objesidir
+- onQuoteClick: Kullanıcı teklif alma butonuna tıkladığında tetiklenmesi gereken işlevleri yürüten callback fonksiyonudur
+**Dönüş**: KnowledgeBlockProps tipinde tanımlanmış, tüm metin, veri ve kullanıcı etkileşimlerini entegre etmiş, ana sayfada kullanılmak üzere yapılandırılmış React bileşeni döndürür.
 
 ---
 
@@ -18520,8 +18545,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `icon: React.ReactNode`
 
 ### KnowledgeBlockProps
-- `dictionary: {`
-- `finalCtaDict: {`
+- `dictionary: {
+`
+- `finalCtaDict: {
+`
 - `statsExperience: string`
 - `onQuoteClick?: () => void`
 
@@ -18529,26 +18556,41 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **knowledgeItems** (array) — `[
+
   { 
+
     id: 'guides', 
+
     href: Routes.destek.home(),
+
     icon: (
-      <...`
+
+  ...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/home/KnowledgeBlock.tsx::KnowledgeBlock
-- **params**: dictionary: t (renamed), finalCtaDict, statsExperience, onQuoteClick
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (React.FC<KnowledgeBlockProps>)
-
-### [N2_NASIL] AST Pointer: src/components/home/KnowledgeBlock.tsx::map callback
-- **params**: item, index
+- **params**: ({ dictionary: t, finalCtaDict, statsExperience, onQuoteClick })
 - **ic_degiskenler**:
-  - `delayClass` — string containing animation delay class (e.g., 'delay-0', 'delay-100', 'delay-200') derived from `index % 3`
-- **Dönüş**: JSX element (Link component wrapping a knowledge item)
+  - `t` — çeviri nesnesi, `t.eyebrow`, `t.subtitle`, `t.items`, `t.cta` gibi alanları içerir.
+  - `finalCtaDict` — CTA (call‑to‑action) metinlerini tutan nesne; `finalCtaDict.primaryCta` ve `finalCtaDict.secondaryCta` kullanılır.
+  - `statsExperience` — istatistik metni, alt bölümde gösterilir.
+  - `onQuoteClick` — butona tıklandığında tetiklenen callback fonksiyonu, `ClientLeadButton` bileşenine prop olarak aktarılır.
+  - `knowledgeItems` — dışarıdan import edilen sabit dizi; her öğe `{id, href, icon}` alanlarına sahiptir ve `map` içinde iterasyon yapılır.
+  - `item` — `knowledgeItems.map` içinde her bir öğeyi temsil eder; `item.id`, `item.href`, `item.icon` alanları kullanılır.
+  - `index` — `knowledgeItems.map` içinde öğenin sırasını gösterir; `index` ile gecikme sınıfı ve numaralandırma yapılır.
+  - `delayClass` — `['delay-0','delay-100','delay-200'][index % 3]` ifadesiyle oluşturulan gecikme CSS sınıfı, öğenin animasyon gecikmesini belirler.
+- **Dönüş**: React element (`<section>...</section>`) – bileşen render eder, yan etkisi yoktur.  
+
+### [N2_NASIL] AST Pointer: src/components/home/KnowledgeBlock.tsx::(item, index) => { … }
+- **params**: (item, index)
+- **ic_degiskenler**:
+  - `item` — `knowledgeItems` dizisinden gelen tek bir öğe; `item.id`, `item.href`, `item.icon` alanları kullanılır.
+  - `index` — öğenin dizideki konumu; `index` ile `delayClass` ve numaralandırma (`0{index + 1}`) oluşturulur.
+  - `delayClass` — `['delay-0','delay-100','delay-200'][index % 3]` ifadesiyle elde edilen CSS sınıfı, animasyon gecikmesini ayarlar.
+- **Dönüş**: React element (`<div key={item.id}>...</div>`) – her `knowledgeItem` için bir kart render eder.
 
 ---
 
@@ -18726,52 +18768,70 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\StrategicBrands.tsx
-skeleton_hash: df747cf2de34c67b
-generated_at: 2026-05-23T22:07:38Z
+skeleton_hash: c335ec57d52a12da
+generated_at: 2026-05-26T11:44:57Z
 ---
 
-## Genel Bakış
-StrategicBrands.tsx, ana sayfada stratejik markaları gösteren bir React bileşenini tanımlar. Bu bileşen, çeviri fonksiyonu üzerinden içerikleri yerelleştirerek dinamik bir şekilde marka kartlarını renderlar.
+## Genel Bakış  
+StrategicBrands.tsx, ana sayfada “Stratejik Markalar” başlıklı bir bölümü oluşturur. Bileşen, dışarıdan gelen çeviri sözlüğü (`dictionary`) ile metinleri yerelleştirir ve bu verileri kullanarak marka kartlarını dinamik olarak renderlar. Tek dışa açık fonksiyon, bu işlevi sağlayan `StrategicBrands` bileşenidir.
 
-## Fonksiyon Grupları
-### Ana Bileşen
-Bu grup, modülün tek dışa açık işlevi olan StrategicBileşenini içer; bu fonksiyon, prop olarak alınan sözlük nesnesini kullanarak ekranın görüntüsünü oluşturur.
-- StrategicBrands
+## Fonksiyon Grupları  
+### Ana Bileşen  
+Bu grup, modülün tek işlevini içerir: kullanıcı arayüzünü oluşturmak.  
+- StrategicBrands  
+
+Bileşen, `dictionary` prop’u üzerinden çeviri fonksiyonunu (`t`) alır, gerekli metinleri çeker ve JSX ile marka kartlarını ekrana yerleştirir. Böylece dil desteği sağlanır ve bileşen yeniden render edildiğinde güncel çeviriler gösterilir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için aşağıdaki aksiyomlar geçerlidir.
+StrategicBrands bileşeni, **`dictionary`** prop’u üzerinden alınan **`t`** adlı çeviri fonksiyonuna dayanır; bu fonksiyonun varlığı ve davranışı bileşenin doğru çalışması için zorunludur.
 
-[Aksiyom 1]: Eğer `dictionary` prop'u sağlanmazsa, component içindeki `t` fonksiyonu tanımsız olur ve `t(...)` çağrısı çalışma zamanında hata verir.  
-[Aksiyom 2]: Eğer `dictionary` prop'u bir fonksiyon değilse (örneğin string veya nesne), `t(...)` çağrısı çalışma zamanında bir hata fırlatır.
+**Aksiyom 1**: Eğer `dictionary` prop’u **sağlanmazsa**, `t` değişkeni `undefined` olur ve bileşen içinde `t(...)` çağrısı **çalışma zamanında bir `TypeError` üretir**.  
+
+**Aksiyom 2**: Eğer `dictionary` prop’u **fonksiyon değilse** (ör. string, nesne, sayı vb.), `t` bir fonksiyon olmadığı için `t(...)` çağrısı **çalışma zamanında bir `TypeError` üretir**.  
+
+**Aksiyom 3**: Eğer `t` fonksiyonu **bir string anahtar alıp string döndürmezse** (ör. `null`, `undefined`, nesne vb.), JSX içinde beklenmeyen tip ortaya çıkar ve **React render hatası** meydana gelir.  
+
+**Aksiyom 4**: Eğer `t` fonksiyonu **aynı anahtar için tutarsız sonuçlar döndürürse**, bileşenin UI’sı **kararsız ve kullanıcı deneyimi bozulur** (ör. aynı marka kartı farklı dillerde farklı metin gösterir).  
+
+### Domain‑specific kurallar
+- `t` **her zaman** bir **string** anahtar (`key: string`) almalı ve **string** (`translated: string`) döndürmelidir.  
+- `t` fonksiyonunun **yan etkisi olmamalıdır**; aynı giriş için aynı çıktıyı üretmelidir (deterministik olmalı).  
+
+Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağımlılığını** ve bu fonksiyonun eksik, hatalı tipte ya da tutarsız olması durumunda ortaya çıkacak hataları tanımlar.
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### StrategicBrands
-**Ne yapar**: StrategicBrands bileşeni, verilen çeviri sözlüğünü kullanarak “Strategik Markalar” bölümünü renderlar ve kullanıcıya ilgili marka bilgilerini sunar.  
-**Nasıl yapar**: Bileşen, props olarak gelen `dictionary` nesnesinden gerekli çeviri dizelerini çeker, ardından içindeki verileri (örnek: marka logoları, açıklamalar) JSX ile eşleştirerek DOM’a yerleştirir. Bu sayede dil desteği sağlanır ve bileşen yeniden renderlandığında çeviriler güncel kalır.  
-**Parametreler**:  
-- dictionary: Record<string, string> — Anahtar‑değer çiftlerinden oluşan çeviri nesnesi; her anahtar bir UI metnini (örn. başlık, açıklama) temsil eder ve değeri ilgili dildeki çeviridir.  
-**Dönüş**: React.FC<StrategicBrandsProps> — Bileşen, render edildiğinde JSX elementi döndürür; bu element “Strategik Markalar” bölümünün tamamlığını temsil eder ve React ağacına eklenebilir.
+**Ne yapar**: Bu React işlevsel bileşeni, VentHub HVAC platformunun ana sayfasındaki stratejik markalar bölümünü render eder. Kullanıcıların platformla çalıştığı resmi markaları görmesini sağlayan, duyarlı ve yerelleştirilmiş bir UI bölümü oluşturur.
+**Nasıl yapar**: Bileşen, aldığı destructured props içindeki `dictionary` değerini `t` olarak takma adlandırır. Bu prop aracılığıyla uygulamanın i18n çeviri sözlüğüne erişir, bileşenin tüm statik metinlerini yerelleştirir. Standart React render akışını kullanarak marka logoları, isimleri ve ilgili açıklama metinlerini içeren bir container yapısı oluşturur ve ekrana basar.
+**Parametreler**:
+- dictionary: StrategicBrandsProps["dictionary"] — Bileşene iletilen çeviri sözlüğü veya fonksiyonudur, kod içinde `t` olarak kısaltılır. Yerelleştirilmiş metinler kullanarak bileşenin dil bağımsız çalışmasını sağlar.
+**Dönüş**: React.FC<StrategicBrandsProps> tipinde bir bileşen döner, yani belirtilen props tipini alarak geçerli bir React UI elemanı render eder.
 
 ---
 
 ## INTERFACES
 
 ### StrategicBrandsProps
-- `dictionary: {`
+- `dictionary: {
+`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\StrategicBrands.tsx::StrategicBrands
-- **params**: dictionary: t
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element
+### [N1_NASIL] AST Pointer: src\components\home\StrategicBrands.tsx::StrategicBrands
+- **params**: Bir nesne alır, bu nesnenin `dictionary` özelliği `t` olarak adlandırılır (çeviri/metin verilerini taşır).
+- **ic_degiskenler**: 
+  - `t` — fonksiyona parametre olarak gelen çeviri/metin verilerini içeren nesne (dictionary).
+  - `t.eyebrow` — `t` nesnesinden alınan, bileşenin "eyebrow" metnini temsil eden değer.
+  - `t.title` — `t` nesnesinden alınan, bileşenin başlık metnini temsil eden değer.
+  - `t.subtitle` — `t` nesnesinden alınan, bileşenin alt başlık metnini temsil eden değer.
+- **Dönüş**: JSX öğesi (React bileşeni).
 
 ---
 
@@ -18793,16 +18853,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx
-skeleton_hash: a5f3970a11e5b758
-generated_at: 2026-05-23T22:08:05Z
+skeleton_hash: 3990bf5913c326a6
+generated_at: 2026-05-26T12:21:16Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıya güven kanıtı gösteren bir bölüm (TrustProofSection) sunan bir React bileşenini içerir. Bileşen, çeviri sözlüğü ve güven strisi sözlüğü gibi dışarıdan gelen verileri alarak içeriği dinamik olarak doldurur ve görsel olarak güvenilirliği vurgulayan bir arayüz oluşturur.
+Bu modül, Venthub HVAC projesinin ana sayfasında kullanıcıya güven kanıtı göstergeleri sunan bir React bileşenini içerir. Bileşen, dışarıdan sağlanan çeviri sözlüğü ve güven şeridi verilerini kullanarak içeriği dinamik olarak doldurur ve markanın güvenilirliğini vurgulayan görsel bir arayüz bölümü oluşturur.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Bu grup, modülün tek işlevini oluşturan bileşeni içerir; dışarıdan gelen çeviri ve güven strisi verilerini kullanarak güven kanıtı bölümünü render eder.
+Bu grup, modülün tek temel işlevini yerine getiren bileşeni içerir; gelen çeviri ve güven şeridi verilerini işleyerek güven kanıtı bölümünü kullanıcıya sunar.
 - TrustProofSection
 
 ---
@@ -18815,12 +18875,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSIYON DETAYLARI
 
 ### TrustProofSection
-**Ne yapar**: TrustProofSection bileşeni, sağlanan sözlük ve trust strip verilerini kullanarak güven kanıtı bölümünü render eder.  
-**Nasıl yapar**: Props olarak gelen `dictionary` nesnesinden çeviri fonksiyonunu `t` olarak çıkarır ve `trustStripDict` verilerini iterate ederek her bir güven kanıtı öğesini JSX olarak döndürür; ardından bu öğeleri uygun bir wrapper içinde döner.  
+**Ne yapar**: Verilen çeviri sözlükleri (`dictionary` ve `trustStripDict`) kullanılarak güven kanıtı (trust proof) içeren bir React bileşeni oluşturur. Bu bileşen, uygulamanın ana sayfasında güvenilirlik göstergelerini görsel olarak sunar.  
+
+**Nasıl yapar**: Fonksiyon, `dictionary` ve `trustStripDict` nesnelerini parametre olarak alır, bu verileri bileşenin içindeki metin ve görsel öğelere bağlar. Ardından, JSX yapısını döndürerek `TrustProofSectionProps` tipinde bir React fonksiyonel bileşeni üretir.  
+
 **Parametreler**:
-- dictionary: object — Çeviri anahtarlarını değerlere eşleyen nesne; `t` özelliği üzerinden çevrilen metinlere erişim sağlar.  
-- trustStripDict: object — Güven kanıtı bölümünde gösterilecek öğelerin veri kümesi; her bir öğe genellikle başlık, açıklama ve ikon gibi alanları içerir.  
-**Dönüş**: React.FC<TrustProofSectionProps> — Render edilen TrustProofSection bileşeni; JSX elementi döndürür.
+- `dictionary`: object — Genel metin çevirileri için kullanılan sözlük, bileşenin başlık ve açıklama metinlerini içerir.  
+- `trustStripDict`: object — Güven kanıtı şeridiyle ilgili çevirileri barındıran sözlük, şerit üzerindeki etiket ve açıklamaları sağlar.  
+
+**Dönüş**: React.FC\<TrustProofSectionProps\> — `TrustProofSectionProps` tipinde özellikler alabilen bir fonksiyonel React bileşeni.
 
 ---
 
@@ -18832,7 +18895,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `subtitle?: string`
 - `visualAlt?: string`
 - `badge?: string`
-- `items?: Record<string, {`
+- `items?: Record<string, {
+`
 
 ### TrustStripDict
 
@@ -18844,32 +18908,46 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **proofItems** (as_expression) — `[
+
   { 
+
     key: 'brands', 
+
     icon: (
-      <svg width="20" height="20" view...`
+
+      <svg width="20" height="20" ...`
 - **trustStripKeys** (as_expression) — `['authorizedBrands', 'engineeringSupport', 'nationwideDelivery', 'projectGuid...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/home/TrustProofSection.tsx::TrustProofSection
-- **params**: dictionary: t, trustStripDict: stripDict
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element
-
-### [N2_NASIL] AST Pointer: src/components/home/TrustProofSection.tsx::trustStripKeys.map callback
-- **params**: key
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element
-
-### [N3_NASIL] AST Pointer: src/components/home/TrustProofSection.tsx::proofItems.map callback
-- **params**: item, index
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx::TrustProofSection
+- **params**: ({ dictionary: t, trustStripDict: stripDict })
 - **ic_degiskenler**:
-  - `itemDict` — object derived from t.items?.[item.key] with fallback {eyebrow:'',title:'',description:''}, used to access eyebrow, title, description for rendering each proof item.
-  - `delayClass` — string selected from ['delay-0','delay-100','delay-200','delay-300'] based on index % 4, applied to animate fade‑up delay.
-- **Dönüş**: JSX.Element
+  - `t` — dışarıdan gelen sözlük nesnesi; bileşen içinde metin (eyebrow, title, subtitle, vb.) sağlamak için kullanılır.
+  - `stripDict` — dışarıdan gelen nesne; `trustStripKeys` elemanlarını karşılık gelen metinlerle eşleştirir.
+  - `trustStripKeys` — dosyada tanımlı sabit dizi; güven rozetlerinin anahtarlarını tutar ve haritalama için döngüde kullanılır.
+  - `proofItems` — dosyada tanımlı sabit dizi; detaylı kartların verisini (key, icon, vb.) içerir.
+- **Dönüş**: JSX.Element (React bileşeni)
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx::trustStripKeys.map callback
+- **params**: (key)
+- **ic_degiskenler**:
+  - `key` — `trustStripKeys` dizisinden gelen mevcut anahtar; React `key` özniteliği ve `stripDict` erişiminde kullanılır.
+  - `t` — dış kapsamdaki sözlük nesnesi; rozet başlığı (`t.badge`) için yedek metin sağlar.
+  - `stripDict` — dış kapsamdaki sözlük; `key` ile eşleşen değeri gösterir.
+- **Dönüş**: JSX.Element (rozet kartı)
+
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx::proofItems.map callback
+- **params**: (item, index)
+- **ic_degiskenler**:
+  - `item` — `proofItems` dizisinden gelen öğe; `key`, `icon` vb. alanları içerir.
+  - `index` — öğenin dizideki konumu; animasyon gecikmesi sınıfını (`delayClass`) belirlemek için kullanılır.
+  - `t` — dış kapsamdaki sözlük nesnesi; öğe metinlerini (`eyebrow`, `title`, `description`) almak için kullanılır.
+  - `itemDict` — `t.items?.[item.key]` ifadesinden elde edilen nesne; eksikse boş alanlarla doldurulur.
+  - `delayClass` — `index` değerine göre seçilen CSS sınıfı; animasyon gecikmesini ayarlar.
+- **Dönüş**: JSX.Element (detaylı kart)
 
 ---
 
@@ -29183,6 +29261,72 @@ ProjectProvider, React Context API üzerinden proje kapsamındaki alt bileşenle
   export: ProjectProvider
 
 ---
+# FILE: src\design-system\tokens.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\design-system\tokens.js
+skeleton_hash: bc38de88ce673b9c
+generated_at: 2026-05-26T11:43:03Z
+---
+
+## Genel Bakış
+
+Bu modül, Venture Home HVAC projesinin **tasarım sisteminin temel yapı taşlarını (design tokens)** tanımlayan tamamen statik ve bildirime dayalı (declarative) bir yapılandırma dosyasıdır. Herhangi bir fonksiyon tanımı, iş mantığı, ortam değişkeni kullanımı veya harici API/veritabanı sorgusu içermez. Dosyanın tek sorumluluğu, kullanıcı arayüzünün görsel tutarlılığını sağlamak için gerekli olan en düşük seviyeli tasarım kararlarını — `zIndex` (katman sıralaması), `maxWidth` (maksimum genişlik sınırları), `borderRadius` (köşe yuvarlaklık değerleri), `fontSize` (yazı tipi boyut skalası) ve `boxShadow` (gölge/yükseklik efektleri) — merkezi bir yerde sabit değerler olarak tutmak ve dışa aktarmaktır. Bu yapısıyla, projedeki diğer tüm UI bileşenleri için **tek bir doğruluk kaynağı (single source of truth)** görevi görür.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+
+
+---
+
+## SABİTLER
+- **zIndex** (object) — `{
+  'raised':   '10',
+  'dropdown': '50',
+  'sticky':   '90',
+  'modal':    '...`
+- **maxWidth** (object) — `{
+  'page':    '100rem',     // 1600px
+  'content': '56.25rem',   // 900px
+  ...`
+- **borderRadius** (object) — `{
+  'hvac-sm':  '0.375rem',  // 6px
+  'hvac-md':  '1rem',      // 16px
+  'hva...`
+- **fontSize** (object) — `{
+  'display': ['var(--font-size-display)', { lineHeight: '1.1' }],
+}`
+- **boxShadow** (object) — `{
+  'hvac': '0 4px 6px -1px rgba(30, 64, 175, 0.1), 0 2px 4px -1px rgba(30, 6...`
+
+---
+
+## AST POINTERS
+
+---
+
+## NODE ID STANDARD
+
+  file: src\design-system\tokens.js
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: borderRadius
+  export: boxShadow
+  export: fontSize
+  export: maxWidth
+  export: zIndex
+
+---
 # FILE: src\hooks\use-mobile.md
 
 ---
@@ -30094,49 +30238,54 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutPayment.ts
-skeleton_hash: 0a385ab6e790d39a
-generated_at: 2026-05-23T22:29:39Z
+skeleton_hash: 0f81e1692b39b882
+generated_at: 2026-05-26T11:42:56Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun ödeme adımı için geliştirilmiş özel bir React hook'udur. Sepet içeriği, kullanıcı bilgileri, sepet hesaplama ve temizleme metotları gibi gerekli tüm bağımlılıkları alarak ödeme akışının temel mantığını yönetir. Sunucu tarafı fiyatlandırma ayarlarını da sürece entegre ederek tutarlı ve güncel bir ödeme deneyimi sunar.
+`useCheckoutPayment` modülü, VentHub HVAC uygulamasının ödeme adımını yöneten tek bir React hook'udur. Sepet içeriği, kullanıcı bilgileri ve sunucu tarafı fiyatlandırma gibi dış bağımlılıkları alarak, toplam tutarı hesaplar, fiyatları günceller ve ödeme tamamlandığında sepeti temizler. Böylece ödeme sürecinin bütünlüğü ve tutarlılığı tek bir noktadan kontrol edilir.  
 
 ## Fonksiyon Grupları
-### Ana Ödeme Yönetim Hook'u
-Modülün tek ana bileşeni olarak tüm ödeme sürecini tek merkezden yönetir, aldığı tüm bağımlılıkları birleştirerek kullanıcıların sepetten ödemeyi sorunsuz şekilde tamamlamasını sağlar.
-- useCheckoutPayment
+### Ödeme Akışı Orkestratörü  
+Bu grup, ödeme sürecinin tüm adımlarını bir araya getirir; gelen verileri doğrular, tutarı hesaplar, fiyatları günceller ve işlem sonunda sepeti temizler.  
+- useCheckoutPayment  
 
-### Entegre Yardımcı Metotlar ve Veri Kaynakları
-Ana ödeme hook'u tarafından kullanılan, sepet işlemleri, fiyat hesaplamaları ve kullanıcı/ürün verilerini yöneten bileşenleri içerir, ödeme süreci için gerekli tüm destekleyici işlevleri karşılar.
-- getCartTotal, clearCart, applyServerPricing, items, user
+### Yardımcı Veri ve İşlem Sağlayıcıları  
+Ödeme orkestratörünün ihtiyaç duyduğu dış bağımlılıkları içerir; sepet öğeleri, kullanıcı bilgileri ve fiyatlandırma/temizleme fonksiyonları bu grup altında toplanır.  
+- items, user, getCartTotal, applyServerPricing, clearCart
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu ödeme akışı yönetim hook'u useCheckoutPayment, kendisine iletilen tüm zorunlu veri prop'ları ve callback fonksiyonların eksiksiz ve geçerli olarak sağlanmasına bağlıdır; herhangi bir zorunlu bağımlılığın eksikliği ödeme sürecinin başlamasını engeller veya yanlış çalışmasına neden olur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer sepetteki ürünleri içeren items prop'u yoksa, ödeme için gereken ürün listesi oluşturulamadığından toplam tutar hesaplanamaz ve ödeme süreci başlatılamaz.
-[Aksiyom 2]: Eğer sepet toplamını hesaplayan getCartTotal callback fonksiyonu yoksa, ödeme için gereken nihai tutar hesaplanamayacağından ödeme adımları ilerletilemez.
-[Aksiyom 3]: Eğer giriş yapmış kullanıcının verilerini içeren user prop'u yoksa, kullanıcı kimliği doğrulanamadığından ödeme yetkilendirmesi başarısız olur.
-[Aksiyom 4]: Eğer ödeme sonrası sepeti sıfırlayan clearCart callback fonksiyonu yoksa, başarılı ödemenin ardında sepet içeriği temizlenemediği için kullanıcı tekrarlanan ödeme ekranında yanlış ürün listesiyle karşılaşır.
-[Aksiyom 5]: Eğer sunucu tarafı fiyatlandırma düzenlemelerini uygulayan applyServerPricing callback fonksiyonu yoksa, yerel olarak hesaplanan sepet toplamı gerçek ödeme tutarıyla eşleşmeyeceğinden ödeme işleminde tutarsızlık oluşur.
-[Aksiyom 6]: Eğer para birimi ve bölgesel ayarları içeren cu prop'u yoksa, ödeme tutarının gösterimi ve bölgesel ödeme kurallarına uygun işlem yapılamadığından ödeme süreci başarısız olur.
+**Aksiyom 1**: Eğer `items` parametresi sağlanmazsa, ödeme işlemi başlatılamaz ve hook hata verir.  
+**Aksiyom 2**: Eğer `getCartTotal` fonksiyonu tanımlı değilse, sepet tutarı hesaplanamaz, bu yüzden ödeme tutarı belirlenemez ve hook çalışmaz.  
+**Aksiyom 3**: Eğer `user` nesnesi eksik ya da geçersizse, kimlik doğrulama ve faturalama bilgileri alınamaz; bu durumda ödeme süreci durur.  
+**Aksiyom 4**: Eğer `clearCart` fonksiyonu sağlanmazsa, ödeme tamamlandıktan sonra sepet temizlenemez ve kullanıcı aynı sepeti tekrar görür.  
+**Aksiyom 5**: Eğer `applyServerPricing` fonksiyonu mevcut değilse, sunucu tarafı fiyatlandırma güncellemeleri uygulanamaz; bu da fiyat tutarsızlıklarına yol açar.  
+**Aksiyom 6**: Eğer `UseCheckoutPaymentProps` tipindeki bir nesne (`or` anahtarıyla) sağlanmazsa, hook’un beklediği tüm bağımlılıkların (items, getCartTotal, user, clearCart, applyServerPricing) ayrı ayrı geçirilmesi gerekir; aksi takdirde tip uyumsuzluğu hatası oluşur.  
+
+*Domain‑specific bir eşik değeri, kabul kriteri veya başka bir özel kural mevcut değildir; tüm gereksinimler fonksiyon imzasındaki parametrelerin varlığı ve doğru tipte olmasıyla sınırlıdır.*
 
 ---
 
 ## FONKSIYON DETAYLARI
 
 ### useCheckoutPayment
-**Ne yapar**: Ödeme akışını uçtan uca yöneten, sunucu tarafı doğrulama ve Iyzico ödeme geçidi ile entegre çalışan özel bir React hook'udur. Sepet doğrulama, ödeme isteği oluşturma, Iyzico ödeme formunun başlatılması ve başarılı ödeme durumunun sorgulanması gibi tüm ödeme süreci adımlarını yerine getirir. Tüm ödeme durumu ve tetikleyicilerini dışarıya açarak, bileşenlerde ödeme sürecinin kolayca yönetilmesini sağlar.
-**Nasıl yapar**: Önce sunucu tarafı fiyat doğrulamasını çalıştırarak sepet fiyatlarının güncelliğini kontrol eder, ardından geçerli sepet ve kullanıcı bilgileriyle Iyzico entegrasyonu için gerekli ödeme token ve form URL'sini oluşturur. Ödeme süreci boyunca yükleme durumu gibi tüm state değişikliklerini takip eder, periyodik sorgulama (polling) mekanizması ile ödeme sonucunu anlık olarak izler. Başarılı bir ödeme alındığında tanımlı `clearCart` fonksiyonunu çağırarak sepeti boşaltır.
+**Ne yapar**: Checkout sürecinde ödeme akışını yönetir; sepet doğrulamasını yapar, sunucu tarafı fiyatlandırmasını uygular, Iyzico ödeme geçidiyle entegrasyon kurar ve ödeme sonucunu izler.  
+
+**Nasıl yapar**: Gelen `props` nesnesindeki sepet öğelerini ve toplam tutarı kontrol eder, gerekirse sunucu tarafı fiyatlandırma fonksiyonunu çalıştırır, Iyzico formunu başlatır ve ödeme tamamlandığında sepeti temizler. İşlem sırasında bir loading durumu, ödeme token’ı ve yönlendirme URL’si gibi bilgiler içeren bir durum nesnesi döndürülür.  
+
 **Parametreler**:
-- props: UseCheckoutPaymentProps — Ödeme süreci için gerekli tüm konfigürasyon, yardımcı fonksiyon ve state nesnelerini içeren ana parametre
-- props.items: Array — Alışveriş sepetindeki mevcut ürünleri içeren dizi
-- props.getCartTotal: Function — Sepetin toplam değerini hesaplayarak döndüren yardımcı fonksiyon
-- props.user: Object | null — Oturum açılmışsa kimliği doğrulanmış mevcut Supabase kullanıcı nesnesi, oturum açılmamışsa null değerini alır
-- props.clearCart: Function — Başarılı ödeme sonrası alışveriş sepetini tamamen boşaltmak için kullanılan fonksiyon
-- props.applyServerPricing: Function — Sunucu tarafı doğrulama sonucuna göre sepet içindeki ürün fiyatlarını güncellemek için kullanılan fonksiyon
-**Dönüş**: İçerisinde ödeme sürecinin anlık durumunu tutan `loading`, `token` ve `URL` alanları, ödeme sürecini yapılandırmak için gereken yardımcı konfigürasyon fonksiyonları ve ödeme akışını başlatan `initiatePayment` tetikleyicisini içeren bir nesne döndürür.
+- `items`: any — Checkout sırasında işlenen mevcut sepet öğeleri.
+- `getCartTotal`: function — Sepet toplam tutarını döndüren, çağrılabilir bir fonksiyon.
+- `user`: any — Kimliği doğrulanmış Supabase kullanıcı nesnesi (varsa).
+- `clearCart`: function — Başarılı ödeme sonrasında sepeti boşaltmak için kullanılan fonksiyon.
+- `applyServerPricing`: function — Sunucu tarafı fiyat doğrulaması ve güncellemesi yapan fonksiyon.
+- `or`: UseCheckoutPaymentProps — Tüm parametreleri kapsayan tip tanımı (props nesnesi).
+
+**Dönüş**: object — `{ loading: boolean, token: string, url: string, initiatePayment: function, ... }` şeklinde, ödeme durumunu (yükleme, token, yönlendirme URL’si) ve ödeme başlatma işlevini içeren bir nesne.
 
 ---
 
@@ -30148,14 +30297,8 @@ Bu ödeme akışı yönetim hook'u useCheckoutPayment, kendisine iletilen tüm z
 - `user: User | null`
 - `clearCart: (options?: { silent: boolean }) => void`
 - `applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void`
-- `customerInfo: CheckoutCustomerInfo`
-- `shippingAddress: CheckoutAddressInfo`
-- `billingAddress: CheckoutAddressInfo`
-- `sameAsShipping: boolean`
-- `invoiceType: 'individual' | 'corporate'`
-- `invoiceInfo: CheckoutInvoiceInfo`
-- `legalConsents: CheckoutLegalConsents`
-- `shippingMethod: string`
+- `orchestrator: {
+`
 - `couponCode: string | null`
 - `t: (key: string) => string`
 
@@ -30163,64 +30306,56 @@ Bu ödeme akışı yönetim hook'u useCheckoutPayment, kendisine iletilen tüm z
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\hooks\useCheckoutPayment.ts::useCheckoutPayment
-- **params**: items, getCartTotal, user, clearCart, applyServerPricing, customerInfo, shippingAddress, billingAddress, sameAsShipping, invoiceType, invoiceInfo, legalConsents, shippingMethod, couponCode, t
+### [N1_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useCheckoutPayment
+- **params**: `({ items, getCartTotal, user, clearCart, applyServerPricing, orchestrator, couponCode, t }: UseCheckoutPaymentProps)`
 - **ic_degiskenler**:
-  - `router` — Next.js yönlendirme işlemleri için kullanılan useRouter hook'undan dönen nesne
-  - `loading` — Ödeme işleminin aktif olup olmadığını takip eden state değişkeni
-  - `setLoading` — loading state'ini güncellemek için kullanılan setter fonksiyonu
-  - `iyzToken` — Iyzico ödeme sistemi için alınan token'ı tutan state
-  - `setIyzToken` — iyzToken state'ini güncelleyen setter
-  - `paymentUrl` — Iyzico ödeme sayfası URL'sini tutan state
-  - `setPaymentUrl` — paymentUrl state'ini güncelleyen setter
-  - `orderId` — Oluşturulan siparişin benzersiz kimliğini tutan state
-  - `setOrderId` — orderId state'ini güncelleyen setter
-  - `convId` — Ödeme sürecinin konuşma kimliğini tutan state
-  - `setConvId` — convId state'ini güncelleyen setter
-  - `iyzScriptLoaded` — Iyzico script'inin yüklenme durumunu tutan sabit state
-  - `formReady` — Ödeme formunun hazır olup olmadığını belirten state
-  - `setFormReady` — formReady state'ini güncelleyen setter
-  - `progressPct` — Ödeme süreci ilerleme yüzdesini tutan state
-  - `setProgressPct` — progressPct state'ini güncelleyen setter
-  - `paymentFrameContent` — Ödeme frame içeriğini tutan sabit state
-  - `isTest` - globalThis nesnesinde 'vi' anahtarı varlığıyla test ortamı olduğunu belirten boolean flag
-  - `initiatePayment` — Ödeme akışını başlatan iç asenkron fonksiyon
-- **Dönüş**: Tüm state değerleri, setter fonksiyonları ve initiatePayment fonksiyonunu içeren obje
+  - `router` — `useRouter()` ile oluşturulan Next.js yönlendirici, sayfa yönlendirmeleri için kullanılır.
+  - `loading` — ödeme işlemi sırasında gösterilen yükleme durumu (`useState(false)`).
+  - `setLoading` — `loading` değerini güncelleyen setter.
+  - `iyzToken` — İyzico’dan alınan ödeme token’ı (`useState('')`).
+  - `setIyzToken` — `iyzToken` değerini güncelleyen setter.
+  - `paymentUrl` — İyzico ödeme sayfasının URL’i (`useState('')`).
+  - `setPaymentUrl` — `paymentUrl` değerini güncelleyen setter.
+  - `orderId` — oluşturulan siparişin kimliği (`useState('')`).
+  - `setOrderId` — `orderId` değerini güncelleyen setter.
+  - `convId` — İyzico konuşma kimliği (`useState('')`).
+  - `setConvId` — `convId` değerini güncelleyen setter.
+  - `iyzScriptLoaded` — dış script’in yüklendiği durum (sabit `false`).
+  - `formReady` — ödeme formunun hazır olup olmadığını gösteren flag (`useState(false)`).
+  - `setFormReady` — `formReady` değerini güncelleyen setter.
+  - `progressPct` — ödeme sürecindeki ilerleme yüzdesi (`useState(20)`).
+  - `setProgressPct` — `progressPct` değerini güncelleyen setter.
+  - `paymentFrameContent` — iframe içeriği (sabit boş string).
+  - `isTest` — test ortamı kontrolü (`'vi' in globalThis`).
+- **Dönüş**: Hook’un döndürdüğü nesne  
+  `{ loading, iyzToken, paymentUrl, orderId, convId, iyzScriptLoaded, formReady, progressPct, paymentFrameContent, setFormReady, setProgressPct, initiatePayment }`  
+  (yan etkileri: state güncellemeleri, router yönlendirmesi, dış script yüklenmesi).
 
-### [N2_NASIL] AST Pointer: src\hooks\useCheckoutPayment.ts::useCheckoutPayment::initiatePayment
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `authoritativeTotal` - Kullanılacak nihai sepet toplamı, önce yerel sonra sunucu doğrulamasıyla güncellenir
-  - `validation` - validateServerCart fonksiyonundan dönen sunucu tarafı sepet doğrulama verisi
-  - `localHash` - Yerel sepet fiyatlarından üretilen hash değeri
-  - `serverHash` - Sunucudan gelen sepet verilerinden üretilen hash değeri
-  - `buildPaymentRequest` - Dinamik olarak import edilen ödeme isteği oluşturma fonksiyonu
-  - `requestData` - buildPaymentRequest ile oluşturulan, ödeme servisine gönderilecek istek verisi
-  - `data` - Supabase fonksiyon çağrısından dönen başarı cevabı verisi
-  - `error` - Supabase fonksiyon çağrısından dönen hata nesnesi
-  - `d` - data.data nesnesinin kısaltması, Iyzico'dan dönen cevap detayları
-  - `err` - Try bloğunda yakalanan genel hata nesnesi
-  - `msg` - Hata nesnesinden çıkarılan kullanıcıya gösterilecek hata mesajı
-- **Dönüş**: Başarılıysa true, hatalıysa false; ödeme sayfası yönlendirmesi durumunda erken return
+---
 
-### [N3_NASIL] AST Pointer: src\hooks\useCheckoutPayment.ts::useCheckoutPayment::<useEffect>_setup_callback
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::initiatePayment
+- **params**: `()` (hiç parametre almaz)
 - **ic_degiskenler**:
-  - `timer` - 3 saniyede bir çalışan sipariş durumu sorgulama interval ID'si
-  - `data` - Supabase'den sipariş durumu sorgusu sonucu dönen veri
-- **Dönüş**: Interval'ı temizleyen temizleme fonksiyonu
+  - `authoritativeTotal` — `getCartTotal()` sonucu, gerekirse sunucu doğrulaması sonrası güncellenen tutar.
+  - `validation` — `validateServerCart({ userId: user?.id })` çağrısının sonucu, sunucu‑tarafı sepet doğrulaması.
+  - `localHash` — `getPriceHashLocal(items)` ile hesaplanan yerel fiyat hash’i.
+  - `serverHash` — `getPriceHashServer(validation?.items, items)` ile hesaplanan sunucu fiyat hash’i.
+  - `requestData` — `buildPaymentRequest({...})` ile oluşturulan ödeme isteği nesnesi.
+  - `data` — `supabase.functions.invoke('iyzico-payment', { body: requestData })` yanıtının `data` kısmı.
+  - `error` — aynı çağrının olası hatası.
+  - `d` — `data.data` içindeki ödeme yanıtı nesnesi.
+- **Dönüş**: `boolean`  
+  - `true` → ödeme başarılı bir şekilde başlatıldı (token alındı veya doğrudan ödeme sayfasına yönlendirme yapıldı).  
+  - `false` → bir hata oluştu; hata mesajı toast ile gösterilir.
 
-### [N4_NASIL] AST Pointer: src\hooks\useCheckoutPayment.ts::useCheckoutPayment::<setInterval>_polling_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `data` - venthub_orders tablosundan seçilen siparişin durumunu içeren supabase cevap verisi
-- **Dönüş**: yok; yan etkileri: interval temizleme, sepeti temizleme, ödeme başarı sayfasına yönlendirme
+---
 
-### [N5_NASIL] AST Pointer: src\hooks\useCheckoutPayment.ts::useCheckoutPayment::<son_polling_callback>
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useEffect (order‑status polling)
+- **params**: `()` (useEffect callback, parametresiz)
 - **ic_degiskenler**:
-  - `data` - Supabase'den venthub_orders tablosundan alınan sipariş durumu verisi
-- **Dönüş**: yok; yan etkileri: interval temizleme, sepet sıfırlama, başarı sayfasına yönlendirme
+  - `timer` — `setInterval` ile oluşturulan periyodik kontrol kimliği.
+  - `data` — `supabase.from('venthub_orders').select('status').eq('id', orderId).maybeSingle()` sorgusunun yanıtı.
+- **Dönüş**: `void` (useEffect, yan etkileri: interval başlatma, sipariş durumu “paid” olduğunda intervali temizleme, sepeti temizleme ve `router.push` ile başarı sayfasına yönlendirme).
 
 ---
 
@@ -31043,9 +31178,7 @@ Bu modül, tarayıcı tabanlı uygulamalarda kullanılmak üzere tasarlanmış, 
 
 ## SABİTLER
 - **scrollAnimationClasses** (object) — `{
-
     fadeUp: (isVisible: boolean) =>
-
         `transition-all duration-700 ...`
 
 ---
@@ -36845,23 +36978,19 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\adminUi.ts
-skeleton_hash: 7306ab1c10b03b3d
-generated_at: 2026-05-23T22:33:23Z
+skeleton_hash: 3ae172a5374fdd7a
+generated_at: 2026-05-26T12:20:50Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin src/utils dizininde yer alan bu modül, yönetici (admin) arayüzü bileşenlerinde kullanılmak üzere standartlaştırılmış UI sınıfları ve stillerini barındıran basit bir yardımcı dosyasıdır. İçinde herhangi bir fonksiyon, harici bağımlılık veya çalıştırılabilir mantık bulunmaz, sadece yeniden kullanılabilir görsel tanımlarını içerir.
+VentHub HVAC projesinin src/utils dizininde yer alan bu modül, yönetici paneli arayüz bileşenleri için standartlaştırılmış görsel stiller ve CSS sınıf sabitleri barındıran basit bir yardımcı dosyasıdır. Dosyada herhangi bir fonksiyon, harici bağımlılık veya çalıştırılabilir mantık bulunmaz, sadece yönetici kartları için sınıflar, dolgulu kart sınıfı ve seçim alanları için still nesnesi olmak üzere üç adet yerel sabit içerir.
 
-Bu modül herhangi bir ortam değişkeni kullanmaz, harici API'ler ile iletişim kurmaz veya herhangi bir veritabanı tablosunu sorgulamaz. Tamamen yerel olarak tanımladığı yönetici paneli kartları ve seçim alanları için CSS sınıfı ve stili sabitleri, projenin tüm yönetici arayüzü bileşenleri tarafından import edilerek tutarlı bir görsel deneyim sunulmasını sağlar.
+Bu modül hiçbir ortam değişkeni kullanmaz, harici API'ler ile iletişime geçmez ve herhangi bir veritabanı tablosunu sorgulamaz. Tüm sabitler, projenin tüm yönetici arayüz bileşenleri tarafından import edilerek kullanılarak proje genelinde tutarlı bir görsel deneyim sunulmasını hedefler.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, yönetici (admin) arayüzü bileşenlerinin stillendirme ve şablon amaçlı sabitlerini barındırır, bu sabitlerin doğru şekilde kullanılabilmesi için modülün içeriğinin import edildiği UI çalışma zamanı ortamının sabit tipleriyle uyumlu olması gerekmektedir.
-
-[Aksiyom 1]: Eğer bu modüldeki şablon amaçlı sınıf sabitleri (adminCardClass, adminCardPaddedClass) kullanıldığı HTML şablon motoru tarafından işlenemiyorsa, yönetici arayüzündeki kart bileşenleri doğru stillendirilemez, arayüzde görsel bozukluklar oluşur.
-[Aksiyom 2]: Eğer adminSelectStyle nesnesinin yapısı, modülün import edildiği UI kütüphanesinin kabul ettiği stillendirme nesnesi formatıyla uyumlu değilse, yönetici arayüzündeki seçim (select) bileşenleri istenilen görsel özelliklere sahip olamaz, kullanıcı deneyimi bozulur.
-[Aksiyom 3]: Eğer bu modülün ihraç ettiği tüm sabitler, import edildiği tüm ilgili modüller tarafından doğru şekilde referanslanamıyorsa, ilgili yönetici arayüzü bileşenleri stillendirme verisine erişemez, projede genel görsel tutarsızlıklar meydana gelir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -36870,7 +36999,7 @@ Bu modül, yönetici (admin) arayüzü bileşenlerinin stillendirme ve şablon a
 ---
 
 ## SABİTLER
-- **adminCardClass** (template) — ``${glassStrongClass} rounded-[2rem] transition-all duration-500 hover:border-...`
+- **adminCardClass** (template) — ``${glassStrongClass} rounded-hvac-xl transition-colors duration-500 hover:bor...`
 - **adminCardPaddedClass** (template) — ``${adminCardClass} p-8 lg:p-10``
 - **adminSelectStyle** (object) — `{ 
 
@@ -36880,10 +37009,10 @@ Bu modül, yönetici (admin) arayüzü bileşenlerinin stillendirme ve şablon a
 
 ## AST POINTERS
 
-İncelenen `C:\Users\alize\venthub-hvac\src\utils\adminUi.ts` dosyasında çözümlenebilir herhangi bir fonksiyon tanımı, fonksiyon gövdesi veya çağrılabilir yapı bulunmamaktadır. Dosyada sadece aşağıdaki statik sabitler tanımlanmıştır:
-- `adminCardClass` — şablon amaçlı kullanılan sabit
-- `adminCardPaddedClass` — şablon amaçlı kullanılan sabit
-- `adminSelectStyle` — stil tanımları içeren obje tipinde sabit
+Sağlanan kaynak dosyasında (`C:\Users\alize\venthub-hvac\src\utils\adminUi.ts`) analiz edilecek herhangi bir fonksiyon tanımı, sınıf metodu veya çalıştırılabilir fonksiyon gövdesi bulunmamaktadır. Sadece aşağıdaki sabitler tanımlıdır:
+- `adminCardClass` — Şablon (template) kullanımı için tanımlanmış CSS sınıfı değeri
+- `adminCardPaddedClass` — Şablon (template) kullanımı için tanımlanmış dolgulu admin kartı CSS sınıfı değeri
+- `adminSelectStyle` — Admin arayüzü select bileşenleri için stil tanımları içeren nesne
 
 ---
 

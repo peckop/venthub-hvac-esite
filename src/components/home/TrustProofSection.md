@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx
-skeleton_hash: a5f3970a11e5b758
-generated_at: 2026-05-23T22:08:05Z
+skeleton_hash: 3990bf5913c326a6
+generated_at: 2026-05-26T12:21:16Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıya güven kanıtı gösteren bir bölüm (TrustProofSection) sunan bir React bileşenini içerir. Bileşen, çeviri sözlüğü ve güven strisi sözlüğü gibi dışarıdan gelen verileri alarak içeriği dinamik olarak doldurur ve görsel olarak güvenilirliği vurgulayan bir arayüz oluşturur.
+Bu modül, Venthub HVAC projesinin ana sayfasında kullanıcıya güven kanıtı göstergeleri sunan bir React bileşenini içerir. Bileşen, dışarıdan sağlanan çeviri sözlüğü ve güven şeridi verilerini kullanarak içeriği dinamik olarak doldurur ve markanın güvenilirliğini vurgulayan görsel bir arayüz bölümü oluşturur.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Bu grup, modülün tek işlevini oluşturan bileşeni içerir; dışarıdan gelen çeviri ve güven strisi verilerini kullanarak güven kanıtı bölümünü render eder.
+Bu grup, modülün tek temel işlevini yerine getiren bileşeni içerir; gelen çeviri ve güven şeridi verilerini işleyerek güven kanıtı bölümünü kullanıcıya sunar.
 - TrustProofSection
 
 ---
@@ -25,12 +25,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSIYON DETAYLARI
 
 ### TrustProofSection
-**Ne yapar**: TrustProofSection bileşeni, sağlanan sözlük ve trust strip verilerini kullanarak güven kanıtı bölümünü render eder.  
-**Nasıl yapar**: Props olarak gelen `dictionary` nesnesinden çeviri fonksiyonunu `t` olarak çıkarır ve `trustStripDict` verilerini iterate ederek her bir güven kanıtı öğesini JSX olarak döndürür; ardından bu öğeleri uygun bir wrapper içinde döner.  
+**Ne yapar**: Verilen çeviri sözlükleri (`dictionary` ve `trustStripDict`) kullanılarak güven kanıtı (trust proof) içeren bir React bileşeni oluşturur. Bu bileşen, uygulamanın ana sayfasında güvenilirlik göstergelerini görsel olarak sunar.  
+
+**Nasıl yapar**: Fonksiyon, `dictionary` ve `trustStripDict` nesnelerini parametre olarak alır, bu verileri bileşenin içindeki metin ve görsel öğelere bağlar. Ardından, JSX yapısını döndürerek `TrustProofSectionProps` tipinde bir React fonksiyonel bileşeni üretir.  
+
 **Parametreler**:
-- dictionary: object — Çeviri anahtarlarını değerlere eşleyen nesne; `t` özelliği üzerinden çevrilen metinlere erişim sağlar.  
-- trustStripDict: object — Güven kanıtı bölümünde gösterilecek öğelerin veri kümesi; her bir öğe genellikle başlık, açıklama ve ikon gibi alanları içerir.  
-**Dönüş**: React.FC<TrustProofSectionProps> — Render edilen TrustProofSection bileşeni; JSX elementi döndürür.
+- `dictionary`: object — Genel metin çevirileri için kullanılan sözlük, bileşenin başlık ve açıklama metinlerini içerir.  
+- `trustStripDict`: object — Güven kanıtı şeridiyle ilgili çevirileri barındıran sözlük, şerit üzerindeki etiket ve açıklamaları sağlar.  
+
+**Dönüş**: React.FC\<TrustProofSectionProps\> — `TrustProofSectionProps` tipinde özellikler alabilen bir fonksiyonel React bileşeni.
 
 ---
 
@@ -42,7 +45,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `subtitle?: string`
 - `visualAlt?: string`
 - `badge?: string`
-- `items?: Record<string, {`
+- `items?: Record<string, {`
 
 ### TrustStripDict
 
@@ -57,29 +60,39 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   { 
     key: 'brands', 
     icon: (
-      <svg width="20" height="20" view...`
+      <svg width="20" height="20" ...`
 - **trustStripKeys** (as_expression) — `['authorizedBrands', 'engineeringSupport', 'nationwideDelivery', 'projectGuid...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/home/TrustProofSection.tsx::TrustProofSection
-- **params**: dictionary: t, trustStripDict: stripDict
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element
-
-### [N2_NASIL] AST Pointer: src/components/home/TrustProofSection.tsx::trustStripKeys.map callback
-- **params**: key
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element
-
-### [N3_NASIL] AST Pointer: src/components/home/TrustProofSection.tsx::proofItems.map callback
-- **params**: item, index
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx::TrustProofSection
+- **params**: ({ dictionary: t, trustStripDict: stripDict })
 - **ic_degiskenler**:
-  - `itemDict` — object derived from t.items?.[item.key] with fallback {eyebrow:'',title:'',description:''}, used to access eyebrow, title, description for rendering each proof item.
-  - `delayClass` — string selected from ['delay-0','delay-100','delay-200','delay-300'] based on index % 4, applied to animate fade‑up delay.
-- **Dönüş**: JSX.Element
+  - `t` — dışarıdan gelen sözlük nesnesi; bileşen içinde metin (eyebrow, title, subtitle, vb.) sağlamak için kullanılır.
+  - `stripDict` — dışarıdan gelen nesne; `trustStripKeys` elemanlarını karşılık gelen metinlerle eşleştirir.
+  - `trustStripKeys` — dosyada tanımlı sabit dizi; güven rozetlerinin anahtarlarını tutar ve haritalama için döngüde kullanılır.
+  - `proofItems` — dosyada tanımlı sabit dizi; detaylı kartların verisini (key, icon, vb.) içerir.
+- **Dönüş**: JSX.Element (React bileşeni)
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx::trustStripKeys.map callback
+- **params**: (key)
+- **ic_degiskenler**:
+  - `key` — `trustStripKeys` dizisinden gelen mevcut anahtar; React `key` özniteliği ve `stripDict` erişiminde kullanılır.
+  - `t` — dış kapsamdaki sözlük nesnesi; rozet başlığı (`t.badge`) için yedek metin sağlar.
+  - `stripDict` — dış kapsamdaki sözlük; `key` ile eşleşen değeri gösterir.
+- **Dönüş**: JSX.Element (rozet kartı)
+
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx::proofItems.map callback
+- **params**: (item, index)
+- **ic_degiskenler**:
+  - `item` — `proofItems` dizisinden gelen öğe; `key`, `icon` vb. alanları içerir.
+  - `index` — öğenin dizideki konumu; animasyon gecikmesi sınıfını (`delayClass`) belirlemek için kullanılır.
+  - `t` — dış kapsamdaki sözlük nesnesi; öğe metinlerini (`eyebrow`, `title`, `description`) almak için kullanılır.
+  - `itemDict` — `t.items?.[item.key]` ifadesinden elde edilen nesne; eksikse boş alanlarla doldurulur.
+  - `delayClass` — `index` değerine göre seçilen CSS sınıfı; animasyon gecikmesini ayarlar.
+- **Dönüş**: JSX.Element (detaylı kart)
 
 ---
 
