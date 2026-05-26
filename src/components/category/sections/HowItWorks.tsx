@@ -76,7 +76,7 @@ const HowItWorks: React.FC = () => {
                                     onClick={() => setActiveStep(isActive ? -1 : index)}
                                     aria-expanded={isActive}
                                     aria-controls={`step-content-${index}`}
-                                    className={`focus-ring relative z-10 w-full text-left p-5 rounded-xl border-2 transition-all duration-300 cursor-pointer ${isActive
+                                    className={`focus-ring relative z-10 w-full text-left p-5 rounded-xl border-2 transition-colors duration-300 cursor-pointer ${isActive
                                         ? 'border-blue-500 bg-blue-50 shadow-lg'
                                         : 'border-gray-200 bg-white hover:border-blue-300'
                                         }`}
@@ -95,7 +95,7 @@ const HowItWorks: React.FC = () => {
                                             <p className="text-sm text-gray-600 mt-1">{step.description}</p>
                                             <div 
                                                 id={`step-content-${index}`} 
-                                                className={`overflow-hidden transition-all duration-300 ease-in-out ${isActive ? 'max-h-24 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
+                                                className={`overflow-hidden transition-colors duration-300 ease-in-out ${isActive ? 'max-h-24 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
                                             >
                                                 <p className="text-sm text-blue-600 animate-fade-in">
                                                     💡 {step.detail}

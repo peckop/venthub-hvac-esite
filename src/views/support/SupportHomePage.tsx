@@ -32,7 +32,7 @@ const SupportHomePage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {cards.map(({ title, desc, to, icon: Icon }) => (
-          <Link key={to} href={to as import('next').Route} className="group block bg-white rounded-xl border border-light-gray p-6 hover:border-primary-navy/40 hover:shadow-md transition-all">
+          <Link key={to} href={to as import('next').Route} className="group block bg-white rounded-xl border border-light-gray p-6 hover:border-primary-navy/40 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-4">
               <div className="rounded-lg bg-primary-navy/10 p-3 text-primary-navy">
                 <Icon size={24} />

@@ -42,9 +42,9 @@ const NavShell: React.FC<NavShellProps> = ({
             onMouseLeave={onHoverEnd}
         >
             {showProgress && (
-                <div className="absolute inset-x-0 top-0 h-1 bg-slate-200/60 pointer-events-none z-[60]">
+                <div className="absolute inset-x-0 top-0 h-1 bg-slate-200/60 pointer-events-none z-dropdown">
                     <div
-                        className="h-full bg-gradient-to-r from-primary-navy via-secondary-blue to-air-blue transition-all duration-500 ease-out"
+                        className="h-full bg-gradient-to-r from-primary-navy via-secondary-blue to-air-blue transition-colors duration-500 ease-out"
                         style={{ width: `${progress}%` }}
                     />
                 </div>
@@ -53,7 +53,7 @@ const NavShell: React.FC<NavShellProps> = ({
             {/* Top Tier: The Corporate Bar */}
             <div
                 className={cn(
-                    'transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] bg-primary-navy text-white overflow-hidden',
+                    'transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] bg-primary-navy text-white overflow-hidden',
                     // Hide the top tier if we are not at the top
                     !isAtTop ? 'h-0 opacity-0' : 'h-0 opacity-0 md:h-8 md:opacity-100 relative'
                 )}
@@ -68,7 +68,7 @@ const NavShell: React.FC<NavShellProps> = ({
             {/* Bottom Tier: The Action Bar */}
             <header
                 className={cn(
-                    'transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] border-b border-slate-200/50',
+                    'transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] border-b border-slate-200/50',
                     'bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/85 shadow-[0_18px_45px_-28px_rgba(15,23,42,0.15)]',
                     showProgress && 'pt-1'
                 )}

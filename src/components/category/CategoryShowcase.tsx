@@ -80,7 +80,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 <button
                                     type="button"
                                     onClick={() => setWizardOpen(true)}
-                                    className="focus-ring focus-visible:ring-2 focus-visible:ring-primary-navy group flex items-center bg-gradient-to-r from-secondary-blue to-blue-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-lg shadow-blue-500/30 hover:scale-105"
+                                    className="focus-ring focus-visible:ring-2 focus-visible:ring-primary-navy group flex items-center bg-gradient-to-r from-secondary-blue to-blue-600 text-white px-8 py-4 rounded-full font-bold transition-transform shadow-lg shadow-blue-500/30 hover:scale-105"
                                 >
                                     <ThermometerSun className="mr-3" size={24} />
                                     <span>{t('category.findModel')}</span>
@@ -137,7 +137,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             {/* Elektrikli Card */}
                             <Link
                                 href={category.slug === 'elektrikli-isitici' ? Routes.category(category.slug) : Routes.category(category.slug, 'elektrikli-isitici')}
-                                className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-orange-300 hover:shadow-md transition-all"
+                                className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-orange-300 hover:shadow-md transition-shadow"
                             >
                                 <div className="flex items-center space-x-4 mb-4">
                                     <div className="p-3 bg-orange-50 rounded-lg text-orange-500 group-hover:bg-orange-100 transition-colors">
@@ -157,7 +157,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             {/* Ortam Havalı Card */}
                             <Link
                                 href={category.slug === 'ortam-havali' ? Routes.category(category.slug) : Routes.category(category.slug, 'ortam-havali')}
-                                className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all"
+                                className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-blue-300 hover:shadow-md transition-shadow"
                             >
                                 <div className="flex items-center space-x-4 mb-4">
                                     <div className="p-3 bg-blue-50 rounded-lg text-blue-500 group-hover:bg-blue-100 transition-colors">
@@ -186,7 +186,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 initial={{ opacity: 0, x: -30 }}
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
-                                className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl group"
+                                className="relative aspect-[4/5] rounded-hvac-2xl overflow-hidden shadow-2xl group"
                             >
                                 <Image
                                     src="/images/vortice/vortice_lineo_loft.png"
@@ -292,7 +292,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                         <Link
                             key={sub.id}
                             href={Routes.category(category.slug, sub.slug)}
-                            className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:-translate-y-2 transition-all duration-300 border border-gray-100"
+                            className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 border border-gray-100"
                         >
                             <div className="aspect-[4/3] bg-light-gray relative overflow-hidden">
                                 {sub.image_url ? (

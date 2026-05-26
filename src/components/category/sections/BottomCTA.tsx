@@ -61,7 +61,7 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
                         <button
                             type="button"
                             onClick={onShowProducts}
-                            className="focus-ring group flex flex-col items-center p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all"
+                            className="focus-ring group flex flex-col items-center p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 hover:border-white/40 transition-colors"
                         >
                             <div className="w-14 h-14 bg-secondary-blue rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <Package className="text-white" size={28} />
@@ -76,7 +76,7 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
                         <button
                             type="button"
                             onClick={onOpenWizard}
-                            className="focus-ring group flex flex-col items-center p-6 bg-gradient-to-br from-secondary-blue to-blue-600 rounded-2xl border border-blue-400/30 hover:scale-105 transition-all shadow-lg shadow-blue-500/20"
+                            className="focus-ring group flex flex-col items-center p-6 bg-gradient-to-br from-secondary-blue to-blue-600 rounded-2xl border border-blue-400/30 hover:scale-105 transition-transform shadow-lg shadow-blue-500/20"
                         >
                             <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:bg-white/30 transition-colors">
                                 <ThermometerSun className="text-yellow-300" size={28} />
@@ -89,7 +89,7 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
                     {/* Uzman Desteği */}
                     <Link
                         href={Routes.contact('consulting')}
-                        className="focus-ring group flex flex-col items-center p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all"
+                        className="focus-ring group flex flex-col items-center p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 hover:border-white/40 transition-colors"
                     >
                         <div className="w-14 h-14 bg-emerald-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                             <MessageSquare className="text-white" size={28} />

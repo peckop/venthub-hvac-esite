@@ -472,7 +472,7 @@ export default function AdminReturnsPage() {
       {isLoading && returns.length === 0 ? (
         <AdminSkeleton variant="table" rows={6} count={7} />
       ) : filteredReturns.length === 0 ? (
-        <div className={`${adminCardClass} py-20 bg-[#0A0F1E]/20`}>
+        <div className={`${adminCardClass} py-20 bg-surface-deep/20`}>
           <AdminEmptyState
             icon={Undo2}
             title={searchQuery || !Object.values(statusFilter).every(Boolean) ? _t('admin.returns.empty.filtered')! : _t('admin.returns.empty.none')!}
@@ -515,7 +515,7 @@ export default function AdminReturnsPage() {
                               {orderNo}
                             </button>
                             {returnItem.total_amount && (
-                              <span className="text-[10px] font-black text-white/50 uppercase tracking-widest flex items-center gap-1">
+                              <span className="text-xs font-black text-white/50 uppercase tracking-widest flex items-center gap-1">
                                 <div className="w-1 h-[1px] bg-white/10"></div>
                                 {formatCurrency(Number(returnItem.total_amount), lang)}
                               </span>
@@ -527,16 +527,16 @@ export default function AdminReturnsPage() {
                         <td className={`${adminTableCellClass} ${cellPad}`}>
                           <div className="flex flex-col gap-0.5">
                             <span className="font-black text-white uppercase tracking-tight">{returnItem.customer_name}</span>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{returnItem.customer_email}</span>
+                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{returnItem.customer_email}</span>
                           </div>
                         </td>
                       )}
                       {visibleCols.reason && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
                           <div className="max-w-xs space-y-1">
-                            <div className="font-black text-[11px] text-slate-200 uppercase tracking-wider">{returnItem.reason}</div>
+                            <div className="font-black text-xs text-slate-200 uppercase tracking-wider">{returnItem.reason}</div>
                             {returnItem.description && (
-                              <div className="text-[10px] font-bold text-slate-500 leading-relaxed truncate uppercase tracking-widest" title={returnItem.description}>
+                              <div className="text-xs font-bold text-slate-500 leading-relaxed truncate uppercase tracking-widest" title={returnItem.description}>
                                 {returnItem.description}
                               </div>
                             )}
@@ -545,7 +545,7 @@ export default function AdminReturnsPage() {
                       )}
                       {visibleCols.status && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
-                          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${getStatusColor(returnItem.status)}`}>
+                          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-black uppercase tracking-widest ${getStatusColor(returnItem.status)}`}>
                             {getStatusIcon(returnItem.status)}
                             {getStatusLabel(returnItem.status)}
                           </div>
@@ -554,8 +554,8 @@ export default function AdminReturnsPage() {
                       {visibleCols.date && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
                           <div className="flex flex-col gap-0.5">
-                            <span className="font-black text-white tracking-widest text-[10px] uppercase">{formatDate(returnItem.created_at, lang)}</span>
-                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                            <span className="font-black text-white tracking-widest text-xs uppercase">{formatDate(returnItem.created_at, lang)}</span>
+                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
                               <div className="inline-block w-1.5 h-[1px] bg-white/10 mr-1 align-middle"></div>
                               {formatTime(returnItem.created_at, lang)}
                             </span>
@@ -570,14 +570,14 @@ export default function AdminReturnsPage() {
                                 key={status}
                                 onClick={() => handleStatusUpdate(returnItem.id, status)}
                                 disabled={updatingStatus === returnItem.id}
-                                className={`${adminTableActionPrimaryClass} !px-3 !h-7 disabled:opacity-50 gap-1 sm:opacity-0 sm:group-hover/row:opacity-100 transition-all duration-300 transform sm:translate-x-1 sm:group-hover/row:translate-x-0`}
+                                className={`${adminTableActionPrimaryClass} !px-3 !h-7 disabled:opacity-50 gap-1 sm:opacity-0 sm:group-hover/row:opacity-100 transition-transform duration-300 transform sm:translate-x-1 sm:group-hover/row:translate-x-0`}
                                 title={_t('admin.returns.actions.markAs', { status: getStatusLabel(status) }) as string}
                               >
                                 {updatingStatus === returnItem.id ? (
                                   <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
                                 ) : (
                                   <>
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{getStatusLabel(status)}</span>
+                                    <span className="text-xs font-black uppercase tracking-widest">{getStatusLabel(status)}</span>
                                     <ChevronRight size={10} strokeWidth={3} />
                                   </>
                                 )}

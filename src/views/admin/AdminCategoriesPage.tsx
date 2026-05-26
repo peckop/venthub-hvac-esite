@@ -252,14 +252,14 @@ const AdminCategoriesPage: React.FC = () => {
                   <tr key={r.id} className="group hover:bg-white/[0.02] transition-colors duration-300">
                     {visibleCols.image && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-all duration-500">
+                        <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-colors duration-500">
                           {r.image_url ? (
                             <VentImage src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
                               alt=""
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-white/5 text-[10px] font-black text-slate-700 uppercase">NO IMG</div>
+                            <div className="w-full h-full flex items-center justify-center bg-white/5 text-xs font-black text-slate-700 uppercase">NO IMG</div>
                           )}
                         </div>
                       </td>
@@ -274,7 +274,7 @@ const AdminCategoriesPage: React.FC = () => {
                                 value={r.name}
                                 placeholder="KATEGORİ ADI"
                                 inputWidth="w-full"
-                                className={`group-hover:text-cyan-400 transition-colors uppercase tracking-wider font-black ${r.parent_id ? 'text-slate-400 text-[11px]' : 'text-white text-xs'}`}
+                                className={`group-hover:text-cyan-400 transition-colors uppercase tracking-wider font-black ${r.parent_id ? 'text-slate-400 text-xs' : 'text-white text-xs'}`}
                                 onSave={async (val) => {
                                   if (!val || r.name === val) return
                                   const { error: upErr } = await supabase.from('categories').update({ name: val }).eq('id', r.id)
@@ -284,12 +284,12 @@ const AdminCategoriesPage: React.FC = () => {
                                 }}
                               />
                             ) : (
-                              <span className={`uppercase tracking-wider font-black ${r.parent_id ? 'text-slate-400 text-[11px]' : 'text-white text-xs'}`}>{r.name}</span>
+                              <span className={`uppercase tracking-wider font-black ${r.parent_id ? 'text-slate-400 text-xs' : 'text-white text-xs'}`}>{r.name}</span>
                             )}
                             {r.is_featured && (
                               <div className="flex items-center gap-1.5 mt-1">
                                 <span className="w-1 h-1 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
-                                <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Öne Çıkan</span>
+                                <span className="text-xs font-black text-cyan-400 uppercase tracking-widest">Öne Çıkan</span>
                               </div>
                             )}
                           </div>
@@ -299,13 +299,13 @@ const AdminCategoriesPage: React.FC = () => {
                     {visibleCols.sortOrder && (
                       <td className={`${adminTableCellClass} ${cellPad} text-center`}>
                         {hasWriteAccess ? (
-                          <div className="inline-block glass bg-white/5 rounded-xl border border-white/5 group-hover:border-cyan-400/30 transition-all p-1">
+                          <div className="inline-block glass bg-white/5 rounded-xl border border-white/5 group-hover:border-cyan-400/30 transition-colors p-1">
                             <EditableCell
                               value={r.sort_order?.toString() || '0'}
                               placeholder="0"
                               type="number"
                               inputWidth="w-12"
-                              className="text-center text-cyan-400 font-black text-[11px] tracking-widest uppercase"
+                              className="text-center text-cyan-400 font-black text-xs tracking-widest uppercase"
                               onSave={async (val) => {
                                 const num = parseInt(val || '0', 10)
                                 if (isNaN(num)) return
@@ -319,18 +319,18 @@ const AdminCategoriesPage: React.FC = () => {
                             />
                           </div>
                         ) : (
-                          <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">{r.sort_order || 0}</span>
+                          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{r.sort_order || 0}</span>
                         )}
                       </td>
                     )}
                     {visibleCols.slug && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <code className="text-[9px] font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5 group-hover:text-cyan-400/60 transition-colors uppercase tracking-[0.15em] font-mono">{r.slug}</code>
+                        <code className="text-xs font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5 group-hover:text-cyan-400/60 transition-colors uppercase tracking-[0.15em] font-mono">{r.slug}</code>
                       </td>
                     )}
                     {visibleCols.parent && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">
+                        <span className="text-xs font-black text-slate-500 uppercase tracking-[0.15em]">
                           {r.parent_id ? categoryMap.get(r.parent_id) || '-' : '-'}
                         </span>
                       </td>

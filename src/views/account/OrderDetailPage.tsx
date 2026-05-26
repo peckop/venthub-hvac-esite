@@ -277,7 +277,7 @@ export default function OrderDetailPage() {
                   <Package size={24} className="text-primary-navy" />
                   {t('orders.orderNumber')}: #{order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase()}
                   {order.is_demo && (
-                    <span className="px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-[10px] uppercase font-bold tracking-wider rounded-lg shadow-sm">
+                    <span className="px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-xs uppercase font-bold tracking-wider rounded-lg shadow-sm">
                       DEMO
                     </span>
                   )}
@@ -293,8 +293,8 @@ export default function OrderDetailPage() {
               {order.payment_status?.toLowerCase() === 'partial_refunded' && (
                 <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
               )}
-              <button onClick={() => router.push(`/account/returns?new=${order.id}`)} className="h-10 px-4 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-all hover:scale-[1.02] shadow-sm">{t('returns.requestReturn')}</button>
-              <button onClick={() => handleReorder(order)} className="h-10 px-4 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 flex items-center gap-2 transition-all hover:scale-[1.02]"><RefreshCcw size={16} />{t('orders.reorder')}</button>
+              <button onClick={() => router.push(`/account/returns?new=${order.id}`)} className="h-10 px-4 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-transform hover:scale-[1.02] shadow-sm">{t('returns.requestReturn')}</button>
+              <button onClick={() => handleReorder(order)} className="h-10 px-4 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 flex items-center gap-2 transition-transform hover:scale-[1.02]"><RefreshCcw size={16} />{t('orders.reorder')}</button>
             </div>
           </div>
           {/* Detailed Stepper */}
@@ -304,7 +304,7 @@ export default function OrderDetailPage() {
                 <React.Fragment key={s}>
                   <div className="flex flex-col items-center min-w-[80px]">
                     <div className={`w-8 h-8 rounded-full text-xs font-bold flex items-center justify-center transition-colors shadow-sm ${idx <= activeIdx ? 'bg-primary-navy text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>{idx + 1}</div>
-                    <span className={`mt-2 text-[10px] uppercase font-bold tracking-wider ${idx <= activeIdx ? 'text-primary-navy' : 'text-slate-400'}`}>{getStatusText(s)}</span>
+                    <span className={`mt-2 text-xs uppercase font-bold tracking-wider ${idx <= activeIdx ? 'text-primary-navy' : 'text-slate-400'}`}>{getStatusText(s)}</span>
                   </div>
                   {idx < steps.length - 1 && (
                     <div className={`flex-1 h-1 rounded-full ${activeIdx >= idx + 1 ? 'bg-primary-navy' : 'bg-slate-100'}`}></div>
@@ -319,7 +319,7 @@ export default function OrderDetailPage() {
           <div className="mb-8">
             <nav className="flex flex-wrap gap-1 p-1 bg-slate-100/80 rounded-xl max-w-fit">
               {(['overview', 'items', 'shipping', 'invoice'] as const).map(tt => (
-                <button key={tt} onClick={() => setTab(tt)} className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${tab === tt ? 'bg-white text-primary-navy shadow-sm' : 'text-slate-500 hover:text-primary-navy hover:bg-slate-200/50'}`}>
+                <button key={tt} onClick={() => setTab(tt)} className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${tab === tt ? 'bg-white text-primary-navy shadow-sm' : 'text-slate-500 hover:text-primary-navy hover:bg-slate-200/50'}`}>
                   {tt === 'overview' && (t('orders.tabs.overview') || 'Özet')}
                   {tt === 'items' && (t('orders.tabs.items') || 'Ürünler')}
                   {tt === 'shipping' && (t('orders.tabs.shipping') || 'Kargo Takibi')}
@@ -420,7 +420,7 @@ export default function OrderDetailPage() {
                               <VentImage src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)]"  />
                             )
                           ) : (
-                            <div className="w-12 h-12 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('orders.noImage')}</div>
+                            <div className="w-12 h-12 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center text-xs font-bold text-slate-400 uppercase tracking-wider">{t('orders.noImage')}</div>
                           )}
                         </td>
                         <td className="p-4 text-sm font-medium text-slate-600 text-center">{item.quantity}</td>
@@ -456,7 +456,7 @@ export default function OrderDetailPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-slate-900 break-all">{order.tracking_number || '-'}</span>
                     {order.tracking_number && (
-                      <button onClick={() => handleCopy(order.tracking_number)} className="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-primary-navy hover:bg-primary-navy hover:text-white hover:border-primary-navy transition-all shadow-sm focus:outline-none"><Copy size={12} /></button>
+                      <button onClick={() => handleCopy(order.tracking_number)} className="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-primary-navy hover:bg-primary-navy hover:text-white hover:border-primary-navy transition-shadow shadow-sm focus:outline-none"><Copy size={12} /></button>
                     )}
                   </div>
                 </div>
@@ -484,7 +484,7 @@ export default function OrderDetailPage() {
             <div className="space-y-6">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-bold text-slate-900 border-l-4 border-primary-navy pl-3">{t('orders.tabs.invoice')}</h4>
-                <button onClick={() => handleInvoicePdf(order)} className="h-10 px-4 text-sm font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-all shadow-sm flex items-center gap-2">
+                <button onClick={() => handleInvoicePdf(order)} className="h-10 px-4 text-sm font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-shadow shadow-sm flex items-center gap-2">
                   <RefreshCcw size={16} className="text-slate-400" />
                   {t('orders.invoicePdf')}
                 </button>
@@ -531,8 +531,8 @@ export default function OrderDetailPage() {
                           <div key={k} className="flex items-center justify-between group">
                             <span className="text-sm font-bold text-slate-600 group-hover:text-primary-navy transition-colors">{label}</span>
                             <div className="flex items-center gap-3">
-                              <span className="text-[10px] text-slate-400 font-medium">{ok ? ts : ''}</span>
-                              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-sm ${ok ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-slate-200 text-slate-500 border border-slate-300'}`}>{ok ? 'Kabul Edildi' : 'Onay Yok'}</span>
+                              <span className="text-xs text-slate-400 font-medium">{ok ? ts : ''}</span>
+                              <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-sm ${ok ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-slate-200 text-slate-500 border border-slate-300'}`}>{ok ? 'Kabul Edildi' : 'Onay Yok'}</span>
                             </div>
                           </div>
                         )

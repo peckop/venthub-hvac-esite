@@ -872,8 +872,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             </Canvas>
 
             {/* Sol-Sağ Gradient */}
-            <div className="absolute inset-y-0 left-0 w-12 sm:w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-12 sm:w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 left-0 w-12 sm:w-16 bg-gradient-to-r from-surface-darker to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-12 sm:w-16 bg-gradient-to-l from-surface-darker to-transparent pointer-events-none" />
         </div>
     )
 }

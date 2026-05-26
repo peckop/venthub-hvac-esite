@@ -42,7 +42,7 @@ const ProductHealthBadge: React.FC<ProductHealthProps> = ({ stockQty, threshold,
 
     return (
         <div
-            className={`inline-flex items-center justify-center w-6 h-6 rounded-full border text-[11px] font-bold shadow-sm ring-2 ring-offset-1 ${colors[score]}`}
+            className={`inline-flex items-center justify-center w-6 h-6 rounded-full border text-xs font-bold shadow-sm ring-2 ring-offset-1 ${colors[score]}`}
             title={`Sağlık Skoru: ${score} - ${descriptions[score]}`}
         >
             {score}

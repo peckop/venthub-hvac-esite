@@ -49,7 +49,7 @@ const SilentFanProblem: React.FC = () => {
                         return (
                             <div
                                 key={index}
-                                className={`group relative bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-300 ${scrollAnimationClasses.fadeUp(isVisible)}`}
+                                className={`group relative bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-shadow duration-300 ${scrollAnimationClasses.fadeUp(isVisible)}`}
                                 style={{ transitionDelay: `${index * 100}ms` }}
                             >
                                 <div className={`w-10 h-10 sm:w-14 sm:h-14 ${color.bg} rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>

@@ -68,12 +68,12 @@ interface TrustProofSectionProps {
 const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, trustStripDict: stripDict }) => {
   return (
     <section className="relative overflow-hidden bg-white py-24 sm:py-32">
-      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-3xl">
             <div 
               data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-xs font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
             >
               {t.eyebrow}
             </div>
@@ -98,7 +98,7 @@ const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, tr
             data-observe="fade-up"
             className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out"
           >
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2.5rem] border border-slate-200 shadow-2xl">
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-hvac-2xl border border-slate-200 shadow-2xl">
               <Image
                 src="/images/hvac_installation_close_up_premium_3.png"
                 alt={t.visualAlt || 'Visual'}
@@ -114,8 +114,8 @@ const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, tr
 
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
               {trustStripKeys.map((key) => (
-                <div key={key} className="flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center transition-all hover:bg-white hover:shadow-xl hover:shadow-slate-200/50">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div key={key} className="flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center transition-shadow hover:bg-white hover:shadow-xl hover:shadow-slate-200/50">
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     {t.badge || 'Trusted'}
                   </div>
                   <div className="mt-1 text-xs font-bold text-slate-900 leading-tight">
@@ -136,20 +136,20 @@ const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, tr
                 <div
                   key={item.key}
                   data-observe="fade-up"
-                  className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-500 ease-out ${delayClass} group relative rounded-[2rem] border border-slate-100 bg-white p-8 shadow-sm hover:-translate-y-2 hover:border-primary-navy/10 hover:shadow-2xl hover:shadow-primary-navy/5`}
+                  className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-500 ease-out ${delayClass} group relative rounded-hvac-xl border border-slate-100 bg-white p-8 shadow-sm hover:-translate-y-2 hover:border-primary-navy/10 hover:shadow-2xl hover:shadow-primary-navy/5`}
                 >
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-primary-navy transition-all duration-300 group-hover:bg-primary-navy group-hover:text-white group-hover:rotate-6">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-primary-navy transition-transform duration-300 group-hover:bg-primary-navy group-hover:text-white group-hover:rotate-6">
                     {item.icon}
                   </div>
                   
                   <div className="mt-6">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                    <div className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
                       {itemDict.eyebrow}
                     </div>
                     <h3 className="mt-2 text-xl font-bold text-slate-950">
                       {itemDict.title}
                     </h3>
-                    <p className="mt-3 text-[15px] leading-relaxed text-slate-500 font-light">
+                    <p className="mt-3 text-base leading-relaxed text-slate-500 font-light">
                       {itemDict.description}
                     </p>
                   </div>

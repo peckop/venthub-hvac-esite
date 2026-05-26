@@ -54,7 +54,7 @@ const NavSecondaryRail: React.FC<NavSecondaryRailProps> = React.memo(({ items })
     const rightItems = items.filter(item => item.id === 'account')
 
     return (
-        <div className="flex w-full items-center justify-between text-[13px] font-medium tracking-wide">
+        <div className="flex w-full items-center justify-between text-sm font-medium tracking-wide">
             {/* Left side: Corporate Links */}
             <div className="flex items-center gap-6">
                 {leftItems.map((item) => (
@@ -75,7 +75,7 @@ const NavSecondaryRail: React.FC<NavSecondaryRailProps> = React.memo(({ items })
                     <Link
                         key={item.id}
                         href={(item.href || '#') as import('next').Route}
-                        className="group flex items-center gap-2 text-white/90 transition-all duration-200 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg"
+                        className="group flex items-center gap-2 text-white/90 transition-colors duration-200 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg"
                     >
                         {getIconForId(item.id)}
                         <span>{item.label}</span>

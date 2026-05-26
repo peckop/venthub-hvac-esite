@@ -34,7 +34,7 @@ const AddToCartToast: React.FC = () => {
   if (!visible || !product) return null
 
   return (
-    <div className="fixed z-[60] inset-x-3 bottom-3 md:inset-auto md:bottom-6 md:right-6">
+    <div className="fixed z-dropdown inset-x-3 bottom-3 md:inset-auto md:bottom-6 md:right-6">
       <div className="w-full md:w-[360px] max-w-[92vw] rounded-2xl shadow-2xl border border-light-gray bg-white ring-1 ring-black/5 overflow-hidden animate-slide-up">
           <div className="p-3 md:p-4 flex items-start gap-3">
             <div className="bg-success-green/10 p-2 rounded-lg">
@@ -68,7 +68,7 @@ const AddToCartToast: React.FC = () => {
               </span>
             </Link>
           </div>
-          <div className="text-[11px] text-steel-gray text-center mt-2">{t('cartToast.autoClose')}</div>
+          <div className="text-xs text-steel-gray text-center mt-2">{t('cartToast.autoClose')}</div>
         </div>
       </div>
     </div>

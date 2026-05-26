@@ -402,28 +402,28 @@ const AdminMovementsPage: React.FC = () => {
                 sorted.map((m) => (
                   <tr key={m.id} className="group border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                     {visibleCols.date && (
-                      <td className={`${adminTableCellClass} ${cellPad} font-black text-slate-400 text-[10px] uppercase tracking-widest`}>{formatDateTime(m.created_at, lang)}</td>
+                      <td className={`${adminTableCellClass} ${cellPad} font-black text-slate-400 text-xs uppercase tracking-widest`}>{formatDateTime(m.created_at, lang)}</td>
                     )}
                     {visibleCols.product && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex flex-col gap-0.5">
                           <span className="font-black text-white uppercase tracking-tight">{productMap[m.product_id]?.name || m.product_id}</span>
                           {productMap[m.product_id]?.sku && (
-                            <span className="text-[10px] font-black text-slate-500 tracking-widest bg-white/5 w-fit px-2 py-0.5 rounded uppercase">{productMap[m.product_id]?.sku}</span>
+                            <span className="text-xs font-black text-slate-500 tracking-widest bg-white/5 w-fit px-2 py-0.5 rounded uppercase">{productMap[m.product_id]?.sku}</span>
                           )}
                         </div>
                       </td>
                     )}
                     {visibleCols.delta && (
                       <td className={`${adminTableCellClass} ${cellPad} text-right`}>
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-black font-mono px-3 py-1.5 rounded-xl border uppercase tracking-widest ${m.delta > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : m.delta < 0 ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' : 'bg-white/5 text-slate-500 border-white/5'}`}>
+                        <span className={`inline-flex items-center gap-1 text-xs font-black font-mono px-3 py-1.5 rounded-xl border uppercase tracking-widest ${m.delta > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : m.delta < 0 ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' : 'bg-white/5 text-slate-500 border-white/5'}`}>
                           {m.delta > 0 ? <ArrowUpRight size={10} strokeWidth={3} /> : m.delta < 0 ? <ArrowDownRight size={10} strokeWidth={3} /> : null}
                           {m.delta > 0 ? `+${m.delta}` : m.delta}
                         </span>
                       </td>
                     )}
                     {visibleCols.reason && (
-                      <td className={`${adminTableCellClass} ${cellPad} uppercase font-black text-[10px] tracking-widest text-[#22D3EE]`}>
+                      <td className={`${adminTableCellClass} ${cellPad} uppercase font-black text-xs tracking-widest text-brand-cyan`}>
                         <div className="flex items-center gap-2">
                            <div className="w-1 h-1 rounded-full bg-cyan-500/50"></div>
                            {reasonLabel(m.reason, t)}
@@ -431,7 +431,7 @@ const AdminMovementsPage: React.FC = () => {
                       </td>
                     )}
                     {visibleCols.ref && (
-                      <td className={`${adminTableCellClass} ${cellPad} font-black font-mono text-white/60 text-[10px] uppercase tracking-[0.1em]`}>{m.order_id ? (
+                      <td className={`${adminTableCellClass} ${cellPad} font-black font-mono text-white/60 text-xs uppercase tracking-[0.1em]`}>{m.order_id ? (
                         <span className="bg-white/5 px-2 py-1 rounded border border-white/5">
                           #{m.order_id.slice(-8).toUpperCase()}
                         </span>
@@ -447,7 +447,7 @@ const AdminMovementsPage: React.FC = () => {
 
       <div className="flex items-center justify-between mt-8 px-4 py-6 border-t border-white/5 bg-white/[0.02] rounded-3xl">
         <button className={adminButtonSecondaryClass} disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>{t('admin.ui.prev')}</button>
-        <span className="text-[10px] font-black text-slate-400 bg-white/5 px-6 py-3 rounded-2xl border border-white/5 uppercase tracking-[0.2em]">{t('admin.movements.pageLabel', { page: String(page) })}</span>
+        <span className="text-xs font-black text-slate-400 bg-white/5 px-6 py-3 rounded-2xl border border-white/5 uppercase tracking-[0.2em]">{t('admin.movements.pageLabel', { page: String(page) })}</span>
         <button className={adminButtonSecondaryClass} disabled={!hasMore} onClick={() => setPage(p => p + 1)}>{t('admin.ui.next')}</button>
       </div>
     </div>

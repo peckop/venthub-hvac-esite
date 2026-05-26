@@ -122,16 +122,16 @@ const AdminAuditLogPage: React.FC = () => {
         <div className="glass-strong border border-amber-500/20 bg-amber-500/5 p-4 rounded-2xl flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Filter size={18} className="text-amber-500" />
-            <span className="text-[11px] font-black uppercase tracking-widest text-amber-500">
+            <span className="text-xs font-black uppercase tracking-widest text-amber-500">
               Filtre: Batch <span className="font-mono text-xs">{batch}</span>
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <a href={`/admin/movements?batch=${batch}`} className={`${adminButtonSecondaryClass} !h-8 !px-3 font-black text-[10px] uppercase border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-all`}>
+            <a href={`/admin/movements?batch=${batch}`} className={`${adminButtonSecondaryClass} !h-8 !px-3 font-black text-xs uppercase border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-colors`}>
               Hareketleri Gör
             </a>
             <button
-              className={`${adminButtonSecondaryClass} !h-8 !px-3 font-black text-[10px] uppercase border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-all`}
+              className={`${adminButtonSecondaryClass} !h-8 !px-3 font-black text-xs uppercase border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-colors`}
               onClick={() => { 
                 setBatch(''); 
                 const url = new URL(typeof window !== 'undefined' ? window.location.href : 'http://localhost');
@@ -145,7 +145,7 @@ const AdminAuditLogPage: React.FC = () => {
         </div>
       )}
 
-      <div className="glass-strong rounded-[2rem] border border-white/5 overflow-hidden">
+      <div className="glass-strong rounded-hvac-xl border border-white/5 overflow-hidden">
         <AdminToolbar
           storageKey="toolbar:audit"
           search={{ value: q, onChange: setQ, placeholder: 'Tablo adı, PK veya not ara', focusShortcut: '/' }}
@@ -162,7 +162,7 @@ const AdminAuditLogPage: React.FC = () => {
           recordCount={total}
           rightExtra={(
             <div className="flex items-center gap-3 pr-2">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#0A0F1E]/40 border border-white/10 group focus-within:border-cyan-400/50 transition-all">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-deep/40 border border-white/10 group focus-within:border-cyan-400/50 transition-colors">
                 <Calendar size={14} className="text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
                 <input 
                   type="date" 
@@ -173,7 +173,7 @@ const AdminAuditLogPage: React.FC = () => {
                 />
               </div>
               <span className="text-white/20">—</span>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#0A0F1E]/40 border border-white/10 group focus-within:border-cyan-400/50 transition-all">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-deep/40 border border-white/10 group focus-within:border-cyan-400/50 transition-colors">
                 <Calendar size={14} className="text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
                 <input 
                   type="date" 
@@ -190,7 +190,7 @@ const AdminAuditLogPage: React.FC = () => {
         <div className="flex items-center justify-between gap-4 px-6 py-4 border-t border-white/5 bg-white/[0.02]">
           <div className="flex items-center gap-2">
             <History size={16} className="text-cyan-400" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Denetim Geçmişi</span>
+            <span className="text-xs font-black uppercase tracking-widest text-slate-400">Denetim Geçmişi</span>
           </div>
           
           <div className="flex items-center gap-3">
@@ -217,7 +217,7 @@ const AdminAuditLogPage: React.FC = () => {
         </div>
 
         <div className="p-4 pt-0">
-          <div ref={dragScrollRef} className="overflow-x-auto rounded-2xl border border-white/5 bg-[#0A0F1E]/40">
+          <div ref={dragScrollRef} className="overflow-x-auto rounded-2xl border border-white/5 bg-surface-deep/40">
             <table className="w-full text-left">
               <thead>
                 <tr className="glass-strong">
@@ -252,7 +252,7 @@ const AdminAuditLogPage: React.FC = () => {
                       <tr className={`group transition-colors ${expandedId === r.id ? 'bg-cyan-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
                         <td className={`${adminTableCellClass} whitespace-nowrap opacity-60`}>{formatDateTime(r.at, lang)}</td>
                         <td className={adminTableCellClass}>
-                          <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all ${
+                          <span className={`px-2 py-0.5 rounded-lg text-xs font-black uppercase tracking-wider border transition-colors ${
                             r.action === 'INSERT' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                             r.action === 'UPDATE' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
                             r.action === 'DELETE' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
@@ -262,7 +262,7 @@ const AdminAuditLogPage: React.FC = () => {
                           </span>
                         </td>
                         <td className={adminTableCellClass}>{r.table_name}</td>
-                        <td className={`${adminTableCellClass} font-mono text-[11px] text-slate-400`}>{r.row_pk || '-'}</td>
+                        <td className={`${adminTableCellClass} font-mono text-xs text-slate-400`}>{r.row_pk || '-'}</td>
                         <td className={`${adminTableCellClass} max-w-xs truncate`}>{r.comment || '-'}</td>
                         <td className={adminTableCellClass}>
                           <button
@@ -278,9 +278,9 @@ const AdminAuditLogPage: React.FC = () => {
                           <td colSpan={6} className="p-6 bg-black/40 shadow-inner">
                             <div className="flex items-center gap-3 mb-4">
                               <Terminal size={14} className="text-cyan-400" />
-                              <div className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em]">İşlem Detayları</div>
+                              <div className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em]">İşlem Detayları</div>
                             </div>
-                            <div className="rounded-2xl border border-white/5 bg-[#0A0F1E]/60 p-1">
+                            <div className="rounded-2xl border border-white/5 bg-surface-deep/60 p-1">
                               <JsonDiffViewer before={r.before} after={r.after} />
                             </div>
                           </td>

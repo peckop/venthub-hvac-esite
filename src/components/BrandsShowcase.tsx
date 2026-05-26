@@ -29,16 +29,16 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
       <div className="flex marquee-premium-track w-max gap-20 py-12">
         {repeated.map((brand, idx) => (
           <Link key={`${brand.slug}-${idx}`} href={`/brands/${brand.slug}`} className="group/brand">
-            <div className="flex flex-col items-center justify-center gap-6 transition-all duration-700">
+            <div className="flex flex-col items-center justify-center gap-6 transition-colors duration-700">
               {/* Ultra-Minimalist Floating Logo */}
-              <div className="relative flex h-24 w-48 items-center justify-center transition-all duration-700 grayscale opacity-30 group-hover/brand:grayscale-0 group-hover/brand:opacity-100 group-hover/brand:scale-110">
+              <div className="relative flex h-24 w-48 items-center justify-center transition-[filter,transform,opacity] duration-700 grayscale opacity-30 group-hover/brand:grayscale-0 group-hover/brand:opacity-100 group-hover/brand:scale-110">
                 <BrandIcon brand={brand.name} />
               </div>
               
               {/* Subtle Indicator */}
-              <div className="h-px w-0 bg-cyan-500/40 transition-all duration-700 group-hover/brand:w-12" />
+              <div className="h-px w-0 bg-cyan-500/40 transition-[width] duration-700 group-hover/brand:w-12" />
               
-              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 opacity-0 group-hover/brand:opacity-100 transition-all duration-500">
+              <span className="text-xs font-black uppercase tracking-[0.4em] text-slate-400 opacity-0 group-hover/brand:opacity-100 transition-opacity duration-500">
                 {brand.name}
               </span>
             </div>
@@ -58,14 +58,14 @@ const BrandsShowcase: React.FC = () => {
       {/* Background Atmosphere: Extremely Subtle */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(248,250,252,1)_0%,rgba(255,255,255,1)_100%)]" />
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header: Centered & Sophisticated */}
         <div className="text-center mb-20">
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-[10px] font-black uppercase tracking-[0.5em] text-cyan-600 mb-6"
+            className="text-xs font-black uppercase tracking-[0.5em] text-cyan-600 mb-6"
           >
             {t('brands.sectionTitle')}
           </motion.div>
@@ -93,10 +93,10 @@ const BrandsShowcase: React.FC = () => {
         <div className="mt-20 text-center">
           <Link
             href={Routes.brands()}
-            className="group inline-flex items-center gap-4 text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-all"
+            className="group inline-flex items-center gap-4 text-xs font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-colors"
           >
             <span>{t('brands.viewAll')}</span>
-            <div className="h-px w-8 bg-slate-200 group-hover:w-16 group-hover:bg-cyan-500 transition-all duration-500" />
+            <div className="h-px w-8 bg-slate-200 group-hover:w-16 group-hover:bg-cyan-500 transition-[width,background-color] duration-500" />
           </Link>
         </div>
       </div>

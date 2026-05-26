@@ -22,7 +22,7 @@ const AddressSelectModal: React.FC<AddressSelectModalProps> = ({
     onDelete,
     t
 }) => (
-    <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
+    <div className="fixed inset-0 z-dropdown bg-black/40 flex items-center justify-center">
         <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
             <div className="px-5 py-4 border-b flex items-center justify-between">
                 <div className="text-industrial-gray font-semibold">{title}</div>
@@ -41,10 +41,10 @@ const AddressSelectModal: React.FC<AddressSelectModalProps> = ({
                                 <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">{a.full_address}</div>
                                 <div className="mt-3 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <button type="button" className="text-[11px] text-primary-navy hover:underline" onClick={() => onEdit(a)}>
+                                        <button type="button" className="text-xs text-primary-navy hover:underline" onClick={() => onEdit(a)}>
                                             {t('checkout.saved.edit')}
                                         </button>
-                                        <button type="button" className="text-[11px] text-red-600 hover:underline" onClick={() => onDelete(a.id)}>
+                                        <button type="button" className="text-xs text-red-600 hover:underline" onClick={() => onDelete(a.id)}>
                                             {t('checkout.saved.delete')}
                                         </button>
                                     </div>

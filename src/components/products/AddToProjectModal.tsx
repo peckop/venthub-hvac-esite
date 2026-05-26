@@ -53,7 +53,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
 
   return (
     <div 
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      className="fixed inset-0 z-modal flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="add-to-project-title"
@@ -93,7 +93,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
                />
             </div>
             <div>
-              <div className="text-[10px] font-bold text-secondary-blue uppercase tracking-wider">{product.brand}</div>
+              <div className="text-xs font-bold text-secondary-blue uppercase tracking-wider">{product.brand}</div>
               <h4 className="text-sm font-bold text-industrial-gray line-clamp-2 leading-tight">{product.name}</h4>
             </div>
           </div>
@@ -112,7 +112,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
                     key={project.id}
                     disabled={isAdding}
                     onClick={() => handleAddToExisting(project.id)}
-                    className="w-full flex items-center justify-between p-3 rounded-xl border border-light-gray hover:border-primary-navy hover:bg-air-blue group transition-all"
+                    className="w-full flex items-center justify-between p-3 rounded-xl border border-light-gray hover:border-primary-navy hover:bg-air-blue group transition-colors"
                   >
                     <span className="text-sm font-semibold text-industrial-gray group-hover:text-primary-navy">
                       {project.name}
@@ -132,7 +132,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
           {!isCreating ? (
             <button
               onClick={() => setIsCreating(true)}
-              className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl bg-light-gray text-industrial-gray hover:bg-secondary-blue hover:text-white transition-all font-bold text-sm"
+              className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl bg-light-gray text-industrial-gray hover:bg-secondary-blue hover:text-white transition-colors font-bold text-sm"
             >
               <Plus size={18} />
               <span>Yeni Proje Oluştur</span>
@@ -149,7 +149,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
                   placeholder="Proje Adı (Örn: Hilton Otel Renovasyonu)"
-                  className="w-full px-4 py-3 rounded-xl border border-light-gray focus:border-primary-navy focus:ring-2 focus:ring-primary-navy/10 outline-none text-sm transition-all pr-12"
+                  className="w-full px-4 py-3 rounded-xl border border-light-gray focus:border-primary-navy focus:ring-2 focus:ring-primary-navy/10 outline-none text-sm transition-colors pr-12"
                   onKeyDown={(e) => e.key === 'Enter' && handleCreateAndAdd()}
                 />
                 <button
@@ -170,7 +170,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
           )}
         </div>
 
-        <div className="px-6 py-4 bg-light-gray/30 text-[10px] text-steel-gray leading-relaxed">
+        <div className="px-6 py-4 bg-light-gray/30 text-xs text-steel-gray leading-relaxed">
           Projelerinizi hesabım sayfasından yönetebilir, ürün listelerini PDF olarak indirebilir veya teklif isteyebilirsiniz.
         </div>
       </motion.div>

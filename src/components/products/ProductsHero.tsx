@@ -22,7 +22,7 @@ const ProductsHero: React.FC<ProductsHeroProps> = ({
     const { t } = useI18n()
 
     return (
-        <section className="relative min-h-[320px] rounded-2xl overflow-hidden bg-[#0a1628]">
+        <section className="relative min-h-[320px] rounded-2xl overflow-hidden bg-surface-navy">
             {/* Background Image - Optimized for LCP */}
             <div className="absolute inset-0 z-0">
                 <Image
@@ -33,7 +33,7 @@ const ProductsHero: React.FC<ProductsHeroProps> = ({
                     className="object-cover opacity-20"
                 />
                 {/* Gradient Overlay to maintain brand colors and readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628]/80 via-[#0f2040]/90 to-[#0a1628]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-surface-navy/80 via-surface-navy-mid/90 to-surface-navy" />
             </div>
 
             {/* Background Pattern - Decorative SVGs */}
@@ -68,7 +68,7 @@ const ProductsHero: React.FC<ProductsHeroProps> = ({
                 <div className="w-full max-w-xl mx-auto px-4">
                     <div className="relative group">
                         <div className="absolute inset-0 bg-white/10 blur-xl rounded-2xl group-focus-within:bg-cyan-400/10 transition-colors" />
-                        <div className="relative flex items-center bg-white rounded-xl shadow-2xl overflow-hidden transition-all focus-within:ring-2 focus-within:ring-cyan-400/50">
+                        <div className="relative flex items-center bg-white rounded-xl shadow-2xl overflow-hidden transition-colors focus-within:ring-2 focus-within:ring-cyan-400/50">
                             <Search className="absolute left-4 text-gray-400 group-focus-within:text-cyan-500 transition-colors" size={20} aria-hidden="true" />
                             <input
                                 ref={searchInputRef}

@@ -52,7 +52,7 @@ export const QuickEntryRail: React.FC<QuickEntryRailProps> = ({ onQuoteClick }) 
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-steel-gray">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-steel-gray">
               {t('home.quickEntry.eyebrow')}
             </div>
             <h2 className="mt-1 text-lg font-semibold text-slate-950 sm:text-xl">
@@ -69,7 +69,7 @@ export const QuickEntryRail: React.FC<QuickEntryRailProps> = ({ onQuoteClick }) 
             <Link
               key={item.id}
               href={item.href}
-              className="group flex min-h-[88px] items-start gap-3 rounded-[1.55rem] border border-slate-200 bg-white px-4 py-4 shadow-[0_18px_35px_-30px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-navy/20 hover:shadow-[0_22px_40px_-28px_rgba(37,99,235,0.45)]"
+              className="group flex min-h-[88px] items-start gap-3 rounded-hvac-lg border border-slate-200 bg-white px-4 py-4 shadow-[0_18px_35px_-30px_rgba(15,23,42,0.45)] transition-transform duration-300 hover:-translate-y-0.5 hover:border-primary-navy/20 hover:shadow-[0_22px_40px_-28px_rgba(37,99,235,0.45)]"
             >
               <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary-navy/10 bg-primary-navy/[0.06] text-primary-navy transition-colors group-hover:border-primary-navy/20 group-hover:bg-primary-navy/10">
                 {item.icon}
@@ -88,7 +88,7 @@ export const QuickEntryRail: React.FC<QuickEntryRailProps> = ({ onQuoteClick }) 
           <button
             type="button"
             onClick={onQuoteClick}
-            className="group flex min-h-[88px] items-start gap-3 rounded-[1.55rem] border border-primary-navy/15 bg-[linear-gradient(135deg,rgba(15,23,42,0.02),rgba(37,99,235,0.06))] px-4 py-4 shadow-[0_18px_35px_-30px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-navy/25 hover:shadow-[0_22px_40px_-28px_rgba(37,99,235,0.45)]"
+            className="group flex min-h-[88px] items-start gap-3 rounded-hvac-lg border border-primary-navy/15 bg-[linear-gradient(135deg,rgba(15,23,42,0.02),rgba(37,99,235,0.06))] px-4 py-4 shadow-[0_18px_35px_-30px_rgba(15,23,42,0.45)] transition-transform duration-300 hover:-translate-y-0.5 hover:border-primary-navy/25 hover:shadow-[0_22px_40px_-28px_rgba(37,99,235,0.45)]"
           >
             <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary-navy/15 bg-primary-navy text-white shadow-sm transition-colors group-hover:bg-secondary-blue">
               <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">

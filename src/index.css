@@ -186,16 +186,16 @@ textarea:focus-visible {
 
 /* Modern Button Styles */
 .btn-primary {
-  @apply bg-gradient-to-r from-primary-navy to-secondary-blue hover:from-secondary-blue hover:to-primary-navy text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105;
+  @apply bg-gradient-to-r from-primary-navy to-secondary-blue hover:from-secondary-blue hover:to-primary-navy text-white font-bold py-3 px-6 rounded-xl transition-[color,background-color,box-shadow,transform] duration-300 shadow-lg hover:shadow-xl transform hover:scale-105;
 }
 
 .btn-secondary {
-  @apply bg-white hover:bg-gray-50 text-industrial-gray font-medium py-2 px-4 rounded-lg border border-light-gray hover:border-primary-navy transition-all duration-300;
+  @apply bg-white hover:bg-gray-50 text-industrial-gray font-medium py-2 px-4 rounded-lg border border-light-gray hover:border-primary-navy transition-colors duration-300;
 }
 
 /* Modern Card Styles */
 .card-modern {
-  @apply bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-gray-200;
+  @apply bg-white rounded-xl shadow-sm hover:shadow-lg transition-[box-shadow,border-color] duration-300 border border-gray-100 hover:border-gray-200;
 }
 
 /* Gradient Text */
@@ -208,7 +208,7 @@ textarea:focus-visible {
 
 /* Modern Input Styles */
 .input-modern {
-  @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder:text-steel-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-all duration-300 shadow-sm hover:shadow-md;
+  @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder:text-steel-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-[box-shadow,border-color,background-color] duration-300 shadow-sm hover:shadow-md;
 }
 
 /* WhatsApp-specific styles */
@@ -217,7 +217,7 @@ textarea:focus-visible {
 }
 
 .whatsapp-btn {
-  @apply inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105;
+  @apply inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-[color,background-color,box-shadow,transform] duration-300 shadow-md hover:shadow-lg transform hover:scale-105;
 }
 
 .whatsapp-btn:hover {
@@ -234,7 +234,7 @@ textarea:focus-visible {
 
 /* WhatsApp floating button - Modern & Responsive */
 .whatsapp-float {
-  @apply fixed z-[9999] bg-emerald-500 text-white rounded-full shadow-2xl transition-all duration-500 ease-in-out flex items-center justify-center border-2 border-white;
+  @apply fixed z-toast bg-emerald-500 text-white rounded-full shadow-2xl transition-[width,background-color,border-radius] duration-500 ease-in-out flex items-center justify-center border-2 border-white;
   bottom: 110px;
   right: 20px;
   width: 56px;
@@ -272,9 +272,45 @@ textarea:focus-visible {
 
 @layer base {
   :root {
+    /* ── Design System Tokens ──────────────────────────── */
+    --surface-deep: 224 52% 8%;
+    --surface-darker: 224 71% 4%;
+    --surface-darkest: 216 33% 3%;
+    --surface-midnight: 228 49% 10%;
+    --surface-navy: 216 60% 10%;
+    --surface-navy-mid: 216 62% 16%;
+    --brand-cyan: 189 78% 53%;
+    --vortice-green: 149 100% 29%;
+    --italian-red: 355 66% 49%;
+    --primary-navy: 226 71% 40%;
+    --secondary-blue: 201 98% 39%;
+    --industrial-gray: 215 19% 27%;
+    --steel-gray: 220 9% 46%;
+    --light-gray: 220 14% 96%;
+    --air-blue: 202 100% 96%;
+    --clean-white: 0 0% 100%;
+    --font-size-display: clamp(2.5rem, 1rem + 5vw, 5.5rem);
+
+    /* ── Legacy Variables (backward compat) ──────────── */
+    --navy-900: #0A0F1E;
+    --navy-800: #0D1426;
+    --navy-700: #111830;
+    --navy-600: #162040;
+    --navy-500: #1E2D55;
+    --cyan-400: #22D3EE;
+    --cyan-500: #06B6D4;
+    --cyan-glow: rgba(34, 211, 238, 0.15);
+    --amber-400: #FBBF24;
+    --text-primary: rgba(255,255,255,0.92);
+    --text-secondary: rgba(255,255,255,0.55);
+    --text-muted: rgba(255,255,255,0.30);
+    --glass-bg: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.07);
+    --glass-hover: rgba(255,255,255,0.07);
+
+    /* ── Sidebar Variables ──────────────────────────── */
     --radius: 0.5rem;
     --sidebar-background: 0 0% 98%;
-    /* Avoid synthetic bold/italic to reduce layout shifts */
     font-synthesis: none;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -282,14 +318,22 @@ textarea:focus-visible {
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  html, body {
-    width: 100%;
-    margin: 0;
-    overflow-x: hidden;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  .light {
+    --surface-deep: 210 40% 96%;
+    --surface-darker: 215 28% 93%;
+    --surface-darkest: 220 20% 90%;
+    --surface-midnight: 220 25% 95%;
+    --surface-navy: 215 20% 93%;
+    --surface-navy-mid: 215 22% 88%;
+    --brand-cyan: 189 78% 40%;
+    --vortice-green: 149 100% 29%;
+    --italian-red: 355 66% 49%;
+    --primary-navy: 226 71% 40%;
+    --secondary-blue: 201 98% 39%;
+    --font-size-display: clamp(2rem, 1rem + 4vw, 4.5rem);
   }
 
   .dark {
@@ -300,11 +344,16 @@ textarea:focus-visible {
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  html, body {
+    width: 100%;
+    margin: 0;
+    overflow-x: hidden;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 }
-
-
 
 img {
   object-position: top;
@@ -344,32 +393,40 @@ img {
   will-change: filter, background-image;
 }
 
-/* ── VentHub Industrial Navy Theme ─────────────────────────────────── */
-:root {
-  /* Base shell — Industrial Navy */
-  --navy-900:  #0A0F1E;
-  --navy-800:  #0D1426;
-  --navy-700:  #111830;
-  --navy-600:  #162040;
-  --navy-500:  #1E2D55;
+/* ── Typography (Bringhurst & Vercel Guidelines) ────────────────────── */
+body {
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 1.6;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+h1, h2, h3 {
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+p, li {
+  text-wrap: pretty;
+}
 
-  /* Accent — Electric Cyan */
-  --cyan-400:  #22D3EE;
-  --cyan-500:  #06B6D4;
-  --cyan-glow: rgba(34, 211, 238, 0.15);
+/* ── Dark Section Font Smoothing (Hybrid theme) ─────────────────────── */
+.bg-slate-950, .bg-slate-900,
+.bg-surface-deep, .bg-surface-darker, .bg-surface-darkest {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  /* Accent warm — Amber for alerts/warnings */
-  --amber-400: #FBBF24;
+/* ── E-Commerce Tabular Nums ────────────────────────────────────────── */
+.tabular-nums, [data-price], td[data-numeric] {
+  font-variant-numeric: tabular-nums;
+}
 
-  /* Neutral text scale */
-  --text-primary:   rgba(255,255,255,0.92);
-  --text-secondary: rgba(255,255,255,0.55);
-  --text-muted:     rgba(255,255,255,0.30);
-
-  /* Glass surfaces */
-  --glass-bg:     rgba(255,255,255,0.04);
-  --glass-border: rgba(255,255,255,0.07);
-  --glass-hover:  rgba(255,255,255,0.07);
+/* ── Accessibility ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ── Glassmorphism utility classes ─────────────────────────────────── */

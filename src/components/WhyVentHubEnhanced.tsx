@@ -63,7 +63,7 @@ const WhyVentHubEnhanced: React.FC = () => {
                         return (
                             <div
                                 key={index}
-                                className={`text-center p-6 sm:p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 ${scrollAnimationClasses.fadeUp(isVisible)}`}
+                                className={`text-center p-6 sm:p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors duration-300 ${scrollAnimationClasses.fadeUp(isVisible)}`}
                                 style={{ transitionDelay: `${index * 100}ms` }}
                             >
                                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 ${feature.bgColor}`}>
@@ -84,7 +84,7 @@ const WhyVentHubEnhanced: React.FC = () => {
                             return (
                                 <div
                                     key={index}
-                                    className="flex items-center justify-center gap-2 sm:gap-3 py-3 px-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300"
+                                    className="flex items-center justify-center gap-2 sm:gap-3 py-3 px-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors duration-300"
                                 >
                                     <Icon className={badge.color} size={20} />
                                     <span className="text-xs sm:text-sm font-medium text-gray-200">{badge.label}</span>

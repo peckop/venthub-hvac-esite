@@ -62,7 +62,7 @@ const ApplicationCards: React.FC = () => {
                     <Link
                         key={app.id}
                         href={app.href as import('next').Route}
-                        className="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary-navy/20 transition-all duration-300"
+                        className="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary-navy/20 transition-shadow duration-300"
                     >
                         {/* Image Container with Next/Image */}
                         <div className="relative h-40 w-full overflow-hidden bg-gray-100">

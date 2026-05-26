@@ -170,7 +170,7 @@ export default function AccountOverviewPage() {
 
         {/* Metric Cards */}
         <div className="lg:w-2/3 grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 flex flex-col justify-center relative overflow-hidden group hover:shadow-md transition-all hover:-translate-y-1">
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 flex flex-col justify-center relative overflow-hidden group hover:shadow-md transition-transform hover:-translate-y-1">
             <Package className="absolute -right-4 -bottom-4 w-24 h-24 text-slate-50 opacity-50 group-hover:scale-110 transition-transform duration-500" />
             <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-4 shadow-sm border border-amber-100">
               <Clock className="w-6 h-6" />
@@ -179,7 +179,7 @@ export default function AccountOverviewPage() {
             <div className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">{t('account.overview.activeOrders')}</div>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 flex flex-col justify-center relative overflow-hidden group hover:shadow-md transition-all hover:-translate-y-1">
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 flex flex-col justify-center relative overflow-hidden group hover:shadow-md transition-transform hover:-translate-y-1">
             <CheckCircle className="absolute -right-4 -bottom-4 w-24 h-24 text-slate-50 opacity-50 group-hover:scale-110 transition-transform duration-500" />
             <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-4 shadow-sm border border-emerald-100">
               <Package className="w-6 h-6" />
@@ -188,7 +188,7 @@ export default function AccountOverviewPage() {
             <div className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">{t('account.overview.completedOrders')}</div>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 flex flex-col justify-center relative overflow-hidden group hover:shadow-md transition-all hover:-translate-y-1">
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 flex flex-col justify-center relative overflow-hidden group hover:shadow-md transition-transform hover:-translate-y-1">
             <TrendingUp className="absolute -right-4 -bottom-4 w-24 h-24 text-slate-50 opacity-50 group-hover:scale-110 transition-transform duration-500" />
             <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4 shadow-sm border border-blue-100">
               <CreditCard className="w-6 h-6" />
@@ -241,11 +241,11 @@ export default function AccountOverviewPage() {
                     return (
                       <React.Fragment key={step.key}>
                         <div className="flex flex-col items-center">
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm transition-all duration-300 ${active ? 'bg-primary-navy text-white scale-110 shadow-primary-navy/20' : 'bg-white border-2 border-slate-200 text-slate-400'
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm transition-colors duration-300 ${active ? 'bg-primary-navy text-white scale-110 shadow-primary-navy/20' : 'bg-white border-2 border-slate-200 text-slate-400'
                             }`}>
                             <StepIcon size={20} />
                           </div>
-                          <span className={`mt-3 text-[11px] font-bold uppercase tracking-wider transition-colors ${active ? 'text-primary-navy' : 'text-slate-400'}`}>
+                          <span className={`mt-3 text-xs font-bold uppercase tracking-wider transition-colors ${active ? 'text-primary-navy' : 'text-slate-400'}`}>
                             {step.label}
                           </span>
                         </div>
@@ -258,7 +258,7 @@ export default function AccountOverviewPage() {
                 </div>
 
                 <div className="mt-8 flex justify-center">
-                  <button onClick={() => router.push('/account/shipments')} className="h-10 px-6 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 hover:border-primary-navy hover:text-primary-navy transition-all shadow-sm">
+                  <button onClick={() => router.push('/account/shipments')} className="h-10 px-6 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 hover:border-primary-navy hover:text-primary-navy transition-shadow shadow-sm">
                     Tüm Kargoları Görüntüle
                   </button>
                 </div>
@@ -353,7 +353,7 @@ export default function AccountOverviewPage() {
 
               <div className="space-y-4">
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Truck size={12} /> Varsayılan Teslimat</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Truck size={12} /> Varsayılan Teslimat</div>
                   {defaultShipping ? (
                     <div className="text-sm font-bold text-slate-700 leading-relaxed border-l-2 border-primary-navy pl-3 py-0.5">{defaultShipping.full_address}</div>
                   ) : (
@@ -362,7 +362,7 @@ export default function AccountOverviewPage() {
                 </div>
 
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><CreditCard size={12} /> Varsayılan Fatura</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><CreditCard size={12} /> Varsayılan Fatura</div>
                   {defaultBilling ? (
                     <div className="text-sm font-bold text-slate-700 leading-relaxed border-l-2 border-emerald-500 pl-3 py-0.5">{defaultBilling.full_address}</div>
                   ) : (
@@ -371,7 +371,7 @@ export default function AccountOverviewPage() {
                 </div>
               </div>
 
-              <button onClick={() => router.push('/account/addresses')} className="w-full mt-6 h-10 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-all shadow-sm">
+              <button onClick={() => router.push('/account/addresses')} className="w-full mt-6 h-10 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-shadow shadow-sm">
                 Adresleri Yönet
               </button>
             </div>
@@ -404,7 +404,7 @@ export default function AccountOverviewPage() {
             </div>
             <h3 className="text-base font-bold text-slate-900 mb-1">Desteğe mi ihtiyacınız var?</h3>
             <p className="text-xs font-medium text-slate-500 mb-4">Sipariş, iade veya bakiye konularında anında yardım alın.</p>
-            <a href="mailto:support@venthub.com" className="h-9 px-4 rounded-lg bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-all shadow-sm flex items-center justify-center">
+            <a href="mailto:support@venthub.com" className="h-9 px-4 rounded-lg bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-shadow shadow-sm flex items-center justify-center">
               Müşteri Hizmetleri
             </a>
           </div>

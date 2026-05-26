@@ -29,12 +29,12 @@ const normalizeImageUrl = (url: string | null | undefined): string => {
 const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displayCategories = [] }) => {
   return (
     <section id="categories" className="bg-white py-24 sm:py-32">
-      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-3xl">
             <div 
               data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-xs font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
             >
               DETERMİNİSTİK SİSTEMLER
             </div>
@@ -91,8 +91,8 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
 
                       <div className="w-12 h-[1px] bg-white/30 group-hover:w-24 group-hover:bg-cyan-500 transition-[width,background-color] duration-700" />
                       
-                      <div className="mt-6 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 transition-all duration-700 overflow-hidden">
-                        <p className="text-[10px] text-slate-200 font-light leading-relaxed tracking-wider mb-6 max-w-[200px] line-clamp-2">
+                      <div className="mt-6 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-700 overflow-hidden">
+                        <p className="text-xs text-slate-200 font-light leading-relaxed tracking-wider mb-6 max-w-[200px] line-clamp-2">
                           {category.description || 'Profesyonel Havalandırma Çözümleri'}
                         </p>
                       </div>

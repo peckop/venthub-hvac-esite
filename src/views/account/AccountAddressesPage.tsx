@@ -171,33 +171,33 @@ export default function AccountAddressesPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Adres Başlığı</label>
-              <input value={form.label || ''} onChange={(e) => setForm(f => ({ ...f, label: e.target.value }))} placeholder="Ev, İş, Depo vb." className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+              <input value={form.label || ''} onChange={(e) => setForm(f => ({ ...f, label: e.target.value }))} placeholder="Ev, İş, Depo vb." className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2 sm:col-span-1 lg:col-span-2">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Ad Soyad / Firma</label>
-                <input value={form.full_name || ''} onChange={(e) => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="Kişi veya Firma adı" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+                <input value={form.full_name || ''} onChange={(e) => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="Kişi veya Firma adı" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
               </div>
               <div className="col-span-2 sm:col-span-1 lg:col-span-2">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Telefon</label>
-                <input value={form.phone || ''} onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+90 5XX XXX XX XX" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+                <input value={form.phone || ''} onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+90 5XX XXX XX XX" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Açık Adres</label>
-              <textarea value={form.address_line} onChange={(e) => setForm(f => ({ ...f, address_line: e.target.value }))} placeholder="Mahalle, sokak, bina ve daire no..." className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy min-h-[100px] resize-y transition-all" required />
+              <textarea value={form.address_line} onChange={(e) => setForm(f => ({ ...f, address_line: e.target.value }))} placeholder="Mahalle, sokak, bina ve daire no..." className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy min-h-[100px] resize-y transition-colors" required />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">İl</label>
-                <input value={form.city} onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))} placeholder="İl" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" required />
+                <input value={form.city} onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))} placeholder="İl" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">İlçe</label>
-                <input value={form.district} onChange={(e) => setForm(f => ({ ...f, district: e.target.value }))} placeholder="İlçe" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" required />
+                <input value={form.district} onChange={(e) => setForm(f => ({ ...f, district: e.target.value }))} placeholder="İlçe" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" required />
               </div>
             </div>
 
@@ -222,11 +222,11 @@ export default function AccountAddressesPage() {
 
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-6 border-t border-slate-100">
               {isEditing && (
-                <button type="button" onClick={resetForm} className="w-full sm:w-auto h-10 px-5 rounded-lg border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all focus:outline-none focus:ring-2 focus:ring-slate-200">
+                <button type="button" onClick={resetForm} className="w-full sm:w-auto h-10 px-5 rounded-lg border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200">
                   {t('account.addresses.cancel')}
                 </button>
               )}
-              <button disabled={saving} className="w-full h-10 bg-primary-navy hover:bg-industrial-gray text-white flex-1 px-4 rounded-lg font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-navy/50 flex items-center justify-center gap-2">
+              <button disabled={saving} className="w-full h-10 bg-primary-navy hover:bg-industrial-gray text-white flex-1 px-4 rounded-lg font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-navy/50 flex items-center justify-center gap-2">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 {isEditing ? (t('account.addresses.submit.update')) : (t('account.addresses.submit.add'))}
               </button>
@@ -267,7 +267,7 @@ export default function AccountAddressesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {items.map((a) => (
-              <div key={a.id} className="group bg-white border border-slate-200/60 hover:border-primary-navy/40 rounded-2xl shadow-sm hover:shadow-md relative overflow-hidden transition-all flex flex-col">
+              <div key={a.id} className="group bg-white border border-slate-200/60 hover:border-primary-navy/40 rounded-2xl shadow-sm hover:shadow-md relative overflow-hidden transition-shadow flex flex-col">
                 <div className="h-1.5 w-full bg-gradient-to-r from-slate-200 to-slate-100 opacity-50 absolute top-0 left-0" />
 
                 <div className="p-6 flex-1 flex flex-col">
@@ -306,7 +306,7 @@ export default function AccountAddressesPage() {
                         <Truck className="w-3.5 h-3.5" /> Teslimat
                       </div>
                       {a.is_default_shipping ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] uppercase tracking-wider font-bold bg-green-50 text-green-700 border border-green-200 shadow-sm">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs uppercase tracking-wider font-bold bg-green-50 text-green-700 border border-green-200 shadow-sm">
                           <CheckCircle className="w-3 h-3" /> Varsayılan
                         </span>
                       ) : (
@@ -321,7 +321,7 @@ export default function AccountAddressesPage() {
                         <CreditCard className="w-3.5 h-3.5" /> Fatura
                       </div>
                       {a.is_default_billing ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] uppercase tracking-wider font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs uppercase tracking-wider font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
                           <CheckCircle className="w-3 h-3" /> Varsayılan
                         </span>
                       ) : (

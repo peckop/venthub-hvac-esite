@@ -51,8 +51,8 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
             const data = payload[0].payload
             return (
                 <div className="glass-strong border border-white/5 py-3 px-5 rounded-2xl z-50 shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in-95 duration-200">
-                    <p className="text-[13px] font-black text-white mb-2 uppercase tracking-wider">{data.dayName}, {String(data.hour).padStart(2, '0')}:00</p>
-                    <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    <p className="text-sm font-black text-white mb-2 uppercase tracking-wider">{data.dayName}, {String(data.hour).padStart(2, '0')}:00</p>
+                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
                         Sipariş: <span className="text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">{data.count}</span>
                     </p>
                 </div>
@@ -75,8 +75,8 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
         <div className="flex flex-col h-full w-full group/heatmap">
             {title && (
                 <div className="mb-10">
-                    <h3 className="text-[12px] font-black text-slate-500 uppercase tracking-[0.3em] group-hover/heatmap:text-cyan-400 transition-colors uppercase">{title}</h3>
-                    <div className="h-0.5 w-12 bg-cyan-500/30 mt-2 rounded-full group-hover/heatmap:w-20 transition-all duration-700" />
+                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] group-hover/heatmap:text-cyan-400 transition-colors uppercase">{title}</h3>
+                    <div className="h-0.5 w-12 bg-cyan-500/30 mt-2 rounded-full group-hover/heatmap:w-20 transition-colors duration-700" />
                 </div>
             )}
 
@@ -144,7 +144,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
                                             stroke="#22d3ee"
                                             strokeWidth={intensity > 0.7 ? 2 : 0}
                                             strokeOpacity={intensity}
-                                            className="transition-all duration-700 hover:fill-white cursor-pointer origin-center"
+                                            className="transition-colors duration-700 hover:fill-white cursor-pointer origin-center"
                                             style={{ filter: intensity > 0.5 ? `drop-shadow(0 0 ${8 * intensity}px rgba(34,211,238,${0.5 * intensity}))` : 'none' }}
                                         />
                                     )
@@ -157,7 +157,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
 
             {chartData.length > 0 && (
                 <div className="mt-8 flex items-center justify-end gap-4 px-6 relative z-10">
-                    <span className="text-[9px] text-slate-600 font-black uppercase tracking-[0.2em] italic">Yoğunluk Skalası</span>
+                    <span className="text-xs text-slate-600 font-black uppercase tracking-[0.2em] italic">Yoğunluk Skalası</span>
                     <div className="flex items-center gap-2 p-1.5 glass rounded-full border border-white/5">
                         <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-20 border border-white/10"></div>
                         <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-50 border border-white/10"></div>

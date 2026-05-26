@@ -113,7 +113,7 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
                 onClick={() => addBlock(bt.type)}
               >
                 <bt.icon className="w-5 h-5 text-slate-400" />
-                <span className="text-[10px] font-medium uppercase tracking-wider">{bt.label}</span>
+                <span className="text-xs font-medium uppercase tracking-wider">{bt.label}</span>
               </button>
             ))}
           </div>

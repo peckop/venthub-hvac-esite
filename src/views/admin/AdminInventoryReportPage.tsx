@@ -150,7 +150,7 @@ export default function AdminInventoryReportPage() {
     const outboundMovements = filteredMovements.filter(m => (m.delta as number) < 0).slice(0, 50)
 
     if (loading) return (
-        <div className="space-y-6 max-w-[1400px]">
+        <div className="space-y-6 max-w-page">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <div className="h-8 w-64 bg-slate-200 animate-pulse rounded mb-2"></div>
@@ -166,7 +166,7 @@ export default function AdminInventoryReportPage() {
     )
 
     return (
-        <div className="space-y-6 max-w-[1400px]">
+        <div className="space-y-6 max-w-page">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className={adminSectionTitleClass}>Stok Hareket Raporu</h1>
@@ -198,7 +198,7 @@ export default function AdminInventoryReportPage() {
                     <div className={`${adminCardClass} p-6 border-l-4 border-l-emerald-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <ArrowDownRight className="w-5 h-5 text-emerald-500" />
-                            <h3 className="font-black uppercase tracking-[0.2em] text-[9px] text-slate-500/80">Toplam Giriş</h3>
+                            <h3 className="font-black uppercase tracking-[0.2em] text-xs text-slate-500/80">Toplam Giriş</h3>
                         </div>
                         <div className="text-3xl font-black text-slate-800">{stats.totalIn} <span className="text-xs font-medium text-slate-400">adet</span></div>
                     </div>
@@ -206,7 +206,7 @@ export default function AdminInventoryReportPage() {
                     <div className={`${adminCardClass} p-6 border-l-4 border-l-rose-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <ArrowUpRight className="w-5 h-5 text-rose-500" />
-                            <h3 className="font-black uppercase tracking-[0.2em] text-[9px] text-slate-500/80">Toplam Çıkış</h3>
+                            <h3 className="font-black uppercase tracking-[0.2em] text-xs text-slate-500/80">Toplam Çıkış</h3>
                         </div>
                         <div className="text-3xl font-black text-slate-800">{stats.totalOut} <span className="text-xs font-medium text-slate-400">adet</span></div>
                     </div>
@@ -214,7 +214,7 @@ export default function AdminInventoryReportPage() {
                     <div className={`${adminCardClass} p-6 border-l-4 border-l-indigo-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <Activity className="w-5 h-5 text-indigo-500" />
-                            <h3 className="font-black uppercase tracking-[0.2em] text-[9px] text-slate-500/80">Net Değişim</h3>
+                            <h3 className="font-black uppercase tracking-[0.2em] text-xs text-slate-500/80">Net Değişim</h3>
                         </div>
                         <div className={`text-3xl font-black ${stats.net > 0 ? 'text-emerald-600' : stats.net < 0 ? 'text-rose-600' : 'text-slate-800'}`}>
                             {stats.net > 0 ? '+' : ''}{stats.net} <span className="text-xs font-medium text-slate-400">adet</span>
@@ -315,10 +315,10 @@ export default function AdminInventoryReportPage() {
                     {/* Giriş Hareketleri Penceresi */}
                     <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-emerald-100/10`}>
                         <div className="p-4 bg-emerald-500/5 border-b border-emerald-500/10 flex items-center justify-between">
-                            <h2 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                            <h2 className="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
                                 <PlusCircle className="w-4 h-4" /> Son Stok Girişleri
                             </h2>
-                            <span className="text-[9px] font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md border border-emerald-400/20 uppercase tracking-tighter">Incoming</span>
+                            <span className="text-xs font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md border border-emerald-400/20 uppercase tracking-tighter">Incoming</span>
                         </div>
                         <div ref={dragScrollRefIn} className="overflow-x-auto max-h-[400px]">
                             {inboundMovements.length > 0 ? (
@@ -351,10 +351,10 @@ export default function AdminInventoryReportPage() {
                     {/* Çıkış Hareketleri Penceresi */}
                     <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-rose-100/10`}>
                         <div className="p-4 bg-rose-500/5 border-b border-rose-500/10 flex items-center justify-between">
-                            <h2 className="text-[10px] font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
+                            <h2 className="text-xs font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
                                 <MinusCircle className="w-4 h-4" /> Son Stok Çıkışları
                             </h2>
-                            <span className="text-[9px] font-black text-rose-400 bg-rose-400/10 px-2 py-0.5 rounded-md border border-rose-400/20 uppercase tracking-tighter">Outgoing</span>
+                            <span className="text-xs font-black text-rose-400 bg-rose-400/10 px-2 py-0.5 rounded-md border border-rose-400/20 uppercase tracking-tighter">Outgoing</span>
                         </div>
                         <div ref={dragScrollRefOut} className="overflow-x-auto max-h-[400px]">
                             {outboundMovements.length > 0 ? (

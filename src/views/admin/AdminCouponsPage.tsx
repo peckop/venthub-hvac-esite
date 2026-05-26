@@ -214,7 +214,7 @@ const AdminCouponsPage: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-6 gap-5">
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Kupon Kodu</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Kupon Kodu</label>
               <input 
                 value={form.code || ''} 
                 onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} 
@@ -223,7 +223,7 @@ const AdminCouponsPage: React.FC = () => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">İndirim Tipi</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">İndirim Tipi</label>
               <select 
                 value={form.type as string} 
                 onChange={e => setForm(f => ({ ...f, type: e.target.value as 'percent' | 'fixed' }))} 
@@ -234,7 +234,7 @@ const AdminCouponsPage: React.FC = () => {
               </select>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Değer</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Değer</label>
               <input 
                 type="number" 
                 value={(form.value as number | undefined) ?? ''} 
@@ -244,7 +244,7 @@ const AdminCouponsPage: React.FC = () => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Başlangıç</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Başlangıç</label>
               <input 
                 type="datetime-local" 
                 value={(form.starts_at as string | undefined) ?? ''} 
@@ -253,7 +253,7 @@ const AdminCouponsPage: React.FC = () => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Bitiş</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Bitiş</label>
               <input 
                 type="datetime-local" 
                 value={(form.ends_at as string | undefined) ?? ''} 
@@ -262,7 +262,7 @@ const AdminCouponsPage: React.FC = () => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Durum</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Durum</label>
               <div className="flex items-center gap-3 px-4 h-[42px] glass-strong border-white/10 rounded-xl">
                 <input 
                   type="checkbox" 
@@ -275,7 +275,7 @@ const AdminCouponsPage: React.FC = () => {
               </div>
             </div>
             <div className="md:col-span-4 flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Kullanım Limiti (Opsiyonel)</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Kullanım Limiti (Opsiyonel)</label>
               <input 
                 type="number" 
                 min={1} 
@@ -341,13 +341,13 @@ const AdminCouponsPage: React.FC = () => {
                     className="group border-t border-white/5 hover:bg-white/[0.02] transition-colors"
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
-                    <td className={`${adminTableCellClass} font-mono text-[11px] font-black text-white`}>
+                    <td className={`${adminTableCellClass} font-mono text-xs font-black text-white`}>
                       <span className="bg-cyan-500/10 px-3 py-1.5 rounded-lg border border-cyan-500/20 text-cyan-400 uppercase tracking-widest">
                         {r.code}
                       </span>
                     </td>
                     <td className={adminTableCellClass}>
-                      <span className={`uppercase tracking-widest font-black inline-flex items-center gap-1.5 text-[10px] ${r.type === 'percent' ? 'text-blue-400' : 'text-emerald-400'}`}>
+                      <span className={`uppercase tracking-widest font-black inline-flex items-center gap-1.5 text-xs ${r.type === 'percent' ? 'text-blue-400' : 'text-emerald-400'}`}>
                         <div className={`w-1 h-1 rounded-full ${r.type === 'percent' ? 'bg-blue-500' : 'bg-emerald-500'}`}></div>
                         {r.type === 'percent' ? 'Yüzde' : 'Sabit'}
                       </span>
@@ -359,7 +359,7 @@ const AdminCouponsPage: React.FC = () => {
                       <button
                         onClick={() => hasWriteAccess && toggleActive(r.id, r.active)}
                         disabled={!hasWriteAccess}
-                        className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all border ${
+                        className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${
                           r.active 
                             ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
                             : 'bg-slate-500/10 text-slate-400 border-white/5 opacity-50'
@@ -370,7 +370,7 @@ const AdminCouponsPage: React.FC = () => {
                       </button>
                     </td>
                     <td className={adminTableCellClass}>
-                      <div className="flex flex-col gap-1 text-[10px] uppercase font-black tracking-widest">
+                      <div className="flex flex-col gap-1 text-xs uppercase font-black tracking-widest">
                         <span className="text-white/80">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</span>
                         <span className="text-slate-500 flex items-center gap-1">
                           <div className="w-1 h-[1px] bg-white/10"></div>
@@ -380,13 +380,13 @@ const AdminCouponsPage: React.FC = () => {
                     </td>
                     <td className={adminTableCellClass}>
                       <div className="flex flex-col gap-1.5 w-24">
-                        <div className="flex justify-between text-[10px] font-bold font-mono text-slate-400">
+                        <div className="flex justify-between text-xs font-bold font-mono text-slate-400">
                           <span>{r.used_count || 0}</span>
                           <span>{r.usage_limit || '∞'}</span>
                         </div>
                         <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-1000"
+                            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-colors duration-1000"
                             style={{ 
                               width: r.usage_limit ? `${Math.min((r.used_count || 0) / r.usage_limit * 100, 100)}%` : '0%' 
                             }}
@@ -394,7 +394,7 @@ const AdminCouponsPage: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className={`${adminTableCellClass} text-slate-500 text-[10px] font-black uppercase tracking-widest`}>
+                    <td className={`${adminTableCellClass} text-slate-500 text-xs font-black uppercase tracking-widest`}>
                       {formatDateTime(r.created_at, lang as 'tr' | 'en')}
                     </td>
                     <td className={`${adminTableCellClass} text-right`}>

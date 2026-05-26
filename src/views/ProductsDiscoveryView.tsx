@@ -29,7 +29,7 @@ const CategoryOrbitCarousel = dynamic(
     {
         ssr: false,
         loading: () => (
-            <div className="w-full h-[500px] bg-[#020617] flex items-center justify-center overflow-hidden">
+            <div className="w-full h-[500px] bg-surface-darker flex items-center justify-center overflow-hidden">
                 {/* Premium, spinner-less nebula glow placeholder */}
                 <div className="w-[300px] h-[300px] bg-cyan-500/5 blur-[100px] rounded-full animate-pulse" />
             </div>
@@ -69,11 +69,11 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
     }, [router])
 
     return (
-        <div className="bg-[#020617] min-h-screen relative pb-12 w-full pt-16 md:pt-24">
+        <div className="bg-surface-darker min-h-screen relative pb-12 w-full pt-16 md:pt-24">
             
             <div className={`
-                transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] z-30 w-full overflow-hidden 
-                bg-[#020617] border-b border-white/5 shadow-2xl relative
+                transition-[max-height,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] z-30 w-full overflow-hidden 
+                bg-surface-darker border-b border-white/5 shadow-2xl relative
             `}>
                 <div className="relative w-full">
                     <CategoryOrbitCarousel
@@ -92,7 +92,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 15 }}
                         transition={{ duration: 0.4 }}
-                        className="bg-white rounded-[2.5rem] relative z-20 px-4 md:px-8 lg:px-12 pt-10 pb-20 mt-8 max-w-[1600px] mx-auto min-h-[60vh] shadow-2xl"
+                        className="bg-white rounded-hvac-2xl relative z-20 px-4 md:px-8 lg:px-12 pt-10 pb-20 mt-8 max-w-page mx-auto min-h-[60vh] shadow-2xl"
                     >
                         {/* Başlık ve Toolbars */}
                         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-10 pb-6 border-b border-slate-100">
@@ -111,14 +111,14 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                 <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-200/60 shadow-inner">
                                     <button
                                         onClick={() => setViewMode('grid')}
-                                        className={`p-2.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white shadow text-cyan-600' : 'text-slate-400 hover:text-slate-600'}`}
+                                        className={`p-2.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-white shadow text-cyan-600' : 'text-slate-400 hover:text-slate-600'}`}
                                         title={t('products.viewGrid')}
                                     >
                                         <LayoutGrid size={18} />
                                     </button>
                                     <button
                                         onClick={() => setViewMode('list')}
-                                        className={`p-2.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white shadow text-cyan-600' : 'text-slate-400 hover:text-slate-600'}`}
+                                        className={`p-2.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white shadow text-cyan-600' : 'text-slate-400 hover:text-slate-600'}`}
                                         title={t('products.viewList')}
                                     >
                                         <List size={18} />

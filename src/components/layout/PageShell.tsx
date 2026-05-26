@@ -19,7 +19,7 @@ interface PageShellProps extends React.HTMLAttributes<HTMLElement> {
 
 const widthStyles = {
     contained: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
-    wide: 'max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8',
+    wide: 'max-w-page mx-auto px-4 sm:px-6 lg:px-8',
     full: 'w-full px-4'
 }
 

@@ -26,7 +26,7 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
   return (
     <Link 
       href={href as import('next').Route}
-      className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white transition-all duration-500 hover:-translate-y-1 hover:border-primary-navy/20 hover:shadow-[0_20px_40px_-15px_rgba(30,41,59,0.1)]"
+      className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white transition-transform duration-500 hover:-translate-y-1 hover:border-primary-navy/20 hover:shadow-[0_20px_40px_-15px_rgba(30,41,59,0.1)]"
     >
       {/* Image Container */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
@@ -46,7 +46,7 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
         )}
         
         {/* Badge: Product Count */}
-        <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-navy backdrop-blur-md shadow-sm">
+        <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary-navy backdrop-blur-md shadow-sm">
           {productCount} {t('common.products') || 'Ürün'}
         </div>
       </div>
@@ -63,7 +63,7 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
 
         <div className="mt-auto flex items-center justify-between border-t border-slate-50 pt-4">
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-steel-gray/60">
+            <span className="text-xs font-bold uppercase tracking-widest text-steel-gray/60">
               {t('product.starting_from') || 'Başlayan fiyatlarla'}
             </span>
             <span className="text-lg font-bold text-primary-navy">
@@ -71,7 +71,7 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
             </span>
           </div>
           
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-air-blue/10 text-primary-navy transition-all duration-300 group-hover:bg-primary-navy group-hover:text-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-air-blue/10 text-primary-navy transition-colors duration-300 group-hover:bg-primary-navy group-hover:text-white">
             <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>

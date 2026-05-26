@@ -61,7 +61,7 @@ export default function InventoryTable({
     const statusBadge = (r: InventoryRow) => {
         const net = r.available_stock
         const th = effectiveThreshold(r.product_id)
-        const base = "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border shadow-sm transition-all"
+        const base = "px-3 py-1 text-xs font-black uppercase tracking-widest rounded-full border shadow-sm transition-colors"
         
         if (net <= 0) return <span className={`${base} bg-rose-500/10 text-rose-400 border-rose-500/20`}>Tükendi</span>
         if (th != null && net <= th) return <span className={`${base} bg-amber-500/10 text-amber-400 border-amber-500/20 animate-pulse`}>Kritik</span>
@@ -79,7 +79,7 @@ export default function InventoryTable({
                 <td className={adminTableCellClass + " " + cellPad}>
                     <div className="flex flex-col">
                         <span className="font-black text-white group-hover:text-cyan-400 transition-colors uppercase tracking-tight text-xs">{r.name}</span>
-                        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-tighter mt-0.5">{r.product_id.slice(0, 8)}</span>
+                        <span className="text-xs font-mono text-slate-500 uppercase tracking-tighter mt-0.5">{r.product_id.slice(0, 8)}</span>
                     </div>
                 </td>
             )}
@@ -120,7 +120,7 @@ export default function InventoryTable({
             {visibleCols.abc && (
                 <td className={adminTableCellClass + " " + cellPad + " text-center"}>
                     {r.abc_class ? (
-                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg font-black text-[10px] border shadow-sm ${r.abc_class === 'A' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg font-black text-xs border shadow-sm ${r.abc_class === 'A' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                             r.abc_class === 'B' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
                                 'bg-slate-500/10 text-slate-400 border-slate-500/20'
                             }`}>
@@ -132,9 +132,9 @@ export default function InventoryTable({
             {visibleCols.days && (
                 <td className={adminTableCellClass + " " + cellPad + " text-right"}>
                     {r.days_until_empty === 9999 ? (
-                        <span className="text-[10px] text-slate-600 uppercase font-black tracking-widest">SABİT</span>
+                        <span className="text-xs text-slate-600 uppercase font-black tracking-widest">SABİT</span>
                     ) : (
-                        <div className={`text-[10px] font-black uppercase tracking-widest ${r.days_until_empty && r.days_until_empty <= 7 ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`}>
+                        <div className={`text-xs font-black uppercase tracking-widest ${r.days_until_empty && r.days_until_empty <= 7 ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`}>
                             {r.days_until_empty && r.days_until_empty <= 7 && '🔥 '}
                             {r.days_until_empty} GÜN
                         </div>
@@ -152,14 +152,14 @@ export default function InventoryTable({
                     <tr>
                         {visibleCols.name && (
                             <th className={adminTableHeadCellClass + " " + headPad}>
-                                <button onClick={() => onSort('name')} className="hover:text-cyan-400 transition-colors flex items-center gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
+                                <button onClick={() => onSort('name')} className="hover:text-cyan-400 transition-colors flex items-center gap-1 uppercase text-xs font-black tracking-[0.2em]">
                                     Ürün {sortIndicator('name')}
                                 </button>
                             </th>
                         )}
                         {visibleCols.physical && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em]">
                                     <button onClick={() => onSort('physical')} className="hover:text-cyan-400 transition-colors">Fiziksel {sortIndicator('physical')}</button>
                                     <InfoTooltip text="Depodaki gerçekte sayılan mevcut ürün adedi." />
                                 </div>
@@ -167,7 +167,7 @@ export default function InventoryTable({
                         )}
                         {visibleCols.reserved && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em]">
                                     <button onClick={() => onSort('reserved')} className="hover:text-cyan-400 transition-colors">Rezerve {sortIndicator('reserved')}</button>
                                     <InfoTooltip text="Henüz kargolanmamış ama parası ödenmiş ürün miktarı." />
                                 </div>
@@ -175,7 +175,7 @@ export default function InventoryTable({
                         )}
                         {visibleCols.available && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em] text-cyan-400">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em] text-cyan-400">
                                     <button onClick={() => onSort('available')} className="hover:opacity-80">Müsait {sortIndicator('available')}</button>
                                     <InfoTooltip text="Satılabilir durumdaki net stok. (Fiziksel - Rezerve)" />
                                 </div>
@@ -183,25 +183,25 @@ export default function InventoryTable({
                         )}
                         {visibleCols.threshold && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em]">
                                     <button onClick={() => onSort('threshold')} className="hover:text-cyan-400 transition-colors">Eşik {sortIndicator('threshold')}</button>
                                     <InfoTooltip text="Stok bu rakamın altına indiğinde uyarı verilir." />
                                 </div>
                             </th>
                         )}
                         {visibleCols.location && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-[10px] font-black tracking-[0.2em]"}>
+                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-[0.2em]"}>
                                 <button onClick={() => onSort('location')} className="hover:text-cyan-400 transition-colors">Raf {sortIndicator('location')}</button>
                             </th>
                         )}
                         {visibleCols.supplier && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-[10px] font-black tracking-[0.2em]"}>
+                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-[0.2em]"}>
                                 <button onClick={() => onSort('supplier')} className="hover:text-cyan-400 transition-colors">Tedarikçi {sortIndicator('supplier')}</button>
                             </th>
                         )}
                         {visibleCols.abc && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-center"}>
-                                <div className="flex items-center justify-center gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-center gap-1 uppercase text-xs font-black tracking-[0.2em]">
                                     <button onClick={() => onSort('abc')} className="hover:text-cyan-400 transition-colors">Sınıf {sortIndicator('abc')}</button>
                                     <InfoTooltip text="A (En Popüler), B (Orta), C (Az Satan)." />
                                 </div>
@@ -209,14 +209,14 @@ export default function InventoryTable({
                         )}
                         {visibleCols.days && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-[10px] font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em]">
                                     <button onClick={() => onSort('days_empty')} className="hover:text-cyan-400 transition-colors">Tükenme {sortIndicator('days_empty')}</button>
                                     <InfoTooltip text="Eldeki stoğun kaç gün içinde biteceği tahmini." />
                                 </div>
                             </th>
                         )}
                         {visibleCols.status && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase text-[10px] font-black tracking-[0.2em]"}>Durum</th>
+                            <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase text-xs font-black tracking-[0.2em]"}>Durum</th>
                         )}
                     </tr>
                 </thead>
@@ -243,7 +243,7 @@ export default function InventoryTable({
                         groupedRows.map(g => (
                             <React.Fragment key={g._c_id ?? 'null'}>
                                 <tr className="bg-white/[0.02] group">
-                                    <th colSpan={10} className={`text-left ${density === 'compact' ? 'px-4 py-2' : 'px-8 py-4'} text-cyan-400 font-black uppercase text-[10px] tracking-[0.3em] border-y border-white/5`}>
+                                    <th colSpan={10} className={`text-left ${density === 'compact' ? 'px-4 py-2' : 'px-8 py-4'} text-cyan-400 font-black uppercase text-xs tracking-[0.3em] border-y border-white/5`}>
                                         <div className="flex items-center gap-3">
                                             <span className="w-1 h-4 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.5)]"></span>
                                             {g.name || 'Kategorisiz'} <span className="text-slate-500 ml-2">({g.items.length})</span>

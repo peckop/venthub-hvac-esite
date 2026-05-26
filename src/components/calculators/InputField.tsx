@@ -65,7 +65,7 @@ const InputField: React.FC<InputFieldProps> = ({
                     step={step}
                     disabled={disabled}
                     className={`
-            w-full px-4 py-3 rounded-xl border transition-all
+            w-full px-4 py-3 rounded-xl border transition-colors
             focus:outline-none focus:ring-2 focus:ring-primary-navy/20
             ${error
                             ? 'border-danger-red bg-danger-red/5'
@@ -129,7 +129,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
                         type="button"
                         onClick={() => onChange(option.value)}
                         className={`
-              p-4 rounded-xl border text-left transition-all
+              p-4 rounded-xl border text-left transition-colors
               ${value === option.value
                                 ? 'border-primary-navy bg-primary-navy/5'
                                 : 'border-light-gray hover:border-steel-gray'

@@ -21,9 +21,9 @@ export default function InventoryReservedTable({ reservedOrders }: InventoryRese
             <table className="w-full text-xs border-separate border-spacing-0">
                 <thead>
                     <tr className="bg-white/[0.02]">
-                        <th className="text-left px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Sipariş</th>
-                        <th className="text-left px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Tarih</th>
-                        <th className="text-right px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Adet</th>
+                        <th className="text-left px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Sipariş</th>
+                        <th className="text-left px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Tarih</th>
+                        <th className="text-right px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Adet</th>
                     </tr>
                 </thead>
                 <tbody className="bg-transparent">

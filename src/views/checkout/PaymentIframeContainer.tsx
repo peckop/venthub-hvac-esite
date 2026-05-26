@@ -38,13 +38,13 @@ const PaymentIframeContainer: React.FC<PaymentIframeContainerProps> = ({
                         <Lock size={18} />
                         <div className="text-sm font-semibold">{t('checkout.securePaymentBrand', { brand: 'Venthub HVAC' })}</div>
                     </div>
-                    <div className="text-[11px] text-steel-gray">{t('checkout.securePaymentProvider', { provider: 'iyzico' })}</div>
+                    <div className="text-xs text-steel-gray">{t('checkout.securePaymentProvider', { provider: 'iyzico' })}</div>
                 </div>
                 {/* Progress Bar */}
                 <div className="w-full h-2 bg-light-gray/80 rounded-full overflow-hidden" aria-hidden>
-                    <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all" style={{ width: `${progressPct}%` }} />
+                    <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-colors" style={{ width: `${progressPct}%` }} />
                 </div>
-                <div className="text-[11px] text-steel-gray">
+                <div className="text-xs text-steel-gray">
                     {overlayStep === 1 ? t('checkout.overlay.starting') : overlayStep === 2 ? t('checkout.overlay.secureForm') : t('checkout.overlay.bank3d')}
                 </div>
             </div>

@@ -48,7 +48,7 @@ const NavActionButton: React.FC<NavActionButtonProps> = ({
             {label && (
                 <span
                     className={cn(
-                        'min-w-0 truncate text-[13px] font-semibold transition-all',
+                        'min-w-0 truncate text-sm font-semibold transition-colors',
                         labelClassName
                     )}
                 >
@@ -59,7 +59,7 @@ const NavActionButton: React.FC<NavActionButtonProps> = ({
     )
 
     const classes = cn(
-        'group relative inline-flex items-center gap-2 rounded-2xl border border-transparent transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:ring-offset-2',
+        'group relative inline-flex items-center gap-2 rounded-2xl border border-transparent transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:ring-offset-2',
         'px-3 py-2.5', // Using compact sizing as default for the Action Bar
         toneClasses[tone],
         className

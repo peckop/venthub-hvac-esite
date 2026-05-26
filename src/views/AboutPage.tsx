@@ -68,10 +68,10 @@ const AboutPage: React.FC = () => {
           />          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950" />
         </div>
 
-        <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">Engineering Excellence Since 2009</span>
+            <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400">Engineering Excellence Since 2009</span>
           </div>
 
           <h1 ref={heroTitleRef} className={scrollAnimationClasses.scaleIn(heroTitleVisible) + " text-5xl lg:text-8xl font-extralight tracking-tighter leading-[1.1] mb-10"}>
@@ -86,7 +86,7 @@ const AboutPage: React.FC = () => {
 
       {/* Stats Grid */}
       <section className="py-24 bg-slate-50 border-b border-slate-100">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-12">
             {stats.map((stat, i) => (
               <div
@@ -95,7 +95,7 @@ const AboutPage: React.FC = () => {
                 style={scrollAnimationClasses.staggerChild(i)}
               >
                 <div className="text-5xl lg:text-7xl font-bold text-slate-900 tracking-tighter mb-4">{stat.value}</div>
-                <div className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-600">{stat.label}</div>
+                <div className="text-xs font-black uppercase tracking-[0.3em] text-cyan-600">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -104,21 +104,21 @@ const AboutPage: React.FC = () => {
 
       {/* Story & Philosophy */}
       <section className="py-24 lg:py-32 overflow-hidden">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
-            <div ref={storyRef} className={scrollAnimationClasses.slideLeft(storyVisible) + " relative aspect-square lg:aspect-video rounded-[3rem] overflow-hidden"}>
+            <div ref={storyRef} className={scrollAnimationClasses.slideLeft(storyVisible) + " relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden"}>
               <Image 
                 src="/images/ekran/homepage beğendiğim yapı.png" 
                 alt="VentHub Story" 
                 fill 
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+                className="object-cover grayscale hover:grayscale-0 transition-transform duration-1000"
               />
               <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
             </div>
 
             <div>
-              <div className="text-cyan-600 text-[10px] font-black uppercase tracking-[0.5em] mb-8">Our Vision</div>
+              <div className="text-cyan-600 text-xs font-black uppercase tracking-[0.5em] mb-8">Our Vision</div>
               <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-12 text-slate-900">
                 Geleceğin İklimini <br />
                 <span className="font-medium text-slate-950 italic">Bugün Kuruyoruz</span>
@@ -158,9 +158,9 @@ const AboutPage: React.FC = () => {
 
       {/* Authorized Brands Strip */}
       <section className="py-24 bg-slate-950 text-white">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <div className="text-cyan-400 text-[10px] font-black uppercase tracking-[0.5em] mb-6">Strategic Partnerships</div>
+            <div className="text-cyan-400 text-xs font-black uppercase tracking-[0.5em] mb-6">Strategic Partnerships</div>
             <h2 className="text-3xl lg:text-5xl font-extralight tracking-tight">Resmi Distribütör <span className="text-cyan-400 font-medium italic">Ağımız</span></h2>
           </div>
           
@@ -168,7 +168,7 @@ const AboutPage: React.FC = () => {
             {HVAC_BRANDS.map((brand) => (
               <div
                 key={brand.slug}
-                className="w-32 h-16 lg:w-48 lg:h-24 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 flex items-center justify-center grayscale opacity-50 hover:grayscale-0 hover:opacity-100 hover:scale-110 transition-all duration-500"
+                className="w-32 h-16 lg:w-48 lg:h-24 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 flex items-center justify-center grayscale opacity-50 hover:grayscale-0 hover:opacity-100 hover:scale-110 transition-transform duration-500"
               >
                 <BrandIcon brand={brand.name} className="w-full h-full brightness-0 invert" />
               </div>
@@ -179,7 +179,7 @@ const AboutPage: React.FC = () => {
 
       {/* Values Grid */}
       <section className="py-24 lg:py-32 bg-white">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div ref={valuesRef} className="grid lg:grid-cols-3 gap-16">
             {coreValues.map((value, i) => (
               <div
@@ -187,7 +187,7 @@ const AboutPage: React.FC = () => {
                 className={scrollAnimationClasses.fadeUp(valuesVisible) + " group"}
                 style={scrollAnimationClasses.staggerChild(i)}
               >
-                <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-500">
+                <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">
                   <value.icon size={32} strokeWidth={1} />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-6 tracking-tight">{value.title}</h3>
@@ -208,13 +208,13 @@ const AboutPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link 
               href={Routes.contact()} 
-              className="bg-slate-950 text-white px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-cyan-600 transition-all shadow-xl"
+              className="bg-slate-950 text-white px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-shadow shadow-xl"
             >
               İletişime Geçin
             </Link>
             <Link 
               href={Routes.products()} 
-              className="bg-white text-slate-950 border border-slate-200 px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-50 transition-all"
+              className="bg-white text-slate-950 border border-slate-200 px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 transition-colors"
             >
               Ürünleri Keşfedin
             </Link>

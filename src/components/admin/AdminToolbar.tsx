@@ -49,7 +49,7 @@ export type AdminToolbarProps = {
   className?: string
 }
 
-const defaultChipOn = 'bg-cyan-400 text-[#0A0F1E] border-cyan-400 font-bold shadow-[0_0_15px_rgba(34,211,238,0.2)]'
+const defaultChipOn = 'bg-cyan-400 text-surface-deep border-cyan-400 font-bold shadow-[0_0_15px_rgba(34,211,238,0.2)]'
 const defaultChipOff = 'glass text-slate-400 border-white/5 hover:bg-white/5 hover:text-white hover:border-white/10'
 
 const AdminToolbar: React.FC<AdminToolbarProps> = ({
@@ -159,7 +159,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
 
   return (
     <div className={`${sticky ? 'sticky top-0 z-30 mx-0 mb-8' : 'mb-8'} ${className || ''} animate-in fade-in slide-in-from-top-4 duration-500`}>
-      <div className={`rounded-[1.5rem] border border-white/5 shadow-2xl ${sticky ? 'glass-strong backdrop-blur-2xl' : 'glass'} p-2.5 md:p-3 transition-all duration-300`}>
+      <div className={`rounded-hvac-lg border border-white/5 shadow-2xl ${sticky ? 'glass-strong backdrop-blur-2xl' : 'glass'} p-2.5 md:p-3 transition-colors duration-300`}>
         <div className="flex flex-col md:flex-row md:items-center gap-3">
           {/* Mobil: Arama + Filtre Butonu (Yan yana) */}
           <div className="flex md:hidden items-center gap-2 w-full">
@@ -173,7 +173,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                   onChange={(e) => search.onChange(e.target.value)}
                   placeholder={search.placeholder || _t('admin.toolbar.searchPlaceholder')}
                   aria-label={_t('admin.a11y.search') || 'Ara'}
-                  className="w-full h-11 bg-[#0A0F1E]/40 border border-white/20 rounded-xl pl-12 pr-12 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50 transition-all placeholder:text-slate-600 font-bold shadow-inner"
+                  className="w-full h-11 bg-surface-deep/40 border border-white/20 rounded-xl pl-12 pr-12 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50 transition-colors placeholder:text-slate-600 font-bold shadow-inner"
                 />
               </div>
             )}
@@ -182,13 +182,13 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 onClick={() => setFiltersOpen(!filtersOpen)}
                 aria-label={_t('admin.a11y.filter') || 'Filtreleri Göster'}
                 aria-expanded={filtersOpen}
-                className={`relative h-11 px-4 rounded-xl border transition-all flex items-center gap-2 ${
-                  filtersOpen ? 'bg-cyan-400 border-cyan-400 text-[#0A0F1E]' : 'glass border-white/10 text-slate-400'
+                className={`relative h-11 px-4 rounded-xl border transition-colors flex items-center gap-2 ${
+                  filtersOpen ? 'bg-cyan-400 border-cyan-400 text-surface-deep' : 'glass border-white/10 text-slate-400'
                 }`}
               >
                 <SlidersHorizontal size={16} />
                 {activeFilterCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-[10px] font-black text-white flex items-center justify-center shadow-lg border border-[#0A0F1E]">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-xs font-black text-white flex items-center justify-center shadow-lg border border-surface-deep">
                     {activeFilterCount}
                   </span>
                 )}
@@ -207,10 +207,10 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 onChange={(e) => search.onChange(e.target.value)}
                 placeholder={search.placeholder || _t('admin.toolbar.searchPlaceholder')}
                 aria-label={_t('admin.a11y.search') || 'Ara'}
-                className="w-full h-11 bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-12 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-all placeholder:text-slate-600 font-bold"
+                className="w-full h-11 bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-12 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-colors placeholder:text-slate-600 font-bold"
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-2.5 pointer-events-none group-focus-within:opacity-0 transition-opacity">
-                <kbd className="min-w-[1.25rem] h-5 flex items-center justify-center rounded border border-white/10 bg-transparent text-[10px] font-black text-slate-500 font-sans shadow-sm">/</kbd>
+                <kbd className="min-w-[1.25rem] h-5 flex items-center justify-center rounded border border-white/10 bg-transparent text-xs font-black text-slate-500 font-sans shadow-sm">/</kbd>
               </div>
             </div>
           )}
@@ -227,7 +227,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 aria-label={select.title || _t('admin.a11y.filter')}
               >
                 {select.options.map(opt => (
-                  <option key={opt.value} value={opt.value} className="bg-[#0A0F1E] text-white font-medium">{opt.label}</option>
+                  <option key={opt.value} value={opt.value} className="bg-surface-deep text-white font-medium">{opt.label}</option>
                 ))}
               </select>
             </div>
@@ -239,7 +239,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
               <div className="flex items-center gap-6 px-4 py-2 bg-white/5 rounded-2xl border border-white/5">
                 {toggles.map(tog => (
                   <div key={tog.key} className="flex items-center gap-3 text-xs">
-                    <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px] whitespace-nowrap">{tog.label}</span>
+                    <span className="text-slate-400 font-bold uppercase tracking-widest text-xs whitespace-nowrap">{tog.label}</span>
                     <Switch.Root
                       checked={tog.checked}
                       onCheckedChange={tog.onChange}
@@ -258,13 +258,13 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 type="button"
                 onClick={onClear}
                 aria-label={_t('admin.a11y.refresh') || 'Filtreleri Temizle'}
-                className="h-12 px-5 glass text-slate-400 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                className="h-12 px-5 glass text-slate-400 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest transition-colors"
               >{_t('admin.toolbar.clear') || 'Temizle'}</button>
             )}
 
             {typeof recordCount === 'number' && (
               <div className="flex flex-col items-end px-4 border-l border-white/10">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{_t('admin.toolbar.records') || 'Kayıt'}</span>
+                <span className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">{_t('admin.toolbar.records') || 'Kayıt'}</span>
                 <span className="text-base font-black text-cyan-400 font-mono tracking-tighter" aria-live="polite">
                     {recordCount.toLocaleString()}
                 </span>
@@ -283,7 +283,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 key={ch.key}
                 type="button"
                 onClick={ch.onToggle}
-                className={`px-5 h-10 inline-flex items-center rounded-xl border text-[11px] font-black uppercase tracking-widest transition-all ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-cyan-400/20`}
+                className={`px-5 h-10 inline-flex items-center rounded-xl border text-xs font-black uppercase tracking-widest transition-colors ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-cyan-400/20`}
                 title={ch.title || ch.label}
                 aria-pressed={ch.active}
                 aria-label={ch.label}
@@ -297,7 +297,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
           <div className="flex flex-col gap-5 md:hidden pt-5 mt-3 border-t border-white/5 animate-in fade-in slide-in-from-top-4 duration-300">
             {select && (
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{select.title || 'Kategori'}</label>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{select.title || 'Kategori'}</label>
                 <select
                   className={adminSelectClass}
                   style={adminSelectStyle}
@@ -306,7 +306,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                   aria-label={select.title || 'Kategori'}
                 >
                   {select.options.map(opt => (
-                    <option key={opt.value} value={opt.value} className="bg-[#0A0F1E]">{opt.label}</option>
+                    <option key={opt.value} value={opt.value} className="bg-surface-deep">{opt.label}</option>
                   ))}
                 </select>
               </div>
@@ -315,8 +315,8 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
             {toggles && toggles.length > 0 && (
               <div className="grid grid-cols-2 gap-3 bg-white/5 p-4 rounded-2xl border border-white/5">
                 {toggles.map(tog => (
-                  <div key={tog.key} className="flex items-center justify-between gap-3 text-xs bg-[#0A0F1E]/20 p-3 rounded-xl">
-                    <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">{tog.label}</span>
+                  <div key={tog.key} className="flex items-center justify-between gap-3 text-xs bg-surface-deep/20 p-3 rounded-xl">
+                    <span className="text-slate-400 font-bold uppercase tracking-widest text-xs">{tog.label}</span>
                     <Switch.Root
                       checked={tog.checked}
                       onCheckedChange={tog.onChange}
@@ -332,14 +332,14 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
 
             {chips && chips.length > 0 && (
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{_t('admin.common.filter') || 'Filtreler'}</label>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{_t('admin.common.filter') || 'Filtreler'}</label>
                 <div className="flex flex-wrap gap-2 text-xs">
                     {chips.map(ch => (
                     <button
                         key={ch.key}
                         type="button"
                         onClick={ch.onToggle}
-                        className={`px-4 h-10 flex-1 min-w-[120px] inline-flex items-center justify-center rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)}`}
+                        className={`px-4 h-10 flex-1 min-w-[120px] inline-flex items-center justify-center rounded-xl border text-xs font-black uppercase tracking-widest transition-colors ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)}`}
                         aria-pressed={ch.active}
                         aria-label={ch.label}
                     >{ch.label}</button>
@@ -359,13 +359,13 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 <button
                   type="button"
                   onClick={onClear}
-                  className="h-10 px-6 glass text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/5"
+                  className="h-10 px-6 glass text-slate-400 font-black text-xs uppercase tracking-widest rounded-xl hover:bg-white/5"
                   aria-label={_t('admin.toolbar.clear') || 'Temizle'}
                 >{_t('admin.toolbar.clear') || 'Temizle'}</button>
               )}
               {typeof recordCount === 'number' && (
                 <div className="text-right">
-                  <span className="block text-[8px] font-black text-slate-500 uppercase tracking-widest opacity-50">{_t('admin.toolbar.records') || 'Toplam Kayıt'}</span>
+                  <span className="block text-xs font-black text-slate-500 uppercase tracking-widest opacity-50">{_t('admin.toolbar.records') || 'Toplam Kayıt'}</span>
                   <span className="text-lg font-black text-cyan-400 font-mono" aria-live="polite">{recordCount.toLocaleString()}</span>
                 </div>
               )}

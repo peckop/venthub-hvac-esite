@@ -78,7 +78,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 sm:p-4 perspective-1000">
+    <div className="fixed inset-0 z-modal flex items-center justify-center p-0 sm:p-4 perspective-1000">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-secondary-blue/80 backdrop-blur-sm transition-opacity"
@@ -92,7 +92,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
         role="dialog"
         aria-modal="true"
         aria-labelledby="lead-modal-title"
-        className="relative w-full max-w-5xl bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:flex-row max-h-[100dvh] sm:max-h-[85vh] transform transition-all animate-in fade-in zoom-in-95 duration-300"
+        className="relative w-full max-w-5xl bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:flex-row max-h-[100dvh] sm:max-h-[85vh] transform transition-colors animate-in fade-in zoom-in-95 duration-300"
       >
         {/* Close Button Mobile */}
         <button
@@ -195,7 +195,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         value={name} onChange={(e) => setName(e.target.value)}
                         placeholder="John Doe"
-                        className={`w-full bg-gray-50 border ${errors.name ? 'border-red-400 focus:bg-red-50' : 'border-gray-200'} rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all`}
+                        className={`w-full bg-gray-50 border ${errors.name ? 'border-red-400 focus:bg-red-50' : 'border-gray-200'} rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors`}
                       />
                     </div>
                     {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
@@ -209,7 +209,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         value={company} onChange={(e) => setCompany(e.target.value)}
                         placeholder="Şirketiniz A.Ş."
-                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                       />
                     </div>
                   </div>
@@ -222,7 +222,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                         placeholder="ornek@sirket.com"
-                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                       />
                     </div>
                   </div>
@@ -235,7 +235,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         value={phone} onChange={(e) => setPhone(e.target.value)}
                         placeholder="05XX XXX XX XX"
-                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                       />
                     </div>
                   </div>
@@ -252,7 +252,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         value={city} onChange={(e) => setCity(e.target.value)}
                         placeholder="Örn: İstanbul"
-                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                       />
                     </div>
                   </div>
@@ -262,7 +262,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     <label className="text-xs font-semibold text-industrial-gray uppercase tracking-wider">{t('lead.form.appAreaLabel')}</label>
                     <select
                       value={appArea} onChange={(e) => setAppArea(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                     >
                       <option value="">{t('lead.form.selectPlaceholder')}</option>
                       {applicationAreas.map(a => <option key={a} value={a}>{a}</option>)}
@@ -277,7 +277,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     value={message} onChange={(e) => setMessage(e.target.value)}
                     rows={4}
                     placeholder={t('lead.form.messagePlaceholder')}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all h-32"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors h-32"
                   />
                 </div>
 
@@ -294,14 +294,14 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <label htmlFor="consent" className="text-xs text-steel-gray leading-tight cursor-pointer">
                         <Link href={Routes.legal.kvkk()} className="text-primary-navy hover:underline font-medium" target="_blank" rel="noopener">{t('legalLinks.kvkk')}</Link> {t('lead.consent.text')}
                       </label>
-                      {errors.consent && <p className="text-[11px] text-red-500 mt-0.5">{errors.consent}</p>}
+                      {errors.consent && <p className="text-xs text-red-500 mt-0.5">{errors.consent}</p>}
                     </div>
                   </div>
 
                   <button
                     type="submit"
                     disabled={submitted}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary-navy hover:bg-secondary-blue text-white px-8 py-3 rounded-lg font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed group shadow-lg shadow-blue-900/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-navy"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary-navy hover:bg-secondary-blue text-white px-8 py-3 rounded-lg font-bold transition-shadow disabled:opacity-70 disabled:cursor-not-allowed group shadow-lg shadow-blue-900/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-navy"
                   >
                     {submitted ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

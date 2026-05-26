@@ -63,18 +63,18 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                 <header className="px-6 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                     <div className="flex flex-col truncate pr-4">
                         <h2 className="text-xl font-black text-white truncate uppercase tracking-tight">{selected.name}</h2>
-                        <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-[0.2em] mt-1">{selected.product_id}</span>
+                        <span className="text-xs font-mono text-cyan-400 uppercase tracking-[0.2em] mt-1">{selected.product_id}</span>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                         <button 
                             disabled={printingQr} 
-                            className="h-10 px-4 rounded-xl bg-cyan-400 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-cyan-300 transition-all disabled:opacity-50" 
+                            className="h-10 px-4 rounded-xl bg-cyan-400 text-surface-deep text-xs font-black uppercase tracking-widest hover:bg-cyan-300 transition-opacity disabled:opacity-50" 
                             onClick={() => void printQrLabel(selected, setPrintingQr)}
                         >
                             {printingQr ? '...' : 'QR'}
                         </button>
                         <button 
-                            className="h-10 px-4 rounded-xl glass border border-white/10 text-slate-400 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest" 
+                            className="h-10 px-4 rounded-xl glass border border-white/10 text-slate-400 hover:text-white transition-colors text-xs font-black uppercase tracking-widest" 
                             onClick={() => setSelected(null)}
                         >
                             {t('admin.ui.close') || 'Kapat'}
@@ -85,23 +85,23 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                 <div className="flex-1 p-6 space-y-8 overflow-y-auto custom-scrollbar">
                     {/* Özet Kartları */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="glass rounded-[1.5rem] border border-white/5 p-4 relative overflow-hidden group">
+                        <div className="glass rounded-hvac-lg border border-white/5 p-4 relative overflow-hidden group">
                             <div className="absolute top-0 left-0 w-1 h-full bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
-                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Güncel Stok</div>
+                            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Güncel Stok</div>
                             <div className="text-3xl font-black text-white">{selectedStock ?? '-'}</div>
                         </div>
-                        <div className="glass rounded-[1.5rem] border border-white/5 p-4 relative overflow-hidden group">
+                        <div className="glass rounded-hvac-lg border border-white/5 p-4 relative overflow-hidden group">
                             <div className="absolute top-0 left-0 w-1 h-full bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]"></div>
-                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Eşik (Alarm)</div>
+                            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Eşik (Alarm)</div>
                             <div className="text-3xl font-black text-white">{(selectedThreshold === '' ? (defaultThreshold ?? '-') : selectedThreshold) as string | number}</div>
                         </div>
                     </div>
 
                     {/* Zeki Öneri Bölümü */}
                     {selected.daily_velocity !== undefined && selected.daily_velocity > 0 && (
-                        <section className="glass-strong rounded-[2rem] border border-cyan-400/20 p-6 relative overflow-hidden shadow-[0_0_30px_rgba(34,211,238,0.05)]">
+                        <section className="glass-strong rounded-hvac-xl border border-cyan-400/20 p-6 relative overflow-hidden shadow-[0_0_30px_rgba(34,211,238,0.05)]">
                             <div className="absolute -right-8 -top-8 w-32 h-32 bg-cyan-400/10 rounded-full blur-3xl"></div>
-                            <h3 className="text-[11px] font-black text-cyan-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
+                            <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
                                 <span className="relative flex h-2.5 w-2.5">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]"></span>
@@ -111,21 +111,21 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <div className="text-[9px] text-slate-500 uppercase tracking-[0.2em] mb-2 font-black">Satış Hızı (30 Gün)</div>
-                                    <div className="font-mono text-base font-bold text-white tracking-tight">{selected.daily_velocity.toFixed(2)} <span className="text-[10px] text-slate-500 uppercase">/ g</span></div>
-                                    <div className="text-[9px] text-slate-600 mt-1 uppercase font-black">~ {Math.ceil(selected.daily_velocity * 30)} adet/ay</div>
+                                    <div className="text-xs text-slate-500 uppercase tracking-[0.2em] mb-2 font-black">Satış Hızı (30 Gün)</div>
+                                    <div className="font-mono text-base font-bold text-white tracking-tight">{selected.daily_velocity.toFixed(2)} <span className="text-xs text-slate-500 uppercase">/ g</span></div>
+                                    <div className="text-xs text-slate-600 mt-1 uppercase font-black">~ {Math.ceil(selected.daily_velocity * 30)} adet/ay</div>
                                 </div>
                                 <div>
-                                    <div className="text-[9px] text-cyan-400 font-black uppercase tracking-[0.2em] mb-2">Önerilen Sipariş</div>
+                                    <div className="text-xs text-cyan-400 font-black uppercase tracking-[0.2em] mb-2">Önerilen Sipariş</div>
                                     <div className="font-mono text-3xl font-black text-white leading-none">
                                         {Math.max(0, Math.ceil((selected.daily_velocity * 30)) - selected.available_stock)} <span className="text-xs font-bold text-slate-500 uppercase">ADET</span>
                                     </div>
-                                    <div className="text-[9px] text-slate-600 mt-2 uppercase font-black tracking-tighter">30 günlük tampon için</div>
+                                    <div className="text-xs text-slate-600 mt-2 uppercase font-black tracking-tighter">30 günlük tampon için</div>
                                 </div>
                             </div>
 
                             {selected.abc_class === 'A' && (
-                                <div className="mt-5 text-[10px] bg-cyan-400/10 text-cyan-300 px-3 py-2.5 rounded-xl border border-cyan-400/20 flex items-center gap-2 font-bold leading-relaxed">
+                                <div className="mt-5 text-xs bg-cyan-400/10 text-cyan-300 px-3 py-2.5 rounded-xl border border-cyan-400/20 flex items-center gap-2 font-bold leading-relaxed">
                                     <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
                                     <span className="opacity-80">A Sınıfı Ürün: Kritik ciro kaynağıdır, stokta daima bulunmalıdır.</span>
                                 </div>
@@ -136,26 +136,26 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                     {/* Eşik Düzenleme */}
                     {hasWriteAccess && (
                         <section className="space-y-4">
-                            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Eşik Seviyesini Güncelle</h3>
+                            <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Eşik Seviyesini Güncelle</h3>
                             <div className="flex items-center gap-3">
                                 <input
                                     type="number"
                                     value={selectedThreshold}
                                     onChange={(e) => setSelectedThreshold(e.target.value === '' ? '' : Number(e.target.value))}
                                     placeholder="Değer"
-                                    className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-all font-bold"
+                                    className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-colors font-bold"
                                 />
                                 <button
                                     disabled={saving}
                                     onClick={() => saveThreshold(selected.product_id)}
-                                    className="h-12 px-6 rounded-2xl bg-cyan-400 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-cyan-300 transition-all shadow-lg shadow-cyan-400/10 disabled:opacity-50"
+                                    className="h-12 px-6 rounded-2xl bg-cyan-400 text-surface-deep text-xs font-black uppercase tracking-widest hover:bg-cyan-300 transition-shadow shadow-lg shadow-cyan-400/10 disabled:opacity-50"
                                 >
                                     {saving ? '...' : 'Kaydet'}
                                 </button>
                                 <button
                                     disabled={saving}
                                     onClick={() => setSelectedThreshold('')}
-                                    className="h-12 px-5 rounded-2xl glass border border-white/5 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-amber-400 hover:border-amber-400/30 transition-all"
+                                    className="h-12 px-5 rounded-2xl glass border border-white/5 text-slate-400 text-xs font-black uppercase tracking-widest hover:text-amber-400 hover:border-amber-400/30 transition-colors"
                                 >
                                     Sıfırla
                                 </button>
@@ -165,7 +165,7 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
 
                     {/* Stok Hareketleri */}
                     {hasWriteAccess && (
-                        <div className="glass rounded-[2rem] border border-white/5 p-6 space-y-4">
+                        <div className="glass rounded-hvac-xl border border-white/5 p-6 space-y-4">
                             <InventoryStockAdjust
                                 _productId={selected.product_id}
                                 onAdjust={adjustStock}
@@ -177,22 +177,22 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                     )}
 
                     {/* Rezerve Siparişler */}
-                    <div className="glass rounded-[2rem] border border-white/5 overflow-hidden">
+                    <div className="glass rounded-hvac-xl border border-white/5 overflow-hidden">
                         <div className="p-5 border-b border-white/5 bg-white/[0.02]">
-                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Rezerve Siparişler</h3>
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Rezerve Siparişler</h3>
                         </div>
                         <InventoryReservedTable reservedOrders={reservedOrders} />
                     </div>
 
                     {/* Hareket Geçmişi */}
-                    <div className="glass rounded-[2rem] border border-white/5 overflow-hidden">
+                    <div className="glass rounded-hvac-xl border border-white/5 overflow-hidden">
                         <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
-                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Son Hareketler</h3>
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Son Hareketler</h3>
                             {movements.length > 0 && hasWriteAccess && (
                                 <button 
                                     onClick={undoLastMovement}
                                     disabled={undoing}
-                                    className="text-[9px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-400 transition-all disabled:opacity-50"
+                                    className="text-xs font-black text-rose-500 uppercase tracking-widest hover:text-rose-400 transition-opacity disabled:opacity-50"
                                 >
                                     {undoing ? 'Geri Alınıyor...' : 'Sonuncuyu Geri AL'}
                                 </button>

@@ -68,7 +68,7 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
             <nav className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 space-y-6 overflow-x-auto md:overflow-visible no-scrollbar flex md:block">
               {navGroups.map((group, gi) => (
                 <div key={gi} className="shrink-0 md:shrink">
-                  <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2 hidden md:block">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-2 hidden md:block">
                     {group.label}
                   </h3>
                   <div className="flex gap-2 md:flex-col md:space-y-0.5">
@@ -78,7 +78,7 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
                         <Link
                           key={tab.to}
                           href={tab.to as import('next').Route}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${isActive
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap ${isActive
                               ? 'bg-primary-navy text-white shadow-md shadow-primary-navy/20'
                               : 'text-slate-600 hover:bg-slate-100 hover:text-primary-navy hover:translate-x-0.5'
                             }`}

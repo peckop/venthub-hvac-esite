@@ -42,7 +42,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
   if (isList) {
     return (
       <Link href={Routes.product(product.slug!)} className="block w-full">
-        <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
+        <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-transform duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 bg-light-gray/50 rounded-xl overflow-hidden p-2">
             <VentImage
               src={product.image_url}
@@ -56,9 +56,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
           
           <div className="ml-5 flex-1 flex flex-col justify-center min-w-0">
             <div className="flex items-center space-x-2 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-secondary-blue">{product.brand}</span>
-              <span className="text-[10px] text-steel-gray">/</span>
-              <span className="text-[10px] text-steel-gray font-medium truncate">{product.sku}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-secondary-blue">{product.brand}</span>
+              <span className="text-xs text-steel-gray">/</span>
+              <span className="text-xs text-steel-gray font-medium truncate">{product.sku}</span>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-industrial-gray group-hover:text-primary-navy transition-colors line-clamp-1">
               {product.name}
@@ -71,13 +71,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
                   formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
                 )}
               </div>
-              {!hidePrice && <span className="text-[10px] text-steel-gray font-medium uppercase">{t('pdp.vatIncluded') || 'KDV Dahil'}</span>}
+              {!hidePrice && <span className="text-xs text-steel-gray font-medium uppercase">{t('pdp.vatIncluded') || 'KDV Dahil'}</span>}
             </div>
           </div>
 
           <button 
             onClick={handleAddToCart} 
-            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-11 h-11 rounded-xl bg-primary-navy text-white flex items-center justify-center hover:bg-secondary-blue transition-all shadow-md active:scale-95 ml-4 flex-shrink-0"
+            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-11 h-11 rounded-xl bg-primary-navy text-white flex items-center justify-center hover:bg-secondary-blue transition-transform shadow-md active:scale-95 ml-4 flex-shrink-0"
             title={t('common.addToCart') || 'Sepete Ekle'}
           >
             <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,12 +92,12 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
   // GRID VIEW
   return (
     <Link href={Routes.product(product.slug!)} className="block h-full">
-      <div className={`group relative flex flex-col h-full bg-white rounded-2xl border border-light-gray transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-1 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
+      <div className={`group relative flex flex-col h-full bg-white rounded-2xl border border-light-gray transition-transform duration-300 hover:shadow-hvac-lg hover:-translate-y-1 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
         
         {/* Badges Overlay */}
         <div className="absolute top-3 left-3 right-3 z-20 flex justify-between items-start pointer-events-none">
           {product.is_featured && (
-            <div className="bg-gold-accent backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm">
+            <div className="bg-gold-accent backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm">
               {t('pdp.featured') || 'ÖNE ÇIKAN'}
             </div>
           )}
@@ -122,10 +122,10 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
         {/* Product Details */}
         <div className="flex flex-col flex-1 px-1">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-secondary-blue">
+            <span className="text-xs font-bold uppercase tracking-wider text-secondary-blue">
               {product.brand}
             </span>
-            <span className="text-[9px] text-steel-gray font-medium">{product.sku}</span>
+            <span className="text-xs text-steel-gray font-medium">{product.sku}</span>
           </div>
           
           <h3 className="text-sm font-bold text-industrial-gray leading-snug min-h-[2.5rem] line-clamp-2 mb-4 group-hover:text-primary-navy transition-colors">
@@ -145,7 +145,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             
             <button 
               onClick={handleAddToCart} 
-              className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-9 h-9 rounded-lg bg-primary-navy text-white flex items-center justify-center transition-all hover:bg-secondary-blue hover:shadow-lg active:scale-95"
+              className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-9 h-9 rounded-lg bg-primary-navy text-white flex items-center justify-center transition-transform hover:bg-secondary-blue hover:shadow-lg active:scale-95"
               title={t('common.addToCart') || 'Sepete Ekle'}
             >
               <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">

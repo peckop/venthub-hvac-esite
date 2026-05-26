@@ -463,9 +463,9 @@ const AdminOrdersPage: React.FC = () => {
         <div className="flex items-center gap-1 glass-strong p-1 rounded-2xl border border-white/5 shrink-0 shadow-2xl">
           <button
             onClick={() => setViewMode('list')}
-            className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-all duration-500 ${
+            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-colors duration-500 ${
               viewMode === 'list' 
-                ? 'bg-cyan-400 text-[#0A0F1E] shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
+                ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -473,9 +473,9 @@ const AdminOrdersPage: React.FC = () => {
           </button>
           <button
             onClick={() => setViewMode('board')}
-            className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-all duration-500 ${
+            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-colors duration-500 ${
               viewMode === 'board' 
-                ? 'bg-cyan-400 text-[#0A0F1E] shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
+                ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -518,13 +518,13 @@ const AdminOrdersPage: React.FC = () => {
       ) : (
         <>
           <div className="flex items-center justify-end gap-3 mt-6 mb-4">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
               {t('admin.ui.prev')}
             </button>
-            <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
+            <span className="text-xs font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
               {t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}
             </span>
-            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
               {t('admin.ui.next')}
             </button>
           </div>
@@ -568,30 +568,30 @@ const AdminOrdersPage: React.FC = () => {
                             type="checkbox" 
                             checked={selectedIds.includes(r.id)} 
                             onChange={(e) => setSelectedIds(prev => e.target.checked ? [...prev, r.id] : prev.filter(x => x !== r.id))} 
-                            className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-500 focus:ring-cyan-500/20 transition-all"
+                            className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-500 focus:ring-cyan-500/20 transition-colors"
                           />
                         </td>
                         {visibleCols.id && (
                           <td className="px-6 py-5">
                             <div className="font-black text-white uppercase tracking-wider text-xs">{r.order_number || r.id.slice(0, 8)}</div>
-                            {r.order_number && <div className="text-[10px] text-slate-500 mt-1 font-mono">{r.id.slice(0, 8)}...</div>}
+                            {r.order_number && <div className="text-xs text-slate-500 mt-1 font-mono">{r.id.slice(0, 8)}...</div>}
                           </td>
                         )}
                         {visibleCols.status && (<td className="px-6 py-5"><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
-                        {visibleCols.conversation && (<td className="px-6 py-5 text-[11px] font-medium text-slate-400 font-mono italic">{r.conversation_id || '-'}</td>)}
+                        {visibleCols.conversation && (<td className="px-6 py-5 text-xs font-medium text-slate-400 font-mono italic">{r.conversation_id || '-'}</td>)}
                         {visibleCols.amount && (<td className="px-6 py-5 font-black text-white text-xs tracking-wider">{formatAmount(r.total_amount, lang)}</td>)}
-                        {visibleCols.created && (<td className="px-6 py-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">{safeDate(r.created_at, lang)}</td>)}
+                        {visibleCols.created && (<td className="px-6 py-5 text-xs font-black text-slate-500 uppercase tracking-widest">{safeDate(r.created_at, lang)}</td>)}
                         <td className="px-6 py-5">
                           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             {hasWriteAccess && (
-                              <button onClick={() => openShipModal(r.id)} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black uppercase text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all">
+                              <button onClick={() => openShipModal(r.id)} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors">
                                 {t('admin.orders.actions.shipping')}
                               </button>
                             )}
-                            <button onClick={() => openLogsModal(r.id)} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black uppercase text-amber-400 hover:bg-amber-500 hover:text-white transition-all">
+                            <button onClick={() => openLogsModal(r.id)} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-amber-400 hover:bg-amber-500 hover:text-white transition-colors">
                               {t('admin.orders.actions.logs')}
                             </button>
-                            <button onClick={() => openNotesModal(r.id)} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black uppercase text-slate-400 hover:bg-slate-500 hover:text-white transition-all">
+                            <button onClick={() => openNotesModal(r.id)} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-slate-400 hover:bg-slate-500 hover:text-white transition-colors">
                               {t('admin.orders.actions.notes')}
                             </button>
                           </div>
@@ -604,21 +604,21 @@ const AdminOrdersPage: React.FC = () => {
             </div>
             {/* Toplu İşlem Toolbar */}
             {bulkMode && hasWriteAccess && (
-              <div className="mx-6 mb-6 px-6 py-4 rounded-[2rem] bg-cyan-500 text-white flex items-center justify-between shadow-[0_0_50px_rgba(34,211,238,0.2)] animate-in slide-in-from-bottom-4 duration-500">
+              <div className="mx-6 mb-6 px-6 py-4 rounded-hvac-xl bg-cyan-500 text-white flex items-center justify-between shadow-[0_0_50px_rgba(34,211,238,0.2)] animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center gap-4">
                   <span className="text-xs font-black uppercase tracking-[0.2em]">{selectedIds.length} {t('admin.orders.bulk.selected')}</span>
-                  <button onClick={() => setSelectedIds([])} className="text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors underline underline-offset-4 decoration-white/20">
+                  <button onClick={() => setSelectedIds([])} className="text-xs font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors underline underline-offset-4 decoration-white/20">
                     {t('admin.orders.bulk.clearSelection')}
                   </button>
                 </div>
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={() => { setShipOpen(true); setBulkMode(true) }} 
-                    className="px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl bg-cyan-400 text-[#0A0F1E] hover:bg-cyan-300 shadow-lg shadow-cyan-400/20 transition-all flex items-center gap-2 active:scale-95"
+                    className="px-6 py-2.5 text-xs font-black uppercase tracking-[0.2em] rounded-xl bg-cyan-400 text-surface-deep hover:bg-cyan-300 shadow-lg shadow-cyan-400/20 transition-transform flex items-center gap-2 active:scale-95"
                   >
                     <Truck size={14} /> {t('admin.orders.bulk.shipSelected')}
                   </button>
-                  <button onClick={bulkCancelShipping} className="px-6 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl bg-black/20 text-white hover:bg-black/30 transition-all flex items-center gap-2">
+                  <button onClick={bulkCancelShipping} className="px-6 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl bg-black/20 text-white hover:bg-black/30 transition-colors flex items-center gap-2">
                     <X size={14} /> {t('admin.orders.bulk.cancelShipping')}
                   </button>
                 </div>
@@ -629,44 +629,44 @@ const AdminOrdersPage: React.FC = () => {
       )}
 
       {shipOpen && (
-        <div className="fixed inset-0 bg-[#020617]/40 backdrop-blur-xl flex items-center justify-center z-[100] p-4 animate-in fade-in duration-500">
-          <div className="glass-strong border border-white/10 rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden transform animate-in zoom-in-95 duration-500">
+        <div className="fixed inset-0 bg-surface-darker/40 backdrop-blur-xl flex items-center justify-center z-modal p-4 animate-in fade-in duration-500">
+          <div className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-lg overflow-hidden transform animate-in zoom-in-95 duration-500">
             <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
               <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">
                 {t('admin.orders.modals.shipping.title')}
               </h3>
-              <button onClick={closeShipModal} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-all ring-1 ring-white/10">
+              <button onClick={closeShipModal} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10">
                 <X size={20} />
               </button>
             </div>
             <div className="p-10 space-y-8">
               <div className="grid grid-cols-1 gap-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
                   <select 
                     value={carrier} 
                     onChange={e => setCarrier(e.target.value)} 
                     className={adminSelectClass}
                     style={adminSelectStyle}
                   >
-                    <option value="" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carrierSelect')}</option>
-                    <option value="Yurtiçi" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
-                    <option value="Aras" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carriers.aras')}</option>
-                    <option value="MNG" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carriers.mng')}</option>
-                    <option value="PTT" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carriers.ptt')}</option>
+                    <option value="" className="bg-surface-deep">{t('admin.orders.modals.shipping.carrierSelect')}</option>
+                    <option value="Yurtiçi" className="bg-surface-deep">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
+                    <option value="Aras" className="bg-surface-deep">{t('admin.orders.modals.shipping.carriers.aras')}</option>
+                    <option value="MNG" className="bg-surface-deep">{t('admin.orders.modals.shipping.carriers.mng')}</option>
+                    <option value="PTT" className="bg-surface-deep">{t('admin.orders.modals.shipping.carriers.ptt')}</option>
                   </select>
                 </div>
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.trackingLabel')}</label>
-                  <input value={tracking} onChange={e => setTracking(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all placeholder:text-slate-600" placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')} />
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.trackingLabel')}</label>
+                  <input value={tracking} onChange={e => setTracking(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-colors placeholder:text-slate-600" placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')} />
                 </div>
               </div>
             </div>
             <div className="px-10 py-8 bg-white/[0.02] border-t border-white/5 flex justify-end gap-4">
-              <button onClick={closeShipModal} className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all">
+              <button onClick={closeShipModal} className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors">
                 {t('admin.orders.modals.shipping.cancel')}
               </button>
-              <button onClick={submitShip} className="px-8 py-3 text-xs font-black uppercase tracking-widest bg-cyan-500 text-white rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:scale-105 active:scale-95 transition-all">
+              <button onClick={submitShip} className="px-8 py-3 text-xs font-black uppercase tracking-widest bg-cyan-500 text-white rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:scale-105 active:scale-95 transition-transform">
                 {t('admin.orders.modals.shipping.save')}
               </button>
             </div>
@@ -675,37 +675,37 @@ const AdminOrdersPage: React.FC = () => {
       )}
 
       {logsOpen && (
-        <div className="fixed inset-0 bg-[#020617]/40 backdrop-blur-xl flex items-center justify-center z-[100] p-4 animate-in fade-in duration-500">
-          <div className="glass-strong border border-white/10 rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden transform animate-in zoom-in-95 duration-500">
+        <div className="fixed inset-0 bg-surface-darker/40 backdrop-blur-xl flex items-center justify-center z-modal p-4 animate-in fade-in duration-500">
+          <div className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform animate-in zoom-in-95 duration-500">
             <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
               <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">
                 {t('admin.orders.modals.logs.title')}
               </h3>
-              <button onClick={closeLogsModal} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-all ring-1 ring-white/10">
+              <button onClick={closeLogsModal} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10">
                 <X size={20} />
               </button>
             </div>
             <div className="p-10">
-              <div className="max-h-[50vh] overflow-y-auto rounded-[2rem] border border-white/10 bg-white/[0.02] overflow-hidden custom-scrollbar">
+              <div className="max-h-[50vh] overflow-y-auto rounded-hvac-xl border border-white/10 bg-white/[0.02] overflow-hidden custom-scrollbar">
                 {logsLoading ? (
                   <div className="p-20 text-center flex flex-col items-center gap-4">
                     <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{t('admin.common.loading')}</span>
+                    <span className="text-xs font-black uppercase tracking-[0.3em] text-slate-500">{t('admin.common.loading')}</span>
                   </div>
                 ) : (
                   <div className="overflow-x-auto w-full">
                     <table className="min-w-full text-sm divide-y divide-white/5">
                       <thead className="bg-white/5 sticky top-0 backdrop-blur-xl">
                         <tr>
-                          <th className="px-8 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{t('admin.orders.modals.logs.table.date')}</th>
-                          <th className="px-8 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{t('admin.orders.modals.logs.subjectLabel') || 'Konu'}</th>
+                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-[0.2em]">{t('admin.orders.modals.logs.table.date')}</th>
+                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-[0.2em]">{t('admin.orders.modals.logs.subjectLabel') || 'Konu'}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/[0.02]">
                         {emailLogs.map((l, i) => (
                           <tr key={i} className="hover:bg-white/[0.03] transition-colors group">
-                            <td className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">{safeDate(l.created_at)}</td>
-                            <td className="px-8 py-5 text-[12px] text-white font-medium flex items-center gap-3">
+                            <td className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">{safeDate(l.created_at)}</td>
+                            <td className="px-8 py-5 text-xs text-white font-medium flex items-center gap-3">
                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                               {l.subject}
                             </td>
@@ -716,7 +716,7 @@ const AdminOrdersPage: React.FC = () => {
                             <td colSpan={2} className="px-8 py-20 text-center">
                               <div className="flex flex-col items-center gap-4 text-slate-500">
                                 <Info size={32} className="opacity-20" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">E-posta kaydı bulunamadı</span>
+                                <span className="text-xs font-black uppercase tracking-[0.3em] italic">E-posta kaydı bulunamadı</span>
                               </div>
                             </td>
                           </tr>
@@ -728,7 +728,7 @@ const AdminOrdersPage: React.FC = () => {
               </div>
             </div>
             <div className="px-10 py-8 bg-white/[0.02] border-t border-white/5 flex justify-end">
-              <button onClick={closeLogsModal} className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all">
+              <button onClick={closeLogsModal} className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors">
                 {t('admin.ui.close') || 'Kapat'}
               </button>
             </div>
@@ -737,13 +737,13 @@ const AdminOrdersPage: React.FC = () => {
       )}
 
       {notesOpen && (
-        <div className="fixed inset-0 bg-[#020617]/40 backdrop-blur-xl flex items-center justify-center z-[101] p-4 animate-in fade-in duration-500">
-          <div className="glass-strong border border-white/10 rounded-[2.5rem] shadow-2xl w-full max-w-xl overflow-hidden transform animate-in zoom-in-95 duration-500">
+        <div className="fixed inset-0 bg-surface-darker/40 backdrop-blur-xl flex items-center justify-center z-modal p-4 animate-in fade-in duration-500">
+          <div className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-xl overflow-hidden transform animate-in zoom-in-95 duration-500">
             <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
               <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">
                 Sipariş Notları
               </h3>
-              <button onClick={closeNotesModal} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-all ring-1 ring-white/10">
+              <button onClick={closeNotesModal} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10">
                 <X size={20} />
               </button>
             </div>
@@ -753,37 +753,37 @@ const AdminOrdersPage: React.FC = () => {
                   value={noteInput}
                   onChange={e => setNoteInput(e.target.value)}
                   placeholder="Not ekle..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xs font-medium text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all placeholder:text-slate-600"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xs font-medium text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-colors placeholder:text-slate-600"
                 />
                 <button
                   onClick={addNote}
-                  className="px-8 py-4 bg-cyan-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:scale-105 active:scale-95 transition-all"
+                  className="px-8 py-4 bg-cyan-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:scale-105 active:scale-95 transition-transform"
                 >
                   Ekle
                 </button>
               </div>
               <div className="max-h-[40vh] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 {notes.map(n => (
-                  <div key={n.id} className="p-6 bg-white/[0.02] rounded-2xl border border-white/5 group hover:border-white/10 transition-all">
+                  <div key={n.id} className="p-6 bg-white/[0.02] rounded-2xl border border-white/5 group hover:border-white/10 transition-colors">
                     <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1 text-[13px] text-slate-300 leading-relaxed font-medium">{n.note}</div>
+                      <div className="flex-1 text-sm text-slate-300 leading-relaxed font-medium">{n.note}</div>
                       <button
                         onClick={() => deleteNote(n.id)}
-                        className="p-1.5 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-500 hover:text-white rounded-md opacity-0 group-hover:opacity-100 transition-all border border-rose-500/20"
+                        className="p-1.5 text-xs font-black uppercase tracking-widest text-rose-500 hover:bg-rose-500 hover:text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity border border-rose-500/20"
                       >
                         SİL
                       </button>
                     </div>
-                    <div className="text-[10px] text-slate-500 mt-4 font-black uppercase tracking-[0.2em]">{safeDate(n.created_at)}</div>
+                    <div className="text-xs text-slate-500 mt-4 font-black uppercase tracking-[0.2em]">{safeDate(n.created_at)}</div>
                   </div>
                 ))}
                 {notes.length === 0 && (
-                  <div className="text-center py-16 text-slate-500 font-black uppercase tracking-[0.2em] text-[11px]">Henüz bir not eklenmemiş.</div>
+                  <div className="text-center py-16 text-slate-500 font-black uppercase tracking-[0.2em] text-xs">Henüz bir not eklenmemiş.</div>
                 )}
               </div>
             </div>
             <div className="px-10 py-8 bg-white/[0.02] border-t border-white/5 flex justify-end">
-              <button onClick={closeNotesModal} className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all">
+              <button onClick={closeNotesModal} className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors">
                 Kapat
               </button>
             </div>
@@ -820,8 +820,8 @@ function prettyStatus(s: string, t: (key: string, params?: Record<string, unknow
 }
 
 function badgeClass(s: string) {
-  if (!s) return 'inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border bg-white/5 text-slate-400 border-white/5 ring-1 ring-white/10 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all'
-  const base = 'inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border group-hover:scale-105 transition-all shadow-[0_0_15px_rgba(0,0,0,0.1)]'
+  if (!s) return 'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border bg-white/5 text-slate-400 border-white/5 ring-1 ring-white/10 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-colors'
+  const base = 'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border group-hover:scale-105 transition-colors shadow-[0_0_15px_rgba(0,0,0,0.1)]'
   const key = s.toLowerCase()
   switch (key) {
     case 'pending':

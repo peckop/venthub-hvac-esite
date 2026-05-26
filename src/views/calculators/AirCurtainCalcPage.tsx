@@ -215,7 +215,7 @@ const AirCurtainCalcPage: React.FC = () => {
                 <svg viewBox="0 0 200 160" className="w-full max-w-xs" role="img" aria-label="Door dimensions diagram">
                   <rect x="40" y="20" width="120" height="120" fill="none" stroke="#1C3D5A" strokeWidth="3" />
                   <rect x="50" y="20" width="100" height="8" fill="#0EA5E9" rx="2" />
-                  <text x="100" y="16" textAnchor="middle" className="text-[8px] fill-primary-navy font-medium">
+                  <text x="100" y="16" textAnchor="middle" className="text-xs fill-primary-navy font-medium">
                     {t('calculators.airCurtain.diagram.unit')}
                   </text>
                   {[60, 80, 100, 120, 140].map((x, i) => (
@@ -225,11 +225,11 @@ const AirCurtainCalcPage: React.FC = () => {
                     </g>
                   ))}
                   <line x1="35" y1="20" x2="35" y2="140" stroke="#6B7280" strokeWidth="1" />
-                  <text x="20" y="85" textAnchor="middle" className="text-[10px] fill-steel-gray" transform="rotate(-90, 20, 85)">
+                  <text x="20" y="85" textAnchor="middle" className="text-xs fill-steel-gray" transform="rotate(-90, 20, 85)">
                     {doorHeight || '?'} m
                   </text>
                   <line x1="40" y1="150" x2="160" y2="150" stroke="#6B7280" strokeWidth="1" />
-                  <text x="100" y="158" textAnchor="middle" className="text-[10px] fill-steel-gray">
+                  <text x="100" y="158" textAnchor="middle" className="text-xs fill-steel-gray">
                     {doorWidth || '?'} m
                   </text>
                 </svg>
@@ -415,7 +415,7 @@ const AirCurtainCalcPage: React.FC = () => {
           <button
             onClick={currentStep === 4 ? reset : prevStep}
             className={`
-              flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all
+              flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors
               ${currentStep === 1
                 ? 'text-steel-gray cursor-not-allowed opacity-50'
                 : 'text-steel-gray hover:text-industrial-gray hover:bg-gray-100'}
@@ -441,7 +441,7 @@ const AirCurtainCalcPage: React.FC = () => {
               onClick={nextStep}
               disabled={!canProceed()}
               className={`
-                flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all
+                flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors
                 ${canProceed()
                   ? 'bg-primary-navy text-white hover:bg-secondary-blue'
                   : 'bg-gray-200 text-steel-gray cursor-not-allowed'}

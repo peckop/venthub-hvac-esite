@@ -74,7 +74,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950" />
                 </div>
 
-                <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     {/* FIXED BREADCRUMB - VENTHUB SIGNATURE */}
                     <div ref={breadcrumbRef} className={scrollAnimationClasses.fadeUp(breadcrumbVisible) + " flex justify-center mb-12"}>
                         <Breadcrumb items={breadcrumbItems} variant="transparent" />
@@ -82,7 +82,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
 
                     <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
                         <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">{t('category.showcase.premiumTitle')}</span>
+                        <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400">{t('category.showcase.premiumTitle')}</span>
                     </div>
 
                     <h1 ref={heroTitleRef} className={scrollAnimationClasses.scaleIn(heroTitleVisible) + " text-5xl lg:text-8xl font-extralight tracking-tighter leading-[1.1] mb-10"}>
@@ -97,7 +97,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                         <button
                             ref={airCurtainBtnRef}
                             onClick={() => setWizardOpen(true)}
-                            className={scrollAnimationClasses.fadeIn(airCurtainBtnVisible) + " group inline-flex items-center bg-white text-slate-950 px-10 py-5 rounded-full font-bold transition-all hover:bg-cyan-500 hover:text-white"}
+                            className={scrollAnimationClasses.fadeIn(airCurtainBtnVisible) + " group inline-flex items-center bg-white text-slate-950 px-10 py-5 rounded-full font-bold transition-colors hover:bg-cyan-500 hover:text-white"}
                         >
                             <ThermometerSun className="mr-3" size={20} />
                             <span>{t('category.findModel')}</span>
@@ -110,14 +110,14 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                     onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
                     className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
                 >
-                    <span className="text-[10px] uppercase tracking-widest font-bold">Keşfet</span>
+                    <span className="text-xs uppercase tracking-widest font-bold">Keşfet</span>
                     <ChevronDown className="w-5 h-5" />
                 </button>
             </section>
 
-            <div id="content-start" className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <div id="content-start" className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 py-24">
                 <div className="flex flex-col items-center text-center mb-20">
-                    <div className="inline-flex items-center gap-2 text-cyan-600 font-black text-[10px] uppercase tracking-[0.3em] mb-4">
+                    <div className="inline-flex items-center gap-2 text-cyan-600 font-black text-xs uppercase tracking-[0.3em] mb-4">
                         <Layers size={14} />
                         <span>{t('category.showcase.catalog')}</span>
                     </div>
@@ -133,18 +133,18 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                         return (
                             <button
                                 key={sub.id}
-                                className="group relative bg-white rounded-[2.5rem] p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] transition-all duration-700 cursor-pointer overflow-hidden w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1.5rem)] max-w-[420px] text-left block"
+                                className="group relative bg-white rounded-hvac-2xl p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] transition-shadow duration-700 cursor-pointer overflow-hidden w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1.5rem)] max-w-modal text-left block"
                                 onClick={() => handleSubSelect(sub.slug)}
                             >
                                 <div className="relative z-10">
-                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900 mb-10 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-500">
+                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900 mb-10 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">
                                         {getCategoryIcon(sub.slug, { size: 28 })}
                                     </div>
                                     <h3 className="text-2xl font-bold text-slate-950 mb-4 tracking-tight">{subVm?.displayName}</h3>
                                     <p className="text-slate-500 text-sm font-light leading-relaxed line-clamp-3 mb-10">{subVm?.description}</p>
-                                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-cyan-600 transition-colors">
+                                    <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-cyan-600 transition-colors">
                                         <span>{t('category.showcase.exploreSeries')}</span>
-                                        <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-all duration-500" />
+                                        <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-colors duration-500" />
                                     </div>
                                 </div>
                             </button>
@@ -154,10 +154,10 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
             </div>
 
             <section className="relative py-32 bg-slate-950 overflow-hidden text-white">
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
                         <div>
-                            <div className="inline-flex items-center gap-2 text-cyan-400 font-black text-[10px] uppercase tracking-[0.3em] mb-6">
+                            <div className="inline-flex items-center gap-2 text-cyan-400 font-black text-xs uppercase tracking-[0.3em] mb-6">
                                 <ShieldCheck size={16} />
                                 <span>{t('category.showcase.guarantee')}</span>
                             </div>
@@ -169,7 +169,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                     { icon: Zap, title: 'Akıllı Kontrol', desc: 'BMS ve merkezi otomasyon sistemleriyle kusursuz entegrasyon.' }
                                 ].map((item, i) => (
                                     <div key={i} className="flex gap-6 group">
-                                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-500">
+                                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">
                                             <item.icon size={24} />
                                         </div>
                                         <div>
@@ -180,7 +180,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                 ))}
                             </div>
                         </div>
-                        <div className="relative aspect-square rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl">
+                        <div className="relative aspect-square rounded-hvac-3xl overflow-hidden border border-white/10 shadow-2xl">
                             <VentImage src={heroImage} alt="Premium Engineering" className="object-cover opacity-60" fill />
                         </div>
                     </div>

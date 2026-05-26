@@ -423,7 +423,7 @@ const AdminProductsPage: React.FC = () => {
 
   const statusBadge = (s?: string | null) => {
     const v = (s || '').toLowerCase()
-    const baseClass = "px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg border"
+    const baseClass = "px-2.5 py-1 text-xs font-black uppercase tracking-wider rounded-lg border"
     if (v === 'active') return <span className={`${baseClass} bg-emerald-500/10 text-emerald-400 border-emerald-500/20`}>{t('admin.products.statusLabels.active')}</span>
     if (v === 'inactive') return <span className={`${baseClass} bg-slate-500/10 text-slate-400 border-white/5`}>{t('admin.products.statusLabels.inactive')}</span>
     if (v === 'out_of_stock') return <span className={`${baseClass} bg-rose-500/10 text-rose-400 border-rose-500/20`}>{t('admin.products.statusLabels.out_of_stock')}</span>
@@ -530,22 +530,22 @@ const AdminProductsPage: React.FC = () => {
         {error && <div className="p-4 text-rose-400 text-xs font-bold bg-rose-500/10 border-b border-white/5 animate-pulse flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-rose-500" />{error}</div>}
         
         <div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
-          <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('admin.ui.total') ?? 'Toplam'}: <span className="text-cyan-400">{total}</span> Ürün</div>
+          <div className="text-xs font-black text-slate-500 uppercase tracking-widest">{t('admin.ui.total') ?? 'Toplam'}: <span className="text-cyan-400">{total}</span> Ürün</div>
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setPage(p => Math.max(1, p - 1))} 
               disabled={page <= 1} 
-              className="w-8 h-8 flex items-center justify-center rounded-lg glass border border-white/5 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-8 h-8 flex items-center justify-center rounded-lg glass border border-white/5 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
             >
               <ChevronRight size={16} className="rotate-180" />
             </button>
-            <span className="text-[10px] font-black text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 min-w-[100px] text-center uppercase tracking-tighter">
+            <span className="text-xs font-black text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 min-w-[100px] text-center uppercase tracking-tighter">
               {t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}
             </span>
             <button 
               onClick={() => setPage(p => p + 1)} 
               disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} 
-              className="w-8 h-8 flex items-center justify-center rounded-lg glass border border-white/5 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-8 h-8 flex items-center justify-center rounded-lg glass border border-white/5 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
             >
               <ChevronRight size={16} />
             </button>
@@ -649,7 +649,7 @@ const AdminProductsPage: React.FC = () => {
                   const isSelected = selectedIds.has(r.id);
                   return (
                     <React.Fragment key={r.id}>
-                      <tr className={`group transition-all duration-300 ${isSelected ? 'bg-cyan-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
+                      <tr className={`group transition-colors duration-300 ${isSelected ? 'bg-cyan-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
                         <td className={`${adminTableCellClass} ${cellPad} w-10 text-center`}>
                           {hasWriteAccess && (
                             <input 
@@ -663,21 +663,21 @@ const AdminProductsPage: React.FC = () => {
                         <td className={`${adminTableCellClass} ${cellPad} w-8`}>
                           <button 
                             onClick={() => { toggleExpand(r.id); loadTechSpecs(r.id) }} 
-                            className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all duration-300 ${isExpanded ? 'bg-cyan-400/10 text-cyan-400 rotate-90' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'}`}
+                            className={`w-6 h-6 flex items-center justify-center rounded-lg transition-colors duration-300 ${isExpanded ? 'bg-cyan-400/10 text-cyan-400 rotate-90' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'}`}
                           >
                             <ChevronRight size={14} />
                           </button>
                         </td>
                         {visibleCols.image && (
                           <td className={`${adminTableCellClass} ${cellPad}`}>
-                            <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-all duration-500">
+                            <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-colors duration-500">
                               {covers[r.id] ? (
                                 <VentImage src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
                                   alt=""
                                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                  />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-white/5 text-slate-700 uppercase font-black text-[10px]">No Img</div>
+                                <div className="w-full h-full flex items-center justify-center bg-white/5 text-slate-700 uppercase font-black text-xs">No Img</div>
                               )}
                             </div>
                           </td>
@@ -686,15 +686,15 @@ const AdminProductsPage: React.FC = () => {
                           <td className={`${adminTableCellClass} ${cellPad}`}>
                             <div className="flex flex-col gap-0.5">
                               <span className="text-sm font-bold text-slate-100 line-clamp-1 group-hover:text-cyan-400 transition-colors">{r.name}</span>
-                              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">{r.brand || 'Markasız'}</span>
+                              <span className="text-xs text-slate-500 font-bold uppercase tracking-tight">{r.brand || 'Markasız'}</span>
                             </div>
                           </td>
                         )}
                         {visibleCols.sku && (
                           <td className={`${adminTableCellClass} ${cellPad}`}>
                             <div className="flex flex-col gap-0.5">
-                              <code className="text-[11px] font-mono font-black text-cyan-400/70 bg-cyan-400/10 px-2 py-0.5 rounded-md w-max">{r.sku}</code>
-                              {r.model_code && <span className="text-[10px] text-slate-500 font-black uppercase tracking-tighter">{r.model_code}</span>}
+                              <code className="text-xs font-mono font-black text-cyan-400/70 bg-cyan-400/10 px-2 py-0.5 rounded-md w-max">{r.sku}</code>
+                              {r.model_code && <span className="text-xs text-slate-500 font-black uppercase tracking-tighter">{r.model_code}</span>}
                             </div>
                           </td>
                         )}
@@ -733,13 +733,13 @@ const AdminProductsPage: React.FC = () => {
                                     onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
                                     onBlur={saveInlineEdit}
                                     onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                                    className="w-24 text-right bg-[#0A0F1E] border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 font-black"
+                                    className="w-24 text-right bg-surface-deep border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 font-black"
                                   />
                                 </div>
                               ) : (
                                 <button
                                   onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
-                                  className="group/btn relative bg-white/[0.03] hover:bg-cyan-400/10 px-3 py-1.5 rounded-xl border border-white/5 hover:border-cyan-400/30 transition-all duration-300 flex flex-col items-end gap-0.5 ml-auto"
+                                  className="group/btn relative bg-white/[0.03] hover:bg-cyan-400/10 px-3 py-1.5 rounded-xl border border-white/5 hover:border-cyan-400/30 transition-colors duration-300 flex flex-col items-end gap-0.5 ml-auto"
                                 >
                                   <span className="text-sm font-black text-slate-100 group-hover/btn:text-cyan-400 transition-colors">
                                     {r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
@@ -763,13 +763,13 @@ const AdminProductsPage: React.FC = () => {
                                     onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
                                     onBlur={saveInlineEdit}
                                     onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                                    className="w-20 text-right bg-[#0A0F1E] border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 font-black"
+                                    className="w-20 text-right bg-surface-deep border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 font-black"
                                   />
                                 </div>
                               ) : (
                                 <button
                                   onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
-                                  className={`group/btn relative px-3 py-1.5 rounded-xl border transition-all duration-300 flex flex-col items-end gap-0.5 ml-auto ${
+                                  className={`group/btn relative px-3 py-1.5 rounded-xl border transition-colors duration-300 flex flex-col items-end gap-0.5 ml-auto ${
                                     Number(r.stock_qty) < (r.low_stock_threshold || 10) 
                                       ? 'bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20' 
                                       : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.08] hover:border-white/10'
@@ -797,7 +797,7 @@ const AdminProductsPage: React.FC = () => {
                                   <button onClick={() => remove(r.id)} className={adminTableActionDangerClass}>{t('admin.ui.delete')}</button>
                                 </>
                               ) : (
-                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-lg">Yetki Yok</span>
+                                <span className="text-xs font-black text-slate-600 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-lg">Yetki Yok</span>
                               )}
                             </div>
                           </td>
@@ -809,13 +809,13 @@ const AdminProductsPage: React.FC = () => {
                             <div className="max-w-4xl mx-auto">
                               <div className="flex items-center gap-3 mb-6">
                                 <div className="w-8 h-0.5 bg-cyan-400" />
-                                <h4 className="text-[11px] font-black text-cyan-400 uppercase tracking-[0.3em]">Teknik Ürün Parametreleri</h4>
+                                <h4 className="text-xs font-black text-cyan-400 uppercase tracking-[0.3em]">Teknik Ürün Parametreleri</h4>
                               </div>
                               {techSpecs[r.id] && Object.keys(techSpecs[r.id]).length > 0 ? (
                                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                   {Object.entries(techSpecs[r.id]).map(([key, val]) => (
-                                    <div key={key} className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-all group/spec">
-                                      <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">{key}</div>
+                                    <div key={key} className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
+                                      <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">{key}</div>
                                       <div className="text-xs font-black text-slate-200 uppercase">{String(val)}</div>
                                     </div>
                                   ))}

@@ -120,7 +120,7 @@ export default function AccountSecurityPage() {
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <Lock className="w-4 h-4 text-slate-400" />
                   </div>
-                  <input type="password" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder={t('account.security.currentLabel')} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+                  <input type="password" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder={t('account.security.currentLabel')} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
                 </div>
               </div>
 
@@ -133,7 +133,7 @@ export default function AccountSecurityPage() {
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                       <Key className="w-4 h-4 text-slate-400" />
                     </div>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('account.security.newLabel')} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('account.security.newLabel')} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
                   </div>
                   {/* Güç Göstergesi */}
                   {password.length > 0 && (
@@ -148,7 +148,7 @@ export default function AccountSecurityPage() {
                       <p className="text-xs text-slate-500">Güvenlik: <span className="font-semibold">{strengthLabel}</span></p>
                       <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5">
                         {passwordRules.map(rule => (
-                          <li key={rule.key} className={`flex items-center gap-1 text-[11px] ${
+                          <li key={rule.key} className={`flex items-center gap-1 text-xs ${
                             rule.test(password) ? 'text-green-600' : 'text-slate-400'
                           }`}>
                             <span>{rule.test(password) ? '✓' : '○'}</span>{rule.label}
@@ -166,13 +166,13 @@ export default function AccountSecurityPage() {
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                       <Check className="w-4 h-4 text-slate-400" />
                     </div>
-                    <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={t('account.security.confirmLabel')} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
+                    <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={t('account.security.confirmLabel')} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
                   </div>
                 </div>
               </div>
 
               <div className="pt-4 flex justify-end border-t border-slate-100 mt-2">
-                <button disabled={saving} className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-all hover:scale-[1.02] flex items-center gap-2">
+                <button disabled={saving} className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-transform hover:scale-[1.02] flex items-center gap-2">
                   {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('account.security.saving')}</> : <><Check className="w-4 h-4" /> {t('account.security.save')}</>}
                 </button>
               </div>
@@ -202,11 +202,11 @@ export default function AccountSecurityPage() {
                   </div>
                 </div>
                 {hasProvider('email') ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
                     <Check className="w-3.5 h-3.5" /> {t('account.security.connected')}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200 shadow-sm"> {t('account.security.disconnected')} </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200 shadow-sm"> {t('account.security.disconnected')} </span>
                 )}
               </div>
 
@@ -225,7 +225,7 @@ export default function AccountSecurityPage() {
                 <div className="flex items-center gap-3">
                   {hasProvider('google') ? (
                     <>
-                      <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
+                      <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
                         <Check className="w-3.5 h-3.5" /> {t('account.security.connected')}
                       </span>
                       <button

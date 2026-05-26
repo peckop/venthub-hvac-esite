@@ -63,14 +63,14 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
               <div className="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
                 <button 
                   onClick={() => onUpdateFilters({ viewMode: 'grid' })}
-                  className={`p-2 rounded-lg transition-all ${filters.viewMode === 'grid' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`p-2 rounded-lg transition-colors ${filters.viewMode === 'grid' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                   title={t('category.view.grid') || 'Izgara Görünümü'}
                 >
                   <Grid size={18} />
                 </button>
                 <button 
                   onClick={() => onUpdateFilters({ viewMode: 'list' })}
-                  className={`p-2 rounded-lg transition-all ${filters.viewMode === 'list' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`p-2 rounded-lg transition-colors ${filters.viewMode === 'list' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                   title={t('category.view.list') || 'Liste Görünümü'}
                 >
                   <List size={18} />
@@ -80,7 +80,7 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
               <select 
                 value={filters.sortBy}
                 onChange={(e) => onUpdateFilters({ sortBy: e.target.value })}
-                className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus:ring-primary-ocean/20 transition-all shadow-sm"
+                className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus:ring-primary-ocean/20 transition-colors shadow-sm"
                 aria-label={t('category.sort.title') || 'Sıralama'}
               >
                 <option value="name">{t('category.sort.name')}</option>
@@ -105,7 +105,7 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
           </div>
 
           {products.length === 0 && !loading && (
-            <div className="py-32 text-center bg-white rounded-[3rem] border border-dashed border-slate-200">
+            <div className="py-32 text-center bg-white rounded-hvac-3xl border border-dashed border-slate-200">
               <p className="text-slate-400 font-medium">{t('category.noProductsFound')}</p>
             </div>
           )}

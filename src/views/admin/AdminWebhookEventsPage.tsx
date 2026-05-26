@@ -84,7 +84,7 @@ const AdminWebhookEventsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white rounded-xl border border-light-gray shadow-sm overflow-hidden">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 border-b border-slate-100 text-steel-gray uppercase text-[10px] font-bold">
+            <thead className="bg-slate-50 border-b border-slate-100 text-steel-gray uppercase text-xs font-bold">
               <tr>
                 <th className="px-4 py-3">Olay Tipi</th>
                 <th className="px-4 py-3">Kaynak</th>

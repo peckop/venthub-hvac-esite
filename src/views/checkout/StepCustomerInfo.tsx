@@ -32,7 +32,7 @@ const StepCustomerInfo: React.FC<StepCustomerInfoProps> = ({ customerInfo, setCu
                         type="text"
                         value={customerInfo.name}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
-                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                         placeholder={t('checkout.personal.namePlaceholder')}
                     />
                 </div>
@@ -44,7 +44,7 @@ const StepCustomerInfo: React.FC<StepCustomerInfoProps> = ({ customerInfo, setCu
                         type="email"
                         value={customerInfo.email}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
-                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                         placeholder={t('checkout.personal.emailPlaceholder')}
                     />
                 </div>
@@ -56,7 +56,7 @@ const StepCustomerInfo: React.FC<StepCustomerInfoProps> = ({ customerInfo, setCu
                         type="tel"
                         value={customerInfo.phone}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
-                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                         placeholder={t('checkout.personal.phonePlaceholder')}
                     />
                 </div>
@@ -68,7 +68,7 @@ const StepCustomerInfo: React.FC<StepCustomerInfoProps> = ({ customerInfo, setCu
                         type="text"
                         value={customerInfo.identityNumber}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, identityNumber: e.target.value })}
-                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
                         placeholder={t('checkout.personal.idPlaceholder')}
                         maxLength={11}
                     />

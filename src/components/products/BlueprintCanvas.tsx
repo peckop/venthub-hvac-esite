@@ -118,7 +118,7 @@ interface BlueprintCanvasProps {
 
 const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
     return (
-        <div className="w-full h-full min-h-[400px] relative group overflow-hidden rounded-3xl bg-[#05070A] border border-white/5 shadow-2xl">
+        <div className="w-full h-full min-h-[400px] relative group overflow-hidden rounded-3xl bg-surface-darkest border border-white/5 shadow-2xl">
             {/* Dark Tech Grid Background */}
             <div className="absolute inset-0 opacity-20 pointer-events-none" 
                  style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)', backgroundSize: '24px 24px' }} 
@@ -133,16 +133,16 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
             {/* Corner Tech Decor */}
             <div className="absolute top-6 left-6 flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                <span className="text-[8px] font-black text-cyan-500 uppercase tracking-widest leading-none">Scanning Blueprint...</span>
+                <span className="text-xs font-black text-cyan-500 uppercase tracking-widest leading-none">Scanning Blueprint...</span>
             </div>
 
             <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
                 <div className="flex flex-col gap-1">
                     <div className="w-24 h-[1px] bg-white/10" />
-                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none">Object Reference: P-501</span>
+                    <span className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none">Object Reference: P-501</span>
                 </div>
                 <div className="text-right">
-                    <span className="text-[8px] font-black text-white uppercase tracking-widest leading-none">Cinematic Mode</span>
+                    <span className="text-xs font-black text-white uppercase tracking-widest leading-none">Cinematic Mode</span>
                     <div className="mt-1 flex gap-1 justify-end">
                         <div className="w-3 h-[2px] bg-cyan-500" />
                         <div className="w-1 h-[2px] bg-white/20" />

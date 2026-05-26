@@ -19,7 +19,7 @@ interface NavPrimaryRailProps {
 }
 
 const itemBaseClass =
-    'group relative inline-flex items-center justify-center gap-2 rounded-2xl border border-transparent px-3.5 py-3 text-sm font-medium text-steel-gray transition-all duration-300 hover:border-primary-navy/10 hover:bg-gradient-to-r hover:from-air-blue/40 hover:to-slate-50 hover:text-primary-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:ring-offset-2'
+    'group relative inline-flex items-center justify-center gap-2 rounded-2xl border border-transparent px-3.5 py-3 text-sm font-medium text-steel-gray transition-colors duration-300 hover:border-primary-navy/10 hover:bg-gradient-to-r hover:from-air-blue/40 hover:to-slate-50 hover:text-primary-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:ring-offset-2'
 
 const NavPrimaryRail: React.FC<NavPrimaryRailProps> = React.memo(({
     items,

@@ -108,7 +108,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     const hoveredVm = wrapCategory(hoveredCategory)
 
     return (
-        <div className={`fixed inset-0 z-[100] transition-opacity duration-500 ${isAnimating ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`fixed inset-0 z-modal transition-opacity duration-500 ${isAnimating ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div 
                 className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" 
                 onClick={onClose} 
@@ -116,8 +116,8 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                 role="presentation"
             />
 
-            <div className={`absolute left-0 w-full top-[96px] bg-slate-900/90 backdrop-blur-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] border-b border-slate-700/50 overflow-hidden transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] origin-top z-[90] ${isAnimating ? 'max-h-[calc(100vh-96px)] scale-y-100 opacity-100 blur-none' : 'max-h-0 scale-y-95 opacity-0 blur-[2px] pointer-events-none'}`}>
-                <div className="flex h-[600px] max-w-[1400px] mx-auto">
+            <div className={`absolute left-0 w-full top-[96px] bg-slate-900/90 backdrop-blur-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] border-b border-slate-700/50 overflow-hidden transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] origin-top z-sticky ${isAnimating ? 'max-h-[calc(100vh-96px)] scale-y-100 opacity-100 blur-none' : 'max-h-0 scale-y-95 opacity-0 blur-[2px] pointer-events-none'}`}>
+                <div className="flex h-[600px] max-w-page mx-auto">
 
                     <div className="w-[42%] relative hidden lg:flex flex-col justify-between p-10 bg-gradient-to-r from-transparent to-slate-800/20 border-r border-slate-700/50 overflow-hidden shrink-0">
                         <div
@@ -131,13 +131,13 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                         {hoveredCategory ? (
                             <>
                                 <div className="relative z-10 animate-in fade-in slide-in-from-top-4 duration-500">
-                                    <span className="inline-block mb-4 text-[10px] font-bold tracking-[0.2em] uppercase text-sky-400 font-mono border border-sky-400/20 bg-sky-400/10 rounded-sm px-2.5 py-1">
+                                    <span className="inline-block mb-4 text-xs font-bold tracking-[0.2em] uppercase text-sky-400 font-mono border border-sky-400/20 bg-sky-400/10 rounded-sm px-2.5 py-1">
                                         ÖNE ÇIKAN TEKNOLOJİ
                                     </span>
                                     <h3 className="text-3xl font-extrabold leading-none tracking-tight text-white mb-3" style={{ fontVariantNumeric: "tabular-nums" }}>
                                         {hoveredVm?.displayName}
                                     </h3>
-                                    <p className="text-[13px] leading-relaxed text-slate-400 max-w-[280px]">
+                                    <p className="text-sm leading-relaxed text-slate-400 max-w-[280px]">
                                         {hoveredVm?.description || 'Yüksek performanslı, akıllı endüstriyel çözüm.'}
                                     </p>
                                 </div>
@@ -175,7 +175,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                         return (
                                             <div>
                                                 <p className="text-2xl font-bold tabular-nums leading-none text-white">{String(metric1.value || '')}</p>
-                                                <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{String(metric1.label || '')}</p>
+                                                <p className="mt-1 text-xs font-semibold tracking-[0.15em] uppercase text-slate-500">{String(metric1.label || '')}</p>
                                             </div>
                                         )
                                     })()}
@@ -224,17 +224,17 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                             onMouseEnter={() => !isSelected && setHoveredCategory(cat)}
                                             onClick={() => { if (isSelected) { handleSubCategoryClick(cat); } else { handleCategoryClick(cat); } }}
                                             className="group/item relative flex items-center justify-between px-5 py-4 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-colors duration-200 overflow-hidden w-full text-left
-                                                       before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-0 before:w-[3px] before:rounded-r-full before:bg-sky-400 before:transition-all before:duration-300 hover:before:h-2/3"
+                                                       before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-0 before:w-[3px] before:rounded-r-full before:bg-sky-400 before:transition-transform before:duration-300 hover:before:h-2/3"
                                         >
                                             <div>
                                                 <div className="text-base font-bold text-slate-200 group-hover/item:text-white transition-colors flex items-center gap-3">
                                                     {vm?.displayName}
                                                 </div>
                                                 {!isSelected && subCount > 0 && (
-                                                    <div className="text-[11px] font-medium tracking-wide uppercase text-slate-500 mt-1.5">{subCount} Alt Kategori</div>
+                                                    <div className="text-xs font-medium tracking-wide uppercase text-slate-500 mt-1.5">{subCount} Alt Kategori</div>
                                                 )}
                                             </div>
-                                            <div className="w-8 h-8 rounded-full border border-slate-700/50 bg-slate-800/50 flex items-center justify-center group-hover/item:bg-sky-500 group-hover/item:border-sky-400 group-hover/item:text-white text-slate-500 transition-all duration-300 opacity-0 -translate-x-4 group-hover/item:opacity-100 group-hover/item:translate-x-0">
+                                            <div className="w-8 h-8 rounded-full border border-slate-700/50 bg-slate-800/50 flex items-center justify-center group-hover/item:bg-sky-500 group-hover/item:border-sky-400 group-hover/item:text-white text-slate-500 transition-transform duration-300 opacity-0 -translate-x-4 group-hover/item:opacity-100 group-hover/item:translate-x-0">
                                                 <ChevronRight size={16} />
                                             </div>
                                         </button>

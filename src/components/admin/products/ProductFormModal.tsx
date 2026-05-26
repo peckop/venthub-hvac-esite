@@ -133,8 +133,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     return (
         <Dialog.Root open={open} onOpenChange={onClose}>
             <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1000]" />
-                <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl z-[1001] p-6">
+                <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-modal" />
+                <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl z-modal p-6">
                     <div className="flex items-center justify-between mb-6">
                         <Dialog.Title className="text-xl font-bold text-industrial-gray">
                             {_productId ? t('admin.common.edit') : t('admin.common.addNewProduct')}
@@ -149,12 +149,12 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.products.form.name')}</label>
                                 <input {...register('name')} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
-                                {errors.name && <p className="text-red-500 text-[10px]">{errors.name.message}</p>}
+                                {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">SKU</label>
                                 <input {...register('sku')} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
-                                {errors.sku && <p className="text-red-500 text-[10px]">{errors.sku.message}</p>}
+                                {errors.sku && <p className="text-red-500 text-xs">{errors.sku.message}</p>}
                             </div>
                         </div>
 

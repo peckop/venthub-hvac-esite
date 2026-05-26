@@ -99,7 +99,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
         caption: "flex justify-center pt-1 relative items-center",
         caption_label: "text-sm font-bold text-slate-800",
         nav: "space-x-1 flex items-center",
-        nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-slate-100 rounded-md transition-all flex items-center justify-center text-slate-600",
+        nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-slate-100 rounded-md transition-colors flex items-center justify-center text-slate-600",
         nav_button_previous: "absolute left-2",
         nav_button_next: "absolute right-2",
         table: "w-full border-collapse space-y-1",
@@ -121,7 +121,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
         <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
             <Popover.Trigger asChild>
                 <button
-                    className={`inline-flex items-center gap-2 justify-between bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 transition-all w-full sm:w-auto max-w-full ${className}`}
+                    className={`inline-flex items-center gap-2 justify-between bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 transition-shadow w-full sm:w-auto max-w-full ${className}`}
                 >
                     <div className="flex items-center gap-2 text-slate-600">
                         <CalendarIcon size={16} className={value?.from ? 'text-primary-navy' : 'text-slate-400'} />
@@ -134,7 +134,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
             </Popover.Trigger>
             <Popover.Portal>
                 <Popover.Content
-                    className="z-[9999] mt-2 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl p-0 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] md:max-h-none overflow-y-auto w-[calc(100vw-32px)] md:w-auto"
+                    className="z-toast mt-2 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl p-0 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] md:max-h-none overflow-y-auto w-[calc(100vw-32px)] md:w-auto"
                     align="center"
                     sideOffset={5}
                     collisionPadding={16}
@@ -153,7 +153,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                                     <button
                                         key={idx}
                                         onClick={() => handleSelect(preset.getRange())}
-                                        className={`text-left px-3 py-2 rounded-lg text-sm transition-all flex items-center justify-between ${isSelected ? 'bg-primary-navy text-white font-bold shadow-md' : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-800'}`}
+                                        className={`text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${isSelected ? 'bg-primary-navy text-white font-bold shadow-md' : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-800'}`}
                                     >
                                         {preset.label}
                                         {isSelected && <Check size={14} className="opacity-80" />}
@@ -200,7 +200,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                                 <button
                                     onClick={applySelection}
                                     disabled={!selectedRange?.from}
-                                    className="px-6 py-2 text-sm font-bold bg-primary-navy text-white hover:bg-primary-navy/90 rounded-lg shadow-md shadow-primary-navy/20 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100"
+                                    className="px-6 py-2 text-sm font-bold bg-primary-navy text-white hover:bg-primary-navy/90 rounded-lg shadow-md shadow-primary-navy/20 active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
                                 >
                                     Uygula
                                 </button>

@@ -29,8 +29,8 @@ function Model({ url, hotspots }: { url: string, hotspots?: ThreeDMetadata['hots
                     <div className="group relative">
                         <div className="w-4 h-4 bg-primary-navy rounded-full border-2 border-white shadow-lg cursor-pointer animate-pulse" />
                         <div className="absolute left-6 top-0 hidden group-hover:block bg-white/90 backdrop-blur-md p-2 rounded-lg shadow-xl border border-slate-200 w-48 z-10">
-                            <p className="text-[10px] font-black text-industrial-gray uppercase mb-1">{spot.label}</p>
-                            {spot.description && <p className="text-[9px] text-steel-gray leading-tight">{spot.description}</p>}
+                            <p className="text-xs font-black text-industrial-gray uppercase mb-1">{spot.label}</p>
+                            {spot.description && <p className="text-xs text-steel-gray leading-tight">{spot.description}</p>}
                         </div>
                     </div>
                 </Html>
@@ -64,8 +64,8 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
                         </div>
                     </div>
                     <div>
-                        <p className="text-[10px] font-black text-industrial-gray uppercase tracking-[0.2em]">3D Interactive View</p>
-                        <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">Click to Initialize Engine</p>
+                        <p className="text-xs font-black text-industrial-gray uppercase tracking-[0.2em]">3D Interactive View</p>
+                        <p className="text-xs text-slate-400 font-bold uppercase mt-1">Click to Initialize Engine</p>
                     </div>
                 </div>
                 
@@ -92,7 +92,7 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
                     <Html center>
                         <div className="flex flex-col items-center">
                             <div className="w-8 h-8 border-2 border-primary-navy border-t-transparent rounded-full animate-spin mb-2" />
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading 3D Model</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading 3D Model</p>
                         </div>
                     </Html>
                 }>
@@ -122,7 +122,7 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
             {/* Help Overlay */}
             <div className="absolute bottom-4 left-4 pointer-events-none">
                 <div className="bg-white/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-200">
-                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">3D Interactive View • Drag to Rotate</p>
+                    <p className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">3D Interactive View • Drag to Rotate</p>
                 </div>
             </div>
         </motion.div>

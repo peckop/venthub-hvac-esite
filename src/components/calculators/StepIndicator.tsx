@@ -42,7 +42,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
                                 <div
                                     className={`
                     w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
-                    transition-all duration-300
+                    transition-colors duration-300
                     ${isCompleted
                                             ? 'bg-success-green text-white'
                                             : isActive
@@ -73,7 +73,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
                             {index < steps.length - 1 && (
                                 <div className="flex-1 mx-4 h-0.5 bg-gray-200 relative">
                                     <div
-                                        className="absolute inset-y-0 left-0 bg-success-green transition-all duration-500"
+                                        className="absolute inset-y-0 left-0 bg-success-green transition-colors duration-500"
                                         style={{
                                             width: isCompleted ? '100%' : '0%'
                                         }}
@@ -97,7 +97,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                        className="h-full bg-primary-navy transition-all duration-500"
+                        className="h-full bg-primary-navy transition-colors duration-500"
                         style={{
                             width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`
                         }}

@@ -345,10 +345,10 @@ const AdminErrorGroupsPage: React.FC = () => {
               className={adminSelectClass}
               style={adminSelectStyle}
             >
-              <option value="" className="bg-[#0A0F1E]">{t('admin.errorGroups.filter.statusAll')}</option>
-              <option value="open" className="bg-[#0A0F1E]">open</option>
-              <option value="resolved" className="bg-[#0A0F1E]">resolved</option>
-              <option value="ignored" className="bg-[#0A0F1E]">ignored</option>
+              <option value="" className="bg-surface-deep">{t('admin.errorGroups.filter.statusAll')}</option>
+              <option value="open" className="bg-surface-deep">open</option>
+              <option value="resolved" className="bg-surface-deep">resolved</option>
+              <option value="ignored" className="bg-surface-deep">ignored</option>
             </select>
             <select 
               value={assigned} 
@@ -356,10 +356,10 @@ const AdminErrorGroupsPage: React.FC = () => {
               className={adminSelectClass}
               style={adminSelectStyle}
             >
-              <option value="" className="bg-[#0A0F1E]">{t('admin.errorGroups.filter.assignedAll')}</option>
-              <option value="__none__" className="bg-[#0A0F1E]">{t('admin.errorGroups.filter.unassigned')}</option>
+              <option value="" className="bg-surface-deep">{t('admin.errorGroups.filter.assignedAll')}</option>
+              <option value="__none__" className="bg-surface-deep">{t('admin.errorGroups.filter.unassigned')}</option>
               {users.map(u => (
-                <option key={u.id} value={u.id} className="bg-[#0A0F1E]">{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
+                <option key={u.id} value={u.id} className="bg-surface-deep">{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
               ))}
             </select>
             <input 
@@ -397,13 +397,13 @@ const AdminErrorGroupsPage: React.FC = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-3 mb-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
           {t('admin.ui.prev')}
         </button>
-        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
+        <span className="text-xs font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
           {t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}
         </span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed">
           {t('admin.ui.next')}
         </button>
       </div>
@@ -420,9 +420,9 @@ const AdminErrorGroupsPage: React.FC = () => {
               className={`${adminSelectClass} !h-10`}
               style={adminSelectStyle}
             >
-              <option value="open" className="bg-[#0A0F1E]">open</option>
-              <option value="resolved" className="bg-[#0A0F1E]">resolved</option>
-              <option value="ignored" className="bg-[#0A0F1E]">ignored</option>
+              <option value="open" className="bg-surface-deep">open</option>
+              <option value="resolved" className="bg-surface-deep">resolved</option>
+              <option value="ignored" className="bg-surface-deep">ignored</option>
             </select>
             <button onClick={bulkApplyStatus} disabled={savingBulk || !hasWriteAccess} className={adminButtonPrimaryClass}>{savingBulk ? t('admin.ui.loadingShort') : t('admin.ui.apply')}</button>
             <button onClick={() => setSelectedIds([])} className={adminButtonSecondaryClass}>{t('admin.ui.clear')}</button>
@@ -491,7 +491,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                       </td>
                       {visibleCols.lastSeen && <td className={`${adminTableCellClass} font-black text-white tracking-widest uppercase`}>{formatDateTime(r.last_seen, lang)}</td>}
                       {visibleCols.level && <td className={`${adminTableCellClass}`}>
-                        <span className={`inline-flex items-center text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
+                        <span className={`inline-flex items-center text-xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
                           r.level === 'error' ? 'bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20' : 
                           r.level === 'warn' ? 'bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20' : 
                           'bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/20'
@@ -502,10 +502,10 @@ const AdminErrorGroupsPage: React.FC = () => {
                       {visibleCols.signature && <td className={`${adminTableCellClass}`}>
                         <div className="flex flex-col gap-1">
                           <span className="font-black text-slate-100 uppercase tracking-tight line-clamp-1">{r.signature}</span>
-                          <code className="text-[9px] font-black text-slate-500 uppercase tracking-widest opacity-60">ID: {r.id.slice(0, 8)}</code>
+                          <code className="text-xs font-black text-slate-500 uppercase tracking-widest opacity-60">ID: {r.id.slice(0, 8)}</code>
                         </div>
                       </td>}
-                      {visibleCols.lastMsg && <td className={`${adminTableCellClass} ${cellPad} max-w-[420px] whitespace-normal break-words`} title={r.last_message || ''}>{r.last_message || '-'}</td>}
+                      {visibleCols.lastMsg && <td className={`${adminTableCellClass} ${cellPad} max-w-modal whitespace-normal break-words`} title={r.last_message || ''}>{r.last_message || '-'}</td>}
                       {visibleCols.count && <td className={`${adminTableCellClass} text-center`}>
                         <span className="inline-flex items-center justify-center min-w-[28px] h-[28px] rounded-lg bg-cyan-500/10 text-cyan-400 text-xs font-black border border-cyan-500/20">
                           {r.count}
@@ -516,12 +516,12 @@ const AdminErrorGroupsPage: React.FC = () => {
                           disabled={!hasWriteAccess}
                           value={r.status}
                           onChange={(e) => updateStatus(r.id, e.target.value as 'open' | 'resolved' | 'ignored')}
-                          className={`${adminSelectClass} !py-1 !px-2 !text-[10px] !h-8`}
+                          className={`${adminSelectClass} !py-1 !px-2 !text-xs !h-8`}
                           style={adminSelectStyle}
                         >
-                          <option value="open" className="bg-[#0A0F1E]">open</option>
-                          <option value="resolved" className="bg-[#0A0F1E]">resolved</option>
-                          <option value="ignored" className="bg-[#0A0F1E]">ignored</option>
+                          <option value="open" className="bg-surface-deep">open</option>
+                          <option value="resolved" className="bg-surface-deep">resolved</option>
+                          <option value="ignored" className="bg-surface-deep">ignored</option>
                         </select>
                       </td>}
                       {visibleCols.assigned && <td className={`${adminTableCellClass} ${cellPad}`}>
@@ -530,19 +530,19 @@ const AdminErrorGroupsPage: React.FC = () => {
                             disabled={!hasWriteAccess}
                             value={r.assigned_to || ''}
                             onChange={(e) => updateAssignedTo(r.id, e.target.value)}
-                            className={`${adminSelectClass} !py-1 !px-2 !text-[10px] !h-8`}
+                            className={`${adminSelectClass} !py-1 !px-2 !text-xs !h-8`}
                             style={adminSelectStyle}
                           >
-                            <option value="" className="bg-[#0A0F1E]">{t('admin.errorGroups.assigned.none')}</option>
+                            <option value="" className="bg-surface-deep">{t('admin.errorGroups.assigned.none')}</option>
                             {users.map(u => (
-                              <option key={u.id} value={u.id} className="bg-[#0A0F1E]">{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
+                              <option key={u.id} value={u.id} className="bg-surface-deep">{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
                             ))}
                           </select>
                         </div>
                       </td>}
                       {visibleCols.actions && <td className={`${adminTableCellClass}`}>
                         <button
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
                           onClick={() => {
                             setExpandedId(id => id === r.id ? null : r.id)
                             if (expandedId !== r.id) loadLatestClientErrors(r.id)
@@ -574,7 +574,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                                     <div className="text-slate-500">{formatDateTime(e.at, lang)} • {e.level || 'error'}</div>
                                     <div className="text-slate-500 break-words">{e.message}</div>
                                     <div className="text-slate-500 break-all">{e.url || '-'}</div>
-                                    {e.stack && <details className="mt-1"><summary className="cursor-pointer">{t('admin.errorGroups.details.stackSummary')}</summary><pre className="text-[10px] overflow-auto max-h-40">{String(e.stack).slice(0, 4000)}</pre></details>}
+                                    {e.stack && <details className="mt-1"><summary className="cursor-pointer">{t('admin.errorGroups.details.stackSummary')}</summary><pre className="text-xs overflow-auto max-h-40">{String(e.stack).slice(0, 4000)}</pre></details>}
                                   </div>
                                 ))}
                               </div>
@@ -590,7 +590,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                                 placeholder={t('admin.errorGroups.details.notesPlaceholder') as string}
                               />
                               <div className="font-medium text-slate-500 mb-1 mt-3">{t('admin.errorGroups.details.sampleUrl')}</div>
-                              <div className="text-[11px] break-all">{r.url_sample || '-'}</div>
+                              <div className="text-xs break-all">{r.url_sample || '-'}</div>
                               <div className="font-medium text-slate-500 mb-2 mt-3">{t('admin.errorGroups.details.top5')}</div>
                               {(() => {
                                 const list = latestClientErrors[r.id] || []
@@ -611,9 +611,9 @@ const AdminErrorGroupsPage: React.FC = () => {
                                     <div className="text-slate-500 font-medium mb-1">{title}</div>
                                     <ul className="space-y-1 list-disc pl-4">
                                       {items.map(([k, c]) => (
-                                        <li key={k} className="text-[11px] break-all"><span className="text-slate-500">{k}</span> <span className="text-slate-500">({c})</span></li>
+                                        <li key={k} className="text-xs break-all"><span className="text-slate-500">{k}</span> <span className="text-slate-500">({c})</span></li>
                                       ))}
-                                      {items.length === 0 && <li className="text-[11px] text-slate-500">-</li>}
+                                      {items.length === 0 && <li className="text-xs text-slate-500">-</li>}
                                     </ul>
                                   </div>
                                 )

@@ -288,7 +288,7 @@ export const BrandIcon: React.FC<{ brand: string; className?: string }> = ({
       // Fallback to a placeholder or generic icon if needed
       return (
         <div className={`flex items-center justify-center bg-slate-100 rounded-lg p-2 ${className}`}>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{brand}</span>
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">{brand}</span>
         </div>
       )
   }

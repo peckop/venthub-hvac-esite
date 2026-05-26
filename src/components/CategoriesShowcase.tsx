@@ -54,7 +54,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
               <Link
                 key={category.id}
                 href={Routes.category(category.slug)}
-                className="group bg-gradient-to-br from-air-blue to-light-gray rounded-xl p-6 hover:shadow-hvac transition-all duration-200"
+                className="group bg-gradient-to-br from-air-blue to-light-gray rounded-xl p-6 hover:shadow-hvac transition-shadow duration-200"
               >
                 <div className="text-center">
                   <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform duration-200">
@@ -91,7 +91,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
               <Link
                 key={category.id}
                 href={Routes.category(category.slug)}
-                className="group flex items-center space-x-3 p-4 bg-white border border-light-gray rounded-lg hover:border-secondary-blue hover:shadow-sm transition-all duration-200"
+                className="group flex items-center space-x-3 p-4 bg-white border border-light-gray rounded-lg hover:border-secondary-blue hover:shadow-sm transition-shadow duration-200"
               >
                 <div className="text-primary-navy group-hover:text-secondary-blue transition-colors">
                   {getCategoryIcon(category.slug, { size: 32 })}
@@ -104,7 +104,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
                     {t('categories.variantCount', { count: getSubCategoryCount(category.id) })}
                   </p>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-steel-gray group-hover:text-secondary-blue group-hover:translate-x-1 transition-all" aria-hidden="true"><path d="M5 12h14" /><path d="M13 5l7 7-7 7" /></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-steel-gray group-hover:text-secondary-blue group-hover:translate-x-1 transition-transform" aria-hidden="true"><path d="M5 12h14" /><path d="M13 5l7 7-7 7" /></svg>
               </Link>
             ))}
           </div>

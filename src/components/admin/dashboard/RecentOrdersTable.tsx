@@ -56,15 +56,15 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                     <h3 className="text-xl font-black text-white tracking-tighter uppercase leading-none group-hover/table:text-cyan-400 transition-colors uppercase">{title}</h3>
                     <div className="flex items-center gap-2 mt-3 italic opacity-60">
                         <div className="h-0.5 w-8 bg-cyan-500 rounded-full" />
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic opacity-80">Son İşlemler</p>
+                        <p className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] italic opacity-80">Son İşlemler</p>
                     </div>
                 </div>
-                <Link href={Routes.admin.orders()} className="text-[11px] font-black text-white uppercase tracking-widest px-8 py-3 rounded-2xl glass-strong hover:bg-cyan-500 hover:text-[#0A0F1E] hover:scale-105 active:scale-95 border border-white/5 transition-all duration-300 flex items-center gap-3 group/btn shadow-2xl">
+                <Link href={Routes.admin.orders()} className="text-xs font-black text-white uppercase tracking-widest px-8 py-3 rounded-2xl glass-strong hover:bg-cyan-500 hover:text-surface-deep hover:scale-105 active:scale-95 border border-white/5 transition-transform duration-300 flex items-center gap-3 group/btn shadow-2xl">
                     Tümünü Gör <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
                 </Link>
             </div>
             
-            <div className={`${adminTableContainerClass} glass-strong border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl`}>
+            <div className={`${adminTableContainerClass} glass-strong border border-white/5 rounded-hvac-2xl overflow-hidden shadow-2xl`}>
                 <div ref={dragScrollRef} className="overflow-x-auto custom-scrollbar relative">
                     {/* Decorative glow inside table */}
                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/5 blur-[100px] pointer-events-none" />
@@ -94,25 +94,25 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                             ) : orders.map((r, index) => (
                                 <tr 
                                     key={r.id} 
-                                    className="group/row hover:bg-white/[0.03] transition-all duration-500 animate-in fade-in slide-in-from-left-4 duration-500"
+                                    className="group/row hover:bg-white/[0.03] transition-colors duration-500 animate-in fade-in slide-in-from-left-4 duration-500"
                                     style={{ animationDelay: `${index * 50}ms` }}
                                 >
-                                    <td className={`${adminTableCellClass} py-6 first:pl-8 font-black text-[12px] text-cyan-400/90 tracking-wider group-hover/row:text-white transition-colors`}>
+                                    <td className={`${adminTableCellClass} py-6 first:pl-8 font-black text-xs text-cyan-400/90 tracking-wider group-hover/row:text-white transition-colors`}>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-1.5 h-6 bg-cyan-500/0 group-hover/row:bg-cyan-500 transition-all rounded-full -ml-8 mr-6 duration-500" />
+                                            <div className="w-1.5 h-6 bg-cyan-500/0 group-hover/row:bg-cyan-500 transition-colors rounded-full -ml-8 mr-6 duration-500" />
                                             #{(r.order_number || r.id).toString().slice(-8).toUpperCase()}
                                         </div>
                                     </td>
                                     <td className={adminTableCellClass}>
-                                        <span className="text-slate-400 font-black text-[11px] tracking-wider uppercase opacity-80 group-hover/row:opacity-100 transition-opacity">{formatDateTime(r.created_at, lang)}</span>
+                                        <span className="text-slate-400 font-black text-xs tracking-wider uppercase opacity-80 group-hover/row:opacity-100 transition-opacity">{formatDateTime(r.created_at, lang)}</span>
                                     </td>
-                                    <td className={`${adminTableCellClass} text-right font-black text-white tracking-widest text-[14px]`}>
+                                    <td className={`${adminTableCellClass} text-right font-black text-white tracking-widest text-sm`}>
                                         <span className="px-3 py-1 rounded-lg bg-white/5 group-hover/row:bg-white/10 transition-colors border border-white/5">
                                             {formatCurrency(r.total_amount, lang)}
                                         </span>
                                     </td>
                                     <td className={adminTableCellClass}>
-                                        <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-inset backdrop-blur-md transition-all duration-500 group-hover/row:scale-105 ${getStatusStyles(r.status)}`}>
+                                        <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ring-1 ring-inset backdrop-blur-md transition-transform duration-500 group-hover/row:scale-105 ${getStatusStyles(r.status)}`}>
                                             <div className="w-1.5 h-1.5 rounded-full bg-current mr-2 animate-pulse" />
                                             {getStatusLabel(r.status)}
                                         </span>
@@ -120,7 +120,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                                     <td className={`${adminTableCellClass} text-right last:pr-8`}>
                                         <Link 
                                             href={`/admin/orders/${r.id}` as import('next').Route} 
-                                            className="inline-flex items-center gap-3 text-white text-[10px] font-black uppercase tracking-[0.2em] bg-white/5 px-6 py-3 rounded-xl hover:bg-cyan-500 hover:text-[#0A0F1E] border border-white/5 transition-all duration-500 shadow-lg"
+                                            className="inline-flex items-center gap-3 text-white text-xs font-black uppercase tracking-[0.2em] bg-white/5 px-6 py-3 rounded-xl hover:bg-cyan-500 hover:text-surface-deep border border-white/5 transition-shadow duration-500 shadow-lg"
                                         >
                                             Detay <ExternalLink size={14} className="opacity-60 group-hover/link:opacity-100" />
                                         </Link>

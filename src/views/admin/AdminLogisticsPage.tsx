@@ -144,7 +144,7 @@ export default function AdminLogisticsPage() {
     }
 
     return (
-        <div className="space-y-8 max-w-[1400px] animate-in fade-in duration-700">
+        <div className="space-y-8 max-w-page animate-in fade-in duration-700">
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div className="space-y-1">
                     <h1 className={adminSectionTitleClass}>{t('admin.logistics.title')}</h1>
@@ -164,7 +164,7 @@ export default function AdminLogisticsPage() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-cyan-500/10" />
                 
                 <div className="flex-1 space-y-3 relative z-10">
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
+                    <label className="block text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
                     <div className="relative max-w-xs">
                         <select
                             value={globalCarrier}
@@ -183,7 +183,7 @@ export default function AdminLogisticsPage() {
                 {hasWriteAccess && (
                     <button 
                         onClick={applyGlobalCarrier} 
-                        className="h-12 px-8 rounded-2xl bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 relative z-10"
+                        className="h-12 px-8 rounded-2xl bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-transform active:scale-95 relative z-10"
                     >
                         {t('admin.logistics.applyToAll')}
                     </button>
@@ -196,7 +196,7 @@ export default function AdminLogisticsPage() {
                         <AdminSkeleton variant="table" count={7} rows={5} />
                     </div>
                 ) : rows.length === 0 ? (
-                    <div className="py-20 bg-[#0A0F1E]/20">
+                    <div className="py-20 bg-surface-deep/20">
                         <AdminEmptyState
                             icon={CheckCircle2}
                             title={t('admin.orders.states.noRecords')}
@@ -219,14 +219,14 @@ export default function AdminLogisticsPage() {
                                 {rows.map((row, idx) => (
                                     <tr 
                                         key={row.id} 
-                                        className={`group border-b border-white/5 transition-all duration-300 ${
+                                        className={`group border-b border-white/5 transition-colors duration-300 ${
                                             row.saved 
                                                 ? 'bg-emerald-500/[0.03] hover:bg-emerald-500/[0.06]' 
                                                 : 'hover:bg-white/[0.02]'
                                         }`}
                                         style={{ animationDelay: `${idx * 50}ms` }}
                                     >
-                                        <td className={`${adminTableCellClass} font-mono text-[11px] font-black text-cyan-400`}>
+                                        <td className={`${adminTableCellClass} font-mono text-xs font-black text-cyan-400`}>
                                             <span className="bg-cyan-500/10 px-2 py-1 rounded-lg border border-cyan-500/20">
                                                 #{row.order_number}
                                             </span>
@@ -238,7 +238,7 @@ export default function AdminLogisticsPage() {
                                                     disabled={!hasWriteAccess || row.saved || saving}
                                                     value={row.carrier}
                                                     onChange={e => updateRow(row.id, 'carrier', e.target.value)}
-                                                    className={`${adminSelectClass} !py-2 !text-xs !rounded-xl !bg-[#0A0F1E]/60 disabled:opacity-40`}
+                                                    className={`${adminSelectClass} !py-2 !text-xs !rounded-xl !bg-surface-deep/60 disabled:opacity-40`}
                                                     style={adminSelectStyle}
                                                 >
                                                     <option value="Yurtiçi">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
@@ -256,16 +256,16 @@ export default function AdminLogisticsPage() {
                                                 value={row.tracking_number}
                                                 onChange={e => updateRow(row.id, 'tracking_number', e.target.value)}
                                                 placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
-                                                className={`${adminInputClass} !py-2 !text-xs !rounded-xl !bg-[#0A0F1E]/60 !font-mono focus:!bg-white/[0.03] disabled:opacity-40`}
+                                                className={`${adminInputClass} !py-2 !text-xs !rounded-xl !bg-surface-deep/60 !font-mono focus:!bg-white/[0.03] disabled:opacity-40`}
                                             />
                                         </td>
                                         <td className={`${adminTableCellClass} text-center`}>
                                             {row.saved ? (
-                                                <span className="inline-flex items-center gap-1.5 text-[9px] font-black text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 rounded-full uppercase tracking-widest animate-in zoom-in duration-300">
+                                                <span className="inline-flex items-center gap-1.5 text-xs font-black text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 rounded-full uppercase tracking-widest animate-in zoom-in duration-300">
                                                     <CheckCircle2 size={10} /> {t('admin.common.success')}
                                                 </span>
                                             ) : (
-                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest opacity-40">Ready</span>
+                                                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest opacity-40">Ready</span>
                                             )}
                                         </td>
                                     </tr>
@@ -277,7 +277,7 @@ export default function AdminLogisticsPage() {
 
                 {rows.length > 0 && (
                     <div className="p-6 bg-white/[0.02] border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-0 z-10 backdrop-blur-xl">
-                        <div className="text-[13px] font-bold text-slate-400">
+                        <div className="text-sm font-bold text-slate-400">
                             <span className="text-cyan-400 font-black text-base">{rows.filter(r => r.tracking_number).length}</span> / {rows.length} {t('admin.titles.orders')} {t('admin.ui.ready') || 'Ready'}
                         </div>
                         {hasWriteAccess && (

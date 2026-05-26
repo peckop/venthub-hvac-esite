@@ -114,7 +114,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                                     Uygula
                                 </button>
                             </div>
-                            <div className="text-[11px] text-gray-400 mt-2">
+                            <div className="text-xs text-gray-400 mt-2">
                                 {priceMode === 'percent'
                                     ? 'Pozitif değer = Zam, Negatif değer = İndirim'
                                     : 'Pozitif değer = Fiyata Ekle, Negatif değer = Fiyattan Düş'}

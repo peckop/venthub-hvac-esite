@@ -17,7 +17,7 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
     if (!open) return null
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
             <div 
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" 
                 onClick={onClose}
@@ -28,7 +28,7 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
             <div 
                 role="dialog"
                 aria-modal="true"
-                className="relative w-full max-w-xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+                className="relative w-full max-w-xl bg-white rounded-hvac-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
             >
                 <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-3">
@@ -45,7 +45,7 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
                         <button
                             key={p.id}
                             onClick={() => onSelect(p)}
-                            className="w-full text-left group bg-white border border-slate-200 hover:border-primary-navy/40 hover:shadow-md rounded-2xl p-5 transition-all relative overflow-hidden"
+                            className="w-full text-left group bg-white border border-slate-200 hover:border-primary-navy/40 hover:shadow-md rounded-2xl p-5 transition-shadow relative overflow-hidden"
                         >
                             <div className="flex items-start gap-4">
                                 <div className={`w-10 h-10 flex items-center justify-center rounded-xl shrink-0 ${p.profile_type === 'individual' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
@@ -57,7 +57,7 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
                                             {p.profile_type === 'individual' ? `${p.first_name} ${p.last_name}` : p.company_name}
                                         </h4>
                                         {p.is_default && (
-                                            <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                                            <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
                                                 <CheckCircle size={8} /> Varsayılan
                                             </span>
                                         )}

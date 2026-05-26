@@ -41,7 +41,7 @@ const SecurePaymentOverlay: React.FC<SecurePaymentOverlayProps> = ({
                     </div>
                     <div className="text-right">
                         <div className="text-sm font-semibold text-primary-navy">Venthub HVAC</div>
-                        <div className="text-[11px] text-steel-gray">iyzico ile güvenli ödeme</div>
+                        <div className="text-xs text-steel-gray">iyzico ile güvenli ödeme</div>
                     </div>
                 </div>
                 {/* Body */}
@@ -55,9 +55,9 @@ const SecurePaymentOverlay: React.FC<SecurePaymentOverlayProps> = ({
                         <div className={`text-center ${overlayStep >= 3 ? 'font-medium text-primary-navy' : ''}`}>{t('checkout.overlay.stageBank')}</div>
                     </div>
                     <div className="mt-3 w-full h-2 bg-light-gray/70 rounded-full overflow-hidden" aria-hidden>
-                        <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-500" style={{ width: `${overlayPercent}%` }} />
+                        <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-colors duration-500" style={{ width: `${overlayPercent}%` }} />
                     </div>
-                    <div className="mt-3 text-[11px] text-steel-gray">
+                    <div className="mt-3 text-xs text-steel-gray">
                         {t('checkout.overlay.dontClose')}
                     </div>
                 </div>

@@ -156,10 +156,10 @@ export default function AccountInvoicesPage() {
           
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="flex p-1.5 bg-slate-100/80 rounded-xl border border-slate-200/50">
-              <button type="button" onClick={() => setProfileType('individual')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all ${profileType === 'individual' ? 'bg-white text-primary-navy shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-700'}`}>
+              <button type="button" onClick={() => setProfileType('individual')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-colors ${profileType === 'individual' ? 'bg-white text-primary-navy shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-700'}`}>
                 <User className="w-4 h-4" /> Bireysel
               </button>
-              <button type="button" onClick={() => setProfileType('corporate')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all ${profileType === 'corporate' ? 'bg-white text-primary-navy shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-700'}`}>
+              <button type="button" onClick={() => setProfileType('corporate')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-colors ${profileType === 'corporate' ? 'bg-white text-primary-navy shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-700'}`}>
                 <Building2 className="w-4 h-4" /> Kurumsal
               </button>
             </div>
@@ -218,7 +218,7 @@ export default function AccountInvoicesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {items.map((p) => (
-              <div key={p.id} className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm relative overflow-hidden group hover:border-primary-navy/40 transition-all">
+              <div key={p.id} className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm relative overflow-hidden group hover:border-primary-navy/40 transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className={`w-10 h-10 flex items-center justify-center rounded-xl ${p.profile_type === 'individual' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
                     {p.profile_type === 'individual' ? <User size={20} /> : <Building2 size={20} />}
@@ -237,9 +237,9 @@ export default function AccountInvoicesPage() {
                 <div className="text-sm text-slate-500 mb-6 line-clamp-2">{p.address_line} {p.district}/{p.city}</div>
 
                 {p.is_default ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-3 py-1 rounded-full"><CheckCircle size={10} /> Varsayılan</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-green-600 bg-green-50 px-3 py-1 rounded-full"><CheckCircle size={10} /> Varsayılan</span>
                 ) : (
-                  <button onClick={() => handleMakeDefault(p.id)} className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-primary-navy transition-colors underline">Varsayılan Yap</button>
+                  <button onClick={() => handleMakeDefault(p.id)} className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-primary-navy transition-colors underline">Varsayılan Yap</button>
                 )}
               </div>
             ))}

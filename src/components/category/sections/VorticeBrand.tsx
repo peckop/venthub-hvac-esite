@@ -112,7 +112,7 @@ const VorticeBrand: React.FC = () => {
                                 return (
                                     <div
                                         key={index}
-                                        className={`bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3 text-center hover:bg-white/10 transition-all ${scrollAnimationClasses.fadeUp(isVisible)}`}
+                                        className={`bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3 text-center hover:bg-white/10 transition-colors ${scrollAnimationClasses.fadeUp(isVisible)}`}
                                         style={{ transitionDelay: `${400 + index * 100}ms` }}
                                     >
                                         <Icon className="text-orange-400 mx-auto mb-1" size={20} />
