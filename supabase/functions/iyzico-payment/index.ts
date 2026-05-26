@@ -87,8 +87,27 @@ Deno.serve(async (req: Request) => {
         });
         if (debugEnabled) console.warn('İyzico Payment Request Started');
 
+        interface IyzicoPaymentRequestData {
+            amount?: number | string;
+            cartItems?: Array<{ product_id: string; quantity: number; price?: number }>;
+            user_id?: string;
+            invoiceInfo?: Record<string, unknown> | null;
+            invoiceType?: string | null;
+            legalConsents?: Record<string, unknown> | null;
+            shippingMethod?: string | null;
+            customerInfo?: { name?: string; email?: string; phone?: string } | null;
+            customer?: { name?: string; email?: string; phone?: string } | null;
+            shippingAddress?: { fullAddress?: string } | null;
+            shipping?: { fullAddress?: string } | null;
+            shipping_address?: { fullAddress?: string } | null;
+            billingAddress?: { fullAddress?: string } | null;
+            billing?: { fullAddress?: string } | null;
+            billing_address?: { fullAddress?: string } | null;
+            couponCode?: string | null;
+        }
+
         // Parse request body safely
-        let requestData: any = null;
+        let requestData: IyzicoPaymentRequestData | null = null;
         try {
             const bodyText = await req.text();
             if (!bodyText || bodyText.trim().length === 0) {
