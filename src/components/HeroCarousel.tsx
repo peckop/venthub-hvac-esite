@@ -112,7 +112,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
     if (mainCategoryVms.length === 0) return null
 
     return (
-        <div className="relative h-[600px] lg:h-[700px] w-full overflow-hidden bg-zinc-900 text-white group">
+        <div className="relative h-hvac-hero lg:h-hvac-hero-lg w-full overflow-hidden bg-zinc-900 text-white group">
             {mainCategoryVms.map((vm, idx) => {
                 const isActive = idx === currentIndex
                 const cat = vm.raw
@@ -137,7 +137,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
                             <VentImage src={bgImage}
                                 alt={vm.displayName}
-                                className={`w-full h-full object-cover object-center transform transition-transform duration-[2000ms] ${isActive ? 'scale-105' : 'scale-100'}`}
+                                className={`w-full h-full object-cover object-center transform transition-transform duration-hvac-glacial ${isActive ? 'scale-105' : 'scale-100'}`}
                                  onError={(e) => {
                                     const target = e.target as HTMLImageElement;
                                     target.onerror = null;

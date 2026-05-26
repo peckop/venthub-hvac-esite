@@ -34,7 +34,7 @@ const NavShell: React.FC<NavShellProps> = ({
     return (
         <div
             className={cn(
-                'transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+                'transition-transform duration-hvac-slow ease-hvac-ease',
                 fixed ? 'fixed inset-x-0 top-0 z-50' : 'relative z-40',
                 isScrollingDown && !isAtTop ? '-translate-y-full' : 'translate-y-0'
             )}
@@ -53,7 +53,7 @@ const NavShell: React.FC<NavShellProps> = ({
             {/* Top Tier: The Corporate Bar */}
             <div
                 className={cn(
-                    'transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] bg-primary-navy text-white overflow-hidden',
+                    'transition-colors duration-hvac-slow ease-hvac-ease bg-primary-navy text-white overflow-hidden',
                     // Hide the top tier if we are not at the top
                     !isAtTop ? 'h-0 opacity-0' : 'h-0 opacity-0 md:h-8 md:opacity-100 relative'
                 )}
@@ -68,7 +68,7 @@ const NavShell: React.FC<NavShellProps> = ({
             {/* Bottom Tier: The Action Bar */}
             <header
                 className={cn(
-                    'transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] border-b border-slate-200/50',
+                    'transition-colors duration-hvac-slow ease-hvac-ease border-b border-slate-200/50',
                     'bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/85 shadow-[0_18px_45px_-28px_rgba(15,23,42,0.15)]',
                     showProgress && 'pt-1'
                 )}

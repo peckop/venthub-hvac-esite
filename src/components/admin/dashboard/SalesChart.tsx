@@ -21,19 +21,19 @@ interface SalesChartProps {
 
 const SalesChart: React.FC<SalesChartProps> = ({ data, title }) => {
     return (
-        <div className="flex flex-col h-[400px] w-full group/chart">
+        <div className="flex flex-col h-hvac-panel w-full group/chart">
             <div className="flex items-center justify-between mb-10">
                 <div>
                     <h3 className="text-xl font-black text-white tracking-tighter uppercase leading-none group-hover/chart:text-cyan-400 transition-colors">{title}</h3>
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] mt-3 italic opacity-60">Operasyonel Performans Trendi</p>
+                    <p className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed mt-3 italic opacity-60">Operasyonel Performans Trendi</p>
                 </div>
                 <div className="flex items-center gap-4 glass p-1.5 rounded-2xl border border-white/5 backdrop-blur-2xl shadow-2xl">
                     <div className="flex items-center gap-2 px-4 py-2 hover:bg-white/5 rounded-xl transition-colors">
-                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.6)]" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-glow-md" />
                         <span className="text-xs font-black text-slate-300 uppercase tracking-widest">Sipariş</span>
                     </div>
                     <div className="flex items-center gap-2 px-4 py-2 border-l border-white/10 hover:bg-white/5 rounded-xl transition-colors">
-                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.6)]" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-glow-md" />
                         <span className="text-xs font-black text-slate-300 uppercase tracking-widest">İade</span>
                     </div>
                 </div>

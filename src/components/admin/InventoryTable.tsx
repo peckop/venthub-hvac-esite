@@ -72,7 +72,7 @@ export default function InventoryTable({
     const TableRow = ({ r }: { r: InventoryRow }) => (
         <tr
             key={r.product_id}
-            className={`group hover:bg-white/[0.03] cursor-pointer transition-colors border-b border-white/5 last:border-0 ${selected?.product_id === r.product_id ? 'bg-cyan-500/[0.05]' : ''}`}
+            className={`group hover:bg-white/3 cursor-pointer transition-colors border-b border-white/5 last:border-0 ${selected?.product_id === r.product_id ? 'bg-cyan-500/5' : ''}`}
             onClick={() => onSelect(r)}
         >
             {visibleCols.name && (
@@ -109,11 +109,11 @@ export default function InventoryTable({
                             value={r.supplier_name || ''}
                             placeholder="-"
                             inputWidth="w-24"
-                            className="max-w-[120px] truncate text-slate-400"
+                            className="max-w-120px truncate text-slate-400"
                             onSave={(val) => onUpdateSupplier(r.product_id, val)}
                         />
                     ) : (
-                        <span className="text-slate-500 max-w-[120px] truncate block text-xs">{r.supplier_name || '-'}</span>
+                        <span className="text-slate-500 max-w-120px truncate block text-xs">{r.supplier_name || '-'}</span>
                     )}
                 </td>
             )}
@@ -147,19 +147,19 @@ export default function InventoryTable({
 
     return (
         <div ref={dragScrollRef} className="overflow-x-auto w-full">
-            <table className="w-full min-w-[1000px] border-separate border-spacing-0">
+            <table className="w-full min-w-1000px border-separate border-spacing-0">
                 <thead className="sticky top-0 z-10 backdrop-blur-xl">
                     <tr>
                         {visibleCols.name && (
                             <th className={adminTableHeadCellClass + " " + headPad}>
-                                <button onClick={() => onSort('name')} className="hover:text-cyan-400 transition-colors flex items-center gap-1 uppercase text-xs font-black tracking-[0.2em]">
+                                <button onClick={() => onSort('name')} className="hover:text-cyan-400 transition-colors flex items-center gap-1 uppercase text-xs font-black tracking-hvac-normal">
                                     Ürün {sortIndicator('name')}
                                 </button>
                             </th>
                         )}
                         {visibleCols.physical && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
                                     <button onClick={() => onSort('physical')} className="hover:text-cyan-400 transition-colors">Fiziksel {sortIndicator('physical')}</button>
                                     <InfoTooltip text="Depodaki gerçekte sayılan mevcut ürün adedi." />
                                 </div>
@@ -167,7 +167,7 @@ export default function InventoryTable({
                         )}
                         {visibleCols.reserved && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
                                     <button onClick={() => onSort('reserved')} className="hover:text-cyan-400 transition-colors">Rezerve {sortIndicator('reserved')}</button>
                                     <InfoTooltip text="Henüz kargolanmamış ama parası ödenmiş ürün miktarı." />
                                 </div>
@@ -175,7 +175,7 @@ export default function InventoryTable({
                         )}
                         {visibleCols.available && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em] text-cyan-400">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal text-cyan-400">
                                     <button onClick={() => onSort('available')} className="hover:opacity-80">Müsait {sortIndicator('available')}</button>
                                     <InfoTooltip text="Satılabilir durumdaki net stok. (Fiziksel - Rezerve)" />
                                 </div>
@@ -183,25 +183,25 @@ export default function InventoryTable({
                         )}
                         {visibleCols.threshold && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
                                     <button onClick={() => onSort('threshold')} className="hover:text-cyan-400 transition-colors">Eşik {sortIndicator('threshold')}</button>
                                     <InfoTooltip text="Stok bu rakamın altına indiğinde uyarı verilir." />
                                 </div>
                             </th>
                         )}
                         {visibleCols.location && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-[0.2em]"}>
+                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-hvac-normal"}>
                                 <button onClick={() => onSort('location')} className="hover:text-cyan-400 transition-colors">Raf {sortIndicator('location')}</button>
                             </th>
                         )}
                         {visibleCols.supplier && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-[0.2em]"}>
+                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-hvac-normal"}>
                                 <button onClick={() => onSort('supplier')} className="hover:text-cyan-400 transition-colors">Tedarikçi {sortIndicator('supplier')}</button>
                             </th>
                         )}
                         {visibleCols.abc && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-center"}>
-                                <div className="flex items-center justify-center gap-1 uppercase text-xs font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-center gap-1 uppercase text-xs font-black tracking-hvac-normal">
                                     <button onClick={() => onSort('abc')} className="hover:text-cyan-400 transition-colors">Sınıf {sortIndicator('abc')}</button>
                                     <InfoTooltip text="A (En Popüler), B (Orta), C (Az Satan)." />
                                 </div>
@@ -209,14 +209,14 @@ export default function InventoryTable({
                         )}
                         {visibleCols.days && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-[0.2em]">
+                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
                                     <button onClick={() => onSort('days_empty')} className="hover:text-cyan-400 transition-colors">Tükenme {sortIndicator('days_empty')}</button>
                                     <InfoTooltip text="Eldeki stoğun kaç gün içinde biteceği tahmini." />
                                 </div>
                             </th>
                         )}
                         {visibleCols.status && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase text-xs font-black tracking-[0.2em]"}>Durum</th>
+                            <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase text-xs font-black tracking-hvac-normal"}>Durum</th>
                         )}
                     </tr>
                 </thead>
@@ -242,10 +242,10 @@ export default function InventoryTable({
                     ) : groupByCategory ? (
                         groupedRows.map(g => (
                             <React.Fragment key={g._c_id ?? 'null'}>
-                                <tr className="bg-white/[0.02] group">
-                                    <th colSpan={10} className={`text-left ${density === 'compact' ? 'px-4 py-2' : 'px-8 py-4'} text-cyan-400 font-black uppercase text-xs tracking-[0.3em] border-y border-white/5`}>
+                                <tr className="bg-white/2 group">
+                                    <th colSpan={10} className={`text-left ${density === 'compact' ? 'px-4 py-2' : 'px-8 py-4'} text-cyan-400 font-black uppercase text-xs tracking-hvac-relaxed border-y border-white/5`}>
                                         <div className="flex items-center gap-3">
-                                            <span className="w-1 h-4 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.5)]"></span>
+                                            <span className="w-1 h-4 bg-cyan-400 rounded-full shadow-glow-sm"></span>
                                             {g.name || 'Kategorisiz'} <span className="text-slate-500 ml-2">({g.items.length})</span>
                                         </div>
                                     </th>

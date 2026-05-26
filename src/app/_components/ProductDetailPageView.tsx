@@ -314,7 +314,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <ChevronRight size={10} className="flex-shrink-0" />
               </>
             )}
-            <span className="text-industrial-gray truncate max-w-[150px] sm:max-w-none">
+            <span className="text-industrial-gray truncate max-w-150px sm:max-w-none">
               {product.name}
             </span>
           </nav>
@@ -376,7 +376,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <BrandIcon brand={product.brand || ''} className="w-8 h-8" />
                 <div className="flex flex-col">
                   <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">{product.brand}</span>
-                  <span className="text-steel-gray text-xs font-medium tracking-[0.2em]">{t('pdp.officialDistributor')}</span>
+                  <span className="text-steel-gray text-xs font-medium tracking-hvac-normal">{t('pdp.officialDistributor')}</span>
                 </div>
               </div>
               {product.is_featured && (
@@ -388,7 +388,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             </div>
 
             {/* Product Name - Refined Size */}
-            <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-[1.1] mb-4 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-hvac-11 mb-4 tracking-tight">
               {product.name}
             </h1>
 
@@ -412,7 +412,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
-                <span className="text-xs font-bold text-steel-gray uppercase tracking-[0.2em] mb-1 opacity-60">{t('pdp.priceAvailability') || 'Price & Availability'}</span>
+                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{t('pdp.priceAvailability') || 'Price & Availability'}</span>
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
@@ -460,25 +460,25 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       className="w-full bg-industrial-gray hover:bg-primary-navy text-white font-black py-3.5 px-6 rounded-xl transition-shadow shadow-md flex items-center justify-center space-x-3 group"
                     >
                       <Settings size={16} className="group-hover:rotate-90 transition-transform duration-500" />
-                      <span className="text-xs uppercase tracking-[0.15em]">{t('pdp.techQuote')}</span>
+                      <span className="text-xs uppercase tracking-hvac-snug">{t('pdp.techQuote')}</span>
                     </button>
                   ) : (
                     <button
                       onClick={handleAddToCart}
                       disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                      className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-black py-3.5 px-6 rounded-xl transition-transform shadow-lg hover:shadow-primary-navy/20 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-[0.98]"
+                      className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-black py-3.5 px-6 rounded-xl transition-transform shadow-lg hover:shadow-primary-navy/20 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-98"
                     >
                       <ShoppingCart size={16} className="group-hover:translate-x-1 transition-transform" />
-                      <span className="text-xs uppercase tracking-[0.15em]">{t('pdp.addToCart')}</span>
+                      <span className="text-xs uppercase tracking-hvac-snug">{t('pdp.addToCart')}</span>
                     </button>
                   )}
                   
                   <button
                     onClick={() => setIsProjectModalOpen(true)}
-                    className="w-full bg-white border-2 border-primary-navy/10 hover:border-primary-navy text-primary-navy font-bold py-3.5 px-6 rounded-xl transition-transform flex items-center justify-center space-x-2 group active:scale-[0.98]"
+                    className="w-full bg-white border-2 border-primary-navy/10 hover:border-primary-navy text-primary-navy font-bold py-3.5 px-6 rounded-xl transition-transform flex items-center justify-center space-x-2 group active:scale-98"
                   >
                     <FolderPlus size={16} className="group-hover:scale-110 transition-transform" />
-                    <span className="text-xs uppercase tracking-[0.15em]">{t('pdp.actions.addToProject')}</span>
+                    <span className="text-xs uppercase tracking-hvac-snug">{t('pdp.actions.addToProject')}</span>
                   </button>
                 </div>
 
@@ -533,7 +533,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {isGeneratingPdf ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} className="group-hover:animate-bounce" />}
                   <div className="flex flex-col">
                     <span className="text-xs uppercase tracking-wider">{t('pdp.labels.technicalDatasheet')}</span>
-                    <span className="text-xs text-white/50 font-medium uppercase tracking-[0.2em]">DATASHEET (PDF)</span>
+                    <span className="text-xs text-white/50 font-medium uppercase tracking-hvac-normal">DATASHEET (PDF)</span>
                   </div>
                 </div>
                 <ChevronRight size={16} className="opacity-30 group-hover:opacity-100 transition-opacity" />
@@ -577,7 +577,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       {/* Section Navigation - Airy Integrated Design */}
       <div
         id="pdp-sticky-nav"
-        className={`transition-colors duration-500 z-dropdown bg-white/80 backdrop-blur-xl border-b border-light-gray/50 ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0 shadow-lg shadow-primary-navy/5' : 'relative mt-8 sm:mt-12'
+        className={`transition-colors duration-500 z-dropdown bg-white/80 backdrop-blur-xl border-b border-light-gray/50 ${isNavSticky ? 'fixed top-56px md:top-80px left-0 right-0 shadow-lg shadow-primary-navy/5' : 'relative mt-8 sm:mt-12'
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -586,7 +586,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs sm:text-xs uppercase tracking-[0.2em] whitespace-nowrap transition-colors ${activeSection === section.id
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs sm:text-xs uppercase tracking-hvac-normal whitespace-nowrap transition-colors ${activeSection === section.id
                   ? 'bg-primary-navy text-white shadow-hvac scale-105'
                   : 'text-industrial-gray/60 hover:text-primary-navy hover:bg-air-blue/50'
                   }`}
@@ -600,7 +600,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           {isNavSticky && (
             <div className="hidden lg:flex items-center space-x-3 pl-6 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-8 duration-500">
               <div className="flex flex-col items-end mr-2">
-                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-[120px] uppercase tracking-tight">{product.name}</span>
+                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{product.name}</span>
                 <span className="text-xs text-primary-navy font-black tracking-widest">
                   {(mainCategory?.metadata as CategoryMetadata)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                 </span>
@@ -647,7 +647,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <>
                       <div className="lg:col-span-7 xl:col-span-8 space-y-8">
                         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm hover:shadow-md transition-shadow">
-                          <h4 className="font-black text-industrial-gray mb-6 flex items-center text-xs uppercase tracking-[0.2em] opacity-60">
+                          <h4 className="font-black text-industrial-gray mb-6 flex items-center text-xs uppercase tracking-hvac-normal opacity-60">
                             <Info className="text-primary-navy mr-2.5" size={16} />
                             {t('pdp.labels.productDescription')}
                           </h4>
@@ -659,7 +659,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                       <div className="lg:col-span-5 xl:col-span-4">
                         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm sticky top-36">
-                          <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-[0.2em] opacity-60">{t('common.quickDetails')}</h4>
+                          <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-hvac-normal opacity-60">{t('common.quickDetails')}</h4>
                           <div className="space-y-4">
                             {[
                               { label: t('pdp.brand'), value: product.brand },
@@ -672,7 +672,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                               </div>
                             ))}
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
-                              <span className="text-xs font-bold text-steel-gray uppercase tracking-[0.2em]">{t('common.listingPrice')}</span>
+                              <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{t('common.listingPrice')}</span>
                               <span className="text-lg font-black text-primary-navy">
                                 {(mainCategory?.metadata as CategoryMetadata | null)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                               </span>
@@ -719,7 +719,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                                   </div>
                                   <div className={`p-1.5 rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-primary-navy text-white' : 'bg-white text-primary-navy'}`}><ChevronDown size={16} /></div>
                                 </button>
-                                <div className={`transition-colors duration-500 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
+                                <div className={`transition-colors duration-500 ease-in-out ${isOpen ? 'max-h-2000px opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
                                   <div className="p-5 bg-white grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-1">
                                     {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
                                       <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
@@ -740,11 +740,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {section.id === 'diagrams' && (
                     <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                        <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-[0.2em] opacity-60">{t('pdp.diagramsExtra.technicalDiagrams')}</h4>
+                        <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-hvac-normal opacity-60">{t('pdp.diagramsExtra.technicalDiagrams')}</h4>
                         <div className="space-y-4">
                           {['mounting', 'electrical'].map(type => (
                             <div key={type} className="group relative aspect-video bg-slate-50 rounded-2xl flex items-center justify-center border-2 border-dashed border-light-gray hover:border-primary-navy/30 transition-colors cursor-pointer overflow-hidden">
-                              <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                              <div className="absolute inset-0 bg-white/40 backdrop-blur-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
                                 <div className="p-2.5 bg-primary-navy text-white rounded-full shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform"><Download size={20} /></div>
                               </div>
                               <div className="text-center">
@@ -757,7 +757,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                         </div>
                       </div>
                       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                        <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-[0.2em] opacity-60">{t('pdp.diagramsExtra.threeDViews')}</h4>
+                        <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-hvac-normal opacity-60">{t('pdp.diagramsExtra.threeDViews')}</h4>
                         <div className="space-y-4">
                           {[ { icon: Settings, label: 'view3DModel', sub: 'interactiveModel' }, { icon: Ruler, label: 'dimensionedDrawing', sub: 'CAD/DWG AVAILABLE' } ].map((item, i) => (
                             <div key={i} className="p-5 bg-slate-50 rounded-2xl border border-light-gray/50 flex items-center space-x-5 group hover:bg-white hover:shadow-md transition-shadow">
@@ -778,7 +778,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       {['installationGuide', 'userManual', 'maintenanceManual', 'safetyInfo', 'warrantyTerms', 'technicalSpecsDoc'].map((doc, i) => (
                         <div key={i} className="bg-white rounded-3xl p-6 border border-light-gray shadow-sm hover:shadow-md transition-shadow group text-center">
                           <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:bg-air-blue/20 transition-colors"><FileText size={32} className="text-primary-navy/40" /></div>
-                          <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-4 min-h-[2rem]">{t(`pdp.docs.${doc}`)}</h4>
+                          <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-4 min-h-8">{t(`pdp.docs.${doc}`)}</h4>
                           <button className="w-full bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white py-3 px-4 rounded-xl transition-colors font-black text-xs uppercase tracking-widest flex items-center justify-center space-x-2">
                             <Download size={14} /> <span>{t('pdp.actions.download')}</span>
                           </button>
@@ -791,8 +791,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-8">
                       {['productCatalog', 'technicalBrochure'].map(type => (
                         <div key={type} className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                          <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-[0.2em] opacity-60">{t(`pdp.docs.${type}`)}</h4>
-                          <div className="aspect-[4/3] bg-slate-50 rounded-xl mb-6 flex items-center justify-center border border-light-gray/30"><Download size={40} className="text-primary-navy/20" /></div>
+                          <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-hvac-normal opacity-60">{t(`pdp.docs.${type}`)}</h4>
+                          <div className="aspect-4/3 bg-slate-50 rounded-xl mb-6 flex items-center justify-center border border-light-gray/30"><Download size={40} className="text-primary-navy/20" /></div>
                           <button onClick={type === 'technicalBrochure' ? handleDownloadPdf : undefined} className="w-full bg-slate-900 hover:bg-primary-navy text-white py-3.5 px-6 rounded-xl transition-colors font-black text-xs uppercase tracking-widest flex items-center justify-center space-x-2">
                             <Download size={18} /> <span>{t(`pdp.actions.download${type === 'productCatalog' ? 'Catalog' : 'Brochure'}`)}</span>
                           </button>

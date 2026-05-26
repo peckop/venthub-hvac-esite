@@ -90,7 +90,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 <Info size={16} />
                                 <span>Uzmanlık Alanı</span>
                             </div>
-                            <h1 className="text-5xl md:text-7xl font-black text-industrial-gray mb-8 leading-[1.1] tracking-tight">
+                            <h1 className="text-5xl md:text-7xl font-black text-industrial-gray mb-8 leading-hvac-11 tracking-tight">
                                 {vm?.displayName}
                             </h1>
                             <p className="text-xl text-steel-gray max-w-xl leading-relaxed font-medium">
@@ -113,8 +113,8 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                         </div>
                         <div className="relative">
                             <div className="absolute -inset-10 bg-secondary-blue/5 rounded-full blur-3xl" />
-                            <div className="relative aspect-square rounded-hvac-3xl overflow-hidden shadow-2xl border-[16px] border-white group">
-                                <Image src={heroImage} alt={vm?.displayName || ''} fill className="object-cover group-hover:scale-105 transition-transform duration-[2s]" priority />
+                            <div className="relative aspect-square rounded-hvac-3xl overflow-hidden shadow-2xl border-16 border-white group">
+                                <Image src={heroImage} alt={vm?.displayName || ''} fill className="object-cover group-hover:scale-105 transition-transform duration-hvac-glacial" priority />
                             </div>
                         </div>
                     </div>

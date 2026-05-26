@@ -167,7 +167,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 tabIndex={-1}
             />
             
-            <div className="relative w-full max-w-4xl bg-white rounded-hvac-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="relative w-full max-w-4xl bg-white rounded-hvac-2xl shadow-2xl overflow-hidden flex flex-col max-h-90vh">
                 {/* Header */}
                 <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <div className="flex items-center gap-4">

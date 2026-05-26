@@ -28,7 +28,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" role="dialog" aria-modal="true">
-      <div className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-xl overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-11/12 max-w-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-light-gray">
           <h3 className="text-lg font-semibold text-industrial-gray">{t('quickView.title')}</h3>
           <button onClick={onClose} aria-label={t('quickView.close')} className="p-2 rounded hover:bg-light-gray focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">

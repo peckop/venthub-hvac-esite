@@ -34,20 +34,20 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
           <div className="max-w-3xl">
             <div 
               data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-[opacity,transform] duration-700 ease-out text-xs font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
             >
               DETERMİNİSTİK SİSTEMLER
             </div>
             <h2 
               data-observe="fade-up"
-              className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
+              className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
             >
               Hava Akışının Mühendislik Estetiği
             </h2>
           </div>
           <p 
             data-observe="fade-up"
-            className="opacity-0 data-[in-view=true]:opacity-100 transition-[opacity] duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
+            className="opacity-0 data-[in-view=true]:opacity-100 transition-opacity duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
           >
             VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin.
           </p>
@@ -63,7 +63,7 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
               <div
                 key={category.id}
                 data-observe="fade-up"
-                className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-[opacity,transform] duration-700 ease-out ${delayClass} group relative flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center overflow-hidden bg-slate-100 aspect-square lg:aspect-[0.85/1]`}
+                className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass} group relative flex-shrink-0 w-280px sm:w-320px md:w-auto snap-center overflow-hidden bg-slate-100 aspect-square lg:aspect-orbit`}
               >
                 <Link href={Routes.category(category.slug)} className="block w-full h-full relative z-10">
                   {/* Background Image with Fallback Logic */}
@@ -73,7 +73,7 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
                       alt={category.displayName}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 grayscale-[0.3] group-hover:grayscale-0"
+                      className="object-cover transition-transform duration-1.5s ease-out group-hover:scale-110 grayscale-30 group-hover:grayscale-0"
                     />
                     {/* Architectural Overlay */}
                     <div className="absolute inset-0 bg-slate-950/40 group-hover:bg-slate-950/20 transition-colors duration-700" />
@@ -85,14 +85,14 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
                     <div 
                       className="flex flex-col items-center opacity-90 transition-opacity duration-700"
                     >
-                      <h3 className="text-xl lg:text-2xl font-extralight text-white tracking-[0.1em] mb-4 transition-transform duration-700 group-hover:-translate-y-2">
+                      <h3 className="text-xl lg:text-2xl font-extralight text-white tracking-hvac-tight mb-4 transition-transform duration-700 group-hover:-translate-y-2">
                         {category.displayName}
                       </h3>
 
-                      <div className="w-12 h-[1px] bg-white/30 group-hover:w-24 group-hover:bg-cyan-500 transition-[width,background-color] duration-700" />
+                      <div className="w-12 h-px bg-white/30 group-hover:w-24 group-hover:bg-cyan-500 transition-width-bg duration-700" />
                       
                       <div className="mt-6 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-700 overflow-hidden">
-                        <p className="text-xs text-slate-200 font-light leading-relaxed tracking-wider mb-6 max-w-[200px] line-clamp-2">
+                        <p className="text-xs text-slate-200 font-light leading-relaxed tracking-wider mb-6 max-w-200px line-clamp-2">
                           {category.description || 'Profesyonel Havalandırma Çözümleri'}
                         </p>
                       </div>

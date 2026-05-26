@@ -77,7 +77,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                         💰 Fiyat Güncelle
                     </button>
                     {showPricePanel && (
-                        <div className="absolute bottom-full mb-2 left-0 bg-white text-gray-800 rounded-xl shadow-2xl p-4 min-w-[280px] border border-gray-200">
+                        <div className="absolute bottom-full mb-2 left-0 bg-white text-gray-800 rounded-xl shadow-2xl p-4 min-w-280px border border-gray-200">
                             <div className="text-sm font-semibold mb-3 text-primary-navy">Toplu Fiyat Güncelleme</div>
                             <div className="flex gap-2 mb-3">
                                 <button

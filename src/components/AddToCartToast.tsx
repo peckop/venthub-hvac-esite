@@ -35,7 +35,7 @@ const AddToCartToast: React.FC = () => {
 
   return (
     <div className="fixed z-dropdown inset-x-3 bottom-3 md:inset-auto md:bottom-6 md:right-6">
-      <div className="w-full md:w-[360px] max-w-[92vw] rounded-2xl shadow-2xl border border-light-gray bg-white ring-1 ring-black/5 overflow-hidden animate-slide-up">
+      <div className="w-full md:w-360px max-w-92vw rounded-2xl shadow-2xl border border-light-gray bg-white ring-1 ring-black/5 overflow-hidden animate-slide-up">
           <div className="p-3 md:p-4 flex items-start gap-3">
             <div className="bg-success-green/10 p-2 rounded-lg">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-success-green" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>

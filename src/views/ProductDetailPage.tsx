@@ -186,13 +186,13 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
             className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
           >
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-600">Premium Product Specifications</span>
+            <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-600">Premium Product Specifications</span>
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-4xl lg:text-7xl font-extralight tracking-tighter text-slate-900 leading-[1.1] mb-10"
+            className="text-4xl lg:text-7xl font-extralight tracking-tighter text-slate-900 leading-hvac-11 mb-10"
           >
             {product.name.split(' ').slice(0, -1).join(' ')} <span className="font-medium text-slate-950 italic">{product.name.split(' ').slice(-1)}</span>
           </motion.h1>
@@ -220,13 +220,13 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
             <div className="flex items-center gap-4 mb-8">
               <BrandIcon brand={product.brand} className="w-12 h-12" />
               <div className="flex flex-col">
-                <span className="text-cyan-600 font-black text-xs tracking-[0.2em] uppercase">{product.brand} Official</span>
-                <span className="text-slate-400 text-xs font-medium tracking-[0.2em]">{t('pdp.officialDistributor')}</span>
+                <span className="text-cyan-600 font-black text-xs tracking-hvac-normal uppercase">{product.brand} Official</span>
+                <span className="text-slate-400 text-xs font-medium tracking-hvac-normal">{t('pdp.officialDistributor')}</span>
               </div>
             </div>
 
             <div className="mb-10 p-10 bg-slate-50 rounded-hvac-2xl border border-slate-100 relative overflow-hidden group">
-              <span className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-4 block">{t('pdp.priceAvailability')}</span>
+              <span className="text-xs font-black text-slate-400 uppercase tracking-hvac-relaxed mb-4 block">{t('pdp.priceAvailability')}</span>
               <div className="flex flex-col">
                 <div className="text-4xl sm:text-5xl font-black text-slate-950 tracking-tighter mb-2">
                   {categoryMetadata?.hide_price ? t('common.requestQuote') : formatCurrency(product.price, lang)}
@@ -248,11 +248,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
 
                 <div className="flex flex-col gap-4">
                   {categoryMetadata?.hide_price ? (
-                    <button onClick={() => setLeadOpen(true)} className="w-full bg-slate-950 hover:bg-cyan-600 text-white font-black py-5 px-8 rounded-2xl transition-[background-color,box-shadow] shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 group"><Settings size={20} aria-hidden="true" className="group-hover:rotate-90 transition-transform duration-500" /><span className="text-xs uppercase tracking-[0.2em]">{t('pdp.techQuote')}</span></button>
+                    <button onClick={() => setLeadOpen(true)} className="w-full bg-slate-950 hover:bg-cyan-600 text-white font-black py-5 px-8 rounded-2xl transition-bg-shadow shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 group"><Settings size={20} aria-hidden="true" className="group-hover:rotate-90 transition-transform duration-500" /><span className="text-xs uppercase tracking-hvac-normal">{t('pdp.techQuote')}</span></button>
                   ) : (
-                    <button onClick={handleAddToCart} disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')} className="w-full bg-slate-950 hover:bg-cyan-600 text-white font-black py-5 px-8 rounded-2xl transition-[background-color,opacity,box-shadow,transform] shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 disabled:opacity-50 group active:scale-95"><ShoppingCart size={20} aria-hidden="true" className="group-hover:translate-x-1 transition-transform" /><span className="text-xs uppercase tracking-[0.2em]">{t('pdp.addToCart')}</span></button>
+                    <button onClick={handleAddToCart} disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')} className="w-full bg-slate-950 hover:bg-cyan-600 text-white font-black py-5 px-8 rounded-2xl transition-bg-opacity-shadow-transform shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 disabled:opacity-50 group active:scale-95"><ShoppingCart size={20} aria-hidden="true" className="group-hover:translate-x-1 transition-transform" /><span className="text-xs uppercase tracking-hvac-normal">{t('pdp.addToCart')}</span></button>
                   )}
-                  <button onClick={() => setIsProjectModalOpen(true)} className="w-full bg-white border-2 border-slate-100 hover:border-slate-900 text-slate-950 font-bold py-5 px-8 rounded-2xl transition-[border-color,transform] flex items-center justify-center gap-3 group active:scale-95"><FolderPlus size={20} aria-hidden="true" /><span className="text-xs uppercase tracking-[0.2em]">{t('pdp.actions.addToProject')}</span></button>
+                  <button onClick={() => setIsProjectModalOpen(true)} className="w-full bg-white border-2 border-slate-100 hover:border-slate-900 text-slate-950 font-bold py-5 px-8 rounded-2xl transition-border-transform flex items-center justify-center gap-3 group active:scale-95"><FolderPlus size={20} aria-hidden="true" /><span className="text-xs uppercase tracking-hvac-normal">{t('pdp.actions.addToProject')}</span></button>
                 </div>
               </div>
             </div>
@@ -263,11 +263,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct })
       <AddToProjectModal product={product} isOpen={isProjectModalOpen} onClose={() => setIsProjectModalOpen(false)} />
       <div ref={navTriggerRef} className="h-0" />
 
-      <div id="pdp-sticky-nav" className={`transition-[top,box-shadow] duration-500 z-dropdown bg-white/90 backdrop-blur-2xl border-b border-slate-100 ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0 shadow-xl shadow-slate-900/5' : 'relative mt-12'}`}>
+      <div id="pdp-sticky-nav" className={`transition-top-shadow duration-500 z-dropdown bg-white/90 backdrop-blur-2xl border-b border-slate-100 ${isNavSticky ? 'fixed top-56px md:top-80px left-0 right-0 shadow-xl shadow-slate-900/5' : 'relative mt-12'}`}>
         <PageShell spacing="none" className="flex items-center justify-between">
           <nav className="flex space-x-2 overflow-x-auto py-4 no-scrollbar">
             {sections.map((section) => (
-              <button key={section.id} onClick={() => scrollToSection(section.id)} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-[0.2em] whitespace-nowrap transition-[color,background-color,box-shadow] ${activeSection === section.id ? 'bg-slate-950 text-white shadow-lg' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}>
+              <button key={section.id} onClick={() => scrollToSection(section.id)} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-hvac-normal whitespace-nowrap transition-color-bg-shadow ${activeSection === section.id ? 'bg-slate-950 text-white shadow-lg' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}>
                 <section.icon size={14} /> <span>{section.title}</span>
               </button>
             ))}

@@ -26,10 +26,10 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
   return (
     <Link 
       href={href as import('next').Route}
-      className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white transition-transform duration-500 hover:-translate-y-1 hover:border-primary-navy/20 hover:shadow-[0_20px_40px_-15px_rgba(30,41,59,0.1)]"
+      className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white transition-transform duration-500 hover:-translate-y-1 hover:border-primary-navy/20 hover:shadow-series-card-hover"
     >
       {/* Image Container */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
+      <div className="relative aspect-4/3 w-full overflow-hidden bg-slate-50">
         {image ? (
           <Image
             src={image}

@@ -105,8 +105,8 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
     const modelGroupRef = useRef<THREE.Group | null>(null)
 
     const tb = isFullscreen
-        ? { icon: 18, font: 'text-xs', pad: 'p-1.5', minW: 'min-w-[40px]', div: 'h-7', top: 'top-4' }
-        : { icon: 13, font: 'text-[6px]', pad: 'p-1', minW: 'min-w-[28px]', div: 'h-5', top: 'top-2' }
+        ? { icon: 18, font: 'text-xs', pad: 'p-1.5', minW: 'min-w-40px', div: 'h-7', top: 'top-4' }
+        : { icon: 13, font: 'text-[6px]', pad: 'p-1', minW: 'min-w-28px', div: 'h-5', top: 'top-2' }
 
     const handleReset = useCallback(() => {
         setAutoRotate(false)
@@ -152,7 +152,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
     const placement = getModelPlacement(modelType, slug, 'grounded')
 
     return (
-        <div className={`relative w-full h-full bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#cde0f5_100%)] ${isFullscreen ? 'fixed inset-0 z-toast' : 'rounded-xl overflow-hidden border border-light-gray'}`}>
+        <div className={`relative w-full h-full bg-product-3d-radial ${isFullscreen ? 'fixed inset-0 z-toast' : 'rounded-xl overflow-hidden border border-light-gray'}`}>
             <Canvas shadows dpr={[1, 2]} camera={{ position: [2, 2, 2.8], fov: 40 }} gl={{ alpha: true }}>
                 <ambientLight intensity={0.7} />
                 <directionalLight position={[10, 15, 10]} intensity={1.5} castShadow shadow-mapSize={2048} />

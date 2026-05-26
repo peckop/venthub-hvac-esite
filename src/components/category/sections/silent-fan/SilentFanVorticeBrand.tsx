@@ -25,7 +25,7 @@ const SilentFanVorticeBrand: React.FC = () => {
                                 <div className="w-4 bg-white" />
                                 <div className="w-4 bg-italian-red" />
                             </div>
-                            <span className="text-sm font-bold tracking-[0.2em] text-slate-400 uppercase">{String(tr('eyebrow'))}</span>
+                            <span className="text-sm font-bold tracking-hvac-normal text-slate-400 uppercase">{String(tr('eyebrow'))}</span>
                         </div>
 
                         <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">

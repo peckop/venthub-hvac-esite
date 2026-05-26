@@ -208,7 +208,7 @@ const AdminCouponsPage: React.FC = () => {
         <div className={`${adminCardPaddedClass} glass-strong border-white/5 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500`}>
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-admin-coupons-glow-1"></div>
               Yeni Kupon Oluştur
             </h3>
           </div>
@@ -263,7 +263,7 @@ const AdminCouponsPage: React.FC = () => {
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Durum</label>
-              <div className="flex items-center gap-3 px-4 h-[42px] glass-strong border-white/10 rounded-xl">
+              <div className="flex items-center gap-3 px-4 h-42px glass-strong border-white/10 rounded-xl">
                 <input 
                   type="checkbox" 
                   id="coupon-active" 
@@ -293,7 +293,7 @@ const AdminCouponsPage: React.FC = () => {
               <button 
                 onClick={saveCoupon} 
                 disabled={saving || !(String(form.code || '').trim().length >= 3 && (form.type === 'percent' || form.type === 'fixed') && Number(form.value) > 0)} 
-                className={`${adminButtonPrimaryClass} shadow-lg shadow-cyan-900/20 w-full h-[42px]`}
+                className={`${adminButtonPrimaryClass} shadow-lg shadow-cyan-900/20 w-full h-42px`}
               >
                 {saving ? 'Kaydediliyor...' : 'Kuponu Oluştur'}
               </button>
@@ -338,7 +338,7 @@ const AdminCouponsPage: React.FC = () => {
                 filtered().map((r, idx) => (
                   <tr 
                     key={r.id} 
-                    className="group border-t border-white/5 hover:bg-white/[0.02] transition-colors"
+                    className="group border-t border-white/5 hover:bg-white/2 transition-colors"
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
                     <td className={`${adminTableCellClass} font-mono text-xs font-black text-white`}>
@@ -365,7 +365,7 @@ const AdminCouponsPage: React.FC = () => {
                             : 'bg-slate-500/10 text-slate-400 border-white/5 opacity-50'
                         }`}
                       >
-                        <div className={`w-1 h-1 rounded-full ${r.active ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]' : 'bg-slate-500'}`}></div>
+                        <div className={`w-1 h-1 rounded-full ${r.active ? 'bg-emerald-500 shadow-admin-coupons-glow-2' : 'bg-slate-500'}`}></div>
                         {r.active ? 'Aktif' : 'Pasif'}
                       </button>
                     </td>
@@ -373,7 +373,7 @@ const AdminCouponsPage: React.FC = () => {
                       <div className="flex flex-col gap-1 text-xs uppercase font-black tracking-widest">
                         <span className="text-white/80">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</span>
                         <span className="text-slate-500 flex items-center gap-1">
-                          <div className="w-1 h-[1px] bg-white/10"></div>
+                          <div className="w-1 h-px bg-white/10"></div>
                           {r.ends_at ? formatDateTime(r.ends_at, lang as 'tr' | 'en') : 'SÜRESİZ'}
                         </span>
                       </div>

@@ -134,7 +134,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
         <Dialog.Root open={open} onOpenChange={onClose}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-modal" />
-                <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl z-modal p-6">
+                <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-90vh overflow-y-auto bg-white rounded-2xl shadow-2xl z-modal p-6">
                     <div className="flex items-center justify-between mb-6">
                         <Dialog.Title className="text-xl font-bold text-industrial-gray">
                             {_productId ? t('admin.common.edit') : t('admin.common.addNewProduct')}

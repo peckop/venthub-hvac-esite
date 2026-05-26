@@ -94,7 +94,7 @@ const StatCard: React.FC<StatCardProps> = ({
     const content = (
         <div className="flex items-start justify-between relative z-10 h-full">
             <div className="flex-1 min-w-0 pr-2">
-                <div className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] leading-tight mb-4 truncate group-hover:text-slate-400 transition-colors" title={title}>
+                <div className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal leading-tight mb-4 truncate group-hover:text-slate-400 transition-colors" title={title}>
                     {title}
                 </div>
                 <div className="flex items-baseline gap-2 flex-wrap">
@@ -111,13 +111,13 @@ const StatCard: React.FC<StatCardProps> = ({
                     )}
                 </div>
                 {subtitle && !loading && (
-                    <div className="mt-2 text-xs font-black text-slate-500 uppercase tracking-[0.3em] truncate opacity-50 italic">
+                    <div className="mt-2 text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed truncate opacity-50 italic">
                         {subtitle}
                     </div>
                 )}
             </div>
             {icon && (
-                <div className={`flex shrink-0 w-14 h-14 rounded-2xl ${currentAccent.iconBg} items-center justify-center border border-white/5 shadow-2xl ml-auto transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]`}>
+                <div className={`flex shrink-0 w-14 h-14 rounded-2xl ${currentAccent.iconBg} items-center justify-center border border-white/5 shadow-2xl ml-auto transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-hvac-stat-card-hover`}>
                     {React.cloneElement(icon as React.ReactElement<{ size?: number, strokeWidth?: number }>, { size: 24, strokeWidth: 2.5 })}
                 </div>
             )}
@@ -130,7 +130,7 @@ const StatCard: React.FC<StatCardProps> = ({
         return (
             <Link href={href as import('next').Route} className={`${baseClass} block hover:-translate-y-2`}>
                 <div className={`absolute -top-12 -right-12 w-48 h-48 bg-gradient-to-br from-white/5 to-transparent rounded-full transition-transform duration-1000 group-hover:scale-150 opacity-20`}></div>
-                <div className={`absolute bottom-0 left-0 w-full h-1 ${currentAccent.accent} scale-x-0 transition-transform origin-left duration-700 group-hover:scale-x-100 shadow-[0_0_15px_rgba(34,211,238,0.5)]`}></div>
+                <div className={`absolute bottom-0 left-0 w-full h-1 ${currentAccent.accent} scale-x-0 transition-transform origin-left duration-700 group-hover:scale-x-100 shadow-glow-md`}></div>
                 {content}
             </Link>
         )

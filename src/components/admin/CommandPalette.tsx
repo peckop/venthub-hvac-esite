@@ -151,8 +151,8 @@ const CommandPalette: React.FC = () => {
             />
 
             {/* Dialog */}
-            <div className="relative flex items-start justify-center pt-[15vh]">
-                <div className="w-full max-w-[640px] glass-strong rounded-hvac-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden mx-4 animate-in zoom-in-95 duration-200">
+            <div className="relative flex items-start justify-center pt-15vh">
+                <div className="w-full max-w-640px glass-strong rounded-hvac-xl shadow-elevation-4 border border-white/10 overflow-hidden mx-4 animate-in zoom-in-95 duration-200">
                     {/* Search Input */}
                     <div className="flex items-center border-b border-white/5 px-6 py-5">
                         <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center mr-4 cyan-glow">
@@ -167,7 +167,7 @@ const CommandPalette: React.FC = () => {
                             className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-slate-500 text-lg font-medium"
                         />
                         <div className="flex items-center gap-2 ml-auto shrink-0">
-                            <kbd className="px-2.5 py-1 text-xs font-black text-cyan-400 bg-cyan-400/10 rounded-lg border border-cyan-400/20 shadow-[0_0_10px_rgba(34,211,238,0.1)]">ESC</kbd>
+                            <kbd className="px-2.5 py-1 text-xs font-black text-cyan-400 bg-cyan-400/10 rounded-lg border border-cyan-400/20 shadow-glow-sm">ESC</kbd>
                             <button onClick={() => setOpen(false)} className="p-2 rounded-xl hover:bg-white/5 transition-colors" aria-label="Kapat">
                                 <X size={20} className="text-slate-500 hover:text-white" aria-hidden="true" />
                             </button>
@@ -175,7 +175,7 @@ const CommandPalette: React.FC = () => {
                     </div>
 
                     {/* Results List */}
-                    <div className="max-h-[450px] overflow-y-auto p-3 scrollbar-hide">
+                    <div className="max-h-450px overflow-y-auto p-3 scrollbar-hide">
                         {loading && (
                             <div className="p-8 text-center">
                                 <Activity className="animate-spin text-cyan-400 mx-auto mb-2" size={24} />
@@ -186,7 +186,7 @@ const CommandPalette: React.FC = () => {
                         {/* Navigation Group */}
                         {filteredNav.length > 0 && (
                             <div className="mb-4">
-                                <div className="px-4 mb-3 text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Navigasyon</div>
+                                <div className="px-4 mb-3 text-xs font-bold text-slate-500 uppercase tracking-hvac-normal">Navigasyon</div>
                                 <div className="space-y-1">
                                     {filteredNav.map((item, idx) => {
                                         const Icon = item.icon
@@ -197,7 +197,7 @@ const CommandPalette: React.FC = () => {
                                                 onClick={() => { setOpen(false); router.push(item.href as import('next').Route) }}
                                                 className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-colors text-left group ${
                                                     isActive 
-                                                        ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
+                                                        ? 'bg-cyan-400 text-surface-deep shadow-glow-md' 
                                                         : 'text-slate-400 hover:bg-white/5 hover:text-white'
                                                 }`}
                                             >
@@ -216,7 +216,7 @@ const CommandPalette: React.FC = () => {
                         {/* Products Group */}
                         {products.length > 0 && (
                             <div className="mt-2">
-                                <div className="px-4 my-3 text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Ürün Kataloğu</div>
+                                <div className="px-4 my-3 text-xs font-bold text-slate-500 uppercase tracking-hvac-normal">Ürün Kataloğu</div>
                                 <div className="space-y-1">
                                     {products.map((p, idx) => {
                                         const globalIdx = filteredNav.length + idx
@@ -227,7 +227,7 @@ const CommandPalette: React.FC = () => {
                                                 onClick={() => { setOpen(false); router.push(`/admin/products?id=${p.id}` as import('next').Route) }}
                                                 className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold cursor-pointer transition-colors text-left group ${
                                                     isActive 
-                                                        ? 'bg-cyan-400 text-surface-deep shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
+                                                        ? 'bg-cyan-400 text-surface-deep shadow-glow-md' 
                                                         : 'text-slate-400 hover:bg-white/5 hover:text-white'
                                                 }`}
                                             >

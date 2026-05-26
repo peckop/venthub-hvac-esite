@@ -211,7 +211,7 @@ const AdminCategoriesPage: React.FC = () => {
       <div className={adminTableContainerClass}>
         {error && <div className="p-4 text-rose-400 text-xs font-bold bg-rose-500/10 border-b border-white/5 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-rose-500" />{error}</div>}
         <div ref={dragScrollRef} className="overflow-x-auto w-full custom-scrollbar">
-          <table className="w-full text-left min-w-[800px]">
+          <table className="w-full text-left min-w-800px">
             <thead>
               <tr className="glass-strong">
                 {visibleCols.image && <th className={`${adminTableHeadCellClass} ${headPad}`}>Görsel</th>}
@@ -249,7 +249,7 @@ const AdminCategoriesPage: React.FC = () => {
                 </tr>
               ) : (
                 filtered.map(r => (
-                  <tr key={r.id} className="group hover:bg-white/[0.02] transition-colors duration-300">
+                  <tr key={r.id} className="group hover:bg-white/2 transition-colors duration-300">
                     {visibleCols.image && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-colors duration-500">
@@ -288,7 +288,7 @@ const AdminCategoriesPage: React.FC = () => {
                             )}
                             {r.is_featured && (
                               <div className="flex items-center gap-1.5 mt-1">
-                                <span className="w-1 h-1 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+                                <span className="w-1 h-1 rounded-full bg-cyan-400 shadow-admin-categories-glow" />
                                 <span className="text-xs font-black text-cyan-400 uppercase tracking-widest">Öne Çıkan</span>
                               </div>
                             )}
@@ -325,19 +325,19 @@ const AdminCategoriesPage: React.FC = () => {
                     )}
                     {visibleCols.slug && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <code className="text-xs font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5 group-hover:text-cyan-400/60 transition-colors uppercase tracking-[0.15em] font-mono">{r.slug}</code>
+                        <code className="text-xs font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5 group-hover:text-cyan-400/60 transition-colors uppercase tracking-hvac-snug font-mono">{r.slug}</code>
                       </td>
                     )}
                     {visibleCols.parent && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <span className="text-xs font-black text-slate-500 uppercase tracking-[0.15em]">
+                        <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-snug">
                           {r.parent_id ? categoryMap.get(r.parent_id) || '-' : '-'}
                         </span>
                       </td>
                     )}
                     {visibleCols.description && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px] italic">{r.description || '-'}</p>
+                        <p className="text-xs text-slate-500 line-clamp-1 max-w-200px italic">{r.description || '-'}</p>
                       </td>
                     )}
                     {visibleCols.actions && (

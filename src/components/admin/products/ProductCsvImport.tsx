@@ -127,7 +127,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
 
             {importPreview && (
                 <div className="fixed inset-0 z-modal flex items-center justify-center bg-slate-900/50 p-4">
-                    <div className={`${adminCardClass} w-full max-w-4xl max-h-[90vh] flex flex-col shadow-xl animate-in fade-in zoom-in duration-200`}>
+                    <div className={`${adminCardClass} w-full max-w-4xl max-h-90vh flex flex-col shadow-xl animate-in fade-in zoom-in duration-200`}>
 
                         <div className="p-4 border-b border-slate-200 flex items-center justify-between">
                             <h3 className="font-semibold text-slate-800">

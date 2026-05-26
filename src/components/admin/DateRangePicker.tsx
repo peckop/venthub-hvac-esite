@@ -134,14 +134,15 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
             </Popover.Trigger>
             <Popover.Portal>
                 <Popover.Content
-                    className="z-toast mt-2 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl p-0 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] md:max-h-none overflow-y-auto w-[calc(100vw-32px)] md:w-auto"
+                    className="z-toast mt-2 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl p-0 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-85vh md:max-h-none overflow-y-auto md:w-auto"
+                    style={{ width: typeof window !== 'undefined' && window.innerWidth >= 768 ? 'auto' : 'calc(100vw - 32px)' }}
                     align="center"
                     sideOffset={5}
                     collisionPadding={16}
                 >
 
                     {/* Preset Buttons - Left Sidebar */}
-                    <div className="md:w-48 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200/60 p-3 overflow-y-auto max-h-[60vh]">
+                    <div className="md:w-48 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200/60 p-3 overflow-y-auto max-h-60vh">
                         <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">Hızlı Seçim</div>
                         <div className="flex flex-col gap-1">
                             {presets.map((preset, idx) => {

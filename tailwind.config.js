@@ -1,4 +1,19 @@
-import { fontSize, borderRadius, zIndex, maxWidth, boxShadow } from './src/design-system/tokens.js';
+import {
+  fontSize,
+  borderRadius,
+  zIndex,
+  maxWidth,
+  boxShadow,
+  height,
+  minHeight,
+  maxHeight,
+  width,
+  minWidth,
+  transitionDuration,
+  transitionTimingFunction,
+  blur,
+  transitionProperty
+} from './src/design-system/tokens.js';
 
 /** @type {import('tailwindcss').Config} */
 const tailwindConfig = {
@@ -37,15 +52,111 @@ const tailwindConfig = {
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
       },
+      letterSpacing: {
+        'hvac-tight': '0.1em',
+        'hvac-snug': '0.15em',
+        'hvac-normal': '0.2em',
+        'hvac-relaxed': '0.3em',
+        'hvac-loose': '0.4em',
+        'hvac-wide': '0.5em',
+        'hvac-22': '0.22em',
+        'hvac-08': '0.08em',
+        'hvac-25': '0.25em',
+        'hvac-24': '0.24em',
+      },
+      lineHeight: {
+        'hvac-105': '1.05',
+        'hvac-11': '1.1',
+        'hvac-12': '1.2',
+        'hvac-15': '1.5',
+      },
+      opacity: {
+        '1': '0.01',
+        '2': '0.02',
+        '3': '0.03',
+        '4': '0.04',
+        '5': '0.05',
+        '6': '0.06',
+        '8': '0.08',
+      },
+      scale: {
+        '102': '1.02',
+        '101': '1.01',
+        '98': '0.98',
+      },
+      aspectRatio: {
+        '4/3': '4 / 3',
+        '4/5': '4 / 5',
+        'orbit': '0.85 / 1',
+        '3/2': '3 / 2',
+        '21/9': '21 / 9',
+      },
+      grayscale: {
+        '30': '0.3',
+      },
+      flex: {
+        '2': '2 2 0%',
+      },
+      backgroundSize: {
+        'grid-100': '100px 100px',
+      },
+      gridTemplateColumns: {
+        'hvac-layout-sidebar': '1fr 320px',
+        'hvac-layout-split': '0.75fr 1fr',
+        'hvac-layout-detail': '1fr 450px',
+      },
+      gridAutoRows: {
+        '140': '140px',
+        '160': '160px',
+        '180': '180px',
+      },
+      borderWidth: {
+        '16': '16px',
+      },
+      saturate: {
+        '110': '1.1',
+      },
+      brightness: {
+        '60': '0.6',
+      },
+      skew: {
+        '45': '45deg',
+      },
+      inset: {
+        '56px': '56px',
+        '80px': '80px',
+        '96px': '96px',
+        '100px': '100px',
+        '10%': '10%',
+        '20%': '20%',
+        '-10%': '-10%',
+        '-20%': '-20%',
+      },
+      dropShadow: {
+        'hvac-card-drop': '0 10px 10px rgba(0,0,0,0.5)',
+        'pie-chart-glow': '0 0 15px rgba(255,255,255,0.3)',
+        'heatmap-glow': '0 0 8px rgba(34,211,238,0.4)',
+        'cinematic-drop': '0 50px 100px rgba(0,0,0,0.8)',
+        'sinevizyon-drop': '0 30px 60px rgba(0,0,0,0.9)',
+      },
       fontSize,
       borderRadius,
       zIndex,
       maxWidth,
       boxShadow,
+      height,
+      minHeight,
+      maxHeight,
+      width,
+      minWidth,
+      transitionDuration,
+      transitionTimingFunction,
+      blur,
+      transitionProperty,
       backdropBlur: {
         'xs': '2px',
       },
-      /* Mevcut animation/keyframes/backgroundImage KORUNACAK */
+      /* Mevcut animation/keyframes/backgroundImage KORUNACAK ve genişletilecek */
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
@@ -58,6 +169,7 @@ const tailwindConfig = {
         'enterFromRight': 'enterFromRight 0.25s ease',
         'exitToLeft': 'exitToLeft 0.25s ease',
         'exitToRight': 'exitToRight 0.25s ease',
+        'scan-slow': 'scan 3s linear infinite',
       },
       keyframes: {
         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -74,6 +186,16 @@ const tailwindConfig = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
         'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0))',
+        'brands-radial': 'radial-gradient(circle at center, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)',
+        'cyan-grid': 'linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px)',
+        'knowledge-radial': 'radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.1), transparent 70%)',
+        'entry-rail-gradient': 'linear-gradient(135deg, rgba(15, 23, 42, 0.02), rgba(37, 99, 235, 0.06))',
+        'nav-brand-radial': 'radial-gradient(circle at top, rgba(255, 255, 255, 0.3), transparent 55%)',
+        'login-radial': 'radial-gradient(circle at top, rgba(255, 255, 255, 0.3), transparent 60%)',
+        'product-3d-radial': 'radial-gradient(circle at center, #ffffff 0%, #cde0f5 100%)',
+        'orbit-radial-1': 'radial-gradient(circle at center, rgba(30, 41, 59, 0.5) 0%, rgb(2, 6, 23) 70%)',
+        'orbit-radial-2': 'radial-gradient(circle at center, rgba(6, 182, 212, 0.15) 0%, rgb(2, 6, 23) 70%)',
+        'brand-detail-radial': 'radial-gradient(circle at center, rgba(34, 211, 238, 0.1), transparent 70%)',
       },
     },
   },

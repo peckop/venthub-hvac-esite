@@ -12,13 +12,13 @@ export default function AdminSkeleton({ variant, rows = 5, count = 4, fields = 6
     if (variant === 'table') {
         return (
             <div className={`w-full ${glassStrongClass} rounded-hvac-xl border border-white/5 overflow-hidden shadow-2xl`}>
-                <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/2">
                     <div className="h-6 w-32 bg-white/5 animate-pulse rounded-lg border border-white/5"></div>
                     <div className="h-10 w-48 bg-white/5 animate-pulse rounded-xl border border-white/5 shadow-inner"></div>
                 </div>
                 <div className="overflow-x-auto w-full">
                     <table className="w-full text-left">
-                        <thead className="bg-white/[0.03] border-b border-white/5">
+                        <thead className="bg-white/3 border-b border-white/5">
                             <tr>
                                 {[...Array(5)].map((_, i) => (
                                     <th key={i} className="p-5">
@@ -32,7 +32,7 @@ export default function AdminSkeleton({ variant, rows = 5, count = 4, fields = 6
                                 <tr key={i} className="bg-transparent">
                                     {[...Array(5)].map((_, j) => (
                                         <td key={j} className="p-5">
-                                          <div className="h-4 w-full max-w-[120px] bg-white/[0.05] animate-pulse rounded-lg"></div>
+                                          <div className="h-4 w-full max-w-120px bg-white/5 animate-pulse rounded-lg"></div>
                                         </td>
                                     ))}
                                 </tr>

@@ -39,7 +39,7 @@ export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = React
   return (
     <div className="space-y-4 py-8 border-y border-slate-100/80 my-8 animate-in fade-in slide-in-from-top-4 duration-700">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+        <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-hvac-normal text-slate-400">
           <div className="flex h-1.5 w-1.5 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-navy opacity-75"></span>
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-navy"></span>
@@ -58,7 +58,7 @@ export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = React
             className={`group relative flex items-start gap-5 p-5 rounded-2xl border bg-gradient-to-br ${getThemeColor(item.type)} transition-transform hover:shadow-md hover:-translate-y-0.5 duration-300 overflow-hidden`}
           >
             {/* Background Accent Decorative element */}
-            <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:scale-110 transition-transform duration-700">
+            <div className="absolute -right-4 -bottom-4 opacity-3 group-hover:scale-110 transition-transform duration-700">
               {getIcon(item.type)}
             </div>
 

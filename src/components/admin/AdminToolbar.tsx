@@ -207,10 +207,10 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 onChange={(e) => search.onChange(e.target.value)}
                 placeholder={search.placeholder || _t('admin.toolbar.searchPlaceholder')}
                 aria-label={_t('admin.a11y.search') || 'Ara'}
-                className="w-full h-11 bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-12 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-colors placeholder:text-slate-600 font-bold"
+                className="w-full h-11 bg-white/3 border border-white/10 rounded-xl pl-12 pr-12 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-colors placeholder:text-slate-600 font-bold"
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-2.5 pointer-events-none group-focus-within:opacity-0 transition-opacity">
-                <kbd className="min-w-[1.25rem] h-5 flex items-center justify-center rounded border border-white/10 bg-transparent text-xs font-black text-slate-500 font-sans shadow-sm">/</kbd>
+                <kbd className="min-w-5 h-5 flex items-center justify-center rounded border border-white/10 bg-transparent text-xs font-black text-slate-500 font-sans shadow-sm">/</kbd>
               </div>
             </div>
           )}
@@ -219,7 +219,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
           {select && (
             <div className="hidden md:flex items-center gap-2">
               <select
-                className={`${adminSelectClass} min-w-[200px] shadow-inner hover:border-white/10 h-12`}
+                className={`${adminSelectClass} min-w-200px shadow-inner hover:border-white/10 h-12`}
                 style={adminSelectStyle}
                 value={select.value}
                 onChange={(e) => select.onChange(e.target.value)}
@@ -264,7 +264,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
 
             {typeof recordCount === 'number' && (
               <div className="flex flex-col items-end px-4 border-l border-white/10">
-                <span className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">{_t('admin.toolbar.records') || 'Kayıt'}</span>
+                <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal">{_t('admin.toolbar.records') || 'Kayıt'}</span>
                 <span className="text-base font-black text-cyan-400 font-mono tracking-tighter" aria-live="polite">
                     {recordCount.toLocaleString()}
                 </span>
@@ -339,7 +339,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                         key={ch.key}
                         type="button"
                         onClick={ch.onToggle}
-                        className={`px-4 h-10 flex-1 min-w-[120px] inline-flex items-center justify-center rounded-xl border text-xs font-black uppercase tracking-widest transition-colors ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)}`}
+                        className={`px-4 h-10 flex-1 min-w-120px inline-flex items-center justify-center rounded-xl border text-xs font-black uppercase tracking-widest transition-colors ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)}`}
                         aria-pressed={ch.active}
                         aria-label={ch.label}
                     >{ch.label}</button>

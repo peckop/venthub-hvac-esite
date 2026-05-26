@@ -210,7 +210,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           addToRecent(q)
           handleClose()
         }}
-        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-transform duration-200 group outline-none hover:scale-[1.01] hover:shadow-md hover:z-10 relative ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20 shadow-sm' : 'hover:bg-gray-50'}`}
+        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-transform duration-200 group outline-none hover:scale-101 hover:shadow-md hover:z-10 relative ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20 shadow-sm' : 'hover:bg-gray-50'}`}
       >
         <div className={`p-2 rounded-lg border transition-colors flex items-center justify-center ${isActive ? 'bg-white border-primary-ocean/30 shadow-sm' : 'bg-gray-50 border-transparent group-hover:bg-white group-hover:border-gray-200'}`}>
           {icon}

@@ -32,7 +32,7 @@ const EducationalGuide: React.FC<EducationalGuideProps> = ({ categorySlug }) => 
                             <h4 className="text-xl font-bold text-industrial-gray">{t('category.ambientAir')}</h4>
                         </div>
 
-                        <p className="text-gray-600 mb-6 relative z-10 min-h-[48px]">
+                        <p className="text-gray-600 mb-6 relative z-10 min-h-12">
                             {t('category.ambientAirDesc')}
                         </p>
 
@@ -65,7 +65,7 @@ const EducationalGuide: React.FC<EducationalGuideProps> = ({ categorySlug }) => 
                             <h4 className="text-xl font-bold text-industrial-gray">{t('category.electricHeated')}</h4>
                         </div>
 
-                        <p className="text-gray-600 mb-6 relative z-10 min-h-[48px]">
+                        <p className="text-gray-600 mb-6 relative z-10 min-h-12">
                             {t('category.electricHeatedDesc')}
                         </p>
 

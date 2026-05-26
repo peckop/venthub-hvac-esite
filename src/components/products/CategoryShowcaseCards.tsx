@@ -38,13 +38,13 @@ const CategoryShowcaseCards: React.FC = () => {
                     </div>
 
                     {/* Product Image - Air Curtain Unit */}
-                    <div className="flex-1 flex items-center justify-center px-6 py-4 min-h-[140px] relative">
+                    <div className="flex-1 flex items-center justify-center px-6 py-4 min-h-140px relative">
                         <Image 
                             src="/images/products/isometric-air-curtain.png"
                             alt="Hava Perdesi"
                             width={220}
                             height={120}
-                            className="object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
+                            className="object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-hvac-card-drop"
                         />
                     </div>
 
@@ -81,13 +81,13 @@ const CategoryShowcaseCards: React.FC = () => {
                     </div>
 
                     {/* Product Image - Premium Lineo */}
-                    <div className="flex-1 flex items-center justify-center px-6 py-4 min-h-[140px] relative">
+                    <div className="flex-1 flex items-center justify-center px-6 py-4 min-h-140px relative">
                         <Image 
                             src="/images/vortice_lineo_futuristic.png"
                             alt="Endüstriyel Fan"
                             width={180}
                             height={160}
-                            className="object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
+                            className="object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-hvac-card-drop"
                         />
                     </div>
 
@@ -122,13 +122,13 @@ const CategoryShowcaseCards: React.FC = () => {
                     </div>
 
                     {/* Product Image - HRV Unit */}
-                    <div className="flex-1 flex items-center justify-center px-6 py-4 min-h-[140px] relative">
+                    <div className="flex-1 flex items-center justify-center px-6 py-4 min-h-140px relative">
                         <Image 
                             src="/images/products/isometric-hrv.png"
                             alt="Isı Geri Kazanım Cihazı"
                             width={200}
                             height={120}
-                            className="object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
+                            className="object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-hvac-card-drop"
                         />
                     </div>
 

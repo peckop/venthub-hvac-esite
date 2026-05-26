@@ -76,13 +76,13 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                         className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
                     >
                         <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                        <span className="text-xs font-black uppercase tracking-[0.4em] text-cyan-600">Technical Product Family</span>
+                        <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-600">Technical Product Family</span>
                     </motion.div>
 
                     <motion.h1
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="text-5xl lg:text-8xl font-extralight tracking-tighter text-slate-900 leading-[1.1] mb-10"
+                        className="text-5xl lg:text-8xl font-extralight tracking-tighter text-slate-900 leading-hvac-11 mb-10"
                     >
                         {vm?.displayName?.split(' ').slice(0, -1).join(' ')} <span className="font-medium text-slate-950 italic">{vm?.displayName?.split(' ').slice(-1)}</span>
                     </motion.h1>
@@ -108,7 +108,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                                 <div className="max-w-2xl">
                                     <div className="flex items-center gap-4 mb-6">
                                         <span className="h-px w-12 bg-secondary-blue" />
-                                        <span className="text-sm font-black text-secondary-blue uppercase tracking-[0.3em]">Seri Detayı</span>
+                                        <span className="text-sm font-black text-secondary-blue uppercase tracking-hvac-relaxed">Seri Detayı</span>
                                     </div>
                                     <h2 className="text-4xl md:text-5xl font-black text-industrial-gray mb-4 tracking-tighter">{series.name} SERİSİ</h2>
                                     <p className="text-slate-500 font-medium text-lg leading-relaxed">
@@ -134,7 +134,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto rounded-hvac-2xl border border-slate-100 shadow-2xl bg-white">
-                                    <table className="w-full text-left border-collapse min-w-[1000px]">
+                                    <table className="w-full text-left border-collapse min-w-1000px">
                                         <thead>
                                             <tr className="bg-slate-50">
                                                 <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Model</th>

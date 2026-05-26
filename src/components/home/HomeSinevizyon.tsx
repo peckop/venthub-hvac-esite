@@ -106,7 +106,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
 
   return (
     <section 
-      className="relative w-full h-[80vh] lg:h-[90vh] min-h-[650px] overflow-hidden bg-slate-950 flex items-center touch-pan-y contain-layout"
+      className="relative w-full h-80vh lg:h-90vh min-h-650px overflow-hidden bg-slate-950 flex items-center touch-pan-y contain-layout"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -174,12 +174,12 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                     : 'opacity-0 -translate-x-8 absolute inset-0 z-0 pointer-events-none'
                 }`}
               >
-                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.4em] text-cyan-400 backdrop-blur-md mb-8">
-                  <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#22D3EE]" />
+                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-5 py-2.5 text-xs font-bold uppercase tracking-hvac-loose text-cyan-400 backdrop-blur-md mb-8">
+                  <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-glow-sm" />
                   <span>{currentContent.eyebrow}</span>
                 </div>
 
-                <h1 className="text-5xl font-light leading-[1.05] tracking-tighter text-white sm:text-6xl lg:text-8xl mb-8">
+                <h1 className="text-5xl font-light leading-hvac-105 tracking-tighter text-white sm:text-6xl lg:text-8xl mb-8">
                   {currentContent.title}
                 </h1>
 
@@ -190,7 +190,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                 <div className="flex flex-col gap-5 sm:flex-row">
                   <Link
                     href={Routes.products()}
-                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl bg-cyan-500 px-12 text-sm font-bold uppercase tracking-widest text-slate-950 transition-shadow hover:bg-cyan-400 hover:shadow-[0_0_40px_rgba(34,211,238,0.4)]"
+                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl bg-cyan-500 px-12 text-sm font-bold uppercase tracking-widest text-slate-950 transition-shadow hover:bg-cyan-400 hover:shadow-glow-lg"
                   >
                     {t('home.hero.primaryCta')}
                   </Link>
@@ -214,7 +214,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
         </div>
 
         {/* Right Side: Floating High-Tech Products */}
-        <div className="w-full lg:w-1/2 relative h-[450px] sm:h-[550px]">
+        <div className="w-full lg:w-1/2 relative h-450px sm:h-550px">
           {/* Animated Air Flow Particles using optimized CSS */}
           <div className="absolute inset-0 pointer-events-none z-0">
             {[...Array(6)].map((_, i) => (
@@ -240,7 +240,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                   key={p.url}
                   className={`absolute transition-colors duration-1000 ease-in-out ${
                     slideIdx === currentSlide 
-                      ? i === 0 ? 'z-20 opacity-100 translate-x-0' : 'z-10 opacity-40 translate-x-32 translate-y-20 blur-[1px]'
+                      ? i === 0 ? 'z-20 opacity-100 translate-x-0' : 'z-10 opacity-40 translate-x-32 translate-y-20 blur-1'
                       : 'opacity-0'
                   }`}
                 >
@@ -250,22 +250,25 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                       <div className="relative">
                         {/* Connecting Line with Animated Dot */}
                         <div className={`absolute ${i === 0 ? 'right-full' : 'left-full'} top-1/2 -translate-y-1/2 flex items-center`}>
-                          <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-cyan-500 to-cyan-400" />
-                          <div className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22D3EE] animate-pulse" />
+                          <div className="h-px w-16 bg-gradient-to-r from-transparent via-cyan-500 to-cyan-400" />
+                          <div className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-glow-sm animate-pulse" />
                         </div>
 
-                        <div className="relative group/hud overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-900/40 p-4 backdrop-blur-xl transition-shadow duration-500 hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(34,211,238,0.15)]">
+                        <div 
+                          className="relative group/hud overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-900/40 p-4 backdrop-blur-xl transition-shadow duration-500 hover:border-cyan-400/50 hover:shadow-glow-md"
+                          style={{ '--glow-color': 'rgba(34,211,238,0.15)' } as React.CSSProperties}
+                        >
                           {/* HUD Corner Accents */}
                           <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-400/60" />
                           <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400/60" />
                           
                           {/* Animated Scan Line Inside HUD */}
-                          <div className="absolute left-0 right-0 h-px bg-cyan-400/10 pointer-events-none animate-[scan_3s_linear_infinite]" />
+                          <div className="absolute left-0 right-0 h-px bg-cyan-400/10 pointer-events-none animate-scan-slow" />
 
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
                               <div className="h-1 w-1 bg-cyan-400 rounded-full" />
-                              <div className="text-xs font-black uppercase tracking-[0.2em] text-cyan-400/80">System.Data.Live</div>
+                              <div className="text-xs font-black uppercase tracking-hvac-normal text-cyan-400/80">System.Data.Live</div>
                             </div>
                             <div className="text-base font-bold text-white tracking-tight leading-tight">{t(p.labelKey)}</div>
                             <div className="flex items-center gap-2 mt-1">
@@ -278,7 +281,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                     </div>
 
                     <div
-                      className="relative w-64 h-64 sm:w-80 sm:h-80 drop-shadow-[0_30px_60px_rgba(0,0,0,0.9)] transition-transform group-hover:scale-105"
+                      className="relative w-64 h-64 sm:w-80 sm:h-80 drop-shadow-sinevizyon-drop transition-transform group-hover:scale-105"
                       style={{ 
                         animation: `float ${5 + i}s ease-in-out infinite`,
                         transform: 'translate3d(0, 0, 0)' // Trigger GPU acceleration
@@ -316,7 +319,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
           ))}
         </div>
         <div className="h-px w-12 bg-white/10" />
-        <div className="text-xs font-bold text-white/40 tracking-[0.3em]">0{currentSlide + 1} / 0{slidesData.length}</div>
+        <div className="text-xs font-bold text-white/40 tracking-hvac-relaxed">0{currentSlide + 1} / 0{slidesData.length}</div>
       </div>
     </section>
   )

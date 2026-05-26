@@ -257,7 +257,7 @@ const JetFanCalcPage: React.FC = () => {
 
                 {/* Legend */}
                 <circle cx="250" cy="35" r="5" fill="#0EA5E9" />
-                <text x="250" y="50" textAnchor="middle" className="text-[7px] fill-steel-gray">Jet Fan</text>
+                <text x="250" y="50" textAnchor="middle" className="text-7px fill-steel-gray">Jet Fan</text>
               </svg>
             </div>
           </div>

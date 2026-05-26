@@ -135,7 +135,7 @@ function AdminStockPage() {
         <h2 className="text-xl font-semibold text-industrial-gray">Operasyon &gt; Stok</h2>
       </div>
 
-      <div className="mb-4 relative w-full sm:w-auto sm:min-w-[18rem]">
+      <div className="mb-4 relative w-full sm:w-auto sm:min-w-72">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
         <input
           type="text"

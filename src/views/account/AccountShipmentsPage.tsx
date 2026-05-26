@@ -156,7 +156,7 @@ export default function AccountShipmentsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[30vh] flex items-center justify-center">
+      <div className="min-h-30vh flex items-center justify-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy" />
       </div>
     )
@@ -212,7 +212,7 @@ export default function AccountShipmentsPage() {
           <p className="text-sm text-slate-500 mb-6">{t('orders.noShippingInfo') || 'Siparişlerinize kargo bilgisi eklendiğinde burada görünecektir.'}</p>
           <button
             onClick={() => router.push('/account/orders')}
-            className="h-10 px-6 bg-primary-navy hover:bg-industrial-gray text-white font-bold rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-[1.02] inline-flex items-center gap-2"
+            className="h-10 px-6 bg-primary-navy hover:bg-industrial-gray text-white font-bold rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-102 inline-flex items-center gap-2"
           >
             <Package size={16} /> {t('account.shipments.goToOrders')}
           </button>
@@ -267,7 +267,7 @@ export default function AccountShipmentsPage() {
                       const StepIcon = step.icon
                       return (
                         <React.Fragment key={step.key}>
-                          <div className="flex flex-col items-center min-w-[80px]">
+                          <div className="flex flex-col items-center min-w-80px">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${active ? 'bg-primary-navy text-white' : 'bg-white border border-slate-200 text-slate-400'
                               }`}>
                               <StepIcon size={14} />

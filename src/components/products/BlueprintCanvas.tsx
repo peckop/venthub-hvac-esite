@@ -118,7 +118,7 @@ interface BlueprintCanvasProps {
 
 const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
     return (
-        <div className="w-full h-full min-h-[400px] relative group overflow-hidden rounded-3xl bg-surface-darkest border border-white/5 shadow-2xl">
+        <div className="w-full h-full min-h-400px relative group overflow-hidden rounded-3xl bg-surface-darkest border border-white/5 shadow-2xl">
             {/* Dark Tech Grid Background */}
             <div className="absolute inset-0 opacity-20 pointer-events-none" 
                  style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)', backgroundSize: '24px 24px' }} 
@@ -138,21 +138,21 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
 
             <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
                 <div className="flex flex-col gap-1">
-                    <div className="w-24 h-[1px] bg-white/10" />
+                    <div className="w-24 h-px bg-white/10" />
                     <span className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none">Object Reference: P-501</span>
                 </div>
                 <div className="text-right">
                     <span className="text-xs font-black text-white uppercase tracking-widest leading-none">Cinematic Mode</span>
                     <div className="mt-1 flex gap-1 justify-end">
-                        <div className="w-3 h-[2px] bg-cyan-500" />
-                        <div className="w-1 h-[2px] bg-white/20" />
-                        <div className="w-1 h-[2px] bg-white/20" />
+                        <div className="w-3 h-0.5 bg-cyan-500" />
+                        <div className="w-1 h-0.5 bg-white/20" />
+                        <div className="w-1 h-0.5 bg-white/20" />
                     </div>
                 </div>
             </div>
 
             {/* Subtle Overlay Vignette */}
-            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
+            <div className="absolute inset-0 pointer-events-none shadow-inset-deep" />
         </div>
     )
 }

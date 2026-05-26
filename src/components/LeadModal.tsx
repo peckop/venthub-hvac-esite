@@ -92,7 +92,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
         role="dialog"
         aria-modal="true"
         aria-labelledby="lead-modal-title"
-        className="relative w-full max-w-5xl bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:flex-row max-h-[100dvh] sm:max-h-[85vh] transform transition-colors animate-in fade-in zoom-in-95 duration-300"
+        className="relative w-full max-w-5xl bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:flex-row max-h-screen sm:max-h-85vh transform transition-colors animate-in fade-in zoom-in-95 duration-300"
       >
         {/* Close Button Mobile */}
         <button

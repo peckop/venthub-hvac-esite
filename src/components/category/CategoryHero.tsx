@@ -40,7 +40,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
 
   if (loading || !category) {
     return (
-      <div className="bg-slate-900 text-white min-h-[300px] flex items-center border-b border-white/5 relative overflow-hidden">
+      <div className="bg-slate-900 text-white min-h-300px flex items-center border-b border-white/5 relative overflow-hidden">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="animate-pulse space-y-6">
             <div className="h-4 w-24 bg-white/10 rounded-full" />
@@ -71,9 +71,9 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
       {/* Background Decor (Main Category Only) */}
       {isMainCategory && (
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl -mr-64 -mt-64" />
-          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-cyan-500/10 rounded-full blur-3xl -ml-32 -mb-32" />
-          <div className="absolute inset-0 bg-[url('/images/grid-white.svg')] opacity-[0.03] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-500px h-500px bg-indigo-600/10 rounded-full blur-3xl -mr-64 -mt-64" />
+          <div className="absolute bottom-0 left-0 w-300px h-300px bg-cyan-500/10 rounded-full blur-3xl -ml-32 -mb-32" />
+          <div className="absolute inset-0 opacity-3 pointer-events-none" style={{ backgroundImage: "url('/images/grid-white.svg')" }} />
         </div>
       )}
 
@@ -83,7 +83,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
           onClick={handleBack}
           className={cn(
             scrollAnimationClasses.slideLeft(backBtnVisible),
-            "inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] transition-colors mb-12 group",
+            "inline-flex items-center gap-2 text-xs font-black uppercase tracking-hvac-relaxed transition-colors mb-12 group",
             isMainCategory ? "text-slate-400 hover:text-white" : "text-slate-400 hover:text-primary-navy"
           )}
         >
@@ -122,7 +122,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
             >
               {parentCategory && (
                 <span className={cn(
-                  "text-xs font-bold uppercase tracking-[0.4em] mb-4 block",
+                  "text-xs font-bold uppercase tracking-hvac-loose mb-4 block",
                   isMainCategory ? "text-cyan-400" : "text-indigo-600"
                 )}>
                   {getCategoryDisplayName(parentCategory)}

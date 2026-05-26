@@ -147,7 +147,7 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
       )}
 
       {activeTab === 'json' && (
-        <div className="p-4 bg-slate-900 text-indigo-300 font-mono text-xs overflow-auto max-h-[500px] rounded-lg">
+        <div className="p-4 bg-slate-900 text-indigo-300 font-mono text-xs overflow-auto max-h-500px rounded-lg">
           <pre>{JSON.stringify(blocks, null, 2)}</pre>
         </div>
       )}

@@ -24,7 +24,7 @@ const SecurePaymentOverlay: React.FC<SecurePaymentOverlayProps> = ({
                 role="dialog"
                 aria-modal="true"
                 aria-label={t('checkout.overlay.dialogLabel')}
-                className="bg-white/90 backdrop-saturate-150 border border-white/60 shadow-2xl rounded-2xl p-0 w-[92%] max-w-xl overflow-hidden"
+                className="bg-white/90 backdrop-saturate-150 border border-white/60 shadow-2xl rounded-2xl p-0 w-11/12 max-w-xl overflow-hidden"
             >
                 {/* Header */}
                 <div className="px-6 md:px-8 py-5 border-b border-light-gray/60 bg-white/80 flex items-center justify-between">

@@ -172,7 +172,7 @@ export default function AccountSecurityPage() {
               </div>
 
               <div className="pt-4 flex justify-end border-t border-slate-100 mt-2">
-                <button disabled={saving} className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-transform hover:scale-[1.02] flex items-center gap-2">
+                <button disabled={saving} className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-transform hover:scale-102 flex items-center gap-2">
                   {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('account.security.saving')}</> : <><Check className="w-4 h-4" /> {t('account.security.save')}</>}
                 </button>
               </div>

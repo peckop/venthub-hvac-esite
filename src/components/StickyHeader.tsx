@@ -183,7 +183,7 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
           <Link href={Routes.auth.login()} className="hidden rounded-2xl px-3.5 py-3 text-sm font-medium text-steel-gray transition-colors duration-300 hover:text-primary-navy lg:inline-flex">
             {t('common.signIn')}
           </Link>
-          <Link href={Routes.auth.register()} className="hidden rounded-2xl bg-gradient-to-r from-primary-navy to-secondary-blue px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_35px_-20px_rgba(37,99,235,0.7)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 lg:inline-flex">
+          <Link href={Routes.auth.register()} className="hidden rounded-2xl bg-gradient-to-r from-primary-navy to-secondary-blue px-4 py-3 text-sm font-semibold text-white shadow-elevation-3 transition-transform-shadow duration-300 hover:-translate-y-0.5 lg:inline-flex">
             {t('common.signUp')}
           </Link>
           <NavActionButton href={Routes.auth.login()} ariaLabel={t('common.signIn')} icon={<svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" /></svg>} className="lg:hidden" />
@@ -257,7 +257,7 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
               </div>
               <NavActionButton href={Routes.cart()} ariaLabel={t('header.cart')} tone="success" icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" /><path strokeWidth={2} d="M5 6L4 2H2" /><circle cx="16" cy="19" r="2" /><circle cx="8" cy="19" r="2" /></svg>} label={isMounted && cartTotal > 0 ? formatCurrency(cartTotal, lang, { maximumFractionDigits: 0 }) : undefined} labelClassName="hidden 2xl:block font-semibold text-success-green" badge={<>{isMounted && cartCount > 0 && (<span className="absolute flex items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue font-bold text-white shadow-md -right-2 -top-2 h-5 w-5 text-xs">{cartCount}</span>)}</>} />
               <div className="hidden lg:block">{renderUserMenu()}</div>
-              <div className="transition-[opacity,transform] duration-300 overflow-hidden sm:hidden"><NavActionButton ariaLabel={t('common.search')} onClick={openSearchOverlay} icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>} /></div>
+              <div className="transition-opacity-transform duration-300 overflow-hidden sm:hidden"><NavActionButton ariaLabel={t('common.search')} onClick={openSearchOverlay} icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>} /></div>
               <NavActionButton ariaLabel={t('header.menu')} onClick={() => { trackEvent('nav_click', { target: 'menu', mode }); openMenu(); }} icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>} tone={activeSurface === 'menu' ? 'accent' : 'default'} className="lg:hidden" />
             </NavUtilityRail>
           </>

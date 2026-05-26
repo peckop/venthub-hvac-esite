@@ -49,7 +49,7 @@ const SilentFanFAQ: React.FC = () => {
                                 
                                 <div 
                                     id={`silent-faq-content-${index}`}
-                                    className={`overflow-hidden transition-colors duration-300 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+                                    className={`overflow-hidden transition-colors duration-300 ease-in-out ${isOpen ? 'max-h-500px opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
                                     <div className="px-6 pb-6 pt-0 text-slate-600 leading-relaxed border-t border-slate-50 mt-1">
                                         <div className="pt-4">

@@ -198,7 +198,7 @@ export default function AdminInventoryReportPage() {
                     <div className={`${adminCardClass} p-6 border-l-4 border-l-emerald-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <ArrowDownRight className="w-5 h-5 text-emerald-500" />
-                            <h3 className="font-black uppercase tracking-[0.2em] text-xs text-slate-500/80">Toplam Giriş</h3>
+                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">Toplam Giriş</h3>
                         </div>
                         <div className="text-3xl font-black text-slate-800">{stats.totalIn} <span className="text-xs font-medium text-slate-400">adet</span></div>
                     </div>
@@ -206,7 +206,7 @@ export default function AdminInventoryReportPage() {
                     <div className={`${adminCardClass} p-6 border-l-4 border-l-rose-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <ArrowUpRight className="w-5 h-5 text-rose-500" />
-                            <h3 className="font-black uppercase tracking-[0.2em] text-xs text-slate-500/80">Toplam Çıkış</h3>
+                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">Toplam Çıkış</h3>
                         </div>
                         <div className="text-3xl font-black text-slate-800">{stats.totalOut} <span className="text-xs font-medium text-slate-400">adet</span></div>
                     </div>
@@ -214,7 +214,7 @@ export default function AdminInventoryReportPage() {
                     <div className={`${adminCardClass} p-6 border-l-4 border-l-indigo-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <Activity className="w-5 h-5 text-indigo-500" />
-                            <h3 className="font-black uppercase tracking-[0.2em] text-xs text-slate-500/80">Net Değişim</h3>
+                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">Net Değişim</h3>
                         </div>
                         <div className={`text-3xl font-black ${stats.net > 0 ? 'text-emerald-600' : stats.net < 0 ? 'text-rose-600' : 'text-slate-800'}`}>
                             {stats.net > 0 ? '+' : ''}{stats.net} <span className="text-xs font-medium text-slate-400">adet</span>
@@ -320,7 +320,7 @@ export default function AdminInventoryReportPage() {
                             </h2>
                             <span className="text-xs font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md border border-emerald-400/20 uppercase tracking-tighter">Incoming</span>
                         </div>
-                        <div ref={dragScrollRefIn} className="overflow-x-auto max-h-[400px]">
+                        <div ref={dragScrollRefIn} className="overflow-x-auto max-h-400px">
                             {inboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
                                     <thead className="bg-slate-50 sticky top-0 z-10">
@@ -334,7 +334,7 @@ export default function AdminInventoryReportPage() {
                                         {inboundMovements.map((m) => (
                                             <tr key={m.id as string} className="hover:bg-emerald-50/30 transition-colors">
                                                 <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at as string), 'dd.MM HH:mm')}</td>
-                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
+                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-150px"}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
                                                 <td className={adminTableCellClass + " py-2 font-bold text-emerald-600"}>+{m.delta as number}</td>
                                             </tr>
                                         ))}
@@ -356,7 +356,7 @@ export default function AdminInventoryReportPage() {
                             </h2>
                             <span className="text-xs font-black text-rose-400 bg-rose-400/10 px-2 py-0.5 rounded-md border border-rose-400/20 uppercase tracking-tighter">Outgoing</span>
                         </div>
-                        <div ref={dragScrollRefOut} className="overflow-x-auto max-h-[400px]">
+                        <div ref={dragScrollRefOut} className="overflow-x-auto max-h-400px">
                             {outboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
                                     <thead className="bg-slate-50 sticky top-0 z-10">
@@ -370,7 +370,7 @@ export default function AdminInventoryReportPage() {
                                         {outboundMovements.map((m) => (
                                             <tr key={m.id as string} className="hover:bg-rose-50/30 transition-colors">
                                                 <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at as string), 'dd.MM HH:mm')}</td>
-                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
+                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-150px"}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
                                                 <td className={adminTableCellClass + " py-2 font-bold text-rose-600"}>{m.delta as number}</td>
                                             </tr>
                                         ))}

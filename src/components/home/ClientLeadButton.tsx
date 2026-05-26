@@ -27,7 +27,7 @@ export const ClientLeadButton: React.FC<ClientLeadButtonProps> = ({
       }}
       className={
         className || 
-        "group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-xs tracking-[0.2em] rounded-2xl overflow-hidden transition-colors hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]"
+        "group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-xs tracking-hvac-normal rounded-2xl overflow-hidden transition-colors hover:shadow-white-glow"
       }
     >
       <span className="relative z-10">{primaryCta}</span>

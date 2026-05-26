@@ -116,7 +116,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-surface-deep space-y-6">
         <div className="w-12 h-12 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin" />
-        <span className="text-xs font-black text-slate-500 uppercase tracking-[0.4em] animate-pulse">Studio Initialization...</span>
+        <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-loose animate-pulse">Studio Initialization...</span>
       </div>
     );
   }
@@ -183,15 +183,15 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
 
                 {/* Bottom Guide */}
                 <div className="mt-20 pt-12 border-t border-white/5 text-center">
-                    <p className="text-xs font-bold text-slate-600 uppercase tracking-[0.3em]">VentHub Content Authority Engine v2.4</p>
+                    <p className="text-xs font-bold text-slate-600 uppercase tracking-hvac-relaxed">VentHub Content Authority Engine v2.4</p>
                 </div>
             </div>
         </main>
 
         {/* --- RIGHT: FLOATING PREVIEW SIDEBAR --- */}
         {showPreview && (
-          <aside className="w-[480px] border-l border-white/5 flex flex-col bg-surface-deep animate-in slide-in-from-right duration-500">
-            <div className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-white/[0.02]">
+          <aside className="w-480px border-l border-white/5 flex flex-col bg-surface-deep animate-in slide-in-from-right duration-500">
+            <div className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-white/2">
                 <div className="flex items-center gap-2">
                     <PanelRight size={16} className="text-cyan-400" />
                     <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Canlı Önizleme</span>
@@ -211,7 +211,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                 <div 
                     className={`
                     bg-white shadow-2xl transition-colors duration-500 overflow-y-auto custom-scrollbar-light relative
-                    ${previewMode === 'mobile' ? 'w-[320px] h-[568px] rounded-hvac-xl border-[8px] border-slate-800' : 'w-full h-full rounded-lg'}
+                    ${previewMode === 'mobile' ? 'w-320px h-568px rounded-hvac-xl border-8 border-slate-800' : 'w-full h-full rounded-lg'}
                     `}
                 >
                     <AuthorityRenderer content={blocks || []} />

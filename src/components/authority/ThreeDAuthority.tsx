@@ -64,13 +64,13 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
                         </div>
                     </div>
                     <div>
-                        <p className="text-xs font-black text-industrial-gray uppercase tracking-[0.2em]">3D Interactive View</p>
+                        <p className="text-xs font-black text-industrial-gray uppercase tracking-hvac-normal">3D Interactive View</p>
                         <p className="text-xs text-slate-400 font-bold uppercase mt-1">Click to Initialize Engine</p>
                     </div>
                 </div>
                 
                 {/* Background Pattern */}
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+                <div className="absolute inset-0 opacity-3 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
             </motion.div>
         )
     }
@@ -122,7 +122,7 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
             {/* Help Overlay */}
             <div className="absolute bottom-4 left-4 pointer-events-none">
                 <div className="bg-white/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-200">
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">3D Interactive View • Drag to Rotate</p>
+                    <p className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal">3D Interactive View • Drag to Rotate</p>
                 </div>
             </div>
         </motion.div>

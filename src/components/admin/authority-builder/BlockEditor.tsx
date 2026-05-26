@@ -101,7 +101,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400">Teknik Satırlar</label>
+                <label className="text-xs font-black uppercase tracking-hvac-normal text-indigo-400">Teknik Satırlar</label>
                 <button 
                   type="button" 
                   onClick={addRow}
@@ -182,7 +182,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400">Özellik Kartları</label>
+                <label className="text-xs font-black uppercase tracking-hvac-normal text-indigo-400">Özellik Kartları</label>
                 <button 
                   type="button" 
                   onClick={addItem}
