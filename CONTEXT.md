@@ -46,6 +46,7 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | React Three Fiber | - | 3D görselleştirme |
 | Framer Motion | - | Animasyonlar |
 | Sonner | - | Toast bildirimleri |
+| @tailwindcss/typography | 0.5.x | prose sınıfları ile yasal ve teknik bilgi sayfalarının Bringhurst tipografi standardına getirilmesi |
 
 ### Backend
 | Teknoloji | Kullanım |
@@ -301,6 +302,7 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 **NotebookLM Digital Twin:** Tüm master MD'ler NLM'e yüklenerek proje hafızası oluşturulur. Notebook ID: `2aa4fc16-acf6-47c6-90a8-c02fe5bb28f8`
 - **Otonom Oturum Yönetimi:** Dokümantasyon eşitlemeleri sırasında oluşabilecek `Authentication expired` hataları, kullanıcı müdahalesi gerekmeksizin otonom olarak `nlm login` + `refresh_auth` mekanizması ile sessizce çözülür.
 - **Supabase Edge Functions Mühürü:** 29 adet Edge Function'ın (`cc doc batch`) dokümanlarının senkronizasyon sırasında NotebookLM'e tam ve eksiksiz aktarılması zorunludur. Bu durum tüm mikroservislerin otonom denetimini garanti eder.
+- **Orion CLI Granüler Dökümantasyon Standardı:** Dökümantasyon motoru, tüm modüller için `entity_hashes` tabanlı parça değişimi takibi yapar ve `AST POINTERS` standardına uygun olarak iç değişkenleri (`ic_degiskenler`, `params`, `dönüşler`) en ince kılcal damarına kadar detaylandırır.
 
 ---
 
@@ -316,6 +318,9 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 8. **Webhook Replay Guard:** Tüm webhook'lar (iade/kargo) HMAC doğrulamasına ek olarak zaman damgası (`x-timestamp`) veya idempotency koruması içermelidir (Tekrar oynatma saldırılarına karşı)
 9. **MVVM & Gateway Prensibi:** UI bileşenleri ham veri çekme (fetch/supabase) mantığından izole edilmeli; veri akışları Gateway hook'larına soyutlanmalıdır
 10. **Design Token ve Strict Linter Standardı:** Frontend katmanında arbitrary (bracket içi serbest stil, örn: `w-[92vw]`, `duration-[2000ms]`) stil kullanımı tamamen yasaktır. Proje, `eslint-plugin-tailwindcss` tarafından `tailwindcss/no-arbitrary-value: error` seviyesinde strict olarak korunur. Spacing, elevation shadow, timing, blur ve z-index değerleri `src/design-system/tokens.js` (SSOT) üzerinden yönetilmelidir. Renk tanımlamalarında HEX yerine CSS Custom Property (HSL) token'ları kullanılmalı, çift `:root` tanımlamaları elenmeli ve çalışma zamanı (runtime) tema değişkenleri korunmalıdır.
+11. **content-auto Render Performans Standardı:** Sayfa dışı (below-the-fold) ağır veri tabloları, Kanban panoları veya 3D canvas gibi yoğun bileşenlerde viewport dışı render yükünü sıfırlamak ve LCP/FID performansını korumak amacıyla `.content-auto` (content-visibility: auto) utility sınıfı zorunlu olarak kullanılmalıdır.
+12. **focus-visible Klavye Erişilebilirlik Standardı:** Proje genelinde erişilebilirlik (A11y) uyumunu en üst seviyede tutmak için, tüm interaktif elemanlarda (button, a, input, select, textarea) fare tıklamalarında beliren halkaları engellemek ama klavye sekmelerinde premium odak çizgilerini korumak amacıyla `focus:` yerine **`focus-visible:`** state seçicileri kullanılmalıdır.
+13. **Typography prose Standartları:** Yasal sözleşme sayfaları veya bilgi merkezi Hub/Topic teknik makale sayfaları gibi metin yoğunluklu arayüzlerin tamamında, Bringhurst tipografi standardına (Premium UI) tam uyum sağlamak amacıyla `prose dark:prose-invert max-w-prose` sınıfları standart okuma sarmalayıcısı olarak kullanılmalıdır.
 
 ---
 
