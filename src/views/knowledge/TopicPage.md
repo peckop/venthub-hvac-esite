@@ -7,8 +7,8 @@ skeleton_hash: 0c7e1c369b37db44
 entity_hashes:
   func:TopicPage: f0965ed8eda6ce60
   overview: 288735bf511e8c87
-  style_tokens: 7506717b380c24fa
-generated_at: 2026-05-27T11:53:32Z
+  style_tokens: cc78d049395b1cf9
+generated_at: 2026-05-27T17:46:37Z
 ---
 
 ## Genel Bakış
@@ -88,6 +88,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-3xl`, `tracking-hvac-loose`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-50/30`, `bg-amber-500`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-amber-100/50`, `border-cyan-500/20`, `border-slate-100`, `border-slate-200`, `lg:text-7xl`, `text-2xl`, `text-4xl`, `text-5xl`
-- **Layout:** `absolute`, `flex`, `flex-col`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `group-hover:scale-150`, `group-hover:translate-x-2`, `h-1.5`, `h-20`, `h-8`, `inline-flex`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-amber-50/30`, `bg-amber-500`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-amber-100/50`, `border-cyan-500/20`, `border-slate-100`, `border-slate-200`, `hover:bg-cyan-600`, `hover:bg-slate-50`, `hover:text-slate-950`, `hover:text-white`
+- **Layout:** `absolute`, `flex`, `flex-col`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `h-1.5`, `h-20`, `h-8`, `inline-flex`, `items-center`, `justify-center`
+- **Varyant/Responsive:** `active:`, `dark:`, `group-hover:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-95`, `border`, `dark:prose-invert`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `group`, `group-hover:scale-150`, `group-hover:translate-x-2`, `inset-0`, `leading-relaxed`, `leading-tight`, `lg:px-8`, `mb-10`

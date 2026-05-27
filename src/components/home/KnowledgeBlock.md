@@ -7,8 +7,8 @@ skeleton_hash: 6f7ef05f64566f7e
 entity_hashes:
   func:KnowledgeBlock: 6d00cfd06aa7a00e
   overview: 558d6d867468cadc
-  style_tokens: 696f4d29b5f4b2c9
-generated_at: 2026-05-27T12:13:21Z
+  style_tokens: 45bee56ab9c18ab4
+generated_at: 2026-05-27T17:46:34Z
 ---
 
 ## Genel Bakış
@@ -112,4 +112,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-clip-text`, `bg-cyan-400/40`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-gradient-to-r`, `bg-knowledge-radial`, `bg-slate-950`, `bg-white/2`, `bg-white/5`, `border-cyan-500/30`, `border-l-2`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-400`
 - **Layout:** `absolute`, `backdrop-blur-3xl`, `backdrop-blur-md`, `bg-clip-text`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `from-cyan-400`, `from-cyan-600`, `gap-12`, `gap-3`, `gap-4`, `gap-6`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `data-[in-view=true]:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${delayClass`, `-translate-x-4`, `animate-pulse`, `border`, `dark:prose-invert`, `data-[in-view=true]:opacity-100`, `data-[in-view=true]:translate-x-0`, `data-[in-view=true]:translate-y-0`, `delay-200`, `delay-300`, `duration-500`, `duration-700`, `ease-out`, `font-black`, `font-bold`

@@ -7,8 +7,8 @@ skeleton_hash: af47b1c0134c0866
 entity_hashes:
   func:CookiePolicyPage: b3e779c99eb43367
   overview: 07640220d73eceb5
-  style_tokens: 388713faf986c7e1
-generated_at: 2026-05-27T11:53:55Z
+  style_tokens: a770e5a7f64844ff
+generated_at: 2026-05-27T17:46:40Z
 ---
 
 ## Genel Bakış
@@ -70,4 +70,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xl`, `text-yellow-800`
 - **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `list-disc`, `mb-3`, `mb-6`, `mx-auto`, `pl-6`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`
