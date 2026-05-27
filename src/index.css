@@ -536,6 +536,21 @@ p, li {
     content-visibility: auto;
     contain-intrinsic-size: auto 500px;
   }
+  .h-showcase {
+    height: var(--showcase-height, 550px);
+  }
+  .content-auto-table {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+  .content-auto-board {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
+  }
+  .content-auto-showcase {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 550px;
+  }
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2;
   }

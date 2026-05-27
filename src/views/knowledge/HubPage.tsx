@@ -141,7 +141,7 @@ const HubPage: React.FC = () => {
                   transition={{ delay: i * 0.05 }}
                 >
                   <Link 
-                    href={`/destek/konular/${topic.slug}`}
+                    href={Routes.destek.konular(topic.slug)}
                     className="group block h-full bg-white rounded-hvac-2xl border border-slate-100 p-10 transition-shadow duration-500 hover:border-cyan-500/20 hover:shadow-hvac-card-hover-lg"
                   >
                     <div className="flex justify-between items-start mb-12">
