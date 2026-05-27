@@ -1,5 +1,16 @@
 # Changelog
 
+### [2026-05-27] Enterprise Design Token System — Ultimate Konsolidasyon & NotebookLM Senkronizasyonu
+**Özet:** Tasarım sistemi kuralı `tailwindcss/no-arbitrary-value` flat config'de **Strict Error** seviyesine çekildi. Kalan tüm arbitrary değerler temizlendi. Tasarım token'ları (shadow, elevation, timing, blur, spacing) genişletilerek `tokens.js` ve `tokens.d.ts` ultimate düzeyde güncellendi. Tüm yerel mimari otonom bir şekilde NotebookLM ile %100 senkronize edildi.
+**Değişiklik Kapsamı:**
+- **Strict Linter Guard:** `"tailwindcss/no-arbitrary-value": "error"` olarak aktifleştirildi. `pnpm run lint` sıfır hata verdi.
+- **Kalan Temizlik (43 satır):** 16 satır `transition-all`, 6 satır `rounded-[...]` ve `max-w-[...]` değerleri standart Tailwind ve `rounded-hvac-*` token'larına refaktör edildi.
+- **Tasarım Sistemi Genişletilmesi:** `src/design-system/tokens.js` ve `tokens.d.ts` spacing, elevation, duration, timing, blur ve specific transition'lar ile ultimate haline getirildi.
+- **Otonom NotebookLM Sync (NLM Sync):** Frontend (`cc doc all`) ve Supabase Edge Functions (`cc doc batch`) dokümanları güncellendi. `Authentication expired` hatası sessizce otonom `nlm login` + `refresh_auth` ile çözülerek `cc doc tree --nlm-sync --force-sync` ile tüm master ve standalone dosyalar NotebookLM bulutunda başarıyla senkronize edildi.
+**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ (0 error, 0 warning) | `pnpm run build` ✅ (399/399 sayfa)
+
+---
+
 ### [2026-05-26] Enterprise Design Token System — Tam Migrasyon
 **Özet:** Projedeki tüm hardcoded tasarım değerleri (renk, font, radius, z-index, max-width, animasyon) merkezi bir Design Token Sistemi'ne taşındı. `src/design-system/` modülü oluşturuldu, `tailwind.config.js` tamamen yeniden yazıldı, `src/index.css`'teki çift `:root` bloğu birleştirildi.
 **Değişiklik Kapsamı:**
