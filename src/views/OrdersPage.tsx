@@ -256,7 +256,7 @@ const OrdersPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.status')}</label>
-              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as StatusFilter)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors">
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as StatusFilter)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors">
                 <option value="all">{t('orders.all')}</option>
                 <option value="pending">{t('orders.pending')}</option>
                 <option value="paid">{t('orders.paid')}</option>
@@ -267,19 +267,19 @@ const OrdersPage: React.FC = () => {
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.startDate')}</label>
-              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors" />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.endDate')}</label>
-              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors" />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.orderCode')}</label>
-              <input type="text" placeholder={t('orders.orderCodePlaceholder')} value={searchCode} onChange={e => setSearchCode(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
+              <input type="text" placeholder={t('orders.orderCodePlaceholder')} value={searchCode} onChange={e => setSearchCode(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors" />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.product')}</label>
-              <input type="text" placeholder={t('orders.productSearchPlaceholder')} value={productFilter} onChange={e => setProductFilter(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
+              <input type="text" placeholder={t('orders.productSearchPlaceholder')} value={productFilter} onChange={e => setProductFilter(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors" />
             </div>
           </div>
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">

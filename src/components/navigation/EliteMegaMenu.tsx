@@ -92,7 +92,7 @@ const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate })
                                 <Link
                                     href={Routes.category(category.slug)}
                                     onClick={() => handleLinkClick(0, category.slug)}
-                                    className="block select-none rounded px-3 py-2 text-base font-medium leading-none text-slate-700 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-slate-300 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer flex items-center gap-2"
+                                    className="block select-none rounded px-3 py-2 text-base font-medium leading-none text-slate-700 outline-none hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-300 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer flex items-center gap-2"
                                 >
                                     <span className="text-primary-navy">
                                         {getCategoryIcon(category.slug, { size: 18 })}
@@ -105,7 +105,7 @@ const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate })
 
                     return (
                         <NavigationMenu.Item key={category.id}>
-                            <NavigationMenu.Trigger className="group flex select-none items-center justify-between gap-0.5 rounded px-3 py-2 text-base font-medium leading-none text-slate-700 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-slate-300 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer">
+                            <NavigationMenu.Trigger className="group flex select-none items-center justify-between gap-0.5 rounded px-3 py-2 text-base font-medium leading-none text-slate-700 outline-none hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-300 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer">
                                 <div className="flex items-center gap-2">
                                     <span className="text-primary-navy">
                                         {getCategoryIcon(category.slug, { size: 18 })}
@@ -121,7 +121,7 @@ const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate })
                             <NavigationMenu.Content className="absolute top-0 left-0 w-full sm:w-auto data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight">
                                 <div className="m-0 grid list-none gap-x-8 p-8 sm:w-hvac-mega-sm sm:grid-cols-hvac-layout-split md:w-hvac-mega-md lg:w-hvac-mega-lg">
                                     <div className="row-span-3">
-                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-hvac-sm bg-slate-50/80 backdrop-blur-md border border-slate-100/50 shadow-inner p-6 no-underline outline-none focus:ring-2 focus:ring-slate-300 relative overflow-hidden rounded-xl">
+                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-hvac-sm bg-slate-50/80 backdrop-blur-md border border-slate-100/50 shadow-inner p-6 no-underline outline-none focus-visible:ring-2 focus-visible:ring-slate-300 relative overflow-hidden rounded-xl">
                                             <MegaMenu3DBackground categorySlug={category.slug} />
                                             <div className="relative z-10">
                                                 <div className="text-primary-navy mb-4">

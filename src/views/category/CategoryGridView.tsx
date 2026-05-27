@@ -80,7 +80,7 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
               <select 
                 value={filters.sortBy}
                 onChange={(e) => onUpdateFilters({ sortBy: e.target.value })}
-                className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus:ring-primary-ocean/20 transition-colors shadow-sm"
+                className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus-visible:ring-primary-ocean/20 transition-colors shadow-sm"
                 aria-label={t('category.sort.title') || 'Sıralama'}
               >
                 <option value="name">{t('category.sort.name')}</option>

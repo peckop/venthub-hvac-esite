@@ -10,7 +10,7 @@ const PreInformationPage: React.FC = () => {
         Bu metin taslaktır ve test amaçlıdır. Canlıya çıkmadan önce şirketinizin gerçek bilgileri ile güncelleyiniz ve bir hukukçudan teyit alınız.
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 text-steel-gray space-y-6">
+      <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 text-steel-gray space-y-6 prose dark:prose-invert max-w-prose">
         <section>
           <h2 className="text-xl font-semibold text-industrial-gray mb-3">1) Satıcı Bilgileri</h2>
           <p>

@@ -111,7 +111,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                     onKeyDown={handleKeyDown}
                     onBlur={() => void save()}
                     disabled={saving}
-                    className={`${inputWidth} px-1.5 py-0.5 text-sm border border-primary-navy rounded focus:outline-none focus:ring-1 focus:ring-primary-navy/50 disabled:opacity-50`}
+                    className={`${inputWidth} px-1.5 py-0.5 text-sm border border-primary-navy rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-navy/50 disabled:opacity-50`}
                 />
                 {saving && (
                     <span className="inline-block w-3.5 h-3.5 border-2 border-primary-navy/30 border-t-primary-navy rounded-full animate-spin" />

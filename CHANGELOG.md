@@ -1,5 +1,17 @@
 # Changelog
 
+### [2026-05-27] VentHub CSS Enterprise Polish — Cilalama ve Performans Optimizasyonları
+**Özet:** CSS katmanında global premium iyileştirmeler, `.content-auto` render performans optimizasyonları, `@tailwindcss/typography` ile Bringhurst standartları entegrasyonu ve klavye navigasyonunu standarda bağlayan otonom `focus-visible` migrasyonu gerçekleştirildi.
+**Değişiklik Kapsamı:**
+- **index.css Polish:** root seviyesinde `accent-color`, `color-scheme` eklendi; selection, coarse pointers, thin scrollbars ve high contrast modları base katmanına işlendi.
+- **Performans (content-visibility):** `.content-auto` utility sınıfı oluşturularak ağır tablolar ve 3D tuval barındıran bileşenlere (`AdminOrdersBoard.tsx`, `InventoryTable.tsx`, `InfiniteProductsShowcase.tsx`) entegre edildi. Sayfa dışı eleman render yükü sıfırlandı.
+- **focus-visible Migrasyonu:** 43 adet TSX dosyasında, interaktif elemanlar üzerinde (`button`, `a`, `input`, `select`, `textarea`) yer alan **381 adet** `focus:ring/outline/border/shadow` sınıfı otonom olarak `focus-visible:` formuna dönüştürüldü.
+- **Typography prose:** `@tailwindcss/typography` eklentisi kuruldu. 6 adet yasal sayfa, teknik konular sayfası (`TopicPage.tsx`) ve ana sayfa `KnowledgeBlock.tsx` wrapper'ları `prose dark:prose-invert max-w-prose` sınıflarıyla bezenerek premium seviyeye çekildi.
+- **Dark Mode Shadows:** tailwind.config.js extend.boxShadow altına `'elevation-1-dark'`, `'elevation-2-dark'`, `'elevation-3-dark'` token'ları eklendi.
+**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ (0 error, 0 warning) | `pnpm run build` ✅ (399/399 sayfa)
+
+---
+
 ### [2026-05-27] Enterprise Design Token System — Ultimate Konsolidasyon & NotebookLM Senkronizasyonu
 **Özet:** Tasarım sistemi kuralı `tailwindcss/no-arbitrary-value` flat config'de **Strict Error** seviyesine çekildi. Kalan tüm arbitrary değerler temizlendi. Tasarım token'ları (shadow, elevation, timing, blur, spacing) genişletilerek `tokens.js` ve `tokens.d.ts` ultimate düzeyde güncellendi. Tüm yerel mimari otonom bir şekilde NotebookLM ile %100 senkronize edildi.
 **Değişiklik Kapsamı:**

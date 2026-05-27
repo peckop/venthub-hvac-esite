@@ -148,12 +148,12 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.products.form.name')}</label>
-                                <input {...register('name')} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
+                                <input {...register('name')} className="w-full px-4 py-2 border rounded-lg focus-visible:outline-none" />
                                 {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">SKU</label>
-                                <input {...register('sku')} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
+                                <input {...register('sku')} className="w-full px-4 py-2 border rounded-lg focus-visible:outline-none" />
                                 {errors.sku && <p className="text-red-500 text-xs">{errors.sku.message}</p>}
                             </div>
                         </div>
@@ -161,14 +161,14 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.products.form.category')}</label>
-                                <select {...register('category_id')} className="w-full px-4 py-2 border rounded-lg focus:outline-none">
+                                <select {...register('category_id')} className="w-full px-4 py-2 border rounded-lg focus-visible:outline-none">
                                     <option value="">{t('admin.products.form.select')}</option>
                                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.common.status')}</label>
-                                <select {...register('status')} className="w-full px-4 py-2 border rounded-lg focus:outline-none">
+                                <select {...register('status')} className="w-full px-4 py-2 border rounded-lg focus-visible:outline-none">
                                     <option value="active">{t('admin.common.active')}</option>
                                     <option value="out_of_stock">{t('admin.products.form.outOfStock')}</option>
                                     <option value="inactive">{t('admin.common.passive')}</option>
@@ -176,7 +176,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.products.form.price')}</label>
-                                <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
+                                <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full px-4 py-2 border rounded-lg focus-visible:outline-none" />
                             </div>
                         </div>
 

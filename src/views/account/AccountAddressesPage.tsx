@@ -171,33 +171,33 @@ export default function AccountAddressesPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Adres Başlığı</label>
-              <input value={form.label || ''} onChange={(e) => setForm(f => ({ ...f, label: e.target.value }))} placeholder="Ev, İş, Depo vb." className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
+              <input value={form.label || ''} onChange={(e) => setForm(f => ({ ...f, label: e.target.value }))} placeholder="Ev, İş, Depo vb." className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors" />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2 sm:col-span-1 lg:col-span-2">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Ad Soyad / Firma</label>
-                <input value={form.full_name || ''} onChange={(e) => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="Kişi veya Firma adı" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
+                <input value={form.full_name || ''} onChange={(e) => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="Kişi veya Firma adı" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors" />
               </div>
               <div className="col-span-2 sm:col-span-1 lg:col-span-2">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Telefon</label>
-                <input value={form.phone || ''} onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+90 5XX XXX XX XX" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" />
+                <input value={form.phone || ''} onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+90 5XX XXX XX XX" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors" />
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Açık Adres</label>
-              <textarea value={form.address_line} onChange={(e) => setForm(f => ({ ...f, address_line: e.target.value }))} placeholder="Mahalle, sokak, bina ve daire no..." className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy min-h-100px resize-y transition-colors" required />
+              <textarea value={form.address_line} onChange={(e) => setForm(f => ({ ...f, address_line: e.target.value }))} placeholder="Mahalle, sokak, bina ve daire no..." className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy min-h-100px resize-y transition-colors" required />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">İl</label>
-                <input value={form.city} onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))} placeholder="İl" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" required />
+                <input value={form.city} onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))} placeholder="İl" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">İlçe</label>
-                <input value={form.district} onChange={(e) => setForm(f => ({ ...f, district: e.target.value }))} placeholder="İlçe" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors" required />
+                <input value={form.district} onChange={(e) => setForm(f => ({ ...f, district: e.target.value }))} placeholder="İlçe" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors" required />
               </div>
             </div>
 
@@ -222,11 +222,11 @@ export default function AccountAddressesPage() {
 
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-6 border-t border-slate-100">
               {isEditing && (
-                <button type="button" onClick={resetForm} className="w-full sm:w-auto h-10 px-5 rounded-lg border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200">
+                <button type="button" onClick={resetForm} className="w-full sm:w-auto h-10 px-5 rounded-lg border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200">
                   {t('account.addresses.cancel')}
                 </button>
               )}
-              <button disabled={saving} className="w-full h-10 bg-primary-navy hover:bg-industrial-gray text-white flex-1 px-4 rounded-lg font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed transition-transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-primary-navy/50 flex items-center justify-center gap-2">
+              <button disabled={saving} className="w-full h-10 bg-primary-navy hover:bg-industrial-gray text-white flex-1 px-4 rounded-lg font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed transition-transform hover:scale-102 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/50 flex items-center justify-center gap-2">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 {isEditing ? (t('account.addresses.submit.update')) : (t('account.addresses.submit.add'))}
               </button>
@@ -278,10 +278,10 @@ export default function AccountAddressesPage() {
                     </h3>
 
                     <div className="flex items-center gap-2">
-                      <button onClick={() => startEdit(a)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary-navy hover:bg-primary-navy/5 transition-colors focus:outline-none" title={t('admin.ui.edit')}>
+                      <button onClick={() => startEdit(a)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary-navy hover:bg-primary-navy/5 transition-colors focus-visible:outline-none" title={t('admin.ui.edit')}>
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button onClick={() => handleDelete(a.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors focus:outline-none" title={t('admin.ui.delete')}>
+                      <button onClick={() => handleDelete(a.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors focus-visible:outline-none" title={t('admin.ui.delete')}>
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -310,7 +310,7 @@ export default function AccountAddressesPage() {
                           <CheckCircle className="w-3 h-3" /> Varsayılan
                         </span>
                       ) : (
-                        <button onClick={() => makeDefault(a.id, 'shipping')} className="text-xs font-bold text-slate-400 hover:text-primary-navy transition-colors focus:outline-none focus:underline">
+                        <button onClick={() => makeDefault(a.id, 'shipping')} className="text-xs font-bold text-slate-400 hover:text-primary-navy transition-colors focus-visible:outline-none focus:underline">
                           {t('account.addresses.makeDefault')}
                         </button>
                       )}
@@ -325,7 +325,7 @@ export default function AccountAddressesPage() {
                           <CheckCircle className="w-3 h-3" /> Varsayılan
                         </span>
                       ) : (
-                        <button onClick={() => makeDefault(a.id, 'billing')} className="text-xs font-bold text-slate-400 hover:text-primary-navy transition-colors focus:outline-none focus:underline">
+                        <button onClick={() => makeDefault(a.id, 'billing')} className="text-xs font-bold text-slate-400 hover:text-primary-navy transition-colors focus-visible:outline-none focus:underline">
                           {t('account.addresses.makeDefault')}
                         </button>
                       )}

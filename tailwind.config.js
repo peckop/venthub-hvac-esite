@@ -14,6 +14,7 @@ import {
   blur,
   transitionProperty
 } from './src/design-system/tokens.js';
+import typography from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
 const tailwindConfig = {
@@ -143,7 +144,12 @@ const tailwindConfig = {
       borderRadius,
       zIndex,
       maxWidth,
-      boxShadow,
+      boxShadow: {
+        ...boxShadow,
+        'elevation-1-dark': '0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03)',
+        'elevation-2-dark': '0 4px 12px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04)',
+        'elevation-3-dark': '0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)',
+      },
       height,
       minHeight,
       maxHeight,
@@ -199,7 +205,7 @@ const tailwindConfig = {
       },
     },
   },
-  plugins: [],
+  plugins: [typography],
 };
 
 export default tailwindConfig;

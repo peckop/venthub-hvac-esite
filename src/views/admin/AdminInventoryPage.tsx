@@ -103,14 +103,14 @@ const AdminInventoryPage: React.FC = () => {
           <input 
             type="text"
             placeholder="Ürün adı ile ara..."
-            className="w-full pl-10 pr-4 py-2 bg-gray-50 border-gray-200 rounded-lg focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 bg-gray-50 border-gray-200 rounded-lg focus-visible:outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-3">
           <select 
-            className="bg-gray-50 border-gray-200 rounded-lg px-3 py-2 text-sm font-bold focus:outline-none"
+            className="bg-gray-50 border-gray-200 rounded-lg px-3 py-2 text-sm font-bold focus-visible:outline-none"
             value={filterCategory || ''}
             onChange={(e) => setFilterCategory(e.target.value || null)}
           >

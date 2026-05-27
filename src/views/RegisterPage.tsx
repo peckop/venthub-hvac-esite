@@ -182,7 +182,7 @@ const RegisterPage: React.FC = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-light-gray rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:border-transparent"
                   placeholder={t('checkout.personal.namePlaceholder')}
                   required
                 />
@@ -201,7 +201,7 @@ const RegisterPage: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-light-gray rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:border-transparent"
                   placeholder={t('checkout.personal.emailPlaceholder')}
                   required
                 />
@@ -220,7 +220,7 @@ const RegisterPage: React.FC = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-12 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                  className="w-full pl-10 pr-12 py-3 border border-light-gray rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:border-transparent"
                   placeholder={t('auth.passwordMin')}
                   required
                 />
@@ -271,7 +271,7 @@ const RegisterPage: React.FC = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-12 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                  className="w-full pl-10 pr-12 py-3 border border-light-gray rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:border-transparent"
                   placeholder={t('auth.confirmPassword')}
                   required
                 />

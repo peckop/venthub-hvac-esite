@@ -98,7 +98,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
         <button
           onClick={handleClose}
           aria-label={t('common.close')}
-          className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-gray-100 rounded-full text-gray-500 sm:hidden transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
+          className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-gray-100 rounded-full text-gray-500 sm:hidden transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
         >
           <X className="w-5 h-5" />
         </button>
@@ -170,7 +170,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     </p>
                   )}
                 </div>
-                <button onClick={handleClose} aria-label={t('common.close')} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
+                <button onClick={handleClose} aria-label={t('common.close')} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -195,7 +195,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         value={name} onChange={(e) => setName(e.target.value)}
                         placeholder="John Doe"
-                        className={`w-full bg-gray-50 border ${errors.name ? 'border-red-400 focus:bg-red-50' : 'border-gray-200'} rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors`}
+                        className={`w-full bg-gray-50 border ${errors.name ? 'border-red-400 focus:bg-red-50' : 'border-gray-200'} rounded-lg px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors`}
                       />
                     </div>
                     {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
@@ -209,7 +209,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         value={company} onChange={(e) => setCompany(e.target.value)}
                         placeholder="Şirketiniz A.Ş."
-                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
                       />
                     </div>
                   </div>
@@ -222,7 +222,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                         placeholder="ornek@sirket.com"
-                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
                       />
                     </div>
                   </div>
@@ -235,7 +235,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         value={phone} onChange={(e) => setPhone(e.target.value)}
                         placeholder="05XX XXX XX XX"
-                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
                       />
                     </div>
                   </div>
@@ -252,7 +252,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <input
                         value={city} onChange={(e) => setCity(e.target.value)}
                         placeholder="Örn: İstanbul"
-                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
                       />
                     </div>
                   </div>
@@ -262,7 +262,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     <label className="text-xs font-semibold text-industrial-gray uppercase tracking-wider">{t('lead.form.appAreaLabel')}</label>
                     <select
                       value={appArea} onChange={(e) => setAppArea(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
                     >
                       <option value="">{t('lead.form.selectPlaceholder')}</option>
                       {applicationAreas.map(a => <option key={a} value={a}>{a}</option>)}
@@ -277,7 +277,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     value={message} onChange={(e) => setMessage(e.target.value)}
                     rows={4}
                     placeholder={t('lead.form.messagePlaceholder')}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors h-32"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors h-32"
                   />
                 </div>
 
@@ -287,7 +287,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     <div className="flex items-center h-5">
                       <input
                         id="consent" type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}
-                        className="w-4 h-4 text-primary-navy bg-gray-100 border-gray-300 rounded focus:ring-primary-navy focus:ring-2"
+                        className="w-4 h-4 text-primary-navy bg-gray-100 border-gray-300 rounded focus-visible:ring-primary-navy focus-visible:ring-2"
                       />
                     </div>
                     <div className="flex flex-col">
@@ -301,7 +301,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                   <button
                     type="submit"
                     disabled={submitted}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary-navy hover:bg-secondary-blue text-white px-8 py-3 rounded-lg font-bold transition-shadow disabled:opacity-70 disabled:cursor-not-allowed group shadow-lg shadow-blue-900/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-navy"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary-navy hover:bg-secondary-blue text-white px-8 py-3 rounded-lg font-bold transition-shadow disabled:opacity-70 disabled:cursor-not-allowed group shadow-lg shadow-blue-900/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-navy"
                   >
                     {submitted ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

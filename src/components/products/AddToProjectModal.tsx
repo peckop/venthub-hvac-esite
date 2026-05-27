@@ -149,7 +149,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
                   placeholder="Proje Adı (Örn: Hilton Otel Renovasyonu)"
-                  className="w-full px-4 py-3 rounded-xl border border-light-gray focus:border-primary-navy focus:ring-2 focus:ring-primary-navy/10 outline-none text-sm transition-colors pr-12"
+                  className="w-full px-4 py-3 rounded-xl border border-light-gray focus-visible:border-primary-navy focus-visible:ring-2 focus-visible:ring-primary-navy/10 outline-none text-sm transition-colors pr-12"
                   onKeyDown={(e) => e.key === 'Enter' && handleCreateAndAdd()}
                 />
                 <button

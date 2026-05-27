@@ -12,7 +12,7 @@ const KVKKPage: React.FC = () => {
         Bu metin taslaktır ve test amaçlıdır. Canlıya çıkmadan önce şirketinizin gerçek bilgileri ile güncelleyiniz ve bir hukukçudan teyit alınız.
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 space-y-6 text-steel-gray">
+      <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 space-y-6 text-steel-gray prose dark:prose-invert max-w-prose">
         <section>
           <h2 className="text-xl font-semibold text-industrial-gray mb-3">1) Veri Sorumlusunun Kimliği</h2>
           <p>

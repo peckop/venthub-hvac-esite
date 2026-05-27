@@ -66,10 +66,10 @@ const InputField: React.FC<InputFieldProps> = ({
                     disabled={disabled}
                     className={`
             w-full px-4 py-3 rounded-xl border transition-colors
-            focus:outline-none focus:ring-2 focus:ring-primary-navy/20
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20
             ${error
                             ? 'border-danger-red bg-danger-red/5'
-                            : 'border-light-gray hover:border-steel-gray focus:border-primary-navy'
+                            : 'border-light-gray hover:border-steel-gray focus-visible:border-primary-navy'
                         }
             ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
             ${unit ? 'pr-12' : ''}

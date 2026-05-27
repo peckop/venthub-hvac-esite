@@ -487,7 +487,7 @@ export default function AdminOrdersBoard() {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div
                     ref={scrollRef}
-                    className="flex flex-col md:flex-row gap-6 flex-1 min-h-0 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-4 scroll-smooth custom-scrollbar"
+                    className="flex flex-col md:flex-row gap-6 flex-1 min-h-0 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-4 scroll-smooth custom-scrollbar content-auto"
                 >
                     <div className="contents md:flex md:gap-6 md:min-w-max px-px">
                         {COLUMNS.map(col => {

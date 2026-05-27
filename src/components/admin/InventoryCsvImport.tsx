@@ -336,7 +336,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                 aria-checked={dryRun}
                                 aria-label="Simülasyon modu aç kapa"
                                 tabIndex={0}
-                                className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors outline-none focus:ring-2 focus:ring-cyan-400/50 ${dryRun ? 'bg-amber-400' : 'bg-white/10'}`}
+                                className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 ${dryRun ? 'bg-amber-400' : 'bg-white/10'}`}
                                 onClick={() => setDryRun(!dryRun)}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' || e.key === ' ') {

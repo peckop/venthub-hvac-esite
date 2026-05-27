@@ -99,7 +99,7 @@ const LoginPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-clean-white border border-light-gray rounded-xl focus:ring-2 focus:ring-primary-ocean/20 focus:border-primary-ocean transition-border-shadow placeholder:text-gray-400"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-clean-white border border-light-gray rounded-xl focus-visible:ring-2 focus-visible:ring-primary-ocean/20 focus-visible:border-primary-ocean transition-border-shadow placeholder:text-gray-400"
                   placeholder="name@company.com"
                 />
               </div>
@@ -119,7 +119,7 @@ const LoginPage: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-2.5 bg-clean-white border border-light-gray rounded-xl focus:ring-2 focus:ring-primary-ocean/20 focus:border-primary-ocean transition-border-shadow placeholder:text-gray-400"
+                  className="block w-full pl-10 pr-10 py-2.5 bg-clean-white border border-light-gray rounded-xl focus-visible:ring-2 focus-visible:ring-primary-ocean/20 focus-visible:border-primary-ocean transition-border-shadow placeholder:text-gray-400"
                   placeholder="••••••••"
                 />
                 <button
@@ -138,7 +138,7 @@ const LoginPage: React.FC = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-primary-ocean border-light-gray rounded focus:ring-primary-ocean/20"
+                  className="w-4 h-4 text-primary-ocean border-light-gray rounded focus-visible:ring-primary-ocean/20"
                 />
                 <span className="text-sm text-steel-gray">{t('auth.rememberMe')}</span>
               </label>

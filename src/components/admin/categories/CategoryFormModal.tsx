@@ -274,7 +274,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                             <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Kategori Adı</label>
                                             <input 
                                                 {...form.register('name')}
-                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600"
+                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600"
                                                 placeholder="Örn: Endüstriyel Fanlar"
                                             />
                                             {form.formState.errors.name && <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">{form.formState.errors.name.message}</p>}
@@ -284,7 +284,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                             <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Slug (URL)</label>
                                             <input 
                                                 {...form.register('slug')}
-                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 font-mono"
+                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 font-mono"
                                                 placeholder="endustriyel-fanlar"
                                             />
                                             {form.formState.errors.slug && <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">{form.formState.errors.slug.message}</p>}
@@ -296,7 +296,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                             <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Üst Kategori</label>
                                             <select 
                                                 {...form.register('parent_id')}
-                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer"
+                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer"
                                             >
                                                 <option value="" className="bg-surface-deep">Ana Kategori (Yok)</option>
                                                 {parentIdOptions.map(p => (
@@ -310,7 +310,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                             <input 
                                                 type="number"
                                                 {...form.register('sort_order', { valueAsNumber: true })}
-                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/5 transition-colors"
+                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors"
                                             />
                                         </div>
                                     </div>
@@ -320,7 +320,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                         <textarea 
                                             {...form.register('description')}
                                             rows={4}
-                                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 resize-none"
+                                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 resize-none"
                                             placeholder="Kategori hakkında genel bilgi..."
                                         />
                                     </div>
@@ -331,7 +331,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">SEO Başlığı</label>
                                         <input 
                                             {...form.register('seo_title')}
-                                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/5 transition-colors"
+                                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors"
                                             placeholder="Arama motoru başlığı"
                                         />
                                     </div>
@@ -341,7 +341,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                         <textarea 
                                             {...form.register('seo_desc')}
                                             rows={3}
-                                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/5 transition-colors"
+                                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors"
                                             placeholder="Arama motoru açıklaması"
                                         />
                                     </div>
@@ -351,7 +351,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                             type="checkbox"
                                             {...form.register('is_featured')}
                                             id="is_featured"
-                                            className="w-5 h-5 rounded border-white/10 bg-white/5 text-cyan-500 focus:ring-cyan-500/50 focus:ring-offset-0"
+                                            className="w-5 h-5 rounded border-white/10 bg-white/5 text-cyan-500 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0"
                                         />
                                         <label htmlFor="is_featured" className="text-sm font-bold text-white cursor-pointer select-none">
                                             Öne Çıkarılan Kategori
@@ -413,7 +413,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.common.imageUrlWithManual')}</label>
                                                     <input 
                                                         {...form.register('image_url')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-cyan-500/50 font-mono"
+                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-3 py-2 text-xs focus-visible:outline-none focus-visible:border-cyan-500/50 font-mono"
                                                         placeholder="https://..."
                                                     />
                                                 </div>
@@ -435,7 +435,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric1Label')}</label>
                                                     <input 
                                                         {...form.register('metric1_label')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-colors font-medium"
+                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 transition-colors font-medium"
                                                         placeholder={t('admin.categories.metric1LabelPlaceholder')}
                                                     />
                                                 </div>
@@ -443,7 +443,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric1Value')}</label>
                                                     <input 
                                                         {...form.register('metric1_value')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-colors font-bold text-cyan-400"
+                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 transition-colors font-bold text-cyan-400"
                                                         placeholder={t('admin.categories.metric1ValuePlaceholder')}
                                                     />
                                                 </div>
@@ -454,7 +454,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric2Label')}</label>
                                                     <input 
                                                         {...form.register('metric2_label')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-colors font-medium"
+                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 transition-colors font-medium"
                                                         placeholder="Örn: Güç Aralığı"
                                                     />
                                                 </div>
@@ -462,7 +462,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric2Value')}</label>
                                                     <input 
                                                         {...form.register('metric2_value')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-colors font-bold text-cyan-400"
+                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 transition-colors font-bold text-cyan-400"
                                                         placeholder="Örn: 0.75 - 45 kW"
                                                     />
                                                 </div>

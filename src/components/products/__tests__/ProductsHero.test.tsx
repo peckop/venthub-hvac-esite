@@ -22,7 +22,7 @@ describe('ProductsHero', () => {
     expect(container?.className).toContain('focus-within:ring-cyan-400/50')
     
     // Input should not have its own focus ring to avoid duplication
-    expect(input.className).not.toContain('focus:ring-2')
-    expect(input.className).not.toContain('focus:ring-cyan-400')
+    expect(input.className).not.toContain('focus-visible:ring-2')
+    expect(input.className).not.toContain('focus-visible:ring-cyan-400')
   })
 })

@@ -568,7 +568,7 @@ const AdminOrdersPage: React.FC = () => {
                             type="checkbox" 
                             checked={selectedIds.includes(r.id)} 
                             onChange={(e) => setSelectedIds(prev => e.target.checked ? [...prev, r.id] : prev.filter(x => x !== r.id))} 
-                            className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-500 focus:ring-cyan-500/20 transition-colors"
+                            className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-500 focus-visible:ring-cyan-500/20 transition-colors"
                           />
                         </td>
                         {visibleCols.id && (
@@ -658,7 +658,7 @@ const AdminOrdersPage: React.FC = () => {
                 </div>
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1">{t('admin.orders.modals.shipping.trackingLabel')}</label>
-                  <input value={tracking} onChange={e => setTracking(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-colors placeholder:text-slate-600" placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')} />
+                  <input value={tracking} onChange={e => setTracking(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 transition-colors placeholder:text-slate-600" placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')} />
                 </div>
               </div>
             </div>
@@ -753,7 +753,7 @@ const AdminOrdersPage: React.FC = () => {
                   value={noteInput}
                   onChange={e => setNoteInput(e.target.value)}
                   placeholder="Not ekle..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xs font-medium text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-colors placeholder:text-slate-600"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xs font-medium text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 transition-colors placeholder:text-slate-600"
                 />
                 <button
                   onClick={addNote}

@@ -77,7 +77,7 @@ const ProductsHero: React.FC<ProductsHeroProps> = ({
                                 onChange={(e) => onSearchChange(e.target.value)}
                                 placeholder={t('products.searchPlaceholder') || 'Ürün veya kategori arayın...'}
                                 aria-label={t('products.searchAriaLabel') || 'Ürün ara'}
-                                className="w-full pl-12 pr-6 py-4 bg-transparent text-gray-800 placeholder-gray-400 border-0 focus:outline-none text-base md:text-lg"
+                                className="w-full pl-12 pr-6 py-4 bg-transparent text-gray-800 placeholder-gray-400 border-0 focus-visible:outline-none text-base md:text-lg"
                             />
                         </div>
                     </div>
