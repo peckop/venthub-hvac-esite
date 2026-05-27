@@ -4,81 +4,76 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx
 skeleton_hash: 19335609589ce934
-generated_at: 2026-05-23T21:52:39Z
+entity_hashes:
+  func:DateRangePicker: ed79aaef040a5b25
+  func:applySelection: 68dcb4d14b5cc83c
+  func:cancelSelection: 4bec1b96cb2c08c1
+  func:handleSelect: fdeacf6bd5ee123e
+  overview: 83cabe93bf8f0d23
+  style_tokens: 50ed94bf03c87e5a
+generated_at: 2026-05-27T12:21:49Z
 ---
 
 ## Genel Bakış
-`DateRangePicker` bileşeni, kullanıcıların bir tarih aralığı seçmesine olanak tanıyan bir UI kontrolüdür. Seçim işlemleri sırasında geçici durumu yönetir, onay veya iptal akışlarını gerçekleştirir ve dışarıya sağlanan callback aracılığıyla ebeveyn bileşeni günceller.
+Bu modül, yönetim paneli arayüzünde başlangıç ve bitiş tarihlerinin seçilmesi için kullanılan özel bir React bileşenidir. Kullanıcının yaptığı geçici seçimleri yönetir, onaylama veya iptal mekanizması sağlar ve nihai tarih aralığını üst bileşene iletir.
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı
-Bileşenin dış arayüzünü, props yapılandırmasını ve temel render mekanizmasını içerir; tarih aralığı seçme arayüzünün görüntülenmesini sağlar.  
-- `DateRangePicker`
+Tarih seçici arayüzünü oluşturan ana bileşendir ve dış dünyadan gelen yapılandırma parametrelerini kabul eder.
+- DateRangePicker
 
-### Seçim İşleme
-Kullanıcının geçici seçimlerini kaydeder, onaylandığında `onChange` callback'ini tetikler ya da iptal edildiğinde seçimi sıfırlayarak önceki duruma döndürür.  
-- `handleSelect`, `applySelection`, `cancelSelection`
+### Etkileşim ve Durum Yönetimi
+Kullanıcının tarih seçimi, seçimi onaylama veya iptal etme gibi aksiyonlarını işleyerek bileşenin iç durumunu ve çıktısını günceller.
+- handleSelect, applySelection, cancelSelection
 
 ---
 
-## AXIOMS – Mimari Varsayımlar  
+## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-### Aksiyom 1  
-**Aksiyom 1**: Eğer `value` parametresi `undefined` ise, bileşen kullanıcıya `placeholder` metnini gösterir.  
-**Aksiyom 2**: Eğer `value` parametresi `undefined` değilse, bileşen `value` içinde belirtilen tarih aralığını varsayılan olarak seçilmiş olarak gösterir.  
+**Aksiyom 1**: Eğer `className` prop’u sağlanmazsa, `className` değeri boş string (`''`) olur.  
+**Aksiyom 2**: Eğer `value` prop’u `undefined` ya da geçerli bir `DateRange` nesnesi değilse, tarih seçici başlangıçta **seçili bir aralık** göstermez.  
+**Aksiyom 3**: Eğer `onChange` callback’i tanımlı değilse, tarih aralığı değiştiğinde **hiçbir dış etki** (state güncellemesi, API çağrısı vb.) gerçekleşmez.  
+**Aksiyom 4**: Eğer `handleSelect` fonksiyonu `undefined` bir argüman (`r`) alırsa, mevcut seçili tarih aralığı **silinir** (yani içsel seçim durumu `null/undefined` olur).  
+**Aksiyom 5**: Eğer `handleSelect` fonksiyonu geçerli bir `DateRange` nesnesi alırsa, bu nesne **içsel seçim durumuna** kaydedilir ve `onChange` callback’i (varsa) bu yeni `DateRange` ile tetiklenir.  
+**Aksiyom 6**: Eğer `applySelection` çağrılırsa, **içsel seçim durumu** `value` prop’una aktarılır ve `onChange` callback’i (varsa) bu güncellenmiş `value` ile çalıştırılır.  
+**Aksiyom 7**: Eğer `cancelSelection` çağrılırsa, **içsel seçim durumu** `value` prop’una eşitlenir (yani son onaylanmış değer geri yüklenir) ve `onChange` callback’i (varsa) bu geri yüklenmiş değerle tetiklenir.  
+**Aksiyom 8**: Eğer `placeholder` prop’u sağlanmazsa, tarih seçici **varsayılan bir yer tutucu** (bilinmiyor) gösterir; bu, UI‑nın boş bir giriş alanı gibi görünmesini sağlar.  
 
-### Aksiyom 2  
-**Aksiyom 3**: `handleSelect(r: DateRange | undefined)` fonksiyonu çağrıldığında, `r` değeri `undefined` ise bileşenin geçici seçimi (internal state) boşaltılır; aksi halde geçici seçim `r` ile güncellenir.  
-
-### Aksiyom 3  
-**Aksiyom 4**: `applySelection()` fonksiyonu çağrıldığında, geçici seçim `value` ile aynı değilse `onChange` callback’i çağrılır ve geçici seçim `value` olarak kabul edilir.  
-**Aksiyom 5**: `applySelection()` çağrıldığında `onChange` callback’i tanımlı değilse, fonksiyon hiçbir yan etki yaratmaz.  
-
-### Aksiyom 4  
-**Aksiyom 6**: `cancelSelection()` fonksiyonu çağrıldığında, geçici seçim `value` ile aynı hale getirilir (yani yapılan değişiklikler iptal edilir).  
-
-### Aksiyom 5  
-**Aksiyom 7**: `className` parametresi boş string (`''`) ise bileşen root elementine herhangi bir ek sınıf eklenmez; aksi halde verilen sınıf root elementine uygulanır.  
-
-### Domain‑specific Kurallar  
-- `DateRange` nesnesi, `start` ve `end` alanlarına sahip olmalı ve `start` tarihinin `end` tarihinden önce veya eşit olması gerekir.  
-- `onChange` callback’i, yeni `DateRange` nesnesini alacak şekilde tanımlanmalıdır.  
-- `placeholder` metni, `value` `undefined` olduğunda gösterilecek metindir; bu metin boş olamaz.  
-
-Bu aksiyomlar, fonksiyon gövdelerinin (varsa) ve fonksiyon imzalarının (verilen) temel mantığını yansıtmaktadır.
+*Domain‑specific not*: `DateRange` tipinin geçerli bir aralık olup olmadığını belirlemek için **başlangıç tarihinin bitiş tarihinden önce olması** gereklidir; aksi takdirde `handleSelect` içinde “geçersiz aralık” olarak kabul edilir ve seçim iptal edilir. (Bu kural, tip tanımının dışına çıkmadığı sürece uygulanır.)
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### DateRangePicker
-**Ne yapar**: Tarih aralığı seçmek için kullanılan bir React fonksiyonel bileşenidir. Kullanıcının başlangıç ve bitiş tarihlerini seçmesine olanak tanır.
-
-**Nasıl yapar**: Belirtilen prop'lar aracılığıyla seçili değeri alır, değişiklikleri üst bileşene bildirir ve görsel özelleştirmeye izin verir. İç yapısında genellikle iki adet tarih seçici alanı ve onay/iptal düğmeleri barındırır.
-
+**Ne yapar**: Kullanıcıların bir tarih aralığı seçmesine olanak tanıyan bir React bileşeni sunar.  
+**Nasıl yapar**: `value`, `onChange`, `placeholder` ve isteğe bağlı `className` propslarını alır; içsel durum ve etkileşimleri yöneterek seçilen aralığı dışarıya `onChange` callback’iyle bildirir.  
 **Parametreler**:
-- value: DateRange | undefined — Bileşenin kontrol ettiği seçili tarih aralığı değeri.
-- onChange: (range: DateRange | undefined) => void — Kullanıcı seçimi onayladığında yeni aralığı ileten geri çağırma işlevi.
-- placeholder: string — Seçim yapılmadığında gösterilecek yer tutucu metin.
-- className: string — Bileşenin kök öğesine eklenecek ek CSS sınıfı.
-
-**Dönüş**: React.FC<DateRangePickerProps>
+- `value`: DateRange — Bileşenin mevcut tarih aralığı değeri.
+- `onChange`: (range: DateRange) => void — Seçim değiştiğinde tetiklenen geri çağırma fonksiyonu.
+- `placeholder`: string — Kullanıcıya gösterilecek yer tutucu metin.
+- `className`: string — Bileşenin dış görünümünü özelleştirmek için ek CSS sınıfları (varsayılan: boş string).  
+**Dönüş**: React.FC<DateRangePickerProps> — Tanımlı props tipine sahip bir fonksiyonel React bileşeni.
 
 ### handleSelect
-**Ne yapar**: Kullanıcı tarafından bir tarih aralığı seçildiğinde tetiklenen olay işleyicisidir. Seçilen aralığı yakalar ve bileşenin geçici durumuna işler.
-
-**Nasıl yapar**: Aldığı `r` parametresini kullanarak seçilen aralığı kaydeder. Bu işlem genellikle bileşenin bir `useState` değişkenini güncellemeyi içerir.
-
+**Ne yapar**: Önceden tanımlı bir tarih aralığı (preset) seçildiğinde, bu aralığı işleyerek bileşenin durumunu günceller.  
+**Nasıl yapar**: `preset.getRange()` çağrısıyla elde edilen `DateRange` nesnesini alır ve `handleSelect` fonksiyonuna iletir; fonksiyon içinde muhtemelen `onChange` callback’i çağrılır.  
 **Parametreler**:
-- r: DateRange | undefined — Kullanıcının seçtiği yeni tarih aralığı; aralık seçimi kaldırılmışsa `undefined` gelir.
-
-**Dönüş**: (belirtilmemiş)
+- `r`: DateRange | undefined — Seçilen tarih aralığı; tanımsız (undefined) olma ihtimali vardır.  
+**Dönüş**: Belirtilmemiş (void veya bilinmiyor).
 
 ### applySelection
-**Ne yapar**: Kullanıcının geçici olarak seçtiği tarih aralığını onaylar ve kesinleşt
+**Ne yapar**: Kullanıcı tarafından yapılan tarih aralığı seçimini onaylar ve seçilen değeri dışa aktarır.  
+**Nasıl yapar**: Muhtemelen geçerli seçim durumunu `onChange` callback’iyle iletir ve UI’yı kapatır; iç mantık kodda belirtilmemiştir.  
+**Parametreler**: Yok.  
+**Dönüş**: Belirtilmemiş (void veya bilinmiyor).
+
+### cancelSelection
+**Ne yapar**: Kullanıcı tarafından başlatılan tarih aralığı seçimini iptal eder ve önceki duruma geri döner.  
+**Nasıl yapar**: Seçim sürecini sonlandırarak geçici değişiklikleri temizler; iç mantık kodda yer almamaktadır.  
+**Parametreler**: Yok.  
+**Dönüş**: Belirtilmemiş (void veya bilinmiyor).
 
 ---
 
@@ -94,82 +89,73 @@ Bu aksiyomlar, fonksiyon gövdelerinin (varsa) ve fonksiyon imzalarının (veril
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx::DateRangePicker
-- **params**: `value`, `onChange`, `placeholder`, `className` (varsayılan değer `''`)
+### [N1_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::DateRangePicker
+- **params**: (value, onChange, placeholder, className = '')
 - **ic_degiskenler**:
-  - `lang` — `useI18n()` hook'undan alınan dil kodu (örn. `'en'` veya `'tr'`)
-  - `locale` — `lang` değerine göre `enUS` veya `tr` olarak atanan date-fns locale objesi
-  - `isOpen` — popover'ın açık/kapalı durumunu tutan state (`useState(false)`)
-  - `selectedRange` — mevcut seçili tarih aralığını tutan state (`useState<DateRange | undefined>(value)`)
-  - `months` — takvimde görüntülenecek ay sayısını tutan state (`useState(2)`, mobilde 1)
-  - `checkMobile` — `useEffect` içinde tanımlanan, pencere genişliğine göre `months` değerini güncelleyen fonksiyon
-  - `presets` — hızlı seçim butonları için tanımlanan, her biri `label` ve `getRange` metodu olan nesne dizisi
-  - `triggerLabel` — popover tetikleyici butonda gösterilecek metin; `value.from` varsa formatlanmış tarih, yoksa `placeholder` veya varsayılan metin
-  - `dayPickerClassNames` — `react-day-picker` bileşenini Tailwind CSS ile özelleştirmek için sınıf isimleri objesi
-- **Dönüş**: JSX (Popover.Root, Popover.Trigger, Popover.Content, DayPicker, butonlar)
+  - `lang` — `useI18n()` hook’den gelen mevcut dil kodu (`'en'` veya `'tr'`).
+  - `locale` — Dil koduna göre seçilen `date-fns` locale (`enUS` veya `tr`).
+  - `isOpen` — Popover’ın açık/kapalı durumunu tutan boolean state.
+  - `setIsOpen` — `isOpen` state’ini güncelleyen setter fonksiyonu.
+  - `selectedRange` — Kullanıcının seçtiği tarih aralığını tutan `DateRange | undefined` state.
+  - `setSelectedRange` — `selectedRange` state’ini güncelleyen setter fonksiyonu.
+  **`months`** — Mobil/desktop görünümüne göre gösterilecek takvim ayı sayısını tutan sayı state.  
+  **`setMonths`** — `months` state’ini güncelleyen setter fonksiyonu.  
+  **`presets`** — Ön tanımlı tarih aralıklarını içeren nesne dizisi; her nesne `label` ve `getRange` fonksiyonuna sahiptir.  
+  **`triggerLabel`** — Popover tetikleyicisinin içinde gösterilen metin; seçili tarih aralığına göre formatlanır.  
+  **`dayPickerClassNames`** — `react-day-picker` bileşeni için Tailwind‑CSS sınıf haritası.  
+- **Dönüş**: JSX element (`<Popover.Root …>`). Component, dışarıdan `value` ve `onChange` prop’larıyla kontrol edilen bir tarih aralığı seçicisi render eder; yan etkileri arasında pencere boyutuna göre `months` ayarlanması ve `value` değiştiğinde `selectedRange` senkronizasyonu bulunur.
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx::handleSelect
-- **params**: `r: DateRange | undefined`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (`setSelectedRange(r)` çağrısı yapar)
+### [N2_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::handleSelect
+- **params**: (r: DateRange | undefined)
+- **ic_degiskenler**:
+  - `r` — Kullanıcının takvimden seçtiği yeni tarih aralığı; `undefined` olabilir.
+  - `setSelectedRange` — Üst component’tan gelen state setter; `selectedRange`’ı `r` ile günceller.
+- **Dönüş**: yok (sadece `selectedRange` state’ini günceller).
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx::applySelection
+### [N3_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::applySelection
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (`onChange` varsa `onChange(selectedRange)` çağrısı yapar, `setIsOpen(false)` ile popover'ı kapatır)
+- **ic_degiskenler**:
+  - `onChange` — Prop olarak gelen, seçili tarih aralığını dışarıya ileten callback; var olduğunda `selectedRange` ile çağrılır.
+  - `selectedRange` — Şu anki seçili tarih aralığı state’i.
+  - `setIsOpen` — Popover’ın açık/kapalı durumunu kontrol eden setter; `false` yaparak popover’ı kapatır.
+- **Dönüş**: yok (callback’i tetikler ve popover’ı kapatır).
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx::cancelSelection
+### [N4_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::cancelSelection
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (`setSelectedRange(value)` ile seçimi iptal eder, `setIsOpen(false)` ile popover'ı kapatır)
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx::useEffect (mobil kontrol)
-- **params**: (parametre yok, useEffect callback)
 - **ic_degiskenler**:
-  - `checkMobile` — `window.innerWidth < 768` kontrolü ile `setMonths(1)` veya `setMonths(2)` yapan fonksiyon
-- **Dönüş**: temizleme fonksiyonu (`window.removeEventListener('resize', checkMobile)`)
+  - `value` — Prop olarak gelen dış tarih aralığı; iptal edildiğinde `selectedRange` bu değere geri set edilir.
+  - `setSelectedRange` — `selectedRange` state’ini `value` ile sıfırlar.
+  - `setIsOpen` — Popover’ı kapatmak için `false` atanır.
+- **Dönüş**: yok (state’i geri alır ve popover’ı kapatır).
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx::useEffect (dışarıdan value senkronizasyonu)
-- **params**: (parametre yok, useEffect callback)
-- **ic_degiskenler**: (yok, doğrudan `value?.from`, `value?.to`, `selectedRange?.from`, `selectedRange?.to` karşılaştırılır)
-- **Dönüş**: yok (fark varsa `setSelectedRange(value)` çağrısı)
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx::Geçen Ay preset arrow function
-- **params**: (parametre yok, preset.getRange fonksiyonu)
+### [N5_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::<anonymous useEffect 1>
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lp` — `subMonths(new Date(), 1)` ile bir önceki ayın tarihi
-- **Dönüş**: `{ from: startOfMonth(lp), to: endOfMonth(lp) }`
+  - `checkMobile` — `window.innerWidth` kontrolüyle `months` state’ini `1` (mobile) veya `2` (desktop) olarak ayarlayan fonksiyon.
+  - `setMonths` — `months` state’ini güncelleyen setter.
+  - `window` — Global nesne; `innerWidth` ve `addEventListener`/`removeEventListener` kullanılır.
+- **Dönüş**: yok (cleanup fonksiyonu `removeEventListener` ile event listener’ı kaldırır).
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx::preset.map callback
-- **params**: `preset`, `idx`
+### [N6_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::<anonymous useEffect 2>
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `isSelected` — `selectedRange.from` ve `selectedRange.to` ile `preset.getRange()` dönüşünün karşılaştırılması sonucu boolean
-- **Dönüş**: JSX (buton elementi, tıklanınca `handleSelect(preset.getRange())` çağrısı)
+  - `value` — Prop olarak gelen dış tarih aralığı.
+  - `selectedRange` — İç state; `value` ile eşleşmezse `setSelectedRange` ile senkronize edilir.
+  - `setSelectedRange` — `selectedRange` state’ini `value` ile günceller.
+- **Dönüş**: yok (sadece koşullu senkronizasyon yapar).
 
 ---
 
-## Çağrı Haritası
 
-### Dışarıya Çağrılar (Outgoing)
-- **DateRangePicker()** fonksiyonu, kullanıcı bir tarih aralığı seçtiğinde **handleSelect** fonksiyonunu çağırır; seçilen tarihleri işlemek için bu çağrı yapılır.
-
-### Dışarından Çağrılanlar (Incoming)
-- Verilen veri setinde bu modülü çağıran dış bir fonksiyon veya modül bulunmamaktadır.
-
-### İç İçe Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  DateRangePicker() → handleSelect()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    DateRangePicker["DateRangePicker()"] --> handleSelect["handleSelect()"]
+graph TD
+    DateRangePicker_tsx__DateRangePicker["DateRangePicker"]
+    DateRangePicker_tsx__applySelection["applySelection"]
+    DateRangePicker_tsx__cancelSelection["cancelSelection"]
+    DateRangePicker_tsx__handleSelect["handleSelect"]
+    DateRangePicker_tsx__DateRangePicker --> DateRangePicker_tsx__handleSelect
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -189,16 +175,12 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[60vh]`, `max-h-[85vh]`
-- **width:** `w-[calc(100vw-32px)]`
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `md:border-b-0`, `md:border-r`, `text-left`, `text-primary-navy`, `text-slate-400`, `text-slate-500`
-- **Layout:** `backdrop-blur-xl`, `flex`, `flex-col`, `gap-1`, `gap-2`, `inline-flex`, `items-center`, `justify-between`, `max-w-full`, `md:flex-row`, `md:max-h-none`, `md:w-48`, `md:w-auto`, `overflow-hidden`, `overflow-y-auto`
+- **Layout:** `backdrop-blur-xl`, `flex`, `flex-col`, `gap-1`, `gap-2`, `inline-flex`, `items-center`, `justify-between`, `max-h-60vh`, `max-h-85vh`, `max-w-full`, `md:flex-row`, `md:max-h-none`, `md:w-48`, `md:w-auto`
 - **Responsive:** `md:`, `sm:` prefix kullanımları

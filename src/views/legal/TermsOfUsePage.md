@@ -4,49 +4,49 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\legal\TermsOfUsePage.tsx
 skeleton_hash: 4ce5312f302597e2
-generated_at: 2026-05-23T22:41:17Z
+entity_hashes:
+  func:TermsOfUsePage: 107aaa4df0cf13a7
+  overview: e378e8b50990e5c0
+  style_tokens: 388713faf986c7e1
+generated_at: 2026-05-27T11:55:27Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun yasal içerikler bölümünde yer alan Kullanım Koşulları sayfasını oluşturan React bileşenidir. Platformu kullanan ziyaretçilere sunulacak yasal şart ve koşulları görüntüleyen arayüzü oluşturur, projenin istemci tarafı görünüm katmanında yer alır.
+Bu modül, VentHub HVAC platformunun yasal alanındaki Kullanım Şartları sayfasını oluşturan tek React bileşenini barındırır. Modül içinde birden fazla fonksiyon bulunmadığından, hiçbir fonksiyon birbirini çağırmaz ve tüm sorumluluk tek bileşene aittir. Ziyaretçilerin platformun kullanım kurallarını okuyabileceği resmi bir metin sayfası sunmak üzere tasarlanmıştır.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Modülün tek ve ana sorumluluğunu üstlenen bu fonksiyon, Kullanım Koşulları sayfasının tüm yapısını render ederek kullanıcılara sunar.
+Modülün tek sorumluluğunu yerine getirir, Kullanım Şartları sayfasının tüm içeriğini render eder ve platformun yasal sayfaları kapsamında yer alır.
 - TermsOfUsePage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React fonksiyonel bileşeni, VentHub HVAC uygulamasının yasal içerikler bölümündeki Kullanım Koşulları sayfasını kullanıcıya sunmak üzere tasarlanmıştır, çalışması için uygulamanın frontend React çalışma zamanı ve yönlendirme altyapısının erişilebilir olması zorunludur.
-
-[Aksiyom 1]: Eğer projeye React 16.8 ve üzeri bir sürüm entegre edilmemişse, fonksiyonel bileşen olarak TermsOfUsePage çalışmaz ve sayfa hiç render edilemez.
-[Aksiyom 2]: Eğer uygulamanın frontend yönlendirme (routing) mekanizması bu bileşeni ilgili /legal rotası altında kaydetmemişse, kullanıcılar Kullanım Koşulları sayfasına erişemez.
-[Aksiyom 3]: Eğer TermsOfUsePage’in import ettiği uygulamanın ortak temel bileşenleri (Header, Footer, içerik sarmalayıcıları vb.) derleme sırasında çözülemezse, sayfa eksik içerikle veya hiç render edilemez.
-[Aksiyom 4]: Eğer bu modül uygulamanın ana geliştirme veya üretim derleme (build) sürecine dahil edilmemişse, kullanıcı sayfaya erişmeye çalıştığında 404 hatası oluşur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### TermsOfUsePage
-**Ne yapar**: VentHub HVAC platformunun yasal içeriklerinden biri olan Kullanım Koşulları sayfasını oluşturan React sayfa bileşenidir. Projenin src/views/legal dizininde tanımlı bu bileşen, platformu kullanan tüm kullanıcılara platformun kullanım şartlarını, hak ve yükümlülükleri tek bir merkezi sayfa üzerinden sunma görevini üstlenir. Platformun diğer yasal sayfalarıyla aynı yapıda çalışarak kullanıcı deneyiminde tutarlılık sağlar.
-**Nasıl yapar**: React ekosisteminin standart sayfa bileşeni standartlarına tam uyumlu olarak çalışır, herhangi bir karmaşık iş mantığı veya dış veri entegrasyonu barındırmadan kendi dosyası içerisindeki statik yasal metinleri kullanıcıya sunar. Platformun yönlendirme sistemi tarafından ilgili rotada çağrıldığında otomatik olarak içeriği ekrana yansıtır, ek geliştirme yapısına uygun olarak genişletilebilir şekilde tasarlanmıştır.
+**Ne yapar**: Bu fonksiyon, uygulamanın "Kullanım Koşulları" (Terms of Use) sayfasını temsil eden bir React bileşenidir. Kullanıcıya uygulamanın kullanımına dair yasal şartları ve kuralları sunan arayüzü oluşturur.
+**Nasıl yapar**: React fonksiyonel bileşeni (Functional Component) yapısında tanımlanmıştır. Verilen imzada herhangi bir giriş parametresi bulunmamaktadır ve muhtemelen sayfa içeriğini içeren JSX yapısını döndürerek ekranda yasal metni gösterir.
 **Parametreler**:
-- Bu fonksiyon herhangi bir giriş parametresi almamaktadır, tüm ihtiyaç duyduğu içeriği kendi tanımlandığı TermsOfUsePage.tsx dosyası içerisindeki statik kaynaklardan karşılar.
-**Dönüş**: React.FC türünde bir değer döndürür, bu tür React uygulamalarında kullanılabilecek standart, uyumlu sayfa bileşenini ifade eder. Dönen bu bileşen, platformun tüm React tabanlı yapısıyla sorunsuz entegre olarak çalışır, yönlendirme sistemi tarafından çağrıldığında Kullanım Koşulları içeriğini eksiksiz olarak ekrana çizer.
+- Yok — Fonksiyon tanımında parametre belirtilmemiştir.
+**Dönüş**: React.FC — React bileşen tipinde bir dönüş değeri sağlar.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\legal\TermsOfUsePage.tsx::TermsOfUsePage
+### [N1_NASIL] AST Pointer: src/views/legal/TermsOfUsePage.tsx::TermsOfUsePage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `legalConfig.websiteUrl` — Hukuki metinde gösterilen web sitesi adresi, taraflar ve kabul bölümünde kullanılır
-  - `legalConfig.sellerTitle` — Satıcı firma unvanı, fikri mülkiyet ve sorumluluk reddi bölümlerinde kullanılır
-  - `legalConfig.lastUpdated` — Kullanım koşullarının son güncelleme tarihi, değişiklikler bölümünde gösterilir
-- **Dönüş**: React JSX elementi, Kullanım Koşulları sayfa arayüzünü döndüren React.FC bileşeni çıktısı
+  - `legalConfig` - Projeden import edilmiş, hukuki sayfalarda kullanılacak site ve satıcı bilgilerini içeren yapılandırma nesnesi
+  - `legalConfig.websiteUrl` - Kullanım koşulları metninde belirtilen sitenin alan adresini tutan config alanı
+  - `legalConfig.sellerTitle` - Siteden sorumlu satıcı kurumun resmi unvanını tutan config alanı
+  - `legalConfig.lastUpdated` - Kullanım koşullarının en son güncellendiği tarihi tutan config alanı
+- **Dönüş**: React JSX elementi (Kullanım Koşulları sayfasının kullanıcı arayüzü bileşeni)
 
 ---
 
@@ -59,3 +59,18 @@ Bu React fonksiyonel bileşeni, VentHub HVAC uygulamasının yasal içerikler b�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: TermsOfUsePage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xl`, `text-yellow-800`
+- **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

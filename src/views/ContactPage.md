@@ -4,104 +4,103 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ContactPage.tsx
 skeleton_hash: 485416222821ec4f
-generated_at: 2026-05-23T22:40:53Z
+entity_hashes:
+  func:ArrowRight: 1546741fbe749202
+  func:ContactPage: a5b3030a0864a814
+  func:handleSubmit: 460293fdfa9263b6
+  overview: d36d38f2c5628948
+  style_tokens: 2843b884779face7
+generated_at: 2026-05-27T11:54:43Z
 ---
 
-## Genel Bakış
-Bu modül, VentHub HVAC platformunun iletişim sayfasını oluşturan React tabanlı bir bileşendir. Kullanıcıların iletişim taleplerini gönderebileceği form yapısını sunarken, form işlemleri ve sayfa içi küçük arayüz elemanlarını tek modül üzerinde toplar. Tüm iletişim sayfası işlevselliğini uçtan uca yönetir.
+## Genel Bakış  
+`ContactPage` bir tek sayfa React bileşenidir; kullanıcıdan e‑posta, telefon ve mesaj bilgilerini toplar, form gönderildiğinde bu verileri işleyen bir asenkron fonksiyon çağırır. Sayfa, basit bir stil ve yönlendirme ikonu içerir.
 
-## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Modülün temel çıktısı olan ana iletişim sayfası bileşenidir, sayfanın tüm kullanıcı arayüzü yapısını oluşturur ve modül içindeki diğer fonksiyonları entegre eder.
-- ContactPage
+## Fonksiyon Grupları  
 
-### Form Gönderim Yöneticisi
-İletişim formunun gönderim işlemini yöneten, form etkileşimlerini yakalayıp işleyen asenkron fonksiyondur, formun kurallara uygun şekilde işlenmesini sağlar.
-- handleSubmit
+### Sayfa Bileşeni  
+`ContactPage` sayfanın ana yapısını oluşturur, form alanlarını ve gönderme butonunu render eder.  
+- ContactPage  
 
-### Yardımcı Arayüz Bileşeni
-Sayfada kullanılan sağa yönelik ok ikonunu oluşturan, boyutu ayarlanabilen küçük, yeniden kullanılabilir özel arayüz bileşenidir.
+### Form İşleme  
+`handleSubmit` form gönderildiğinde tetiklenir, e‑postayı, telefonu ve mesajı alır, gerekli doğrulamaları yapar ve sunucuya gönderir.  
+- handleSubmit  
+
+### Yardımcı Bileşen  
+`ArrowRight` basit bir ok ikonunu, varsayılan 16 piksel boyutuyla render eder; sayfanın navigasyon veya butonlarında kullanılır.  
 - ArrowRight
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı iletişim sayfası bileşeninin sorunsuz çalışması için React runtime ortamının, bağımlı alt bileşenlerin ve standart form gönderim olaylarını işleyen altyapının erişilebilir olması zorunludur.
-
-[Aksiyom 1]: Eğer React kütüphanesi projeye entegre edilmemiş ve React.FormEvent tip tanımı mevcut değilse, handleSubmit fonksiyonu form gönderim olaylarını tanıyamaz ve iletişim formunun işlevselliği tamamen devre dışı kalır.
-[Aksiyom 2]: Eğer ContactPage tarafından kullanılan ArrowRight alt bileşeni import edildiği konumda erişilebilir değilse, sayfa yüklenemez veya ikon öğesi oluşturulamaz, kullanıcı arayüzü eksik görüntülenir.
-[Aksiyom 3]: Eğer ArrowRight bileşenine iletilen size prop'u sayı tipinde değilse, varsayılan 16 değerinin üzerine geçirilen yanlış tipte değer nedeniyle ikon beklenen boyutta görüntülenemez, kullanıcı arayüzü düzeninde bozulmalar oluşur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ContactPage
-**Ne yapar**: VentHub HVAC projesinin iletişim sayfasını oluşturan ana React fonksiyonel bileşenidir. Tüm iletişim sayfasının görsel ve işlevsel yapısını barındırır, kullanıcıların site üzerinden şirketle iletişime geçmesi için gereken form ve içerikleri ekrana sunar.
-**Nasıl yapar**: ContactPage.tsx dosyası içinde tanımlı olan React.FC türünde bileşen, içerdiği alt işlevler ve yardımcı bileşenler ile iletişim sayfasının tüm ihtiyaçlarını karşılar. Sayfa yüklemesi sırasında tüm içerik ve etkileşimli öğeleri tek bir bileşen çatısı altında toplayarak tarayıcıya render eder.
-**Parametreler**: Herhangi bir giriş parametresi almaz.
-**Dönüş**: Tanımlanan React.FC türünde bir değer döndürür, yani iletişim sayfasının tüm DOM yapısını React ekosistemine sunarak ekrana çizilmesini sağlar.
+**Ne yapar**: ContactPage, uygulamanın iletişim sayfasını temsil eden bir React fonksiyonel bileşenidir. Bu bileşen, kullanıcıların iletişim bilgilerini girebilecekleri bir form ve ilgili UI öğelerini içerir. Sayfa yüklendiğinde React tarafından render edilerek kullanıcı arayüzüne eklenir.  
+
+**Nasıl yapar**: Fonksiyon, React.FC tipinde bir bileşen döndürür; bu sayede JSX içinde doğrudan kullanılabilir. İçerik, tipik bir React bileşeninin yaşam döngüsü ve render mantığına uygun olarak tanımlanır.  
+
+**Parametreler**:  
+- (yok): Bu fonksiyon parametre almaz; sadece bir bileşen tanımı döndürür.  
+
+**Dönüş**: React.FC — bir React fonksiyonel bileşeni.
 
 ### handleSubmit
-**Ne yapar**: ContactPage bileşeni içindeki iletişim formunun gönderim işlemini yöneten olay işleyici fonksiyonudur. Formun gönderilmesi sırasında tetiklenerek tüm gönderim akışını kontrol altına alır.
-**Nasıl yapar**: Formun yerleşik gönderim olayını yakalar, olay parametresi üzerinden formun varsayılan tarayıcı davranışını engelleyerek özel bir iş akışı çalıştırır. Form üzerindeki kullanıcı girdilerinin doğrulanması, ilgili API isteğine yönlendirilmesi gibi işlemleri tetiklemek için temel olay yönetimini gerçekleştirir.
-**Parametreler**:
-- e: React.FormEvent — İletişim formunun gönderim olayını temsil eden, tüm olay özelliklerini barındıran React olay nesnesi
-**Dönüş**: Dönüş tipi belirtilmemiştir, herhangi bir değer döndürmez, yalnızca form gönderim sürecini yönetir.
+**Ne yapar**: handleSubmit, iletişim formu gönderildiğinde tetiklenen bir olay işleyicisidir. Form verilerini toplar, doğrulama adımlarını başlatabilir ve gönderim sürecini yönetir. İşlem tamamlandığında sayfa yenilenmesi veya başka bir UI güncellemesi yapılabilir.  
+
+**Nasıl yapar**: Fonksiyon, React.FormEvent tipinde bir olay nesnesi alır ve bu nesnenin `preventDefault()` metodunu çağırarak tarayıcının varsayılan form gönderimini engeller. Ardından, form alanlarından değerler okunur ve gerekli iş mantığı (ör. API çağrısı) yürütülür.  
+
+**Parametreler**:  
+- e: React.FormEvent — Form gönderim olayını temsil eden nesne; olayın detaylerine ve hedef form elemanlarına erişim sağlar.  
+
+**Dönüş**: Belirtilmemiş; genellikle `void` (geri dönüş değeri yok) olarak kullanılır.
 
 ### ArrowRight
-**Ne yapar**: ContactPage bileşeni içinde kullanılan, sağ yönlü ok ikonunu oluşturan yardımcı React bileşenidir. Kullanıcı arayüzündeki butonlar, yönlendirme linkleri veya diğer etkileşimli öğeler üzerinde ikon olarak kullanılır.
-**Nasıl yapar**: Aldığı boyut parametresine göre ikonun piksel cinsinden boyutlarını ayarlar, standart bir sağ ok grafiğini ekrana render ederek istendiği yerde kullanılmasını sağlar. Varsayılan boyut değeri ile standart kullanım için uygun bir boyut sunar, ihtiyaç halinde boyut özel olarak ayarlanabilir.
-**Parametreler**:
-- size: number — İkonun piksel cinsinden genişlik ve yüksekliğini belirleyen isteğe bağlı parametre, varsayılan değeri 16'dır
-**Dönüş**: Dönüş tipi belirtilmemiştir, yalnızca ilgili ikonun ekrana çizilmesi için gerekli yapıyı üretir.
+**Ne yapar**: ArrowRight, sağa yön gösteren bir ikon bileşenidir ve UI içinde ok işareti olarak kullanılabilir. Varsayılan olarak 16 piksel boyutunda render edilir, ancak `size` parametresi ile farklı boyutlar ayarlanabilir. Bu bileşen, ikonun stil ve renk özelliklerini dışarıdan gelen props ile özelleştirmeye olanak tanır.  
+
+**Nasıl yapar**: Fonksiyon, `size` adlı bir parametre alır; parametre verilmezse 16 değeri varsayılan olarak kullanılır. Bileşen, SVG veya benzeri bir grafik öğesi döndürerek belirtilen boyutta bir ok çizer.  
+
+**Parametreler**:  
+- size: number — Ok ikonunun genişlik ve yükseklik değerini belirler; varsayılan değer 16’dır.  
+
+**Dönüş**: Belirtilmemiş; genellikle bir React bileşeni (JSX) döndürür, ancak döndürdüğü tip açıkça tanımlanmamıştır.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\ContactPage.tsx::ContactPage
+### [N1_NASIL] AST Pointer: src\views\ContactPage.tsx::ContactPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, sayfa metinlerini çokdilli kullanmak için kullanılır
-  - `formSubmitted` — İletişim formunun gönderilip gönderilmediğini takip eden boolean state değişkeni
-  - `setFormSubmitted` — formSubmitted state'ini güncellemek için kullanılan React state setter fonksiyonu
-  - `whatsappLink` - getSupportLink utility'siyle üretilen WhatsApp destek hattı bağlantısı
-  - `heroBadgeRef` - Hero bölümündeki rozet elementi için scroll animasyonu DOM referansı
-  - `heroBadgeVisible` - Hero rozetinin görünürlük durumunu tutan scroll animasyonu state'i
-  - `contactGridRef` - İletişim kartları grid elementi için scroll animasyonu DOM referansı
-  - `contactGridVisible` - İletişim grid'inin görünürlük durumunu tutan scroll animasyonu state'i
-  - `formSuccessRef` - Form başarı mesajı elementi için scroll animasyonu DOM referansı
-  - `formSuccessVisible` - Form başarı mesajının görünürlük durumunu tutan scroll animasyonu state'i
-  - `contactCards` - Sayfada gösterilen 3 iletişim kartının tüm verilerini tutan nesne dizisi
-  - `handleSubmit` - Form gönderim işlemini yöneten asenkron iç fonksiyon
-- **Dönüş**: React JSX elementi (tam iletişim sayfası DOM yapısı)
+  - `t` — `useI18n()` hook’inden dönen çeviri fonksiyonu, metinleri yerelleştirmek için kullanılır.
+  - `formSubmitted` — formun gönderilip gönderilmediğini tutan boolean state, başlangıçta `false`.
+  - `setFormSubmitted` — `formSubmitted` state’ini güncelleyen setter fonksiyonu.
+  - `whatsappLink` — `getSupportLink(t('common.whatsapp.supportMessageDefault'))` ifadesiyle oluşturulan WhatsApp destek URL’si.
+  - `heroBadgeRef` — `useScrollAnimation` hook’u tarafından döndürülen element referansı, hero badge için kaydırma animasyonu.
+  - `heroBadgeVisible` — hero badge’ın görünürlük durumu (boolean) aynı hook’tan.
+  - `contactGridRef` — iletişim kartları grid’i için element referansı, kaydırma animasyonu.
+  - `contactGridVisible` — grid’in görünürlük durumu (boolean) aynı hook’tan.
+  - `formSuccessRef` — form gönderiminden sonra gösterilen başarı mesajı için element referansı, kaydırma animasyonu.
+  - `formSuccessVisible` — başarı mesajının görünürlük durumu (boolean) aynı hook’tan.
+  - `contactCards` — her bir iletişim kartının `icon`, `title`, `value`, `href`, `label` alanlarını içeren dizi.
+  - `handleSubmit` — form gönderildiğinde çalıştırılan async fonksiyon (aşağıda ayrı olarak tanımlanmıştır).
+- **Dönüş**: React bileşeni JSX döndürür (`React.ReactNode`). Bileşen yan etkisizdir; sadece UI render eder ve kullanıcı etkileşimlerine (form gönderimi, link tıklamaları) yanıt verir.
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\ContactPage.tsx::handleSubmit
-- **params**: e: React.FormEvent
+### [N2_NASIL] AST Pointer: src\views\ContactPage.tsx::handleSubmit
+- **params**: `e` — `React.FormEvent` tipinde form submit olayı.
 - **ic_degiskenler**:
-  - `e` — Form gönderim event nesnesi, tarayıcının varsayılan form yenileme davranışını engellemek için kullanılır
-  - `setFormSubmitted` — Üst scope'tan alınan state setter, formun başarıyla gönderildiğini işaretlemek için kullanılır
-- **Dönüş**: yok
+  - `e` — form submit olay nesnesi; `preventDefault()` ile varsayılan form gönderimi engellenir.
+- **Dönüş**: `void` (yok). Fonksiyon, `setFormSubmitted(true)` çağrısı ile `formSubmitted` state’ini `true` yapar; bu da UI’da başarı mesajının gösterilmesini tetikler.
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\ContactPage.tsx::contactCardsMapCallback
-- **params**: card, i
+### [N3_NASIL] AST Pointer: src\views\ContactPage.tsx::ArrowRight
+- **params**: `size = 16` — opsiyonel parametre, ikonun genişlik ve yüksekliğini belirler; varsayılan değer 16.
 - **ic_degiskenler**:
-  - `card` — O anki döngüdeki iletişim kartının tüm verilerini içeren nesne
-  - `i` — Döngüdeki kartın sıralama index'i, React anahtarı ve sıralı animasyon için kullanılır
-  - `card.href` — Kartın tıklandığında yönlendireceği bağlantı adresi
-  - `card.icon` — Kartta gösterilecek Lucide ikon bileşeni
-  - `card.title` — Kartın başlık metni
-  - `card.value` — Kartın ana içerik metni (telefon numarası, mail adresi vb.)
-  - `card.label` — Kartın alt etkiket metni
-  - `contactGridVisible` — Üst scope'tan alınan grid görünürlük state'i, scroll animasyonunu tetiklemek için kullanılır
-- **Dönüş**: Tek iletişim kartı için React JSX elementi
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\ContactPage.tsx::ArrowRight
-- **params**: { size = 16 }
-- **ic_degiskenler**:
-  - `size` — SVG ikonunun genişlik ve yükseklik değerini belirten parametre, varsayılan değeri 16
-- **Dönüş**: Sağ ok simgesi için SVG React JSX elementi
+  - `size` — SVG’nin `width` ve `height` özniteliklerine atanır; ikonun boyutunu kontrol eder.
+- **Dönüş**: `React.ReactNode` (JSX). `size` değerine göre ayarlanmış bir SVG elementi döndürür.
 
 ---
 
@@ -126,3 +125,22 @@ graph TD
 ## DISA AKTARILANLAR (EXPORTS)
   export: ArrowRight
   export: ContactPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+- **shadow:** (yok)
+- **height:** (yok)
+- **width:** (yok)
+- **spacing:** (yok)
+- **diğer:** `hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]`
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-wide`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-slate-100`, `lg:text-6xl`, `lg:text-8xl`, `text-2xl`
+- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `group-hover:bg-cyan-500`, `group-hover:text-white`, `h-12`, `h-2`, `h-20`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

@@ -4,70 +4,59 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx
 skeleton_hash: d55e7e1f42ff8548
-generated_at: 2026-05-23T22:41:55Z
+entity_hashes:
+  func:RegisterPage: 595595bc145e81ea
+  func:handleChange: c35710484665a43c
+  func:handleSubmit: 460293fdfa9263b6
+  func:validateForm: 35d7413c1db3ab00
+  overview: f33301e20d1c64f6
+  style_tokens: bb6026c45bd8dd20
+generated_at: 2026-05-27T11:56:35Z
 ---
 
 ## Genel Bakış
-src/views/RegisterPage.tsx, VentHub HVAC platformunun kullanıcı kayıt ekranını oluşturan React bileşenidir. Kullanıcıların yeni hesap oluşturmak için doldurduğu kayıt formunun tüm işlevlerini tek merkezde yönetir. Form girdisi takibi, doğrulama ve sunucuya gönderim süreçlerini kapsar.
+Bu modül, kullanıcı kayıt arayüzünü sağlayan bir React bileşenidir. Form verilerini yönetir, kullanıcı girdilerinin geçerliliğini kontrol eder ve kayıt işlemini başlatır.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Modülün temel React bileşenidir, kayıt sayfasının arayüzünü oluşturur, tüm form işlevlerini barındırır ve sayfayı kullanıcıya sunar.
+Kayıt sayfasının görsel yapısını oluşturur ve kullanıcı arayüzünü sunar.
 - RegisterPage
 
-### Form Girdisi Yönetimi
-Kullanıcının form alanlarına yaptığı giriş değişikliklerini algılar, formun dahili veri durumunu güncel tutar.
-- handleChange
-
-### Form Doğrulama
-Kayıt formundaki tüm alanların belirlenen kurallara uygunluğunu kontrol eder, geçersiz veya eksik girdileri tespit eder.
-- validateForm
-
-### Form Gönderimi
-Doğrulanmış form verilerini sunucuya gönderen asenkron işlem akışını yönetir, sunucu yanıtına göre kullanıcı deneyimini yönlendirir.
-- handleSubmit
+### Form Yönetimi ve Doğrulama
+Kullanıcı girdilerini takip eder, verilerin kurallara uygunluğunu sınar ve form gönderme işlemini koordine eder.
+- handleChange, validateForm, handleSubmit
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı kullanıcı kayıt sayfası bileşeninin sorunsuz çalışması için frontend React ortam bağımlılıklarının, form yönetimi altyapısının ve backend kayıt servisinin erişilebilir olması zorunludur.
-
-[Aksiyom 1]: Eğer React kütüphanesi, React.ChangeEvent ve React.FormEvent tipleri ile bileşen çalışması için gerekli tüm React çekirdek yapıları ortamda mevcut değilse, bileşen derlenemez, olay dinleyicileri çalışmaz, kayıt sayfası hiç görüntülenemez.
-[Aksiyom 2]: Eğer kullanıcı girişlerini saklamak için tanımlanan yerel bileşen state yapısı mevcut değilse, handleChange fonksiyonu input değişikliklerini kaydedemez, validateForm ve handleSubmit fonksiyonları işlenecek form verisine erişemediği için kayıt süreci çalışmaz.
-[Aksiyom 3]: Eğer formdaki HTML input elementleri handleChange ve handleSubmit olay dinleyicileri ile doğru şekilde ilişkilendirilmemişse, kullanıcı girişi yakalanmaz, form gönderim işlemi hiç tetiklenemez.
-[Aksiyom 4]: Eğer validateForm fonksiyonunun çalışması için gerekli alan doğrulama kuralları tanımlanmamışsa, formdaki hatalı veriler tespit edilemez, geçersiz girdilerin gönderimi engellenemez.
-[Aksiyom 5]: Eğer handleSubmit fonksiyonunun kayıt verilerini göndereceği backend kullanıcı kayıt API uç noktası erişilebilir değilse, sunucu tarafında kullanıcı hesabı oluşturulamaz, kayıt süreci başarısız olur.
-[Aksiyom 6]: Eğer kayıt sonrası kullanıcıyı yönlendirecek frontend yönlendirme (routing) altyapısı mevcut değilse, başarılı kayıt işleminin ardından kullanıcı platformun ilgili çalışma ekranına yönlendirilemez.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### RegisterPage
-**Ne yapar**: VentHub HVAC projesinin kullanıcı hesap oluşturma süreçlerini yöneten frontend kayıt sayfası React bileşenidir. Kullanıcıların kayıt formu üzerinden girdiği tüm bilgilerin toplanması, doğrulanması ve gönderilmesi süreçlerini tek bileşen altında toplar.
-**Nasıl yapar**: Form yönetimi için gerekli yerel durum (state) değişkenlerini, input değişikliklerini takip eden işleyicileri, form doğrulama ve gönderim fonksiyonlarını içinde barındırır. Sayfanın kullanıcı arayüzünü ve tüm iş mantığını birleştirerek sunuma hazır React bileşeni olarak döndürür.
-**Parametreler**: Girdi parametresi bulunmamaktadır.
-**Dönüş**: React.FC tipi, yandexim kayıt sayfasının kullanıcıya sunulacak React bileşenini döndürür.
+**Ne yapar**: Bu React bileşeni, kullanıcı kayıt formunu oluşturur ve yönetir. Bileşen, form alanlarını, giriş doğrulamayı ve gönderme işlemini kapsayan bir kayıt arayüzü sağlar.
+**Nasıl yapar**: Bileşen, içinde `handleChange`, `validateForm` ve `handleSubmit` yardımcı fonksiyonlarını tanımlayarak form durumunu (state) ve olaylarını yönetir. `useState` ve `useEffect` gibi React hook'larını kullanarak form verilerini ve hata mesajlarını tutar. JSX dönüşünde bir HTML form öğesi ve gerekli input alanlarını render eder.
+**Parametreler**: Fonksiyon hiçbir parametre almaz.
+**Dönüş**: `React.FC` — Bileşen, geçerli bir React fonksiyonel bileşeni olarak `React.FC` tipini döndürür.
 
 ### handleChange
-**Ne yapar**: Kayıt formundaki input alanlarında meydana gelen değer değişikliklerini anlık olarak takip eder ve formun genel durumunu (state) günceller. Kullanıcının herhangi bir input alanına girdiği verinin ilgili form alanına kaydedilmesini sağlar.
-**Nasıl yapar**: Tetiklendiği input elementinin name ve value özelliklerini alarak, formun durum nesnesindeki ilgili alanı dinamik olarak günceller. Tüm form inputları için tek bir değişiklik yönetim fonksiyonu olarak çalışarak kod tekrarını ortadan kaldırır.
+**Ne yapar**: Form içindeki herhangi bir giriş alanındaki (input) değişiklik olayını yakalar ve ilgili form durumunu (state) günceller. Kullanıcının her tuş vuruşunda veya seçiminde form verilerini canlı olarak güncel tutar.
 **Parametreler**:
-- e: React.ChangeEvent<HTMLInputElement> — Formdaki input alanında tetiklenen değişiklik olayını taşıyan React olay nesnesi, olayın gerçekleştiği elementin özelliklerine erişim sağlar.
-**Dönüş**: Dönüş tipi belirtilmemiştir, yalnızca form durumunu güncellemek üzere işlem gerçekleştirir.
+- `e: React.ChangeEvent<HTMLInputElement>` — Bir input öğesinden (text, email, password vb.) gelen değişiklik olayını temsil eder. Olay nesnesinden hedef elementin `name` ve `value` niteliklerini alarak ilgili form alanını günceller.
+**Dönüş**: Hiçbir değer döndürmez (void). Sadece yan etki olarak form state'ini günceller.
 
 ### validateForm
-**Ne yapar**: Kullanıcının kayıt formuna girdiği tüm bilgilerin ön tanımlı kurallara uygunluğunu kontrol eder. Formun gönderilmeden önce doğruluğunu teyit ederek, hatalı veya eksik verinin backend'e gönderilmesini engeller.
-**Nasıl yapar**: Formdaki zorunlu alanların doldurulma durumunu, e-posta formatının geçerliliği, şifre güvenlik kriterleri gibi standart doğrulama kontrollerini gerçekleştirir. Oluşan tüm hata mesajlarını kullanıcıya gösterilmek üzere ilgili durum (state) alanına kaydeder.
-**Parametreler**: Girdi parametresi bulunmamaktadır.
-**Dönüş**: Dönüş tipi belirtilmemiştir, yalnızca form doğrulama işlemini gerçekleştirir.
+**Ne yapar**: Formdaki tüm alanların geçerliliğini kontrol eder. Gerekli alanların boş olup olmadığını, e-posta formatı gibi belirli kurallara uygunluğu denetler.
+**Parametreler**: Hiçbir parametre almaz. Form durumuna (state) doğrudan erişir.
+**Dönüş**: Hiçbir değer döndürmez (void). Doğrulama sonuçlarını bir hata durumu (errors state) nesnesine kaydeder veya geçerlilik bayrağını günceller. `handleSubmit` tarafından gönderme öncesi çağrılır.
 
 ### handleSubmit
-**Ne yapar**: Kullanıcının kayıt formunu gönderme isteğinde bulunduğunda tetiklenerek, formun gönderim sürecini yönetir. Varsayılan tarayıcı form gönderim davranışını engelleyerek tek sayfa uygulama akışını korur.
-**Nasıl yapar**: İlk olarak olayın varsayılan davranışını engelleyerek sayfanın yenilenmesini önler. Ardından formun doğruluğunu kontrol etmek için validateForm fonksiyonunu çağırır, doğrulama süreci başarılı geçerse kayıt verilerini backend API'sine iletmek için gerekli istek işlemlerini başlatır.
+**Ne yapar**: Form gönderme olayını işler. Öncelikle `validateForm` ile doğrulama yapar, eğer doğrulama başarılıysa form verilerini bir API'ye göndermek veya başka bir işlem için hazırlar. Sayfanın yeniden yüklenmesini engeller.
 **Parametreler**:
-- e: React.FormEvent — Formun gönderilmesi olayını taşıyan React olay nesnesi, varsayılan gönderim davranışını engellemek ve form verilerine erişmek için kullanılır.
-**Dönüş**: Dönüş tipi belirtilmemiştir, yalnızca form gönderim sürecini yönetmek üzere işlem gerçekleştirir.
+- `e: React.FormEvent` — Formun submit olayını temsil eder. `preventDefault()` yöntemi ile varsayılan form gönderme davranışı durdurulur.
+**Dönüş**: Hiçbir değer döndürmez (void). Başarılı gönderimde kullanıcıyı başka bir sayfaya yönlendirebilir veya bir durum mesajı gösterebilir.
 
 ---
 
@@ -75,92 +64,52 @@ Bu React tabanlı kullanıcı kayıt sayfası bileşeninin sorunsuz çalışmas�
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::RegisterPage
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `useState` — React state hook'u, form ve bileşen state'lerini yönetmek için kullanılır
-  - `useAuth` — kimlik doğrulama hook'u, kayıt işlemi için signUp metoduna erişim sağlar
-  - `useI18n` — yerelleştirme hook'u, çeviri fonksiyonuna erişim sağlar
-- **Dönüş**: React.FC (JSX bileşeni)
+- **ic_degiskenler**: yok
+- **Dönüş**: React.FC (bileşen render eder, JSX döndürür)
 
 ### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::handleChange
-- **params**: (e: React.ChangeEvent<HTMLInputElement>)
+- **params**: e — `React.ChangeEvent<HTMLInputElement>` (giriş elemanının değişim olayı)
 - **ic_degiskenler**:
-  - `setFormData` — form verisi state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `formData` — tüm form alanlarının mevcut değerlerini tutan state nesnesi
-  - `e.target.name` — değişikliğe uğrayan input elementinin name niteliği, hangi alanın güncelleneceğini belirler
-  - `e.target.value` — değişikliğe uğrayan input elementinin yeni girilen değeri
-- **Dönüş**: yok
+  - `setFormData` — dışarıdan gelen state güncelleme fonksiyonu; form verisini yeni değerle birleştirerek günceller.
+  - `formData` — dışarıdan gelen mevcut form durumu; yeni alan değeriyle genişletilir.
+- **Dönüş**: yok (state günceller, UI yeniden render olur)
 
 ### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::validateForm
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `formData.name` — formda girilen kullanıcı adı, boş geçilip geçilmediği kontrol edilir
-  - `toast` — kullanıcıya bildirim göstermek için kullanılan toast kütüphanesi fonksiyonu
-  - `t` — yerelleştirilmiş metinleri çekmek için kullanılan çeviri fonksiyonu
-  - `formData.email` — formda girilen email adresi, @ içerip içermediği kontrol edilir
-  - `passedRules` — şifre güvenlik kurallarından kaç tanesinin karşılandığını tutan sayısal değer
-  - `formData.password` — formda girilen şifre, tekrarıyla eşleşip eşleşmediği kontrol edilir
-  - `formData.confirmPassword` — formda girilen şifre tekrarı, ana şifreyle eşleşip eşleşmediği kontrol edilir
-- **Dönüş**: boolean (form geçerliyse true, değilse false)
+  - `formData` — form alanlarının mevcut değerleri; `name`, `email`, `password`, `confirmPassword` vb. içerir.
+  - `passedRules` — şifre güvenlik kurallarının kaç tanesinin sağlandığını gösteren sayı.
+  - `toast` — kullanıcıya hata mesajı göstermek için kullanılan bildirim fonksiyonu.
+  - `t` — i18n çeviri fonksiyonu; hata mesajlarını yerelleştirir.
+- **Dönüş**: `boolean` — form geçerli ise `true`, aksi takdirde `false` (hata toastları gösterilir)
 
 ### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::handleSubmit
-- **params**: (e: React.FormEvent)
+- **params**: e — `React.FormEvent` (form gönderim olayı)
 - **ic_degiskenler**:
-  - `e.preventDefault()` — formun varsayılan gönderim davranışını engeller
-  - `validateForm` — form alanlarının geçerliliğini kontrol eden fonksiyon, geçersizse işlemi durdurur
-  - `setLoading` — yükleme durumunu güncelleyen state setter fonksiyonu
-  - `hibpPwnedCount` — şifrenin veri ihlallerinde bulunup bulunmadığını kontrol eden API fonksiyonu
-  - `formData.password` — HIBP kontrolü ve kayıt işlemi için kullanılan şifre değeri
-  - `pwned` — şifrenin kaç veri ihlalinde geçtiğini döndüren HIBP cevap değeri
-  - `signUp` — useAuth hook'undan gelen kullanıcı kaydı yapan kimlik doğrulama fonksiyonu
-  - `formData.email` — kayıt işlemi için kullanılan email adresi
-  - `formData.name` — kayıt işlemi için kullanılan kullanıcı adı
-  - `error` — kayıt işlemi sırasında oluşan hata nesnesi
-  - `setRegistrationComplete` — kaydın başarılı olduğunu işaretleyen state setter fonksiyonu
-  - `console.error` — oluşan beklenmedik hataları konsola yazdıran fonksiyon
-- **Dönüş**: yok
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::anonymous-strength-bar-item
-- **params**: (i: döngü indeksi)
-- **ic_degiskenler**:
-  - `i` -- şifre gücü çubuğundaki doluluk segmentinin indeksi
-  - `passedRules` -- karşılanan güvenlik kuralı sayısı, segmentin renkli olup olmayacağını belirler
-  - `strengthColor` -- karşılanan kural sayısına göre belirlenen dolu segmentin arka plan rengi
-  - `bg-light-gray` -- boş segmentlerin varsayılan arka plan rengi
-- **Dönüş**: JSX.Element (şifre gücü çubuğu segmenti div'i)
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::anonymous-password-rule-item
-- **params**: (rule: şifre güvenlik kuralı nesnesi)
-- **ic_degiskenler**:
-  - `rule.key` -- kuralın benzersiz tanımlayıcısı, React liste anahtarı olarak kullanılır
-  - `rule.test` -- şifrenin kuralı karşılayıp karşılamadığını kontrol eden fonksiyon
-  - `formData.password` — kuralın test edildiği mevcut girilen şifre değeri
-  - `rule.label` — kullanıcıya gösterilen kuralın açıklama metni
-- **Dönüş**: JSX.Element (şifre güvenlik kuralı listeleme li elementi)
+  - `e` — form gönderim olayını durdurmak için `preventDefault()` çağrılır.
+  - `validateForm` — form doğrulama fonksiyonu; `false` dönerse işlem durur.
+  - `setLoading` — yükleme durumunu `true/false` olarak ayarlayan state setter.
+  - `toast` — başarı ve hata bildirimleri için kullanılan fonksiyon.
+  - `t` — i18n çeviri fonksiyonu; mesajları yerelleştirir.
+  - `hibpPwnedCount` — şifreyi Have I Been Pwned API'siyle kontrol eden async fonksiyon; `pwned` sayısını döner.
+  - `formData` — gönderilecek kayıt bilgileri (`email`, `password`, `name`).
+  - `signUp` — kullanıcı kaydı yapan async fonksiyon; `{ error }` nesnesi döner.
+  - `setRegistrationComplete` — kayıt tamamlandığında UI durumunu güncelleyen state setter.
+  - `console.error` — beklenmeyen hataları konsola loglar.
+- **Dönüş**: yok (state günceller, toast gösterir, olası hataları yakalar)
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Bu modüldeki `RegisterPage()` fonksiyonu, form doğrulama işlemini gerçekleştirmek için aynı dosya içindeki `validateForm` fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon belirtilmemiştir, kayıtlı gelen çağrı bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  RegisterPage() → validateForm()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    RegisterPage["RegisterPage()"] --> validateForm["validateForm()"]
+graph TD
+    RegisterPage_tsx__RegisterPage["RegisterPage"]
+    RegisterPage_tsx__handleChange["handleChange"]
+    RegisterPage_tsx__handleSubmit["handleSubmit"]
+    RegisterPage_tsx__validateForm["validateForm"]
+    RegisterPage_tsx__RegisterPage --> RegisterPage_tsx__validateForm
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -174,3 +123,18 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: RegisterPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-light-gray`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `from-air-blue`, `text-2xl`, `text-center`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `flex-1`, `from-air-blue`, `gap-1`, `gap-1.5`, `h-1.5`, `h-16`, `h-5`, `inline-flex`, `items-center`, `justify-center`, `left-3`
+- **Responsive:** (yok)

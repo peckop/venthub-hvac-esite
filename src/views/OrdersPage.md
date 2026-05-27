@@ -4,70 +4,77 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx
 skeleton_hash: 5df35a98307945cc
-generated_at: 2026-05-23T22:42:05Z
+entity_hashes:
+  func:OrdersPage: 438a8bbd716fd9a1
+  func:formatDate: cda2f023d87c7e9e
+  func:formatPrice: ca980d25e00442de
+  func:getStatusColor: 278d94f1c8a522db
+  func:getStatusText: 248f40bb51719423
+  overview: fc7e5a9a85876ec8
+  style_tokens: 71d7860a8420a926
+generated_at: 2026-05-27T12:07:56Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun siparişler listesi sayfasını oluşturan React modülüdür. Sayfada görüntülenecek sipariş verilerini kullanıcı dostu formata dönüştürmek, sipariş durumlarının arayüzde doğru şekilde yansımasını sağlamak için gereken tüm fonksiyonları barındırır. Tek bir ana sayfa bileşeni ve ona destek olan yardımcı fonksiyonlardan oluşur.
+Bu modül, siparişlerin görüntülendiği bir React sayfa bileşenidir. Sipariş verilerini okunabilir ve kullanıcı dostu formata dönüştürmek için çeşitli yardımcı fonksiyonlar içerir.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Siparişler sayfasının temel React bileşeni olarak çalışır, sayfanın tüm yapısını oluşturur, sipariş verilerini işler ve modül içindeki yardımcı fonksiyonları kullanarak içeriği son kullanıcıya sunar.
+Siparişler sayfasının temel yapısını, görüntüsünü ve genel işleyişini yöneten ana React bileşenidir.
 - OrdersPage
 
-### Veri Formatlama ve Görselleştirme Yardımcıları
-Siparişlerdeki ham tarih ve fiyat verilerini okunabilir, standart formata dönüştürür, sipariş durumlarına göre arayüzde kullanılacak metin ve renk değerlerini belirleyerek tüm siparişlerde tutarlı bir görüntüleme sağlar.
+### Veri Formatlama Yardımcıları
+Siparişlerle ilgili bilgileri (tarih, fiyat) okunabilir formata dönüştürür ve durum bilgileri için görsel ipuçları sağlar.
 - formatDate, formatPrice, getStatusColor, getStatusText
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı sipariş görüntüleme sayfası modülü, HVAC platformundaki kullanıcı siparişlerini listelemek ve görüntülemek üzere tasarlanmıştır, çalışması için tüm sipariş verilerinin üst componentlerden prop olarak iletilmesi ve bağlı yardımcı fonksiyonların çalıştığı runtime ortamının sorunsuz olması zorunludur.
+Bu modül, siparişleri görüntüleyen frontend React bileşenidir; çalışması için tüm yardımcı fonksiyonlara iletilen parametrelerin ve ana OrdersPage bileşenine aktarılan sipariş verilerinin tanımlı tür ve formatlarda gelmesi zorunludur.
 
-[Aksiyom 1]: Eğer OrdersPage componentine görüntülenecek sipariş listesi verisi prop olarak iletilmezse, sayfada hiçbir sipariş kaydı görüntülenemez, kullanıcı boş bir arayüzle karşılaşır.
-[Aksiyom 2]: Eğer formatDate fonksiyonuna aktarılan dateString parametresi parse edilebilir geçerli bir tarih formatlı string değilse, ilgili siparişin tarih bilgisi ekranda hatalı veya okunamaz şekilde görüntülenir.
-[Aksiyom 3]: Eğer formatPrice fonksiyonuna aktarılan price parametresi geçerli bir sayısal değer değilse, ilgili siparişin tutar bilgisi yanlış formatta veya anlamsız bir değer olarak ekranda görünür.
-[Aksiyom 4]: Eğer getStatusColor ve getStatusText fonksiyonlarına aktarılan status string değeri sistemde tanımlı geçerli sipariş durumu değerlerinden biri değilse, ilgili siparişin durumu renksiz veya anlaşılmaz bir metin olarak görüntülenir.
-[Aksiyom 5]: Eğer modülün bağlı olduğu React runtime ortamında componentler arası veri iletim mekanizması çalışmıyorsa, OrdersPage componenti hiç render olmaz veya oluşan runtime hatası uygulamayı çöker.
+[Aksiyom 1]: Eğer formatDate fonksiyonuna iletilen dateString parametresi geçerli string türünde değilse, tarih formatlama işlemi başarısız olur, sipariş tarihlerini kullanıcıya doğru şekilde gösteremez.
+[Aksiyom 2]: Eğer formatPrice fonksiyonuna iletilen price parametresi geçerli sayısal (number) türünde değilse, fiyat formatlama işlemi başarısız olur, sipariş tutarları hatalı görüntülenir.
+[Aksiyom 3]: Eğer getStatusColor ve getStatusText fonksiyonlarına iletilen status parametresi geçerli string türünde değilse, sipariş durumunun arayüzde gösterilmesi gereken rengi ve metni üretilemez, arayüzde hatalı durum görünümü oluşur.
+[Aksiyom 4]: Eğer OrdersPage ana bileşenine props olarak her siparişe ait tarih, fiyat, durum gibi zorunlu alanları içeren geçerli sipariş listesi iletilmezse, sayfa içeriğini oluşturamaz, boş ya da hatalı arayüz gösterir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### OrdersPage
-**Ne yapar**: VentHub HVAC sisteminin siparişler yönetimi sayfasını oluşturan ana React root bileşenidir. Tüm sipariş listeleme, görüntüleme ve temel durum sunumu işlevlerini barındıran siparişler sayfasının tek giriş noktasıdır.
-**Nasıl yapar**: Kendi içinde barındırdığı yardımcı formatlama ve durum eşleştirme fonksiyonlarını kullanarak ham sipariş verilerini kullanıcı dostu bir arayüze dönüştürür, React bileşen yaşam döngüsüne uygun olarak sayfa içeriğini kullanıcıya sunar.
-**Parametreler**:
-- Herhangi bir giriş parametresi almaz, ana sayfa bileşeni olarak çalışır.
-**Dönüş**: React.FC tipi, arayüzde görüntülenmek üzere geçerli bir React bileşeni döndürür.
+**Ne yapar**: Fonksiyonun amacı ve işlevi kaynak kodunda belirtilmemiştir.  
+**Nasıl yapar**: İç mantığı hakkında bilgi bulunmamaktadır.  
+**Parametreler**:  
+- (parametre yok)  
+**Dönüş**: `React.FC` – bir React fonksiyonel bileşeni tipini döndürür.
 
 ### formatDate
-**Ne yapar**: Sipariş verilerinde yer alan ham tarih string'lerini kullanıcıların okuyabileceği standart, tutarlı bir formata dönüştüren özel yardımcı fonksiyondur. Sadece siparişler sayfasının tarih formatlama ihtiyacını karşılamak üzere tasarlanmıştır.
-**Nasıl yapar**: Gelen ham tarih string'ini (genellikle veri tabanından gelen ISO formatı) ayrıştırır, yerel ayarlara uygun gün/ay/yıl ve isteğe bağlı saat bilgisiyle yeniden yapılandırarak tüm siparişlerde aynı tarih sunumunu sağlar.
-**Parametreler**:
-- dateString: string — İşlenecek ham tarih verisini içeren string tipinde parametre, orijinal işlenmemiş tarih bilgisini taşır.
-**Dönüş**: Fonksiyonun dönüş tipi mevcut tanımda net olarak belirtilmemiştir, formatlanmış okunabilir tarih string'ini döndürmesi beklenir ancak herhangi bir varsayım veya uydurma yapılmamıştır.
+**Ne yapar**: Fonksiyonun ne amaçla kullanıldığı ve ne yaptığı belirtilmemiştir.  
+**Nasıl yapar**: İşlevsel içeriği hakkında bilgi mevcut değildir.  
+**Parametreler**:  
+- `dateString`: `string` — tarih bilgisini içeren metin.  
+**Dönüş**: Belirtilmemiştir (return tipi bilinmiyor).
 
 ### formatPrice
-**Ne yapar**: Siparişlerdeki ürün ve hizmetlerin ham sayısal fiyat değerlerini para birimi kurallarına uygun, tutarlı biçimde formatlayan yardımcı fonksiyondur. Tüm sipariş listesindeki fiyatların aynı standartta görünmesini sağlar.
-**Nasıl yapar**: Gelen sayısal fiyat değerini binlik ayırıcı, ondalık basamak ayarları ve ilgili para birimi simgesiyle standart para formatına dönüştürerek kullanıcının kolayca anlayabileceği bir sunum hazırlar.
-**Parametreler**:
-- price: number — Formatlanacak ham sayısal fiyat değerini taşıyan parametre, işlenmemiş maliyet verisini içerir.
-**Dönüş**: Fonksiyonun dönüş tipi mevcut tanımda net olarak belirtilmemiştir, formatlanmış para birimi string'ini döndürmesi beklenir ancak herhangi bir varsayım veya uydurma yapılmamıştır.
+**Ne yapar**: Fonksiyonun görevi ve çıktısı kaynakta tanımlanmamıştır.  
+**Nasıl yapar**: İç mantığı hakkında veri bulunmamaktadır.  
+**Parametreler**:  
+- `price`: `number` — fiyat değerini temsil eden sayı.  
+**Dönüş**: Belirtilmemiştir (return tipi bilinmiyor).
 
 ### getStatusColor
-**Ne yapar**: Siparişlerin mevcut durumuna göre arayüzde kullanılacak uygun renk kodları veya CSS sınıf isimlerini belirleyen yardımcı fonksiyondur. Sipariş durumlarının görsel olarak hızlıca ayırt edilmesini sağlar.
-**Nasıl yapar**: Gelen durum string'ini eşleştirerek, örneğin beklemede, teslim edildi, iptal edildi gibi durumlara karşılık gelen sarı, yeşil, kırmızı gibi ilgili renkleri veya CSS sınıflarını belirler, arayüzde görsel tutarlılık sunar.
-**Parametreler**:
-- status: string — Siparişin mevcut durumunu içeren string tipinde parametre, renk eşleştirmesi yapılacak temel durum bilgisini taşır.
-**Dönüş**: Fonksiyonun dönüş tipi mevcut tanımda net olarak belirtilmemiştir, arayüzde kullanılacak renk kodu veya CSS sınıfı string'ini döndürmesi beklenir ancak herhangi bir varsayım veya uydurma yapılmamıştır.
+**Ne yapar**: Fonksiyonun işlevi ve kullanım amacı açıklanmamıştır.  
+**Nasıl yapar**: İşlevsel detayları mevcut değildir.  
+**Parametreler**:  
+- `status`: `string` — durum bilgisini ifade eden metin.  
+**Dönüş**: Belirtilmemiştir (return tipi bilinmiyor).
 
 ### getStatusText
-**Ne yapar**: Siparişlerin sistem içindeki ham durum kodlarını veya yabancı dildeki durum string'lerini kullanıcının anlayabileceği yerelleştirilmiş, okunabilir metinlere dönüştüren yardımcı fonksiyondur. Tüm durum metinlerinin siparişler sayfasında tutarlı bir şekilde yazılmasını sağlar.
-**Nasıl yapar**: Gelen ham durum string'ini eşleyerek, örneğin "delivered" gibi sistem içi ifadeyi "Teslim Edildi", "pending" ifadesini "Beklemede" gibi kullanıcı dostu metinlere çevirir, sayfa içindeki tüm durum yazımlarını standartlaştırır.
-**Parametreler**:
-- status: string — İşlenecek ham sipariş durumu string'ini taşıyan parametre, çevrilecek orijinal durum bilgisini içerir.
-**Dönüş**: Fonksiyonun dönüş tipi mevcut tanımda net olarak belirtilmemiştir, yerelleştirilmiş okunabilir durum metni string'ini döndürmesi beklenir ancak herhangi bir varsayım veya uydurma yapılmamıştır.
+**Ne yapar**: Fonksiyonun ne yaptığı ve ne döndürdüğü kaynakta yer almamaktadır.  
+**Nasıl yapar**: İç mantığı hakkında bilgi yoktur.  
+**Parametreler**:  
+- `status`: `string` — durum bilgisini temsil eden metin.  
+**Dönüş**: Belirtilmemiştir (return tipi bilinmiyor).
 
 ---
 
@@ -115,179 +122,128 @@ type StatusFilter = 'all' | 'pending' | 'paid' | 'shipped' | 'delivered' | 'fail
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::fetchOrders
+### [N1_NASIL] AST Pointer: src\views\OrdersPage.tsx::fetchOrders
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `setLoading` — Sipariş yükleme durumunu güncelleyen state setter fonksiyonu
-  - `supabase` — Veritabanı sorguları için kullanılan Supabase istemcisi
-  - `ordersData` — Supabase'den gelen ham sipariş verilerini tutan değişken
-  - `ordersError` — Sorgu sırasında oluşan hatayı tutan değişken
-  - `ordersError.code` — Hata nesnesinin özel hata kodu alanı
-  - `ordersError.status` — Hata nesnesinin HTTP durum kodu alanı
-  - `user?.id` — Oturum açmış kullanıcının ID'si, kendi siparişlerini filtrelemek için kullanılır
-  - `toast.error` — Kullanıcıya hata bildirimi göstermek için kullanılan toast fonksiyonu
-  - `t` — Çeviri metinlerini çekmek için kullanılan i18n fonksiyonu
-  - `formattedOrders` — Ham veriyi uygulama sipariş tipine dönüştürülmüş listesi
-  - `rawOrder` — Map fonksiyonunda işlenen her bir ham sipariş nesnesi
-  - `isRecord` — Nesne tip kontrolü yapan tip güvenliği fonksiyonu
-  - `order` — Ham siparişin güvenli cast edilmiş işlenebilir hali
-  - `itemsList` — Sipariş ürünleri listesinin dizi olarak doğrulanmış hali
-  - `order.venthub_order_items` — Veritabanından gelen ilişkisel sipariş ürünleri verisi
-  - `items` — Dönüştürülmüş sipariş ürünleri listesi
-  - `rawIt` — Ürün listesinde işlenen her bir ham ürün nesnesi
-  - `it` — Ham ürünün güvenli cast edilmiş işlenebilir hali
-  - `setOrders` — Bileşenin genel sipariş state'ini güncelleyen setter
-  - `searchParams` — Next.js URL sorgu parametreleri nesnesi
-  - `productQ` — URL'den alınan ürün filtresi sorgu değeri
-  - `setProductFilter` — Ürün filtresi state'ini güncelleyen setter
-  - `error` — Try bloğunda yakalanan genel hata nesnesi
-- **Dönüş**: void (hata durumunda erken dönüş, başarılı durumda state günceller)
+  - `setLoading` — component state setter, loading durumunu kontrol eder
+  - `supabase` — Supabase client, veritabanı sorguları için kullanılır
+  - `user` — oturum açmış kullanıcı nesnesi, `user?.id` ile filtreleme yapılır
+  - `ordersData` — sorgu sonucu gelen sipariş listesi (raw)
+  - `ordersError` — sorgu hatası nesnesi
+  - `console` — hata loglamak için kullanılır
+  - `toast` — kullanıcıya hata mesajı göstermek için `react-hot-toast` kullanılır
+  - `t` — i18n çeviri fonksiyonu, hata mesajlarını yerelleştirir
+  - `setOrders` — component state setter, formatlanmış siparişleri saklar
+  - `searchParams` — URL sorgu parametreleri, ürün filtresi almak için kullanılır
+  - `setProductFilter` — component state setter, URL’den gelen ürün filtresini saklar
+- **Dönüş**: `void` (state güncellemeleri ve yan etkiler)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::formatRawOrder
-- **params**: (rawOrder: unknown)
+### [N2_NASIL] AST Pointer: src\views\OrdersPage.tsx::mapRawOrder
+- **params**: `rawOrder: unknown`
 - **ic_degiskenler**:
-  - `order` — Ham siparişin güvenli cast edilmiş işlenebilir nesnesi
-  - `itemsList` — Sipariş ürünleri listesinin dizi olarak doğrulanmış hali
-  - `order.venthub_order_items` — Veritabanından gelen ilişkisel ürün verisi
-  - `items` — Dönüştürülmüş sipariş ürünleri listesi
-  - `rawIt` — Ürün listesinde işlenen her bir ham ürün nesnesi
-  - `it` — Ham ürünün güvenli cast edilmiş işlenebilir hali
-  - `user?.user_metadata?.full_name` — Kullanıcının profildeki tam adı, varsayılan müşteri ismi olarak kullanılır
-  - `user?.email` — Kullanıcının kayıtlı e-postası, varsayılan iletişim bilgisi olarak kullanılır
-- **Dönüş**: Order (tip güvenli uygulama sipariş nesnesi)
+  - `order` — `rawOrder` bir obje ise onun kopyası, aksi takdirde boş obje
+  - `itemsList` — `order.venthub_order_items` dizisi, yoksa boş dizi
+  - `items` — `itemsList` üzerinden dönüştürülmüş `OrderItem` dizisi
+  - `it` — `rawIt` bir obje ise onun kopyası (inner mapper içinde)
+- **Dönüş**: `Order` (formatlanmış sipariş nesnesi)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::formatRawOrderItem
-- **params**: (rawIt: unknown)
+### [N3_NASIL] AST Pointer: src\views\OrdersPage.tsx::mapRawItem
+- **params**: `rawIt: unknown`
 - **ic_degiskenler**:
-  - `it` — Ham ürün nesnesinin güvenli cast edilmiş işlenebilir hali
-  - `it.id` — Ürün kaleminin benzersiz ID'si
-  - `it.product_id` — İlişkili ana ürünün ID'si
-  - `it.product_name` — Ürünün görünen adı
-  - `it.quantity` — Sipariş edilen ürün adedi
-  - `it.price_at_time` — Sipariş anındaki ürün birim fiyatı
-  - `it.product_image_url` — Ürünün görselinin depolama linki
-- **Dönüş**: OrderItem (tip güvenli uygulama sipariş kalemi nesnesi)
+  - `it` — `rawIt` bir obje ise onun kopyası, aksi takdirde boş obje
+- **Dönüş**: `OrderItem` (formatlanmış sipariş kalemi)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::authGuardEffect
+### [N4_NASIL] AST Pointer: src\views\OrdersPage.tsx::authEffect
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `authLoading` — Kimlik doğrulama yükleme durumu
-  - `user` — Oturum açmış kullanıcı nesnesi
-  - `router` — Next.js yönlendirme nesnesi
-  - `Routes.auth.login` — Giriş sayfası rotası, yönlendirme için kullanılır
-  - `fetchOrders` — Siparişleri çeken ana fonksiyon, kullanıcı varsa tetiklenir
-- **Dönüş**: void (giriş yapmamış kullanıcıyı login sayfasına yönlendirir)
+  - `authLoading` — auth hook’dan gelen yükleme durumu
+  - `user` — oturum açmış kullanıcı nesnesi
+  - `router` — Next.js router, yönlendirme için kullanılır
+  - `Routes` — uygulama rotaları sabiti
+  - `fetchOrders` — siparişleri getiren fonksiyon
+- **Dönüş**: `void` (yönlendirme ve veri çekme yan etkileri)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::formatDate
-- **params**: (dateString: string)
+### [N5_NASIL] AST Pointer: src\views\OrdersPage.tsx::formatDate
+- **params**: `dateString: string`
 - **ic_degiskenler**:
-  - `formatDateTime` — Genel tarih formatlama fonksiyonu
-  - `lang` — Uygulamanın aktif dil kodu, yerel ayarlara göre formatlamak için kullanılır
-- **Dönüş**: string (yerelleştirilmiş formatlanmış tarih metni)
+  - `formatDateTime` — tarih‑zaman formatlayıcı fonksiyon
+  - `lang` — geçerli dil kodu (i18n provider’dan alınır)
+- **Dönüş**: `string` (formatlanmış tarih)
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::formatPrice
-- **params**: (price: number)
+### [N6_NASIL] AST Pointer: src\views\OrdersPage.tsx::formatPrice
+- **params**: `price: number`
 - **ic_degiskenler**:
-  - `formatCurrency` — Genel para birimi formatlama fonksiyonu
-  - `lang` — Uygulamanın aktif dil kodu, yerel para birimi ayarları için kullanılır
-- **Dönüş**: string (yerelleştirilmiş formatlanmış fiyat metni)
+  - `formatCurrency` — para birimi formatlayıcı fonksiyon
+  - `lang` — geçerli dil kodu
+- **Dönüş**: `string` (formatlanmış fiyat)
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::getStatusColor
-- **params**: (status: string)
+### [N7_NASIL] AST Pointer: src\views\OrdersPage.tsx::getStatusColor
+- **params**: `status: string`
 - **ic_degiskenler**:
-  - `status.toLowerCase()` — Durum metnini küçük harfe çevirerek case insensitive karşılaştırma yapmak için kullanılır
-- **Dönüş**: string (sipariş durumuna göre Tailwind CSS renk sınıfları)
+  - `status` — sipariş durumu, küçük harfe dönüştürülerek karşılaştırılır
+- **Dönüş**: `string` (CSS sınıfı, renk kodu)
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::getStatusText
-- **params**: (status: string)
+### [N8_NASIL] AST Pointer: src\views\OrdersPage.tsx::getStatusText
+- **params**: `status: string`
 - **ic_degiskenler**:
-  - `status.toLowerCase()` — Durum metnini küçük harfe çevirerek case insensitive karşılaştırma yapmak için kullanılır
-  - `t` — Çeviri metinlerini çekmek için kullanılan i18n fonksiyonu
-- **Dönüş**: string (sipariş durumunun yerelleştirilmiş görünen metni)
+  - `t` — i18n çeviri fonksiyonu
+  - `status` — sipariş durumu, küçük harfe dönüştürülerek karşılaştırılır
+- **Dönüş**: `string` (yerelleştirilmiş durum metni)
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::filterOrder
-- **params**: (o: Order)
+### [N9_NASIL] AST Pointer: src\views\OrdersPage.tsx::orderFilter
+- **params**: `o`
 - **ic_degiskenler**:
-  - `productFilter` — Aktif ürün arama filtresi değeri
-  - `q` — Küçük harfe çevrilmiş arama sorgusu, karşılaştırmada kullanılır
-  - `o.order_items` — Siparişin ürün listesi, ürün adı araması için taranır
-  - `it.product_name` — Ürünün adı, arama sorgusuyla eşleştirilir
-  - `statusFilter` — Aktif durum filtresi değeri
-  - `o.status` — Siparişin durumu, durum filtresiyle karşılaştırılır
-  - `dateFrom` — Başlangıç tarihi filtresi, sipariş oluşturma tarihiyle karşılaştırılır
-  - `o.created_at` — Siparişin oluşturulma tarihi, tarih filtrelerinde kullanılır
-  - `dateTo` — Bitiş tarihi filtresi, sipariş oluşturma tarihiyle karşılaştırılır
-  - `searchCode` — Sipariş kodu arama filtresi
-  - `o.order_number` — Siparişin resmi numarası, arama için kırpılır
-  - `o.id` — Siparişin benzersiz ID'si, order_number yoksa yedek olarak kullanılır
-- **Dönüş**: boolean (sipariş tüm filtreleri geçiyorsa true, geçmiyorsa false)
+  - `productFilter` — URL’den gelen ürün filtresi
+  - `statusFilter` — seçili durum filtresi
+  - `dateFrom` — başlangıç tarihi filtresi
+  - `dateTo` — bitiş tarihi filtresi
+  - `searchCode` — sipariş kodu arama filtresi
+  - `q` — `productFilter`’ın küçük harfe dönüştürülmüş hali
+  - `match` — ürün adı filtre kontrol sonucu
+  - `code` — sipariş numarasından türetilen kod
+- **Dönüş**: `boolean` (siparişin filtreye uygunluğu)
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::renderOrderCard
-- **params**: (order: Order)
+### [N10_NASIL] AST Pointer: src\views\OrdersPage.tsx::orderRowRenderer
+- **params**: `order`
 - **ic_degiskenler**:
-  - `order.id` — Siparişin benzersiz ID'si, React anahtarı ve detay yönlendirmesi için kullanılır
-  - `steps` — Sipariş ilerleme adımları listesi
-  - `s` — Adım listesinde işlenen her bir adım metni
-  - `idx` — Adımın listedeki indeksi
-  - `normalizedStatus` — 'confirmed' durumunu 'paid' olarak normalleştiren değer, ilerleme çubuğu için kullanılır
-  - `activeIdx` — Mevcut sipariş durumunun adım listesindeki indeksi
-  - `active` — Adımın tamamlanıp tamamlanmadığını belirten boolean
-  - `stepLabel[s]` — Adımın yerelleştirilmiş görünen metni
-  - `order.order_number` — Siparişin numarası, kart başlığında gösterilir
-  - `order.is_demo` — Siparişin demo olup olmadığı, etiket göstermek için kullanılır
-  - `order.created_at` — Siparişin oluşturulma tarihi, formatlanarak kartta gösterilir
-  - `order.total_amount` — Siparişin toplam tutarı, formatlanarak kartta gösterilir
-  - `order.status` — Siparişin durumu, renk ve metin için formatlanır
-  - `order.payment_status` — Ödeme durumu, kısmi iade etiketi göstermek için kullanılır
-  - `router` — Next.js yönlendirme nesnesi, detay sayfasına gitmek için kullanılır
-  - `formatDate` — Tarih formatlama fonksiyonu
-  - `formatPrice` — Fiyat formatlama fonksiyonu
-  - `getStatusColor` — Durum rengi getiren fonksiyon
-  - `getStatusText` — Durum metni getiren fonksiyon
-  - `t` — Çeviri metinleri çeken i18n fonksiyonu
-  - Lucide ikonları (Package, Calendar, CreditCard, Eye) — Kartta görsel olarak kullanılır
-- **Dönüş**: JSX.Element (tek sipariş için render edilmiş kart bileşeni)
+  - `steps` — sipariş aşamaları dizisi
+  - `stepLabel` — aşama etiketleri haritası
+  - `formatDate` — tarih formatlayıcı
+  - `formatPrice` — fiyat formatlayıcı
+  - `getStatusColor` — durum renk sınıfı
+  - `getStatusText` — durum metni
+  - `t` — i18n çeviri fonksiyonu
+  - `router` — Next.js router, detay sayfasına yönlendirme
+  - `order` — mevcut sipariş nesnesi, JSX içinde çeşitli alanları kullanılır
+- **Dönüş**: `JSX.Element` (sipariş kartı)
 
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx::renderProgressStep
-- **params**: (s: string, idx: number)
+### [N11_NASIL] AST Pointer: src\views\OrdersPage.tsx::stepRenderer
+- **params**: `s, idx`
 - **ic_degiskenler**:
-  - `order.status` — İşlenen siparişin mevcut durumu
-  - `normalizedStatus` - 'confirmed' durumunu 'paid' olarak normalleştiren değer, ilerleme hesaplamak için kullanılır
-  - `activeIdx` — Mevcut durumun adım listesindeki indeksi
-  - `active` — Adımın tamamlanıp tamamlanmadığını belirten boolean
-  - `stepLabel[s]` — Adımın yerelleştirilmiş görünen metni
-- **Dönüş**: React.Fragment (sipariş ilerleme çubuğunun tek adımını içeren fragment)
+  - `order` — dış scope’tan gelen sipariş nesnesi
+  - `steps` — aşama dizisi
+  - `stepLabel` — aşama etiketleri
+  - `normalizedStatus` — `order.status` “confirmed” ise “paid” olarak normalize edilir
+  - `activeIdx` — aktif aşama indeksini belirler
+  - `active` — mevcut indeksin aktif olup olmadığını gösterir
+- **Dönüş**: `JSX.Element` (adım göstergesi)
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-OrdersPage() ana fonksiyonu, sipariş verilerini sayfada gösterebilmek için durum metnini getStatusText, fiyat bilgisini formatPrice, tarih bilgisini formatDate ve durum renk kodlarını getStatusColor fonksiyonlarından almak üzere bu 4 dahili fonksiyonu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı verisinde bu modülü kullanan dış dosya veya fonksiyon bilgisi mevcut değildir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  OrdersPage() → formatDate()
-  OrdersPage() → formatPrice()
-  OrdersPage() → getStatusColor()
-  OrdersPage() → getStatusText()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    OrdersPage["OrdersPage()"] --> formatDate["formatDate()"]
-    OrdersPage["OrdersPage()"] --> formatPrice["formatPrice()"]
-    OrdersPage["OrdersPage()"] --> getStatusColor["getStatusColor()"]
-    OrdersPage["OrdersPage()"] --> getStatusText["getStatusText()"]
+graph TD
+    OrdersPage_tsx__OrdersPage["OrdersPage"]
+    OrdersPage_tsx__formatDate["formatDate"]
+    OrdersPage_tsx__formatPrice["formatPrice"]
+    OrdersPage_tsx__getStatusColor["getStatusColor"]
+    OrdersPage_tsx__getStatusText["getStatusText"]
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusColor
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatDate
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -302,3 +258,18 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: OrdersPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-clean-white`, `bg-orange-100`, `bg-orange-100/80`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-slate-100`, `bg-slate-50`, `bg-white`, `border-b`, `border-b-2`, `border-orange-200`, `border-primary-navy`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `h-1`, `h-10`, `h-12`, `h-16`, `h-7`, `inline-flex`, `items-center`, `justify-between`
+- **Responsive:** `md:` prefix kullanımları

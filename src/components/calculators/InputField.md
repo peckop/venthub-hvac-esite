@@ -4,58 +4,80 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\calculators\InputField.tsx
 skeleton_hash: 2c4bf169494b0683
-generated_at: 2026-05-23T21:56:08Z
+entity_hashes:
+  func:InputField: 67cc20ea60eef576
+  func:RadioGroup: 3547a0581eb094b6
+  overview: 886525d7c102a6da
+  style_tokens: 3311fed767cc16e1
+generated_at: 2026-05-27T11:42:31Z
 ---
 
-## Genel Bakış
-`InputField.tsx` modülü, HVAC hesaplayıcıları içinde kullanıcıdan veri almak için yeniden kullanılabilir temel form elemanlarını içerir. Bu dosyada, tek bir değer giren **InputField** ve birden fazla seçenekten tek bir seçim yapan **RadioGroup** bileşenleri tanımlanmıştır; her ikisi de ortak özellikleri paylaşarak tutarlı bir kullanıcı arayüzü sağlar.
+## Genel Bakış  
+Bu modül, kullanıcı arayüzünde veri girişi için iki temel bileşen sunar: tek bir sayısal veya metin alanı ve bir radyo grup. Her iki bileşen de etiket, değer, değişiklik işleyici ve isteğe bağlı görsel ayarları alarak, form elemanlarını tek bir yerde tutarak kodun yeniden kullanılabilirliğini artırır.
 
-## Fonksiyon Grupları
-### Form Giriş Bileşenleri
-Bu grup, kullanıcıdan alınan bilgileri işlemek ve üst bileşenlere iletmek için gerekli olan kullanıcı arayüzü bileşenlerini toplar.  
-- InputField, RadioGroup  
+## Fonksiyon Grupları  
 
-Her iki bileşen de etiket, mevcut değer ve değişiklik bildirimi gibi temel özellikleri alır; `InputField` sayısal veya metin tabanlı tek alan girdisi sunarken, `RadioGroup` önceden belirlenmiş seçenekler arasında tek bir seçim yapmayı ve hata gösterimi ile sütun düzeni gibi ek düzenlemeleri mümkün kılar.
+### Giriş Alanı Bileşeni  
+Bu grup, tek bir giriş alanı oluşturur. Kullanıcıdan sayı veya metin alır, etiket ve yer tutucu ile birlikte değişiklikleri üst bileşene iletir.  
+- InputField  
+
+### Radyo Grubu Bileşeni  
+Bu grup, birden çok radyo butonunu sütun düzeninde gösterir. Seçilen değeri, hata mesajını ve seçenek listesini yönetir, değişiklikleri üst bileşene iletir.  
+- RadioGroup
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-[Bu modül için özel aksiyom tanımlanmamıştır.]  
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-- Eğer **InputField** bileşenine `type` prop’u verilmezse, varsayılan olarak `'number'` kullanılır.  
-- Eğer **InputField** bileşenine `placeholder` prop’u verilmezse, giriş kutusu placeholder özelliği olmadan render edilir.  
-- Eğer **InputField** bileşenine `onChange` prop’u verilmezse, değer değişiklikleri üst bileşene iletilmez.  
-- Eğer **RadioGroup** bileşenine `options` prop’u verilmezse, seçenek listesi boş olduğu için hiçbir radyo düğmesi gösterilmez.  
-- Eğer **RadioGroup** bileşenine `onChange` prop’u verilmezse, seçenek değişiklikleri üst bileşene iletilmez.  
-- Eğer **RadioGroup** bileşenine `error` prop’u verilmezse, hata mesajı gösterilmez.  
-- Eğer **RadioGroup** bileşenine `columns` prop’u verilmezse, sütun düzeni belirtilmediği için bileşen tek sütun varsayılan davranışına bağlıdır (bu davranış stil veya diğer prop’lar tarafından belirlenir).
+**Aksiyom 1**: Eğer `InputField` bileşenine `label` parametresi sağlanmazsa, bileşen render edilemez ve UI’da boş etiket gösterilir.
+
+**Aksiyom 2**: Eğer `InputField` bileşenine `value` parametresi, `type` parametresiyle uyumlu bir veri tipi (ör. `type='number'` ise sayı) değilse, giriş alanı hatalı veri alır ve beklenmeyen davranış (ör. NaN gösterimi) ortaya çıkar.
+
+**Aksiyom 3**: Eğer `InputField` bileşenine `onChange` callback’i verilmezse, kullanıcı etkileşimi (değer değişikliği) yakalanamaz ve form durumu güncellenmez.
+
+**Aksiyom 4**: Eğer `InputField` bileşenine `type` parametresi `'number'` dışındaki bir değer verilirse, bileşen o tipte bir HTML input oluşturur; ancak `type` değeri desteklenmeyen bir tipse (ör. `'unknown'`) tarayıcı varsayılan olarak `text` tipine düşer.
+
+**Aksiyom 5**: Eğer `InputField` bileşenine `placeholder` parametresi sağlanmazsa, giriş alanı boş bir yer tutucu gösterir; bu durum UI/UX açısından kabul edilebilir bir durumdur.
+
+**Aksiyom 6**: Eğer `RadioGroup` bileşenine `label` parametresi sağlanmazsa, radyo grubunun başlığı eksik olur ve kullanıcıya grup hakkında bilgi verilmez.
+
+**Aksiyom 7**: Eğer `RadioGroup` bileşenine `value` parametresi, `options` içinde tanımlı bir değerle eşleşmezse, hiçbir radyo butonu seçili gelmez ve UI’da tutarsız bir durum oluşur.
+
+**Aksiyom 8**: Eğer `RadioGroup` bileşenine `onChange` callback’i verilmezse, kullanıcı bir seçenek seçtiğinde seçimin dışarıya aktarımı gerçekleşmez; bu da formun doğru şekilde güncellenmemesine yol açar.
+
+**Aksiyom 9**: Eğer `RadioGroup` bileşenine `options` parametresi eksik veya boş bir dizi olarak verilirse, radyo butonları oluşturulamaz ve bileşen render hatası verir.
+
+**Aksiyom 10**: Eğer `RadioGroup` bileşenine `error` parametresi sağlanmazsa, hata mesajı gösterilmez; bu durum hatalı girişlerin kullanıcıya bildirilmemesine neden olabilir ancak bileşenin çalışmasını engellemez.
+
+**Aksiyom 11**: Eğer `RadioGroup` bileşenine `columns` parametresi sağlanmazsa, radyo butonları tek sütun halinde (default layout) düzenlenir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### InputField
-**Ne yapar**: Kullanıcıdan veri girişi almak için stilize edilmiş bir giriş alanı render eder;Tooltip, birim gösterimi ve hata mesajı gibi ek bileşenleri içerir.  
-**Nasıl yapar**: Props olarak gelen `label`, `value`, `onChange`, `type` ve `placeholder` değerlerini kullanarak bir `<input>` elementi oluşturur; ek olarak Tooltip, birim ve hata gösterimi için iç içe bileşenler render eder.  
+**Ne yapar**: Kullanıcıdan sayısal veri girişi almak için tasarlanmış bir React bileşenidir; etiket, placeholder, birim ve hata mesajı gibi ek UI öğelerini içerir.  
+**Nasıl yapar**: Props olarak gelen `label`, `value`, `onChange`, `type` ve `placeholder` değerlerini kullanarak bir `<input>` elemanı oluşturur; `type` varsayılan olarak `'number'` olduğundan sayısal girişe odaklanır. Tooltip ve birim göstergesi eklenerek kullanıcı deneyimi artırılır; hata durumu varsa `error` prop’u üzerinden görsel geri bildirim sağlanır.  
 **Parametreler**:
-- label: string — Giriş alanının üstünde gösterilecek açıklama metni  
-- value: string | number — Şu anki giriş değeri, kontrolü dışarıdan yönetmek için kullanılır  
-- onChange: (value: string | number) => void — Kullanıcı değeri değiştirdiğinde çağrılan geri çağırım fonksiyonu  
-- type: string — HTML input tipi (varsayılan: 'number'); metin, sayı, vb. türleri belirler  
-- placeholder: string — Giriş alanı boşken gösterilecek ipucu metni  
-**Dönüş**: React.FC<InputFieldProps> — Props'u alan ve JSX döndüren bir React fonksiyon bileşeni  
+- `label`: string — Giriş alanının üstünde gösterilecek açıklama metni.  
+- `value`: string | number — Kontrol edilen giriş değerinin mevcut durumu.  
+- `onChange`: (newValue: string | number) => void — Değer değiştiğinde tetiklenen geri çağırma fonksiyonu.  
+- `type`: string — HTML input tipini belirler; varsayılan `'number'`.  
+- `placeholder`: string — Kullanıcıya örnek bir değer göstermek için kullanılan yer tutucu metin.  
+**Dönüş**: React.FC<InputFieldProps> — Tanımlanan prop tipleriyle uyumlu bir fonksiyonel React bileşeni.
 
 ### RadioGroup
-**Ne yapar**: Seçenekler arasında tek bir seçime izin veren bir radyo grubu oluşturur; seçili değeri, etiket ve hata durumu gibi bilgileri gösterir.  
-**Nasıl yapar**: `options` prop'undan gelen seçenek listesini iterate ederek her bir seçenek için bir `<input type="radio">` ve ilişkili `<label>` elementi render eder; `value` ve `onChange` props'u ile seçilen değeri yönetir, `error` varsa hata mesajını gösterir.  
+**Ne yapar**: Belirli bir seçenek kümesi arasından tek bir seçim yapılmasını sağlayan bir radyo buton grubu bileşenidir; etiket, hata mesajı ve sütun düzeni gibi ek özellikler sunar.  
+**Nasıl yapar**: `options` dizisindeki her bir öğe için bir `<input type="radio">` oluşturur, `value` prop’u seçili öğeyi belirler ve `onChange` geri çağırmasıyla seçim değişikliklerini üst bileşene iletir. `columns` parametresi, radyo butonlarının kaç sütun halinde düzenleneceğini kontrol eder; `error` varsa ilgili stil ve mesaj gösterilir.  
 **Parametreler**:
-- label: string — Radyo grubunun üstünde gösterilecek açıklama metni  
-- value: string | number — Şu anda seçili olan seçeneğin değeri  
-- onChange: (value: string | number) => void — Kullanıcı farklı bir seçenek işaretlediğinde çağrılan geri çağırım fonksiyonu  
-- options: Array<{ value: string | number; label: string }> — Gösterilecek radyo seçeneklerinin listesi; her seçenek bir değer ve görüntülenecek etiket içerir  
-- error: string | null — Gösterilecek hata mesajı; null veya boş string ise hata gösterilmez  
-- columns: number — Seçeneklerin kaç sütunda düzenleneceğini belirten sayı (ör. 2 için iki sütunlu düzen)  
-**Dönüş**: React.FC<RadioGroupProps> — Props'u alan ve JSX döndüren bir React fonksiyon bileşeni
+- `label`: string — Radyo grubunun başlığı veya açıklama metni.  
+- `value`: string | number — Şu anda seçili olan radyo butonunun değeri.  
+- `onChange`: (newValue: string | number) => void — Seçim değiştiğinde tetiklenen geri çağırma fonksiyonu.  
+- `options`: Array<{ label: string; value: string | number }> — Her bir radyo butonunun gösterilecek etiketi ve değeri.  
+- `error`: string (opsiyonel) — Doğrulama hatası durumunda gösterilecek mesaj.  
+- `columns`: number (opsiyonel) — Radyo butonlarının kaç sütun içinde yer alacağını belirler.  
+**Dönüş**: React.FC<RadioGroupProps> — Tanımlanan prop tipleriyle uyumlu bir fonksiyonel React bileşeni.
 
 ---
 
@@ -88,16 +110,16 @@ Her iki bileşen de etiket, mevcut değer ve değişiklik bildirimi gibi temel �
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/calculators/InputField.tsx::InputField
-- **params**: label, value, onChange, type = 'number', placeholder, unit, min, max, step = 0.1, tooltip, error, disabled = false
-- **ic_degiskenler**: 
-  - `id` — unique ID generated by React.useId() for associating the label with the input and tooltip
-- **Dönüş**: React.FC<InputFieldProps>
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\calculators\InputField.tsx::InputField
+- **params**: `label, value, onChange, type = 'number', placeholder, unit, min, max, step = 0.1, tooltip, error, disabled = false`
+- **ic_degiskenler**:
+  - `id` — `React.useId()` ile oluşturulan benzersiz element id’si; `<label>` ve `<input>` elementlerinin `htmlFor` ve `id` özelliklerinde kullanılır.
+- **Dönüş**: JSX/React element (bir `<div>` içinde label, input ve isteğe bağlı tooltip, unit ve hata mesajı içerir).
 
-### [N2_NASIL] AST Pointer: src/components/calculators/InputField.tsx::RadioGroup
-- **params**: label, value, onChange, options, error, columns = 2, tooltip
-- **ic_degiskenler**: yok
-- **Dönüş**: React.FC<RadioGroupProps>
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\calculators\InputField.tsx::RadioGroup
+- **params**: `label, value, onChange, options, error, columns = 2, tooltip`
+- **ic_degiskenler**: *(yok)*
+- **Dönüş**: JSX/React element (bir `<div>` içinde label, isteğe bağlı tooltip, dinamik olarak oluşturulmuş radio‑butonlar ve hata mesajı içerir).
 
 ---
 

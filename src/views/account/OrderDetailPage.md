@@ -4,37 +4,54 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx
 skeleton_hash: 622dd4d11cb43f53
-generated_at: 2026-05-23T22:36:40Z
+entity_hashes:
+  func:OrderDetailPage: 86e76b4c00c9f2fc
+  overview: 91762eaa328b7587
+  style_tokens: 571bb75f176a8e04
+generated_at: 2026-05-27T11:48:49Z
 ---
 
 ## Genel Bakış
-Venthub HVAC projesinin kullanıcı hesap paneli bölümünde yer alan bir React görünüm modülüdür. Kullanıcıların kendi hesapları üzerinden eriştikleri belirli bir siparişin tüm detaylarını görüntülemesini sağlayan sipariş detay sayfasının temel yapısını oluşturur. Modül, tamamen bu sayfanın işleyişinden sorumlu ana bileşeni barındırır.
+Bu modül, kullanıcının bir siparişin tüm detaylarını görüntülemesini sağlayan sayfa bileşenini tanımlar. Sipariş özeti, ürün listesi, teslimat bilgileri ve sipariş durumu gibi temel bilgilerin tek bir ekranda sunulmasından sorumludur.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Sipariş detay sayfasının tüm arayüz düzenini, içerik yönetimini ve kullanıcıya sunulmasını üstlenen tek ana bileşendir, sayfanın çalışmasının temelini oluşturur.
+Sipariş detay sayfasının tamamını oluşturan ve ilgili tüm alt bileşenleri bir araya getiren ana fonksiyondur.
 - OrderDetailPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-OrderDetailPage, VentHub HVAC projesinin kullanıcı hesapları bölümündeki sipariş detaylarını görüntüleyen React view bileşenidir, doğru ve güvenli şekilde çalışması için yönlendirme, kimlik doğrulama, arka plan API servisleri ve ortak UI bileşeni bağımlılıklarının sorunsuz çalışması zorunludur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer ana uygulamanın yönlendirme (routing) sistemi tarafından bu sayfaya erişim sırasında URL parametresi olarak sipariş kimliği (order ID) iletilmiyorsa, sipariş verisi çekilemez ve sayfa hata ekranıyla veya boş şekilde yüklenir.
-[Aksiyom 2]: Eğer sipariş detayı verisini sunucudan çeken arka plan API servisi erişilemez veya geçerli veri dönmüyorsa, hiçbir sipariş detayı kullanıcıya gösterilemez ve kullanıcı sayfa üzerindeki hiçbir işlevi kullanamaz.
-[Aksiyom 3]: Eğer kullanıcının ilgili siparişi görüntülemeye yetkisi olduğunu doğrulayan kimlik doğrulama/yetkilendirme sistemi çalışmıyorsa, ya yetkisiz kullanıcılar hassas sipariş verilerine erişir ya da yetkili kullanıcılar sayfaya erişim sağlayamaz.
-[Aksiyom 4]: Eğer bu sayfanın bağımlı olduğu ortak proje UI bileşenleri (navigasyon çubuğu, buton, bilgi kartları vb.) projeye dahil edilmemiş veya çalışmıyorsa, sayfa düzgün şekilde render edilemez, kullanıcı arayüzü işlevsiz ve bozuk görünür.
+**Aksiyom 1**: Eğer **React Router** (veya benzeri bir yönlendirme bağlamı) mevcut değilse, `OrderDetailPage` bileşeni doğru URL parametrelerine erişemez ve sayfa içeriği render edilemez.
+
+**Aksiyom 2**: Eğer **global state/store** (ör. Redux, Context API) içinde sipariş detay verisi (`orderDetail`) bulunmuyorsa, `OrderDetailPage` ya bir **yükleme (loading) göstergesi** gösterir ya da **veri bulunamadı** hatası üretir.
+
+**Aksiyom 3**: Eğer **kullanıcı oturum bilgisi** (auth context) sağlanmamışsa, `OrderDetailPage` erişim kontrolü nedeniyle yönlendirme (redirect) yapar veya yetkisiz erişim mesajı gösterir.
+
+**Aksiyom 4**: Eğer **stil/tema sağlayıcısı** (ThemeProvider vb.) eksikse, `OrderDetailPage` stil sınıflarını bulamaz ve varsayılan (fallback) stil ile render olur; bu da UI tutarsızlığına yol açar.
+
+**Aksiyom 5**: Eğer **harici API çağrısı** (ör. sipariş detaylarını getiren endpoint) başarısız olursa, `OrderDetailPage` hata durumunu yakalar ve kullanıcıya **hata mesajı** gösterir; aksi takdirde sayfa boş kalır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### OrderDetailPage
-**Ne yapar**: VentHub HVAC projesinin hesap yönetimi modülünde yer alan sipariş detayları sayfa bileşenidir. src/views/account/OrderDetailPage.tsx dosyası içinde tanımlanan bu bileşen, platformdaki kullanıcıların kendilerine ait siparişlerin tüm detaylarını görüntüleyebilmesini sağlayan arayüzü kullanıma sunar. Projenin genel domain yapısına uygun olarak hesaplar bölümündeki sipariş takibi akışının temel parçasını oluşturur.
-**Nasıl yapar**: React tabanlı proje mimarisinde sayfa bileşeni olarak çalışan OrderDetailPage, projenin yönlendirme sistemi ile eşleşerek yalnızca sipariş detayları için tanımlanan rotada çağrılır. Sipariş detaylarını göstermek için gerekli tüm alt bileşenleri, kullanıcı arayüzü elemanlarını bir araya getirerek kullanıcıya sunacak şekilde dahili mantığını işletir, kaynak tipine uygun belge yapısı içinde sayfa işlevini yerine getirir.
-**Parametreler**:
-- Verilen kaynak belgede bu fonksiyon için herhangi bir giriş parametresi tanımlanmamıştır.
-**Dönüş**: Kaynak belgede fonksiyonun dönüş tipi olarak void veya bilinmiyor olarak belirtilmiştir, fonksiyona ait ek dönüş değeri veya içeriğine dair herhangi bir detay paylaşılmamıştır.
+**Ne yapar**: Kullanıcının sipariş detaylarını gösteren bir sayfa komponenti. Kimlik doğrulama, sipariş verisinin yüklenmesi, sekme yönetimi ve PDF fatura oluşturma gibi işlemleri gerçekleştirir.  
+
+**Nasıl yapar**:  
+- URL parametresinden `id` alır, kimlik doğrulama durumunu kontrol eder; doğrulanmamışsa giriş sayfasına yönlendirir.  
+- `useEffect` içinde Supabase üzerinden sipariş ve ilgili ürün kalemlerini tek sorguda çeker, veriyi tip güvenli nesnelere dönüştürür ve `order` durumuna kaydeder.  
+- Yükleme, kopyalama, PDF oluşturma ve yeniden sipariş (reorder) gibi yardımcı fonksiyonları tanımlar.  
+- Sekme (`overview`, `items`, `shipping`, `invoice`) seçimine göre farklı UI bölümlerini render eder.  
+
+**Parametreler**:  
+- *yok* — Bu bir React fonksiyon komponentidir, dışarıdan parametre almaz.  
+
+**Dönüş**:  
+- `void` – UI render eder, doğrudan bir değer döndürmez.
 
 ---
 
@@ -86,176 +103,170 @@ OrderDetailPage, VentHub HVAC projesinin kullanıcı hesapları bölümündeki s
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::auth_redirect_callback
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::anonymousRedirectEffect
+- **params**: (none)
 - **ic_degiskenler**:
-  - `authLoading` — Kullanıcı oturum yükleme durumu, yetkilendirme kontrolü için kullanılır
-  - `user` - Oturum açmış kullanıcı nesnesi, yetkisiz erişimi engellemek için kontrol edilir
-  - `router` - Next.js yönlendirme nesnesi, giriş sayfasına yönlendirme için kullanılır
-  - `Routes.auth.login` - Giriş sayfası rota üreticisi, yönlendirme adresi oluşturmak için kullanılır
-  - `id` - Mevcut siparişin ID'si, geri dönüş adresi parametresi olarak kullanılır
-- **Dönüş**: void, yetkisiz kullanıcıları giriş sayfasına yönlendirir, koşul sağlanırsa erken return eder
+  - `authLoading` — auth hook‑dan gelen yükleme durumu, yönlendirme kararını etkiler
+  - `user` — oturum açmış kullanıcı nesnesi, yoksa yönlendirme yapılır
+  - `router` — Next.js router, `router.push` ile login sayfasına yönlendirme yapılır
+  - `id` — URL parametresi, yönlendirme URL’sine eklenir
+- **Dönüş**: yok (yan etki: olası yönlendirme)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::useEffect_order_loader
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::loadEffectWrapper
+- **params**: (none)
 - **ic_degiskenler**:
-  - `user` - Oturumlu kullanıcı nesnesi, sipariş yükleme izni kontrolü için kullanılır
-  - `id` - Detayı gösterilecek siparişin ID'si, sorgu koşulu olarak kullanılır
-  - `setLoading` - Yükleme durumu state setter'ı, yükleme başlangıç/bitişinde güncellenir
-  - `supabase` - Supabase veritabanı istemcisi, sipariş verisi çekmek için kullanılır
-  - `orderData` - Veritabanından çekilen ham sipariş nesnesi, veri işlemede kullanılır
-  - `orderError` - Sipariş sorgusu sırasında oluşan hata nesnesi, hata yakalamada kullanılır
-  - `rawItems` - Ham sipariş kalemleri listesi, tiplendirme sonrası map işlemi için kullanılır
-  - `mappedItems` - Tiplendirilip işlenmiş sipariş kalemleri listesi, sipariş nesnesine eklenir
-  - `mappedOrder` - Uygulama tiplerine uygun işlenmiş sipariş nesnesi, state'e kaydedilir
-  - `setOrder` - Sipariş state setter'ı, işlenmiş siparişi kaydetmek için kullanılır
-  - `toast` - Bildirim gösterici utility, hata mesajı göstermek için kullanılır
-  - `t` - Çeviri fonksiyonu, yerelleştirilmiş hata mesajı almak için kullanılır
-  - `load` - İçinde tanımlanan async sipariş yükleme fonksiyonu, çağrılarak çalıştırılır
-- **Dönüş**: void, sipariş yükleme sürecini başlatır
+  - `load` — iç tanımlı async fonksiyon, sipariş verisini çeker
+  - `user` — oturum açmış kullanıcı, yoksa fonksiyon erken döner
+  - `id` — sipariş kimliği, yoksa fonksiyon erken döner
+- **Dönüş**: yok (yan etki: `load` fonksiyonunun çalıştırılması)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::load_order
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::load
+- **params**: (none)
 - **ic_degiskenler**:
-  - `user` - Oturumlu kullanıcı nesnesi, yükleme izni kontrolü için kullanılır
-  - `id` - Yüklenecek siparişin ID'si, veritabanı sorgu koşulu olarak kullanılır
-  - `setLoading` - Yükleme state setter'ı, işlem süresince yükleme durumunu aktif eder
-  - `supabase` - Supabase veritabanı istemcisi, ilişkisel sipariş verisi çekmek için kullanılır
-  - `orderData` - Veritabanından çekilen ham sipariş ana verisi, işlenmek için kullanılır
-  - `orderError` - Sorgu hatası nesnesi, hata fırlatmak için kullanılır
-  - `rawItems` - Ham sipariş kalemleri listesi, tip dönüşümü sonrası işlenir
-  - `mappedItems` - Uygulama tiplerine uygun işlenmiş sipariş kalemleri
-  - `mappedOrder` - Tamamen işlenmiş sipariş nesnesi, state'e kaydedilir
-  - `setOrder` - Sipariş state setter'ı, işlenmiş siparişi kaydeder
-  - `console.error` - Hata loglama fonksiyonu, yükleme hatalarını kaydeder
-  - `toast.error` - Hata bildirimi fonksiyonu, kullanıcıya hata gösterir
-  - `t` - Çeviri fonksiyonu, yerelleştirilmiş hata mesajı alır
-- **Dönüş**: Promise<void>, async olarak sipariş verisini yükleyip state'e kaydeder
+  - `user` — oturum açmış kullanıcı, müşteri adı/eposta fallback’inde kullanılır
+  - `id` — sipariş kimliği, sorgu filtresi
+  - `setLoading` — state setter, yükleme durumunu yönetir
+  - `supabase` — veritabanı client, `venthub_orders` ve `products` tablolarına sorgu yapar
+  - `orderData` — sorgudan dönen sipariş kaydı, alanları haritalanır
+  - `orderError` — sorgu hatası, fırlatılırsa yakalanır
+  - `rawItems` — `orderData.venthub_order_items` dizisi, tip güvenliği için `Record<string, unknown>[]`
+  - `mappedItems` — `OrderItem[]` tipinde, fiyat ve miktar hesaplamaları yapılır
+  - `mappedOrder` — `Order` nesnesi, UI state’e aktarılır
+  - `setOrder` — state setter, `mappedOrder`’ı kaydeder
+  - `toast` — UI toast bildirimi, hata ve başarı mesajları gösterir
+  - `t` — i18n çeviri fonksiyonu, hata mesajı çevirisi
+- **Dönüş**: yok (yan etki: `setOrder`, `setLoading`, toast bildirimleri)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::map_order_item
-- **params**: it (ham sipariş kalemi nesnesi)
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::itemMapper
+- **params**: `it`
 - **ic_degiskenler**:
-  - `unit` - Birim fiyat, sayıya dönüştürülmüş kalem fiyatı, toplam hesaplamada kullanılır
-  - `qty` - Sipariş adedi, sayıya dönüştürülmüş miktar, toplam hesaplamada kullanılır
-  - `it.price_at_time` - Ham verideki kalem birim fiyatı, dönüşüm için kullanılır
-  - `it.quantity` - Ham verideki kalem miktarı, dönüşüm için kullanılır
-- **Dönüş**: OrderItem tipi işlenmiş sipariş kalemi nesnesi
+  - `unit` — `it.price_at_time` değerinin sayısal hâli, varsayılan 0
+  - `qty` — `it.quantity` değerinin sayısal hâli, varsayılan 0
+- **Dönüş**: `OrderItem` nesnesi (id, product_id, product_name, quantity, unit_price, total_price, product_image_url)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::copy_to_clipboard
-- **params**: text?: string (kopyalanacak metin)
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::copyToClipboard
+- **params**: `text?` (opsiyonel string)
 - **ic_degiskenler**:
-  - `navigator.clipboard.writeText` - Tarayıcı panosuna yazma metodu, metni kopyalar
-  - `toast.success` - Başarı bildirimi, kopyalama başarılı olursa gösterilir
-  - `toast.error` - Hata bildirimi, kopyalama başarısız olursa gösterilir
-  - `t` - Çeviri fonksiyonu, yerelleştirilmiş bildirim mesajları alır
-- **Dönüş**: Promise<void>, async olarak metni panoya kopyalar
+  - `text` — kopyalanacak metin, yoksa fonksiyon erken döner
+  - `navigator.clipboard.writeText` — tarayıcı API’si, metni panoya yazar
+  - `toast` — başarı/başarısızlık toast’ları
+  - `t` — i18n çeviri fonksiyonu, mesaj çevirileri
+- **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::generate_proforma_pdf
-- **params**: o: Order (PDF'i oluşturulacak sipariş nesnesi)
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::generatePdf
+- **params**: `o: Order`
 - **ic_degiskenler**:
-  - `jsPDF` - Dinamik olarak yüklenen jsPDF kütüphanesi, PDF oluşturmak için kullanılır
-  - `autoTable` - jsPDF eklentisi, PDF'de tablo oluşturmak için kullanılır
-  - `doc` - Oluşturulan jsPDF belgesi nesnesi, tüm içerikler bu belgeye eklenir
-  - `nf` - Para formatı için Intl.NumberFormat nesnesi, fiyatları yerel biçimde gösterir
-  - `lang` - Uygulama dil kodu, format ayarları için kullanılır
-  - `orderNo` - PDF'de kullanılacak sipariş numarası, sipariş verisinden üretilir
-  - `head` - PDF tablosu başlık satırı, sipariş kalemleri tablosu için kullanılır
-  - `body` - PDF tablosu içerik satırları, sipariş kalemlerinden üretilir
-  - `after` - Son tablonun bittiği Y koordinatı, toplam tutarı yazmak için kullanılır
-  - `formatDateTime` - Tarih formatlama fonksiyonu, sipariş tarihini biçimlendirir
-  - `doc.save` - PDF'i indirme metodu, kullanıcıya belgeyi sunar
-- **Dönüş**: Promise<void>, async olarak proforma fatura PDF'i oluşturur ve indirir
+  - `jsPDF` — dinamik import edilen PDF sınıfı
+  - `autoTable` — PDF içinde tablo oluşturmak için kütüphane
+  - `doc` — yeni PDF belgesi, `jsPDF` örneği
+  - `nf` — para birimi formatlayıcı (`Intl.NumberFormat`)
+  - `orderNo` — sipariş numarası ya da ID’den türetilen kod
+  - `head` — tablo başlıkları, i18n çevirileriyle doldurulur
+  - `body` — sipariş kalemlerinden oluşturulan tablo satırları
+  - `after` — tablo sonrasındaki Y koordinatı
+  - `t` — i18n çeviri fonksiyonu
+  - `formatDateTime` — tarih‑saat formatlayıcı
+  - `toast` — hata toast’ı
+- **Dönüş**: yok (yan etki: PDF dosyasını indirme)
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::reorder_items
-- **params**: o: Order (Tekrar sipariş edilecek sipariş nesnesi)
+### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::reorder
+- **params**: `o: Order`
 - **ic_degiskenler**:
-  - `ids` - Sipariş kalemlerindeki geçerli ürün ID'leri listesi, ürün sorgusu için kullanılır
-  - `names` - ID'si olmayan kalemlerin ürün isimleri listesi, alternatif sorgu için kullanılır
-  - `productMap` - Çekilen ürünleri saklayan harita, ID/isime göre ürün erişimi sağlar
-  - `supabase` - Supabase istemcisi, ürün verilerini çekmek için kullanılır
-  - `added` - Sepete eklenen toplam ürün adedi, başarı mesajı için kullanılır
-  - `addToCart` - Sepete ekleme fonksiyonu, ürünleri sepete ekler
-  - `router.push` - Yönlendirme metodu, işlem başarılı olursa sepet sayfasına gönderir
-  - `Routes.cart` - Sepet sayfası rota üreticisi, yönlendirme adresi oluşturur
-  - `toast` - Bildirim fonksiyonları, işlem sonucunu kullanıcıya gösterir
-- **Dönüş**: Promise<void>, async olarak eski siparişin ürünlerini sepete ekler, sepet sayfasına yönlendirir
+  - `ids` — ürün‑id’leri listesi (tekil)
+  - `names` — ürün‑adları listesi (tekil, id’si olmayanlar)
+  - `productMap` — `Record<string, Product>`; id veya ad → Product nesnesi
+  - `supabase` — veritabanı client, `products` tablosundan veri çeker
+  - `data` / `error` — sorgu sonuçları
+  - `added` — sepete eklenen toplam miktar
+  - `it` — döngüdeki sipariş kalemi
+  - `prod` — bulunmuş `Product` nesnesi
+  - `addToCart` — sepet ekleme fonksiyonu (dışarıdan import)
+  - `router` — yönlendirme, sepet sayfasına gitmek için
+  - `toast` — başarı/başarısızlık toast’ları
+  - `t` — i18n çeviri fonksiyonu
+- **Dönüş**: yok (yan etki: sepet güncellemesi, toast, yönlendirme)
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::get_status_classes
-- **params**: status: string (Sipariş durumu metni)
+### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::statusColor
+- **params**: `status: string`
 - **ic_degiskenler**:
-  - Durum metni, küçük harfe dönüştürülerek switch case'inde kontrol edilir
-- **Dönüş**: string, duruma uygun Tailwind CSS renk sınıfları
+  - `status` — sipariş durumu, küçük harfe dönüştürülür
+- **Dönüş**: CSS sınıfı string (renk‑arka plan kombinasyonu)
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::get_status_text
-- **params**: status: string (Ham sipariş durumu metni)
+### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::statusText
+- **params**: `status: string`
 - **ic_degiskenler**:
-  - `t` - Çeviri fonksiyonu, duruma göre yerelleştirilmiş metin döndürür
-- **Dönüş**: string, yerelleştirilmiş sipariş durumu metni
+  - `status` — sipariş durumu, küçük harfe dönüştürülür
+  - `t` — i18n çeviri fonksiyonu, durum metinlerini döndürür
+- **Dönüş**: Çevirilmiş durum metni string
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::render_step
-- **params**: s (adım metni), idx (adım indeksi)
+### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::stepRenderer
+- **params**: `s, idx`
 - **ic_degiskenler**:
-  - `activeIdx` - Şu anki aktif adım indeksi, adımın tamamlanma durumunu belirler
-  - `getStatusText` - Durum metnini çeviren fonksiyon, adım etiketi için kullanılır
-  - `steps.length` - Toplam adım sayısı, son adımda ayırıcı çizgi çizmemek için kullanılır
-- **Dönüş**: React.Fragment, sipariş takip adımı JSX elementi
+  - `s` — adım etiketi (status string)
+  - `idx` — adım indeksi
+  - `activeIdx` — mevcut aktif adım indeksi (component state)
+  - `getStatusText` — dışarıdan gelen fonksiyon, `s` için metin döndürür
+  - `steps` — adım dizisi (component state)
+- **Dönüş**: JSX fragment (step göstergesi)
 
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::render_tab_button
-- **params**: tt (sekme ID'si)
+### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::tabButtonRenderer
+- **params**: `tt`
 - **ic_degiskenler**:
-  - `setTab` - Aktif sekme state setter'ı, tıklanınca aktif sekmeyi değiştirir
-  - `tab` - Şu anki aktif sekme ID'si, buton stillendirmesi için kullanılır
-  - `t` - Çeviri fonksiyonu, sekme etiketlerini yerelleştirir
-- **Dönüş**: JSX button elementi, sekme butonu render eder
+  - `tt` — sekme anahtarı (`overview`, `items`, `shipping`, `invoice`)
+  - `tab` — seçili sekme (component state)
+  - `setTab` — sekme değiştirici
+  - `t` — i18n çeviri fonksiyonu, sekme başlıklarını döndürür
+- **Dönüş**: JSX button elementi
 
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::render_shipping_address
-- **params**: (parametre yok)
+### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::addressRenderer
+- **params**: (none)
 - **ic_degiskenler**:
-  - `order` - Mevcut sipariş nesnesi, kargo adresi verisi içinden alınır
-  - `addr` - Tiplendirilmiş kargo adresi nesnesi, adres satırları oluşturmak için kullanılır
-  - `line1` - Adresin ilk satırı, sokak bilgisi içerir
-  - `line2` - Adresin ikinci satırı, şehir/ilçe bilgisi içerir
-  - `line3` - Adresin üçüncü satırı, posta kodu bilgisi içerir
-- **Dönüş**: JSX div elementi, formatlanmış kargo adresi render eder
+  - `order` — component state, sipariş nesnesi
+  - `addr` — `order.shipping_address` cast edilmiş `ShippingAddress`
+  - `line1` — adresin birinci satırı (fullAddress veya street)
+  - `line2` — şehir ve ilçe/state birleşimi
+  - `line3` — posta kodu
+- **Dönüş**: JSX `<div>` içinde adres satırları
 
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::render_order_item_row
-- **params**: item (sipariş kalemi nesnesi)
+### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::orderItemRow
+- **params**: `item`
 - **ic_degiskenler**:
-  - `Routes.legacyProduct` - Ürün detay sayfası rota üreticisi, link adresi oluşturur
-  - `Link` - Next.js Link bileşeni, ürün sayfasına yönlendirme için kullanılır
-  - `VentImage` - Özel resim bileşeni, ürün resmi gösterir
-  - `formatPrice` - Fiyat formatlama fonksiyonu, kalem fiyatlarını biçimlendirir
-  - `t` - Çeviri fonksiyonu, resim yok metnini yerelleştirir
-- **Dönüş**: JSX tr elementi, sipariş kalemi tablo satırı render eder
+  - `item` — `OrderItem` nesnesi
+  - `Routes` — URL helper, ürün detay linki üretir
+  - `VentImage` — resim komponenti
+  - `t` — i18n çeviri (no‑image metni)
+  - `formatPrice` — fiyat formatlayıcı
+- **Dönüş**: JSX `<tr>` satırı
 
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::render_invoice_info
-- **params**: (parametre yok)
+### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::invoiceInfoRenderer
+- **params**: (none)
 - **ic_degiskenler**:
-  - `order` - Mevcut sipariş nesnesi, fatura verisi içinden alınır
-  - `info` - Ham fatura bilgisi nesnesi, fatura alanlarını okumak için kullanılır
-  - `iv` - Fatura bilgisi getirici yardımcı fonksiyon, alan değerini formatlar
-- **Dönüş**: JSX div elementi, fatura türüne göre fatura bilgilerini render eder
+  - `order` — component state
+  - `info` — `order.invoice_info` cast edilmiş `Record<string, unknown>`
+  - `iv` — yardımcı fonksiyon, bilgi alanını string’e çevirir veya `-` döndürür
+  - `t` — i18n çeviri (alan etiketleri)
+- **Dönüş**: JSX `<div>` içinde fatura bilgileri
 
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::render_legal_consents
-- **params**: (parametre yok)
+### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::legalConsentsRenderer
+- **params**: (none)
 - **ic_degiskenler**:
-  - `order` - Mevcut sipariş nesnesi, yasal onay verisi içinden alınır
-  - `cons` - Tiplendirilmiş yasal onaylar nesnesi, onay durumlarını okur
-  - `row` - Onay satırı oluşturan yardımcı fonksiyon, her onay için satır oluşturur
-  - `formatDateTime` - Onay tarihi formatlama fonksiyonu, kabul zamanını biçimlendirir
-  - `lang` - Uygulama dil kodu, tarih formatlaması için kullanılır
-- **Dönüş**: JSX fragment, tüm yasal onayları render eder
+  - `order` — component state
+  - `cons` — `order.legal_consents` cast edilmiş `Record<string, {accepted?: boolean; ts?: string | null}>`
+  - `row` — iç fonksiyon, her bir onay satırını üretir (label, k)
+  - `lang` — i18n dil kodu, tarih formatlamada kullanılır
+  - `formatDateTime` — tarih‑saat formatlayıcı
+  - `t` — i18n çeviri (toast mesajları)
+- **Dönüş**: JSX fragment içinde onay satırları
 
-### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::render_consent_row
-- **params**: label: string (onay etiketi), k: string (onay anahtarı)
+### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::legalConsentRow
+- **params**: `label: string, k: string`
 - **ic_degiskenler**:
-  - `cons` - Tüm yasal onayları içeren nesne, ilgili onay verisini alır
-  - `c` - İlgili onayın detay nesnesi, kabul durumu ve zamanını içerir
-  - `ok` - Onayın kabul edilip edilmediğini gösteren boolean
-  - `ts` - Formatlanmış onay zamanı, kabul edilmişse gösterilir
-  - `formatDateTime` - Tarih formatlama fonksiyonu, onay zamanını biçimlendirir
-  - `lang` - Uygulama dil kodu, tarih formatlaması için kullanılır
-- **Dönüş**: JSX div elementi, tek bir yasal onay satırı render eder
+  - `cons` — dışarıdan kapanış (legalConsentsRenderer) erişilen onay nesnesi
+  - `c` — `cons?.[k]` ilgili onay kaydı
+  - `ok` — onayın kabul edilip edilmediği (boolean)
+  - `ts` — onay zaman damgası, `formatDateTime` ile formatlanır
+  - `lang` — dil kodu, tarih formatlamada kullanılır
+- **Dönüş**: JSX `<div>` satırı (onay durumu gösterimi)
 
 ---
 
@@ -268,3 +279,18 @@ OrderDetailPage, VentHub HVAC projesinin kullanıcı hesapları bölümündeki s
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: OrderDetailPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-clean-white`, `bg-green-100`, `bg-orange-100`, `bg-orange-100/80`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-slate-100`, `bg-slate-100/80`, `bg-slate-200`, `bg-slate-50`, `bg-slate-50/80`, `bg-white`, `border-b`, `border-b-2`, `border-gray-100`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-6`, `grid`, `grid-cols-1`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `h-1`, `h-10`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları

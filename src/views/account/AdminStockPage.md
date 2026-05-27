@@ -4,160 +4,114 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx
 skeleton_hash: ed993728dcffbd9f
-generated_at: 2026-05-23T22:36:32Z
+entity_hashes:
+  func:AdminStockPage: c624fd2be5fee91c
+  overview: 62b56555e7eaf8c3
+  style_tokens: 77f08903451a51c4
+generated_at: 2026-05-27T11:48:56Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin hesap yönetimi alanında yer alan yönetici özelinde stok yönetimi sayfa bileşenidir. Sistemdeki yetkili admin kullanıcılarının stok verilerine erişip yönetebilmesi için tasarlanmış arayüzün ana giriş noktasıdır.
+Bu modül, yöneticilerin stok ve envanter verilerini görüntüleyip yönetebileceği ana kullanıcı arayüzü bileşenidir. Stok listesini sunma ve ilgili yönetim işlemleri için sayfa düzenini ve mantığını içerir.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Modülün tek ve temel bileşeni olarak yönetici stok yönetimi arayüzünü tüm işlevleriyle birlikte sunar, sayfanın temel işleyişinden ve kullanıcıya sunulmasından sorumludur.
+### Sayfa Bileşeni
+Yönetici stok sayfasının ana görsel yapısını ve kullanıcı etkileşimlerini tanımlar.
 - AdminStockPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı yönetici (admin) stok yönetimi sayfa modülünün sorunsuz derlenmesi, çalıştırılması ve amaçlandığı gibi kullanılması için yetkilendirme sistemi, frontend yönlendirme (routing) altyapısı, bağımlı React kütüphanesi, proje özel servisleri ve arka uç veri kaynaklarının erişilebilir ve uyumlu olması zorunludur.
+Bu, hesap yöneticilerinin stok işlemlerini yürütmesi için tasarlanmış bir frontend view bileşenidir, doğru çalışması için projenin rota yönetimi altyapısı, yetkilendirme mekanizması ve stok verilerini sunan backend servisinin eksiksiz çalışması zorunludur.
 
-[Aksiyom 1]: Eğer sisteme giriş yapmış kullanıcının bu sayfaya erişim hakkı veren admin yetkisi yoksa, kullanıcı sayfaya erişemez, yetkisiz erişim hatası ile karşılaşır ya da güvenlik amaçlı olarak ana sayfaya yönlendirilir.
-[Aksiyom 2]: Eğer projenin frontend routing sistemi bu sayfa için tanımlı path üzerinden erişim imkanı sunmuyorsa, kullanıcı sayfaya ulaşamaz, 404 bulunamadı hatası ile karşılaşır.
-[Aksiyom 3]: Eğer modülün import ettiği React kütüphanesi, projeye özel temel UI bileşenleri ve stok yönetimi servisleri proje içinde bulunmuyorsa, modül derleme aşamasında hata verir ya da çalışma zamanında (runtime) kesintiye uğrar.
-[Aksiyom 4]: Eğer bu sayfanın kullandığı arka uç stok veri servisi erişilemez durumdaysa, sayfada stok verileri yüklenemez, kullanıcıya yüklenememe hatası gösterilir ya da boş bir görünüm sunulur.
-[Aksiyom 5]: Eğer admin kullanıcısının stok üzerinde ekleme, silme, düzenleme gibi işlem yapma yetkileri arka uç tarafından tanımlanmamışsa, sayfadaki ilgili işlem butonları çalışmaz, kullanıcıya yetki eksikliği hatası döndürülür.
+[Aksiyom 1]: Eğer bu sayfaya erişimi tanımlayan proje içindeki frontend rota yapısı (React Router vb.) tanımlı değilse, kullanıcı hiçbir şekilde bu sayfaya yönlendirilemez, erişim hatası alınır.
+[Aksiyom 2]: Eğer admin kullanıcı rolüne ait erişim haklarını doğrulayan rota koruma (route guard) mekanizması entegre edilmemişse, yetkisiz普通kullanıcılar dahi stok verilerine erişip değiştirebilir, veri güvenliği tamamen ihlal edilir.
+[Aksiyom 3]: Eğer kimlik doğrulama servisi erişilebilir değilse, hiçbir kullanıcı (yetkili admin dahi) sayfanın içeriğine erişemez, stok verileri görüntülenemez.
+[Aksiyom 4]: Eğer stok verilerini sunan backend API servisi çalışır durumda değilse, AdminStockPage üzerinden hiçbir stok kaydı listelenemez, stokla ilgili tüm ekleme/güncelleme/silme işlemleri başarısız olur.
+[Aksiyom 5]: Eğer bu bileşende import edilen ortak proje UI bileşenleri (tablo, buton, form elemanları vb.) erişilebilir değilse, bileşen derleme aşamasında hata alır veya kullanıcı arayüzü bozuk şekilde ekrana yansır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminStockPage
-**Ne yapar**: VentHub HVAC projesinin admin paneline ait stok yönetimi sayfa bileşenidir. Sadece hesap yetkisine sahip admin kullanıcıların erişebileceği bu bileşen, sistemdeki tüm stok verilerinin görüntülenmesi, yönetilmesi ve stok işlemlerinin yürütülmesi için ana arayüz görevi görür.
-**Nasıl yapar**: Proje kaynak kodunda src/views/account dizini altında konumlandırılmış React tabanlı bir TypeScript (TSX) bileşeni olarak çalışır. Kendi bünyesinde stok yönetimi ile ilgili alt bileşenleri, durum yönetimi mantığını ve yetki kontrollerini barındırarak kullanıcının erişim haklarını doğrular, stokla ilgili tüm işlevleri tek bir sayfa üzerinden kullanıcıya sunar.
-**Parametreler**: Bu fonksiyona herhangi bir dış parametre aktarılmaz. Bileşen olarak çalışması için ihtiyaç duyduğu tüm bağlılıkları ve verileri uygulamanın genel bağlamından, state yönetim sisteminden ve yetki servislerinden temin eder.
-**Dönüş**: Fonksiyon için açıkça tanımlanmış bir dönüş tipi belirtilmemiştir. Ancak bir React sayfa bileşeni olma niteliği gereği, uygulama tarafından ekran üzerinde render edilmek üzere geçerli bir React node'u döndürür.
+**Ne yapar**: Admin yetkisine sahip kullanıcıların ürün stok miktarlarını, stok eşik değerlerini görüntüleyip düzenleyebildiği bir stok yönetim sayfasını render eder. Kullanıcının admin olup olmadığını kontrol eder, admin değilse erişim reddedilir ve sayfa içeriği gösterilmez.
+
+**Nasıl yapar**: `useAuth` ile kimlik doğrulama durumunu alır, kullanıcı yoksa login sayfasına yönlendirir. `checkAdminAccess` ile admin yetkisini kontrol eder, yetki yoksa hata mesajı içeren bir JSX döndürür. Sayfa mount olduğunda Supabase `products` tablosundan tüm ürünlerin id, isim, SKU, marka, fiyat, durum, stok ve eşik bilgilerini çeker ve `all` state'inde saklar. Kullanıcı arama kutusuna yazdıkça `q` state'i güncellenir; `useMemo` ile filtrelenmiş liste (`filtered`) hesaplanır. Her ürün satırında stok miktarını artırma/azaltma (`adjust`), doğrudan sayı atama (`setQty`) ve eşik değerini kaydetme/kaldırma (`setThreshold`) işlemleri asenkron olarak doğrudan Supabase UPDATE sorgusuyla veritabanına yazılır ve başarılı olursa state güncellenir. İşlem sırasında `saving` state'i ilgili ürün ID'sini tutarak butonları devre dışı bırakır.
+
+**Parametreler**: Yok (function hiçbir parametre almaz, tüm veriyi `useAuth`, `useRouter` ve Supabase sorgusu ile kendi içinde elde eder).
+
+**Dönüş**: JSX öğesi — admin yetkisi varsa stok tablosu içeren tam sayfa; yoksa erişim reddedildi uyarısı. Dönüş tipi React bileşeni olarak `React.ReactElement` veya `null` olarak değerlendirilebilir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::AdminStockPage
+### [N1_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::AdminStockPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `user` — useAuth hook'tan gelen oturum açmış kullanıcı nesnesi, yetki kontrolünde kullanılır
-  - `loading` — useAuth hook'tan gelen kimlik doğrulama yükleme durumu, yönlendirme kontrolünde kullanılır
-  - `router` — Next.js useRouter hook'tan gelen yönlendirme nesnesi, giriş sayfasına yönlendirme için kullanılır
-  - `all` — Tüm ürünleri tutan Product tipi durum değişkeni, stok listeleme ve filtrelemede kullanılır
-  - `setAll` — all durumunu güncelleyen setter fonksiyonu, stok veya eşik değişikliklerinde güncelleme için kullanılır
-  - `q` - Arama sorgusunu tutan string durum değişkeni, ürün filtrelemede kullanılır
-  - `setQ` — q durumunu güncelleyen setter fonksiyonu, arama input onChange olayında kullanılır
-  - `saving` — Şu anda güncellenmekte olan ürün ID'sini tutan string|null durumu, butonları devre dışı bırakmak için kullanılır
-  - `setSaving` — saving durumunu güncelleyen setter fonksiyonu, işlem başında ve sonunda durumu ayarlar
-  - `tempQty` — Ürün ID'lerine göre geçici stok miktarlarını tutan Record<string, number|''> durumu, manuel stok girişinde kullanılır
-  - `setTempQty` — tempQty durumunu güncelleyen setter fonksiyonu, stok input onChange olayında kullanılır
-  - `tempThreshold` — Ürün ID'lerine göre geçici düşük stok eşiklerini tutan Record<string, number|''> durumu, manuel eşik girişinde kullanılır
-  - `setTempThreshold` — tempThreshold durumunu güncelleyen setter fonksiyonu, eşik input onChange olayında kullanılır
-  - `isAdmin` — Kullanıcının admin yetkisine sahip olup olmadığını tutan boolean durumu, erişim kontrolünde kullanılır
-  - `setIsAdmin` — isAdmin durumunu güncelleyen setter fonksiyonu, admin kontrolü sonucunda ayarlanır
-  - `filtered` — Arama sorgusuna göre filtrelenmiş ürün listesi, tabloya yazdırılmak için useMemo ile üretilir
-- **Dönüş**: JSX React elementi (stok yönetim sayfası arayüzü)
+  - `user` — `useAuth()` hook tarafından sağlanan oturum kullanıcısı, kimlik doğrulama ve yetkilendirme için kullanılır.
+  - `loading` — `useAuth()` hook tarafından dönen yükleme durumu, kullanıcı bilgisi henüz gelmemişse `true`.
+  - `router` — `useRouter()` hook’u, yönlendirme (navigation) işlemleri için.
+  - `all` — `useState<Product[]>([])` ile tutulan ürün listesi, veritabanından çekilen `Product[]`.
+  - `setAll` — `all` durumunu güncelleyen setter fonksiyonu.
+  - `q` — arama kutusundaki metin girdisi, `useState('')` ile tutulur.
+  - `setQ` — `q` değerini güncelleyen setter.
+  - `saving` — şu anda güncelleme (stock/threshold) yapılan ürünün `id`si veya `null`; `useState<string | null>(null)`.
+  - `setSaving` — `saving` durumunu güncelleyen setter.
+  - `tempQty` — ürün bazlı geçici stok miktarı girişi, `Record<string, number | ''>`.
+  - `setTempQty` — `tempQty` nesnesini güncelleyen setter.
+  - `tempThreshold` — ürün bazlı geçici eşik değeri girişi, `Record<string, number | ''>`.
+  - `setTempThreshold` — `tempThreshold` nesnesini güncelleyen setter.
+  - `isAdmin` — admin yetkisi kontrolü sonucu, `useState(false)`.
+  - `setIsAdmin` — `isAdmin` durumunu güncelleyen setter.
+  - `filtered` — `useMemo` ile oluşturulan, arama metnine göre `all` listesini süzen dizi.
+  - `t` — `q` değerinin kırpılmış ve küçük harfe dönüştürülmüş hali, arama filtresi içinde kullanılır.
+- **Dönüş**: JSX element (React bileşeni). Admin yetkisi yoksa erişim reddi mesajı, yetkili ise stok yönetim tablosu ve arama/kontrol UI’sı döner.
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::auth_redirect_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `loading` — useAuth'tan gelen yükleme durumu, yönlendirme koşulunda kontrol edilir
-  - `user` — useAuth'tan gelen kullanıcı nesnesi, oturum açılıp açılmadığını kontrol etmek için kullanılır
-  - `router.push` — Next.js yönlendirme metodu, girişsiz kullanıcıları login sayfasına yönlendirir
-  - `Routes.auth.login` — Tanımlı rota nesnesi, login sayfası URL'sini oluşturmak için kullanılır
-- **Dönüş**: void
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::set_admin_status_callback
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::adjust
+- **params**: `(p: Product, delta: number)`
 - **ic_degiskenler**:
-  - `user` — useAuth'tan gelen kullanıcı nesnesi, admin yetkisini kontrol etmek için checkAdminAccess'a gönderilir
-  - `checkAdminAccess` — Admin yetkisi kontrolü yapan yardımcı fonksiyon, kullanıcı nesnesiyle çağrılır
-  - `setIsAdmin` — isAdmin durumunu güncelleyen setter, kontrol sonucunu saklar
-- **Dönüş**: void
+  - `newQty` — `p.stock_qty` (null olursa 0) üzerine `delta` eklenip negatif olmaması sağlanarak hesaplanan yeni stok miktarı.
+  - `error` — Supabase `update` sorgusundan dönen hata nesnesi.
+- **Dönüş**: `void` (asenkron işlem, UI’da `saving` ve `all` durumları güncellenir; hata oluşursa konsola loglanır).
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::load_products_effect_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `mounted` — Bileşenin hala monte olup olmadığını takip eden bayrak, bellek sızıntısını önlemek için kullanılır
-  - `load` - Ürünleri veritabanından çeken async iç fonksiyon, etki içinde çağrılır
-- **Dönüş**: Temizleme fonksiyonu (() => void), bileşen unmount olduğunda mounted bayrağını false yapar
+---
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::load_products_async
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::setQty
+- **params**: `(_productId: string, qty: number)`
 - **ic_degiskenler**:
-  - `mounted` — Bileşenin monte durumunu kontrol eden bayrak, veri geldikten sonra durumu güncellemek için kontrol edilir
-  - `data` — Supabase'den dönen ürün listesi, all durumuna kaydedilmek için kullanılır
-  - `error` — Supabase sorgusu sırasında oluşan hata nesnesi, try/catch içinde yakalanır
-  - `supabase.from().select().order()` — Supabase sorgu zinciri, ürünleri isimle sıralı olarak çeker
-  - `setAll` — all ürün listesi durumunu güncelleyen setter, gelen verileri saklar
-- **Dönüş**: Promise<void>
+  - `newQty` — `qty` değerinin negatif olmaması için `Math.max(0, qty)` ile hesaplanan yeni stok miktarı.
+  - `error` — Supabase `update` sorgusundan dönen hata nesnesi.
+- **Dönüş**: `void` (asenkron işlem, `all` ve `tempQty` durumları güncellenir; hata oluşursa konsola loglanır).
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::filter_products_usememo_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `q` — Arama sorgusu, trim ve küçük harfe çevrilerek filtrelemede kullanılır
-  - `all` — Tüm ürünlerin ham listesi, filtreleme işlemi için kaynak olarak kullanılır
-  - `t` — İşlenmiş arama metni, tüm filtreleme kontrollerinde kullanılır
-  - `p.name, p.sku, p.brand` — Ürünlerin filtrelemede kullanılan metinsel alanları, arama terimiyle eşleştirilir
-- **Dönüş**: Filtrelenmiş Product[] listesi
+---
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::adjust
-- **params**: (p: Product, delta: number)
+### [N4_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::setThreshold
+- **params**: `(_productId: string, threshold: number | null)`
 - **ic_degiskenler**:
-  - `p` — Stok miktarı güncellenecek ürün nesnesi, mevcut stok miktarını almak için kullanılır
-  - `delta` — Stok miktarına eklenecek/çıkarılacak değer (+1/-1), artırma/azaltma işlemlerinde kullanılır
-  - `p.id` — Güncellenecek ürünün benzersiz ID'si, veritabanı sorgusunda eşleştirme için kullanılır
-  - `p.stock_qty` — Ürünün mevcut stok miktarı, yeni miktarı hesaplamak için kullanılır
-  - `newQty` - Hesaplanan yeni stok miktarı, minimum 0 olarak sınırlanır
-  - `setSaving` — İşlem sırasında saving durumunu ayarlayan setter, işlem başlangıcında p.id, sonunda null atanır
-  - `error` — Supabase güncelleme sorgusunda oluşan hata, yakalanıp loglanır
-  - `supabase.from().update().eq()` — Supabase stok güncelleme sorgusu, ürünün stok miktarını veritabanında günceller
-  - `setAll` — Tüm ürünler listesini yerel olarak güncelleyen setter, değişikliği arayüze yansıtır
-- **Dönüş**: Promise<void>
+  - `newThreshold` — `threshold` null değil ve `>=0` ise aynı değer, aksi takdirde `null` (varsayılan eşik).
+  - `error` — Supabase `update` sorgusundan dönen hata nesnesi.
+- **Dönüş**: `void` (asenkron işlem, `all` ve `tempThreshold` durumları güncellenir; hata oluşursa konsola loglanır).
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::setQty
-- **params**: (_productId: string, qty: number)
-- **ic_degiskenler**:
-  - `_productId` — Stok miktarı ayarlanacak ürünün ID'si, veritabanı eşleştirmesi ve durum güncellemelerinde kullanılır
-  - `qty` — Kullanıcının girdiği yeni stok miktarı, doğrulanıp kaydedilir
-  - `newQty` — Sınırlanmış yeni stok miktarı, minimum 0 olarak ayarlanır
-  - `setSaving` — İşlem sürecinde saving durumunu yöneten setter
-  - `error` — Supabase sorgusunda oluşan hata, loglanır
-  - `supabase.from().update().eq()` — Stok miktarını veritabanında güncelleyen sorgu
-  - `setAll` — Yerel ürün listesini güncelleyen setter, değişikliği arayüze yansıtır
-  - `setTempQty` — Geçici stok girişini sıfırlayan setter, kayıt sonrası inputu temizler
-- **Dönüş**: Promise<void>
+---
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::setThreshold
-- **params**: (_productId: string, threshold: number | null)
+### [N5_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::load
+- **params**: (parametre yok) – `useEffect` içinde tanımlı iç fonksiyon.
 - **ic_degiskenler**:
-  - `_productId` — Düşük stok eşiği güncellenecek ürünün ID'si
-  - `threshold` — Kullanıcının girdiği yeni eşik değeri, null ise varsayılan kullanılacak anlamına gelir
-  - `newThreshold` — Doğrulanmış yeni eşik değeri, sadece 0 veya üstü sayılar kabul edilir
-  - `setSaving` — İşlem sürecinde saving durumunu yöneten setter
-  - `error` — Veritabanı güncellemesinde oluşan hata
-  - `supabase.from().update().eq()` — Eşik değerini veritabanında güncelleyen sorgu
-  - `setAll` — Yerel ürün listesini güncelleyen setter
-  - `setTempThreshold` — Geçici eşik girişini sıfırlayan setter, kayıt sonrası inputu temizler
-- **Dönüş**: Promise<void>
+  - `data` — Supabase `select` sorgusundan dönen ürün dizisi (`Product[]`).
+  - `error` — Supabase sorgusundan dönen hata nesnesi.
+- **Dönüş**: `void` (asenkron işlem, `mounted` hâlâ `true` ise `setAll` ile `all` durumunu doldurur; hata yok sayılır).
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AdminStockPage.tsx::map_product_row_callback
-- **params**: (p: Product)
+---
+
+### [N6_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::filtered
+- **params**: (parametre yok) – `useMemo` içinde tanımlı ok fonksiyonu.
 - **ic_degiskenler**:
-  - `p` — Tabloya yazdırılacak ürün nesnesi, tüm alanları arayüzde gösterilir
-  - `p.id` — Ürünün benzersiz ID'si, React listesi key'i ve tüm durum erişimlerinde kullanılır
-  - `p.stock_qty, p.low_stock_threshold` — Ürünün stok ve eşik değerleri, arayüzde gösterilir ve renklendirme için kullanılır
-  - `qty` — Tür kontrolünden geçmiş stok miktarı, arayüzde gösterilir
-  - `threshold` — Tür kontrolünden geçmiş eşik değeri, arayüzde gösterilir
-  - `tempQty[p.id], tempThreshold[p.id]` — Ürüne ait geçici giriş değerleri, inputlarda kullanılır
-  - `tempQty_val, tempThreshold_val` - Geçici değerlerin varsayılan boş string ile yedeklenmiş halleri, input değerleri olarak kullanılır
-  - `saving` — İşlemdeki ürün ID'si, butonların devre dışı bırakılması için kontrol edilir
-  - `adjust, setQty, setThreshold` - Stok ve eşik güncelleme fonksiyonları, buton onClick olaylarında çağrılır
-  - `setTempQty, setTempThreshold` — Geçici durumları güncelleyen setterler, input onChange olaylarında kullanılır
-- **Dönüş**: JSX React elementi (tek ürün tablo satırı)
+  - `t` — `q.trim().toLowerCase()` sonucu, arama filtresi için kullanılan metin.
+- **Dönüş**: `Product[]` – `q` boşsa `all` dizisini, aksi takdirde `name`, `sku`, `brand` alanlarında `t` içeren ürünleri döner.
 
 ---
 
@@ -170,3 +124,18 @@ Bu React tabanlı yönetici (admin) stok yönetimi sayfa modülünün sorunsuz d
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminStockPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-50`, `bg-white`, `border-gray-100`, `border-light-gray`, `border-t`, `border-warning-orange`, `text-center`, `text-industrial-gray`, `text-left`, `text-red-600`, `text-sm`, `text-steel-gray`, `text-warning-orange`, `text-xl`, `text-xs`
+- **Layout:** `absolute`, `flex`, `gap-1`, `gap-2`, `items-center`, `justify-between`, `left-3`, `max-w-7xl`, `overflow-hidden`, `relative`, `sm:min-w-72`, `sm:w-96`, `sm:w-auto`, `top-1/2`, `w-16`
+- **Responsive:** `sm:` prefix kullanımları

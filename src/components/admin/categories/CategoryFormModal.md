@@ -4,24 +4,26 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\categories\CategoryFormModal.tsx
 skeleton_hash: d69339254c3c365a
-generated_at: 2026-05-23T21:52:05Z
+entity_hashes:
+  func:CategoryFormModal: 45e70a4b9811a0d5
+  func:handleImageUpload: 633c0036d64f1044
+  func:onSubmit: c1bb6fdd37c1f2b9
+  overview: aa842adfcce629ec
+  style_tokens: a697519bb3613c56
+generated_at: 2026-05-27T12:17:18Z
 ---
 
 ## Genel Bakış
-`CategoryFormModal` bileşeni, yönetim panelinde kategori ekleme ve düzenleme işlemlerini gerçekleştiren bir modal formdur. Kullanıcıdan alınan kategori bilgilerini ve görsel dosyaları işleyerek API üzerinden gönderir, işlem sonucunda üst bileşene geri bildirim sağlar.
+Bu modül, yönetici panelinde kategori ekleme ve düzenleme işlemlerini yöneten bir form modal bileşenidir. Kullanıcıdan kategori adı, açıklama ve görsel gibi bilgileri alır, geçerlilik kontrollerini yapar ve ilgili API çağrılarını tetikler. Modal açılıp kapanma durumu, mevcut kategori verisi ve başarı durumunda çağrılacak geri çağrı (callback) gibi dışarıdan aldığı özelliklerle (props) esnek bir kullanım sunar.
 
 ## Fonksiyon Grupları
-### Modal ve Form Arayüzü
-Modal penceresinin açılıp kapanmasını, form başlangıç değerlerini ve bileşenin genel görünümünü yönetir.  
+### Form Gönderimi ve Veri İşleme
+Kullanıcının doldurduğu form verilerini alır, doğrular ve yeni bir kategori oluşturmak veya mevcut kategoriyi güncellemek için gerekli işlemleri başlatır.
+- handleImageUpload, onSubmit
+
+### Bileşenin Kendisi
+Form modalının tüm yapısını, görünümünü ve alt bileşenlerini düzenleyen ana fonksiyondur. Açılma/kapanma durumu, başlık, form alanları ve butonlar gibi kullanıcı arayüzü ögelerini içerir.
 - CategoryFormModal
-
-### Görsel Yükleme
-Kullanıcının seçtiği görsel dosyasını alır ve sonraki işlemler için hazır hale getirir.  
-- handleImageUpload
-
-### Form Gönderme ve İş Mantığı
-Form verilerini doğrular, gerekli API çağrılarını yapar ve başarılı yanıt sonrasında `onSuccess` callback’ini tetikler.  
-- onSubmit
 
 ---
 
@@ -30,33 +32,31 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryFormModal
-**Ne yapar**: Kategori ekleme veya düzenleme işlemleri için kullanılan bir modal form bileşenidir. Açık/kapalı durumu ve form verilerini dışarıdan alarak yönetir.
-**Nasıl yapar**: `open` ve `onOpenChange` prop’ları ile modal görünürlüğü kontrol edilir; `category` prop’u mevcut kategori verisini forma yerleştirir; `onSuccess` callback’i başarılı kayıt/güncelleme sonrası üst bileşeni bilgilendirir.
+**Ne yapar**: Açık/kapalı durumunu kontrol eden, kategori verisini alıp başarı durumunda bir geri bildirim sağlayan bir React bileşeni oluşturur.  
+**Nasıl yapar**: `open`, `onOpenChange`, `category` ve `onSuccess` prop’larını alır; bu prop’lar bileşenin görünürlüğünü, dışarıdan kontrol edilen durum değişikliklerini, düzenlenecek/eklenecek kategori bilgisini ve işlem tamamlandığında tetiklenecek callback’i yönetir. Bileşen, bu prop’ları içeren bir fonksiyonel komponent (`React.FC`) döndürür.  
 **Parametreler**:
-- `open`: Belirtilmemiş — Modalın açık olup olmadığını belirten değer.
-- `onOpenChange`: Belirtilmemiş — Modalın açılıp kapanma durumunu güncellemek için kullanılan callback fonksiyonu.
-- `category`: Belirtilmemiş — Düzenlenecek kategori bilgisini içeren obje (opsiyonel).
-- `onSuccess`: Belirtilmemiş — Başarılı işlem sonrası tetiklenen callback fonksiyonu.
-**Dönüş**: React.FC<CategoryFormModalProps> — React functional component olarak tanımlanmıştır.
+- `open`: boolean — Modal penceresinin açık olup olmadığını belirler.  
+- `onOpenChange`: (open: boolean) => void — Modal’ın açık/kapalı durumundaki değişiklikleri dışarıya bildiren fonksiyon.  
+- `category`: Category | undefined — Düzenlenmekte olan kategori nesnesi; yeni bir kategori ekleniyorsa `undefined` olabilir.  
+- `onSuccess`: () => void — Form başarıyla gönderildiğinde çalıştırılan geri çağırma fonksiyonu.  
+**Dönüş**: `React.FC<CategoryFormModalProps>` — Belirtilen prop tiplerini kullanan bir fonksiyonel React bileşeni.
 
 ### handleImageUpload
-**Ne yapar**: Kullanıcının bir dosya seçmesi durumunda tetiklenen olay işleyicisidir. Seçilen dosyayı alarak resim yükleme sürecini başlatır.
-**Nasıl yapar**: Input elemanındaki `change` olayını yakalar, `e.target.files` üzerinden seçilen dosyaya erişir ve gerekli işlemleri (örneğin önizleme oluşturma veya state’e kaydetme) gerçekleştirir.
+**Ne yapar**: Kullanıcı bir dosya (görsel) seçtiğinde bu dosyayı işleyerek ilgili form alanına ekler.  
+**Nasıl yapar**: `React.ChangeEvent<HTMLInputElement>` tipindeki olay nesnesini alır, seçilen dosyayı (eğer mevcutsa) okur ve gerekli durum güncellemelerini gerçekleştirir.  
 **Parametreler**:
-- `e`: React.ChangeEvent<HTMLInputElement> — Dosya seçme input’unda meydana gelen değişim olayı.
-**Dönüş**: Belirtilmemiş.
+- `e`: React.ChangeEvent<HTMLInputElement> — Dosya girişindeki değişiklik olayını temsil eder.  
+**Dönüş**: Belirtilmemiş; fonksiyonun dönüş tipi mevcut dokümantasyonda tanımlı değildir.
 
 ### onSubmit
-**Ne yapar**: Form gönderildiğinde çalışan işleyici fonksiyondur. Toplanan form değerlerini alarak kategori kaydetme veya güncelleme işlemini yürütür.
-**Nasıl yapar**: `CategoryFormValues` türündeki değerleri alır; doğrulama, API çağrısı ve başarılı sonuçta `onSuccess`’i tetikleme gibi adımları içerir.
+**Ne yapar**: Kategori formundan gelen değerleri alır ve bu verileri işleyerek (örneğin API çağrısı) kaydetme işlemini başlatır.  
+**Nasıl yapar**: `CategoryFormValues` tipindeki form değerlerini parametre olarak alır, gerekli doğrulama ve iş mantığını uygular, ardından başarılı bir işlem durumunda `onSuccess` callback’ini tetikleyebilir.  
 **Parametreler**:
-- `values`: CategoryFormValues — Form alanlarından elde edilen verileri içeren nesne.
-**Dönüş**: Belirtilmemiş.
+- `values`: CategoryFormValues — Formda toplanan kategori adı, açıklama, görsel vb. alanların değerlerini içeren nesne.  
+**Dönüş**: Belirtilmemiş; fonksiyonun dönüş tipi mevcut dokümantasyonda tanımlı değildir.
 
 ---
 
@@ -100,12 +100,66 @@ type CategoryFormValues = z.infer<typeof categorySchema>
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\categories\CategoryFormModal.tsx::useEffectFetchParents
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::CategoryFormModal
+- **params**: `open`, `onOpenChange`, `category`, `onSuccess`
 - **ic_degiskenler**:
-  - `fetchParents` — scope içinde tanımlanan async fonksiyon, parent kategorileri getirir
-  - `open` — dışarıdan gelen boolean değer, modalın açık/kapalı olduğunu belirtir
-- **Dönüş**:
+  - `fetchParents` — component içinde tanımlı async fonksiyon, parent kategorileri getirir ve `setParentIdOptions` ile state günceller.
+  - `form` — `useForm` hookundan dönen nesne, form değerlerini yönetir (`reset`, `setValue` vb.).
+  - `setParentIdOptions` — parent seçeneklerini tutan state setter.
+  - `setPreviewImage` — seçilen/resim URL’sini tutan state setter.
+  - `setUploadingImage` — resim yükleme sırasında loading state’i yöneten setter.
+  - `setLoading` — form submit sırasında loading state’i yöneten setter.
+  - `handleImageUpload` — resim seçildiğinde çalıştırılan async fonksiyon (aşağıda ayrı pointer).
+  - `onSubmit` — form submit handler (aşağıda ayrı pointer).
+- **Dönüş**: React bileşeni JSX döndürür; yan etkileri (`useEffect`) içinde veri çekme ve form resetleme yapılır.
+
+### [N2_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::fetchParents
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `data` — Supabase sorgusundan dönen kategori listesi (`id`, `name` alanları).
+- **Dönüş**: `setParentIdOptions(data)` ile state günceller; explicit return yoktur.
+
+### [N3_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::useEffect‑open
+- **params**: (parametre yok) – `useEffect` callback
+- **ic_degiskenler**:
+  - `open` – component prop, modal açık olduğunda `fetchParents` çağrılır.
+- **Dönüş**: yok (effect içinde yan etki).
+
+### [N4_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::useEffect‑category
+- **params**: (parametre yok) – `useEffect` callback
+- **ic_degiskenler**:
+  - `category` – prop, var ise form `reset` edilir ve `setPreviewImage` çağrılır; yoksa boş değerlerle reset yapılır.
+  - `form` – `useForm` nesnesi, `reset` metodu ile form değerlerini ayarlar.
+  - `setPreviewImage` – resim önizleme state setter.
+- **Dönüş**: yok (effect içinde yan etki).
+
+### [N5_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::handleImageUpload
+- **params**: `e` — `React.ChangeEvent<HTMLInputElement>`
+- **ic_degiskenler**:
+  - `file` — seçilen dosya (`e.target.files?.[0]`).
+  - `compressedFile` — `compressImage(file)` sonucu elde edilen sıkıştırılmış dosya.
+  - `fileExt` — dosya uzantısı (`file.name.split('.').pop()`).
+  - `fileName` — UUID ve uzantıdan oluşan yeni dosya adı.
+  - `filePath` — Supabase storage içinde dosyanın yolu (`category-images/${fileName}`).
+  - `uploadError` — storage upload işlemi sırasında oluşabilecek hata.
+  - `publicUrl` — yüklenen dosyanın herkese açık URL’si (`supabase.storage.from('products').getPublicUrl(filePath)`).
+- **Dönüş**: yok (state güncellemeleri ve toast bildirimleriyle yan etki).
+
+### [N6_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::onSubmit
+- **params**: `values` — `CategoryFormValues`
+- **ic_degiskenler**:
+  - `metadata` — `CategoryMetadata` nesnesi, metric1 ve metric2 bilgilerini içerir.
+  - `updateData` — `CategoryUpdate` nesnesi, mevcut kategori güncellenirken kullanılan alanlar ve `metadata` (JSON’a dönüştürülmüş).
+  - `insertData` — `CategoryInsert` nesnesi, yeni kategori eklenirken kullanılan alanlar, `metadata` ve boş `authority_content` dizisi.
+  - `error` — Supabase `update` veya `insert` işlemi sırasında oluşan hata.
+- **Dönüş**: yok (state güncellemeleri, toast bildirimleri ve `onSuccess`, `onOpenChange` callback’leriyle yan etki).
+
+### [N7_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::optionRender
+- **params**: `p` — parent seçenek nesnesi (`{ id, name }`)
+- **ic_degiskenler**:
+  - `p.id` — option value attribute.
+  - `p.name` — option display text.
+- **Dönüş**: JSX `<option>` elementi; explicit return yoktur (inline render).
 
 ---
 
@@ -135,16 +189,12 @@ graph TD
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[90vh]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `backdrop-blur-[2px]`, `group-hover:translate-y-[-1px]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/40`, `bg-black/60`, `bg-cyan-500`, `bg-red-500`, `bg-surface-deep`, `bg-white/5`, `bg-white/[0.01]`, `bg-white/[0.02]`, `bg-white/[0.03]`, `border-2`, `border-b`, `border-b-2`, `border-dashed`, `border-t`, `border-transparent`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`, `group-hover:opacity-100`
+- **Renkler:** `bg-black/40`, `bg-black/60`, `bg-cyan-500`, `bg-red-500`, `bg-surface-deep`, `bg-white/1`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-2`, `border-b`, `border-b-2`, `border-dashed`, `border-t`, `border-transparent`
+- **Layout:** `absolute`, `backdrop-blur-2`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`
 - **Responsive:** (yok)

@@ -4,60 +4,51 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\legal\PrivacyPolicyPage.tsx
 skeleton_hash: 236dec3edf614633
-generated_at: 2026-05-23T22:41:22Z
+entity_hashes:
+  func:PrivacyPolicyPage: 40c3e34ff307a7eb
+  overview: f7094466668600a6
+  style_tokens: d97b122360d0289d
+generated_at: 2026-05-27T11:57:10Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun yasal bölümünde yer alan bu modül, kullanıcılara platformun gizlilik politikasını sunan React tabanlı bir ön yüz bileşeni barındırır. Yasal sayfalar kategorisinde yer alan bu modül, kullanıcıların platformun kişisel veri işleme süreçleriyle ilgili şartları kolayca görüntülemesini sağlamak amacıyla tasarlanmıştır.
+Bu modül, web uygulamasının gizlilik politikası sayfasını temsil eden tek bir React bileşeni içerir. Sayfa, kullanıcıya gizlilik politikası metnini sunmak için gerekli görsel ve metinsel öğeleri barındırır.
 
 ## Fonksiyon Grupları
-### Gizlilik Politikası Ana Sayfa Bileşeni
-Modülün tüm sorumluluğunu üstlenen, gizlilik politikası sayfasının tüm yapı ve içeriğini kullanıcıya sunan tek bileşendir.
+### Gizlilik Politikası Sayfası
+Bu grup, gizlilik politikası içeriğini görüntülemek ve sayfanın temel yapısını oluşturmakla sorumludur.
 - PrivacyPolicyPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı Gizlilik Politikası sayfası modülünün doğru şekilde oluşturulması, görüntülenmesi ve kullanıcılara erişilebilir olması için uygulamanın React runtime ortamına, yönlendirme sistemine ve paylaşılan ortak bileşen bağımlılıklarının sorunsuz çalışması zorunludur.
-
-[Aksiyom 1]: Eğer projeye React kütüphanesi (JSX çalışma zamanı dahil) dahil edilmemiş veya erişilebilir değilse, bu bileşen hiçbir şekilde oluşturulamaz ve uygulama çalışma zamanında kritik hata fırlatır.
-[Aksiyom 2]: Eğer uygulamanın istemci tarafı yönlendirme sistemi bu sayfa bileşenini ilgili rota altında kaydetmemişse, kullanıcılar Gizlilik Politikası sayfasına erişemez ve erişim denemesi sonucunda 404 hatası alır.
-[Aksiyom 3]: Eğer sayfanın kullandığı paylaşılan ortak şablon, navigasyon, altbilgi gibi temel bileşenler proje içinde erişilebilir değilse, sayfa düzeni bozuk görüntülenir veya hiç oluşturulamaz.
-[Aksiyom 4]: Eğer son kullanıcının tarayıcısında JavaScript çalıştırma özelliği devre dışı bırakılmışsa, bu React bileşeni istemcide oluşturulamaz, kullanıcıya boş veya eksik içerik gösterilir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### PrivacyPolicyPage
-**Ne yapar**: VentHub HVAC projesinin yasal içerikli sayfalarından biri olarak, platformun gizlilik politikasını son kullanıcılara sunmak üzere tasarlanmış React tabanlı sayfa bileşenidir. Genel domain yapısına entegre şekilde çalışarak kullanıcıların gizlilik politikası metin ve ilgili tüm yasal içerikleri sorunsuzca görüntülemesini sağlar.
-**Nasıl yapar**: Standart React bileşeni standartlarına uygun olarak çalışır, projenin kaynak kod ağacında src/views/legal dizininde konumlanarak projenin sayfa hiyerarşisinde yer alır. Sayfa için gerekli tüm içeriği işleyerek React sanal DOM yapısına ekler, kullanıcının cihazında doğru şekilde görüntülenmesini sağlar.
-**Parametreler**: Bu fonksiyon herhangi bir giriş parametresi almaz.
-**Dönüş**: React.FC tipinde, gizlilik politikası sayfasının tüm görsel, metinsel ve yapısal içeriğini barındıran geçerli bir React bileşeni döndürür.
+**Ne yapar**: Bu fonksiyon, bir React fonksiyonel bileşeni (React.FC) döndürür. Fonksiyonun spesifik işlevi ve içeriği kod içinde açıklanmadığı için yalnızca bir bileşen üretmekle sınırlı olduğu söylenebilir.  
+
+**Nasıl yapar**: Fonksiyon, içinde tanımlı bir React bileşenini oluşturur ve bu bileşeni geri döndürür. İç mantığı ve render edilen JSX yapısı kodda belirtilmediği için detaylandırılamaz.  
+
+**Parametreler**:
+- (Parametre yok) — Fonksiyon hiçbir girdi almaz.
+
+**Dönüş**: React.FC — Fonksiyon, bir React fonksiyonel bileşeni tipinde değer döndürür.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/legal/PrivacyPolicyPage.tsx::PrivacyPolicyPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src\views\legal\PrivacyPolicyPage.tsx::PrivacyPolicyPage
+- **params**: (none)
 - **ic_degiskenler**:
-  - `React` — JSX sözdizimi ile sayfa içeriği oluşturmak için kullanılan ana React kütüphanesi
-  - `Link` — Next.js tarafından sağlanan istemci tarafı yönlendirme bileşeni, Çerez Politikası sayfasına köprü oluşturmak için kullanılır
-  - `legalConfig` — Hukuki metinlerde kullanılacak sabit şirket ve veri saklama verilerini içeren proje konfigürasyon nesnesi
-  - `legalConfig.sellerTitle` — Veri sorumlusu bölümünde gösterilen şirket unvanı
-  - `legalConfig.sellerAddress` — Veri sorumlusu bölümünde gösterilen şirket fiziksel adresi
-  - `legalConfig.sellerEmail` — Veri sorumlusu bölümünde gösterilen şirket iletişim e-posta adresi
-  - `legalConfig.sellerPhone` — Veri sorumlusu bölümünde gösterilen şirket iletişim telefon numarası
-  - `legalConfig.retentionOrders` — Sipariş ve faturalandırma verilerinin saklama süresi değeri
-  - `legalConfig.retentionSupport` — Destek yazışması verilerinin saklama süresi değeri
-  - `legalConfig.retentionMarketing` — Pazarlama verilerinin saklama süresi değeri
-  - `legalConfig.retentionLogs` — Güvenlik loglarının saklama süresi değeri
-  - `legalConfig.applicationEmail` — Kullanıcıların KVKK hakları için başvuracağı resmi başvuru e-posta adresi
-  - `legalConfig.lastUpdated` — Gizlilik politikasının son güncellenme tarihi değeri
-  - `Routes` — Proje genelinde kullanılan rota adreslerini barındıran yardımcı nesne
-  - `Routes.legal.cerez()` — Çerez Politikası sayfasının rota adresini döndüren fonksiyon, Link bileşeninin href özelliğine atanır
-- **Dönüş**: React.FC türünde JSX elementi, Gizlilik Politikası sayfasının tüm kullanıcı arayüzü içeriğini render ederek döndürür
+  - `legalConfig` — Imported configuration object containing legal information such as seller details, retention periods, and contact emails.
+  - `Routes` — Imported routing utility used to generate the URL for the cookie policy page via `Routes.legal.cerez()`.
+  - `Link` — Imported Next.js component used to render a hyperlink to the cookie policy page.
+- **Dönüş**: JSX element tree representing the privacy policy page.
 
 ---
 
@@ -70,3 +61,18 @@ Bu React tabanlı Gizlilik Politikası sayfası modülünün doğru şekilde olu
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: PrivacyPolicyPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-yellow-800`
+- **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
+- **Responsive:** `lg:`, `sm:` prefix kullanımları

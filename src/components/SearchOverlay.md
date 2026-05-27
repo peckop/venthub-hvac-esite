@@ -4,102 +4,114 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx
 skeleton_hash: 8455b920ef65c537
-generated_at: 2026-05-23T22:27:44Z
+entity_hashes:
+  func:SearchOverlay: 5877a83b84daa2a4
+  func:addToRecent: bf8c952c533ee587
+  func:handleClose: 5443cae55c424b9f
+  func:handleKeyDown: 1487e8d647499b5f
+  func:performFullSearch: ffbaaa64876e5226
+  func:renderIdle: ceb6e27699bb9c05
+  func:renderResults: e506feef4e55d367
+  func:renderSuggestion: 843bcfdde37f5fbe
+  func:renderSuggestions: 8f7a31a904a04209
+  overview: 1ded2cd49051df65
+  style_tokens: 63fb12683ce25606
+generated_at: 2026-05-27T12:21:59Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunda kullanıcıların karşısına açılan, açılır kapanır arama arayüzünü (search overlay) yöneten React bileşenidir. Kullanıcının arama yapmasını, arama önerilerini ve sonuçlarını görüntülemesini, önceki aramalarını kaydetmesini sağlayan tüm temel işlevleri tek bir modülde toplar. Arayüzün açılıp kapanma durumunu, klavye etkileşimlerini ve farklı kullanıcı durumlarına göre içerik gösterme mantığını yönetir.
+Bu modül, kullanıcıya tam ekran veya katmanlı bir arayüz üzerinden arama yapma imkanı sunan React bileşenidir. Kullanıcı girdilerini dinleyerek eşzamanlı arama işlemlerini yönetir, arama geçmişini günceller ve sonuçları farklı görsel durumlar halinde sunar.
 
 ## Fonksiyon Grupları
-### Çekirdek Bileşen ve Temel Etkileşim Yönetimi
-Overlay'in genel yaşam döngüsünü, açılıp kapanma mantığını ve klavye gibi temel kullanıcı girişlerini yöneterek bileşenin ana çalışma prensibini hayata geçirir.
-- SearchOverlay, handleClose, handleKeyDown
 
-### Arama İşlevleri Yönetimi
-Kullanıcının girdiği arama terimleriyle ilgili tüm işlemleri yürütür, tam metin arama sorgularını çalıştırır ve yapılan aramaları son aramalar listesine ekleyerek kaydeder.
-- addToRecent, performFullSearch
+### Bileşen Yapısı ve Durum Yönetimi
+Ana bileşenin tanımlanmasını ve arama geçmişine yeni terimler eklenerek yerel durumun güncellenmesini sağlar.
+- SearchOverlay, addToRecent
 
-### İçerik Renderlama Mantığı
-Arayüzün mevcut durumuna göre uygun ekranı (boşta bekleme, arama önerileri, arama sonuçları) ve her bir öneri öğesini kullanıcıya göstermek için tüm render işlemlerini yönetir.
-- renderIdle, renderSuggestion, renderSuggestions, renderResults
+### Kullanıcı Etkileşimi
+Klavye navigasyonunu ve pencerenin kapatılma isteğini gibi kullanıcı aksiyonlarını ele alır.
+- handleClose, handleKeyDown
+
+### Veri İşlemleri
+Kullanıcının sorgusuna göre arama sonuçlarını asenkron olarak getirir.
+- performFullSearch
+
+### Arayüz Görselleştirme
+Arama penceresinin boş durum, öneri listesi ve sonuç listesi gibi farklı görsel durumlarını oluşturur.
+- renderIdle, renderSuggestions, renderResults, renderSuggestion
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı arama kaplama (SearchOverlay) bileşeni, üst bileşenlerden gerekli prop'ların düzgün iletildiği, arama iş akışları için gereken tüm harici kaynak ve veri yapılarının erişilebilir olduğu durumlarda tasarlandığı şekilde çalışır.
-
-[Aksiyom 1]: Eğer SearchOverlay bileşenine `open` boolean durumu prop olarak iletilmezse, bileşenin görünürlük durumu yönetilemez, beklenen şekilde açılamaz veya kapanamaz.
-[Aksiyom 2]: Eğer SearchOverlay bileşenine `onClose` kapatma callback fonksiyonu prop olarak iletilmezse, kullanıcı tarafından tetiklenen kapanma eylemleri üst bileşene iletilemez, overlay'in durum senkronizasyonu bozulur.
-[Aksiyom 3]: Eğer `SearchSuggestion` tipinde tanımlı öneri ve sonuç veri yapıları beklenen formatta bileşene iletilmezse, `renderSuggestion`, `renderSuggestions` ve `renderResults` içerik gösterme fonksiyonları çalışmaz, arama içerikleri görüntülenemez.
-[Aksiyom 4]: Eğer klavye etkileşimleri için gerekli React.KeyboardEvent nesneleri doğru şekilde `handleKeyDown` fonksiyonuna iletilmezse, klavye gezintisi, ESC tuşıyla kapatma gibi erişilebilirlik özellikleri devre dışı kalır.
-[Aksiyom 5]: Eğer son aramaların saklanacağı istemci tarafı depolama veya merkezi durum yönetim sistemi erişilemez durumdaysa, `addToRecent` fonksiyonu çalışmaz, geçmiş aramalar sonraki kullanımlarda listelenemez.
-[Aksiyom 6]: Eğer tam arama işlevini gerçekleştirecek arama API'si veya yerel veri kaynağı erişilemez durumdaysa, `performFullSearch` fonksiyonu hiçbir sonuç üretemez, kullanıcıya arama çıktısı sunulamaz.
-[Aksiyom 7]: Eğer bileşen içindeki `renderIdle`, `renderSuggestions`, `renderResults` gibi durum bazlı alt render fonksiyonlarından herhangi biri çalışmaz durumdaysa, ilgili arama durumunda kullanıcı arayüzü bozuk görüntülenir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SearchOverlay
-**Ne yapar**: VentHub HVAC projesinin arama işlevselliğini sunan, ekranın üstünde açılan kaplama (overlay) arayüzünü oluşturan ana React fonksiyonel bileşenidir. Arama girişini, önerilerini, sonuçlarını ve tüm arama ile ilgili etkileşimleri tek bir arayüzde toplar, yalnızca açık olduğu durumda ekranda görünür.
-**Nasıl yapar**: İçerisinde tanımlı tüm yardımcı arayüz ve işlev fonksiyonlarını kullanarak kullanıcı etkileşimlerini yönetir. `open` prop'u ile görünürlüğünü dinamik olarak kontrol eder, kapanma işlemi için üst bileşenden alınan `onClose` callback'ini tetikler. Arama sürecinin tüm aşamalarını (boş durum, öneri gösterme, sonuç gösterme) yöneterek uygun arayüzü ekrana yansıtır.
+**Ne yapar**: Arama çubuğu için üst katman (overlay) bileşenini tanımlar ve `open` ve `onClose` prop’larıyla görünürlüğünü kontrol eder.  
+**Nasıl yapar**: React fonksiyonel bileşeni olarak `SearchOverlayProps` tipinde parametre alır, içindeki durum yönetimi ve olay işleyicileriyle arama önerileri, sonuçları ve klavye etkileşimlerini yönetir.  
 **Parametreler**:
-- open: boolean — Arama arayüzünün görünür olup olmadığını belirten doğruluk değeri, true olduğunda arayüz ekranda aktif olur, false olduğunda gizlenir
-- onClose: () => void — Arama arayüzünün kapatılması gerektiğinde üst bileşene bildirim göndermek için kullanılan callback fonksiyonu
-**Dönüş**: React.FC<SearchOverlayProps> — Tür tanımı yapılmış React fonksiyonel bileşeni olarak arama arayüzünü uygulama DOM yapısına ekler.
+- `open`: boolean — Overlay’ın açık olup olmadığını belirten flag.
+- `onClose`: () => void — Overlay kapatıldığında tetiklenen geri çağırma fonksiyonu.  
+**Dönüş**: React.FC\<SearchOverlayProps\> — Tanımlanan overlay bileşenini döndürür.
 
 ### handleClose
-**Ne yapar**: SearchOverlay arayüzünün düzenli bir şekilde kapanmasını sağlayan iç yardımcı fonksiyondur. Kapanma sırasında tüm geçici durumları sıfırlayarak arayüzün bir sonraki açılışında temiz bir başlangıç yapmasını garanti eder.
-**Nasıl yapar**: Bileşene prop olarak iletilen `onClose` callback fonksiyonunu tetikler, kapanma öncesinde arama giriş alanını temizler, açık olan öneri veya sonuç listelerini sıfırlar, odak yönetimini düzenleyerek erişilebilirlik standartlarına uygun kapanma süreci sunar.
-**Parametreler**: Hiçbir parametre almaz
-**Dönüş**: void — Kaynak kodda belirtilen şekilde herhangi bir değer döndürmez, yalnızca kapanma işlemini yürütür.
+**Ne yapar**: Overlay’ı kapatmak için kullanılan yardımcı fonksiyondur.  
+**Nasıl yapar**: `onClose` geri çağırmasını çalıştırarak overlay’ın kapanmasını sağlar.  
+**Parametreler**: Yok.  
+**Dönüş**: void
 
 ### addToRecent
-**Ne yapar**: Kullanıcının gerçekleştirdiği arama terimlerini kaydederek son aramalar listesini güncelleyen iç yardımcı fonksiyondur. Kullanıcıların önceki aramalarına hızlıca erişmesini sağlamak amacıyla kullanılır.
-**Nasıl yapar**: Aynı arama teriminin listede birden fazla kez yer almasını engellemek için mevcut listedeki eşleşen terimi siler, yeni eklenen terimi listenin en başına ekler, güncel listeyi kalıcı depolama alanına kaydederek sayfa yenilenmelerinde bile verilerin korunmasını sağlar.
+**Ne yapar**: Kullanıcının arama terimini son aramalara ekler.  
+**Nasıl yapar**: Verilen terimi (örnek kodda `q`) son arama listesine ekleyerek gelecekte hızlı erişim sağlar.  
 **Parametreler**:
-- term: string — Son aramalar listesine eklenecek, kullanıcının girdiği tam arama terimi
-**Dönüş**: void veya bilinmiyor — Kaynak kodda belirtilen şekilde dönüş tipi tanımlanmamıştır, yalnızca son aramalar listesini güncelleme işlemini yürütür.
+- `term`: string — Son aramalara eklenmek istenen arama terimi.  
+**Dönüş**: void
 
 ### performFullSearch
-**Ne yapar**: Kullanıcının girdiği arama terimi ile tam kapsamlı arama işlemini başlatan iç yardımcı fonksiyondur. HVAC sistemleri, bileşenleri ve dökümanları üzerinde arama yaparak ilgili sonuçların getirilmesini sağlar.
-**Nasıl yapar**: Gelen arama terimini temizleyerek (özel karakterleri kaldırarak, gereksiz boşlukları düzenleyerek) geçerli bir sorgu haline getirir, arama altyapısını kullanarak eşleşen içerikleri çeker, gelen sonuçları bileşenin durumuna kaydederek sonuç arayüzünün aktif olmasını tetikler.
+**Ne yapar**: Kullanıcı tarafından girilen terimle tam metin araması başlatır.  
+**Nasıl yapar**: `setQ` ile arama sorgusunu günceller ve aynı terimle `performFullSearch` fonksiyonunu (muhtemelen bir API çağrısı) tetikler.  
 **Parametreler**:
-- term: string — Üzerinde tam arama yapılacak olan kullanıcı tarafından girilen arama terimi
-**Dönüş**: void veya bilinmiyor — Kaynak kodda belirtilen şekilde dönüş tipi tanımlanmamıştır, yalnızca arama işlemini ve sonuçların yüklenmesini yürütür.
+- `term`: string — Aranacak tam metin sorgusu.  
+**Dönüş**: void
 
 ### handleKeyDown
-**Ne yapar**: Arama arayüzündeki tüm klavye etkileşimlerini yöneten iç yardımcı fonksiyondur. Kullanıcıların klavye ile arayüzü tam olarak kontrol etmesini sağlayarak erişilebilirliği artırır.
-**Nasıl yapar**: Tetiklenen klavye olayının tuş değerini okur, tuşa göre önceden tanımlanmış işlemleri yürütür. Escape tuşunda arayüzü kapatmak için `handleClose` fonksiyonunu, ok tuşlarında öneriler arasında gezinme işlemini, Enter tuşunda seçili öneri ile arama başlatma işlemini çalıştırır, odak yönetimini sağlayarak klavye gezintisinin kesintisiz olmasını garanti eder.
+**Ne yapar**: Klavye tuşlarına (Escape, ArrowDown, ArrowUp, Enter) göre arama overlay’ının davranışlarını yönetir.  
+**Nasıl yapar**:  
+- Escape tuşu basıldığında `handleClose` çağrılır.  
+- ArrowDown/ArrowUp tuşlarıyla aktif öneri/sonuç indeksi güncellenir.  
+- Enter tuşu basıldığında seçili öğe varsa ilgili sayfaya yönlendirme yapılır, yoksa tam arama (`performFullSearch`) başlatılır.  
 **Parametreler**:
-- e: React.KeyboardEvent — Tetiklenen klavye olayının tüm özelliklerini (basılan tuş, odak durumu vb.) içeren React klavye olay nesnesi
-**Dönüş**: void veya bilinmiyor — Kaynak kodda belirtilen şekilde dönüş tipi tanımlanmamıştır, yalnızca klavye etkileşimlerine göre ilgili işlemleri yürütür.
+- `e`: React.KeyboardEvent — Klavye olayı nesnesi.  
+**Dönüş**: void
 
 ### renderSuggestion
-**Ne yapar**: Tek bir arama önerisi öğesini arayüzde görüntüleyen iç render fonksiyonudur. Her öneri öğesinin görsel stilini ve etkileşimlerini tanımlar.
-**Nasıl yapar**: Gelen öneri nesnesinin verilerine (türü, başlığı, ikon bilgisi vb.) göre uygun içerik ve stilleri ekler, öneriye tıklandığında ilgili aramayı başlatacak onClick olayını tanımlar, sıra numarası ile odak ve vurgulama işlemlerini destekler.
+**Ne yapar**: Tek bir arama önerisini UI’da göstermek için render fonksiyonunu çağırır.  
+**Nasıl yapar**: Gelen öneri nesnesi `s` ve indeks `idx` parametrelerini `renderSuggestion` (muhtemelen bir JSX bileşeni) ile işler.  
 **Parametreler**:
-- s: SearchSuggestion — Render edilecek arama önerisinin tüm verilerini içeren, önceden tanımlanmış SearchSuggestion tipinde nesne
-- idx: number — Önerinin bulunduğu listedeki sıra numarası, stil, odak ve vurgulama işlemleri için kullanılır
-**Dönüş**: void veya bilinmiyor — Kaynak kodda belirtilen şekilde dönüş tipi tanımlanmamıştır, yalnızca tek öneri öğesini arayüzde görüntülemek için işlemleri yürütür.
+- `s`: SearchSuggestion — Görüntülenecek öneri nesnesi.  
+- `idx`: number — Önerinin listedeki sırası.  
+**Dönüş**: void
 
 ### renderIdle
-**Ne yapar**: Arama arayüzü ilk açıldığında, kullanıcı henüz herhangi bir arama terimi girmemişken görüntülenen boş durum arayüzünü oluşturan iç render fonksiyonudur.
-**Nasıl yapar**: Kalıcı depolama alanından kaydedilmiş son aramaları, önceden tanımlanmış popüler aramaları getirir, bu öğeleri liste halinde sunarak kullanıcının tek tıkla arama yapmasını sağlayan arayüzü oluşturur, giriş alanının boş olduğu tüm durumlarda bu görünümü aktif eder.
-**Parametreler**: Hiçbir parametre almaz
-**Dönüş**: void veya bilinmiyor — Kaynak kodda belirtilen şekilde dönüş tipi tanımlanmamıştır, yalnızca boş durum arayüzünü görüntülemek için işlemleri yürütür.
+**Ne yapar**: Arama overlay’ı boş (idle) durumundayken gösterilecek içeriği üretir.  
+**Nasıl yapar**: Boş durum UI’sını döndürmek için ilgili render mantığını uygular.  
+**Parametreler**: Yok.  
+**Dönüş**: void
 
 ### renderSuggestions
-**Ne yapar**: Kullanıcı arama terimi girmeye başladıktan sonra, tam arama başlamadan önce gösterilen tüm eşleşen önerilerin listesini ekrana yazdıran iç render fonksiyonudur.
-**Nasıl yapar**: Kullanıcının girdiği kısmi terimle eşleşen tüm önerileri filtreler, her bir öneriyi tek tek render etmek için `renderSuggestion` fonksiyonunu çağırır, listenin uzunluğuna göre kaydırma davranışlarını ve boyutlarını ayarlar, hiç öneri bulunmaması durumunda uygun uyarı mesajını gösterir.
-**Parametreler**: Hiçbir parametre almaz
-**Dönüş**: void veya bilinmiyor — Kaynak kodda belirtilen şekilde dönüş tipi tanımlanmamıştır, yalnızca öneriler listesini arayüzde görüntülemek için işlemleri yürütür.
+**Ne yapar**: Arama önerileri listesini UI’da gösterir.  
+**Nasıl yapar**: `suggestions` dizisini dolaşarak her bir öğeyi `renderSuggestion` ile render eder.  
+**Parametreler**: Yok.  
+**Dönüş**: void
 
 ### renderResults
-**Ne yapar**: Kullanıcı tam arama işlemini başlattıktan sonra gelen tüm arama sonuçlarını ekrana yazdıran iç render fonksiyonudur. Tüm eşleşen sonuçların kullanıcıya sunulmasını sağlar.
-**Nasıl yapar**: Bileşenin durumunda saklanan arama sonuçlarını alır, her bir sonuca uygun görsel ve etkileşim özellikleri ekleyerek listeler, sonuç sayısına göre sayfalama veya sonsuz kaydırma mekanizmalarını devreye sokar, hiç sonuç gelmemesi durumunda "sonuç bulunamadı" mesajını ekrana yansıtır.
-**Parametreler**: Hiçbir parametre almaz
-**Dönüş**: void veya bilinmiyor — Kaynak kodda belirtilen şekilde dönüş tipi tanımlanmamıştır, yalnızca arama sonuçlarını arayüzde görüntülemek için işlemleri yürütür.
+**Ne yapar**: Arama sonuçlarını UI’da gösterir.  
+**Nasıl yapar**: `results` dizisini işleyerek her bir sonuç öğesini uygun bir bileşenle render eder.  
+**Parametreler**: Yok.  
+**Dönüş**: void
 
 ---
 
@@ -122,303 +134,176 @@ type ViewState = 'IDLE' | 'SUGGESTING' | 'RESULTS'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::getPopularRootCategories
+### [N1_NASIL] AST Pointer: src/components/SearchOverlay.tsx::SearchOverlay
+- **params**: `open`, `onClose`
+- **ic_degiskenler**:
+  - `globalCategories` — dışarıdan gelen kategori listesi, üst‑kategori olmayanları filtrelemek için kullanılır.
+  - `popularCategories` — `globalCategories` üzerinden alınan ilk 5 kategori, UI’da gösterilir.
+  - `RECENT_SEARCHES_KEY` — localStorage’da saklanan son aramaları tutan anahtar.
+  - `recentSearches` — state, en son yapılan aramaları tutar; UI’da listelenir ve `addToRecent` ile güncellenir.
+  - `setRecentSearches` — `recentSearches` state’ini güncelleyen setter.
+  - `q` — arama kutusundaki metin, `setQ` ile güncellenir.
+  - `setQ` — arama metnini güncelleyen setter.
+  - `debounced` — `q` değerinin gecikmeli (debounce) hali, arama önerileri ve sonuçları için kullanılır.
+  - `setDebounced` — `debounced` state’ini güncelleyen setter.
+  - `suggestions` — öneri listesi, `setSuggestions` ile güncellenir.
+  - `setSuggestions` — öneri listesi state’ini güncelleyen setter.
+  - `results` — tam arama sonuçları, `setResults` ile güncellenir.
+  - `setResults` — sonuç listesi state’ini güncelleyen setter.
+  - `viewState` — `'IDLE' | 'SUGGESTING' | 'RESULTS'` gibi UI durumunu tutar.
+  - `setViewState` — `viewState`i güncelleyen setter.
+  - `loading` — arama işlemi devam ederken gösterilen yükleme durumu.
+  - `setLoading` — `loading` state’ini güncelleyen setter.
+  - `error` — arama hatası mesajı.
+  - `setError` — `error` state’ini güncelleyen setter.
+  - `activeIndex` — klavye ile seçilen öneri/sonuç indeksi.
+  - `setActiveIndex` — `activeIndex`i güncelleyen setter.
+  - `listRef` — öneri/sonuç listesinin DOM referansı, kaydırma için kullanılır.
+  - `inputRef` — arama kutusunun DOM referansı, odaklamak için kullanılır.
+  - `router` — `useRouter()` ile alınan yönlendirme nesnesi, sayfa navigasyonu için.
+  - `t` — `useI18n()` ile alınan çeviri fonksiyonu.
+- **Dönüş**: React bileşeni JSX döndürür; yan etkileri arasında localStorage okuma/yazma, zamanlayıcı yönetimi ve router navigasyonu bulunur.
+
+### [N2_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleClose
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `globalCategories` — Tüm sistemdeki kategori listesi, ana kategorileri filtrelemek için kullanılır
-  - `c` — filter fonksiyonunun iterasyon değişkeni, her kategori öğesini temsil eder
-- **Dönüş**: İlk 5 parent_id'siz ana kategori içeren Partial<DbCategory>[] tipinde dizi
+  - `setQ` — arama kutusunu boşaltır.
+  - `setResults` — sonuç listesini temizler.
+  - `setSuggestions` — öneri listesini temizler.
+  - `setViewState` — UI durumunu `'IDLE'` yapar.
+  - `setActiveIndex` — seçili indeks’i `-1` yapar.
+  - `onClose` — üst bileşenden gelen kapanış callback’i, çağrılır.
+- **Dönüş**: yok (yan etki: UI ve state sıfırlama).
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::loadRecentSearchesFromStorage
+### [N3_NASIL] AST Pointer: src/components/SearchOverlay.tsx::addToRecent
+- **params**: `term: string`
+- **ic_degiskenler**:
+  - `recentSearches` — mevcut son arama listesi.
+  - `setRecentSearches` — güncellenmiş listeyi state’e yazar.
+  - `RECENT_SEARCHES_KEY` — localStorage anahtarı.
+- **Dönüş**: yok (yan etki: state ve localStorage güncellenir).
+
+### [N4_NASIL] AST Pointer: src/components/SearchOverlay.tsx::performFullSearch
+- **params**: `term: string`
+- **ic_degiskenler**:
+  - `setLoading` — arama sırasında loading durumunu `true` yapar.
+  - `setError` — hata mesajını sıfırlar.
+  - `setViewState` — UI’yı `'RESULTS'` durumuna geçirir.
+  - `addToRecent` — arama terimini son aramalara ekler.
+  - `setActiveIndex` — seçili indeksi `-1` yapar.
+  - `ftsSearchProducts` — dinamik import ile getirilen tam metin arama fonksiyonu.
+  - `rows` — `ftsSearchProducts` sonucunda dönen satırlar (her satır bir ürün).
+  - `setResults` — `rows`u sonuç state’ine yazar.
+  - `t` — çeviri fonksiyonu, hata mesajı için kullanılır.
+  - `setLoading` (finally) — loading durumunu `false` yapar.
+- **Dönüş**: yok (yan etki: API çağrısı, state güncellemeleri, hata yönetimi).
+
+### [N5_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleKeyDown
+- **params**: `e: React.KeyboardEvent`
+- **ic_degiskenler**:
+  - `router` — sayfa yönlendirme nesnesi.
+  - `viewState` — mevcut UI durumu.
+  - `suggestions` — öneri listesi.
+  - `results` — tam arama sonuçları.
+  - `activeIndex` — şu an seçili öğe indeksi.
+  - `maxIndex` — `viewState`a göre geçerli maksimum indeks.
+  - `setActiveIndex` — klavye ok tuşlarıyla indeksi günceller.
+  - `handleClose` — Escape tuşunda overlay’i kapatır.
+  - `performFullSearch` — Enter tuşunda tam arama başlatır.
+  - `addToRecent` — seçilen öneri/sonuç etiketini son aramalara ekler.
+  - `router.push` — seçilen öğenin URL’sine yönlendirir.
+- **Dönüş**: yok (yan etki: klavye navigasyonu, state güncelleme, yönlendirme).
+
+### [N6_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestion
+- **params**: `s: SearchSuggestion`, `idx: number`
+- **ic_degiskenler**:
+  - `activeIndex` — mevcut seçili indeks.
+  - `isActive` — `idx === activeIndex` kontrolü.
+  - `icon` — öneri tipine göre oluşturulan JSX (image veya SVG).
+  - `label` — öneri etiketi, marka ön eki eklenebilir.
+  - `router` — navigasyon.
+  - `addToRecent` — arama terimini son aramalara ekler.
+  - `handleClose` — overlay’i kapatır.
+  - `setActiveIndex` — mouseEnter ile aktif öğeyi ayarlar.
+  - `highlightMatch` — arama kelimesiyle eşleşen kısmı vurgulamak için kullanılan yardımcı fonksiyon.
+- **Dönüş**: JSX `<button>` elementi döndürür; yan etkileri mouse olayları ve navigasyon.
+
+### [N7_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderIdle
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `RECENT_SEARCHES_KEY` — localStorage'da son aramaları saklamak için kullanılan sabit anahtar
-  - `stored` — localStorage'dan okunan ham JSON string verisi
-  - `setRecentSearches` — Son aramalar state'ini güncellemek için kullanılan state setter fonksiyonu
-- **Dönüş**: yok
+  - `recentSearches` — son arama listesi.
+  - `setRecentSearches` — temizleme butonunda listeyi sıfırlar.
+  - `RECENT_SEARCHES_KEY` — localStorage’dan silinir.
+  - `popularCategories` — popüler kategori listesi.
+  - `router` — kategori butonlarıyla yönlendirme.
+  - `Routes.category` — kategori URL’si üretir.
+  - `getCategoryIcon` — kategori ikonu JSX’i.
+  - `t` — çeviri fonksiyonu.
+- **Dönüş**: JSX; UI’da son aramalar ve popüler kategorileri gösterir.
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::setupDebounceCleanup
+### [N8_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestions
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t_id` - Oluşturulan timeout'un ID'si, temizlemek için saklanır
-  - `q` - Kullanıcının girdiği ham arama metni
-  - `setDebounced` - Filtrelenmiş arama metni state'ini güncelleyen setter
-- **Dönüş**: Timeout'u temizleyen cleanup fonksiyonu
+  - `suggestions` — öneri dizisi.
+  - `renderSuggestion` — her öneri için JSX üretir.
+  - `listRef` — öneri listesinin DOM referansı.
+  - `performFullSearch` — “Tüm sonuçları göster” butonunda tam arama başlatır.
+  - `debounced` — mevcut arama terimi, buton metninde gösterilir.
+  - `t` — çeviri fonksiyonu.
+- **Dönüş**: JSX; öneri listesi ve “Tüm sonuçları göster” butonu.
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::resetActiveIndex
+### [N9_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderResults
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `setActiveIndex` - Seçili liste öğesi indeksini sıfırlamak için kullanılan state setter
-- **Dönüş**: yok
+  - `results` — tam arama sonuçları.
+  - `activeIndex` — seçili sonuç indeksi.
+  - `setActiveIndex` — mouseEnter ile aktif indeksi ayarlar.
+  - `router` — ürün detay sayfasına yönlendirme.
+  - `Routes.product` — ürün URL’si üretir.
+  - `handleClose` — overlay’i kapatır.
+  - `highlightMatch` — ürün adı, marka ve sku vurgulama.
+  - `listRef` — sonuç listesinin DOM referansı.
+  - `t` — çeviri fonksiyonu.
+  - `hasFuzzy` — sonuçlarda fuzzy eşleşme olup olmadığını belirler.
+- **Dönüş**: JSX; sonuç listesi ve fuzzy eşleşme uyarısı.
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::scrollActiveElementIntoView
+### [N10_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderIdle (no‑results placeholder)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `activeIndex` - Mevcut seçili liste öğesinin indeksi
-  - `listRef.current` - Sonuç listesinin DOM referansı
-  - `activeEl` - Seçili liste öğesinin HTML element referansı
-- **Dönüş**: yok
+  - `t` — çeviri fonksiyonu.
+  - `performFullSearch` — “Detaylı arama” butonunda tam arama başlatır.
+  - `debounced` — arama terimi, buton metninde gösterilir.
+- **Dönüş**: JSX; öneri yokken gösterilen “sonuç yok” mesajı.
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::fetchSuggestionsEffect
+### [N11_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderResults (no‑results placeholder)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `active` - Efekti takip etmek için kullanılan bayrak, bileşen monte edilmişse true
-  - `fetchData` - İç içe tanımlı öneri getirme asenkron fonksiyonu
-  - `open` - Arama penceresinin açık olma durumu
-  - `debounced` - Filtrelenmiş arama metni
-  - `setViewState` - Arama görünüm durumunu değiştiren setter
-  - `setSuggestions` - Öneri listesi state setter'ı
-  - `setResults` - Sonuç listesi state setter'ı
-  - `setLoading` - Yükleme durumu state setter'ı
-  - `getSearchSuggestions` - Supabase'den arama önerileri getiren API fonksiyonu
-  - `items` - API'den gelen öneri listesi
-  - `err` - Hata yakalama sırasında elde edilen hata nesnesi
-- **Dönüş**: Bileşen unmount olduğunda active bayrağını false yapan cleanup fonksiyonu
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::fetchData
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `open` - Arama penceresinin açık olma durumu
-  - `debounced` - Filtrelenmiş arama metni
-  - `setViewState` - Arama görünüm durumunu değiştiren setter
-  - `setSuggestions` - Öneri listesi state setter'ı
-  - `setResults` - Sonuç listesi state setter'ı
-  - `setLoading` - Yükleme durumu state setter'ı
-  - `getSearchSuggestions` - Supabase'den arama önerileri getiren API fonksiyonu
-  - `items` - API'den gelen öneri listesi
-  - `active` - Bileşen aktiflik bayrağı
-  - `err` - API çağrısı sırasında oluşan hata nesnesi
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::focusInputOnOpen
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `open` - Arama penceresinin açık olma durumu
-  - `setQ` - Arama metni state setter'ı
-  - `inputRef.current` - Arama input'unun DOM referansı
-- **Dönüş**: yok
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::handleClose
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setQ` - Arama metni sıfırlayan state setter
-  - `setResults` - Sonuç listesini sıfırlayan state setter
-  - `setSuggestions` - Öneri listesini sıfırlayan state setter
-  - `setViewState` - Görünüm durumunu IDLE'a çeken state setter
-  - `setActiveIndex` - Aktif indeksi sıfırlayan state setter
-  - `onClose` - Props'tan gelen üst bileşeni bilgilendiren kapatma fonksiyonu
-- **Dönüş**: yok
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::addToRecent
-- **params**: term: string
-- **ic_degiskenler**:
-  - `term` - Eklenecek arama terimi
-  - `recentSearches` - Mevcut son aramalar listesi
-  - `x` - Filtre fonksiyonunun iterasyon değişkeni, tekrarlı terimleri çıkarmak için kullanılır
-  - `next` - Güncellenmiş son aramalar listesi, maksimum 5 öğe içerir
-  - `setRecentSearches` - Son aramalar state'ini güncelleyen setter
-  - `RECENT_SEARCHES_KEY` - localStorage anahtarı
-  - `localStorage` - Tarayıcı yerel depolama nesnesi
-- **Dönüş**: yok
-
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::performFullSearch
-- **params**: term: string
-- **ic_degiskenler**:
-  - `term` - Tüm ürünler arasında aranacak metin
-  - `setLoading` - Yükleme durumunu açan state setter
-  - `setError` - Hata durumunu ayarlayan state setter
-  - `setViewState` - Görünümü RESULTS durumuna çeken setter
-  - `addToRecent` - Arama terimini son aramalara ekleyen fonksiyon
-  - `setActiveIndex` - Aktif indeksi sıfırlayan setter
-  - `ftsSearchProducts` - Supabase'de tam metin araması yapan API fonksiyonu
-  - `rows` - API'den gelen ürün sonuç listesi
-  - `setResults` - Sonuç listesini kaydeden state setter
-  - `t` - Çeviri fonksiyonu
-- **Dönüş**: yok
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::handleKeyDown
-- **params**: e: React.KeyboardEvent
-- **ic_degiskenler**:
-  - `e` - Klavye olay nesnesi
-  - `e.key` - Basılan tuşun adı
-  - `handleClose` - ESC tuşunda arama penceresini kapatan fonksiyon
-  - `viewState` - Mevcut arama görünüm durumu
-  - `suggestions` - Öneri listesi, SUGGESTING durumunda indeks sınırı için kullanılır
-  - `results` - Ürün sonuç listesi, RESULTS durumunda indeks sınırı için kullanılır
-  - `maxIndex` - Listedeki son öğenin indeksi, klavye gezinmesi için üst sınır
-  - `setActiveIndex` - Aktif indeksi güncelleyen state setter
-  - `prev` - Önceki aktif indeks değeri
-  - `activeIndex` - Mevcut seçili öğenin indeksi
-  - `s` - Enter tuşunda seçilen öneri nesnesi (SUGGESTING durumunda)
-  - `router` - Next.js yönlendirici nesnesi
-  - `addToRecent` - Seçilen öneriyi son aramalara ekleyen fonksiyon
-  - `res` - Enter tuşunda seçilen ürün sonucu nesnesi (RESULTS durumunda)
-  - `Routes.product` - Ürün detay sayfası rotası oluşturan utility fonksiyon
-  - `performFullSearch` - Hiçbir öğe seçili değilse tam arama yapan fonksiyon
-  - `q` - Kullanıcının girdiği ham arama metni
-- **Dönüş**: yok
-
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::renderSuggestion
-- **params**: s: SearchSuggestion, idx: number
-- **ic_degiskenler**:
-  - `s` - Oluşturulacak öneri nesnesi
-  - `idx` - Önerinin listedeki indeksi
-  - `isActive` - Önerinin klavye/fare ile seçili olma durumu
-  - `activeIndex` - Mevcut seçili öğenin indeksi
-  - `icon` - Önerinin türüne göre oluşturulacak ikon elementi
-  - `label` - Önerinin görüntülenecek etiketi, marka türünde önek eklenir
-  - `highlightMatch` - Arama teriminin eşleşen kısımlarını vurgulayan utility fonksiyon
-  - `debounced` - Filtrelenmiş arama metni, vurgulama için kullanılır
-  - `setActiveIndex` - Fare ile üzerine gelindiğinde aktif indeksi güncelleyen setter
-  - `router` - Next.js yönlendirici nesnesi
-  - `addToRecent` - Tıklanan öneriyi son aramalara ekleyen fonksiyon
-  - `q` - Kullanıcının girdiği ham arama metni
-  - `handleClose` - Öneriye tıklandıktan sonra arama penceresini kapatan fonksiyon
-- **Dönüş**: React elementi olarak öneri butonu
-
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::suggestionClickHandler
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `s` - Tıklanan öneri nesnesi
-  - `router` - Next.js yönlendirici nesnesi
-  - `addToRecent` - Tıklanan terimi son aramalara ekleyen fonksiyon
-  - `q` - Mevcut arama metni
-  - `handleClose` - Arama penceresini kapatan fonksiyon
-- **Dönüş**: yok
-
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::renderIdle
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `recentSearches` - Kaydedilmiş son aramalar listesi
-  - `setRecentSearches` - Son aramaları sıfırlayan state setter
-  - `localStorage` - Tarayıcı yerel depolama nesnesi
-  - `RECENT_SEARCHES_KEY` - localStorage anahtarı
-  - `setQ` - Arama metnini seçilen son arama ile güncelleyen setter
-  - `performFullSearch` - Son arama terimi ile tekrar arama yapan fonksiyon
-  - `popularCategories` - Görüntülenecek popüler kategori listesi
-  - `router` - Next.js yönlendirici nesnesi
-  - `Routes.category` - Kategori sayfası rotası oluşturan utility
-  - `handleClose` - Kategoriye tıklandıktan sonra pencereyi kapatan fonksiyon
-  - `getCategoryIcon` - Kategori slug'ına göre ikon döndüren utility
-  - `t` - Çeviri fonksiyonu
-- **Dönüş**: React elementi olarak boşta durumdaki arama görünümü
-
-### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::clearRecentSearchesHandler
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setRecentSearches` - Son aramalar listesini boşaltan state setter
-  - `localStorage` - Tarayıcı yerel depolama nesnesi
-  - `RECENT_SEARCHES_KEY` - localStorage'daki son aramalar anahtarı
-- **Dönüş**: yok
-
-### [N17_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::recentSearchItemRenderer
-- **params**: term, i
-- **ic_degiskenler**:
-  - `term` - Listelenen son arama terimi
-  - `i` - Terimin listedeki indeksi
-  - `setQ` - Tıklanan terimi arama input'una yazan state setter
-  - `performFullSearch` - Tıklanan terim ile tam arama yapan fonksiyon
-- **Dönüş**: React elementi olarak son arama butonu
-
-### [N18_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::popularCategoryItemRenderer
-- **params**: cat
-- **ic_degiskenler**:
-  - `cat` - Listelenen kategori nesnesi
-  - `router` - Next.js yönlendirici nesnesi
-  - `Routes.category` - Kategori rotası oluşturan utility
-  - `handleClose` - Kategoriye tıklandıktan sonra pencereyi kapatan fonksiyon
-  - `getCategoryIcon` - Kategori için ikon döndüren utility
-- **Dönüş**: React elementi olarak popüler kategori butonu
-
-### [N19_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::fallbackCategoryItemRenderer
-- **params**: cat
-- **ic_degiskenler**:
-  - `cat` - Listelenen yedek kategori nesnesi (slug ve name içerir)
-  - `router` - Next.js yönlendirici nesnesi
-  - `Routes.category` - Kategori rotası oluşturan utility
-  - `handleClose` - Kategoriye tıklandıktan sonra pencereyi kapatan fonksiyon
-- **Dönüş**: React elementi olarak yedek kategori butonu
-
-### [N20_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::renderSuggestions
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `suggestions` - Mevcut arama önerileri listesi
-  - `performFullSearch` - Tüm sonuçları görmek için tıklandığında tam arama yapan fonksiyon
-  - `debounced` - Arama metni, buton metninde görüntülenmek için kullanılır
-  - `listRef` - Öneri listesinin DOM referansı
-  - `renderSuggestion` - Her öneri öğesini oluşturan fonksiyon
-  - `t` - Çeviri fonksiyonu
-- **Dönüş**: React elementi olarak öneri listesi görünümü
-
-### [N21_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::renderResults
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `results` - Ürün arama sonuçları listesi
-  - `hasFuzzy` - Sonuçlarda bulanık arama ile eşleşen öğe var mı kontrolü
-  - `listRef` - Sonuç listesinin DOM referansı
-  - `r` - Map fonksiyonunda iterasyon yapılan ürün sonucu nesnesi
-  - `idx` - Ürünün listedeki indeksi
-  - `isActive` - Ürünün seçili olma durumu
-  - `router` - Next.js yönlendirici nesnesi
-  - `Routes.product` - Ürün detay rotası oluşturan utility
-  - `handleClose` - Ürüne tıklandıktan sonra pencereyi kapatan fonksiyon
-  - `setActiveIndex` - Fare üzerine gelindiğinde aktif indeksi güncelleyen setter
-  - `highlightMatch` - Arama teriminin eşleşen kısımlarını vurgulayan utility
-  - `debounced` - Vurgulama için kullanılan arama metni
-  - `t` - Çeviri fonksiyonu
-- **Dönüş**: React elementi olarak ürün sonuçları görünümü
-
-### [N22_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx::resultItemRenderer
-- **params**: r, idx
-- **ic_degiskenler**:
-  - `r` - Listelenen ürün sonucu nesnesi
-  - `idx` - Ürünün listedeki indeksi
-  - `isActive` - Ürünün klavye/fare ile seçili olma durumu
-  - `activeIndex` - Mevcut seçili öğenin indeksi
-  - `router` - Next.js yönlendirici nesnesi
-  - `Routes.product` - Ürün detay rotası oluşturan utility
-  - `handleClose` - Ürüne tıklandıktan sonra pencereyi kapatan fonksiyon
-  - `setActiveIndex` - Fare üzerine gelindiğinde aktif indeksi güncelleyen setter
-  - `highlightMatch` - Arama terimi eşleşmelerini vurgulayan utility
-  - `debounced` - Vurgulama için kullanılan arama metni
-- **Dönüş**: React elementi olarak ürün sonucu butonu
+  - `t` — çeviri fonksiyonu.
+- **Dönüş**: JSX; sonuç yokken gösterilen mesaj.
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki ana SearchOverlay() fonksiyonu, arama arayüzünü ve işlemlerini yönetmek için renderSuggestion, renderSuggestions, renderResults, renderIdle (ekran bileşenlerini çizen), performFullSearch (tam arama işlemini çalıştıran), addToRecent (son aramaları kaydeden), handleClose (kapatma akışını yöneten) dahili fonksiyonlarını çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veri setinde bu modülü kullanan dış dosya/fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  SearchOverlay() → addToRecent()
-  SearchOverlay() → handleClose()
-  SearchOverlay() → performFullSearch()
-  SearchOverlay() → renderIdle()
-  SearchOverlay() → renderResults()
-  SearchOverlay() → renderSuggestion()
-  SearchOverlay() → renderSuggestions()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    SearchOverlay["SearchOverlay()"] --> addToRecent["addToRecent()"]
-    SearchOverlay["SearchOverlay()"] --> handleClose["handleClose()"]
-    SearchOverlay["SearchOverlay()"] --> performFullSearch["performFullSearch()"]
-    SearchOverlay["SearchOverlay()"] --> renderIdle["renderIdle()"]
-    SearchOverlay["SearchOverlay()"] --> renderResults["renderResults()"]
-    SearchOverlay["SearchOverlay()"] --> renderSuggestion["renderSuggestion()"]
-    SearchOverlay["SearchOverlay()"] --> renderSuggestions["renderSuggestions()"]
+graph TD
+    SearchOverlay_tsx__SearchOverlay["SearchOverlay"]
+    SearchOverlay_tsx__addToRecent["addToRecent"]
+    SearchOverlay_tsx__handleClose["handleClose"]
+    SearchOverlay_tsx__handleKeyDown["handleKeyDown"]
+    SearchOverlay_tsx__performFullSearch["performFullSearch"]
+    SearchOverlay_tsx__renderIdle["renderIdle"]
+    SearchOverlay_tsx__renderResults["renderResults"]
+    SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
+    SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -443,11 +328,7 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `hover:scale-[1.01]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
