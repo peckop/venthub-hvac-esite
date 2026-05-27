@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-27T12:09:25.895766+00:00
-total_compiled_files: 422
+compiled_at: 2026-05-27T14:10:33.924323+00:00
+total_compiled_files: 434
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-27T12:09:25.895766+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-27T14:10:33.924323+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -5157,6 +5157,133 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Responsive:** `md:` prefix kullanımları
 
 ---
+# FILE: src\components\BackToTopButton.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx
+skeleton_hash: 7805843109ba355b
+entity_hashes:
+  func:BackToTopButton: c8f2538093a58334
+  overview: bde72dfa4c09c889
+  style_tokens: 2d1270f1d895a080
+generated_at: 2026-05-27T12:12:35Z
+---
+
+## Genel Bakış
+`BackToTopButton` bileşeni, sayfa kaydırma konumuna göre görünür hâle gelen ve tıklandığında kullanıcıyı sayfanın en üstüne taşıyan bir React fonksiyonel bileşenidir. UI içinde sabit bir konumda yer alır ve kullanıcı deneyimini iyileştirmek için basit bir geri dönüş işlevi sunar.
+
+## Fonksiyon Grupları
+### UI Render ve Etkileşim
+Bu grup, butonun görsel çıktısını üretir ve kullanıcı tıklamasını işleyerek sayfayı en üste kaydırır.  
+- BackToTopButton   (bileşenin kendisi, render ve click handler içerir)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### BackToTopButton
+**Ne yapar**: Sayfanın en altına kaydırıldığında kullanıcıyı sayfanın en üstüne götüren bir “Back to Top” (yukarı dön) butonu sağlayan bir React fonksiyonel bileşeni oluşturur.  
+
+**Nasıl yapar**: Fonksiyon, bir React functional component (`React.FC`) döndürür; bileşen içinde muhtemelen bir buton/render elemanı tanımlanır ve tıklama olayıyla sayfa kaydırma davranışı tetiklenir. (İç mantık koddan elde edilemediği için genel bir açıklama verilmiştir.)  
+
+**Parametreler**:
+- *Yok* — Fonksiyon parametre almaz.
+
+**Dönüş**: `React.FC` — Oluşturulan “Back to Top” butonunu temsil eden bir React functional component.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::BackToTopButton
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `visible` — `useState` ile oluşturulan, butonun görünür olup olmadığını tutan boolean değer.
+  - `setVisible` — `visible` state'ini güncelleyen setter fonksiyonu.
+  - `pos` — `{ bottom: number; right: number }` tipinde, butonun ekrandaki konumunu tutan nesne.
+  - `setPos` — `pos` state'ini güncelleyen setter fonksiyonu.
+  - `t` — `useI18n` hookundan gelen çeviri fonksiyonu, `t('common.backToTop')` ile metin çevirisi yapılır.
+  - `onScroll` — kaydırma olayını dinleyen ve `visible` state'ini ayarlayan iç fonksiyon (aşağıda ayrı bir AST Pointer olarak listelenir).
+  - `computePos` — butonun konumunu hesaplayan ve `pos` state'ini güncelleyen iç fonksiyon (aşağıda ayrı bir AST Pointer olarak listelenir).
+  - `id` — `setInterval` tarafından döndürülen zamanlayıcı kimliği, temizleme sırasında `clearInterval` ile iptal edilir.
+  - `GAP` — layout boşluğu için kullanılan sabit (dosyada tanımlı değil, dışarıdan sağlanır).
+- **Dönüş**: React bileşeni (`React.FC`). Render edilen `<button>` elemanı, `visible` durumuna göre görünürlük ve konum stillerini ayarlar; tıklanınca sayfayı üstteki konuma yumuşak kaydırır.
+
+---
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::onScroll
+- **params**: `_e: Event`
+- **ic_degiskenler**:
+  - `y` — `window.scrollY` veya `document.documentElement.scrollTop` değerlerinden elde edilen mevcut dikey kaydırma konumu.
+  - `setVisible` — dışarıdaki `BackToTopButton` bileşeninden gelen setter, `y > 400` olduğunda `visible` state'ini `true` yapar.
+- **Dönüş**: `void` (state güncellemesi yapar, geri değer döndürmez).
+
+---
+
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::computePos
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `el` — `document.getElementById('language-switcher')` ile elde edilen dil değiştirici DOM elemanı.
+  - `rect` — `el.getBoundingClientRect()` ile alınan elemanın konum ve boyut bilgilerini içeren `DOMRect` nesnesi.
+  - `bottomFromViewport` — viewport alt kenarı ile elemanın alt kenarı arasındaki boşluk; `Math.max(16, window.innerHeight - rect.bottom)` ile hesaplanır.
+  - `rightToLeftEdge` — viewport sol kenarı ile elemanın sol kenarı arasındaki yatay mesafe; `window.innerWidth - rect.left` ile hesaplanır.
+  - `setPos` — dışarıdaki `BackToTopButton` bileşeninden gelen setter, butonun `bottom` ve `right` konumlarını günceller.
+  - `GAP` — yatay/vertical ek boşluk sabiti; konum hesaplamalarında eklenir.
+- **Dönüş**: `void` (state güncellemesi yapar, geri değer döndürmez).
+
+---
+
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::cleanupScrollEffect
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `onScroll` — `useEffect` içinde tanımlı kaydırma dinleyicisi; bu temizleme fonksiyonunda `window.removeEventListener('scroll', onScroll)` ile kaldırılır.
+- **Dönüş**: `void` (event listener'ı kaldırır).
+
+---
+
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::cleanupResizeEffect
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `computePos` — `useEffect` içinde tanımlı konum hesaplama fonksiyonu; `window.removeEventListener('resize', computePos)` ile kaldırılır.
+  - `id` — `setInterval` tarafından döndürülen zamanlayıcı kimliği; `clearInterval(id)` ile iptal edilir.
+- **Dönüş**: `void` (resize listener'ı ve interval'i temizler).
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\BackToTopButton.tsx
+  function: src\components\BackToTopButton.tsx::BackToTopButton
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: BackToTopButton
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `border-white/20`, `text-white`
+- **Layout:** `fixed`, `p-3`, `shadow-lg`, `z-40`
+- **Responsive:** (yok)
+
+---
 # FILE: src\components\BeforeAfterSlider.md
 
 ---
@@ -6061,6 +6188,228 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `-bottom-4`, `-left-4`, `-right-4`, `-top-4`, `absolute`, `bottom-4`, `flex`, `flex-shrink-0`, `from-gray-50`, `gap-4`, `group-hover:opacity-100`, `group-hover:scale-110`, `h-24`, `h-32`, `h-40`
 - **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
 
+
+---
+# FILE: src\components\ErrorBoundary.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\ErrorBoundary.tsx
+skeleton_hash: 6e8fe4f254f36ffa
+entity_hashes:
+  func:ErrorBoundary:componentDidCatch: 87e1c834c124bf4c
+  func:ErrorBoundary:constructor: f8409de1e499d06a
+  func:ErrorBoundary:getDerivedStateFromError: 7c6b6e8065153a82
+  func:ErrorBoundary:render: e2424b954c998122
+  func:isChunkLoadError: 31516cfb6918b024
+  func:serializeError: 2f05a1b7f35a9398
+  overview: 4d67cf292bff82fe
+  style_tokens: a43b820f80ab122e
+generated_at: 2026-05-27T12:17:27Z
+---
+
+## Genel Bakış
+Bu modül, React uygulamalarında beklenmeyen hataları yakalamak için kullanılan bir hata sınırı (ErrorBoundary) bileşeni sunar. Yakalanan hataları işleyerek kullanıcıya anlamlı bir hata arayüzü gösterir; özellikle dinamik modül yükleme hatalarını (chunk load error) ayırt eder ve hata nesnelerini loglama ya da raporlama amacıyla serileştirir.
+
+## Fonksiyon Grupları
+
+### Hata Sınırı Yaşam Döngüsü
+ErrorBoundary sınıfının React hata sınırı metotlarını kapsar. Bileşenin hata durumunu başlatır, günceller ve hata yakalandığında yan etkileri (loglama vb.) yönetir.
+- constructor, getDerivedStateFromError, componentDidCatch, render
+
+### Hata İşleme Yardımcıları
+Hataları serileştirme ve belirli hata türlerini (özellikle chunk yükleme hataları) tanıma işlevlerini içerir. Bu fonksiyonlar, hata sınırı metotları tarafından kullanılarak hataların daha anlaşılır ve işlenebilir olmasını sağlar.
+- serializeError, isChunkLoadError
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül React tabanlı uygulamalarda alt bileşenlerin fırlattığı çalışma zamanı hatalarını yakalayan, uygulamanın tamamen çökmesini önleyen hata sınırı bileşenidir; doğru çalışması için React'in ErrorBoundary yaşam döngülerini desteklemesi ve proje içerisinde hata alabilecek bileşenleri sarmalayacak şekilde konumlandırılması zorunludur.
+
+[Aksiyom 1]: Eğer React kütüphanesi bu modülün kullandığı `getDerivedStateFromError` ve `componentDidCatch` yaşam döngüsü metodlarını desteklemiyorsa, modül hiçbir hatayı yakalayamaz, uygulama beklendiği gibi çöker.
+[Aksiyom 2]: Eğer bu modül uygulama içerisinde hata fırlatabilecek tüm alt bileşenleri sarmayacak şekilde yanlış konumlandırılırsa, kapsam dışında kalan bileşenlerde oluşan hatalar yakalanamaz.
+[Aksiyom 3]: Eğer `serializeError` fonksiyonu gelen `unknown` tipteki hata nesnesini standart formata dönüştüremiyorsa, hata detayları ne kaydedilebilir ne de kullanıcıya gösterilebilir.
+[Aksiyom 4]: Eğer `isChunkLoadError` fonksiyonu kod ayırma (code splitting) sırasında oluşan parça yükleme hatalarını doğru tespit edemiyorsa, bu tür ağa bağlı hatalar için özel kurtarma akışları çalıştırılamaz.
+[Aksiyom 5]: Eğer ErrorBoundary'nin constructor'ında tanımlanan temel state yapısı bozulursa, `render()` metodu hata durumunda gösterilecek fallback arayüzünü yükleyemez, kullanıcı hatadan haberdar olamaz.
+[Aksiyom 6]: Eğer `componentDidCatch` metodunun eriştiği harici hata loglama servisi entegrasyonu çalışmıyorsa, yakalanan hatalar uzaktan takip edilemez, hata kök nedenleri analiz edilemez.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### serializeError
+**Ne yapar**: Hata nesnesini okunabilir bir biçime dönüştürerek geliştirici konsolunda veya UI’da gösterilmesini sağlar.  
+**Nasıl yapar**: Fonksiyonun iç mantığı kodda verilmemiştir; yalnızca `ErrorBoundary` içinde `serializeError(this.state.error)` şeklinde çağrılır ve dönen değer `<pre>` içinde gösterilir.  
+**Parametreler**:
+- `error`: unknown — Serileştirilecek hata nesnesi.  
+**Dönüş**: Belirtilmemiş (kod içinde dönüş değeri kullanılmaz, muhtemelen string veya nesne).
+
+### isChunkLoadError
+**Ne yapar**: Bir hatanın, dinamik olarak yüklenen kod parçacıklarından (chunk) kaynaklanıp kaynaklanmadığını tespit eder.  
+**Nasıl yapar**: Fonksiyonun içeriği verilmemiştir; `ErrorBoundary` içinde `isChunkLoadError(error)` çağrılarıyla hem UI’da hem de hata izleme mantığında kullanılır.  
+**Parametreler**:
+- `error`: unknown — Kontrol edilecek hata nesnesi.  
+**Dönüş**: `boolean` — Hata bir chunk yükleme hatasıysa `true`, aksi takdirde `false`.
+
+### constructor
+**Ne yapar**: `ErrorBoundary` bileşeninin başlangıç durumunu (state) oluşturur ve React’in `Component` sınıfının kurucusunu çağırır.  
+**Nasıl yapar**: `super(props)` ile üst sınıfın kurucusu çalıştırılır, ardından `this.state` `{ hasError: false }` olarak başlatılır.  
+**Parametreler**:
+- `props`: Props — Bileşene dışarıdan geçirilen özellikler.  
+**Dönüş**: Yok (constructor, sınıf örneği oluşturur).
+
+### getDerivedStateFromError
+**Ne yapar**: React’ın hata yakalama yaşam döngüsü içinde, bir hata oluştuğunda bileşenin state’ini güncelleyerek hata durumunu işaretler.  
+**Nasıl yapar**: Statik bir metod olarak tanımlanır; gelen `error` nesnesini alır, `hasError` true, `error` nesnesi ve `isChunkError` (chunk hatası kontrolü) değerlerini içeren yeni bir state objesi döndürür.  
+**Parametreler**:
+- `error`: Error — Yakalanan hata nesnesi.  
+**Dönüş**: `State` — `{ hasError: true, error: error, isChunkError: isChunkLoadError(error) }` şeklinde yeni state.
+
+### componentDidCatch
+**Ne yapar**: React’ın hata yakalama mekanizmasında, bir hata ve ek hata bilgisi alındığında konsola log yazar ve chunk yükleme hatalarını özel olarak bildirir.  
+**Nasıl yapar**: `console.error` ile hatayı ve `errorInfo`yu loglar; hata bir chunk hatasıysa `console.warn` ile kullanıcıya sayfayı yenilemesi gerektiği uyarısını verir.  
+**Parametreler**:
+- `error`: Error — Yakalanan hata nesnesi.  
+- `errorInfo`: ErrorInfo — Hata hakkında ek bilgi (örn. component stack).  
+**Dönüş**: Yok (yan etkili bir metod).
+
+### render
+**Ne yapar**: Bileşenin UI’sını üretir; hata durumunda özel bir hata ekranı, hata yoksa çocuk bileşenleri render eder.  
+**Nasıl yapar**: `I18nContext.Consumer` üzerinden çeviri fonksiyonu alır, `this.state.hasError` kontrolü yapar. Hata varsa fallback UI veya varsayılan hata mesajı gösterilir; chunk hatasıysa yenileme butonu, diğer hatalarda yeniden deneme ve yenileme butonları sunulur. Geliştirme modunda `serializeError` ile hata detayları da gösterilir.  
+**Parametreler**: Yok.  
+**Dönüş**: JSX element — Hata ekranı veya `this.props.children`.
+
+---
+
+## INTERFACES
+
+### Props
+- `children: ReactNode`
+- `fallback?: ReactNode`
+
+### State
+- `hasError: boolean`
+- `error?: Error`
+- `isChunkError?: boolean`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::serializeError
+- **params**: `(error: unknown)`
+- **ic_degiskenler**:
+  - `error` — fonksiyona gelen hata nesnesi; `Error` örneği ise `message` ve `stack` döndürülür, aksi takdirde JSON.stringify denemesi yapılır.
+- **Dönüş**: `string` (hata mesajı ve yığını, JSON stringi veya `String(error)`)
+
+### [N2_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::isChunkLoadError
+- **params**: `(error: unknown)`
+- **ic_degiskenler**:
+  - `error` — fonksiyona gelen hata nesnesi; `Error` örneği ise mesaj içinde chunk yükleme hatası anahtar kelimeleri aranır.
+- **Dönüş**: `boolean` (chunk yükleme hatası ise `true`, aksi takdirde `false`)
+
+### [N3_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::constructor
+- **params**: `(props: Props)`
+- **ic_degiskenler**:
+  - `props` — bileşenin dışarıdan aldığı özellikler (fallback, children vb.).
+- **Dönüş**: `yok` (state `{ hasError: false }` olarak başlatılır)
+
+### [N4_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::getDerivedStateFromError
+- **params**: `(error: Error)`
+- **ic_degiskenler**:
+  - `error` — yakalanan hata nesnesi.
+- **Dönüş**: `State`  
+  ```ts
+  {
+    hasError: true,
+    error,
+    isChunkError: isChunkLoadError(error)
+  }
+  ```
+
+### [N5_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::componentDidCatch
+- **params**: `(error: Error, errorInfo: ErrorInfo)`
+- **ic_degiskenler**:
+  - `error` — yakalanan hata nesnesi.
+  - `errorInfo` — React tarafından sağlanan ek hata bilgisi.
+- **Dönüş**: `yok` (console.error ve olası chunk hatası için console.warn)
+
+### [N6_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::handleRetry
+- **params**: `()`
+- **ic_degiskenler**: *(hiçbiri)*
+- **Dönüş**: `yok` (state `{ hasError: false, error: undefined, isChunkError: false }` olarak sıfırlanır)
+
+### [N7_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::handleRefresh
+- **params**: `()`
+- **ic_degiskenler**:
+  - `window` — global nesne; tarayıcı ortamında olup olmadığı kontrol edilir.
+- **Dönüş**: `yok` (sayfa yeniden yüklenir `window.location.reload()`)
+
+### [N8_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::render
+- **params**: `()`
+- **ic_degiskenler**:
+  - `ctx` — `I18nContext.Consumer` tarafından sağlanan çeviri konteksi.
+  - `t` — çeviri fonksiyonu; `ctx?.t` mevcutsa kullanılır, yoksa `(key, alt) => alt || key`.
+  - `this.state.hasError` — hata oluşup oluşmadığını gösterir.
+  - `this.props.fallback` — hata durumunda gösterilecek alternatif JSX.
+  - `isChunkError` — `this.state.isChunkError`; chunk hatası mı diye kontrol.
+  - `this.handleRefresh` — sayfayı yenilemek için kullanılan metod.
+  - `this.handleRetry` — hatayı yeniden denemek için kullanılan metod.
+  - `process.env.NODE_ENV` — geliştirme ortamı kontrolü.
+  - `this.state.error` — detaylı hata bilgisi (geliştirme modunda gösterilir).
+  - `serializeError` — hata nesnesini okunabilir stringe dönüştürür.
+- **Dönüş**: `JSX.Element` (hata UI’si veya `this.props.children`)
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    ErrorBoundary_tsx__componentDidCatch["componentDidCatch"]
+    ErrorBoundary_tsx__constructor["constructor"]
+    ErrorBoundary_tsx__getDerivedStateFromError["getDerivedStateFromError"]
+    ErrorBoundary_tsx__isChunkLoadError["isChunkLoadError"]
+    ErrorBoundary_tsx__render["render"]
+    ErrorBoundary_tsx__serializeError["serializeError"]
+```
+
+## NODE ID STANDARD
+
+  file: src\components\ErrorBoundary.tsx
+  function: src\components\ErrorBoundary.tsx::serializeError
+  function: src\components\ErrorBoundary.tsx::isChunkLoadError
+  class: src\components\ErrorBoundary.tsx::ErrorBoundary
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: ErrorBoundary
+  export: isChunkLoadError
+  export: serializeError
+
+---
+
+## BILEŞIM (CONTAINS)
+  contains: Component<Props
+  contains: State>
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-100`, `bg-primary-navy`, `border-gray-300`, `text-amber-500`, `text-center`, `text-gray-500`, `text-gray-600`, `text-gray-700`, `text-gray-800`, `text-left`, `text-sm`, `text-white`, `text-xl`, `text-xs`
+- **Layout:** `flex`, `h-16`, `h-4`, `inline-flex`, `items-center`, `justify-center`, `max-h-40`, `max-w-md`, `min-h-400px`, `overflow-auto`, `p-3`, `p-8`, `w-16`, `w-4`
+- **Responsive:** (yok)
 
 ---
 # FILE: src\components\FAQShortSection.md
@@ -7615,6 +7964,182 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Responsive:** (yok)
 
 ---
+# FILE: src\components\LeadModal.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx
+skeleton_hash: e05ac99c5e8bf5bc
+entity_hashes:
+  func:LeadModal: d62325f85f800f09
+  func:handleClose: 63d7dd03089c88aa
+  func:submit: 57ac99ffc1840be0
+  func:validate: 3e57d313017d2565
+  overview: 666966080ef15820
+  style_tokens: e138a3ea7ab2fcea
+generated_at: 2026-05-27T12:13:00Z
+---
+
+## Genel Bakış
+`LeadModal` bileşeni, bir ürünle ilgili potansiyel müşteri (lead) bilgilerini toplamak için kullanılan bir modal penceresidir. Açılma/kapanma kontrolü, form doğrulama ve gönderim işlemlerini içerir.
+
+## Fonksiyon Grupları
+### Modal Kontrol ve Render
+Modalın görünürlüğünü yönetir, kapanma olayını işler ve JSX çıktısını üretir.  
+- LeadModal
+
+### Form Doğrulama
+Kullanıcı tarafından girilen verilerin geçerliliğini kontrol eder.  
+- validate
+
+### Form İşleme
+Form gönderildiğinde olayları yakalar, doğrulama çalıştırır ve başarılı ise veriyi işler; ayrıca hata durumlarını yönetir.  
+- submit, handleClose
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Aksiyom 1**: Eğer `LeadModal` bileşenine `open` prop’u sağlanmazsa, modal hiçbir zaman görüntülenmez.  
+**Aksiyom 2**: Eğer `LeadModal` bileşenine `onClose` callback’i sağlanmazsa, modal kapatılmaya çalışıldığında bir hata oluşur ve UI’da “close” işlemi gerçekleşmez.  
+**Aksiyom 3**: Eğer `LeadModal` bileşenine `productName` prop’u sağlanmazsa, modal içinde ürün adı gösterilemez; bu durum UI’da boş bir alan ya da “bilinmiyor” metni olarak ortaya çıkar.  
+**Aksiyom 4**: Eğer `LeadModal` bileşenine `_productId` (alias `__productId`) prop’u sağlanmazsa, `validate` ve `submit` fonksiyonları ürün kimliğine erişemez ve ilgili iş mantığı (ör. API çağrısı) çalışmaz.  
+**Aksiyom 5**: Eğer `validate()` fonksiyonu çağrıldığında gerekli form alanları (ör. isim, e‑posta vb.) eksik ya da geçersizse, `validate` `false` döner ve form gönderimi engellenir.  
+**Aksiyom 6**: Eğer `submit(e)` fonksiyonu çağrıldığında `e` bir `React.FormEvent` nesnesi değilse, fonksiyon içinde `preventDefault()` çağrısı başarısız olur ve sayfa yenilenmesi gerçekleşir.  
+**Aksiyom 7**: Eğer `submit(e)` fonksiyonu içinde `validate()` `false` dönerse, `submit` işlemine devam edilmez ve form verileri gönderilmez.  
+**Aksiyom 8**: Eğer `handleClose()` fonksiyonu çağrıldığında `onClose` callback’i tanımlı değilse, modal kapanmaz ve UI’da “close” butonu işlevsiz kalır.  
+**Aksiyom 9**: Eğer `handleClose()` fonksiyonu çağrıldığında `onClose` tanımlıysa, `onClose` callback’i çalıştırılır ve modal kapanır.  
+
+*Domain‑specific notlar*: Bu aksiyomlar, `LeadModal` bileşeninin doğru çalışması için gerekli olan temel prop ve fonksiyon davranışlarını tanımlar; değer sınırları veya kabul kriterleri fonksiyon gövdesinde belirtilmediği için “bilinmiyor” olarak bırakılmıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### LeadModal
+**Ne yapar**: Kullanıcıların iletişim bilgilerini topladığı bir modal pencere bileşeni oluşturur.  
+**Nasıl yapar**: Props olarak gelen `open`, `onClose`, `productName` ve `_productId` değerlerini alır, bu değerleri modal içinde gösterir ve form gönderimi için `validate`, `submit` gibi yardımcı fonksiyonları kullanır.  
+**Parametreler**:
+- `open`: boolean — Modal’ın açık/kapalı durumunu belirler.  
+- `onClose`: () => void — Modal kapatıldığında çalıştırılacak geri çağırma fonksiyonu.  
+- `productName`: string — Modal içinde gösterilecek ürün adı.  
+- `_productId`: any — İçeride `__productId` olarak yeniden adlandırılan ürün kimliği.  
+**Dönüş**: React.FC\<LeadModalProps\> — Tanımlı prop tipleriyle bir React fonksiyonel bileşeni döndürür.
+
+### validate
+**Ne yapar**: Form gönderiminde girilen verileri kontrol eder ve hataları bir nesne olarak döndürür.  
+**Nasıl yapar**: Form submit olayında `e.preventDefault()` ile varsayılan davranışı engeller, `validate()` fonksiyonunu çağırarak doğrulama sonuçlarını alır, `setErrors` ile hataları state’e kaydeder ve hata yoksa formun gönderilmesine izin verir.  
+**Parametreler**: Yok.  
+**Dönüş**: Bilinmiyor (kod içinde dönüş değeri kullanılmaktadır; muhtemelen hata nesnesi).
+
+### submit
+**Ne yapar**: Form gönderildiğinde çalıştırılan ana işlem akışını yönetir.  
+**Nasıl yapar**: `e.preventDefault()` ile formun doğal gönderimini durdurur, `validate()` ile doğrulama yapar, hatalar varsa işlemi sonlandırır; hatasız ise `setSubmitted(true)` ile gönderim durumunu işaretler, ardından API taklidi için gecikmeli bir `setTimeout` içinde başarı durumunu ayarlar, modalı otomatik kapatmak için ikinci bir gecikme başlatır.  
+**Parametreler**:
+- `e`: React.FormEvent — Form submit olay nesnesi.  
+**Dönüş**: Bilinmiyor (fonksiyon içinde yan etkiler vardır, dönüş değeri belirtilmemiştir).
+
+### handleClose
+**Ne yapar**: Modal kapanış işlemini tetikler.  
+**Nasıl yapar**: İçeride tanımlı `handleClose` fonksiyonunu çağırarak modalın kapanmasını sağlar; bu, dışarıdan gelen `onClose` geri çağırma fonksiyonuna yönlendirilmiş olabilir.  
+**Parametreler**: Yok.  
+**Dönüş**: Bilinmiyor (fonksiyon yan etki üretir, dönüş değeri belirtilmemiştir).
+
+---
+
+## INTERFACES
+
+### LeadModalProps
+- `open: boolean`
+- `onClose: () => void`
+- `productName?: string`
+- `_productId?: string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/LeadModal.tsx::validate
+- **params**: (none)
+- **ic_degiskenler**:
+  - `e` — boş nesne (`Record<string, string>`) oluşturur; hataları tutmak için kullanılır.
+  - `name` — bileşenin `name` state’ini temsil eder; boşsa `e.name` e hata mesajı atanır.
+  - `email` — bileşenin `email` state’ini temsil eder; boşsa `e.contact` e hata mesajı atanır.
+  - `phone` — bileşenin `phone` state’ini temsil eder; boşsa `e.contact` e hata mesajı atanır.
+  - `consent` — bileşenin `consent` state’ini temsil eder; `false` ise `e.consent` e hata mesajı atanır.
+  - `t` — i18n çeviri fonksiyonu; hata mesajlarını çevirir.
+- **Dönüş**: `Record<string, string>` – topladığı hataları döndürür.
+
+### [N2_NASIL] AST Pointer: src/components/LeadModal.tsx::submit
+- **params**: `e: React.FormEvent`
+- **ic_degiskenler**:
+  - `e` — form submit olayını temsil eder; `e.preventDefault()` ile varsayılan davranışı engeller.
+  - `v` — `validate()` fonksiyonunun döndürdüğü hata nesnesi.
+  - `errors` — bileşenin `errors` state’ini güncellemek için `setErrors(v)` ile kullanılır.
+  - `Object` — `Object.keys(v).length` ile hata sayısı kontrol edilir; eğer hata varsa fonksiyon erken döner.
+  - `setSubmitted` — bileşenin `submitted` state’ini `true` yapar.
+  - `setIsSuccess` — bileşenin `isSuccess` state’ini `true` yapar (API çağrısı simülasyonu).
+  - `setTimeout` — 1200 ms sonra başarı durumunu ayarlar, ardından 3000 ms sonra `handleClose()` çağrılır.
+  - `handleClose` — modalı kapatmak için çağrılır.
+- **Dönüş**: yok (void)
+
+### [N3_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose
+- **params**: (none)
+- **ic_degiskenler**:
+  - `onClose` — üst bileşenden gelen kapanış callback’i; `onClose()` ile modal kapatılır.
+  - `setIsSuccess` — `isSuccess` state’ini `false` yapar.
+  - `setName`, `setCompany`, `setEmail`, `setPhone`, `setCity`, `setAppArea`, `setConsent` — ilgili state’leri sıfırlar veya boş string’e ayarlar.
+  - `setMessage` — `productName` varsa varsayılan mesajı çeviri ile ayarlar, yoksa boş string’e ayarlar.
+  - `setErrors` — hata state’ini boş nesneyle sıfırlar.
+  - `setTimeout` — 300 ms sonra yukarıdaki state sıfırlama işlemlerini gerçekleştirir.
+- **Dönüş**: yok (void)
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    LeadModal_tsx__LeadModal["LeadModal"]
+    LeadModal_tsx__handleClose["handleClose"]
+    LeadModal_tsx__submit["submit"]
+    LeadModal_tsx__validate["validate"]
+    LeadModal_tsx__LeadModal --> LeadModal_tsx__validate
+    LeadModal_tsx__LeadModal --> LeadModal_tsx__handleClose
+```
+
+## NODE ID STANDARD
+
+  file: src\components\LeadModal.tsx
+  function: src\components\LeadModal.tsx::LeadModal
+  function: src\components\LeadModal.tsx::validate
+  function: src\components\LeadModal.tsx::submit
+  function: src\components\LeadModal.tsx::handleClose
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: LeadModal
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-br`, `bg-gray-100`, `bg-gray-50`, `bg-gray-50/50`, `bg-green-100`, `bg-primary-navy`, `bg-secondary-blue/80`, `bg-white`, `bg-white/10`, `border-2`, `border-gray-100`, `border-gray-200`, `border-gray-300`, `border-red-400`, `border-t`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-blue-600/20`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`
+- **Responsive:** `md:`, `sm:` prefix kullanımları
+
+---
 # FILE: src\components\LoadingSpinner.md
 
 ---
@@ -8634,6 +9159,348 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** (yok)
 - **Responsive:** (yok)
 
+
+---
+# FILE: src\components\SearchOverlay.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx
+skeleton_hash: 8455b920ef65c537
+entity_hashes:
+  func:SearchOverlay: 5877a83b84daa2a4
+  func:addToRecent: bf8c952c533ee587
+  func:handleClose: 5443cae55c424b9f
+  func:handleKeyDown: 1487e8d647499b5f
+  func:performFullSearch: ffbaaa64876e5226
+  func:renderIdle: ceb6e27699bb9c05
+  func:renderResults: e506feef4e55d367
+  func:renderSuggestion: 843bcfdde37f5fbe
+  func:renderSuggestions: 8f7a31a904a04209
+  overview: 1ded2cd49051df65
+  style_tokens: 63fb12683ce25606
+generated_at: 2026-05-27T12:27:00Z
+---
+
+## Genel Bakış  
+SearchOverlay bileşeni, kullanıcı arayüzünde arama çubuğu açıldığında gösterilen bir üst katman (overlay) sağlar. Arama terimleri girildiğinde anlık öneriler sunar, son aramaları saklar ve tam arama sonuçlarını görüntüler. Bileşen, açılış/kapama, tuş olayları ve arama mantığını yöneten yardımcı fonksiyonları içerir.
+
+## Fonksiyon Grupları  
+
+### Arayüz ve Durum Yönetimi  
+Bu grup, bileşenin görünürlüğünü ve kapanış davranışını kontrol eder.  
+- `SearchOverlay`  
+- `handleClose`  
+
+### Arama İşlemleri  
+Arama terimlerini işleyip sonuçları elde eden fonksiyonlar.  
+- `performFullSearch`  
+- `addToRecent`  
+
+### Kullanıcı Etkileşimi  
+Kullanıcının tuş basımlarını yakalayıp uygun aksiyonları tetikleyen fonksiyonlar.  
+- `handleKeyDown`  
+
+### Görüntüleme (Render) Yardımcıları  
+Arama önerileri, boş durum ve sonuçların ekranda gösterilmesini sağlayan fonksiyonlar.  
+- `renderSuggestion`  
+- `renderIdle`  
+- `renderSuggestions`  
+- `renderResults`
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### SearchOverlay
+**Ne yapar**: Arama çubuğu için bir üst katman (overlay) bileşeni oluşturur ve `open` durumu ile `onClose` geri çağrısını yönetir.  
+**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanır; `open` prop’u overlay’in görünürlüğünü kontrol eder, `onClose` ise kapanma eylemini tetikler. İçerik ve etkileşim mantığı diğer yardımcı fonksiyonlar tarafından sağlanır.  
+**Parametreler**:
+- `open`: boolean — Overlay’in açık/kapalı durumunu belirler.  
+- `onClose`: () => void — Overlay kapandığında çalıştırılacak geri çağrı fonksiyonu.  
+**Dönüş**: React.FC\<SearchOverlayProps\> — Belirtilen props tipine sahip bir React fonksiyonel bileşeni döndürür.
+
+### handleClose
+**Ne yapar**: Klavye olaylarını dinleyerek arama overlay’ini kapatır ve gezinme/arama akışını yönetir.  
+**Nasıl yapar**: Gelen `React.KeyboardEvent` nesnesinin `key` özelliğine bakar; `Escape` tuşu basıldığında overlay’i kapatır, `ArrowDown` ve `ArrowUp` tuşlarıyla aktif öneri indeksini günceller, `Enter` tuşu ile seçili öneri ya da sonuç üzerinden yönlendirme yapar ya da tam arama başlatır.  
+**Parametreler**:
+- `e`: React.KeyboardEvent — Kullanıcıdan gelen klavye olayı.  
+**Dönüş**: void — İşlevi tamamladıktan sonra bir değer döndürmez.
+
+### addToRecent
+**Ne yapar**: Kullanıcının arama terimini son aramalara ekler.  
+**Nasıl yapar**: Verilen terimi (örnek kodda `q`) alır ve muhtemelen bir geçmiş listesine kaydeder; aynı zamanda ilgili yönlendirme ve kapanma işlemlerini tetikler.  
+**Parametreler**:
+- `term`: string — Son aramalara eklenmek istenen arama ifadesi.  
+**Dönüş**: void — İşlem tamamlandığında bir değer döndürmez.
+
+### performFullSearch
+**Ne yapar**: Tam metin araması başlatır.  
+**Nasıl yapar**: Gelen arama terimini durum (`q`) olarak ayarlar ve aynı terimle tam arama fonksiyonunu (muhtemelen kendisini) çağırır.  
+**Parametreler**:
+- `term`: string — Aranacak tam metin ifadesi.  
+**Dönüş**: void — İşlev bir sonuç döndürmez.
+
+### handleKeyDown
+**Ne yapar**: Klavye tuşlarına göre arama overlay’inde gezinme ve eylem tetikleme sorumluluğu taşır.  
+**Nasıl yapar**: (Kod içeriği verilmemiştir; genellikle `handleClose` benzeri bir mantıkla tuşları kontrol eder.)  
+**Parametreler**:
+- `e`: React.KeyboardEvent — Kullanıcıdan gelen klavye olayı.  
+**Dönüş**: void — İşlem sonrası bir değer döndürmez.
+
+### renderSuggestion
+**Ne yapar**: Tek bir arama önerisini görsel olarak oluşturur.  
+**Nasıl yapar**: (Kod içinde aynı fonksiyona yeniden çağrı yapılmış; gerçek render mantığı burada tanımlanmamış.)  
+**Parametreler**:
+- `s`: SearchSuggestion — Görüntülenecek öneri nesnesi.  
+- `idx`: number — Önerinin listedeki indeksi.  
+**Dönüş**: void — Görsel çıktı üretir, ancak dönüş değeri yoktur.
+
+### renderIdle
+**Ne yapar**: Arama overlay’i boş (idle) durumundayken gösterilecek içeriği üretir.  
+**Nasıl yapar**: (Kod içeriği sağlanmamıştır.)  
+**Parametreler**: Yok.  
+**Dönüş**: void — Görsel bir eleman döndürür.
+
+### renderSuggestions
+**Ne yapar**: Öneri listesini (suggestions) render eder.  
+**Nasıl yapar**: (Kod içeriği eksiktir; muhtemelen `renderSuggestion` fonksiyonunu döngü içinde çağırır.)  
+**Parametreler**: Yok.  
+**Dönüş**: void — Öneri elemanlarını ekrana yerleştirir.
+
+### renderResults
+**Ne yapar**: Arama sonuçlarını (results) ekranda gösterir.  
+**Nasıl yapar**: (Kod içeriği verilmemiştir; genellikle sonuç dizisini map ederek her birini render eder.)  
+**Parametreler**: Yok.  
+**Dönüş**: void — Sonuç elemanlarını üretir.
+
+---
+
+## INTERFACES
+
+### SearchOverlayProps
+- `open: boolean`
+- `onClose: () => void`
+
+---
+
+## TYPE ALIASES
+
+### ViewState
+```typescript
+type ViewState = 'IDLE' | 'SUGGESTING' | 'RESULTS'
+```
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/SearchOverlay.tsx::SearchOverlay
+- **params**: `open, onClose`
+- **ic_degiskenler**:
+  - `open` — overlay’ın açık/kapalı durumunu belirten boolean prop.
+  - `onClose` — overlay kapatıldığında çağrılan fonksiyon prop.
+  - `router` — `useRouter()` ile alınan Next.js router, sayfa yönlendirmeleri için kullanılır.
+  - `t` — `useI18n()` ile alınan çeviri fonksiyonu, UI metinlerini yerelleştirir.
+  - `RECENT_SEARCHES_KEY` — localStorage’da saklanan son aramaları tutan anahtar.
+  - `recentSearches` — state, son arama terimlerinin dizisi.
+  - `setRecentSearches` — `recentSearches` state’ini güncelleyen setter.
+  - `popularCategories` — state, popüler kategori listesi.
+  - `setPopularCategories` — `popularCategories` state’ini güncelleyen setter.
+  - `globalCategories` — `useCategories()` bağlamından gelen tüm kategori listesi.
+  - `q` — arama kutusundaki metni tutan state.
+  - `setQ` — `q` state’ini güncelleyen setter.
+  - `debounced` — `q` değerinin gecikmeli (debounce) hali, arama tetikleme için kullanılır.
+  - `setDebounced` — `debounced` değerini güncelleyen setter.
+  - `suggestions` — öneri sonuçlarını tutan state.
+  - `setSuggestions` — `suggestions` state’ini güncelleyen setter.
+  - `results` — tam arama sonuçlarını tutan state.
+  - `setResults` — `results` state’ini güncelleyen setter.
+  - `viewState` — `'IDLE' | 'SUGGESTING' | 'RESULTS'` gibi UI durumunu tutan state.
+  - `setViewState` — `viewState` state’ini güncelleyen setter.
+  - `loading` — arama sırasında gösterilen yükleme durumu.
+  - `setLoading` — `loading` state’ini güncelleyen setter.
+  - `error` — arama hatası mesajı.
+  - `setError` — `error` state’ini güncelleyen setter.
+  - `activeIndex` — klavye ile seçilen öneri/sonuç indeksini tutan state.
+  - `setActiveIndex` — `activeIndex` state’ini güncelleyen setter.
+  - `listRef` — öneri/sonuç listesinin DOM referansı.
+  - `inputRef` — arama kutusunun DOM referansı.
+- **Dönüş**: React bileşeni JSX döndürür; yan etkileri (localStorage okuma/yazma, router yönlendirmeleri) vardır.
+
+### [N2_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleClose
+- **params**: *(parametre yok)*
+- **ic_degiskenler**:
+  - `setQ` — arama kutusunu boş stringe sıfırlar.
+  - `setResults` — sonuç listesini temizler.
+  - `setSuggestions` — öneri listesini temizler.
+  - `setViewState` — UI durumunu `'IDLE'` yapar.
+  - `setActiveIndex` — seçili indeks’i `-1` yapar.
+  - `onClose` — dışarıdan gelen kapanış callback’i çağırır.
+- **Dönüş**: `void` (yan etkileri vardır).
+
+### [N3_NASIL] AST Pointer: src/components/SearchOverlay.tsx::addToRecent
+- **params**: `term: string`
+- **ic_degiskenler**:
+  - `term` — eklenmek istenen arama terimi.
+  - `recentSearches` — mevcut son arama dizisi.
+  - `setRecentSearches` — güncellenmiş diziyle state’i değiştirir.
+  - `RECENT_SEARCHES_KEY` — localStorage anahtarı.
+- **Dönüş**: `void` (state ve localStorage güncellenir).
+
+### [N4_NASIL] AST Pointer: src/components/SearchOverlay.tsx::performFullSearch
+- **params**: `term: string`
+- **ic_degiskenler**:
+  - `term` — tam arama yapılacak metin.
+  - `setLoading` — arama sırasında loading durumunu `true` yapar.
+  - `setError` — hata mesajını sıfırlar.
+  - `setViewState` — UI durumunu `'RESULTS'` yapar.
+  - `addToRecent` — arama terimini son aramalara ekler.
+  - `setActiveIndex` — seçili indeksi `-1` yapar.
+  - `ftsSearchProducts` — dinamik import ile `../lib/supabase`’dan alınan tam‑metin arama fonksiyonu.
+  - `rows` — `ftsSearchProducts` çağrısından dönen ürün satırları.
+  - `setResults` — arama sonuçlarını state’e koyar.
+  - `t` — çeviri fonksiyonu, hata mesajı için kullanılır.
+  - `setLoading` (finally) — loading durumunu `false` yapar.
+- **Dönüş**: `void` (state güncellenir, olası hata yakalanır).
+
+### [N5_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleKeyDown
+- **params**: `e: React.KeyboardEvent`
+- **ic_degiskenler**:
+  - `e` — klavye olayı.
+  - `viewState` — mevcut UI durumu.
+  - `suggestions` — öneri dizisi.
+  - `results` — tam sonuç dizisi.
+  - `maxIndex` — geçerli listede (öneri veya sonuç) en yüksek seçilebilir indeks.
+  - `activeIndex` — şu an seçili indeks.
+  - `setActiveIndex` — indeks’i artırıp azaltır veya `-1` yapar.
+  - `router` — yönlendirme için.
+  - `suggestions[activeIndex]` (`s`) — seçili öneri.
+  - `results[activeIndex]` (`res`) — seçili sonuç.
+  - `addToRecent` — seçili öğeyi son aramalara ekler.
+  - `handleClose` — overlay’ı kapatır.
+  - `performFullSearch` — `q` (debounced) ile tam arama başlatır.
+- **Dönüş**: `void` (state ve router yönlendirmeleri).
+
+### [N6_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestion
+- **params**: `s: SearchSuggestion, idx: number`
+- **ic_degiskenler**:
+  - `s` — tek bir öneri nesnesi.
+  - `idx` — önerinin listedeki indeksi.
+  - `activeIndex` — şu anki seçili indeks.
+  - `isActive` — `idx === activeIndex` kontrolü.
+  - `icon` — öneri tipine göre oluşturulan JSX (resim veya SVG).
+  - `label` — öneri etiketi, marka ön eki eklenebilir.
+  - `router` — yönlendirme.
+  - `addToRecent` — arama terimini kaydeder.
+  - `handleClose` — overlay’ı kapatır.
+  - `setActiveIndex` — mouse‑enter ile aktif indeksi ayarlar.
+  - `highlightMatch` — arama kelimesiyle eşleşen kısmı vurgulamak için kullanılan yardımcı fonksiyon.
+- **Dönüş**: JSX `<button>` elementi (render edilen öneri satırı).
+
+### [N7_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderIdle
+- **params**: *(parametre yok)*
+- **ic_degiskenler**:
+  - `recentSearches` — son arama terimleri dizisi.
+  - `setRecentSearches` — temizleme butonunda kullanılan setter.
+  - `RECENT_SEARCHES_KEY` — localStorage’dan silmek için kullanılan anahtar.
+  - `t` — çeviri fonksiyonu.
+  - `router` — kategori butonları için yönlendirme.
+  - `Routes` — kategori URL’lerini oluşturur.
+  - `getCategoryIcon` — kategori ikonunu döndürür.
+  - `popularCategories` — dinamik olarak getirilen popüler kategori listesi.
+  - `setPopularCategories` — (kod içinde doğrudan kullanılmaz, dışarıdan set edilir).
+- **Dönüş**: JSX – boş durum, son aramalar ve popüler kategori butonlarını gösterir.
+
+### [N8_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestions
+- **params**: *(parametre yok)*
+- **ic_degiskenler**:
+  - `suggestions` — öneri dizisi.
+  - `debounced` — arama kelimesinin gecikmeli hali.
+  - `renderSuggestion` — her öneri satırını oluşturmak için kullanılan fonksiyon.
+  - `listRef` — öneri listesinin DOM referansı.
+  - `performFullSearch` — “Tüm sonuçları göster” butonunda çağrılır.
+  - `t` — çeviri fonksiyonu.
+- **Dönüş**: JSX – öneri listesi veya “sonuç yok” mesajı.
+
+### [N9_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderResults
+- **params**: *(parametre yok)*
+- **ic_degiskenler**:
+  - `results` — tam arama sonuçları dizisi.
+  - `debounced` — arama kelimesi.
+  - `activeIndex` — klavye ile seçili sonuç indeksi.
+  - `setActiveIndex` — mouse‑enter ile aktif indeksi ayarlar.
+  - `router` — ürün sayfasına yönlendirme.
+  - `handleClose` — overlay’ı kapatır.
+  - `highlightMatch` — ürün adı, marka ve SKU vurgulama.
+  - `listRef` — sonuç listesinin DOM referansı.
+  - `t` — çeviri fonksiyonu.
+  - `hasFuzzy` — sonuçların içinde fuzzy eşleşme olup olmadığını belirten boolean.
+- **Dönüş**: JSX – sonuç listesi veya “sonuç bulunamadı” mesajı.
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    SearchOverlay_tsx__SearchOverlay["SearchOverlay"]
+    SearchOverlay_tsx__addToRecent["addToRecent"]
+    SearchOverlay_tsx__handleClose["handleClose"]
+    SearchOverlay_tsx__handleKeyDown["handleKeyDown"]
+    SearchOverlay_tsx__performFullSearch["performFullSearch"]
+    SearchOverlay_tsx__renderIdle["renderIdle"]
+    SearchOverlay_tsx__renderResults["renderResults"]
+    SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
+    SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
+```
+
+## NODE ID STANDARD
+
+  file: src\components\SearchOverlay.tsx
+  function: src\components\SearchOverlay.tsx::SearchOverlay
+  function: src\components\SearchOverlay.tsx::handleClose
+  function: src\components\SearchOverlay.tsx::addToRecent
+  function: src\components\SearchOverlay.tsx::performFullSearch
+  function: src\components\SearchOverlay.tsx::handleKeyDown
+  function: src\components\SearchOverlay.tsx::renderSuggestion
+  function: src\components\SearchOverlay.tsx::renderIdle
+  function: src\components\SearchOverlay.tsx::renderSuggestions
+  function: src\components\SearchOverlay.tsx::renderResults
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: SearchOverlay
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-air-blue/10`, `bg-amber-50`, `bg-gray-100`, `bg-gray-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-900/40`, `bg-transparent`, `bg-white`, `border-amber-100`, `border-b`, `border-gray-100`, `border-gray-200`, `border-primary-ocean/30`, `border-slate-100`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-white`
+- **Responsive:** `sm:` prefix kullanımları
 
 ---
 # FILE: src\components\SecurityRibbon.md
@@ -11060,6 +11927,123 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Responsive:** `lg:`, `md:` prefix kullanımları
 
 ---
+# FILE: src\components\admin\BulkActionToolbar.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\admin\BulkActionToolbar.tsx
+skeleton_hash: 7bf65b45d538cf54
+entity_hashes:
+  func:BulkActionToolbar: ba39222c0aa88e73
+  overview: e440025fef007b62
+  style_tokens: 8018b08eafed78fd
+generated_at: 2026-05-27T12:14:07Z
+---
+
+## Genel Bakış
+`BulkActionToolbar` bileşeni, yönetim panelinde birden fazla öğe seçildiğinde toplu işlemler (durum güncelleme, özellik değiştirme, silme) yapabilmek için kullanılan bir araç çubuğu sağlar. Seçili öğe sayısını gösterir ve ilgili eylemlerin tetiklenmesi için dışarıdan gelen callback fonksiyonlarını yönetir.
+
+## Fonksiyon Grupları
+### UI Render ve Görsel Düzen
+Bu grup, seçili öğe sayısını gösteren etiket, eylem butonları ve araç çubuğunun genel görünümünü oluşturur.  
+- BulkActionToolbar
+
+### Eylem Tetikleme ve Callback Yönetimi
+Bu grup, buton tıklamalarıyla gelen kullanıcı etkileşimlerini alır, ilgili parametreleri (ör. yeni durum, özellik anahtarı) hazırlayarak dışarıdan sağlanan `onStatusChange`, `onFeatureToggle` ve `onDelete` callback’lerini çağırır.  
+- BulkActionToolbar (içindeki event handler mantığı)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### BulkActionToolbar
+**Ne yapar**: Seçili öğe sayısını gösteren ve toplu eylemler (durum değişikliği, özellik geçişi, silme) için tetikleyiciler sağlayan bir React bileşenini tanımlar.  
+
+**Nasıl yapar**: Props olarak aldığı `selectedCount`, `onStatusChange`, `onFeatureToggle` ve `onDelete` fonksiyonlarını UI elemanlarına bağlayarak, kullanıcı etkileşimlerine göre ilgili geri çağırma fonksiyonlarını çalıştırır. Bileşen, `BulkActionToolbarProps` tipinde bir fonksiyonel bileşen (`React.FC`) olarak döndürülür.  
+
+**Parametreler**:
+- `selectedCount`: number — Kullanıcı tarafından seçilen öğelerin toplam sayısı.
+- `onStatusChange`: (newStatus: string) => void — Seçili öğelerin durumunu güncellemek için çağrılan geri çağırma fonksiyonu.
+- `onFeatureToggle`: (featureName: string, enabled: boolean) => void — Belirli bir özelliğin etkinleştirilip devre dışı bırakılmasını yönetmek için kullanılan geri çağırma fonksiyonu.
+- `onDelete`: () => void — Seçili öğelerin toplu silinmesini tetikleyen geri çağırma fonksiyonu.
+
+**Dönüş**: React.FC<BulkActionToolbarProps> — Tanımlanan props tipine uygun bir fonksiyonel React bileşeni.
+
+---
+
+## INTERFACES
+
+### BulkActionToolbarProps
+- `selectedCount: number`
+- `onStatusChange: (status: string) => void`
+- `onFeatureToggle: (featured: boolean) => void`
+- `onDelete: () => void`
+- `onPriceAdjust: (mode: 'percent' | 'fixed', value: number) => void`
+- `onClearSelection: () => void`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src\components\admin\BulkActionToolbar.tsx::BulkActionToolbar
+- **params**: selectedCount, onStatusChange, onFeatureToggle, onDelete, onPriceAdjust, onClearSelection
+- **ic_degiskenler**:
+  - `showPricePanel` — Fiyat güncelleme panelinin görünürlüğünü kontrol eden boolean React state değeri
+  - `setShowPricePanel` — showPricePanel state'ini güncellemek için kullanılan setState fonksiyonu
+  - `priceMode` — Fiyat güncelleme modunu tutan state, 'percent' (yüzde) veya 'fixed' (sabit) değerlerini alır
+  - `setPriceMode` — priceMode state'ini güncelleyen setState fonksiyonu
+  - `priceValue` — Kullanıcının girdiği fiyat değerini string olarak tutan React state değeri
+  - `setPriceValue` — priceValue state'ini güncelleyen setState fonksiyonu
+  - `adminButtonPrimaryClass` — Import edilen, butonlara stil vermek için kullanılan CSS sınıfı
+- **Dönüş**: null | JSX.Element; seçili ürün sayısı 0 ise null, aksi halde toolbar JSX yapısını döndürür
+
+### [N2_NASIL] AST Pointer: src\components\admin\BulkActionToolbar.tsx::fiyatGuncelleUygulaOnClick
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `v` — Kullanıcının girdiği string tipindeki priceValue'nin float'a dönüştürülmüş sayısal hali
+  - `priceValue` — Üst kapsamdan erişilen, kullanıcının girdiği fiyat değerini tutan state
+  - `priceMode` — Üst kapsamdan erişilen, seçili fiyat güncelleme modunu tutan state
+  - `onPriceAdjust` — Üst parametrelerden alınan, toplu fiyat güncelleme işlemini tetikleyen callback fonksiyonu
+  - `setShowPricePanel` — Fiyat panelini kapatmak için kullanılan üst kapsamdaki setState fonksiyonu
+  - `setPriceValue` - İşlem sonrası fiyat girişini sıfırlamak için kullanılan üst kapsamdaki setState fonksiyonu
+  - `alert` — Tarayıcının yerleşik uyarı fonksiyonu, geçersiz sayısal giriş durumunda çağrılır
+- **Dönüş**: void | number; geçersiz giriş durumunda alert() dönüş değerini döndürür, başarılı işlemde hiçbir değer döndürmez
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\admin\BulkActionToolbar.tsx
+  function: src\components\admin\BulkActionToolbar.tsx::BulkActionToolbar
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: BulkActionToolbar
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-400/80`, `bg-emerald-500/80`, `bg-gray-400/80`, `bg-gray-50`, `bg-primary-navy`, `bg-red-500/80`, `bg-white`, `bg-white/20`, `bg-yellow-500/80`, `border-gray-200`, `border-primary-navy`, `text-gray-400`, `text-gray-800`, `text-primary-navy`, `text-sm`
+- **Layout:** `absolute`, `bg-yellow-500/80`, `bottom-4`, `bottom-full`, `fixed`, `flex`, `flex-1`, `flex-wrap`, `gap-2`, `gap-3`, `h-6`, `h-8`, `hover:bg-yellow-500`, `items-center`, `justify-center`
+- **Responsive:** (yok)
+
+---
 # FILE: src\components\admin\ColumnsMenu.md
 
 ---
@@ -11399,6 +12383,196 @@ graph LR
 - **Layout:** `absolute`, `backdrop-blur-md`, `fixed`, `flex`, `flex-1`, `gap-1.5`, `gap-2`, `gap-4`, `group-hover:text-cyan-400`, `h-1.5`, `h-10`, `h-16`, `h-5`, `h-8`, `h-full`
 - **Responsive:** (yok)
 
+
+---
+# FILE: src\components\admin\DateRangePicker.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx
+skeleton_hash: 19335609589ce934
+entity_hashes:
+  func:DateRangePicker: ed79aaef040a5b25
+  func:applySelection: 68dcb4d14b5cc83c
+  func:cancelSelection: 4bec1b96cb2c08c1
+  func:handleSelect: fdeacf6bd5ee123e
+  overview: 83cabe93bf8f0d23
+  style_tokens: 50ed94bf03c87e5a
+generated_at: 2026-05-27T12:21:49Z
+---
+
+## Genel Bakış
+Bu modül, yönetim paneli arayüzünde başlangıç ve bitiş tarihlerinin seçilmesi için kullanılan özel bir React bileşenidir. Kullanıcının yaptığı geçici seçimleri yönetir, onaylama veya iptal mekanizması sağlar ve nihai tarih aralığını üst bileşene iletir.
+
+## Fonksiyon Grupları
+### Bileşen Tanımı
+Tarih seçici arayüzünü oluşturan ana bileşendir ve dış dünyadan gelen yapılandırma parametrelerini kabul eder.
+- DateRangePicker
+
+### Etkileşim ve Durum Yönetimi
+Kullanıcının tarih seçimi, seçimi onaylama veya iptal etme gibi aksiyonlarını işleyerek bileşenin iç durumunu ve çıktısını günceller.
+- handleSelect, applySelection, cancelSelection
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Aksiyom 1**: Eğer `className` prop’u sağlanmazsa, `className` değeri boş string (`''`) olur.  
+**Aksiyom 2**: Eğer `value` prop’u `undefined` ya da geçerli bir `DateRange` nesnesi değilse, tarih seçici başlangıçta **seçili bir aralık** göstermez.  
+**Aksiyom 3**: Eğer `onChange` callback’i tanımlı değilse, tarih aralığı değiştiğinde **hiçbir dış etki** (state güncellemesi, API çağrısı vb.) gerçekleşmez.  
+**Aksiyom 4**: Eğer `handleSelect` fonksiyonu `undefined` bir argüman (`r`) alırsa, mevcut seçili tarih aralığı **silinir** (yani içsel seçim durumu `null/undefined` olur).  
+**Aksiyom 5**: Eğer `handleSelect` fonksiyonu geçerli bir `DateRange` nesnesi alırsa, bu nesne **içsel seçim durumuna** kaydedilir ve `onChange` callback’i (varsa) bu yeni `DateRange` ile tetiklenir.  
+**Aksiyom 6**: Eğer `applySelection` çağrılırsa, **içsel seçim durumu** `value` prop’una aktarılır ve `onChange` callback’i (varsa) bu güncellenmiş `value` ile çalıştırılır.  
+**Aksiyom 7**: Eğer `cancelSelection` çağrılırsa, **içsel seçim durumu** `value` prop’una eşitlenir (yani son onaylanmış değer geri yüklenir) ve `onChange` callback’i (varsa) bu geri yüklenmiş değerle tetiklenir.  
+**Aksiyom 8**: Eğer `placeholder` prop’u sağlanmazsa, tarih seçici **varsayılan bir yer tutucu** (bilinmiyor) gösterir; bu, UI‑nın boş bir giriş alanı gibi görünmesini sağlar.  
+
+*Domain‑specific not*: `DateRange` tipinin geçerli bir aralık olup olmadığını belirlemek için **başlangıç tarihinin bitiş tarihinden önce olması** gereklidir; aksi takdirde `handleSelect` içinde “geçersiz aralık” olarak kabul edilir ve seçim iptal edilir. (Bu kural, tip tanımının dışına çıkmadığı sürece uygulanır.)
+
+---
+
+## FONKSİYON DETAYLARI
+
+### DateRangePicker
+**Ne yapar**: Kullanıcıların bir tarih aralığı seçmesine olanak tanıyan bir React bileşeni sunar.  
+**Nasıl yapar**: `value`, `onChange`, `placeholder` ve isteğe bağlı `className` propslarını alır; içsel durum ve etkileşimleri yöneterek seçilen aralığı dışarıya `onChange` callback’iyle bildirir.  
+**Parametreler**:
+- `value`: DateRange — Bileşenin mevcut tarih aralığı değeri.
+- `onChange`: (range: DateRange) => void — Seçim değiştiğinde tetiklenen geri çağırma fonksiyonu.
+- `placeholder`: string — Kullanıcıya gösterilecek yer tutucu metin.
+- `className`: string — Bileşenin dış görünümünü özelleştirmek için ek CSS sınıfları (varsayılan: boş string).  
+**Dönüş**: React.FC<DateRangePickerProps> — Tanımlı props tipine sahip bir fonksiyonel React bileşeni.
+
+### handleSelect
+**Ne yapar**: Önceden tanımlı bir tarih aralığı (preset) seçildiğinde, bu aralığı işleyerek bileşenin durumunu günceller.  
+**Nasıl yapar**: `preset.getRange()` çağrısıyla elde edilen `DateRange` nesnesini alır ve `handleSelect` fonksiyonuna iletir; fonksiyon içinde muhtemelen `onChange` callback’i çağrılır.  
+**Parametreler**:
+- `r`: DateRange | undefined — Seçilen tarih aralığı; tanımsız (undefined) olma ihtimali vardır.  
+**Dönüş**: Belirtilmemiş (void veya bilinmiyor).
+
+### applySelection
+**Ne yapar**: Kullanıcı tarafından yapılan tarih aralığı seçimini onaylar ve seçilen değeri dışa aktarır.  
+**Nasıl yapar**: Muhtemelen geçerli seçim durumunu `onChange` callback’iyle iletir ve UI’yı kapatır; iç mantık kodda belirtilmemiştir.  
+**Parametreler**: Yok.  
+**Dönüş**: Belirtilmemiş (void veya bilinmiyor).
+
+### cancelSelection
+**Ne yapar**: Kullanıcı tarafından başlatılan tarih aralığı seçimini iptal eder ve önceki duruma geri döner.  
+**Nasıl yapar**: Seçim sürecini sonlandırarak geçici değişiklikleri temizler; iç mantık kodda yer almamaktadır.  
+**Parametreler**: Yok.  
+**Dönüş**: Belirtilmemiş (void veya bilinmiyor).
+
+---
+
+## INTERFACES
+
+### DateRangePickerProps
+- `value?: DateRange`
+- `onChange?: (range?: DateRange) => void`
+- `placeholder?: string`
+- `className?: string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::DateRangePicker
+- **params**: (value, onChange, placeholder, className = '')
+- **ic_degiskenler**:
+  - `lang` — `useI18n()` hook’den gelen mevcut dil kodu (`'en'` veya `'tr'`).
+  - `locale` — Dil koduna göre seçilen `date-fns` locale (`enUS` veya `tr`).
+  - `isOpen` — Popover’ın açık/kapalı durumunu tutan boolean state.
+  - `setIsOpen` — `isOpen` state’ini güncelleyen setter fonksiyonu.
+  - `selectedRange` — Kullanıcının seçtiği tarih aralığını tutan `DateRange | undefined` state.
+  - `setSelectedRange` — `selectedRange` state’ini güncelleyen setter fonksiyonu.
+  **`months`** — Mobil/desktop görünümüne göre gösterilecek takvim ayı sayısını tutan sayı state.  
+  **`setMonths`** — `months` state’ini güncelleyen setter fonksiyonu.  
+  **`presets`** — Ön tanımlı tarih aralıklarını içeren nesne dizisi; her nesne `label` ve `getRange` fonksiyonuna sahiptir.  
+  **`triggerLabel`** — Popover tetikleyicisinin içinde gösterilen metin; seçili tarih aralığına göre formatlanır.  
+  **`dayPickerClassNames`** — `react-day-picker` bileşeni için Tailwind‑CSS sınıf haritası.  
+- **Dönüş**: JSX element (`<Popover.Root …>`). Component, dışarıdan `value` ve `onChange` prop’larıyla kontrol edilen bir tarih aralığı seçicisi render eder; yan etkileri arasında pencere boyutuna göre `months` ayarlanması ve `value` değiştiğinde `selectedRange` senkronizasyonu bulunur.
+
+### [N2_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::handleSelect
+- **params**: (r: DateRange | undefined)
+- **ic_degiskenler**:
+  - `r` — Kullanıcının takvimden seçtiği yeni tarih aralığı; `undefined` olabilir.
+  - `setSelectedRange` — Üst component’tan gelen state setter; `selectedRange`’ı `r` ile günceller.
+- **Dönüş**: yok (sadece `selectedRange` state’ini günceller).
+
+### [N3_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::applySelection
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `onChange` — Prop olarak gelen, seçili tarih aralığını dışarıya ileten callback; var olduğunda `selectedRange` ile çağrılır.
+  - `selectedRange` — Şu anki seçili tarih aralığı state’i.
+  - `setIsOpen` — Popover’ın açık/kapalı durumunu kontrol eden setter; `false` yaparak popover’ı kapatır.
+- **Dönüş**: yok (callback’i tetikler ve popover’ı kapatır).
+
+### [N4_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::cancelSelection
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `value` — Prop olarak gelen dış tarih aralığı; iptal edildiğinde `selectedRange` bu değere geri set edilir.
+  - `setSelectedRange` — `selectedRange` state’ini `value` ile sıfırlar.
+  - `setIsOpen` — Popover’ı kapatmak için `false` atanır.
+- **Dönüş**: yok (state’i geri alır ve popover’ı kapatır).
+
+### [N5_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::<anonymous useEffect 1>
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `checkMobile` — `window.innerWidth` kontrolüyle `months` state’ini `1` (mobile) veya `2` (desktop) olarak ayarlayan fonksiyon.
+  - `setMonths` — `months` state’ini güncelleyen setter.
+  - `window` — Global nesne; `innerWidth` ve `addEventListener`/`removeEventListener` kullanılır.
+- **Dönüş**: yok (cleanup fonksiyonu `removeEventListener` ile event listener’ı kaldırır).
+
+### [N6_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::<anonymous useEffect 2>
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `value` — Prop olarak gelen dış tarih aralığı.
+  - `selectedRange` — İç state; `value` ile eşleşmezse `setSelectedRange` ile senkronize edilir.
+  - `setSelectedRange` — `selectedRange` state’ini `value` ile günceller.
+- **Dönüş**: yok (sadece koşullu senkronizasyon yapar).
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    DateRangePicker_tsx__DateRangePicker["DateRangePicker"]
+    DateRangePicker_tsx__applySelection["applySelection"]
+    DateRangePicker_tsx__cancelSelection["cancelSelection"]
+    DateRangePicker_tsx__handleSelect["handleSelect"]
+    DateRangePicker_tsx__DateRangePicker --> DateRangePicker_tsx__handleSelect
+```
+
+## NODE ID STANDARD
+
+  file: src\components\admin\DateRangePicker.tsx
+  function: src\components\admin\DateRangePicker.tsx::DateRangePicker
+  function: src\components\admin\DateRangePicker.tsx::handleSelect
+  function: src\components\admin\DateRangePicker.tsx::applySelection
+  function: src\components\admin\DateRangePicker.tsx::cancelSelection
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: DateRangePicker
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `md:border-b-0`, `md:border-r`, `text-left`, `text-primary-navy`, `text-slate-400`, `text-slate-500`
+- **Layout:** `backdrop-blur-xl`, `flex`, `flex-col`, `gap-1`, `gap-2`, `inline-flex`, `items-center`, `justify-between`, `max-h-60vh`, `max-h-85vh`, `max-w-full`, `md:flex-row`, `md:max-h-none`, `md:w-48`, `md:w-auto`
+- **Responsive:** `md:`, `sm:` prefix kullanımları
 
 ---
 # FILE: src\components\admin\EditableCell.md
@@ -13151,6 +14325,210 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-indigo-50`, `bg-indigo-50/20`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-white`, `border-indigo-100/50`, `border-slate-100`, `text-center`, `text-indigo-400`, `text-indigo-600`, `text-slate-300`, `text-slate-400`, `text-slate-500`, `text-sm`
 - **Layout:** `absolute`, `flex`, `flex-1`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-32`, `h-7`, `h-9`, `items-center`, `items-start`, `justify-between`
+- **Responsive:** (yok)
+
+---
+# FILE: src\components\admin\categories\CategoryFormModal.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\admin\categories\CategoryFormModal.tsx
+skeleton_hash: d69339254c3c365a
+entity_hashes:
+  func:CategoryFormModal: 45e70a4b9811a0d5
+  func:handleImageUpload: 633c0036d64f1044
+  func:onSubmit: c1bb6fdd37c1f2b9
+  overview: aa842adfcce629ec
+  style_tokens: a697519bb3613c56
+generated_at: 2026-05-27T12:23:11Z
+---
+
+## Genel Bakış
+Bu modül, yönetici panelinde kategori ekleme ve düzenleme işlemlerini yöneten bir form modal bileşenidir. Kullanıcıdan kategori adı, açıklama ve görsel gibi bilgileri alır, geçerlilik kontrollerini yapar ve ilgili API çağrılarını tetikler. Modal açılıp kapanma durumu, mevcut kategori verisi ve başarı durumunda çağrılacak geri çağrı (callback) gibi dışarıdan aldığı özelliklerle (props) esnek bir kullanım sunar.
+
+## Fonksiyon Grupları
+### Form Gönderimi ve Veri İşleme
+Kullanıcının doldurduğu form verilerini alır, doğrular ve yeni bir kategori oluşturmak veya mevcut kategoriyi güncellemek için gerekli işlemleri başlatır.
+- handleImageUpload, onSubmit
+
+### Bileşenin Kendisi
+Form modalının tüm yapısını, görünümünü ve alt bileşenlerini düzenleyen ana fonksiyondur. Açılma/kapanma durumu, başlık, form alanları ve butonlar gibi kullanıcı arayüzü ögelerini içerir.
+- CategoryFormModal
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### CategoryFormModal
+**Ne yapar**: Açık/kapalı durumunu kontrol eden, kategori verisini alıp başarı durumunda bir geri bildirim sağlayan bir React bileşeni oluşturur.  
+**Nasıl yapar**: `open`, `onOpenChange`, `category` ve `onSuccess` prop’larını alır; bu prop’lar bileşenin görünürlüğünü, dışarıdan kontrol edilen durum değişikliklerini, düzenlenecek/eklenecek kategori bilgisini ve işlem tamamlandığında tetiklenecek callback’i yönetir. Bileşen, bu prop’ları içeren bir fonksiyonel komponent (`React.FC`) döndürür.  
+**Parametreler**:
+- `open`: boolean — Modal penceresinin açık olup olmadığını belirler.  
+- `onOpenChange`: (open: boolean) => void — Modal’ın açık/kapalı durumundaki değişiklikleri dışarıya bildiren fonksiyon.  
+- `category`: Category | undefined — Düzenlenmekte olan kategori nesnesi; yeni bir kategori ekleniyorsa `undefined` olabilir.  
+- `onSuccess`: () => void — Form başarıyla gönderildiğinde çalıştırılan geri çağırma fonksiyonu.  
+**Dönüş**: `React.FC<CategoryFormModalProps>` — Belirtilen prop tiplerini kullanan bir fonksiyonel React bileşeni.
+
+### handleImageUpload
+**Ne yapar**: Kullanıcı bir dosya (görsel) seçtiğinde bu dosyayı işleyerek ilgili form alanına ekler.  
+**Nasıl yapar**: `React.ChangeEvent<HTMLInputElement>` tipindeki olay nesnesini alır, seçilen dosyayı (eğer mevcutsa) okur ve gerekli durum güncellemelerini gerçekleştirir.  
+**Parametreler**:
+- `e`: React.ChangeEvent<HTMLInputElement> — Dosya girişindeki değişiklik olayını temsil eder.  
+**Dönüş**: Belirtilmemiş; fonksiyonun dönüş tipi mevcut dokümantasyonda tanımlı değildir.
+
+### onSubmit
+**Ne yapar**: Kategori formundan gelen değerleri alır ve bu verileri işleyerek (örneğin API çağrısı) kaydetme işlemini başlatır.  
+**Nasıl yapar**: `CategoryFormValues` tipindeki form değerlerini parametre olarak alır, gerekli doğrulama ve iş mantığını uygular, ardından başarılı bir işlem durumunda `onSuccess` callback’ini tetikleyebilir.  
+**Parametreler**:
+- `values`: CategoryFormValues — Formda toplanan kategori adı, açıklama, görsel vb. alanların değerlerini içeren nesne.  
+**Dönüş**: Belirtilmemiş; fonksiyonun dönüş tipi mevcut dokümantasyonda tanımlı değildir.
+
+---
+
+## INTERFACES
+
+### CategoryFormModalProps
+- `open: boolean`
+- `onOpenChange: (open: boolean) => void`
+- `category?: DbCategory | null`
+- `onSuccess: () => void`
+
+---
+
+## TYPE ALIASES
+
+### CategoryUpdate
+```typescript
+type CategoryUpdate = Database['public']['Tables']['categories']['Update']
+```
+
+### CategoryInsert
+```typescript
+type CategoryInsert = Database['public']['Tables']['categories']['Insert']
+```
+
+### CategoryFormValues
+```typescript
+type CategoryFormValues = z.infer<typeof categorySchema>
+```
+
+---
+
+## SABİTLER
+- **categorySchema** (call) — `z.object({
+
+    name: z.string().min(1, 'Kategori adı zorunludur'),
+
+    slug...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::CategoryFormModal
+- **params**: `open`, `onOpenChange`, `category`, `onSuccess`
+- **ic_degiskenler**:
+  - `fetchParents` — component içinde tanımlı async fonksiyon, parent kategorileri getirir ve `setParentIdOptions` ile state günceller.
+  - `form` — `useForm` hookundan dönen nesne, form değerlerini yönetir (`reset`, `setValue` vb.).
+  - `setParentIdOptions` — parent seçeneklerini tutan state setter.
+  - `setPreviewImage` — seçilen/resim URL’sini tutan state setter.
+  - `setUploadingImage` — resim yükleme sırasında loading state’i yöneten setter.
+  - `setLoading` — form submit sırasında loading state’i yöneten setter.
+  - `handleImageUpload` — resim seçildiğinde çalıştırılan async fonksiyon (aşağıda ayrı pointer).
+  - `onSubmit` — form submit handler (aşağıda ayrı pointer).
+- **Dönüş**: React bileşeni JSX döndürür; yan etkileri (`useEffect`) içinde veri çekme ve form resetleme yapılır.
+
+### [N2_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::fetchParents
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `data` — Supabase sorgusundan dönen kategori listesi (`id`, `name` alanları).
+- **Dönüş**: `setParentIdOptions(data)` ile state günceller; explicit return yoktur.
+
+### [N3_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::useEffect‑open
+- **params**: (parametre yok) – `useEffect` callback
+- **ic_degiskenler**:
+  - `open` – component prop, modal açık olduğunda `fetchParents` çağrılır.
+- **Dönüş**: yok (effect içinde yan etki).
+
+### [N4_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::useEffect‑category
+- **params**: (parametre yok) – `useEffect` callback
+- **ic_degiskenler**:
+  - `category` – prop, var ise form `reset` edilir ve `setPreviewImage` çağrılır; yoksa boş değerlerle reset yapılır.
+  - `form` – `useForm` nesnesi, `reset` metodu ile form değerlerini ayarlar.
+  - `setPreviewImage` – resim önizleme state setter.
+- **Dönüş**: yok (effect içinde yan etki).
+
+### [N5_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::handleImageUpload
+- **params**: `e` — `React.ChangeEvent<HTMLInputElement>`
+- **ic_degiskenler**:
+  - `file` — seçilen dosya (`e.target.files?.[0]`).
+  - `compressedFile` — `compressImage(file)` sonucu elde edilen sıkıştırılmış dosya.
+  - `fileExt` — dosya uzantısı (`file.name.split('.').pop()`).
+  - `fileName` — UUID ve uzantıdan oluşan yeni dosya adı.
+  - `filePath` — Supabase storage içinde dosyanın yolu (`category-images/${fileName}`).
+  - `uploadError` — storage upload işlemi sırasında oluşabilecek hata.
+  - `publicUrl` — yüklenen dosyanın herkese açık URL’si (`supabase.storage.from('products').getPublicUrl(filePath)`).
+- **Dönüş**: yok (state güncellemeleri ve toast bildirimleriyle yan etki).
+
+### [N6_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::onSubmit
+- **params**: `values` — `CategoryFormValues`
+- **ic_degiskenler**:
+  - `metadata` — `CategoryMetadata` nesnesi, metric1 ve metric2 bilgilerini içerir.
+  - `updateData` — `CategoryUpdate` nesnesi, mevcut kategori güncellenirken kullanılan alanlar ve `metadata` (JSON’a dönüştürülmüş).
+  - `insertData` — `CategoryInsert` nesnesi, yeni kategori eklenirken kullanılan alanlar, `metadata` ve boş `authority_content` dizisi.
+  - `error` — Supabase `update` veya `insert` işlemi sırasında oluşan hata.
+- **Dönüş**: yok (state güncellemeleri, toast bildirimleri ve `onSuccess`, `onOpenChange` callback’leriyle yan etki).
+
+### [N7_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::optionRender
+- **params**: `p` — parent seçenek nesnesi (`{ id, name }`)
+- **ic_degiskenler**:
+  - `p.id` — option value attribute.
+  - `p.name` — option display text.
+- **Dönüş**: JSX `<option>` elementi; explicit return yoktur (inline render).
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    CategoryFormModal_tsx__CategoryFormModal["CategoryFormModal"]
+    CategoryFormModal_tsx__handleImageUpload["handleImageUpload"]
+    CategoryFormModal_tsx__onSubmit["onSubmit"]
+```
+
+## NODE ID STANDARD
+
+  file: src\components\admin\categories\CategoryFormModal.tsx
+  function: src\components\admin\categories\CategoryFormModal.tsx::CategoryFormModal
+  function: src\components\admin\categories\CategoryFormModal.tsx::handleImageUpload
+  function: src\components\admin\categories\CategoryFormModal.tsx::onSubmit
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: CategoryFormModal
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-black/60`, `bg-cyan-500`, `bg-red-500`, `bg-surface-deep`, `bg-white/1`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-2`, `border-b`, `border-b-2`, `border-dashed`, `border-t`, `border-transparent`
+- **Layout:** `absolute`, `backdrop-blur-2`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`
 - **Responsive:** (yok)
 
 ---
@@ -19121,6 +20499,132 @@ graph LR
 
 
 ---
+# FILE: src\components\home\KnowledgeBlock.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\home\KnowledgeBlock.tsx
+skeleton_hash: 6f7ef05f64566f7e
+entity_hashes:
+  func:KnowledgeBlock: 6d00cfd06aa7a00e
+  overview: 558d6d867468cadc
+  style_tokens: 696f4d29b5f4b2c9
+generated_at: 2026-05-27T12:13:21Z
+---
+
+## Genel Bakış
+Bu modül, ana sayfada bilgi birikimi ve deneyim istatistiklerini sergileyen React bileşenini içerir. Kullanıcıya yerelleştirilmiş içerikler sunarak, teklif alma sürecini başlatan bir eylem çağrısı (CTA) görüntüler.
+
+## Fonksiyon Grupları
+### Ana Bileşen
+Bilgi bloğu, istatistik verileri ve son eylem çağrısını içeren arayüzü oluşturur ve kullanıcı etkileşimlerini yönetir.
+- KnowledgeBlock
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### KnowledgeBlock
+**Ne yapar**: `KnowledgeBlock` bir React fonksiyonel bileşenidir ve "Bilgi Bloğu" adı verilen bir kullanıcı arayüzü bileşenini oluşturur. Bu bileşen, çeviri sözlüğü, çağrı eylem metinleri, istatistik/deneyim verileri ve bir teklif butonu tıklama işleyicisi alarak ilgili içeriği görüntüler.
+
+**Nasıl yapar**: Bileşen, kendisine iletilen propları (dictionary, finalCtaDict, statsExperience, onQuoteClick) kullanarak bir bilgi bloğu render eder. İç mantığı verilen kod parçacığında detaylandırılmamıştır; ancak tipik olarak bu propları uygun JSX elementlerine dönüştürür ve bir React bileşeni olarak döndürür.
+
+**Parametreler**:
+- `dictionary`: object (props içinde `t` olarak aliaslanmış) — Çeviri anahtarlarını içeren sözlük nesnesi. Uygulamanın dil desteği için kullanılır.
+- `finalCtaDict`: object — Son çağrı eylemi (Call to Action) metinlerini ve yapılandırmasını içeren sözlük.
+- `statsExperience`: any — Görüntülenecek istatistik veya deneyim verileri. Türü belirtilmemiştir.
+- `onQuoteClick`: function — Kullanıcının teklif butonuna tıklaması durumunda tetiklenecek geri çağırım fonksiyonu.
+
+**Dönüş**: `React.FC<KnowledgeBlockProps>` — Bileşenin kendisi bir React fonksiyonel bileşenidir; bu tür, bileşenin `KnowledgeBlockProps` tipinde proplar almasını sağlar. Kullanıldığında bir `JSX.Element` döndürür.
+
+---
+
+## INTERFACES
+
+### KnowledgeItem
+- `id: 'guides' | 'calculators' | 'support'`
+- `href: string`
+- `icon: React.ReactNode`
+
+### KnowledgeBlockProps
+- `dictionary: {
+`
+- `finalCtaDict: {
+`
+- `statsExperience: string`
+- `onQuoteClick?: () => void`
+
+---
+
+## SABİTLER
+- **knowledgeItems** (array) — `[
+
+  { 
+
+    id: 'guides', 
+
+    href: Routes.destek.home(),
+
+    icon: (
+
+  ...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/home/KnowledgeBlock.tsx::KnowledgeBlock
+- **params**:
+  - `t` — dictionary alias, çeviri metinlerini içeren obje (parametre adı: dictionary)
+  - `finalCtaDict` — son CTA buton metinlerini içeren obje (primaryCta, secondaryCta alanları)
+  - `statsExperience` — istatistik alanında gösterilecek deneyim metni
+  - `onQuoteClick` — teklif butonu tıklama callback fonksiyonu
+- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı bulunmamaktadır)
+- **Dönüş**: JSX elementi (React bileşeni) — section, grid layout, final action layer içeren yapı
+
+### [N2_NASIL] AST Pointer: src/components/home/KnowledgeBlock.tsx::(item, index) => {} (knowledgeItems.map callback)
+- **params**:
+  - `item` — knowledgeItems dizisinin elemanı; id, href, icon alanlarını içerir
+  - `index` — dizideki sıra numarası (0‑based)
+- **ic_degiskenler**:
+  - `delayClass` — `['delay-0', 'delay-100', 'delay-200'][index % 3]` ifadesiyle hesaplanan gecikme CSS sınıfı
+- **Dönüş**: JSX elementi — div wrapper içinde Link (numara, icon, başlık, açıklama, CTA)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\home\KnowledgeBlock.tsx
+  function: src\components\home\KnowledgeBlock.tsx::KnowledgeBlock
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: KnowledgeBlock
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-xl`, `tracking-hvac-loose`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-clip-text`, `bg-cyan-400/40`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-gradient-to-r`, `bg-knowledge-radial`, `bg-slate-950`, `bg-white/2`, `bg-white/5`, `border-cyan-500/30`, `border-l-2`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-400`
+- **Layout:** `absolute`, `backdrop-blur-3xl`, `backdrop-blur-md`, `bg-clip-text`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `from-cyan-400`, `from-cyan-600`, `gap-12`, `gap-3`, `gap-4`, `gap-6`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+
+---
 # FILE: src\components\home\QuickEntryRail.md
 
 ---
@@ -23325,6 +24829,106 @@ graph LR
 - **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `from-surface-darker`, `gap-24`, `gap-3`, `h-16`, `h-8`, `h-9`, `items-center`, `justify-center`, `left-0`, `relative`, `right-0`
 - **Responsive:** `md:`, `sm:` prefix kullanımları
 
+
+---
+# FILE: src\components\products\ProductsGrid.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\ProductsGrid.tsx
+skeleton_hash: 9ea1ac36dfdc188b
+entity_hashes:
+  func:ProductsGrid: 3dd0bc95cb82a18e
+  overview: b0875b8b603aa680
+  style_tokens: 85ab299eedf71c41
+generated_at: 2026-05-27T12:25:30Z
+---
+
+## Genel Bakış
+`ProductsGrid` bileşeni, ürün listesini farklı görünümler (grid/list) ve sıralama seçenekleriyle sunan bir UI konteyneridir. Gelen veri, yükleme durumu ve kullanıcı etkileşimleri (görünüm değişikliği, sıralama değişikliği) üzerinden render mantığını yönetir.
+
+## Fonksiyon Grupları
+### UI Render ve Durum Yönetimi
+Bu grup, ürün verisini, yükleme göstergesini ve seçili görünüm modunu alarak uygun şekilde görselleştirir; aynı zamanda `onViewModeChange` ve `onSortChange` geri çağrıları aracılığıyla dışarıya etkileşim sinyalleri gönderir.  
+- ProductsGrid   (tek bileşen)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+[Aksiyom 1]: Eğer products prop'u sağlanmazsa, bileşen görüntülenecek ürün verisine sahip olamaz ve boş bir grid veya beklenmeyen içerik ile karşılaşılır.
+[Aksiyom 2]: Eğer viewMode prop'u sağlanmazsa, bileşen geçerli bir görünüm modu belirleyemez ve beklenmeyen bir arayüz durumu ile karşılaşılır.
+[Aksiyom 3]: Eğer loading prop'u sağlanmazsa, bileşen yükleme durumu hakkında doğru bilgi alamaz ve yanlış bir yükleme durumu göstergesi durumu ile karşılaşılır.
+[Aksiyom 4]: Eğer onViewModeChange prop'u sağlanmazsa, görünüm modu değişiklikleri işlenemez ve kullanıcı grid'in görünüm modunu değiştiremez.
+[Aksiyom 5]: Eğer onSortChange prop'u sağlanmazsa, ürün sıralama değişiklikleri işlenemez ve kullanıcı grid'deki ürünleri sıralayamaz.
+
+Domain-specific kurallar: bilinmiyor (verilen imza ve modül bilgileri dışında ek bilgi bulunmamaktadır)
+
+---
+
+## FONKSİYON DETAYLARI
+
+### ProductsGrid
+**Ne yapar**: VentHub HVAC platformunda kullanılan, ürün listesini ızgara veya liste görünümünde görüntüleyen yeniden kullanılabilir atomik React bileşenidir. Ürünlerin görsel sunumunu yönetir, görüntüleme modu ve sıralama gibi kullanıcı etkileşimlerini üst bileşenlere iletir, yükleme sürecinde uygun gösterimleri devreye sokar.
+**Nasıl yapar**: Props olarak aldığı tüm yapılandırma ve veri parametrelerini kullanarak dinamik arayüz oluşturur. Aktif viewMode değerine göre ürünleri ızgara formatında yan yana veya liste formatında alt alta sıralayarak render eder. Yükleme durumu aktifken içerik yerine yükleme göstergesi, ürün listesi boşken uygun bilgilendirme metni gösterir. Kullanıcının görüntüleme modu veya sıralama kriteri değiştirme işlemlerinde ilgili callback fonksiyonlarını tetikleyerek durum değişikliğini üst bileşenlere iletir.
+**Parametreler**:
+- products: ProductsGridProps["products"] — Görüntülenecek tüm ürünleri içeren dizi, her dizi elemanı tek bir HVAC ürününün tüm detay verilerini barındırır.
+- viewMode: ProductsGridProps["viewMode"] — Mevcut aktif görüntüleme modu, "grid" (ızgara) veya "list" (liste) değerlerinden birini alır, arayüzün ürün sunum formatını belirler.
+- loading: ProductsGridProps["loading"] — Ürün verilerinin halen yüklenme sürecinde olup olmadığını belirten boolean bayrak, true değeri aldığında arayüzde ürün içeriği yerine yükleme göstergesi gösterilir.
+- onViewModeChange: ProductsGridProps["onViewModeChange"] — Kullanıcı görüntüleme modunu değiştirdiğinde tetiklenen callback fonksiyonu, seçilen yeni modu parametre olarak alarak üst bileşenlere durum değişikliğini iletir.
+- onSortChange: ProductsGridProps["onSortChange"] — Kullanıcı sıralama kriterini değiştirdiğinde tetiklenen callback fonksiyonu, seçilen yeni sıralama anahtarını parametre olarak alarak üst bileşenlere sıralama değişikliğini iletir.
+**Dönüş**: React.FC<ProductsGridProps> — Tip güvenliği sağlanmış bir React fonksiyonel bileşen örneği döndürür, bu bileşen tüm ürün görünümlerini, görüntüleme ve sıralama kontrollerini kendi içinde barındırarak sayfaya render edilir.
+
+---
+
+## INTERFACES
+
+### ProductsGridProps
+- `products: Product[]`
+- `viewMode: 'grid' | 'list'`
+- `loading?: boolean`
+- `onViewModeChange?: (mode: 'grid' | 'list') => void`
+- `onSortChange?: (sortBy: string) => void`
+- `sortBy?: string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/products/ProductsGrid.tsx::ProductsGrid
+- **params**: `products`, `viewMode`, `loading`, `onViewModeChange`, `onSortChange`, `sortBy` (varsayılan `'name'`)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook’undan alınan çeviri/yerelleştirme fonksiyonu; `t('...')` çağrılarıyla UI metinlerini döndürür.
+- **Dönüş**: React.ReactNode (JSX elementi)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\ProductsGrid.tsx
+  function: src\components\products\ProductsGrid.tsx::ProductsGrid
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: ProductsGrid
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
+- **Layout:** `absolute`, `flex`, `flex-col`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `p-1`, `p-2`, `relative`, `right-3`
+- **Responsive:** `sm:`, `xl:` prefix kullanımları
 
 ---
 # FILE: src\components\products\ProductsHero.md
@@ -44336,6 +45940,192 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Responsive:** `sm:` prefix kullanımları
 
 ---
+# FILE: src\views\account\AccountReturnsPage.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx
+skeleton_hash: 495418f85c94e7a0
+entity_hashes:
+  func:AccountReturnsPage: 45c93b9f2f8ddaf9
+  overview: b5840b0f6d7ee947
+  style_tokens: 97255f4698dc2d21
+generated_at: 2026-05-27T12:13:56Z
+---
+
+## Genel Bakış
+`AccountReturnsPage` bileşeni, kullanıcıların iade işlemlerini görüntüleyebildiği ve yönetebildiği bir sayfa sunar. React/TypeScript ortamında, ilgili veri çekme, durum yönetimi ve UI render işlemlerini tek bir bileşende birleştirir.
+
+## Fonksiyon Grupları
+### Sayfa Render ve Veri Yönetimi
+Bu grup, iade listelerinin alınması, sayfa durumunun (loading, error, empty) yönetilmesi ve UI’nın oluşturulmasından sorumludur.  
+- AccountReturnsPage   (sayfanın ana bileşeni, veri çekme ve render akışını kontrol eder)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### AccountReturnsPage
+**Ne yapar**: Kullanıcının iade taleplerini listeleyen, yeni iade talebi oluşturulmasını sağlayan ve iade sürecinin durumunu görsel bir zaman çizelgesiyle izletecek bir sayfa bileşeni sunar.  
+
+**Nasıl yapar**:  
+- `useAuth`, `useI18n`, `useSearchParams` ve `useRouter` gibi React hook’larıyla kimlik, çeviri, URL parametreleri ve yönlendirme bilgilerini alır.  
+- `useEffect` içinde iki ayrı asenkron yükleme fonksiyonu (`load` ve `loadOrders`) çalıştırarak Supabase’dan iade kayıtlarını (`venthub_returns`) ve ilgili siparişleri (`venthub_orders`) çeker, hataları yönetir ve bileşen durumlarını (`rows`, `orders`, `loading`) günceller.  
+- Kullanıcı bir sipariş ID’siyle (`?new=`) sayfayı açarsa modal otomatik olarak gösterilir.  
+- Form durumunu (`form`) ve modal görünürlüğünü (`openModal`) `useState` ile yönetir.  
+- `handleCreate` fonksiyonu, form doğrulaması yapar, yeni iade kaydını Supabase’a ekler, başarılı olduğunda listeyi yeniler ve kullanıcıyı yönlendirir.  
+- `statusClass`, `getStatusIcon`, `getStatusLabel` ve `getReturnTimeline` yardımcı fonksiyonları, iade durumuna göre stil, ikon, etiket ve zaman çizelgesi adımlarını üretir.  
+- Render aşamasında, yükleme, boş liste, filtreleme ve iade kartları gibi UI durumlarını koşullu olarak gösterir; ayrıca yeni iade oluşturmak için modal içerir.  
+
+**Parametreler**: *Bu fonksiyon dışarıdan parametre almaz.*  
+
+**Dönüş**: `void` – React bileşeni olarak JSX döndürür, doğrudan bir değer üretmez.
+
+---
+
+## INTERFACES
+
+### ReturnRow
+- `id: string`
+- `order_id: string`
+- `reason: string`
+- `description?: string | null`
+- `status: string`
+- `created_at: string`
+
+### OrderLite
+- `id: string`
+- `order_number: string`
+- `created_at: string`
+
+### SupabaseError
+- `code?: string`
+- `status?: number`
+- `message?: string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::AccountReturnsPage
+- **params**: (none)
+- **ic_degiskenler**:
+  - `mounted` — effect yaşam döngüsü boyunca bileşenin hâlâ monte edilmiş olup olmadığını izler; temizleme fonksiyonunda `false` yapılır.
+  - `load` — returns verisini Supabase’dan çeken ve `setRows`, `setLoading` durumlarını yöneten async iç fonksiyon.
+- **Dönüş**: yok (React bileşeni render eder, yan etkileri `useEffect` içinde yönetir)
+
+### [N2_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::load
+- **params**: (none)
+- **ic_degiskenler**:
+  - `list` — Supabase sorgusundan dönen returns listesi (`data` kısmı).
+  - `error` — Supabase sorgusundan dönen hata nesnesi.
+- **Dönüş**: yok (durum günceller, hata fırlatır)
+
+### [N3_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::loadOrders
+- **params**: (none)
+- **ic_degiskenler**:
+  - `data` — Supabase’dan çekilen sipariş kayıtları.
+  - `error` — Supabase sorgusundan dönen hata nesnesi.
+  - `fb` — alternatif sorgu (sütun eksikliği/400 hatası durumunda) sonucu.
+- **Dönüş**: yok (`setOrders` ile durum günceller)
+
+### [N4_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::prefillEffect
+- **params**: (none)
+- **ic_degiskenler**:
+  - `prefillOrderId` — URL parametresi veya dışarıdan gelen ön‑doldurma değeri.
+- **Dönüş**: yok (modal açma yan etkisi)
+
+### [N5_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::reasonOptions
+- **params**: (none)
+- **ic_degiskenler**: (none, sadece sabit dizi döner)
+- **Dönüş**: `string[]` — iade nedenleri listesi
+
+### [N6_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::submitReturn
+- **params**: (none)
+- **ic_degiskenler**:
+  - `form.order_id` — seçilen sipariş kimliği.
+  - `form.reason` — seçilen iade nedeni.
+  - `form.description` — isteğe bağlı açıklama.
+  - `payload` — Supabase `venthub_returns` tablosuna eklenecek veri nesnesi.
+  - `error` — insert işleminden dönen hata.
+  - `list` — yeni eklenen iade sonrası güncellenen returns listesi.
+- **Dönüş**: yok (toast gösterir, modal kapatır, form sıfırlar, yönlendirir)
+
+### [N7_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::statusClass
+- **params**: `s: string`
+- **ic_degiskenler**:
+  - `v` — `s` değerinin küçük harfe çevrilmiş hali; sınıf seçimi için kullanılır.
+- **Dönüş**: `string` — CSS sınıfı
+
+### [N8_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::getStatusIcon
+- **params**: `status: string`
+- **ic_degiskenler**: (none, sadece `status` üzerinden switch)
+- **Dönüş**: `JSX.Element` — ilgili Lucide‑react ikonu
+
+### [N9_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::getStatusLabel
+- **params**: `status: string`
+- **ic_degiskenler**: (none, sadece `status` üzerinden i18n lookup)
+- **Dönüş**: `string` — yerelleştirilmiş durum etiketi
+
+### [N10_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::getReturnTimeline
+- **params**: `currentStatus: string`
+- **ic_degiskenler**:
+  - `allSteps` — normal akıştaki adımların sabit dizisi.
+  - `currentIndex` — `currentStatus`’ın `allSteps` içindeki konumu.
+- **Dönüş**: `TimelineStep[]` — her adımın tamamlanma ve mevcut olma bilgisiyle dönen dizi
+
+### [N11_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::renderOption
+- **params**: `o: OrderLite`
+- **ic_degiskenler**: (none, sadece `o` üzerinden değer okur)
+- **Dönüş**: `JSX.Element` — `<option>` öğesi
+
+### [N12_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::renderReturnRow
+- **params**: `r: ReturnRow`
+- **ic_degiskenler**:
+  - `o` — `orders` dizisinden `r.order_id` eşleşen sipariş.
+  - `code` — sipariş numarası ya da return id’den türetilen gösterim kodu.
+  - `timeline` — `getReturnTimeline(r.status)` sonucu.
+- **Dönüş**: `JSX.Element` — iade satırı kartı markup’u
+
+--- 
+
+*Not: Fonksiyon isimleri, kod içinde açıkça tanımlı olan adlardan alınmıştır; anonim arrow fonksiyonlar (useEffect callbackleri vb.) için mantıksal bir adlandırma yapılmıştır.*
+
+---
+
+## NODE ID STANDARD
+
+  file: src\views\account\AccountReturnsPage.tsx
+  function: src\views\account\AccountReturnsPage.tsx::AccountReturnsPage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: AccountReturnsPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-primary-navy/5`, `bg-red-500`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/80`, `bg-slate-900/40`, `bg-white`, `border-b`, `border-b-2`, `border-primary-navy`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-1`
+- **Responsive:** `sm:` prefix kullanımları
+
+---
 # FILE: src\views\account\AccountSecurityPage.md
 
 ---
@@ -49207,6 +50997,566 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Responsive:** `md:` prefix kullanımları
 
 ---
+# FILE: src\views\admin\AdminProductsPage.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx
+skeleton_hash: 6dcd87ef2140afca
+entity_hashes:
+  func:AdminProductsPage: 7ee4bfb4fdbbf892
+  func:bulkDelete: 396db34432b201cc
+  func:bulkFeatureToggle: da5595cacf5bd1c3
+  func:bulkPriceAdjust: 392dce30ade3768e
+  func:bulkStatusChange: 420140e12f67c1f1
+  func:handleCreate: df124e23e226a1a4
+  func:handleEdit: 5e53cea7890cad6c
+  func:handleModalSuccess: fff2542be2c950a9
+  func:loadTechSpecs: ce079898c584578e
+  func:remove: 16990c02664975f8
+  func:saveInlineEdit: 22c42f560d85a7be
+  func:sortIndicator: 14968e5f2f2ffbf7
+  func:statusBadge: f17a6d9c7aca030a
+  func:toggleExpand: 63f2441bd2a8f378
+  func:toggleSelect: 5a6b497e4acebdf1
+  func:toggleSelectAll: b6733934eb7cddda
+  func:toggleSort: 865bfd9d85445d70
+  overview: 6edaaf2ebf329de0
+  style_tokens: fdfb3c696080e8df
+generated_at: 2026-05-27T12:24:25Z
+---
+
+## Genel Bakış  
+AdminProductsPage, ürün yönetimi için tek sayfa arayüzünü sunar. Kullanıcıların ürünleri listelemesi, seçmesi, düzenlemesi, toplu işlemler yapması ve teknik özellikleri görüntülemesi için gerekli tüm etkileşimleri sağlar. Sayfa, React bileşeni olarak yapılandırılmış olup, durum yönetimi ve API çağrılarıyla bütünleşir.
+
+## Fonksiyon Grupları  
+
+### Görünüm ve Durum Yönetimi  
+Bu grup, sayfanın görünümünü kontrol eden ve bileşenin durumunu güncelleyen fonksiyonları içerir.  
+- `AdminProductsPage`  
+- `toggleSelect`  
+- `toggleSelectAll`  
+- `toggleExpand`  
+- `toggleSort`  
+- `sortIndicator`  
+- `statusBadge`  
+
+### İşlem Başlatıcıları  
+Kullanıcı eylemlerini başlatan ve ilgili API çağrılarını tetikleyen fonksiyonlar.  
+- `handleCreate`  
+- `handleEdit`  
+- `handleModalSuccess`  
+
+### Tekil Ürün İşlemleri  
+Bireysel ürün üzerinde yapılan değişiklikleri yöneten fonksiyonlar.  
+- `remove`  
+
+### Toplu İşlemler  
+Birden fazla üründe aynı anda değişiklik yapılmasını sağlayan fonksiyonlar.  
+- `bulkStatusChange`  
+- `bulkFeatureToggle`  
+- `bulkDelete`  
+- `bulkPriceAdjust`  
+
+### Veri Yükleme ve Güncelleme  
+Veri çekme ve satır içi düzenlemeleri kaydetme işlemlerini kapsar.  
+- `loadTechSpecs`  
+- `saveInlineEdit`
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül, yönetim panelinde ürün listesinin görüntülenmesi, seçilmesi, düzenlenmesi ve toplu işlemlerin yürütülmesi için UI‑mantığı sağlar.  
+
+**Aksiyom 1**: Eğer `toggleSelect(id)` çağrısında verilen **id** mevcut bir ürün kaydına karşılık gelmiyorsa, seçim durumu değişmez ve UI’da bir hata/uyarı gösterilmez.  
+
+**Aksiyom 2**: Eğer `toggleSelectAll()` çağrıldığında listede **hiç ürün bulunmuyorsa**, hiçbir seçim durumu değişmez.  
+
+**Aksiyom 3**: Eğer `toggleExpand(id)` içinde verilen **id** listede bulunmuyorsa, genişletme/katlama durumu değişmez ve UI’da bir değişiklik olmaz.  
+
+**Aksiyom 4**: Eğer `handleCreate()` çalıştırıldığında **gerekli modal/form bileşenleri yüklenemezse**, yeni ürün oluşturma süreci başlatılamaz ve UI’da “create” aksiyonu başarısız olur.  
+
+**Aksiyom 5**: Eğer `handleEdit(id)` içinde verilen **id** geçerli bir ürün kaydı değilse, düzenleme modalı açılmaz ve UI’da bir değişiklik olmaz.  
+
+**Aksiyom 6**: Eğer `handleModalSuccess()` çağrısı **aktif bir modal** olmadan gerçekleşirse, hiçbir veri kaydedilmez ve UI’da bir yan etki oluşmaz.  
+
+**Aksiyom 7**: Eğer `remove(id)` içinde verilen **id** listede bulunmuyorsa, silme işlemi gerçekleşmez ve UI’da bir değişiklik olmaz.  
+
+**Aksiyom 8**: Eğer `bulkStatusChange(status)` içinde verilen **status** değeri geçerli bir durum (ör. “active”, “inactive” vb.) değilse, seçili ürünlerin durumu değiştirilmez.  
+
+**Aksiyom 9**: Eğer `bulkFeatureToggle(featured)` çağrısı **hiç ürün seçilmemişse**, “featured” özelliği hiçbir ürüne uygulanmaz.  
+
+**Aksiyom 10**: Eğer `bulkDelete()` çağrısı **seçili ürün yoksa**, silme işlemi gerçekleşmez ve UI’da bir değişiklik olmaz.  
+
+**Aksiyom 11**: Eğer `bulkPriceAdjust(mode, value)` içinde **mode** `'percent'` ya da `'fixed'` dışındaki bir değer alırsa, fiyat ayarlaması uygulanmaz.  
+
+**Aksiyom 12**: Eğer `bulkPriceAdjust` için **value** `null` ya da `undefined` ise, fiyat ayarlaması uygulanmaz.  
+
+**Aksiyom 13**: Eğer `saveInlineEdit()` sırasında **veri doğrulama hatası** oluşursa, değişiklikler kaydedilmez ve UI’da hatalı alanlar işaretlenir.  
+
+**Aksiyom 14**: Eğer `loadTechSpecs(_productId)` içinde verilen **_productId** geçerli bir ürün kimliği değilse, teknik özellikler yüklenmez ve UI’da boş bir alan gösterilir.  
+
+**Aksiyom 15**: Eğer `toggleSort(key)` içinde verilen **key** geçerli bir `SortKey` (ör. `name`, `price`, `status` vb.) değilse, sıralama düzeni değişmez.  
+
+**Aksiyom 16**: Eğer `sortIndicator(key)` içinde verilen **key** mevcut bir sıralama anahtarı değilse, varsayılan (boş) sıralama göstergesi döndürülür.  
+
+**Aksiyom 17**: Eğer `statusBadge(s)` çağrısında **s** `null` ya da `undefined` ise, varsayılan (bilinmeyen) durum rozeti gösterilir.  
+
+### Domain‑specific kurallar
+- `bulkPriceAdjust`‑de **mode** yalnızca `'percent'` ya da `'fixed'` olabilir; başka bir değer kabul edilmez.  
+- `statusBadge`‑de **s** parametresi opsiyoneldir; `null`/`undefined` olduğunda “bilinmiyor” badge’ı gösterilir.  
+
+*Bu aksiyomlar, yalnızca fonksiyon imzalarından türetilmiş olup, modülün doğru çalışması için gerekli koşulları tanımlar.*
+
+---
+
+## FONKSİYON DETAYLARI
+
+### AdminProductsPage
+**Ne yapar**: Uygulamanın yönetim panelinde ürünlerin listelendiği ve yönetildiği ana sayfa bileşenini tanımlar.  
+**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanır ve içinde ürün tablosu, seçim ve eylem kontrolleri gibi alt bileşenleri barındırır.  
+**Parametreler**: *Yok*  
+**Dönüş**: `React.FC` – bir React fonksiyonel bileşeni.
+
+### toggleSelect
+**Ne yapar**: Tek bir ürünün seçili durumunu tersine çevirir.  
+**Nasıl yapar**: Verilen `id` parametresiyle ilgili ürünün seçili/seçili değil durumunu günceller.  
+**Parametreler**:
+- `id`: `string` — seçimin değiştirileceği ürünün benzersiz kimliği.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
+
+### toggleSelectAll
+**Ne yapar**: Listede bulunan tüm ürünlerin seçili durumunu toplu olarak tersine çevirir.  
+**Nasıl yapar**: Seçim durumunu kontrol eder ve tüm öğeler için aynı seçimi uygular.  
+**Parametreler**: *Yok*  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
+
+### toggleExpand
+**Ne yapar**: Belirli bir ürün satırının detay (expand) görünümünü açar veya kapatır.  
+**Nasıl yapar**: `id` ile eşleşen satırın genişletme durumunu değiştirir ve aynı zamanda `loadTechSpecs` fonksiyonunu çağırarak teknik özellikleri yükler.  
+**Parametreler**:
+- `id`: `string` — genişletme durumunun değiştirileceği ürünün kimliği.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
+
+### handleCreate
+**Ne yapar**: Yeni bir ürün oluşturma sürecini başlatır.  
+**Nasıl yapar**: Kullanıcı “Yeni Ürün” eylemini tetiklediğinde ilgili modal veya formu açar.  
+**Parametreler**: *Yok*  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
+
+### handleEdit
+**Ne yapar**: Mevcut bir ürünün düzenleme moduna geçişi sağlar.  
+**Nasıl yapar**: Verilen `id` ile eşleşen ürünün bilgilerini düzenleme formuna yükler.  
+**Parametreler**:
+- `id`: `string` — düzenlenecek ürünün kimliği.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
+
+### handleModalSuccess
+**Ne yapar**: Ürün oluşturma veya düzenleme modalı başarılı bir şekilde tamamlandığında tetiklenir.  
+**Nasıl yapar**: Modal kapanışını yönetir ve listeyi güncelleyerek yeni/ güncellenmiş veriyi yansıtır.  
+**Parametreler**: *Yok*  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
+
+### remove
+**Ne yapar**: Belirli bir ürünü sistemden siler.  
+**Nasıl yapar**: `id` parametresiyle eşleşen ürünün silinmesini başlatır ve ardından listeyi yeniler.  
+**Parametreler**:
+- `id`: `string` — silinecek ürünün kimliği.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
+
+### bulkStatusChange
+**Ne yapar**: Seçili ürünlerin durumunu toplu olarak değiştirir.  
+**Nasıl yapar**: `status` parametresiyle belirtilen yeni durumu tüm seçili ürünlere uygular.  
+**Parametreler**:
+- `status`: `string` — uygulanacak yeni durum değeri.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
+
+### bulkFeatureToggle
+**Ne yapar**: Seçili ürünlerin “featured” (öne çıkarılmış) özelliğini toplu olarak açar veya kapatır.  
+**Nasıl yapar**: `featured` parametresiyle belirlenen boolean değeri tüm seçili ürünlere atar.  
+**Parametreler**:
+- `featured`: `boolean` — ürünlerin öne çıkarılıp çıkarılmayacağını belirten değer.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
+
+### bulkDelete
+**Ne yapar**: Birden fazla ürünün silinmesini toplu olarak başlatır.  
+**Nasıl yapar**: Fonksiyonun iç mantığı kodda verilmemiştir; genellikle seçili ürün ID'lerini toplayıp bir API çağrısı yaparak silme işlemini gerçekleştirir.  
+**Parametreler**:  
+- *Yok*  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
+
+### bulkPriceAdjust
+**Ne yapar**: Seçili ürünlerin fiyatlarını toplu olarak yüzde ya da sabit tutar üzerinden ayarlar.  
+**Nasıl yapar**: `mode` parametresi yüzde (`percent`) ya da sabit (`fixed`) değer tipini belirler; `value` ise uygulanacak yüzde artışı/azalışını ya da sabit fiyat farkını temsil eder. Fonksiyon bu değerleri alıp ilgili ürünlerin fiyatlarını günceller.  
+**Parametreler**:  
+- `mode`: `'percent' | 'fixed'` — Fiyat ayarlama yöntemini belirler.  
+- `value`: `number` — Uygulanacak yüzde ya da sabit tutar.  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
+
+### saveInlineEdit
+**Ne yapar**: Satır içi düzenleme modunda yapılan değişiklikleri kaydeder.  
+**Nasıl yapar**: Kullanıcı `Enter` tuşuna bastığında bu fonksiyon çağrılır; `Escape` tuşuna basıldığında ise satır içi düzenleme iptal edilerek `setInlineEdit(null)` çalıştırılır.  
+**Parametreler**:  
+- *Yok*  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
+
+### loadTechSpecs
+**Ne yapar**: Belirtilen ürün kimliği için teknik özellikleri yükler.  
+**Nasıl yapar**: Fonksiyon, bir ürün satırının genişletilmesi (`toggleExpand`) ile birlikte çağrılır; ürün ID'si (`_productId`) parametresi üzerinden ilgili teknik veri çekilir.  
+**Parametreler**:  
+- `_productId`: `string` — Teknik özelliklerin yükleneceği ürünün kimliği.  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
+
+### toggleSort
+**Ne yapar**: Belirtilen anahtara göre tablo ya da liste sıralamasını değiştirir.  
+**Nasıl yapar**: Mevcut sıralama yönünü kontrol eder; aynı anahtar tekrar seçildiğinde yön tersine çevrilir, farklı bir anahtar seçildiğinde yeni anahtar ve varsayılan yön ile sıralama yapılır.  
+**Parametreler**:  
+- `key`: `SortKey` — Sıralama yapılacak alanın anahtarı.  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
+
+### sortIndicator
+**Ne yapar**: Belirli bir sıralama anahtarının mevcut sıralama yönünü gösteren görsel işaretçi üretir.  
+**Nasıl yapar**: `key` parametresi ile eşleşen sıralama durumunu kontrol eder ve UI’da ok ya da benzeri bir gösterge döndürür.  
+**Parametreler**:  
+- `key`: `SortKey` — İncelenecek sıralama anahtarı.  
+**Dönüş**: Bilinmiyor (muhtemelen bir JSX/React öğesi).
+
+### statusBadge
+**Ne yapar**: Ürün ya da işlem durumunu görsel bir rozet (badge) olarak sunar.  
+**Nasıl yapar**: Opsiyonel `s` parametresi üzerinden durum değeri alınır; değer `null` ya da `undefined` ise varsayılan bir durum gösterilir.  
+**Parametreler**:  
+- `s` (opsiyonel): `string | null` — Gösterilecek durum metni.  
+**Dönüş**: Bilinmiyor (muhtemelen bir JSX/React öğesi).
+
+---
+
+## INTERFACES
+
+### CategoryOpt
+- `id: string`
+- `name: string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleSelect
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `selectedIds` — component state `Set<string>`; used to check current selection size.
+  - `rows` — component state `DomainProduct[]`; used to map all row ids.
+  - `setSelectedIds` — state setter; updates the selection set.
+- **Dönüş**: yok (state günceller)
+
+### [N2_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleSelectAll
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `selectedIds` — component state `Set<string>`; compared with `rows.length`.
+  - `rows` — component state `DomainProduct[]`; used to build a new set of all ids.
+  - `setSelectedIds` — state setter; replaces the selection set.
+- **Dönüş**: yok
+
+### [N3_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleExpand
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `expandedIds` — component state `Set<string>`; toggles presence of `id`.
+  - `setExpandedIds` — state setter; updates the expanded set.
+- **Dönüş**: yok
+
+### [N4_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleCreate
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `setEditingId` — state setter; sets `null` for create mode.
+  - `setIsModalOpen` — state setter; opens the modal.
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleEdit
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `setEditingId` — state setter; stores the id of the product to edit.
+  - `setIsModalOpen` — state setter; opens the modal.
+- **Dönüş**: yok
+
+### [N6_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleModalSuccess
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `load` — function reference; triggers data reload.
+- **Dönüş**: yok
+
+### [N7_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::remove
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `rows` — component state; used to find the row before deletion (`before`).
+  - `supabase` — imported client; performs `delete` on `products`.
+  - `logAdminAction` — dynamically imported; logs the delete action.
+  - `load` — reloads data after deletion.
+  - `setError`, `setRows`, `setTotal` — state setters used in error handling (not in success path).
+- **Dönüş**: yok
+
+### [N8_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkStatusChange
+- **params**: (status: string)
+- **ic_degiskenler**:
+  - `selectedIds` — `Set<string>`; determines which rows to update.
+  - `supabase` — client; updates `status` for all selected ids.
+  - `setSelectedIds` — clears selection after successful update.
+  - `load` — reloads data.
+- **Dönüş**: yok
+
+### [N9_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkFeatureToggle
+- **params**: (featured: boolean)
+- **ic_degiskenler**:
+  - `selectedIds` — `Set<string>`; ids to update.
+  - `supabase` — client; updates `is_featured`.
+  - `setSelectedIds` — clears selection.
+  - `load` — reloads data.
+- **Dönüş**: yok
+
+### [N10_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkDelete
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `selectedIds` — `Set<string>`; ids to delete.
+  - `supabase` — client; performs bulk delete.
+  - `setSelectedIds` — clears selection.
+  - `load` — reloads data.
+- **Dönüş**: yok
+
+### [N11_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkPriceAdjust
+- **params**: (mode: 'percent' | 'fixed', value: number)
+- **ic_degiskenler**:
+  - `selectedIds` — `Set<string>`; ids to adjust.
+  - `supabase` — client; fetches current prices and applies updates.
+  - `mode`, `value` — control calculation (percentage or fixed amount).
+  - `updates` — array of `{id, price}` objects with new calculated price.
+  - `results` — array of Supabase update responses; checked for errors.
+  - `setSelectedIds` — clears selection after success.
+  - `load` — reloads data.
+- **Dönüş**: yok
+
+### [N12_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::saveInlineEdit
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `inlineEdit` — state object `{id, field, value}`; contains edited field/value.
+  - `parseFloat`, `isNaN` — validate numeric input.
+  - `payload` — `Partial<DomainProduct>` built from edited field.
+  - `supabase` — client; updates the product.
+  - `setRows` — updates local rows with new value.
+  - `setInlineEdit` — clears edit state.
+- **Dönüş**: yok
+
+### [N13_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::loadTechSpecs
+- **params**: (_productId: string)
+- **ic_degiskenler**:
+  - `techSpecs` — component state map of productId → specs; checked before fetch.
+  - `supabase` — client; selects `technical_specs` for the product.
+  - `setTechSpecs` — stores fetched specs or empty object on failure.
+- **Dönüş**: yok
+
+### [N14_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleSort
+- **params**: (key: SortKey)
+- **ic_degiskenler**:
+  - `sortKey`, `sortDir` — component state; updated based on current key.
+  - `setSortKey`, `setSortDir` — state setters.
+  - `setPage` — resets pagination to first page.
+- **Dönüş**: yok
+
+### [N15_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::sortIndicator
+- **params**: (key: SortKey)
+- **ic_degiskenler**:
+  - `sortKey`, `sortDir` — component state; used to decide indicator direction.
+- **Dönüş**: yok (JSX element returned)
+
+### [N16_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::statusBadge
+- **params**: (s?: string | null)
+- **ic_degiskenler**:
+  - `s` — status string; normalized to lower case.
+  - `baseClass` — base CSS class string.
+  - `t` — translation function (from i18n context) used in rendered spans.
+- **Dönüş**: yok (JSX element)
+
+### [N17_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleCategoryChange
+- **params**: (value: string)
+- **ic_degiskenler**:
+  - `setSelectedCategoryFilter` — state setter; stores selected category id.
+- **Dönüş**: yok
+
+### [N18_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::categorySelectProps
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `selectedCategoryFilter` — current filter value.
+  - `handleCategoryChange` — change handler.
+  - `cats` — array of category options; mapped to `{value, label}`.
+- **Dönüş**: object with `value`, `onChange`, `options`.
+
+### [N19_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::exportCsv
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `sorted` — currently sorted rows.
+  - `cols` — column identifiers.
+  - `header` — CSV header line.
+  - `lines` — array of CSV rows built from each product.
+  - `csv` — final CSV string with BOM.
+  - `blob`, `url`, `a` — DOM objects used to trigger download.
+- **Dönüş**: yok
+
+### [N20_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::mapCategories
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `cats` — array of category objects.
+  - `map` — `Map<string, string>` mapping id → name.
+- **Dönüş**: `Map<string, string>`
+
+### [N21_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::applySorting
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `filtered` — set of rows after filters.
+  - `sortKey`, `sortDir` — sorting criteria.
+  - `catsMap` — map of category ids to names.
+  - `arr` — copy of filtered rows.
+- **Dönüş**: sorted array of `DomainProduct`
+
+### [N22_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::compareRows
+- **params**: (a, b)
+- **ic_degiskenler**:
+  - `sortKey`, `sortDir` — used to compute direction.
+  - `catsMap` — for category comparison.
+- **Dönüş**: number (comparison result for `Array.sort`)
+
+### [N23_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::load
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `setLoading`, `setError`, `setRows`, `setTotal`, `setCats`, `setCovers` — state setters.
+  - `ensureSessionFresh` — ensures session validity.
+  - `debouncedQ`, `page`, `PAGE_SIZE`, `selectedCategoryFilter`, `featuredOnly`, `statusFilter` — query parameters.
+  - `adminSearchProducts` — RPC for full‑text search.
+  - `toUIProductList` — converts DB rows to UI model.
+  - `supabase` — used for normal queries, categories, settings, images.
+  - `sortKey`, `sortDir` — sorting.
+  - `ids`, `chunks`, `results`, `map` — image‑fetching logic.
+  - `setTechSpecs` — not used here but part of component state.
+- **Dönüş**: yok (state updates)
+
+### [N24_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::useDebounceEffect
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `q` — search input.
+  - `setDebouncedQ`, `setPage` — state setters.
+  - `setTimeout`, `clearTimeout` — timer handling.
+- **Dönüş**: cleanup function for effect.
+
+### [N25_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::onSearchChange
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `setDebouncedQ`, `setPage` — reset pagination on manual search change.
+- **Dönüş**: yok
+
+### [N26_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::openCreateModal
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `setEditingId(null)`, `setIsModalOpen(true)` — open modal for creation.
+- **Dönüş**: yok
+
+### [N27_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::openEditModal
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `setEditingId(id)`, `setIsModalOpen(true)` — open modal for editing.
+- **Dönüş**: yok
+
+### [N28_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::loadOnMount
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `load` — invoked once on component mount.
+- **Dönüş**: yok
+
+### [N29_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::rowRenderer
+- **params**: (r: DomainProduct)
+- **ic_degiskenler**:
+  - `expandedIds`, `selectedIds`, `hasWriteAccess`, `covers`, `visibleCols`, `catsMap`, `statusBadge`, `inlineEdit`, `saveInlineEdit`, `setInlineEdit`, `formatCurrency`, `lang`, `t` — all used to render a table row with actions, inline editing, expand/collapse, images, etc.
+- **Dönüş**: JSX `<React.Fragment>` representing a table row (and optional expanded row).
+
+### [N30_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::techSpecRenderer
+- **params**: ([key, val])
+- **ic_degiskenler**:
+  - `key`, `val` — entry from `techSpecs[productId]`; rendered inside a styled div.
+- **Dönüş**: JSX element for a single tech‑spec key/value pair.
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    AdminProductsPage_tsx__AdminProductsPage["AdminProductsPage"]
+    AdminProductsPage_tsx__bulkDelete["bulkDelete"]
+    AdminProductsPage_tsx__bulkFeatureToggle["bulkFeatureToggle"]
+    AdminProductsPage_tsx__bulkPriceAdjust["bulkPriceAdjust"]
+    AdminProductsPage_tsx__bulkStatusChange["bulkStatusChange"]
+    AdminProductsPage_tsx__handleCreate["handleCreate"]
+    AdminProductsPage_tsx__handleEdit["handleEdit"]
+    AdminProductsPage_tsx__handleModalSuccess["handleModalSuccess"]
+    AdminProductsPage_tsx__loadTechSpecs["loadTechSpecs"]
+    AdminProductsPage_tsx__remove["remove"]
+    AdminProductsPage_tsx__saveInlineEdit["saveInlineEdit"]
+    AdminProductsPage_tsx__sortIndicator["sortIndicator"]
+    AdminProductsPage_tsx__statusBadge["statusBadge"]
+    AdminProductsPage_tsx__toggleExpand["toggleExpand"]
+    AdminProductsPage_tsx__toggleSelect["toggleSelect"]
+    AdminProductsPage_tsx__toggleSelectAll["toggleSelectAll"]
+    AdminProductsPage_tsx__toggleSort["toggleSort"]
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__remove
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
+```
+
+## NODE ID STANDARD
+
+  file: src\views\admin\AdminProductsPage.tsx
+  function: src\views\admin\AdminProductsPage.tsx::AdminProductsPage
+  function: src\views\admin\AdminProductsPage.tsx::toggleSelect
+  function: src\views\admin\AdminProductsPage.tsx::toggleSelectAll
+  function: src\views\admin\AdminProductsPage.tsx::toggleExpand
+  function: src\views\admin\AdminProductsPage.tsx::handleCreate
+  function: src\views\admin\AdminProductsPage.tsx::handleEdit
+  function: src\views\admin\AdminProductsPage.tsx::handleModalSuccess
+  function: src\views\admin\AdminProductsPage.tsx::remove
+  function: src\views\admin\AdminProductsPage.tsx::bulkStatusChange
+  function: src\views\admin\AdminProductsPage.tsx::bulkFeatureToggle
+  function: src\views\admin\AdminProductsPage.tsx::bulkDelete
+  function: src\views\admin\AdminProductsPage.tsx::bulkPriceAdjust
+  function: src\views\admin\AdminProductsPage.tsx::saveInlineEdit
+  function: src\views\admin\AdminProductsPage.tsx::loadTechSpecs
+  function: src\views\admin\AdminProductsPage.tsx::toggleSort
+  function: src\views\admin\AdminProductsPage.tsx::sortIndicator
+  function: src\views\admin\AdminProductsPage.tsx::statusBadge
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: AdminProductsPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `tracking-hvac-relaxed`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-cyan-400/3`, `bg-emerald-500/10`, `bg-gradient-to-r`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-surface-deep`, `bg-white/1`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-2`, `border-b`
+- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-transparent`, `gap-0.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `group-hover/btn:text-cyan-400`, `group-hover/btn:text-slate-400`, `group-hover/spec:text-cyan-400/70`, `group-hover:border-white/10`, `group-hover:rotate-90`
+- **Responsive:** `lg:`, `md:` prefix kullanımları
+
+---
 # FILE: src\views\admin\AdminReturnsPage.md
 
 ---
@@ -53146,6 +55496,151 @@ Bu React test modülü, ReviewSummary bileşeninin testlerinin sorunsuz çalış
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: wrap
+
+---
+# FILE: src\views\knowledge\HubPage.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\views\knowledge\HubPage.tsx
+skeleton_hash: 51959c03f2b8ee36
+entity_hashes:
+  func:HubPage: ae5a0ef5e997bc98
+  overview: 92f1bd1bc9a0b472
+  style_tokens: c268b09644e71fe8
+generated_at: 2026-05-27T12:24:28Z
+---
+
+## Genel Bakış
+Bu modül, Bilgi Merkezi sayfasının ana arayüzünü oluşturan React bileşenini içerir. Kullanıcıya bilgi kaynaklarına erişim sağlayan merkezi sayfanın yapısını ve düzenini tanımlar.
+
+## Fonksiyon Grupları
+### Sayfa Bileşeni
+Bilgi Merkezi sayfasının görsel yapısını ve içerik düzenini tanımlar.
+- HubPage
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### HubPage
+**Ne yapar**: Bu fonksiyon, bir React fonksiyonel bileşeni (Functional Component) olarak tanımlanmıştır ve muhtemelen bilgi merkezi veya bilgi sayfası görünümünü temsil eden bir kullanıcı arayüzü bileşeni döndürür. Dosya yolu `views/knowledge` dizinini işaret ettiğinden, bilgi yönetimi veya dokümantasyonla ilgili bir sayfanın ana gövdesini oluşturur.
+
+**Nasıl yapar**: HubPage, herhangi bir parametre almadan React.FC tipini döndüren bir oklar fonksiyonudur (`def` anahtar kelimesiyle değil, geleneksel `function` veya `const` sözdizimiyle değil; mevcut tanım Python benzeri bir söz diziminde verilmiştir). Gerçek uygulamada JSX/TSX sözdizimi kullanarak bir React bileşeni render eder.
+
+**Parametreler**: Fonksiyon herhangi bir parametre almaz. (Props kullanımı durumunda, alt bileşenler veya çağıran üst bileşen üzerinden props iletilebilir, ancak mevcut tanıma göre parametre seti boştur.)
+
+**Dönüş**: `React.FC` — React tarafından render edilebilen bir fonksiyonel bileşen döndürür. Dönen bileşen, `hub page` olarak adlandırılan sayfanın görsel ve yapısal içeriğini taşır.
+
+---
+
+## TYPE ALIASES
+
+### TopicSlug
+```typescript
+type TopicSlug = typeof TOPIC_SLUGS[number]
+```
+
+---
+
+## SABİTLER
+- **TOPIC_SLUGS** (as_expression) — `['hava-perdesi', 'jet-fan', 'hrv'] as const`
+- **TAGS** (array) — `[
+
+  { key: 'all', labelKey: 'knowledge.tags.all' },
+
+  { key: 'hava-perdesi'...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::HubPage
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook’inden dönen çeviri fonksiyonu, metinleri yerelleştirmek için kullanılır.
+  - `q` — Arama kutusundaki kullanıcı girdisini tutan state değişkeni.
+  - `setQ` — `q` state’ini güncelleyen set fonksiyonu.
+  - `activeTag` — Seçili etiket (veya `'all'`) değerini tutan state değişkeni.
+  - `setActiveTag` — `activeTag` state’ini güncelleyen set fonksiyonu.
+  - `topics` — `TOPIC_SLUGS` listesinden oluşturulan, her bir konu için başlık, özet, okuma süresi ve kategori bilgilerini içeren dizi. `useMemo` ile `t` bağımlılığına göre memoize edilir.
+  - `filtered` — `q` ve `activeTag` değerlerine göre `topics` dizisini filtreleyen dizi. `useMemo` ile `q`, `topics`, `activeTag` bağımlılıklarına göre memoize edilir.
+- **Dönüş**: React element ağacı (JSX) döner; bileşen render edildiğinde UI oluşturur ve yan etkisi yoktur (state ve memoizasyonlar aracılığıyla UI güncellenir).
+
+### [N2_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(TOPIC_SLUGS.map callback)
+- **params**: `slug`
+- **ic_degiskenler**:
+  - `categoryKey` — `slug` değerine göre `'comfort'`, `'safety'` veya `'efficiency'` stringi atanır; kategori çevirisi için kullanılır.
+- **Dönüş**: `{ slug, title, summary, time, category }` nesnesi döner; `title`, `summary`, `time` ve `category` değerleri `t` çeviri fonksiyonu ile oluşturulur.
+
+### [N3_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(filtered useMemo callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `text` — `q` değerinin boşlukları temizlenmiş ve küçük harfe dönüştürülmüş hali.
+- **Dönüş**: `topics.filter` çağrısının sonucu olan, arama metni ve seçili etiket koşullarını sağlayan konu nesnelerinin dizisi.
+
+### [N4_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(topics.filter callback)
+- **params**: `tpc`
+- **ic_degiskenler**:
+  - `matchesText` — `text` boş ise `true`, aksi takdirde `tpc.title` ve `tpc.summary` birleştirilip `text` içinde bulunuyorsa `true`.
+  - `matchesTag` — `activeTag` `'all'` ise `true`, aksi takdirde `tpc.slug` ile `activeTag` eşleşiyorsa `true`.
+- **Dönüş**: `matchesText && matchesTag` boolean ifadesi; filtreleme sonucunu belirler.
+
+### [N5_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(title split map callback)
+- **params**: `part, i`
+- **ic_degiskenler**: (hiçbiri)
+- **Dönüş**: `React.Fragment` içinde `part` ve koşullu virgül/`<br/>` öğeleri döner; başlık metnini parçalar ve formatlar.
+
+### [N6_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(TAGS.map callback)
+- **params**: `tag`
+- **ic_degiskenler**:
+  - `tag.key` — Etiketin benzersiz anahtarı, `setActiveTag` çağrısında kullanılır.
+  - `tag.labelKey` — Çeviri dosyasındaki etiket etiketi anahtarı, `t` ile çevrilir.
+- **Dönüş**: `<button>` JSX öğesi döner; tıklanınca `activeTag` güncellenir ve etiket adı gösterilir.
+
+### [N7_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(filtered.map callback)
+- **params**: `topic, i`
+- **ic_degiskenler**:
+  - `topic.slug` — Konu sayfasına yönlendirme URL’si için kullanılır.
+  - `topic.category` — Konu kategorisi etiketi.
+  - `topic.time` — Okuma süresi etiketi.
+  - `topic.title` — Konu başlığı.
+  - `topic.summary` — Konu özeti.
+- **Dönüş**: `<motion.div>` içinde `<Link>` JSX öğesi döner; konu kartını ve animasyonlarını oluşturur.
+
+---
+
+## NODE ID STANDARD
+
+  file: src\views\knowledge\HubPage.tsx
+  function: src\views\knowledge\HubPage.tsx::HubPage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: HubPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-3xl`, `tracking-hvac-loose`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-500`, `bg-cyan-50`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-gradient-to-b`, `bg-slate-200/50`, `bg-slate-400`, `bg-slate-50`, `bg-slate-900`, `bg-slate-950`, `bg-transparent`, `bg-white`, `bg-white/5`, `border-cyan-500/20`
+- **Layout:** `absolute`, `backdrop-blur-xl`, `block`, `flex`, `flex-wrap`, `from-slate-950/80`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `group-focus-within:opacity-100`, `group-hover:bg-cyan-500/20`, `group-hover:text-cyan-600`
+- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
 
 ---
 # FILE: src\views\knowledge\TopicPage.md

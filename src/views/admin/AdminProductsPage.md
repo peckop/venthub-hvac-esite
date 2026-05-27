@@ -24,7 +24,7 @@ entity_hashes:
   func:toggleSort: 865bfd9d85445d70
   overview: 6edaaf2ebf329de0
   style_tokens: fdfb3c696080e8df
-generated_at: 2026-05-27T12:17:53Z
+generated_at: 2026-05-27T12:24:25Z
 ---
 
 ## Genel Bakış  
@@ -503,15 +503,15 @@ graph TD
     AdminProductsPage_tsx__toggleSelect["toggleSelect"]
     AdminProductsPage_tsx__toggleSelectAll["toggleSelectAll"]
     AdminProductsPage_tsx__toggleSort["toggleSort"]
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__remove
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__remove
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
 ```
 
 ## NODE ID STANDARD
