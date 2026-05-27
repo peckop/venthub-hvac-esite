@@ -2,7 +2,7 @@
 source_dirs: [src]
 master_md: "docs/venthub_hvac_master.md"
 notebook_id: "2aa4fc16-acf6-47c6-90a8-c02fe5bb28f8"
-standalone_files: [README.md, CONTEXT.md, CHANGELOG.md, docs/database_schema_master.md]
+standalone_files: [README.md, CONTEXT.md, CHANGELOG.md, database_schema_master.md]
 skip_dirs: [__pycache__, .git, .agent, .venv, venv, mcp-env, node_modules, tests, .pytest_cache, .ruff_cache, build, dist, egg-info, registry]
 skip_files: [venthub_hvac_master.md, system_tree.md, supabase_functions_master.md, database_schema_master.md, CHANGELOG.md, next-env.d.ts, index.ts, HowItWorks.test.tsx, tokens.d.ts, brand.ts, three-setup.ts, setup.d.ts, env.d.ts, imagetools.d.ts, isomorphic-dompurify.d.ts, vitest-axe.d.ts, iyzico-real.ts]
 
