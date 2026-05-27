@@ -42,7 +42,7 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | Next.js | 15 | App Router, SSR/SSG |
 | React | 19 | UI bileşenler |
 | TypeScript | 5.x | Tip güvenliği |
-| Tailwind CSS | 4.x | Styling |
+| Tailwind CSS | 4.x | Styling, Dynamic Theme Ready (.light/.dark runtime CSS variables) |
 | React Three Fiber | - | 3D görselleştirme |
 | Framer Motion | - | Animasyonlar |
 | Sonner | - | Toast bildirimleri |
@@ -299,6 +299,8 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 | `cc doc tree --nlm-sync --force-sync` | Master birleştirme + NLM upload |
 
 **NotebookLM Digital Twin:** Tüm master MD'ler NLM'e yüklenerek proje hafızası oluşturulur. Notebook ID: `2aa4fc16-acf6-47c6-90a8-c02fe5bb28f8`
+- **Otonom Oturum Yönetimi:** Dokümantasyon eşitlemeleri sırasında oluşabilecek `Authentication expired` hataları, kullanıcı müdahalesi gerekmeksizin otonom olarak `nlm login` + `refresh_auth` mekanizması ile sessizce çözülür.
+- **Supabase Edge Functions Mühürü:** 29 adet Edge Function'ın (`cc doc batch`) dokümanlarının senkronizasyon sırasında NotebookLM'e tam ve eksiksiz aktarılması zorunludur. Bu durum tüm mikroservislerin otonom denetimini garanti eder.
 
 ---
 
@@ -313,6 +315,7 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 7. **i18n-Ready:** Tüm kullanıcıya görünen metinler sözlük dosyalarından gelir
 8. **Webhook Replay Guard:** Tüm webhook'lar (iade/kargo) HMAC doğrulamasına ek olarak zaman damgası (`x-timestamp`) veya idempotency koruması içermelidir (Tekrar oynatma saldırılarına karşı)
 9. **MVVM & Gateway Prensibi:** UI bileşenleri ham veri çekme (fetch/supabase) mantığından izole edilmeli; veri akışları Gateway hook'larına soyutlanmalıdır
+10. **Design Token ve Strict Linter Standardı:** Frontend katmanında arbitrary (bracket içi serbest stil, örn: `w-[92vw]`, `duration-[2000ms]`) stil kullanımı tamamen yasaktır. Proje, `eslint-plugin-tailwindcss` tarafından `tailwindcss/no-arbitrary-value: error` seviyesinde strict olarak korunur. Spacing, elevation shadow, timing, blur ve z-index değerleri `src/design-system/tokens.js` (SSOT) üzerinden yönetilmelidir. Renk tanımlamalarında HEX yerine CSS Custom Property (HSL) token'ları kullanılmalı, çift `:root` tanımlamaları elenmeli ve çalışma zamanı (runtime) tema değişkenleri korunmalıdır.
 
 ---
 
@@ -328,6 +331,6 @@ Bu projede kullanılan Antigravity CLI (`agy.exe`) konuşmalarını isimlendirme
 
 ---
 
-*Son güncelleme: 2026-05-26*
+*Son güncelleme: 2026-05-27*
 
 
