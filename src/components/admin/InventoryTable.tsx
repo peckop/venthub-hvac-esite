@@ -146,7 +146,7 @@ export default function InventoryTable({
     )
 
     return (
-        <div ref={dragScrollRef} className="overflow-x-auto w-full">
+        <div ref={dragScrollRef} className="overflow-x-auto w-full content-auto">
             <table className="w-full min-w-1000px border-separate border-spacing-0">
                 <thead className="sticky top-0 z-10 backdrop-blur-xl">
                     <tr>

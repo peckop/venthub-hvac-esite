@@ -142,7 +142,7 @@ function AdminStockPage() {
           placeholder="Ürün adı veya SKU ile ara"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          className="w-full sm:w-96 pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
+          className="w-full sm:w-96 pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
         />
       </div>
 

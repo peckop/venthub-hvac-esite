@@ -70,7 +70,7 @@ export default function AccountProfilePage() {
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
                     placeholder={t('account.profile.fullNamePlaceholder')}
-                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
+                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
                   />
                 </div>
               </div>
@@ -88,7 +88,7 @@ export default function AccountProfilePage() {
                     value={phone}
                     onChange={e => setPhone(e.target.value.replace(/[^0-9+\s-]/g, ''))}
                     placeholder={t('account.profile.phonePlaceholder')}
-                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors"
+                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
                   />
                 </div>
               </div>

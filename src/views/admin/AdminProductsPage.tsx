@@ -562,7 +562,7 @@ const AdminProductsPage: React.FC = () => {
                       type="checkbox" 
                       checked={rows.length > 0 && selectedIds.size === rows.length} 
                       onChange={toggleSelectAll} 
-                      className="rounded-md border-white/10 bg-white/5 text-cyan-400 focus:ring-cyan-400/30 focus:ring-offset-0 w-4 h-4" 
+                      className="rounded-md border-white/10 bg-white/5 text-cyan-400 focus-visible:ring-cyan-400/30 focus-visible:ring-offset-0 w-4 h-4" 
                     />
                   )}
                 </th>
@@ -656,7 +656,7 @@ const AdminProductsPage: React.FC = () => {
                               type="checkbox" 
                               checked={isSelected} 
                               onChange={() => toggleSelect(r.id)} 
-                              className="rounded-md border-white/10 bg-white/5 text-cyan-400 focus:ring-cyan-400/30 focus:ring-offset-0" 
+                              className="rounded-md border-white/10 bg-white/5 text-cyan-400 focus-visible:ring-cyan-400/30 focus-visible:ring-offset-0" 
                             />
                           )}
                         </td>
@@ -733,7 +733,7 @@ const AdminProductsPage: React.FC = () => {
                                     onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
                                     onBlur={saveInlineEdit}
                                     onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                                    className="w-24 text-right bg-surface-deep border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 font-black"
+                                    className="w-24 text-right bg-surface-deep border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400/10 font-black"
                                   />
                                 </div>
                               ) : (
@@ -763,7 +763,7 @@ const AdminProductsPage: React.FC = () => {
                                     onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
                                     onBlur={saveInlineEdit}
                                     onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                                    className="w-20 text-right bg-surface-deep border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 font-black"
+                                    className="w-20 text-right bg-surface-deep border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400/10 font-black"
                                   />
                                 </div>
                               ) : (

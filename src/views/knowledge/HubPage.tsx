@@ -100,7 +100,7 @@ const HubPage: React.FC = () => {
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t('knowledge.hub.searchPlaceholder')}
                 aria-label={t('knowledge.hub.searchPlaceholder')}
-                className="w-full bg-transparent border-none text-white px-4 py-4 focus:ring-0 placeholder:text-slate-600 text-lg"
+                className="w-full bg-transparent border-none text-white px-4 py-4 focus-visible:ring-0 placeholder:text-slate-600 text-lg"
               />
             </div>
           </div>

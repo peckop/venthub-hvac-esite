@@ -99,7 +99,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                                     value={priceValue}
                                     onChange={(e) => setPriceValue(e.target.value)}
                                     placeholder={priceMode === 'percent' ? 'Örn: 15 (zam) veya -10 (indirim)' : 'Örn: 500 (ekle) veya -200 (düş)'}
-                                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30"
+                                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/30"
                                 />
                                 <button
                                     onClick={() => {

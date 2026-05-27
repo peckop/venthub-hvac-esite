@@ -374,7 +374,7 @@ export default function AccountReturnsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{t('returns.order')}</label>
-                <select value={form.order_id} onChange={e => setForm(s => ({ ...s, order_id: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors">
+                <select value={form.order_id} onChange={e => setForm(s => ({ ...s, order_id: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors">
                   <option value="">{t('returns.selectOrder')}</option>
                   {orders.map(o => (
                     <option key={o.id} value={o.id}>{o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`} • {formatDate(o.created_at, lang)}</option>
@@ -383,20 +383,20 @@ export default function AccountReturnsPage() {
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{t('returns.reason')}</label>
-                <select value={form.reason} onChange={e => setForm(s => ({ ...s, reason: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors">
+                <select value={form.reason} onChange={e => setForm(s => ({ ...s, reason: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors">
                   <option value="">{t('returns.selectReason')}</option>
                   {reasonOptions.map(r => (<option key={r} value={r}>{r}</option>))}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{t('returns.description')}</label>
-                <textarea value={form.description} onChange={e => setForm(s => ({ ...s, description: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-colors resize-none" rows={4} placeholder={t('returns.descriptionPh')} />
+                <textarea value={form.description} onChange={e => setForm(s => ({ ...s, description: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors resize-none" rows={4} placeholder={t('returns.descriptionPh')} />
               </div>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-3">
-              <button onClick={() => setOpenModal(false)} className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200">{t('common.cancel') || 'İptal'}</button>
-              <button onClick={handleCreate} className="h-10 px-5 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-primary-navy/50">{t('returns.submit')}</button>
+              <button onClick={() => setOpenModal(false)} className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200">{t('common.cancel') || 'İptal'}</button>
+              <button onClick={handleCreate} className="h-10 px-5 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-102 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/50">{t('returns.submit')}</button>
             </div>
           </div>
         </div>

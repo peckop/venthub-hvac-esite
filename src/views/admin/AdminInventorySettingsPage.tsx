@@ -152,7 +152,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                   <label className="flex items-start gap-4 p-4 rounded-2xl bg-surface-deep/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
                     <input 
                       type="checkbox" 
-                      className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus:ring-cyan-400/20 transition-colors" 
+                      className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors" 
                       checked={resetAll} 
                       onChange={(e) => setResetAll(e.target.checked)} 
                     />

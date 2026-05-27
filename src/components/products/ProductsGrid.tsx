@@ -64,7 +64,7 @@ const ProductsGrid: React.FC<ProductsGridProps> = ({
               <select 
                 value={sortBy}
                 onChange={(e) => onSortChange(e.target.value)}
-                className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus:ring-primary-ocean/20 transition-colors shadow-sm appearance-none"
+                className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus-visible:ring-primary-ocean/20 transition-colors shadow-sm appearance-none"
                 aria-label={t('category.sort.title') || 'Sıralama'}
               >
                 <option value="name">{t('category.sort.name') || 'İsim'}</option>

@@ -149,20 +149,20 @@ const ContactPage: React.FC = () => {
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">Ad Soyad</label>
-                      <input required type="text" className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus:ring-2 focus:ring-cyan-500 transition-colors" placeholder="John Doe" />
+                      <input required type="text" className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors" placeholder="John Doe" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">E-posta</label>
-                      <input required type="email" className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus:ring-2 focus:ring-cyan-500 transition-colors" placeholder="name@company.com" />
+                      <input required type="email" className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors" placeholder="name@company.com" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">Konu / Proje Adı</label>
-                    <input required type="text" className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus:ring-2 focus:ring-cyan-500 transition-colors" placeholder="Örn: Otopark Jet Fan Projesi" />
+                    <input required type="text" className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors" placeholder="Örn: Otopark Jet Fan Projesi" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">Mesajınız</label>
-                    <textarea required rows={4} className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus:ring-2 focus:ring-cyan-500 transition-colors resize-none" placeholder="İhtiyaçlarınızı buraya yazın..." />
+                    <textarea required rows={4} className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors resize-none" placeholder="İhtiyaçlarınızı buraya yazın..." />
                   </div>
                   <button className="w-full bg-slate-950 text-white py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-transform shadow-xl active:scale-98">
                     Talebi Gönder

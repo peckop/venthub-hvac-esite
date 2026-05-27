@@ -362,7 +362,7 @@ export default function OrderDetailPage() {
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <span className="font-bold text-slate-700">{t('orders.orderId')}</span>
-                      <button onClick={() => handleCopy(order.id)} className="text-xs font-bold text-primary-navy hover:text-secondary-blue transition-colors focus:outline-none">{t('orders.copy')}</button>
+                      <button onClick={() => handleCopy(order.id)} className="text-xs font-bold text-primary-navy hover:text-secondary-blue transition-colors focus-visible:outline-none">{t('orders.copy')}</button>
                     </div>
                     <div className="p-2.5 bg-slate-50 border border-slate-200/60 rounded-lg break-all text-xs font-mono text-slate-500" title={order.id}>{order.id}</div>
                   </div>
@@ -370,7 +370,7 @@ export default function OrderDetailPage() {
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span className="font-bold text-slate-700">{t('orders.conversationId')}</span>
-                        <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs font-bold text-primary-navy hover:text-secondary-blue transition-colors focus:outline-none">{t('orders.copy')}</button>
+                        <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs font-bold text-primary-navy hover:text-secondary-blue transition-colors focus-visible:outline-none">{t('orders.copy')}</button>
                       </div>
                       <div className="p-2.5 bg-slate-50 border border-slate-200/60 rounded-lg break-all text-xs font-mono text-slate-500" title={order.conversation_id}>{order.conversation_id}</div>
                     </div>
@@ -456,7 +456,7 @@ export default function OrderDetailPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-slate-900 break-all">{order.tracking_number || '-'}</span>
                     {order.tracking_number && (
-                      <button onClick={() => handleCopy(order.tracking_number)} className="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-primary-navy hover:bg-primary-navy hover:text-white hover:border-primary-navy transition-shadow shadow-sm focus:outline-none"><Copy size={12} /></button>
+                      <button onClick={() => handleCopy(order.tracking_number)} className="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-primary-navy hover:bg-primary-navy hover:text-white hover:border-primary-navy transition-shadow shadow-sm focus-visible:outline-none"><Copy size={12} /></button>
                     )}
                   </div>
                 </div>

@@ -173,7 +173,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                   onChange={(e) => search.onChange(e.target.value)}
                   placeholder={search.placeholder || _t('admin.toolbar.searchPlaceholder')}
                   aria-label={_t('admin.a11y.search') || 'Ara'}
-                  className="w-full h-11 bg-surface-deep/40 border border-white/20 rounded-xl pl-12 pr-12 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50 transition-colors placeholder:text-slate-600 font-bold shadow-inner"
+                  className="w-full h-11 bg-surface-deep/40 border border-white/20 rounded-xl pl-12 pr-12 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/30 focus-visible:border-cyan-400/50 transition-colors placeholder:text-slate-600 font-bold shadow-inner"
                 />
               </div>
             )}
@@ -207,7 +207,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 onChange={(e) => search.onChange(e.target.value)}
                 placeholder={search.placeholder || _t('admin.toolbar.searchPlaceholder')}
                 aria-label={_t('admin.a11y.search') || 'Ara'}
-                className="w-full h-11 bg-white/3 border border-white/10 rounded-xl pl-12 pr-12 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-colors placeholder:text-slate-600 font-bold"
+                className="w-full h-11 bg-white/3 border border-white/10 rounded-xl pl-12 pr-12 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/20 focus-visible:border-cyan-400/40 transition-colors placeholder:text-slate-600 font-bold"
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-2.5 pointer-events-none group-focus-within:opacity-0 transition-opacity">
                 <kbd className="min-w-5 h-5 flex items-center justify-center rounded border border-white/10 bg-transparent text-xs font-black text-slate-500 font-sans shadow-sm">/</kbd>
@@ -283,7 +283,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 key={ch.key}
                 type="button"
                 onClick={ch.onToggle}
-                className={`px-5 h-10 inline-flex items-center rounded-xl border text-xs font-black uppercase tracking-widest transition-colors ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-cyan-400/20`}
+                className={`px-5 h-10 inline-flex items-center rounded-xl border text-xs font-black uppercase tracking-widest transition-colors ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/20`}
                 title={ch.title || ch.label}
                 aria-pressed={ch.active}
                 aria-label={ch.label}

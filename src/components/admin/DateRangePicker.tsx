@@ -121,7 +121,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
         <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
             <Popover.Trigger asChild>
                 <button
-                    className={`inline-flex items-center gap-2 justify-between bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 transition-shadow w-full sm:w-auto max-w-full ${className}`}
+                    className={`inline-flex items-center gap-2 justify-between bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 transition-shadow w-full sm:w-auto max-w-full ${className}`}
                 >
                     <div className="flex items-center gap-2 text-slate-600">
                         <CalendarIcon size={16} className={value?.from ? 'text-primary-navy' : 'text-slate-400'} />

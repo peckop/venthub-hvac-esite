@@ -146,7 +146,7 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                                     value={selectedThreshold}
                                     onChange={(e) => setSelectedThreshold(e.target.value === '' ? '' : Number(e.target.value))}
                                     placeholder="Değer"
-                                    className="w-full bg-white/3 border border-white/5 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-colors font-bold"
+                                    className="w-full bg-white/3 border border-white/5 rounded-2xl px-5 py-3 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/20 focus-visible:border-cyan-400/40 transition-colors font-bold"
                                 />
                                 <button
                                     disabled={saving}

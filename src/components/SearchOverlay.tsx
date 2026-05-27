@@ -322,7 +322,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         </div>
         <button
           onClick={() => performFullSearch(debounced)}
-          className="w-full text-center py-3 text-sm text-primary-ocean font-medium hover:bg-gray-50 border-t transition-colors focus:bg-air-blue/10 focus:outline-none"
+          className="w-full text-center py-3 text-sm text-primary-ocean font-medium hover:bg-gray-50 border-t transition-colors focus:bg-air-blue/10 focus-visible:outline-none"
         >
           {t('search.allResults')} ("{debounced}")
         </button>
@@ -420,7 +420,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={t('search.placeholder_ai') || t('search.placeholder') || "Ürün, kategori veya AI destekli arama..."}
-              className="flex-1 text-lg placeholder:text-gray-400 focus:outline-none text-industrial-gray bg-transparent font-medium"
+              className="flex-1 text-lg placeholder:text-gray-400 focus-visible:outline-none text-industrial-gray bg-transparent font-medium"
             />
             {loading && (
               <svg className="animate-spin h-5 w-5 text-primary-ocean mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -430,7 +430,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             )}
             <button
               onClick={handleClose}
-              className="px-2.5 py-1.5 text-xs font-bold text-steel-gray bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-slate-900 transition-colors shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
+              className="px-2.5 py-1.5 text-xs font-bold text-steel-gray bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-slate-900 transition-colors shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
               aria-label={t('common.close')}
             >
               ESC

@@ -118,7 +118,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                     <h3 className="text-2xl font-bold text-white transition-colors group-hover:text-cyan-400">
                       {t.items[item.id]?.title}
                     </h3>
-                    <p className="mt-4 text-base leading-relaxed text-slate-400 group-hover:text-slate-300 font-light">
+                    <p className="mt-4 text-base leading-relaxed text-slate-400 group-hover:text-slate-300 font-light prose dark:prose-invert max-w-prose">
                       {t.items[item.id]?.description}
                     </p>
                   </div>

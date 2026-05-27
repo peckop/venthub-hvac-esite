@@ -168,7 +168,7 @@ const AdminAuditLogPage: React.FC = () => {
                   type="date" 
                   value={fromDate} 
                   onChange={(e) => setFromDate(e.target.value)} 
-                  className="bg-transparent text-xs font-bold text-white focus:outline-none placeholder-slate-600 w-24" 
+                  className="bg-transparent text-xs font-bold text-white focus-visible:outline-none placeholder-slate-600 w-24" 
                   title="Başlangıç" 
                 />
               </div>
@@ -179,7 +179,7 @@ const AdminAuditLogPage: React.FC = () => {
                   type="date" 
                   value={toDate} 
                   onChange={(e) => setToDate(e.target.value)} 
-                  className="bg-transparent text-xs font-bold text-white focus:outline-none placeholder-slate-600 w-24" 
+                  className="bg-transparent text-xs font-bold text-white focus-visible:outline-none placeholder-slate-600 w-24" 
                   title="Bitiş" 
                 />
               </div>

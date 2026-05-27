@@ -25,7 +25,7 @@ const btnGhost = `${btnBase} hover:bg-slate-100 hover:text-slate-900`;
 const btnOutline = `${btnBase} border border-slate-200 bg-white shadow-sm hover:bg-slate-100 hover:text-slate-900`;
 const btnSecondary = `${btnBase} bg-slate-100 text-slate-900 shadow-sm hover:bg-slate-100/80`;
 const cardClass = "rounded-xl border border-slate-200 bg-white text-slate-950 shadow";
-const badgeClass = "inline-flex items-center rounded-md border border-slate-200 px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 text-slate-950";
+const badgeClass = "inline-flex items-center rounded-md border border-slate-200 px-2.5 py-0.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 text-slate-950";
 
 interface AuthorityBuilderProps {
   value: AuthorityContent | null;

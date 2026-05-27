@@ -269,7 +269,7 @@ const AdminCouponsPage: React.FC = () => {
                   id="coupon-active" 
                   checked={!!form.active} 
                   onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} 
-                  className="w-4 h-4 rounded border-white/10 bg-slate-800 text-cyan-500 focus:ring-cyan-500/20" 
+                  className="w-4 h-4 rounded border-white/10 bg-slate-800 text-cyan-500 focus-visible:ring-cyan-500/20" 
                 />
                 <label htmlFor="coupon-active" className="text-sm font-medium text-slate-300 cursor-pointer">Aktif</label>
               </div>
