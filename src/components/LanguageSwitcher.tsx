@@ -2,11 +2,13 @@
 
 import React from 'react'
 import { useI18n } from '../i18n/I18nProvider'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import type { Route } from 'next'
 
 const LanguageSwitcher: React.FC = () => {
   const { lang, t } = useI18n()
   const pathname = usePathname()
+  const router = useRouter()
 
   const switchLanguage = (newLang: 'tr' | 'en') => {
     if (lang === newLang) return
@@ -30,8 +32,9 @@ const LanguageSwitcher: React.FC = () => {
       newPath = '/' + newLang + (pathname === '/' ? '' : pathname)
     }
 
-    // Tarayıcı yönlendirmesi kullanarak sunucu ve istemci senkronizasyonunu 100% garanti et
-    window.location.href = newPath
+    // SPA akışını ve pürüzsüzlüğü koruyarak yönlendir ve sunucu cache'ini yenile
+    router.push(newPath as Route)
+    router.refresh()
   }
 
   return (
