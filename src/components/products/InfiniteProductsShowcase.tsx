@@ -219,7 +219,7 @@ const InfiniteProductsShowcase: React.FC<InfiniteProductsShowcaseProps> = ({ ite
     if (!items || items.length === 0) return null
 
     return (
-        <div className="w-full h-550px relative bg-surface-darker overflow-hidden group/canvas content-auto">
+        <div className="w-full h-showcase relative bg-surface-darker overflow-hidden group/canvas content-auto-showcase">
             <Canvas
                 shadows={false}
                 gl={{ 

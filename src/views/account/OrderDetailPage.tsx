@@ -73,7 +73,7 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push(Routes.auth.login(`/account/orders/detail?id=${id}`))
+      router.push(Routes.auth.login(Routes.account.orderDetail(id)))
       return
     }
   }, [authLoading, user, id, router])
@@ -266,7 +266,7 @@ export default function OrderDetailPage() {
   return (
     <div className="min-h-screen bg-clean-white py-8">
       <div className="max-w-5xl mx-auto px-4">
-        <button className="mb-4 inline-flex items-center text-steel-gray hover:text-primary-navy text-sm" onClick={() => router.push('/account/orders')}><ArrowLeft size={18} className="mr-1" />{t('auth.back')}</button>
+        <button className="mb-4 inline-flex items-center text-steel-gray hover:text-primary-navy text-sm" onClick={() => router.push(Routes.account.orders())}><ArrowLeft size={18} className="mr-1" />{t('auth.back')}</button>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 mb-6">
           <div className="flex items-center justify-between border-b border-gray-100 pb-6 mb-6">
@@ -293,7 +293,7 @@ export default function OrderDetailPage() {
               {order.payment_status?.toLowerCase() === 'partial_refunded' && (
                 <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
               )}
-              <button onClick={() => router.push(`/account/returns?new=${order.id}`)} className="h-10 px-4 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-transform hover:scale-102 shadow-sm">{t('returns.requestReturn')}</button>
+              <button onClick={() => router.push(Routes.account.returns(order.id))} className="h-10 px-4 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-transform hover:scale-102 shadow-sm">{t('returns.requestReturn')}</button>
               <button onClick={() => handleReorder(order)} className="h-10 px-4 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 flex items-center gap-2 transition-transform hover:scale-102"><RefreshCcw size={16} />{t('orders.reorder')}</button>
             </div>
           </div>

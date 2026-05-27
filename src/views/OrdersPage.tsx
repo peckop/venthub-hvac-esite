@@ -301,7 +301,7 @@ const OrdersPage: React.FC = () => {
               {t('orders.noOrdersDesc')}
             </p>
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push(Routes.home())}
               className="bg-primary-navy hover:bg-industrial-gray text-white font-bold h-10 px-6 rounded-lg shadow-sm shadow-primary-navy/20 transition-colors inline-flex items-center justify-center"
             >
               {t('orders.exploreProducts')}
@@ -370,7 +370,7 @@ const OrdersPage: React.FC = () => {
                         </span>
                       )}
                       <button
-                        onClick={() => router.push(`/account/orders/detail?id=${order.id}`)}
+                        onClick={() => router.push(Routes.account.orderDetail(order.id))}
                         className="flex items-center space-x-1 bg-slate-50 hover:bg-slate-100 text-primary-navy border border-slate-200 h-10 px-4 rounded-lg text-sm font-bold shadow-sm transition-transform hover:scale-102"
                       >
                         <Eye size={16} />

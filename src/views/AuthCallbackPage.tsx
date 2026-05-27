@@ -36,7 +36,7 @@ const AuthCallbackPage: React.FC = () => {
               setMessage('E-posta başarıyla doğrulandı! Anasayfaya yönlendiriliyorsunuz...')
               toast.success('E-posta başarıyla doğrulandı!')
               setTimeout(() => {
-                router.push('/')
+                router.push(Routes.home())
               }, 2000)
               return
             }
@@ -59,7 +59,7 @@ const AuthCallbackPage: React.FC = () => {
             toast.success('E-posta başarıyla doğrulandı!')
             // Successfully signed in, redirect to app
             setTimeout(() => {
-              router.push('/')
+              router.push(Routes.home())
             }, 2000)
             return
           }

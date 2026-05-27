@@ -4,6 +4,7 @@ import { Routes } from '../../utils/routes'
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import type { Route } from 'next'
 import { 
   getProductBySlugOrId, 
   getProductsEnriched, 
@@ -275,7 +276,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
         <div className="text-center">
           <h1 className="text-xl font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1>
-          <Link href="/" className="text-primary-navy hover:text-secondary-blue font-bold text-sm uppercase tracking-widest">
+          <Link href={"/" as Route} className="text-primary-navy hover:text-secondary-blue font-bold text-sm uppercase tracking-widest">
             {t('pdp.backHome')}
           </Link>
         </div>
@@ -294,7 +295,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       <div className="relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
           <nav className="flex items-center space-x-2 text-xs sm:text-xs uppercase tracking-widest font-bold text-steel-gray/60">
-            <Link href="/" className="hover:text-primary-navy transition-colors">
+            <Link href={"/" as Route} className="hover:text-primary-navy transition-colors">
               {t('category.breadcrumbHome')}
             </Link>
             <ChevronRight size={10} className="flex-shrink-0" />

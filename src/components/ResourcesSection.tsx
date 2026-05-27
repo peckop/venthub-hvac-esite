@@ -8,10 +8,10 @@ import { Routes } from '../utils/routes';
 const ResourcesSection: React.FC = () => {
   const { t } = useI18n()
   const items = [
-    { title: t('resources.items.jetFan'), href: '/destek/konular/jet-fan', icon: 'book' },
-    { title: t('resources.items.airCurtain'), href: '/destek/konular/hava-perdesi', icon: 'file' },
-    { title: t('resources.items.hrv'), href: '/destek/konular/hrv', icon: 'book' },
-  ] as const
+    { title: t('resources.items.jetFan'), href: Routes.destek.konular('jet-fan'), icon: 'book' },
+    { title: t('resources.items.airCurtain'), href: Routes.destek.konular('hava-perdesi'), icon: 'file' },
+    { title: t('resources.items.hrv'), href: Routes.destek.konular('hrv'), icon: 'book' },
+  ]
 
   return (
     <section className="py-12 bg-gradient-to-br from-gray-50 to-white">

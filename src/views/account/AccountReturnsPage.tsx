@@ -5,6 +5,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatDate } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { Routes } from '../../utils/routes'
 import { Clock, CheckCircle, XCircle, Truck, Package, RefreshCw, Filter } from 'lucide-react'
 
 interface ReturnRow {
@@ -140,7 +141,7 @@ export default function AccountReturnsPage() {
         .select('id, order_id, reason, description, status, created_at')
         .order('created_at', { ascending: false })
       setRows((list || []) as ReturnRow[])
-      router.push('/account/returns')
+      router.push(Routes.account.returns())
     } catch (e) {
       console.error(e)
       toast.error(t('returns.createError'))
@@ -280,7 +281,7 @@ export default function AccountReturnsPage() {
                     </div>
                     <div>
                       <button
-                        onClick={() => router.push(`/account/orders/detail?id=${r.order_id}`)}
+                        onClick={() => router.push(Routes.account.orderDetail(r.order_id))}
                         className="text-lg font-bold text-slate-900 hover:text-primary-navy transition-colors"
                       >
                         Sipariş {code}

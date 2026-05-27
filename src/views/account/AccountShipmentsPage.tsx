@@ -5,6 +5,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDate as formatOnlyDate } from '../../i18n/datetime'
 import { useRouter } from 'next/navigation'
+import { Routes } from '../../utils/routes'
 import { Truck, Package, Copy, ExternalLink, CheckCircle, Clock, MapPin } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -211,7 +212,7 @@ export default function AccountShipmentsPage() {
           <h3 className="text-lg font-bold text-slate-900 mb-1">Henüz kargo bilgisi yok</h3>
           <p className="text-sm text-slate-500 mb-6">{t('orders.noShippingInfo') || 'Siparişlerinize kargo bilgisi eklendiğinde burada görünecektir.'}</p>
           <button
-            onClick={() => router.push('/account/orders')}
+            onClick={() => router.push(Routes.account.orders())}
             className="h-10 px-6 bg-primary-navy hover:bg-industrial-gray text-white font-bold rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-102 inline-flex items-center gap-2"
           >
             <Package size={16} /> {t('account.shipments.goToOrders')}
@@ -239,7 +240,7 @@ export default function AccountShipmentsPage() {
                       </div>
                       <div>
                         <button
-                          onClick={() => router.push(`/account/orders/detail?id=${o.id}`)}
+                          onClick={() => router.push(Routes.account.orderDetail(o.id))}
                           className="text-base font-bold text-slate-900 hover:text-primary-navy transition-colors"
                         >
                           Sipariş {orderCode}
@@ -250,7 +251,7 @@ export default function AccountShipmentsPage() {
                     <div className="flex items-center gap-3">
                       {getShipStatusBadge(shipStatus)}
                       <button
-                        onClick={() => router.push(`/account/orders/detail?id=${o.id}`)}
+                        onClick={() => router.push(Routes.account.orderDetail(o.id))}
                         className="h-8 px-3 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 hover:border-primary-navy hover:text-primary-navy rounded-lg transition-shadow shadow-sm"
                       >
                         Detay

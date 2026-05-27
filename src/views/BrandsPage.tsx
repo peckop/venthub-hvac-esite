@@ -8,6 +8,7 @@ import Image from 'next/image'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
+import { Routes } from '../utils/routes'
 
 /**
  * BrandsPage - Premium "Markalar" sayfası
@@ -59,7 +60,7 @@ const BrandsPage: React.FC = () => {
                 style={scrollAnimationClasses.staggerChild(index)}
               >
                 <Link
-                  href={`/brands/${brand.slug}`}
+                  href={Routes.brand(brand.slug)}
                   aria-label={`${t('brands.aboutBrand')} ${brand.name}`}
                   className="group block relative h-full rounded-hvac-2xl border border-slate-100 bg-white p-10 transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-hvac-card-hover"
                 >

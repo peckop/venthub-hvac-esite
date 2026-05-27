@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useContext, useMemo, useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import React, { useContext, useMemo, useState, useEffect } from 'react'
 import { en } from './dictionaries/en'
 import { tr } from './dictionaries/tr'
 
@@ -40,28 +39,29 @@ function interpolate(str: string, params?: Record<string, unknown>): string {
   })
 }
 
-/**
- * URL'deki lang parametresini izleyen yardımcı bileşen.
- * useSearchParams() kullandığı için Suspense içinde tutulmalıdır.
- */
-function LanguageUrlWatcher({ onLangChange }: { onLangChange: (l: Lang) => void }) {
-  const searchParams = useSearchParams()
-  
-  useEffect(() => {
-    const fromUrl = searchParams?.get('lang')
-    if (fromUrl === 'tr' || fromUrl === 'en') {
-      onLangChange(fromUrl as Lang)
-    }
-  }, [searchParams, onLangChange])
-
-  return null
+interface I18nProviderProps {
+  children: React.ReactNode
+  lang?: Lang
+  dictionary?: AppDictionary
 }
 
-export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [lang, setLangState] = useState<Lang>('tr')
+export const I18nProvider: React.FC<I18nProviderProps> = ({ 
+  children, 
+  lang: initialLang, 
+  dictionary 
+}) => {
+  const [lang, setLangState] = useState<Lang>(initialLang || 'tr')
 
-  // Initial detection on mount (Client-side only)
+  // Sync state if initialLang prop changes
   useEffect(() => {
+    if (initialLang) {
+      setLangState(initialLang)
+    }
+  }, [initialLang])
+
+  // Initial detection on mount (Client-side only fallback if no initialLang)
+  useEffect(() => {
+    if (initialLang) return
     try {
       const saved = localStorage.getItem('lang')
       if (saved === 'tr' || saved === 'en') {
@@ -73,7 +73,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       setLangState('tr')
     }
-  }, [])
+  }, [initialLang])
 
   useEffect(() => {
     try { 
@@ -89,21 +89,19 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const t = useMemo(() => {
     return (key: string, paramsOrAlt?: Record<string, unknown> | string) => {
-      const translation = get(DICTS[lang], key)
+      const currentDict = dictionary || (DICTS[lang] as AppDictionary)
+      const translation = get(currentDict as unknown as Dict, key)
       const hasTranslation = translation !== key
       if (!hasTranslation && typeof paramsOrAlt === 'string') return paramsOrAlt
       return interpolate(translation, typeof paramsOrAlt === 'object' ? paramsOrAlt : undefined)
     }
-  }, [lang])
+  }, [lang, dictionary])
 
-  const dict = useMemo(() => DICTS[lang] as AppDictionary, [lang])
+  const dict = useMemo(() => dictionary || (DICTS[lang] as AppDictionary), [lang, dictionary])
   const value = useMemo(() => ({ lang, setLang, t, dict }), [lang, setLang, t, dict])
 
   return (
     <I18nContext.Provider value={value}>
-      <Suspense fallback={null}>
-        <LanguageUrlWatcher onLangChange={setLang} />
-      </Suspense>
       {children}
     </I18nContext.Provider>
   )

@@ -258,7 +258,7 @@ export default function AccountOverviewPage() {
                 </div>
 
                 <div className="mt-8 flex justify-center">
-                  <button onClick={() => router.push('/account/shipments')} className="h-10 px-6 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 hover:border-primary-navy hover:text-primary-navy transition-shadow shadow-sm">
+                  <button onClick={() => router.push(Routes.account.shipments())} className="h-10 px-6 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 hover:border-primary-navy hover:text-primary-navy transition-shadow shadow-sm">
                     Tüm Kargoları Görüntüle
                   </button>
                 </div>
@@ -271,7 +271,7 @@ export default function AccountOverviewPage() {
                 <p className="text-sm font-medium text-slate-500 max-w-sm">
                   Aktif bir teslimatınız yok. Yeni bir sipariş verdiğinizde kargo süreçlerini buradan canlı olarak izleyebilirsiniz.
                 </p>
-                <button onClick={() => router.push('/products')} className="mt-6 h-10 px-6 rounded-xl bg-primary-navy text-white text-sm font-bold hover:bg-industrial-gray transition-colors shadow-sm shadow-primary-navy/20">
+                <button onClick={() => router.push(Routes.products())} className="mt-6 h-10 px-6 rounded-xl bg-primary-navy text-white text-sm font-bold hover:bg-industrial-gray transition-colors shadow-sm shadow-primary-navy/20">
                   Kataloğu İncele
                 </button>
               </div>
@@ -308,7 +308,7 @@ export default function AccountOverviewPage() {
                           <Package size={20} />
                         </div>
                         <div>
-                          <Link href={`/account/orders/detail?id=${o.id}`} className="text-base font-bold text-slate-900 hover:text-primary-navy transition-colors">
+                          <Link href={Routes.account.orderDetail(o.id)} className="text-base font-bold text-slate-900 hover:text-primary-navy transition-colors">
                             Sipariş {code}
                           </Link>
                           <div className="flex items-center gap-2 mt-1">
@@ -321,7 +321,7 @@ export default function AccountOverviewPage() {
 
                       <div className="flex items-center gap-3 self-start sm:self-auto ml-16 sm:ml-0">
                         {activeShipStatusBadge(getShipStatus(o))}
-                        <button onClick={() => router.push(`/account/orders/detail?id=${o.id}`)} className="w-9 h-9 rounded-xl flex items-center justify-center bg-white border border-slate-200 text-slate-400 hover:text-primary-navy hover:border-primary-navy transition-colors shadow-sm">
+                        <button onClick={() => router.push(Routes.account.orderDetail(o.id))} className="w-9 h-9 rounded-xl flex items-center justify-center bg-white border border-slate-200 text-slate-400 hover:text-primary-navy hover:border-primary-navy transition-colors shadow-sm">
                           <ArrowRight size={16} />
                         </button>
                       </div>
@@ -371,7 +371,7 @@ export default function AccountOverviewPage() {
                 </div>
               </div>
 
-              <button onClick={() => router.push('/account/addresses')} className="w-full mt-6 h-10 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-shadow shadow-sm">
+              <button onClick={() => router.push(Routes.account.addresses())} className="w-full mt-6 h-10 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-shadow shadow-sm">
                 Adresleri Yönet
               </button>
             </div>
@@ -391,7 +391,7 @@ export default function AccountOverviewPage() {
                 Şifrenizi, 2FA ayarlarınızı ve oturum bilgilerinizi güvenli bir şekilde yönetin.
               </p>
 
-              <button onClick={() => router.push('/account/security')} className="w-full h-11 rounded-xl bg-white text-slate-900 border border-transparent hover:bg-slate-100 text-sm font-bold flex items-center justify-center gap-2 transition-colors">
+              <button onClick={() => router.push(Routes.account.security())} className="w-full h-11 rounded-xl bg-white text-slate-900 border border-transparent hover:bg-slate-100 text-sm font-bold flex items-center justify-center gap-2 transition-colors">
                 Göz At <ArrowRight size={16} />
               </button>
             </div>
