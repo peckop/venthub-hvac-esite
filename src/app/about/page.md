@@ -4,15 +4,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\about\page.tsx
 skeleton_hash: e96bf4d40e2325e9
-generated_at: 2026-05-23T21:47:04Z
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 8871c1e7b993cf8e
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:13Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın "Hakkında" sayfasını oluşturan tek bir React bileşeni olan `Page` fonksiyonunu barındırır. Bu bileşen sayfa içeriğini döndürerek kullanıcıya statik bilgiler sunar.
+`src/app/about/page.tsx` modülü, uygulamanın “Hakkında” (About) sayfasını oluşturan tek bir React fonksiyonel bileşeni içerir. `Page` fonksiyonu, Next.js tarafından `/about` rotası ziyaret edildiğinde çağrılır ve statik içerik sağlayan JSX ağacını döndürür. Modülün tek sorumluluğu, bu sayfanın render edilmesini sağlamaktır.
 
 ## Fonksiyon Grupları
 ### Sayfa Renderlama
-Bu grup, "Hakkında" sayfasının JSX yapısını üreten tek bir fonksiyondan oluşur.
+Bu grup, “Hakkında” sayfasının kullanıcıya sunulacak JSX yapısını üreten tek bileşeni kapsar.  
 - Page
 
 ---
@@ -22,23 +26,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Bu fonksiyon, `venthub-hvac` uygulamasının `/about` (Hakkımızda) sayfasının ana görünümünü temsil eder. Kullanıcı bu rotayı ziyaret ettiğinde Next.js tarafından çağrılır ve sayfanın içeriğini oluşturur. Statik bir bilgilendirme sayfası olarak hizmet verir.
-**Nasıl yapar**: Standart bir React fonksiyonel bileşeni olarak çalışır. JSX (TypeScript) kullanarak sayfa düzenini, metinleri ve olası alt bileşenleri tanımlar ve render eder. Herhangi bir prop veya parametre almadığı için, içeriği tamamen bileşenin kendi kodunda tanımlıdır ve dışarıdan gelen verilere bağımlı değildir.
-**Parametreler**:
-- (Bu fonksiyon herhangi bir parametre almaz.)
-**Dönüş**: `React.ReactElement` — Sayfayı temsil eden bir JSX öğesi döndürür. Dönüş tipi `PageComponent` olarak işaretlenmiştir, bu da Next.js App Router'ın beklediği standart bir bileşen formatıdır.
+**Ne yapar**: `Page` fonksiyonu, uygulamanın "Hakkında" sayfasını temsil eden bir React bileşenidir. Sayfa içeriğini oluşturmak üzere `PageComponent` adlı başka bir bileşeni döndürür.
+**Nasıl yapar**: Herhangi bir işlem veya state yönetimi içermeden doğrudan `PageComponent` bileşenini JSX formatında return eder. Bu, üst düzey bir sayfa bileşeni olarak içeriği sarmalar.
+**Parametreler**: Yok
+**Dönüş**: `JSX.Element` — `<PageComponent />` şeklinde JSX ifadesi döndürür. Bu ifade, React tarafından render edilebilir bir sanal DOM öğesidir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\about\page.tsx::Page  
-- **params**: yok  
-- **ic_degiskenler**: yok  
-- **Dönüş**: JSX element (`<PageComponent />`)
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\about\page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element (React bileşeni `<PageComponent />` döndürür)
 
 ---
 
@@ -51,3 +54,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

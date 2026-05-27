@@ -8,8 +8,8 @@ entity_hashes:
   func:QuickViewModal: debc62013d59b5ee
   func:handleAdd: 552a96581034d630
   overview: 3c7154223e99d479
-  style_tokens: a984258a010d174d
-generated_at: 2026-05-27T11:49:22Z
+  style_tokens: a0d16d1087294b08
+generated_at: 2026-05-27T18:09:18Z
 ---
 
 ## Genel Bakış
@@ -109,6 +109,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/40`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-2`, `border-b`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `text-2xl`, `text-6xl`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-secondary-blue/30`
+- **Renkler:** `bg-black/40`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-2`, `border-b`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `hover:bg-light-gray`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-white`, `text-2xl`, `text-6xl`
 - **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `from-air-blue`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `line-clamp-2`, `line-clamp-4`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `aspect-square`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-semibold`, `inset-0`, `mb-1`, `mb-2`, `mb-4`, `mb-6`, `mr-2`, `mt-auto`, `px-4`

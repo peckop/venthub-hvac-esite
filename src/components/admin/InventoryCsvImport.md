@@ -7,8 +7,8 @@ skeleton_hash: b3421236e71cdedd
 entity_hashes:
   func:InventoryCsvImport: bba4310bb8e97324
   overview: 618d3c1361b05bd5
-  style_tokens: bdc03fc662abeb30
-generated_at: 2026-05-27T11:46:08Z
+  style_tokens: 3e4e1345adb17abc
+generated_at: 2026-05-27T18:10:41Z
 ---
 
 ## Genel Bakış
@@ -99,99 +99,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::processCsv
-- **params**: `()`
-- **ic_degiskenler**:
-  - `skus` — `csvPreview` içindeki tüm `sku` değerlerinin dizisi.
-  - `products` — Supabase’dan çekilen ürün kayıtları (`id, sku`).
-  - `skuToId` — `sku` → `id` haritası.
-  - `dryRun` — dışarıdan gelen boolean; kuru çalıştırma kontrolü.
-  - `successCount` — başarılı stok güncellemelerinin sayacı.
-  - `errors` — `{ sku, message }` hataları tutan dizi.
-  - `batchId` — `generateId()` ile oluşturulan işlem grubu kimliği.
-  - `BATCH_SIZE` — aynı anda işlenecek maksimum satır sayısı (20).
-  - `chunk` — `csvPreview` dilimlenmiş parça.
-  - `_productId` — `skuToId` haritasından elde edilen ürün kimliği.
-  - `reason` — RPC çağrısı için oluşturulan açıklama metni.
-  - `error` — `supabase.rpc('adjust_stock', …)` sonucundaki hata nesnesi.
-  - `logAdminAction` — dinamik import ile alınan denetim kaydı fonksiyonu.
-  - `downloadErrors` — hataları CSV olarak indiren yardımcı fonksiyon.
-- **Dönüş**: yok (yan etkileri: `setCsvProcessing`, `setCsvProgress`, `toast` bildirimleri, `onClose`, `onSuccess`, `downloadErrors`)
-
----
-
-### [N3_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::updateItem
-- **params**: `(item)`
-- **ic_degiskenler**:
-  - `_productId` — `skuToId.get(item.sku)` ile elde edilen ürün kimliği.
-  - `reason` — `CSV import: add/remove <delta>` biçiminde açıklama.
-  - `error` — `supabase.rpc('adjust_stock', …)` sonucundaki hata.
-  - `logAdminAction` — dinamik import ile alınan denetim kaydı fonksiyonu.
-- **Dönüş**: yok (yan etkileri: stok güncelleme, denetim kaydı, `successCount` artırma, `errors` dizisine ekleme)
-
----
-
-### [N4_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::downloadErrors
-- **params**: `()`
-- **ic_degiskenler**:
-  - `header` — CSV başlık satırı `['sku','message']`.
-  - `lines` — `errors` dizisinden oluşturulan CSV satırları.
-  - `csv` — UTF‑8 BOM ile birleştirilmiş tam CSV metni.
-  - `blob` — `csv` içeriğiyle oluşturulan `Blob` nesnesi.
-  - `url` — `URL.createObjectURL(blob)` ile elde edilen geçici URL.
-  - `a` — indirme linki olarak kullanılan `HTMLAnchorElement`.
-- **Dönüş**: yok (yan etkileri: dosya indirme tetikleme)
-
----
-
-### [N5_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::toastContent
-- **params**: `(t)`
-- **ic_degiskenler**:
-  - `successCount` — işlem sonunda güncellenen ürün sayısı (üst kapsamdan).
-  - `batchId` — işlem grubu kimliği (üst kapsamdan).
-  - `errors` — hata listesi (üst kapsamdan).
-  - `downloadErrors` — hata indirme fonksiyonu (üst kapsamdan).
-- **Dönüş**: JSX element (toast içinde gösterilen özel içerik)
-
----
-
-### [N6_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::undoHandler
-- **params**: `()`
-- **ic_degiskenler**:
-  - `csvUndoingRef` — geri alma işleminin çalışıp çalışmadığını izleyen `useRef` değeri.
-  - `batchId` — geri alınacak işlem grubu kimliği (üst kapsamdan).
-  - `data` — `supabase.rpc('reverse_inventory_batch', …)` sonucundaki veri.
-  - `error` — RPC çağrısındaki hata.
-  - `undone` — geri alınan hareket sayısı (`Number(data || 0)`).
-- **Dönüş**: yok (yan etkileri: `toast` bildirimleri, `onSuccess`, `csvUndoingRef` güncellemesi)
-
----
-
-### [N7_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::onFileChange
-- **params**: `(e)`
-- **ic_degiskenler**:
-  - `file` — `e.target.files?.[0]` ile seçilen dosya.
-- **Dönüş**: yok (yan etkileri: `handleCsvImport(file)` çağrısı)
-
----
-
-### [N8_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::onKeyToggle
-- **params**: `(e)`
-- **ic_degiskenler**:
-  - `e.key` — basılan tuşun adı.
-- **Dönüş**: yok (yan etkileri: `setDryRun(!dryRun)` ile kuru‑çalıştırma durumunu değiştirir)
-
----
-
-### [N9_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::renderRow
-- **params**: `(item, idx)`
-- **ic_degiskenler**:
-  - `item` — `CsvPreviewRow` nesnesi (sku, name, current, new, delta, status).
-  - `idx` — satırın indeks numarası (React `key` için).
-- **Dönüş**: JSX `<tr>` elementi (tablo satırı)
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\admin\InventoryCsvImport.tsx
@@ -214,5 +121,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-amber-400`, `bg-black/60`, `bg-cyan-400`, `bg-rose-500/20`, `bg-surface-deep/20`, `bg-surface-midnight`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/2`, `bg-white/5`, `border-2`, `border-b`, `border-dashed`, `border-none`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-cyan-400`, `group-hover:scale-110`, `group-hover:text-slate-300`, `group-hover:text-surface-deep`
-- **Responsive:** (yok)
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `h-10`, `h-12`, `h-16`, `h-3`
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `group-hover:`, `group-last:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${dryRun`, `${item.delta`, `0`, `:`, `>`, `animate-in`, `animate-spin`, `border`, `cursor-default`, `cursor-pointer`, `decoration-cyan-400/30`, `disabled:opacity-30`, `duration-300`, `fade-in`, `focus-visible:ring-2`

@@ -8,8 +8,8 @@ entity_hashes:
   func:AdminInventoryPage: 66c4abfcbc4634eb
   func:fetchData: 3334aa9b134a3cd8
   overview: 2651cee931ba15f0
-  style_tokens: 162ca5315152734a
-generated_at: 2026-05-27T11:55:43Z
+  style_tokens: 6c71c306ec3450e6
+generated_at: 2026-05-27T18:30:47Z
 ---
 
 ## Genel Bakış
@@ -116,6 +116,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gray-50`, `bg-primary-navy`, `bg-white`, `border-gray-200`, `border-light-gray`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-white`
+- **Renkler:** `bg-gray-50`, `bg-primary-navy`, `bg-white`, `border-gray-200`, `border-light-gray`, `hover:text-primary-navy`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-white`
 - **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `items-center`, `justify-between`, `left-3`, `md:flex-row`, `md:items-center`, `p-2`, `p-4`, `relative`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `-translate-y-1/2`, `animate-fadeIn`, `animate-spin`, `border`, `focus-visible:outline-none`, `font-bold`, `mb-4`, `mx-auto`, `pl-10`, `pr-4`, `px-3`, `px-4`, `py-2`, `py-20`, `rounded-lg`

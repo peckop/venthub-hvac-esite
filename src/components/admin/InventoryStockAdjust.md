@@ -7,8 +7,8 @@ skeleton_hash: 257f3a60c6c02a8b
 entity_hashes:
   func:InventoryStockAdjust: 140b16e336bb5af7
   overview: 3b1f0525645c9b2f
-  style_tokens: da9bb6cd4c8234cf
-generated_at: 2026-05-27T11:41:58Z
+  style_tokens: 333546eed756e72e
+generated_at: 2026-05-27T18:10:46Z
 ---
 
 ## Genel Bakış
@@ -111,6 +111,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/3`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-sm`, `text-white`, `text-xs`
+- **Renkler:** `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/3`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `focus-visible:border-cyan-400/40`, `hover:bg-emerald-500/20`, `hover:bg-rose-500/20`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-sm`, `text-white`, `text-xs`
 - **Layout:** `flex`, `flex-1`, `gap-3`, `h-12`, `items-center`, `w-24`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `border`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `ml-1`, `px-4`, `py-3`, `rounded-2xl`, `space-y-4`, `tracking-widest`, `transition-colors`, `transition-opacity`

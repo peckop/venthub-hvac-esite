@@ -4,38 +4,50 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryShowcase.tsx
 skeleton_hash: bba0312a82b87d24
-generated_at: 2026-05-23T21:58:31Z
+entity_hashes:
+  func:CategoryShowcase: 27f451ff64c2aa4f
+  overview: 7308f814cbfe1bd6
+  style_tokens: 74c7a2fe586c3948
+generated_at: 2026-05-27T18:14:23Z
 ---
 
 ## Genel Bakış
-Bu modül, bir kategori ve onun alt kategorilerini görsel olarak sergilemek için kullanılan bir React bileşenidir. `CategoryShowcase` fonksiyonu, verilen kategori bilgilerini alarak kullanıcı arayüzünde kategori kartı ve alt kategori listesi gibi öğeleri renderlar.
+`CategoryShowcase` modülü, bir kategori ve ona bağlı alt‑kategorileri görsel bir vitrin içinde sunan bir React bileşenidir. Gelen `category`, `subCategories` ve `parentCategory` prop’larını alır, bunları UI öğelerine dönüştürerek kategori kartı, alt‑kategori listesi ve gerektiğinde üst‑kategori navigasyonu oluşturur.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-Kategori gösterimini oluşturan ve dışarıdan gelen verileri UI elemanlarına dönüştüren temel işlevi yerine getirir.
+### Ana Bileşen – UI Oluşturma
+Bu grup, dışarıdan sağlanan veri prop’larını alıp kullanıcı arayüzüne yansıtan temel sorumluluğu taşır. Bileşen, prop’ları ayrıştırır, kategori başlığı, görseli ve açıklamasını gösterir, alt‑kategorileri haritalayarak kart veya bağlantı listesi üretir ve varsa üst‑kategoriye yönlendiren bir geri‑bağlantı ekler.  
 - CategoryShowcase
+
+*Fonksiyon İlişkileri:* `CategoryShowcase` tek başına çalışır; aynı modül içinde başka bir fonksiyonu çağırmaz.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modülün doğru çalışması için gerekli props sağlanmalıdır.
 
-[Aksiyom 1]: Eğer `category` prop'u sağlanmazsa, bileşen kategori bilgilerini render edemez ve hata veya boş görüntü oluşabilir.  
-[Aksiyom 2]: Eğer `subCategories` prop'u sağlanmazsa, alt kategori listesi gösterilemez veya boş liste gibi davranabilir.  
-[Aksiyom 3]: Eğer `parentCategory` prop'u sağlanmazsa, üst kategori navigasyonu veya breadcrumb gösterilemez.
+[Aksiyom 1]: Eğer `category` prop'u yoksa, bileşen kategori bilgilerini render edemez ve hata veya boş görüntü oluşabilir.  
+[Aksiyom 2]: Eğer `subCategories` prop'u yoksa, alt kategori listesi gösterilemez veya boş liste görünebilir.  
+[Aksiyom 3]: Eğer `parentCategory` prop'u yoksa, bileşen üst kategori bağlamını kullanamayacak ve ilgili UI öğeleri (örn. geri navigasyon, başlık) eksik görünebilir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryShowcase
-**Ne yapar**: Verilen kategori, onun alt kategorileri ve üst kategori bilgilerini alarak bu verileri kullanıcı arayüzünde görsel bir vitrin olarak render eder.  
-**Nasıl yapar**: Props olarak gelen `category`, `subCategories` ve `parentCategory` nesnelerini destructure eder; ardından kategori başlığını, görselini ve açıklamasını gösterir, `subCategories` listesini harita ederek her bir alt kategori için bir kart veya bağlantı oluşturur ve eğer `parentCategory` mevcutsa ona yönlendiren bir geri bağlantı ekler. Sonuç olarak JSX döndürerek React bileşeni olarak işlev görür.  
+**Ne yapar**:  
+Kategori gösterimini sağlayan bir React bileşeni oluşturur. Bu bileşen, üst kategori bilgisi, alt kategoriler ve ilgili kategori verilerini alarak, kullanıcıya görsel olarak çekici bir kategori galerisini sunar.  
+
+**Nasıl yapar**:  
+Fonksiyon, `CategoryShowcaseProps` tipinde bir nesne alır ve bu nesnenin `category`, `subCategories` ve `parentCategory` alanlarını kullanarak JSX döndürür. İçerik, kategori başlığı, açıklama, görsel ve alt kategori bağlantıları gibi öğeleri içerir. Bileşen, stil ve layout için CSS sınıfları veya stil bileşenleri kullanır.  
+
 **Parametreler**:
-- category: object — Gösterilecek ana kategorinin verilerini içerir (id, ad, görsel, açıklama gibi alanlar).
-- subCategories: array — Ana kategoriye ait alt kategorilerin listesi; her eleman genellikle bir kategori nesnesidir ve UI içinde kart veya bağlantı olarak render edilir.
-- parentCategory: object | null — Eğer kategori bir hiyerarşinin parçasıysa üst kategori bilgilerini taşır; null değeri üst kategori yoktur anlamına gelir ve bu durumda geri bağlantı gösterilmez.
-**Dönüş**: React.FC — JSX elementi döndüren bir fonksiyonel React bileşeni; render çıktısı kategori vitrini olarak ekrana basılır.
+- category: object — Gösterilecek ana kategori bilgilerini içerir (örneğin, ad, açıklama, görsel URL).
+- subCategories: array — Ana kategoriye ait alt kategorilerin listesini tutar; her öğe alt kategori nesnesidir.
+- parentCategory: object — Ana kategorinin üst kategorisi hakkında bilgi sağlar (örneğin, ad, link).
+
+**Dönüş**:  
+React.FC<CategoryShowcaseProps> tipinde bir fonksiyon bileşeni döndürür. Bu bileşen, JSX ile kategori galerisini render eder.
 
 ---
 
@@ -50,27 +62,15 @@ Bu modülün doğru çalışması için gerekli props sağlanmalıdır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::RenderSubCategoryLink
-- **params**: (sub)
-- **ic_degiskenler**:
-  - `sub` — subCategory object containing `id`, `slug`, `image_url`, and `description` used to build the link URL, image source, alt text, heading, and description.
-  - `category` — parent category object from component props; its `slug` is combined with `sub.slug` to generate the route via `Routes.category`.
-  - `t` — translation function (e.g., from `useTranslation`) used to retrieve the localized label for the inspect series call‑to‑action.
-  - `process` — global Node.js `process` object; accesses `process.env.NEXT_PUBLIC_SUPABASE_URL` to construct the base URL for Supabase storage image paths.
-  - `Routes` — utility module providing the `category(slug, subSlug)` function that returns the correct Next.js route path.
-  - `getCategoryDisplayName` — helper that returns a human‑readable display name for a category/subcategory; used for the image `alt` attribute and the heading `<h3>`.
-  - `getCategoryIcon` — helper that returns an icon component when a subcategory lacks an image; receives the subcategory `slug` and size/className props.
-  - `VentImage` — custom image component that renders the product image with proper styling and hover effects.
-  - `ArrowRight` — icon component indicating navigation, animated on hover.
-- **Dönüş**: JSX.Element (a `<Link>` wrapping a card that displays the subcategory image, title, description, and a navigation arrow)
+### [N1_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::(sub) => { ... }
+- **params**: sub
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element (Link component that renders a subcategory card with image, title, description and an arrow icon)
 
-### [N2_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::RenderFeatureItem
-- **params**: (feature, i)
-- **ic_degiskenler**:
-  - `feature` — object with `title` and `desc` strings describing a feature; used to render the heading `<h3>` and paragraph `<p>`.
-  - `i` — numeric index of the feature in the list; used as the React `key` prop for the outer `<div>`.
-  - `CheckCircle2` — icon component (from `lucide-react`) displayed inside a colored circle to visually indicate a checked/validated feature.
-- **Dönüş**: JSX.Element (a `<div>` card showing an icon, feature title, and description)
+### [N2_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::(feature, i) => { ... }
+- **params**: feature, i
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element (div component that displays a feature with an icon, title and description)
 
 ---
 
@@ -89,16 +89,13 @@ Bu modülün doğru çalışması için gerekli props sağlanmalıdır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[600px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `aspect-[16/9]`, `aspect-[4/3]`, `aspect-[4/5]`, `duration-[2s]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`
+- `h-hvac-hero`, `rounded-hvac-2xl`
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-blue-50`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-gray-50`, `bg-light-gray`, `bg-orange-50`, `bg-primary-navy`, `bg-primary-navy/10`, `bg-secondary-blue/20`, `bg-slate-50`, `bg-slate-900/50`, `bg-white`, `border-4`, `border-b`, `border-gray-100`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-4`, `bottom-8`, `flex`, `flex-col`, `flex-shrink-0`, `from-black/60`, `from-primary-navy/80`, `from-secondary-blue`, `from-slate-950/80`, `gap-16`, `gap-2`, `gap-6`, `gap-8`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `-translate-x-1/2`, `animate-bounce`, `animate-fadeIn`, `aspect-4/3`, `aspect-4/5`, `aspect-video`, `border`, `cursor-pointer`, `duration-300`, `duration-700`, `duration-hvac-glacial`, `focus-ring`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-bold`

@@ -8,8 +8,8 @@ entity_hashes:
   func:ForgotPasswordPage: 40bcbdf4b0d8dfc1
   func:handleSubmit: 460293fdfa9263b6
   overview: 230126d511311554
-  style_tokens: 5a2976565d64aeae
-generated_at: 2026-05-27T11:54:27Z
+  style_tokens: 90202b3fc6cca016
+generated_at: 2026-05-27T18:30:20Z
 ---
 
 ## Genel Bakış
@@ -102,6 +102,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/20`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `from-air-blue`, `text-2xl`, `text-center`
+- **Renkler:** `bg-air-blue/20`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `focus-visible:border-transparent`, `from-air-blue`, `hover:bg-primary-navy`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `from-air-blue`, `h-16`, `h-5`, `inline-flex`, `items-center`, `justify-center`, `left-3`, `max-w-md`, `min-h-screen`, `p-4`, `p-8`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-medium`, `font-semibold`, `inset-0`, `leading-relaxed`, `mb-2`, `mb-4`, `mb-6`

@@ -7,8 +7,8 @@ skeleton_hash: 7bf65b45d538cf54
 entity_hashes:
   func:BulkActionToolbar: ba39222c0aa88e73
   overview: e440025fef007b62
-  style_tokens: 8018b08eafed78fd
-generated_at: 2026-05-27T12:14:07Z
+  style_tokens: 812207303bb8adc3
+generated_at: 2026-05-27T18:10:35Z
 ---
 
 ## Genel Bakış
@@ -108,6 +108,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-400/80`, `bg-emerald-500/80`, `bg-gray-400/80`, `bg-gray-50`, `bg-primary-navy`, `bg-red-500/80`, `bg-white`, `bg-white/20`, `bg-yellow-500/80`, `border-gray-200`, `border-primary-navy`, `text-gray-400`, `text-gray-800`, `text-primary-navy`, `text-sm`
+- **Renkler:** `bg-blue-400/80`, `bg-emerald-500/80`, `bg-gray-400/80`, `bg-gray-50`, `bg-primary-navy`, `bg-red-500/80`, `bg-white`, `bg-white/20`, `bg-yellow-500/80`, `border-gray-200`, `border-primary-navy`, `hover:bg-blue-400`, `hover:bg-emerald-500`, `hover:bg-gray-400`, `hover:bg-red-500`
 - **Layout:** `absolute`, `bg-yellow-500/80`, `bottom-4`, `bottom-full`, `fixed`, `flex`, `flex-1`, `flex-wrap`, `gap-2`, `gap-3`, `h-6`, `h-8`, `hover:bg-yellow-500`, `items-center`, `justify-center`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `!py-2`, `!text-xs`, `${adminButtonPrimaryClass`, `${priceMode`, `:`, `===`, `animate-slide-up`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/30`, `font-bold`, `font-medium`, `font-semibold`, `mb-2`

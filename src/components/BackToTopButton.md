@@ -7,8 +7,8 @@ skeleton_hash: 7805843109ba355b
 entity_hashes:
   func:BackToTopButton: c8f2538093a58334
   overview: bde72dfa4c09c889
-  style_tokens: 2d1270f1d895a080
-generated_at: 2026-05-27T12:12:35Z
+  style_tokens: 5e3169b1c89ec108
+generated_at: 2026-05-27T18:00:52Z
 ---
 
 ## Genel Bakış
@@ -58,45 +58,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::onScroll
-- **params**: `_e: Event`
-- **ic_degiskenler**:
-  - `y` — `window.scrollY` veya `document.documentElement.scrollTop` değerlerinden elde edilen mevcut dikey kaydırma konumu.
-  - `setVisible` — dışarıdaki `BackToTopButton` bileşeninden gelen setter, `y > 400` olduğunda `visible` state'ini `true` yapar.
-- **Dönüş**: `void` (state güncellemesi yapar, geri değer döndürmez).
-
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::computePos
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `el` — `document.getElementById('language-switcher')` ile elde edilen dil değiştirici DOM elemanı.
-  - `rect` — `el.getBoundingClientRect()` ile alınan elemanın konum ve boyut bilgilerini içeren `DOMRect` nesnesi.
-  - `bottomFromViewport` — viewport alt kenarı ile elemanın alt kenarı arasındaki boşluk; `Math.max(16, window.innerHeight - rect.bottom)` ile hesaplanır.
-  - `rightToLeftEdge` — viewport sol kenarı ile elemanın sol kenarı arasındaki yatay mesafe; `window.innerWidth - rect.left` ile hesaplanır.
-  - `setPos` — dışarıdaki `BackToTopButton` bileşeninden gelen setter, butonun `bottom` ve `right` konumlarını günceller.
-  - `GAP` — yatay/vertical ek boşluk sabiti; konum hesaplamalarında eklenir.
-- **Dönüş**: `void` (state güncellemesi yapar, geri değer döndürmez).
-
----
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::cleanupScrollEffect
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `onScroll` — `useEffect` içinde tanımlı kaydırma dinleyicisi; bu temizleme fonksiyonunda `window.removeEventListener('scroll', onScroll)` ile kaldırılır.
-- **Dönüş**: `void` (event listener'ı kaldırır).
-
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::cleanupResizeEffect
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `computePos` — `useEffect` içinde tanımlı konum hesaplama fonksiyonu; `window.removeEventListener('resize', computePos)` ile kaldırılır.
-  - `id` — `setInterval` tarafından döndürülen zamanlayıcı kimliği; `clearInterval(id)` ile iptal edilir.
-- **Dönüş**: `void` (resize listener'ı ve interval'i temizler).
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\BackToTopButton.tsx
@@ -118,6 +79,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `border-white/20`, `text-white`
+- **Renkler:** `bg-primary-navy`, `border-white/20`, `hover:bg-secondary-blue`, `text-white`
 - **Layout:** `fixed`, `p-3`, `shadow-lg`, `z-40`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${visible`, `:`, `border`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `invisible`, `opacity-0`, `opacity-100`, `pointer-events-none`, `rounded-full`, `transition-shadow`, `translate-y-0`

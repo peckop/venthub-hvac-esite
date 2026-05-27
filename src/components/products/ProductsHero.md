@@ -7,8 +7,8 @@ skeleton_hash: 93075d4dc41a48bb
 entity_hashes:
   func:ProductsHero: 23bf6f05c6d119a9
   overview: 9bf8d11aa62d961e
-  style_tokens: e0270442d06112db
-generated_at: 2026-05-27T11:44:44Z
+  style_tokens: e2ac21d82aa84114
+generated_at: 2026-05-27T18:30:13Z
 ---
 
 ## Genel Bakış  
@@ -96,6 +96,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-b`, `bg-surface-navy`, `bg-transparent`, `bg-white`, `bg-white/10`, `border-0`, `from-surface-navy/80`, `lg:text-5xl`, `md:text-4xl`, `md:text-lg`, `text-3xl`, `text-base`, `text-center`, `text-gray-400`, `text-gray-800`
-- **Layout:** `absolute`, `drop-shadow-md`, `flex`, `flex-col`, `from-surface-navy/80`, `group-focus-within:bg-cyan-400/10`, `group-focus-within:text-cyan-500`, `h-80`, `h-full`, `items-center`, `justify-center`, `left-4`, `max-w-3xl`, `max-w-xl`, `min-h-320px`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-b`, `bg-surface-navy`, `bg-transparent`, `bg-white`, `bg-white/10`, `border-0`, `from-surface-navy/80`, `group-focus-within:bg-cyan-400/10`, `group-focus-within:text-cyan-500`, `lg:text-5xl`, `md:text-4xl`, `md:text-lg`, `text-3xl`, `text-base`, `text-center`
+- **Layout:** `absolute`, `drop-shadow-md`, `flex`, `flex-col`, `from-surface-navy/80`, `h-80`, `h-full`, `items-center`, `justify-center`, `left-4`, `max-w-3xl`, `max-w-xl`, `min-h-320px`, `overflow-hidden`, `relative`
+- **Varyant/Responsive:** `focus-visible:`, `focus-within:`, `group-focus-within:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `blur-xl`, `focus-visible:outline-none`, `focus-within:ring-2`, `focus-within:ring-cyan-400/50`, `font-bold`, `group`, `inset-0`, `mb-8`, `md:py-24`, `mt-4`, `mx-auto`, `object-cover`, `opacity-20`, `opacity-40`, `pl-12`

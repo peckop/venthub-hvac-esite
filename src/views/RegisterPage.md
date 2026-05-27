@@ -10,8 +10,8 @@ entity_hashes:
   func:handleSubmit: 460293fdfa9263b6
   func:validateForm: 35d7413c1db3ab00
   overview: f33301e20d1c64f6
-  style_tokens: bb6026c45bd8dd20
-generated_at: 2026-05-27T11:56:35Z
+  style_tokens: b4142733c6599819
+generated_at: 2026-05-27T18:30:26Z
 ---
 
 ## Genel Bakış
@@ -135,6 +135,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `bg-light-gray`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `from-air-blue`, `text-2xl`, `text-center`
+- **Renkler:** `bg-gradient-to-br`, `bg-light-gray`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `focus-visible:border-transparent`, `from-air-blue`, `hover:bg-primary-navy`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `flex-1`, `from-air-blue`, `gap-1`, `gap-1.5`, `h-1.5`, `h-16`, `h-5`, `inline-flex`, `items-center`, `justify-center`, `left-3`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `$`, `:`, `<=`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-medium`, `font-semibold`, `i`

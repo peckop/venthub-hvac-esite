@@ -9,8 +9,8 @@ entity_hashes:
   func:save: 0164a79f2bf21d0f
   func:saveGeneralSettings: e292d3d4a2e6fa04
   overview: 59445d0b8972e8c9
-  style_tokens: 42508eca7917a722
-generated_at: 2026-05-27T11:50:50Z
+  style_tokens: 114083f4641bd38f
+generated_at: 2026-05-27T18:30:49Z
 ---
 
 ## Genel Bakış
@@ -170,6 +170,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-xl`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/5`, `bg-cyan-500/5`, `bg-rose-500/5`, `bg-surface-deep/40`, `bg-transparent`, `bg-violet-500`, `bg-violet-500/5`, `border-amber-500/10`, `border-b`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `text-amber-400`, `text-amber-500/80`
-- **Layout:** `!h-12`, `absolute`, `block`, `flex`, `flex-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `group-hover:bg-cyan-500/10`, `group-hover:bg-violet-500/10`, `group-hover:text-cyan-400`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Renkler:** `bg-amber-500/5`, `bg-cyan-500/5`, `bg-rose-500/5`, `bg-surface-deep/40`, `bg-transparent`, `bg-violet-500`, `bg-violet-500/5`, `border-amber-500/10`, `border-b`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:bg-cyan-500/10`, `group-hover:bg-violet-500/10`
+- **Layout:** `!h-12`, `absolute`, `block`, `flex`, `flex-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-14`, `h-5`, `h-64`
+- **Varyant/Responsive:** `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `!font-black`, `!text-center`, `!text-lg`, `${adminButtonPrimaryClass`, `${adminCardClass`, `${adminInputClass`, `-mr-32`, `-mt-32`, `animate-in`, `blur-3xl`, `border`, `cursor-pointer`, `duration-700`, `fade-in`, `focus-visible:ring-cyan-400/20`

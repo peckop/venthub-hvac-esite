@@ -23,8 +23,8 @@ entity_hashes:
   func:toggleSelectAll: b6733934eb7cddda
   func:toggleSort: 865bfd9d85445d70
   overview: 6edaaf2ebf329de0
-  style_tokens: fdfb3c696080e8df
-generated_at: 2026-05-27T12:24:25Z
+  style_tokens: 4970a750083c3797
+generated_at: 2026-05-27T18:30:54Z
 ---
 
 ## Genel Bakış  
@@ -503,15 +503,15 @@ graph TD
     AdminProductsPage_tsx__toggleSelect["toggleSelect"]
     AdminProductsPage_tsx__toggleSelectAll["toggleSelectAll"]
     AdminProductsPage_tsx__toggleSort["toggleSort"]
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__remove
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
 ```
 
 ## NODE ID STANDARD
@@ -552,5 +552,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-cyan-400/3`, `bg-emerald-500/10`, `bg-gradient-to-r`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-surface-deep`, `bg-white/1`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-2`, `border-b`
-- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-transparent`, `gap-0.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `group-hover/btn:text-cyan-400`, `group-hover/btn:text-slate-400`, `group-hover/spec:text-cyan-400/70`, `group-hover:border-white/10`, `group-hover:rotate-90`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-transparent`, `gap-0.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-0.5`, `h-1.5`, `h-12`, `h-4`, `h-6`
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `group-hover/btn:`, `group-hover/spec:`, `group-hover:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${Number(r.stock_qty`, `${adminButtonPrimaryClass`, `${adminButtonSecondaryClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${baseClass`, `${cellPad`, `${headPad`, `${isExpanded`, `${isSelected`, `10`, `:`, `<`, `Number(r.stock_qty`

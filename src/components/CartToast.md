@@ -4,38 +4,31 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\CartToast.tsx
 skeleton_hash: eb3942a6caa35ebc
-generated_at: 2026-05-23T21:57:16Z
+entity_hashes:
+  func:CartToast: a2ae301e9df08eee
+  overview: 8dcc105f56ed9e74
+  style_tokens: c52e4aa86d11fa3f
+generated_at: 2026-05-27T18:04:22Z
 ---
 
-## Genel Bakış
-CartToast, alışveriş sepetine eklenen ürün hakkında kullanıcıya kısa bir bildirim gösteren bir React bileşenidir. Görünürlüğü, ürün bilgileri ve kapatma işlevi props üzerinden kontrol edilir.
 
-## Fonksiyon Grupları
-### Bildirim Gösterimi
-Kullanıcıya sepetteki ürün hakkında bilgilendirme mesajı sunar ve kapatma işlemini yönetir.
-- CartToast
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için aşağıdaki varsayımlar geçerlidir.
-
-[Aksiyom 1]: Eğer `isVisible` prop'ı boolean türünde değilse, bileşenin görünürlük durumu beklenmedik şekilde değerlendirilir ve UI beklenen şekilde gösterilemeyebilir.  
-[Aksiyom 2]: Eğer `product` prop'ı `null` veya `undefined` ise, ürün bilgileri render edilemeyecek ve bileşen boş veya hatalı içerik gösterebilir.  
-[Aksiyom 3]: Eğer `onClose` prop'ı bir fonksiyon değilse, kapatma eylemi tetiklendiğinde çalışma zamanı hatası (örneğin “onClose is not a function”) oluşur.
 
 ---
 
-## FONKSIYON DETAYLARI
+
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### CartToast
-**Ne yapar**: CartToast, alışveriş sepeti ile ilgili bir bildirim (toast) gösteren bir React bileşenidir. Kullanıcıya ürün ekleme veya çıkarma gibi işlemlerin sonucunu kısa bir süre içinde sunar.  
-**Nasıl yapar**: `isVisible` prop'una göre koşullu olarak render edilir; `true` olduğunda ürün bilgilerini içeren bir kutucuk gösterilir. Kullanıcı bildirimi kapatmak istediğinde `onClose` fonksiyonu çağrılır ve bileşen görünürlüğü kapatılır.  
-**Parametreler**:  
-- isVisible: boolean — Bileşenin ekranda görünür olup olmadığını belirler.  
-- product: object — Gösterilecek ürünün verilerini içerir (örneğin isim, fiyat, resim gibi alanlar).  
-- onClose: function — Kullanıcı kapatma işlemi gerçekleştirdiğinde çalıştırılacak geri çağırım fonksiyonudur.  
-**Dönüş**: React.FC<CartToastProps> — Bir React fonksiyon bileşeni olarak JSX döndürür; bu JSX, koşullu renderleme sonucunda toast öğesini veya null değerini içerir.
+**Ne yapar**: Sepete ürün eklenmesi gibi işlemler sonrası kullanıcıya kısa süreli bir bildirim (toast) gösteren React bileşenidir. Görünürlük durumuna ve ürün bilgisine bağlı olarak ekranda geçici bir kutu içerisinde bilgi sunar.
+**Nasıl yapar**: `isVisible` prop’u `true` olduğunda toast kutusunu render eder ve `product` nesnesindeki ürün adı, fiyat gibi alanları görüntüler. Kullanıcı toast üzerindeki kapatma butonuna tıkladığında veya belirli bir süre sonra `onClose` fonksiyonunu çağırarak bileşenin gizlenmesini sağlar. Bileşen, görünmez olduğunda herhangi bir çıktı üretmez.
+**Parametreler**:
+- isVisible: `boolean` — Toast’un görünür olup olmadığını belirler. `true` iken toast ekranda gösterilir.
+- product: `any` — Toast içinde gösterilecek ürün bilgilerini içeren nesne (örneğin ürün adı, fiyatı, resim URL’si).
+- onClose: `function` — Toast kapatıldığında çağrılacak geri çağrı fonksiyonu. Genellikle toast’un görünmez olmasını sağlamak için kullanılır.
+**Dönüş**: `React.FC<CartToastProps>` — Fonksiyonel bir React bileşeni olduğu için bir JSX elementi döndürür; `CartToastProps` tipindeki prop’ları alır. Bileşen tipi `React.FC` olarak tanımlanmıştır.
 
 ---
 
@@ -50,17 +43,18 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/CartToast.tsx::CartToast
-- **params**: isVisible, product, onClose
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\CartToast.tsx::CartToast
+- **params**: (isVisible, product, onClose)
 - **ic_degiskenler**:
-  - `t` — çeviri fonksiyonu, useI18n hook'undan dönen, arayüz metinlerini dil bazlı olarak alır
-  - `lang` — aktif dil kodu (örn. "en", "tr"), useI18n hook'undan döner, formatCurrency ve çevirilerde kullanılır
-  - `showChoiceModal` — seçim modallarının görünürlüğünü kontrol eden boolean state
-  - `setShowChoiceModal` — showChoiceModal state'ini güncelleyen setter fonksiyonu
-  - `timer` — setTimeout tarafından dönen kimlik tutucu; modal gösterimi/gizleme gecikmesini yönetir ve useEffect temizleme fonksiyonunda clearTimeout ile iptal edilir
-  - `handleContinueShopping` — "Alışverişe Devam" butonuna tıklandığında çağrılır; showChoiceModal'ı false yapar ve onClose ile toast'u kapatır
-  - `handleGoToCart` — "Sepete Git" butonuna tıklandığında çağrılır; showChoiceModal'ı false yapar, onClose ile toast'u kapatır ve Link bileşeni üzerinden navigasyon sağlar
-- **Dönüş**: JSX.Element (React.FC<CartToastProps>) – component'in render ettiği JSX döner (koşullu olarak null veya toast/modal yapısı)
+  - `t` — `useI18n()` hook tarafından döndürülen çeviri fonksiyonu, metinleri yerelleştirmek için kullanılır.
+  - `lang` — `useI18n()` hook tarafından döndürülen geçerli dil kodu, para birimi formatlamada kullanılır.
+  - `showChoiceModal` — `useState(false)` ile tanımlanan boolean durum, seçim modalının gösterilip gösterilmeyeceğini kontrol eder.
+  - `setShowChoiceModal` — `showChoiceModal` durumunu güncellemek için kullanılan set fonksiyonu.
+  - `timer` (ilk `useEffect` içinde) — `setTimeout` tarafından döndürülen zamanlayıcı kimliği, efekt temizleme fonksiyonunda `clearTimeout` ile iptal edilir.
+  - `timer` (ikinci `useEffect` içinde) — aynı amaçla ikinci efekt içinde tanımlanan zamanlayıcı kimliği.
+  - `handleContinueShopping` — `onClose` ve `setShowChoiceModal(false)` çağırarak modalı kapatan ve dış kapatma fonksiyonunu tetikleyen olay işleyicisi.
+  - `handleGoToCart` — `onClose` ve `setShowChoiceModal(false)` çağırarak modalı kapatan, ardından `Link` bileşeni aracılığıyla yönlendirme yapılmasını sağlayan olay işleyicisi.
+- **Dönüş**: React element (JSX) – toast ve isteğe bağlı seçim modalını render eder; `null` dönebilir (`!isVisible || !product` durumunda).
 
 ---
 
@@ -85,6 +79,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black`, `bg-light-gray`, `bg-opacity-50`, `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-2`, `border-primary-navy`, `border-success-green`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`
+- **Renkler:** `bg-black`, `bg-light-gray`, `bg-opacity-50`, `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-2`, `border-primary-navy`, `border-success-green`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-industrial-gray`, `hover:text-white`, `text-center`, `text-industrial-gray`
 - **Layout:** `fixed`, `flex`, `flex-1`, `flex-shrink-0`, `items-center`, `items-start`, `justify-center`, `max-w-md`, `max-w-sm`, `min-w-0`, `p-2`, `p-3`, `p-4`, `p-6`, `right-4`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `animate-bounce-in`, `animate-slide-up`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `font-medium`, `font-semibold`, `inset-0`, `mb-4`, `mb-6`, `ml-auto`, `mt-0.5`, `mt-4`

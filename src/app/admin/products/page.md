@@ -4,15 +4,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx
 skeleton_hash: 1d95369f5f63b92b
-generated_at: 2026-05-23T21:48:13Z
+entity_hashes:
+  func:Page: b78386183e5eac2e
+  overview: 3abd4459140e249f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:59:32Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki ürün listesi sayfasının giriş noktasıdır. Next.js App Router yapısında bir sayfa bileşeni olarak `AdminProductsPage` bileşenini dinamik olarak içe aktarır ve render eder. Sayfa, ürünlerin görüntülenmesi ve yönetilmesi için gerekli UI'yi sağlar.
+Bu modül, Next.js App Router içinde `admin/products` yoluna karşılık gelen sayfanın giriş noktasıdır. Tek bir bileşen fonksiyonu aracılığıyla `AdminProductsPage` bileşenini dinamik olarak yükler ve render eder; böylece ürün yönetimi UI’sinin oluşturulması ve gösterilmesi sorumluluğu bu dosyaya taşınır.
 
 ## Fonksiyon Grupları
-### Sayfa Render ve Layout
-Sayfanın oluşturulması ve temel düzenin sağlanması sorumluluğunu taşır. Tek bir fonksiyon aracılığıyla admin ürün sayfasının tüm JSX yapısını üretir.
+### Sayfa Girişi ve Render
+Bu grup, yönetim panelindeki ürün listesi sayfasının temel render sürecini başlatır. `Page` fonksiyonu, başka bir fonksiyonu çağırmaz; sadece dinamik olarak içe aktarılan `AdminProductsPage` bileşenini JSX olarak döndürerek tüm UI ve iş mantığını alt bileşene devreder.
 - Page
 
 ---
@@ -22,19 +26,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Admin ürünler sayfasının ana bileşenini temsil eder. Uygulamanın yönlendirme yapısında (`admin/products` rotası) ilgili sayfanın görüntülenmesini sağlamak için giriş noktası olarak görev yapar.
-
-**Nasıl yapar**: Herhangi bir parametre veya karmaşık mantık içermez. Doğrudan `<AdminProductsPage />` JSX elementini döndürerek tüm görsel ve durumsal sorumluluğu alt bileşene devreder. Bu sayede modüler bir yapı sağlanır ve sayfa, gerektiğinde tembel yükleme (lazy loading) için uygun hale gelir.
-
+**Ne yapar**: Bu fonksiyon, uygulamanın admin paneli ürünler sayfasının ana giriş bileşeni olarak görev yapar. Doğrudan ilgili sayfa bileşenini döndürerek sayfanın render edilmesini sağlar.
+**Nasıl yapar**: Fonksiyon, herhangi bir ek iş mantığı, durum yönetimi veya yan etki işlemi içermez. Sadece statik olarak `AdminProductsPage` bileşenini JSX formatında döndürür.
 **Parametreler**:
-- Parametre almaz.
-
-**Dönüş**: `<AdminProductsPage />` – Admin ürünler sayfasını temsil eden React JSX elemanı. Dönüş tipi `JSX.Element` olarak değerlendirilir.
+- Herhangi bir parametre almaz.
+**Dönüş**: React JSX öğesi döndürür; spesifik olarak `AdminProductsPage` bileşeninin bir örneğini.
 
 ---
 
@@ -49,9 +48,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  (yok)
-- **Dönüş**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (`<AdminProductsPage />`) – React bileşeni olarak `AdminProductsPage` bileşenini render eder.
 
 ---
 
@@ -64,3 +62,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`

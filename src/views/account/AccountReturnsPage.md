@@ -7,8 +7,8 @@ skeleton_hash: 495418f85c94e7a0
 entity_hashes:
   func:AccountReturnsPage: 45c93b9f2f8ddaf9
   overview: b5840b0f6d7ee947
-  style_tokens: 97255f4698dc2d21
-generated_at: 2026-05-27T12:13:56Z
+  style_tokens: d5328287ff24abb4
+generated_at: 2026-05-27T18:30:33Z
 ---
 
 ## Genel Bakış
@@ -179,4 +179,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-primary-navy`, `bg-primary-navy/5`, `bg-red-500`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/80`, `bg-slate-900/40`, `bg-white`, `border-b`, `border-b-2`, `border-primary-navy`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-1`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${statusClass(r.status`, `${statusFilter`, `${step.completed`, `:`, `===`, `animate-in`, `animate-spin`, `border`, `cancelled`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `focus-visible:ring-primary-navy/50`

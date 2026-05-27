@@ -4,37 +4,47 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\HeroCarousel.tsx
 skeleton_hash: 4c1485db4b4d7c76
-generated_at: 2026-05-23T22:16:39Z
+entity_hashes:
+  func:HeroCarousel: ab714744003cac86
+  overview: 4f1991c46b287359
+  style_tokens: 08751a5dc318cad7
+generated_at: 2026-05-27T18:05:10Z
 ---
 
 ## Genel Bakış
-HeroCarousel modülü, verilen kategori listesini kullanarak bir öne çıkan görsel kaydırma (carousel) bileşeni oluşturur. Bu bileşen, sayfanın baş kısmında görsel içerikleri dinamik olarak göstererek kullanıcı deneyimini zenginleştirir.
+`HeroCarousel` modülü, dışarıdan sağlanan `categories` dizisini alarak ana sayfanın üst kısmında görsel bir kaydırma (carousel) bileşeni oluşturur. Bileşen, her kategori için bir slayt üretir, gerekli ikon ve meta verileri tamamlar ve kaydırma geçişlerini yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-HeroCarousel fonksiyonu, dışarıdan gelen `categories` verisini alarak carousel yapısını render eder ve gerekli görsel geçişleri yönetir.
-- HeroCarousel
+Bu grup, bileşenin dışarıdan gelen veriyi alıp UI’yı render etmesinden sorumludur.  
+- HeroCarousel  
+
+### Veri Hazırlama (İçsel Yardımcılar – varsayılan olarak dosyada tanımlı)
+Bu grup, `categories` öğelerindeki eksik ikon ve meta verileri `IconMap` ve `FALLBACK_METADATA` kullanarak tamamlar.  
+- (İçsel yardımcı fonksiyonlar, örn. ikon eşleştirme, metadata doldurma)
+
+### Carousel Kontrolü
+Bu grup, slayt geçişleri, otomatik kaydırma ve kullanıcı etkileşimlerini (örn. önceki/sonraki butonları) yönetir.  
+- (Kaydırma zamanlayıcıları, navigasyon handler’ları)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her öğesinin görüntüleme için gerekli metadata ve ikon bilgilerini içerdiği varsayımına dayanır; bu bilgiler eksik olduğunda `IconMap` ve `FALLBACK_METADATA` sabitleri kullanılarak tamamlanır.
-
-[Aksiyom 1]: Eğer `categories` prop'u tanımsız, null veya boş bir dizi ise, bileşen hiçbir slayt render etmez (veya hata fırlatabilir, bu da içeriğin eksik olduğu anlamına gelir).  
-[Aksiyom 2]: Eğer bir kategori öğesi `IconMap` nesnesinde karşılık gelen bir ikon anahtarına sahip değilse, `FALLBACK_METADATA` nesnesindeki varsayılan ikon değeri kullanılır.  
-[Aksiyom 3]: Eğer bir kategori öğesi gerekli metadata alanlarını (örn. başlık, görsel URL vb.) içermiyorsa, bu eksik alanlar `FALLBACK_METADATA` nesnesinden alınarak tamamlanır.  
-[Aksiyom 4]: Eğer `IconMap` veya `FALLBACK_METADATA` nesneleri tanımsız veya null ise, bileşen ikon ve metadata eksikliklerini düzeltemez verender sırasında beklenmeyen değerler veya hata ortaya çıkabilir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### HeroCarousel
-**Ne yapar**: HeroCarousel, ana sayfa hero bölümünde kategorileri gösteren bir carousels (slayt) bileşeni render eder.  
-**Nasıl yapar**: Bileşen, `categories` prop'undan gelen veri listesini alıp, her bir kategori için bir slayt oluşturur ve genellikle bir kaydırma veya geçiş efekti sağlayan bir carousel kütüphanesi ile gösterir.  
-**Parametreler**:  
-- categories: React.ReactNode[] — Gösterilecek kategorilerin JSX elemanları veya veri objeleri dizisi.  
-**Dönüş**: React.FC<HeroCarouselProps> — Render edilen hero carousel bileşenini döndürür; JSX olarak kullanıma hazır bir React elementi.
+**Ne yapar**: `HeroCarousel` bir React fonksiyonel bileşenidir; bileşen, dışarıdan `categories` adlı bir prop alır.
+
+**Nasıl yapar**: Fonksiyonun iç mantığı ve işleyişi kaynak kodunda yer almamaktadır; bu nedenle uygulanma şekli belirtilmemiştir.
+
+**Parametreler**:
+- `categories`: *type not specified* — Bileşene dışarıdan sağlanan veri; tip bilgisi kodda tanımlı değildir.
+
+**Dönüş**: `React.FC<HeroCarouselProps>` — `HeroCarouselProps` tipinde bir React fonksiyonel bileşenini döndürür.
 
 ---
 
@@ -71,90 +81,104 @@ HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/HeroCarousel.tsx::HeroCarousel
-- **params**: categories
+- **params**: `categories` — dışarıdan gelen kategori listesi
 - **ic_degiskenler**:
-  - `wrapCategory` — ViewModel oluşturucu fonksiyonu, her kategori nesnesini UI için hazırlanan ViewModel'a dönüştürür.
-  - `t` — i18n çeviri fonksiyonu, arayüz metinlerini mevcut dile göre çevirir.
-  - `currentIndex` — Şu anda gösterilen slaytın indeksi; `setCurrentIndex` ile güncellenir.
-  - `setCurrentIndex` — `currentIndex` state'ini güncelleyen setter fonksiyonu.
-  - `isAutoPlaying` — Otomatik oynatma aktif mi? `true` ise slaytlar belirli aralıklarla değişir.
-  - `setIsAutoPlaying` — `isAutoPlaying` state'ini güncelleyen setter fonksiyonu.
-  - `timeoutRef` — `setTimeout` tarafından oluşturulan tutucuyu tutan `useRef`; otomatik oynatma zamanlayıcısını temizlemek için kullanılır.
-  - `mainCategoryVms` — `useMemo` ile hesaplanan, üst‑level kategorilerin ViewModel listesi; filtrelenmiş, sıralanmış ve sarılmış kategorilerden oluşur.
-  - `handleNext` — “Sonraki” butonuna tıklandığında çağrılan fonksiyon; otomatik oynatmayı durdurur ve indeksi bir artırır.
-  - `handlePrev` — “Önceki” butonuna tıklandığında çağrılan fonksiyon; otomatik oynatmayı durdurur ve indeksi bir azaltır.
-- **Dönüş**: JSX elementi (karusel UI) veya `null` (kategori yoksa).
+  - `wrapCategory` — `useCategoryViewModel` hookundan gelen, bir kategori nesnesini ViewModel’e dönüştüren fonksiyon
+  - `t` — `useI18n` hookundan gelen çeviri fonksiyonu
+  - `currentIndex` — aktif slaytın indeksini tutan state
+  - `setCurrentIndex` — `currentIndex` state’ini güncelleyen setter
+  - `isAutoPlaying` — otomatik geçişin açık/kapalı olduğunu belirten boolean state
+  - `setIsAutoPlaying` — `isAutoPlaying` state’ini güncelleyen setter
+  - `timeoutRef` — `setTimeout` kimliğini saklayan ref
+  - `mainCategoryVms` — `useMemo` ile hesaplanan, üst‑seviye kategorilerin ViewModel’leri
+  - `handleNext` — sonraki slayta geçiş yapan, otomatik oynatmayı durduran fonksiyon
+  - `handlePrev` — önceki slayta geçiş yapan, otomatik oynatmayı durduran fonksiyon
+- **Dönüş**: JSX element (hero carousel UI) veya `null` (eğer `mainCategoryVms.length === 0`)
 
-### [N2_NASIL] AST Pointer: src/components/HeroCarousel.tsx::mainCategoryVmsFactory (useMemo callback)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `CategoryViewModel[]` — `categories` dizisinden `parent_id` olmayanları filtreler, isimlerine göre sıralar, her birini `wrapCategory` ile sarar ve `null` olmayan sonuçları döndürür.
-
-### [N3_NASIL] AST Pointer: src/components/HeroCarousel.tsx::resetEffect (useEffect for index reset)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` (useEffect temizliği yok) — `currentIndex` değeri `mainCategoryVms.length`’e eşit veya büyükse indeksi `0`’a sıfırlar.
-
-### [N4_NASIL] AST Pointer: src/components/HeroCarousel.tsx::autoPlayEffect (useEffect for auto‑play)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` veya cleanup fonksiyonu — `isAutoPlaying` true ve liste boş değilse 5 saniyelik bir `setTimeout` kurar; dönüş değeri olarak zamanlayıcıyı temizleyen cleanup fonksiyonunu döndürür.
-
-### [N5_NASIL] AST Pointer: src/components/HeroCarousel.tsx::tickCallback (setTimeout inside autoPlayEffect)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `setCurrentIndex` ile mevcut indeksi bir artırır (modulo liste uzunluğu).
-
-### [N6_NASIL] AST Pointer: src/components/HeroCarousel.tsx::autoPlayCleanup (cleanup function of autoPlayEffect)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — Eğer `timeoutRef.current` tanımlıysa onu `clearTimeout` ile iptal eder.
-
-### [N7_NASIL] AST Pointer: src/components/HeroCarousel.tsx::handleNext
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `setIsAutoPlaying(false)` ile otomatik oynatmayı durdurur ve `setCurrentIndex` ile indeksi bir artırır (sarar).
-
-### [N8_NASIL] AST Pointer: src/components/HeroCarousel.tsx::handlePrev
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `setIsAutoPlaying(false)` ile otomatik oynatmayı durdurur ve `setCurrentIndex` ile indeksi bir azaltır (sarar).
-
-### [N9_NASIL] AST Pointer: src/components/HeroCarousel.tsx::itemRenderer (mainCategoryVms.map callback)
-- **params**: vm, idx
+### [N2_NASIL] AST Pointer: src/components/HeroCarousel.tsx::mainCategoryVms (useMemo callback)
+- **params**: yok
 - **ic_degiskenler**:
-  - `isActive` — Boolean; geçerli slaytın (`idx === currentIndex`) olup olmadığını gösterir, animasyon ve z‑index kontrolü için kullanılır.
-  - `cat` — Ham kategori nesnesi (`vm.raw`); metadata ve diğer özelliklere erişim sağlar.
-  - `meta` — Kategori metadata’sı; `FALLBACK_METADATA` ile birleştirilerek eksik alanlar tamamlanır.
-  - `bgImage` — String; arkaplan görselinin URL’si, `vm.imageUrl` varsa onu kullanır, yoksa varsayılan yolunu oluşturur.
-- **Dönüş**: JSX elementi — bir slaytın tamamını (arkaın, içerik, özellikler, butonlar) içeren `<div>`.
+  - `categories` — dışarıdan gelen kategori listesi (kapalı)
+  - `wrapCategory` — kategori → ViewModel dönüştürücü
+  - `c` — geçici kategori nesnesi (filter içinde)
+  - `a`, `b` — sıralama karşılaştırması için kullanılan iki kategori nesnesi
+  - `vm` — `wrapCategory` sonucunda elde edilen ViewModel
+- **Dönüş**: `NonNullable<typeof vm>` tipinde ViewModel dizisi
 
-### [N10_NASIL] AST Pointer: src/components/HeroCarousel.tsx::ventImageOnError (VentImage onError handler)
-- **params**: e
+### [N3_NASIL] AST Pointer: src/components/HeroCarousel.tsx::reset effect (useEffect callback)
+- **params**: yok
 - **ic_degiskenler**:
-  - `target` — HTMLImageElement; hatalı resmin `<img>` elementi, `onerror`’u temizleyerek ve `src`’i varsayılan görsele değiştirerek geri dönüşüm sağlar.
-- **Dönüş**: `void`
+  - `currentIndex` — mevcut aktif indeks
+  - `mainCategoryVms` — hesaplanan ViewModel dizisi
+  - `setCurrentIndex` — indeks state’ini sıfırlayan setter
+- **Dönüş**: yok (yan etki: gerekirse `currentIndex`i 0’a ayarlar)
 
-### [N11_NASIL] AST Pointer: src/components/HeroCarousel.tsx::featureItemMapper (meta.features.map callback)
-- **params**: f: CategoryFeature, i: number
+### [N4_NASIL] AST Pointer: src/components/HeroCarousel.tsx::auto‑play effect (useEffect callback)
+- **params**: yok
 - **ic_degiskenler**:
-  - `Icon` — React bileşeni; `IconMap` üzerinden özelliğin ikonunu alır, bulunamazsa `Activity` ikonunu varsayılan olarak kullanır.
-- **Dönüş**: JSX elementi — bir özelliğin ikonu, başlığı ve açıklamasını gösteren `<div>`.
+  - `isAutoPlaying` — otomatik oynatma flag’i
+  - `mainCategoryVms` — ViewModel dizisi
+  - `timeoutRef` — timeout kimliğini tutan ref
+  - `setCurrentIndex` — indeks state’ini güncelleyen setter
+  - `currentIndex` — mevcut indeks (temizleme fonksiyonunda kullanılır)
+- **Dönüş**: temizleme fonksiyonu (timeout varsa `clearTimeout`)
 
-### [N12_NASIL] AST Pointer: src/components/HeroCarousel.tsx::openLeadModalClick (button onClick)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `window.openLeadModal?.()` çağrısıyla lead modalını açar (varsa).
+### [N5_NASIL] AST Pointer: src/components/HeroCarousel.tsx::handleNext
+- **params**: yok
+- **ic_degiskenler**:
+  - `setIsAutoPlaying` — otomatik oynatmayı durduran setter
+  - `setCurrentIndex` — bir sonraki indeksi hesaplayıp güncelleyen setter
+  - `mainCategoryVms` — toplam slayt sayısını belirlemek için kullanılan dizi
+- **Dönüş**: yok (state güncellemeleriyle yan etki)
 
-### [N13_NASIL] AST Pointer: src/components/HeroCarousel.tsx::progressIndicatorClick (progress button onClick)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `setIsAutoPlaying(false)` ile otomatik oynatmayı durdurur ve `setCurrentIndex(idx)` ile ilgili slayta geçer.
+### [N6_NASIL] AST Pointer: src/components/HeroCarousel.tsx::handlePrev
+- **params**: yok
+- **ic_degiskenler**:
+  - `setIsAutoPlaying` — otomatik oynatmayı durduran setter
+  - `setCurrentIndex` — bir önceki indeksi hesaplayıp güncelleyen setter
+  - `mainCategoryVms` — toplam slayt sayısını belirlemek için kullanılan dizi
+- **Dönüş**: yok (state güncellemeleriyle yan etki)
 
-### [N14_NASIL] AST Pointer: src/components/HeroCarousel.tsx::progressItemMapper (progress indicators map callback)
-- **params**: _, idx
-- **ic_degiskenler**: - yok
-- **Dönüş**: JSX elementi — slayt göstergesi butonu; aktifse geniş bir mavi çizgi, değilse ince gri bir çizgi gösterir ve tıklandığında ilgili slayta geçer.
+### [N7_NASIL] AST Pointer: src/components/HeroCarousel.tsx::render slide callback `(vm, idx) => {...}`
+- **params**:
+  - `vm` — tek bir kategori ViewModel’i
+  - `idx` — o slaytın dizindeki konumu
+- **ic_degiskenler**:
+  - `isActive` — `idx === currentIndex` kontrolü, slaytın görünür olup olmadığını belirler
+  - `cat` — `vm.raw` üzerinden alınan ham kategori nesnesi
+  - `meta` — kategori meta verisi; `cat.metadata` ya da `FALLBACK_METADATA[vm.slug]` ya da `FALLBACK_METADATA['default']`
+  - `bgImage` — arka plan resmi URL’si; koşullu olarak `vm.imageUrl` veya varsayılan yol
+  - `target` — `onError` içinde kullanılan `HTMLImageElement` referansı
+- **Dönüş**: JSX element (tek slayt)
+
+### [N8_NASIL] AST Pointer: src/components/HeroCarousel.tsx::image onError handler `(e) => {...}`
+- **params**: `e` — `React.SyntheticEvent` (image hata olayı)
+- **ic_degiskenler**:
+  - `target` — `e.target` olarak tiplenmiş `HTMLImageElement`; hatalı görseli yedek görsele yönlendirir
+- **Dönüş**: yok (image `src`’i değiştirme yan etkisi)
+
+### [N9_NASIL] AST Pointer: src/components/HeroCarousel.tsx::features map callback `(f: CategoryFeature, i: number) => {...}`
+- **params**:
+  - `f` — tek bir özellik nesnesi (`CategoryFeature`)
+  - `i` — özellik dizisindeki indeks
+- **ic_degiskenler**:
+  - `Icon` — `IconMap` üzerinden bulunan ikon bileşeni veya varsayılan `Activity`
+- **Dönüş**: JSX element (özellik kartı)
+
+### [N10_NASIL] AST Pointer: src/components/HeroCarousel.tsx::lead modal opener `( ) => { window.openLeadModal?.() }`
+- **params**: yok
+- **ic_degiskenler**:
+  - `window.openLeadModal` — global fonksiyon, varsa çağrılır
+- **Dönüş**: yok (global fonksiyon yan etkisi)
+
+### [N11_NASIL] AST Pointer: src/components/HeroCarousel.tsx::progress indicator button callback `(_, idx) => {...}`
+- **params**:
+  - `_` — kullanılmayan slide öğesi (placeholder)
+  - `idx` — tıklanan gösterge indeksi
+- **ic_degiskenler**:
+  - `setIsAutoPlaying` — otomatik oynatmayı durdurur
+  - `setCurrentIndex` — göstergeye tıklanınca aktif indeksi `idx` olarak ayarlar
+- **Dönüş**: yok (state güncellemeleriyle yan etki)
 
 ---
 
@@ -173,16 +197,13 @@ HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[600px]`, `lg:h-[700px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `duration-[2000ms]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `h-hvac-hero`, `lg:h-hvac-hero-lg`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/40`, `bg-gradient-to-r`, `bg-secondary-blue`, `bg-white/10`, `bg-white/30`, `bg-white/5`, `bg-zinc-900`, `border-white/10`, `border-white/20`, `from-black/80`, `lg:text-7xl`, `text-5xl`, `text-gray-200`, `text-gray-400`, `text-secondary-blue`
+- **Renkler:** `bg-black/40`, `bg-gradient-to-r`, `bg-secondary-blue`, `bg-white/10`, `bg-white/30`, `bg-white/5`, `bg-zinc-900`, `border-white/10`, `border-white/20`, `from-black/80`, `hover:bg-blue-600`, `hover:bg-white/10`, `hover:bg-white/20`, `hover:bg-white/50`, `lg:text-7xl`
 - **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `bottom-10`, `flex`, `flex-col`, `flex-wrap`, `from-black/80`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `h-1.5`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${idx`, `${isActive`, `-translate-x-1/2`, `:`, `===`, `border`, `currentIndex`, `duration-1000`, `duration-300`, `duration-hvac-glacial`, `ease-in-out`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-offset-black/50`

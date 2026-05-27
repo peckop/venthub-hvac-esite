@@ -12,8 +12,8 @@ entity_hashes:
   func:saveCoupon: 13014c937b37a622
   func:toggleActive: bde4db4c0f16dfdc
   overview: bf9bd25b077ab626
-  style_tokens: 28be68dd9e200846
-generated_at: 2026-05-27T11:49:32Z
+  style_tokens: 4a0b7c9fcb1d8a38
+generated_at: 2026-05-27T18:30:44Z
 ---
 
 ## Genel Bakış
@@ -247,9 +247,9 @@ graph TD
     AdminCouponsPage_tsx__isAllowedCouponType["isAllowedCouponType"]
     AdminCouponsPage_tsx__saveCoupon["saveCoupon"]
     AdminCouponsPage_tsx__toggleActive["toggleActive"]
-    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__toggleActive
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__isAllowedCouponType
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__filtered
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__toggleActive
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__dbToUi
 ```
 
@@ -282,5 +282,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-blue-500`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-emerald-500/10`, `bg-gradient-to-r`, `bg-slate-500`, `bg-slate-500/10`, `bg-slate-800`, `bg-white/10`, `bg-white/5`, `border-cyan-500/20`, `border-emerald-500/20`, `border-t`, `border-white/10`
-- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`, `grid-cols-1`, `group-hover:opacity-100`, `h-1`, `h-1.5`
-- **Responsive:** `md:` prefix kullanımları
+- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`, `grid-cols-1`, `h-1`, `h-1.5`, `h-4`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${adminButtonSecondaryClass`, `${adminCardPaddedClass`, `${adminInputClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${r.active`, `${r.type`, `:`, `===`, `animate-in`, `border`, `cursor-pointer`, `divide-white/5`

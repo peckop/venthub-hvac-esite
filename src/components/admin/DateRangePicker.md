@@ -10,8 +10,8 @@ entity_hashes:
   func:cancelSelection: 4bec1b96cb2c08c1
   func:handleSelect: fdeacf6bd5ee123e
   overview: 83cabe93bf8f0d23
-  style_tokens: 50ed94bf03c87e5a
-generated_at: 2026-05-27T12:21:49Z
+  style_tokens: 8f057de8409875ea
+generated_at: 2026-05-27T18:10:37Z
 ---
 
 ## Genel Bakış
@@ -181,6 +181,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `md:border-b-0`, `md:border-r`, `text-left`, `text-primary-navy`, `text-slate-400`, `text-slate-500`
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `hover:bg-primary-navy/90`, `hover:bg-slate-100`, `hover:bg-slate-200/50`, `hover:bg-slate-50`, `hover:border-slate-300`, `hover:text-slate-800`
 - **Layout:** `backdrop-blur-xl`, `flex`, `flex-col`, `gap-1`, `gap-2`, `inline-flex`, `items-center`, `justify-between`, `max-h-60vh`, `max-h-85vh`, `max-w-full`, `md:flex-row`, `md:max-h-none`, `md:w-48`, `md:w-auto`
-- **Responsive:** `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `active:`, `disabled:`, `focus-visible:`, `hover:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${className`, `${isOpen`, `${isSelected`, `:`, `active:scale-95`, `animate-in`, `border`, `disabled:active:scale-100`, `disabled:opacity-50`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`

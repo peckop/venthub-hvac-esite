@@ -4,15 +4,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\account\shipments\page.tsx
 skeleton_hash: ec39e9ffa86e6b02
-generated_at: 2026-05-23T21:47:32Z
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: d9c0633b70be8b36
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:59:43Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı hesabı altındaki gönderi (shipment) bilgilerinin listelendiği ve yönetildiği ana sayfa bileşenini tanımlar. Tek bir giriş noktası olan `Page` fonksiyonu, gerekli veri çekme, durum yönetimi ve kullanıcı arayüzünü sunma sorumluluklarını bir arada üstlenir.
+Bu modül, VentHub HVAC platformunun kullanıcı hesap bölümündeki sevkiyatlar (shipments) sayfasını oluşturan Next.js sayfa bileşenidir. Kullanıcıların kendi hesaplarına ait tüm sevkiyat bilgilerini görüntüleyebileceği sayfa düzeyinde kullanıcı arayüzünü oluşturur. Platformun yönlendirme yapısıyla uyumlu çalışarak, hesap altındaki sevkiyatlar rotasında otomatik olarak yüklenen ana bileşen görevi görür.
 
 ## Fonksiyon Grupları
-### UI ve Veri Sunumu
-Bu grup, gönderi verilerini alıp kullanıcıya uygun bir biçimde (tablo, kart vb.) sunan ana sayfa bileşenini oluşturur.
+### Ana Sayfa Bileşeni
+Sevkiyatlar sayfasının tüm görsel ve işlevsel yapısını inşa eden, alt bileşenler ve durum yönetimi araçlarından faydalanarak kullanıcıya bilgi sunumunu sağlayan ana girişi barındırır.
 - Page
 
 ---
@@ -25,14 +29,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Hesap bölümü altındaki sevkiyatlar (shipments) sayfasını oluşturan ana React bileşenidir. Kullanıcının sevkiyat bilgilerini görüntüleyebileceği sayfa düzeyindeki kullanıcı arayüzünü temsil eder.
-
-**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanmıştır, JSX döndürerek sayfa düzenini render eder. Sayfa içeriğini oluşturmak için alt bileşenlerden, hook'lardan ve state yönetiminden faydalanır. Herhangi bir parametre almadığı için sayfa düzeyinde routing'e bağlı olarak çalışır.
-
-**Parametreler**:
-- (parametre yok) — Fonksiyon herhangi bir parametre almamaktadır.
-
-**Dönüş**: `<PageComponent />` — React JSX bileşeni döndürür. Bu bileşen, sevkiyat sayfasının tüm görsel ve işlevsel öğelerini kapsayan bir üst düzey kapsayıcıdır.
+**Ne yapar**: Uygulamanın `src/app/account/shipments/page.tsx` yolunda tanımlı shipments sayfasının ana bileşenini render eder. Sayfanın giriş noktası olarak işlev görür ve kullanıcı arayüzünün yüklenmesini sağlar.
+**Nasıl yapar**: Doğrudan `<PageComponent />` JSX ifadesini döndürerek `PageComponent` bileşenini çağırır. Herhangi bir state yönetimi veya iş mantığı içermez, yalnızca bir sarmalayıcı (wrapper) görevi üstlenir.
+**Parametreler**: Parametre almaz.
+**Dönüş**: `<PageComponent />` — Sayfanın kullanıcı arayüzünü oluşturan React JSX bileşeni.
 
 ---
 
@@ -54,3 +54,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

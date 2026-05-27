@@ -4,15 +4,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\orders\page.tsx
 skeleton_hash: 0eb01de0ed96f5e5
-generated_at: 2026-05-23T21:48:10Z
+entity_hashes:
+  func:Page: d710ec3bcbfd4e2f
+  overview: a752ca63e1e75a0e
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:59:40Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki siparişler sayfasının giriş noktasıdır. `Page` adlı tek bir React bileşeni dışa aktarır. Bileşen, çeviri fonksiyonu aracılığıyla metinleri yönetir ve dinamik import ile yüklenen `AdminOrdersPage` görünümünü bir `Suspense` sarmalayıcısı içinde render ederek sayfa yükleme performansını iyileştirir.
+Bu modül, VentHub HVAC projesinin Next.js tabanlı yönetim panelindeki siparişler rotasının ana giriş noktasıdır. Yönetici kullanıcıların siparişleri görüntüleyip yönetebileceği sayfanın temel iskeletini oluşturur. Projeye özel çok dilli çeviri desteği ve dinamik içerik yüklemesi kullanarak hem çoklu dil uyumluluğu hem de gelişmiş sayfa yükleme performansı sağlar.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni  
-Siparişler sayfasının tüm veri akışı, durum yönetimi ve kullanıcı arayüzünü tek bir noktada birleştirir; siparişlerin listelenmesi ve yönetimi için gerekli yapıyı sağlar.  
+### Rota Ana Sayfa Bileşeni
+Yönetim paneli siparişler rotasının varsayılan çalıştırılabilir bileşeni olarak görev alır, çeviri altyapısını hazırlar ve dinamik olarak yüklenen asıl sipariş yönetimi görünümünü yükleme sırasında sarmalayıcı ile kullanıcıya sunar.
 - Page
 
 ---
@@ -22,19 +26,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Admin panelinin `orders` (siparişler) sayfasını temsil eden bir Next.js sayfa bileşenidir. Dosya yolundan (`src/app/admin/orders/page.tsx`) anlaşıldığı üzere, bu fonksiyon ilgili route’un varsayılan dışa aktarılan (default export) bileşenidir ve sayfanın görünümünü sağlar.
-
-**Nasıl yapar**: Fonksiyonun iç mantığına dair dokümantasyon (docstring) bulunmamaktadır. TypeScript ve JSX kullanılarak yazıldığı dosya uzantısından (`.tsx`) çıkarılabilir, ancak spesifik işleyiş bilgisi mevcut değildir.
-
-**Parametreler**:  
-- Bu fonksiyon herhangi bir parametre almamaktadır.
-
-**Dönüş**: Dönüş türü belirtilmemiştir; kaynak kodundaki yorum, türün `void` veya bilinmiyor olabileceğini ifade etmektedir. Bir React bileşeni olduğundan, standart olarak JSX öğesi döndürmesi beklenir.
+**Ne yapar**: Bu bileşen, yönetici siparişleri sayfasının ana giriş noktası olarak görev yapar. Uluslararasılaştırma desteği entegre eder ve içerik yüklenirken kullanıcıya görsel bir geri bildirim sağlar.
+**Nasıl yapar**: `useI18n` kancasından (hook) elde edilen çeviri fonksiyonunu kullanarak metinleri yerelleştirir. Asıl içeriği oluşturan `AdminOrdersPage` bileşenini, `fallback` özelliği ile yükleniyor animasyonu içeren bir `Suspense` yapısı içinde sarmalayarak render eder.
+**Parametreler**: Yok
+**Dönüş**: JSX.Element — `Suspense` bileşeni ile sarılmış sayfa yapısını döndürür.
 
 ---
 
@@ -50,7 +48,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### [N1_NASIL] AST Pointer: src/app/admin/orders/page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**: 
-  - `t` — `useI18n` hook'undan alınan çeviri fonksiyonu; `t('common.loading')` ile metin çevirisi yapmak için kullanılır
+  - `t` — `useI18n()` hook’undan alınan yerelleştirme (çeviri) fonksiyonu; `t('common.loading')` ile `Suspense` fallback’inde gösterilecek metni döndürür.
 - **Dönüş**: JSX.Element (React bileşeni)
 
 ---
@@ -64,3 +62,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`

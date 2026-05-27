@@ -7,8 +7,8 @@ skeleton_hash: ed993728dcffbd9f
 entity_hashes:
   func:AdminStockPage: c624fd2be5fee91c
   overview: 62b56555e7eaf8c3
-  style_tokens: 77f08903451a51c4
-generated_at: 2026-05-27T11:48:56Z
+  style_tokens: d6523eb6a70db49b
+generated_at: 2026-05-27T18:30:38Z
 ---
 
 ## Genel Bakış
@@ -71,50 +71,6 @@ Bu, hesap yöneticilerinin stok işlemlerini yürütmesi için tasarlanmış bir
 
 ---
 
-### [N2_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::adjust
-- **params**: `(p: Product, delta: number)`
-- **ic_degiskenler**:
-  - `newQty` — `p.stock_qty` (null olursa 0) üzerine `delta` eklenip negatif olmaması sağlanarak hesaplanan yeni stok miktarı.
-  - `error` — Supabase `update` sorgusundan dönen hata nesnesi.
-- **Dönüş**: `void` (asenkron işlem, UI’da `saving` ve `all` durumları güncellenir; hata oluşursa konsola loglanır).
-
----
-
-### [N3_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::setQty
-- **params**: `(_productId: string, qty: number)`
-- **ic_degiskenler**:
-  - `newQty` — `qty` değerinin negatif olmaması için `Math.max(0, qty)` ile hesaplanan yeni stok miktarı.
-  - `error` — Supabase `update` sorgusundan dönen hata nesnesi.
-- **Dönüş**: `void` (asenkron işlem, `all` ve `tempQty` durumları güncellenir; hata oluşursa konsola loglanır).
-
----
-
-### [N4_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::setThreshold
-- **params**: `(_productId: string, threshold: number | null)`
-- **ic_degiskenler**:
-  - `newThreshold` — `threshold` null değil ve `>=0` ise aynı değer, aksi takdirde `null` (varsayılan eşik).
-  - `error` — Supabase `update` sorgusundan dönen hata nesnesi.
-- **Dönüş**: `void` (asenkron işlem, `all` ve `tempThreshold` durumları güncellenir; hata oluşursa konsola loglanır).
-
----
-
-### [N5_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::load
-- **params**: (parametre yok) – `useEffect` içinde tanımlı iç fonksiyon.
-- **ic_degiskenler**:
-  - `data` — Supabase `select` sorgusundan dönen ürün dizisi (`Product[]`).
-  - `error` — Supabase sorgusundan dönen hata nesnesi.
-- **Dönüş**: `void` (asenkron işlem, `mounted` hâlâ `true` ise `setAll` ile `all` durumunu doldurur; hata yok sayılır).
-
----
-
-### [N6_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::filtered
-- **params**: (parametre yok) – `useMemo` içinde tanımlı ok fonksiyonu.
-- **ic_degiskenler**:
-  - `t` — `q.trim().toLowerCase()` sonucu, arama filtresi için kullanılan metin.
-- **Dönüş**: `Product[]` – `q` boşsa `all` dizisini, aksi takdirde `name`, `sku`, `brand` alanlarında `t` içeren ürünleri döner.
-
----
-
 ## NODE ID STANDARD
 
   file: src\views\account\AdminStockPage.tsx
@@ -136,6 +92,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gray-50`, `bg-white`, `border-gray-100`, `border-light-gray`, `border-t`, `border-warning-orange`, `text-center`, `text-industrial-gray`, `text-left`, `text-red-600`, `text-sm`, `text-steel-gray`, `text-warning-orange`, `text-xl`, `text-xs`
+- **Renkler:** `bg-gray-50`, `bg-white`, `border-gray-100`, `border-light-gray`, `border-t`, `border-warning-orange`, `hover:bg-warning-orange`, `hover:border-primary-navy`, `hover:border-secondary-blue`, `hover:text-white`, `text-center`, `text-industrial-gray`, `text-left`, `text-red-600`, `text-sm`
 - **Layout:** `absolute`, `flex`, `gap-1`, `gap-2`, `items-center`, `justify-between`, `left-3`, `max-w-7xl`, `overflow-hidden`, `relative`, `sm:min-w-72`, `sm:w-96`, `sm:w-auto`, `top-1/2`, `w-16`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${qty`, `${threshold`, `-1`, `-translate-y-1/2`, `:`, `<=`, `===`, `border`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-medium`, `font-semibold`, `italic`

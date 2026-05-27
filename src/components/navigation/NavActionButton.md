@@ -4,44 +4,48 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavActionButton.tsx
 skeleton_hash: e5eba658c6a4867c
-generated_at: 2026-05-23T22:15:32Z
+entity_hashes:
+  func:NavActionButton: 9e352ab0f1dc93af
+  overview: 42d52b47442e736b
+  style_tokens: 7a26081e3b2c4d09
+generated_at: 2026-05-27T18:24:23Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulama içinde gezinti işlemlerini tetiklemek için kullanılan yeniden kullanılabilir bir düğme bileşenini tanımlar. İkon, metin, bağlantı ve tıklama işleyici gibi esnek özellikler alarak farklı bağlamlarda tutarlı bir görsel ve davranışsal deneyim sunar.
+`NavActionButton` bileşeni, uygulama içinde gezinme ve eylem tetikleme amaçlı kullanılan, ikon, etiket ve isteğe bağlı bağlantı ya da tıklama işleyicisi alabilen yeniden kullanılabilir bir UI elemanıdır. Prop’ların varlığına göre bir `<a>` ya da `<button>` elementini render ederek erişilebilirlik ve stil bütünlüğünü sağlar.
 
 ## Fonksiyon Grupları
-### Temel Bileşen
-Navigasyon eylemlerini temsil eden ve kullanıcı etkileşimini yöneten ana işlev.
-- NavActionButton
+### Navigasyon Düğmesi Bileşeni
+Bu grup, kullanıcı etkileşimini yöneten ve görsel‑işlevsel tutarlılığı sağlayan tek bir UI bileşenini içerir.  
+- NavActionButton   (diğer fonksiyonları çağırmaz; kendi içinde prop’ları işleyerek render yapar)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Komponentin beklendiği gibi render edip işlev görebilmesi için gerekli prop'ların ve stil nesnesinin sağlanması gerekir.
+Bu navigasyon eylem butonu bileşeninin doğru şekilde render edilmesi, kullanıcı etkileşimlerini alması ve erişilebilirlik standartlarını karşılaması için gerekli tüm prop'ların iletilmesi ve modülün yerleşik toneClasses stil sabitinin projeye başarılı şekilde dahil edilmesi zorunludur.
 
-- Eğer **icon** prop'u sağlanmazsa, buton içinde görsel simge gösterilemez veya görsel eksikliği oluşur.  
-- Eğer **label** prop'u sağlanmazsa, butonun amacı metinsel olarak ifade edilemez ve erişilebilirlik açısından eksiklik entsteht.  
-- Eğer **href** ve **onClick** ikisi de sağlanmazsa, buton hiçbir navigasyon veya işlem tetiklemez; etkileşimsiz bir öğe haline gelir.  
-- Eğer **ariaLabel** prop'u sağlanmazsa, ekran okuyucular tarafından butonun işlevi anlamlı şekilde açıklanamaz; erişilebilirlik azalır.  
-- Eğer **title** prop'u sağlanmazsa, fare ile üzerine gelindiğinde ipucu (tooltip) gösterilmez.  
-- Eğer **toneClasses** nesnesi eksik veya bileşenin stilini belirlemek için gerekli sınıfları içermiyorsa, komponentin görsel görünümü beklenen tema stilleriyle uyuşmayabilir.
+[Aksiyom 1]: Eğer icon prop'u sağlanmazsa, buton içinde görsel simge render edilemez, kullanıcı deneyiminde görsel eksikliği oluşur.
+[Aksiyom 2]: Eğer label prop'u sağlanmazsa, butonun amacı metinsel olarak ifade edilemez, erişilebilirlik ve kullanıcı anlayışı zarar görür.
+[Aksiyom 3]: Eğer hem href prop'u hem de onClick prop'u aynı anda sağlanmazsa, buton herhangi bir navigasyon işlemi veya özel eylem tetikleyemez, etkileşimsiz kalır.
+[Aksiyom 4]: Eğer ariaLabel prop'u sağlanmazsa, ekran okuyucu gibi erişilebilirlik araçları butonun amacını düzgün şekilde kullanıcıya iletemez, erişilebilirlik gereksinimleri karşılanamaz.
+[Aksiyom 5]: Eğer modülün yerleşik toneClasses stil sabiti projeye dahil edilmez veya geçersiz tanımlanırsa, butona ait görsel stil kuralları uygulanamaz, uygulama genelindeki görsel tutarlılık bozulur.
+[Aksiyom 6]: Eğer title prop'u sağlanmazsa, kullanıcı fare ile butonun üzerine geldiğinde gösterilecek ek açıklama ipucu metini render edilemez, ek bilgilendirme ihtiyacı karşılanamaz.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### NavActionButton
-**Ne yapar**: Bir simge, metin ve opsiyonel tıklama veya link özellikleriyle bir navigasyon eylemi butonu oluşturur.  
-**Nasıl yapar**: Props olarak alınan `icon`, `label`, `href`, `onClick`, `ariaLabel` ve `title` değerlerini kullanarak bir `<a>` veya `<button>` elementi render eder; `href` tanımlıysa `<a>` ile yönlendirme yapılır, tanımlı değilse `onClick` ile `<button>` kullanılır. Erişilebilirlik için `aria-label` ve `title` öznitelikleri eklenir.  
+**Ne yapar**: VentHub HVAC projesinin navigasyon katmanında kullanılan, kullanıcıların kolayca etkileşime girebileceği aksiyon odaklı buton bileşenidir. Hem sayfa içi rotalama yapmak hem de özel aksiyonları tetiklemek için çok yönlü olarak tasarlanmıştır, ikon ve metin etiketi desteği ile kullanıcı deneyimini zenginleştirir. Tüm modern web standartlarına ve erişilebilirlik kurallarına uygun olarak geliştirilmiştir.
+**Nasıl yapar**: Gelen tüm giriş parametrelerini erişilebilirlik prensipleri gözeterek işler, eğer href parametresi tanımlıysa bir yönlendirme bağlantısı olarak, tanımsız ise etkileşimli bir buton olarak kullanıcı arayüzüne render edilir. onClick parametresi aracılığıyla özel işlevleri tetiklerken, ariaLabel ve title gibi ek etiketlerle hem ekran okuyucu kullanan kullanıcılar hem de fare ile etkileşim kuran kullanıcılar için ek bilgilendirme sunar.
 **Parametreler**:
-- icon: React.ReactNode — Buton içinde gösterilecek simge veya SVG elementi  
-- label: string — Buton üzerinde görünecek metin  
-- href: string \| undefined — Butonun link hedefi; tanımlıysa `<a>` elementiyle yönlendirme yapılır  
-- onClick: React.MouseEventHandler<HTMLAnchorElement \| HTMLButtonElement> \| undefined — Tıklama olayını işleyen fonksiyon; `href` tanımlı değilse zorunlu  
-- ariaLabel: string \| undefined — Erişilebilirlik için butona verilecek açıklama metni  
-- title: string \| undefined — Fare ile üzerine gelindiğinde gösterilecek ipucu metni  
-**Dönüş**: React.FC<NavActionButtonProps> — Props'u alan ve ilgili JSX elementi döndüren bir React fonksiyon bileşeni
+- icon: React.ReactNode — Buton üzerinde kullanıcının göreceği görsel ikon öğesi, butonun amacını hızlıca anlamayı destekler
+- label: string — Buton üzerinde görüntülenecek metin etiketi, butonun işlevini açıkça kullanıcıya iletir
+- href: string | undefined — Butona tıklandığında yönlendirilecek rota veya harici bağlantı adresi, sadece rotalama amaçlı kullanıldığında tanımlanır
+- onClick: () => void | undefined — Butona tıklandığında tetiklenecek özel aksiyon fonksiyonu, manuel işlemler veya özel iş akışları için kullanılır
+- ariaLabel: string | undefined — Ekran okuyucular tarafından okunacak erişilebilirlik etiketi, butonun amacını ek metinle açıklar, erişilebilirliği artırır
+- title: string | undefined — Buton üzerine fare imleci ile gelindiğinde açılan küçük ipucu metni, kullanıcıya ek bilgi sunar
+**Dönüş**: React.FC<NavActionButtonProps> — Projenin navigasyon menülerinde veya navigasyon ile ilgili alanlarda kullanılmaya hazır, tüm özellikleri yapılandırılmış React fonksiyonel bileşeni döndürür
 
 ---
 
@@ -79,12 +83,12 @@ type NavActionTone = 'default' | 'accent' | 'success' | 'warning'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/navigation/NavActionButton.tsx::NavActionButton
-- **params**: icon, label, href, onClick, ariaLabel, title, badge, tone, className, iconClassName, labelClassName
+### [N1_NASIL] AST Pointer: NavActionButton.tsx::NavActionButton
+- **params**: `{ icon, label, href, onClick, ariaLabel, title, badge, tone = 'default', className, iconClassName, labelClassName }`
 - **ic_degiskenler**:
-  - `content` — JSX fragment that renders the icon (with optional badge) and label wrapped in spans, applying `iconClassName` and conditionally rendering the label when present.
-  - `classes` — string of Tailwind CSS classes produced by `cn` that merges base group styles, compact sizing, tone‑specific lookup from `toneClasses[tone]`, and any extra `className` prop.
-- **Dönüş**: JSX.Element (React.FC) — returns a `<Link>` component wrapping `content` when `href` is truthy, otherwise returns a `<button>` with `onClick` handler; both receive `aria-label`, `title`, and the computed `classes`.
+  - `content` — JSX fragment wrapping the icon, optional badge, and conditional label text, used as the child content for both navigation link and button elements
+  - `classes` — Concatenated CSS class strings generated via the imported `cn` utility, including base component styling, tone-specific styles from `toneClasses[tone]`, and custom class props passed to the component
+- **Dönüş**: Returns a Next.js `<Link>` component when `href` prop is provided, otherwise returns a native HTML `<button type="button">` element; both are valid React JSX elements
 
 ---
 
@@ -110,5 +114,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `border-transparent`, `text-sm`
-- **Layout:** `gap-2`, `group-hover:scale-105`, `inline-flex`, `items-center`, `min-w-0`, `relative`
-- **Responsive:** (yok)
+- **Layout:** `gap-2`, `inline-flex`, `items-center`, `min-w-0`, `relative`
+- **Varyant/Responsive:** `focus-visible:`, `group-hover:` önekleri
+- **Yardımcı Sınıflar:** `border`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy/20`, `font-semibold`, `group`, `group-hover:scale-105`, `px-3`, `py-2.5`, `rounded-2xl`, `shrink-0`, `transition-colors`, `transition-transform`

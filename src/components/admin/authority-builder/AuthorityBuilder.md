@@ -8,8 +8,8 @@ entity_hashes:
   func:AuthorityBuilder: ea4f02be3be8275d
   func:getInitialContent: d68640fe30ab6ebc
   overview: 03c5d2aeedc01c1b
-  style_tokens: 6c54695849d4863f
-generated_at: 2026-05-27T11:40:20Z
+  style_tokens: debe507a4c224f1e
+generated_at: 2026-05-27T18:10:48Z
 ---
 
 ## Genel Bakış
@@ -142,6 +142,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-indigo-600`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-900`, `bg-white`, `border-2`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `text-center`, `text-indigo-300`, `text-lg`, `text-red-500`, `text-slate-300`
-- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `group-hover:opacity-100`, `h-10`, `h-4`, `h-5`, `h-6`, `h-8`, `h-auto`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Renkler:** `bg-indigo-600`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-900`, `bg-white`, `border-2`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `hover:bg-indigo-50`, `hover:bg-red-50`, `hover:bg-slate-200`, `hover:border-indigo-400`, `text-center`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `h-10`, `h-4`, `h-5`, `h-6`, `h-8`, `h-auto`, `hover:shadow-md`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${btnOutline`, `${cardClass`, `border`, `cursor-grab`, `editor`, `font-bold`, `font-medium`, `font-mono`, `group`, `group-hover:opacity-100`, `italic`, `json`, `mr-2`, `mt-8`, `opacity-0`

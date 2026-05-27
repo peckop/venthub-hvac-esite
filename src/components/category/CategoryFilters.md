@@ -8,8 +8,8 @@ entity_hashes:
   func:CategoryFilters: 420d76bf670f1cf8
   func:toggleBrand: 67afbe53ea415719
   overview: e7958b385edc9e41
-  style_tokens: 15f8a6328e78c6bf
-generated_at: 2026-05-27T11:45:31Z
+  style_tokens: 57cd966a2983f774
+generated_at: 2026-05-27T18:10:59Z
 ---
 
 ## Genel Bakış
@@ -115,6 +115,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `accent-primary-ocean`, `bg-slate-50`, `bg-white`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-300`, `text-primary-ocean`, `text-slate-300`, `text-slate-400`, `text-slate-500`, `text-slate-600`, `text-slate-900`, `text-sm`, `text-white`
-- **Layout:** `absolute`, `block`, `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `group-hover:text-slate-900`, `h-3`, `h-5`, `items-center`, `justify-between`, `justify-center`, `max-h-48`, `overflow-y-auto`, `p-6`
-- **Responsive:** (yok)
+- **Renkler:** `accent-primary-ocean`, `bg-slate-50`, `bg-white`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-300`, `checked:bg-primary-ocean`, `checked:border-primary-ocean`, `focus-visible:border-primary-ocean`, `group-hover:text-slate-900`, `hover:bg-slate-50`, `hover:text-primary-navy`, `placeholder:text-slate-300`, `placeholder:text-slate-400`
+- **Layout:** `absolute`, `block`, `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `h-3`, `h-5`, `items-center`, `justify-between`, `justify-center`, `max-h-48`, `overflow-y-auto`, `p-6`, `relative`
+- **Varyant/Responsive:** `checked:`, `focus-visible:`, `group-hover:`, `hover:`, `peer-checked:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `appearance-none`, `border`, `cursor-pointer`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-ocean/20`, `font-black`, `font-bold`, `font-medium`, `font-semibold`, `group`, `mb-2`, `mb-3`, `mb-6`, `mb-8`

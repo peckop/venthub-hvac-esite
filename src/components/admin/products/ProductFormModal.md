@@ -8,8 +8,8 @@ entity_hashes:
   func:ProductFormModal: 6997b37c35b0ebef
   func:onSubmit: 56cec6a550e2cc75
   overview: 12f9cde3f23a5605
-  style_tokens: 07efc4a866288b40
-generated_at: 2026-05-27T11:44:07Z
+  style_tokens: 553a7b8fa0cd3c86
+generated_at: 2026-05-27T18:10:54Z
 ---
 
 ## Genel Bakış
@@ -177,6 +177,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/50`, `bg-primary-navy`, `bg-white`, `text-industrial-gray`, `text-red-500`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
+- **Renkler:** `bg-black/50`, `bg-primary-navy`, `bg-white`, `hover:bg-blue-700`, `hover:bg-slate-100`, `hover:bg-slate-50`, `text-industrial-gray`, `text-red-500`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
 - **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-center`, `justify-between`, `justify-end`, `left-1/2`, `max-h-90vh`, `max-w-2xl`, `md:grid-cols-2`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `focus-visible:outline-none`, `font-bold`, `inset-0`, `mb-6`, `mt-8`, `px-4`, `px-6`, `py-2`, `rounded-2xl`, `rounded-full`, `rounded-lg`

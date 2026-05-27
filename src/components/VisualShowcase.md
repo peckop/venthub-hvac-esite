@@ -4,224 +4,206 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx
 skeleton_hash: aff37f07cc40274b
-generated_at: 2026-05-23T22:28:43Z
+entity_hashes:
+  func:ChevronLeftIcon: 528282355948f0bf
+  func:ChevronRightIcon: eee2ea0200791ea6
+  func:PauseIcon: ceb957c4aff5f7b7
+  func:PlayIcon: 0708496e420e6f6e
+  func:VisualShowcase: 41ca766f4149219c
+  func:onTouchEnd: 6d11887cdcd98ede
+  func:onTouchStart: e808a6bab1256660
+  func:usePrefersReducedMotion: 11085ad489b48f61
+  overview: 7e4ec691259cb85e
+  style_tokens: 2f11e16677a4f30c
+generated_at: 2026-05-27T18:10:31Z
 ---
 
 ## Genel Bakış
-Bu React modülü, içerikleri etkileşimli bir slayt vitrini olarak sunan VisualShowcase bileşenini barındırır. Hem masaüstü hem mobil cihazlarda kullanıcı etkileşimini destekler, erişilebilirlik standartlarına uygun olarak kullanıcıların hareket azaltma tercihini de dikkate alır. Slaytlar arasında gezinme, oynatma/duraklatma gibi temel işlevleri tek bir modül altında toplar.
+`VisualShowcase` modülü, kaydırılabilir görsel içerikleri sunan bir React bileşenidir. Kullanıcıların hareket azaltma tercihine duyarlı olup, dokunmatik ve fare etkileşimlerini yönetir; aynı zamanda gezinme ve medya kontrolü için özelleştirilebilir ikon bileşenleri sağlar.
 
 ## Fonksiyon Grupları
-### Ana Bileşen ve Erişilebilirlik Yardımcısı
-Modülün tüm işlevlerini koordine eden, alt bileşenleri bir araya getiren temel yapıdır. Kullanıcının hareket azaltma tercihini alarak erişilebilirlik gereksinimlerini karşılar.
-- usePrefersReducedMotion, VisualShowcase
+### Erişilebilirlik ve Bileşen Koordinasyonu  
+Bu grup, bileşenin genel davranışını yöneten ve kullanıcı tercihlerini (reduced motion) dikkate alan yardımcı fonksiyonları içerir.  
+- usePrefersReducedMotion, VisualShowcase  
 
-### Dokunmatik Etkileşim Yöneticileri
-Mobil cihazlarda kullanıcıların dokunmatik hareketleriyle vitrin içindeki slaytlar arasında gezinmesini sağlayan olay işleyicileridir.
-- onTouchStart, onTouchEnd
+### Dokunmatik Etkileşim İşleyicileri  
+Mobil cihazlarda kaydırma ve dokunma hareketlerini algılayarak slayt geçişlerini kontrol eden olay yöneticileri.  
+- onTouchStart, onTouchEnd  
 
-### Arayüz İkon Bileşenleri
-Vitrin arayüzünde kullanılan gezinme ve medya kontrol ikonlarını oluşturan, boyut ve stil özelleştirmesini destekleyen yeniden kullanılabilir bileşenlerdir.
+### UI İkon Bileşenleri  
+Gezinme ve oynatma/duraklatma kontrolleri için kullanılan, boyut ve stil özelleştirmesine izin veren yeniden kullanılabilir ikon bileşenleri.  
 - ChevronLeftIcon, ChevronRightIcon, PauseIcon, PlayIcon
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı görsel vitrin bileşeninin çalışması için bağımlı olduğu tüm React hook'ları, ikon bileşenleri ve tarayıcı ortam özelliklerinin erişilebilir, tanımlı ve çalışır durumda olması zorunludur.
 
-[Aksiyom 1]: Eğer `usePrefersReducedMotion()` hook'u proje içinde tanımlı ve erişilebilir değilse, bileşen kullanıcının azaltılmış hareket tercihini algılayamaz, görsel animasyonlar erişilebilirlik standartlarını karşılamaz.
-[Aksiyom 2]: Eğer React ortamında `React.TouchEvent` tipi tanımlı değilse, `onTouchStart` ve `onTouchEnd` dokunmatik olay işleyicileri çalışmaz, mobil cihazlarda vitrin ile kullanıcı etkileşimi kurulamaz.
-[Aksiyom 3]: Eğer `ChevronLeftIcon`, `ChevronRightIcon`, `PauseIcon`, `PlayIcon` ikon bileşenleri proje içinden erişilebilir değilse, VisualShowcase bileşeni başarıyla render edilemez, derleme veya çalışma zamanı hatası fırlatır.
-[Aksiyom 4]: Eğer ikon bileşenleri kendisine aktarılan `size` ve `className` parametrelerini işleyemiyorsa, ikonlar doğru şekilde görüntülenemez, VisualShowcase bileşeninin kullanıcı arayüzü bozulur.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### usePrefersReducedMotion
-**Ne yapar**: Kullanıcının tarayıcı veya işletim sistemi seviyesindeki azaltılmış hareket tercihini tespit ederek bu bilgiyi React bileşenlerine sunan özel bir hook'tur. Animasyon yoğunluğunu kullanıcının erişilebilirlik tercihine göre ayarlamak amacıyla kullanılır.
-**Nasıl yapar**: Tarayıcının standart `window.matchMedia` API'sini kullanarak `prefers-reduced-motion` medya sorgusunu çalıştırır, sorgunun sonucunu hook içindeki durumda saklar ve bu değeri kullanıma sunar. Kullanıcı tercihi değiştiğinde durumu otomatik olarak günceller.
-**Parametreler**: Herhangi bir parametre almaz
-**Dönüş**: Kullanıcının azaltılmış hareket tercihini belirten boolean tipinde `reduced` değeri; tercih mevcutsa `true`, aksi halde `false` döndürür.
+**Ne yapar**: Kullanıcının “reduce motion” tercihini izler ve bu tercihe göre bir boolean değer döndürür.  
+**Nasıl yapar**: `useState` ile `reduced` adında bir durum oluşturur, `useEffect` içinde `window.matchMedia('(prefers-reduced-motion: reduce)')` sorgusunu dinler, değişiklik olduğunda `setReduced` ile günceller ve bileşen unmount olduğunda dinleyiciyi temizler.  
+**Parametreler**:  
+- *yok*  
+**Dönüş**: `boolean` – `true` ise kullanıcı hareketi azaltmayı tercih eder, `false` ise tercih etmez.
 
 ### VisualShowcase
-**Ne yapar**: Venthub HVAC projesinde sistemlerin görsel vitrinini sunan ana React bileşenidir. İnteraktif olarak havalandırma ve klima sistemlerinin demolarını, animasyonlarını kullanıcıya göstermek için tasarlanmıştır.
-**Nasıl yapar**: İçerisinde hareket tercihi kontrolü için `usePrefersReducedMotion` hook'unu, dokunmatik etkileşimler için `onTouchStart` ve `onTouchEnd` olay işleyicilerini kullanır. Gezinme ve oynatma kontrolleri için ikon bileşenlerini entegre ederek eksiksiz bir interaktif vitrin deneyimi sunar.
-**Parametreler**: Herhangi bir parametre almaz
-**Dönüş**: React tarafından DOM'a render edilebilecek bir React.FC (React Bileşeni) olarak, vitrin içeriğini içeren JSX yapısını döndürür.
+**Ne yapar**: Projenin görsel gösterim bileşenini tanımlar; dışarıdan bir React fonksiyonel bileşen (FC) olarak kullanılabilir.  
+**Nasıl yapar**: Kaynak kodu verilmemiştir; ancak isimlendirmeden ve dosya yolundan, UI içinde çeşitli ikon ve dokunma olaylarını yöneten bir gösterim bileşeni olduğu anlaşılır.  
+**Parametreler**:  
+- *yok*  
+**Dönüş**: `React.FC` – bir React fonksiyonel bileşenidir.
 
 ### onTouchStart
-**Ne yapar**: Dokunmatik ekranlı cihazlarda kullanıcının vitrin içeriğine dokunmaya başladığında tetiklenen olay işleyicisidir. Dokunma başlangıcında animasyonları yönetmek, dokunma konumunu kaydetmek gibi işlemleri gerçekleştirir.
-**Nasıl yapar**: React tarafından sarmalanmış standart `TouchEvent` nesnesini alarak olayın tüm verilerine erişir, bileşenin iç durumunu güncelleyerek dokunma işleminin başladığını kaydeder, gerektiğinde vitrin içindeki animasyonların akışını duraklatır veya yönlendirir.
-**Parametreler**:
-- name: e — type: React.TouchEvent — Tarayıcının tetiklediği dokunma başlangıç olayının konum, zaman ve etkileşim verilerini içeren standart React olay nesnesi
-**Dönüş**: Herhangi bir değer döndürmez, yalnızca bileşenin iç durumunu etkileyen yan etkiler oluşturur, dönüş tipi `void`'tır.
+**Ne yapar**: Dokunma (touch) başlangıç olayını yakalar; genellikle kaydırma veya sürükleme gibi etkileşimlerin başlangıcını işaret eder.  
+**Nasıl yapar**: Fonksiyon gövdesi sağlanmamış olsa da, parametre olarak gelen `React.TouchEvent` nesnesini alır ve ilgili mantığı yürütür.  
+**Parametreler**:  
+- `e`: `React.TouchEvent` — Dokunma başlangıç olayının detaylarını içerir.  
+**Dönüş**: Belirtilmemiş; tipik olarak `void`.
 
 ### onTouchEnd
-**Ne yapar**: Kullanıcının vitrin içeriğinden parmağını çektiği, dokunma işleminin sonlandığı anda tetiklenen olay işleyicisidir. Dokunma sonrası animasyonları yeniden başlatmak, kaydırma veya gezinme işlemlerini tetiklemek için kullanılır.
-**Nasıl yapar**: Aldığı `TouchEvent` nesnesinin verileriyle dokunma süresini ve mesafesini hesaplar, bu hesaplamalara göre kullanıcının sola/sağa kaydırma mı yoksa basit tıklama mı yaptığını ayırt eder, tespit ettiği eyleme göre vitrin içeriğinde gezinme veya oynatma işlemlerini başlatır.
-**Parametreler**:
-- name: e — type: React.TouchEvent — Dokunma sonlanma anındaki tüm olay verilerini içeren React tarafından sarmalanmış standart olay nesnesi
-**Dönüş**: Herhangi bir değer döndürmez, yalnızca iç durumu güncellemek ve işlemleri tetiklemek için kullanılır, dönüş tipi `void`'tır.
+**Ne yapar**: Dokunma (touch) bitiş olayını yakalar; kaydırma veya sürükleme gibi etkileşimlerin sonlandırılmasını işaret eder.  
+**Nasıl yapar**: Fonksiyon gövdesi sağlanmamış olsa da, parametre olarak gelen `React.TouchEvent` nesnesini alır ve ilgili mantığı yürütür.  
+**Parametreler**:  
+- `e`: `React.TouchEvent` — Dokunma bitiş olayının detaylarını içerir.  
+**Dönüş**: Belirtilmemiş; tipik olarak `void`.
 
 ### ChevronLeftIcon
-**Ne yapar**: Sol yönlü ok şeklinde özelleştirilebilir bir ikon bileşenidir, VisualShowcase içindeki önceki içeriğe geçme butonunda kullanılır. Yeniden kullanılabilir yapıya sahiptir.
-**Nasıl yapar**: Parametre olarak aldığı boyut ve sınıf değerlerini SVG elemanına ileterek ikonun görünümünü ihtiyaca göre ayarlar, hardcoded sol ok vektör yolu üzerinden ikonu ekrana render eder, özel CSS sınıflarını kabul ederek stillendirme esnekliği sunar.
-**Parametreler**:
-- name: size — type: number? — İkonun piksel cinsinden genişlik ve yüksekliğini belirleyen opsiyonel sayısal değer, varsayılan değeri 18'dir
-- name: className — type: string? — İkona özel stiller veya ek CSS sınıfları eklemek için kullanılan opsiyonel metin değeri, varsayılan olarak boş string'dir
-**Dönüş**: Özelleştirilmiş sol ok ikonunu içeren JSX içeriği döndürür, UI'de kullanılmak üzere render edilir, herhangi bir fonksiyonel dönüş değeri yoktur.
+**Ne yapar**: Sol yönlü bir ok (chevron) SVG ikonu üretir; UI’da gezinme veya geri yönlendirme için kullanılabilir.  
+**Nasıl yapar**: `size` ve `className` prop’larını alır, bu değerlerle bir `<svg>` elementi oluşturur ve içinde sol yönlü polyline çizer.  
+**Parametreler**:  
+- `size`: `number` — İkonun genişlik ve yükseklik değerini belirler; varsayılan 18.  
+- `className`: `string` — İkonun CSS sınıflarını eklemek için kullanılır; varsayılan boş string.  
+**Dönüş**: JSX içinde bir `<svg>` elementi; React bileşeni olarak render edilir.
 
 ### ChevronRightIcon
-**Ne yapar**: Sağ yönlü ok şeklinde özelleştirilebilir bir ikon bileşenidir, VisualShowcase içindeki sonraki içeriğe geçme butonunda kullanılır. Tüm projede yeniden kullanılabilir yapıya sahiptir.
-**Nasıl yapar**: Aldığı boyut ve sınıf parametrelerini SVG elemanının özelliklerine uygulayarak ikonun boyutlarını ve stillerini ayarlar, sağ ok vektör yolu üzerinden ikonu ekrana yazdırır, her türlü tasarıma uyum sağlayacak şekilde özelleştirilebilir.
-**Parametreler**:
-- name: size — type: number? — İkonun piksel cinsinden boyutunu belirleyen opsiyonel sayısal değer, varsayılan değeri 18'dir
-- name: className — type: string? — İkona özel CSS sınıfları eklemek için kullanılan opsiyonel metin değeri, varsayılan olarak boş string'dir
-**Dönüş**: Özelleştirilmiş sağ ok ikonunu içeren JSX içeriği döndürür, UI kontrollerinde kullanılmak üzere sunulur, herhangi bir fonksiyonel dönüş değeri yoktur.
+**Ne yapar**: Sağ yönlü bir ok (chevron) SVG ikonu üretir; UI’da ileri yönlendirme için kullanılabilir.  
+**Nasıl yapar**: `size` ve `className` prop’larını alır, bu değerlerle bir `<svg>` elementi oluşturur ve içinde sağ yönlü polyline çizer.  
+**Parametreler**:  
+- `size`: `number` — İkonun genişlik ve yükseklik değerini belirler; varsayılan 18.  
+- `className`: `string` — İkonun CSS sınıflarını eklemek için kullanılır; varsayılan boş string.  
+**Dönüş**: JSX içinde bir `<svg>` elementi; React bileşeni olarak render edilir.
 
 ### PauseIcon
-**Ne yapar**: İki dikey çubuk şeklindeki standart duraklatma simgesini oluşturan özelleştirilebilir ikon bileşenidir, VisualShowcase içindeki animasyon veya medya oynatımını duraklatmak için kullanılan butonlarda yer alır.
-**Nasıl yapar**: Parametre olarak aldığı boyut ve sınıf değerlerini SVG elemanına ileterek ikonun görünümünü ihtiyaca göre ayarlar, standart duraklatma ikonunun vektör yolunu kullanarak ekrana render eder, stillendirme esnekliği sunar.
-**Parametreler**:
-- name: size — type: number? — İkonun piksel cinsinden genişlik ve yüksekliğini belirleyen opsiyonel sayısal değer, varsayılan değeri 18'dir
-- name: className — type: string? — İkona özel stiller veya ek sınıflar eklemek için kullanılan opsiyonel metin değeri, varsayılan olarak boş string'dir
-**Dönüş**: Özelleştirilmiş duraklatma ikonunu içeren JSX içeriği döndürür, vitrinin oynatım kontrollerinde kullanılmak üzere sunulur, herhangi bir fonksiyonel dönüş değeri yoktur.
+**Ne yapar**: Duraklatma (pause) durumunu temsil eden iki dikdörtgen SVG ikonu üretir.  
+**Nasıl yapar**: `size` ve `className` prop’larını alır, bu değerlerle bir `<svg>` elementi oluşturur ve içinde iki dikdörtgen çizer.  
+**Parametreler**:  
+- `size`: `number` — İkonun genişlik ve yükseklik değerini belirler; varsayılan 18.  
+- `className`: `string` — İkonun CSS sınıflarını eklemek için kullanılır; varsayılan boş string.  
+**Dönüş**: JSX içinde bir `<svg>` elementi; React bileşeni olarak render edilir.
 
 ### PlayIcon
-**Ne yapar**: Sağa yönlü üçgen şeklindeki standart oynatma simgesini oluşturan özelleştirilebilir ikon bileşenidir, VisualShowcase içindeki duraklatılmış animasyon veya medya içeriğini yeniden başlatmak için kullanılan butonlarda yer alır.
-**Nasıl yapar**: Aldığı boyut ve sınıf parametrelerini SVG elemanının özelliklerine uygulayarak ikonun boyutlarını ve stillerini ayarlar, standart oynatma ikonunun vektör yolunu kullanarak ekrana render eder, projenin tasarım diline uyum sağlayacak şekilde özelleştirilebilir.
-**Parametreler**:
-- name: size — type: number? — İkonun piksel cinsinden genişlik ve yüksekliğini belirleyen opsiyonel sayısal değer, varsayılan değeri 18'dir
-- name: className — type: string? — İkona özel CSS sınıfları eklemek için kullanılan opsiyonel metin değeri, varsayılan olarak boş string'dir
-**Dönüş**: Özelleştirilmiş oynatma ikonunu içeren JSX içeriği döndürür, vitrinin oynatım kontrollerinde kullanılmak üzere sunulur, herhangi bir fonksiyonel dönüş değeri yoktur.
+**Ne yapar**: Oynatma (play) durumunu temsil eden üçgen SVG ikonu üretir.  
+**Nasıl yapar**: `size` ve `className` prop’larını alır, bu değerlerle bir `<svg>` elementi oluşturur ve içinde bir üçgen (polygon) çizer.  
+**Parametreler**:  
+- `size`: `number` — İkonun genişlik ve yükseklik değerini belirler; varsayılan 18.  
+- `className`: `string` — İkonun CSS sınıflarını eklemek için kullanılır; varsayılan boş string.  
+**Dönüş**: JSX içinde bir `<svg>` elementi; React bileşeni olarak render edilir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::usePrefersReducedMotion
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: src/components/VisualShowcase.tsx::usePrefersReducedMotion
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `reduced` — Kullanıcının azaltılmış hareket tercihini saklayan boolean state değeri
-  - `setReduced` - reduced state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `mq` - `(prefers-reduced-motion: reduce)` medya sorgusunu temsil eden MediaQueryList nesnesi
-  - `onChange` - Medya sorgusu değeri değiştiğinde reduced state'ini güncellemek için tanımlanan event handler
-- **Dönüş**: boolean (reduced state değeri)
+  - `reduced` — `useState` ile tanımlanan boolean, kullanıcının “reduce motion” tercihini tutar.
+  - `setReduced` — `reduced` state'ini güncelleyen setter fonksiyonu.
+  - `mq` — `window.matchMedia('(prefers-reduced-motion: reduce)')` sonucunda elde edilen MediaQueryList nesnesi.
+  - `onChange` — `mq.matches` değerine göre `setReduced` çağıran callback.
+- **Dönüş**: `boolean` (`reduced`)
 
----
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::VisualShowcase
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: src/components/VisualShowcase.tsx::VisualShowcase
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` - useI18n hook'undan alınan metinleri çevirmek için kullanılan fonksiyon
-  - `index` - Aktif carousel slaytının indeksini saklayan state değeri
-  - `setIndex` - index state'ini güncelleyen React state setter fonksiyonu
-  - `playing` - Carousel otomatik oynatma durumunu saklayan boolean state
-  - `setPlaying` - playing state'ini güncelleyen React state setter fonksiyonu
-  - `startXRef` - Dokunmatik kaydırma başlangıç X koordinatını saklayan ref nesnesi
-  - `containerRef` - Carousel ana kapsayıcı DOM elementine erişmek için kullanılan ref nesnesi
-  - `reducedMotion` - usePrefersReducedMotion hook'undan alınan kullanıcının azaltılmış hareket tercihi
-  - `mounted` - Bileşenin DOM'a mount olup olmadığını takip eden boolean state
-  - `setMounted` - mounted state'ini güncelleyen React state setter fonksiyonu
-  - `isCoarse` - Cihazın dokunmatik (pointer: coarse) olup olmadığını kontrol eden boolean değer
-  - `disableFancy` - Gelişmiş görsel efektleri (parallax, parçacık) devre dışı bırakmak için kullanılan boolean
-  - `mouse` - Parallax efektinde kullanılan fare konumunu saklayan {x: number, y: number} nesnesi
-  - `setMouse` - mouse state'ini güncelleyen React state setter fonksiyonu
-  - `slides` - Carousel içindeki tüm slaytların verisini tutan, useMemo ile önbelleğe alınan dizi
-  - `slidesCount` - Toplam slayt sayısını saklayan sayısal değer
-  - `id` - Otomatik oynatma interval ID'sini saklayan değişken
-  - `prev` - Önceki slayta geçmek için useCallback ile sarmalanmış fonksiyon
-  - `next` - Sonraki slayta geçmek için useCallback ile sarmalanmış fonksiyon
-  - `canvasRef` - Parçacık efekti için kullanılan canvas DOM elementine erişen ref nesnesi
-  - `particles` - Canvas üzerinde çizilecek 28 adet parçacığın koordinat ve hız verisini tutan, useMemo ile önbelleğe alınan dizi
-  - `ctx` - Canvas'ın 2D çizim bağlamı
-  - `raf` - requestAnimationFrame ID'sini saklayan değişken
-  - `render` - Her karede canvas üzerinde parçacıkları çizen render fonksiyonu
-- **Dönüş**: JSX.Element (React carousel bileşeni)
+  - `t` — `useI18n` hookundan gelen çeviri fonksiyonu.
+  - `index` — mevcut slide indeksini tutan state.
+  - `setIndex` — `index` state'ini güncelleyen setter.
+  - `playing` — otomatik oynatma (autoplay) durumunu belirten boolean state.
+  - `setPlaying` — `playing` state'ini güncelleyen setter.
+  - `startXRef` — dokunma başlangıç X koordinatını saklayan `useRef<number | null>`.
+  - `containerRef` — carousel konteyner DOM elemanına referans veren `useRef<HTMLDivElement | null>`.
+  - `reducedMotion` — `usePrefersReducedMotion` hookundan dönen değer.
+  - `mounted` — bileşenin DOM'a monte edilip edilmediğini gösteren boolean state.
+  - `isCoarse` — cihazın dokunmatik (coarse) işaretçi tipine sahip olup olmadığını belirten boolean.
+  - `disableFancy` — reduced motion, coarse pointer veya dar ekran koşullarında fancy efektleri devre dışı bırakmak için kullanılan boolean.
+  - `mouse` — `{x:number, y:number}` şeklinde fare konumunun yumuşatılmış değerlerini tutan state.
+  - `setMouse` — `mouse` state'ini güncelleyen setter.
+  - `slides` — `useMemo` ile oluşturulan sabit slide dizisi; her eleman `{title, subtitle, colorFrom, colorTo}` içerir.
+  - `slidesCount` — `slides.length` değeri.
+  - `prev` — önceki slide’a geçiş yapan `React.useCallback` fonksiyonu.
+  - `next` — sonraki slide’a geçiş yapan `React.useCallback` fonksiyonu.
+  - `onTouchStart` — dokunma başlangıcında `startXRef.current`'i ayarlayan fonksiyon.
+  - `onTouchEnd` — dokunma bitişinde kaydırma mesafesini ölçüp `prev`/`next` çağıran fonksiyon.
+  - `onKey` — klavye olaylarını dinleyen, ok tuşları ve boşluk ile kontrol sağlayan callback.
+  - `el` — `containerRef.current` üzerinden elde edilen DOM elemanı (parallax hareketi için).
+  - `onMove` — fare hareketlerini izleyip `mouse` state'ini yumuşak bir şekilde güncelleyen fonksiyon.
+  - `canvasRef` — `<canvas>` elemanına referans veren `useRef<HTMLCanvasElement | null>`.
+  - `particles` — `useMemo` ile oluşturulan 28 adet rastgele konum ve hız değerine sahip parçacık nesnesi dizisi.
+  - `ctx` — `canvas.getContext('2d')` ile alınan 2D çizim bağlamı.
+  - `raf` — `requestAnimationFrame` döngüsü için tutulan kimlik.
+  - `render` — canvas üzerine parçacıkları çizen ve animasyonu sürdüren fonksiyon.
+- **Dönüş**: `React.FC` (JSX öğesi döner; yan etkileri: DOM event listener ekleme, canvas çizimi, state güncellemeleri)
 
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::onTouchStart
-- **params**: (e: React.TouchEvent)
+### [N3_NASIL] AST Pointer: src/components/VisualShowcase.tsx::onTouchStart
+- **params**: `e: React.TouchEvent`
 - **ic_degiskenler**:
-  - `e` - Dokunma başlangıç olayını temsil eden React TouchEvent nesnesi
-  - `e.touches[0].clientX` - İlk temas noktasının X koordinatı
-  - `startXRef.current` - Dokunma başlangıç konumunu saklamak için kullanılan ref değeri
-- **Dönüş**: yok
+  - `e` — dokunma olayı nesnesi.
+- **Dönüş**: yok (sadece `startXRef.current` günceller)
 
----
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::onTouchEnd
-- **params**: (e: React.TouchEvent)
+### [N4_NASIL] AST Pointer: src/components/VisualShowcase.tsx::onTouchEnd
+- **params**: `e: React.TouchEvent`
 - **ic_degiskenler**:
-  - `e` - Dokunma bitiş olayını temsil eden React TouchEvent nesnesi
-  - `startXRef.current` - Önce kaydedilen dokunma başlangıç X koordinatı
-  - `e.changedTouches[0].clientX` - Dokunma sonu temas noktasının X koordinatı
-  - `dx` - Başlangıç ve son X koordinatları arasındaki mesafe farkı
-  - `prev` - Önceki slayta geçme fonksiyonu
-  - `next` - Sonraki slayta geçme fonksiyonu
-- **Dönüş**: yok
+  - `e` — dokunma bitiş olayı nesnesi.
+  - `dx` — başlangıç X (`startXRef.current`) ile bitiş X arasındaki fark.
+- **Dönüş**: yok (koşula göre `prev`/`next` çağırır ve `startXRef.current`i sıfırlar)
 
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::ChevronLeftIcon
-- **params**: ({ size = 18, className = '' }: { size?: number; className?: string })
+### [N5_NASIL] AST Pointer: src/components/VisualShowcase.tsx::ChevronLeftIcon
+- **params**: `{ size = 18, className = '' }: { size?: number; className?: string }`
 - **ic_degiskenler**:
-  - `size` - SVG ikonunun genişlik ve yüksekliğini belirten sayısal değer
-  - `className` - İkona uygulanacak özel CSS sınıfları
-- **Dönüş**: JSX.Element (Sol ok simgesi SVG'i)
+  - `size` — SVG genişlik ve yükseklik değeri (default 18).
+  - `className` — ek CSS sınıfları (default boş string).
+- **Dönüş**: yok (JSX `<svg>` döner)
 
----
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::ChevronRightIcon
-- **params**: ({ size = 18, className = '' }: { size?: number; className?: string })
+### [N6_NASIL] AST Pointer: src/components/VisualShowcase.tsx::ChevronRightIcon
+- **params**: `{ size = 18, className = '' }: { size?: number; className?: string }`
 - **ic_degiskenler**:
-  - `size` - SVG ikonunun genişlik ve yüksekliğini belirten sayısal değer
-  - `className` - İkona uygulanacak özel CSS sınıfları
-- **Dönüş**: JSX.Element (Sağ ok simgesi SVG'i)
+  - `size` — SVG genişlik ve yükseklik değeri (default 18).
+  - `className` — ek CSS sınıfları (default boş string).
+- **Dönüş**: yok (JSX `<svg>` döner)
 
----
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::PauseIcon
-- **params**: ({ size = 18, className = '' }: { size?: number; className?: string })
+### [N7_NASIL] AST Pointer: src/components/VisualShowcase.tsx::PauseIcon
+- **params**: `{ size = 18, className = '' }: { size?: number; className?: string }`
 - **ic_degiskenler**:
-  - `size` - SVG ikonunun genişlik ve yüksekliğini belirten sayısal değer
-  - `className` - İkona uygulanacak özel CSS sınıfları
-- **Dönüş**: JSX.Element (Duraklatma simgesi SVG'i)
+  - `size` — SVG genişlik ve yükseklik değeri (default 18).
+  - `className` — ek CSS sınıfları (default boş string).
+- **Dönüş**: yok (JSX `<svg>` döner)
 
----
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::PlayIcon
-- **params**: ({ size = 18, className = '' }: { size?: number; className?: string })
+### [N8_NASIL] AST Pointer: src/components/VisualShowcase.tsx::PlayIcon
+- **params**: `{ size = 18, className = '' }: { size?: number; className?: string }`
 - **ic_degiskenler**:
-  - `size` - SVG ikonunun genişlik ve yüksekliğini belirten sayısal değer
-  - `className` - İkona uygulanacak özel CSS sınıfları
-- **Dönüş**: JSX.Element (Oynatma simgesi SVG'i)
+  - `size` — SVG genişlik ve yükseklik değeri (default 18).
+  - `className` — ek CSS sınıfları (default boş string).
+- **Dönüş**: yok (JSX `<svg>` döner)
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki VisualShowcase() fonksiyonu, kullanıcıların hareket azaltma tercihini sorgulamak amacıyla usePrefersReducedMotion hook'unu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veride bu modülü kullanan herhangi bir dış dosya veya fonksiyon belirtilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  VisualShowcase() → usePrefersReducedMotion()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    VisualShowcase["VisualShowcase()"] --> usePrefersReducedMotion["usePrefersReducedMotion()"]
+graph TD
+    VisualShowcase_tsx__ChevronLeftIcon["ChevronLeftIcon"]
+    VisualShowcase_tsx__ChevronRightIcon["ChevronRightIcon"]
+    VisualShowcase_tsx__PauseIcon["PauseIcon"]
+    VisualShowcase_tsx__PlayIcon["PlayIcon"]
+    VisualShowcase_tsx__VisualShowcase["VisualShowcase"]
+    VisualShowcase_tsx__onTouchEnd["onTouchEnd"]
+    VisualShowcase_tsx__onTouchStart["onTouchStart"]
+    VisualShowcase_tsx__usePrefersReducedMotion["usePrefersReducedMotion"]
+    VisualShowcase_tsx__VisualShowcase --> VisualShowcase_tsx__usePrefersReducedMotion
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -256,6 +238,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `bg-white`, `bg-white/10`, `bg-white/70`, `bg-white/80`, `lg:text-4xl`, `sm:text-3xl`, `sm:text-lg`, `text-2xl`, `text-base`, `text-center`, `text-industrial-gray`, `text-white`, `text-white/90`
+- **Renkler:** `bg-gradient-to-br`, `bg-white`, `bg-white/10`, `bg-white/70`, `bg-white/80`, `hover:bg-white`, `lg:text-4xl`, `sm:text-3xl`, `sm:text-lg`, `text-2xl`, `text-base`, `text-center`, `text-industrial-gray`, `text-white`, `text-white/90`
 - **Layout:** `-bottom-12`, `-left-16`, `-right-20`, `-top-10`, `absolute`, `bottom-2`, `drop-shadow-sm`, `flex`, `gap-2`, `h-10`, `h-2`, `h-48`, `h-64`, `h-80`, `h-full`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${i`, `${s.colorFrom`, `${s.colorTo`, `-translate-x-1/2`, `:`, `===`, `blur-2xl`, `duration-700`, `ease-out`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `font-bold`, `index`
