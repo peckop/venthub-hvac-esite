@@ -11,17 +11,19 @@ const LanguageSwitcher: React.FC = () => {
   const router = useRouter()
 
   const switchLanguage = (newLang: 'tr' | 'en') => {
-    if (lang === newLang) return
-
     // İstemci tarafında cookie'yi güncelle (Middleware dil algılama kararlılığı için)
     document.cookie = `NEXT_LOCALE=${newLang}; path=/; max-age=31536000; SameSite=Lax`
 
-    // URL'deki dil segmentini değiştirerek yönlendir
-    if (pathname.startsWith(`/${lang}`)) {
-      const newPath = pathname.replace(`/${lang}`, `/${newLang}`)
+    const segments = pathname.split('/').filter(Boolean)
+    const firstSegment = segments[0]
+
+    if (firstSegment === 'tr' || firstSegment === 'en') {
+      segments[0] = newLang
+      const newPath = '/' + segments.join('/')
       router.push(newPath as Route)
     } else {
-      router.push(`/${newLang}${pathname}` as Route)
+      const newPath = '/' + newLang + (pathname === '/' ? '' : pathname)
+      router.push(newPath as Route)
     }
   }
 

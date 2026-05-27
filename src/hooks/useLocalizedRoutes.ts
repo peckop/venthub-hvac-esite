@@ -8,6 +8,10 @@ function localizeUrl(url: string, lang: string): string {
   if (url.startsWith('/admin') || url.startsWith('/api')) {
     return url
   }
+  // Eğer url zaten /tr veya /en ile başlıyorsa, mükerrer ön ek eklememek için direkt döndür
+  if (url.startsWith('/tr') || url.startsWith('/en')) {
+    return url
+  }
   // Kök sayfa /tr veya /en olacaktır
   return `/${lang}${url === '/' ? '' : url}`
 }
