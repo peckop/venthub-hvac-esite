@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-27T14:10:33.924323+00:00
+compiled_at: 2026-05-27T17:46:58.252017+00:00
 total_compiled_files: 434
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-27T14:10:33.924323+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-27T17:46:58.252017+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -13717,8 +13717,8 @@ skeleton_hash: b542cdd2cde6050b
 entity_hashes:
   func:InventoryTable: 27b7aa4339f5ff4f
   overview: 998a56ed5857e9c5
-  style_tokens: c91e802099cf375d
-generated_at: 2026-05-27T11:40:57Z
+  style_tokens: b486366e0062094a
+generated_at: 2026-05-27T17:46:28Z
 ---
 
 ## Genel Bakış
@@ -13868,8 +13868,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-amber-500/10`, `bg-blue-500/10`, `bg-cyan-400`, `bg-cyan-500/5`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-transparent`, `bg-white/2`, `border-amber-500/20`, `border-b`, `border-b-0`, `border-blue-500/20`, `border-emerald-500/20`, `border-rose-500/20`
-- **Layout:** `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `gap-1`, `gap-3`, `group-hover:text-cyan-400`, `h-4`, `h-6`, `inline-flex`, `items-center`, `justify-center`, `justify-end`, `max-w-120px`, `min-w-1000px`
-- **Responsive:** (yok)
+- **Layout:** `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `gap-1`, `gap-3`, `h-4`, `h-6`, `inline-flex`, `items-center`, `justify-center`, `justify-end`, `max-w-120px`, `min-w-1000px`, `overflow-x-auto`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `last:` önekleri
+- **Yardımcı Sınıflar:** `${base`, `${density`, `${r.abc_class`, `${r.days_until_empty`, `7`, `:`, `<=`, `===`, `A`, `B`, `animate-pulse`, `border`, `compact`, `content-auto`, `cursor-pointer`
 
 ---
 # FILE: src\components\admin\JsonDiffViewer.md
@@ -20510,8 +20511,8 @@ skeleton_hash: 6f7ef05f64566f7e
 entity_hashes:
   func:KnowledgeBlock: 6d00cfd06aa7a00e
   overview: 558d6d867468cadc
-  style_tokens: 696f4d29b5f4b2c9
-generated_at: 2026-05-27T12:13:21Z
+  style_tokens: 45bee56ab9c18ab4
+generated_at: 2026-05-27T17:46:34Z
 ---
 
 ## Genel Bakış
@@ -20622,7 +20623,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-clip-text`, `bg-cyan-400/40`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-gradient-to-r`, `bg-knowledge-radial`, `bg-slate-950`, `bg-white/2`, `bg-white/5`, `border-cyan-500/30`, `border-l-2`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-400`
 - **Layout:** `absolute`, `backdrop-blur-3xl`, `backdrop-blur-md`, `bg-clip-text`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `from-cyan-400`, `from-cyan-600`, `gap-12`, `gap-3`, `gap-4`, `gap-6`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `data-[in-view=true]:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${delayClass`, `-translate-x-4`, `animate-pulse`, `border`, `dark:prose-invert`, `data-[in-view=true]:opacity-100`, `data-[in-view=true]:translate-x-0`, `data-[in-view=true]:translate-y-0`, `delay-200`, `delay-300`, `duration-500`, `duration-700`, `ease-out`, `font-black`, `font-bold`
 
 ---
 # FILE: src\components\home\QuickEntryRail.md
@@ -24215,8 +24217,8 @@ entity_hashes:
   func:getOptimizedImageUrl: 17e01a36f07a7e10
   func:handleClick: bffc3b12eebc550c
   overview: 30d5253fe6fbef7a
-  style_tokens: 43d10894b51d5a62
-generated_at: 2026-05-27T11:47:26Z
+  style_tokens: 24cca5d2deee0041
+generated_at: 2026-05-27T17:46:31Z
 ---
 
 ## Genel Bakış
@@ -24415,8 +24417,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-cyan-400`, `bg-cyan-500`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-slate-900/50`, `bg-surface-darker`, `border-slate-800`, `from-surface-darker`, `text-cyan-400`, `text-xs`, `to-transparent`, `via-surface-darker/40`
-- **Layout:** `absolute`, `backdrop-blur-md`, `bottom-6`, `flex`, `from-surface-darker`, `gap-3`, `group-hover/canvas:opacity-100`, `h-2`, `h-550px`, `h-full`, `hidden`, `inline-flex`, `items-center`, `left-0`, `left-1/2`
-- **Responsive:** (yok)
+- **Layout:** `absolute`, `backdrop-blur-md`, `bottom-6`, `flex`, `from-surface-darker`, `gap-3`, `h-2`, `h-550px`, `h-full`, `hidden`, `inline-flex`, `items-center`, `left-0`, `left-1/2`, `overflow-hidden`
+- **Varyant/Responsive:** `:`, `group-hover/canvas:` önekleri
+- **Yardımcı Sınıflar:** `${isPaused`, `-translate-x-1/2`, `:`, `animate-ping`, `border`, `content-auto`, `duration-500`, `font-mono`, `group-hover/canvas:opacity-100`, `group/canvas`, `inset-y-0`, `opacity-60`, `opacity-75`, `pointer-events-none`, `px-4`
 
 ---
 # FILE: src\components\products\OrbitalProductsShowcase.md
@@ -50234,8 +50237,8 @@ entity_hashes:
   func:getEffectiveStatus: ea418f0307dfab79
   func:shardColor: 021e3e606c5c9dff
   overview: 29c093f4c4ea3400
-  style_tokens: ae221dcc168b9414
-generated_at: 2026-05-27T11:52:41Z
+  style_tokens: fede8f2e3790a5c2
+generated_at: 2026-05-27T17:46:25Z
 ---
 
 ## Genel Bakış
@@ -50444,9 +50447,9 @@ graph TD
     AdminOrdersBoard_tsx__OrderStepper["OrderStepper"]
     AdminOrdersBoard_tsx__getEffectiveStatus["getEffectiveStatus"]
     AdminOrdersBoard_tsx__shardColor["shardColor"]
-    AdminOrdersBoard_tsx__AdminOrdersBoard --> AdminOrdersBoard_tsx__shardColor
     AdminOrdersBoard_tsx__AdminOrdersBoard --> AdminOrdersBoard_tsx__getEffectiveStatus
     AdminOrdersBoard_tsx__MiniDetailPanel --> AdminOrdersBoard_tsx__getEffectiveStatus
+    AdminOrdersBoard_tsx__AdminOrdersBoard --> AdminOrdersBoard_tsx__shardColor
 ```
 
 ## NODE ID STANDARD
@@ -50480,7 +50483,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-amber-400/5`, `bg-blue-500/10`, `bg-blue-500/20`, `bg-clip-text`, `bg-cyan-400`, `bg-cyan-500`, `bg-cyan-500/5`, `bg-gradient-to-r`, `bg-rose-500/10`, `bg-surface-darker/40`, `bg-white`, `bg-white/10`, `bg-white/2`, `bg-white/3`, `bg-white/5`
 - **Layout:** `!h-42px`, `-right-4`, `-top-4`, `-z-10`, `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `bg-clip-text`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-white`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `disabled:`, `group-hover:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `!px-5`, `${!isExpanded`, `${adminButtonPrimaryClass`, `${col.bgClass`, `${col.colorClass`, `${color`, `${isActive`, `${isCurrent`, `${isExpanded`, `${isPast`, `${snapshot.isDragging`, `${snapshot.isDraggingOver`, `-mx-1`, `-translate-y-1/2`, `:`
 
 ---
 # FILE: src\views\admin\AdminOrdersPage.md
@@ -55654,8 +55658,8 @@ skeleton_hash: 0c7e1c369b37db44
 entity_hashes:
   func:TopicPage: f0965ed8eda6ce60
   overview: 288735bf511e8c87
-  style_tokens: 7506717b380c24fa
-generated_at: 2026-05-27T11:53:32Z
+  style_tokens: cc78d049395b1cf9
+generated_at: 2026-05-27T17:46:37Z
 ---
 
 ## Genel Bakış
@@ -55735,9 +55739,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-3xl`, `tracking-hvac-loose`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-50/30`, `bg-amber-500`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-amber-100/50`, `border-cyan-500/20`, `border-slate-100`, `border-slate-200`, `lg:text-7xl`, `text-2xl`, `text-4xl`, `text-5xl`
-- **Layout:** `absolute`, `flex`, `flex-col`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `group-hover:scale-150`, `group-hover:translate-x-2`, `h-1.5`, `h-20`, `h-8`, `inline-flex`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-amber-50/30`, `bg-amber-500`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-amber-100/50`, `border-cyan-500/20`, `border-slate-100`, `border-slate-200`, `hover:bg-cyan-600`, `hover:bg-slate-50`, `hover:text-slate-950`, `hover:text-white`
+- **Layout:** `absolute`, `flex`, `flex-col`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `h-1.5`, `h-20`, `h-8`, `inline-flex`, `items-center`, `justify-center`
+- **Varyant/Responsive:** `active:`, `dark:`, `group-hover:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-95`, `border`, `dark:prose-invert`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `group`, `group-hover:scale-150`, `group-hover:translate-x-2`, `inset-0`, `leading-relaxed`, `leading-tight`, `lg:px-8`, `mb-10`
 
 ---
 # FILE: src\views\legal\CookiePolicyPage.md
@@ -55751,8 +55756,8 @@ skeleton_hash: af47b1c0134c0866
 entity_hashes:
   func:CookiePolicyPage: b3e779c99eb43367
   overview: 07640220d73eceb5
-  style_tokens: 388713faf986c7e1
-generated_at: 2026-05-27T11:53:55Z
+  style_tokens: a770e5a7f64844ff
+generated_at: 2026-05-27T17:46:40Z
 ---
 
 ## Genel Bakış
@@ -55814,7 +55819,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xl`, `text-yellow-800`
 - **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `list-disc`, `mb-3`, `mb-6`, `mx-auto`, `pl-6`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`
 
 ---
 # FILE: src\views\legal\DistanceSalesAgreementPage.md
@@ -55828,8 +55834,8 @@ skeleton_hash: b87686df266773f0
 entity_hashes:
   func:DistanceSalesAgreementPage: 818f8664074dced3
   overview: 926bc742391d576d
-  style_tokens: d36bd46b4b8cdb4e
-generated_at: 2026-05-27T11:54:30Z
+  style_tokens: bd7814a811af4780
+generated_at: 2026-05-27T17:46:55Z
 ---
 
 ## Genel Bakış
@@ -55906,7 +55912,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`, `text-yellow-800`
 - **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `mb-3`, `mb-6`, `mt-2`, `mt-4`, `mx-auto`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`
 
 ---
 # FILE: src\views\legal\KVKKPage.md
@@ -55920,8 +55927,8 @@ skeleton_hash: 1c341980847d22bc
 entity_hashes:
   func:KVKKPage: aa86d51285a03cb2
   overview: f3246c955e327a67
-  style_tokens: 86e7732df0a6377b
-generated_at: 2026-05-27T11:54:25Z
+  style_tokens: ceaea319d6812937
+generated_at: 2026-05-27T17:46:43Z
 ---
 
 ## Genel Bakış
@@ -55981,7 +55988,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`, `text-yellow-800`
 - **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `list-disc`, `mb-3`, `mb-6`, `mt-2`, `mt-4`, `mx-auto`, `pl-6`, `prose`, `px-4`, `py-10`
 
 ---
 # FILE: src\views\legal\PreInformationPage.md
@@ -55995,8 +56003,8 @@ skeleton_hash: 47f4bda80ce59bb6
 entity_hashes:
   func:PreInformationPage: 3746fdd57fa8f528
   overview: 9f7c71a3d1be24be
-  style_tokens: d36bd46b4b8cdb4e
-generated_at: 2026-05-27T11:53:42Z
+  style_tokens: f624520e4dc7da19
+generated_at: 2026-05-27T17:46:52Z
 ---
 
 ## Genel Bakış
@@ -56061,7 +56069,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`, `text-yellow-800`
 - **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `list-disc`, `mb-3`, `mb-6`, `mt-2`, `mt-4`, `mx-auto`, `pl-6`, `prose`, `px-4`, `py-10`
 
 ---
 # FILE: src\views\legal\PrivacyPolicyPage.md
@@ -56075,8 +56084,8 @@ skeleton_hash: 236dec3edf614633
 entity_hashes:
   func:PrivacyPolicyPage: 40c3e34ff307a7eb
   overview: f7094466668600a6
-  style_tokens: d97b122360d0289d
-generated_at: 2026-05-27T11:57:10Z
+  style_tokens: 59b3a50b22e1661e
+generated_at: 2026-05-27T17:46:49Z
 ---
 
 ## Genel Bakış
@@ -56143,7 +56152,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-yellow-800`
 - **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `list-disc`, `mb-3`, `mb-6`, `mx-auto`, `pl-6`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`
 
 ---
 # FILE: src\views\legal\TermsOfUsePage.md
@@ -56157,8 +56167,8 @@ skeleton_hash: 4ce5312f302597e2
 entity_hashes:
   func:TermsOfUsePage: 107aaa4df0cf13a7
   overview: e378e8b50990e5c0
-  style_tokens: 388713faf986c7e1
-generated_at: 2026-05-27T11:55:27Z
+  style_tokens: a770e5a7f64844ff
+generated_at: 2026-05-27T17:46:46Z
 ---
 
 ## Genel Bakış
@@ -56223,7 +56233,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xl`, `text-yellow-800`
 - **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `list-disc`, `mb-3`, `mb-6`, `mx-auto`, `pl-6`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`
 
 ---
 # FILE: src\views\support\FAQPage.md

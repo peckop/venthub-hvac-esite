@@ -7,8 +7,8 @@ skeleton_hash: b542cdd2cde6050b
 entity_hashes:
   func:InventoryTable: 27b7aa4339f5ff4f
   overview: 998a56ed5857e9c5
-  style_tokens: c91e802099cf375d
-generated_at: 2026-05-27T11:40:57Z
+  style_tokens: b486366e0062094a
+generated_at: 2026-05-27T17:46:28Z
 ---
 
 ## Genel Bakış
@@ -158,5 +158,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-amber-500/10`, `bg-blue-500/10`, `bg-cyan-400`, `bg-cyan-500/5`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-transparent`, `bg-white/2`, `border-amber-500/20`, `border-b`, `border-b-0`, `border-blue-500/20`, `border-emerald-500/20`, `border-rose-500/20`
-- **Layout:** `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `gap-1`, `gap-3`, `group-hover:text-cyan-400`, `h-4`, `h-6`, `inline-flex`, `items-center`, `justify-center`, `justify-end`, `max-w-120px`, `min-w-1000px`
-- **Responsive:** (yok)
+- **Layout:** `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `gap-1`, `gap-3`, `h-4`, `h-6`, `inline-flex`, `items-center`, `justify-center`, `justify-end`, `max-w-120px`, `min-w-1000px`, `overflow-x-auto`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `last:` önekleri
+- **Yardımcı Sınıflar:** `${base`, `${density`, `${r.abc_class`, `${r.days_until_empty`, `7`, `:`, `<=`, `===`, `A`, `B`, `animate-pulse`, `border`, `compact`, `content-auto`, `cursor-pointer`

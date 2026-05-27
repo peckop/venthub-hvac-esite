@@ -7,8 +7,8 @@ skeleton_hash: b87686df266773f0
 entity_hashes:
   func:DistanceSalesAgreementPage: 818f8664074dced3
   overview: 926bc742391d576d
-  style_tokens: d36bd46b4b8cdb4e
-generated_at: 2026-05-27T11:54:30Z
+  style_tokens: bd7814a811af4780
+generated_at: 2026-05-27T17:46:55Z
 ---
 
 ## Genel Bakış
@@ -85,4 +85,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`, `text-yellow-800`
 - **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `mb-3`, `mb-6`, `mt-2`, `mt-4`, `mx-auto`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`

@@ -11,8 +11,8 @@ entity_hashes:
   func:getEffectiveStatus: ea418f0307dfab79
   func:shardColor: 021e3e606c5c9dff
   overview: 29c093f4c4ea3400
-  style_tokens: ae221dcc168b9414
-generated_at: 2026-05-27T11:52:41Z
+  style_tokens: fede8f2e3790a5c2
+generated_at: 2026-05-27T17:46:25Z
 ---
 
 ## Genel Bakış
@@ -221,9 +221,9 @@ graph TD
     AdminOrdersBoard_tsx__OrderStepper["OrderStepper"]
     AdminOrdersBoard_tsx__getEffectiveStatus["getEffectiveStatus"]
     AdminOrdersBoard_tsx__shardColor["shardColor"]
-    AdminOrdersBoard_tsx__AdminOrdersBoard --> AdminOrdersBoard_tsx__shardColor
     AdminOrdersBoard_tsx__AdminOrdersBoard --> AdminOrdersBoard_tsx__getEffectiveStatus
     AdminOrdersBoard_tsx__MiniDetailPanel --> AdminOrdersBoard_tsx__getEffectiveStatus
+    AdminOrdersBoard_tsx__AdminOrdersBoard --> AdminOrdersBoard_tsx__shardColor
 ```
 
 ## NODE ID STANDARD
@@ -257,4 +257,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-amber-400/5`, `bg-blue-500/10`, `bg-blue-500/20`, `bg-clip-text`, `bg-cyan-400`, `bg-cyan-500`, `bg-cyan-500/5`, `bg-gradient-to-r`, `bg-rose-500/10`, `bg-surface-darker/40`, `bg-white`, `bg-white/10`, `bg-white/2`, `bg-white/3`, `bg-white/5`
 - **Layout:** `!h-42px`, `-right-4`, `-top-4`, `-z-10`, `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `bg-clip-text`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-white`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `disabled:`, `group-hover:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `!px-5`, `${!isExpanded`, `${adminButtonPrimaryClass`, `${col.bgClass`, `${col.colorClass`, `${color`, `${isActive`, `${isCurrent`, `${isExpanded`, `${isPast`, `${snapshot.isDragging`, `${snapshot.isDraggingOver`, `-mx-1`, `-translate-y-1/2`, `:`
