@@ -2,29 +2,36 @@
 
 import React from 'react'
 import { useI18n } from '../i18n/I18nProvider'
-import { usePathname, useRouter } from 'next/navigation'
-import type { Route } from 'next'
+import { usePathname } from 'next/navigation'
 
 const LanguageSwitcher: React.FC = () => {
   const { lang, t } = useI18n()
   const pathname = usePathname()
-  const router = useRouter()
 
   const switchLanguage = (newLang: 'tr' | 'en') => {
+    if (lang === newLang) return
+
     // İstemci tarafında cookie'yi güncelle (Middleware dil algılama kararlılığı için)
     document.cookie = `NEXT_LOCALE=${newLang}; path=/; max-age=31536000; SameSite=Lax`
+
+    // Local storage güncelle (I18nProvider fallback için)
+    try {
+      localStorage.setItem('lang', newLang)
+    } catch {}
 
     const segments = pathname.split('/').filter(Boolean)
     const firstSegment = segments[0]
 
+    let newPath = '/'
     if (firstSegment === 'tr' || firstSegment === 'en') {
       segments[0] = newLang
-      const newPath = '/' + segments.join('/')
-      router.push(newPath as Route)
+      newPath = '/' + segments.join('/')
     } else {
-      const newPath = '/' + newLang + (pathname === '/' ? '' : pathname)
-      router.push(newPath as Route)
+      newPath = '/' + newLang + (pathname === '/' ? '' : pathname)
     }
+
+    // Tarayıcı yönlendirmesi kullanarak sunucu ve istemci senkronizasyonunu 100% garanti et
+    window.location.href = newPath
   }
 
   return (
