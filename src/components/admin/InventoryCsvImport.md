@@ -4,66 +4,51 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx
 skeleton_hash: b3421236e71cdedd
-generated_at: 2026-05-27T04:46:09Z
+entity_hashes:
+  func:InventoryCsvImport: bba4310bb8e97324
+  overview: 618d3c1361b05bd5
+  style_tokens: bdc03fc662abeb30
+generated_at: 2026-05-27T11:46:08Z
 ---
 
-## Genel Bakış  
-`InventoryCsvImport` bileşeni, yöneticilerin envanter verilerini CSV dosyası üzerinden sisteme aktarmasını sağlayan bir modal penceresidir. Kullanıcı dosya seçtiğinde dosya içeriği okunur, satırlar ayrıştırılır ve iş kurallarına göre doğrulanır; ardından bir ön izleme tablosu gösterilir ve onaylandığında veri aktarımı tamamlanıp geri bildirim verilir.
+## Genel Bakış
 
-## Fonksiyon Grupları  
+Bu modül, CSV dosyaları aracılığıyla envanter verilerini toplu olarak içe aktarmak için kullanılan bir React bileşenidir. Kullanıcıya bir dosya seçme, yüklenen verileri doğrulama ve belirli bir eşik değerine göre işleme imkanı sunar. İşlem başarıyla tamamlandığında bir geri çağrı fonksiyonu tetiklenir ve kullanıcıya sonuç bildirilir.
 
-### UI & Dialog Yönetimi  
-Bu grup, modalın açılıp kapanması, kullanıcı etkileşimlerinin yakalanması ve bileşenin temel render mantığını içerir.  
-- `InventoryCsvImport`, `closeDialog`, `confirmImport`
+## Fonksiyon Grupları
 
-### CSV Okuma & Ayrıştırma  
-Dosya içeriğinin ham metinden satır‑satır bölünmesi, her satırın hücrelerine ayrılması ve temel veri tipine dönüştürülmesi bu fonksiyonlar tarafından yapılır.  
-- `handleCsvImport`, `split`, `parseCsvLines`
-
-### Doğrulama & İş Kuralları  
-Ayrıştırılan satırlar, SKU varlığı, miktar formatı ve iş eşiği gibi kurallara göre kontrol edilir; hatalı satırlar toplanır.  
-- `validateRows`, `collectErrors`, `getEffectiveThreshold`
-
-### Ön İzleme & Geri Bildirim  
-Doğrulama sonrası oluşturulan satırlar üzerinden delta (değişim) hesaplanır, ön izleme tablosu hazırlanır ve kullanıcıya hatalar ya da başarı mesajı gösterilir.  
-- `buildPreviewRows`, `computeDelta`, `showPreview`, `showSuccessMessage`, `showErrorList`
+### Ana Bileşen
+Envanter CSV içe aktarma sürecinin tüm adımlarını yönetir; dosya seçimi, veri çözümleme, doğrulama, eşik değeri uygulama ve sonuç bildirimini tek bir yerde toplar.
+- InventoryCsvImport
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `isOpen` prop’u sağlanmazsa, bileşen hiçbir zaman görüntülenmez ve kullanıcı CSV içe aktarma işlemini başlatamaz.  
-**Aksiyom 2**: Eğer `onClose` prop’u sağlanmazsa, kullanıcı diyalog penceresini kapattığında hiçbir geri çağırma (callback) çalışmaz; bu da üst katmanın (parent component) kapanma durumunu yönetememesine yol açar.  
-**Aksiyom 3**: Eğer `onSuccess` prop’u sağlanmazsa, CSV başarılı bir şekilde içe aktarıldıktan sonra üst katmana bildirim gönderilemez; bu da UI’da “başarılı” mesajı gösterilmemesine ve olası sonraki adımların (ör. liste yenileme) otomatik olarak tetiklenmemesine neden olur.  
-**Aksiyom 4**: Eğer `effectiveThreshold` fonksiyonu tanımlı değilse veya `null` döndürürse, ürün başına eşik değeri hesaplanamaz; bu durumda “critical”/“out” durumları belirlenemez ve satır‑satır doğrulama mantığı eksik kalır.  
-**Aksiyom 5**: Eğer `effectiveThreshold` fonksiyonu bir sayı döndürürse, bu sayı ürünün kritik eşik değeri olarak kabul edilir; eşik değerin altında kalan `new` değerleri “critical” olarak işaretlenir.  
-**Aksiyom 6**: Eğer `effectiveThreshold` fonksiyonu `null` döndürürse, o ürün için eşik kontrolü atlanır ve `status` alanı `null` kalır.  
-
-*Domain‑specific kural*: `effectiveThreshold` fonksiyonunun döndürdüğü sayı, “critical” durumunu belirlemek için kullanılan eşik değeridir; bu eşik değerin kesin bir sınırı (ör. 0‑100) belgelenmemiştir, bu yüzden değer aralığı **bilinmiyor**.
-
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### InventoryCsvImport
-**Ne yapar**: CSV dosyasından stok verilerini okuyarak ürünlerin mevcut stok miktarlarını günceller veya bir önizleme sunar. Kullanıcıya kuru çalıştırma (simülasyon) seçeneği ve işlem sonrası hataları indirme imkanı verir. İşlem tamamlandığında başarı mesajı ve ilgili hareketlerin listesine yönlendirme sağlar.  
+**Ne yapar**: CSV dosyasından ürün stok bilgilerini okuyarak önizleme oluşturur, kullanıcıya gösterir ve isteğe bağlı olarak gerçek veritabanı güncellemelerini (veya sadece kuru çalıştırma) gerçekleştirir.  
 
-**Nasıl yapar**: 
-- Açık olduğunda (`isOpen`) bileşen, dosya seçimi ve sürükle‑bırak aracılığıyla bir CSV dosyası alır.  
-- `handleCsvImport` fonksiyonu dosyayı metin olarak okur, başlık satırını analiz eder ve `sku` ile `qty`/`quantity`/`stock`/`new_stock` sütunlarını bulur.  
-- Satırları ayrıştırıp geçerli SKU ve miktarları doğrular, hatalı satırları toplar ve veritabanındaki eşleşen ürünlerle birleştirerek bir önizleme (`csvPreview`) oluşturur.  
-- `processCSV` fonksiyonu, önizleme verisini toplu (batch) olarak `adjust_stock` RPC çağrısı ile günceller; `dryRun` aktifse sadece simülasyon yapılır.  
-- İşlem sırasında ilerleme yüzdesi (`csvProgress`) ve işlem durumu (`csvProcessing`) güncellenir, hatalar toplanır ve kullanıcıya indirme butonu ile CSV hata raporu sunulur.  
-- Başarıda `onSuccess` ve `onClose` callback’leri tetiklenir, ayrıca geri alma (undo) işlemi için `reverse_inventory_batch` RPC çağrısı sağlanır.  
+**Nasıl yapar**:  
+- Bileşen açıldığında (`isOpen` true) dosya seçimi bekler.  
+- `handleCsvImport` dosyayı metin olarak okur, başlık satırını analiz eder ve SKU ile miktar sütunlarını belirler.  
+- Satırları ayrıştırıp geçerli SKU ve sayısal miktarları doğrular; hatalı satırları toplar.  
+- Veritabanından ilgili ürünleri (`supabase.from('products')`) çekerek SKU‑product eşlemesi kurar.  
+- Her satır için yeni stok, mevcut stok ve kritik eşik (`effectiveThreshold`) karşılaştırması yaparak bir önizleme (`CsvPreviewRow`) oluşturur ve `csvPreview` durumuna kaydeder.  
+- `processCSV` fonksiyonu, önizleme verileri mevcutsa, kuru çalıştırma modunda sadece onay verir; aksi takdirde batch‑boyutlu (20) RPC çağrıları (`adjust_stock`) ile stok değişikliklerini uygular, işlem loglarını (`logAdminAction`) kaydeder ve ilerleme yüzdesini `csvProgress` ile günceller.  
+- Başarılı ve hatalı işlemler için toast bildirimleri gösterir, hataları CSV olarak indirilebilir kılar ve geri alma (undo) işlemi için `reverse_inventory_batch` RPC’sini çağırır.  
 
 **Parametreler**:
-- `isOpen`: boolean — Bileşenin görünür olup olmadığını belirler; `false` ise bileşen render edilmez.  
-- `onClose`: () => void — Kullanıcı kapanış butonuna bastığında veya işlem tamamlandığında çağrılan fonksiyon.  
-- `onSuccess`: () => void — CSV işleme başarılı bir şekilde tamamlandığında tetiklenen geri bildirim fonksiyonu.  
-- `effectiveThreshold`: (productId: string) => number \| null — Bir ürünün kritik stok eşiğini döndüren, ürün ID’sine göre çalışan fonksiyon.  
+- `isOpen`: boolean — Bileşenin görünür olup olmadığını belirler; false ise bileşen render edilmez.  
+- `onClose`: () => void — Kullanıcı kapanış butonuna tıkladığında veya işlem tamamlandığında çağrılan geri dönüş fonksiyonu.  
+- `onSuccess`: () => void — CSV işleme başarılı bir şekilde tamamlandığında tetiklenen geri dönüş fonksiyonu.  
+- `effectiveThreshold`: (productId: string) => number \| null — Bir ürünün kritik stok eşiğini döndüren fonksiyon; `null` ise eşik yoktur.  
 
-**Dönüş**: React bileşeni JSX döndürür; fonksiyonun kendisi bir UI komponenti olduğundan tipik olarak `JSX.Element` (veya `null` if `!isOpen`).
+**Dönüş**: void (React bileşeni JSX döndürür; fonksiyonun kendisi bir değer üretmez).
 
 ---
 
@@ -88,101 +73,122 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleCsvImport
-- **params**: (file: File)
+- **params**: `(file: File)`
 - **ic_degiskenler**:
-  - `file` — the uploaded CSV file object
-  - `textRaw` — raw text content of the file
-  - `text` — UTF‑8 BOM‑stripped text
-  - `lines` — array of non‑empty lines from the CSV
-  - `split` — helper function that splits a CSV line into cells
-  - `headerRaw` — array of header names lower‑cased and trimmed
-  - `skuIdx` — index of the `sku` column in the header
-  - `qtyIdx` — index of the quantity column (`qty`, `quantity`, `stock`, or `new_stock`)
-  - `parsedRows` — array of objects `{ line, sku, newQty }` for valid rows
-  - `errors` — array of objects `{ line, sku, message }` for rows that failed validation
-  - `skus` — set of unique SKUs extracted from parsed rows
-  - `products` — array of product records fetched from Supabase
-  - `skuToProduct` — Map from SKU to `{ id, name, stock }`
-  - `preview` — array of `CsvPreviewRow` objects built from parsed rows and product data
-- **Dönüş**: yok (side effects: updates state and shows toast messages)
-
-### [N2_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::processCsv
-- **params**: ()
-- **ic_degiskenler**:
-  - `csvPreview` — current preview data from state
-  - `setCsvProcessing` — state setter for processing flag
-  - `setCsvProgress` — state setter for progress indicator
-  - `skus` — array of SKUs extracted from preview
-  - `products` — array of product records fetched from Supabase
-  - `skuToId` — Map from SKU to product ID
-  - `dryRun` — boolean flag indicating whether to perform a dry run
-  - `batchId` — unique identifier for the current import batch
-  - `successCount` — counter of successfully updated products
-  - `errors` — array of `{ sku, message }` for failures
-  - `chunk` — slice of preview rows processed in a batch
-  - `item` — individual preview row being processed
-  - `_productId` — product ID corresponding to the current SKU
-  - `reason` — string describing the stock adjustment reason
-  - `logAdminAction` — imported audit logging function
-  - `downloadErrors` — function that creates and downloads a CSV of errors
-  - `toast` — toast notification library
-  - `onClose` — callback to close the modal
-  - `onSuccess` — callback to signal successful completion
-  - `csvUndoingRef` — ref tracking whether an undo operation is in progress
-- **Dönüş**: yok (side effects: updates state, shows toast, triggers callbacks)
-
-### [N3_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::updateItemStock
-- **params**: (item)
-- **ic_degiskenler**:
-  - `item` — preview row being processed
-  - `_productId` — product ID retrieved from `skuToId`
-  - `reason` — reason string for the stock adjustment
-  - `logAdminAction` — imported audit logging function
-  - `successCount` — incremented on successful adjustment
-  - `errors` — appended with error details on failure
-- **Dönüş**: yok (side effects: RPC call, audit log, state updates)
-
-### [N4_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::downloadErrors
-- **params**: ()
-- **ic_degiskenler**:
-  - `errors` — array of error objects from the import process
-  - `header` — CSV header array `['sku', 'message']`
-  - `lines` — array of CSV lines constructed from error objects
-  - `csv` — BOM‑prefixed CSV string
-  - `blob` — Blob object created from the CSV string
-  - `url` — object URL for the Blob
-  - `a` — temporary anchor element used to trigger download
-- **Dönüş**: yok (side effect: triggers file download)
-
-### [N5_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::undoBatch
-- **params**: ()
-- **ic_degiskenler**:
-  - `csvUndoingRef` — ref indicating if an undo is already running
-  - `batchId` — identifier of the batch to reverse
-  - `undone` — number of movements reversed returned from RPC
-- **Dönüş**: yok (side effects: RPC call, toast notifications, callback)
-
-### [N6_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleFileChange
-- **params**: (e)
-- **ic_degiskenler**:
-  - `e` — change event from the file input
-  - `file` — first selected file from `e.target.files`
-- **Dönüş**: yok (side effect: calls `handleCsvImport`)
-
-### [N7_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::toggleDryRun
-- **params**: (e)
-- **ic_degiskenler**:
-  - `e` — keyboard event from the dry‑run toggle
-- **Dönüş**: yok (side effect: toggles `dryRun` state)
-
-### [N8_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::renderRow
-- **params**: (item, idx)
-- **ic_degiskenler**:
-  - `item` — preview row data
-  - `idx` — index of the row in the preview array
-- **Dönüş**: JSX element representing a table row
+  - `textRaw` — `await file.text()` ile dosyanın ham metni.
+  - `text` — UTF‑8 BOM kaldırılmış metin.
+  - `lines` — satır sonu karakterlerine göre bölünmüş, boş olmayan satırların dizisi.
+  - `split` — CSV satırlarını virgül dışındaki tırnakları koruyarak ayıran yardımcı fonksiyon.
+  - `headerRaw` — başlık satırının temizlenmiş, küçük harfe dönüştürülmüş hücreleri.
+  - `skuIdx` — `sku` başlığının indeks konumu.
+  - `qtyIdx` — `qty`/`quantity`/`stock`/`new_stock` başlıklarından birinin indeks konumu.
+  - `parsedRows` — geçerli satırların `{ line, sku, newQty }` nesneleri dizisi.
+  - `errors` — satır bazlı hata nesneleri `{ line, sku, message }` dizisi.
+  - `cells` — mevcut satırın `split` ile ayrılmış hücreleri.
+  - `sku` — `skuIdx` konumundaki hücre değeri, boşluklar temizlenmiş.
+  - `qtyStr` — `qtyIdx` konumundaki hücre değeri, boşluklar temizlenmiş.
+  - `newQty` — `qtyStr` sayısal değere dönüştürülmüş; boş ise `NaN`.
+  - `skus` — `parsedRows` içindeki benzersiz `sku` değerlerinin listesi.
+  - `products` — Supabase’dan çekilen ürün kayıtları (`id, sku, name, stock_qty`).
+  - `skuToProduct` — `sku` → `{ id, name, stock }` haritası.
+  - `preview` — `CsvPreviewRow` tipinde önizleme satırları dizisi.
+  - `product` — `skuToProduct` haritasından bulunan ürün bilgisi.
+  - `th` — `effectiveThreshold(product.id)` çağrısının sonucu.
+  - `status` — `row.newQty` ve `th` değerlerine göre `'out' | 'critical' | null`.
+- **Dönüş**: yok (yan etkileri: `setCsvPreview`, `toast` bildirimleri, `errors` toplama)
 
 ---
+
+### [N2_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::processCsv
+- **params**: `()`
+- **ic_degiskenler**:
+  - `skus` — `csvPreview` içindeki tüm `sku` değerlerinin dizisi.
+  - `products` — Supabase’dan çekilen ürün kayıtları (`id, sku`).
+  - `skuToId` — `sku` → `id` haritası.
+  - `dryRun` — dışarıdan gelen boolean; kuru çalıştırma kontrolü.
+  - `successCount` — başarılı stok güncellemelerinin sayacı.
+  - `errors` — `{ sku, message }` hataları tutan dizi.
+  - `batchId` — `generateId()` ile oluşturulan işlem grubu kimliği.
+  - `BATCH_SIZE` — aynı anda işlenecek maksimum satır sayısı (20).
+  - `chunk` — `csvPreview` dilimlenmiş parça.
+  - `_productId` — `skuToId` haritasından elde edilen ürün kimliği.
+  - `reason` — RPC çağrısı için oluşturulan açıklama metni.
+  - `error` — `supabase.rpc('adjust_stock', …)` sonucundaki hata nesnesi.
+  - `logAdminAction` — dinamik import ile alınan denetim kaydı fonksiyonu.
+  - `downloadErrors` — hataları CSV olarak indiren yardımcı fonksiyon.
+- **Dönüş**: yok (yan etkileri: `setCsvProcessing`, `setCsvProgress`, `toast` bildirimleri, `onClose`, `onSuccess`, `downloadErrors`)
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::updateItem
+- **params**: `(item)`
+- **ic_degiskenler**:
+  - `_productId` — `skuToId.get(item.sku)` ile elde edilen ürün kimliği.
+  - `reason` — `CSV import: add/remove <delta>` biçiminde açıklama.
+  - `error` — `supabase.rpc('adjust_stock', …)` sonucundaki hata.
+  - `logAdminAction` — dinamik import ile alınan denetim kaydı fonksiyonu.
+- **Dönüş**: yok (yan etkileri: stok güncelleme, denetim kaydı, `successCount` artırma, `errors` dizisine ekleme)
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::downloadErrors
+- **params**: `()`
+- **ic_degiskenler**:
+  - `header` — CSV başlık satırı `['sku','message']`.
+  - `lines` — `errors` dizisinden oluşturulan CSV satırları.
+  - `csv` — UTF‑8 BOM ile birleştirilmiş tam CSV metni.
+  - `blob` — `csv` içeriğiyle oluşturulan `Blob` nesnesi.
+  - `url` — `URL.createObjectURL(blob)` ile elde edilen geçici URL.
+  - `a` — indirme linki olarak kullanılan `HTMLAnchorElement`.
+- **Dönüş**: yok (yan etkileri: dosya indirme tetikleme)
+
+---
+
+### [N5_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::toastContent
+- **params**: `(t)`
+- **ic_degiskenler**:
+  - `successCount` — işlem sonunda güncellenen ürün sayısı (üst kapsamdan).
+  - `batchId` — işlem grubu kimliği (üst kapsamdan).
+  - `errors` — hata listesi (üst kapsamdan).
+  - `downloadErrors` — hata indirme fonksiyonu (üst kapsamdan).
+- **Dönüş**: JSX element (toast içinde gösterilen özel içerik)
+
+---
+
+### [N6_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::undoHandler
+- **params**: `()`
+- **ic_degiskenler**:
+  - `csvUndoingRef` — geri alma işleminin çalışıp çalışmadığını izleyen `useRef` değeri.
+  - `batchId` — geri alınacak işlem grubu kimliği (üst kapsamdan).
+  - `data` — `supabase.rpc('reverse_inventory_batch', …)` sonucundaki veri.
+  - `error` — RPC çağrısındaki hata.
+  - `undone` — geri alınan hareket sayısı (`Number(data || 0)`).
+- **Dönüş**: yok (yan etkileri: `toast` bildirimleri, `onSuccess`, `csvUndoingRef` güncellemesi)
+
+---
+
+### [N7_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::onFileChange
+- **params**: `(e)`
+- **ic_degiskenler**:
+  - `file` — `e.target.files?.[0]` ile seçilen dosya.
+- **Dönüş**: yok (yan etkileri: `handleCsvImport(file)` çağrısı)
+
+---
+
+### [N8_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::onKeyToggle
+- **params**: `(e)`
+- **ic_degiskenler**:
+  - `e.key` — basılan tuşun adı.
+- **Dönüş**: yok (yan etkileri: `setDryRun(!dryRun)` ile kuru‑çalıştırma durumunu değiştirir)
+
+---
+
+### [N9_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::renderRow
+- **params**: `(item, idx)`
+- **ic_degiskenler**:
+  - `item` — `CsvPreviewRow` nesnesi (sku, name, current, new, delta, status).
+  - `idx` — satırın indeks numarası (React `key` için).
+- **Dönüş**: JSX `<tr>` elementi (tablo satırı)
 
 ---
 

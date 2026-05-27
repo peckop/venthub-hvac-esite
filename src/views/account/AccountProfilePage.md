@@ -4,37 +4,39 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountProfilePage.tsx
 skeleton_hash: 8f54003fdfbd1d91
-generated_at: 2026-05-23T22:35:41Z
+entity_hashes:
+  func:AccountProfilePage: 754183d7e2ba9791
+  overview: 6f24907adef049a2
+  style_tokens: b339cbd32bc0fb94
+generated_at: 2026-05-27T11:49:25Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun hesap yönetimi bölümünde yer alan kullanıcı profil sayfasını oluşturan React görünüm bileşenidir. Kullanıcıların kendi hesap bilgilerini görüntüleyip yönetebileceği web arayüzünü sunan ana sayfa yapısını barındırır.
+Bu modül, kullanıcı profil bilgilerini gösteren ve düzenleyen bir hesap profili sayfası bileşenini içerir. Sayfa, kullanıcı verilerini alarak arayüzde sunar ve gerekli etkileşimleri yönetir.
 
 ## Fonksiyon Grupları
-### Profil Sayfası Ana Bileşeni
-Hesap profil sayfasının tüm arayüz yapısını ve temel işleyişini yöneten tek ana bileşendir, sayfanın yüklenmesi ve temel kullanıcı etkileşimlerinin koordinasyonundan sorumludur.
+### Ana Bileşen
+Kullanıcı profil sayfasının görsel yapısını oluşturur ve veri akışını koordin eder.
 - AccountProfilePage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React Typescript ile geliştirilmiş hesap profili görünüm (view) bileşeninin sorunsuz çalışması, uygulama ortamının frontend çalışma gereksinimlerini, yönlendirme yapısını, veri sağlayıcı bağlamları ve harici servis erişimini sağlamasına bağlıdır.
-
-[Aksiyom 1]: Eğer React 16.8 ve üstü sürümü (hooks desteği sunan) uygulama çalışma ortamında yüklü değilse, AccountProfilePage bileşeni hiçbir şekilde kullanıcıya render edilemez, profil görünümü oluşturulamaz.
-[Aksiyom 2]: Eğer kullanıcı hesap verilerini sağlayan global uygulama bağlamı (context API) bu bileşen tarafından erişilebilir durumda değilse, kullanıcının kişisel profil bilgileri görüntülenemez, boş ya da hatalı içerik kullanıcıya sunulur.
-[Aksiyom 3]: Eğer projenin Typescript yapılandırması TSX dosyalarını derleyecek şekilde ayarlanmamışsa, uygulama build işlemi sırasında derleme hatası alınır, AccountProfilePage içeren üretim paketi oluşturulamaz.
-[Aksiyom 4]: Eğer uygulama içi yönlendirme (routing) sistemi, bu bileşene ait tanımlı rota üzerinden çalışma zamanında AccountProfilePage'i yükleyecek şekilde yapılandırılmamışsa, kullanıcı hesap profil sayfasına erişim sağlayamaz, tanımlanmamış rota hatasıyla karşılaşır.
-[Aksiyom 5]: Eğer hesap profil bilgilerini okumak/güncellemek için kullanılan backend API uç noktaları, bu bileşenin çalıştığı kaynaktan erişime izin verecek şekilde yapılandırılmamışsa (CORS hatası, servis erişimsizliği vb.), profil görüntüleme ve güncelleme işlemleri tamamlanamaz.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AccountProfilePage
-**Ne yapar**: Venthub HVAC projesinin kullanıcı hesap profili sayfasını oluşturan ana bileşendir. Kullanıcıların kendi hesap bilgilerini görüntülemesi ve hesap ayarlarıyla ilgili işlemleri gerçekleştirebilmesi için gereken arayüzü sunar, uygulamanın hesap yönetimi akışının temel görüntüleme katmanı olarak görev alır.
-**Nasıl yapar**: Proje ağacında `src/views/account/AccountProfilePage.tsx` dosyasında tanımlanan TSX tabanlı bileşen olarak çalışır. React uygulamasının sayfa render mekanizması tarafından çağrılarak hesap profil sayfasının içeriğini uygulamanın DOM yapısına ekler, genel domain kapsamında kullanıcı hesap işlemleri için özel olarak geliştirilmiştir.
-**Parametreler**: Bu fonksiyon herhangi bir giriş parametresi almaz.
-**Dönüş**: Fonksiyonun return tipi tanımda void veya bilinmiyor olarak belirtilmiştir. Temel işlevi, hesap profili sayfasının arayüzünü oluşturmak ve kullanıcıya sunmaktır.
+**Ne yapar**: Kullanıcının profil bilgilerini (ad soyad ve telefon) görüntüleyip düzenlemesini sağlayan bir React bileşenidir. Kullanıcı mevcut bilgilerini forma yansıtır, değişiklik yapıp kaydedebilir.
+
+**Nasıl yapar**: `useAuth()` ile mevcut kullanıcıyı alır, `user_metadata` içindeki `full_name` ve `phone` değerlerini `useEffect` ile `fullName` ve `phone` state'lerine yükler. Form gönderildiğinde `onSave` async fonksiyonu çalışır: `supabase.auth.updateUser` ile kullanıcı metadata'sını günceller, başarılı olursa toast ile bildirim gösterir, hata durumunda ise hata mesajı gösterir. Kaydetme işlemi sırasında buton devre dışı kalır ve yüklenme animasyonu gösterilir.
+
+**Parametreler**:
+- (parametre almaz)
+
+**Dönüş**: JSX.Element — Kullanıcı profili düzenleme formunu içeren bir React bileşeni döndürür.
 
 ---
 
@@ -48,44 +50,44 @@ Bu React Typescript ile geliştirilmiş hesap profili görünüm (view) bileşen
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountProfilePage.tsx::AccountProfilePage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src\views\account\AccountProfilePage.tsx::AccountProfilePage
+- **params**: (none)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri metinlerini getiren fonksiyon, tüm arayüz metinleri için kullanılır
-  - `user` — useAuth hook'undan alınan oturum açmış mevcut kullanıcı nesnesi, kullanıcı metadata'sını çekmek için kullanılır
-  - `fullName` — React.useState ile yönetilen, kullanıcının tam adını tutan string state değeri, form inputunda bağlanır
-  - `setFullName` — fullName state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `phone` — React.useState ile yönetilen, kullanıcının telefon numarasını tutan string state değeri, form inputunda bağlanır
-  - `setPhone` — phone state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `saving` — React.useState ile yönetilen, profil kaydetme işleminin devam edip etmediğini belirten boolean yükleme durumu state'i
-  - `setSaving` — saving state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `onSave` - form submit edildiğinde tetiklenen, profili kaydetmek için çalışan asenkron iç fonksiyon
-- **Dönüş**: Profil sayfası arayüzünü oluşturan React JSX elementi
+  - `t` — translation function returned by `useI18n()`, used to localize UI strings.
+  - `user` — current authenticated user object returned by `useAuth()`, contains `user_metadata`.
+  - `fullName` — state variable holding the current value of the full name input field.
+  - `setFullName` — state updater function for `fullName`.
+  - `phone` — state variable holding the current value of the phone input field.
+  - `setPhone` — state updater function for `phone`.
+  - `saving` — state variable indicating whether a save operation is in progress.
+  - `setSaving` — state updater function for `saving`.
+  - `onSave` — event handler function defined within the component, invoked on form submission.
+- **Dönüş**: returns JSX markup for the account profile page.
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountProfilePage.tsx::AccountProfilePage.useEffect.callback
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src\views\account\AccountProfilePage.tsx::useEffect callback
+- **params**: (none)
 - **ic_degiskenler**:
-  - `meta` — kullanıcı nesnesinden alınan, ek kullanıcı bilgilerini (ad, telefon) içeren metadata nesnesi, tip dönüşümü yapılarak kullanılır
-  - `meta.full_name` — meta nesnesinden alınan kullanıcının kayıtlı tam adı, fullName state'ine atanır
-  - `meta.phone` — meta nesnesinden alınan kullanıcının kayıtlı telefon numarası, phone state'ine atanır
-  - `user` — üst fonksiyondan gelen mevcut kullanıcı nesnesi, user?.user_metadata erişimi yapılır
-  - `setFullName` — üst fonksiyondan gelen fullName state setter'ı, kullanıcının mevcut adını state'e yüklemek için kullanılır
-  - `setPhone` — üst fonksiyondan gelen phone state setter'ı, kullanıcının mevcut telefonunu state'e yüklemek için kullanılır
-- **Dönüş**: yok
+  - `user` — accessed from outer scope to read `user_metadata`.
+  - `meta` — local variable holding the user metadata cast to `UserMetadata`; defaults to an empty object if `user` or `user_metadata` is undefined.
+  - `fullName` — accessed from outer scope to set its state.
+  - `setFullName` — state updater function for `fullName`.
+  - `phone` — accessed from outer scope to set its state.
+  - `setPhone` — state updater function for `phone`.
+- **Dönüş**: no explicit return; side effect updates component state.
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountProfilePage.tsx::onSave
-- **params**: e: React.FormEvent (form submit olayını tutan event nesnesi)
+### [N3_NASIL] AST Pointer: src\views\account\AccountProfilePage.tsx::onSave
+- **params**: `e` — `React.FormEvent` representing the form submission event.
 - **ic_degiskenler**:
-  - `e.preventDefault` — formun varsayılan yenileme davranışını engellemek için kullanılan event metodu
-  - `setSaving` — üst fonksiyondan gelen yükleme durumu state setter'ı, kaydetme süreci başında ve sonunda durumu günceller
-  - `supabase` — projeye entegre Supabase istemcisi, auth.updateUser API çağrısı ile kullanıcı verisini güncellemek için kullanılır
-  - `error` — Supabase API çağrısından dönen olası hata nesnesi, hata durumunda yakalanıp işlenir
-  - `fullName` — üst fonksiyondan gelen formda girilen yeni tam adı tutan state değeri, API'ye gönderilir
-  - `phone` — üst fonksiyondan gelen formda girilen yeni telefon numarasını tutan state değeri, API'ye gönderilir
-  - `toast` — react-hot-toast bildirim kütüphanesi, başarı ve hata durumunda kullanıcıya bildirim göstermek için kullanılır
-  - `t` — üst fonksiyondan gelen çeviri fonksiyonu, bildirim ve buton metinlerini çevirmek için kullanılır
-  - `console.error` — tarayıcı konsoluna hata yazdırmak için kullanılan yerleşik metot, yakalanan hataları loglamak için kullanılır
-- **Dönüş**: yok
+  - `e` — event object; `e.preventDefault()` stops default form submission.
+  - `setSaving` — state updater function for `saving`; called with `true` at start and `false` in `finally`.
+  - `saving` — accessed only in JSX button `disabled={saving}` (not within this function body).
+  - `supabase` — imported client used to call `supabase.auth.updateUser`.
+  - `fullName` — current value of the full name state, used in the update payload.
+  - `phone` — current value of the phone state, used in the update payload.
+  - `toast` — imported notification library; `toast.success` and `toast.error` are called based on operation outcome.
+  - `t` — translation function used to fetch localized toast messages.
+  - `error` — local variable capturing the `error` property from the Supabase response.
+- **Dönüş**: no explicit return; performs asynchronous update and side‑effects (state changes, notifications).
 
 ---
 
@@ -98,3 +100,18 @@ Bu React Typescript ile geliştirilmiş hesap profili görünüm (view) bileşen
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AccountProfilePage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `text-2xl`, `text-primary-navy`, `text-slate-400`, `text-slate-500`, `text-slate-900`, `text-sm`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `block`, `flex`, `gap-2`, `h-10`, `h-4`, `h-6`, `items-center`, `justify-end`, `left-0`, `max-w-2xl`, `overflow-hidden`, `p-6`, `relative`, `shadow-primary-navy/20`
+- **Responsive:** `sm:` prefix kullanımları

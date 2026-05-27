@@ -4,42 +4,59 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx
 skeleton_hash: 68ab2fd6998e4d6d
-generated_at: 2026-05-23T21:52:30Z
+entity_hashes:
+  func:EditableCell: c69e143b78ab0750
+  overview: 4312d2a15431d150
+  style_tokens: 4f1bcdc4878f37fb
+generated_at: 2026-05-27T11:42:10Z
 ---
 
 ## Genel Bakış
-`EditableCell` bileşeni, tablo veya form gibi veri listelerinde hücrelerin satır içinde düzenlenebilmesini sağlayan yeniden kullanılabilir bir UI elemanıdır. Verilen değeri gösterir, kullanıcı etkileşimiyle düzenleme moduna geçer ve değişiklikleri `onSave` callback’i aracılığıyla dışa aktarır.
+`EditableCell` bileşeni, yönetim panelindeki tablo hücrelerinin düzenlenebilir olmasını sağlayan bir React fonksiyonel bileşenidir. Gelen değer, tip ve yer tutucu gibi parametreleri alır, kullanıcı etkileşimi sonrası değişikliği `onSave` callback’i ile dışarı aktarır.
+
+## Fonksiyon Grupları
+### Düzenlenebilir Hücre Bileşeni
+Bu grup, hücrenin görüntülenmesi, düzenleme moduna geçişi ve kaydedilmesi süreçlerini yönetir.  
+- EditableCell  
+
+(İçeride kullanılan yardımcı fonksiyonlar (ör. durum yönetimi, olay işleyicileri) bu bileşenin içinde tanımlanır ve dışarıdan ayrı bir fonksiyon olarak listelenmez.)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `value` parametresi `undefined` veya `null` ise, bileşen varsayılan olarak `placeholder` değerini gösterir.  
-[Aksiyom 2]: Eğer `type` parametresi `'text'` değilse, bileşen `type` değerini geçerli bir HTML input tipine dönüştürmek için ek bir kontrol yapar; aksi halde `type` değeri doğrudan kullanılır.  
-[Aksiyom 3]: Eğer `onSave` fonksiyonu sağlanmazsa, bileşen herhangi bir kaydetme işlemi gerçekleştirmez ve kullanıcı girişini yalnızca yerel state içinde tutar.  
-[Aksiyom 4]: Eğer `placeholder` değeri `'-'` olarak bırakılırsa, bu karakterler hücre boş olduğunda gösterilir; aksi halde `placeholder` değeri görsel olarak gizlenir.  
-[Aksiyom 5]: Eğer `clas` (muhtemelen `className`) parametresi sağlanmazsa, bileşen varsayılan CSS sınıfı eklemez; bu durumda stil uygulaması dış kaynaklardan gelmelidir.
+**Aksiyom 1**: Eğer `onSave` fonksiyonu sağlanmazsa, hücrede yapılan değişiklikler kalıcı olarak kaydedilemez ve kullanıcıya bir hata/uyarı gösterilir.  
+
+**Aksiyom 2**: Eğer `type` parametresi belirtilmezse, varsayılan olarak `'text'` tipi kullanılır; bu tip dışındaki bir değer verilirse, tip `'text'` olarak düşürülür.  
+
+**Aksiyom 3**: Eğer `placeholder` parametresi belirtilmezse, varsayılan değer `'-'` kullanılır; bu değer gösterim amaçlıdır ve gerçek veri kaybına yol açmaz.  
+
+**Aksiyom 4**: Eğer `value` parametresi `null` veya `undefined` ise, hücre içeriği `placeholder` değeriyle gösterilir; bu durumda `onSave` çağrısı yapılmadan önce kullanıcı bir giriş yapmalıdır.  
+
+**Aksiyom 5**: Eğer `type` değeri desteklenmeyen bir formatta (ör. `'binary'`, `'object'` vb.) ise, davranış **bilinmiyor**; bu durumda uygulama bir istisna fırlatabilir veya tip `'text'`e geri dönebilir (tasarım kararına bağlı).  
+
+**Domain‑specific kural**: `type` parametresi için kabul edilen değerler **bilinmiyor**; mevcut kod tabanında tanımlı olabilecek tipler (`'text'`, `'number'`, `'date'` vb.) proje dokümantasyonunda belirtilmelidir.  
+
+Bu aksiyomlar, `EditableCell` bileşeninin temel çalışma koşullarını ve eksik/girişik parametrelerin sistem üzerindeki etkilerini tanımlar.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### EditableCell
-**Ne yapar**: EditableCell, bir tablo hücresinin doğrudan düzenlenebilmesini sağlayan bir React fonksiyonel bileşenidir. Kullanıcı, mevcut değeri görüntüleyebilir ve hücreye tıklayarak bir giriş alanı aracılığıyla değeri değiştirebilir; değişiklikler kaydedildiğinde belirtilen geri çağırım fonksiyonu tetiklenir.
+**Ne yapar**: EditableCell, kullanıcının bir hücredeki değeri düzenlemesine ve kaydetmesine olanak tanıyan bir React fonksiyonel bileşenidir. Inline düzenleme işlevselliği sağlar.
 
-**Nasıl yapar**: Bileşen, `value` prop'u ile aldığı mevcut değeri statik olarak gösterir. Kullanıcı hücreye tıkladığında, bir `input` (veya belirtilen `type`’a göre uygun giriş elemanı) ile değiştirme moduna geçer. Değer değiştirildiğinde ve kaydetme eylemi gerçekleştiğinde (örneğin, Enter’a basma veya alanın odağını kaybetme), `onSave` fonksiyonu yeni değerle çağrılır ve bileşen tekrar salt okunur moda döner.
+**Nasıl yapar**: Bileşen, `value`, `onSave`, `type`, `placeholder` ve `clas` prop'larını alır. `type` değerine göre uygun bir giriş elemanı (input, select vb.) render eder. Kullanıcı düzenleme işlemini tamamladığında `onSave` callback'ini tetikler. `placeholder`, değer boşken gösterilecek metni belirler. `clas` prop'u bileşene ek CSS sınıfları atamak için kullanılır.
 
 **Parametreler**:
-- `value`: `any` — Hücrede görüntülenen ve düzenlenebilen mevcut değer.
-- `onSave`: `(value: any) => void` — Kullanıcı düzenlemeyi tamamlayıp kaydettiğinde çağrılan geri çağırım fonksiyonu; yeni değer parametre olarak iletilir.
-- `type`: `'text' | 'number' | 'email'` (varsayılan: `'text'`) — Düzenleme modunda kullanılacak input türü.
-- `placeholder`: `string` (varsayılan: `'-'`) — Giriş alanı boş olduğunda gösterilen yer tutucu metin.
-- `className`: `string` (opsiyonel) — Bileşenin kök öğesine uygulanacak ek CSS sınıf adı.
+- `value`: any — Hücrede gösterilecek ve düzenlenecek olan mevcut değer.
+- `onSave`: function — Kullanıcı değişikliği kaydettiğinde çağrılan geri çağrı fonksiyonu. Yeni değeri parametre olarak alır.
+- `type`: string (varsayılan `'text'`) — Giriş elemanının türü (text, number, select vb.).
+- `placeholder`: string (varsayılan `'-'`) — Değer boş veya tanımsız olduğunda gösterilen yer tutucu metin.
+- `clas`: string — Bileşene uygulanacak ek CSS sınıf adı.
 
-**Dönüş**: `React.FC<EditableCellProps>` — Bileşen, React fonksiyonel bileşeni olarak tanımlanmıştır ve bir JSX elemanı döndürür.
+**Dönüş**: `React.FC<EditableCellProps>` — `EditableCellProps` arayüzüne sahip prop'lar bekleyen bir React fonksiyonel bileşeni döndürür. Bu bileşen, hücre düzenleme arayüzünü oluşturmak için kullanılır.
 
 ---
 
@@ -58,55 +75,24 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::EditableCell
-- **params**: `value`, `onSave`, `type` (varsayılan `'text'`), `placeholder` (varsayılan `'-'`), `className` (varsayılan `''`), `disabled` (varsayılan `false`), `inputWidth` (varsayılan `'w-24'`)
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx::EditableCell
+- **params**: (value, onSave, type = 'text', placeholder = '-', className = '', disabled = false, inputWidth = 'w-24')
 - **ic_degiskenler**:
-  - `editing` — `useState<boolean>`, düzenleme modunun açık/kapalı olduğunu tutar
-  - `draft` — `useState<string>`, input alanındaki geçici değer
-  - `saving` — `useState<boolean>`, kaydetme işleminin devam edip etmediğini belirtir
-  - `inputRef` — `useRef<HTMLInputElement>`, input elementine referans
-  - `startEdit` — `useCallback`, düzenleme modunu başlatan fonksiyon
-  - `cancel` — `useCallback`, düzenlemeyi iptal eden fonksiyon
-  - `save` — `useCallback`, async kaydetme fonksiyonu
-  - `handleKeyDown` — `useCallback`, klavye olaylarını işleyen fonksiyon
-- **Dönüş**: `React.ReactNode` (JSX output: düzenleme modunda `<div>` içinde `<input>`, aksi halde `<button>`)
-
-### [N2_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::useEffect_callback (draft senkronizasyonu)
-- **params**: yok
-- **ic_degiskenler**: yok (kullandığı dış değişkenler: `editing`, `value`, `setDraft`)
-- **Dönüş**: yok (void)
-
-### [N3_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::useEffect_callback (input odaklama)
-- **params**: yok
-- **ic_degiskenler**: yok (kullandığı dış değişkenler: `editing`, `inputRef`)
-- **Dönüş**: yok (void)
-
-### [N4_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::startEdit
-- **params**: yok
-- **ic_degiskenler**: yok (kullandığı dış değişkenler: `disabled`, `saving`, `value`, `setDraft`, `setEditing`)
-- **Dönüş**: yok (void) — erken dönüş durumu `return` ile
-
-### [N5_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::cancel
-- **params**: yok
-- **ic_degiskenler**: yok (kullandığı dış değişkenler: `value`, `setDraft`, `setEditing`)
-- **Dönüş**: yok (void)
-
-### [N6_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::save
-- **params**: yok
-- **ic_degiskenler**:
-  - `trimmed` — `draft.trim()` sonucu elde edilen temizlenmiş string
-  - `original` — `String(value ?? '')` ile elde edilen orijinal değer
-- **Dönüş**: `Promise<void>` (async) — `onSave(trimmed)` çağrısı sonrası `setEditing(false)` ile tamamlanır; hata durumunda `setDraft(original)`, `toast.error('Güncelleme başarısız')` ve `setEditing(false)` çalışır
-
-### [N7_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::handleKeyDown
-- **params**: `e` (`React.KeyboardEvent`)
-- **ic_degiskenler**: yok (kullandığı dış değişkenler: `save`, `cancel`)
-- **Dönüş**: yok (void) — `e.preventDefault()` ve `void save()` veya `cancel()` çağrıları
-
-### [N8_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::onClick_handler
-- **params**: `e` (`React.MouseEvent`)
-- **ic_degiskenler**: yok (kullandığı dış değişken: `startEdit`)
-- **Dönüş**: yok (void) — `e.stopPropagation()` ve `startEdit()` çağrısı
+  - `editing` — hücrenin düzenleme modunda olup olmadığını tutan boolean state.
+  - `setEditing` — `editing` state'ini güncelleyen set fonksiyonu.
+  - `draft` — kullanıcı tarafından düzenlenen geçici değer; başlangıçta `value`'nun string temsili.
+  - `setDraft` — `draft` state'ini güncelleyen set fonksiyonu.
+  - `saving` — kaydetme işlemi devam ederken gösterilen boolean state.
+  - `setSaving` — `saving` state'ini güncelleyen set fonksiyonu.
+  - `inputRef` — `<input>` elementine referans tutan `useRef` nesnesi.
+  - `startEdit` — düzenleme moduna geçişi başlatan, `disabled` veya `saving` durumunda işlem yapmayan callback.
+  - `cancel` — düzenleme iptal edildiğinde `draft`'ı orijinal `value`'ya sıfırlayan ve `editing`i kapatan callback.
+  - `save` — `draft`'ı `trim()` edip `onSave` async fonksiyonuna gönderen, hata durumunda toast bildirimi gösteren ve ilgili state'leri yöneten async callback.
+    - `trimmed` — `draft`'ın baş ve sondaki boşlukları kaldırılmış hali.
+    - `original` — komponentin başlangıçtaki `value`'nun string temsili.
+  - `handleKeyDown` — klavye olaylarını dinleyen, `Enter` tuşunda `save`i, `Escape` tuşunda `cancel`ı tetikleyen callback.
+    - `e` — `React.KeyboardEvent` nesnesi, tuş bilgisi ve `preventDefault` metodunu içerir.
+- **Dönüş**: React element (JSX) – düzenleme modunda bir `<input>` ve kaydetme animasyonu, düzenleme modunda değilken bir `<button>` döndürür.
 
 ---
 

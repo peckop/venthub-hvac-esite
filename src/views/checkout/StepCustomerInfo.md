@@ -4,38 +4,52 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\StepCustomerInfo.tsx
 skeleton_hash: 0f6c10a75d5ca248
-generated_at: 2026-05-23T22:40:44Z
+entity_hashes:
+  func:StepCustomerInfo: 2698d0acd17fa1de
+  overview: 3962b33f58fa703d
+  style_tokens: 7e2cf916d8e002e3
+generated_at: 2026-05-27T11:51:09Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin ödeme (checkout) akışının müşteri bilgilerini girme adımını yöneten React bileşenidir. Üst bileşenden aldığı mevcut müşteri bilgisi verisini ve güncelleme fonksiyonunu kullanarak kullanıcının bilgilerini düzenlemesine olanak tanır. Çoklu dil desteği için gelen çeviri fonksiyonuyla arayüz metinlerini kullanıcının dil tercihine uygun şekilde sunar.
+`StepCustomerInfo` bileşeni, checkout sürecinde müşterinin iletişim ve fatura bilgilerini toplamak için kullanılan bir adım ekranını temsil eder. Props olarak aldığı `customerInfo`, `setCustomerInfo` ve çeviri fonksiyonu `t` aracılığıyla mevcut bilgileri gösterir, kullanıcı girdilerini günceller ve çok‑dilli bir arayüz sağlar.
 
 ## Fonksiyon Grupları
-### Ana Müşteri Bilgisi Adımı Bileşeni
-Modülün tek ana sorumluluğu olan ödeme akışının müşteri bilgisi girme adımının tüm işlevlerini üstlenir. Üst bileşenle veri alışverişi yaparak kullanıcı tarafından yapılan bilgi güncellemelerini iletir ve adım arayüzünü kullanıcıya sunar.
-- StepCustomerInfo
+### UI Render ve Veri Bağlantısı
+Bu grup, bileşenin JSX yapısını oluşturur, form alanlarını `customerInfo` verisiyle doldurur ve kullanıcı etkileşimlerini `setCustomerInfo` aracılığıyla günceller.  
+- StepCustomerInfo   (tek bileşen)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu checkout sürecinin müşteri bilgisi girişi adımına ait React bileşeninin çalışması, kendisine aktarılan tüm zorunlu prop'ların eksiksiz ve doğru biçimde sağlanmasına tamamen bağlıdır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer mevcut müşteri bilgilerini içeren customerInfo nesnesi prop olarak sağlanmazsa, bilgi giriş alanları boş veya geçersiz state ile yüklenir, kullanıcı doğru bilgiyi giremez.
-[Aksiyom 2]: Eğer customerInfo nesnesini güncellemek için kullanılan setCustomerInfo state setter fonksiyonu sağlanmazsa, kullanıcının girdiği yeni bilgiler kaydedilemez, sonraki sipariş adımlarına aktarılamaz.
-[Aksiyom 3]: Eğer arayüz metinlerini yönetmek için kullanılan t fonksiyonu sağlanmazsa, ekrandaki tüm etiket, uyarı ve buton metinleri yüklenemez, kullanıcı arayüzü kullanılamaz hale gelir.
+**Aksiyom 1**: Eğer `customerInfo` nesnesi sağlanmazsa, bileşen gerekli müşteri verilerine erişemez ve render sırasında **boş** veya **hata** durumu oluşur.  
+
+**Aksiyom 2**: Eğer `setCustomerInfo` bir fonksiyon değilse, kullanıcı tarafından girilen veya değiştirilen müşteri bilgileri **state**’e kaydedilemez ve UI’da veri tutarlılığı bozulur.  
+
+**Aksiyom 3**: Eğer `t` (çeviri/yerelleştirme fonksiyonu) tanımlı değilse, metinler **ham** (çevirisiz) olarak gösterilir; uygulama çökmez ancak kullanıcı deneyimi **düşer**.  
+
+**Aksiyom 4**: Eğer `customerInfo` içinde beklenen alanlar (ör. `name`, `email`, `phone`) eksik ya da `null` ise, ilgili form alanları **boş** başlar ve doğrulama hataları **tetiklenir**.  
+
+**Aksiyom 5**: Eğer `setCustomerInfo` asenkron bir işlem (Promise) döndürürken beklenmeyen bir hata fırlatırsa, bileşen **hata yakalama** mekanizması yoksa UI’da **uncaught exception** meydana gelir.  
+
+**Domain‑specific kural**: `customerInfo` nesnesinin yapısı, uygulamanın diğer katmanları (ör. API payloadları) ile uyumlu olmalıdır; uyumsuzluk durumunda **veri senkronizasyon hatası** ortaya çıkar. (Detaylı şema kod içinde tanımlı değildir, bu yüzden kesin değerler *bilinmiyor*.)
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### StepCustomerInfo
-**Ne yapar**: VentHub HVAC projesinin ödeme (checkout) sürecinin müşteri bilgileri giriş adımını oluşturan React fonksiyonel bileşenidir. Ödeme akışı sırasında kullanıcının müşteri bilgilerini girebileceği, yönetebileceği ve doğrulayabileceği arayüzü sunar, tüm süreçte üst bileşenlerle senkronize çalışarak müşteri verilerinin bütünlüğünü korur.
-**Nasıl yapar**: Üst bileşenden alınan mevcut müşteri bilgisi verisini temel alarak arayüzü renderlar, kullanıcı tarafından yapılan tüm bilgi güncellemelerini kendisine prop olarak gelen state setter fonksiyonu aracılığıyla üst bileşene ileterek merkezi state yönetimini destekler. Çeviri fonksiyonu prop'u üzerinden arayüzdeki tüm metinleri çoklu dil desteğine uygun olarak gösterir, tanımlanmış StepCustomerInfoProps tip kontrolü ile type safety sağlayarak güvenilir bir bileşen yapısı sunar.
+**Ne yapar**: React bileşenini tanımlar; müşterinin bilgi girişini yönetir ve görüntüler.  
+**Nasıl yapar**: `customerInfo` ve `setCustomerInfo` prop'larını alarak, form alanlarıyla iki yönlü veri bağlaması kurar; `t` fonksiyonunu çeviri (i18n) için kullanır. Bileşen, `React.FC<StepCustomerInfoProps>` tipinde döner.  
+
 **Parametreler**:
-- customerInfo: StepCustomerInfoProps üzerinden aktarılan müşteri verisi nesnesi — Üst bileşenden iletilen, mevcut müşterinin tüm kişisel ve iletişim bilgilerini içeren nesnedir, bileşen tarafından arayüzdeki başlangıç değerleri olarak kullanılır.
-- setCustomerInfo: StepCustomerInfoProps üzerinden aktarılan state setter fonksiyonu — Üst bileşenin müşteri bilgisi state'ini güncellemek için kullanılan fonksiyondur, kullanıcı tarafından girilen yeni bilgileri alarak üst bileşendeki state'i yeniler.
-- t: StepCustomerInfoProps üzerinden aktarılan çeviri fonksiyonu — Uluslararasılaştırma (i18n) süreçlerinde kullanılan fonksiyondur, arayüzdeki statik metinlerin kullanıcının tercih ettiği dile uygun olarak gösterilmesini sağlar.
-**Dönüş**: React.FC<StepCustomerInfoProps> — Tanımlanan tiplere uygun React fonksiyonel bileşeni döndürür, bu bileşen ödeme sürecinin müşteri bilgileri adımının tüm kullanıcı arayüzünü ve kullanıcı etkileşimlerini sorumluluğunda yürütür.
+- `customerInfo`: object — Mevcut müşteri bilgilerini içeren veri nesnesi.
+- `setCustomerInfo`: function — Müşteri bilgilerini güncellemek için kullanılan state setter fonksiyonu.
+- `t`: function — Çeviri anahtarlarını yerelleştirilmiş metinlere dönüştüren i18n yardımcı fonksiyonu.
+
+**Dönüş**: `React.FC<StepCustomerInfoProps>` — Tanımlanan props tipine uygun bir React fonksiyonel bileşeni.
 
 ---
 
@@ -50,19 +64,16 @@ Bu checkout sürecinin müşteri bilgisi girişi adımına ait React bileşenini
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\StepCustomerInfo.tsx::StepCustomerInfo
-- **params**: (customerInfo, setCustomerInfo, t)
+### [N1_NASIL] AST Pointer: src\views\checkout\StepCustomerInfo.tsx::StepCustomerInfo
+- **params**: customerInfo, setCustomerInfo, t
 - **ic_degiskenler**:
-  - `customerInfo` — Müşteri kişisel bilgilerini tutan state nesnesi, form inputlarının mevcut değerlerini sağlamak için kullanılır
-  - `setCustomerInfo` — customerInfo state'ini güncellemek için kullanılan React state setter fonksiyonu, her input değişikliğinde ilgili alanı günceller
-  - `t` — Çoklu dil desteği için kullanılan çeviri (i18n) fonksiyonu, tüm form başlıkları, etiketleri ve placeholder metinlerini getirmek için kullanılır
-  - `customerInfo.name` — customerInfo nesnesinde müşterinin ad-soyad bilgisini tutan alan, isim inputunun değeri olarak atanır
-  - `customerInfo.email` — customerInfo nesnesinde müşterinin e-posta adresini tutan alan, e-posta inputunun değeri olarak kullanılır
-  - `customerInfo.phone` — customerInfo nesnesinde müşterinin telefon numarasını tutan alan, telefon inputunun değeri olarak atanır
-  - `customerInfo.identityNumber` — customerInfo nesnesinde müşterinin kimlik numarasını tutan alan, kimlik numarası inputunun değeri olarak kullanılır
-  - `e.target.value` — Input değişikliklerinde tetiklenen event nesnesinden alınan güncel input değeri, setCustomerInfo ile ilgili müşteri bilgisi alanına yazılır
-  - `User` — Lucide-react'ten import edilen kullanıcı ikonu, form başlığının solunda gösterilmek üzere kullanılır
-- **Dönüş**: Checkout sürecinin müşteri bilgileri adımının kullanıcı arayüzünü oluşturan React JSX elementi, bilgi giriş inputları ve görsel bileşenler içerir
+  - `customerInfo.name` — müşteri adı input değeri; `value={customerInfo.name}` ile inputa bağlanır, `onChange` ile `setCustomerInfo({...customerInfo, name: e.target.value})` çağrılarak güncellenir.
+  - `customerInfo.email` — e-posta input değeri; `value={customerInfo.email}` ile inputa bağlanır, `onChange` ile `setCustomerInfo({...customerInfo, email: e.target.value})` ile güncellenir.
+  - `customerInfo.phone` — telefon input değeri; `value={customerInfo.phone}` ile inputa bağlanır, `onChange` ile `setCustomerInfo({...customerInfo, phone: e.target.value})` ile güncellenir.
+  - `customerInfo.identityNumber` — kimlik no input değeri; `value={customerInfo.identityNumber}` ile inputa bağlanır, `onChange` ile `setCustomerInfo({...customerInfo, identityNumber: e.target.value})` ile güncellenir; `maxLength={11}` kısıtı vardır.
+  - `setCustomerInfo` — `CheckoutCustomerInfo` state'ini güncellemek için kullanılan fonksiyon; her input `onChange`'inde yayılım (`...customerInfo`) ile yeni değer atanır.
+  - `t` — çeviri/yerelleştirme fonksiyonu; `t('checkout.personal.title')`, `t('checkout.personal.nameLabel')`, `t('checkout.personal.emailLabel')`, `t('checkout.personal.phoneLabel')`, `t('checkout.personal.idLabel')`, `t('checkout.personal.namePlaceholder')`, `t('checkout.personal.emailPlaceholder')`, `t('checkout.personal.phonePlaceholder')`, `t('checkout.personal.idPlaceholder')` şeklinde etiket ve placeholder metinlerini sağlar.
+- **Dönüş**: JSX elementi — dört input alanı (isim, email, telefon, kimlik no) içeren bir form bölümü render edilir.
 
 ---
 
@@ -75,3 +86,18 @@ Bu checkout sürecinin müşteri bilgisi girişi adımına ait React bileşenini
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: StepCustomerInfo
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `border-slate-200`, `text-industrial-gray`, `text-sm`, `text-white`, `text-xl`
+- **Layout:** `block`, `flex`, `gap-4`, `grid`, `grid-cols-1`, `h-10`, `items-center`, `md:grid-cols-2`, `p-2`, `w-full`
+- **Responsive:** `md:` prefix kullanımları

@@ -4,82 +4,111 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx
 skeleton_hash: be5d7735ad6c9ca2
-generated_at: 2026-05-23T22:37:28Z
+entity_hashes:
+  func:AdminCouponsPage: f0fec4b54553c13d
+  func:dbToUi: c92f28b112f4d513
+  func:filtered: d0d2941fe8951600
+  func:isAllowedCouponType: af4b48320744b9de
+  func:saveCoupon: 13014c937b37a622
+  func:toggleActive: bde4db4c0f16dfdc
+  overview: bf9bd25b077ab626
+  style_tokens: 28be68dd9e200846
+generated_at: 2026-05-27T11:49:32Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun yönetici panelinde kupon yönetimi işlemlerini sunan React tabanlı bir ön yüz sayfasıdır. Yöneticilerin kuponları görüntülemesi, düzenlemesi, kaydetmesi ve durumlarını yönetmesi için gerekli tüm işlevleri tek bir modülde toplar.
+Bu modül, yönetici panelinde kupon yönetimi sayfasını oluşturan React bileşenini ve yardımcı işlevleri içerir. Kuponların listelenmesi, filtrelenmesi, yeni kupon eklenmesi ve aktif/pasif durumlarının değiştirilmesi gibi işlemleri yönetir.
 
 ## Fonksiyon Grupları
+
 ### Ana Sayfa Bileşeni
-Yönetici kuponları sayfasını oluşturan ana React bileşenidir, tüm alt işlevleri bir araya getirerek kullanıcı arayüzünü sunar.
+Sayfanın temel React bileşenini oluşturur, diğer tüm işlevleri bir araya getirir.
 - AdminCouponsPage
 
-### Veri Doğrulama ve Dönüşüm
-Veritabanından gelen ham kupon verilerini arayüzün kullanabileceği formata dönüştürmek ve geçerli kupon tiplerini doğrulamakla sorumludur.
+### Veri Dönüşümü ve Doğrulama
+Veritabanından gelen kupon verilerini kullanıcı arayüzü formatına çevirir ve kupon türlerinin geçerliliğini kontrol eder.
 - isAllowedCouponType, dbToUi
 
-### Kupon İşlem Yönetimi
-Kuponların filtrelenmesi, kaydedilmesi ve aktiflik durumlarının değiştirilmesi gibi tüm kullanıcı odaklı işlemleri gerçekleştiren işlevleri barındırır.
-- filtered, saveCoupon, toggleActive
+### Durum Yönetimi ve Filtreleme
+Mevcut kupon listesini belirli kriterlere göre filtreleyerek görüntülenen veriyi hazırlar.
+- filtered
+
+### API İşlemleri
+Kupon ekleme ve aktiflik durumunu değiştirme gibi sunucuyla etkileşim gerektiren işlemleri gerçekleştirir.
+- saveCoupon, toggleActive
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül, admin yetkisine sahip kullanıcılar için kupon oluşturma, listeleme, durum güncelleme ve kaydetme işlemlerini sunar, tüm işlevlerinin sorunsuz çalışması için kullanıcı yetkilendirmesi, veritabanı erişimi ve tip doğrulama mekanizmalarının kesintisiz çalışması zorunludur.
+## AXIOMS – Mimari Varsayımlar  
+Bu modül için özel aksiyom tanımlanmamıştır. Aşağıdaki aksiyomlar, yalnızca fonksiyon imzalarından çıkarılan zorunlu koşulları ve beklenen sonuçları tanımlar.
 
-[Aksiyom 1]: Eğer kupon tiplerinin geçerliliğini doğrulayan isAllowedCouponType işlevi çalışmıyorsa, sistemde geçersiz tiplerde kuponlar kaydedilebilir veya mevcut kuponlar listelenirken hatalar oluşur.
-[Aksiyom 2]: Eğer veritabanı kupon kayıtlarını (DbCouponRow) UI formatına dönüştüren dbToUi işlevi çalışmıyorsa, admin panelinde kuponlar doğru şekilde görüntülenemez, tüm listeleme işlemleri başarısız olur.
-[Aksiyom 3]: Eğer AdminCouponsPage ana bileşeni sadece yetkili admin kullanıcılarına erişim izni vermiyorsa, yetkisiz kişiler kupon yönetimi işlemlerini gerçekleştirebilir, veri güvenliği ihlal edilir.
-[Aksiyom 4]: Eğer kayıtlı kuponları filtreleyen filtered() işlevi tüm veritabanı kupon kayıtlarına erişemiyorsa, admin kullanıcıları aradıkları kuponlara ulaşamaz, hatalı filtrelenmiş listelerle karşılaşır.
-[Aksiyom 5]: Eğer yeni veya düzenlenmiş kupon verilerini kalıcı olarak kaydeden saveCoupon() işlevi veritabanı yazma iznine sahip değilse, kupon oluşturma ve güncelleme işlemleri tamamlanamaz.
-[Aksiyom 6]: Eğer kuponların aktiflik durumunu değiştiren toggleActive(id: string, active: boolean) işlevi tarafından gönderilen kimlik ve durum verileri veritabanı tarafından doğru işlenemiyorsa, kuponların aktif/pasif durumu yönetilemez.
+**Aksiyom 1**: Eğer `isAllowedCouponType` fonksiyonuna verilen `x` parametresi **tanımsız (undefined) veya null** ise, fonksiyon **false** döner.  
+
+**Aksiyom 2**: Eğer `isAllowedCouponType` fonksiyonuna verilen `x` parametresi **beklenen coupon‑type formatına** (örneğin string ya da enum) uymuyorsa, fonksiyon **false** döner.  
+
+**Aksiyom 3**: Eğer `dbToUi` fonksiyonuna verilen `row` parametresi **null, undefined** ya da **DbCouponRow tipine uygun değilse**, fonksiyon **bir hata fırlatır** (exception) ya da **null** döner.  
+
+**Aksiyom 4**: Eğer `AdminCouponsPage` bileşeni **gerekli bağlam (React context, router, vb.)** olmadan render edilirse, bileşen **boş** ya da **hata ekranı** gösterir.  
+
+**Aksiyom 5**: Eğer `filtered` fonksiyonu **filtreleme kriterleri** (örn. arama metni, aktif/pasif durumu) **tanımlı değilse**, fonksiyon **tüm kuponları** (yani hiçbir filtre uygulamadan) döner.  
+
+**Aksiyom 6**: Eğer `saveCoupon` fonksiyonu **geçersiz kupon verisi** (örneğin eksik alanlar, tip uyuşmazlığı) alırsa, fonksiyon **kaydetme işlemini reddeder** ve **hata mesajı** üretir.  
+
+**Aksiyom 7**: Eğer `toggleActive` fonksiyonuna verilen `id` **veritabanında mevcut bir kuponu işaret etmiyorsa**, fonksiyon **hiçbir değişiklik yapmaz** ve **başarısızlık durumu** döner.  
+
+**Aksiyom 8**: Eğer `toggleActive` fonksiyonuna verilen `active` değeri **boolean tipinde değilse**, fonksiyon **tip hatası** fırlatır.  
+
+**Domain‑specific kurallar**:  
+- Kupon tipinin izin verilen değerleri (örneğin `"percentage"`, `"fixed_amount"` vb.) **bilinmiyor**; bu değerler `isAllowedCouponType` içinde tanımlı olmalıdır.  
+- `DbCouponRow` yapısının zorunlu alanları (örneğin `id`, `code`, `type`, `value`) **bilinmiyor**; ancak bu alanların eksik olması `dbToUi` fonksiyonunun hata üretmesine yol açar.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### isAllowedCouponType
-**Ne yapar**: Girilen bilinmeyen türdeki değerin geçerli kupon tiplerinden olup olmadığını kontrol eden tip koruma fonksiyonudur. Sadece ön tanımlı iki izinli kupon tipinin sistemde kullanılmasına izin vererek veri tutarlılığını korur.
-**Nasıl yapar**: Gelen bilinmeyen değeri doğrudan 'percent' ve 'fixed' string değerleriyle eşleştirerek kontrol sağlar. TypeScript'te tip daraltma işlemi yaparak, sonrasında ilgili değerin güvenli şekilde string olarak kullanılmasını sağlar.
+**Ne yapar**: Verilen değerin izin verilen kupon tiplerinden (`'percent'` veya `'fixed'`) biri olup olmadığını kontrol eder.  
+**Nasıl yapar**: Değeri doğrudan `'percent'` ve `'fixed'` stringleriyle karşılaştırır; eşleşme varsa `true`, aksi takdirde `false` döner.  
 **Parametreler**:
-- name: x, type: unknown — Geçerliliği kontrol edilecek bilinmeyen türdeki giriş değeri
-**Dönüş**: boolean — Giren değer 'percent' veya 'fixed' ise true, aksi takdirde false döndürür
+- x: unknown — Kontrol edilmek istenen değer.  
+**Dönüş**: `x is AllowedCouponType` (boolean) – değer izin verilen tiplerden biriyse `true`, değilse `false`.
 
 ### dbToUi
-**Ne yapar**: Veritabanından çekilen ham kupon kaydını, kullanıcı arayüzünde kullanılabilecek formata dönüştüren veri dönüşüm fonksiyonudur. Veritabanı ve arayüz arasındaki veri formatı farklarını ortadan kaldırarak uyum sağlar.
-**Nasıl yapar**: DbCouponRow tipinde almış olduğu veritabanı kaydını, arayüzün ihtiyaç duyduğu alanlara ve tiplere uyumlu olacak şekilde yeniden yapılandırır, tüm zorunlu alanları arayüz standardına göre düzenler.
+**Ne yapar**: Veritabanı satırını (DbCouponRow) UI katmanında kullanılacak biçime (CouponRow) dönüştürür.  
+**Nasıl yapar**: Gelen nesnenin alanlarını yeniden adlandırır, tip dönüşümleri yapar (`discount_type` → `type`, `discount_value` → `value` gibi) ve null/undefined kontrolleriyle güvenli değerler üretir.  
 **Parametreler**:
-- name: row, type: DbCouponRow — Veritabanından çekilen ham yapıdaki kupon kaydı
-**Dönüş**: CouponRow — Arayüzde kullanıma uygun formatlanmış, yapılandırılmış kupon kaydı
+- row: DbCouponRow — Veritabanından alınan kupon kaydı.  
+**Dönüş**: `CouponRow` — UI’da gösterilecek kupon nesnesi.
 
 ### AdminCouponsPage
-**Ne yapar**: Yönetici panelinin kupon yönetimi sayfasını oluşturan ana React bileşenidir. Tüm kupon yönetimi işlemlerinin tek merkezde toplandığı, yöneticiye tüm kupon işlemlerini yapma imkanı sunan sayfayı render eder.
-**Nasıl yapar**: Sayfa içerisinde kupon listeleme, arama ile filtreleme, yeni kupon oluşturma, mevcut kuponları düzenleme, aktiflik durumlarını değiştirme gibi tüm iş mantığını barındırır, ilgili alt bileşenleri ve işlemleri koordine ederek arayüzü oluşturur.
-**Parametreler**: Herhangi bir giriş parametresi almaz, standart React sayfa bileşeni olarak çağrılır.
-**Dönüş**: React.FC — React tarafından işlenebilen, tüm kupon yönetimi arayüzünü içeren fonksiyonel bileşen
+**Ne yapar**: Yönetim panelinde kuponları listeleyen, ekleyen ve düzenleyen React bileşenini tanımlar.  
+**Nasıl yapar**: İçerik olarak `useState`, `useEffect` ve yukarıdaki yardımcı fonksiyonları (ör. `saveCoupon`, `toggleActive`, `filtered`) kullanarak kupon verilerini yönetir ve UI render eder.  
+**Parametreler**: Yok.  
+**Dönüş**: `React.FC` — Fonksiyonel React bileşeni.
 
 ### filtered
-**Ne yapar**: Mevcut tüm kupon listesini girilen arama metnine göre filtreleyen, arama sonuçlarını döndüren fonksiyondur. Yöneticinin kupon listesi içinde kolayca arama yapmasını sağlar.
-**Nasıl yapar**: Kapsamı içinde eriştiği tüm kupon satırları üzerinde dolaşır, her bir kuponun kodunu ve tipini küçük harfe çevirir. Gelen arama metninin de küçük harfli halini içeren kayıtları seçerek filtrelenmiş listeyi oluşturur.
-**Parametreler**:
-- name: rows, type: DbCouponRow[] — Filtreleme işlemine tabi tutulacak tüm kupon kayıtlarını içeren ana liste, fonksiyonun kapsamı içinde erişildiği tanımlanmıştır
-- name: s, type: string — Filtreleme için kullanılan arama metni, fonksiyonun kapsamı içinde erişildiği tanımlanmıştır
-**Dönüş**: DbCouponRow[] — Arama kriterlerine uyan tüm kupon kayıtlarını içeren filtrelenmiş liste
+**Ne yapar**: Kullanıcı arama sorgusuna göre kupon listesini filtreler.  
+**Nasıl yapar**: Arama metni boşsa tüm satırları döndürür; aksi takdirde kod ve tip alanlarını küçük harfe çevirerek sorgu metniyle içerik kontrolü yapar.  
+**Parametreler**: Yok (fonksiyon dışındaki `q` ve `rows` değişkenlerine erişir).  
+**Dönüş**: `CouponRow[]` — Filtrelenmiş kupon satırları dizisi.
 
 ### saveCoupon
-**Ne yapar**: Oluşturulan veya düzenlenen kupon kaydını kalıcı olarak kaydetme işlemini gerçekleştiren fonksiyondur. Yeni kupon ekleme veya mevcut kuponu güncelleme işlemlerinin son adımını yönetir.
-**Nasıl yapar**: Düzenlenen veya oluşturulan kupon verilerini alarak gerekli doğrulama kontrollerini yapar, ardından ilgili servis çağrılarıyla veriyi kalıcı depolama alanına kaydeder. İşlem sırasında oluşabilecek hata ve başarı durumlarını yönetir.
-**Parametreler**: Resmi olarak tanımlanmış herhangi bir giriş parametresi belirtilmemiştir.
-**Dönüş**: Dönüş tipi resmi olarak tanımlanmamıştır, muhtemelen void türündedir.
+**Ne yapar**: Formdan alınan kupon verilerini doğrular, Supabase edge function aracılığıyla yeni bir kupon oluşturur ve UI’da listeyi günceller.  
+**Nasıl yapar**:  
+1. Form alanlarını temizler ve temel doğrulamalar (kod uzunluğu, tip seçimi, değer pozitifliği) yapar.  
+2. Hata yoksa `supabase.functions.invoke` ile backend’e istek gönderir.  
+3. Gelen veriyi `dbToUi` ile UI formatına çevirir, mevcut satır listesine ekler ve formu sıfırlar.  
+4. Başarı veya hata durumunda toast mesajları gösterir.  
+**Parametreler**: Yok.  
+**Dönüş**: `void` (asenkron işlem, sonuç UI üzerinden yansıtılır).
 
 ### toggleActive
-**Ne yapar**: Belirli bir kuponun aktiflik durumunu değiştiren, kuponun sistemde kullanılıp kullanılamayacağını yöneten fonksiyondur. Yöneticinin tek tıkla kuponları aktif veya pasif hale getirmesini sağlar.
-**Nasıl yapar**: İlgili kuponun benzersiz kimliğini ve ayarlanacak yeni aktiflik durumunu alır, bu durumu veritabanında günceller. Ardından arayüzdeki kupon listesini de yeni duruma göre güncelleyerek görüntünün tutarlı kalmasını sağlar.
+**Ne yapar**: Belirtilen kuponun aktiflik durumunu tersine çevirir ve UI’da günceller.  
+**Nasıl yapar**: Supabase `update` sorgusuyla `is_active` alanını tersine çevirir, güncellenmiş kaydı alır ve `setRows` ile yerel durum dizisini günceller; işlem sonucunda toast bildirimi gösterir.  
 **Parametreler**:
-- name: id, type: string — Aktiflik durumu değiştirilecek kuponun benzersiz kimlik numarası
-- name: active, type: boolean — Kuponun ayarlanacak yeni aktiflik durumu, true ise aktif, false ise pasif duruma getirilir
-**Dönüş**: Dönüş tipi resmi olarak tanımlanmamıştır, muhtemelen void türündedir.
+- id: string — Güncellenecek kuponun benzersiz kimliği.  
+- active: boolean — Kuponun mevcut aktiflik durumu (fonksiyon yeni durumu `!active` olarak ayarlar).  
+**Dönüş**: `void` (asenkron işlem, UI yan etkileriyle sonuçlanır).
 
 ---
 
@@ -109,13 +138,21 @@ type AllowedCouponType = 'percent' | 'fixed'
 ### DbCouponRow
 ```typescript
 type DbCouponRow = {
+
   id: string
+
   code: string
+
   discount_type: 'percentage' | 'fixed_amount' | string
+
   discount_value: number
+
   valid_from?: string | null
+
   valid_until?: string | null
+
   is_active: boolean
+
  
 ```
 
@@ -123,151 +160,98 @@ type DbCouponRow = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::isAllowedCouponType
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::isAllowedCouponType
 - **params**: (x: unknown)
 - **ic_degiskenler**:
-  - `x` — Giriş değeri, izin verilen kupon türleri ('percent', 'fixed') ile kıyaslanarak tür doğrulaması yapılır
-- **Dönüş**: x is AllowedCouponType (tip predicate, boolean)
+  - `x` — kontrol edilen değer, `'percent'` ya da `'fixed'` olup olmadığı test edilir
+- **Dönüş**: `x is AllowedCouponType` (type guard, boolean)
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::dbToUi
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::dbToUi
 - **params**: (row: DbCouponRow)
 - **ic_degiskenler**:
-  - `row.id` — Veritabanından gelen kupon satırının benzersiz kimliği, UI nesnesinin id alanına aktarılır
-  - `row.code` — Veritabanından gelen kupon kodu, UI nesnesinin code alanına aktarılır
-  - `row.discount_type` — Veritabanındaki indirim türü, UI'daki 'percent'/'fixed' formatına dönüştürülerek type alanına atanır
-  - `row.discount_value` — Veritabanındaki indirim değeri, sayıya dönüştürülerek UI nesnesinin value alanına atanır
-  - `row.valid_from` — Kuponun geçerlilik başlangıç tarihi, null durumu yönetilerek UI starts_at alanına aktarılır
-  - `row.valid_until` — Kuponun geçerlilik bitiş tarihi, null durumu yönetilerek UI ends_at alanına aktarılır
-  - `row.is_active` — Kuponun aktiflik durumu, boolean'a dönüştürülerek UI active alanına aktarılır
-  - `row.usage_limit` — Kuponun kullanım limiti, null durumu yönetilerek UI usage_limit alanına aktarılır
-  - `row.used_count` — Kuponun kullanım sayısı, varsayılan 0 atanarak UI used_count alanına aktarılır
-  - `row.created_at` — Kuponun oluşturulma tarihi, UI nesnesinin created_at alanına aktarılır
-- **Dönüş**: CouponRow (UI formatında kupon nesnesi)
+  - `row.id` — veri tabanındaki kuponun kimliği
+  - `row.code` — kupon kodu
+  - `row.discount_type` — `'percentage'` ya da `'fixed_amount'`, UI tipine çevrilir
+  - `row.discount_value` — sayı olarak saklanan indirim değeri
+  - `row.valid_from` — kuponun geçerli olduğu başlangıç tarih‑zamanı, yoksa `null`
+  - `row.valid_until` — kuponun geçerli olduğu bitiş tarih‑zamanı, yoksa `null`
+  - `row.is_active` — aktiflik bayrağı, UI’da `active` olarak dönüştürülür
+  - `row.usage_limit` — kullanım limiti, yoksa `null`
+  - `row.used_count` — kullanılan miktar, yoksa `0`
+  - `row.created_at` — oluşturulma zaman damgası
+- **Dönüş**: `CouponRow` (UI‑model nesnesi)
 
-### [N3_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::anonymous_fetch_coupons
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::(anonymous async fetch)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `setLoading` — Yükleme durumunu yöneten state setter, işlem başlangıcında true, sonunda false yapılır
-  - `ensureSessionFresh` — Oturumun geçerliliğini kontrol eden asenkron fonksiyon, işlem başında çağrılır
-  - `supabase.from('coupons').select` — Supabase'den kupon verilerini çeken sorgu, 200 adetle sınırlı, oluşturulma tarihine göre sıralı
-  - `data` — Sorgudan dönen kupon verileri listesi
-  - `error` — Sorgu sırasında oluşan hata nesnesi
-  - `mapped` — dbToUi ile UI formatına dönüştürülmüş tüm kuponlar listesi
-  - `setRows` — Kupon listesi state'ini güncelleyen setter, dönüştürülmüş verileri state'e atar
-  - `console.error` — Hata durumunda konsola log yazan fonksiyon
-- **Dönüş**: yok
+  - `setLoading` — yükleme durumunu `true/false` olarak ayarlar
+  - `ensureSessionFresh` — oturumun güncel olup olmadığını kontrol eder
+  - `supabase` — Supabase istemcisi, `coupons` tablosundan veri çeker
+  - `data` — sorgu sonucu dizi (DbCouponRow[]), `null` olma ihtimali
+  - `error` — sorgu hatası, varsa fırlatılır
+  - `mapped` — `data` dizisinin `dbToUi` ile dönüştürülmüş hali
+  - `setRows` — UI’da gösterilecek kupon satırlarını günceller
+- **Dönüş**: yok (yan etki: state güncellenir, console.log hataları)
 
-### [N4_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::filtered
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::filtered
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `q` — Arama sorgusu metni, boşlukları temizlenerek filtreleme işlemi için kullanılır
-  - `rows` — Tüm mevcut kupon satırları, filtrelenerek döndürülür
-  - `s` — Küçük harfe çevrilmiş normalize edilmiş arama sorgusu, kıyaslamalarda kullanılır
-  - `r` — Filtreleme sırasında işlenen tek bir kupon satırı
-- **Dönüş**: CouponRow[] (arama sorgusuyla eşleşen filtrelenmiş kupon listesi)
+  - `q` — arama sorgusu stringi
+  - `rows` — mevcut kupon satırları dizisi (state)
+  - `s` — `q`’nun küçük harfe dönüştürülmüş hali
+- **Dönüş**: `rows` (filtrelenmemiş) veya `rows.filter(...)` (arama kriterine uyan satırlar)
 
-### [N5_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::saveCoupon
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::saveCoupon
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `form.code` — Formda girilen kupon kodu, trimlenerek doğrulanır
-  - `form.type` — Formda seçilen indirim türü, izin verilen türler arasında mı diye kontrol edilir
-  - `form.value` — Formda girilen indirim değeri, sayıya dönüştürülerek doğrulanır
-  - `codeTrim` — Trimlenmiş geçerli kupon kodu, tüm sonraki işlemlerde kullanılır
-  - `issues` — Doğrulama sırasında oluşan hata mesajları listesi, doluysa işlem durdurulur
-  - `val` — Sayıya dönüştürülmüş geçerli indirim değeri, doğrulama ve payload oluşturulmasında kullanılır
-  - `toast.error` — Hata bildirimi gösteren fonksiyon, doğrulama hatalarını kullanıcıya iletir
-  - `setSaving` — Kayıt durumunu yöneten state setter, işlem başında true, sonunda false yapılır
-  - `payload` — Supabase edge function'a gönderilecek kupon verisi, form değerlerinden oluşturulur
-  - `form.starts_at` — Formda girilen kupon geçerlilik başlangıç tarihi, payload'a aktarılır
-  - `form.ends_at` — Formda girilen kupon geçerlilik bitiş tarihi, payload'a aktarılır
-  - `form.active` — Formda işaretlenen kupon aktiflik durumu, payload'a aktarılır
-  - `form.usage_limit` — Formda girilen kupon kullanım limiti, payload'a aktarılır
-  - `supabase.functions.invoke` — 'admin-create-coupon' Supabase edge function'ını tetikleyen çağrı
-  - `response` — Edge function'dan dönen tam cevap nesnesi
-  - `data` — Edge function'dan dönen veritabanı formatında yeni kupon nesnesi
-  - `error` — Edge function çağrısı sırasında oluşan hata nesnesi
-  - `ui` — dbToUi ile UI formatına dönüştürülmüş yeni kupon nesnesi
-  - `setRows` — Kupon listesi state'ini güncelleyen setter, yeni kuponu listenin başına ekler
-  - `setForm` — Form state'ini sıfırlayan setter, varsayılan değerlere döndürür
-  - `toast.success` — Başarı bildirimi gösteren fonksiyon, kupon eklendiğinde kullanıcıya iletilir
-  - `console.error` — İşlem sırasında oluşan hataları konsola loglayan fonksiyon
-- **Dönüş**: yok
+  - `form.code` — kullanıcı tarafından girilen kupon kodu
+  - `codeTrim` — boşlukları temizlenmiş kod stringi
+  - `issues` — doğrulama hatalarını tutan dizi
+  - `form.type` — kupon tipi (`percent` | `fixed`)
+  - `val` — `form.value`’nin sayısal karşılığı
+  - `form.value` — kullanıcı girişi değer
+  - `form.starts_at`, `form.ends_at` — tarih aralıkları, string ya da `null`
+  - `form.active` — kuponun aktif olup olmadığı
+  - `form.usage_limit` — kullanım limiti sayı ya da `null`
+  - `payload` — API’ye gönderilecek kupon nesnesi
+  - `supabase.functions.invoke` — edge function çağrısı, `admin-create-coupon`
+  - `response` — fonksiyon yanıtı, `{ data, error }`
+  - `data` — oluşturulan `DbCouponRow` veya `null`
+  - `error` — yanıt hatası
+  - `ui` — `dbToUi(data)` ile UI modeli
+  - `setRows` — yeni kuponu listenin başına ekler
+  - `setForm` — formu varsayılan değerlere sıfırlar
+  - `toast` — kullanıcı bildirimleri (`error`, `success`)
+  - `setSaving` — kaydetme işlemi sırasında loading state
+- **Dönüş**: yok (yan etki: state güncellenir, toast gösterilir)
 
-### [N6_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::toggleActive
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::toggleActive
 - **params**: (id: string, active: boolean)
 - **ic_degiskenler**:
-  - `id` — Durumu değiştirilecek kuponun benzersiz kimliği
-  - `active` — Kuponun mevcut aktiflik durumu, tersine çevrilerek güncellenir
-  - `supabase.from('coupons').update` — Supabase'de ilgili kuponun is_active değerini güncelleyen sorgu
-  - `data` — Sorgudan dönen, kuponun id ve güncel is_active değerini içeren nesne
-  - `error` — Sorgu sırasında oluşan hata nesnesi
-  - `setRows` — Kupon listesi state'ini güncelleyen setter, ilgili kuponun aktiflik durumunu değiştirir
-  - `r` — State güncellemesi sırasında işlenen tek kupon satırı
-  - `toast.success` — Başarı bildirimi, durum değişikliği kullanıcıya iletilir
-  - `toast.error` — Hata bildirimi, durum değiştirilemezse gösterilir
-  - `console.error` — Hata durumunda konsola log yazan fonksiyon
-- **Dönüş**: yok
-
-### [N7_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::anonymous_usage_limit_form_setter
-- **params**: (e: InputChangeEvent)
-- **ic_degiskenler**:
-  - `e.target.value` — Kullanım limiti inputundan girilen değer, sayıya dönüştürülür
-  - `raw` — Input değerinin sayıya dönüştürülmüş hali, null durumu yönetilir
-  - `normalized` — Sıfırdan büyük olan geçerli kullanım limiti değeri, form state'ine atanır
-  - `f` — Mevcut form state nesnesi, güncellenerek yeni state döndürülür
-- **Dönüş**: Güncellenmiş form state nesnesi
-
-### [N8_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::anonymous_render_coupon_row
-- **params**: (r: CouponRow, idx: number)
-- **ic_degiskenler**:
-  - `r.id` — Kuponun benzersiz kimliği, tablo satırının benzersiz key değeri olarak kullanılır
-  - `r.code` — Kupon kodu, tabloda stil verilerek görüntülenir
-  - `r.type` — Kuponun indirim türü, türüne göre stil ayrıması yapılarak tabloda gösterilir
-  - `r.value` — Kuponun indirim değeri, yüzde veya para formatında görüntülenir
-  - `r.active` — Kuponun mevcut aktiflik durumu, durum butonunda gösterilir, toggleActive fonksiyonuna parametre verilir
-  - `r.starts_at` — Kuponun geçerlilik başlangıç tarihi, formatlanarak tabloda gösterilir
-  - `r.ends_at` — Kuponun geçerlilik bitiş tarihi, formatlanarak tabloda gösterilir
-  - `r.used_count` — Kuponun kullanım sayısı, sayaç ve ilerleme çubuğunda kullanılır
-  - `r.usage_limit` — Kuponun kullanım limiti, ilerleme çubuğu ve sayaçta kullanılır
-  - `r.created_at` — Kuponun oluşturulma tarihi, formatlanarak tabloda gösterilir
-  - `idx` — Kuponun listedeki indeksi, satır animasyonunun gecikmesini ayarlamak için kullanılır
-  - `hasWriteAccess` — Kullanıcının yazma izni durumu, aktiflik değiştirme butonunun aktifliğini kontrol eder
-  - `toggleActive` — Kuponun aktiflik durumunu değiştiren asenkron fonksiyon, butona tıklandığında çağrılır
-  - `formatCurrency` — Para birimi formatlayan fonksiyon, sabit indirimleri göstermek için kullanılır
-  - `formatDateTime` — Tarih formatlayan fonksiyon, geçerlilik ve oluşturulma tarihlerini göstermek için kullanılır
-  - `lang` — Uygulama dili, formatlama fonksiyonlarına parametre olarak iletilir
-- **Dönüş**: React.ReactNode (tek kupon için tablo satırı JSX çıktısı)
+  - `supabase` — Supabase istemcisi, `coupons` tablosunda `is_active` alanını tersine çevirir
+  - `data` — güncellenmiş satır `{ id, is_active }`
+  - `error` — olası hata, fırlatılır
+  - `setRows` — ilgili satırın `active` alanını yeni değerle günceller
+  - `toast` — işlem sonucunu kullanıcıya bildirir
+- **Dönüş**: yok (yan etki: state güncellenir, toast gösterilir)
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Bu dosyadaki tek ana fonksiyon olan AdminCouponsPage(), yetki doğrulaması için isAllowedCouponType, veritabanı verisini kullanıcı arayüzüne uyarlamak için dbToUi, kuponları filtrelemek için filtered, kupon aktiflik durumunu değiştirmek için toggleActive yerel fonksiyonlarını çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen çağrı verisinde bu modülü kullanan dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  AdminCouponsPage() → dbToUi()
-  AdminCouponsPage() → filtered()
-  AdminCouponsPage() → isAllowedCouponType()
-  AdminCouponsPage() → toggleActive()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    AdminCouponsPage["AdminCouponsPage()"] --> dbToUi["dbToUi()"]
-    AdminCouponsPage["AdminCouponsPage()"] --> filtered["filtered()"]
-    AdminCouponsPage["AdminCouponsPage()"] --> isAllowedCouponType["isAllowedCouponType()"]
-    AdminCouponsPage["AdminCouponsPage()"] --> toggleActive["toggleActive()"]
+graph TD
+    AdminCouponsPage_tsx__AdminCouponsPage["AdminCouponsPage"]
+    AdminCouponsPage_tsx__dbToUi["dbToUi"]
+    AdminCouponsPage_tsx__filtered["filtered"]
+    AdminCouponsPage_tsx__isAllowedCouponType["isAllowedCouponType"]
+    AdminCouponsPage_tsx__saveCoupon["saveCoupon"]
+    AdminCouponsPage_tsx__toggleActive["toggleActive"]
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__toggleActive
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__isAllowedCouponType
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__filtered
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__dbToUi
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -285,3 +269,18 @@ graph LR
   export: AdminCouponsPage
   export: dbToUi
   export: isAllowedCouponType
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-blue-500`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-emerald-500/10`, `bg-gradient-to-r`, `bg-slate-500`, `bg-slate-500/10`, `bg-slate-800`, `bg-white/10`, `bg-white/5`, `border-cyan-500/20`, `border-emerald-500/20`, `border-t`, `border-white/10`
+- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`, `grid-cols-1`, `group-hover:opacity-100`, `h-1`, `h-1.5`
+- **Responsive:** `md:` prefix kullanımları

@@ -4,42 +4,47 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\ProductsGrid.tsx
 skeleton_hash: 9ea1ac36dfdc188b
-generated_at: 2026-05-23T22:26:11Z
+entity_hashes:
+  func:ProductsGrid: 3dd0bc95cb82a18e
+  overview: b0875b8b603aa680
+  style_tokens: 85ab299eedf71c41
+generated_at: 2026-05-27T12:19:14Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun ürün listeleme bölümünde kullanılan, ürünleri ızgara formatında sunan temel React bileşenini barındırır. Gelen yapılandırma ve veri prop'larını işleyerek kullanıcılara tutarlı bir ürün görüntüleme deneyimi sunar, yükleme, sıralama ve görünüm ayarı gibi temel işlevleri destekler.
+`ProductsGrid` bileşeni, ürün listesini farklı görünümler (grid/list) ve sıralama seçenekleriyle sunan bir UI konteyneridir. Gelen veri, yükleme durumu ve kullanıcı etkileşimleri (görünüm değişikliği, sıralama değişikliği) üzerinden render mantığını yönetir.
 
 ## Fonksiyon Grupları
-### Ana Ürün Listeleme Bileşeni
-Modülün tüm sorumluluklarını üstlenen bu grup, ürün görüntüleme ve kullanıcı etkileşimi yönetimi işlevlerini tek bileşen altında toplar. Gelen veri ve ayar prop'larını işleyerek ürünleri istenen formatta sunar, görünüm modu ve sıralama değişikliği gibi kullanıcı taleplerini üst bileşenlere iletir.
-- ProductsGrid
+### UI Render ve Durum Yönetimi
+Bu grup, ürün verisini, yükleme göstergesini ve seçili görünüm modunu alarak uygun şekilde görselleştirir; aynı zamanda `onViewModeChange` ve `onSortChange` geri çağrıları aracılığıyla dışarıya etkileşim sinyalleri gönderir.  
+- ProductsGrid   (tek bileşen)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı ürün listeleme grid bileşeni, tüm çalışması için gereken veri ve aksiyon fonksiyonlarını üst bileşen tarafından kendisine prop olarak iletilmesini varsayar; hiçbir harici kaynaktan veri çekmez ya da state yönetimi yapmaz.
 
-[Aksiyom 1]: Eğer `products` prop'u iletilmezse, bileşen gösterilecek ürün verisine erişemez, boş içerikli liste hatasız olsa da kullanıcıya hiçbir ürün gösterilemez.
-[Aksiyom 2]: Eğer `viewMode` prop'u iletilmezse, bileşen mevcut görünüm ayarını bilemez, grid görünümü doğru şekilde başlatılamaz, kullanıcıya hatalı görünüm render edilir.
-[Aksiyom 3]: Eğer `loading` prop'u iletilmezse, veri yüklenme durumu kullanıcıya bildirilemez, ürünler yüklenirken ekranda kalıcı olarak boş liste görüntüsü oluşur.
-[Aksiyom 4]: Eğer `onViewModeChange` callback prop'u iletilmezse, kullanıcının görünüm modu değiştirme talebi üst bileşene iletilemez, görünüm modu hiçbir şekilde güncellenemez.
-[Aksiyom 5]: Eğer `onSortChange` callback prop'u iletilmezse, kullanıcının ürün sıralaması değiştirme talebi üst bileşene iletilemez, ürün listesinin sıralaması hiçbir şekilde güncellenemez.
+[Aksiyom 1]: Eğer products prop'u sağlanmazsa, bileşen görüntülenecek ürün verisine sahip olamaz ve boş bir grid veya beklenmeyen içerik ile karşılaşılır.
+[Aksiyom 2]: Eğer viewMode prop'u sağlanmazsa, bileşen geçerli bir görünüm modu belirleyemez ve beklenmeyen bir arayüz durumu ile karşılaşılır.
+[Aksiyom 3]: Eğer loading prop'u sağlanmazsa, bileşen yükleme durumu hakkında doğru bilgi alamaz ve yanlış bir yükleme durumu göstergesi durumu ile karşılaşılır.
+[Aksiyom 4]: Eğer onViewModeChange prop'u sağlanmazsa, görünüm modu değişiklikleri işlenemez ve kullanıcı grid'in görünüm modunu değiştiremez.
+[Aksiyom 5]: Eğer onSortChange prop'u sağlanmazsa, ürün sıralama değişiklikleri işlenemez ve kullanıcı grid'deki ürünleri sıralayamaz.
+
+Domain-specific kurallar: bilinmiyor (verilen imza ve modül bilgileri dışında ek bilgi bulunmamaktadır)
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ProductsGrid
-**Ne yapar**: Ürün listesini kullanıcının tercihine göre ızgara veya liste modunda görüntüleyen atomik React bileşenidir. HVAC sistemi ürünleri için tasarlanan bu bileşen, ürünlerin tutarlı bir şekilde son kullanıcıya sunulmasını sağlarken, görünüm modu değiştirme ve sıralama işlemlerini de destekler. Yüklenme durumu kontrolü ile boş veya eksik içerik gösterilmesinin önüne geçer.
-**Nasıl yapar**: Gelen prop'lardaki değerleri işleyerek iç mantığını çalıştırır, viewMode prop'una göre görünüm şablonunu seçerek ürünleri ilgili düzende ekrana yansıtır. Kullanıcı tarafından tetiklenen görünüm modu değiştirme veya sıralama değiştirme isteklerini üst bileşene iletmek için tanımlı callback fonksiyonlarını tetikler, loading prop'u true olduğu durumda içerik yerine yüklenme göstergesi sunar.
+**Ne yapar**: VentHub HVAC platformunda kullanılan, ürün listesini ızgara veya liste görünümünde görüntüleyen yeniden kullanılabilir atomik React bileşenidir. Ürünlerin görsel sunumunu yönetir, görüntüleme modu ve sıralama gibi kullanıcı etkileşimlerini üst bileşenlere iletir, yükleme sürecinde uygun gösterimleri devreye sokar.
+**Nasıl yapar**: Props olarak aldığı tüm yapılandırma ve veri parametrelerini kullanarak dinamik arayüz oluşturur. Aktif viewMode değerine göre ürünleri ızgara formatında yan yana veya liste formatında alt alta sıralayarak render eder. Yükleme durumu aktifken içerik yerine yükleme göstergesi, ürün listesi boşken uygun bilgilendirme metni gösterir. Kullanıcının görüntüleme modu veya sıralama kriteri değiştirme işlemlerinde ilgili callback fonksiyonlarını tetikleyerek durum değişikliğini üst bileşenlere iletir.
 **Parametreler**:
-- products: ProductsGridProps içindeki products tipi — Bileşende görüntülenecek tüm ürünlerin detaylarını barındıran veri dizisidir, bileşenin ana içeriğini oluşturur.
-- viewMode: ProductsGridProps içindeki viewMode tipi — Mevcut aktif görünüm modunu tutan değişkendir, ızgara veya liste görünümü seçeneklerinden birini alır.
-- loading: ProductsGridProps içindeki loading tipi — Ürün verilerinin henüz yüklenmediğini belirten boolean değer, true olduğu durumda bileşen yüklenme göstergesi gösterir.
-- onViewModeChange: ProductsGridProps içindeki onViewModeChange tipi — Kullanıcı görünüm modunu değiştirmek istediğinde tetiklenen callback fonksiyonudur, yeni seçilen görünüm modunu üst bileşene iletir.
-- onSortChange: ProductsGridProps içindeki onSortChange tipi — Kullanıcı sıralama kriterini değiştirdiğinde tetiklenen callback fonksiyonudur, yeni seçilen sıralama tercihini üst bileşene ileterek liste güncellemesini tetikler.
-**Dönüş**: React.FC<ProductsGridProps> tipinde bir React fonksiyonel bileşeni döndürür. Tanımlanan prop türlerine uygun olarak çalışan bu bileşen, tarayıcıda kullanıcıya gösterilecek React elementini üretir, tüm prop kontrollerini ve görünüm mantığını barındırır.
+- products: ProductsGridProps["products"] — Görüntülenecek tüm ürünleri içeren dizi, her dizi elemanı tek bir HVAC ürününün tüm detay verilerini barındırır.
+- viewMode: ProductsGridProps["viewMode"] — Mevcut aktif görüntüleme modu, "grid" (ızgara) veya "list" (liste) değerlerinden birini alır, arayüzün ürün sunum formatını belirler.
+- loading: ProductsGridProps["loading"] — Ürün verilerinin halen yüklenme sürecinde olup olmadığını belirten boolean bayrak, true değeri aldığında arayüzde ürün içeriği yerine yükleme göstergesi gösterilir.
+- onViewModeChange: ProductsGridProps["onViewModeChange"] — Kullanıcı görüntüleme modunu değiştirdiğinde tetiklenen callback fonksiyonu, seçilen yeni modu parametre olarak alarak üst bileşenlere durum değişikliğini iletir.
+- onSortChange: ProductsGridProps["onSortChange"] — Kullanıcı sıralama kriterini değiştirdiğinde tetiklenen callback fonksiyonu, seçilen yeni sıralama anahtarını parametre olarak alarak üst bileşenlere sıralama değişikliğini iletir.
+**Dönüş**: React.FC<ProductsGridProps> — Tip güvenliği sağlanmış bir React fonksiyonel bileşen örneği döndürür, bu bileşen tüm ürün görünümlerini, görüntüleme ve sıralama kontrollerini kendi içinde barındırarak sayfaya render edilir.
 
 ---
 
@@ -55,24 +60,19 @@ Bu React tabanlı ürün listeleme grid bileşeni, tüm çalışması için gere
 
 ---
 
-## AST POINTERS
+We need to produce AST POINTERS section for the given source file. The file is a React component file: ProductsGrid.tsx. The function signature given: ProductsGrid({ products, viewMode, loading, onViewModeChange, onSortChange, sortBy = 'name' }) -> React.FC<ProductsGridProps>. Actually it's an arrow function component.
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\ProductsGrid.tsx::ProductsGrid
-- **params**: (products, viewMode, loading, onViewModeChange, onSortChange, sortBy = 'name')
-- **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, UI metinlerini yerelleştirmek için tüm metin gösterimlerinde kullanılır
-  - `useI18n` — Uygulama yerelleştirme sistemine erişmek için kullanılan React hook'u
-- **Dönüş**: Ürün grid/listesi ve araç çubuğunu içeren React JSX elementi
+We need to list each function. There are two functions: the main component function (arrow function) and the inner map callback: product => ( ... ). The map callback is inside JSX but it's a function.
 
----
+We need to produce for each function: a heading like ### [N1_NASIL] AST Pointer: {rel_path}::fonksiyon_adı
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\ProductsGrid.tsx::products.map callback
-- **params**: (product)
-- **ic_degiskenler**:
-  - `product.id` — İşlenen ürünün benzersiz kimliği, React liste render'ında key propu olarak kullanılır
-  - `product` - products dizisinden dönen tekil Product tipi nesnesi, alt ProductCard bileşenine aktarılır
-  - `viewMode` — Üst kapsamdaki ana ProductsGrid fonksiyonundan erişilen görünüm modu, ProductCard'a layout propu olarak aktarılır
-- **Dönüş**: İşlenen ürün için oluşturulmuş ProductCard JSX elementi
+We need to compute relative path? The source_path given: C:\Users\alize\venthub-hvac\src\components\products\ProductsGrid.tsx. Probably relative path from project root? Not given. We'll just use the file name? Usually they'd want something like src/components/products/ProductsGrid.tsx. We'll assume that's the relative path.
+
+Thus for main function: ### [N1_NASIL] AST Pointer: src/components/products/ProductsGrid.tsx::ProductsGrid
+
+For inner map callback: maybe name it as map callback? Could be something like ProductsGrid::mapCallback or just the arrow function. We'll name it as ProductsGrid::mapProduct (or just the inline function). We'll need to decide.
+
+We need to list params, ic_degiskenler (variables
 
 ---
 

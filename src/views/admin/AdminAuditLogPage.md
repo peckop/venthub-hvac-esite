@@ -4,36 +4,35 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminAuditLogPage.tsx
 skeleton_hash: faa129e425bec71a
-generated_at: 2026-05-23T22:36:55Z
+entity_hashes:
+  func:AdminAuditLogPage: 50d17db2bc55805a
+  overview: 2053e68b7986a9b1
+  style_tokens: 4afc856417bb59ae
+generated_at: 2026-05-27T11:51:32Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC sisteminin yönetici paneline ait denetim kayıtları (audit log) sayfasını oluşturan React bileşenini barındırır. Yalnızca yetkili yöneticilerin erişebildiği bu sayfa, sistemdeki tüm işlem kayıtlarını görüntülemek amacıyla tasarlanmıştır.
+Bu modül, VentHub HVAC uygulamasının yönetici paneli altındaki denetim günlüğü sayfasını uygulayan tek React bileşenini barındırır. Yalnızca yetkili yönetici kullanıcıların sistemde gerçekleştirilen tüm eylemlerin kayıtlarını görüntülemesi için bir kullanıcı arayüzü sunar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Denetim kayıtları sayfasının tüm temel React yapısını ve kullanıcı arayüzü işleyişini üstlenir, yöneticiye sistem kayıtlarını listeleyen arayüzü sunar.
+Modülün tek sorumluluğunu kapsar: Yönetici denetim günlüğü sayfasının tüm kullanıcı arayüzünü ve temel işlevselliğini sağlayan React bileşenini tanımlar.
 - AdminAuditLogPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı admin denetim kaydı görüntüleme sayfa modülünün doğru çalışması için kimlik yetkilendirme servisleri, denetim kayıtlarını servis eden backend API'si, proje içi ortak UI bağımlılıkları ve yönlendirme mekanizmasının sorunsuz çalışması zorunludur.
-
-[Aksiyom 1]: Eğer kullanıcının admin yetkisine sahip olduğunu doğrulayan kimlik yetkilendirme servisi yoksa/calışmıyorsa, ya yetkisiz kullanıcılar hassas denetim kayıtlarına erişebilir ya da yetkili admin kullanıcıları bile bu sayfaya hiç giremez.
-[Aksiyom 2]: Eğer geçmiş denetim kayıtlarını çeken backend API servisi erişilemez durumdaysa, sayfa hiçbir kaydı görüntüleyemez, tamamen boş kalır.
-[Aksiyom 3]: Eğer proje içerisinde kullanılan ortak React tabanlı UI componentleri (tablo, filtreleme, sayfalama vb.) bu modül tarafından import edilemiyorsa, sayfa hiç render edilemez, uygulama çalışma zamanında hata verir.
-[Aksiyom 4]: Eğer admin paneli içindeki yönlendirme (routing) mekanizması bu sayfayı doğru şekilde yetkilendirilmiş kullanıcılara sunmuyorsa, hiçbir yetkili kullanıcı bu denetim kaydı sayfasına erişemez.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminAuditLogPage
-**Ne yapar**: VentHub HVAC platformunun yönetici paneli kapsamında erişime sunulan denetim kayıtları (audit log) sayfasını oluşturan React fonksiyonel bileşenidir. Sadece yetkili yönetici kullanıcıların sistemde gerçekleşen tüm işlemlerin kayıtlarını merkezi bir arayüz üzerinden görüntülemesini sağlayan özel bir sayfa arayüzünü yükler.
-**Nasıl yapar**: Projenin kaynak kodunda src/views/admin dizininde konumlanan bu bileşen, TypeScript kullanılarak tip güvenliği sağlanacak şekilde tanımlanmıştır. Yönetici paneli sayfalarının genel mimarisiyle uyumlu çalışacak şekilde yapılandırılmış, yalnızca denetim kayıtları sayfasının tüm görsel ve işlevsel süreçlerini yönetmek üzere oluşturulmuştur.
-**Parametreler**: Bu fonksiyonel bileşen herhangi bir giriş parametresi kabul etmez, tanımında herhangi bir bağımsız değişken tanımlanmamıştır.
-**Dönüş**: React.FC türünde geçerli bir React fonksiyonel bileşeni döndürür. Bu dönüş değeri, React tarafından işlenerek tarayıcıda yönetici denetim kayıtları sayfasının tüm kullanıcı arayüzü öğelerinin render edilmesini sağlar.
+**Ne yapar**: VentHub HVAC projesinin admin paneline ait sistem denetim günlükleri (audit log) sayfasını oluşturan React bileşenidir. Yalnızca yetkili yönetici kullanıcıların erişebildiği bu sayfa, platform üzerinde gerçekleştirilen tüm kullanıcı ve sistem aktivitelerinin kaydedildiği günlükleri görüntülemek amacıyla tasarlanmıştır. Projenin admin rotaları altında çağrılarak yönetici kullanıcıların karşısına denetim kayıtları arayüzünü çıkarır.
+**Nasıl yapar**: TypeScript ile yazılmış bir React fonksiyonel bileşeni olarak tanımlanmış, projenin src/views/admin dizini altında yer alan AdminAuditLogPage.tsx dosyasında barınmaktadır. React rota yönetim sistemi tarafından tetiklendiğinde ana admin şablonu içine yerleştirilerek ekrana render edilir, kendi iç yapısında gerekli veri yönetimi ve arayüz düzenleme işlemlerini yürüterek denetim kayıtlarını kullanıcıya sunar.
+**Parametreler**: Herhangi bir giriş parametresi almaz, standart React sayfa bileşeni olarak rota sistemi tarafından çağrılır, tüm ihtiyaç duyduğu verileri ve bağlamları içindeki araçlar ve servisler aracılığıyla kendi bünyesinde karşılar.
+**Dönüş**: React.FC türünde bir değer döndürür. Bu dönen değer, React tarafından işlenerek DOM'a eklenmek üzere hazırlanmış, denetim günlükleri sayfasının kullanıcı arayüzünü oluşturan React fonksiyonel bileşen instance'ıdır.
 
 ---
 
@@ -55,107 +54,129 @@ Bu React tabanlı admin denetim kaydı görüntüleme sayfa modülünün doğru 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::AdminAuditLogPage
-- **params**: (parametre yok)
+- **params**: (none)
 - **ic_degiskenler**:
-  - `t, lang` — useI18n hook'undan dönen çeviri fonksiyonu ve aktif dil kodu
-  - `dragScrollRef` — Sürükleyerek yatay kaydırma işlemi için tablo kapsayıcısına atanan ref nesnesi
-  - `router` — Next.js yönlendirme işlemleri için kullanılan useRouter hook nesnesi
-  - `rows` — Denetim logu kayıtlarını tutan AuditRow tipinde state dizisi
-  - `setRows` — rows state'ini güncelleyen setter fonksiyonu
-  - `loading` — Log yükleme işleminin aktifliğini tutan state
-  - `setLoading` — loading state'ini güncelleyen setter fonksiyonu
-  - `error` — Yükleme sırasında oluşan hata mesajını tutan string|null tipinde state
-  - `setError` — error state'ini güncelleyen setter fonksiyonu
-  - `total` - Sorguya uyan toplam log sayısını tutan state
-  - `setTotal` — total state'ini güncelleyen setter fonksiyonu
-  - `page` - Sayfalama için mevcut sayfa numarasını tutan state
-  - `setPage` — page state'ini güncelleyen setter fonksiyonu
-  - `q` - Arama input değerini tutan state
-  - `setQ` — q state'ini güncelleyen setter fonksiyonu
-  - `debouncedQ` - Geciktirilmiş arama değeri, sık state değişimini önlemek için kullanılır
-  - `setDebouncedQ` — debouncedQ state'ini güncelleyen setter fonksiyonu
-  - `fromDate` - Filtreleme için başlangıç tarihini tutan state
-  - `setFromDate` — fromDate state'ini güncelleyen setter fonksiyonu
-  - `toDate` - Filtreleme için bitiş tarihini tutan state
-  - `setToDate` — toDate state'ini güncelleyen setter fonksiyonu
-  - `action` - İşlem türü filtresini tutan state
-  - `setAction` — action state'ini güncelleyen setter fonksiyonu
-  - `batch` - Batch ID filtresini tutan state
-  - `setBatch` — batch state'ini güncelleyen setter fonksiyonu
-  - `pathname` - usePathname hook'undan dönen mevcut sayfa yolu
-  - `searchParams` - useSearchParams hook'undan dönen URL sorgu parametreleri nesnesi
-  - `expandedId` - Detayları açılmış log kaydının ID'sini tutan string|null tipinde state
-  - `setExpandedId` — expandedId state'ini güncelleyen setter fonksiyonu
-  - `fetchLogs` - Logları veritabanından çeken memoize edilmiş callback fonksiyonu
-- **Dönüş**: React.FC JSX elementi, admin denetim logu sayfası arayüzü
+  - `t` — translation function from `useI18n`
+  - `lang` — current language code from `useI18n`
+  - `dragScrollRef` — ref object for drag‑scroll container from `useDragScroll`
+  - `router` — Next.js router instance from `useRouter`
+  - `rows` — state array of `AuditRow` objects
+  - `setRows` — state updater for `rows`
+  - `loading` — boolean state indicating data fetch in progress
+  - `setLoading` — state updater for `loading`
+  - `error` — string or null state for error message
+  - `setError` — state updater for `error`
+  - `total` — numeric state of total audit log count
+  - `setTotal` — state updater for `total`
+  - `page` — current page number state
+  - `setPage` — state updater for `page`
+  - `q` — search query string state
+  - `setQ` — state updater for `q`
+  - `debouncedQ` — debounced search query string state
+  - `setDebouncedQ` — state updater for `debouncedQ`
+  - `fromDate` — start date filter string state
+  - `setFromDate` — state updater for `fromDate`
+  - `toDate` — end date filter string state
+  - `setToDate` — state updater for `toDate`
+  - `action` — action filter string state
+  - `setAction` — state updater for `action`
+  - `batch` — batch filter string state
+  - `setBatch` — state updater for `batch`
+  - `pathname` — current path string from `usePathname`
+  - `searchParams` — URL search parameters object from `useSearchParams`
+  - `expandedId` — id of currently expanded row or null
+  - `setExpandedId` — state updater for `expandedId`
+- **Dönüş**: JSX element tree rendering the audit log page
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::debounceEffectCallback
-- **params**: (parametre yok)
+---
+
+### [N2_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::useEffect (debounce)
+- **params**: (none)
 - **ic_degiskenler**:
-  - `t` — setTimeout tarafından döndürülen zaman aşımı kimliği, temizleme işlemi için kullanılır
-  - `setDebouncedQ` — Geciktirilmiş arama değerini güncelleyen setter fonksiyonu
-  - `q` — Orijinal arama input değeri, trimlenerek geciktirilmiş state'e aktarılır
-- **Dönüş**: Zaman aşımını temizleyen React efekt cleanup fonksiyonu
+  - `t` — timeout identifier returned by `setTimeout`
+- **Dönüş**: cleanup function that clears the timeout via `clearTimeout(t)`
+
+---
 
 ### [N3_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::fetchLogs
-- **params**: (parametre yok)
+- **params**: (none)
 - **ic_degiskenler**:
-  - `setLoading` — Yükleme state'ini açıp kapatan setter fonksiyonu
-  - `setError` — Hata mesajı state'ini güncelleyen setter fonksiyonu
-  - `ensureSessionFresh` — Kullanıcı oturumunun geçerliliğini kontrol eden yardımcı fonksiyon
-  - `supabase` — Supabase veritabanı istemcisi, sorgular için kullanılır
-  - `query` — Aşamalı olarak filtreler eklenen Supabase sorgu nesnesi
-  - `fromDate` — Sorguda kullanılan başlangıç tarihi filtresi
-  - `toDate` — Sorguda kullanılan bitiş tarihi filtresi
-  - `action` — Sorguda kullanılan işlem türü filtresi
-  - `debouncedQ` — Sorguda tam metin araması için kullanılan geciktirilmiş arama değeri
-  - `like` — Supabase ILIKE operatörü için hazırlanmış % ile sarmalanmış arama deseni
-  - `batch` — Sorguda batch ID'si ile filtreleme için kullanılan değer
-  - `from` — Sayfalama için sorgunun başlayacağı satır indeksi
-  - `to` — Sayfalama için sorgunun biteceği satır indeksi
-  - `PAGE_SIZE` — Sayfa başına kayıt sayısı sabiti, sayfalama hesaplamaları için kullanılır
-  - `data` — Sorgudan dönen log kayıtları dizisi
-  - `error` — Sorgu sırasında oluşan Supabase hata nesnesi
-  - `count` — Sorguya uyan toplam kayıt sayısı
-  - `setRows` — Log kayıtları state'ini güncelleyen setter
-  - `setTotal` — Toplam kayıt sayısı state'ini güncelleyen setter
-- **Dönüş**: Promise<void>, async yükleme işlemi tamamlandığında çözülen boş söz
+  - `loading` — state value set to `true` at start
+  - `error` — state value set to `null` at start
+  - `ensureSessionFresh` — async function ensuring auth session
+  - `supabase` — Supabase client instance
+  - `fromDate` — filter value for start date
+  - `toDate` — filter value for end date
+  - `action` — filter value for action type
+  - `debouncedQ` — debounced search query
+  - `batch` — filter value for batch id
+  - `page` — current page number
+  - `PAGE_SIZE` — constant page size
+  - `query` — Supabase query builder object
+  - `from` — numeric offset for pagination
+  - `to` — numeric limit for pagination
+  - `data` — array of fetched rows
+  - `error` — error object from Supabase query
+  - `count` — total count returned by Supabase
+  - `rows` — state updater `setRows`
+  - `total` — state updater `setTotal`
+  - `setRows` — state updater for `rows`
+  - `setTotal` — state updater for `total`
+  - `setError` — state updater for `error`
+  - `setLoading` — state updater for `loading`
+- **Dönüş**: `Promise<void>` (async function, no explicit return)
 
-### [N4_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::searchParamsEffectCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `searchParams` — URL sorgu parametreleri nesnesi, içinden batch parametresi okunur
-  - `b` — URL'den okunup temizlenmiş (trimlenmiş) batch ID değeri
-  - `setBatch` — Batch filtresi state'ini güncelleyen setter fonksiyonu
-- **Dönüş**: yok
+---
 
-### [N5_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::clearBatchOnClick
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::useEffect (pathname)
+- **params**: (none)
 - **ic_degiskenler**:
-  - `setBatch` — Batch filtresi state'ini sıfırlayan setter fonksiyonu
-  - `window.location.href` — Mevcut sayfanın tam URL'si, yeni URL oluşturmak için kullanılır
-  - `url` — Oluşturulan yeni URL nesnesi, üzerinden batch sorgu parametresi silinir
-  - `router.push` — Next.js yönlendirme fonksiyonu, güncellenmiş URL'ye yönlendirir
-- **Dönüş**: yok
+  - `fetchLogs` — reference to the `fetchLogs` callback
+  - `pathname` — current path string
+- **Dönüş**: `void` (effect runs `fetchLogs()`)
 
-### [N6_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::rowsMapCallback
-- **params**: r (işlenecek tek denetim logu satırı, AuditRow tipinde)
+---
+
+### [N5_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::useEffect (searchParams)
+- **params**: (none)
 - **ic_degiskenler**:
-  - `r.id` — Mevcut log kaydının benzersiz kimliği, React anahtarı ve genişletme kontrolü için kullanılır
-  - `expandedId` — Şu anda detayları açık olan log kaydının ID'si
-  - `formatDateTime` — Tarih biçimlendirme fonksiyonu, log zamanını kullanıcı dilinde gösterir
-  - `r.at` — Log kaydının oluşturulma zamanı
-  - `lang` — Aktif kullanıcı dili, tarih biçimlendirme için kullanılır
-  - `r.action` — Logdaki işlem türü (INSERT/UPDATE/DELETE/CUSTOM)
-  - `r.table_name` — İşlem yapılan veritabanı tablosunun adı
-  - `r.row_pk` — İşlem yapılan satırın birincil anahtarı
-  - `r.comment` — Log kaydına eklenmiş yorum metni
-  - `setExpandedId` — Genişletilmiş kayıt ID'sini güncelleyen setter, detayları açıp kapatmak için kullanılır
-  - `t` — Çeviri fonksiyonu, "Gizle" / "Detaylar" metinleri için kullanılır
-  - `r.before` — İşlem öncesi JSON verisi, değişiklik karşılaştırması için kullanılır
-  - `r.after` — İşlem sonrası JSON verisi, değişiklik karşılaştırması için kullanılır
-  - `JsonDiffViewer` — JSON değişikliklerini görselleştiren bileşen, detaylar açıkken render edilir
-- **Dönüş**: React.Fragment, mevcut log satırı için tablo satırları ve isteğe bağlı detay satırı içeren fragment
+  - `searchParams` — URLSearchParams object
+  - `b` — trimmed value of `batch` query param
+  - `setBatch` — state updater for `batch`
+- **Dönüş**: `void` (effect runs `setBatch(b)`)
+
+---
+
+### [N6_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::batch clear handler
+- **params**: (none)
+- **ic_degiskenler**:
+  - `setBatch` — state updater for `batch`
+  - `url` — `URL` instance created from current window location or fallback
+  - `router` — Next.js router instance
+- **Dönüş**: `void` (handler performs state reset and navigation)
+
+---
+
+### [N7_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::row mapping function (r => ...)
+- **params**: `r` — single `AuditRow` object from `rows` array
+- **ic_degiskenler**:
+  - `expandedId` — current expanded row id state
+  - `setExpandedId` — state updater for `expandedId`
+  - `t` — translation function
+  - `lang` — current language code
+  - `formatDateTime` — helper to format timestamps
+  - `adminTableCellClass` — CSS class string
+  - `adminTableActionClass` — CSS class string
+  - `adminTableHeadCellClass` — CSS class string
+  - `adminButtonSecondaryClass` — CSS class string
+  - `adminSectionTitleClass` — CSS class string
+  - `adminSubtitleClass` — CSS class string
+  - `adminEmptyState` — component for empty state
+  - `AdminSkeleton` — component for loading skeleton
+  - `JsonDiffViewer` — component to display diff
+  - `Terminal`, `Calendar`, `History`, `ChevronLeft`, `ChevronRight`, `Filter`, `ClipboardList` — icon components
+  - `r.id`, `r.at`, `r.action`, `r.table_name`, `r.row_pk`, `r.comment`, `r.before`, `r.after` — properties of the audit row
+- **Dönüş**: JSX fragment containing table rows and optional detail row for the audit entry
 
 ---
 
@@ -168,3 +189,18 @@ Bu React tabanlı admin denetim kaydı görüntüleme sayfa modülünün doğru 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminAuditLogPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-xl`, `tracking-hvac-normal`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-500/5`, `bg-black/40`, `bg-cyan-400/3`, `bg-cyan-500/10`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-rose-500/5`, `bg-slate-500/10`, `bg-surface-deep/40`, `bg-surface-deep/60`, `bg-transparent`, `bg-white/2`, `border-amber-500/20`, `border-cyan-500/20`, `border-emerald-500/20`
+- **Layout:** `!h-10`, `!h-8`, `!p-0`, `!w-10`, `flex`, `gap-2`, `gap-3`, `gap-4`, `group-focus-within:text-cyan-400`, `h-10`, `items-center`, `justify-between`, `justify-center`, `max-w-xs`, `overflow-hidden`
+- **Responsive:** (yok)

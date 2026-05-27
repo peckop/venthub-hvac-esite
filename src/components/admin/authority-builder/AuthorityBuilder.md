@@ -4,19 +4,24 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx
 skeleton_hash: a0d22b9a0a435a6b
-generated_at: 2026-05-23T21:51:30Z
+entity_hashes:
+  func:AuthorityBuilder: ea4f02be3be8275d
+  func:getInitialContent: d68640fe30ab6ebc
+  overview: 03c5d2aeedc01c1b
+  style_tokens: 6c54695849d4863f
+generated_at: 2026-05-27T11:40:20Z
 ---
 
 ## Genel Bakış
-`AuthorityBuilder` bileşeni, yönetim panelinde yetki bloklarının görüntülenmesi ve düzenlenmesinden sorumludur. Kullanıcı etkileşimleriyle blokları günceller, bu değişiklikleri `onChange` geri çağrısı ile dışarıya iletir. Yardımcı fonksiyon `getInitialContent` ise kullanıcı yeni bir blok eklediğinde türe uygun varsayılan içeriği oluşturarak bileşenin tutarlı bir başlangıç durumu almasını sağlar.
+`AuthorityBuilder` bileşeni, yönetim panelinde yetki bloklarının oluşturulması ve düzenlenmesi için kullanıcı arayüzünü sağlar. İçerik tipine göre başlangıç verisini üretmek amacıyla yardımcı bir fonksiyon (`getInitialContent`) kullanır.
 
 ## Fonksiyon Grupları
-### UI Bileşeni
-Kullanıcının yetki bloklarını yönetmesini sağlayan ana React bileşenidir; mevcut değerleri görüntüler, ekleme/çıkarma/düzenleme işlemlerini yönetir ve sonuçları dışarıya bildirir.  
+### UI Oluşturma & Durum Yönetimi
+Bu grup, kullanıcı etkileşimlerini yakalar, bileşenin iç durumunu yönetir ve dışarıya değişiklikleri `onChange` callback’iyle iletir.  
 - AuthorityBuilder
 
-### İçerik Başlatma
-Yeni bir yetki bloğu oluşturulurken kullanılacak başlangıç içerik yapısını belirler; UI bileşeni tarafından çağrılır ve blok türüne göre uygun şablonu döndürür.  
+### İçerik Başlatma Yardımcısı
+Yetki bloğu tipine göre varsayılan içerik yapısını döndürerek, UI’nın ilk render’ı ve yeni blok eklemeleri için temel veri sağlar.  
 - getInitialContent
 
 ---
@@ -24,32 +29,30 @@ Yeni bir yetki bloğu oluşturulurken kullanılacak başlangıç içerik yapıs�
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
----
+**Aksiyom 1**: Eğer `value` parametresi boş bir dizi (`[]`) olarak geçilmezse, `AuthorityBuilder` bileşeni varsayılan olarak boş bir dizi ile başlatılır.  
+**Aksiyom 2**: Eğer `onChange` fonksiyonu sağlanmazsa, `AuthorityBuilder` bileşeni değişiklik olaylarını tetiklemek için bir geri çağırma (callback) kullanmaz.  
+**Aksiyom 3**: Eğer `getInitialContent` fonksiyonu `type` parametresi olarak geçerli bir `AuthorityBlockType` değeri almazsa, fonksiyon `undefined` döndürür.  
+
+> **Not**: Yukarıdaki aksiyomlar, fonksiyon gövdelerinin (implementation) göz önüne alınarak oluşturulmuştur. Diğer potansiyel aksiyomlar, fonksiyon gövdelerinin detaylı incelenmesiyle ortaya çıkabilir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AuthorityBuilder
-**Ne yapar**: Yetki bloklarını görsel olarak düzenlemek ve yönetmek için kullanılan bir React bileşenidir. Belirtilen yetki yapılandırmasını (value) alır ve kullanıcı etkileşimleriyle değişiklikleri üst bileşene iletir.
-
-**Nasıl yapar**: Bileşen, `value` prop'u ile aldığı yetki blokları listesini bir düzenleyici arayüzünde görüntüler. Kullanıcı blok ekleme, silme veya düzenleme yaptığında, `onChange` callback'ini güncellenmiş blok listesiyle çağırarak state değişikliklerini yukarı taşır.
-
+**Ne yapar**: AuthorityBuilder, bir React bileşeni olarak tanımlanır ve yönetim panelinde yetki bloklarının oluşturulup düzenlenmesini sağlar.  
+**Nasıl yapar**: Bileşen, `value` prop’u ile mevcut yetki bloklarını alır, `onChange` callback’i aracılığıyla değişiklikleri dışa aktarır ve iç içe bileşenler aracılığıyla blok tipine göre ilgili içerik formlarını render eder.  
 **Parametreler**:
-- `value: AuthorityBlock[]` — (isteğe bağlı, varsayılan `[]`) Mevcut yetki bloklarının listesini içeren dizi. Her blok tür, içerik ve alt blok bilgisi taşır.
-- `onChange: (blocks: AuthorityBlock[]) => void` — Blok listesinde herhangi bir değişiklik olduğunda tetiklenen callback fonksiyonu. Güncellenmiş blok dizisini parametre olarak alır.
-
-**Dönüş**: `React.FC<AuthorityBuilderProps>` — Bir JSX elementi döndürür. Yetki bloklarını görsel olarak düzenlemeye olanak tanıyan bir arayüz sağlar.
+- `value`: array — Başlangıçta gösterilecek yetki bloklarının listesi; varsayılan değer `[]`.
+- `onChange`: function — Yetki blokları değiştiğinde tetiklenen geri çağırma; yeni blok dizisini alır.
+**Dönüş**: React.FC\<AuthorityBuilderProps\> — Tanımlı prop tiplerine sahip bir fonksiyonel React bileşeni.
 
 ### getInitialContent
-**Ne yapar**: Belirtilen yetki blok türüne göre başlangıç içerik yapısını oluşturan yardımcı bir fonksiyondur. Her blok türü için uygun varsayılan alanları ve değerleri döndürür.
-
-**Nasıl yapar**: Parametre olarak alınan `type` değerine göre bir switch-case veya benzeri bir kontrol yapısı kullanarak ilgili blok türüne özel başlangıç içerik nesnesini oluşturur. Örneğin "user" türü için kullanıcı seçim alanı, "action" türü için işlem seçim alanı gibi yapılar hazırlar.
-
+**Ne yapar**: Belirtilen `AuthorityBlockType` değerine göre, o blok tipine uygun başlangıç içerik nesnesi üretir.  
+**Nasıl yapar**: `switch` ifadesiyle `type` parametresi incelenir; her bir blok tipi için sabit bir içerik şablonu döndürülür. Tanımlı tipler dışında bir değer gelirse, boş bir içerik nesnesi (`{}`) döndürülür.  
 **Parametreler**:
-- `type: AuthorityBlockType` — Başlangıç içeriğinin hangi blok türüne ait olduğunu belirten enum veya string değer. Örn: "user", "action", "condition".
-
-**Dönüş**: `AuthorityBlock['content']` — Blok türüne uygun varsayılan içerik yapısını içeren bir nesne. Bu nesne daha sonra kullanıcı tarafından düzenlenebilir.
+- `type`: AuthorityBlockType — İçerik şablonunun oluşturulacağı blok tipini belirten sabit bir değer.
+**Dönüş**: AuthorityBlock['content'] — Seçilen blok tipine uygun, önceden tanımlanmış alanları içeren bir içerik nesnesi.
 
 ---
 
@@ -73,36 +76,46 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/authority-builder/AuthorityBuilder.tsx::AuthorityBuilder
-- **params**: `{ value = [], onChange }`
-- **ic_degiskenler**:  
-  - `activeTab` — state değişkeni, mevcut sekme (editor/preview/json) değerini tutar. `setActiveTab` ile güncellenir.  
-  - `setActiveTab` — `activeTab` state’ini güncelleyen setter fonksiyonu. Sekme butonlarının `onClick`’inde kullanılır.  
-  - `blocks` — `value` prop’unun normalize edilmiş dizisi. `Array.isArray(value) ? value : []` ile oluşturulur. Blok listesinin kaynağıdır.  
-  - `addBlock` — yeni blok eklemek için kullanılan fonksiyon. Parametre olarak `type: Authority
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx::AuthorityBuilder
+- **params**: (value = [], onChange)
+- **ic_degiskenler**:
+  - `activeTab` — `'editor' | 'preview' | 'json'` tipinde geçerli sekmeyi tutan state.
+  - `setActiveTab` — `activeTab` değerini güncelleyen state setter fonksiyonu.
+  - `blocks` — `value` prop’u bir dizi ise onu, değilse boş dizi `[]` olarak tutan sabit.
+  - `addBlock` — yeni bir blok oluşturup `onChange` ile dışarıya ileten yardımcı fonksiyon.
+  - `removeBlock` — verilen `id` değerine sahip bloğu `blocks` dizisinden çıkarıp `onChange` ile güncelleyen fonksiyon.
+  - `moveBlock` — bir bloğu `up` ya da `down` yönünde yer değiştirip sıralamayı (`order`) yeniden ayarlayan fonksiyon.
+  - `updateBlock` — belirtilen indeksdeki bloğu `updatedBlock` ile değiştirip `onChange` ile yeni dizi gönderir.
+- **Dönüş**: JSX.Element — bileşenin render ettiği UI (sekme kontrolü, blok ekleme butonları, blok listesi, JSON önizleme vb.).
 
----
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx::addBlock
+- **params**: (type: AuthorityBlockType)
+- **ic_degiskenler**:
+  - `newBlock` — `AuthorityBlock` tipinde, rastgele `id`, verilen `type`, mevcut `blocks.length` kadar `order`, sabit `config` ve `getInitialContent(type)` ile oluşturulan `content` içeren nesne.
+- **Dönüş**: yok — `onChange([...blocks, newBlock])` çağrısı ile dışarıya yan etki sağlar.
 
-## ÇAĞRI HARİTASI
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx::removeBlock
+- **params**: (id: string)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `onChange(blocks.filter(b => b.id !== id))` ile belirtilen `id` dışındaki blokları dışarıya gönderir.
 
-### Dışarıya Çağrılar (Outgoing)
-- **AuthorityBuilder()** fonksiyonu, başlangıç içeriğini almak için **getInitialContent()** fonksiyonunu çağırır.
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx::moveBlock
+- **params**: (index: number, direction: 'up' | 'down')
+- **ic_degiskenler**:
+  - `newBlocks` — `blocks` dizisinin kopyası, sıralama değişikliği yapılmadan önceki geçici dizi.
+  - `targetIndex` — `direction` değerine göre `index - 1` (up) ya da `index + 1` (down) olarak hesaplanan hedef konum.
+- **Dönüş**: yok — geçerli sınırlar içinde ise iki bloğun yerini değiştirir, ardından `order` alanını yeniden indeksleyerek `onChange` ile günceller.
 
-### Dışarıdan Çağrılanlar (Incoming)
-Yok
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx::updateBlock
+- **params**: (index: number, updatedBlock: AuthorityBlock)
+- **ic_degiskenler**:
+  - `newBlocks` — `blocks` dizisinin kopyası; `newBlocks[index]` öğesi `updatedBlock` ile değiştirilir.
+- **Dönüş**: yok — güncellenmiş dizi `onChange(newBlocks)` ile dışarıya iletilir.
 
-### İç İçe Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  AuthorityBuilder() → getInitialContent()
-
-```mermaid
-graph LR
-    AuthorityBuilder["AuthorityBuilder()"] --> getInitialContent["getInitialContent()"]
-```
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx::getInitialContent
+- **params**: (type: AuthorityBlockType)
+- **ic_degiskenler**: yok (switch ifadesi içinde doğrudan dönen sabit nesneler)
+- **Dönüş**: AuthorityBlock['content'] — `type` değerine göre ön tanımlı içerik nesnesi (örnek: hero, specs, media vb.) döndürür.
 
 ---
 
@@ -123,11 +136,7 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[500px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)

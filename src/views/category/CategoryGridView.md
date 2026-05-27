@@ -4,42 +4,60 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\category\CategoryGridView.tsx
 skeleton_hash: f777c407c48b29e3
-generated_at: 2026-05-23T22:39:29Z
+entity_hashes:
+  func:CategoryGridView: 7b1f2c5723260534
+  overview: 24b0f5382275b1f2
+  style_tokens: 063c4d890f50f7a4
+generated_at: 2026-05-27T11:55:28Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun kategori sayfalarında kullanılan grid tipi kategori görünümü bileşenidir. React tabanlı olan bu bileşen, kategori hiyerarşisi, marka listesi ve kullanıcı türü gibi verileri alarak kullanıcı dostu bir kategori listeleme arayüzü oluşturur. Tüm kategori sayfalarında tutarlı bir görünüm ve işlevsellik sağlamak üzere tasarlanmıştır.
+Bu modül, bir kategori ve onun alt kategorilerini, markalarını ve ilgili özellikleri görsel bir ızgara düzeninde gösteren bir React bileşenidir. Kullanıcıya kategori içeriğini düzenli bir şekilde sunarak, filtreleme ve gezinti işlemlerini destekler.
 
 ## Fonksiyon Grupları
-### Kategori Grid Ana Bileşeni
-Modülün temel işlevini yerine getiren tek ana fonksiyondur, gelen kategori, üst kategori, alt kategori, marka listesi ve profesyonel kullanım modu gibi parametreleri işleyerek kategori grid görünümünü kullanıcıya sunar.
+### Ana Bileşen
+Kategori ızgara görünümünü oluşturan ve dışarıdan gelen verileri (kategori, üst kategori, alt kategoriler, markalar ve pro bilgisi) kullanarak arayüzü render eden fonksiyondur.
 - CategoryGridView
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu sunum odaklı React kategorisi görünüm bileşeni, giriş olarak aldığı tüm prop'ların geçerli ve uygun formatta olmasını zorunlu kılar, aksi takdirde kategori hiyerarşisi, filtreleme ve kullanıcıya özel içerikler doğru şekilde çalışmaz.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer ana kategori nesnesi (category) yoksa, CategoryGridView bileşeni hiçbir çekirdek içerik gösteremez, çalışması başarısız olur.
-[Aksiyom 2]: Eğer üst kategori nesnesi (parentCategory) mevcutken eksik veya geçersiz formatta gelirse, kategori hiyerarşisi navigasyonu doğru şekilde oluşturulamaz.
-[Aksiyom 3]: Eğer alt kategoriler listesi (subCategories) yoksa veya boş olarak iletilirse, görünümdeki alt kategori listesi alanı boş kalır, alt kategorilere erişim sağlanamaz.
-[Aksiyom 4]: Eğer mevcut markalar listesi (availableBrands) eksik iletilirse, kategori içindeki marka bazlı filtreleme özelliği kullanılamaz.
-[Aksiyom 5]: Eğer profesyonel kullanıcı bayrağı (pro) eksik veya yanlış tipte iletilirse, profesyonel kullanıcılara özel tüm görünüm ve işlevsellikler doğru şekilde uygulanamaz.
+**Aksiyom 1**: Eğer `category` prop’u sağlanmazsa, kategori başlığı ve temel kategori bilgileri gösterilemez; bileşen render aşamasında eksik veri hatası oluşur.  
+
+**Aksiyom 2**: Eğer `parentCategory` prop’u sağlanmazsa, üst‑kategori navigasyonu (breadcrumb) eksik olur ve kullanıcı mevcut kategori hiyerarşisini tam olarak göremez.  
+
+**Aksiyom 3**: Eğer `subCategories` prop’u sağlanmazsa, alt‑kategori ızgarası boş kalır; alt‑kategori listesi gösterilemez ve ilgili UI bölümü render edilmez.  
+
+**Aksiyom 4**: Eğer `availableBrands` prop’u sağlanmazsa, marka filtreleme/kullanılabilir marka listesi oluşturulamaz; marka seçimi UI öğesi devre dışı bırakılır veya hatalı davranış sergiler.  
+
+**Aksiyom 5**: Eğer `pro` prop’u sağlanmazsa, “pro” (premium) özellikleri devre dışı kalır; bu özelliklere bağlı UI öğeleri (ör. özel stil, ek aksiyon butonları) gösterilmez.  
+
+**Aksiyom 6**: Eğer herhangi bir prop beklenen tipte (ör. `category` nesnesi, `subCategories` dizi, `availableBrands` dizi, `pro` boolean) gelmezse, tip uyuşmazlığı nedeniyle çalışma zamanı hatası oluşur ve bileşen render edilmez.  
+
+**Aksiyom 7**: Eğer `CategoryGridView` bileşeni içinde kullanılan alt bileşenler (ör. `CategoryCard`, `BrandFilter`) gerekli bağımlılıkları (CSS, ikon setleri vb.) yüklemezse, UI bozulur veya stil kaybı yaşanır.  
+
+**Aksiyom 8**: Eğer `CategoryGridView`’un bulunduğu ortam (ör. Next.js/React uygulaması) gerekli React sürümünü (≥ 16.8) desteklemezse, hook‑lar (useState, useEffect vb.) çalışmaz ve bileşen hata verir.  
+
+**Aksiyom 9**: Eğer `CategoryGridView`’un dışarıdan aldığı veri (ör. API yanıtı) gecikmeli veya hatalı dönerse, bileşen yükleme/boş durum göstergesi (loading spinner) gösterilmez; bu durumda UI boş kalır veya hatalı veri gösterilir.  
+
+**Aksiyom 10**: Eğer `CategoryGridView`’un stil dosyaları (CSS/SCSS) bulunmazsa, bileşenin görsel düzeni bozulur; layout ve grid hizalamaları beklenen şekilde çalışmaz.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryGridView
-**Ne yapar**: VentHub HVAC platformunun kategori sayfasında, ürün kategorileri için ızgara tarzı gezinme arayüzünü oluşturan ana React bileşenidir. Kullanıcıların mevcut kategorinin temel detaylarını görmesini, iç içe geçmiş kategori hiyerarşisinde sorunsuz gezinmesini, mevcut markalara göre ürünleri filtrelemesini ve aktif abonelikleri varsa pro'ya özel içeriklere erişmesini sağlar. Uygulamadaki tüm kategori ile ilgili gezinme deneyimleri için birincil görünüm bileşeni olarak görev yapar.
-**Nasıl yapar**: Dahili olarak veri çekmek yerine, yapılandırılmış kategori ve kullanıcıyla ilgili girdileri tüketerek arayüz içeriğini dinamik olarak oluşturan yeniden kullanılabilir bir sunum bileşeni olarak çalışır. Hiyerarşik bağlam sağlamak için parentCategory prop'unu kullanarak ekmek kırıntısı gezinmesi oluşturur, subCategories ve availableBrands dizilerini eşleyerek etkileşimli gezinme ve filtreleme öğelerini render eder. Pro boolean bayrağını kontrol ederek abonelik arkasında kilitlenen premium özellikleri koşullu olarak görüntüler, girdi prop'ları değiştiğinde yalnızca arayüzünü güncelleyerek verimli renderlama performansı sunar.
+**Ne yapar**: Bu React Fonksiyonel Bileşeni, VentHub HVAC platformundaki kategori sayfaları için grid tabanlı arayüz sunar. Almış olduğu kategori, alt kategori, marka ve pro abonelik verilerini kullanarak kullanıcıların kategorileri gezmesi, filtrelemesi ve ilgili ürünlere erişmesi için gerekli UI öğelerini oluşturur. Kullanıcı deneyimini iyileştirmek için dinamik içerik gösterimi ve filtreleme seçenekleri sunar.
+**Nasıl yapar**: Bileşen, dışarıdan iletilen tüm propsları alır ve bu verileri kullanarak grid yapısını dinamik olarak oluşturur. Öncelikle ana kategori bilgilerini başlık olarak gösterir, ardından alt kategorileri kartlar halinde sıralar, mevcut markaları filtre seçenekleri olarak ekler ve pro kullanıcıları için özel içeriklerin erişilebilirliğini kontrol eder. Tüm veri akışını props üzerinden sağlayarak bağımsız, test edilebilir ve yeniden kullanılabilir bir yapı sunar.
 **Parametreler**:
-- name: category, type: CategoryGridViewProps['category'] — Şu anda görüntülenmekte olan ana kategorinin tüm temel bilgilerini barındıran veri nesnesidir, ızgara görünümünün başlığı ve çekirdek içeriği için ana veri kaynağı olarak kullanılır.
-- name: parentCategory, type: CategoryGridViewProps['parentCategory'] — Aktif kategorinin üst kategorisine ait veri nesnesidir, iç içe geçmiş kategori yapılarında gezinirken kullanıcılara hiyerarşik bağlam sunmak ve ekmek kırıntısı gezinmesini oluşturmak için kullanılır.
-- name: subCategories, type: CategoryGridViewProps['subCategories'] — Mevcut görüntülenen kategoriye ait tüm alt kategorilerin listesidir, kullanıcıların daha derin kategori seviyelerine geçmesi için tıklanabilir ızgara öğeleri oluşturmak üzere kullanılır.
-- name: availableBrands, type: CategoryGridViewProps['availableBrands'] — Mevcut kategori içinde sunulan tüm ürün markalarının listesidir, kategori ızgara görünümünde marka filtresi seçeneklerini render etmek için kullanılır.
-- name: pro, type: CategoryGridViewProps['pro'] — Mevcut kullanıcının aktif VentHub pro aboneliğine sahip olup olmadığını belirten boolean bayraktır, ızgara görünümünde pro'ya özel özelliklerin ve içeriklerin görünürlüğünü yönetmek için kullanılır.
-**Dönüş**: React.ReactElement — Bileşenin React fonksiyonel bileşeni tür tanımına uygun olarak, kategori ızgara görünümü arayüzünü tam olarak oluşturan, render edilmeye hazır bir React öğesi döndürür.
+- category: Category — Mevcut aktif kategori ile ilgili tüm meta verileri içeren nesne, kategori kimliği, adı, tanımı ve görsel bilgileri gibi temel verileri barındırır.
+- parentCategory: Category | undefined — Mevcut kategorinin üst kategorisi ile ilgili bilgileri içeren opsiyonel nesne, eğer mevcut kategori ana seviye bir kategori ise bu değer tanımlanmayabilir.
+- subCategories: Category[] — Mevcut kategorinin altındaki tüm alt kategorileri içeren dizi, grid görünümünde her bir alt kategori için ayrı kart öğeleri oluşturmak için kullanılır.
+- availableBrands: Brand[] — Mevcut kategori ile ilişkili tüm markaları içeren dizi, kullanıcıların marka bazında filtreleme yapması için seçenekler sunar.
+- pro: boolean — Mevcut kullanıcının pro abonelik durumunu belirten mantıksal değer, pro özel indirimler veya içeriklerin gösterilip gösterilmeyeceğine karar vermek için kullanılır.
+**Dönüş**: React.FC<CategoryGridViewProps> türünde bir React bileşeni döndürür. Bu döndürülen bileşen, alınan tüm propsları kullanarak render edilmiş grid arayüzünü sunar ve kategori gezintisi, alt kategori listeleme, marka filtreleme ve pro içerik erişimi gibi temel işlevleri barındırır.
 
 ---
 
@@ -59,19 +77,11 @@ Bu sunum odaklı React kategorisi görünüm bileşeni, giriş olarak aldığı 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategoryGridView.tsx::CategoryGridView
-- **params**: [category, parentCategory, subCategories, availableBrands, products, filters, onUpdateFilters, loading]
-- **ic_degiskenler**: 
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, tüm UI metinlerini çevirmek için kullanılır
-- **Dönüş**: Kategori sayfası içeren JSX React elementi
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategoryGridView.tsx::productsMapCallback
-- **params**: [product]
-- **ic_degiskenler**: 
-  - `product.id` — Ürünün benzersiz kimliği, liste renderı için React anahtarı olarak kullanılır
-  - `product` — Ürün verisi nesnesi, ProductCard bileşenine aktarılır
-  - `filters.viewMode` - Aktif görünüm modu, ProductCard'ın layout ayarı olarak gönderilir
-- **Dönüş**: Ürün verisiyle doldurulmuş ProductCard React bileşeni örneği
+### [N1_NASIL] AST Pointer: src\views\category\CategoryGridView.tsx::CategoryGridView
+- **params**: (category, parentCategory, subCategories, availableBrands, products, filters, onUpdateFilters, loading)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook’inden dönen çeviri fonksiyonu; UI metinlerini yerelleştirmek için kullanılır.
+- **Dönüş**: React element (JSX) döner; fonksiyon bir React functional component olarak tanımlanmıştır.
 
 ---
 
@@ -84,3 +94,18 @@ Bu sunum odaklı React kategorisi görünüm bileşeni, giriş olarak aldığı 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryGridView
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-3xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-12`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `lg:flex-row`, `lg:w-80`
+- **Responsive:** `lg:`, `sm:`, `xl:` prefix kullanımları

@@ -4,69 +4,81 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx
 skeleton_hash: e05ac99c5e8bf5bc
-generated_at: 2026-05-25T07:29:15Z
+entity_hashes:
+  func:LeadModal: d62325f85f800f09
+  func:handleClose: 63d7dd03089c88aa
+  func:submit: 57ac99ffc1840be0
+  func:validate: 3e57d313017d2565
+  overview: 666966080ef15820
+  style_tokens: e138a3ea7ab2fcea
+generated_at: 2026-05-27T12:13:00Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıdan potansiyel müşteri bilgilerini toplama amacıyla bir açılır pencere (modal) bileşeni tanımlar. Modalın görünürlüğü, kapatılması ve formun doğrulama‑gönderme işlevleri içindeki fonksiyonlarla koordine edilerek kullanıcı deneyimi sağlanır.
+`LeadModal` bileşeni, bir ürünle ilgili potansiyel müşteri (lead) bilgilerini toplamak için kullanılan bir modal penceresidir. Açılma/kapanma kontrolü, form doğrulama ve gönderim işlemlerini içerir.
 
 ## Fonksiyon Grupları
-### Modal Görünümü ve Kapatma İşlemleri
-Bu grup, modalın render edilmesi, açık/kapalı durumu yönetimi ve kullanıcı tarafından kapatma talebini işleyen fonksiyonları içerir.
-- LeadModal, handleClose
+### Modal Kontrol ve Render
+Modalın görünürlüğünü yönetir, kapanma olayını işler ve JSX çıktısını üretir.  
+- LeadModal
 
-### Form Doğrulama ve Gönderme
-Bu grup, kullanıcının girdiği bilgilerin geçerliliğini kontrol eden ve geçerli olduğunda veriyi işleyen işlevleri bir araya getirir.
-- validate, submit
+### Form Doğrulama
+Kullanıcı tarafından girilen verilerin geçerliliğini kontrol eder.  
+- validate
+
+### Form İşleme
+Form gönderildiğinde olayları yakalar, doğrulama çalıştırır ve başarılı ise veriyi işler; ayrıca hata durumlarını yönetir.  
+- submit, handleClose
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması gerekir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-- **Eğer** `open` prop’u boolean olarak verilmezse, **modalın** görünürlüğü kontrol edilemez.  
-- **Eğer** `onClose` prop’u fonksiyon olarak verilmezse, **handleClose()** çağrıldığında hata oluşur.  
-- **Eğer** `productName` prop’u string olarak verilmezse, **validate()** ürün adı alanını kontrol edemez.  
-- **Eğer** `_productId` (veya `__productId`) prop’u tanımlanmazsa, **submit()** işlemi sırasında ürün kimliği eksik olur.  
-- **Eğer** `applicationAreas` sabiti boş bir dizi ise, **validate()** veya **submit()** içinde alan seçimi kontrolü başarısız olur.  
-- **Eğer** `validate()` fonksiyonu çağrılmadan **submit()** çalıştırılırsa, form geçerliliği garantisi olmaz.  
-- **Eğer** `submit()` fonksiyonuna geçirilen `e` argümanı `React.FormEvent` tipi değilse, olay nesnesi üzerinden veri çıkarma işlemi başarısız olur.  
-- **Eğer** `handleClose()` fonksiyonu çağrıldığında `onClose` prop’u tanımlı değilse, modal kapatma işlemi gerçekleşemez.
+**Aksiyom 1**: Eğer `LeadModal` bileşenine `open` prop’u sağlanmazsa, modal hiçbir zaman görüntülenmez.  
+**Aksiyom 2**: Eğer `LeadModal` bileşenine `onClose` callback’i sağlanmazsa, modal kapatılmaya çalışıldığında bir hata oluşur ve UI’da “close” işlemi gerçekleşmez.  
+**Aksiyom 3**: Eğer `LeadModal` bileşenine `productName` prop’u sağlanmazsa, modal içinde ürün adı gösterilemez; bu durum UI’da boş bir alan ya da “bilinmiyor” metni olarak ortaya çıkar.  
+**Aksiyom 4**: Eğer `LeadModal` bileşenine `_productId` (alias `__productId`) prop’u sağlanmazsa, `validate` ve `submit` fonksiyonları ürün kimliğine erişemez ve ilgili iş mantığı (ör. API çağrısı) çalışmaz.  
+**Aksiyom 5**: Eğer `validate()` fonksiyonu çağrıldığında gerekli form alanları (ör. isim, e‑posta vb.) eksik ya da geçersizse, `validate` `false` döner ve form gönderimi engellenir.  
+**Aksiyom 6**: Eğer `submit(e)` fonksiyonu çağrıldığında `e` bir `React.FormEvent` nesnesi değilse, fonksiyon içinde `preventDefault()` çağrısı başarısız olur ve sayfa yenilenmesi gerçekleşir.  
+**Aksiyom 7**: Eğer `submit(e)` fonksiyonu içinde `validate()` `false` dönerse, `submit` işlemine devam edilmez ve form verileri gönderilmez.  
+**Aksiyom 8**: Eğer `handleClose()` fonksiyonu çağrıldığında `onClose` callback’i tanımlı değilse, modal kapanmaz ve UI’da “close” butonu işlevsiz kalır.  
+**Aksiyom 9**: Eğer `handleClose()` fonksiyonu çağrıldığında `onClose` tanımlıysa, `onClose` callback’i çalıştırılır ve modal kapanır.  
+
+*Domain‑specific notlar*: Bu aksiyomlar, `LeadModal` bileşeninin doğru çalışması için gerekli olan temel prop ve fonksiyon davranışlarını tanımlar; değer sınırları veya kabul kriterleri fonksiyon gövdesinde belirtilmediği için “bilinmiyor” olarak bırakılmıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### LeadModal
-**Ne yapar**: Potansiyel müşteri (lead) oluşturmak için kullanılan veri giriş formunu içeren bir React modal bileşenidir.
-**Nasıl yapar**: `open` prop'u ile görünürlüğü kontrol eder, `productName` ve `_productId` bilgilerini kullanarak form içeriğini bağlama duyarlı hale getirir ve kullanıcı etkileşimlerini yönetir.
+**Ne yapar**: Kullanıcıların iletişim bilgilerini topladığı bir modal pencere bileşeni oluşturur.  
+**Nasıl yapar**: Props olarak gelen `open`, `onClose`, `productName` ve `_productId` değerlerini alır, bu değerleri modal içinde gösterir ve form gönderimi için `validate`, `submit` gibi yardımcı fonksiyonları kullanır.  
 **Parametreler**:
-- open: boolean — Modalın açık veya kapalı olduğunu belirten durum bayrağı.
-- onClose: function — Modalın kapatılması gerektiğinde çalıştırılan geri çağırım fonksiyonu.
-- productName: string — Lead ile ilişkilendirilecek ürünün adı.
-- _productId: string | number — Lead ile ilişkilendirilecek ürünün benzersiz tanımlayıcısı.
-**Dönüş**: React.FC<LeadModalProps> — React bileşeni yapısı döner.
+- `open`: boolean — Modal’ın açık/kapalı durumunu belirler.  
+- `onClose`: () => void — Modal kapatıldığında çalıştırılacak geri çağırma fonksiyonu.  
+- `productName`: string — Modal içinde gösterilecek ürün adı.  
+- `_productId`: any — İçeride `__productId` olarak yeniden adlandırılan ürün kimliği.  
+**Dönüş**: React.FC\<LeadModalProps\> — Tanımlı prop tipleriyle bir React fonksiyonel bileşeni döndürür.
 
 ### validate
-**Ne yapar**: Form içindeki kullanıcı girdilerinin gerekli kriterlere uygun olup olmadığını denetleyen doğrulama fonksiyonudur.
-**Nasıl yapar**: Form alanlarını (muhtemelen isim, e-posta vb.) kontrol ederek, eksik veya hatalı veri varsa hata durumlarını ayarlar.
-**Parametreler**: Yok
-**Dönüş**: void — Herhangi bir değer döndürmez, genellikle durum (state) güncellemesi yapar.
+**Ne yapar**: Form gönderiminde girilen verileri kontrol eder ve hataları bir nesne olarak döndürür.  
+**Nasıl yapar**: Form submit olayında `e.preventDefault()` ile varsayılan davranışı engeller, `validate()` fonksiyonunu çağırarak doğrulama sonuçlarını alır, `setErrors` ile hataları state’e kaydeder ve hata yoksa formun gönderilmesine izin verir.  
+**Parametreler**: Yok.  
+**Dönüş**: Bilinmiyor (kod içinde dönüş değeri kullanılmaktadır; muhtemelen hata nesnesi).
 
 ### submit
-**Ne yapar**: Formun gönderilme olayını ele alan ve lead oluşturma işlemini başlatan fonksiyondur.
-**Nasıl yapar**: Tarayıcının varsayılan form gönderme davranışını engeller, verileri doğrular (`validate`) ve başarılıysa ilgili işlemleri gerçekleştirir.
+**Ne yapar**: Form gönderildiğinde çalıştırılan ana işlem akışını yönetir.  
+**Nasıl yapar**: `e.preventDefault()` ile formun doğal gönderimini durdurur, `validate()` ile doğrulama yapar, hatalar varsa işlemi sonlandırır; hatasız ise `setSubmitted(true)` ile gönderim durumunu işaretler, ardından API taklidi için gecikmeli bir `setTimeout` içinde başarı durumunu ayarlar, modalı otomatik kapatmak için ikinci bir gecikme başlatır.  
 **Parametreler**:
-- e: React.FormEvent — Form gönderildiğinde oluşan olay nesnesi.
-**Dönüş**: void — Herhangi bir değer döndürmez.
+- `e`: React.FormEvent — Form submit olay nesnesi.  
+**Dönüş**: Bilinmiyor (fonksiyon içinde yan etkiler vardır, dönüş değeri belirtilmemiştir).
 
 ### handleClose
-**Ne yapar**: Modal penceresini kapatma işlemini tetikleyen ve gerekli temizlik işlemlerini yapan fonksiyondur.
-**Nasıl yapar**: Üst bileşenden gelen `onClose` prop'unu çağırarak modalın ekrandan kaldırılmasını sağlar.
-**Parametreler**: Yok
-**Dönüş**: void — Herhangi bir değer döndürmez.
+**Ne yapar**: Modal kapanış işlemini tetikler.  
+**Nasıl yapar**: İçeride tanımlı `handleClose` fonksiyonunu çağırarak modalın kapanmasını sağlar; bu, dışarıdan gelen `onClose` geri çağırma fonksiyonuna yönlendirilmiş olabilir.  
+**Parametreler**: Yok.  
+**Dönüş**: Bilinmiyor (fonksiyon yan etki üretir, dönüş değeri belirtilmemiştir).
 
 ---
 
@@ -82,81 +94,54 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx::LeadModal
-- **params**: open, onClose, productName, _productId
-- **ic_degiskenler**: 
-  - `__productId` — _productId parametresinin dahili yeniden isimlendirilmiş hali
-  - `useState` hook türevli state setterları: setName, setCompany, setEmail, setPhone, setCity, setAppArea, setConsent, setMessage, setIsSuccess, setSubmitted, setErrors
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
-- **Dönüş**: React.FC<LeadModalProps> tipinde React bileşeni
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx::validate
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/LeadModal.tsx::validate
+- **params**: (none)
 - **ic_degiskenler**:
-  - `e` — Form doğrulama hatalarını tutan Record<string, string> tipinde nesne
-  - `name` — Formdaki isim alanı değeri, boşluk kontrolü için kullanılır
-  - `email` — Formdaki e-posta alanı değeri, iletişim bilgisi kontrolü için kullanılır
-  - `phone` — Formdaki telefon alanı değeri, iletişim bilgisi kontrolü için kullanılır
-  - `consent` — Kullanıcı onay durumu, onay kontrolü için kullanılır
-  - `t` — i18n çeviri fonksiyonu, çevrilmiş hata mesajları almak için kullanılır
-- **Dönüş**: Doğrulama hatalarını içeren Record<string, string> nesnesi
+  - `e` — boş nesne (`Record<string, string>`) oluşturur; hataları tutmak için kullanılır.
+  - `name` — bileşenin `name` state’ini temsil eder; boşsa `e.name` e hata mesajı atanır.
+  - `email` — bileşenin `email` state’ini temsil eder; boşsa `e.contact` e hata mesajı atanır.
+  - `phone` — bileşenin `phone` state’ini temsil eder; boşsa `e.contact` e hata mesajı atanır.
+  - `consent` — bileşenin `consent` state’ini temsil eder; `false` ise `e.consent` e hata mesajı atanır.
+  - `t` — i18n çeviri fonksiyonu; hata mesajlarını çevirir.
+- **Dönüş**: `Record<string, string>` – topladığı hataları döndürür.
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx::submit
-- **params**: e: React.FormEvent
+### [N2_NASIL] AST Pointer: src/components/LeadModal.tsx::submit
+- **params**: `e: React.FormEvent`
 - **ic_degiskenler**:
-  - `e` — Form gönderim olay nesnesi, varsayılan form davranışını engellemek için kullanılır
-  - `v` — validate() fonksiyonundan dönen hata nesnesi
-  - `setErrors` — Form hata state'ini güncelleyen setter fonksiyonu
-  - `Object.keys` — Yerel JavaScript nesne metodu, hata nesnesinin anahtar sayısını almak için kullanılır
-  - `setSubmitted` — Form gönderim durumu state'ini güncelleyen setter
-  - `setIsSuccess` — Başarı durumu state'ini güncelleyen setter
-  - `handleClose` — Modal kapatma işlemini yürüten dahili fonksiyon
-- **Dönüş**: yok
+  - `e` — form submit olayını temsil eder; `e.preventDefault()` ile varsayılan davranışı engeller.
+  - `v` — `validate()` fonksiyonunun döndürdüğü hata nesnesi.
+  - `errors` — bileşenin `errors` state’ini güncellemek için `setErrors(v)` ile kullanılır.
+  - `Object` — `Object.keys(v).length` ile hata sayısı kontrol edilir; eğer hata varsa fonksiyon erken döner.
+  - `setSubmitted` — bileşenin `submitted` state’ini `true` yapar.
+  - `setIsSuccess` — bileşenin `isSuccess` state’ini `true` yapar (API çağrısı simülasyonu).
+  - `setTimeout` — 1200 ms sonra başarı durumunu ayarlar, ardından 3000 ms sonra `handleClose()` çağrılır.
+  - `handleClose` — modalı kapatmak için çağrılır.
+- **Dönüş**: yok (void)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx::handleClose
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose
+- **params**: (none)
 - **ic_degiskenler**:
-  - `onClose` — Prop olarak alınan üst bileşen kapatma callback fonksiyonu
-  - `setIsSuccess` — Başarı durumu state'ini sıfırlayan setter
-  - `setName` — İsim alanı state'ini sıfırlayan setter
-  - `setCompany` — Şirket alanı state'ini sıfırlayan setter
-  - `setEmail` — E-posta alanı state'ini sıfırlayan setter
-  - `setPhone` — Telefon alanı state'ini sıfırlayan setter
-  - `setCity` — Şehir alanı state'ini sıfırlayan setter
-  - `setAppArea` — Uygulama alanı state'ini sıfırlayan setter
-  - `setConsent` — Kullanıcı onay state'ini sıfırlayan setter
-  - `setMessage` — Mesaj alanı state'ini varsayılan değere sıfırlayan setter
-  - `productName` — Prop olarak alınan ürün ismi, varsayılan mesaj oluşturmak için kullanılır
-  - `t` — i18n çeviri fonksiyonu, varsayılan mesajın çevirisini almak için kullanılır
-  - `setErrors` — Form hata state'ini sıfırlayan setter
-- **Dönüş**: yok
+  - `onClose` — üst bileşenden gelen kapanış callback’i; `onClose()` ile modal kapatılır.
+  - `setIsSuccess` — `isSuccess` state’ini `false` yapar.
+  - `setName`, `setCompany`, `setEmail`, `setPhone`, `setCity`, `setAppArea`, `setConsent` — ilgili state’leri sıfırlar veya boş string’e ayarlar.
+  - `setMessage` — `productName` varsa varsayılan mesajı çeviri ile ayarlar, yoksa boş string’e ayarlar.
+  - `setErrors` — hata state’ini boş nesneyle sıfırlar.
+  - `setTimeout` — 300 ms sonra yukarıdaki state sıfırlama işlemlerini gerçekleştirir.
+- **Dönüş**: yok (void)
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-LeadModal() fonksiyonu, kapatma ve doğrulama işlemleri için sırasıyla handleClose ve validate fonksiyonlarını çağırıyor.
-
-### Disaridan Cagrilanlar (Incoming)
-Bu modüle ait dışarıdan gelen çağrı bilgisi verilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Veri bulunmamaktadır.
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  LeadModal() → handleClose()
-  LeadModal() → validate()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    LeadModal["LeadModal()"] --> handleClose["handleClose()"]
-    LeadModal["LeadModal()"] --> validate["validate()"]
+graph TD
+    LeadModal_tsx__LeadModal["LeadModal"]
+    LeadModal_tsx__handleClose["handleClose"]
+    LeadModal_tsx__submit["submit"]
+    LeadModal_tsx__validate["validate"]
+    LeadModal_tsx__LeadModal --> LeadModal_tsx__validate
+    LeadModal_tsx__LeadModal --> LeadModal_tsx__handleClose
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -176,11 +161,7 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[100dvh]`, `sm:max-h-[85vh]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)

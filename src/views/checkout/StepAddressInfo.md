@@ -4,41 +4,43 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx
 skeleton_hash: 61818ab3eba26faa
-generated_at: 2026-05-23T22:40:34Z
+entity_hashes:
+  func:StepAddressInfo: d5b5813fe5d1d5af
+  overview: f4c7e4e155655b30
+  style_tokens: b1b761a6e8929d20
+generated_at: 2026-05-27T11:52:43Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun ödeme (checkout) akışının adres bilgileri adımını oluşturan React bileşen modülüdür. Üst bileşenlerden aldığı teslimat ve fatura adresi verileri ile state güncelleme metodları aracılığıyla kullanıcının adres bilgilerini girmesini ve güncellemesini destekler.
+Bu modül, ödeme sürecinin adres bilgisi adımını yöneten bir React bileşenidir. Kullanıcının teslimat ve fatura adresi bilgilerini girebilmesi için gerekli form arayüzünü ve veri akışını sağlar.
 
 ## Fonksiyon Grupları
-### Ana Adres Adımı Bileşeni
-Modülün temel bileşeni olarak ödeme akışındaki adres bilgisini girme adımının tüm işleyişinden sorumludur. Üst bileşenle adres verilerini senkronize tutarak kullanıcı girişlerini ilgili state'lere aktarır.
+
+### Adres Bilgisi Arayüzü
+Ödeme akışı sırasında teslimat ve fatura adresi verilerinin kullanıcıya sunulmasını ve bu verilerin güncellenmesini sağlayan ana bileşendir.
 - StepAddressInfo
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React bileşeni, VentHub HVAK platformu sipariş sürecinin adres bilgisini girme adımında çalışır, teslimat ve fatura adresi yönetimi için gerekli state ve state güncelleme fonksiyonlarını üst bileşenlerden prop olarak alır, çalışması için bu prop'ların eksiksiz ve doğru yapıda iletilmesi zorunludur.
-
-[Aksiyom 1]: Eğer üst bileşen tarafından shippingAddress prop'u iletilmezse, kullanıcının mevcut teslimat adresi formda görüntülenemez, boş formla karşılaşılır.
-[Aksiyom 2]: Eğer setShippingAddress setter fonksiyonu iletilmezse, kullanıcının formda girdiği yeni teslimat adresi uygulama genel state'e kaydedilemez, adres değişiklikleri kalıcı olmaz.
-[Aksiyom 3]: Eğer billingAddress prop'u iletilmezse, mevcut fatura adresi formda yüklenemez, kullanıcı fatura adresini düzenleyemez.
-[Aksiyom 4]: Eğer prop imzasında kısmi yazılan setBi ile temsil edilen setBillingAddress setter fonksiyonu iletilmezse, kullanıcının girdiği yeni fatura adresi genel state'e aktarılamaz, sipariş süreci eksik adres bilgisiyle ilerler.
-[Aksiyom 5]: Eğer iletilen shippingAddress veya billingAddress prop'ları geçerli adres nesnesi yapısında değilse, form alanları hatalı veriyle doldurulur, sonraki sipariş adımlarında adres doğrulaması başarısız olur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### StepAddressInfo
-**Ne yapar**: VentHub HVAC projesinin ödeme (checkout) akışında adres bilgisi girişi adımını yöneten React fonksiyonel bileşenidir. Kullanıcıdan teslimat ve fatura adresi bilgilerini toplamak, mevcut adres bilgilerini kullanıcıya sunmak ve kullanıcının adreslerde yaptığı değişiklikleri üst (parent) bileşene iletmekle görevlidir. Ödeme sürecinin zorunlu adres toplama adımının tüm veri akışı ve arayüz sorumluluğunu üstlenir.
-**Nasıl yapar**: Üst bileşenden aldığı mevcut adres state'leri ve state güncelleme fonksiyonları ile adres verilerini merkezi olarak yönetir. Gelen teslimat ve fatura adresi verilerini kendi içindeki form arayüzünde kullanıcıya görüntüler, kullanıcının form alanlarında yaptığı değişiklikleri ilgili setter fonksiyonlarını çağırarak üst bileşene iletir, bu sayede uygulama genelindeki adres state'inin güncel kalmasını sağlar.
+**Ne yapar**: Bir ödeme adımında (checkout) kullanıcıdan teslimat ve fatura adres bilgilerini toplamak için kullanılan bir React fonksiyonel bileşenidir. Kullanıcının adres verilerini girmesine ve bu verilerin üst bileşen tarafından yönetilen state’lerle senkronize edilmesine olanak tanır.
+
+**Nasıl yapar**: Bileşen, dışarıdan aldığı `shippingAddress`, `setShippingAddress`, `billingAddress` ve `setBillingAddress` prop’larını kullanarak adres form alanlarını render eder. Her bir alandaki değişiklik ilgili state setter fonksiyonu aracılığıyla üst bileşenin state’ine yansıtılır. İç yapısı ve form elemanlarının detayları mevcut kod parçasında tam olarak görülememekle birlikte, genellikle iki ayrı adres bölümü (teslimat ve fatura) içerir.
+
 **Parametreler**:
-- shippingAddress: any — Üst bileşenden iletilen, mevcut teslimat (shipping) adresi verilerini tutan state objesi
-- setShippingAddress: function — Teslimat adresi state'ini güncellemek için kullanılan, üst bileşen tarafından sağlanan setter fonksiyonu
-- billingAddress: any — Üst bileşenden iletilen, mevcut fatura (billing) adresi verilerini tutan state objesi
-- setBi: function — Fatura adresi state'ini güncellemek için üst bileşen tarafından sağlanan, fonksiyon tanımında kısaltılmış şekilde belirtilen setter fonksiyonu
-**Dönüş**: React.FC<StepAddressInfoProps> — Props olarak StepAddressInfoProps tipini kabul eden, ödeme akışının adres bilgisi giriş adımının tüm kullanıcı arayüzünü render eden React fonksiyonel bileşeni döndürür.
+- `shippingAddress`: `object` (type) — Kullanıcının teslimat adresini temsil eden state değeri. Alanlar (ör. sokak, şehir, posta kodu) içeren bir nesne olduğu varsayılır.
+- `setShippingAddress`: `React.Dispatch<React.SetStateAction<object>>` — `shippingAddress` state’ini güncellemek için kullanılan setter fonksiyonudur.
+- `billingAddress`: `object` — Kullanıcının fatura adresini temsil eden state değeri. `shippingAddress` ile benzer yapıda olduğu varsayılır.
+- `setBillingAddress`: (kodda `setBi` olarak kısaltılmıştır) `React.Dispatch<React.SetStateAction<object>>` — `billingAddress` state’ini güncellemek için kullanılan setter fonksiyonudur.
+
+**Dönüş**: `React.FC<StepAddressInfoProps>` — Bileşen, bir React fonksiyonel bileşeni (Functional Component) olarak tanımlanmıştır. Bu nedenle dönüş değeri, JSX formatında bir kullanıcı arayüzü öğesidir (React.ReactNode). Props’ları `StepAddressInfoProps` arayüzü ile tipleştirilmiştir.
 
 ---
 
@@ -69,27 +71,23 @@ Bu React bileşeni, VentHub HVAK platformu sipariş sürecinin adres bilgisini g
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx::StepAddressInfo içi shippingAddress postalCode güncelleme arrow fonksiyonu
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx::anonymous_1
 - **params**: (e)
 - **ic_degiskenler**:
-  - `e` — Input değişikliğini tetikleyen React change event nesnesi
-  - `e.target.value` — Posta kodu girilen inputun ham girilen değeri
-  - `v` — Sadece sayılardan kalacak şekilde temizlenmiş, maksimum 10 karaktere kırpılmış geçerli posta kodu değeri
-  - `setShippingAddress` — Kargo adresi state'ini güncellemek için kullanılan prop olarak gelen setter fonksiyonu
-  - `shippingAddress` — Mevcut tüm kargo adresi bilgilerini tutan state nesnesi
-  - `shippingAddress.postalCode` — Güncellenecek olan kargo adresine ait posta kodu alanı
-- **Dönüş**: void (sadece state güncellemesi yapar, herhangi bir değer döndürmez)
+  - `e` — olay nesnesi, `e.target.value` üzerinden girilen metin alınır
+  - `v` — `e.target.value` içindeki sadece rakamları tutan ve ilk 10 karaktere kesilen string
+  - `shippingAddress` — dışarıdan gelen state nesnesi, mevcut adres bilgilerini içerir
+  - `setShippingAddress` — React state güncelleme fonksiyonu, yeni `postalCode` değeriyle state’i günceller
+- **Dönüş**: yok (callback olarak kullanılan anonim fonksiyon, bir değer döndürmez)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx::StepAddressInfo içi billingAddress postalCode güncelleme arrow fonksiyonu
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx::anonymous_2
 - **params**: (e)
 - **ic_degiskenler**:
-  - `e` — Input değişikliğini tetikleyen React change event nesnesi
-  - `e.target.value` — Posta kodu girilen inputun ham girilen değeri
-  - `v` — Sadece sayılardan kalacak şekilde temizlenmiş, maksimum 10 karaktere kırpılmış geçerli posta kodu değeri
-  - `setBillingAddress` — Fatura adresi state'ini güncellemek için kullanılan prop olarak gelen setter fonksiyonu
-  - `billingAddress` — Mevcut tüm fatura adresi bilgilerini tutan state nesnesi
-  - `billingAddress.postalCode` — Güncellenecek olan fatura adresine ait posta kodu alanı
-- **Dönüş**: void (sadece state güncellemesi yapar, herhangi bir değer döndürmez)
+  - `e` — olay nesnesi, `e.target.value` üzerinden girilen metin alınır
+  - `v` — `e.target.value` içindeki sadece rakamları tutan ve ilk 10 karaktere kesilen string
+  - `billingAddress` — dışarıdan gelen state nesnesi, mevcut fatura adresi bilgilerini içerir
+  - `setBillingAddress` — React state güncelleme fonksiyonu, yeni `postalCode` değeriyle state’i günceller
+- **Dönüş**: yok (callback olarak kullanılan anonim fonksiyon, bir değer döndürmez)
 
 ---
 
@@ -102,3 +100,18 @@ Bu React bileşeni, VentHub HVAK platformu sipariş sürecinin adres bilgisini g
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: StepAddressInfo
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `border-light-gray`, `border-primary-navy`, `border-slate-200`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-white`, `text-xl`, `text-xs`
+- **Layout:** `block`, `flex`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `h-10`, `items-center`, `items-start`, `justify-between`, `justify-end`, `md:col-span-2`, `md:grid-cols-2`
+- **Responsive:** `md:`, `sm:` prefix kullanımları

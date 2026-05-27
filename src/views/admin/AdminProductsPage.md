@@ -4,172 +4,230 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx
 skeleton_hash: 6dcd87ef2140afca
-generated_at: 2026-05-23T22:38:52Z
+entity_hashes:
+  func:AdminProductsPage: 7ee4bfb4fdbbf892
+  func:bulkDelete: 396db34432b201cc
+  func:bulkFeatureToggle: da5595cacf5bd1c3
+  func:bulkPriceAdjust: 392dce30ade3768e
+  func:bulkStatusChange: 420140e12f67c1f1
+  func:handleCreate: df124e23e226a1a4
+  func:handleEdit: 5e53cea7890cad6c
+  func:handleModalSuccess: fff2542be2c950a9
+  func:loadTechSpecs: ce079898c584578e
+  func:remove: 16990c02664975f8
+  func:saveInlineEdit: 22c42f560d85a7be
+  func:sortIndicator: 14968e5f2f2ffbf7
+  func:statusBadge: f17a6d9c7aca030a
+  func:toggleExpand: 63f2441bd2a8f378
+  func:toggleSelect: 5a6b497e4acebdf1
+  func:toggleSelectAll: b6733934eb7cddda
+  func:toggleSort: 865bfd9d85445d70
+  overview: 6edaaf2ebf329de0
+  style_tokens: fdfb3c696080e8df
+generated_at: 2026-05-27T12:17:53Z
 ---
 
-## Genel Bakış
-Bu modül, VentHub HVAC platformunun yönetici panelinde ürün yönetimi sayfasını oluşturan React bileşenidir. Yöneticilerin tüm ürünleri listeleyip tekil veya toplu olarak düzenleme, silme, durumlarını değiştirme gibi tüm temel ürün yönetimi işlemlerini gerçekleştirmesini sağlar. Sayfa içi sıralama, satır içi düzenleme ve detaylı ürün görünümü gibi kullanıcı deneyimini iyileştiren özellikleri bünyesinde barındırır.
+## Genel Bakış  
+AdminProductsPage, ürün yönetimi için tek sayfa arayüzünü sunar. Kullanıcıların ürünleri listelemesi, seçmesi, düzenlemesi, toplu işlemler yapması ve teknik özellikleri görüntülemesi için gerekli tüm etkileşimleri sağlar. Sayfa, React bileşeni olarak yapılandırılmış olup, durum yönetimi ve API çağrılarıyla bütünleşir.
 
-## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Tüm ürün yönetimi sayfasının durum ve iş akışlarını yöneten ana bileşendir, tüm alt fonksiyonları ve arayüz yapısını oluşturur.
-- AdminProductsPage
+## Fonksiyon Grupları  
 
-### Ürün Seçim ve Görünüm Yönetimi
-Kullanıcıların listelenen ürünleri tek tek veya toplu olarak seçmesini, ürün detaylarını görüntülemek için kartları genişletmesini sağlayan işlemleri yönetir.
-- toggleSelect, toggleSelectAll, toggleExpand
+### Görünüm ve Durum Yönetimi  
+Bu grup, sayfanın görünümünü kontrol eden ve bileşenin durumunu güncelleyen fonksiyonları içerir.  
+- `AdminProductsPage`  
+- `toggleSelect`  
+- `toggleSelectAll`  
+- `toggleExpand`  
+- `toggleSort`  
+- `sortIndicator`  
+- `statusBadge`  
 
-### Kullanıcı Etkileşim Tetikleyicileri
-Ürün ekleme, düzenleme, sıralama değiştirme, satır içi düzenleme kaydetme gibi kullanıcı eylemlerini tetikleyen iş akışı başlatan fonksiyonlardır.
-- handleCreate, handleEdit, handleModalSuccess, toggleSort, saveInlineEdit
+### İşlem Başlatıcıları  
+Kullanıcı eylemlerini başlatan ve ilgili API çağrılarını tetikleyen fonksiyonlar.  
+- `handleCreate`  
+- `handleEdit`  
+- `handleModalSuccess`  
 
-### Tekil Ürün İşlemleri
-Sadece tek bir ürün üzerinde gerçekleştirilen silme, teknik özellikleri yükleme gibi özel işlemleri yapan asenkron fonksiyonlardır.
-- remove, loadTechSpecs
+### Tekil Ürün İşlemleri  
+Bireysel ürün üzerinde yapılan değişiklikleri yöneten fonksiyonlar.  
+- `remove`  
 
-### Toplu Ürün Yönetimi İşlemleri
-Birden fazla seçili ürün üzerinde aynı anda çalışan, durum güncelleme, öne çıkarma, toplu silme ve toplu fiyat düzenleme gibi işlemleri gerçekleştirir.
-- bulkStatusChange, bulkFeatureToggle, bulkDelete, bulkPriceAdjust
+### Toplu İşlemler  
+Birden fazla üründe aynı anda değişiklik yapılmasını sağlayan fonksiyonlar.  
+- `bulkStatusChange`  
+- `bulkFeatureToggle`  
+- `bulkDelete`  
+- `bulkPriceAdjust`  
 
-### Yardımcı Arayüz Fonksiyonları
-Arayüzde kullanılan görsel öğeleri oluşturan, sıralama göstergesi ve durum etiketi gibi yardımcı işlevleri yerine getirir.
-- sortIndicator, statusBadge
+### Veri Yükleme ve Güncelleme  
+Veri çekme ve satır içi düzenlemeleri kaydetme işlemlerini kapsar.  
+- `loadTechSpecs`  
+- `saveInlineEdit`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül VentHub HVAC platformunun admin paneli ürün yönetimi sayfasıdır; tüm tekil ve toplu ürün seçimi, düzenleme, silme, durum değiştirme, sıralama, fiyat ayarlama ve teknik spesifikasyon yükleme işlemlerinin kesintisiz çalışması için gerekli tüm istemci state yönetimi, yetki sistemleri ve arka plan API erişiminin sürekliliği zorunludur.
+Bu modül, yönetim panelinde ürün listesinin görüntülenmesi, seçilmesi, düzenlenmesi ve toplu işlemlerin yürütülmesi için UI‑mantığı sağlar.  
 
-[Aksiyom 1]: Eğer ürün listesi ve kullanıcı etkileşimlerini yöneten istemci tarafı state yönetim sistemi yoksa, toggleSelect, toggleSelectAll, toggleExpand, toggleSort gibi tüm yerel durum değişikliği gerektiren işlemler başarısız olur.
-[Aksiyom 2]: Eğer ürün kalıcı değişikliklerini destekleyen arka plan API servisleri erişilebilir değilse, handleCreate, handleEdit, remove, bulkStatusChange, bulkPriceAdjust gibi veritabanı değişikliği gerektiren tüm işlemler başarısız olur.
-[Aksiyom 3]: Eğer admin kullanıcısının bu sayfadaki değişiklik işlemlerini gerçekleştirmek için gerekli yetkileri yoksa, tüm silme, düzenleme, toplu işlem fonksiyonları yetki hatasıyla sonuçlanır.
-[Aksiyom 4]: Eğer bulkPriceAdjust fonksiyonuna geçirilen mode parametresi tanımlı 'percent' | 'fixed' değerleri dışında bir değer alırsa, toplu fiyat ayarlama işlemi çalışmaz.
-[Aksiyom 5]: Eğer loadTechSpecs fonksiyonuna geçerli formatta bir _productId string değeri sağlanmazsa, ürün teknik spesifikasyonları yüklenemez.
-[Aksiyom 6]: Eğer toggleSort ve sortIndicator fonksiyonlarında kullanılan SortKey tipinde geçerli bir sıralama anahtarı sağlanmazsa, ürün listesi sıralama işlemi başarısız olur.
-[Aksiyom 7]: Eğer toplu işlemler için seçilen ürünlerin kimlik listesi state'te tutulmuyorsa, tüm bulk ile başlayan toplu işlem fonksiyonları hedef ürün olmadan başarısız olur.
-[Aksiyom 8]: Eğer işlem sonrası başarı modallerini yöneten state yapısı yoksa, handleModalSuccess fonksiyonu çalışmaz ve işlem sonrası bildirimler gösterilemez.
-[Aksiyom 9]: Eğer statusBadge fonksiyonuna tanımlı string|null türleri dışında bir değer gönderilirse, ürün durumunu gösteren rozet bileşeni düzgün render edilemez.
+**Aksiyom 1**: Eğer `toggleSelect(id)` çağrısında verilen **id** mevcut bir ürün kaydına karşılık gelmiyorsa, seçim durumu değişmez ve UI’da bir hata/uyarı gösterilmez.  
+
+**Aksiyom 2**: Eğer `toggleSelectAll()` çağrıldığında listede **hiç ürün bulunmuyorsa**, hiçbir seçim durumu değişmez.  
+
+**Aksiyom 3**: Eğer `toggleExpand(id)` içinde verilen **id** listede bulunmuyorsa, genişletme/katlama durumu değişmez ve UI’da bir değişiklik olmaz.  
+
+**Aksiyom 4**: Eğer `handleCreate()` çalıştırıldığında **gerekli modal/form bileşenleri yüklenemezse**, yeni ürün oluşturma süreci başlatılamaz ve UI’da “create” aksiyonu başarısız olur.  
+
+**Aksiyom 5**: Eğer `handleEdit(id)` içinde verilen **id** geçerli bir ürün kaydı değilse, düzenleme modalı açılmaz ve UI’da bir değişiklik olmaz.  
+
+**Aksiyom 6**: Eğer `handleModalSuccess()` çağrısı **aktif bir modal** olmadan gerçekleşirse, hiçbir veri kaydedilmez ve UI’da bir yan etki oluşmaz.  
+
+**Aksiyom 7**: Eğer `remove(id)` içinde verilen **id** listede bulunmuyorsa, silme işlemi gerçekleşmez ve UI’da bir değişiklik olmaz.  
+
+**Aksiyom 8**: Eğer `bulkStatusChange(status)` içinde verilen **status** değeri geçerli bir durum (ör. “active”, “inactive” vb.) değilse, seçili ürünlerin durumu değiştirilmez.  
+
+**Aksiyom 9**: Eğer `bulkFeatureToggle(featured)` çağrısı **hiç ürün seçilmemişse**, “featured” özelliği hiçbir ürüne uygulanmaz.  
+
+**Aksiyom 10**: Eğer `bulkDelete()` çağrısı **seçili ürün yoksa**, silme işlemi gerçekleşmez ve UI’da bir değişiklik olmaz.  
+
+**Aksiyom 11**: Eğer `bulkPriceAdjust(mode, value)` içinde **mode** `'percent'` ya da `'fixed'` dışındaki bir değer alırsa, fiyat ayarlaması uygulanmaz.  
+
+**Aksiyom 12**: Eğer `bulkPriceAdjust` için **value** `null` ya da `undefined` ise, fiyat ayarlaması uygulanmaz.  
+
+**Aksiyom 13**: Eğer `saveInlineEdit()` sırasında **veri doğrulama hatası** oluşursa, değişiklikler kaydedilmez ve UI’da hatalı alanlar işaretlenir.  
+
+**Aksiyom 14**: Eğer `loadTechSpecs(_productId)` içinde verilen **_productId** geçerli bir ürün kimliği değilse, teknik özellikler yüklenmez ve UI’da boş bir alan gösterilir.  
+
+**Aksiyom 15**: Eğer `toggleSort(key)` içinde verilen **key** geçerli bir `SortKey` (ör. `name`, `price`, `status` vb.) değilse, sıralama düzeni değişmez.  
+
+**Aksiyom 16**: Eğer `sortIndicator(key)` içinde verilen **key** mevcut bir sıralama anahtarı değilse, varsayılan (boş) sıralama göstergesi döndürülür.  
+
+**Aksiyom 17**: Eğer `statusBadge(s)` çağrısında **s** `null` ya da `undefined` ise, varsayılan (bilinmeyen) durum rozeti gösterilir.  
+
+### Domain‑specific kurallar
+- `bulkPriceAdjust`‑de **mode** yalnızca `'percent'` ya da `'fixed'` olabilir; başka bir değer kabul edilmez.  
+- `statusBadge`‑de **s** parametresi opsiyoneldir; `null`/`undefined` olduğunda “bilinmiyor” badge’ı gösterilir.  
+
+*Bu aksiyomlar, yalnızca fonksiyon imzalarından türetilmiş olup, modülün doğru çalışması için gerekli koşulları tanımlar.*
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminProductsPage
-**Ne yapar**: VentHub HVAC projesinin yönetici paneline ait ürün yönetimi sayfasını oluşturan ana React bileşenidir. Tüm ürün listeleme, seçim, düzenleme, silme ve toplu işlem gibi yönetim işlevlerini tek bir arayüzde toplayarak yöneticilere sunar. Sayfa içindeki tüm yardımcı işlevlerin barındığı ana bileşendir.
-**Nasıl yapar**: React.FC türünde tanımlanmış, sayfa içindeki tüm yardımcı fonksiyonları (toggleSelect, handleCreate, bulkStatusChange vb.) kendi bünyesinde barındırır, bileşen içi state yönetimini gerçekleştirir ve tüm yönetim işlevlerini içeren kullanıcı arayüzünü JSX olarak render eder.
-**Parametreler**: Yoktur
-**Dönüş**: React bileşeni olarak tamamen işlevsel yönetici ürünler sayfası arayüzünü döndürür.
+**Ne yapar**: Uygulamanın yönetim panelinde ürünlerin listelendiği ve yönetildiği ana sayfa bileşenini tanımlar.  
+**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanır ve içinde ürün tablosu, seçim ve eylem kontrolleri gibi alt bileşenleri barındırır.  
+**Parametreler**: *Yok*  
+**Dönüş**: `React.FC` – bir React fonksiyonel bileşeni.
 
 ### toggleSelect
-**Ne yapar**: Tek bir ürün öğesinin seçili olma durumunu tersine çeviren işlemcidir. Ürün listesinden herhangi bir ürünün tek başına seçilmesini veya seçiminin kaldırılmasını sağlar, tekil seçim işlemlerini yönetir.
-**Nasıl yapar**: Aldığı ürün kimliği ile bileşen içi seçili ürünler state'ini günceller. Eğer ilgili ürün id'si seçili ürünler listesinde mevcutsa listeden çıkarır, mevcut değilse listeye ekleyerek seçim durumunu tersine çevirir.
+**Ne yapar**: Tek bir ürünün seçili durumunu tersine çevirir.  
+**Nasıl yapar**: Verilen `id` parametresiyle ilgili ürünün seçili/seçili değil durumunu günceller.  
 **Parametreler**:
-- name: id, type: string — Seçim durumu değiştirilecek ürünün benzersiz kimlik değeri
-**Dönüş**: Hiçbir değer döndürmez, yalnızca bileşen içi seçili ürünler state'ini günceller.
+- `id`: `string` — seçimin değiştirileceği ürünün benzersiz kimliği.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
 
 ### toggleSelectAll
-**Ne yapar**: Ürün listesindeki tüm ürünlerin aynı anda seçilmesi veya tüm seçimlerin kaldırılması işlemini gerçekleştiren toplu seçim fonksiyonudur. Tüm ürünleri tek tıkla seçmeyi veya seçimleri iptal etmeyi sağlar.
-**Nasıl yapar**: Sayfada listelenen tüm ürünlerin benzersiz id'lerini toplar, eğer tüm ürünler zaten seçili state'de ise tümünü seçili ürünler listesinden çıkarır, herhangi biri seçili değilse tüm ürün id'lerini seçili listesine ekler.
-**Parametreler**: Yoktur
-**Dönüş**: Hiçbir değer döndürmez, yalnızca seçili ürünler state'ini günceller.
+**Ne yapar**: Listede bulunan tüm ürünlerin seçili durumunu toplu olarak tersine çevirir.  
+**Nasıl yapar**: Seçim durumunu kontrol eder ve tüm öğeler için aynı seçimi uygular.  
+**Parametreler**: *Yok*  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
 
 ### toggleExpand
-**Ne yapar**: Tek bir ürün öğesinin detaylarının görünürlük durumunu tersine çeviren genişletme/küçültme fonksiyonudur. Ürün kartının ek detaylarının yöneticiye gösterilmesini veya gizlenmesini sağlar.
-**Nasıl yapar**: Aldığı ürün kimliği ile genişletilmiş öğeler listesini günceller. Eğer ilgili id genişletilmiş listede mevcutsa listeden çıkararak ürün detaylarını gizler, mevcut değilse listeye ekleyerek detayları görünür hale getirir.
+**Ne yapar**: Belirli bir ürün satırının detay (expand) görünümünü açar veya kapatır.  
+**Nasıl yapar**: `id` ile eşleşen satırın genişletme durumunu değiştirir ve aynı zamanda `loadTechSpecs` fonksiyonunu çağırarak teknik özellikleri yükler.  
 **Parametreler**:
-- name: id, type: string — Genişletme/küçültme işlemi yapılacak ürünün benzersiz kimlik değeri
-**Dönüş**: Hiçbir değer döndürmez, yalnızca bileşen içi genişletilmiş öğeler state'ini günceller.
+- `id`: `string` — genişletme durumunun değiştirileceği ürünün kimliği.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
 
 ### handleCreate
-**Ne yapar**: Yeni ürün oluşturma işlemini başlatan işlemcidir. Ürün ekleme formunu içeren modal penceresini açarak yöneticiye yeni ürün bilgilerini girebileceği arayüzü sunar.
-**Nasıl yapar**: Bileşen içinde tanımlı ürün oluşturma modalının görünürlük state'ini aktif hale getirir, tüm alanları boş olan sıfırlanmış bir ürün formunu kullanıcıya sunar.
-**Parametreler**: Yoktur
-**Dönüş**: Hiçbir değer döndürmez, yalnızca modal state'ini güncelleyerek ürün ekleme formunu açar.
+**Ne yapar**: Yeni bir ürün oluşturma sürecini başlatır.  
+**Nasıl yapar**: Kullanıcı “Yeni Ürün” eylemini tetiklediğinde ilgili modal veya formu açar.  
+**Parametreler**: *Yok*  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
 
 ### handleEdit
-**Ne yapar**: Mevcut bir ürünün düzenleme işlemini başlatan işlemcidir. Seçilen ürünün mevcut tüm bilgileriyle dolu olan düzenleme formunu içeren modal penceresini açar.
-**Nasıl yapar**: Aldığı ürün kimliği ile ilgili ürün verisini çeker, düzenleme formunu bu mevcut verilerle doldurur ve düzenleme modalının görünürlüğünü aktif hale getirir.
+**Ne yapar**: Mevcut bir ürünün düzenleme moduna geçişi sağlar.  
+**Nasıl yapar**: Verilen `id` ile eşleşen ürünün bilgilerini düzenleme formuna yükler.  
 **Parametreler**:
-- name: id, type: string — Düzenlenecek ürünün benzersiz kimlik değeri
-**Dönüş**: Hiçbir değer döndürmez, yalnızca ilgili state'leri güncelleyerek ürün düzenleme formunu açar.
+- `id`: `string` — düzenlenecek ürünün kimliği.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
 
 ### handleModalSuccess
-**Ne yapar**: Ürün oluşturma veya düzenleme işlemlerinde başarılı bir kayıt sonrası çalışan temizleme ve yenileme fonksiyonudur. Yeni veya güncellenmiş ürünün ürün listesinde anında görünmesini sağlar.
-**Nasıl yapar**: Açık olan modal penceresini kapatır, ürün listesinin güncel verilerle yeniden yüklenmesi için ilgili veri çekme fonksiyonunu tetikler, formdaki eski verileri tamamen temizler.
-**Parametreler**: Yoktur
-**Dönüş**: Hiçbir değer döndürmez, yalnızca işlem sonrası bileşen state'lerini sıfırlar ve ürün listesini yeniler.
+**Ne yapar**: Ürün oluşturma veya düzenleme modalı başarılı bir şekilde tamamlandığında tetiklenir.  
+**Nasıl yapar**: Modal kapanışını yönetir ve listeyi güncelleyerek yeni/ güncellenmiş veriyi yansıtır.  
+**Parametreler**: *Yok*  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
 
 ### remove
-**Ne yapar**: Tek bir ürünün sistemden kalıcı olarak silinmesi işlemini gerçekleştiren fonksiyondur. Silme işlemi öncesi yönetici onayı alarak güvenli silme işlemi sunar.
-**Nasıl yapar**: Önce yöneticiye silme işlemini onaylaması için bir onay penceresi sunar, onay alınması halinde aldığı ürün kimliği ile silme API çağrısını yapar, işlem başarılı olursa ürün listesini güncel verilerle yeniler.
+**Ne yapar**: Belirli bir ürünü sistemden siler.  
+**Nasıl yapar**: `id` parametresiyle eşleşen ürünün silinmesini başlatır ve ardından listeyi yeniler.  
 **Parametreler**:
-- name: id, type: string — Silinecek ürünün benzersiz kimlik değeri
-**Dönüş**: Hiçbir değer döndürmez, yalnızca silme işlemini tamamlayarak ürün listesini günceller.
+- `id`: `string` — silinecek ürünün kimliği.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
 
 ### bulkStatusChange
-**Ne yapar**: Önceden seçilmiş tüm ürünlerin aktif/pasif gibi durumlarını tek seferde değiştiren toplu işlem fonksiyonudur. Birden fazla ürünün durumunu tek işlemle yönetmeyi sağlar.
-**Nasıl yapar**: Seçili ürünler listesindeki tüm ürün id'lerini toplar, aldığı yeni durum değeri ile toplu durum güncelleme API çağrısını yapar, işlem başarılı olursa ürün listesini yeniler ve seçili ürünler listesini sıfırlar.
+**Ne yapar**: Seçili ürünlerin durumunu toplu olarak değiştirir.  
+**Nasıl yapar**: `status` parametresiyle belirtilen yeni durumu tüm seçili ürünlere uygular.  
 **Parametreler**:
-- name: status, type: string — Tüm seçili ürünlere atanacak yeni durum değeri
-**Dönüş**: Hiçbir değer döndürmez, yalnızca toplu durum güncelleme işlemini gerçekleştirerek ilgili state'leri ve ürün listesini günceller.
+- `status`: `string` — uygulanacak yeni durum değeri.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
 
 ### bulkFeatureToggle
-**Ne yapar**: Önceden seçilmiş tüm ürünlerin öne çıkarılmış (featured) durumunu tek seferde ayarlayan toplu işlem fonksiyonudur. Birden fazla ürünün platformda öne çıkarılma durumunu toplu olarak yönetmek için kullanılır.
-**Nasıl yapar**: Seçili ürünler listesindeki tüm ürün id'lerini toplar, aldığı boolean değer ile tüm seçili ürünlerin öne çıkarılmış durumunu güncelleyen API çağrısını yapar, işlem başarılı olursa ürün listesini yeniler ve seçili ürünler listesini sıfırlar.
+**Ne yapar**: Seçili ürünlerin “featured” (öne çıkarılmış) özelliğini toplu olarak açar veya kapatır.  
+**Nasıl yapar**: `featured` parametresiyle belirlenen boolean değeri tüm seçili ürünlere atar.  
 **Parametreler**:
-- name: featured, type: boolean — Tüm seçili ürünlere atanacak öne çıkarılmış durum değeri, true ise ürünler öne çıkarılır, false ise öne çıkarılmış durumu kaldırılır
-**Dönüş**: Hiçbir değer döndürmez, yalnızca toplu özellik ayarlama işlemini tamamlayarak ilgili state'leri ve ürün listesini günceller.
-
----
-
+- `featured`: `boolean` — ürünlerin öne çıkarılıp çıkarılmayacağını belirten değer.  
+**Dönüş**: Belirtilmemiş (muhtemelen `void`).
 
 ### bulkDelete
-**Ne yapar**: VentHub HVAC platformunun yönetici ürünler sayfasında, kullanıcı tarafından arayüzde seçilen birden fazla ürünü tek işlemde toplu olarak silmek için tetiklenen fonksiyondur. Yöneticilerin ürün yönetimi süreçlerini hızlandırmak için tasarlanmış toplu işlem fonksiyonlarından biridir.
-**Nasıl yapar**: Öncelikle arayüzde seçilen tüm ürünlerin benzersiz ID'lerini toplar, kullanıcıdan silme işlemi için onay aldıktan sonra bu ID listesini arka uç API'ye gönderir. İşlem sonrası yerel ürün listesini güncelleyerek silinen ürünleri listeden kaldırır, işlem başarısı veya hatası durumunda kullanıcıya uygun bildirim gösterir.
-**Parametreler**: Herhangi bir parametre almaz
-**Dönüş**: Tanımlı bir dönüş tipi bulunmamaktadır, void olarak çalışır.
+**Ne yapar**: Birden fazla ürünün silinmesini toplu olarak başlatır.  
+**Nasıl yapar**: Fonksiyonun iç mantığı kodda verilmemiştir; genellikle seçili ürün ID'lerini toplayıp bir API çağrısı yaparak silme işlemini gerçekleştirir.  
+**Parametreler**:  
+- *Yok*  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
 
 ### bulkPriceAdjust
-**Ne yapar**: Seçilen birden fazla ürünün fiyatını toplu olarak güncellemek için kullanılan fonksiyondur. Yöneticilerin yüzdesel veya sabit tutarlı fiyat ayarlamalarını tüm seçili ürünlere tek seferde uygulamasını sağlar.
-**Nasıl yapar**: Aldığı mod ve value parametrelerine göre her seçili ürünün mevcut fiyatını güncelleyecek şekilde hesaplama yapar. 'percent' modunda belirtilen oranda fiyat artışı veya düşüşü hesaplar, 'fixed' modunda belirtilen sabit tutarı doğrudan fiyatlara ekler veya çıkarır. Hesaplanan yeni fiyatları arka uca kaydeder ve yerel ürün listesini güncelleyerek değişikliklerin arayüzde görünmesini sağlar.
-**Parametreler**:
-- mode: 'percent' | 'fixed' — Fiyat ayarlama işleminin türünü belirten parametre, 'percent' değeri yüzdesel, 'fixed' değeri sabit tutarlı fiyat ayarlaması yapılacağını belirtir.
-- value: number — Fiyat ayarlama miktarını taşıyan sayısal parametre, pozitif değer fiyat artışı, negatif değer fiyat düşüşü işlemini tetikler.
-**Dönüş**: Tanımlı bir dönüş tipi bulunmamaktadır, void olarak çalışır.
+**Ne yapar**: Seçili ürünlerin fiyatlarını toplu olarak yüzde ya da sabit tutar üzerinden ayarlar.  
+**Nasıl yapar**: `mode` parametresi yüzde (`percent`) ya da sabit (`fixed`) değer tipini belirler; `value` ise uygulanacak yüzde artışı/azalışını ya da sabit fiyat farkını temsil eder. Fonksiyon bu değerleri alıp ilgili ürünlerin fiyatlarını günceller.  
+**Parametreler**:  
+- `mode`: `'percent' | 'fixed'` — Fiyat ayarlama yöntemini belirler.  
+- `value`: `number` — Uygulanacak yüzde ya da sabit tutar.  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
 
 ### saveInlineEdit
-**Ne yapar**: Ürün listesi üzerinde satır içi (inline) olarak düzenlenen ürün bilgilerini kaydetmek için tetiklenen fonksiyondur. Yöneticilerin ürün listesini terk etmeden hızlıca ürün detaylarını güncelleyebilmesini sağlar.
-**Nasıl yapar**: Düzenleme sırasında kullanıcı tarafından girilen tüm yeni değerleri toplar, öncelikle gerekli format ve doğrulama kontrollerinden geçirir. Doğrulamaları geçen verileri arka uç API'ye kaydetme isteği olarak gönderir, işlem başarılı olursa yerel ürün listesindeki ilgili ürünün bilgilerini günceller. Hata durumunda kullanıcıya hatanın kaynağını açıklayan bildirim gösterir.
-**Parametreler**: Herhangi bir parametre almaz
-**Dönüş**: Tanımlı bir dönüş tipi bulunmamaktadır, void olarak çalışır.
+**Ne yapar**: Satır içi düzenleme modunda yapılan değişiklikleri kaydeder.  
+**Nasıl yapar**: Kullanıcı `Enter` tuşuna bastığında bu fonksiyon çağrılır; `Escape` tuşuna basıldığında ise satır içi düzenleme iptal edilerek `setInlineEdit(null)` çalıştırılır.  
+**Parametreler**:  
+- *Yok*  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
 
 ### loadTechSpecs
-**Ne yapar**: Belirtilen ID'ye sahip ürünün teknik spesifikasyonlarını arka uçtan yüklemek için kullanılan fonksiyondur. Ürün detaylarının görüntülendiği bölümde teknik özelliklerin kullanıcıya sunulmasını sağlar.
-**Nasıl yapar**: Aldığı ürün ID'sini kullanarak arka uç API'den ilgili ürünün teknik spesifikasyonlarını ister, gelen veriyi yerel uygulama state'ine kaydederek arayüzde render edilmesini sağlar. Yükleme sırasında oluşabilecek hataları yakalar, kullanıcıya yükleme başarısızlığı hakkında bildirim gösterir.
-**Parametreler**:
-- _productId: string — Teknik spesifikasyonları yüklenecek ürünün benzersiz kimliğini taşıyan string tipinde parametre, başındaki alt çizgi parametrenin dahili kullanım için tanımlandığını belirtir.
-**Dönüş**: Tanımlı bir dönüş tipi bulunmamaktadır, void olarak çalışır.
+**Ne yapar**: Belirtilen ürün kimliği için teknik özellikleri yükler.  
+**Nasıl yapar**: Fonksiyon, bir ürün satırının genişletilmesi (`toggleExpand`) ile birlikte çağrılır; ürün ID'si (`_productId`) parametresi üzerinden ilgili teknik veri çekilir.  
+**Parametreler**:  
+- `_productId`: `string` — Teknik özelliklerin yükleneceği ürünün kimliği.  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
 
 ### toggleSort
-**Ne yapar**: Ürün listesinin sıralama kriterini veya mevcut kritere göre sıralama yönünü değiştirmek için kullanılan fonksiyondur. Kullanıcıların istedikleri kritere göre ürün listesini yeniden sıralayabilmesini sağlar.
-**Nasıl yapar**: Aldığı sıralama anahtarının mevcut aktif sıralama anahtarı olup olmadığını kontrol eder. Eğer aynı anahtar tekrar tetiklenirse sıralama yönünü (artan/azalan) tersine çevirir, farklı bir anahtar seçilmişse sıralama kriterini yeni anahtarla güncelleyerek ürün listesini yeniden sıralar ve yerel state'i günceller.
-**Parametreler**:
-- key: SortKey — Sıralama işlemi için kullanılacak kriteri temsil eden, önceden tanımlanmış izin verilen değerlerden oluşan SortKey tipinde parametre.
-**Dönüş**: Tanımlı bir dönüş tipi bulunmamaktadır, void olarak çalışır.
+**Ne yapar**: Belirtilen anahtara göre tablo ya da liste sıralamasını değiştirir.  
+**Nasıl yapar**: Mevcut sıralama yönünü kontrol eder; aynı anahtar tekrar seçildiğinde yön tersine çevrilir, farklı bir anahtar seçildiğinde yeni anahtar ve varsayılan yön ile sıralama yapılır.  
+**Parametreler**:  
+- `key`: `SortKey` — Sıralama yapılacak alanın anahtarı.  
+**Dönüş**: Bilinmiyor (muhtemelen `void`).
 
 ### sortIndicator
-**Ne yapar**: Arayüzde aktif sıralama kriterine göre uygun sıralama göstergesinin (artan/azalan yönünü gösteren ok vb. görsel öğe) render edilmesini sağlayan yardımcı fonksiyondur. Kullanıcıların hangi kritere göre ve hangi yönde sıralama yapıldığını hızlıca anlamasını sağlar.
-**Nasıl yapar**: Aldığı sıralama anahtarının mevcut aktif sıralama anahtarı olup olmadığını kontrol eder. Eğer ilgili anahtar aktifse, güncel sıralama yönüne uygun olarak artan veya azalan sırayı gösteren görsel öğeyi arayüze ekler, aktif değilse varsayılan boş göstergeyi render eder.
-**Parametreler**:
-- key: SortKey - Sıralama göstergesinin oluşturulacağı sıralama kriterini temsil eden SortKey tipinde parametre.
-**Dönüş**: Tanımlı bir dönüş tipi bulunmamaktadır, void olarak çalışır.
+**Ne yapar**: Belirli bir sıralama anahtarının mevcut sıralama yönünü gösteren görsel işaretçi üretir.  
+**Nasıl yapar**: `key` parametresi ile eşleşen sıralama durumunu kontrol eder ve UI’da ok ya da benzeri bir gösterge döndürür.  
+**Parametreler**:  
+- `key`: `SortKey` — İncelenecek sıralama anahtarı.  
+**Dönüş**: Bilinmiyor (muhtemelen bir JSX/React öğesi).
 
 ### statusBadge
-**Ne yapar**: Ürünün stok durumu, onay durumu veya satış durumu gibi metrikleri temsil eden renkli etiket (badge) bileşeninin oluşturulmasını sağlayan yardımcı fonksiyondur. Ürün listesinde her ürünün durumunun hızlıca fark edilmesini sağlar.
-**Nasıl yapar**: Aldığı durum string'ine göre önceden tanımlanmış renk ve metne sahip badge bileşenini hazırlar. Eğer gelen durum değeri null veya undefined ise varsayılan "bilinmeyen durum" etiketini render eder. Her durum değerine atanan özel renkler ile stokta/stokta değil, aktif/pasif gibi durumları görsel olarak ayırt eder.
-**Parametreler**:
-- s?: string | null — Ürünün durumunu temsil eden opsiyonel string veya null değerli parametre, geçerli bir durum değeri almadığında varsayılan durum gösterimi kullanılır.
-**Dönüş**: Tanımlı bir dönüş tipi bulunmamaktadır, void olarak çalışır.
+**Ne yapar**: Ürün ya da işlem durumunu görsel bir rozet (badge) olarak sunar.  
+**Nasıl yapar**: Opsiyonel `s` parametresi üzerinden durum değeri alınır; değer `null` ya da `undefined` ise varsayılan bir durum gösterilir.  
+**Parametreler**:  
+- `s` (opsiyonel): `string | null` — Gösterilecek durum metni.  
+**Dönüş**: Bilinmiyor (muhtemelen bir JSX/React öğesi).
 
 ---
 
@@ -183,460 +241,278 @@ Bu modül VentHub HVAC platformunun admin paneli ürün yönetimi sayfasıdır; 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::toggleSelectAll
+### [N1_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleSelect
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `selectedIds` — component state `Set<string>`; used to check current selection size.
+  - `rows` — component state `DomainProduct[]`; used to map all row ids.
+  - `setSelectedIds` — state setter; updates the selection set.
+- **Dönüş**: yok (state günceller)
+
+### [N2_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleSelectAll
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `selectedIds` — Tüm seçili ürün ID'lerini depolayan Set nesnesi
-  - `rows` — Tüm ürün listesini tutan dizi
-  - `setSelectedIds` — Seçili ID'ler state'ini güncelleyen setter fonksiyonu
+  - `selectedIds` — component state `Set<string>`; compared with `rows.length`.
+  - `rows` — component state `DomainProduct[]`; used to build a new set of all ids.
+  - `setSelectedIds` — state setter; replaces the selection set.
 - **Dönüş**: yok
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::loadLocalStoragePrefs
+### [N3_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleExpand
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `expandedIds` — component state `Set<string>`; toggles presence of `id`.
+  - `setExpandedIds` — state setter; updates the expanded set.
+- **Dönüş**: yok
+
+### [N4_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleCreate
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `window` — Tarayıcı window nesnesi, SSR kontrolü için kullanılır
-  - `localStorage.getItem(`${STORAGE_KEY}:cols`)` — localStorage'dan kaydedilmiş görünür sütun ayarlarını çeken metod
-  - `c` - localStorage'dan okunan sütun ayarları ham string değeri
-  - `setVisibleCols` — Görünür sütunlar state'ini güncelleyen setter fonksiyonu
-  - `JSON.parse(c)` — Okunan sütun ayarları stringini nesneye dönüştüren metod
-  - `localStorage.getItem(`${STORAGE_KEY}:density`)` — localStorage'dan kaydedilmiş tablo yoğunluğu ayarını çeken metod
-  - `d` — localStorage'dan okunan yoğunluk ayarı string değeri
-  - `setDensity` — Tablo yoğunluğu state'ini güncelleyen setter fonksiyonu
+  - `setEditingId` — state setter; sets `null` for create mode.
+  - `setIsModalOpen` — state setter; opens the modal.
 - **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::saveVisibleColsToStorage
+### [N5_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleEdit
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `setEditingId` — state setter; stores the id of the product to edit.
+  - `setIsModalOpen` — state setter; opens the modal.
+- **Dönüş**: yok
+
+### [N6_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleModalSuccess
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `window` — Tarayıcı window nesnesi, SSR kontrolü için kullanılır
-  - `localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols))` — Güncel görünür sütun ayarlarını localStorage'a kaydeden metod
-  - `visibleCols` — Mevcut görünür sütunlar state değeri
+  - `load` — function reference; triggers data reload.
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::saveDensityToStorage
+### [N7_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::remove
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `rows` — component state; used to find the row before deletion (`before`).
+  - `supabase` — imported client; performs `delete` on `products`.
+  - `logAdminAction` — dynamically imported; logs the delete action.
+  - `load` — reloads data after deletion.
+  - `setError`, `setRows`, `setTotal` — state setters used in error handling (not in success path).
+- **Dönüş**: yok
+
+### [N8_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkStatusChange
+- **params**: (status: string)
+- **ic_degiskenler**:
+  - `selectedIds` — `Set<string>`; determines which rows to update.
+  - `supabase` — client; updates `status` for all selected ids.
+  - `setSelectedIds` — clears selection after successful update.
+  - `load` — reloads data.
+- **Dönüş**: yok
+
+### [N9_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkFeatureToggle
+- **params**: (featured: boolean)
+- **ic_degiskenler**:
+  - `selectedIds` — `Set<string>`; ids to update.
+  - `supabase` — client; updates `is_featured`.
+  - `setSelectedIds` — clears selection.
+  - `load` — reloads data.
+- **Dönüş**: yok
+
+### [N10_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkDelete
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `window` — Tarayıcı window nesnesi, SSR kontrolü için kullanılır
-  - `localStorage.setItem(`${STORAGE_KEY}:density`, density)` — Mevcut tablo yoğunluğu ayarını localStorage'a kaydeden metod
-  - `density` — Mevcut tablo yoğunluğu state değeri
+  - `selectedIds` — `Set<string>`; ids to delete.
+  - `supabase` — client; performs bulk delete.
+  - `setSelectedIds` — clears selection.
+  - `load` — reloads data.
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::getSavedSortKey
+### [N11_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkPriceAdjust
+- **params**: (mode: 'percent' | 'fixed', value: number)
+- **ic_degiskenler**:
+  - `selectedIds` — `Set<string>`; ids to adjust.
+  - `supabase` — client; fetches current prices and applies updates.
+  - `mode`, `value` — control calculation (percentage or fixed amount).
+  - `updates` — array of `{id, price}` objects with new calculated price.
+  - `results` — array of Supabase update responses; checked for errors.
+  - `setSelectedIds` — clears selection after success.
+  - `load` — reloads data.
+- **Dönüş**: yok
+
+### [N12_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::saveInlineEdit
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `localStorage.getItem(SORT_KEY_STORAGE)` — localStorage'dan kaydedilmiş sıralama anahtarını çeken metod
-  - `v` — localStorage'dan okunan sıralama anahtarı değeri
-- **Dönüş**: SortKey ('name' | 'sku' | 'category' | 'status' | 'price' | 'stock')
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::getSavedSortDir
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `localStorage.getItem(SORT_DIR_STORAGE)` — localStorage'dan kaydedilmiş sıralama yönünü çeken metod
-  - `v` — localStorage'dan okunan sıralama yönü değeri
-- **Dönüş**: 'asc' | 'desc'
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::processDeepLinkQuery
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `deepLinkAppliedRef.current` — Derin bağlantının sadece bir kez işlenmesini kontrol eden referans değeri
-  - `searchParams?.get('q')` — URL sorgu parametrelerinden arama terimini çeken metod
-  - `queryParam` — URL'den okunan arama terimi değeri
-  - `setQ` — Arama terimi state'ini güncelleyen setter fonksiyonu
-  - `setDebouncedQ` — Gecikmeli arama terimi state'ini güncelleyen setter fonksiyonu
+  - `inlineEdit` — state object `{id, field, value}`; contains edited field/value.
+  - `parseFloat`, `isNaN` — validate numeric input.
+  - `payload` — `Partial<DomainProduct>` built from edited field.
+  - `supabase` — client; updates the product.
+  - `setRows` — updates local rows with new value.
+  - `setInlineEdit` — clears edit state.
 - **Dönüş**: yok
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::loadProducts
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setLoading` — Yükleme durumu state'ini güncelleyen setter fonksiyonu
-  - `setError` — Hata mesajı state'ini güncelleyen setter fonksiyonu
-  - `await ensureSessionFresh()` — Kullanıcı oturumunun geçerliliğini kontrol eden asenkron metod
-  - `debouncedQ.trim()` — Gecikmeli arama teriminin temizlenmiş hali
-  - `term` — Kullanılabilir arama terimi değeri
-  - `list` — UI'a uyarlanmış ürün listesi depolayan değişken
-  - `totalCount` — Toplam ürün sayısını depolayan değişken
-  - `offset` — Sayfalama için hesaplanan başlangıç indeksi
-  - `await adminSearchProducts(...)` — FTS ile ürün arayan asenkron admin metodu
-  - `PAGE_SIZE` — Sayfa başına gösterilecek ürün sayısı sabiti
-  - `selectedCategoryFilter` — Seçili kategori filtresi değeri
-  - `results` — Arama metodundan dönen ham sonuçlar
-  - `filtered` — İstemci tarafı filtrelerinden geçirilmiş sonuç listesi
-  - `anyStatus` - Aktif herhangi bir durum filtresi olup olmadığını kontrol eden boolean
-  - `statusFilter` — Durum filtreleri state değeri
-  - `statuses` — Filtrelemede kullanılacak aktif durum değerleri listesi
-  - `featuredOnly` — Sadece öne çıkan ürünleri gösterme durumu boolean değeri
-  - `toUIProductList` — Veritabanı ürün nesnelerini UI formatına dönüştüren metod
-  - `(results[0] as { total_count?: number }).total_count` — RPC'den dönen toplam ürün sayısı değeri
-  - `supabase.from('products').select(...)` — Supabase üzerinden ürünleri çeken sorgu
-  - `query` — Ürün sorgusunu depolayan değişken
-  - `sortableMap` — Sıralama anahtarlarını veritabanı sütun isimlerine eşleyen nesne
-  - `col` — Sıralama için kullanılacak veritabanı sütun ismi
-  - `sortKey` — Mevcut sıralama anahtarı state değeri
-  - `sortDir` — Mevcut sıralama yönü state değeri
-  - `from` — Sayfalama için sorgu aralığı başlangıç indeksi
-  - `to` — Sayfalama için sorgu aralığı bitiş indeksi
-  - `await query.range(from, to)` — Sorguya sayfalama aralığı ekleyen metot
-  - `{ data, error, count }` — Supabase sorgusundan dönen yanıt nesneleri
-  - `setRows` — Ürün listesi state'ini güncelleyen setter fonksiyonu
-  - `setTotal` — Toplam ürün sayısı state'ini güncelleyen setter fonksiyonu
-  - `await Promise.all([supabase.from('categories').select(...), supabase.from('inventory_settings').select(...)])` — Kategori ve stok ayarlarını paralel olarak çeken metot
-  - `c` — Kategoriler sorgusundan dönen yanıt
-  - `s` — Envanter ayarları sorgusundan dönen yanıt
-  - `setCats` — Kategori listesi state'ini güncelleyen setter fonksiyonu
-  - `ids = list.map(x => x.id)` — Mevcut sayfadaki ürün ID'lerini içeren dizi
-  - `chunkSize` — Ürün ID'lerini bölmek için kullanılan parça boyutu sabiti
-  - `chunks` — ID listesinin parçalara ayrılmış hali
-  - `await Promise.all(chunks.map(c => supabase.from('product_images').select(...).in('product_id', c)))` — Ürün resimlerini paralel olarak çeken metot
-  - `map` — Ürün ID'lerini kapak resmi yoluna eşleyen nesne
-  - `setCovers` — Kapak resimleri eşleştirmesi state'ini güncelleyen setter fonksiyonu
-  - `e` — Try bloğunda yakalanan hata nesnesi
-- **Dönüş**: yok
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::processImageResults
-- **params**: ({ data })
-- **ic_degiskenler**:
-  - `data` — Supabase'den dönen ürün resimleri listesi
-  - `map` — Ürün ID'lerini kapak resmi yoluna eşleyen ana nesne
-  - `r.product_id` — İterasyon edilen resmin ait olduğu ürün ID'si
-  - `r.path` — İterasyon edilen resmin dosya yolu
-- **Dönüş**: yok
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::assignCoverImage
-- **params**: (r)
-- **ic_degiskenler**:
-  - `r` — İterasyon edilen ürün resmi nesnesi
-  - `r.product_id` — Resmin ait olduğu ürün ID'si
-  - `r.path` — Resmin dosya yolu
-  - `map` — Ürün ID'lerini kapak resmi yoluna eşleyen ana nesne
-- **Dönüş**: yok
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::debounce cleanup effect
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — 300ms gecikmeli setTimeout nesnesi, arama sorgusu ve sayfa ayarlarını tetiklemek için kullanılır
-  - `setDebouncedQ` — nihai arama sorgusunu ayarlayan state setter fonksiyonu
-  - `q` — işlenecek ham arama sorgusu değişkeni, trim() ile baştaki/sondaki boşlukları temizlenir
-  - `setPage` — aktif sayfa numarasını ayarlayan state setter fonksiyonu
-- **Dönüş**: setTimeout'u temizleyen React effect temizlik fonksiyonu
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::immediate search update
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setDebouncedQ` — nihai arama sorgusunu ayarlayan state setter fonksiyonu
-  - `q` — işlenecek ham arama sorgusu değişkeni
-  - `setPage` — aktif sayfa numarasını 1 olarak ayarlayan state setter fonksiyonu
-- **Dönüş**: yok
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::handleCreate
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setEditingId` — düzenlenen ürün id'sini ayarlayan state setter fonksiyonu
-  - `setIsModalOpen` — ürün ekleme/düzenleme modalının açılma durumunu ayarlayan state setter
-- **Dönüş**: yok
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::handleEdit
-- **params**: id: string
-- **ic_degiskenler**:
-  - `id` — düzenlenecek ürünün benzersiz veritabanı kimliği
-  - `setEditingId` — düzenlenen ürün id'sini parametreden gelen id olarak ayarlayan state setter
-  - `setIsModalOpen` — ürün düzenleme modalını açmak için true olarak ayarlayan state setter
-- **Dönüş**: yok
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::handleModalSuccess
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `load` — ürün listesini veritabanından yeniden yükleyen asenkron veri çekme fonksiyonu
-- **Dönüş**: yok
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::remove
-- **params**: id: string
-- **ic_degiskenler**:
-  - `id` — silinecek ürünün benzersiz veritabanı kimliği
-  - `confirm` — kullanıcıdan silme işlemi onayı alan tarayıcı API'si
-  - `t` — yerelleştirme için kullanılan çeviri fonksiyonu
-  - `before` — silinmeden önce ürünün mevcut verilerini tutan değişken, ürün listesinden id ile eşleşen kaydı alır
-  - `rows` — ekranda listelenen mevcut ürünlerin dizisi
-  - `supabase` — veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `error` — Supabase silme işlemi sırasında dönen hata nesnesi
-  - `logAdminAction` — denetim kaydı tutmak için içe aktarılan audit modülü fonksiyonu
-  - `load` — silme işleminden sonra ürün listesini yeniden yükleyen fonksiyon
-  - `e` — catch bloğunda yakalanan işlem hatası nesnesi
-  - `alert` — kullanıcıya hata mesajı gösteren tarayıcı API'si
-- **Dönüş**: yok
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::bulkStatusChange
-- **params**: status: string
-- **ic_degiskenler**:
-  - `status` — tüm seçili ürünlere uygulanacak yeni durum değeri
-  - `selectedIds` — kullanıcı tarafından seçilen ürünlerin id'lerini tutan Set nesnesi
-  - `confirm` — kullanıcıdan toplu güncelleme onayı alan tarayıcı API'si
-  - `ids` — selectedIds Set'inden diziye dönüştürülen ürün id listesi
-  - `supabase` — veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `error` — Supabase güncelleme işlemi sırasında oluşan hata nesnesi
-  - `setSelectedIds` — seçili id'leri sıfırlamak için kullanılan state setter
-  - `load` — güncellemeden sonra ürün listesini yeniden yükleyen fonksiyon
-  - `e` — catch bloğunda yakalanan işlem hatası nesnesi
-  - `alert` — kullanıcıya hata mesajı gösteren tarayıcı API'si
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::bulkFeatureToggle
-- **params**: featured: boolean
-- **ic_degiskenler**:
-  - `featured` — seçili ürünlerin vitinde gösterilip gösterilmeyeceğini belirten boolean değer
-  - `selectedIds` — kullanıcı tarafından seçilen ürünlerin id'lerini tutan Set nesnesi
-  - `ids` — selectedIds Set'inden diziye dönüştürülen ürün id listesi
-  - `supabase` — veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `error` — Supabase güncelleme işlemi sırasında oluşan hata nesnesi
-  - `setSelectedIds` — seçili id'leri sıfırlamak için kullanılan state setter
-  - `load` — güncellemeden sonra ürün listesini yeniden yükleyen fonksiyon
-  - `e` — catch bloğunda yakalanan işlem hatası nesnesi
-  - `alert` — kullanıcıya hata mesajı gösteren tarayıcı API'si
-- **Dönüş**: yok
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::bulkDelete
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `selectedIds` — kullanıcı tarafından seçilen ürünlerin id'lerini tutan Set nesnesi
-  - `confirm` — kullanıcıdan toplu silme onayı alan tarayıcı API'si
-  - `ids` — selectedIds Set'inden diziye dönüştürülen ürün id listesi
-  - `supabase` — veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `error` — Supabase silme işlemi sırasında oluşan hata nesnesi
-  - `setSelectedIds` — seçili id'leri sıfırlamak için kullanılan state setter
-  - `load` — silme işleminden sonra ürün listesini yeniden yükleyen fonksiyon
-  - `e` — catch bloğunda yakalanan işlem hatası nesnesi
-  - `alert` — kullanıcıya hata mesajı gösteren tarayıcı API'si
-- **Dönüş**: yok
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::bulkPriceAdjust
-- **params**: mode: 'percent' | 'fixed', value: number
-- **ic_degiskenler**:
-  - `mode` — fiyat güncelleme modu, yüzde veya sabit tutar artırımı
-  - `value` — uygulanacak fiyat güncelleme miktarı
-  - `selectedIds` — kullanıcı tarafından seçilen ürünlerin id'lerini tutan Set nesnesi
-  - `label` — kullanıcı onayı mesajında gösterilecek güncelleme etiketi
-  - `confirm` — kullanıcıdan fiyat güncelleme onayı alan tarayıcı API'si
-  - `ids` — selectedIds Set'inden diziye dönüştürülen ürün id listesi
-  - `supabase` — veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `data` — güncellenecek ürünlerin verilerini içeren Supabase dönüş nesnesi
-  - `fetchErr` — ürün verilerini çekerken oluşan hata nesnesi
-  - `products` — güncellenecek ürünlerin listesi
-  - `updates` — her ürün için hesaplanan yeni fiyatı içeren güncelleme nesnelerinin listesi
-  - `currentPrice` — ürünün mevcut fiyatı, null ise 0 olarak atanır
-  - `newPrice` — mod ve değere göre hesaplanan yeni fiyat
-  - `results` — tüm ürünlerin ayrı ayrı güncelleme işlemlerinin sonuçlarını tutan dizi
-  - `errorResult` — sonuçlar arasında hata içeren ilk güncelleme sonucu
-  - `setSelectedIds` — seçili id'leri sıfırlamak için kullanılan state setter
-  - `load` — güncellemeden sonra ürün listesini yeniden yükleyen fonksiyon
-  - `e` — catch bloğunda yakalanan işlem hatası nesnesi
-  - `alert` — kullanıcıya hata mesajı gösteren tarayıcı API'si
-- **Dönüş**: yok
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::bulkPriceAdjust_map_callback
-- **params**: (p: { id: string; price: number | null; name: string; sku: string; brand: string }, mode: 'percent' | 'fixed', value: number)
-- **ic_degiskenler**:
-  - `currentPrice` — Ürünün mevcut fiyatı, null ise 0 olarak varsayılır
-  - `newPrice` — Moda göre hesaplanan yeni fiyat, yüzdelik veya sabit artış uygulanıp 2 ondalık basamağa yuvarlanır
-- **Dönüş**: { id: string; price: number } tipinde güncellenmiş ürün fiyat nesnesi
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::saveInlineEdit
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `inlineEdit` — Açık olan satır içi düzenleme verisi, mevcut değilse fonksiyon erken sonlanır
-  - `numVal` — Düzenlenen metin değerinin sayısal karşılığı, parseFloat ile dönüştürülür
-  - `payload` — Supabase'e gönderilecek güncelleme yükü, düzenlenen alana göre price veya stock_qty içerir
-  - `error` — Supabase güncelleme işlemi sırasında dönen hata nesnesi
-  - `e` — Try bloğunda yakalanan genel işlem hatası
-- **Dönüş**: yok
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::loadTechSpecs
+### [N13_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::loadTechSpecs
 - **params**: (_productId: string)
 - **ic_degiskenler**:
-  - `techSpecs` - Tüm ürünlerin teknik özelliklerini saklayan genel nesne, tekrar yüklemeyi engellemek için kontrol edilir
-  - `data` - Supabase'den çekilen ürün teknik özellikleri yanıt verisi
+  - `techSpecs` — component state map of productId → specs; checked before fetch.
+  - `supabase` — client; selects `technical_specs` for the product.
+  - `setTechSpecs` — stores fetched specs or empty object on failure.
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::toggleSort
+### [N14_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleSort
 - **params**: (key: SortKey)
 - **ic_degiskenler**:
-  - `sortKey` - Mevcut aktif sıralama anahtarı
-  - `setSortDir` - Sıralama yönünü (asc/desc) güncelleyen state setter fonksiyonu
-  - `setSortKey` - Sıralama anahtarını güncelleyen state setter fonksiyonu
-  - `setPage` - Sayfa numarasını 1'e sıfırlayan state setter fonksiyonu
+  - `sortKey`, `sortDir` — component state; updated based on current key.
+  - `setSortKey`, `setSortDir` — state setters.
+  - `setPage` — resets pagination to first page.
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::category_map_builder
-- **params**: (parametre yok)
+### [N15_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::sortIndicator
+- **params**: (key: SortKey)
 - **ic_degiskenler**:
-  - `map` - Kategori id'lerini isimlerle eşleyen Map nesnesi
-  - `c` - cats dizisinde dönülen her bir kategori öğesi
-  - `cats` - Tüm kategori listesi
-- **Dönüş**: Kategori eşleştirmelerini içeren Map<string, string> nesnesi
+  - `sortKey`, `sortDir` — component state; used to decide indicator direction.
+- **Dönüş**: yok (JSX element returned)
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::sorted_array_builder
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `arr` - Filtrelenmiş ürün listesinin kopyası, sıralama işlemi için kullanılır
-  - `filtered` - Filtrelenmiş ham ürün listesi
-  - `sortDir` - Mevcut sıralama yönü (asc/desc)
-  - `sortKey` - Mevcut sıralama anahtarı
-  - `a` - Sıralama karşılaştırmasındaki ilk ürün öğesi
-  - `b` - Sıralama karşılaştırmasındaki ikinci ürün öğesi
-  - `dir` - Sıralama yönüne göre çarpan olarak kullanılan 1 veya -1 değeri
-  - `an` - Karşılaştırmadaki ilk ürünün kategori ismi
-  - `bn` - Karşılaştırmadaki ikinci ürünün kategori ismi
-  - `catsMap` - Kategori id'lerini isimlerle eşleyen Map nesnesi
-- **Dönüş**: Sıralanmış ürün dizisi
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::sort_compare_callback
-- **params**: (a, b)
-- **ic_degiskenler**:
-  - `sortDir` - Mevcut sıralama yönü (asc/desc)
-  - `sortKey` - Mevcut sıralama anahtarı
-  - `dir` - Sıralama yönüne göre çarpan olarak kullanılan 1 veya -1 değeri
-  - `an` - Karşılaştırmadaki ilk ürünün kategori ismi
-  - `bn` - Karşılaştırmadaki ikinci ürünün kategori ismi
-  - `catsMap` - Kategori id'lerini isimlerle eşleyen Map nesnesi
-- **Dönüş**: karşılaştırma sonucu dönen sayısal değer
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::statusBadge
+### [N16_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::statusBadge
 - **params**: (s?: string | null)
 - **ic_degiskenler**:
-  - `v` - Gelen durum string'inin küçük harfe dönüştürülmüş hali, boşsa boş string olarak atanır
-  - `baseClass` - Tüm durum etiketlerinde kullanılan ortak CSS sınıfları
-  - `t` - Çeviri sistemi fonksiyonu, durum etiketlerinin yerelleştirilmiş metinlerini çeker
-- **Dönüş**: Duruma göre stilendirilmiş React JSX span elementi
+  - `s` — status string; normalized to lower case.
+  - `baseClass` — base CSS class string.
+  - `t` — translation function (from i18n context) used in rendered spans.
+- **Dönüş**: yok (JSX element)
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::handleCategoryChange
+### [N17_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleCategoryChange
 - **params**: (value: string)
 - **ic_degiskenler**:
-  - `setSelectedCategoryFilter` - Seçili kategori filtresini güncelleyen state setter fonksiyonu
+  - `setSelectedCategoryFilter` — state setter; stores selected category id.
 - **Dönüş**: yok
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::category_select_props_builder
+### [N18_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::categorySelectProps
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `selectedCategoryFilter` - Mevcut seçili kategori filtresi değeri
-  - `handleCategoryChange` - Kategori değişikliğini yöneten event handler fonksiyonu
-  - `cats` - Tüm kategori listesi, select seçeneklerini oluşturmak için kullanılır
-  - `t` - Çeviri sistemi fonksiyonu, select varsayılan etiketinin yerelleştirilmiş metnini çeker
-- **Dönüş**: Kategori select bileşeninin ihtiyaç duyduğu value, onChange ve options alanlarını içeren nesne
+  - `selectedCategoryFilter` — current filter value.
+  - `handleCategoryChange` — change handler.
+  - `cats` — array of category options; mapped to `{value, label}`.
+- **Dönüş**: object with `value`, `onChange`, `options`.
 
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::anonim_csv_uret_indir
+### [N19_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::exportCsv
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `cols` — CSV dosyasının sütun başlıklarını tutan dizi
-  - `header` — cols dizisinin virgülle birleştirilerek oluşturulan CSV başlık satırı
-  - `sorted` — Sıralanmış ürün listesi, üzerinde map ile dönülerek CSV satırları oluşturulur
-  - `lines` — Her ürün için CSV formatına dönüştürülmüş satırların listesi
-  - `r.id` — İşlenen ürünün kimliği, CSV satırına eklenir
-  - `r.name` — İşlenen ürünün adı, CSV'de tırnak sorunlarını önlemek için temizlenir
-  - `r.sku` — İşlenen ürünün stok kodu, CSV satırına eklenir
-  - `r.category_id` — İşlenen ürünün kategori kimliği, boşsa boş string olarak eklenir
-  - `r.status` — İşlenen ürünün durumu, boşsa boş string olarak eklenir
-  - `r.price` — İşlenen ürünün fiyatı, string'e çevrilerek CSV'ye eklenir
-  - `r.stock_qty` — İşlenen ürünün stok miktarı, string'e çevrilerek CSV'ye eklenir
-  - `csv` — BOM etiketli, başlık ve tüm satırları içeren tam CSV içeriği
-  - `blob` — CSV içeriğinden oluşturulan indirme için Blob nesnesi
-  - `url` — Blob'dan oluşturulan geçici indirme URL'si
-  - `a` — Dinamik olarak oluşturulan <a> indirme linki DOM elementi
-- **Dönüş**: yok (yan etki: `products.csv` dosyasını tarayıcıda indirme işlemini tetikler)
+  - `sorted` — currently sorted rows.
+  - `cols` — column identifiers.
+  - `header` — CSV header line.
+  - `lines` — array of CSV rows built from each product.
+  - `csv` — final CSV string with BOM.
+  - `blob`, `url`, `a` — DOM objects used to trigger download.
+- **Dönüş**: yok
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::anonim_csv_urun_satiri_cevir
-- **params**: r (işlenen ürün nesnesi)
+### [N20_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::mapCategories
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `r.id` — Ürün kimliği, CSV satırına eklenir
-  - `r.name` — Ürün adı, CSV formatına uygun olarak tırnak işaretleri temizlenir
-  - `r.sku` — Ürün stok kodu, CSV satırına eklenir
-  - `r.category_id` — Ürün kategori kimliği, boşsa boş string olarak atanır
-  - `r.status` — Ürün durumu, boşsa boş string olarak atanır
-  - `r.price` — Ürün fiyatı, null değilse string'e çevrilerek CSV'ye eklenir
-  - `r.stock_qty` — Ürün stok miktarı, null değilse string'e çevrilerek CSV'ye eklenir
-- **Dönüş**: string (virgülle birleştirilmiş tek ürün CSV satırı)
+  - `cats` — array of category objects.
+  - `map` — `Map<string, string>` mapping id → name.
+- **Dönüş**: `Map<string, string>`
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::anonim_tablo_satiri_olustur
-- **params**: r (işlenen ürün nesnesi)
+### [N21_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::applySorting
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `isExpanded` — Ürün satırının teknik özellikler için genişletilip genişletilmediğini belirten boolean
-  - `expandedIds` — Genişletilmiş tüm ürün kimliklerini saklayan Set nesnesi
-  - `isSelected` — Ürünün toplu işlemler için seçilip seçilmediğini belirten boolean
-  - `selectedIds` — Seçilmiş tüm ürün kimliklerini saklayan Set nesnesi
-  - `toggleSelect` — Ürün seçim durumunu tersine çeviren fonksiyon
-  - `toggleExpand` — Ürün satırının genişletme durumunu tersine çeviren fonksiyon
-  - `loadTechSpecs` — Ürün teknik özelliklerini yükleyen asenkron fonksiyon
-  - `hasWriteAccess` — Kullanıcının ürün üzerinde değişiklik yapma yetkisi olup olmadığını belirten boolean
-  - `adminTableCellClass` — Tüm tablo hücreleri için ortak CSS sınıfı
-  - `cellPad` — Tablo hücreleri için iç dolgu CSS sınıfı
-  - `visibleCols` — Hangi tablo sütunlarının görüntüleneceğini belirten nesne
-  - `covers` — Ürün kapak görseli dosya isimlerini saklayan nesne, ürün kimliği ile erişilir
-  - `process.env.NEXT_PUBLIC_SUPABASE_URL` — Supabase depolama temel URL'si, ürün görseli bağlantısı oluşturmak için kullanılır
-  - `r.brand` — Ürün markası, tabloda görüntülenir
-  - `r.model_code` — Ürün model kodu, tabloda görüntülenir
-  - `catsMap` — Kategori kimliklerini kategori isimlerine eşleyen Map nesnesi
-  - `statusBadge` — Ürün durumu için renkli etiket bileşeni oluşturan fonksiyon
-  - `r.low_stock_threshold` — Düşük stok uyarısı için eşik değeri
-  - `inlineEdit` — Aktif satır içi düzenleme nesnesi, null ise açık düzenleme yok
-  - `setInlineEdit` — Satır içi düzenleme state'ini güncelleyen setter fonksiyonu
-  - `saveInlineEdit` — Satır içi düzenleme değişikliklerini kaydeden asenkron fonksiyon
-  - `formatCurrency` — Fiyatı kullanıcı diline göre para formatına çeviren fonksiyon
-  - `lang` — Kullanıcı arayüzü dili, para formatlaması için kullanılır
-  - `handleEdit` — Ürün düzenleme modalını açan fonksiyon
-  - `remove` — Ürün silme işlemini başlatan asenkron fonksiyon
-  - `t` — Arayüz metinlerini yerelleştiren çeviri fonksiyonu
-  - `techSpecs` — Ürün teknik özelliklerini saklayan nesne, ürün kimliği ile erişilir
-- **Dönüş**: React.ReactFragment (ürün ana satırı ve genişletilmişse teknik özellikler alt satırını içeren JSX fragmenti)
+  - `filtered` — set of rows after filters.
+  - `sortKey`, `sortDir` — sorting criteria.
+  - `catsMap` — map of category ids to names.
+  - `arr` — copy of filtered rows.
+- **Dönüş**: sorted array of `DomainProduct`
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::anonim_teknik_ozellik_olustur
-- **params**: [key, val] (teknik özellik anahtar-değer çifti)
+### [N22_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::compareRows
+- **params**: (a, b)
 - **ic_degiskenler**:
-  - `key` — Teknik özelliğin tanımlayıcı anahtarı, arayüzde başlık olarak görüntülenir
-  - `val` — Teknik özelliğin değeri, string'e çevrilerek arayüzde gösterilir
-- **Dönüş**: JSX.Element (tek bir teknik özelliği görüntüleyen div elementi)
+  - `sortKey`, `sortDir` — used to compute direction.
+  - `catsMap` — for category comparison.
+- **Dönüş**: number (comparison result for `Array.sort`)
+
+### [N23_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::load
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `setLoading`, `setError`, `setRows`, `setTotal`, `setCats`, `setCovers` — state setters.
+  - `ensureSessionFresh` — ensures session validity.
+  - `debouncedQ`, `page`, `PAGE_SIZE`, `selectedCategoryFilter`, `featuredOnly`, `statusFilter` — query parameters.
+  - `adminSearchProducts` — RPC for full‑text search.
+  - `toUIProductList` — converts DB rows to UI model.
+  - `supabase` — used for normal queries, categories, settings, images.
+  - `sortKey`, `sortDir` — sorting.
+  - `ids`, `chunks`, `results`, `map` — image‑fetching logic.
+  - `setTechSpecs` — not used here but part of component state.
+- **Dönüş**: yok (state updates)
+
+### [N24_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::useDebounceEffect
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `q` — search input.
+  - `setDebouncedQ`, `setPage` — state setters.
+  - `setTimeout`, `clearTimeout` — timer handling.
+- **Dönüş**: cleanup function for effect.
+
+### [N25_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::onSearchChange
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `setDebouncedQ`, `setPage` — reset pagination on manual search change.
+- **Dönüş**: yok
+
+### [N26_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::openCreateModal
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `setEditingId(null)`, `setIsModalOpen(true)` — open modal for creation.
+- **Dönüş**: yok
+
+### [N27_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::openEditModal
+- **params**: (id: string)
+- **ic_degiskenler**:
+  - `setEditingId(id)`, `setIsModalOpen(true)` — open modal for editing.
+- **Dönüş**: yok
+
+### [N28_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::loadOnMount
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `load` — invoked once on component mount.
+- **Dönüş**: yok
+
+### [N29_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::rowRenderer
+- **params**: (r: DomainProduct)
+- **ic_degiskenler**:
+  - `expandedIds`, `selectedIds`, `hasWriteAccess`, `covers`, `visibleCols`, `catsMap`, `statusBadge`, `inlineEdit`, `saveInlineEdit`, `setInlineEdit`, `formatCurrency`, `lang`, `t` — all used to render a table row with actions, inline editing, expand/collapse, images, etc.
+- **Dönüş**: JSX `<React.Fragment>` representing a table row (and optional expanded row).
+
+### [N30_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::techSpecRenderer
+- **params**: ([key, val])
+- **ic_degiskenler**:
+  - `key`, `val` — entry from `techSpecs[productId]`; rendered inside a styled div.
+- **Dönüş**: JSX element for a single tech‑spec key/value pair.
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki ana AdminProductsPage() fonksiyonu, ürün yönetimi sayfasındaki tüm işlevleri çalıştırmak üzere toggleSort, handleEdit, statusBadge, remove, saveInlineEdit, toggleExpand, loadTechSpecs, sortIndicator ve toggleSelect olmak üzere 9 dosya içi yardımcı fonksiyonu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi paylaşılmamıştır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  AdminProductsPage() → handleEdit()
-  AdminProductsPage() → loadTechSpecs()
-  AdminProductsPage() → remove()
-  AdminProductsPage() → saveInlineEdit()
-  AdminProductsPage() → sortIndicator()
-  AdminProductsPage() → statusBadge()
-  AdminProductsPage() → toggleExpand()
-  AdminProductsPage() → toggleSelect()
-  AdminProductsPage() → toggleSort()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    AdminProductsPage["AdminProductsPage()"] --> handleEdit["handleEdit()"]
-    AdminProductsPage["AdminProductsPage()"] --> loadTechSpecs["loadTechSpecs()"]
-    AdminProductsPage["AdminProductsPage()"] --> remove["remove()"]
-    AdminProductsPage["AdminProductsPage()"] --> saveInlineEdit["saveInlineEdit()"]
-    AdminProductsPage["AdminProductsPage()"] --> sortIndicator["sortIndicator()"]
-    AdminProductsPage["AdminProductsPage()"] --> statusBadge["statusBadge()"]
-    AdminProductsPage["AdminProductsPage()"] --> toggleExpand["toggleExpand()"]
-    AdminProductsPage["AdminProductsPage()"] --> toggleSelect["toggleSelect()"]
-    AdminProductsPage["AdminProductsPage()"] --> toggleSort["toggleSort()"]
+graph TD
+    AdminProductsPage_tsx__AdminProductsPage["AdminProductsPage"]
+    AdminProductsPage_tsx__bulkDelete["bulkDelete"]
+    AdminProductsPage_tsx__bulkFeatureToggle["bulkFeatureToggle"]
+    AdminProductsPage_tsx__bulkPriceAdjust["bulkPriceAdjust"]
+    AdminProductsPage_tsx__bulkStatusChange["bulkStatusChange"]
+    AdminProductsPage_tsx__handleCreate["handleCreate"]
+    AdminProductsPage_tsx__handleEdit["handleEdit"]
+    AdminProductsPage_tsx__handleModalSuccess["handleModalSuccess"]
+    AdminProductsPage_tsx__loadTechSpecs["loadTechSpecs"]
+    AdminProductsPage_tsx__remove["remove"]
+    AdminProductsPage_tsx__saveInlineEdit["saveInlineEdit"]
+    AdminProductsPage_tsx__sortIndicator["sortIndicator"]
+    AdminProductsPage_tsx__statusBadge["statusBadge"]
+    AdminProductsPage_tsx__toggleExpand["toggleExpand"]
+    AdminProductsPage_tsx__toggleSelect["toggleSelect"]
+    AdminProductsPage_tsx__toggleSelectAll["toggleSelectAll"]
+    AdminProductsPage_tsx__toggleSort["toggleSort"]
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__remove
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -663,3 +539,18 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminProductsPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `tracking-hvac-relaxed`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-cyan-400/3`, `bg-emerald-500/10`, `bg-gradient-to-r`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-surface-deep`, `bg-white/1`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-2`, `border-b`
+- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-transparent`, `gap-0.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `group-hover/btn:text-cyan-400`, `group-hover/btn:text-slate-400`, `group-hover/spec:text-cyan-400/70`, `group-hover:border-white/10`, `group-hover:rotate-90`
+- **Responsive:** `lg:`, `md:` prefix kullanımları

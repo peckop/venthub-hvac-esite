@@ -4,20 +4,24 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\BulkActionToolbar.tsx
 skeleton_hash: 7bf65b45d538cf54
-generated_at: 2026-05-23T21:51:23Z
+entity_hashes:
+  func:BulkActionToolbar: ba39222c0aa88e73
+  overview: e440025fef007b62
+  style_tokens: 8018b08eafed78fd
+generated_at: 2026-05-27T12:14:07Z
 ---
 
 ## Genel Bakış
-`BulkActionToolbar` bileşeni, yönetim panelinde birden fazla öğe seçildiğinde toplu işlem seçeneklerini sunan bir araç çubuğudur. Seçili öğe sayısını görsel olarak belirtir ve durum değiştirme, özellik açma/kapama ve silme gibi eylemleri dışarıdan sağlanan çağrı fonksiyonları aracılığıyla üst bileşene iletir.
+`BulkActionToolbar` bileşeni, yönetim panelinde birden fazla öğe seçildiğinde toplu işlemler (durum güncelleme, özellik değiştirme, silme) yapabilmek için kullanılan bir araç çubuğu sağlar. Seçili öğe sayısını gösterir ve ilgili eylemlerin tetiklenmesi için dışarıdan gelen callback fonksiyonlarını yönetir.
 
 ## Fonksiyon Grupları
 ### UI Render ve Görsel Düzen
-Bu grup, araç çubuğunun görsel yapısını oluşturur; seçili öğe sayısını gösteren etiket, eylem butonları ve olası menü öğelerinin düzenlenmesinden sorumludur.  
+Bu grup, seçili öğe sayısını gösteren etiket, eylem butonları ve araç çubuğunun genel görünümünü oluşturur.  
 - BulkActionToolbar
 
 ### Eylem Tetikleme ve Callback Yönetimi
-Kullanıcı bir butona tıkladığında veya bir seçim yaptığında, ilgili dış çağrı fonksiyonlarını (`onStatusChange`, `onFeatureToggle`, `onDelete`) çalıştırarak iş mantığını üst katmana aktarır.  
-- BulkActionToolbar
+Bu grup, buton tıklamalarıyla gelen kullanıcı etkileşimlerini alır, ilgili parametreleri (ör. yeni durum, özellik anahtarı) hazırlayarak dışarıdan sağlanan `onStatusChange`, `onFeatureToggle` ve `onDelete` callback’lerini çağırır.  
+- BulkActionToolbar (içindeki event handler mantığı)
 
 ---
 
@@ -29,17 +33,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### BulkActionToolbar
-**Ne yapar**: Seçili öğeler üzerinde toplu işlemler yapmak için bir araç çubuğu bileşenidir. Seçili öğe sayısını gösterir ve durum değiştirme, özellik açma/kapama ve silme gibi eylemler için butonlar sunar.
+**Ne yapar**: Seçili öğe sayısını gösteren ve toplu eylemler (durum değişikliği, özellik geçişi, silme) için tetikleyiciler sağlayan bir React bileşenini tanımlar.  
 
-**Nasıl yapar**: Bileşen, props olarak aldığı `selectedCount`, `onStatusChange`, `onFeatureToggle` ve `onDelete` değerlerini kullanarak bir araç çubuğu arayüzü oluşturur. Seçili sayı bir metin olarak render edilir, her işlem butonu kendi callback fonksiyonuna bağlanır. Butonlara tıklandığında ilgili callback tetiklenerek üst bileşene bildirim gönderilir.
+**Nasıl yapar**: Props olarak aldığı `selectedCount`, `onStatusChange`, `onFeatureToggle` ve `onDelete` fonksiyonlarını UI elemanlarına bağlayarak, kullanıcı etkileşimlerine göre ilgili geri çağırma fonksiyonlarını çalıştırır. Bileşen, `BulkActionToolbarProps` tipinde bir fonksiyonel bileşen (`React.FC`) olarak döndürülür.  
 
 **Parametreler**:
-- selectedCount: number — Araç çubuğunda görüntülenecek olan seçili öğe sayısı.
-- onStatusChange: function — Toplu durum değişikliği butonuna tıklandığında çağrılır.
-- onFeatureToggle: function — Toplu özellik açma/kapama butonuna tıklandığında çağrılır.
-- onDelete: function — Toplu silme butonuna tıklandığında çağrılır.
+- `selectedCount`: number — Kullanıcı tarafından seçilen öğelerin toplam sayısı.
+- `onStatusChange`: (newStatus: string) => void — Seçili öğelerin durumunu güncellemek için çağrılan geri çağırma fonksiyonu.
+- `onFeatureToggle`: (featureName: string, enabled: boolean) => void — Belirli bir özelliğin etkinleştirilip devre dışı bırakılmasını yönetmek için kullanılan geri çağırma fonksiyonu.
+- `onDelete`: () => void — Seçili öğelerin toplu silinmesini tetikleyen geri çağırma fonksiyonu.
 
-**Dönüş**: `React.FC<BulkActionToolbarProps>` tipinde bir fonksiyonel React bileşeni döndürür. Bileşen, içerdiği JSX elemanlarını kullanıcıya render eder.
+**Dönüş**: React.FC<BulkActionToolbarProps> — Tanımlanan props tipine uygun bir fonksiyonel React bileşeni.
 
 ---
 
@@ -57,28 +61,29 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: admin/BulkActionToolbar.tsx::BulkActionToolbar
-- **params**: `selectedCount`, `onStatusChange`, `onFeatureToggle`, `onDelete`, `onPriceAdjust`, `onClearSelection`
+### [N1_NASIL] AST Pointer: src\components\admin\BulkActionToolbar.tsx::BulkActionToolbar
+- **params**: selectedCount, onStatusChange, onFeatureToggle, onDelete, onPriceAdjust, onClearSelection
 - **ic_degiskenler**:
-  - `showPricePanel` — fiyat güncelleme panelinin açılıp kapanmasını kontrol eden boolean state
-  - `setShowPricePanel` — `showPricePanel` state'ini güncelleyen fonksiyon
-  - `priceMode` — fiyat modunu (`'percent'` veya `'fixed'`) tutan state
-  - `setPriceMode` — `priceMode` state'ini güncelleyen fonksiyon
-  - `priceValue` — fiyat güncelleme inputunun değerini tutan state
-  - `setPriceValue` — `priceValue` state'ini güncelleyen fonksiyon
-  - `adminButtonPrimaryClass` — UI için import edilen CSS sınıfı (buton className'inde kullanılır)
-- **Dönüş**: JSX.Element | null (seçili ürün sayısı 0 ise `null`, değilse toplu işlem çubuğu JSX'i)
+  - `showPricePanel` — Fiyat güncelleme panelinin görünürlüğünü kontrol eden boolean React state değeri
+  - `setShowPricePanel` — showPricePanel state'ini güncellemek için kullanılan setState fonksiyonu
+  - `priceMode` — Fiyat güncelleme modunu tutan state, 'percent' (yüzde) veya 'fixed' (sabit) değerlerini alır
+  - `setPriceMode` — priceMode state'ini güncelleyen setState fonksiyonu
+  - `priceValue` — Kullanıcının girdiği fiyat değerini string olarak tutan React state değeri
+  - `setPriceValue` — priceValue state'ini güncelleyen setState fonksiyonu
+  - `adminButtonPrimaryClass` — Import edilen, butonlara stil vermek için kullanılan CSS sınıfı
+- **Dönüş**: null | JSX.Element; seçili ürün sayısı 0 ise null, aksi halde toolbar JSX yapısını döndürür
 
-### [N2_NASIL] AST Pointer: admin/BulkActionToolbar.tsx::BulkActionToolbar.onClickUygula
-- **params**: yok
+### [N2_NASIL] AST Pointer: src\components\admin\BulkActionToolbar.tsx::fiyatGuncelleUygulaOnClick
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `v` — `parseFloat(priceValue)` ile elde edilen sayısal değer
-  - `priceValue` — dış kapsamdaki fiyat input state'i (sayıya çevirmek için okunur)
-  - `priceMode` — dış kapsamdaki fiyat modu state'i (`'percent'` veya `'fixed'`)
-  - `onPriceAdjust` — dış kapsamdaki toplu fiyat güncelleme fonksiyonu (state güncelleme ve kapatma işlemi)
-  - `setShowPricePanel` — dış kapsamdaki panel görünürlük state'ini güncelleyen fonksiyon
-  - `setPriceValue` — dış kapsamdaki `priceValue` state'ini sıfırlayan fonksiyon
-- **Dönüş**: void (geriye değer döndürmez; yan etkiler: `alert`, `onPriceAdjust` çağrısı, state güncellemeleri)
+  - `v` — Kullanıcının girdiği string tipindeki priceValue'nin float'a dönüştürülmüş sayısal hali
+  - `priceValue` — Üst kapsamdan erişilen, kullanıcının girdiği fiyat değerini tutan state
+  - `priceMode` — Üst kapsamdan erişilen, seçili fiyat güncelleme modunu tutan state
+  - `onPriceAdjust` — Üst parametrelerden alınan, toplu fiyat güncelleme işlemini tetikleyen callback fonksiyonu
+  - `setShowPricePanel` — Fiyat panelini kapatmak için kullanılan üst kapsamdaki setState fonksiyonu
+  - `setPriceValue` - İşlem sonrası fiyat girişini sıfırlamak için kullanılan üst kapsamdaki setState fonksiyonu
+  - `alert` — Tarayıcının yerleşik uyarı fonksiyonu, geçersiz sayısal giriş durumunda çağrılır
+- **Dönüş**: void | number; geçersiz giriş durumunda alert() dönüş değerini döndürür, başarılı işlemde hiçbir değer döndürmez
 
 ---
 
@@ -97,11 +102,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** `min-w-[280px]`
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)

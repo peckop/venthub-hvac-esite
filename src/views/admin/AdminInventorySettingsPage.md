@@ -4,57 +4,70 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventorySettingsPage.tsx
 skeleton_hash: 46f3ae0b5676adff
-generated_at: 2026-05-23T22:37:35Z
+entity_hashes:
+  func:AdminInventorySettingsPage: 19119fa4d0915cd3
+  func:save: 0164a79f2bf21d0f
+  func:saveGeneralSettings: e292d3d4a2e6fa04
+  overview: 59445d0b8972e8c9
+  style_tokens: 42508eca7917a722
+generated_at: 2026-05-27T11:50:50Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC projesinin yönetici panelinde yer alan envanter ayarları yönetim sayfasını oluşturan React bileşenidir. Sistem yöneticilerinin platformun envanter yönetimine ait genel ayarları düzenlemesi ve değişikliklerini kalıcı hale getirmesi için gerekli tüm ön yüz ve arka plan işlevselliğini sunar. Tüm ayar kaydetme işlemlerini merkezi olarak yöneterek değişikliklerin güvenli bir şekilde sunucuya iletilmesini sağlar.
+AdminInventorySettingsPage modülü, yönetici panelinde envanter ayarlarını görüntülemek ve güncellemek için kullanılan sayfanın bileşenini ve kaydetme iş mantığını tanımlar. Kaydetme işlemleri, genel ayarların ayrı ayrı ele alınmasını sağlayacak şekilde yapılandırılmıştır.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Envanter ayarları sayfasının ana giriş noktasıdır, arayüzü oluşturur ve sayfanın tüm temel çalışma altyapısını yönetir.
+### Sayfa Bileşeni
+Envanter ayarları sayfasının React bileşenini oluşturur, kullanıcı arayüzünü sunar ve kaydetme eylemlerini tetikler.
 - AdminInventorySettingsPage
 
-### Ayar Kaydetme İşlemleri
-Kullanıcı tarafından yapılan ayar değişikliklerini işleyerek sunucuda kalıcı hale getirmekten sorumlu fonksiyonlardır. Ana kaydetme akışı, özel genel ayarlar kaydetme işlemini tetikleyerek çalışır.
+### Kaydetme İşlemleri
+Envanter ayarlarının ve genel ayarların güncellenmesi için asenkron kaydetme fonksiyonlarını içerir. Daha kapsamlı olan save muhtemelen diğer alt kaydetme işlemlerini de yönetir.
 - save, saveGeneralSettings
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC projesinin admin paneline ait envanter ayarlarını görüntüleme, düzenleme ve kalıcılaştırma işlemlerini gerçekleştiren ön yüz React bileşenidir, doğru çalışması için ana uygulama altyapısının ve bağlı servislerin bütünlüğü zorunludur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer projenin React çalışma ortamı ve ana uygulama altyapısı bu bileşeni yükleyemeyecek durumdaysa, AdminInventorySettingsPage bileşeni hiç render edilemez, kullanıcı ayarlar sayfasına erişemez.
-[Aksiyom 2]: Eğer bileşeni kullanan admin kullanıcısının envanter ayarlarını düzenleme izni veya geçerli yetkilendirme kimliği yoksa, save() ve saveGeneralSettings() kaydetme fonksiyonları çalışmaz, yapılan değişiklikler kaydedilemez.
-[Aksiyom 3]: Eğer envanter ayarlarını kaydetmek için iletişim kurulan arka uç API uç noktası erişilemez veya çalışmıyorsa, save() ve saveGeneralSettings() fonksiyonları hata fırlatır, kullanıcı değişiklikleri kalıcılaştıramaz.
-[Aksiyom 4]: Eğer ana uygulamanın global state yönetim mekanizması mevcut envanter ayarları verisini bu bileşene iletmezse, sayfa mevcut konfigürasyonu görüntüleyemez, kullanıcı güncel ayarları göremez.
-[Aksiyom 5]: Eğer bileşene iletilmesi gereken zorunlu giriş verileri (prop'lar) eksik kalırsa, AdminInventorySettingsPage bileşeni hatalı render edilir veya tamamen çöker.
-[Aksiyom 6]: Eğer kaydetme işlemlerinin sonucunu kullanıcıya bildiren işlem sonucu bildirim mekanizması entegre edilmemişse, kullanıcı save() veya saveGeneralSettings() fonksiyonlarının başarılı olup olmadığını öğrenemez.
+**Aksiyom 1**: Eğer `AdminInventorySettingsPage()` bileşeni oluşturulmazsa, yönetim paneli envanter ayarları kullanıcı arayüzü gösterilemez.
+
+**Aksiyom 2**: Eğer `save()` fonksiyonu çağrıldığında gerekli form verileri (ör. ayar değerleri) mevcut değilse, ayarların kalıcı depoya kaydedilmesi gerçekleşmez ve bir hata/uyarı durumu ortaya çıkar.
+
+**Aksiyom 3**: Eğer `saveGeneralSettings()` fonksiyonu çalıştırıldığında genel ayarların geçerli bir yapılandırma nesnesi sağlanmazsa, genel ayarlar güncellenmez ve sistem mevcut ayarları korur.
+
+**Domain‑specific kural**: Bu fonksiyonların hiçbiri parametre almadığından, gerekli veri kaynağı (örn. bileşen durumu, context, veya global store) önceden hazırlanmış olmalıdır; aksi takdirde fonksiyonların iç mantığı çalışamaz ve beklenen yan etki (ayarların kaydedilmesi) gerçekleşmez.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminInventorySettingsPage
-**Ne yapar**: VentHub HVAC projesinin admin paneli bünyesinde yer alan envanter ayarları sayfasının ana React bileşenidir. Yönetici kullanıcıların sistemdeki envanter kaynaklarına ilişkin tüm ayarları görüntülemesi, düzenlemesi ve kalıcı olarak kaydetmesi için gereken kullanıcı arayüzü yapısını sunar. Sadece yetkili yönetici hesaplarının erişebildiği bir rota altında yüklenen, sayfanın temel bileşeni olarak görev alır.
-**Nasıl yapar**: React.FC tipinde tanımlanmış olan bu bileşen, içerdiği form yapıları, alt bileşenler ve kaydetme işlevlerini bünyesinde barındırarak kullanıcı etkileşimlerini yönetir. Proje içindeki admin rotalarına ait olarak çalışır, kendi durumu (state) üzerinde kullanıcının formda yaptığı değişiklikleri tutar ve içindeki save, saveGeneralSettings gibi fonksiyonlar aracılığıyla bu değişiklikleri işler.
+**Ne yapar**: React uygulamasında envanter ayarları sayfasının bileşenini tanımlar ve dışarıya bir fonksiyonel bileşen (`React.FC`) olarak sunar.  
+**Nasıl yapar**: Fonksiyon, TypeScript/React ortamında bir fonksiyonel bileşen tanımı döndürür; bileşenin içeriği dosyada tanımlı diğer yardımcı fonksiyonlar ve UI öğeleriyle birleştirilir.  
 **Parametreler**:
-- Herhangi bir giriş parametresi almaz, tanımında belirtilen herhangi bir dışarıdan aktarılan veri veya prop bulunmamaktadır.
-**Dönüş**: React.FC tipi döndürür, bu React fonksiyonel bileşeni DOM ağacına işlenerek yönetici kullanıcının karşısına envanter ayarları sayfasının çıkarılmasını sağlar.
+- *yok* — Bu bileşen dışarıdan parametre almaz.
+**Dönüş**: `React.FC` — Bileşen tipinde bir fonksiyonel React bileşeni döndürür.
 
 ### save
-**Ne yapar**: AdminInventorySettingsPage bileşeni bünyesinde tanımlı, kullanıcının envanter ayarları sayfasında yaptığı tüm değişiklikleri topluca kaydetmek için tetiklenen ana kaydetme fonksiyonudur. Kullanıcı arayüzündeki genel kaydetme butonuna tıklandığında çalışarak tüm kategori ayarlarının kaydedilme sürecini koordine eder.
-**Nasıl yapar**: Kendi içinde tanımlı olan alt kaydetme fonksiyonlarını sırayla çalıştırarak tüm form verilerinin ayrı ayrı işlenmesini sağlar. Kayıt süreci boyunca oluşabilecek hataları yakalar, başarılı kayıt sonrası kullanıcıya bildirim gösterir ve sayfanın durumunu güncelleyerek kullanıcının yeni ayarları görmesini sağlar.
+**Ne yapar**: Genel envanter ayarlarını veritabanına kaydeder ve işlem sonucuna göre kullanıcıya geri bildirim verir.  
+**Nasıl yapar**: `saveGeneralSettings` fonksiyonunun aynı mantığını uygular; kaydetme sürecini başlatır, hata ve başarı durumlarını yönetir, ardından ayarları yeniden yükler.  
 **Parametreler**:
-- Tanımında herhangi bir giriş parametresi belirtilmemiştir, yalnızca ait olduğu AdminInventorySettingsPage bileşeninin dahili durumunda (state) tutulan verileri kullanarak çalışır.
-**Dönüş**: Dönüş tipi belirtilmemiştir, herhangi bir değer döndürmeyen void tipinde bir aksiyon fonksiyonudur, yalnızca kayıt işlemlerini yürütmek için tasarlanmıştır.
+- *yok* — Fonksiyon dışarıdan veri almaz; gerekli değerler bileşen içinde tanımlı durum değişkenlerinden (`alertEmail`, `alertWebhook`, `resTimeout`) elde edilir.
+**Dönüş**: `void` — İşlem tamamlandığında bir değer döndürmez; sadece yan etkileri (state güncellemeleri, console log) vardır.
 
 ### saveGeneralSettings
-**Ne yapar**: AdminInventorySettingsPage bileşeni içindeki genel envanter ayarları kategorisine ait form verilerini kaydetmekten sorumlu özel kayıt fonksiyonudur. Sadece genel kategorideki ayarların kaydedilmesini hedefler, ana kaydetme sürecinin bir parçası olarak ya da tek başına tetiklenebilir.
-**Nasıl yapar**: Bileşenin dahili durumunda tutulan genel ayarlar formundaki tüm giriş değerlerini öncelikle doğrular, doğrulama sürecinden başarıyla geçen verileri ilgili sunucu API uç noktasına gönderir. Gönderim sonrası başarılı veya başarısız durumuna göre kullanıcıya geri bildirim sunar ve sayfanın durumunu güncelleyerek kayıt işleminin tamamlandığını belirtir.
+**Ne yapar**: Envanter ayarlarını Supabase veritabanındaki `inventory_settings` tablosuna günceller, işlem sonucunu kullanıcıya bildirir ve güncel ayarları tekrar yükler.  
+**Nasıl yapar**: 
+1. `setSavingGeneral(true)` ile kaydetme sürecini başlatır ve UI’da bekleme durumu gösterir.  
+2. `setSuccess('')` ve `setError('')` ile önceki mesajları temizler.  
+3. Supabase SDK’sı ile `inventory_settings` tablosunda `id = true` koşuluna sahip satırı, `alert_email`, `alert_webhook_url`, `reservation_timeout_hours` ve `updated_at` alanlarını güncelleyerek değiştirir.  
+4. Güncelleme sırasında bir hata oluşursa `throw` ile yakalar; hata mesajını konsola yazar ve `setError` ile kullanıcıya gösterir.  
+5. Başarılı olursa `setSuccess('Genel ayarlar kaydedildi')` mesajını ayarlar ve `await load()` ile en son ayarları tekrar yükler.  
+6. `finally` bloğunda `setSavingGeneral(false)` çağrısı yapılarak bekleme durumu sonlandırılır.  
 **Parametreler**:
-- Tanımında herhangi bir giriş parametresi belirtilmemiştir, yalnızca ait olduğu AdminInventorySettingsPage bileşeninin dahili state verilerini kullanarak çalışır.
-**Dönüş**: Dönüş tipi belirtilmemiştir, herhangi bir değer döndürmeyen void tipinde bir kayıt aksiyon fonksiyonudur, yalnızca genel envanter ayarlarının kayıt sürecini yürütmek için tasarlanmıştır.
+- *yok* — Gerekli tüm veriler bileşen içindeki durum değişkenlerinden (`alertEmail`, `alertWebhook`, `resTimeout`) alınır.
+**Dönüş**: `void` — Fonksiyon asenkron çalışır ancak dışarıya bir değer döndürmez; sadece yan etkileri (state güncellemeleri, veri kaydetme) vardır.
 
 ---
 
@@ -69,59 +82,59 @@ Bu modül, VentHub HVAC projesinin admin paneline ait envanter ayarlarını gör
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::AdminInventorySettingsPage
+### [N1_NASIL] AST Pointer: src\views\admin\AdminInventorySettingsPage.tsx::AdminInventorySettingsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `pathname` — Next.js `usePathname` hook'u ile alınan mevcut sayfa yolu
-  - `defaultThreshold` — Varsayılan düşük stok eşiği için tutulan state değeri, sayı veya boş string olabilir
-  - `setDefaultThreshold` — `defaultThreshold` state'ini güncelleyen React state setter fonksiyonu
-  - `resetAll` — Tüm ürünlere varsayılan stok eşiğini toplu uygulama seçeneği için tutulan boolean state
-  - `setResetAll` — `resetAll` state'ini güncelleyen React state setter fonksiyonu
-  - `loading` — Sayfa verilerinin yükleme durumunu tutan `LoadState` tipi state
-  - `setLoading` — `loading` state'ini güncelleyen React state setter fonksiyonu
-  - `saving` — Stok eşik ayarlarının kaydedilme durumunu tutan boolean state
-  - `setSaving` — `saving` state'ini güncelleyen React state setter fonksiyonu
-  - `savingGeneral` — Genel bildirim ve rezervasyon ayarlarının kaydedilme durumunu tutan boolean state
-  - `setSavingGeneral` — `savingGeneral` state'ini güncelleyen React state setter fonksiyonu
-  - `error` — Kullanıcıya gösterilecek hata mesajını tutan string state
-  - `setError` — `error` state'ini güncelleyen React state setter fonksiyonu
-  - `success` — Kullanıcıya gösterilecek başarı mesajını tutan string state
-  - `setSuccess` — `success` state'ini güncelleyen React state setter fonksiyonu
-  - `alertEmail` — Kritik stok bildirimlerinin gönderileceği e-posta adresini tutan string state
-  - `setAlertEmail` — `alertEmail` state'ini güncelleyen React state setter fonksiyonu
-  - `alertWebhook` — Anlık stok bildirimleri için kullanılan webhook URL'sini tutan string state
-  - `setAlertWebhook` — `alertWebhook` state'ini güncelleyen React state setter fonksiyonu
-  - `resTimeout` — Ödemesi tamamlanmayan rezervasyonların otomatik iptal süresini (saat cinsinden) tutan number state
-  - `setResTimeout` — `resTimeout` state'ini güncelleyen React state setter fonksiyonu
-  - `canWrite` — `useRole` hook'undan alınan, kaynak bazında yazma izni kontrolü yapan fonksiyon
-  - `hasWriteAccess` — `inventory_settings` kaynağı için yazma izni olup olmadığını belirten boolean değer
-  - `load` — Mevcut envanter ayarlarını Supabase veritabanından yükleyen, `useCallback` ile sarmalanmış async fonksiyon
-- **Dönüş**: React.JSX.Element
+  - `pathname` — `usePathname()` hook ile mevcut URL yolunu alır, `React.useEffect` bağımlılığı olarak kullanılır.
+  - `defaultThreshold` — Stok düşük eşik değeri; sayı ya da boş string tutar, `<input>` değerine bağlanır.
+  - `setDefaultThreshold` — `defaultThreshold` state’ini güncelleyen setter fonksiyonu.
+  - `resetAll` — “Tüm Ürünlere Uygula” checkbox’ının boolean durumu.
+  - `setResetAll` — `resetAll` state’ini güncelleyen setter.
+  - `loading` — veri yükleme durumu (`LoadState` enum); UI’da loading spinner gösterimi için kullanılır.
+  - `setLoading` — `loading` state’ini güncelleyen setter.
+  - `saving` — eşik güncelleme işlemi sırasında gösterilen loading flag’i.
+  - `setSaving` — `saving` state’ini güncelleyen setter.
+  - `savingGeneral` — genel ayarların kaydedilmesi sırasında gösterilen loading flag’i.
+  - `setSavingGeneral` — `savingGeneral` state’ini güncelleyen setter.
+  - `error` — hata mesajı string’i; UI’da hata bildirimi için gösterilir.
+  - `setError` — `error` state’ini güncelleyen setter.
+  - `success` — başarı mesajı string’i; UI’da başarı bildirimi için gösterilir.
+  - `setSuccess` — `success` state’ini güncelleyen setter.
+  - `alertEmail` — e‑posta bildirim adresi; form input değeri.
+  - `setAlertEmail` — `alertEmail` state’ini güncelleyen setter.
+  - `alertWebhook` — webhook URL; form input değeri.
+  - `setAlertWebhook` — `alertWebhook` state’ini güncelleyen setter.
+  - `resTimeout` — rezervasyon iptal süresi (saat); form input değeri.
+  - `setResTimeout` — `resTimeout` state’ini güncelleyen setter.
+  - `canWrite` — `useRole()` hook’tan gelen yetki kontrol fonksiyonu.
+  - `hasWriteAccess` — `canWrite('inventory_settings')` sonucunu tutar; UI’da erişim kontrolü.
+  - `load` — `React.useCallback` içinde tanımlı async fonksiyon; ayarları Supabase’den çeker ve state’leri doldurur.
+- **Dönüş**: React bileşeni JSX döndürür; yan etkileri: `useEffect` ile `load` fonksiyonunu sayfa yüklendiğinde ve `pathname` değiştiğinde çalıştırır, Supabase API çağrıları yapar, state güncellemeleriyle UI’yı yönetir.
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::load
+### [N2_NASIL] AST Pointer: src\views\admin\AdminInventorySettingsPage.tsx::save
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — Supabase'den alınan `inventory_settings` tablosuna ait tüm ayar verileri
-  - `error` — Supabase sorgusu sırasında oluşabilecek hata nesnesi
-  - `val` — Veritabanından gelen varsayılan düşük stok eşiği değerini, state'e uygun formata dönüştürmek için geçici tutulan değişken
-- **Dönüş**: yok
+  - `value` — `defaultThreshold` boş ise `null`, değilse sayısal eşik değeri; RPC’ye gönderilir.
+  - `error` — `supabase.rpc` çağrısının döndürdüğü hata nesnesi (varsa).
+  - `e` — `catch` bloğunda yakalanan bilinmeyen hata; mesajı `msg` değişkenine dönüştürülür.
+  - `msg` — hata mesajı string’i; `setError` ile UI’da gösterilir.
+- **Dönüş**: `void` (yan etkileri: `saving` flag’i, `success`/`error` state’leri güncellenir, `load()` çağrısı ile veriler yeniden çekilir).
 
-### [N3_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::save
+### [N3_NASIL] AST Pointer: src\views\admin\AdminInventorySettingsPage.tsx::saveGeneralSettings
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `value` — Kullanıcı tarafından girilen varsayılan stok eşiğini, Supabase'e gönderilecek formata dönüştüren geçici değişken
-  - `error` — Supabase `update_inventory_thresholds` rpc çağrısı sırasında oluşan hata nesnesi
-  - `e` — Catch bloğunda yakalanan genel hata nesnesi
-  - `msg` — Kullanıcıya gösterilmek üzere işlenen hata mesajı
-- **Dönüş**: yok
+  - `error` — `supabase.from(...).update(...).eq(... )` çağrısının döndürdüğü hata nesnesi (varsa).
+  - `e` — `catch` bloğunda yakalanan bilinmeyen hata; mesajı `msg` değişkenine dönüştürülür.
+  - `msg` — hata mesajı string’i; `setError` ile UI’da gösterilir.
+- **Dönüş**: `void` (yan etkileri: `savingGeneral` flag’i, `success`/`error` state’leri güncellenir, `load()` ile ayarlar yeniden yüklenir).
 
-### [N4_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::saveGeneralSettings
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: src\views\admin\AdminInventorySettingsPage.tsx::load
+- **params**: (parametre yok) – `React.useCallback` içinde tanımlı.
 - **ic_degiskenler**:
-  - `error` — Supabase `inventory_settings` tablosu update sorgusu sırasında oluşan hata nesnesi
-  - `e` — Catch bloğunda yakalanan genel hata nesnesi
-  - `msg` — Kullanıcıya gösterilmek üzere işlenen hata mesajı
-- **Dönüş**: yok
+  - `data` — Supabase `select('*').maybeSingle()` sonucunda gelen kayıt objesi.
+  - `error` — API çağrısında oluşan hata nesnesi (varsa).
+  - `val` — `data?.default_low_stock_threshold` değerinin number | null tipinde tutulduğu ara değişken.
+- **Dönüş**: `void` (yan etkileri: `defaultThreshold`, `alertEmail`, `alertWebhook`, `resTimeout`, `error`, `loading` state’lerini günceller).
 
 ---
 
@@ -145,3 +158,18 @@ graph TD
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminInventorySettingsPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-500/5`, `bg-cyan-500/5`, `bg-rose-500/5`, `bg-surface-deep/40`, `bg-transparent`, `bg-violet-500`, `bg-violet-500/5`, `border-amber-500/10`, `border-b`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `text-amber-400`, `text-amber-500/80`
+- **Layout:** `!h-12`, `absolute`, `block`, `flex`, `flex-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `group-hover:bg-cyan-500/10`, `group-hover:bg-violet-500/10`, `group-hover:text-cyan-400`
+- **Responsive:** `lg:`, `md:` prefix kullanımları

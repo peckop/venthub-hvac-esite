@@ -4,91 +4,90 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx
 skeleton_hash: b004be65939f363c
-generated_at: 2026-05-23T22:26:33Z
+entity_hashes:
+  func:InfiniteProductsShowcase: 085e1a5c6ded015b
+  func:ProductCard: 9a7014f633ef56b4
+  func:SceneContent: 03f3d506874eed14
+  func:getOptimizedImageUrl: 17e01a36f07a7e10
+  func:handleClick: bffc3b12eebc550c
+  overview: 30d5253fe6fbef7a
+  style_tokens: 43d10894b51d5a62
+generated_at: 2026-05-27T11:47:26Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformu için geliştirilmiş, sonsuz kaydırma özelliğine sahip etkileşimli ürün vitrini React bileşenidir. 3B görselleştirme desteğiyle ürünleri akıcı bir animasyonla kullanıcıya sunar, resim optimizasyonu ve tüm kullanıcı etkileşimlerini tek bir modülde toplar.
+Bu modül, ürünleri sonsuz kaydırma (infinite scroll) mantığıyla gösteren bir React bileşeni sağlar. Görsel optimizasyonu, ürün kartları ve 3B sahne içeriği gibi işlevleri birleştirerek kullanıcıya etkileşimli bir ürün vitrini sunar.
 
 ## Fonksiyon Grupları
-### Ana Giriş Bileşeni
-Modülün dışarıya açılan ana giriş noktasıdır, tüm ürün vitrini yapısının çalışma akışını yönetir. Dışarıdan alınan ürün listesini iç alt bileşenlere ileterek vitrinin temelini oluşturur.
+### Görsel Optimizasyonu
+Ürün görsellerinin istenen boyutta ve formatta sunulmasını sağlayan yardımcı işlevi içerir.
+- getOptimizedImageUrl
+
+### Kullanıcı Arayüzü Bileşenleri
+Ürün kartlarının oluşturulması ve bu kartların bir koleksiyon olarak sahne içinde düzenlenmesini yönetir.
+- ProductCard
+- SceneContent
+
+### Etkileşim İşleyicisi
+Kullanıcının ürün kartlarına yaptığı tıklamaları yakalayıp ilgili yanıtları tetikler.
+- handleClick
+
+### Ana Bileşen
+Ürün listesini alır, sonsuz kaydırma mantığını uygulayıp diğer bileşenleri bir araya getirerek tamamlı vitrini render eder.
 - InfiniteProductsShowcase
-
-### Sahne ve Ürün Görünüm Bileşenleri
-Vitrinin iç görsel yapısını oluşturan alt React bileşenlerini barındırır. 3B sahne içeriğini ve her ürün için özel kart görünümlerini oluşturarak konumlandırma, animasyon ve aralık ayarlarını yönetir.
-- ProductCard, SceneContent
-
-### Yardımcı ve Etkileşim İşlevleri
-Görsel optimizasyon ve kullanıcı etkileşimlerini işleyen yardımcı fonksiyonlardır. Ürün resimlerini görüntüleme boyutuna göre optimize eder, tıklama ve fare üzerine gelme gibi kullanıcı aksiyonlarını yönetir.
-- getOptimizedImageUrl, handleClick
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı 3D sonsuz ürün vitrini modülü, kendisine ve tüm alt bileşenlerine aktarılan prop'ların yapısal olarak geçerli olmasını, ihtiyaç duyduğu Three.js kütüphanesinin çalışma ortamında erişilebilir olmasını ve resim optimizasyonu fonksiyonunun doğru çalışmasını varsayar.
-
-[Aksiyom 1]: Eğer InfiniteProductsShowcase ana bileşenine aktarılan `items` dizisi boş, tanımsız ya da içindeki elemanlar ProductCard'ın işleyebileceği yapıda değilse, hiçbir ürün kartı doğru şekilde render edilemez, vitrin boş veya hatalı görünür.
-[Aksiyom 2]: Eğer `getOptimizedImageUrl` fonksiyonuna iletilen orijinal resim url'si geçersiz ya da erişilemez değilse, tüm ürün kartlarında ürün görselleri yüklenemez, ürün görseli alanları boş kalır.
-[Aksiyom 3]: Eğer modülün çalıştığı ortamda Three.js kütüphanesi yüklenmemiş ya da `ThreeEvent` tipi tanımlı değilse, `handleClick` fonksiyonu tıklama olaylarını yakalayamaz, ürün kartlarına tıklandığında hiçbir işlem tetiklenmez.
-[Aksiyom 4]: Eğer ProductCard bileşenine aktarılan `index`, `total`, `gap`, `scrollOffset` gibi sayısal prop'lar tanımsız, geçersiz (NaN, negatif gibi) değilse, ürünlerin ekrandaki konumları ve aralıkları hatalı hesaplanır, vitrinin tüm düzeni bozulur.
-[Aksiyom 5]: Eğer alt bileşenlere aktarılan `isPaused` boolean değeri ve `onHover` olay dinleyicisi tanımlı değilse, kaydırmayı duraklatma ve fare ile ürün üzerine gelme işlemleri çalışmaz, sonsuz kaydırma akışı kesintisiz olarak devam eder.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getOptimizedImageUrl
-**Ne yapar**: next/image resim optimizasyonunu Three.js dokuları için uyarlayan, resim yükleme performansını artırmak amacıyla tasarlanmış yardımcı fonksiyondur. Three.js ortamında kullanılacak resimlerin boyutlandırılıp optimize edilmiş URL'ler halinde sunulmasını sağlar.
-**Nasıl yapar**: Girdi olarak aldığı orijinal resim URL'si ve istenen genişlik değerini kullanarak, Three.js'in doku yükleme gereksinimlerine uygun, boyutlandırılmış bir URL oluşturur. next/image'ın standart web optimizasyon mantığını 3B grafik ortamına özel olarak uyarlayarak çalışır, aşırı büyük resimlerin yüklenmesinin önüne geçer.
+**Ne yapar**: Üç.js dokuları için next/image optimizasyonunu taklit eden yardımcı bir fonksiyondur. Bir görsel URL'sini alıp optimize edilmiş bir versiyonunu döndürür.
+**Nasıl yapar**: (Belirtilmemiş; işlev gövdesi verilmemiştir.)
 **Parametreler**:
-- name: url, type: string — Orijinal, henüz optimize edilmemiş resmin erişim adresini içeren metin değeri
-- name: width, type: belirtilmemiş — Optimize edilecek resmin hedef genişliğini belirten değer, boyutlandırma işlemi için kullanılır
-**Dönüş**: Dönüş tipi belirtilmemiştir, void veya tanımsız olarak tanımlanmıştır.
-
----
+- url: string — Optimize edilecek görselin URL adresi.
+- width: (tip belirtilmemiş) — Görselin genişlik değeri.
+**Dönüş**: void (veya bilinmiyor — kesin dönüş tipi verilmemiştir.)
 
 ### ProductCard
-**Ne yapar**: InfiniteProductsShowcase yapısının temel yapı taşı olan, bireysel ürünleri 3B ortamda sergileyen React bileşenidir. Ürünün resmi ve başlığını barındırır, üç boyutlu sahne içindeki konum ve etkileşimleri yönetir.
-**Nasıl yapar**: İçinde drei/Image kütüphanesini kullanarak gereksiz çizim çağrılarını azaltır, gelen konum, kaydırma ofseti ve diğer düzenleme parametreleriyle kartın ekrandaki konumunu hassas şekilde hesaplar. Fare ile kart üzerindeki etkileşimleri algılayarak ilgili geri çağırma fonksiyonlarını tetikler, otomatik kaydırma durumuna göre kartın hareketini yönetir.
+**Ne yapar**: Görsel ve başlık içeren bir ürün kartı bileşenidir. drei/Image kullanılarak optimize edilmiş bir görsel yükleme sunar.
+**Nasıl yapar**: Ürün öğesini (`item`), indeksini ve kapsayıcı bilgilerini alarak bir 3D sahne içinde kartı oluşturur. Scroll offseti ve duraklama durumu gibi özellikleri yönetir.
 **Parametreler**:
-- name: item, type: ProductItem — Kart üzerinde sergilenecek tek ürünün tüm verilerini (resim, başlık gibi) içeren nesne
-- name: index, type: number — Ürün listesi içindeki kartın sıra numarası, konum hesaplamalarında kullanılır
-- name: total, type: number — Toplam ürün sayısı, sonsuz kaydırma mantığında konum hesapları için gereklidir
-- name: gap, type: number — Ardışık ürün kartları arasındaki boşluk miktarı, sahne düzeni hesaplamalarında kullanılır
-- name: scrollOffset, type: React.MutableRefObject<number> — Sahnenin mevcut kaydırma ofsetini saklayan değiştirilebilir referans nesnesi, kartın anlık konumunu güncel tutmak için kullanılır
-- name: isPaused, type: boolean — Otomatik kaydırmanın durdurulup durdurulmadığını belirten boolean değer, kartın hareket durumunu kontrol eder
-- name: onHover, type: (hovering: boolean) => void — Fare kartın üzerine geldiğinde veya ayrıldığında tetiklenen geri çağırma fonksiyonu, etkileşim durumunu ana bileşene bildirir
-**Dönüş**: React bileşeni olarak, ekranda sergilenen 3B ürün kartı öğesini döndürür.
-
----
+- item: ProductItem — Gösterilecek ürünün veri nesnesi.
+- index: number — Ürünler listesindeki sıra numarası.
+- total: number — Toplam ürün sayısı.
+- gap: number — Kartlar arasındaki boşluk miktarı.
+- scrollOffset: React.MutableRefObject<number> — Kaydırma konumunu referans olarak tutan nesne.
+- isPaused: boolean — Otomatik kaydırmanın duraklatılıp duraklatılmadığını belirtir.
+- onHover: (hovering: boolean) => void — Fare üzerine gelme olayında çağrılan callback fonksiyonu.
+**Dönüş**: React.FC — Bir React fonksiyonel bileşeni döndürür.
 
 ### handleClick
-**Ne yapar**: Three.js sahnesi üzerindeki fare tıklama olaylarını yöneten olay işleyici fonksiyonudur, sahne veya ürün kartları üzerindeki tıklama etkileşimlerini işlemek için tasarlanmıştır.
-**Nasıl yapar**: Three.js tarafından sarmalanan yerel fare olayı nesnesini alarak, tıklamanın konumunu ve hedefini algılar, ilgili aksiyonları tetiklemek için Three.js'in olay sistemiyle uyumlu çalışır.
+**Ne yapar**: Ürün kartına tıklandığında tetiklenen olay işleyicisidir.
+**Nasıl yapar**: (İç mantık belirtilmemiştir.)
 **Parametreler**:
-- name: e, type: ThreeEvent<MouseEvent> — Tarayıcının yerel fare olayını Three.js özelinde sarmalayan olay nesnesi, tıklama ile ilgili tüm meta verileri içerir
-**Dönüş**: Dönüş tipi belirtilmemiştir, void veya tanımsız olarak tanımlanmıştır.
-
----
+- e: ThreeEvent<MouseEvent> — Three.js üzerinden gelen fare tıklama olayı.
+**Dönüş**: void (veya bilinmiyor — kesin dönüş tipi verilmemiştir.)
 
 ### SceneContent
-**Ne yapar**: 3B ürün sergi sahnesinin tüm içeriğini barındıran, performans odaklı optimize edilmiş otomatik kaydırma özelliğine sahip React bileşenidir. Tüm ürün kartlarını bir arada toplayan ana sahne yapısıdır.
-**Nasıl yapar**: İçinde tüm ürün kartlarını düzenler, otomatik kaydırma mantığını çalıştırarak sahnenin sürekli olarak akmasını sağlar, isPaused durumu geldiğinde kaydırmayı anında duraklatır. Sahne genelindeki performans iyileştirmelerini uygular, fare ile sahne üzerindeki etkileşimleri tüm sahne ölçeğinde yöneterek ilgili geri çağırma fonksiyonlarını tetikler.
+**Ne yapar**: Performans odaklı otomatik kaydırma özelliğine sahip 3D sahne içeriği bileşenidir. Ürün kartlarını üç boyutlu uzayda düzenler ve otomatik olarak kaydırır.
+**Nasıl yapar**: Öğeler listesini (`items`) alarak her bir öğe için `ProductCard` bileşeni oluşturur. `isPaused` ve `onHover` aracılığıyla kaydırma davranışını ve etkileşimleri yönetir.
 **Parametreler**:
-- name: items, type: ProductItem[] — Sahne içinde sergilenecek tüm ürünleri içeren dizi, her bir elemanı tek ürünün verilerini barındırır
-- name: isPaused, type: boolean — Otomatik kaydırmanın durdurulup durdurulmadığını belirten boolean değer, sahnenin hareketini merkezi olarak kontrol eder
-- name: onHover, type: (h: boolean) => void — Fare herhangi bir sahne öğesi üzerine geldiğinde veya ayrıldığında tetiklenen geri çağırma fonksiyonu, etkileşim durumunu ana bileşene iletir
-**Dönüş**: React bileşeni olarak, tüm ürünleri ve kaydırma mantığını içeren 3B sahne içeriğini döndürür.
-
----
+- items: ProductItem[] — Görüntülenecek ürün öğelerinin dizisi.
+- isPaused: boolean — Otomatik kaydırmanın duraklatılıp duraklatılmadığını belirtir.
+- onHover: (h: boolean) => void — Fare üzerine gelme olayında çağrılan callback fonksiyonu.
+**Dönüş**: React.FC — Bir React fonksiyonel bileşeni döndürür.
 
 ### InfiniteProductsShowcase
-**Ne yapar**: Ürünlerin sonsuz kaydırılabilen 3B bir ortamda sergilenmesini sağlayan ana, tamamen optimize edilmiş React bileşenidir. Kullanıcıya hazır, tüm temel işlevleri barındıran bir ürün vitrini sunar.
-**Nasıl yapar**: İçinde SceneContent ve tüm alt bileşenleri koordine ederek çalışır, doku optimizasyonu, gereksiz çizim çağrılarını azaltma, adaptif performans ölçeklemesi ve sonsuz otomatik kaydırma gibi tanımlı tüm özellikleri devreye alır. Girdi olarak aldığı ürün listesini alt bileşenlere ileterek tüm serginin çalışmasını tek merkezden yönetir, sahne genelindeki performans optimizasyonlarını uygular.
+**Ne yapar**: Ana optimize edilmiş 3D vitrin bileşenidir. next/image benzeri doku optimizasyonu, drei/Image ile azaltılmış çizim çağrıları ve uyarlanabilir performans ölçekleme gibi özellikler sunar. Sonsuz otomatik kaydırma sağlar.
+**Nasıl yapar**: Kendisine iletilen ürün öğelerini (`items`) alarak bir `SceneContent` bileşeni oluşturur ve tüm vitrin mantığını bu alt bileşene devreder.
 **Parametreler**:
-- name: items, type: ProductItem[] — Bileşen içinde sergilenecek tüm ürünleri içeren dizi, InfiniteProductsShowcaseProps arayüzünde tanımlanan temel giriş değeridir
-**Dönüş**: React.FC<InfiniteProductsShowcaseProps> tipinde, tüm 3B ürün vitrini işlevselliğini barındıran ana React bileşenini döndürür.
+- items: ProductItem[] — Vitrinde sergilenecek ürün öğeleri dizisi.
+**Dönüş**: React.FC<InfiniteProductsShowcaseProps> — `InfiniteProductsShowcaseProps` prop tipine sahip bir React fonksiyonel bileşeni döndürür.
 
 ---
 
@@ -107,109 +106,81 @@ Bu React tabanlı 3D sonsuz ürün vitrini modülü, kendisine ve tüm alt bile�
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::getOptimizedImageUrl
-- **params**: url: string, width: number (varsayılan 400)
+- **params**: (url: string, width = 400)
 - **ic_degiskenler**:
-  - `base` — URL'nin sorgu parametrelerinden önceki temel kısmı, Supabase URL'sini işlemek için ayıklanan değer
-  - `renderUrl` — Supabase'den alınan orijinal nesne URL'sini, resim olarak render edilebilir formata dönüştürülen hali
-- **Dönüş**: Optimize edilmiş resim URL'si, URL boşsa orijinal URL, Supabase harici URL'ler için orijinal URL
-
----
+  - `base` — `url`’un “?” karakterinden önceki kısmını tutar; render URL oluşturmak için kullanılır.
+  - `renderUrl` — `base` içinde “/object/” varsa “/render/image/” ile değiştirilmiş hali; son URL’ye ek parametreler eklenir.
+- **Dönüş**: `string` (optimize edilmiş veya orijinal URL)
 
 ### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::ProductCard
-- **params**: item: ProductItem, index: number, total: number, gap: number, scrollOffset: React.MutableRefObject<number>, isPaused: boolean, onHover: (hovering: boolean) => void
+- **params**: ({ item, index, total, gap, scrollOffset, isPaused, onHover })
 - **ic_degiskenler**:
-  - `groupRef` — 3B ürün kartı grubunu referanslayan Three.js Group referansı
-  - `imageRef` — Ürün resim mesh'ini referanslayan Three.js Mesh referansı
-  - `router` — Next.js yönlendirme hook'u, ürün tıklamasında sayfa geçişi için kullanılır
-  - `hovered` — Ürün üzerine gelinip gelinmediğini izleyen yerel state değeri
-  - `optimizedUrl` — `getOptimizedImageUrl` ile üretilen, useMemo ile önbelleğe alınmış resim URL'si
-  - `sphereWidth` — Tüm ürünlerin toplam kapladığı genişlik, sonsuz kaydırma mantığı için hesaplanan değer
-  - `handleClick` — Ürün tıklamasında çalışan yerel callback fonksiyonu
-- **Dönüş**: 3B ürün kartını render eden React JSX elementi
+  - `groupRef` — `<group>` öğesinin referansı; konum ve dönüş animasyonları burada güncellenir.
+  - `imageRef` — `<DreiImage>` mesh referansı; ölçek ve ışınım (emissive) efektleri burada uygulanır.
+  - `router` — Next.js yönlendirme nesnesi; tıklama olayında kategori sayfasına yönlendirme yapılır.
+  - `hovered` — `boolean` state; fare üzerindeyken `true`, çıkınca `false`.
+  - `setHover` — `hovered` state’ini güncelleyen fonksiyon.
+  - `optimizedUrl` — `item.image` için `getOptimizedImageUrl` ile elde edilen, texture olarak kullanılacak URL.
+  - `sphereWidth` — `total * gap`; sonsuz kaydırma hesabında kullanılan toplam genişlik.
+- **Dönüş**: `React.ReactElement` (JSX içinde `<group>` ve içindeki öğeler)
 
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::ProductCard_useFrameCallback
-- **params**: state: ReactThreeFiber.State, _delta: number
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::ProductCard_useFrame
+- **params**: (state, _delta)
 - **ic_degiskenler**:
-  - `offset` — Genel kaydırma konumunu tutan `scrollOffset.current` değerinden alınan kaydırma ofseti
-  - `xPos` — Ürün kartının X eksenindeki anlık konumu, sonsuz kaydırma için modulo mantığı ile sarmalanan değer
-  - `targetScale` — Hover durumuna göre resim mesh'i için belirlenen hedef ölçek değeri
-  - `mat` — Resim mesh'inin malzemesini cast ederek alınan Three.js MeshStandardMaterial nesnesi, hover efektleri için kullanılır
-- **Dönüş**: yok
-
----
+  - `offset` — `scrollOffset.current`; kaydırma miktarını tutar.
+  - `xPos` — Hesaplanan X konumu; grup konumunu ve dönüşünü belirler.
+  - `targetScale` — `hovered` durumuna göre `1.15` ya da `1.0`; ölçekleme lerp hedefi.
+  - `mat` — `imageRef.current.material` tip dönüşümü; `MeshStandardMaterial` olarak kullanılır, emissive yoğunluğu burada ayarlanır.
+- **Dönüş**: `yok` (yan etkileri: grup konumu/rotasyonu, mesh ölçeği ve materyal emissive ayarı)
 
 ### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::ProductCard_handleClick
-- **params**: e: ThreeEvent<MouseEvent>
+- **params**: (e: ThreeEvent<MouseEvent>)
 - **ic_degiskenler**:
-  - `e.stopPropagation()` — Tıklama olayının üst elementlere yayılmasını engeller
-  - `router.push(Routes.category(item.id))` — Tıklanan ürünün kategori sayfasına yönlendirme yapar
-- **Dönüş**: yok
-
----
+  - `e` — Gelen fare olayı; `stopPropagation()` ile olay yayılımı durdurulur.
+- **Dönüş**: `yok` (yan etki: `router.push(Routes.category(item.id))` ile sayfa yönlendirmesi)
 
 ### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::SceneContent
-- **params**: items: ProductItem[], isPaused: boolean, onHover: (h: boolean) => void
+- **params**: ({ items, isPaused, onHover })
 - **ic_degiskenler**:
-  - `gap` — Ürün kartları arasındaki boşluk miktarı, sabit 5 olarak ayarlanmış
-  - `scrollOffset` — Genel kaydırma konumunu tutan React useRef referansı, sonsuz kaydırma için kullanılır
-  - `camera` — `useThree` hook'u ile alınan Three.js sahne kamerası referansı
-  - `items.map` — Tüm ürünler üzerinden geçerek her biri için ProductCard bileşeni oluşturan dizi döngüsü
-- **Dönüş**: Tüm ürünleri ve sahne öğelerini içeren React JSX elementi
+  - `gap` — Ürün kartları arasındaki sabit mesafe; `5` olarak tanımlanır.
+  - `scrollOffset` — `useRef(0)` ile oluşturulan kaydırma ofseti; `useFrame` içinde güncellenir.
+  - `camera` — `useThree()` ile alınan kamera nesnesi; solunum (breathing) animasyonu burada uygulanır.
+- **Dönüş**: `React.ReactElement` (JSX içinde `<Bvh>` ve sahne öğeleri)
 
----
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::SceneContent_useFrameCallback
-- **params**: state: ReactThreeFiber.State, delta: number
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::SceneContent_useFrame
+- **params**: (state, delta)
 - **ic_degiskenler**:
-  - `scrollOffset.current` — Otomatik akışın konumunu tutan değer, duraklatılmadıkça her karede güncellenir
-  - `camera.position.x` — Kameranın X pozisyonu, "nefes alma" efekti için lerp ile yumuşak güncellenir
-  - `camera.position.y` — Kameranın Y pozisyonu, "nefes alma" efekti için lerp ile yumuşak güncellenir
-- **Dönüş**: yok
+  - `scrollOffset` — `scrollOffset.current`; `isPaused` false olduğunda artar, 1’i geçtiğinde sıfırlanır.
+  - `camera` — `camera.position.x` ve `camera.position.y`; `THREE.MathUtils.lerp` ile zaman bazlı sinüs fonksiyonlarıyla hareket ettirilir.
+- **Dönüş**: `yok` (yan etkileri: `scrollOffset` ve `camera` konum güncellemeleri)
 
----
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::SceneContent_itemsMapCallback
-- **params**: item: ProductItem, i: number
+### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::SceneContent_mapCallback
+- **params**: (item, i)
 - **ic_degiskenler**:
-  - `key` — React listeleri için benzersiz anahtar, `${item.id}-${i}` formatında oluşturulur
-  - `ProductCard` — Her ürün için oluşturulan ürün kartı bileşeni, tüm gerekli prop'lar iletilir
-- **Dönüş**: Her ürün için üretilmiş ProductCard JSX elementi
-
----
+  - `item` — Tek bir ürün nesnesi; `ProductCard` prop’ları içinde kullanılır.
+  - `i` — Ürün indeks numarası; `ProductCard` prop’ları içinde kullanılır.
+- **Dönüş**: `React.ReactElement` (`<ProductCard …/>`)
 
 ### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::InfiniteProductsShowcase
-- **params**: items: ProductItem[]
+- **params**: ({ items })
 - **ic_degiskenler**:
-  - `isPaused` — Ürünlerin otomatik akışının duraklatılıp duraklatılmadığını tutan ana state değeri
-  - `setIsPaused` — `isPaused` state'ini güncellemek için kullanılan useState setter fonksiyonu
-- **Dönüş**: Tam ürün vitrinini, Canvas arayüzü ve tüm alt bileşenleri ile render eden React JSX elementi; `items` boşsa null döner
+  - `isPaused` — `boolean` state; otomatik akışı duraklatma kontrolü.
+  - `setIsPaused` — `isPaused` state’ini güncelleyen fonksiyon; `SceneContent` üzerinden hover durumuna göre tetiklenir.
+- **Dönüş**: `React.ReactElement` (JSX içinde `<Canvas>` ve UI overlay)
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki ProductCard() fonksiyonu, ürün kartında gösterilecek görselin optimize edilmiş bağlantısını almak için dosya içindeki getOptimizedImageUrl fonksiyonunu çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı grafiği verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  ProductCard() → getOptimizedImageUrl()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    ProductCard["ProductCard()"] --> getOptimizedImageUrl["getOptimizedImageUrl()"]
+graph TD
+    InfiniteProductsShowcase_tsx__InfiniteProductsShowcase["InfiniteProductsShowcase"]
+    InfiniteProductsShowcase_tsx__ProductCard["ProductCard"]
+    InfiniteProductsShowcase_tsx__SceneContent["SceneContent"]
+    InfiniteProductsShowcase_tsx__getOptimizedImageUrl["getOptimizedImageUrl"]
+    InfiniteProductsShowcase_tsx__handleClick["handleClick"]
+    InfiniteProductsShowcase_tsx__ProductCard --> InfiniteProductsShowcase_tsx__getOptimizedImageUrl
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -233,16 +204,12 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[550px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `tracking-[0.2em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-cyan-400`, `bg-cyan-500`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-slate-900/50`, `bg-surface-darker`, `border-slate-800`, `from-surface-darker`, `text-cyan-400`, `text-xs`, `to-transparent`, `via-surface-darker/40`
-- **Layout:** `absolute`, `backdrop-blur-md`, `bottom-6`, `flex`, `from-surface-darker`, `gap-3`, `group-hover/canvas:opacity-100`, `h-2`, `h-full`, `hidden`, `inline-flex`, `items-center`, `left-0`, `left-1/2`, `overflow-hidden`
+- **Layout:** `absolute`, `backdrop-blur-md`, `bottom-6`, `flex`, `from-surface-darker`, `gap-3`, `group-hover/canvas:opacity-100`, `h-2`, `h-550px`, `h-full`, `hidden`, `inline-flex`, `items-center`, `left-0`, `left-1/2`
 - **Responsive:** (yok)

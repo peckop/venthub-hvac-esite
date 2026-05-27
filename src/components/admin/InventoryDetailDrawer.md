@@ -4,23 +4,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryDetailDrawer.tsx
 skeleton_hash: b4c161454e49e38a
-generated_at: 2026-05-23T21:53:04Z
+entity_hashes:
+  func:InventoryDetailDrawer: 3a57400ca0f546b7
+  overview: 92caa1481da5cee7
+  style_tokens: 05c1509659776517
+generated_at: 2026-05-27T11:45:04Z
 ---
 
 ## Genel Bakış
-`InventoryDetailDrawer` bileşeni, yönetim panelinde bir envanter öğesinin ayrıntılarını yan panel (drawer) içinde görüntüleyen ve kullanıcının bu öğeyi düzenlemesine ya da silmesine olanak tanıyan bir React bileşenidir. Props aracılığıyla gelen envanter verisini alır, form durumunu yönetir ve güncelleme/silme gibi işlemler için API servislerine yönlendirme yapar.
+InventoryDetailDrawer, envanter öğelerinin ayrıntılarını gösteren bir React bileşenidir. Kullanıcıya seçilen ürünün stok miktarı, konumu ve diğer meta verileri sunar. Ayrıca düzenleme ve kapatma işlevlerini sağlayarak envanter yönetimi akışını destekler.
 
 ## Fonksiyon Grupları
-### UI Render & Layout
-Drawer’ın başlık, içerik alanı ve aksiyon butonları (kaydet, iptal, sil) gibi görsel yapısını oluşturur ve JSX çıktısını üretir.
-- InventoryDetailDrawer
-
-### State & Event Management
-Kullanıcı girdilerini (form alanları) izler, bileşen içi durumu (state) günceller ve buton tıklamaları gibi olayları yönetir.
-- InventoryDetailDrawer
-
-### Veri İşleme & Servis Entegrasyonu
-Formdan alınan veriyi doğrular, envanter güncelleme veya silme gibi API çağrılarını başlatır ve gelen yanıtları işleyerek UI’yı günceller.
+### Ana Bileşen
+Bileşenin giriş noktası ve render mantığını yönetir.
 - InventoryDetailDrawer
 
 ---
@@ -30,16 +26,37 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### InventoryDetailDrawer
-**Ne yapar**: InventoryDetailDrawer, bir envanter öğesinin detaylarını görüntülemek için kullanılan bir drawer (çekmece) bileşenidir. Fonksiyon, aldığı InventoryDetailDrawerProps türündeki parametreye göre drawer'ın içeriğini ve davranışını belirler.
-**Nasıl yapar**: Bir React bileşeni olarak, InventoryDetailDrawerProps tipindeki prop nesnesinde bulunan değerleri kullanarak ilgili drawer arayüzünü render eder. Drawer'ın görünürlüğü, gösterilecek veri ve olası callback'ler prop'lar aracılığıyla yönetilir.
+**Ne yapar**: Seçili bir ürünün stok detaylarını, eşik değerlerini ve hareket geçmişini gösteren bir yan çekmece (drawer) arayüzü oluşturur. Kullanıcıların QR etiketi yazdırması, eşik güncellemesi, stok ayarlaması ve hareketleri geri alması gibi etkileşimli işlemleri yönetir.  
+
+**Nasıl yapar**: Props içinde gelen durum ve setter fonksiyonlarını destrüktüre eder, Escape tuşu ile çekmeceyi kapatmak için bir `useEffect` ekler ve `selected` nesnesi yoksa `null` döner. UI, bir kapatma butonu, ürün bilgileri, stok ve eşik kartları, zeki satın alma önerisi, eşik güncelleme formu, stok ayarlama bileşeni, rezerve sipariş tablosu ve hareket geçmişi bölümlerinden oluşur. Buton ve input etkileşimleri ilgili callback’leri (ör. `printQrLabel`, `saveThreshold`, `adjustStock`, `undoLastMovement`) tetikler.  
+
 **Parametreler**:
-- props: InventoryDetailDrawerProps — Drawer'ın yapılandırmasını (açık/kapalı durumu, envanter detay verisi, kapatma işlevi vb.) taşıyan prop nesnesidir.
-**Dönüş**: Return tipi belirtilmemiştir; bu nedenle dönüş değeri bilinmemektedir.
+- props: InventoryDetailDrawerProps — Çekmeceyi kontrol eden tüm durum ve fonksiyonları içeren nesne. İçerisinde:
+  - selected: any — Görüntülenecek ürün nesnesi; yoksa çekmece kapanır.
+  - setSelected: (value: any) => void — Çekmeceyi kapatmak veya seçimi değiştirmek için kullanılan setter.
+  - printingQr: boolean — QR etiketi yazdırma işleminin devam edip etmediğini gösterir.
+  - setPrintingQr: (value: boolean) => void — QR yazdırma durumunu günceller.
+  - selectedStock: number | null — Ürünün mevcut stok miktarı.
+  - selectedThreshold: string | number — Kullanıcı tarafından girilen eşik değeri.
+  - setSelectedThreshold: (value: string | number) => void — Eşik değerini günceller.
+  - defaultThreshold: number | null — Sistem tarafından tanımlı varsayılan eşik.
+  - saving: boolean — Eşik kaydetme işleminin sürecini gösterir.
+  - saveThreshold: (productId: string) => void — Yeni eşik değerini kaydeder.
+  - hasWriteAccess: boolean — Kullanıcının düzenleme yetkisi olup olmadığını belirler.
+  - moveQty: number — Stok hareketi miktarı.
+  - setMoveQty: (value: number) => void — Stok hareket miktarını ayarlar.
+  - moving: boolean — Stok hareketi işleminin devam edip etmediği.
+  - adjustStock: (params: any) => void — Stok ayarlama işlemini gerçekleştirir.
+  - reservedOrders: any[] — Rezerve siparişlerin listesi.
+  - movements: any[] — Stok hareket geçmişi.
+  - undoLastMovement: () => void — Son stok hareketini geri alır.
+  - undoing: boolean — Geri alma işleminin sürecini gösterir.
+  - t: (key: string) => string — Çeviri fonksiyonu.
+
+**Dönüş**: `void` (React bileşeni olarak JSX döndürür; render edildiğinde UI oluşturur).
 
 ---
 
@@ -72,33 +89,30 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryDetailDrawer.tsx::InventoryDetailDrawer
-- **params**: `props: InventoryDetailDrawerProps`
+- **params**: (props)
 - **ic_degiskenler**:
-  - `selected` — currently selected inventory item (InventoryRow); used to display name, product_id, daily_velocity, available_stock, abc_class via dot access; passed to `printQrLabel`.
-  - `setSelected` — state setter for `selected`; called with `null` to close drawer (backdrop click, close button, Escape key via `onKey`).
-  - `printingQr` — boolean flag; disables QR button and shows `'...'` when true.
-  - `setPrintingQr` — state setter for `printingQr`; passed as second argument to `printQrLabel`.
-  - `selectedStock` — numeric stock level or `'-'`; displayed in “Güncel Stok” card.
-  - `selectedThreshold` — string or number; threshold input value; used in condition to decide display value (if empty, falls back to `defaultThreshold`).
-  - `setSelectedThreshold` — state setter for threshold; called with `e.target.value === '' ? '' : Number(e.target.value)` on input change.
-  - `defaultThreshold` — default threshold value; used when `selectedThreshold` is empty.
-  - `saving` — boolean; disables threshold save button and shows `'...'`.
-  - `saveThreshold` — function to save threshold; called with `selected.product_id`.
-  - `hasWriteAccess` — boolean; controls visibility of write‑access sections (threshold edit, stock adjust, undo button).
-  - `moveQty` — number; stock movement quantity passed to `InventoryStockAdjust`.
-  - `setMoveQty` — state setter for `moveQty`; passed to `InventoryStockAdjust`.
-  - `moving` — boolean; stock movement in progress; passed to `InventoryStockAdjust`.
-  - `adjustStock` — function to adjust stock; passed as `onAdjust` to `InventoryStockAdjust`.
-  - `reservedOrders` — array of ReservedRow; passed to `InventoryReservedTable`.
-  - `movements` — array of Movement; passed to `InventoryMovementHistory`; also used for length check in undo button condition.
-  - `undoLastMovement` — function to undo last movement; called on button click.
-  - `undoing` — boolean; disables undo button and shows `'Geri Alınıyor...'`.
-  - `t` — translation function; called with `'admin.ui.close'` for close button label.
-  - `printQrLabel` — imported async function from `'./InventoryQrLabel'`; called with `selected` and `setPrintingQr` inside QR button onClick (using `void` to ignore promise).
-  - `useEffect` — React hook; used to register/unregister a keyboard event listener for Escape key.
-  - `window` — global object; `addEventListener('keydown', onKey)` / `removeEventListener('keydown', onKey)`.
-  - `onKey` — arrow function defined inside `useEffect` callback; checks `e.key === 'Escape'` and calls `setSelected(null)`.
-- **Dönüş**: `JSX.Element | null` — returns `null` if `!selected`, otherwise renders a drawer panel (fragment containing a backdrop and an aside with all item details, controls, and sub‑components).
+  - `selected` — seçili envanter satırı, drawer’ın gösterilip gösterilmeyeceğini belirler
+  - `setSelected` — seçili satırı sıfırlamak için kullanılan state setter fonksiyonu
+  - `printingQr` — QR kodu basımının şu anda gerçekleşip gerçekleşmediğini gösteren boolean
+  - `setPrintingQr` — QR basım durumunu güncelleyen state setter fonksiyonu
+  - `selectedStock` — seçili ürünün mevcut stok miktarı
+  - `selectedThreshold` — seçili ürün için gösterilen eşik (alarm) değeri
+  - `setSelectedThreshold` — eşik değerini güncelleyen state setter fonksiyonu
+  - `defaultThreshold` — ürünün varsayılan eşik değeri (fallback)
+  - `saving` — eşik güncelleme işleminin devam edip etmediğini gösteren boolean
+  - `saveThreshold` — eşik değerini kaydeden fonksiyon (product_id parametresi alır)
+  - `hasWriteAccess` — kullanıcının düzenleme yetkisi olup olmadığını belirten boolean
+  - `moveQty` — stok hareketi miktarı (adjust component’ine aktarılır)
+  - `setMoveQty` — hareket miktarını güncelleyen state setter fonksiyonu
+  - `moving` — stok hareketi işleminin devam edip etmediğini gösteren boolean
+  - `adjustStock` — stok ayarlama işlemini tetikleyen callback
+  - `reservedOrders` — rezerve siparişlerin listesi, `InventoryReservedTable`a prop olarak verilir
+  - `movements` — stok hareket geçmişi dizisi, `InventoryMovementHistory`a prop olarak verilir
+  - `undoLastMovement` — son hareketi geri almayı tetikleyen fonksiyon
+  - `undoing` — geri alma işleminin devam edip etmediğini gösteren boolean
+  - `t` — i18n çeviri fonksiyonu
+  - `onKey` — `Escape` tuşuna basıldığında drawer’ı kapatan yerel fonksiyon (useEffect içinde tanımlanır)
+- **Dönüş**: yok (React bileşeni, JSX döndürür; yan etkileri: `useEffect` ile klavye dinleyicisi ekler ve temizler)
 
 ---
 
@@ -117,16 +131,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[-20px_0_50px_rgba(0,0,0,0.5)]`, `shadow-[0_0_10px_rgba(34,211,238,0.8)]`, `shadow-[0_0_15px_rgba(245,158,11,0.5)]`, `shadow-[0_0_15px_rgba(34,211,238,0.5)]`, `shadow-[0_0_30px_rgba(34,211,238,0.05)]`
-- **height:** (yok)
-- **width:** `sm:w-[480px]`
-- **spacing:** (yok)
-- **diğer:** `tracking-[0.2em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-lg`, `rounded-hvac-xl`
+- `rounded-hvac-lg`, `rounded-hvac-xl`, `shadow-glow-md`, `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500`, `bg-black/60`, `bg-cyan-400`, `bg-cyan-400/10`, `bg-white/[0.02]`, `bg-white/[0.03]`, `border-b`, `border-cyan-400/20`, `border-l`, `border-none`, `border-white/10`, `border-white/5`, `text-3xl`, `text-base`, `text-cyan-300`
+- **Renkler:** `bg-amber-500`, `bg-black/60`, `bg-cyan-400`, `bg-cyan-400/10`, `bg-white/2`, `bg-white/3`, `border-b`, `border-cyan-400/20`, `border-l`, `border-none`, `border-white/10`, `border-white/5`, `text-3xl`, `text-base`, `text-cyan-300`
 - **Layout:** `-right-8`, `-top-8`, `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`
 - **Responsive:** `sm:` prefix kullanımları

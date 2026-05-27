@@ -4,38 +4,55 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\ProductsHero.tsx
 skeleton_hash: 93075d4dc41a48bb
-generated_at: 2026-05-23T22:26:16Z
+entity_hashes:
+  func:ProductsHero: 23bf6f05c6d119a9
+  overview: 9bf8d11aa62d961e
+  style_tokens: e0270442d06112db
+generated_at: 2026-05-27T11:44:44Z
 ---
 
-## Genel Bakış
-Bu modül, VentHub HVAC platformunun ürünler sayfasının kullanıcının ilk etkileşime girdiği üst (hero) bölümünü oluşturan bir React bileşenini barındırır. Üst bileşenlerden aldığı prop'lar aracılığıyla sayfa içindeki arama işlevini yönetir ve bu işlevi hero bölümünde entegre eder.
+## Genel Bakış  
+ProductsHero, ürün sayfasının üst kısmında yer alan arama çubuğu ve başlık bileşenini oluşturan bir React fonksiyonel bileşendir. Kullanıcı arama girdisini kontrol eder, değişiklikleri üst bileşene iletir ve referans üzerinden doğrudan DOM erişimi sağlar.
 
-## Fonksiyon Grupları
-### Ana Ürünler Hero Bileşeni
-Ürünler sayfasının ana üst bölümünü render eden, arama girişinin değerini, değişiklik tetikleyicisini ve giriş referansını üst bileşenlerden alarak çalışan tek sorumlu bileşendir.
-- ProductsHero
+## Fonksiyon Grupları  
+### UI ve Etkileşim  
+Bu grup, bileşenin görsel düzenini ve kullanıcı etkileşimini yönetir.  
+- ProductsHero  
+
+Bu tek fonksiyon, arama alanının değerini alır, değişiklikleri `onSearchChange` ile geri bildirir ve `searchInputRef` ile DOM referansını sağlar. Bileşen, arama kutusunu ve başlık/alt başlık gibi statik metinleri render eder.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı ürünler sayfası üst (hero) bileşeni, çalışması için üst bileşenden zorunlu olarak iletilen prop'ların geçerli biçimde sağlanmasını varsayar; arama işlevlerinin sorunsuz çalışması bu prop'ların bütünlüğüne bağlıdır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer üst bileşenden iletilen `searchValue` string değeri sağlanmaz veya geçersiz bir tipte gönderilirse, arama input'u doğru şekilde gösterilemez, kullanıcı girdiği arama sorgusunu ekranda göremez.
-[Aksiyom 2]: Eğer arama girdisindeki değişiklikleri üst bileşene bildirmek için gereken `onSearchChange` fonksiyonu sağlanmazsa, kullanıcının input'a yaptığı tüm değişiklikler yakalanamaz, arama işlevi hiç çalışmaz.
-[Aksiyom 3]: Eğer arama input'una dışarıdan erişim için iletilen `searchInputRef` React ref nesnesi geçersiz biçimde gönderilirse, bileşen dışından bu input'a odaklanma, değerini okuma gibi işlemler yapılamaz.
+**Aksiyom 1**: Eğer `searchValue` sağlanmazsa, arama kutusu boş gösterilir ve kullanıcı arama yapamaz.
+
+**Aksiyom 2**: Eğer `onSearchChange` bir fonksiyon değilse veya tanımlı değilse, arama girdisi değiştiğinde hiçbir geri bildirim gerçekleşmez ve UI’da “debounce” ya da “live‑search” gibi davranışlar çalışmaz.
+
+**Aksiyom 3**: Eğer `searchInputRef` bir geçerli React ref nesnesi (ör. `React.createRef()` ya da `useRef()`) değilse, dışarıdan bu input elemanına odaklanma / değer set etme gibi işlemler gerçekleştirilemez ve odak yönetimi hatalı olur.
+
+**Aksiyom 4**: Eğer `searchValue` bir `string` tipinde değilse (ör. `null`, `undefined` veya başka bir tip), bileşen render sırasında tip hatası verir ve UI’da arama kutusunun değeri gösterilemez.
+
+**Aksiyom 5**: Eğer `onSearchChange` fonksiyonu, beklenen imzaya (ör. `(event: React.ChangeEvent<HTMLInputElement>) => void`) uymuyorsa, arama kutusundaki değişiklikler doğru şekilde işlenmez ve uygulama mantığı bozulur.
+
+**Aksiyom 6**: Eğer `searchInputRef` sağlanmazsa, bileşen içinde `ref` üzerinden doğrudan DOM elemanına erişim (ör. `focus()`) mümkün olmaz; bu da otomatik odaklama gibi özelliklerin çalışmamasına yol açar.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ProductsHero
-**Ne yapar**: VentHub HVAC platformunun ürün hub'ında kullanılan ana giriş (hero) bölümünü oluşturan React bileşenidir. Ürünler kataloğuna erişim öncesi kullanıcıya görsel bir karşılama bölümü sunan yapı, LCP (En Büyük İçerik Boyanması) performansı odaklı olarak optimize edilmiştir. Bölüm içerisinde kullanıcıların ürünleri filtreleyerek arayabileceği beyaz bir arama çubuğu, koyu lacivert gradyan ile zenginleştirilmiş endüstriyel bir arka plan görseli barındırır.
-**Nasıl yapar**: React fonksiyonel bileşeni olarak, aldığı prop'ları içerisindeki arama giriş elemanına ileterek tam etkileşimli bir yapı oluşturur. LCP optimizasyonu sayesinde sayfa yükleme sürecinde en büyük ve en önemli görsel ve metinsel içeriklerin en kısa sürede kullanıcıya sunulmasını sağlar, bu da hem kullanıcı deneyimini hem de arama motoru sıralamalarını olumlu yönde etkiler. Arka planındaki gradyan ve endüstriyel görsel kombinasyonu, platformun HVAC odaklı kimliği ile tam uyumlu bir görünüm oluşturur.
+**Ne yapar**: Ürünler sayfasının üst kısmında yer alan hero bölümü oluşturur; koyu lacivert bir degrade, endüstriyel arka plan görseli ve beyaz bir arama çubuğu içerir.  
+
+**Nasıl yapar**: Gelen `searchValue`, `onSearchChange` ve `searchInputRef` propslarını kullanarak arama çubuğunu kontrol eder, stil ve görselleri LCP (Largest Contentful Paint) optimizasyonuna uygun şekilde ayarlar ve JSX içinde hero tasarımını render eder.  
+
 **Parametreler**:
-- searchValue: string — Arama çubuğunda anlık olarak görüntülenen mevcut arama terimini tutan dinamik değer
-- onSearchChange: function — Arama çubuğundaki değer değişikliklerini üst bileşene iletmek için kullanılan geri çağırım (callback) fonksiyonu
-- searchInputRef: React.RefObject<HTMLInputElement> — Arama giriş elemanına DOM seviyesinde erişim sağlamak için kullanılan React referans nesnesi
-**Dönüş**: React.FC<ProductsHeroProps> — Tanımlı prop tipleriyle tam uyumlu, uygulamanın ilgili sayfasına entegre edilerek ürün hub'ı hero bölümünü ekrana render eden React fonksiyonel bileşeni döndürür.
+- `searchValue`: string — Arama giriş alanının mevcut değeri.
+- `onSearchChange`: (event: React.ChangeEvent\<HTMLInputElement\>) => void — Arama metni değiştiğinde tetiklenen geri çağırma fonksiyonu.
+- `searchInputRef`: React.RefObject\<HTMLInputElement\> — Arama girişine doğrudan erişim sağlamak için kullanılan ref nesnesi.
+
+**Dönüş**: React.FC\<ProductsHeroProps\> — Tanımlanan props tipine sahip bir fonksiyonel React bileşeni.
 
 ---
 
@@ -51,13 +68,10 @@ Bu React tabanlı ürünler sayfası üst (hero) bileşeni, çalışması için 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\ProductsHero.tsx::ProductsHero
-- **params**: searchValue, onSearchChange, searchInputRef
-  - `searchValue` — arama inputunda gösterilen mevcut metin değeri, arama filtresi olarak kullanılır
-  - `onSearchChange` — arama inputunda metin değişikliği olduğunda tetiklenen callback fonksiyonu, üst bileşene yeni arama değerini iletmek için kullanılır
-  - `searchInputRef` — arama input elementine erişmek için kullanılan ref nesnesi, DOM manipülasyonu için aktarılır
+- **params**: (searchValue, onSearchChange, searchInputRef)
 - **ic_degiskenler**:
-  - `t` — `useI18n` hookundan alınan çok dilli çeviri fonksiyonu, bileşen içindeki tüm metinleri dinamik olarak çevirmek için kullanılır
-- **Dönüş**: JSX React elementi, ürünler sayfasının ana hero bölümünü oluşturan, arka plan görseli, dekoratif SVG'ler, başlık metni ve arama çubuğu içeren section elementi döndürülür
+  - `t` — `useI18n` hook'undan alınan çeviri fonksiyonu; UI metinlerini yerelleştirmek için kullanılır
+- **Dönüş**: React.ReactElement (JSX)
 
 ---
 
@@ -76,16 +90,12 @@ Bu React tabanlı ürünler sayfası üst (hero) bileşeni, çalışması için 
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `min-h-[320px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gradient-to-b`, `bg-surface-navy`, `bg-transparent`, `bg-white`, `bg-white/10`, `border-0`, `from-surface-navy/80`, `lg:text-5xl`, `md:text-4xl`, `md:text-lg`, `text-3xl`, `text-base`, `text-center`, `text-gray-400`, `text-gray-800`
-- **Layout:** `absolute`, `drop-shadow-md`, `flex`, `flex-col`, `from-surface-navy/80`, `group-focus-within:bg-cyan-400/10`, `group-focus-within:text-cyan-500`, `h-80`, `h-full`, `items-center`, `justify-center`, `left-4`, `max-w-3xl`, `max-w-xl`, `overflow-hidden`
+- **Layout:** `absolute`, `drop-shadow-md`, `flex`, `flex-col`, `from-surface-navy/80`, `group-focus-within:bg-cyan-400/10`, `group-focus-within:text-cyan-500`, `h-80`, `h-full`, `items-center`, `justify-center`, `left-4`, `max-w-3xl`, `max-w-xl`, `min-h-320px`
 - **Responsive:** `lg:`, `md:` prefix kullanımları
