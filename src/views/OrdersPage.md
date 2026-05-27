@@ -11,8 +11,8 @@ entity_hashes:
   func:getStatusColor: 278d94f1c8a522db
   func:getStatusText: 248f40bb51719423
   overview: fc7e5a9a85876ec8
-  style_tokens: 71d7860a8420a926
-generated_at: 2026-05-27T12:07:56Z
+  style_tokens: 4894888e4850f9b4
+generated_at: 2026-05-27T18:30:24Z
 ---
 
 ## Genel Bakış
@@ -239,8 +239,8 @@ graph TD
     OrdersPage_tsx__formatPrice["formatPrice"]
     OrdersPage_tsx__getStatusColor["getStatusColor"]
     OrdersPage_tsx__getStatusText["getStatusText"]
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusColor
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatDate
 ```
@@ -272,4 +272,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-clean-white`, `bg-orange-100`, `bg-orange-100/80`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-slate-100`, `bg-slate-50`, `bg-white`, `border-b`, `border-b-2`, `border-orange-200`, `border-primary-navy`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`
 - **Layout:** `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `h-1`, `h-10`, `h-12`, `h-16`, `h-7`, `inline-flex`, `items-center`, `justify-between`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${active`, `${activeIdx`, `${getStatusColor(order.status`, `1`, `:`, `>=`, `animate-spin`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`, `font-medium`, `hover:scale-102`, `idx`

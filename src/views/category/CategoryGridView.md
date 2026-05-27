@@ -7,8 +7,8 @@ skeleton_hash: f777c407c48b29e3
 entity_hashes:
   func:CategoryGridView: 7b1f2c5723260534
   overview: 24b0f5382275b1f2
-  style_tokens: 063c4d890f50f7a4
-generated_at: 2026-05-27T11:55:28Z
+  style_tokens: 9b61cf001b5ee023
+generated_at: 2026-05-27T18:30:56Z
 ---
 
 ## Genel Bakış
@@ -106,6 +106,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-3xl`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
+- **Renkler:** `bg-primary-navy`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `hover:text-slate-600`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
 - **Layout:** `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-12`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `lg:flex-row`, `lg:w-80`
-- **Responsive:** `lg:`, `sm:`, `xl:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `lg:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `${filters.viewMode`, `:`, `===`, `border`, `focus-visible:ring-primary-ocean/20`, `font-bold`, `font-medium`, `list`, `mb-10`, `pb-6`, `pl-4`, `pr-10`, `py-2.5`, `py-32`, `rounded-lg`

@@ -7,8 +7,8 @@ skeleton_hash: 68ab2fd6998e4d6d
 entity_hashes:
   func:EditableCell: c69e143b78ab0750
   overview: 4312d2a15431d150
-  style_tokens: 4f1bcdc4878f37fb
-generated_at: 2026-05-27T11:42:10Z
+  style_tokens: 2f2ada2707ada249
+generated_at: 2026-05-27T18:10:39Z
 ---
 
 ## Genel Bakış
@@ -117,6 +117,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-transparent`, `border-2`, `border-b`, `border-dashed`, `border-primary-navy`, `border-primary-navy/30`, `border-slate-300`, `border-t-primary-navy`, `text-left`, `text-slate-400`, `text-sm`
+- **Renkler:** `bg-transparent`, `border-2`, `border-b`, `border-dashed`, `border-primary-navy`, `border-primary-navy/30`, `border-slate-300`, `border-t-primary-navy`, `hover:border-primary-navy`, `hover:text-primary-navy`, `text-left`, `text-slate-400`, `text-sm`
 - **Layout:** `gap-1`, `h-3.5`, `inline-block`, `inline-flex`, `items-center`, `p-0`, `w-3.5`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${className`, `${inputWidth`, `animate-spin`, `border`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-1`, `focus-visible:ring-primary-navy/50`, `px-1.5`, `py-0.5`, `rounded`, `rounded-full`, `transition-colors`

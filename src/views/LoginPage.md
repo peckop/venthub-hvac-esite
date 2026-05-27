@@ -9,8 +9,8 @@ entity_hashes:
   func:handleGoogleSignIn: 0c49de53cd5a94df
   func:handleSubmit: 460293fdfa9263b6
   overview: d9286dd8d85a5a34
-  style_tokens: 0cbaa1cf5400afef
-generated_at: 2026-05-27T11:54:39Z
+  style_tokens: 4dc86ff7a25fa026
+generated_at: 2026-05-27T18:30:22Z
 ---
 
 ## Genel Bakış
@@ -119,6 +119,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-25`, `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-clean-white`, `bg-gradient-to-br`, `bg-login-radial`, `bg-primary-navy`, `bg-repeat`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `border-white/20`, `from-air-blue`, `from-primary-navy`, `text-2xl`, `text-center`, `text-industrial-gray`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `from-air-blue`, `from-primary-navy`, `gap-3`, `group-hover:-translate-y-1`, `group-hover:shadow-login-btn-hover`, `group-hover:text-primary-navy`, `h-16`, `h-4`, `h-5`, `inline-flex`, `items-center`
-- **Responsive:** (yok)
+- **Renkler:** `bg-clean-white`, `bg-gradient-to-br`, `bg-login-radial`, `bg-primary-navy`, `bg-repeat`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `border-white/20`, `focus-visible:border-primary-ocean`, `from-air-blue`, `from-primary-navy`, `group-hover:text-primary-navy`, `hover:bg-industrial-gray`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `from-air-blue`, `from-primary-navy`, `gap-3`, `group-hover:shadow-login-btn-hover`, `h-16`, `h-4`, `h-5`, `inline-flex`, `items-center`, `justify-between`, `justify-center`
+- **Varyant/Responsive:** `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-98`, `animate-spin`, `border`, `cursor-pointer`, `disabled:opacity-70`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-primary-ocean/20`, `font-bold`, `font-medium`, `group`, `group-hover:-translate-y-1`, `inset-0`, `inset-y-0`, `mb-2`

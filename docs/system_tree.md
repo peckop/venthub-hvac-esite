@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-27T17:46:57.978293+00:00
+compiled_at: 2026-05-27T18:35:08.619865+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-27T17:46:57.978293+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-27T18:35:08.619865+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -28,10 +28,10 @@ Bu belge, otonom derleyici tarafından 2026-05-27T17:46:57.978293+00:00 tarihind
 │   │   │   ├── 📂 **orders/**
 │   │   │   │   ├── 📂 **detail/**
 │   │   │   │   │   └── ✅ `page.tsx`
-│   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── ✅ `page.tsx`
 │   │   │   ├── 📂 **profile/**
-│   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── 📂 **returns/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **security/**
@@ -47,13 +47,13 @@ Bu belge, otonom derleyici tarafından 2026-05-27T17:46:57.978293+00:00 tarihind
 │   │   │   │   │       └── ✅ `page.tsx`
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **coupons/**
-│   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── 📂 **error-groups/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **errors/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **inventory/**
-│   │   │   │   ├── ✅ `page.tsx`
+│   │   │   │   ├── ❌ `page.tsx`
 │   │   │   │   ├── 📂 **report/**
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── 📂 **settings/**
@@ -71,7 +71,7 @@ Bu belge, otonom derleyici tarafından 2026-05-27T17:46:57.978293+00:00 tarihind
 │   │   │   ├── 📂 **returns/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **settings/**
-│   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── 📂 **users/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   └── 📂 **webhook-events/**
@@ -155,7 +155,7 @@ Bu belge, otonom derleyici tarafından 2026-05-27T17:46:57.978293+00:00 tarihind
 │   │   ├── ✅ `BentoGrid.tsx`
 │   │   ├── ✅ `BrandsShowcase.tsx`
 │   │   ├── ✅ `BuildTag.tsx`
-│   │   ├── ✅ `CartToast.tsx`
+│   │   ├── ❌ `CartToast.tsx`
 │   │   ├── ✅ `CaseStudySection.tsx`
 │   │   ├── ✅ `CategoriesShowcase.tsx`
 │   │   ├── ✅ `CategoryFlow.tsx`
@@ -176,7 +176,7 @@ Bu belge, otonom derleyici tarafından 2026-05-27T17:46:57.978293+00:00 tarihind
 │   │   ├── ✅ `MagneticCTA.tsx`
 │   │   ├── ✅ `MegaMenu.tsx`
 │   │   ├── ✅ `PaymentWatcher.tsx`
-│   │   ├── ✅ `ProductCard.tsx`
+│   │   ├── ❌ `ProductCard.tsx`
 │   │   ├── ✅ `QuickViewModal.tsx`
 │   │   ├── ✅ `ResourcesSection.tsx`
 │   │   ├── ✅ `ScrollLinkedProcess.tsx`
@@ -192,7 +192,7 @@ Bu belge, otonom derleyici tarafından 2026-05-27T17:46:57.978293+00:00 tarihind
 │   │   ├── ✅ `TiltCard.tsx`
 │   │   ├── ✅ `TrustSection.tsx`
 │   │   ├── ✅ `UndecidedUserCTA.tsx`
-│   │   ├── ✅ `VisualShowcase.tsx`
+│   │   ├── ❌ `VisualShowcase.tsx`
 │   │   ├── ✅ `WhatsAppFloat.tsx`
 │   │   ├── ✅ `WhyVentHubEnhanced.tsx`
 │   │   ├── 📂 **admin/**
@@ -273,7 +273,7 @@ Bu belge, otonom derleyici tarafından 2026-05-27T17:46:57.978293+00:00 tarihind
 │   │   │   ├── ✅ `FinalCTA.tsx`
 │   │   │   ├── ✅ `GuidedCategoryDiscovery.tsx`
 │   │   │   ├── ✅ `HomePageClientWrapper.tsx`
-│   │   │   ├── ✅ `HomeSinevizyon.tsx`
+│   │   │   ├── ❌ `HomeSinevizyon.tsx`
 │   │   │   ├── ✅ `KnowledgeBlock.tsx`
 │   │   │   ├── ✅ `QuickEntryRail.tsx`
 │   │   │   ├── ✅ `RevealSection.tsx`
@@ -292,7 +292,7 @@ Bu belge, otonom derleyici tarafından 2026-05-27T17:46:57.978293+00:00 tarihind
 │   │   │   ├── ✅ `MegaMenu3DBackground.tsx`
 │   │   │   ├── ✅ `NavActionButton.tsx`
 │   │   │   ├── ✅ `NavBrand.tsx`
-│   │   │   ├── ✅ `NavPrimaryRail.tsx`
+│   │   │   ├── ❌ `NavPrimaryRail.tsx`
 │   │   │   ├── ✅ `NavSearchTrigger.tsx`
 │   │   │   ├── ✅ `NavSecondaryRail.tsx`
 │   │   │   ├── ✅ `NavShell.tsx`
@@ -600,4 +600,14 @@ Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut.
 Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
 
 ## Geçersiz Şablon (Invalid Format)
-Harika! Tüm MD belgeleri Enterprise-Ready (5N1K + Axioms) şablonuna uygun. ✅
+Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:
+- [❌] `src\app\account\orders\page.md`
+- [❌] `src\app\account\profile\page.md`
+- [❌] `src\app\admin\coupons\page.md`
+- [❌] `src\app\admin\inventory\page.md`
+- [❌] `src\app\admin\settings\page.md`
+- [❌] `src\components\CartToast.md`
+- [❌] `src\components\ProductCard.md`
+- [❌] `src\components\VisualShowcase.md`
+- [❌] `src\components\home\HomeSinevizyon.md`
+- [❌] `src\components\navigation\NavPrimaryRail.md`

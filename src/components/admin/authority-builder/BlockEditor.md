@@ -7,8 +7,8 @@ skeleton_hash: bb9ce06ca0b5ad23
 entity_hashes:
   func:BlockEditor: 214d29bf0d4fb6bd
   overview: 451c6f0d8f51e9a4
-  style_tokens: 4d81b249599d8110
-generated_at: 2026-05-27T11:45:47Z
+  style_tokens: bc113824a6724140
+generated_at: 2026-05-27T18:10:50Z
 ---
 
 ## Genel Bakış
@@ -152,6 +152,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-indigo-50`, `bg-indigo-50/20`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-white`, `border-indigo-100/50`, `border-slate-100`, `text-center`, `text-indigo-400`, `text-indigo-600`, `text-slate-300`, `text-slate-400`, `text-slate-500`, `text-sm`
+- **Renkler:** `bg-indigo-50`, `bg-indigo-50/20`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-white`, `border-indigo-100/50`, `border-slate-100`, `hover:text-indigo-700`, `hover:text-red-500`, `text-center`, `text-indigo-400`, `text-indigo-600`, `text-slate-300`, `text-slate-400`
 - **Layout:** `absolute`, `flex`, `flex-1`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-32`, `h-7`, `h-9`, `items-center`, `items-start`, `justify-between`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `hover:` önekleri
+- **Yardımcı Sınıflar:** `${inputClass`, `${textareaClass`, `border`, `font-black`, `font-bold`, `font-mono`, `group`, `italic`, `px-3`, `py-1`, `rounded`, `rounded-full`, `rounded-lg`, `rounded-xl`, `space-y-3`

@@ -7,8 +7,8 @@ skeleton_hash: 51959c03f2b8ee36
 entity_hashes:
   func:HubPage: ae5a0ef5e997bc98
   overview: 92f1bd1bc9a0b472
-  style_tokens: c268b09644e71fe8
-generated_at: 2026-05-27T12:24:28Z
+  style_tokens: 8d8885134f307444
+generated_at: 2026-05-27T18:31:03Z
 ---
 
 ## Genel Bakış
@@ -135,5 +135,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-amber-500`, `bg-cyan-50`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-gradient-to-b`, `bg-slate-200/50`, `bg-slate-400`, `bg-slate-50`, `bg-slate-900`, `bg-slate-950`, `bg-transparent`, `bg-white`, `bg-white/5`, `border-cyan-500/20`
-- **Layout:** `absolute`, `backdrop-blur-xl`, `block`, `flex`, `flex-wrap`, `from-slate-950/80`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `group-focus-within:opacity-100`, `group-hover:bg-cyan-500/20`, `group-hover:text-cyan-600`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Layout:** `absolute`, `backdrop-blur-xl`, `block`, `flex`, `flex-wrap`, `from-slate-950/80`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `h-1.5`, `h-64`, `h-full`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-focus-within:`, `group-hover:`, `hover:`, `lg:`, `md:`, `placeholder:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `$`, `:`, `===`, `activeTag`, `animate-pulse`, `blur-100`, `blur-2xl`, `border`, `duration-500`, `focus-visible:ring-0`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `grayscale`

@@ -9,8 +9,8 @@ entity_hashes:
   func:ContactPage: a5b3030a0864a814
   func:handleSubmit: 460293fdfa9263b6
   overview: d36d38f2c5628948
-  style_tokens: 2843b884779face7
-generated_at: 2026-05-27T11:54:43Z
+  style_tokens: 21b7b2d66d6de05a
+generated_at: 2026-05-27T18:30:17Z
 ---
 
 ## Genel Bakış  
@@ -131,16 +131,17 @@ graph TD
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
+- **shadow:** `hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]`
 - **height:** (yok)
 - **width:** (yok)
 - **spacing:** (yok)
-- **diğer:** `hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]`
+- **diğer:** (yok)
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - `rounded-hvac-2xl`, `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-wide`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-slate-100`, `lg:text-6xl`, `lg:text-8xl`, `text-2xl`
-- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `group-hover:bg-cyan-500`, `group-hover:text-white`, `h-12`, `h-2`, `h-20`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-slate-100`, `group-hover:bg-cyan-500`, `group-hover:text-white`, `hover:bg-cyan-400`
+- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `h-12`, `h-2`, `h-20`, `h-500px`, `inline-flex`
+- **Varyant/Responsive:** `active:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `group`, `hover:underline`

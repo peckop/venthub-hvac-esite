@@ -7,8 +7,8 @@ skeleton_hash: 622dd4d11cb43f53
 entity_hashes:
   func:OrderDetailPage: 86e76b4c00c9f2fc
   overview: 91762eaa328b7587
-  style_tokens: 571bb75f176a8e04
-generated_at: 2026-05-27T11:48:49Z
+  style_tokens: 2d7ff3d6e2a546ab
+generated_at: 2026-05-27T18:30:40Z
 ---
 
 ## Genel Bakış
@@ -292,5 +292,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-clean-white`, `bg-green-100`, `bg-orange-100`, `bg-orange-100/80`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-slate-100`, `bg-slate-100/80`, `bg-slate-200`, `bg-slate-50`, `bg-slate-50/80`, `bg-white`, `border-b`, `border-b-2`, `border-gray-100`
-- **Layout:** `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-6`, `grid`, `grid-cols-1`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `h-1`, `h-10`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Layout:** `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-6`, `grid`, `grid-cols-1`, `h-1`, `h-10`, `h-12`, `h-6`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${activeIdx`, `${getStatusColor(order.status`, `${idx`, `${ok`, `${tab`, `1`, `:`, `<=`, `===`, `>=`, `activeIdx`, `animate-spin`, `border`, `break-all`, `divide-slate-100`

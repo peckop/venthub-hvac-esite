@@ -7,8 +7,8 @@ skeleton_hash: 0f6c10a75d5ca248
 entity_hashes:
   func:StepCustomerInfo: 2698d0acd17fa1de
   overview: 3962b33f58fa703d
-  style_tokens: 7e2cf916d8e002e3
-generated_at: 2026-05-27T11:51:09Z
+  style_tokens: 61f2a39b43a19a77
+generated_at: 2026-05-27T18:31:01Z
 ---
 
 ## Genel Bakış
@@ -98,6 +98,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `border-slate-200`, `text-industrial-gray`, `text-sm`, `text-white`, `text-xl`
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `border-slate-200`, `focus-visible:border-primary-navy`, `placeholder:text-slate-400`, `text-industrial-gray`, `text-sm`, `text-white`, `text-xl`
 - **Layout:** `block`, `flex`, `gap-4`, `grid`, `grid-cols-1`, `h-10`, `items-center`, `md:grid-cols-2`, `p-2`, `w-full`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `focus-visible:`, `md:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-medium`, `font-semibold`, `mb-2`, `mb-6`, `px-4`, `rounded-lg`, `space-x-3`, `space-y-6`, `transition-colors`

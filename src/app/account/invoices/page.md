@@ -4,36 +4,39 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx
 skeleton_hash: 3e610cb029e1dc4e
-generated_at: 2026-05-23T21:47:13Z
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 3abd4459140e249f
+  style_tokens: 9144ece4bffe7964
+generated_at: 2026-05-27T17:58:18Z
 ---
 
 ## Genel Bakış
-`src/app/account/invoices/page.tsx` dosyası, fatura listesi sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, ilgili veri çekme, yetkilendirme ve UI düzenlemesini bir araya getirerek kullanıcıların fatura bilgilerini görüntülemesini sağlar.
+Bu dosya, kullanıcı hesabı altındaki fatura listesi sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, dinamik olarak yüklenen `AccountInvoicesPage` bileşenini döndürerek sayfanın veri çekme, yetkilendirme ve kullanıcı arayüzü düzenlemesini yönetir.
+
+## Fonksiyon Grupları
+### Ana Sayfa Bileşeni
+Hesap faturaları sayfasının kök bileşenini oluşturur. Dinamik içe aktarma (dynamic import) yoluyla ilgili görünümü yükler ve render eder.
+- Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `PageComponent` tanımlı değilse, `Page()` çağrısı bir hata (örneğin `ReferenceError`) oluşturur.  
-[Aksiyom 2]: Eğer `PageComponent` tanımlı ise, `Page()` fonksiyonu `PageComponent`'i çağırır ve döndürür.  
-[Aksiyom 3]: `Page()` fonksiyonu, parametre almaz; bu nedenle çağrıldığında hiçbir dış veri (örneğin props) beklemez.
-
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Bu fonksiyon, kullanıcının hesap sayfasındaki faturalar (invoices) bölümünü görüntüleyen bir React bileşeni döndürür. Sayfa, hesap yönetimi bağlamında fatura listeleme ve detay görüntüleme işlevselliğini sağlar.
+**Ne yapar**: React bileşeni `Page` fonksiyonu, JSX içinde `<PageComponent />` öğesini döndürerek bir sayfa görünümü oluşturur.  
 
-**Nasıl yapar**: Fonksiyon, gerekli alt bileşenleri ve veri çekme mantığını kullanarak fatura listesini oluşturur. Sayfa yüklendiğinde kullanıcıya ait faturaları getirir ve uygun bir kullanıcı arayüzü ile sunar. React bileşen yapısına uygun olarak JSX döndürür.
+**Nasıl yapar**: Fonksiyon, doğrudan bir JSX ifadesi olan `<PageComponent />`'i return eder; ek bir mantık, durum yönetimi veya yan etki yoktur.  
 
 **Parametreler**:
-- Yok: Fonksiyon herhangi bir parametre almaz.
+- (hiç parametre almaz)
 
-**Dönüş**: `<PageComponent />` — Hesap faturaları sayfasını temsil eden bir React bileşeni. Bu bileşen, faturaların listelendiği ve yönetildiği kullanıcı arayüzünü içerir.
+**Dönüş**: JSX.Element — `<PageComponent />` bileşenini temsil eden React öğesi.
 
 ---
 
@@ -45,15 +48,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::ArrowFunction (dynamic import callback)
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::anonymous_arrow_function
 - **params**: (parametre yok)
 - **ic_degiskenler**: yok
-- **Dönüş**: yok (loading spinner render eder)
+- **Dönüş**: React JSX elementi (merkezlenmiş yükleme spinner bileşeni)
 
 ### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**: yok
-- **Dönüş**: yok (PageComponent render eder)
+- **Dönüş**: `<PageComponent />` React bileşeni
 
 ---
 
@@ -66,3 +69,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-b-2`, `border-primary-navy`
+- **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`

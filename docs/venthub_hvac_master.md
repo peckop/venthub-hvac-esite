@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-27T17:46:58.252017+00:00
-total_compiled_files: 434
+compiled_at: 2026-05-27T18:35:08.882020+00:00
+total_compiled_files: 424
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-27T17:46:58.252017+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-27T18:35:08.882020+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -153,35 +153,49 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\actions\auth.ts
 skeleton_hash: b555f38881aa12f9
-generated_at: 2026-05-23T21:47:08Z
+entity_hashes:
+  func:loginAction: c7a355d296759a37
+  overview: 73ce20828c8a34de
+generated_at: 2026-05-27T17:58:40Z
 ---
 
 ## Genel Bakış
-`src/actions/auth.ts` modülü, kullanıcı giriş sürecini yöneten tek bir asenkron eylem fonksiyonu içerir. Bu fonksiyon, giriş formundan gelen verileri alır, arka uç kimlik doğrulama servisiyle iletişim kurar ve işlem sonucunu `AuthActionState` tipinde döndürür. Modül, uygulamanın oturum yönetimi katmanına veri sağlayarak giriş işlemlerinin merkezi bir noktada işlenmesini sağlar.
+`src/actions/auth.ts` modülü, Venthub HVAC uygulamasının kullanıcı kimlik doğrulama süreçlerini yöneten merkezi bir sunucu eylemleri modülüdür. Kullanıcı giriş işlemini tek bir yapılandırılmış fonksiyon aracılığıyla yürütür, oturum yönetimi katmanına işlem sonuçlarını standart bir formatta iletir.
 
 ## Fonksiyon Grupları
-### Kimlik Doğrulama İşlemi
-Bu grup, kullanıcı giriş formundan alınan verileri işleyerek kimlik doğrulama servisine gönderir ve oturum durumunu günceller.
+### Giriş İşlemi Yönetimi
+Bu grup, kullanıcı giriş formundan alınan verileri işleyerek kimlik doğrulama sürecini yürütür, başarılı veya başarısız işlem sonuçlarını yapılandırılmış bir durum nesnesi olarak döndürür.
 - loginAction
-
-(Grup içinde tek fonksiyon bulunduğu için diğer fonksiyonlarla doğrudan bir çağrı ilişkisi yoktur.)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Kullanıcı giriş sürecini yöneten bu kimlik doğrulama aksiyon modülünün doğru çalışması için giriş verilerinin beklenen formatta gönderilmesi, bağlı olduğu kimlik doğrulama servisinin erişilebilir olması ve tükettiği oturum yönetimi katmanının döndürülen durum nesnesini doğru işlemesi zorunludur.
+
+[Aksiyom 1]: Eğer loginAction fonksiyonuna iletilen FormData nesnesi kimlik doğrulama için gerekli tüm alanları içermiyorsa, arka uç kimlik doğrulama isteği gönderilemez, tüm giriş denemeleri başarısız olur.
+[Aksiyom 2]: Eğer loginAction'ın iletişim kurması gereken arka uç kimlik doğrulama servisi ağ veya servis hatası nedeniyle erişilebilir değilse, hiçbir kullanıcı için geçerli oturum oluşturulamaz, tüm giriş istekleri hata ile sonuçlanır.
+[Aksiyom 3]: Eğer loginAction'a gönderilen _prevState parametresi, tanımlanan AuthActionState tipinde veya null değilse, önceki giriş denemelerine ait hata bilgileri veya state verileri doğru işlenemez, form validasyon süreçleri çalışmaz.
+[Aksiyom 4]: Eğer uygulamanın oturum yönetimi katmanı bu modül tarafından döndürülen AuthActionState tipindeki durum nesnesini doğru yorumlayamıyorsa, başarılı giriş sonrası oturum açılamaz veya başarısız giriş durumlarında kullanıcıya doğru hata mesajı gösterilemez.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### loginAction
-**Ne yapar**: Kullanıcı giriş işlemini gerçekleştiren bir sunucu eylemidir. Form aracılığıyla gönderilen kimlik bilgilerini alır, doğrular ve kimlik doğrulama sürecini başlatır.
-**Nasıl yapar**: İlk parametre olarak önceki durum bilgisini (genellikle başlangıçta `null` veya daha önceki bir hata durumu) alır. İkinci parametre olarak giriş formundaki alanları içeren `FormData` nesnesini alır. Bu verileri kullanarak kullanıcıyı doğrular, başarılı veya başarısız sonuca göre `AuthActionState` türünde bir nesne döndürür.
+**Ne yapar**: Kullanıcıdan gelen e‑posta ve şifre bilgilerini doğrulayıp, Supabase kimlik doğrulama servisi üzerinden oturum açma işlemini gerçekleştirir. Başarılı ya da hatalı sonuçları `AuthActionState` nesnesi olarak döndürür.
+
+**Nasıl yapar**:  
+1. `formData` içinden `email` ve `password` alanlarını alır.  
+2. Alanlardan biri eksikse, hata mesajı içeren bir `AuthActionState` döner.  
+3. Supabase’ın `signInWithPassword` metodunu `await` ederek kimlik doğrulamayı dener.  
+4. Supabase’dan bir `error` gelirse, hata mesajını döner; aksi takdirde `revalidatePath` ile ana sayfa önbelleğini yeniler ve başarı işareti verir.  
+5. İstisna yakalanırsa, genel bir hata mesajı döndürülür.
+
 **Parametreler**:
-- `_prevState: AuthActionState | null` — Önceki eylem durumu; başlangıçta genellikle `null` olup, hata durumlarında bir önceki hatayı taşıyabilir.
-- `formData: FormData` — Kullanıcının giriş formunda doldurduğu alanları (ör. e-posta, parola) içeren veri yapısı.
-**Dönüş**: `Promise<AuthActionState>` — İşlemin sonucunu belirten asenkron bir dönüş değeri. Başarılı girişte kullanıcı bilgilerini içeren bir durum, başarısız girişte ise hata bilgilerini içeren bir durum döndürür.
+- `_prevState`: AuthActionState | null — Önceki aksiyon durumunu temsil eder; bu fonksiyon içinde kullanılmaz.
+- `formData`: FormData — HTTP isteğiyle gelen form verilerini tutar; `email` ve `password` alanlarını içerir.
+
+**Dönüş**: Promise\<AuthActionState\> — Asenkron olarak `error` (string) veya `success` (boolean) alanlarından birini içeren bir nesne döner.
 
 ---
 
@@ -196,12 +210,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/actions/auth.ts::loginAction
-- **params**: `_prevState: AuthActionState | null` (gövdede kullanılmamış), `formData: FormData`
-- **ic_degiskenler**: 
-  - `email` — `formData.get('email')` ile alınan e-posta adresi (string)
-  - `password` — `formData.get('password')` ile alınan şifre (string)
-  - `error` — `supabase.auth.signInWithPassword` çağrısından dönen hata nesnesi (yoksa `null`)
-- **Dönüş**: `Promise<AuthActionState>` — giriş başarılıysa `{ success: true }` döner ve `revalidatePath('/', 'layout')` ile sayfa önbelleği temizlenir; form alanları eksikse `{ error: 'Email ve şifre zorunludur.' }`; Supabase hatası durumunda `{ error: error.message }`; beklenmedik hata durumunda `{ error: 'Beklenmedik bir hata oluştu.' }` döner.
+- **params**: `_prevState: AuthActionState | null`, `formData: FormData`
+- **ic_degiskenler**:
+  - `email` — `formData.get('email')` ile alınan kullanıcı e-posta adresi (string)
+  - `password` — `formData.get('password')` ile alınan kullanıcı şifresi (string)
+  - `error` — `supabase.auth.signInWithPassword()` çağrısından destructure edilen hata nesnesi; varsa `error.message` dönüş nesnesine yazılır
+- **Dönüş**: `Promise<AuthActionState>` — başarılıysa `{ success: true }`, hata varsa `{ error: string }` döndürür.
 
 ---
 
@@ -568,15 +582,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\about\page.tsx
 skeleton_hash: e96bf4d40e2325e9
-generated_at: 2026-05-23T21:47:04Z
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 8871c1e7b993cf8e
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:13Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın "Hakkında" sayfasını oluşturan tek bir React bileşeni olan `Page` fonksiyonunu barındırır. Bu bileşen sayfa içeriğini döndürerek kullanıcıya statik bilgiler sunar.
+`src/app/about/page.tsx` modülü, uygulamanın “Hakkında” (About) sayfasını oluşturan tek bir React fonksiyonel bileşeni içerir. `Page` fonksiyonu, Next.js tarafından `/about` rotası ziyaret edildiğinde çağrılır ve statik içerik sağlayan JSX ağacını döndürür. Modülün tek sorumluluğu, bu sayfanın render edilmesini sağlamaktır.
 
 ## Fonksiyon Grupları
 ### Sayfa Renderlama
-Bu grup, "Hakkında" sayfasının JSX yapısını üreten tek bir fonksiyondan oluşur.
+Bu grup, “Hakkında” sayfasının kullanıcıya sunulacak JSX yapısını üreten tek bileşeni kapsar.  
 - Page
 
 ---
@@ -586,23 +604,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Bu fonksiyon, `venthub-hvac` uygulamasının `/about` (Hakkımızda) sayfasının ana görünümünü temsil eder. Kullanıcı bu rotayı ziyaret ettiğinde Next.js tarafından çağrılır ve sayfanın içeriğini oluşturur. Statik bir bilgilendirme sayfası olarak hizmet verir.
-**Nasıl yapar**: Standart bir React fonksiyonel bileşeni olarak çalışır. JSX (TypeScript) kullanarak sayfa düzenini, metinleri ve olası alt bileşenleri tanımlar ve render eder. Herhangi bir prop veya parametre almadığı için, içeriği tamamen bileşenin kendi kodunda tanımlıdır ve dışarıdan gelen verilere bağımlı değildir.
-**Parametreler**:
-- (Bu fonksiyon herhangi bir parametre almaz.)
-**Dönüş**: `React.ReactElement` — Sayfayı temsil eden bir JSX öğesi döndürür. Dönüş tipi `PageComponent` olarak işaretlenmiştir, bu da Next.js App Router'ın beklediği standart bir bileşen formatıdır.
+**Ne yapar**: `Page` fonksiyonu, uygulamanın "Hakkında" sayfasını temsil eden bir React bileşenidir. Sayfa içeriğini oluşturmak üzere `PageComponent` adlı başka bir bileşeni döndürür.
+**Nasıl yapar**: Herhangi bir işlem veya state yönetimi içermeden doğrudan `PageComponent` bileşenini JSX formatında return eder. Bu, üst düzey bir sayfa bileşeni olarak içeriği sarmalar.
+**Parametreler**: Yok
+**Dönüş**: `JSX.Element` — `<PageComponent />` şeklinde JSX ifadesi döndürür. Bu ifade, React tarafından render edilebilir bir sanal DOM öğesidir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\about\page.tsx::Page  
-- **params**: yok  
-- **ic_degiskenler**: yok  
-- **Dönüş**: JSX element (`<PageComponent />`)
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\about\page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element (React bileşeni `<PageComponent />` döndürür)
 
 ---
 
@@ -617,6 +634,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
 # FILE: src\app\account\layout.md
 
 ---
@@ -625,15 +658,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\account\layout.tsx
 skeleton_hash: 5148683d09e343c5
-generated_at: 2026-05-23T21:47:06Z
+entity_hashes:
+  func:Layout: f1cd59870391c992
+  overview: df5f26f87596d6fd
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:28Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın hesap (account) bölümüne ait sayfaların tamamı için ortak bir düzen (layout) tanımlar. Alt sayfaları saran bir `Layout` bileşeni aracılığıyla, hesap alanındaki tüm içeriğin tutarlı bir yapı ve görünüm kazanmasını sağlar.
+Bu modül, uygulamanın hesap (account) bölümünde yer alan tüm sayfalar için ortak bir düzen (layout) tanımlar. Tek bir `Layout` bileşeni ile alt sayfaların içeriği sarılır, böylece giriş, kayıt, profil gibi sayfalar arasında tutarlı bir yapı ve kullanıcı deneyimi sağlanır.
 
 ## Fonksiyon Grupları
 ### Sayfa Düzeni Sağlayıcı
-Hesap alt sayfalarının görüntüleneceği çerçeveyi oluşturur; ortak stilleri, gezinme öğelerini veya diğer paylaşılan yapılandırmaları içerebilir.
+Hesap alt sayfalarının görüntüleneceği çerçeveyi oluşturur; ortak stilleri, gezinme öğelerini veya paylaşılan diğer yapılandırmaları içerebilir.
 - Layout
 
 ---
@@ -643,29 +680,24 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Layout
-**Ne yapar**: Bu fonksiyon, uygulamanın "account" (hesap) bölümü için bir Next.js layout bileşeni tanımlar. İlgili sayfa içeriğini ortak bir kullanıcı arayüzü yapısıyla sararak hesap sayfaları (giriş, kayıt, profil vb.) arasında tutarlı bir düzen ve navigasyon sağlar.
-
-**Nasıl yapar**: Fonksiyon, bir `children` prop'u alır ve bu prop'u doğrudan bir `<LayoutComponent>` JSX elementi içine yerleştirir. Bu sayede alt sayfaların içeriği, layout tarafından sağlanan ortak HTML yapısı ve stiller ile birlikte render edilir.
-
+**Ne yapar**: Verilen `children` propunu `LayoutComponent` içine sararak sayfa düzenini sağlar.  
+**Nasıl yapar**: Fonksiyon, destructured `children` parametresini alır ve doğrudan `<LayoutComponent>{children}</LayoutComponent>` JSX'ini döndürür; ek mantık veya side‑effect yoktur.  
 **Parametreler**:
-- `children: React.ReactNode` — Layout içinde görüntülenecek olan alt sayfa bileşenini temsil eder. Next.js, aktif route'a göre bu prop'u otomatik olarak doldurur.
-
-**Dönüş**: `JSX.Element` — İçine `children` prop'u yerleştirilmiş bir `<LayoutComponent>` elementi döndürür. Bu element Next.js tarafından render edilmek üzere hazırdır.
+- children: React.ReactNode — Layout içinde görüntülenecek içerik (JSX elemanları, metin veya başka React bileşenleri).  
+**Dönüş**: JSX elementi — `LayoutComponent` içinde `children` içeren bir React elementi.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/account/layout.tsx::Layout
-- **params**: `children` — `React.ReactNode` türünde alt bileşenleri temsil eden prop; `LayoutComponent` içine aktarılır.
-- **ic_degiskenler**:
-  - `children` — **parametreden gelen değişken**: alt bileşenleri içerir; `{children}` ile `<LayoutComponent>` arasına yerleştirilir.
-- **Dönüş**: `<LayoutComponent>` JSX öğesi (React element).
+- **params**: 
+  - `children` — React.ReactNode tipinde, içeriğe yerleştirilecek alt bileşenleri temsil eder
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `<LayoutComponent>` bileşeni içine sarılmış `children` ile birlikte JSX döndürür (React.ReactElement)
 
 ---
 
@@ -680,6 +712,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Layout
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
 # FILE: src\app\account\page.md
 
 ---
@@ -688,15 +736,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\account\page.tsx
 skeleton_hash: c1785ce6cd56727b
-generated_at: 2026-05-23T21:47:24Z
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 281c4a012ddfb7d3
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:59:02Z
 ---
 
 ## Genel Bakış
-`src/app/account/page.tsx` modülü, kullanıcı hesabı sayfasının ana bileşenini tanımlar. Tek bir fonksiyon aracılığıyla sayfanın render edilmesi, gerekli veri çekme ve yetkilendirme kontrolleri yapılır.
+`src/app/account/page.tsx` modülü, uygulamanın **/account** rotasında gösterilen kullanıcı hesabı sayfasının kök bileşenini tanımlar. Tek bir fonksiyon (`Page`) aracılığıyla sayfanın UI’ı oluşturulur ve gerekli veri/kimlik doğrulama işlemleri bu bileşen içinde yürütülür.
 
 ## Fonksiyon Grupları
 ### Sayfa Render ve İş Mantığı
-Bu grup, hesap sayfasının görüntülenmesi için UI bileşenlerini oluşturur ve sayfanın yaşam döngüsü içinde veri akışını yönetir.
+Bu grup, hesap sayfasının kullanıcı arayüzünü oluşturur, sayfa yaşam döngüsü içinde veri çekme ve yetkilendirme kontrollerini gerçekleştirir.  
 - Page
 
 ---
@@ -706,24 +758,25 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Hesap sayfasını temsil eden React bileşenini tanımlar. Bu bileşen, uygulamanın `/account` yolunda görüntülenecek arayüzü sağlar.
-**Nasıl yapar**: Bileşen herhangi bir parametre almaz ve doğrudan `<PageComponent />` JSX öğesini döndürür. Döndürülen bu bileşen, hesap sayfasının tüm alt bileşenlerini ve kullanıcı arayüzünü içerir.
-**Parametreler**: (yok)
-**Dönüş**: `<PageComponent />` — Hesap sayfasının arayüzünü oluşturan React JSX elementi.
+**Ne yapar**: `Page` fonksiyonu, React bileşeni olarak `<PageComponent />` öğesini döndürür. Bu, sayfanın ana görsel bileşenini render eder.  
+**Nasıl yapar**: Fonksiyon içinde doğrudan JSX döndürülür; herhangi bir durum yönetimi veya yan etki yoktur.  
+**Parametreler**:
+- *hiç parametre yok*  
+**Dönüş**: `<PageComponent />` JSX öğesi (React Element)  
+
+---
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/account/page.tsx::Page
-- **params**: (yok)
+- **params**: (parametre yok)
 - **ic_degiskenler**: yok
-- **Dönüş**: `<PageComponent />` JSX elementi
+- **Dönüş**: <PageComponent /> bileşeni döner
 
 ---
 
@@ -736,6 +789,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
 
 ---
 # FILE: src\app\account\addresses\page.md
@@ -817,36 +886,39 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx
 skeleton_hash: 3e610cb029e1dc4e
-generated_at: 2026-05-23T21:47:13Z
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 3abd4459140e249f
+  style_tokens: 9144ece4bffe7964
+generated_at: 2026-05-27T17:58:18Z
 ---
 
 ## Genel Bakış
-`src/app/account/invoices/page.tsx` dosyası, fatura listesi sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, ilgili veri çekme, yetkilendirme ve UI düzenlemesini bir araya getirerek kullanıcıların fatura bilgilerini görüntülemesini sağlar.
+Bu dosya, kullanıcı hesabı altındaki fatura listesi sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, dinamik olarak yüklenen `AccountInvoicesPage` bileşenini döndürerek sayfanın veri çekme, yetkilendirme ve kullanıcı arayüzü düzenlemesini yönetir.
+
+## Fonksiyon Grupları
+### Ana Sayfa Bileşeni
+Hesap faturaları sayfasının kök bileşenini oluşturur. Dinamik içe aktarma (dynamic import) yoluyla ilgili görünümü yükler ve render eder.
+- Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `PageComponent` tanımlı değilse, `Page()` çağrısı bir hata (örneğin `ReferenceError`) oluşturur.  
-[Aksiyom 2]: Eğer `PageComponent` tanımlı ise, `Page()` fonksiyonu `PageComponent`'i çağırır ve döndürür.  
-[Aksiyom 3]: `Page()` fonksiyonu, parametre almaz; bu nedenle çağrıldığında hiçbir dış veri (örneğin props) beklemez.
-
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Bu fonksiyon, kullanıcının hesap sayfasındaki faturalar (invoices) bölümünü görüntüleyen bir React bileşeni döndürür. Sayfa, hesap yönetimi bağlamında fatura listeleme ve detay görüntüleme işlevselliğini sağlar.
+**Ne yapar**: React bileşeni `Page` fonksiyonu, JSX içinde `<PageComponent />` öğesini döndürerek bir sayfa görünümü oluşturur.  
 
-**Nasıl yapar**: Fonksiyon, gerekli alt bileşenleri ve veri çekme mantığını kullanarak fatura listesini oluşturur. Sayfa yüklendiğinde kullanıcıya ait faturaları getirir ve uygun bir kullanıcı arayüzü ile sunar. React bileşen yapısına uygun olarak JSX döndürür.
+**Nasıl yapar**: Fonksiyon, doğrudan bir JSX ifadesi olan `<PageComponent />`'i return eder; ek bir mantık, durum yönetimi veya yan etki yoktur.  
 
 **Parametreler**:
-- Yok: Fonksiyon herhangi bir parametre almaz.
+- (hiç parametre almaz)
 
-**Dönüş**: `<PageComponent />` — Hesap faturaları sayfasını temsil eden bir React bileşeni. Bu bileşen, faturaların listelendiği ve yönetildiği kullanıcı arayüzünü içerir.
+**Dönüş**: JSX.Element — `<PageComponent />` bileşenini temsil eden React öğesi.
 
 ---
 
@@ -859,15 +931,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::ArrowFunction (dynamic import callback)
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::anonymous_arrow_function
 - **params**: (parametre yok)
 - **ic_degiskenler**: yok
-- **Dönüş**: yok (loading spinner render eder)
+- **Dönüş**: React JSX elementi (merkezlenmiş yükleme spinner bileşeni)
 
 ### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**: yok
-- **Dönüş**: yok (PageComponent render eder)
+- **Dönüş**: `<PageComponent />` React bileşeni
 
 ---
 
@@ -882,85 +954,20 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\account\orders\page.md
 
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\orders\page.tsx
-skeleton_hash: 390e12b128002cd7
-generated_at: 2026-05-23T21:47:29Z
----
+## STİL TOKENLERİ
 
-## Genel Bakış
-`src/app/account/orders/page.tsx` modülü, kullanıcı hesabındaki siparişlerin listelendiği bir sayfa bileşeni sunar. Bu sayfa, `OrdersPage` adlı alt bileşeni dinamik olarak yükleyip render ederken, kullanıcı yetkilendirmesi ve veri çekme gibi hazırlık işlemlerini de yönetir.
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
-## Fonksiyon Grupları
-### UI Render ve Veri Hazırlama
-Bu grup, sipariş sayfasının görsel çıktısını üretmek ve gerekli verileri (sipariş listesi, kullanıcı bilgileri) temin etmekle sorumludur.
-- Page
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
 
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-[Aksiyom 1]: Eğer `PageComponent` tanımlı değilse, `Page()` fonksiyonu çalıştırıldığında bir `NameError` oluşur.  
-[Aksiyom 2]: Eğer `PageComponent` bir çağrılabilir (callable) nesne değilse, `Page()` fonksiyonu çalıştırıldığında bir `TypeError` oluşur.  
-[Aksiyom 3]: `Page()` fonksiyonu, `PageComponent()` çağrısının sonucunu döndürür; başka bir işlem yapmaz.
-
----
-
----
-
-## FONKSIYON DETAYLARI
-
-### Page
-**Ne yapar**: Siparişler sayfasının ana giriş noktasıdır. Kullanıcının hesap paneli altındaki sipariş geçmişini görüntülemek için gerekli olan üst düzey React bileşenini tanımlar. Uygulamanın `/account/orders` yoluna yapılan yönlendirmelerde bu bileşen devreye girer ve ilgili arayüzü kullanıcıya sunar.
-
-**Nasıl yapar**: Next.js App Router yapısına uygun bir sayfa bileşeni (Page Component) olarak görev yapar. Mevcut kod tanımına göre doğrudan kapsamlı bir iş mantığı içermek yerine, tüm sayfa yapısını temsil eden `<PageComponent />` bileşenini döndürerek çalışır. Bu tasarım, sayfanın alt bileşenlere ayrıştırılmasını ve böylece kodun daha modüler ve yönetilebilir olmasını sağlar.
-
-**Parametreler**:
-- **Tanımlı Parametre Yok**: Sağlanan kod parçacığına göre `Page` fonksiyonu herhangi bir parametre almamaktadır. (Next.js sayfaları framework tarafından opsiyonel olarak `params` ve `searchParams` argümanlarını alabilir, ancak bu tanımda böyle bir parametre listesi bulunmamaktadır.)
-
-**Dönüş**: `<PageComponent />` — Bir React JSX öğesi (React.ReactNode / JSX.Element) döndürür. Bu öğe, siparişler sayfasının tüm kullanıcı arayüzünü kapsayan ana bileşendir ve sayfa yüklendiğinde render edilir.
-
----
-
-## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../views/OrdersPage'), {
-
-  ssr: false,
-
-  loadin...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\orders\page.tsx::(anonim-yukleme)
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element — `animate-spin` sinifi ile bir yukleme animasyonu (spinner) iceren div goruntusu dondurur.
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\orders\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `PageComponent` — Dinamik olarak yuklenen siparisler sayfa bileseninin referansi. `Page` fonksiyonu bu bileseni JSX icinde kullanarak ana arayuzu dondurur.
-- **Dönüş**: JSX.Element — `<PageComponent />` bilesenini render eder.
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\orders\page.tsx
-  function: src\app\account\orders\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-b-2`, `border-primary-navy`
+- **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
 
 ---
 # FILE: src\app\account\orders\detail\page.md
@@ -971,11 +978,20 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\account\orders\detail\page.tsx
 skeleton_hash: 7cf33906c20b5fc7
-generated_at: 2026-05-23T21:47:23Z
+entity_hashes:
+  func:Page: 9e0b3aa05006aa66
+  overview: cd40b01c876ac3a5
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:09Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı hesabındaki bir siparişin detay sayfasını oluşturup render eden tek sorumluluğa sahiptir. `Page` bileşeni, ilgili sipariş verilerini alır, gerekli alt bileşenleri (ör. başlık, sipariş bilgileri, işlem geçmişi) bir araya getirerek kullanıcıya bütünsel bir detay görünümü sunar.
+Bu modül, kullanıcı hesabındaki bir siparişin detay sayfasını oluşturup render eden tek bir sorumluluğa sahiptir. `Page` bileşeni, ilgili sipariş verilerini alır ve gerekli alt bileşenleri bir araya getirerek kullanıcıya bütünsel bir detay görünümü sunar. Ayrıca `Suspense` kullanarak asenkron veri yükleme sırasında kullanıcıya yükleniyor geri bildirimi sağlar.
+
+## Fonksiyon Grupları
+### Sayfa Bileşeni
+Uygulamanın "account/orders/detail" sayfasının ana giriş noktasıdır. Sayfa düzeyinde bir React bileşeni döndürür ve dinamik içeriğin hazır olana kadar bekleme deneyimini yönetir.
+- Page
 
 ---
 
@@ -984,18 +1000,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Sayfa düzeyinde bir React bileşeni döndürür. Uygulamanın "account/orders/detail" sayfasının ana giriş noktasıdır ve içeriği `Suspense` ile sarmalayarak asenkron veri yükleme sırasında kullanıcıya bir yükleniyor geri bildirimi sunar.
+**Ne yapar**: React uygulamasında bir sayfa bileşeni oluşturur ve içeriği asenkron olarak yüklenirken bir bekleme (loading) mesajı gösterir. `Suspense` bileşeni sayesinde `PageComponent` bileşeni yüklenene kadar kullanıcıya geri bildirim sağlanır.  
 
-**Nasıl yapar**: `Page` fonksiyonu, `React.Suspense` bileşenini kullanarak `PageComponent` adlı alt bileşeni sarar. `Suspense`'in `fallback` prop'una `t.common.loading` metnini içeren bir `<div>` elementi verilir; böylece `PageComponent` hazır olana kadar bu metin görüntülenir. Bu, Next.js sayfa bileşeni olarak kullanıldığında sunucu taraflı render veya dinamik içeriğin yüklenmesi sırasında kullanıcı deneyimini iyileştirir.
+**Nasıl yapar**: Fonksiyon içinde `tr` çeviri nesnesi `t` olarak kısaltılır, ardından JSX içinde `Suspense` bileşeni kullanılır. `fallback` özelliği, `t.common.loading` metnini içeren bir `<div>` ile tanımlanır; bu, `PageComponent` henüz render edilmediğinde gösterilir. `PageComponent` başarılı bir şekilde yüklendiğinde, `Suspense` otomatik olarak onu render eder.  
 
-**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+**Parametreler**:
+- *Yok* — Fonksiyon dışarıdan herhangi bir argüman almaz.
 
-**Dönüş**: Bir JSX öğesi döndürür. Bu öğe, dışarıdan `Suspense` ile sarılmış ve içeride `PageComponent` adlı alt bileşeni içeren bir React elemanıdır. Gerçek dönüş tipi `React.ReactElement` veya `JSX.Element` olarak değerlendirilebilir.
+**Dönüş**: JSX (React element) – `<Suspense>` içinde `fallback` ve `PageComponent` içeren bir React bileşeni döndürür.
 
 ---
 
@@ -1004,12 +1019,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\orders\detail\page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `tr` — Çevirileri içeren sözlük, import edilmiş ve `t` değişkenine atanmış.
-  - `t` — `tr`'nin kopyası, sayfa içinde çeviri erişimi için kullanılmış. Örneğin `t.common.loading`.
-  - `t.common.loading` — Çeviri sözlüğündeki "yükleniyor" metni, `Suspense` bileşeninin fallback'i olarak kullanılmış.
-  - `Suspense` — React bileşeni, lazy loading için kullanılır. JSX içinde `<Suspense fallback={...}>` olarak kullanılmış.
-  - `PageComponent` — Import edilmiş bileşen, detay sayfasını render eder. JSX içinde `<PageComponent />` olarak kullanılmış.
-- **Dönüş**: `<Suspense>` içinde `<PageComponent />` render eden bir JSX elementi döndürür (ReactNode).
+  - `t` — `tr` sözlüğünün bir referansı; `t.common.loading` ifadesiyle yükleme metnini elde etmek için kullanılır.
+- **Dönüş**: React element (JSX içinde `<Suspense>` ve `<PageComponent />` içeren bir bileşen)
 
 ---
 
@@ -1024,62 +1035,20 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\account\profile\page.md
 
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\profile\page.tsx
-skeleton_hash: 7307aa753f2b0d22
-generated_at: 2026-05-23T21:47:26Z
----
+## STİL TOKENLERİ
 
-## Genel Bakış
-Bu modül, kullanıcı hesabının profil sayfasını render eden bir React bileşeni sunar. Sayfanın ana yapısını oluşturur ve gerekli alt bileşenleri entegre ederek kullanıcıya profil arayüzünü görüntüler.
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
-## Fonksiyon Grupları
-### Sayfa Render Grubu
-Profil sayfasının tüm görsel ve mantıksal birimini tek bir noktadan çıktılamakla sorumludur.
-- Page
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
 
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
----
-
-## FONKSIYON DETAYLARI
-
-### Page
-**Ne yapar**: Kullanıcının hesap profilini görüntüleyen ve düzenlemesine imkan tanıyan Next.js sayfa bileşenidir. Bu fonksiyon, uygulamanın `/account/profile` rotasındaki ana içeriği oluşturur.
-**Nasıl yapar**: Herhangi bir parametre almaz ve doğrudan profil sayfasının kullanıcı arayüzünü temsil eden bir JSX elemanı döndürür. İç yapısında profil bilgilerini göstermek ve güncellemek için gerekli alt bileşenleri barındırır.
-**Parametreler**: (parametre yok)
-**Dönüş**: `<PageComponent />` — Profil sayfasını temsil eden React bileşeni (JSX.Element).
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\profile\page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<PageComponent />`)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\profile\page.tsx
-  function: src\app\account\profile\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
 
 ---
 # FILE: src\app\account\returns\page.md
@@ -1090,15 +1059,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\account\returns\page.tsx
 skeleton_hash: c13912ed61d7eb77
-generated_at: 2026-05-23T21:47:29Z
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 5915b74456bf2b61
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:48Z
 ---
 
 ## Genel Bakış
-`src/app/account/returns/page.tsx` dosyası, hesap (account) bölümünde yer alan iade (returns) sayfasının ana bileşenini tanımlar. Bu modül, yalnızca sayfanın giriş noktası olan `Page` fonksiyonunu içerir; tüm veri yönetimi, API çağrıları ve alt bileşen oluşturma sorumluluğu bu fonksiyonun döndürdüğü daha alt seviye bileşenlere (ör. `PageComponent`) devredilir.
+`src/app/account/returns/page.tsx` dosyası, hesap (account) bölümündeki iade (returns) sayfasının giriş noktasıdır. Tek bir fonksiyon olan **Page** bu modülün dışa aktarılan bileşenidir ve sayfanın temel UI kapsamını sağlayan alt bileşenleri (ör. `PageComponent`) render eder. Veri çekme, durum yönetimi ve alt bileşenlerin detayları bu fonksiyonun döndürdüğü bileşenler içinde ele alınır.
 
 ## Fonksiyon Grupları
-### UI Render ve Veri Hazırlama
-Sayfanın görsel yapısını başlatan, gerekli API çağrılarını ve veri akışını tetikleyen tek giriş noktasını temsil eder. 
+### UI Başlatma ve Sayfa Renderı
+Sayfanın dışarıdan erişilebilen tek giriş noktasıdır; gerekli alt bileşenleri içeren JSX ağacını oluşturur.  
 - Page
 
 ---
@@ -1106,20 +1079,34 @@ Sayfanın görsel yapısını başlatan, gerekli API çağrılarını ve veri ak
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
----
+**Aksiyom 1**: Eğer React çalışma zamanı (runtime) ortamı (örn. `react` ve `react-dom` paketleri) mevcut değilse, `Page` fonksiyonu çalıştırılamaz ve render hatası oluşur.  
+
+**Aksiyom 2**: Eğer `Page` fonksiyonu bir React bileşen ağacının (component tree) dışına doğrudan çağrılırsa, JSX/React elementleri oluşturulamaz ve `Page` fonksiyonunun çıktısı geçerli bir UI öğesi olmaz.  
+
+**Aksiyom 3**: Eğer sayfanın alt bileşenleri (ör. `PageComponent` vb.) ihtiyaç duyduğu veri kaynakları (API endpointleri, context sağlayıcıları vb.) sağlanmazsa, `Page` fonksiyonu içinde bu alt bileşenler hata verir veya boş/yanlış veri gösterir.  
+
+**Aksiyom 4**: Eğer `Page` fonksiyonu bir sunucu‑tarafı (SSR) ortamında çalıştırılıyor ve istemci‑tarafı yalnızca tarayıcıya özgü API’ler (ör. `window`, `document`) kullanılmaya çalışılırsa, SSR aşamasında runtime hatası oluşur.  
+
+**Aksiyom 5**: Eğer proje yapılandırmasında (ör. Next.js, Vite, Webpack) `page.tsx` dosyasının bir “route” olarak tanımlanması eksikse, `Page` bileşeni URL yönlendirmesiyle erişilemez ve kullanıcı bu sayfaya ulaşamaz.  
+
+**Aksiyom 6**: Eğer TypeScript tip denetimi devre dışı bırakılmışsa ve `Page` fonksiyonunun dönüş tipi (`React.ReactNode`/JSX.Element) uyumsuz bir şekilde kullanılırsa, derleme zamanında tip hataları ortaya çıkmaz ancak çalışma zamanında UI bozulması meydana gelebilir.  
+
+**Aksiyom 7**: Eğer stil (CSS/SCSS) dosyaları veya tasarım sistemine (ör. Tailwind, Chakra UI) ait bağımlılıklar eksikse, `Page` bileşeninin görsel çıktısı tasarım beklentilerini karşılamaz.  
+
+**Aksiyom 8**: Eğer `Page` fonksiyonunun içinde kullanılan tüm yan etkiler (ör. veri çekme, event listener ekleme) uygun şekilde temizlenmez (cleanup) ise, bileşen unmount edildiğinde bellek sızıntısı veya istenmeyen yan etkiler oluşur.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Kullanıcının hesap iade taleplerini yönetmek için kullanılan ana sayfa bileşenini oluşturur. Bu bileşen, hesap alanındaki iade sürecine ait kullanıcı arayüzünü temsil eder.
+**Ne yapar**: React bileşeni `Page` fonksiyonunu tanımlar ve render edildiğinde `<PageComponent />` JSX öğesini döndürür.  
+**Nasıl yapar**: Fonksiyon, doğrudan JSX ifadesi `return <PageComponent />` ile `PageComponent` bileşenini çağırır; ek bir mantık veya yan etki içermez.  
 
-**Nasıl yapar**: Fonksiyon, bir React bileşeni olarak tanımlanmıştır ve dönüş değeri olarak `<PageComponent />` sağlar. `<PageComponent />`, iade işlemleri ile ilgili alt bileşenleri ve mantığı içeren kapsayıcı bileşendir. Sayfanın yapısal düzenini ve gerekli durum yönetimini içerir.
+**Parametreler**:
+- (hiç parametre almaz)
 
-**Parametreler**: (parametre yok)
-
-**Dönüş**: `React.ReactNode` — Sayfanın tamamını kapsayan `<PageComponent />` JSX elemanı döndürür.
+**Dönüş**: JSX.Element — `<PageComponent />` bileşeninin render çıktısı.
 
 ---
 
@@ -1127,9 +1114,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\returns\page.tsx::Page
 - **params**: yok
-- **ic_degiskenler**:
-  - `PageComponent` — dışarıdan import edilen React bileşeni; hesap iade sayfasını oluşturur ve fonksiyon tarafından return edilir.
-- **Dönüş**: React.JSX.Element
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element (`<PageComponent />` render edilir)
 
 ---
 
@@ -1144,6 +1130,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
 # FILE: src\app\account\security\page.md
 
 ---
@@ -1152,43 +1154,48 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\account\security\page.tsx
 skeleton_hash: e398f4957f5d633b
-generated_at: 2026-05-23T21:47:31Z
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: f9d663e29d489ed1
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:30Z
 ---
 
 ## Genel Bakış
-`src/app/account/security/page.tsx` dosyası, kullanıcı hesabının güvenlik ayarları sayfasını oluşturan tek bir React bileşeni içerir. Bu sayfa, şifre değiştirme ve iki faktörlü kimlik doğrulama gibi alt güvenlik bileşenlerini sarmalayarak kullanıcıya hesap güvenliğiyle ilgili bir arayüz sunar.
+Bu modül, VentHub HVAC uygulamasının kullanıcı hesap güvenliği ayarları sayfasını oluşturan React bileşenidir. Kullanıcıların şifre yönetimi, iki faktörlü kimlik doğrulama gibi hesap güvenliğiyle ilgili işlemleri gerçekleştirebildiği arayüzü sunar.
 
 ## Fonksiyon Grupları
 ### UI Render Grubu
-Sayfanın temel yapısını oluşturur ve tüm güvenlikle ilgili alt bileşenleri bu yapı içinde düzenleyerek dışa aktarır. Modülün tek giriş noktasıdır; herhangi bir başka fonksiyonu çağırmaz.
+Hesap güvenliği sayfasının temel yapısını oluşturur ve ilgili alt güvenlik bileşenlerini bu yapı içinde düzenler. Modülün tek giriş noktası ve dışa aktarılan öğesidir.
 - Page
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
+## AXIOMS – Mimari Varsayımlar  
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Hesap güvenlik sayfasını oluşturan React bileşenidir. Kullanıcının güvenlik ayarlarını görüntülemesini ve yönetmesini sağlar.
-**Nasıl yapar**: Sayfa içindeki güvenlikle ilgili alt bileşenleri (şifre değiştirme, iki faktörlü doğrulama gibi) birleştirerek kullanıcı arayüzünü sunar.
+**Ne yapar**: `Page` fonksiyonu, React bileşeni olarak tanımlanmış bir sayfa oluşturur ve içinde `<PageComponent />` bileşenini render eder.  
+
+**Nasıl yapar**: Fonksiyon, JSX sözdizimini kullanarak doğrudan `<PageComponent />` öğesini döndürür; bu sayede React render sürecinde ilgili bileşen ekranda gösterilir.  
+
 **Parametreler**:
-- (parametre yok) — Bu bileşen herhangi bir parametre almaz.
-**Dönüş**: `<PageComponent />` — Hesap güvenlik sayfasının tam kullanıcı arayüzünü temsil eden React bileşeni.
+- (Parametre yok)
+
+**Dönüş**: `<PageComponent />` JSX öğesini içeren bir React element'i (JSX) döndürür.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/account/security/page.tsx::Page
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\security\page.tsx::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**: (Bulunmamaktadır)
-- **Dönüş**: ReactNode (JSX)
+- **ic_degiskenler**: Yok
+- **Dönüş**: yok
 
 ---
 
@@ -1203,6 +1210,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
 # FILE: src\app\account\shipments\page.md
 
 ---
@@ -1211,15 +1234,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\account\shipments\page.tsx
 skeleton_hash: ec39e9ffa86e6b02
-generated_at: 2026-05-23T21:47:32Z
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: d9c0633b70be8b36
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:59:43Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı hesabı altındaki gönderi (shipment) bilgilerinin listelendiği ve yönetildiği ana sayfa bileşenini tanımlar. Tek bir giriş noktası olan `Page` fonksiyonu, gerekli veri çekme, durum yönetimi ve kullanıcı arayüzünü sunma sorumluluklarını bir arada üstlenir.
+Bu modül, VentHub HVAC platformunun kullanıcı hesap bölümündeki sevkiyatlar (shipments) sayfasını oluşturan Next.js sayfa bileşenidir. Kullanıcıların kendi hesaplarına ait tüm sevkiyat bilgilerini görüntüleyebileceği sayfa düzeyinde kullanıcı arayüzünü oluşturur. Platformun yönlendirme yapısıyla uyumlu çalışarak, hesap altındaki sevkiyatlar rotasında otomatik olarak yüklenen ana bileşen görevi görür.
 
 ## Fonksiyon Grupları
-### UI ve Veri Sunumu
-Bu grup, gönderi verilerini alıp kullanıcıya uygun bir biçimde (tablo, kart vb.) sunan ana sayfa bileşenini oluşturur.
+### Ana Sayfa Bileşeni
+Sevkiyatlar sayfasının tüm görsel ve işlevsel yapısını inşa eden, alt bileşenler ve durum yönetimi araçlarından faydalanarak kullanıcıya bilgi sunumunu sağlayan ana girişi barındırır.
 - Page
 
 ---
@@ -1232,14 +1259,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Hesap bölümü altındaki sevkiyatlar (shipments) sayfasını oluşturan ana React bileşenidir. Kullanıcının sevkiyat bilgilerini görüntüleyebileceği sayfa düzeyindeki kullanıcı arayüzünü temsil eder.
-
-**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanmıştır, JSX döndürerek sayfa düzenini render eder. Sayfa içeriğini oluşturmak için alt bileşenlerden, hook'lardan ve state yönetiminden faydalanır. Herhangi bir parametre almadığı için sayfa düzeyinde routing'e bağlı olarak çalışır.
-
-**Parametreler**:
-- (parametre yok) — Fonksiyon herhangi bir parametre almamaktadır.
-
-**Dönüş**: `<PageComponent />` — React JSX bileşeni döndürür. Bu bileşen, sevkiyat sayfasının tüm görsel ve işlevsel öğelerini kapsayan bir üst düzey kapsayıcıdır.
+**Ne yapar**: Uygulamanın `src/app/account/shipments/page.tsx` yolunda tanımlı shipments sayfasının ana bileşenini render eder. Sayfanın giriş noktası olarak işlev görür ve kullanıcı arayüzünün yüklenmesini sağlar.
+**Nasıl yapar**: Doğrudan `<PageComponent />` JSX ifadesini döndürerek `PageComponent` bileşenini çağırır. Herhangi bir state yönetimi veya iş mantığı içermez, yalnızca bir sarmalayıcı (wrapper) görevi üstlenir.
+**Parametreler**: Parametre almaz.
+**Dönüş**: `<PageComponent />` — Sayfanın kullanıcı arayüzünü oluşturan React JSX bileşeni.
 
 ---
 
@@ -1261,6 +1284,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
 
 ---
 # FILE: src\app\admin\layout.md
@@ -1331,7 +1370,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\page.tsx
 skeleton_hash: abafacd2feb2ac3d
-generated_at: 2026-05-23T21:48:12Z
+entity_hashes:
+  func:Page: e310741650765783
+  overview: 3abd4459140e249f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:59:51Z
 ---
 
 ## Genel Bakış
@@ -1345,23 +1388,34 @@ Bu grup, admin panosunun ana sayfasını render ederek kullanıcı arayüzünü 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, Next.js App Router içinde bir sayfa bileşeni olarak çalıştığı için aşağıdaki koşulların sağlanması gerekir.
+
+**Aksiyom 1**: Eğer `AdminDashboardPage` bileşeni tanımlı ya da içe aktarılmış değilse, `Page` fonksiyonu çalıştırıldığında **render hatası** oluşur.  
+**Aksiyom 2**: Eğer Next.js’in **App Router** (yani `app/` dizini ve `page.tsx` konumu) kullanılmazsa, `Page` fonksiyonu **yönlendirme/rota** mekanizması tarafından tanınmaz ve `/admin` yolu erişilemez.  
+**Aksiyom 3**: Eğer React ortamı (React 18+ ve JSX desteği) sağlanmazsa, `Page` fonksiyonu **JSX’i yorumlayamaz** ve **runtime hatası** verir.  
+**Aksiyom 4**: Eğer `Page` fonksiyonu dışarıdan **props** bekler ya da alırsa, ancak tanımda parametre yoksa, **props kaybı** meydana gelir ve bileşen beklenen veri akışını sağlayamaz. (Bu durumda fonksiyon imzası parametresiz olduğundan, props kullanılmaz.)  
+**Aksiyom 5**: Eğer `AdminDashboardPage` bileşeni **server‑side** (ör. `export const dynamic = 'force-dynamic'`) ya da **client‑side** (ör. `use client`) olarak yanlış şekilde işaretlenmişse, `Page` bileşeni **uyumsuz render** davranışı sergileyebilir (ör. hydration hatası).  
+
+### Domain‑specific kurallar
+- **Next.js sürümü**: Bu sayfanın doğru çalışması için proje **Next.js 13+** (App Router destekli) olmalıdır.  
+- **React sürümü**: React 18 veya daha yeni bir sürüm gereklidir; aksi takdirde JSX dönüşümü başarısız olur.  
+- **Dosya konumu**: `page.tsx` dosyasının `src/app/admin/` altında bulunması zorunludur; farklı bir konumda ise `/admin` rotası otomatik olarak oluşturulmaz.  
+
+Bu koşullar sağlanmadığında belirtilen sonuçlar ortaya çıkar; aksi takdirde `Page` fonksiyonu sorunsuz bir şekilde `<AdminDashboardPage />` bileşenini render eder.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Bu fonksiyon, uygulamanın admin paneli sayfasını oluşturan bir React bileşenidir. Next.js App Router yapısında bir sayfa bileşeni olarak görev yapar ve /admin yoluna karşılık gelir.
+**Ne yapar**: Bu fonksiyon, Next.js App Router yapısında admin sayfasının ana giriş noktasıdır. `<AdminDashboardPage />` bileşenini render ederek admin panosunu görüntüler.
 
-**Nasıl yapar**: Hiçbir props veya parametre almaz; doğrudan `<AdminDashboardPage />` bileşenini döndürerek admin panosunun görüntülenmesini sağlar. Fonksiyonun gövdesi yalnızca bu dönüşten ibarettir.
+**Nasıl yapar**: Herhangi bir parametre almaz; doğrudan `return <AdminDashboardPage />` ifadesiyle JSX öğesini döndürür. Sayfanın sunucu veya istemci tarafında render edilmesini sağlar.
 
 **Parametreler**:
-- Parametre almaz.
+- Fonksiyon parametre almaz.
 
-**Dönüş**: `JSX.Element` — Uygulamanın admin gösterge panelini temsil eden bir React elemanı döndürür.
+**Dönüş**: `JSX.Element` türünde bir React bileşeni döndürür. Özel olarak `<AdminDashboardPage />` değerini döner.
 
 ---
 
@@ -1376,10 +1430,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/page.tsx::Page
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\page.tsx::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (`<AdminDashboardPage />` bileşenini döndürür)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element (React bileşeni olarak `<AdminDashboardPage />` döndürür)
 
 ---
 
@@ -1394,6 +1448,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
+
+---
 # FILE: src\app\admin\audit-logs\page.md
 
 ---
@@ -1402,15 +1472,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\audit-logs\page.tsx
 skeleton_hash: 64b1cdb0fece9d6a
-generated_at: 2026-05-23T21:47:43Z
+entity_hashes:
+  func:Page: 2750e5b95f2055b0
+  overview: 3abd4459140e249f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:58:33Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki denetim kayıtları sayfasını oluşturan bir React bileşeni içerir. Tek bir `Page` fonksiyonu, görünüm katmanını dinamik olarak yükleyerek kullanıcıya sistemdeki tüm denetim olaylarını listeler.
+Bu modül, yönetim panelindeki denetim kayıtları (audit log) sayfasını sunan tek bir React bileşeni içerir. `Page` fonksiyonu, dinamik olarak yüklenecek `AdminAuditLogsPage` bileşenini render ederek kullanıcıya sistemdeki denetim olaylarını listeler ve yönetim arayüzünün giriş noktasıdır.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni ve Dinamik Yükleme
-Sayfanın root bileşenini tanımlar; görsel katmanı dinamik import ile getirir ve JSX olarak döndürür. Next.js sayfa yönlendirmesinin başlangıç noktasıdır.
+Sayfanın kök bileşenini tanımlar; dinamik import ile `AdminAuditLogsPage` bileşenini getirir ve JSX olarak döndürür. Next.js sayfa yönlendirmesinin başlangıç noktasıdır.  
 - Page
 
 ---
@@ -1420,15 +1494,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Uygulamanın yönetici denetim günlüğü (audit log) sayfasını temsil eden bir React bileşenidir. Kullanıcıya denetim kayıtlarını listeleyen arayüzü sunar.
-**Nasıl yapar**: Dönüş değeri olarak `<AdminAuditLogsPage />` JSX ögesini döndürür. Bu bileşen, audit log verilerini görüntülemek ve yönetmek için gerekli tüm alt bileşenleri ve mantığı içerir.
-**Parametreler**: Herhangi bir parametre almaz.
-**Dönüş**: `React.JSX.Element` — `AdminAuditLogsPage` adlı React bileşeninin render edilmiş halini döndürür.
+**Ne yapar**: `Page` fonksiyonu, admin panelindeki denetim günlükleri (audit logs) sayfasını oluşturan `AdminAuditLogsPage` bileşenini döndürür. Bu fonksiyon, Next.js sayfa bileşeni olarak kullanılmak üzere tasarlanmıştır ve uygulamanın `/admin/audit-logs` yoluna karşılık gelir.
+
+**Nasıl yapar**: Fonksiyon, doğrudan `AdminAuditLogsPage` adlı React bileşenini JSX formatında döndürür. Kendi içinde herhangi bir veri işleme, state yönetimi veya yan etki içermez; yalnızca alt bileşeni render etmekle sorumlu, sarmalayıcı (wrapper) niteliğinde bir sayfa bileşenidir.
+
+**Parametreler**:
+- Parametre almaz.
+
+**Dönüş**: `JSX.Element` – `AdminAuditLogsPage` bileşenini temsil eden React elemanı.
 
 ---
 
@@ -1443,10 +1519,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/audit-logs/page.tsx::Page
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\audit-logs\page.tsx::Page
 - **params**: yok
 - **ic_degiskenler**: yok
-- **Dönüş**: `<AdminAuditLogsPage />` (JSX)
+- **Dönüş**: `return <AdminAuditLogsPage />` (JSX)
 
 ---
 
@@ -1461,6 +1537,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
+
+---
 # FILE: src\app\admin\categories\page.md
 
 ---
@@ -1469,36 +1561,41 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\categories\page.tsx
 skeleton_hash: a52e9b8539fa4dbd
-generated_at: 2026-05-23T21:47:45Z
+entity_hashes:
+  func:Page: 3494fba1713b6485
+  overview: 3abd4459140e249f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:58:47Z
 ---
 
 ## Genel Bakış
-
-Bu modül, yönetim panelindeki kategoriler sayfasının giriş noktasını tanımlar. Tek bir React bileşeni aracılığıyla sayfanın görüntülenmesini sağlar; sayfa içeriğini dinamik olarak başka bir bileşenden yükleyerek kullanıcıya sunar.
+Bu modül, admin panelindeki kategoriler sayfasının giriş noktasını tanımlayan tek bir React bileşenini içerir. Page fonksiyonu, AdminCategoriesPage bileşenini dinamik olarak yükleyerek sayfanın görüntülenmesini sağlar.
 
 ## Fonksiyon Grupları
-
 ### Sayfa Bileşeni
-Admin kategorileri sayfasının tamamını render eden ana bileşendir. Dinamik import yöntemiyle alt bileşeni çağırır ve JSX çıktısını döndürür.
+Modülün tek sorumluluğu, admin kategorileri sayfasını render eden üst düzey bileşeni döndürmektir.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül Next.js App Router mimarisinde çalışan yönetim paneli kategori yönetim sayfasının ana bileşenidir, çalışması için Next.js rota kurallarının, çağrılan alt bileşenin erişilebilirliğinin ve modern React çalışma zamanının varlığı zorunludur.
+
+[Aksiyom 1]: Eğer Next.js App Router'ın "app dizini altındaki page.tsx dosyalarını tanımlı rotalara eşleme" kuralı yoksa, bu modül /admin/categories adresinde kullanıcılara sunulamaz, istekte 404 bulunamadı hatası alınır.
+[Aksiyom 2]: Eğer bu modül tarafından çağrılan AdminCategoriesPage alt bileşeni proje içinde erişilebilir konumda mevcut değilse, sayfa yüklenemez hatası oluşur, kategori yönetim arayüzü hiç görüntülenemez.
+[Aksiyom 3]: Eğer modern fonksiyonel React bileşen sözdizimini destekleyen bir çalışma zamanı ortamı yoksa, bu modül hiç render edilemez, sayfa kullanıcılara sunulamaz.
+[Aksiyom 4]: Eğer bu modüle erişimden önce yönetici yetkisi kontrolü yapan bir ara katman (middleware, route guard vb.) devreye alınmamışsa, yetkisi olmayan kullanıcılar kategori yönetim arayüzüne erişebilir, güvenlik ihlali oluşur.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Admin panelinde kategoriler bölümünün ana sayfa bileşenini döndürür. Kullanıcıların kategorileri görüntülemesi, yönetmesi ve düzenlemesi için oluşturulmuş üst düzey bir React bileşenidir.
-**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanmıştır ve doğrudan `<AdminCategoriesPage />` JSX elementini döndürür. Bu bileşen, admin kategoriler sayfasının tüm alt bileşenlerini, state yönetimini ve kullanıcı etkileşimlerini içeren kapsayıcı bir yapıdır.
+**Ne yapar**: Bu basit React fonksiyonu, venthub-hvac projesinin admin kategoriler yönetim sayfasının ana giriş bileşenidir. Sadece önceden tanımlanmış AdminCategoriesPage bileşenini döndürerek sayfanın içeriklerini sunar.
+**Nasıl yapar**: Herhangi bir ek işlem, veri çekme veya dönüşüm adımı içermez. Sadece tanımlı AdminCategoriesPage bileşenini doğrudan return ifadesi ile döndürür, bu sayede uygulama bu fonksiyonu sayfa bileşeni olarak yükler.
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz.
-**Dönüş**: `JSX.Element` — `<AdminCategoriesPage />` bileşenini döndürür. Bu bileşen, kategorilerle ilgili tüm CRUD işlemlerini ve listelemeyi sağlayan admin sayfasını temsil eder.
+- Yok: Bu fonksiyon herhangi bir dış parametre almaz
+**Dönüş**: <AdminCategoriesPage /> — AdminCategoriesPage bileşenini döndürür, bu bileşen admin panelindeki HVAC kategorilerini yönetmek için gerekli kullanıcı arayüzünü içerir.
 
 ---
 
@@ -1513,10 +1610,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_Page] AST Pointer: src/app/admin/categories/page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `<AdminCategoriesPage />` JSX elemanı (React bileşeni) — Admin kategorileri sayfasını render eder.
+### [N1_NASIL] AST Pointer: src\app\admin\categories\page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+- **Dönüş**: AdminCategoriesPage bileşenini döndürür
 
 ---
 
@@ -1529,6 +1626,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
 
 ---
 # FILE: src\app\admin\categories\[id]\builder\page.md
@@ -1600,73 +1713,6 @@ Bu aksiyomlar, `CategoryBuilderPage` fonksiyonunun doğru çalışması için ge
   export: CategoryBuilderPage
 
 ---
-# FILE: src\app\admin\coupons\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\coupons\page.tsx
-skeleton_hash: b5364a7dcacd7105
-generated_at: 2026-05-23T21:47:51Z
----
-
-## Genel Bakış
-Modül, yönetim panelinde kuponların listelendiği ve yönetildiği ana sayfa bileşenini tanımlar. Tek bir `Page` dışa aktarımı üzerinden sayfanın UI katmanı oluşturulur ve kupon verilerinin görsel sunumu alt bileşen aracılığıyla sağlanır.
-
-## Fonksiyon Grupları
-### UI Oluşturma ve Veri Sunumu
-Kuponların tablo ya da kart biçiminde görüntülenmesi, filtrelenmesi ve sayfalanması gibi görsel işlevleri kapsar.
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
----
-
-## FONKSIYON DETAYLARI
-
-### Page
-**Ne yapar**: Bu fonksiyon, admin kuponları yönetim sayfasını render eden bir React bileşenidir. Uygulamanın admin panelinde kuponları görüntüleme ve yönetme işlevini sağlayan `AdminCouponsPage` bileşenini döndürür.
-**Nasıl yapar**: Fonksiyon herhangi bir parametre almaz ve doğrudan `AdminCouponsPage` bileşenini JSX olarak döndürür. Bu yapı, Next.js dosya tabanlı routing sistemi ile otomatik olarak sayfa olarak tanımlanır.
-**Parametreler**: Yok.
-**Dönüş**: JSX ögesi (`AdminCouponsPage` bileşeni). Döndürülen bileşen, sayfada kupon listesi, oluşturma ve düzenleme gibi işlemleri sağlar.
-
----
-
-## SABİTLER
-- **AdminCouponsPage** (call) — `dynamic(
-
-  () => import('../../../views/admin/AdminCouponsPage'),
-
-  { ssr: ...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/app/admin/coupons/page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (`<AdminCouponsPage />`)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\admin\coupons\page.tsx
-  function: src\app\admin\coupons\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-
----
 # FILE: src\app\admin\error-groups\page.md
 
 ---
@@ -1675,33 +1721,54 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\error-groups\page.tsx
 skeleton_hash: 17706649c0ccf0e3
-generated_at: 2026-05-23T21:47:52Z
+entity_hashes:
+  func:Page: b47a5eb18beb6937
+  overview: 3abd4459140e249f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:58:44Z
 ---
 
 ## Genel Bakış
-`Page` fonksiyonu, yönetim panelindeki hata grupları sayfasının ana bileşenini oluşturur. Bu bileşen, ilgili alt görünümleri çağırarak hata gruplarının listelenmesini ve yönetilmesini sağlayan bir arayüz sunar.
+Bu modül, yönetim panelindeki “Hata Grupları” sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, dinamik olarak yüklenecek `AdminErrorGroupsPage` bileşenini render ederek ilgili UI’nın oluşturulmasını sağlar ve dışa aktarılır.
 
 ## Fonksiyon Grupları
 ### Sayfa Render ve UI Oluşturma
-Sayfanın temel yapısını kurar, gerekli layout ve içeriği birleştirerek son kullanıcıya eksiksiz bir yönetim ekranı sunar.
+Sayfanın temel yapısını kurar; dinamik import edilen `AdminErrorGroupsPage` bileşenini JSX olarak döndürür, böylece hata gruplarının listelenmesi ve yönetilmesi arayüzü sunulur.  
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, **Page** fonksiyonunun yönetim panelindeki “Hata Grupları” sayfasını sorunsuz bir şekilde oluşturabilmesi için aşağıdaki koşulların varlığını varsayar.
+
+**Aksiyom 1**: Eğer `AdminErrorGroupsPage` bileşeni proje içinde tanımlı ve erişilebilir değilse, `Page` fonksiyonu çalıştırıldığında **render hatası** oluşur ve sayfa hiç görüntülenmez.  
+
+**Aksiyom 2**: Eğer React (veya Next.js) çalışma zamanı ortamı (ör. `react`, `react-dom`, `next/server` paketleri) mevcut değilse, `Page` fonksiyonu **derleme/çalıştırma hatası** verir ve uygulama başlatılamaz.  
+
+**Aksiyom 3**: Eğer sayfanın bulunduğu rota, gerekli **auth‑provider** (ör. `SessionProvider`, `AuthContext`) ile sarmalanmamışsa, `AdminErrorGroupsPage` içinde erişim kontrolü sağlanamaz; bu durumda ya **yetkisiz erişim** gerçekleşir ya da bileşen içinde ek bir hata gösterilir.  
+
+**Aksiyom 4**: Eğer sayfanın üst‑seviye **layout** (ör. `AdminLayout`, `Sidebar`, `Header`) bileşeni sağlanmazsa, `Page` fonksiyonu yine de render olur ancak **UI bozulması** (eksik menü, hatalı stil) meydana gelir.  
+
+**Aksiyom 5**: Eğer `AdminErrorGroupsPage` içinde kullanılan **veri çekme** (ör. `fetch('/api/error-groups')` ya da SWR/React‑Query hookları) başarısız olursa, `Page` fonksiyonu hâlâ render edilir fakat **boş liste** ya da **hata mesajı** gösterilir; sayfanın temel işlevi (hata gruplarını listeleme) yerine getirilmez.  
+
+**Aksiyom 6**: Eğer TypeScript tip tanımları (ör. `ErrorGroup[]`, `PageProps`) eksik ya da uyumsuzsa, derleme aşamasında **tip hatası** alınır ve `Page` fonksiyonunun çıktısı güvenilir olmaz.  
+
+**Aksiyom 7**: Eğer istemci tarafı **JavaScript** devre dışı bırakılmışsa, `Page` bileşeni (özellikle dinamik alt‑bileşenler) **statik HTML** olarak render edilir; bu durumda interaktif özellikler (örn. filtreleme, silme) çalışmaz.  
+
+> **Not:** Yukarıdaki aksiyomlar, fonksiyon gövdesinde doğrudan görülen bağımlılıklar (ör. `AdminErrorGroupsPage` çağrısı) ve tipik bir Next.js/React admin sayfasının çalışma ortamı göz önüne alınarak türetilmiştir. Başka bir bilgi kaynağından (docstring, yorum vs.) çıkarım yapılmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Hata grupları yönetim sayfası için ana bileşeni döndürür. Bu sayfa, admin panelinde hata gruplarının listelenmesi ve yönetilmesi işlevlerini üstlenen AdminErrorGroupsPage bileşenini render eder.
-**Nasıl yapar**: Fonksiyon parametre almaz ve doğrudan `<AdminErrorGroupsPage />` JSX ifadesini döndürür. Bu yapı, React'in bileşen hiyerarşisinde ilgili sayfanın içeriğini oluşturmasını sağlar.
-**Parametreler**: Bu fonksiyon parametre almaz.
-**Dönüş**: React JSX elementi: `<AdminErrorGroupsPage />`. Çağrıldığında, admin hata grupları sayfasını temsil eden AdminErrorGroupsPage bileşeninin bir örneğini döndürür.
+**Ne yapar**: `Page` fonksiyonu, yönetici arayüzünde hata gruplarını görüntülemek için kullanılan `AdminErrorGroupsPage` bileşenini döndürür.  
+**Nasıl yapar**: Fonksiyon, React bileşeni olarak tanımlanmış olup, JSX içinde `<AdminErrorGroupsPage />` etiketini render eder. Bu sayede sayfa, hata gruplarının yönetim ekranını sunar.  
+**Parametreler**:
+- *None*  
+**Dönüş**: `<AdminErrorGroupsPage />` bileşeni (React element)  
+
+---
 
 ---
 
@@ -1717,9 +1784,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\error-groups\page.tsx::Page
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (`<AdminErrorGroupsPage />`) – React bileşeni olarak render edilen bir eleman.
 
 ---
 
@@ -1734,6 +1801,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
+
+---
 # FILE: src\app\admin\errors\page.md
 
 ---
@@ -1742,15 +1825,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\errors\page.tsx
 skeleton_hash: d928d1f83ba0523b
-generated_at: 2026-05-23T21:47:53Z
+entity_hashes:
+  func:Page: dbe2af9383c2f93d
+  overview: 3abd4459140e249f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:58:58Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki hata sayfası için Next.js routing katmanındaki giriş noktasını oluşturur. Tek bir `Page` fonksiyonu sayesinde asıl görünüm bileşenini dinamik olarak yükler ve render eder; böylece kod bölünmesi (code splitting) sağlanarak sayfanın ilk yüklenme performansı artırılır.
+Bu modül, Venthub HVAC uygulamasının yönetim paneli içindeki hatalar sayfası için Next.js routing katmanının giriş noktasıdır. Tek bir bileşen üzerinden ilgili görünümü dinamik olarak yükleyip render eder; bu yapı sayesinde kod bölünmesi sağlanarak sayfanın ilk yüklenme performansı artırılır.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni ve Dinamik Yükleme
-Hata sayfasının URL’e bağlanmasını sağlar; `AdminErrorsPage` görünümünü lazy-loading ile içe aktarıp render ederek modülerlik ve performans kazancı sunar.
+Yönetim paneli hatalar sayfasının `/admin/errors` rotasına bağlanmasını sağlar; dinamik yükleme ile görünüm bileşenini çağırarak modüler yapı ve performans kazancı sunar.
 - Page
 
 ---
@@ -1760,22 +1847,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**:  
-Page fonksiyonu, admin hatalar sayfasının varsayılan dışa aktarılan bileşenidir. Uygulamanın `/admin/errors` yoluna gelen taleplerde AdminErrorsPage bileşenini render ederek hata listesi veya hata detayı gösterimini sağlar.
-
-**Nasıl yapar**:  
-Bir React fonksiyonel bileşenidir. Hiçbir parametre almaz, iç state veya side effect barındırmaz. Sadece `AdminErrorsPage` adlı bileşeni döndürerek ilgili sayfanın görüntülenmesini gerçekleştirir.
-
+**Ne yapar**: VentHub HVAC projesinin admin paneli hata yönetimi sayfasının ana rota giriş bileşenidir. Next.js App Router mimarisine uygun olarak tanımlanan bu sayfa bileşeni, /admin/errors rotası üzerinden erişildiğinde sunulacak hata yönetimi arayüzünü kullanıcılara sunmak üzere tasarlanmıştır.
+**Nasıl yapar**: Hiçbir ek işlem, state yönetimi, veri çekme veya özel işleme mantığı barındırmadan doğrudan proje içindeki önceden tanımlanmış AdminErrorsPage React bileşenini geri döndürür. Sadece ilgili rota üzerinden erişim sağlandığında arayüz bileşenini yüklemekle sorumludur, ek işlevi bulunmaz.
 **Parametreler**:
-- **Yok**
-
-**Dönüş**:  
-Bir React JSX elemanı döndürür. Dönüş tipi `JSX.Element` olup, `AdminErrorsPage` bileşeninin örneğidir.
+- Herhangi bir giriş parametresi almaz
+**Dönüş**: React JSX element türünde, admin panelindeki tüm hata yönetimi işlevlerini barındıran <AdminErrorsPage /> bileşenini döndürür.
 
 ---
 
@@ -1792,8 +1871,10 @@ Bir React JSX elemanı döndürür. Dönüş tipi `JSX.Element` olup, `AdminErro
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\errors\page.tsx::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<AdminErrorsPage />`)
+- **ic_degiskenler**:
+  - Kullanılan hiçbir yerel değişken yoktur
+- **Dönüş**: yok
+  - Fonksiyon, AdminErrorsPage bileşenini doğrudan döndürerek yönetici hata sayfasını render eder, herhangi bir yan etkisi bulunmaz.
 
 ---
 
@@ -1808,75 +1889,20 @@ Bir React JSX elemanı döndürür. Dönüş tipi `JSX.Element` olup, `AdminErro
   export: Page
 
 ---
-# FILE: src\app\admin\inventory\page.md
 
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\page.tsx
-skeleton_hash: 463a1aa5b93b7376
-generated_at: 2026-05-23T21:47:53Z
----
+## STİL TOKENLERİ
 
-## Genel Bakış
-Bu modül, yönetim panelindeki envanter sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu aracılığıyla sayfanın tüm kullanıcı arayüzü yapısı ve veri akışı tek bir noktadan yönetilir.
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
-## Fonksiyon Grupları
-### Sayfa Render ve Yapılandırma
-Bu grup, envanter sayfasının görsel bileşenlerini birleştirir ve temel veri bağlamalarını kurarak sayfanın bütüncül şekilde oluşturulmasını sağlar.
-- Page
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
 
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
----
-
-## FONKSIYON DETAYLARI
-
-### Page
-**Ne yapar**: Admin panelinin envanter sayfasını oluşturan React bileşenini döndürür. Bu bileşen, ürün envanterinin yönetimi için kullanıcı arayüzünü sağlar. Sayfa, liste görünümü, filtreleme ve düzenleme gibi işlemleri destekleyecek şekilde tasarlanmıştır.
-**Nasıl yapar**: Fonksiyon hiçbir parametre almaz ve doğrudan `<PageComponent />` React elemanını döndürerek render edilmesini sağlar. İç mantık, PageComponent bileşeninin kendi yaşam döngüsü ve state yönetimi ile ilgili detayları içerir. Bu yaklaşım, sayfanın modüler ve yeniden kullanılabilir olmasını sağlar.
-**Parametreler**:
-- Yok.
-**Dönüş**: `<PageComponent />` — admin envanter sayfasının ana React bileşenini döndürür. Bu bileşen, sayfanın tüm alt bileşenlerini ve işlevselliğini kapsar.
-
----
-
-## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../views/admin/AdminInventoryPage'), {
-
-  ssr: fa...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\inventory\page.tsx::anonymous arrow function (loading spinner)
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX (loading spinner `<div>`)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\inventory\page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX (`<PageComponent />`)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\admin\inventory\page.tsx
-  function: src\app\admin\inventory\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
 
 ---
 # FILE: src\app\admin\inventory\report\page.md
@@ -1887,11 +1913,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\report\page.tsx
 skeleton_hash: a90c7fedc66c4a2a
-generated_at: 2026-05-23T21:47:57Z
+entity_hashes:
+  func:InventoryReportPage: bfcc8ccf4dbc326a
+  overview: 186bde0cd4ca9cee
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:59:05Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki envanter rapor sayfasının ana giriş noktasını oluşturur. `InventoryReportPage` adlı tek bileşen, sayfanın tüm yapısını kapsayan üst düzey bir view bileşenini dinamik olarak yükler ve render eder. Böylece envanter raporlarının liste, grafik ve filtreleme gibi alt bileşenleri tek bir sayfada birleşir.
+Bu modül, yönetim panelindeki envanter rapor sayfasının ana giriş noktasıdır. Tek bir fonksiyon, sayfanın üst düzey bileşenini dinamik olarak yükleyip render eder, böylece raporların listesi, grafikleri ve filtreleme seçenekleri tek bir sayfada birleşir.
 
 ## Fonksiyon Grupları
 ### Sayfa Render ve Bileşen Yönlendirme
@@ -1900,21 +1930,25 @@ Bu grup, rapor sayfasının kök bileşenini tanımlar ve asıl görünüm katma
 
 ---
 
+---
+
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### InventoryReportPage
-**Ne yapar**: Bu fonksiyon, admin panelinde envanter rapor sayfasını görüntülemek için kullanılan bir React fonksiyonel bileşenidir. Sayfa, kullanıcıya envanter raporlarını listeleyip yönetme imkanı sunar.
-**Nasıl yapar**: Herhangi bir parametre almaz ve doğrudan `AdminInventoryReportPage` bileşenini döndürür. Bu sayede admin envanter rapor sayfasının modüler bir şekilde oluşturulmasını sağlar.
-**Parametreler**:
-- (parametre yok)
-**Dönüş**: JSX.Element — `AdminInventoryReportPage` adlı alt bileşeni döndürür. Bu bileşen, envanter raporlarına ait tüm kullanıcı arayüzü öğelerini içerir.
+**Ne yapar**: `InventoryReportPage` bileşenini render eder ve `<AdminInventoryReportPage />` JSX elemanını döndürür. Bu sayede yönetim panelindeki envanter raporu sayfası görüntülenir.  
+
+**Nasıl yapar**: Fonksiyon, React fonksiyonel bileşeni olarak tanımlanmıştır; içinde tek bir return ifadesi bulunur ve doğrudan `AdminInventoryReportPage` bileşenini JSX olarak döndürür.  
+
+**Parametreler**:  
+- *Hiç yok* — Fonksiyon parametre almaz; sabit bir bileşen döndürür.  
+
+**Dönüş**:  
+- `JSX.Element` — `<AdminInventoryReportPage />` bileşenini temsil eden JSX elemanı.
 
 ---
 
@@ -1927,10 +1961,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/inventory/report/page.tsx::InventoryReportPage
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\inventory\report\page.tsx::InventoryReportPage
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX element (AdminInventoryReportPage bileşenini döndürür)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element (React bileşeni `<AdminInventoryReportPage />` döndürür)
 
 ---
 
@@ -1943,6 +1977,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryReportPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
 
 ---
 # FILE: src\app\admin\inventory\settings\page.md
@@ -2011,50 +2061,57 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\logistics\page.tsx
 skeleton_hash: 517c236f99fadd9e
-generated_at: 2026-05-23T21:48:03Z
+entity_hashes:
+  func:LogisticsPage: 70696f052bf11390
+  overview: ab1d59ecc97d7bb1
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:59:17Z
 ---
 
-## Genel Bakış
-Bu modül, yönetim panelindeki Lojistik sayfasının kök bileşenini tanımlar. Sayfanın temel düzenini oluşturur, gerekli veri akışını yönetir ve lojistik işlemlerine ait arayüzü alt bileşenler aracılığıyla sunar. Uygulamada lojistik yönetimi için tek bir giriş noktası görevi görür.
 
-## Fonksiyon Grupları
-### Sayfa Yapılandırma ve Sunum
-Sayfanın iskeletini oluşturur, gerekli yapılandırmaları yapar ve içeriği ilgili alt görünüme yönlendirerek kullanıcı arayüzünü sağlar.
-- LogisticsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu bileşenin hatasız çalışması, React tabanlı sunum ortamına ve dinamik yüklenen `AdminLogisticsPage` bileşeninin sorunsuz içe aktarılmasına bağlıdır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer dinamik olarak yüklenmeye çalışılan AdminLogisticsPage bileşeni belirlenen yolda mevcut değilse, dinamik yükleme işlemi başarısız olur ve sayfa yükleme hatası alınır.
-[Aksiyom 2]: Eğer istemci tarafında dynamic import'ları çözümleyecek bir Next.js çalışma zamanı ortamı yoksa, kod tarayıcıda çalışmaz.
+[Aksiyom 1]: Eğer React çalışma zamanı (runtime) mevcut değilse, `LogisticsPage` bileşeni render edilemez ve sayfa hatalı olur.  
+[Aksiyom 2]: Eğer `AdminLogisticsPage` bileşeni belirtilen yolda (`C:\Users\alize\venthub‑hvac\src\app\admin\logistics\page.tsx`) bulunamaz veya dinamik import başarısız olursa, `LogisticsPage` içinde bu alt bileşen çağrısı bir hata üretir ve sayfa boş ya da çökük gösterilir.  
+[Aksiyom 3]: Eğer `LogisticsPage` fonksiyonu çağrıldığında gerekli React context (ör. Router, Provider) sağlanmazsa, bileşen içinde kullanılan context‑tüketen alt bileşenler (ör. veri akışı, yetkilendirme) çalışmaz ve beklenen UI davranışı gerçekleşmez.  
+[Aksiyom 4]: Eğer sayfanın stil ve layout dosyaları (CSS/TSX) yüklenemezse, `LogisticsPage` görsel olarak bozulur ancak fonksiyonel olarak hâlâ çalışabilir.  
+[Aksiyom 5]: Eğer `LogisticsPage` içinde asenkron veri çekme (ör. API çağrısı) yapılacaksa ve ağ bağlantısı yoksa, veri eksikliği nedeniyle alt bileşenler boş veri setiyle render olur; bu durumda kullanıcıya uygun bir “yükleniyor/boş veri” durumu gösterilmelidir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### LogisticsPage
-**Ne yapar**: Uygulamanın lojistik yönetim sayfasını oluşturan React bileşenidir. `AdminLogisticsPage` bileşenini döndürerek sayfanın görüntülenmesini sağlar.
-**Nasıl yapar**: Herhangi bir prop veya state kullanmaz; doğrudan `AdminLogisticsPage` bileşenini render eder. Bu sayede lojistik modülü ile ilgili içerik ana uygulamaya eklenir.
-**Parametreler**: Yok.
-**Dönüş**: `AdminLogisticsPage` adlı React bileşeni (JSX öğesi).
+**Ne yapar**: `LogisticsPage` bileşenini render eder ve `<AdminLogisticsPage />` JSX elemanını döndürür. Bu sayede yönetim panelindeki lojistik sayfası kullanıcıya sunulur.  
+
+**Nasıl yapar**: Fonksiyon, hiçbir parametre almaz ve doğrudan JSX ifadesi `<AdminLogisticsPage />`'i return eder. React'in fonksiyonel bileşen yapısını kullanarak, bileşenin kendisi bir React elementidir.  
+
+**Parametreler**:
+- *Yok* — Fonksiyon parametre almaz.
+
+**Dönüş**: JSX element (`<AdminLogisticsPage />`) – React tarafından işlenen bir `ReactElement` tipindedir.
 
 ---
 
 ## SABİTLER
 - **AdminLogisticsPage** (call) — `dynamic(
+
   () => import('../../../views/admin/AdminLogisticsPage'),
+
   { ssr...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/logistics/page.tsx::LogisticsPage
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\logistics\page.tsx::LogisticsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok
+- **Dönüş**: JSX element (`<AdminLogisticsPage />`) – React bileşeni olarak `AdminLogisticsPage` bileşenini render eder.
 
 ---
 
@@ -2067,6 +2124,22 @@ Bu bileşenin hatasız çalışması, React tabanlı sunum ortamına ve dinamik 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LogisticsPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
 
 ---
 # FILE: src\app\admin\movements\page.md
@@ -2147,15 +2220,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\orders\page.tsx
 skeleton_hash: 0eb01de0ed96f5e5
-generated_at: 2026-05-23T21:48:10Z
+entity_hashes:
+  func:Page: d710ec3bcbfd4e2f
+  overview: a752ca63e1e75a0e
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:59:40Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki siparişler sayfasının giriş noktasıdır. `Page` adlı tek bir React bileşeni dışa aktarır. Bileşen, çeviri fonksiyonu aracılığıyla metinleri yönetir ve dinamik import ile yüklenen `AdminOrdersPage` görünümünü bir `Suspense` sarmalayıcısı içinde render ederek sayfa yükleme performansını iyileştirir.
+Bu modül, VentHub HVAC projesinin Next.js tabanlı yönetim panelindeki siparişler rotasının ana giriş noktasıdır. Yönetici kullanıcıların siparişleri görüntüleyip yönetebileceği sayfanın temel iskeletini oluşturur. Projeye özel çok dilli çeviri desteği ve dinamik içerik yüklemesi kullanarak hem çoklu dil uyumluluğu hem de gelişmiş sayfa yükleme performansı sağlar.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni  
-Siparişler sayfasının tüm veri akışı, durum yönetimi ve kullanıcı arayüzünü tek bir noktada birleştirir; siparişlerin listelenmesi ve yönetimi için gerekli yapıyı sağlar.  
+### Rota Ana Sayfa Bileşeni
+Yönetim paneli siparişler rotasının varsayılan çalıştırılabilir bileşeni olarak görev alır, çeviri altyapısını hazırlar ve dinamik olarak yüklenen asıl sipariş yönetimi görünümünü yükleme sırasında sarmalayıcı ile kullanıcıya sunar.
 - Page
 
 ---
@@ -2165,19 +2242,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Admin panelinin `orders` (siparişler) sayfasını temsil eden bir Next.js sayfa bileşenidir. Dosya yolundan (`src/app/admin/orders/page.tsx`) anlaşıldığı üzere, bu fonksiyon ilgili route’un varsayılan dışa aktarılan (default export) bileşenidir ve sayfanın görünümünü sağlar.
-
-**Nasıl yapar**: Fonksiyonun iç mantığına dair dokümantasyon (docstring) bulunmamaktadır. TypeScript ve JSX kullanılarak yazıldığı dosya uzantısından (`.tsx`) çıkarılabilir, ancak spesifik işleyiş bilgisi mevcut değildir.
-
-**Parametreler**:  
-- Bu fonksiyon herhangi bir parametre almamaktadır.
-
-**Dönüş**: Dönüş türü belirtilmemiştir; kaynak kodundaki yorum, türün `void` veya bilinmiyor olabileceğini ifade etmektedir. Bir React bileşeni olduğundan, standart olarak JSX öğesi döndürmesi beklenir.
+**Ne yapar**: Bu bileşen, yönetici siparişleri sayfasının ana giriş noktası olarak görev yapar. Uluslararasılaştırma desteği entegre eder ve içerik yüklenirken kullanıcıya görsel bir geri bildirim sağlar.
+**Nasıl yapar**: `useI18n` kancasından (hook) elde edilen çeviri fonksiyonunu kullanarak metinleri yerelleştirir. Asıl içeriği oluşturan `AdminOrdersPage` bileşenini, `fallback` özelliği ile yükleniyor animasyonu içeren bir `Suspense` yapısı içinde sarmalayarak render eder.
+**Parametreler**: Yok
+**Dönüş**: JSX.Element — `Suspense` bileşeni ile sarılmış sayfa yapısını döndürür.
 
 ---
 
@@ -2195,7 +2266,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### [N1_NASIL] AST Pointer: src/app/admin/orders/page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**: 
-  - `t` — `useI18n` hook'undan alınan çeviri fonksiyonu; `t('common.loading')` ile metin çevirisi yapmak için kullanılır
+  - `t` — `useI18n()` hook’undan alınan yerelleştirme (çeviri) fonksiyonu; `t('common.loading')` ile `Suspense` fallback’inde gösterilecek metni döndürür.
 - **Dönüş**: JSX.Element (React bileşeni)
 
 ---
@@ -2211,6 +2282,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
+
+---
 # FILE: src\app\admin\products\page.md
 
 ---
@@ -2219,15 +2306,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx
 skeleton_hash: 1d95369f5f63b92b
-generated_at: 2026-05-23T21:48:13Z
+entity_hashes:
+  func:Page: b78386183e5eac2e
+  overview: 3abd4459140e249f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:59:32Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki ürün listesi sayfasının giriş noktasıdır. Next.js App Router yapısında bir sayfa bileşeni olarak `AdminProductsPage` bileşenini dinamik olarak içe aktarır ve render eder. Sayfa, ürünlerin görüntülenmesi ve yönetilmesi için gerekli UI'yi sağlar.
+Bu modül, Next.js App Router içinde `admin/products` yoluna karşılık gelen sayfanın giriş noktasıdır. Tek bir bileşen fonksiyonu aracılığıyla `AdminProductsPage` bileşenini dinamik olarak yükler ve render eder; böylece ürün yönetimi UI’sinin oluşturulması ve gösterilmesi sorumluluğu bu dosyaya taşınır.
 
 ## Fonksiyon Grupları
-### Sayfa Render ve Layout
-Sayfanın oluşturulması ve temel düzenin sağlanması sorumluluğunu taşır. Tek bir fonksiyon aracılığıyla admin ürün sayfasının tüm JSX yapısını üretir.
+### Sayfa Girişi ve Render
+Bu grup, yönetim panelindeki ürün listesi sayfasının temel render sürecini başlatır. `Page` fonksiyonu, başka bir fonksiyonu çağırmaz; sadece dinamik olarak içe aktarılan `AdminProductsPage` bileşenini JSX olarak döndürerek tüm UI ve iş mantığını alt bileşene devreder.
 - Page
 
 ---
@@ -2237,19 +2328,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Admin ürünler sayfasının ana bileşenini temsil eder. Uygulamanın yönlendirme yapısında (`admin/products` rotası) ilgili sayfanın görüntülenmesini sağlamak için giriş noktası olarak görev yapar.
-
-**Nasıl yapar**: Herhangi bir parametre veya karmaşık mantık içermez. Doğrudan `<AdminProductsPage />` JSX elementini döndürerek tüm görsel ve durumsal sorumluluğu alt bileşene devreder. Bu sayede modüler bir yapı sağlanır ve sayfa, gerektiğinde tembel yükleme (lazy loading) için uygun hale gelir.
-
+**Ne yapar**: Bu fonksiyon, uygulamanın admin paneli ürünler sayfasının ana giriş bileşeni olarak görev yapar. Doğrudan ilgili sayfa bileşenini döndürerek sayfanın render edilmesini sağlar.
+**Nasıl yapar**: Fonksiyon, herhangi bir ek iş mantığı, durum yönetimi veya yan etki işlemi içermez. Sadece statik olarak `AdminProductsPage` bileşenini JSX formatında döndürür.
 **Parametreler**:
-- Parametre almaz.
-
-**Dönüş**: `<AdminProductsPage />` – Admin ürünler sayfasını temsil eden React JSX elemanı. Dönüş tipi `JSX.Element` olarak değerlendirilir.
+- Herhangi bir parametre almaz.
+**Dönüş**: React JSX öğesi döndürür; spesifik olarak `AdminProductsPage` bileşeninin bir örneğini.
 
 ---
 
@@ -2266,9 +2352,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  (yok)
-- **Dönüş**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (`<AdminProductsPage />`) – React bileşeni olarak `AdminProductsPage` bileşenini render eder.
 
 ---
 
@@ -2281,6 +2366,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
 
 ---
 # FILE: src\app\admin\returns\page.md
@@ -2348,78 +2449,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
-
----
-# FILE: src\app\admin\settings\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\settings\page.tsx
-skeleton_hash: c922527cfbd0de6e
-generated_at: 2026-05-23T21:48:19Z
----
-
-## Genel Bakış
-Bu modül, yönetim panelindeki ayarlar sayfasının kullanıcı arayüzünü oluşturmakla sorumludur. Tek bir React bileşeni aracılığıyla sayfanın bütün layout ve içerik yapılarını render eder ve sayfaya ait meta bilgilerini tanımlar.
-
-## Fonksiyon Grupları
-### Sayfa Render Grubu
-Sayfanın JSX yapısını oluşturur ve gerekli alt bileşeni görüntüler.
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-
-Bu modül, Next.js App Router'da bir sayfa bileşeni olarak çalışır ve `AdminSettingsPage` alt bileşenine dayanır.
-
-[Aksiyom 1]: Eğer `Page` fonksiyonu module export edilmezse, bu sayfa routinge bağlanamaz ve 404 hatası alınır.  
-[Aksiyom 2]: Eğer `AdminSettingsPage` bileşeni tanımlı değilse veya import edilmemişse, derleme hatası oluşur.  
-[Aksiyom 3]: Eğer `metadata` export edilmezse, sayfanın başlık ve diğer meta bilgileri tarayıcıda görüntülenmez.
-
----
-
-## FONKSIYON DETAYLARI
-
-### Page
-**Ne yapar**: React fonksiyonel bileşenidir; admin ayarlar sayfasını temsil eden `<AdminSettingsPage />` bileşenini döndürür. Uygulamada yönetici paneline ait ayarlar arayüzünü oluşturur.
-**Nasıl yapar**: Herhangi bir prop, state veya yan etki kullanmadan doğrudan bir JSX ifadesi döndürür. İç içe bileşenlerin (örneğin form alanları, geçiş kontrolleri) `<AdminSettingsPage />` içinde organize edildiği varsayılabilir.
-**Parametreler**:
-- (yok): `void` — Fonksiyon parametre almaz.
-**Dönüş**: `React.JSX.Element` — Admin ayarlar sayfasının tamamını oluşturan React elemanını döndürür.
-
----
-
-## SABİTLER
-- **metadata** (object) — `{
-
-  title: 'Admin Ayarları | VentHub HVAC',
-
-  description: 'VentHub HVAC pl...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\settings\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<AdminSettingsPage />`)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\admin\settings\page.tsx
-  function: src\app\admin\settings\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-  export: metadata
 
 ---
 # FILE: src\app\admin\users\page.md
@@ -5168,8 +5197,8 @@ skeleton_hash: 7805843109ba355b
 entity_hashes:
   func:BackToTopButton: c8f2538093a58334
   overview: bde72dfa4c09c889
-  style_tokens: 2d1270f1d895a080
-generated_at: 2026-05-27T12:12:35Z
+  style_tokens: 5e3169b1c89ec108
+generated_at: 2026-05-27T18:00:52Z
 ---
 
 ## Genel Bakış
@@ -5219,45 +5248,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::onScroll
-- **params**: `_e: Event`
-- **ic_degiskenler**:
-  - `y` — `window.scrollY` veya `document.documentElement.scrollTop` değerlerinden elde edilen mevcut dikey kaydırma konumu.
-  - `setVisible` — dışarıdaki `BackToTopButton` bileşeninden gelen setter, `y > 400` olduğunda `visible` state'ini `true` yapar.
-- **Dönüş**: `void` (state güncellemesi yapar, geri değer döndürmez).
-
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::computePos
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `el` — `document.getElementById('language-switcher')` ile elde edilen dil değiştirici DOM elemanı.
-  - `rect` — `el.getBoundingClientRect()` ile alınan elemanın konum ve boyut bilgilerini içeren `DOMRect` nesnesi.
-  - `bottomFromViewport` — viewport alt kenarı ile elemanın alt kenarı arasındaki boşluk; `Math.max(16, window.innerHeight - rect.bottom)` ile hesaplanır.
-  - `rightToLeftEdge` — viewport sol kenarı ile elemanın sol kenarı arasındaki yatay mesafe; `window.innerWidth - rect.left` ile hesaplanır.
-  - `setPos` — dışarıdaki `BackToTopButton` bileşeninden gelen setter, butonun `bottom` ve `right` konumlarını günceller.
-  - `GAP` — yatay/vertical ek boşluk sabiti; konum hesaplamalarında eklenir.
-- **Dönüş**: `void` (state güncellemesi yapar, geri değer döndürmez).
-
----
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::cleanupScrollEffect
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `onScroll` — `useEffect` içinde tanımlı kaydırma dinleyicisi; bu temizleme fonksiyonunda `window.removeEventListener('scroll', onScroll)` ile kaldırılır.
-- **Dönüş**: `void` (event listener'ı kaldırır).
-
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::cleanupResizeEffect
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `computePos` — `useEffect` içinde tanımlı konum hesaplama fonksiyonu; `window.removeEventListener('resize', computePos)` ile kaldırılır.
-  - `id` — `setInterval` tarafından döndürülen zamanlayıcı kimliği; `clearInterval(id)` ile iptal edilir.
-- **Dönüş**: `void` (resize listener'ı ve interval'i temizler).
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\BackToTopButton.tsx
@@ -5279,9 +5269,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `border-white/20`, `text-white`
+- **Renkler:** `bg-primary-navy`, `border-white/20`, `hover:bg-secondary-blue`, `text-white`
 - **Layout:** `fixed`, `p-3`, `shadow-lg`, `z-40`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${visible`, `:`, `border`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `invisible`, `opacity-0`, `opacity-100`, `pointer-events-none`, `rounded-full`, `transition-shadow`, `translate-y-0`
 
 ---
 # FILE: src\components\BeforeAfterSlider.md
@@ -5683,101 +5674,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `text-steel-gray`, `text-xs`
 - **Layout:** (yok)
-- **Responsive:** (yok)
-
-
----
-# FILE: src\components\CartToast.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\CartToast.tsx
-skeleton_hash: eb3942a6caa35ebc
-generated_at: 2026-05-23T21:57:16Z
----
-
-## Genel Bakış
-CartToast, alışveriş sepetine eklenen ürün hakkında kullanıcıya kısa bir bildirim gösteren bir React bileşenidir. Görünürlüğü, ürün bilgileri ve kapatma işlevi props üzerinden kontrol edilir.
-
-## Fonksiyon Grupları
-### Bildirim Gösterimi
-Kullanıcıya sepetteki ürün hakkında bilgilendirme mesajı sunar ve kapatma işlemini yönetir.
-- CartToast
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için aşağıdaki varsayımlar geçerlidir.
-
-[Aksiyom 1]: Eğer `isVisible` prop'ı boolean türünde değilse, bileşenin görünürlük durumu beklenmedik şekilde değerlendirilir ve UI beklenen şekilde gösterilemeyebilir.  
-[Aksiyom 2]: Eğer `product` prop'ı `null` veya `undefined` ise, ürün bilgileri render edilemeyecek ve bileşen boş veya hatalı içerik gösterebilir.  
-[Aksiyom 3]: Eğer `onClose` prop'ı bir fonksiyon değilse, kapatma eylemi tetiklendiğinde çalışma zamanı hatası (örneğin “onClose is not a function”) oluşur.
-
----
-
-## FONKSIYON DETAYLARI
-
-### CartToast
-**Ne yapar**: CartToast, alışveriş sepeti ile ilgili bir bildirim (toast) gösteren bir React bileşenidir. Kullanıcıya ürün ekleme veya çıkarma gibi işlemlerin sonucunu kısa bir süre içinde sunar.  
-**Nasıl yapar**: `isVisible` prop'una göre koşullu olarak render edilir; `true` olduğunda ürün bilgilerini içeren bir kutucuk gösterilir. Kullanıcı bildirimi kapatmak istediğinde `onClose` fonksiyonu çağrılır ve bileşen görünürlüğü kapatılır.  
-**Parametreler**:  
-- isVisible: boolean — Bileşenin ekranda görünür olup olmadığını belirler.  
-- product: object — Gösterilecek ürünün verilerini içerir (örneğin isim, fiyat, resim gibi alanlar).  
-- onClose: function — Kullanıcı kapatma işlemi gerçekleştirdiğinde çalıştırılacak geri çağırım fonksiyonudur.  
-**Dönüş**: React.FC<CartToastProps> — Bir React fonksiyon bileşeni olarak JSX döndürür; bu JSX, koşullu renderleme sonucunda toast öğesini veya null değerini içerir.
-
----
-
-## INTERFACES
-
-### CartToastProps
-- `isVisible: boolean`
-- `product: Product | null`
-- `onClose: () => void`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/components/CartToast.tsx::CartToast
-- **params**: isVisible, product, onClose
-- **ic_degiskenler**:
-  - `t` — çeviri fonksiyonu, useI18n hook'undan dönen, arayüz metinlerini dil bazlı olarak alır
-  - `lang` — aktif dil kodu (örn. "en", "tr"), useI18n hook'undan döner, formatCurrency ve çevirilerde kullanılır
-  - `showChoiceModal` — seçim modallarının görünürlüğünü kontrol eden boolean state
-  - `setShowChoiceModal` — showChoiceModal state'ini güncelleyen setter fonksiyonu
-  - `timer` — setTimeout tarafından dönen kimlik tutucu; modal gösterimi/gizleme gecikmesini yönetir ve useEffect temizleme fonksiyonunda clearTimeout ile iptal edilir
-  - `handleContinueShopping` — "Alışverişe Devam" butonuna tıklandığında çağrılır; showChoiceModal'ı false yapar ve onClose ile toast'u kapatır
-  - `handleGoToCart` — "Sepete Git" butonuna tıklandığında çağrılır; showChoiceModal'ı false yapar, onClose ile toast'u kapatır ve Link bileşeni üzerinden navigasyon sağlar
-- **Dönüş**: JSX.Element (React.FC<CartToastProps>) – component'in render ettiği JSX döner (koşullu olarak null veya toast/modal yapısı)
-
----
-
-## NODE ID STANDARD
-
-  file: src\components\CartToast.tsx
-  function: src\components\CartToast.tsx::CartToast
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: CartToast
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black`, `bg-light-gray`, `bg-opacity-50`, `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-2`, `border-primary-navy`, `border-success-green`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`
-- **Layout:** `fixed`, `flex`, `flex-1`, `flex-shrink-0`, `items-center`, `items-start`, `justify-center`, `max-w-md`, `max-w-sm`, `min-w-0`, `p-2`, `p-3`, `p-4`, `p-6`, `right-4`
 - **Responsive:** (yok)
 
 
@@ -6856,37 +6752,47 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\HeroCarousel.tsx
 skeleton_hash: 4c1485db4b4d7c76
-generated_at: 2026-05-23T22:16:39Z
+entity_hashes:
+  func:HeroCarousel: ab714744003cac86
+  overview: 4f1991c46b287359
+  style_tokens: 08751a5dc318cad7
+generated_at: 2026-05-27T18:05:10Z
 ---
 
 ## Genel Bakış
-HeroCarousel modülü, verilen kategori listesini kullanarak bir öne çıkan görsel kaydırma (carousel) bileşeni oluşturur. Bu bileşen, sayfanın baş kısmında görsel içerikleri dinamik olarak göstererek kullanıcı deneyimini zenginleştirir.
+`HeroCarousel` modülü, dışarıdan sağlanan `categories` dizisini alarak ana sayfanın üst kısmında görsel bir kaydırma (carousel) bileşeni oluşturur. Bileşen, her kategori için bir slayt üretir, gerekli ikon ve meta verileri tamamlar ve kaydırma geçişlerini yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-HeroCarousel fonksiyonu, dışarıdan gelen `categories` verisini alarak carousel yapısını render eder ve gerekli görsel geçişleri yönetir.
-- HeroCarousel
+Bu grup, bileşenin dışarıdan gelen veriyi alıp UI’yı render etmesinden sorumludur.  
+- HeroCarousel  
+
+### Veri Hazırlama (İçsel Yardımcılar – varsayılan olarak dosyada tanımlı)
+Bu grup, `categories` öğelerindeki eksik ikon ve meta verileri `IconMap` ve `FALLBACK_METADATA` kullanarak tamamlar.  
+- (İçsel yardımcı fonksiyonlar, örn. ikon eşleştirme, metadata doldurma)
+
+### Carousel Kontrolü
+Bu grup, slayt geçişleri, otomatik kaydırma ve kullanıcı etkileşimlerini (örn. önceki/sonraki butonları) yönetir.  
+- (Kaydırma zamanlayıcıları, navigasyon handler’ları)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her öğesinin görüntüleme için gerekli metadata ve ikon bilgilerini içerdiği varsayımına dayanır; bu bilgiler eksik olduğunda `IconMap` ve `FALLBACK_METADATA` sabitleri kullanılarak tamamlanır.
-
-[Aksiyom 1]: Eğer `categories` prop'u tanımsız, null veya boş bir dizi ise, bileşen hiçbir slayt render etmez (veya hata fırlatabilir, bu da içeriğin eksik olduğu anlamına gelir).  
-[Aksiyom 2]: Eğer bir kategori öğesi `IconMap` nesnesinde karşılık gelen bir ikon anahtarına sahip değilse, `FALLBACK_METADATA` nesnesindeki varsayılan ikon değeri kullanılır.  
-[Aksiyom 3]: Eğer bir kategori öğesi gerekli metadata alanlarını (örn. başlık, görsel URL vb.) içermiyorsa, bu eksik alanlar `FALLBACK_METADATA` nesnesinden alınarak tamamlanır.  
-[Aksiyom 4]: Eğer `IconMap` veya `FALLBACK_METADATA` nesneleri tanımsız veya null ise, bileşen ikon ve metadata eksikliklerini düzeltemez verender sırasında beklenmeyen değerler veya hata ortaya çıkabilir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### HeroCarousel
-**Ne yapar**: HeroCarousel, ana sayfa hero bölümünde kategorileri gösteren bir carousels (slayt) bileşeni render eder.  
-**Nasıl yapar**: Bileşen, `categories` prop'undan gelen veri listesini alıp, her bir kategori için bir slayt oluşturur ve genellikle bir kaydırma veya geçiş efekti sağlayan bir carousel kütüphanesi ile gösterir.  
-**Parametreler**:  
-- categories: React.ReactNode[] — Gösterilecek kategorilerin JSX elemanları veya veri objeleri dizisi.  
-**Dönüş**: React.FC<HeroCarouselProps> — Render edilen hero carousel bileşenini döndürür; JSX olarak kullanıma hazır bir React elementi.
+**Ne yapar**: `HeroCarousel` bir React fonksiyonel bileşenidir; bileşen, dışarıdan `categories` adlı bir prop alır.
+
+**Nasıl yapar**: Fonksiyonun iç mantığı ve işleyişi kaynak kodunda yer almamaktadır; bu nedenle uygulanma şekli belirtilmemiştir.
+
+**Parametreler**:
+- `categories`: *type not specified* — Bileşene dışarıdan sağlanan veri; tip bilgisi kodda tanımlı değildir.
+
+**Dönüş**: `React.FC<HeroCarouselProps>` — `HeroCarouselProps` tipinde bir React fonksiyonel bileşenini döndürür.
 
 ---
 
@@ -6910,12 +6816,18 @@ HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her
 
 ## SABİTLER
 - **FALLBACK_METADATA** (object) — `{
+
     'industrial-ventilation': {
+
         hero_title: 'Endüstriyel Havaland...`
 - **IconMap** (object) — `{
+
     wind: Wind,
+
     shield: Shield,
+
     activity: Activity,
+
     zap: Za...`
 
 ---
@@ -6923,90 +6835,104 @@ HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/HeroCarousel.tsx::HeroCarousel
-- **params**: categories
+- **params**: `categories` — dışarıdan gelen kategori listesi
 - **ic_degiskenler**:
-  - `wrapCategory` — ViewModel oluşturucu fonksiyonu, her kategori nesnesini UI için hazırlanan ViewModel'a dönüştürür.
-  - `t` — i18n çeviri fonksiyonu, arayüz metinlerini mevcut dile göre çevirir.
-  - `currentIndex` — Şu anda gösterilen slaytın indeksi; `setCurrentIndex` ile güncellenir.
-  - `setCurrentIndex` — `currentIndex` state'ini güncelleyen setter fonksiyonu.
-  - `isAutoPlaying` — Otomatik oynatma aktif mi? `true` ise slaytlar belirli aralıklarla değişir.
-  - `setIsAutoPlaying` — `isAutoPlaying` state'ini güncelleyen setter fonksiyonu.
-  - `timeoutRef` — `setTimeout` tarafından oluşturulan tutucuyu tutan `useRef`; otomatik oynatma zamanlayıcısını temizlemek için kullanılır.
-  - `mainCategoryVms` — `useMemo` ile hesaplanan, üst‑level kategorilerin ViewModel listesi; filtrelenmiş, sıralanmış ve sarılmış kategorilerden oluşur.
-  - `handleNext` — “Sonraki” butonuna tıklandığında çağrılan fonksiyon; otomatik oynatmayı durdurur ve indeksi bir artırır.
-  - `handlePrev` — “Önceki” butonuna tıklandığında çağrılan fonksiyon; otomatik oynatmayı durdurur ve indeksi bir azaltır.
-- **Dönüş**: JSX elementi (karusel UI) veya `null` (kategori yoksa).
+  - `wrapCategory` — `useCategoryViewModel` hookundan gelen, bir kategori nesnesini ViewModel’e dönüştüren fonksiyon
+  - `t` — `useI18n` hookundan gelen çeviri fonksiyonu
+  - `currentIndex` — aktif slaytın indeksini tutan state
+  - `setCurrentIndex` — `currentIndex` state’ini güncelleyen setter
+  - `isAutoPlaying` — otomatik geçişin açık/kapalı olduğunu belirten boolean state
+  - `setIsAutoPlaying` — `isAutoPlaying` state’ini güncelleyen setter
+  - `timeoutRef` — `setTimeout` kimliğini saklayan ref
+  - `mainCategoryVms` — `useMemo` ile hesaplanan, üst‑seviye kategorilerin ViewModel’leri
+  - `handleNext` — sonraki slayta geçiş yapan, otomatik oynatmayı durduran fonksiyon
+  - `handlePrev` — önceki slayta geçiş yapan, otomatik oynatmayı durduran fonksiyon
+- **Dönüş**: JSX element (hero carousel UI) veya `null` (eğer `mainCategoryVms.length === 0`)
 
-### [N2_NASIL] AST Pointer: src/components/HeroCarousel.tsx::mainCategoryVmsFactory (useMemo callback)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `CategoryViewModel[]` — `categories` dizisinden `parent_id` olmayanları filtreler, isimlerine göre sıralar, her birini `wrapCategory` ile sarar ve `null` olmayan sonuçları döndürür.
-
-### [N3_NASIL] AST Pointer: src/components/HeroCarousel.tsx::resetEffect (useEffect for index reset)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` (useEffect temizliği yok) — `currentIndex` değeri `mainCategoryVms.length`’e eşit veya büyükse indeksi `0`’a sıfırlar.
-
-### [N4_NASIL] AST Pointer: src/components/HeroCarousel.tsx::autoPlayEffect (useEffect for auto‑play)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` veya cleanup fonksiyonu — `isAutoPlaying` true ve liste boş değilse 5 saniyelik bir `setTimeout` kurar; dönüş değeri olarak zamanlayıcıyı temizleyen cleanup fonksiyonunu döndürür.
-
-### [N5_NASIL] AST Pointer: src/components/HeroCarousel.tsx::tickCallback (setTimeout inside autoPlayEffect)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `setCurrentIndex` ile mevcut indeksi bir artırır (modulo liste uzunluğu).
-
-### [N6_NASIL] AST Pointer: src/components/HeroCarousel.tsx::autoPlayCleanup (cleanup function of autoPlayEffect)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — Eğer `timeoutRef.current` tanımlıysa onu `clearTimeout` ile iptal eder.
-
-### [N7_NASIL] AST Pointer: src/components/HeroCarousel.tsx::handleNext
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `setIsAutoPlaying(false)` ile otomatik oynatmayı durdurur ve `setCurrentIndex` ile indeksi bir artırır (sarar).
-
-### [N8_NASIL] AST Pointer: src/components/HeroCarousel.tsx::handlePrev
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `setIsAutoPlaying(false)` ile otomatik oynatmayı durdurur ve `setCurrentIndex` ile indeksi bir azaltır (sarar).
-
-### [N9_NASIL] AST Pointer: src/components/HeroCarousel.tsx::itemRenderer (mainCategoryVms.map callback)
-- **params**: vm, idx
+### [N2_NASIL] AST Pointer: src/components/HeroCarousel.tsx::mainCategoryVms (useMemo callback)
+- **params**: yok
 - **ic_degiskenler**:
-  - `isActive` — Boolean; geçerli slaytın (`idx === currentIndex`) olup olmadığını gösterir, animasyon ve z‑index kontrolü için kullanılır.
-  - `cat` — Ham kategori nesnesi (`vm.raw`); metadata ve diğer özelliklere erişim sağlar.
-  - `meta` — Kategori metadata’sı; `FALLBACK_METADATA` ile birleştirilerek eksik alanlar tamamlanır.
-  - `bgImage` — String; arkaplan görselinin URL’si, `vm.imageUrl` varsa onu kullanır, yoksa varsayılan yolunu oluşturur.
-- **Dönüş**: JSX elementi — bir slaytın tamamını (arkaın, içerik, özellikler, butonlar) içeren `<div>`.
+  - `categories` — dışarıdan gelen kategori listesi (kapalı)
+  - `wrapCategory` — kategori → ViewModel dönüştürücü
+  - `c` — geçici kategori nesnesi (filter içinde)
+  - `a`, `b` — sıralama karşılaştırması için kullanılan iki kategori nesnesi
+  - `vm` — `wrapCategory` sonucunda elde edilen ViewModel
+- **Dönüş**: `NonNullable<typeof vm>` tipinde ViewModel dizisi
 
-### [N10_NASIL] AST Pointer: src/components/HeroCarousel.tsx::ventImageOnError (VentImage onError handler)
-- **params**: e
+### [N3_NASIL] AST Pointer: src/components/HeroCarousel.tsx::reset effect (useEffect callback)
+- **params**: yok
 - **ic_degiskenler**:
-  - `target` — HTMLImageElement; hatalı resmin `<img>` elementi, `onerror`’u temizleyerek ve `src`’i varsayılan görsele değiştirerek geri dönüşüm sağlar.
-- **Dönüş**: `void`
+  - `currentIndex` — mevcut aktif indeks
+  - `mainCategoryVms` — hesaplanan ViewModel dizisi
+  - `setCurrentIndex` — indeks state’ini sıfırlayan setter
+- **Dönüş**: yok (yan etki: gerekirse `currentIndex`i 0’a ayarlar)
 
-### [N11_NASIL] AST Pointer: src/components/HeroCarousel.tsx::featureItemMapper (meta.features.map callback)
-- **params**: f: CategoryFeature, i: number
+### [N4_NASIL] AST Pointer: src/components/HeroCarousel.tsx::auto‑play effect (useEffect callback)
+- **params**: yok
 - **ic_degiskenler**:
-  - `Icon` — React bileşeni; `IconMap` üzerinden özelliğin ikonunu alır, bulunamazsa `Activity` ikonunu varsayılan olarak kullanır.
-- **Dönüş**: JSX elementi — bir özelliğin ikonu, başlığı ve açıklamasını gösteren `<div>`.
+  - `isAutoPlaying` — otomatik oynatma flag’i
+  - `mainCategoryVms` — ViewModel dizisi
+  - `timeoutRef` — timeout kimliğini tutan ref
+  - `setCurrentIndex` — indeks state’ini güncelleyen setter
+  - `currentIndex` — mevcut indeks (temizleme fonksiyonunda kullanılır)
+- **Dönüş**: temizleme fonksiyonu (timeout varsa `clearTimeout`)
 
-### [N12_NASIL] AST Pointer: src/components/HeroCarousel.tsx::openLeadModalClick (button onClick)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `window.openLeadModal?.()` çağrısıyla lead modalını açar (varsa).
+### [N5_NASIL] AST Pointer: src/components/HeroCarousel.tsx::handleNext
+- **params**: yok
+- **ic_degiskenler**:
+  - `setIsAutoPlaying` — otomatik oynatmayı durduran setter
+  - `setCurrentIndex` — bir sonraki indeksi hesaplayıp güncelleyen setter
+  - `mainCategoryVms` — toplam slayt sayısını belirlemek için kullanılan dizi
+- **Dönüş**: yok (state güncellemeleriyle yan etki)
 
-### [N13_NASIL] AST Pointer: src/components/HeroCarousel.tsx::progressIndicatorClick (progress button onClick)
-- **params**: 
-- **ic_degiskenler**: - yok
-- **Dönüş**: `void` — `setIsAutoPlaying(false)` ile otomatik oynatmayı durdurur ve `setCurrentIndex(idx)` ile ilgili slayta geçer.
+### [N6_NASIL] AST Pointer: src/components/HeroCarousel.tsx::handlePrev
+- **params**: yok
+- **ic_degiskenler**:
+  - `setIsAutoPlaying` — otomatik oynatmayı durduran setter
+  - `setCurrentIndex` — bir önceki indeksi hesaplayıp güncelleyen setter
+  - `mainCategoryVms` — toplam slayt sayısını belirlemek için kullanılan dizi
+- **Dönüş**: yok (state güncellemeleriyle yan etki)
 
-### [N14_NASIL] AST Pointer: src/components/HeroCarousel.tsx::progressItemMapper (progress indicators map callback)
-- **params**: _, idx
-- **ic_degiskenler**: - yok
-- **Dönüş**: JSX elementi — slayt göstergesi butonu; aktifse geniş bir mavi çizgi, değilse ince gri bir çizgi gösterir ve tıklandığında ilgili slayta geçer.
+### [N7_NASIL] AST Pointer: src/components/HeroCarousel.tsx::render slide callback `(vm, idx) => {...}`
+- **params**:
+  - `vm` — tek bir kategori ViewModel’i
+  - `idx` — o slaytın dizindeki konumu
+- **ic_degiskenler**:
+  - `isActive` — `idx === currentIndex` kontrolü, slaytın görünür olup olmadığını belirler
+  - `cat` — `vm.raw` üzerinden alınan ham kategori nesnesi
+  - `meta` — kategori meta verisi; `cat.metadata` ya da `FALLBACK_METADATA[vm.slug]` ya da `FALLBACK_METADATA['default']`
+  - `bgImage` — arka plan resmi URL’si; koşullu olarak `vm.imageUrl` veya varsayılan yol
+  - `target` — `onError` içinde kullanılan `HTMLImageElement` referansı
+- **Dönüş**: JSX element (tek slayt)
+
+### [N8_NASIL] AST Pointer: src/components/HeroCarousel.tsx::image onError handler `(e) => {...}`
+- **params**: `e` — `React.SyntheticEvent` (image hata olayı)
+- **ic_degiskenler**:
+  - `target` — `e.target` olarak tiplenmiş `HTMLImageElement`; hatalı görseli yedek görsele yönlendirir
+- **Dönüş**: yok (image `src`’i değiştirme yan etkisi)
+
+### [N9_NASIL] AST Pointer: src/components/HeroCarousel.tsx::features map callback `(f: CategoryFeature, i: number) => {...}`
+- **params**:
+  - `f` — tek bir özellik nesnesi (`CategoryFeature`)
+  - `i` — özellik dizisindeki indeks
+- **ic_degiskenler**:
+  - `Icon` — `IconMap` üzerinden bulunan ikon bileşeni veya varsayılan `Activity`
+- **Dönüş**: JSX element (özellik kartı)
+
+### [N10_NASIL] AST Pointer: src/components/HeroCarousel.tsx::lead modal opener `( ) => { window.openLeadModal?.() }`
+- **params**: yok
+- **ic_degiskenler**:
+  - `window.openLeadModal` — global fonksiyon, varsa çağrılır
+- **Dönüş**: yok (global fonksiyon yan etkisi)
+
+### [N11_NASIL] AST Pointer: src/components/HeroCarousel.tsx::progress indicator button callback `(_, idx) => {...}`
+- **params**:
+  - `_` — kullanılmayan slide öğesi (placeholder)
+  - `idx` — tıklanan gösterge indeksi
+- **ic_degiskenler**:
+  - `setIsAutoPlaying` — otomatik oynatmayı durdurur
+  - `setCurrentIndex` — göstergeye tıklanınca aktif indeksi `idx` olarak ayarlar
+- **Dönüş**: yok (state güncellemeleriyle yan etki)
 
 ---
 
@@ -7025,20 +6951,16 @@ HeroCarousel bileşeni, `categories` propunun bir dizi olduğu ve bu dizinin her
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[600px]`, `lg:h-[700px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `duration-[2000ms]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `h-hvac-hero`, `lg:h-hvac-hero-lg`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/40`, `bg-gradient-to-r`, `bg-secondary-blue`, `bg-white/10`, `bg-white/30`, `bg-white/5`, `bg-zinc-900`, `border-white/10`, `border-white/20`, `from-black/80`, `lg:text-7xl`, `text-5xl`, `text-gray-200`, `text-gray-400`, `text-secondary-blue`
+- **Renkler:** `bg-black/40`, `bg-gradient-to-r`, `bg-secondary-blue`, `bg-white/10`, `bg-white/30`, `bg-white/5`, `bg-zinc-900`, `border-white/10`, `border-white/20`, `from-black/80`, `hover:bg-blue-600`, `hover:bg-white/10`, `hover:bg-white/20`, `hover:bg-white/50`, `lg:text-7xl`
 - **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `bottom-10`, `flex`, `flex-col`, `flex-wrap`, `from-black/80`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `h-1.5`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
-
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${idx`, `${isActive`, `-translate-x-1/2`, `:`, `===`, `border`, `currentIndex`, `duration-1000`, `duration-300`, `duration-hvac-glacial`, `ease-in-out`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-offset-black/50`
 
 ---
 # FILE: src\components\HeroSection.md
@@ -7713,11 +7635,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx
 skeleton_hash: 8a850a2b7d984e21
-generated_at: 2026-05-23T22:08:35Z
+entity_hashes:
+  func:LanguageSwitcher: e20e68a6d834aa54
+  overview: 7882320662f1fa31
+  style_tokens: 93059c02fd156e45
+generated_at: 2026-05-27T18:07:01Z
 ---
 
 ## Genel Bakış
-LanguageSwitcher, uygulamanın dil seçimini sağlayan bir React bileşenidir. Kullanıcıya mevcut dillerden birini seçme ve seçimi uygulama durumu yönetimiyle güncelleme imkanı sunar.
+LanguageSwitcher modülü, uygulamanın dil seçimini sağlayan basit bir React bileşenidir. Kullanıcıya mevcut dillerden birini seçme ve bu seçimi uygulama genelinde güncelleme imkanı sunar.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
@@ -7727,30 +7653,35 @@ Bu grup, dil değiştirme işlevselliğini tek bir fonksiyonda toplar.
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Dil değiştirme işlevini yerine getiren bu React bileşeninin çalışması için uygulama içi dil yönetimi altyapısının ve React çalışma ortamının erişilebilir olması zorunludur.
+
+[Aksiyom 1]: Eğer uygulama genelinde paylaşılan global dil durumu (dil state'i) bileşen tarafından erişilebilir değilse, kullanıcının seçtiği dil uygulama genelindeki hiçbir içeriği etkilemez, bileşen tamamen işlevsiz kalır.
+[Aksiyom 2]: Eğer desteklenen dillerin listesi bileşen tarafından erişilebilir değilse, kullanıcıya seçim yapabileceği hiçbir dil seçeneği sunulamaz, bileşen boş olarak render edilir.
+[Aksiyom 3]: Eğer dil değişikliğini uygulama genelinde uygulayacak global callback fonksiyonu tanımlı ve erişilebilir değilse, kullanıcı herhangi bir dil seçse bile dil değişikliği işlemi gerçekleştirilemez, uygulama mevcut dilinde kalır.
+[Aksiyom 4]: Eğer React kütüphanesi bileşenin çalıştığı istemci ortamında erişilebilir değilse, bileşen hiçbir şekilde render edilemez, çalışmaz.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### LanguageSwitcher
-**Ne yapar**: Uygulamada dil değiştirme seçeneği sunan bir React bileşeni render eder.  
-**Nasıl yapar**: Kullanıcıya mevcut dillerin listesi gösterir ve bir dil seçildiğinde içerik dilini güncelleyen bir callback fonksiyonunu tetikler.  
+**Ne yapar**: LanguageSwitcher fonksiyonu, uygulama içinde dil seçimini sağlayan bir React bileşeni döndürür.  
+**Nasıl yapar**: Fonksiyon, React.FC arayüzünü uygulayarak JSX döndürür; içeriğinde dil seçeneklerini gösteren öğeler ve kullanıcı etkileşimini yöneten mantık bulunur (örneğin, bir buton veya açılır menü).  
 **Parametreler**:  
 - (parametre yok)  
-**Dönüş**: `React.FC` türünde bir bileşen döndürür; bu bileşen render edildiğinde dil seçiciyi içeren JSX elemanı üretir.
+**Dönüş**: React.FC türünde bir fonksiyon; bu fonksiyon render edildiğinde dil değiştirme kullanıcı arayüzünü gösterir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/LanguageSwitcher.tsx::LanguageSwitcher
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx::LanguageSwitcher
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lang` — current locale string ('tr' or 'en') obtained from the `useI18n` hook; determines which language button is active and is passed to the translation function.
-  - `setLang` — function returned by `useI18n` to update the locale; invoked when the TR or EN button is clicked.
-  - `t` — translation function from `useI18n`; used to retrieve localized strings for `aria-label` attributes and button labels.
-- **Dönüş**: JSX element (React.FC) rendering the language switcher UI with TR/EN buttons.
+  - `lang` — Mevcut aktif uygulama dili kodu, useI18n kancası aracılığıyla alındı
+  - `setLang` — Uygulamanın aktif dilini güncellemek için kullanılan fonksiyon, useI18n kancası tarafından sağlandı
+  - `t` — Yerelleştirilmiş metin dizelerini almak için kullanılan çeviri fonksiyonu, useI18n kancası tarafından sağlandı
+- **Dönüş**: React.FC
 
 ---
 
@@ -7775,10 +7706,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-white/90`, `border-light-gray`, `text-industrial-gray`, `text-sm`, `text-white`
+- **Renkler:** `bg-primary-navy`, `bg-white/90`, `border-light-gray`, `hover:bg-light-gray`, `text-industrial-gray`, `text-sm`, `text-white`
 - **Layout:** `backdrop-blur`, `bottom-4`, `fixed`, `flex`, `gap-1`, `items-center`, `p-1`, `right-4`, `shadow-sm`, `z-50`
-- **Responsive:** (yok)
-
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${lang`, `:`, `===`, `border`, `en`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `outline-none`, `px-3`, `py-1`, `rounded-full`, `tr`
 
 ---
 # FILE: src\components\LazyBrandsShowcase.md
@@ -7978,8 +7909,8 @@ entity_hashes:
   func:submit: 57ac99ffc1840be0
   func:validate: 3e57d313017d2565
   overview: 666966080ef15820
-  style_tokens: e138a3ea7ab2fcea
-generated_at: 2026-05-27T12:13:00Z
+  style_tokens: 671fc429a274af0c
+generated_at: 2026-05-27T18:07:03Z
 ---
 
 ## Genel Bakış
@@ -8137,7 +8068,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gradient-to-br`, `bg-gray-100`, `bg-gray-50`, `bg-gray-50/50`, `bg-green-100`, `bg-primary-navy`, `bg-secondary-blue/80`, `bg-white`, `bg-white/10`, `border-2`, `border-gray-100`, `border-gray-200`, `border-gray-300`, `border-red-400`, `border-t`
 - **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-blue-600/20`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`
-- **Responsive:** `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `focus:`, `group-hover:`, `hover:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${errors.name`, `-mt-2`, `:`, `animate-bounce`, `animate-in`, `animate-spin`, `border`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-70`, `duration-300`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-gray-300`
 
 ---
 # FILE: src\components\LoadingSpinner.md
@@ -8575,89 +8507,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 
 ---
-# FILE: src\components\ProductCard.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ProductCard.tsx
-skeleton_hash: a9c5f54f770565d8
-generated_at: 2026-05-23T22:19:05Z
----
-
-## Genel Bakış
-ProductCard.tsx, ürün bilgilerini görsel olarak sunan bir React bileşenidir. Supabase üzerinden gelen Product verisini kullanarak ürün adı, fiyatı, marka simgesi ve görüntüsünü gösterer, useCart hook’u ile sepete ekleme işlemini ve useI18n/formatCurrency ile uluslararasılaştırılmış fiyat formatlamasını entegre eder. Ayrıca, ürün detay sayfasına yönlendirme için Next.js Link bileşeni kullanılır.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-
-
----
-
-## INTERFACES
-
-### ProductCardProps
-- `product: Product`
-- `onQuickView?: (product: Product) => void`
-- `highlightFeatured?: boolean`
-- `layout?: 'grid' | 'list'`
-- `priority?: boolean`
-- `hidePrice?: boolean`
-- `compact?: boolean`
-
----
-
-## SABİTLER
-- **ProductCard** (call) — `React.memo(function ProductCard({
-  product,
-  layout = 'grid',
-  priority...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/components/ProductCard.tsx::handleClick
-- **params**: (e: React.MouseEvent)
-- **ic_degiskenler**:
-  - `e` — React.MouseEvent nesnesi; tıklama olayıdır, preventDefault() ve stopPropagation() çağrılarak varsayılan davranış engellenir ve olay yayılımı durdurulur.
-  - `product` — Eklenecek ürün nesnesi (Product tipi); addToCart fonksiyonuna argüman olarak geçirilir.
-  - `addToCart` — useCart hookundan alınan fonksiyon; ürünü sepeteklemek için çağrılır.
-- **Dönüş**: yok
-
----
-
-## NODE ID STANDARD
-
-  file: src\components\ProductCard.tsx
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `min-h-[2.5rem]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gold-accent`, `bg-light-gray/30`, `bg-light-gray/50`, `bg-primary-navy`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `sm:text-lg`, `text-base`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-secondary-blue`, `text-sm`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-3`, `group-hover:bg-light-gray/50`, `group-hover:opacity-100`, `group-hover:scale-105`, `group-hover:text-primary-navy`, `h-11`, `h-28`, `h-9`
-- **Responsive:** `sm:` prefix kullanımları
-
-
----
 # FILE: src\components\QuickViewModal.md
 
 ---
@@ -8670,8 +8519,8 @@ entity_hashes:
   func:QuickViewModal: debc62013d59b5ee
   func:handleAdd: 552a96581034d630
   overview: 3c7154223e99d479
-  style_tokens: a984258a010d174d
-generated_at: 2026-05-27T11:49:22Z
+  style_tokens: a0d16d1087294b08
+generated_at: 2026-05-27T18:09:18Z
 ---
 
 ## Genel Bakış
@@ -8771,9 +8620,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/40`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-2`, `border-b`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `text-2xl`, `text-6xl`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-secondary-blue/30`
+- **Renkler:** `bg-black/40`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-2`, `border-b`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `hover:bg-light-gray`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-white`, `text-2xl`, `text-6xl`
 - **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `from-air-blue`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `line-clamp-2`, `line-clamp-4`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `aspect-square`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-semibold`, `inset-0`, `mb-1`, `mb-2`, `mb-4`, `mb-6`, `mr-2`, `mt-auto`, `px-4`
 
 ---
 # FILE: src\components\ResourcesSection.md
@@ -9180,8 +9030,8 @@ entity_hashes:
   func:renderSuggestion: 843bcfdde37f5fbe
   func:renderSuggestions: 8f7a31a904a04209
   overview: 1ded2cd49051df65
-  style_tokens: 63fb12683ce25606
-generated_at: 2026-05-27T12:27:00Z
+  style_tokens: dd6869457e23a7f7
+generated_at: 2026-05-27T18:09:20Z
 ---
 
 ## Genel Bakış  
@@ -9460,12 +9310,12 @@ graph TD
     SearchOverlay_tsx__renderResults["renderResults"]
     SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
     SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
 ```
 
@@ -9499,8 +9349,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-air-blue/10`, `bg-amber-50`, `bg-gray-100`, `bg-gray-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-900/40`, `bg-transparent`, `bg-white`, `border-amber-100`, `border-b`, `border-gray-100`, `border-gray-200`, `border-primary-ocean/30`, `border-slate-100`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-white`
-- **Responsive:** `sm:` prefix kullanımları
+- **Layout:** `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `h-10`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `focus:`, `group-hover:`, `hover:`, `placeholder:`, `sm:`, `xs:` önekleri
+- **Yardımcı Sınıflar:** `${isActive`, `:`, `animate-in`, `animate-spin`, `border`, `cursor-pointer`, `divide-gray-100`, `divide-y`, `duration-200`, `duration-300`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-bold`
 
 ---
 # FILE: src\components\SecurityRibbon.md
@@ -10726,272 +10577,6 @@ Bu istemci tarafı React bileşeni, kararsız kullanıcılara yönelik harekete 
 
 
 ---
-# FILE: src\components\VisualShowcase.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx
-skeleton_hash: aff37f07cc40274b
-generated_at: 2026-05-23T22:28:43Z
----
-
-## Genel Bakış
-Bu React modülü, içerikleri etkileşimli bir slayt vitrini olarak sunan VisualShowcase bileşenini barındırır. Hem masaüstü hem mobil cihazlarda kullanıcı etkileşimini destekler, erişilebilirlik standartlarına uygun olarak kullanıcıların hareket azaltma tercihini de dikkate alır. Slaytlar arasında gezinme, oynatma/duraklatma gibi temel işlevleri tek bir modül altında toplar.
-
-## Fonksiyon Grupları
-### Ana Bileşen ve Erişilebilirlik Yardımcısı
-Modülün tüm işlevlerini koordine eden, alt bileşenleri bir araya getiren temel yapıdır. Kullanıcının hareket azaltma tercihini alarak erişilebilirlik gereksinimlerini karşılar.
-- usePrefersReducedMotion, VisualShowcase
-
-### Dokunmatik Etkileşim Yöneticileri
-Mobil cihazlarda kullanıcıların dokunmatik hareketleriyle vitrin içindeki slaytlar arasında gezinmesini sağlayan olay işleyicileridir.
-- onTouchStart, onTouchEnd
-
-### Arayüz İkon Bileşenleri
-Vitrin arayüzünde kullanılan gezinme ve medya kontrol ikonlarını oluşturan, boyut ve stil özelleştirmesini destekleyen yeniden kullanılabilir bileşenlerdir.
-- ChevronLeftIcon, ChevronRightIcon, PauseIcon, PlayIcon
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı görsel vitrin bileşeninin çalışması için bağımlı olduğu tüm React hook'ları, ikon bileşenleri ve tarayıcı ortam özelliklerinin erişilebilir, tanımlı ve çalışır durumda olması zorunludur.
-
-[Aksiyom 1]: Eğer `usePrefersReducedMotion()` hook'u proje içinde tanımlı ve erişilebilir değilse, bileşen kullanıcının azaltılmış hareket tercihini algılayamaz, görsel animasyonlar erişilebilirlik standartlarını karşılamaz.
-[Aksiyom 2]: Eğer React ortamında `React.TouchEvent` tipi tanımlı değilse, `onTouchStart` ve `onTouchEnd` dokunmatik olay işleyicileri çalışmaz, mobil cihazlarda vitrin ile kullanıcı etkileşimi kurulamaz.
-[Aksiyom 3]: Eğer `ChevronLeftIcon`, `ChevronRightIcon`, `PauseIcon`, `PlayIcon` ikon bileşenleri proje içinden erişilebilir değilse, VisualShowcase bileşeni başarıyla render edilemez, derleme veya çalışma zamanı hatası fırlatır.
-[Aksiyom 4]: Eğer ikon bileşenleri kendisine aktarılan `size` ve `className` parametrelerini işleyemiyorsa, ikonlar doğru şekilde görüntülenemez, VisualShowcase bileşeninin kullanıcı arayüzü bozulur.
-
----
-
-## FONKSIYON DETAYLARI
-
-### usePrefersReducedMotion
-**Ne yapar**: Kullanıcının tarayıcı veya işletim sistemi seviyesindeki azaltılmış hareket tercihini tespit ederek bu bilgiyi React bileşenlerine sunan özel bir hook'tur. Animasyon yoğunluğunu kullanıcının erişilebilirlik tercihine göre ayarlamak amacıyla kullanılır.
-**Nasıl yapar**: Tarayıcının standart `window.matchMedia` API'sini kullanarak `prefers-reduced-motion` medya sorgusunu çalıştırır, sorgunun sonucunu hook içindeki durumda saklar ve bu değeri kullanıma sunar. Kullanıcı tercihi değiştiğinde durumu otomatik olarak günceller.
-**Parametreler**: Herhangi bir parametre almaz
-**Dönüş**: Kullanıcının azaltılmış hareket tercihini belirten boolean tipinde `reduced` değeri; tercih mevcutsa `true`, aksi halde `false` döndürür.
-
-### VisualShowcase
-**Ne yapar**: Venthub HVAC projesinde sistemlerin görsel vitrinini sunan ana React bileşenidir. İnteraktif olarak havalandırma ve klima sistemlerinin demolarını, animasyonlarını kullanıcıya göstermek için tasarlanmıştır.
-**Nasıl yapar**: İçerisinde hareket tercihi kontrolü için `usePrefersReducedMotion` hook'unu, dokunmatik etkileşimler için `onTouchStart` ve `onTouchEnd` olay işleyicilerini kullanır. Gezinme ve oynatma kontrolleri için ikon bileşenlerini entegre ederek eksiksiz bir interaktif vitrin deneyimi sunar.
-**Parametreler**: Herhangi bir parametre almaz
-**Dönüş**: React tarafından DOM'a render edilebilecek bir React.FC (React Bileşeni) olarak, vitrin içeriğini içeren JSX yapısını döndürür.
-
-### onTouchStart
-**Ne yapar**: Dokunmatik ekranlı cihazlarda kullanıcının vitrin içeriğine dokunmaya başladığında tetiklenen olay işleyicisidir. Dokunma başlangıcında animasyonları yönetmek, dokunma konumunu kaydetmek gibi işlemleri gerçekleştirir.
-**Nasıl yapar**: React tarafından sarmalanmış standart `TouchEvent` nesnesini alarak olayın tüm verilerine erişir, bileşenin iç durumunu güncelleyerek dokunma işleminin başladığını kaydeder, gerektiğinde vitrin içindeki animasyonların akışını duraklatır veya yönlendirir.
-**Parametreler**:
-- name: e — type: React.TouchEvent — Tarayıcının tetiklediği dokunma başlangıç olayının konum, zaman ve etkileşim verilerini içeren standart React olay nesnesi
-**Dönüş**: Herhangi bir değer döndürmez, yalnızca bileşenin iç durumunu etkileyen yan etkiler oluşturur, dönüş tipi `void`'tır.
-
-### onTouchEnd
-**Ne yapar**: Kullanıcının vitrin içeriğinden parmağını çektiği, dokunma işleminin sonlandığı anda tetiklenen olay işleyicisidir. Dokunma sonrası animasyonları yeniden başlatmak, kaydırma veya gezinme işlemlerini tetiklemek için kullanılır.
-**Nasıl yapar**: Aldığı `TouchEvent` nesnesinin verileriyle dokunma süresini ve mesafesini hesaplar, bu hesaplamalara göre kullanıcının sola/sağa kaydırma mı yoksa basit tıklama mı yaptığını ayırt eder, tespit ettiği eyleme göre vitrin içeriğinde gezinme veya oynatma işlemlerini başlatır.
-**Parametreler**:
-- name: e — type: React.TouchEvent — Dokunma sonlanma anındaki tüm olay verilerini içeren React tarafından sarmalanmış standart olay nesnesi
-**Dönüş**: Herhangi bir değer döndürmez, yalnızca iç durumu güncellemek ve işlemleri tetiklemek için kullanılır, dönüş tipi `void`'tır.
-
-### ChevronLeftIcon
-**Ne yapar**: Sol yönlü ok şeklinde özelleştirilebilir bir ikon bileşenidir, VisualShowcase içindeki önceki içeriğe geçme butonunda kullanılır. Yeniden kullanılabilir yapıya sahiptir.
-**Nasıl yapar**: Parametre olarak aldığı boyut ve sınıf değerlerini SVG elemanına ileterek ikonun görünümünü ihtiyaca göre ayarlar, hardcoded sol ok vektör yolu üzerinden ikonu ekrana render eder, özel CSS sınıflarını kabul ederek stillendirme esnekliği sunar.
-**Parametreler**:
-- name: size — type: number? — İkonun piksel cinsinden genişlik ve yüksekliğini belirleyen opsiyonel sayısal değer, varsayılan değeri 18'dir
-- name: className — type: string? — İkona özel stiller veya ek CSS sınıfları eklemek için kullanılan opsiyonel metin değeri, varsayılan olarak boş string'dir
-**Dönüş**: Özelleştirilmiş sol ok ikonunu içeren JSX içeriği döndürür, UI'de kullanılmak üzere render edilir, herhangi bir fonksiyonel dönüş değeri yoktur.
-
-### ChevronRightIcon
-**Ne yapar**: Sağ yönlü ok şeklinde özelleştirilebilir bir ikon bileşenidir, VisualShowcase içindeki sonraki içeriğe geçme butonunda kullanılır. Tüm projede yeniden kullanılabilir yapıya sahiptir.
-**Nasıl yapar**: Aldığı boyut ve sınıf parametrelerini SVG elemanının özelliklerine uygulayarak ikonun boyutlarını ve stillerini ayarlar, sağ ok vektör yolu üzerinden ikonu ekrana yazdırır, her türlü tasarıma uyum sağlayacak şekilde özelleştirilebilir.
-**Parametreler**:
-- name: size — type: number? — İkonun piksel cinsinden boyutunu belirleyen opsiyonel sayısal değer, varsayılan değeri 18'dir
-- name: className — type: string? — İkona özel CSS sınıfları eklemek için kullanılan opsiyonel metin değeri, varsayılan olarak boş string'dir
-**Dönüş**: Özelleştirilmiş sağ ok ikonunu içeren JSX içeriği döndürür, UI kontrollerinde kullanılmak üzere sunulur, herhangi bir fonksiyonel dönüş değeri yoktur.
-
-### PauseIcon
-**Ne yapar**: İki dikey çubuk şeklindeki standart duraklatma simgesini oluşturan özelleştirilebilir ikon bileşenidir, VisualShowcase içindeki animasyon veya medya oynatımını duraklatmak için kullanılan butonlarda yer alır.
-**Nasıl yapar**: Parametre olarak aldığı boyut ve sınıf değerlerini SVG elemanına ileterek ikonun görünümünü ihtiyaca göre ayarlar, standart duraklatma ikonunun vektör yolunu kullanarak ekrana render eder, stillendirme esnekliği sunar.
-**Parametreler**:
-- name: size — type: number? — İkonun piksel cinsinden genişlik ve yüksekliğini belirleyen opsiyonel sayısal değer, varsayılan değeri 18'dir
-- name: className — type: string? — İkona özel stiller veya ek sınıflar eklemek için kullanılan opsiyonel metin değeri, varsayılan olarak boş string'dir
-**Dönüş**: Özelleştirilmiş duraklatma ikonunu içeren JSX içeriği döndürür, vitrinin oynatım kontrollerinde kullanılmak üzere sunulur, herhangi bir fonksiyonel dönüş değeri yoktur.
-
-### PlayIcon
-**Ne yapar**: Sağa yönlü üçgen şeklindeki standart oynatma simgesini oluşturan özelleştirilebilir ikon bileşenidir, VisualShowcase içindeki duraklatılmış animasyon veya medya içeriğini yeniden başlatmak için kullanılan butonlarda yer alır.
-**Nasıl yapar**: Aldığı boyut ve sınıf parametrelerini SVG elemanının özelliklerine uygulayarak ikonun boyutlarını ve stillerini ayarlar, standart oynatma ikonunun vektör yolunu kullanarak ekrana render eder, projenin tasarım diline uyum sağlayacak şekilde özelleştirilebilir.
-**Parametreler**:
-- name: size — type: number? — İkonun piksel cinsinden genişlik ve yüksekliğini belirleyen opsiyonel sayısal değer, varsayılan değeri 18'dir
-- name: className — type: string? — İkona özel CSS sınıfları eklemek için kullanılan opsiyonel metin değeri, varsayılan olarak boş string'dir
-**Dönüş**: Özelleştirilmiş oynatma ikonunu içeren JSX içeriği döndürür, vitrinin oynatım kontrollerinde kullanılmak üzere sunulur, herhangi bir fonksiyonel dönüş değeri yoktur.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::usePrefersReducedMotion
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `reduced` — Kullanıcının azaltılmış hareket tercihini saklayan boolean state değeri
-  - `setReduced` - reduced state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `mq` - `(prefers-reduced-motion: reduce)` medya sorgusunu temsil eden MediaQueryList nesnesi
-  - `onChange` - Medya sorgusu değeri değiştiğinde reduced state'ini güncellemek için tanımlanan event handler
-- **Dönüş**: boolean (reduced state değeri)
-
----
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::VisualShowcase
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `t` - useI18n hook'undan alınan metinleri çevirmek için kullanılan fonksiyon
-  - `index` - Aktif carousel slaytının indeksini saklayan state değeri
-  - `setIndex` - index state'ini güncelleyen React state setter fonksiyonu
-  - `playing` - Carousel otomatik oynatma durumunu saklayan boolean state
-  - `setPlaying` - playing state'ini güncelleyen React state setter fonksiyonu
-  - `startXRef` - Dokunmatik kaydırma başlangıç X koordinatını saklayan ref nesnesi
-  - `containerRef` - Carousel ana kapsayıcı DOM elementine erişmek için kullanılan ref nesnesi
-  - `reducedMotion` - usePrefersReducedMotion hook'undan alınan kullanıcının azaltılmış hareket tercihi
-  - `mounted` - Bileşenin DOM'a mount olup olmadığını takip eden boolean state
-  - `setMounted` - mounted state'ini güncelleyen React state setter fonksiyonu
-  - `isCoarse` - Cihazın dokunmatik (pointer: coarse) olup olmadığını kontrol eden boolean değer
-  - `disableFancy` - Gelişmiş görsel efektleri (parallax, parçacık) devre dışı bırakmak için kullanılan boolean
-  - `mouse` - Parallax efektinde kullanılan fare konumunu saklayan {x: number, y: number} nesnesi
-  - `setMouse` - mouse state'ini güncelleyen React state setter fonksiyonu
-  - `slides` - Carousel içindeki tüm slaytların verisini tutan, useMemo ile önbelleğe alınan dizi
-  - `slidesCount` - Toplam slayt sayısını saklayan sayısal değer
-  - `id` - Otomatik oynatma interval ID'sini saklayan değişken
-  - `prev` - Önceki slayta geçmek için useCallback ile sarmalanmış fonksiyon
-  - `next` - Sonraki slayta geçmek için useCallback ile sarmalanmış fonksiyon
-  - `canvasRef` - Parçacık efekti için kullanılan canvas DOM elementine erişen ref nesnesi
-  - `particles` - Canvas üzerinde çizilecek 28 adet parçacığın koordinat ve hız verisini tutan, useMemo ile önbelleğe alınan dizi
-  - `ctx` - Canvas'ın 2D çizim bağlamı
-  - `raf` - requestAnimationFrame ID'sini saklayan değişken
-  - `render` - Her karede canvas üzerinde parçacıkları çizen render fonksiyonu
-- **Dönüş**: JSX.Element (React carousel bileşeni)
-
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::onTouchStart
-- **params**: (e: React.TouchEvent)
-- **ic_degiskenler**:
-  - `e` - Dokunma başlangıç olayını temsil eden React TouchEvent nesnesi
-  - `e.touches[0].clientX` - İlk temas noktasının X koordinatı
-  - `startXRef.current` - Dokunma başlangıç konumunu saklamak için kullanılan ref değeri
-- **Dönüş**: yok
-
----
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::onTouchEnd
-- **params**: (e: React.TouchEvent)
-- **ic_degiskenler**:
-  - `e` - Dokunma bitiş olayını temsil eden React TouchEvent nesnesi
-  - `startXRef.current` - Önce kaydedilen dokunma başlangıç X koordinatı
-  - `e.changedTouches[0].clientX` - Dokunma sonu temas noktasının X koordinatı
-  - `dx` - Başlangıç ve son X koordinatları arasındaki mesafe farkı
-  - `prev` - Önceki slayta geçme fonksiyonu
-  - `next` - Sonraki slayta geçme fonksiyonu
-- **Dönüş**: yok
-
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::ChevronLeftIcon
-- **params**: ({ size = 18, className = '' }: { size?: number; className?: string })
-- **ic_degiskenler**:
-  - `size` - SVG ikonunun genişlik ve yüksekliğini belirten sayısal değer
-  - `className` - İkona uygulanacak özel CSS sınıfları
-- **Dönüş**: JSX.Element (Sol ok simgesi SVG'i)
-
----
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::ChevronRightIcon
-- **params**: ({ size = 18, className = '' }: { size?: number; className?: string })
-- **ic_degiskenler**:
-  - `size` - SVG ikonunun genişlik ve yüksekliğini belirten sayısal değer
-  - `className` - İkona uygulanacak özel CSS sınıfları
-- **Dönüş**: JSX.Element (Sağ ok simgesi SVG'i)
-
----
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::PauseIcon
-- **params**: ({ size = 18, className = '' }: { size?: number; className?: string })
-- **ic_degiskenler**:
-  - `size` - SVG ikonunun genişlik ve yüksekliğini belirten sayısal değer
-  - `className` - İkona uygulanacak özel CSS sınıfları
-- **Dönüş**: JSX.Element (Duraklatma simgesi SVG'i)
-
----
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx::PlayIcon
-- **params**: ({ size = 18, className = '' }: { size?: number; className?: string })
-- **ic_degiskenler**:
-  - `size` - SVG ikonunun genişlik ve yüksekliğini belirten sayısal değer
-  - `className` - İkona uygulanacak özel CSS sınıfları
-- **Dönüş**: JSX.Element (Oynatma simgesi SVG'i)
-
----
-
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki VisualShowcase() fonksiyonu, kullanıcıların hareket azaltma tercihini sorgulamak amacıyla usePrefersReducedMotion hook'unu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veride bu modülü kullanan herhangi bir dış dosya veya fonksiyon belirtilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  VisualShowcase() → usePrefersReducedMotion()
-
-```mermaid
-graph LR
-    VisualShowcase["VisualShowcase()"] --> usePrefersReducedMotion["usePrefersReducedMotion()"]
-```
-
----
-
-## NODE ID STANDARD
-
-  file: src\components\VisualShowcase.tsx
-  function: src\components\VisualShowcase.tsx::usePrefersReducedMotion
-  function: src\components\VisualShowcase.tsx::VisualShowcase
-  function: src\components\VisualShowcase.tsx::onTouchStart
-  function: src\components\VisualShowcase.tsx::onTouchEnd
-  function: src\components\VisualShowcase.tsx::ChevronLeftIcon
-  function: src\components\VisualShowcase.tsx::ChevronRightIcon
-  function: src\components\VisualShowcase.tsx::PauseIcon
-  function: src\components\VisualShowcase.tsx::PlayIcon
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: ChevronLeftIcon
-  export: ChevronRightIcon
-  export: PauseIcon
-  export: PlayIcon
-  export: VisualShowcase
-  export: usePrefersReducedMotion
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `bg-white`, `bg-white/10`, `bg-white/70`, `bg-white/80`, `lg:text-4xl`, `sm:text-3xl`, `sm:text-lg`, `text-2xl`, `text-base`, `text-center`, `text-industrial-gray`, `text-white`, `text-white/90`
-- **Layout:** `-bottom-12`, `-left-16`, `-right-20`, `-top-10`, `absolute`, `bottom-2`, `drop-shadow-sm`, `flex`, `gap-2`, `h-10`, `h-2`, `h-48`, `h-64`, `h-80`, `h-full`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
-
-
----
 # FILE: src\components\WhatsAppFloat.md
 
 ---
@@ -11658,8 +11243,8 @@ skeleton_hash: 9fd39e890d43433c
 entity_hashes:
   func:AdminToolbar: af143a8f279e1c1e
   overview: abe2ed456058d747
-  style_tokens: 51cba129ed279bb3
-generated_at: 2026-05-27T11:56:55Z
+  style_tokens: f914d27adccfd567
+generated_at: 2026-05-27T18:10:33Z
 ---
 
 ## Genel Bakış
@@ -11924,7 +11509,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-cyan-400`, `bg-rose-500`, `bg-surface-deep`, `bg-surface-deep/20`, `bg-surface-deep/40`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/3`, `bg-white/5`, `border-cyan-400`, `border-l`, `border-surface-deep`, `border-t`, `border-white/10`
 - **Layout:** `${sticky`, `-right-1`, `-top-1`, `absolute`, `backdrop-blur-2xl`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-2.5`, `gap-3`, `gap-4`, `gap-5`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `data-[state=checked]:`, `focus-visible:`, `group-focus-within:`, `hover:`, `lg:`, `md:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${adminSelectClass`, `${ch.active`, `${className`, `-translate-y-1/2`, `:`, `animate-in`, `border`, `ch.classOff`, `ch.classOn`, `cursor-pointer`, `data-[state=checked]:translate-x-3.5`, `data-[state=checked]:translate-x-4.5`, `defaultChipOff`, `defaultChipOn`
 
 ---
 # FILE: src\components\admin\BulkActionToolbar.md
@@ -11938,8 +11524,8 @@ skeleton_hash: 7bf65b45d538cf54
 entity_hashes:
   func:BulkActionToolbar: ba39222c0aa88e73
   overview: e440025fef007b62
-  style_tokens: 8018b08eafed78fd
-generated_at: 2026-05-27T12:14:07Z
+  style_tokens: 812207303bb8adc3
+generated_at: 2026-05-27T18:10:35Z
 ---
 
 ## Genel Bakış
@@ -12039,9 +11625,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-400/80`, `bg-emerald-500/80`, `bg-gray-400/80`, `bg-gray-50`, `bg-primary-navy`, `bg-red-500/80`, `bg-white`, `bg-white/20`, `bg-yellow-500/80`, `border-gray-200`, `border-primary-navy`, `text-gray-400`, `text-gray-800`, `text-primary-navy`, `text-sm`
+- **Renkler:** `bg-blue-400/80`, `bg-emerald-500/80`, `bg-gray-400/80`, `bg-gray-50`, `bg-primary-navy`, `bg-red-500/80`, `bg-white`, `bg-white/20`, `bg-yellow-500/80`, `border-gray-200`, `border-primary-navy`, `hover:bg-blue-400`, `hover:bg-emerald-500`, `hover:bg-gray-400`, `hover:bg-red-500`
 - **Layout:** `absolute`, `bg-yellow-500/80`, `bottom-4`, `bottom-full`, `fixed`, `flex`, `flex-1`, `flex-wrap`, `gap-2`, `gap-3`, `h-6`, `h-8`, `hover:bg-yellow-500`, `items-center`, `justify-center`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `!py-2`, `!text-xs`, `${adminButtonPrimaryClass`, `${priceMode`, `:`, `===`, `animate-slide-up`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/30`, `font-bold`, `font-medium`, `font-semibold`, `mb-2`
 
 ---
 # FILE: src\components\admin\ColumnsMenu.md
@@ -12399,8 +11986,8 @@ entity_hashes:
   func:cancelSelection: 4bec1b96cb2c08c1
   func:handleSelect: fdeacf6bd5ee123e
   overview: 83cabe93bf8f0d23
-  style_tokens: 50ed94bf03c87e5a
-generated_at: 2026-05-27T12:21:49Z
+  style_tokens: 8f057de8409875ea
+generated_at: 2026-05-27T18:10:37Z
 ---
 
 ## Genel Bakış
@@ -12570,9 +12157,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `md:border-b-0`, `md:border-r`, `text-left`, `text-primary-navy`, `text-slate-400`, `text-slate-500`
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `hover:bg-primary-navy/90`, `hover:bg-slate-100`, `hover:bg-slate-200/50`, `hover:bg-slate-50`, `hover:border-slate-300`, `hover:text-slate-800`
 - **Layout:** `backdrop-blur-xl`, `flex`, `flex-col`, `gap-1`, `gap-2`, `inline-flex`, `items-center`, `justify-between`, `max-h-60vh`, `max-h-85vh`, `max-w-full`, `md:flex-row`, `md:max-h-none`, `md:w-48`, `md:w-auto`
-- **Responsive:** `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `active:`, `disabled:`, `focus-visible:`, `hover:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${className`, `${isOpen`, `${isSelected`, `:`, `active:scale-95`, `animate-in`, `border`, `disabled:active:scale-100`, `disabled:opacity-50`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`
 
 ---
 # FILE: src\components\admin\EditableCell.md
@@ -12586,8 +12174,8 @@ skeleton_hash: 68ab2fd6998e4d6d
 entity_hashes:
   func:EditableCell: c69e143b78ab0750
   overview: 4312d2a15431d150
-  style_tokens: 4f1bcdc4878f37fb
-generated_at: 2026-05-27T11:42:10Z
+  style_tokens: 2f2ada2707ada249
+generated_at: 2026-05-27T18:10:39Z
 ---
 
 ## Genel Bakış
@@ -12696,9 +12284,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-transparent`, `border-2`, `border-b`, `border-dashed`, `border-primary-navy`, `border-primary-navy/30`, `border-slate-300`, `border-t-primary-navy`, `text-left`, `text-slate-400`, `text-sm`
+- **Renkler:** `bg-transparent`, `border-2`, `border-b`, `border-dashed`, `border-primary-navy`, `border-primary-navy/30`, `border-slate-300`, `border-t-primary-navy`, `hover:border-primary-navy`, `hover:text-primary-navy`, `text-left`, `text-slate-400`, `text-sm`
 - **Layout:** `gap-1`, `h-3.5`, `inline-block`, `inline-flex`, `items-center`, `p-0`, `w-3.5`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${className`, `${inputWidth`, `animate-spin`, `border`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-1`, `focus-visible:ring-primary-navy/50`, `px-1.5`, `py-0.5`, `rounded`, `rounded-full`, `transition-colors`
 
 ---
 # FILE: src\components\admin\ExportMenu.md
@@ -12909,8 +12498,8 @@ skeleton_hash: b3421236e71cdedd
 entity_hashes:
   func:InventoryCsvImport: bba4310bb8e97324
   overview: 618d3c1361b05bd5
-  style_tokens: bdc03fc662abeb30
-generated_at: 2026-05-27T11:46:08Z
+  style_tokens: 3e4e1345adb17abc
+generated_at: 2026-05-27T18:10:41Z
 ---
 
 ## Genel Bakış
@@ -13001,99 +12590,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::processCsv
-- **params**: `()`
-- **ic_degiskenler**:
-  - `skus` — `csvPreview` içindeki tüm `sku` değerlerinin dizisi.
-  - `products` — Supabase’dan çekilen ürün kayıtları (`id, sku`).
-  - `skuToId` — `sku` → `id` haritası.
-  - `dryRun` — dışarıdan gelen boolean; kuru çalıştırma kontrolü.
-  - `successCount` — başarılı stok güncellemelerinin sayacı.
-  - `errors` — `{ sku, message }` hataları tutan dizi.
-  - `batchId` — `generateId()` ile oluşturulan işlem grubu kimliği.
-  - `BATCH_SIZE` — aynı anda işlenecek maksimum satır sayısı (20).
-  - `chunk` — `csvPreview` dilimlenmiş parça.
-  - `_productId` — `skuToId` haritasından elde edilen ürün kimliği.
-  - `reason` — RPC çağrısı için oluşturulan açıklama metni.
-  - `error` — `supabase.rpc('adjust_stock', …)` sonucundaki hata nesnesi.
-  - `logAdminAction` — dinamik import ile alınan denetim kaydı fonksiyonu.
-  - `downloadErrors` — hataları CSV olarak indiren yardımcı fonksiyon.
-- **Dönüş**: yok (yan etkileri: `setCsvProcessing`, `setCsvProgress`, `toast` bildirimleri, `onClose`, `onSuccess`, `downloadErrors`)
-
----
-
-### [N3_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::updateItem
-- **params**: `(item)`
-- **ic_degiskenler**:
-  - `_productId` — `skuToId.get(item.sku)` ile elde edilen ürün kimliği.
-  - `reason` — `CSV import: add/remove <delta>` biçiminde açıklama.
-  - `error` — `supabase.rpc('adjust_stock', …)` sonucundaki hata.
-  - `logAdminAction` — dinamik import ile alınan denetim kaydı fonksiyonu.
-- **Dönüş**: yok (yan etkileri: stok güncelleme, denetim kaydı, `successCount` artırma, `errors` dizisine ekleme)
-
----
-
-### [N4_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::downloadErrors
-- **params**: `()`
-- **ic_degiskenler**:
-  - `header` — CSV başlık satırı `['sku','message']`.
-  - `lines` — `errors` dizisinden oluşturulan CSV satırları.
-  - `csv` — UTF‑8 BOM ile birleştirilmiş tam CSV metni.
-  - `blob` — `csv` içeriğiyle oluşturulan `Blob` nesnesi.
-  - `url` — `URL.createObjectURL(blob)` ile elde edilen geçici URL.
-  - `a` — indirme linki olarak kullanılan `HTMLAnchorElement`.
-- **Dönüş**: yok (yan etkileri: dosya indirme tetikleme)
-
----
-
-### [N5_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::toastContent
-- **params**: `(t)`
-- **ic_degiskenler**:
-  - `successCount` — işlem sonunda güncellenen ürün sayısı (üst kapsamdan).
-  - `batchId` — işlem grubu kimliği (üst kapsamdan).
-  - `errors` — hata listesi (üst kapsamdan).
-  - `downloadErrors` — hata indirme fonksiyonu (üst kapsamdan).
-- **Dönüş**: JSX element (toast içinde gösterilen özel içerik)
-
----
-
-### [N6_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::undoHandler
-- **params**: `()`
-- **ic_degiskenler**:
-  - `csvUndoingRef` — geri alma işleminin çalışıp çalışmadığını izleyen `useRef` değeri.
-  - `batchId` — geri alınacak işlem grubu kimliği (üst kapsamdan).
-  - `data` — `supabase.rpc('reverse_inventory_batch', …)` sonucundaki veri.
-  - `error` — RPC çağrısındaki hata.
-  - `undone` — geri alınan hareket sayısı (`Number(data || 0)`).
-- **Dönüş**: yok (yan etkileri: `toast` bildirimleri, `onSuccess`, `csvUndoingRef` güncellemesi)
-
----
-
-### [N7_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::onFileChange
-- **params**: `(e)`
-- **ic_degiskenler**:
-  - `file` — `e.target.files?.[0]` ile seçilen dosya.
-- **Dönüş**: yok (yan etkileri: `handleCsvImport(file)` çağrısı)
-
----
-
-### [N8_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::onKeyToggle
-- **params**: `(e)`
-- **ic_degiskenler**:
-  - `e.key` — basılan tuşun adı.
-- **Dönüş**: yok (yan etkileri: `setDryRun(!dryRun)` ile kuru‑çalıştırma durumunu değiştirir)
-
----
-
-### [N9_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::renderRow
-- **params**: `(item, idx)`
-- **ic_degiskenler**:
-  - `item` — `CsvPreviewRow` nesnesi (sku, name, current, new, delta, status).
-  - `idx` — satırın indeks numarası (React `key` için).
-- **Dönüş**: JSX `<tr>` elementi (tablo satırı)
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\admin\InventoryCsvImport.tsx
@@ -13116,8 +12612,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-amber-400`, `bg-black/60`, `bg-cyan-400`, `bg-rose-500/20`, `bg-surface-deep/20`, `bg-surface-midnight`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/2`, `bg-white/5`, `border-2`, `border-b`, `border-dashed`, `border-none`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-cyan-400`, `group-hover:scale-110`, `group-hover:text-slate-300`, `group-hover:text-surface-deep`
-- **Responsive:** (yok)
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `h-10`, `h-12`, `h-16`, `h-3`
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `group-hover:`, `group-last:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${dryRun`, `${item.delta`, `0`, `:`, `>`, `animate-in`, `animate-spin`, `border`, `cursor-default`, `cursor-pointer`, `decoration-cyan-400/30`, `disabled:opacity-30`, `duration-300`, `fade-in`, `focus-visible:ring-2`
 
 ---
 # FILE: src\components\admin\InventoryDetailDrawer.md
@@ -13131,8 +12628,8 @@ skeleton_hash: b4c161454e49e38a
 entity_hashes:
   func:InventoryDetailDrawer: 3a57400ca0f546b7
   overview: 92caa1481da5cee7
-  style_tokens: 05c1509659776517
-generated_at: 2026-05-27T11:45:04Z
+  style_tokens: 4b283d8541dc151c
+generated_at: 2026-05-27T18:10:44Z
 ---
 
 ## Genel Bakış
@@ -13261,9 +12758,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-lg`, `rounded-hvac-xl`, `shadow-glow-md`, `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500`, `bg-black/60`, `bg-cyan-400`, `bg-cyan-400/10`, `bg-white/2`, `bg-white/3`, `border-b`, `border-cyan-400/20`, `border-l`, `border-none`, `border-white/10`, `border-white/5`, `text-3xl`, `text-base`, `text-cyan-300`
+- **Renkler:** `bg-amber-500`, `bg-black/60`, `bg-cyan-400`, `bg-cyan-400/10`, `bg-white/2`, `bg-white/3`, `border-b`, `border-cyan-400/20`, `border-l`, `border-none`, `border-white/10`, `border-white/5`, `focus-visible:border-cyan-400/40`, `hover:bg-cyan-300`, `hover:border-amber-400/30`
 - **Layout:** `-right-8`, `-top-8`, `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `animate-in`, `animate-ping`, `animate-pulse`, `blur-3xl`, `border`, `cursor-default`, `disabled:opacity-50`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `font-mono`, `glass`
 
 ---
 # FILE: src\components\admin\InventoryMovementHistory.md
@@ -13597,8 +13095,8 @@ skeleton_hash: 257f3a60c6c02a8b
 entity_hashes:
   func:InventoryStockAdjust: 140b16e336bb5af7
   overview: 3b1f0525645c9b2f
-  style_tokens: da9bb6cd4c8234cf
-generated_at: 2026-05-27T11:41:58Z
+  style_tokens: 333546eed756e72e
+generated_at: 2026-05-27T18:10:46Z
 ---
 
 ## Genel Bakış
@@ -13701,9 +13199,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/3`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-sm`, `text-white`, `text-xs`
+- **Renkler:** `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/3`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `focus-visible:border-cyan-400/40`, `hover:bg-emerald-500/20`, `hover:bg-rose-500/20`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-sm`, `text-white`, `text-xs`
 - **Layout:** `flex`, `flex-1`, `gap-3`, `h-12`, `items-center`, `w-24`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `border`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `ml-1`, `px-4`, `py-3`, `rounded-2xl`, `space-y-4`, `tracking-widest`, `transition-colors`, `transition-opacity`
 
 ---
 # FILE: src\components\admin\InventoryTable.md
@@ -14027,8 +13526,8 @@ entity_hashes:
   func:AuthorityBuilder: ea4f02be3be8275d
   func:getInitialContent: d68640fe30ab6ebc
   overview: 03c5d2aeedc01c1b
-  style_tokens: 6c54695849d4863f
-generated_at: 2026-05-27T11:40:20Z
+  style_tokens: debe507a4c224f1e
+generated_at: 2026-05-27T18:10:48Z
 ---
 
 ## Genel Bakış
@@ -14163,9 +13662,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-indigo-600`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-900`, `bg-white`, `border-2`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `text-center`, `text-indigo-300`, `text-lg`, `text-red-500`, `text-slate-300`
-- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `group-hover:opacity-100`, `h-10`, `h-4`, `h-5`, `h-6`, `h-8`, `h-auto`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Renkler:** `bg-indigo-600`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-900`, `bg-white`, `border-2`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `hover:bg-indigo-50`, `hover:bg-red-50`, `hover:bg-slate-200`, `hover:border-indigo-400`, `text-center`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `h-10`, `h-4`, `h-5`, `h-6`, `h-8`, `h-auto`, `hover:shadow-md`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${btnOutline`, `${cardClass`, `border`, `cursor-grab`, `editor`, `font-bold`, `font-medium`, `font-mono`, `group`, `group-hover:opacity-100`, `italic`, `json`, `mr-2`, `mt-8`, `opacity-0`
 
 ---
 # FILE: src\components\admin\authority-builder\BlockEditor.md
@@ -14179,8 +13679,8 @@ skeleton_hash: bb9ce06ca0b5ad23
 entity_hashes:
   func:BlockEditor: 214d29bf0d4fb6bd
   overview: 451c6f0d8f51e9a4
-  style_tokens: 4d81b249599d8110
-generated_at: 2026-05-27T11:45:47Z
+  style_tokens: bc113824a6724140
+generated_at: 2026-05-27T18:10:50Z
 ---
 
 ## Genel Bakış
@@ -14324,9 +13824,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-indigo-50`, `bg-indigo-50/20`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-white`, `border-indigo-100/50`, `border-slate-100`, `text-center`, `text-indigo-400`, `text-indigo-600`, `text-slate-300`, `text-slate-400`, `text-slate-500`, `text-sm`
+- **Renkler:** `bg-indigo-50`, `bg-indigo-50/20`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-white`, `border-indigo-100/50`, `border-slate-100`, `hover:text-indigo-700`, `hover:text-red-500`, `text-center`, `text-indigo-400`, `text-indigo-600`, `text-slate-300`, `text-slate-400`
 - **Layout:** `absolute`, `flex`, `flex-1`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-32`, `h-7`, `h-9`, `items-center`, `items-start`, `justify-between`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `hover:` önekleri
+- **Yardımcı Sınıflar:** `${inputClass`, `${textareaClass`, `border`, `font-black`, `font-bold`, `font-mono`, `group`, `italic`, `px-3`, `py-1`, `rounded`, `rounded-full`, `rounded-lg`, `rounded-xl`, `space-y-3`
 
 ---
 # FILE: src\components\admin\categories\CategoryFormModal.md
@@ -14342,8 +13843,8 @@ entity_hashes:
   func:handleImageUpload: 633c0036d64f1044
   func:onSubmit: c1bb6fdd37c1f2b9
   overview: aa842adfcce629ec
-  style_tokens: a697519bb3613c56
-generated_at: 2026-05-27T12:23:11Z
+  style_tokens: 6073b78732e76f74
+generated_at: 2026-05-27T18:10:52Z
 ---
 
 ## Genel Bakış
@@ -14530,7 +14031,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-black/40`, `bg-black/60`, `bg-cyan-500`, `bg-red-500`, `bg-surface-deep`, `bg-white/1`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-2`, `border-b`, `border-b-2`, `border-dashed`, `border-t`, `border-transparent`
 - **Layout:** `absolute`, `backdrop-blur-2`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `data-[state=active]:`, `focus-visible:`, `focus:`, `group-hover:`, `hover:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `appearance-none`, `border`, `cursor-pointer`, `focus-visible:outline-none`, `focus-visible:ring-cyan-500/50`, `focus-visible:ring-offset-0`, `font-black`, `font-bold`, `font-medium`, `font-mono`, `font-normal`
 
 ---
 # FILE: src\components\admin\dashboard\AbcPieChart.md
@@ -15384,8 +14886,8 @@ entity_hashes:
   func:ProductFormModal: 6997b37c35b0ebef
   func:onSubmit: 56cec6a550e2cc75
   overview: 12f9cde3f23a5605
-  style_tokens: 07efc4a866288b40
-generated_at: 2026-05-27T11:44:07Z
+  style_tokens: 553a7b8fa0cd3c86
+generated_at: 2026-05-27T18:10:54Z
 ---
 
 ## Genel Bakış
@@ -15555,9 +15057,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/50`, `bg-primary-navy`, `bg-white`, `text-industrial-gray`, `text-red-500`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
+- **Renkler:** `bg-black/50`, `bg-primary-navy`, `bg-white`, `hover:bg-blue-700`, `hover:bg-slate-100`, `hover:bg-slate-50`, `text-industrial-gray`, `text-red-500`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
 - **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-center`, `justify-between`, `justify-end`, `left-1/2`, `max-h-90vh`, `max-w-2xl`, `md:grid-cols-2`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `focus-visible:outline-none`, `font-bold`, `inset-0`, `mb-6`, `mt-8`, `px-4`, `px-6`, `py-2`, `rounded-2xl`, `rounded-full`, `rounded-lg`
 
 ---
 # FILE: src\components\admin\products\ProductHealthBadge.md
@@ -16378,8 +15881,8 @@ entity_hashes:
   func:InputField: 67cc20ea60eef576
   func:RadioGroup: 3547a0581eb094b6
   overview: 886525d7c102a6da
-  style_tokens: 3311fed767cc16e1
-generated_at: 2026-05-27T11:42:31Z
+  style_tokens: d04e77e09b4ac40e
+generated_at: 2026-05-27T18:10:57Z
 ---
 
 ## Genel Bakış  
@@ -16516,9 +16019,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-danger-red/5`, `bg-gray-100`, `bg-industrial-gray`, `bg-primary-navy/5`, `bg-white`, `border-4`, `border-danger-red`, `border-light-gray`, `border-primary-navy`, `border-t-industrial-gray`, `border-transparent`, `text-danger-red`, `text-industrial-gray`, `text-left`, `text-primary-navy`
-- **Layout:** `absolute`, `bottom-full`, `flex`, `gap-2`, `gap-3`, `grid`, `group-hover:opacity-100`, `items-center`, `left-1/2`, `max-w-xs`, `p-4`, `relative`, `right-4`, `sm:grid-cols-${columns`, `top-1/2`
-- **Responsive:** `sm:` prefix kullanımları
+- **Renkler:** `bg-danger-red/5`, `bg-gray-100`, `bg-industrial-gray`, `bg-primary-navy/5`, `bg-white`, `border-4`, `border-danger-red`, `border-light-gray`, `border-primary-navy`, `border-t-industrial-gray`, `border-transparent`, `focus-visible:border-primary-navy`, `hover:border-steel-gray`, `text-danger-red`, `text-industrial-gray`
+- **Layout:** `absolute`, `bottom-full`, `flex`, `gap-2`, `gap-3`, `grid`, `items-center`, `left-1/2`, `max-w-xs`, `p-4`, `relative`, `right-4`, `sm:grid-cols-${columns`, `top-1/2`, `top-full`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${disabled`, `${error`, `${unit`, `${value`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `===`, `border`, `cursor-help`, `cursor-not-allowed`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-medium`
 
 ---
 # FILE: src\components\calculators\ResultCard.md
@@ -16918,8 +16422,8 @@ entity_hashes:
   func:CategoryFilters: 420d76bf670f1cf8
   func:toggleBrand: 67afbe53ea415719
   overview: e7958b385edc9e41
-  style_tokens: 15f8a6328e78c6bf
-generated_at: 2026-05-27T11:45:31Z
+  style_tokens: 57cd966a2983f774
+generated_at: 2026-05-27T18:10:59Z
 ---
 
 ## Genel Bakış
@@ -17025,9 +16529,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `accent-primary-ocean`, `bg-slate-50`, `bg-white`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-300`, `text-primary-ocean`, `text-slate-300`, `text-slate-400`, `text-slate-500`, `text-slate-600`, `text-slate-900`, `text-sm`, `text-white`
-- **Layout:** `absolute`, `block`, `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `group-hover:text-slate-900`, `h-3`, `h-5`, `items-center`, `justify-between`, `justify-center`, `max-h-48`, `overflow-y-auto`, `p-6`
-- **Responsive:** (yok)
+- **Renkler:** `accent-primary-ocean`, `bg-slate-50`, `bg-white`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-300`, `checked:bg-primary-ocean`, `checked:border-primary-ocean`, `focus-visible:border-primary-ocean`, `group-hover:text-slate-900`, `hover:bg-slate-50`, `hover:text-primary-navy`, `placeholder:text-slate-300`, `placeholder:text-slate-400`
+- **Layout:** `absolute`, `block`, `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `h-3`, `h-5`, `items-center`, `justify-between`, `justify-center`, `max-h-48`, `overflow-y-auto`, `p-6`, `relative`
+- **Varyant/Responsive:** `checked:`, `focus-visible:`, `group-hover:`, `hover:`, `peer-checked:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `appearance-none`, `border`, `cursor-pointer`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-ocean/20`, `font-black`, `font-bold`, `font-medium`, `font-semibold`, `group`, `mb-2`, `mb-3`, `mb-6`, `mb-8`
 
 ---
 # FILE: src\components\category\CategoryHero.md
@@ -17167,38 +16672,50 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryShowcase.tsx
 skeleton_hash: bba0312a82b87d24
-generated_at: 2026-05-23T21:58:31Z
+entity_hashes:
+  func:CategoryShowcase: 27f451ff64c2aa4f
+  overview: 7308f814cbfe1bd6
+  style_tokens: 74c7a2fe586c3948
+generated_at: 2026-05-27T18:14:23Z
 ---
 
 ## Genel Bakış
-Bu modül, bir kategori ve onun alt kategorilerini görsel olarak sergilemek için kullanılan bir React bileşenidir. `CategoryShowcase` fonksiyonu, verilen kategori bilgilerini alarak kullanıcı arayüzünde kategori kartı ve alt kategori listesi gibi öğeleri renderlar.
+`CategoryShowcase` modülü, bir kategori ve ona bağlı alt‑kategorileri görsel bir vitrin içinde sunan bir React bileşenidir. Gelen `category`, `subCategories` ve `parentCategory` prop’larını alır, bunları UI öğelerine dönüştürerek kategori kartı, alt‑kategori listesi ve gerektiğinde üst‑kategori navigasyonu oluşturur.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-Kategori gösterimini oluşturan ve dışarıdan gelen verileri UI elemanlarına dönüştüren temel işlevi yerine getirir.
+### Ana Bileşen – UI Oluşturma
+Bu grup, dışarıdan sağlanan veri prop’larını alıp kullanıcı arayüzüne yansıtan temel sorumluluğu taşır. Bileşen, prop’ları ayrıştırır, kategori başlığı, görseli ve açıklamasını gösterir, alt‑kategorileri haritalayarak kart veya bağlantı listesi üretir ve varsa üst‑kategoriye yönlendiren bir geri‑bağlantı ekler.  
 - CategoryShowcase
+
+*Fonksiyon İlişkileri:* `CategoryShowcase` tek başına çalışır; aynı modül içinde başka bir fonksiyonu çağırmaz.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modülün doğru çalışması için gerekli props sağlanmalıdır.
 
-[Aksiyom 1]: Eğer `category` prop'u sağlanmazsa, bileşen kategori bilgilerini render edemez ve hata veya boş görüntü oluşabilir.  
-[Aksiyom 2]: Eğer `subCategories` prop'u sağlanmazsa, alt kategori listesi gösterilemez veya boş liste gibi davranabilir.  
-[Aksiyom 3]: Eğer `parentCategory` prop'u sağlanmazsa, üst kategori navigasyonu veya breadcrumb gösterilemez.
+[Aksiyom 1]: Eğer `category` prop'u yoksa, bileşen kategori bilgilerini render edemez ve hata veya boş görüntü oluşabilir.  
+[Aksiyom 2]: Eğer `subCategories` prop'u yoksa, alt kategori listesi gösterilemez veya boş liste görünebilir.  
+[Aksiyom 3]: Eğer `parentCategory` prop'u yoksa, bileşen üst kategori bağlamını kullanamayacak ve ilgili UI öğeleri (örn. geri navigasyon, başlık) eksik görünebilir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryShowcase
-**Ne yapar**: Verilen kategori, onun alt kategorileri ve üst kategori bilgilerini alarak bu verileri kullanıcı arayüzünde görsel bir vitrin olarak render eder.  
-**Nasıl yapar**: Props olarak gelen `category`, `subCategories` ve `parentCategory` nesnelerini destructure eder; ardından kategori başlığını, görselini ve açıklamasını gösterir, `subCategories` listesini harita ederek her bir alt kategori için bir kart veya bağlantı oluşturur ve eğer `parentCategory` mevcutsa ona yönlendiren bir geri bağlantı ekler. Sonuç olarak JSX döndürerek React bileşeni olarak işlev görür.  
+**Ne yapar**:  
+Kategori gösterimini sağlayan bir React bileşeni oluşturur. Bu bileşen, üst kategori bilgisi, alt kategoriler ve ilgili kategori verilerini alarak, kullanıcıya görsel olarak çekici bir kategori galerisini sunar.  
+
+**Nasıl yapar**:  
+Fonksiyon, `CategoryShowcaseProps` tipinde bir nesne alır ve bu nesnenin `category`, `subCategories` ve `parentCategory` alanlarını kullanarak JSX döndürür. İçerik, kategori başlığı, açıklama, görsel ve alt kategori bağlantıları gibi öğeleri içerir. Bileşen, stil ve layout için CSS sınıfları veya stil bileşenleri kullanır.  
+
 **Parametreler**:
-- category: object — Gösterilecek ana kategorinin verilerini içerir (id, ad, görsel, açıklama gibi alanlar).
-- subCategories: array — Ana kategoriye ait alt kategorilerin listesi; her eleman genellikle bir kategori nesnesidir ve UI içinde kart veya bağlantı olarak render edilir.
-- parentCategory: object | null — Eğer kategori bir hiyerarşinin parçasıysa üst kategori bilgilerini taşır; null değeri üst kategori yoktur anlamına gelir ve bu durumda geri bağlantı gösterilmez.
-**Dönüş**: React.FC — JSX elementi döndüren bir fonksiyonel React bileşeni; render çıktısı kategori vitrini olarak ekrana basılır.
+- category: object — Gösterilecek ana kategori bilgilerini içerir (örneğin, ad, açıklama, görsel URL).
+- subCategories: array — Ana kategoriye ait alt kategorilerin listesini tutar; her öğe alt kategori nesnesidir.
+- parentCategory: object — Ana kategorinin üst kategorisi hakkında bilgi sağlar (örneğin, ad, link).
+
+**Dönüş**:  
+React.FC<CategoryShowcaseProps> tipinde bir fonksiyon bileşeni döndürür. Bu bileşen, JSX ile kategori galerisini render eder.
 
 ---
 
@@ -17213,27 +16730,15 @@ Bu modülün doğru çalışması için gerekli props sağlanmalıdır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::RenderSubCategoryLink
-- **params**: (sub)
-- **ic_degiskenler**:
-  - `sub` — subCategory object containing `id`, `slug`, `image_url`, and `description` used to build the link URL, image source, alt text, heading, and description.
-  - `category` — parent category object from component props; its `slug` is combined with `sub.slug` to generate the route via `Routes.category`.
-  - `t` — translation function (e.g., from `useTranslation`) used to retrieve the localized label for the inspect series call‑to‑action.
-  - `process` — global Node.js `process` object; accesses `process.env.NEXT_PUBLIC_SUPABASE_URL` to construct the base URL for Supabase storage image paths.
-  - `Routes` — utility module providing the `category(slug, subSlug)` function that returns the correct Next.js route path.
-  - `getCategoryDisplayName` — helper that returns a human‑readable display name for a category/subcategory; used for the image `alt` attribute and the heading `<h3>`.
-  - `getCategoryIcon` — helper that returns an icon component when a subcategory lacks an image; receives the subcategory `slug` and size/className props.
-  - `VentImage` — custom image component that renders the product image with proper styling and hover effects.
-  - `ArrowRight` — icon component indicating navigation, animated on hover.
-- **Dönüş**: JSX.Element (a `<Link>` wrapping a card that displays the subcategory image, title, description, and a navigation arrow)
+### [N1_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::(sub) => { ... }
+- **params**: sub
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element (Link component that renders a subcategory card with image, title, description and an arrow icon)
 
-### [N2_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::RenderFeatureItem
-- **params**: (feature, i)
-- **ic_degiskenler**:
-  - `feature` — object with `title` and `desc` strings describing a feature; used to render the heading `<h3>` and paragraph `<p>`.
-  - `i` — numeric index of the feature in the list; used as the React `key` prop for the outer `<div>`.
-  - `CheckCircle2` — icon component (from `lucide-react`) displayed inside a colored circle to visually indicate a checked/validated feature.
-- **Dönüş**: JSX.Element (a `<div>` card showing an icon, feature title, and description)
+### [N2_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::(feature, i) => { ... }
+- **params**: feature, i
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element (div component that displays a feature with an icon, title and description)
 
 ---
 
@@ -17252,20 +16757,16 @@ Bu modülün doğru çalışması için gerekli props sağlanmalıdır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[600px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `aspect-[16/9]`, `aspect-[4/3]`, `aspect-[4/5]`, `duration-[2s]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`
+- `h-hvac-hero`, `rounded-hvac-2xl`
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-blue-50`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-gray-50`, `bg-light-gray`, `bg-orange-50`, `bg-primary-navy`, `bg-primary-navy/10`, `bg-secondary-blue/20`, `bg-slate-50`, `bg-slate-900/50`, `bg-white`, `border-4`, `border-b`, `border-gray-100`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-4`, `bottom-8`, `flex`, `flex-col`, `flex-shrink-0`, `from-black/60`, `from-primary-navy/80`, `from-secondary-blue`, `from-slate-950/80`, `gap-16`, `gap-2`, `gap-6`, `gap-8`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
-
+- **Varyant/Responsive:** `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `-translate-x-1/2`, `animate-bounce`, `animate-fadeIn`, `aspect-4/3`, `aspect-4/5`, `aspect-video`, `border`, `cursor-pointer`, `duration-300`, `duration-700`, `duration-hvac-glacial`, `focus-ring`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-bold`
 
 ---
 # FILE: src\components\category\EducationalGuide.md
@@ -20194,312 +19695,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 
 ---
-# FILE: src\components\home\HomeSinevizyon.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\HomeSinevizyon.tsx
-skeleton_hash: 7bf18d2b5fbf4eb2
-generated_at: 2026-05-23T22:25:21Z
----
-
-## Genel Bakış
-Bu modül, ana ekranda görsel bir slayt gösterisi sunan bir React bileşeni tanımlar. Kullanıcı dokunmatik hareketlerini yakalayarak slaytlar arasında geçiş yapmayı sağlar ve her slaytta gösterilecek içeriği dinamik olarak belirler.
-
-## Fonksiyon Grupları
-### Bileşen Tanımı ve Renderleme
-Ana bileşenin yapısını ve görünümünü oluşturur, dışarıdan alınan `onQuoteClick` geri çağrısını kullanarak alıntıya tıklandığında gerçekleşecek eylemi bağlar.
-- HomeSinevizyon
-
-### Dokunmatik Etkileşim Yönetimi
-Kullanıcının ekrana dokunmaya başladığı ve bıraktığı anları yakalayarak touch başlangıç ve bitiş olaylarını işler, bu sayede slaytlar arasında sürükleme bırakma hareketlerini algılar.
-- handleTouchStart
-- handleTouchEnd
-
-### Slayt İçeriği Sağlama
-Verilen bir indekse göre o slaytta gösterilecek metin, görsel veya diğer öğeleri döndürür, böylece bileşen dinamik olarak içeriği güncelleyebilir.
-- getSlideContent
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-[Aksiyom 1]: Eğer `onQuoteClick` prop'u bir fonksiyon olarak sağlanmazsa, bileşen Quote öğesine tıklandığında beklenen geri çağırma çalışmaz ve hata oluşur.  
-[Aksiyom 2]: Eğer `handleTouchStart` fonksiyonuna `React.TouchEvent` türünde bir argüman geçilmezse, dokunma başlangıcı eventi işlenemez ve dokunma hareketi başlatılamaz.  
-[Aksiyom 3]: Eğer `handleTouchEnd` fonksiyonuna `React.TouchEvent` türünde bir argüman geçilmezse, dokunma sonu eventi işlenemez ve dokunma hareketi tamamlanamaz.  
-[Aksiyom 4]: Eğer `getSlideContent` fonksiyonuna geçirilen `index` değeri `slidesData` dizisinin geçerli indeks aralığı (0 ≤ index < slidesData.length) dışındaysa, fonksiyon `undefined` döndürür (veya içerik sağlayamaz).  
-[Aksiyom 5]: Eğer `slidesData` sabiti boş bir dizi ise, `getSlideContent` herhangi bir `index` için içerik döndürmez ve `undefined` döner.  
-[Aksiyom 6]: Eğer `slidesData` sabiti tanımlı değilse (null veya undefined), `getSlideContent` çalışma zamanında hata fırlatır ve slayt içeriği alınamaz.
-
----
-
-## FONKSIYON DETAYLARI
-
-### HomeSinevizyon
-**Ne yapar**: HomeSinevizyon bileşeni, bir görsel slayt gösterimi veya veri görselleştirme alanı sunar ve dışarıdan gelen `onQuoteClick` fonksiyonunu kullanarak slayt üzerindeki alıntıya tıklandığında özel bir işlem tetikler.  
-**Nasıl yapar**: Bileşen, iç durumunda slayt indeksini tutar, dokunma olaylarını (`handleTouchStart`, `handleTouchEnd`) dinleyerek kullanıcı tarafından sağa/sola kaydırma hareketlerini algılar ve `getSlideContent` fonksiyonunu çağırarak mevcut slaytı render eder.  
-**Parametreler**:  
-- onQuoteClick: (quoteId: string) => void — Slayt üzerinde gösterilen alıntıya tıklandığında çağrılacak geri çağırım fonksiyonu  
-**Dönüş**: React.FC<HomeSinevizyonProps> — JSX elementi olarak render edilebilir bir fonksiyon bileşeni  
-
-### handleTouchStart
-**Ne yapar**: Dokunma başlangıcını yakalayarak kullanıcı tarafından başlatılan bir hareketin (ör. kaydırma) ilk anını kaydeder.  
-**Nasıl yapar**: Olay nesnesinden ilk dokunma noktasının koordinatlarını (`clientX`, `clientY`) çıkarır ve bu değerleri bir sonraki hareket adımı için geçici bir state veya ref içinde saklar; böylece `handleTouchEnd` ile karşılaştırarak yön ve mesafe hesaplanabilir.  
-**Parametreler**:  
-- e: React.TouchEvent — Dokunma başlangıcıyla ilgili tüm touch verilerini içeren SyntheticEvent nesnesi  
-**Dönüş**: void — Fonksiyon bir değer döndürmez, sadece yan etkiler (state güncellemesi) yapar  
-
-### handleTouchEnd
-**Ne yapar**: Dokunma bitişini yakalayarak kullanıcının hareketini tamamlar ve bu hareketin yönüne göre slayt indeksini günceller.  
-**Nasıl yapar**: Olay nesnesinden son dokunma noktasının koordinatlarını alır, `handleTouchStart` tarafından saklanan başlangıç koordinatlarıyla farkı hesaplar; bu fark eşik değerini aşarsa (ör. sağa kaydırma) slayt indeksi bir azaltılır veya artırılır, ardından durum güncellenerek yeni slayt gösterilir.  
-**Parametreler**:  
-- e: React.TouchEvent — Dokunma bitişiyle ilgili tüm touch verilerini içeren SyntheticEvent nesnesi  
-**Dönüş**: void — Fonksiyon bir değer döndürmez, sadece durum güncellemesi yapar  
-
-### getSlideContent
-**Ne yapar**: Verilen slayt indeksine karşılık gelen içeriği (ör. görüntü, metin, alıntı) döndürerek bileşenin render edeceği öğeyi hazırlar.  
-**Nasıl yapar**: İndex parametresini kullanarak önceden tanımlanmış bir veri dizisi veya yapıdan ilgili slayt nesnesini seçer; bu nesne genellikle `image`, `text`, `quote` gibi alanları içerir ve bu alanlar JSX olarak dönüştürülerek return edilir.  
-**Parametreler**:  
-- index: number — Gösterilecek slaytın sıfır tabanlı pozisyonu  
-**Dönüş**: JSX.Element veya null — Belirtilen indekse ait slayt içeriğini temsil eden React elementi; geçersiz indeks için null döndürülebilir.
-
----
-
-## INTERFACES
-
-### HomeSinevizyonProps
-- `onQuoteClick?: () => void`
-
-### SlideProduct
-- `url: string`
-- `labelKey: string`
-- `subLabelKey: string`
-- `link: string`
-
-### SlideData
-- `image: string`
-- `key: number`
-- `products: SlideProduct[]`
-
----
-
-## SABİTLER
-- **slidesData** (array) — `[
-  {
-    image: '/images/hero_hvac_industrial_premium_1.png',
-    product...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::HomeSinevizyon
-- **params**: onQuoteClick (opsiyonel teklif modalını açmak için çağrılan callback)
-- **ic_degiskenler**:
-  - `t` — useI18n'den alınan çeviri fonksiyonu, tüm metinleri yerelleştirmek için kullanılır
-  - `currentSlide` — Aktif olarak görüntülenen slaytın indeksini tutan state değişkeni
-  - `setCurrentSlide` — currentSlide state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `isMounted` — Bileşenin DOM'a monte edildiğini işaret eden state değişkeni
-  - `setIsMounted` — isMounted state'ini güncelleyen setter fonksiyonu
-  - `touchStartX` — Dokunma hareketinin başlangıç X koordinatını saklayan useRef nesnesi
-  - `isInitialMount` — Bileşenin ilk kez monte edildiğini kontrol eden useRef nesnesi
-  - `paginate` — Slaytlar arası geçişi yöneten useCallback ile sarılmış fonksiyon
-  - `handleTouchStart` — Dokunma başlangıç olayını işleyen fonksiyon
-  - `handleTouchEnd` — Dokunma bitiş olayını işleyen, sürükleme ile slayt geçişini yöneten fonksiyon
-  - `getSlideContent` — Belirli slaytın çevrilmiş metin içeriğini döndüren yardımcı fonksiyon
-  - `slidesData` — Tüm slayt verilerini içeren sabit dizi
-- **Dönüş**: Ana slider bölümünü oluşturan JSX elementi
-
-### [N2_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::ilkUseEffectCallback
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `setIsMounted` — Bileşenin monte edildiğini işaretlemek için isMounted state'ini true yapan setter
-  - `isInitialMount.current` — İlk montaj durumunu false olarak güncelleyen ref değeri
-- **Dönüş**: yok
-
-### [N3_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::paginate
-- **params**: newDirection (geçilecek yönü belirten sayısal değer, 1 ileri, -1 geri)
-- **ic_degiskenler**:
-  - `setCurrentSlide` — Yeni aktif slayt indeksini state'e yazan setter fonksiyonu
-  - `slidesData.length` — Toplam slayt sayısı, modül işlemi ile sonsuz döngü sağlar
-- **Dönüş**: yok
-
-### [N4_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::otomatikKaydirmaUseEffectCallback
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `isMounted` — Bileşen monte edilmediyse fonksiyonu sonlandırmak için kontrol edilen state
-  - `timer` — 120 saniyede bir otomatik slayt geçişi tetikleyen setInterval ID'si
-  - `paginate` — Otomatik geçiş için çağrılan slayt değiştirme fonksiyonu
-  - `clearInterval` - Bileşen unmount olduğunda interval'i temizleyen fonksiyon
-- **Dönüş**: interval'i temizleyen cleanup fonksiyonu
-
-### [N5_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::klavyeOlayiUseEffectCallback
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `handleKeyDown` — Klavye tuş basımlarını işleyen iç içe fonksiyon
-  - `window.addEventListener` — Pencereye keydown olay dinleyicisi ekler
-  - `window.removeEventListener` — Unmount olduğunda olay dinleyicisini kaldırır
-  - `paginate` — Ok tuşları ile slayt geçişini tetiklemek için kullanılan fonksiyon
-- **Dönüş**: olay dinleyicisini temizleyen cleanup fonksiyonu
-
-### [N6_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::handleKeyDown
-- **params**: e (Klavye olayını içeren KeyboardEvent nesnesi)
-- **ic_degiskenler**:
-  - `e.key` — Basılan tuşun adını içeren özellik, sağ/sol okları kontrol eder
-  - `paginate` — Ok tuşuna göre ileri/geri slayt geçişini tetikler
-- **Dönüş**: yok
-
-### [N7_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::handleTouchStart
-- **params**: e (Dokunma başlangıç olayını içeren React.TouchEvent nesnesi)
-- **ic_degiskenler**:
-  - `touchStartX.current` — Dokunmanın başladığı X koordinatını saklayan ref değeri
-  - `e.touches[0].clientX` — İlk dokunma noktasının ekran üzerindeki X koordinatı
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::handleTouchEnd
-- **params**: e (Dokunma bitiş olayını içeren React.TouchEvent nesnesi)
-- **ic_degiskenler**:
-  - `touchStartX.current` - Dokunma başlangıç koordinatını saklayan, null olup olmadığı kontrol edilen ref
-  - `touchEndX` — Dokunmanın bittiği X koordinatı
-  - `e.changedTouches[0].clientX` — Biten dokunmanın son X koordinatı
-  - `diff` — Başlangıç ve bitiş koordinatları arasındaki fark, hareket yönünü belirler
-  - `Math.abs` — Farkın mutlak değerini alarak minimum sürükleme mesafesini kontrol eder
-  - `paginate` — Hareket yönüne göre slayt geçişini tetikler
-- **Dönüş**: yok
-
-### [N9_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::getSlideContent
-- **params**: index (İçeriği alınacak slaytın indeksi)
-- **ic_degiskenler**:
-  - `t` — Slayt metinlerini çevirmek için kullanılan çeviri fonksiyonu
-  - `eyebrow` - Slaytın üstünde gösterilen küçük başlık metni
-  - `title` — Slaytın ana başlığı
-  - `subtitle` — Slaytın açıklama metni
-- **Dönüş**: Üç metin alanını içeren {eyebrow, title, subtitle} nesnesi
-
-### [N10_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::arkaPlanSlaytMapCallback
-- **params**: slide (İşlenen slayt nesnesi), idx (Slaytın indeksi)
-- **ic_degiskenler**:
-  - `slide.key` — React listeleri için benzersiz anahtar
-  - `currentSlide` — Aktif slayt indeksi, görünürlüğü kontrol etmek için kullanılır
-  - `slide.image` — Slaytın arka plan görselinin yolu
-  - `t` — Görsel alt metnini çeviren fonksiyon
-- **Dönüş**: İlk slayt için null, diğer slaytlar için arka plan görselini içeren JSX elementi
-
-### [N11_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::icerikSlaytMapCallback
-- **params**: slide (İşlenen slayt nesnesi), idx (Slaytın indeksi)
-- **ic_degiskenler**:
-  - `currentContent` — getSlideContent ile alınan slaytın metin içeriği
-  - `getSlideContent` — Slayt metinlerini getiren yardımcı fonksiyon
-  - `currentSlide` — Aktif slayt indeksi, içeriğin görünürlüğünü kontrol eder
-  - `onQuoteClick` — Teklif butonuna tıklandığında çağrılan parent'tan gelen callback
-  - `window.openLeadModal` — onQuoteClick yoksa varsayılan olarak açılan genel modal fonksiyonu
-  - `Routes.products()` — Ürünler sayfasına yönlendiren rota üreticisi
-  - `t` — Tüm buton ve metinleri çeviren fonksiyon
-- **Dönüş**: Slayt metin ve butonlarını içeren JSX elementi
-
-### [N12_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::teklifButonuOnClickCallback
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `onQuoteClick` - Parent'tan gelen teklif modalını açan callback, varsa çağrılır
-  - `window` — Tarayıcı pencere nesnesi, openLeadModal'ın varlığını kontrol etmek için kullanılır
-  - `window.openLeadModal` — Genel lead modalını açan opsiyonel global fonksiyon
-- **Dönüş**: yok
-
-### [N13_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::parcacikMapCallback
-- **params**: _ (Kullanılmayan dizi elemanı), i (Parçacığın indeksi)
-- **ic_degiskenler**:
-  - `i` — Parçacığın sıralaması, konum ve animasyon gecikmesini ayarlamak için kullanılır
-- **Dönüş**: Hava akımı parçacığını temsil eden JSX elementi
-
-### [N14_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::urunSlaytMapCallback
-- **params**: slide (İşlenen ürün slayt nesnesi), slideIdx (Ürün slaytının indeksi)
-- **ic_degiskenler**:
-  - `currentSlide` — Aktif slayt indeksi, ürün slaytının görünürlüğünü kontrol eder
-  - `slide.products` - Slayt içinde gösterilecek ürünleri içeren dizi
-- **Dönüş**: Ürünleri içeren slayt JSX elementi
-
-### [N15_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::urunMapCallback
-- **params**: p (İşlenen ürün nesnesi), i (Ürünün indeksi)
-- **ic_degiskenler**:
-  - `p.url` — Ürün görselinin dosya yolu
-  - `slideIdx` — Slayt indeksi, ilk slayt için öncelikli görsel yükleme ayarı yapar
-  - `currentSlide` — Aktif slayt, ürünün görünürlüğünü ve konumunu ayarlar
-  - `p.link` — Ürünün tıklandığında yönlendirileceği rota
-  - `p.labelKey` — Ürün başlığının çeviri anahtarı
-  - `p.subLabelKey` — Ürün alt başlığının çeviri anahtarı
-  - `t` — Tüm ürün metinlerini çeviren fonksiyon
-- **Dönüş**: Ürün kartını ve HUD etiketini içeren JSX elementi
-
-### [N16_NASIL] AST Pointer: src\components\home\HomeSinevizyon.tsx::gostergeMapCallback
-- **params**: _ (Kullanılmayan slayt elemanı), idx (Göstergenin indeksi)
-- **ic_degiskenler**:
-  - `idx` — Tıklanan göstergenin indeksi, setCurrentSlide ile aktife alınır
-  - `setCurrentSlide` - İlgili slaytı aktif yapmak için state'i güncelleyen setter
-  - `currentSlide` — Aktif slayt indeksi, göstergenin genişliğini ve rengini ayarlar
-- **Dönüş**: Slayt geçiş butonunu içeren JSX elementi
-
----
-
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-- **HomeSinevizyon()** fonksiyonu, slayt içeriğini getirmek için **getSlideContent** fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-- Verilen veri setinde bu modülü çağıran dış bir fonksiyon veya dosya belirtilmemiştir; dolayısıyla gelen çağrı yoktur.
-
-### Ic Ice Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  HomeSinevizyon() → getSlideContent()
-
-```mermaid
-graph LR
-    HomeSinevizyon["HomeSinevizyon()"] --> getSlideContent["getSlideContent()"]
-```
-
----
-
-## NODE ID STANDARD
-
-  file: src\components\home\HomeSinevizyon.tsx
-  function: src\components\home\HomeSinevizyon.tsx::HomeSinevizyon
-  function: src\components\home\HomeSinevizyon.tsx::handleTouchStart
-  function: src\components\home\HomeSinevizyon.tsx::handleTouchEnd
-  function: src\components\home\HomeSinevizyon.tsx::getSlideContent
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: HomeSinevizyon
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_0_10px_#22D3EE]`, `shadow-[0_0_8px_#22D3EE]`
-- **height:** `h-[1px]`, `h-[450px]`, `h-[80vh]`, `lg:h-[90vh]`, `min-h-[650px]`, `sm:h-[550px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `animate-[scan_3s_linear_infinite]`, `blur-[1px]`, `drop-shadow-[0_30px_60px_rgba(0,0,0,0.9)]`, `hover:shadow-[0_0_20px_rgba(34,211,238,0.15)]`, `hover:shadow-[0_0_40px_rgba(34,211,238,0.4)]`, `leading-[1.05]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `tracking-[0.4em]`
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-slate-900/40`, `bg-slate-950`, `bg-slate-950/60`, `bg-white/10`, `bg-white/20`, `bg-white/5`, `border-b`, `border-cyan-400/60`, `border-cyan-500/20`
-- **Layout:** `-left-24`, `-right-24`, `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `block`, `bottom-0`, `bottom-10`, `flex`, `flex-1`, `flex-col`, `from-slate-950/80`, `from-slate-950/90`, `from-transparent`, `gap-1`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
-
-
----
 # FILE: src\components\home\KnowledgeBlock.md
 
 ---
@@ -21531,39 +20726,55 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\CategoryCard3D.tsx
 skeleton_hash: 7c8c9e731ab9c6ad
-generated_at: 2026-05-23T22:14:35Z
+entity_hashes:
+  func:CategoryCard3D: b1d42c0fbbe60533
+  overview: ac6e8bdef42e2eaf
+  style_tokens: 72417c9ee963573b
+generated_at: 2026-05-27T18:20:26Z
 ---
 
 ## Genel Bakış
-Bu modül, bir kategori kartını üç boyutlu bir görsel efektle gösteren bir React bileşeni tanımlar. Kategori adı, alt kategori sayısı ve tıklama işlevi gibi bilgileri props üzerinden alır ve kullanıcı etkileşimini sağlar.
+`CategoryCard3D` modülü, kategori bilgilerini ve alt kategori sayısını alarak üç boyutlu bir görsel ve animasyonla sunan bir React fonksiyonel bileşenini tanımlar. Kullanıcı etkileşimini `onClick` callback’iyle sağlayarak, kategori kartının navigasyon içinde etkileşimli bir öğe olarak kullanılmasını mümkün kılar.  
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Kullanıcı arayüzünde bir kategori kartını renderlar, görsel ve etkileşimsel özellikleri birleştirir.
-- CategoryCard3D
+Bu grup, bileşenin temel render ve etkileşim mantığını içerir.  
+- CategoryCard3D  
+
+*(Bu bileşen, aldığı `category`, `subCategoryCount` ve `onClick` prop’larını JSX içinde birleştirir, 3D stil ve animasyonları uygular, ve tıklama olayını tetikler.)*
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki koşullar sağlanmalıdır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `category` prop'u sağlanmazsa, bileşen kategori bilgisi undefined olarak görünecek veya render sırasında hata verebilir.  
-[Aksiyom 2]: Eğer `subCategoryCount` prop'u sağlanmazsa, alt kategori sayısı undefined olarak gösterilecek veya eksik görünecektir.  
-[Aksiyom 3]: Eğer `onClick` prop'u sağlanmazsa, kart üzerindeki tıklama işlevi çalışmayacak ve kullanıcı etkileşimi beklenildiği gibi gerçekleşmeyecektir.  
-[Aksiyom 4]: Eğer `Category3DIcon` sabiti (import edilen ikon) bulunamazsa, bileşen ikon kısmını render edemeyecek ve bu bölümde hata veya boşluk ortaya çıkabilir.
+**Aksiyom 1**: Eğer `category` prop’u sağlanmazsa, bileşen kategori bilgisini **undefined** olarak alır ve render sırasında **boş** bir başlık gösterir veya **React** hata uyarısı verir.  
+
+**Aksiyom 2**: Eğer `subCategoryCount` prop’u sağlanmazsa, alt kategori sayısı **undefined** olur ve bileşen bu değeri **görmez**; UI’da alt kategori sayısı kısmı **görünmez** veya **0** olarak gösterilir.  
+
+**Aksiyom 3**: Eğer `onClick` prop’u sağlanmazsa, kartın tıklama olayı **tanımsız** olur; kullanıcı kartı tıkladığında **hiçbir işlem** gerçekleşmez ve **JavaScript** hatası atılmaz.  
+
+**Aksiyom 4**: Eğer `Category3DIcon` (modül sabiti) çağrısı başarısız olursa, 3D ikon **render** edilmez ve kartın görsel bütünlüğü bozulur; bu durumda bileşen **fallback** bir görsel göstermez.  
+
+**Aksiyom 5**: Eğer `category` nesnesi içinde beklenen alanlar (ör. `name`, `id`) eksikse, bileşen bu alanları **undefined** olarak alır ve ilgili UI bölümleri **boş** ya da **hata** mesajı gösterir.  
+
+**Aksiyom 6**: Eğer `subCategoryCount` negatif bir sayı ise, bileşen bu değeri **0** olarak kabul eder veya **negatif** değeri göstermez; UI’da negatif sayı gösterilmez.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryCard3D
-**Ne yapar**: 3D animasyonlu bir kategori kartı render eder; Category Hub grid’inde görsel ve etkileşimli bir öğe olarak kullanılır.  
-**Nasıl yapar**: Props olarak gelen `category`, `subCategoryCount` ve `onClick` değerlerini alır, kartın içeriğini (kategori adı, alt kategori sayısı vb.) ve 3D dönüşüm animasyonunu uygulayan stil ve etkileşim mantığını JSX içinde birleştirir; kullanıcı kart üzerine tıkladığında `onClick` fonksiyonu tetiklenir.  
+**Ne yapar**: 3D animasyonlu bir kategori kartı bileşeni oluşturur ve Category Hub ızgarasında görsel olarak kategori bilgilerini sunar.  
+
+**Nasıl yapar**: Gelen `category`, `subCategoryCount` ve `onClick` proplarını alarak, kartın iç yüzeyine kategori adı ve alt kategori sayısını yerleştirir; kart üzerine gelindiğinde veya tıklandığında 3D dönüş animasyonları tetiklenir ve `onClick` geri çağrısı çalıştırılır.  
+
 **Parametreler**:
-- category: object — görüntülenecek kategori bilgilerini taşıyan veri nesnesi (tipi component’in props tanımında tanımlanmıştır)  
-- subCategoryCount: number — kategoriye ait alt kategori sayısını gösteren sayısal değer  
-- onClick: function — kart üzerine tıklandığında çağrılacak olay işleyici fonksiyonu  
-**Dönüş**: JSX.Element — React fonksiyon bileşeni olarak render edilen kategori kartı elementi (React.FC<CategoryCard3DProps> türünde)
+- `category`: string — Kartta gösterilecek ana kategori adı.
+- `subCategoryCount`: number — Alt kategori sayısını gösteren metin için kullanılan değer.
+- `onClick`: () => void — Kart tıklandığında yürütülecek fonksiyon.
+
+**Dönüş**: React.FC&lt;CategoryCard3DProps&gt; — Tanımlı prop tipleriyle tip güvenliği sağlayan bir React fonksiyonel bileşeni.
 
 ---
 
@@ -21584,15 +20795,25 @@ Bu modülün doğru çalışması için aşağıdaki koşullar sağlanmalıdır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/navigation/CategoryCard3D.tsx::CategoryCard3D
-- **params**: category, subCategoryCount, onClick
-- **ic_degiskenler**: yok
-- **Dönüş**: React.FC<CategoryCard3DProps>
-
-### [N2_NASIL] AST Pointer: src/components/navigation/CategoryCard3D.tsx::onKeyDown
-- **params**: e
-- **ic_degiskenler**: 
-  - `onClick` — dış kapsamdaki click handler fonksiyonu, Enter veya Space tuşuna basıldığında çağrılır
-- **Dönüş**: yok
+- **params**: `category`, `subCategoryCount`, `onClick`
+- **ic_degiskenler**:
+  - `category` — the category object passed to the component; used for display name, slug, and metadata.
+  - `subCategoryCount` — number of sub‑categories; displayed in the UI.
+  - `onClick` — callback invoked when the card is activated via mouse click or keyboard.
+  - `e` — keyboard event object in the `onKeyDown` handler; used to detect `Enter` or space key and to prevent default behavior.
+  - `getCategoryDisplayName` — imported helper that returns a human‑readable name for a category; called twice for aria label and heading.
+  - `Category3DIcon` — component rendered inside the `<Suspense>` wrapper; receives `categorySlug`, `modelType`, and `scale`.
+  - `Canvas` — Three.js canvas component from `@react-three/fiber`; configured with camera, style, GL options, and DPR.
+  - `Environment` — lighting preset component from `@react-three/drei`; used to set a city environment.
+  - `ambientLight`, `directionalLight`, `pointLight` — Three.js light components added to the scene.
+  - `Suspense` — React suspense component that wraps the 3D icon; fallback is `null`.
+  - `ChevronRight` — icon component from `lucide-react`; displayed next to the sub‑category count.
+  - `category.slug` — accessed to pass as `categorySlug` prop to `Category3DIcon`.
+  - `category.metadata?.model_type` — optional chaining to provide the `modelType` prop to `Category3DIcon`.
+  - `e.key` — checked to determine if the key pressed is `Enter` or space.
+  - `e.preventDefault()` — called to stop the default key action when activating the card via keyboard.
+  - `onClick()` — invoked when the card is clicked or activated via keyboard.
+- **Dönüş**: `React.FC<CategoryCard3DProps>` – renders a clickable card with a 3D canvas, heading, sub‑category count, and navigation icon; no explicit return value beyond the JSX.
 
 ---
 
@@ -21611,20 +20832,16 @@ Bu modülün doğru çalışması için aşağıdaki koşullar sağlanmalıdır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `ease-[cubic-bezier(0.16,1,0.3,1)]`, `group-hover:shadow-[0_0_40px_-10px_rgba(56,189,248,0.25)]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-slate-800/40`, `border-slate-700/50`, `text-lg`, `text-sm`, `text-white`, `text-white/50`, `text-white/70`
-- **Layout:** `-z-10`, `absolute`, `backdrop-blur-md`, `flex`, `group-hover:bg-slate-800/60`, `group-hover:border-sky-500/50`, `group-hover:text-sky-400`, `group-hover:text-white`, `group-hover:translate-x-1`, `h-5`, `h-56`, `hover:shadow-2xl`, `hover:shadow-sky-500/20`, `items-center`, `justify-between`
-- **Responsive:** (yok)
-
+- **Renkler:** `bg-slate-800/40`, `border-slate-700/50`, `group-hover:bg-slate-800/60`, `group-hover:border-sky-500/50`, `group-hover:text-sky-400`, `group-hover:text-white`, `text-lg`, `text-sm`, `text-white`, `text-white/50`, `text-white/70`
+- **Layout:** `-z-10`, `absolute`, `backdrop-blur-md`, `flex`, `group-hover:shadow-hvac-3d-glow`, `h-5`, `h-56`, `hover:shadow-2xl`, `hover:shadow-sky-500/20`, `items-center`, `justify-between`, `relative`, `w-5`, `z-10`, `z-20`
+- **Varyant/Responsive:** `focus-visible:`, `group-hover:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `-mt-12`, `border`, `cursor-pointer`, `duration-300`, `duration-500`, `ease-hvac-ease`, `focus-visible:ring-2`, `focus-visible:ring-sky-500`, `font-bold`, `group`, `group-hover:translate-x-1`, `hover:scale-105`, `inset-0`, `mb-1`, `outline-none`
 
 ---
 # FILE: src\components\navigation\CategoryHubOverlay.md
@@ -21935,8 +21152,8 @@ entity_hashes:
   func:getSubCategories: b504c4c1aa89bb99
   func:handleLinkClick: 44a1929f40d26342
   overview: 4a63a261d39e78bd
-  style_tokens: 12324e8446e52e68
-generated_at: 2026-05-27T11:46:32Z
+  style_tokens: 950eb84fcf443cff
+generated_at: 2026-05-27T18:20:28Z
 ---
 
 ## Genel Bakış
@@ -22071,8 +21288,8 @@ graph TD
     EliteMegaMenu_tsx__getSubCategories["getSubCategories"]
     EliteMegaMenu_tsx__handleLinkClick["handleLinkClick"]
     EliteMegaMenu_tsx__MobileMegaMenu --> EliteMegaMenu_tsx__getSubCategories
-    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
     EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__handleLinkClick
+    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
 ```
 
 ## NODE ID STANDARD
@@ -22100,9 +21317,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `lg:w-hvac-mega-lg`, `md:w-hvac-mega-md`, `rounded-hvac-sm`, `sm:w-hvac-mega-sm`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-opacity-95`, `bg-slate-50/80`, `bg-white`, `border-slate-100/50`, `border-slate-200/50`, `text-base`, `text-primary-navy`, `text-secondary-blue`, `text-slate-600`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-xl`, `text-xs`
-- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `col-span-1`, `data-[motion=from-end]:animate-enterFromRight`, `data-[motion=from-start]:animate-enterFromLeft`, `flex`, `flex-col`, `gap-0.5`, `gap-2`, `gap-4`, `gap-x-8`, `grid`, `grid-cols-2`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-opacity-95`, `bg-slate-50/80`, `bg-white`, `border-slate-100/50`, `border-slate-200/50`, `data-[state=open]:bg-slate-100`, `hover:bg-slate-50`, `hover:text-primary-navy`, `text-base`, `text-primary-navy`, `text-secondary-blue`, `text-slate-600`, `text-slate-700`, `text-slate-900`, `text-sm`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `col-span-1`, `flex`, `flex-col`, `gap-0.5`, `gap-2`, `gap-4`, `gap-x-8`, `grid`, `grid-cols-2`, `h-3`, `h-full`
+- **Varyant/Responsive:** `data-[motion=from-end]:`, `data-[motion=from-start]:`, `data-[motion=to-end]:`, `data-[motion=to-start]:`, `data-[state=open]:`, `disabled:`, `focus-visible:`, `group-data-[state=open]:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `center`, `cursor-pointer`, `data-[motion=from-end]:animate-enterFromRight`, `data-[motion=from-start]:animate-enterFromLeft`, `data-[motion=to-end]:animate-exitToRight`, `data-[motion=to-start]:animate-exitToLeft`, `disabled:opacity-50`, `disabled:pointer-events-none`, `duration-300`, `duration-hvac-normal`, `ease-in`, `focus-visible:ring-2`, `focus-visible:ring-slate-300`, `font-bold`
 
 ---
 # FILE: src\components\navigation\MegaMenu3DBackground.md
@@ -22197,44 +21415,48 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavActionButton.tsx
 skeleton_hash: e5eba658c6a4867c
-generated_at: 2026-05-23T22:15:32Z
+entity_hashes:
+  func:NavActionButton: 9e352ab0f1dc93af
+  overview: 42d52b47442e736b
+  style_tokens: 7a26081e3b2c4d09
+generated_at: 2026-05-27T18:24:23Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulama içinde gezinti işlemlerini tetiklemek için kullanılan yeniden kullanılabilir bir düğme bileşenini tanımlar. İkon, metin, bağlantı ve tıklama işleyici gibi esnek özellikler alarak farklı bağlamlarda tutarlı bir görsel ve davranışsal deneyim sunar.
+`NavActionButton` bileşeni, uygulama içinde gezinme ve eylem tetikleme amaçlı kullanılan, ikon, etiket ve isteğe bağlı bağlantı ya da tıklama işleyicisi alabilen yeniden kullanılabilir bir UI elemanıdır. Prop’ların varlığına göre bir `<a>` ya da `<button>` elementini render ederek erişilebilirlik ve stil bütünlüğünü sağlar.
 
 ## Fonksiyon Grupları
-### Temel Bileşen
-Navigasyon eylemlerini temsil eden ve kullanıcı etkileşimini yöneten ana işlev.
-- NavActionButton
+### Navigasyon Düğmesi Bileşeni
+Bu grup, kullanıcı etkileşimini yöneten ve görsel‑işlevsel tutarlılığı sağlayan tek bir UI bileşenini içerir.  
+- NavActionButton   (diğer fonksiyonları çağırmaz; kendi içinde prop’ları işleyerek render yapar)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Komponentin beklendiği gibi render edip işlev görebilmesi için gerekli prop'ların ve stil nesnesinin sağlanması gerekir.
+Bu navigasyon eylem butonu bileşeninin doğru şekilde render edilmesi, kullanıcı etkileşimlerini alması ve erişilebilirlik standartlarını karşılaması için gerekli tüm prop'ların iletilmesi ve modülün yerleşik toneClasses stil sabitinin projeye başarılı şekilde dahil edilmesi zorunludur.
 
-- Eğer **icon** prop'u sağlanmazsa, buton içinde görsel simge gösterilemez veya görsel eksikliği oluşur.  
-- Eğer **label** prop'u sağlanmazsa, butonun amacı metinsel olarak ifade edilemez ve erişilebilirlik açısından eksiklik entsteht.  
-- Eğer **href** ve **onClick** ikisi de sağlanmazsa, buton hiçbir navigasyon veya işlem tetiklemez; etkileşimsiz bir öğe haline gelir.  
-- Eğer **ariaLabel** prop'u sağlanmazsa, ekran okuyucular tarafından butonun işlevi anlamlı şekilde açıklanamaz; erişilebilirlik azalır.  
-- Eğer **title** prop'u sağlanmazsa, fare ile üzerine gelindiğinde ipucu (tooltip) gösterilmez.  
-- Eğer **toneClasses** nesnesi eksik veya bileşenin stilini belirlemek için gerekli sınıfları içermiyorsa, komponentin görsel görünümü beklenen tema stilleriyle uyuşmayabilir.
+[Aksiyom 1]: Eğer icon prop'u sağlanmazsa, buton içinde görsel simge render edilemez, kullanıcı deneyiminde görsel eksikliği oluşur.
+[Aksiyom 2]: Eğer label prop'u sağlanmazsa, butonun amacı metinsel olarak ifade edilemez, erişilebilirlik ve kullanıcı anlayışı zarar görür.
+[Aksiyom 3]: Eğer hem href prop'u hem de onClick prop'u aynı anda sağlanmazsa, buton herhangi bir navigasyon işlemi veya özel eylem tetikleyemez, etkileşimsiz kalır.
+[Aksiyom 4]: Eğer ariaLabel prop'u sağlanmazsa, ekran okuyucu gibi erişilebilirlik araçları butonun amacını düzgün şekilde kullanıcıya iletemez, erişilebilirlik gereksinimleri karşılanamaz.
+[Aksiyom 5]: Eğer modülün yerleşik toneClasses stil sabiti projeye dahil edilmez veya geçersiz tanımlanırsa, butona ait görsel stil kuralları uygulanamaz, uygulama genelindeki görsel tutarlılık bozulur.
+[Aksiyom 6]: Eğer title prop'u sağlanmazsa, kullanıcı fare ile butonun üzerine geldiğinde gösterilecek ek açıklama ipucu metini render edilemez, ek bilgilendirme ihtiyacı karşılanamaz.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### NavActionButton
-**Ne yapar**: Bir simge, metin ve opsiyonel tıklama veya link özellikleriyle bir navigasyon eylemi butonu oluşturur.  
-**Nasıl yapar**: Props olarak alınan `icon`, `label`, `href`, `onClick`, `ariaLabel` ve `title` değerlerini kullanarak bir `<a>` veya `<button>` elementi render eder; `href` tanımlıysa `<a>` ile yönlendirme yapılır, tanımlı değilse `onClick` ile `<button>` kullanılır. Erişilebilirlik için `aria-label` ve `title` öznitelikleri eklenir.  
+**Ne yapar**: VentHub HVAC projesinin navigasyon katmanında kullanılan, kullanıcıların kolayca etkileşime girebileceği aksiyon odaklı buton bileşenidir. Hem sayfa içi rotalama yapmak hem de özel aksiyonları tetiklemek için çok yönlü olarak tasarlanmıştır, ikon ve metin etiketi desteği ile kullanıcı deneyimini zenginleştirir. Tüm modern web standartlarına ve erişilebilirlik kurallarına uygun olarak geliştirilmiştir.
+**Nasıl yapar**: Gelen tüm giriş parametrelerini erişilebilirlik prensipleri gözeterek işler, eğer href parametresi tanımlıysa bir yönlendirme bağlantısı olarak, tanımsız ise etkileşimli bir buton olarak kullanıcı arayüzüne render edilir. onClick parametresi aracılığıyla özel işlevleri tetiklerken, ariaLabel ve title gibi ek etiketlerle hem ekran okuyucu kullanan kullanıcılar hem de fare ile etkileşim kuran kullanıcılar için ek bilgilendirme sunar.
 **Parametreler**:
-- icon: React.ReactNode — Buton içinde gösterilecek simge veya SVG elementi  
-- label: string — Buton üzerinde görünecek metin  
-- href: string \| undefined — Butonun link hedefi; tanımlıysa `<a>` elementiyle yönlendirme yapılır  
-- onClick: React.MouseEventHandler<HTMLAnchorElement \| HTMLButtonElement> \| undefined — Tıklama olayını işleyen fonksiyon; `href` tanımlı değilse zorunlu  
-- ariaLabel: string \| undefined — Erişilebilirlik için butona verilecek açıklama metni  
-- title: string \| undefined — Fare ile üzerine gelindiğinde gösterilecek ipucu metni  
-**Dönüş**: React.FC<NavActionButtonProps> — Props'u alan ve ilgili JSX elementi döndüren bir React fonksiyon bileşeni
+- icon: React.ReactNode — Buton üzerinde kullanıcının göreceği görsel ikon öğesi, butonun amacını hızlıca anlamayı destekler
+- label: string — Buton üzerinde görüntülenecek metin etiketi, butonun işlevini açıkça kullanıcıya iletir
+- href: string | undefined — Butona tıklandığında yönlendirilecek rota veya harici bağlantı adresi, sadece rotalama amaçlı kullanıldığında tanımlanır
+- onClick: () => void | undefined — Butona tıklandığında tetiklenecek özel aksiyon fonksiyonu, manuel işlemler veya özel iş akışları için kullanılır
+- ariaLabel: string | undefined — Ekran okuyucular tarafından okunacak erişilebilirlik etiketi, butonun amacını ek metinle açıklar, erişilebilirliği artırır
+- title: string | undefined — Buton üzerine fare imleci ile gelindiğinde açılan küçük ipucu metni, kullanıcıya ek bilgi sunar
+**Dönüş**: React.FC<NavActionButtonProps> — Projenin navigasyon menülerinde veya navigasyon ile ilgili alanlarda kullanılmaya hazır, tüm özellikleri yapılandırılmış React fonksiyonel bileşeni döndürür
 
 ---
 
@@ -22266,18 +21488,19 @@ type NavActionTone = 'default' | 'accent' | 'success' | 'warning'
 
 ## SABİTLER
 - **toneClasses** (object) — `{
+
     default: 'text-steel-gray hover:text-primary-navy hover:bg-air-blue/30...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/navigation/NavActionButton.tsx::NavActionButton
-- **params**: icon, label, href, onClick, ariaLabel, title, badge, tone, className, iconClassName, labelClassName
+### [N1_NASIL] AST Pointer: NavActionButton.tsx::NavActionButton
+- **params**: `{ icon, label, href, onClick, ariaLabel, title, badge, tone = 'default', className, iconClassName, labelClassName }`
 - **ic_degiskenler**:
-  - `content` — JSX fragment that renders the icon (with optional badge) and label wrapped in spans, applying `iconClassName` and conditionally rendering the label when present.
-  - `classes` — string of Tailwind CSS classes produced by `cn` that merges base group styles, compact sizing, tone‑specific lookup from `toneClasses[tone]`, and any extra `className` prop.
-- **Dönüş**: JSX.Element (React.FC) — returns a `<Link>` component wrapping `content` when `href` is truthy, otherwise returns a `<button>` with `onClick` handler; both receive `aria-label`, `title`, and the computed `classes`.
+  - `content` — JSX fragment wrapping the icon, optional badge, and conditional label text, used as the child content for both navigation link and button elements
+  - `classes` — Concatenated CSS class strings generated via the imported `cn` utility, including base component styling, tone-specific styles from `toneClasses[tone]`, and custom class props passed to the component
+- **Dönüş**: Returns a Next.js `<Link>` component when `href` prop is provided, otherwise returns a native HTML `<button type="button">` element; both are valid React JSX elements
 
 ---
 
@@ -22303,9 +21526,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `border-transparent`, `text-sm`
-- **Layout:** `gap-2`, `group-hover:scale-105`, `inline-flex`, `items-center`, `min-w-0`, `relative`
-- **Responsive:** (yok)
-
+- **Layout:** `gap-2`, `inline-flex`, `items-center`, `min-w-0`, `relative`
+- **Varyant/Responsive:** `focus-visible:`, `group-hover:` önekleri
+- **Yardımcı Sınıflar:** `border`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy/20`, `font-semibold`, `group`, `group-hover:scale-105`, `px-3`, `py-2.5`, `rounded-2xl`, `shrink-0`, `transition-colors`, `transition-transform`
 
 ---
 # FILE: src\components\navigation\NavBrand.md
@@ -22383,98 +21606,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 
 ---
-# FILE: src\components\navigation\NavPrimaryRail.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavPrimaryRail.tsx
-skeleton_hash: be27047d81aba124
-generated_at: 2026-05-23T22:19:16Z
----
-
-## Genel Bakış
-NavPrimaryRail.tsx modülü, uygulamanın ana gezinti çubuğunu (navigation rail) render eden bir React bileşenidir. Next.js'nin Link ve useRouter hooks'ını kullanarak istemci tarafı yönlendirme sağlar ve @/lib/utils üzerinden cn yardımcı işleviyle sınıf isimlerini birleştirir. Modül, veri çekme veya API sorgusu yapmadan sadece sunum katmanı işlevini yerine getirir.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-
-
----
-
-## INTERFACES
-
-### ResolvedNavigationItem
-- `id: string`
-- `label: string`
-- `href?: string`
-
-### NavPrimaryRailProps
-- `items: ResolvedNavigationItem[]`
-- `isCategoriesLoading: boolean`
-- `isCategoryHubOpen: boolean`
-- `onCategoryClick: () => void`
-- `onItemHover?: (itemId: string) => void`
-
----
-
-## SABİTLER
-- **itemBaseClass** (str) — `'group relative inline-flex items-center justify-center gap-2 rounded-2xl bor...`
-- **NavPrimaryRail** (call) — `React.memo(({
-    items,
-    isCategoriesLoading,
-    isCategoryHubOpen,
-...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/components/navigation/NavPrimaryRail.tsx::NavPrimaryRail
-- **params**: items, isCategoriesLoading, isCategoryHubOpen, onCategoryClick, onItemHover
-- **ic_degiskenler**: 
-  - `router` — `useRouter()` hookundan elde edilen Next.js router nesnesi; sayfa geçişleri ve `/products` yolunun önceden getirilmesi (prefetch) için kullanılır.
-- **Dönüş**: JSX.Element
-
-### [N2_NASIL] AST Pointer: src/components/navigation/NavPrimaryRail.tsx::items.map callback
-- **params**: item
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (button, div veya Link elementi döndürür)
-
-### [N3_NASIL] AST Pointer: src/components/navigation/NavPrimaryRail.tsx::onMouseEnter handler
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (fonksiyon sadece yan etkiler yapar: `onItemHover` çağrısı ve gerekirse `router.prefetch`)
-
----
-
-## NODE ID STANDARD
-
-  file: src\components\navigation\NavPrimaryRail.tsx
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/40`, `border-primary-navy/15`, `text-primary-navy`
-- **Layout:** `flex-1`, `gap-2`, `group-hover:rotate-180`, `h-4`, `hidden`, `items-center`, `lg:flex`, `min-w-0`, `w-4`
-- **Responsive:** `lg:`, `xl:` prefix kullanımları
-
-
----
 # FILE: src\components\navigation\NavSearchTrigger.md
 
 ---
@@ -22483,47 +21614,50 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavSearchTrigger.tsx
 skeleton_hash: 9df73cfd82f6a5f2
-generated_at: 2026-05-23T22:16:21Z
+entity_hashes:
+  func:NavSearchTrigger: 685a255257840b8c
+  overview: f880d1849bdfe091
+  style_tokens: 76073a5206e1d6d6
+generated_at: 2026-05-27T18:30:06Z
 ---
 
 ## Genel Bakış
-Bu modül, arama işlevini tetikleyen bir düğme bileşenini tanımlar. Kullanıcıya görsel ve erişilebilirlik özellikleri sunarak, arama penceresini açmak için gerekli etkileşimi sağlar.
+`NavSearchTrigger` modülü, navigasyon çubuğunda arama işlevini başlatmak için kullanılan bir tetikleyici bileşeni tanımlar. Prop olarak aldığı etiket, kısayol ve erişilebilirlik bilgileriyle görsel ve erişilebilir bir buton render eder; tıklandığında dışarıdan sağlanan `onClick` callback'ini çalıştırır.
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı
-Arama tetikleyici düğmesinin render mantığını ve prop işlemeyi yönetir.
-- NavSearchTrigger
+Arama tetikleyicisinin UI render'ını ve prop işleme mantığını yönetir.  
+- NavSearchTrigger   (tek fonksiyon)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `label` prop'u sağlanmazsa, component'in görüntüleyeceği metin tanımsız olur ve beklenen kullanıcı arayüzü metni gösterilemez.  
-[Aksiyom 2]: Eğer `shortcutLabel` prop'u sağlanmazsa, component'in gösterilecek kısayol etiketi tanımsız olur ve kısayol bilgisi kullanıcıya sunulmaz.  
-[Aksiyom 3]: Eğer `ariaLabel` prop'u sağlanmazsa, component'in erişilebilirlik etiketi tanımsız olur ve ekran okuyucular gibi yardımcı teknolojiler için anlamlı bir açıklama eksik olur.  
-[Aksiyom 4]: Eğer `onClick` prop'u sağlanmazsa veya bir fonksiyon değilse, component'e tıklandığında beklenen işlev çalışmaz veya çalışma zamanında hata oluşabilir.  
-[Aksiyom 5]: Yukarıdaki dört prop'un her biri eksikse, TypeScript derleme zamanında tip hatası oluşur ve component beklendiği şekilde derlenemez.
+**Aksiyom 1**: Eğer `label` prop’u sağlanmazsa, **NavSearchTrigger** bileşeni görsel olarak bir metin gösteremez ve kullanıcı arayüzünde “etiket eksik” durumu ortaya çıkar.  
+
+**Aksiyom 2**: Eğer `shortcutLabel` prop’u sağlanmazsa, bileşen klavye kısayolu bilgisini render edemez; sonuç olarak kullanıcı kısayol ipucunu göremez.  
+
+**Aksiyom 3**: Eğer `ariaLabel` prop’u sağlanmazsa, bileşenin erişilebilirlik (ARIA) etiketi eksik olur; ekran okuyucular bileşeni tanımlayamaz ve erişilebilirlik testi başarısız olur.  
+
+**Aksiyom 4**: Eğer `onClick` prop’u sağlanmazsa, bileşenin tıklama olayına bağlanacak bir geri çağırma fonksiyonu yoktur; bu durumda kullanıcı tıkladığında arama penceresi açılmaz ve işlevsel gereksinim karşılanmaz.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### NavSearchTrigger
-**Ne yapar**:  
-NavSearchTrigger, kullanıcıya bir arama işlemini başlatmak için etkileşimli bir tetikleyici (örneğin bir simge veya buton) sunar. Tıklandığında dışarıdan sağlanan `onClick` fonksiyonunu çağırarak arama açılmasını veya ilgili eylemi tetikler.
+**Ne yapar**: Kullanıcı arayüzünde arama işlevini tetikleyen bir buton ya da etkileşimli öğe oluşturur. Etiket, kısayol ve erişilebilirlik bilgileriyle birlikte tıklandığında verilen `onClick` geri çağrısını çalıştırır.  
 
-**Nasıl yapar**:  
-Bileşen, aldığı `label`, `shortcutLabel` ve `ariaLabel` özelliklerini içeriğe ve erişilebilirlik özelliklerine yerleştirerek render eder. Üst öğe tarafından verilen `onClick` geri çağrısını, öğenin `onClick` olayı üzerinden bağlar; böylece kullanıcı etkileşimi doğrudan dışarıdaki mantığa iletilir. Stil veya görünüm dışındaki mantık sadece bu geri çağrının tetiklenmesidir; diğer işlevsellik (örneğin durum yönetimi) dışarıda bulunur.
+**Nasıl yapar**: Gelen `props` değerlerini bir `<button>` (veya benzeri) elementine aktarır, `aria-label` ve klavye kısayolu göstergesi ekler, ardından `onClick` fonksiyonunu `onClick` olayına bağlar. Bileşen, `React.FC<NavSearchTriggerProps>` tipinde bir fonksiyonel bileşen olarak döndürülür.  
 
 **Parametreler**:
-- label: string — Tetikleyiciye gösterilen ana metin; kullanıcıya işlevin ne olduğu hakkında bilgi verir.
-- shortcutLabel: string — Klavye kısayolu gibi ek bilgiyi göstermek için kullanılan ikincil metin; genellikle parantez içinde veya daha küçük bir fontla gösterilir.
-- ariaLabel: string — Ekran okuyucular için erişilebilirlik amacıyla kullanılan açıklama metni; görsel etiket yoksa veya ek bağlam gerekirse bu özellik sağlanır.
-- onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void — Tetikleyiciye tıklandığında çağrılacak fonksiyon; arama panelini açma veya ilgili state güncellemesi gibi işlemleri içerir.
+- `label`: string — Görsel olarak gösterilecek metin etiketi.
+- `shortcutLabel`: string (opsiyonel) — Klavye kısayolu göstergesi (ör. “Ctrl+K”).
+- `ariaLabel`: string (opsiyonel) — Erişilebilirlik için kullanılan ARIA etiketi.
+- `onClick`: () => void (opsiyonel) — Kullanıcı tıkladığında çalıştırılacak geri çağırma fonksiyonu.
 
-**Dönüş**:  
-React.FC<NavSearchTriggerProps> türünde bir fonksiyonel bileşen döndürür; bu, JSX olarak render edilebilir bir React öğesi üretir. Döndürülen öğe, belirtilen özelliklere göre görüntülenen ve tıklanabilir bir öğedir (genellikle bir buton veya simge).
+**Dönüş**: React.FC\<NavSearchTriggerProps\> — Tanımlanan propsları kullanan bir React fonksiyonel bileşeni.
 
 ---
 
@@ -22542,11 +21676,12 @@ React.FC<NavSearchTriggerProps> türünde bir fonksiyonel bileşen döndürür; 
 ### [N1_NASIL] AST Pointer: src/components/navigation/NavSearchTrigger.tsx::NavSearchTrigger
 - **params**: (label, shortcutLabel, ariaLabel, onClick)
 - **ic_degiskenler**:
-  - `label` — button’ın görüntülenecek metni (daraltılmış durumda gösterilir)
-  - `shortcutLabel` — kısayol tuşu açıklaması, `<kbd>` elementi içinde gösterilir
-  - `ariaLabel` — erişilebilirlik için button’a verilen aria-label özelliği
-  - `onClick` — button’a tıklandığında çağrılacak olay işleyici fonksiyonu
-- **Dönüş**: React.FC<NavSearchTriggerProps> (JSX elementi döndürür)
+  - `label` — button içinde gösterilecek metin
+  - `shortcutLabel` — kısayol tuşu etiketi, `<kbd>` içinde görüntülenir
+  - `ariaLabel` — butona atanacak ARIA etiketi, `aria-label` özniteliğinde kullanılır
+  - `onClick` — butona tıklandığında çağrılacak olay işleyicisi, `onClick` özniteliğine atanır
+- **Dönüş**: React elementi `<button>` ve içindeki JSX yapısı (buton, SVG, span, kbd)  
+  Fonksiyon, verilen parametreleri kullanarak bir arayüz bileşeni oluşturur ve bu bileşeni döndürür.
 
 ---
 
@@ -22565,20 +21700,20 @@ React.FC<NavSearchTriggerProps> türünde bir fonksiyonel bileşen döndürür; 
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_14px_30px_-26px_rgba(15,23,42,0.45)]`
+- **shadow:** `hover:shadow-[0_18px_36px_-24px_rgba(37,99,235,0.45)]`
 - **height:** (yok)
 - **width:** (yok)
 - **spacing:** (yok)
-- **diğer:** `hover:shadow-[0_18px_36px_-24px_rgba(37,99,235,0.45)]`, `tracking-[0.2em]`
+- **diğer:** (yok)
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-slate-50`, `bg-white/80`, `border-slate-200`, `border-slate-200/80`, `text-left`, `text-sm`, `text-steel-gray`, `text-xs`
-- **Layout:** `flex-1`, `gap-3`, `hidden`, `inline-flex`, `items-center`, `lg:block`, `md:block`, `min-w-0`, `shadow-sm`, `w-full`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
-
+- **Renkler:** `bg-slate-50`, `bg-white/80`, `border-slate-200`, `border-slate-200/80`, `hover:bg-white`, `hover:border-primary-navy/20`, `hover:text-primary-navy`, `text-left`, `text-sm`, `text-steel-gray`, `text-xs`
+- **Layout:** `flex-1`, `gap-3`, `hidden`, `inline-flex`, `items-center`, `lg:block`, `md:block`, `min-w-0`, `shadow-hvac-nav-rail`, `shadow-sm`, `w-full`
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `border`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy/20`, `font-medium`, `group`, `px-1.5`, `px-3`, `py-0.5`, `py-2.5`, `rounded-2xl`, `rounded-lg`, `shrink-0`
 
 ---
 # FILE: src\components\navigation\NavSecondaryRail.md
@@ -22999,8 +22134,8 @@ skeleton_hash: 587dc4c4140069f6
 entity_hashes:
   func:AddToProjectModal: 27f66ff6372a1fa9
   overview: 4e046c22462f1ac6
-  style_tokens: ff89f5081629f041
-generated_at: 2026-05-27T11:44:06Z
+  style_tokens: 49ec4d1f3ff40796
+generated_at: 2026-05-27T18:30:09Z
 ---
 
 ## Genel Bakış
@@ -23124,9 +22259,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-light-gray`, `bg-light-gray/30`, `bg-primary-navy`, `bg-slate-900/60`, `bg-white`, `border-b`, `border-dashed`, `border-light-gray`, `border-none`, `text-center`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-secondary-blue`, `text-sm`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `fixed`, `flex`, `flex-shrink-0`, `group-hover:text-primary-navy`, `group-hover:translate-x-0.5`, `h-16`, `h-full`, `items-center`, `items-start`, `justify-between`, `justify-center`, `line-clamp-2`, `max-h-48`
-- **Responsive:** (yok)
+- **Renkler:** `bg-light-gray`, `bg-light-gray/30`, `bg-primary-navy`, `bg-slate-900/60`, `bg-white`, `border-b`, `border-dashed`, `border-light-gray`, `border-none`, `focus-visible:border-primary-navy`, `group-hover:text-primary-navy`, `hover:bg-air-blue`, `hover:bg-secondary-blue`, `hover:bg-white/10`, `hover:border-primary-navy`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `fixed`, `flex`, `flex-shrink-0`, `h-16`, `h-full`, `items-center`, `items-start`, `justify-between`, `justify-center`, `line-clamp-2`, `max-h-48`, `max-w-md`, `overflow-hidden`
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `group-hover:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `-translate-y-1/2`, `animate-spin`, `border`, `cursor-default`, `disabled:opacity-50`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/10`, `font-bold`, `font-medium`, `font-semibold`, `group`, `group-hover:translate-x-0.5`, `inset-0`, `italic`, `leading-relaxed`
 
 ---
 # FILE: src\components\products\ApplicationCards.md
@@ -24845,8 +23981,8 @@ skeleton_hash: 9ea1ac36dfdc188b
 entity_hashes:
   func:ProductsGrid: 3dd0bc95cb82a18e
   overview: b0875b8b603aa680
-  style_tokens: 85ab299eedf71c41
-generated_at: 2026-05-27T12:25:30Z
+  style_tokens: 875e602260424c7a
+generated_at: 2026-05-27T18:30:11Z
 ---
 
 ## Genel Bakış
@@ -24929,9 +24065,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-xl`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `hover:text-slate-600`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
 - **Layout:** `absolute`, `flex`, `flex-col`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `p-1`, `p-2`, `relative`, `right-3`
-- **Responsive:** `sm:`, `xl:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `${viewMode`, `-translate-y-1/2`, `:`, `===`, `appearance-none`, `border`, `focus-visible:ring-primary-ocean/20`, `font-bold`, `font-medium`, `list`, `pb-6`, `pl-4`, `pointer-events-none`, `pr-10`, `py-2.5`
 
 ---
 # FILE: src\components\products\ProductsHero.md
@@ -24945,8 +24082,8 @@ skeleton_hash: 93075d4dc41a48bb
 entity_hashes:
   func:ProductsHero: 23bf6f05c6d119a9
   overview: 9bf8d11aa62d961e
-  style_tokens: e0270442d06112db
-generated_at: 2026-05-27T11:44:44Z
+  style_tokens: e2ac21d82aa84114
+generated_at: 2026-05-27T18:30:13Z
 ---
 
 ## Genel Bakış  
@@ -25034,9 +24171,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-b`, `bg-surface-navy`, `bg-transparent`, `bg-white`, `bg-white/10`, `border-0`, `from-surface-navy/80`, `lg:text-5xl`, `md:text-4xl`, `md:text-lg`, `text-3xl`, `text-base`, `text-center`, `text-gray-400`, `text-gray-800`
-- **Layout:** `absolute`, `drop-shadow-md`, `flex`, `flex-col`, `from-surface-navy/80`, `group-focus-within:bg-cyan-400/10`, `group-focus-within:text-cyan-500`, `h-80`, `h-full`, `items-center`, `justify-center`, `left-4`, `max-w-3xl`, `max-w-xl`, `min-h-320px`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-b`, `bg-surface-navy`, `bg-transparent`, `bg-white`, `bg-white/10`, `border-0`, `from-surface-navy/80`, `group-focus-within:bg-cyan-400/10`, `group-focus-within:text-cyan-500`, `lg:text-5xl`, `md:text-4xl`, `md:text-lg`, `text-3xl`, `text-base`, `text-center`
+- **Layout:** `absolute`, `drop-shadow-md`, `flex`, `flex-col`, `from-surface-navy/80`, `h-80`, `h-full`, `items-center`, `justify-center`, `left-4`, `max-w-3xl`, `max-w-xl`, `min-h-320px`, `overflow-hidden`, `relative`
+- **Varyant/Responsive:** `focus-visible:`, `focus-within:`, `group-focus-within:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `blur-xl`, `focus-visible:outline-none`, `focus-within:ring-2`, `focus-within:ring-cyan-400/50`, `font-bold`, `group`, `inset-0`, `mb-8`, `md:py-24`, `mt-4`, `mx-auto`, `object-cover`, `opacity-20`, `opacity-40`, `pl-12`
 
 ---
 # FILE: src\components\products\ProductsSkeleton.md
@@ -43691,8 +42829,8 @@ entity_hashes:
   func:ContactPage: a5b3030a0864a814
   func:handleSubmit: 460293fdfa9263b6
   overview: d36d38f2c5628948
-  style_tokens: 2843b884779face7
-generated_at: 2026-05-27T11:54:43Z
+  style_tokens: 21b7b2d66d6de05a
+generated_at: 2026-05-27T18:30:17Z
 ---
 
 ## Genel Bakış  
@@ -43813,19 +42951,20 @@ graph TD
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
+- **shadow:** `hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]`
 - **height:** (yok)
 - **width:** (yok)
 - **spacing:** (yok)
-- **diğer:** `hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]`
+- **diğer:** (yok)
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - `rounded-hvac-2xl`, `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-wide`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-slate-100`, `lg:text-6xl`, `lg:text-8xl`, `text-2xl`
-- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `group-hover:bg-cyan-500`, `group-hover:text-white`, `h-12`, `h-2`, `h-20`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-slate-100`, `group-hover:bg-cyan-500`, `group-hover:text-white`, `hover:bg-cyan-400`
+- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `h-12`, `h-2`, `h-20`, `h-500px`, `inline-flex`
+- **Varyant/Responsive:** `active:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `group`, `hover:underline`
 
 ---
 # FILE: src\views\ForgotPasswordPage.md
@@ -43840,8 +42979,8 @@ entity_hashes:
   func:ForgotPasswordPage: 40bcbdf4b0d8dfc1
   func:handleSubmit: 460293fdfa9263b6
   overview: 230126d511311554
-  style_tokens: 5a2976565d64aeae
-generated_at: 2026-05-27T11:54:27Z
+  style_tokens: 90202b3fc6cca016
+generated_at: 2026-05-27T18:30:20Z
 ---
 
 ## Genel Bakış
@@ -43934,9 +43073,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/20`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `from-air-blue`, `text-2xl`, `text-center`
+- **Renkler:** `bg-air-blue/20`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `focus-visible:border-transparent`, `from-air-blue`, `hover:bg-primary-navy`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `from-air-blue`, `h-16`, `h-5`, `inline-flex`, `items-center`, `justify-center`, `left-3`, `max-w-md`, `min-h-screen`, `p-4`, `p-8`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-medium`, `font-semibold`, `inset-0`, `leading-relaxed`, `mb-2`, `mb-4`, `mb-6`
 
 ---
 # FILE: src\views\HomePage.md
@@ -44041,8 +43181,8 @@ entity_hashes:
   func:handleGoogleSignIn: 0c49de53cd5a94df
   func:handleSubmit: 460293fdfa9263b6
   overview: d9286dd8d85a5a34
-  style_tokens: 0cbaa1cf5400afef
-generated_at: 2026-05-27T11:54:39Z
+  style_tokens: 4dc86ff7a25fa026
+generated_at: 2026-05-27T18:30:22Z
 ---
 
 ## Genel Bakış
@@ -44151,9 +43291,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-25`, `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-clean-white`, `bg-gradient-to-br`, `bg-login-radial`, `bg-primary-navy`, `bg-repeat`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `border-white/20`, `from-air-blue`, `from-primary-navy`, `text-2xl`, `text-center`, `text-industrial-gray`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `from-air-blue`, `from-primary-navy`, `gap-3`, `group-hover:-translate-y-1`, `group-hover:shadow-login-btn-hover`, `group-hover:text-primary-navy`, `h-16`, `h-4`, `h-5`, `inline-flex`, `items-center`
-- **Responsive:** (yok)
+- **Renkler:** `bg-clean-white`, `bg-gradient-to-br`, `bg-login-radial`, `bg-primary-navy`, `bg-repeat`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `border-white/20`, `focus-visible:border-primary-ocean`, `from-air-blue`, `from-primary-navy`, `group-hover:text-primary-navy`, `hover:bg-industrial-gray`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `from-air-blue`, `from-primary-navy`, `gap-3`, `group-hover:shadow-login-btn-hover`, `h-16`, `h-4`, `h-5`, `inline-flex`, `items-center`, `justify-between`, `justify-center`
+- **Varyant/Responsive:** `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-98`, `animate-spin`, `border`, `cursor-pointer`, `disabled:opacity-70`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-primary-ocean/20`, `font-bold`, `font-medium`, `group`, `group-hover:-translate-y-1`, `inset-0`, `inset-y-0`, `mb-2`
 
 ---
 # FILE: src\views\OrdersPage.md
@@ -44171,8 +43312,8 @@ entity_hashes:
   func:getStatusColor: 278d94f1c8a522db
   func:getStatusText: 248f40bb51719423
   overview: fc7e5a9a85876ec8
-  style_tokens: 71d7860a8420a926
-generated_at: 2026-05-27T12:07:56Z
+  style_tokens: 4894888e4850f9b4
+generated_at: 2026-05-27T18:30:24Z
 ---
 
 ## Genel Bakış
@@ -44399,8 +43540,8 @@ graph TD
     OrdersPage_tsx__formatPrice["formatPrice"]
     OrdersPage_tsx__getStatusColor["getStatusColor"]
     OrdersPage_tsx__getStatusText["getStatusText"]
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusColor
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatDate
 ```
@@ -44432,7 +43573,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-clean-white`, `bg-orange-100`, `bg-orange-100/80`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-slate-100`, `bg-slate-50`, `bg-white`, `border-b`, `border-b-2`, `border-orange-200`, `border-primary-navy`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`
 - **Layout:** `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `h-1`, `h-10`, `h-12`, `h-16`, `h-7`, `inline-flex`, `items-center`, `justify-between`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${active`, `${activeIdx`, `${getStatusColor(order.status`, `1`, `:`, `>=`, `animate-spin`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`, `font-medium`, `hover:scale-102`, `idx`
 
 ---
 # FILE: src\views\PaymentSuccessPage.md
@@ -45007,8 +44149,8 @@ entity_hashes:
   func:handleSubmit: 460293fdfa9263b6
   func:validateForm: 35d7413c1db3ab00
   overview: f33301e20d1c64f6
-  style_tokens: bb6026c45bd8dd20
-generated_at: 2026-05-27T11:56:35Z
+  style_tokens: b4142733c6599819
+generated_at: 2026-05-27T18:30:26Z
 ---
 
 ## Genel Bakış
@@ -45132,9 +44274,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `bg-light-gray`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `from-air-blue`, `text-2xl`, `text-center`
+- **Renkler:** `bg-gradient-to-br`, `bg-light-gray`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `focus-visible:border-transparent`, `from-air-blue`, `hover:bg-primary-navy`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `flex-1`, `from-air-blue`, `gap-1`, `gap-1.5`, `h-1.5`, `h-16`, `h-5`, `inline-flex`, `items-center`, `justify-center`, `left-3`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `$`, `:`, `<=`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-medium`, `font-semibold`, `i`
 
 ---
 # FILE: src\views\account\AccountAddressesPage.md
@@ -45148,8 +44291,8 @@ skeleton_hash: 85bfbc2f18d6514d
 entity_hashes:
   func:AccountAddressesPage: 75c0fb5d7175a123
   overview: b41befa640558dbe
-  style_tokens: b6d0efad74e880e6
-generated_at: 2026-05-27T11:50:06Z
+  style_tokens: 20e5949307a3284f
+generated_at: 2026-05-27T18:30:28Z
 ---
 
 ## Genel Bakış
@@ -45311,7 +44454,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-blue-50`, `bg-gradient-to-r`, `bg-green-50`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-slate-50`, `bg-slate-50/80`, `bg-white`, `border-b`, `border-blue-200`, `border-green-200`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-slate-300`
 - **Layout:** `absolute`, `block`, `col-span-2`, `flex`, `flex-1`, `flex-col`, `from-slate-200`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `focus:`, `group-hover:`, `hover:`, `lg:`, `md:`, `peer-checked:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `animate-spin`, `border`, `break-words`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-60`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `focus-visible:ring-primary-navy/50`, `focus-visible:ring-slate-200`, `focus:underline`, `font-bold`, `font-medium`, `group`
 
 ---
 # FILE: src\views\account\AccountInvoicesPage.md
@@ -45833,8 +44977,8 @@ skeleton_hash: 8f54003fdfbd1d91
 entity_hashes:
   func:AccountProfilePage: 754183d7e2ba9791
   overview: 6f24907adef049a2
-  style_tokens: b339cbd32bc0fb94
-generated_at: 2026-05-27T11:49:25Z
+  style_tokens: d7513d5d715e48fe
+generated_at: 2026-05-27T18:30:31Z
 ---
 
 ## Genel Bakış
@@ -45938,9 +45082,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `text-2xl`, `text-primary-navy`, `text-slate-400`, `text-slate-500`, `text-slate-900`, `text-sm`, `text-white`, `text-xs`
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `focus-visible:border-primary-navy`, `hover:bg-industrial-gray`, `text-2xl`, `text-primary-navy`, `text-slate-400`, `text-slate-500`, `text-slate-900`, `text-sm`
 - **Layout:** `absolute`, `block`, `flex`, `gap-2`, `h-10`, `h-4`, `h-6`, `items-center`, `justify-end`, `left-0`, `max-w-2xl`, `overflow-hidden`, `p-6`, `relative`, `shadow-primary-navy/20`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-60`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`, `font-medium`, `hover:scale-102`, `inset-y-0`, `mb-1.5`, `mb-8`, `mt-1`, `mt-2`
 
 ---
 # FILE: src\views\account\AccountReturnsPage.md
@@ -45954,8 +45099,8 @@ skeleton_hash: 495418f85c94e7a0
 entity_hashes:
   func:AccountReturnsPage: 45c93b9f2f8ddaf9
   overview: b5840b0f6d7ee947
-  style_tokens: 97255f4698dc2d21
-generated_at: 2026-05-27T12:13:56Z
+  style_tokens: d5328287ff24abb4
+generated_at: 2026-05-27T18:30:33Z
 ---
 
 ## Genel Bakış
@@ -46126,7 +45271,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-primary-navy`, `bg-primary-navy/5`, `bg-red-500`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/80`, `bg-slate-900/40`, `bg-white`, `border-b`, `border-b-2`, `border-primary-navy`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-1`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${statusClass(r.status`, `${statusFilter`, `${step.completed`, `:`, `===`, `animate-in`, `animate-spin`, `border`, `cancelled`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `focus-visible:ring-primary-navy/50`
 
 ---
 # FILE: src\views\account\AccountSecurityPage.md
@@ -46140,8 +45286,8 @@ skeleton_hash: 714d41430b62d140
 entity_hashes:
   func:AccountSecurityPage: c6bf7ae08fac23f0
   overview: 4253e862f0a8090f
-  style_tokens: 826b27fd2abbe23e
-generated_at: 2026-05-27T11:50:37Z
+  style_tokens: ac89c7eeea9aa372
+generated_at: 2026-05-27T18:30:36Z
 ---
 
 ## Genel Bakış
@@ -46251,9 +45397,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-green-50`, `bg-primary-navy`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50`, `bg-white`, `border-b`, `border-green-200`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `border-transparent`, `text-2xl`, `text-green-600`
+- **Renkler:** `bg-green-50`, `bg-primary-navy`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50`, `bg-white`, `border-b`, `border-green-200`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `border-transparent`, `focus-visible:border-primary-navy`, `hover:bg-industrial-gray`
 - **Layout:** `absolute`, `block`, `flex`, `flex-1`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-5`, `gap-x-2`, `gap-y-0.5`, `grid`, `grid-cols-1`, `grid-cols-2`, `h-1`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `$`, `:`, `<=`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-60`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`, `font-medium`, `font-semibold`, `hover:scale-102`
 
 ---
 # FILE: src\views\account\AccountShipmentsPage.md
@@ -46482,8 +45629,8 @@ skeleton_hash: ed993728dcffbd9f
 entity_hashes:
   func:AdminStockPage: c624fd2be5fee91c
   overview: 62b56555e7eaf8c3
-  style_tokens: 77f08903451a51c4
-generated_at: 2026-05-27T11:48:56Z
+  style_tokens: d6523eb6a70db49b
+generated_at: 2026-05-27T18:30:38Z
 ---
 
 ## Genel Bakış
@@ -46546,50 +45693,6 @@ Bu, hesap yöneticilerinin stok işlemlerini yürütmesi için tasarlanmış bir
 
 ---
 
-### [N2_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::adjust
-- **params**: `(p: Product, delta: number)`
-- **ic_degiskenler**:
-  - `newQty` — `p.stock_qty` (null olursa 0) üzerine `delta` eklenip negatif olmaması sağlanarak hesaplanan yeni stok miktarı.
-  - `error` — Supabase `update` sorgusundan dönen hata nesnesi.
-- **Dönüş**: `void` (asenkron işlem, UI’da `saving` ve `all` durumları güncellenir; hata oluşursa konsola loglanır).
-
----
-
-### [N3_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::setQty
-- **params**: `(_productId: string, qty: number)`
-- **ic_degiskenler**:
-  - `newQty` — `qty` değerinin negatif olmaması için `Math.max(0, qty)` ile hesaplanan yeni stok miktarı.
-  - `error` — Supabase `update` sorgusundan dönen hata nesnesi.
-- **Dönüş**: `void` (asenkron işlem, `all` ve `tempQty` durumları güncellenir; hata oluşursa konsola loglanır).
-
----
-
-### [N4_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::setThreshold
-- **params**: `(_productId: string, threshold: number | null)`
-- **ic_degiskenler**:
-  - `newThreshold` — `threshold` null değil ve `>=0` ise aynı değer, aksi takdirde `null` (varsayılan eşik).
-  - `error` — Supabase `update` sorgusundan dönen hata nesnesi.
-- **Dönüş**: `void` (asenkron işlem, `all` ve `tempThreshold` durumları güncellenir; hata oluşursa konsola loglanır).
-
----
-
-### [N5_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::load
-- **params**: (parametre yok) – `useEffect` içinde tanımlı iç fonksiyon.
-- **ic_degiskenler**:
-  - `data` — Supabase `select` sorgusundan dönen ürün dizisi (`Product[]`).
-  - `error` — Supabase sorgusundan dönen hata nesnesi.
-- **Dönüş**: `void` (asenkron işlem, `mounted` hâlâ `true` ise `setAll` ile `all` durumunu doldurur; hata yok sayılır).
-
----
-
-### [N6_NASIL] AST Pointer: src\views\account\AdminStockPage.tsx::filtered
-- **params**: (parametre yok) – `useMemo` içinde tanımlı ok fonksiyonu.
-- **ic_degiskenler**:
-  - `t` — `q.trim().toLowerCase()` sonucu, arama filtresi için kullanılan metin.
-- **Dönüş**: `Product[]` – `q` boşsa `all` dizisini, aksi takdirde `name`, `sku`, `brand` alanlarında `t` içeren ürünleri döner.
-
----
-
 ## NODE ID STANDARD
 
   file: src\views\account\AdminStockPage.tsx
@@ -46611,9 +45714,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gray-50`, `bg-white`, `border-gray-100`, `border-light-gray`, `border-t`, `border-warning-orange`, `text-center`, `text-industrial-gray`, `text-left`, `text-red-600`, `text-sm`, `text-steel-gray`, `text-warning-orange`, `text-xl`, `text-xs`
+- **Renkler:** `bg-gray-50`, `bg-white`, `border-gray-100`, `border-light-gray`, `border-t`, `border-warning-orange`, `hover:bg-warning-orange`, `hover:border-primary-navy`, `hover:border-secondary-blue`, `hover:text-white`, `text-center`, `text-industrial-gray`, `text-left`, `text-red-600`, `text-sm`
 - **Layout:** `absolute`, `flex`, `gap-1`, `gap-2`, `items-center`, `justify-between`, `left-3`, `max-w-7xl`, `overflow-hidden`, `relative`, `sm:min-w-72`, `sm:w-96`, `sm:w-auto`, `top-1/2`, `w-16`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${qty`, `${threshold`, `-1`, `-translate-y-1/2`, `:`, `<=`, `===`, `border`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-medium`, `font-semibold`, `italic`
 
 ---
 # FILE: src\views\account\OrderDetailPage.md
@@ -46627,8 +45731,8 @@ skeleton_hash: 622dd4d11cb43f53
 entity_hashes:
   func:OrderDetailPage: 86e76b4c00c9f2fc
   overview: 91762eaa328b7587
-  style_tokens: 571bb75f176a8e04
-generated_at: 2026-05-27T11:48:49Z
+  style_tokens: 2d7ff3d6e2a546ab
+generated_at: 2026-05-27T18:30:40Z
 ---
 
 ## Genel Bakış
@@ -46912,8 +46016,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-clean-white`, `bg-green-100`, `bg-orange-100`, `bg-orange-100/80`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-slate-100`, `bg-slate-100/80`, `bg-slate-200`, `bg-slate-50`, `bg-slate-50/80`, `bg-white`, `border-b`, `border-b-2`, `border-gray-100`
-- **Layout:** `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-6`, `grid`, `grid-cols-1`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `h-1`, `h-10`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Layout:** `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-6`, `grid`, `grid-cols-1`, `h-1`, `h-10`, `h-12`, `h-6`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${activeIdx`, `${getStatusColor(order.status`, `${idx`, `${ok`, `${tab`, `1`, `:`, `<=`, `===`, `>=`, `activeIdx`, `animate-spin`, `border`, `break-all`, `divide-slate-100`
 
 ---
 # FILE: src\views\account\__tests__\AccountSecurityPage.test.md
@@ -47472,8 +46577,8 @@ skeleton_hash: faa129e425bec71a
 entity_hashes:
   func:AdminAuditLogPage: 50d17db2bc55805a
   overview: 2053e68b7986a9b1
-  style_tokens: 4afc856417bb59ae
-generated_at: 2026-05-27T11:51:32Z
+  style_tokens: d2a1c3bee3a34f52
+generated_at: 2026-05-27T18:30:42Z
 ---
 
 ## Genel Bakış
@@ -47555,96 +46660,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::useEffect (debounce)
-- **params**: (none)
-- **ic_degiskenler**:
-  - `t` — timeout identifier returned by `setTimeout`
-- **Dönüş**: cleanup function that clears the timeout via `clearTimeout(t)`
-
----
-
-### [N3_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::fetchLogs
-- **params**: (none)
-- **ic_degiskenler**:
-  - `loading` — state value set to `true` at start
-  - `error` — state value set to `null` at start
-  - `ensureSessionFresh` — async function ensuring auth session
-  - `supabase` — Supabase client instance
-  - `fromDate` — filter value for start date
-  - `toDate` — filter value for end date
-  - `action` — filter value for action type
-  - `debouncedQ` — debounced search query
-  - `batch` — filter value for batch id
-  - `page` — current page number
-  - `PAGE_SIZE` — constant page size
-  - `query` — Supabase query builder object
-  - `from` — numeric offset for pagination
-  - `to` — numeric limit for pagination
-  - `data` — array of fetched rows
-  - `error` — error object from Supabase query
-  - `count` — total count returned by Supabase
-  - `rows` — state updater `setRows`
-  - `total` — state updater `setTotal`
-  - `setRows` — state updater for `rows`
-  - `setTotal` — state updater for `total`
-  - `setError` — state updater for `error`
-  - `setLoading` — state updater for `loading`
-- **Dönüş**: `Promise<void>` (async function, no explicit return)
-
----
-
-### [N4_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::useEffect (pathname)
-- **params**: (none)
-- **ic_degiskenler**:
-  - `fetchLogs` — reference to the `fetchLogs` callback
-  - `pathname` — current path string
-- **Dönüş**: `void` (effect runs `fetchLogs()`)
-
----
-
-### [N5_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::useEffect (searchParams)
-- **params**: (none)
-- **ic_degiskenler**:
-  - `searchParams` — URLSearchParams object
-  - `b` — trimmed value of `batch` query param
-  - `setBatch` — state updater for `batch`
-- **Dönüş**: `void` (effect runs `setBatch(b)`)
-
----
-
-### [N6_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::batch clear handler
-- **params**: (none)
-- **ic_degiskenler**:
-  - `setBatch` — state updater for `batch`
-  - `url` — `URL` instance created from current window location or fallback
-  - `router` — Next.js router instance
-- **Dönüş**: `void` (handler performs state reset and navigation)
-
----
-
-### [N7_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::row mapping function (r => ...)
-- **params**: `r` — single `AuditRow` object from `rows` array
-- **ic_degiskenler**:
-  - `expandedId` — current expanded row id state
-  - `setExpandedId` — state updater for `expandedId`
-  - `t` — translation function
-  - `lang` — current language code
-  - `formatDateTime` — helper to format timestamps
-  - `adminTableCellClass` — CSS class string
-  - `adminTableActionClass` — CSS class string
-  - `adminTableHeadCellClass` — CSS class string
-  - `adminButtonSecondaryClass` — CSS class string
-  - `adminSectionTitleClass` — CSS class string
-  - `adminSubtitleClass` — CSS class string
-  - `adminEmptyState` — component for empty state
-  - `AdminSkeleton` — component for loading skeleton
-  - `JsonDiffViewer` — component to display diff
-  - `Terminal`, `Calendar`, `History`, `ChevronLeft`, `ChevronRight`, `Filter`, `ClipboardList` — icon components
-  - `r.id`, `r.at`, `r.action`, `r.table_name`, `r.row_pk`, `r.comment`, `r.before`, `r.after` — properties of the audit row
-- **Dönüş**: JSX fragment containing table rows and optional detail row for the audit entry
-
----
-
 ## NODE ID STANDARD
 
   file: src\views\admin\AdminAuditLogPage.tsx
@@ -47667,8 +46682,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-amber-500/5`, `bg-black/40`, `bg-cyan-400/3`, `bg-cyan-500/10`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-rose-500/5`, `bg-slate-500/10`, `bg-surface-deep/40`, `bg-surface-deep/60`, `bg-transparent`, `bg-white/2`, `border-amber-500/20`, `border-cyan-500/20`, `border-emerald-500/20`
-- **Layout:** `!h-10`, `!h-8`, `!p-0`, `!w-10`, `flex`, `gap-2`, `gap-3`, `gap-4`, `group-focus-within:text-cyan-400`, `h-10`, `items-center`, `justify-between`, `justify-center`, `max-w-xs`, `overflow-hidden`
-- **Responsive:** (yok)
+- **Layout:** `!h-10`, `!h-8`, `!p-0`, `!w-10`, `flex`, `gap-2`, `gap-3`, `gap-4`, `h-10`, `items-center`, `justify-between`, `justify-center`, `max-w-xs`, `overflow-hidden`, `overflow-x-auto`
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `focus-within:`, `group-focus-within:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `!bg-white/5`, `!border-white/10`, `!px-3`, `!rounded-xl`, `$`, `${adminButtonSecondaryClass`, `${adminTableActionClass`, `${adminTableCellClass`, `${expandedId`, `:`, `===`, `DELETE`, `INSERT`, `UPDATE`, `animate-in`
 
 ---
 # FILE: src\views\admin\AdminCategoriesPage.md
@@ -47963,8 +46979,8 @@ entity_hashes:
   func:saveCoupon: 13014c937b37a622
   func:toggleActive: bde4db4c0f16dfdc
   overview: bf9bd25b077ab626
-  style_tokens: 28be68dd9e200846
-generated_at: 2026-05-27T11:49:32Z
+  style_tokens: 4a0b7c9fcb1d8a38
+generated_at: 2026-05-27T18:30:44Z
 ---
 
 ## Genel Bakış
@@ -48198,9 +47214,9 @@ graph TD
     AdminCouponsPage_tsx__isAllowedCouponType["isAllowedCouponType"]
     AdminCouponsPage_tsx__saveCoupon["saveCoupon"]
     AdminCouponsPage_tsx__toggleActive["toggleActive"]
-    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__toggleActive
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__isAllowedCouponType
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__filtered
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__toggleActive
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__dbToUi
 ```
 
@@ -48233,8 +47249,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-blue-500`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-emerald-500/10`, `bg-gradient-to-r`, `bg-slate-500`, `bg-slate-500/10`, `bg-slate-800`, `bg-white/10`, `bg-white/5`, `border-cyan-500/20`, `border-emerald-500/20`, `border-t`, `border-white/10`
-- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`, `grid-cols-1`, `group-hover:opacity-100`, `h-1`, `h-1.5`
-- **Responsive:** `md:` prefix kullanımları
+- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`, `grid-cols-1`, `h-1`, `h-1.5`, `h-4`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${adminButtonSecondaryClass`, `${adminCardPaddedClass`, `${adminInputClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${r.active`, `${r.type`, `:`, `===`, `animate-in`, `border`, `cursor-pointer`, `divide-white/5`
 
 ---
 # FILE: src\views\admin\AdminDashboardPage.md
@@ -49007,8 +48024,8 @@ entity_hashes:
   func:AdminInventoryPage: 66c4abfcbc4634eb
   func:fetchData: 3334aa9b134a3cd8
   overview: 2651cee931ba15f0
-  style_tokens: 162ca5315152734a
-generated_at: 2026-05-27T11:55:43Z
+  style_tokens: 6c71c306ec3450e6
+generated_at: 2026-05-27T18:30:47Z
 ---
 
 ## Genel Bakış
@@ -49115,9 +48132,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gray-50`, `bg-primary-navy`, `bg-white`, `border-gray-200`, `border-light-gray`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-white`
+- **Renkler:** `bg-gray-50`, `bg-primary-navy`, `bg-white`, `border-gray-200`, `border-light-gray`, `hover:text-primary-navy`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-white`
 - **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `items-center`, `justify-between`, `left-3`, `md:flex-row`, `md:items-center`, `p-2`, `p-4`, `relative`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `-translate-y-1/2`, `animate-fadeIn`, `animate-spin`, `border`, `focus-visible:outline-none`, `font-bold`, `mb-4`, `mx-auto`, `pl-10`, `pr-4`, `px-3`, `px-4`, `py-2`, `py-20`, `rounded-lg`
 
 ---
 # FILE: src\views\admin\AdminInventoryReportPage.md
@@ -49331,8 +48349,8 @@ entity_hashes:
   func:save: 0164a79f2bf21d0f
   func:saveGeneralSettings: e292d3d4a2e6fa04
   overview: 59445d0b8972e8c9
-  style_tokens: 42508eca7917a722
-generated_at: 2026-05-27T11:50:50Z
+  style_tokens: 114083f4641bd38f
+generated_at: 2026-05-27T18:30:49Z
 ---
 
 ## Genel Bakış
@@ -49492,9 +48510,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-xl`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/5`, `bg-cyan-500/5`, `bg-rose-500/5`, `bg-surface-deep/40`, `bg-transparent`, `bg-violet-500`, `bg-violet-500/5`, `border-amber-500/10`, `border-b`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `text-amber-400`, `text-amber-500/80`
-- **Layout:** `!h-12`, `absolute`, `block`, `flex`, `flex-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `group-hover:bg-cyan-500/10`, `group-hover:bg-violet-500/10`, `group-hover:text-cyan-400`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Renkler:** `bg-amber-500/5`, `bg-cyan-500/5`, `bg-rose-500/5`, `bg-surface-deep/40`, `bg-transparent`, `bg-violet-500`, `bg-violet-500/5`, `border-amber-500/10`, `border-b`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:bg-cyan-500/10`, `group-hover:bg-violet-500/10`
+- **Layout:** `!h-12`, `absolute`, `block`, `flex`, `flex-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-14`, `h-5`, `h-64`
+- **Varyant/Responsive:** `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `!font-black`, `!text-center`, `!text-lg`, `${adminButtonPrimaryClass`, `${adminCardClass`, `${adminInputClass`, `-mr-32`, `-mt-32`, `animate-in`, `blur-3xl`, `border`, `cursor-pointer`, `duration-700`, `fade-in`, `focus-visible:ring-cyan-400/20`
 
 ---
 # FILE: src\views\admin\AdminLayout.md
@@ -50516,8 +49535,8 @@ entity_hashes:
   func:submitShip: 0b47468e1ba29f91
   func:toggleSort: 5416b105263f00aa
   overview: f85949eb6d5dc985
-  style_tokens: 417f070cb42c79ae
-generated_at: 2026-05-27T11:53:22Z
+  style_tokens: 37fc37c91a33397d
+generated_at: 2026-05-27T18:30:51Z
 ---
 
 ## Genel Bakış
@@ -50939,17 +49958,17 @@ graph TD
     AdminOrdersPage_tsx__sortIndicator["sortIndicator"]
     AdminOrdersPage_tsx__submitShip["submitShip"]
     AdminOrdersPage_tsx__toggleSort["toggleSort"]
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__sortIndicator
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openLogsModal
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__safeDate
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__toggleSort
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__badgeClass
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__formatAmount
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openShipModal
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__toggleSort
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openNotesModal
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__prettyStatus
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__sortIndicator
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__generateTrackingUrl
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__badgeClass
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__safeDate
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__deleteNote
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__generateTrackingUrl
 ```
 
 ## NODE ID STANDARD
@@ -50998,7 +50017,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-black/20`, `bg-clip-text`, `bg-cyan-400`, `bg-cyan-500`, `bg-emerald-500`, `bg-gradient-to-r`, `bg-surface-darker/40`, `bg-surface-deep`, `bg-white/2`, `bg-white/5`, `border-2`, `border-b`, `border-cyan-500/20`, `border-rose-500/20`, `border-t`
 - **Layout:** `backdrop-blur-md`, `backdrop-blur-xl`, `bg-clip-text`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `from-white`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-6`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `md:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${adminButtonSecondaryClass`, `${adminTableHeadCellClass`, `${headPad`, `:`, `===`, `active:scale-95`, `animate-in`, `animate-spin`, `board`, `border`, `decoration-white/20`, `disabled:cursor-not-allowed`, `disabled:opacity-30`, `divide-white/2`
 
 ---
 # FILE: src\views\admin\AdminProductsPage.md
@@ -51028,8 +50048,8 @@ entity_hashes:
   func:toggleSelectAll: b6733934eb7cddda
   func:toggleSort: 865bfd9d85445d70
   overview: 6edaaf2ebf329de0
-  style_tokens: fdfb3c696080e8df
-generated_at: 2026-05-27T12:24:25Z
+  style_tokens: 4970a750083c3797
+generated_at: 2026-05-27T18:30:54Z
 ---
 
 ## Genel Bakış  
@@ -51508,15 +50528,15 @@ graph TD
     AdminProductsPage_tsx__toggleSelect["toggleSelect"]
     AdminProductsPage_tsx__toggleSelectAll["toggleSelectAll"]
     AdminProductsPage_tsx__toggleSort["toggleSort"]
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__remove
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
 ```
 
 ## NODE ID STANDARD
@@ -51557,8 +50577,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-cyan-400/3`, `bg-emerald-500/10`, `bg-gradient-to-r`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-surface-deep`, `bg-white/1`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-2`, `border-b`
-- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-transparent`, `gap-0.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `group-hover/btn:text-cyan-400`, `group-hover/btn:text-slate-400`, `group-hover/spec:text-cyan-400/70`, `group-hover:border-white/10`, `group-hover:rotate-90`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `from-transparent`, `gap-0.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-0.5`, `h-1.5`, `h-12`, `h-4`, `h-6`
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `group-hover/btn:`, `group-hover/spec:`, `group-hover:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${Number(r.stock_qty`, `${adminButtonPrimaryClass`, `${adminButtonSecondaryClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${baseClass`, `${cellPad`, `${headPad`, `${isExpanded`, `${isSelected`, `10`, `:`, `<`, `Number(r.stock_qty`
 
 ---
 # FILE: src\views\admin\AdminReturnsPage.md
@@ -53507,8 +52528,8 @@ skeleton_hash: f777c407c48b29e3
 entity_hashes:
   func:CategoryGridView: 7b1f2c5723260534
   overview: 24b0f5382275b1f2
-  style_tokens: 063c4d890f50f7a4
-generated_at: 2026-05-27T11:55:28Z
+  style_tokens: 9b61cf001b5ee023
+generated_at: 2026-05-27T18:30:56Z
 ---
 
 ## Genel Bakış
@@ -53606,9 +52627,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-3xl`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
+- **Renkler:** `bg-primary-navy`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `hover:text-slate-600`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
 - **Layout:** `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-12`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `lg:flex-row`, `lg:w-80`
-- **Responsive:** `lg:`, `sm:`, `xl:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `lg:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `${filters.viewMode`, `:`, `===`, `border`, `focus-visible:ring-primary-ocean/20`, `font-bold`, `font-medium`, `list`, `mb-10`, `pb-6`, `pl-4`, `pr-10`, `py-2.5`, `py-32`, `rounded-lg`
 
 ---
 # FILE: src\views\category\CategoryLandingView.md
@@ -54956,8 +53978,8 @@ skeleton_hash: 61818ab3eba26faa
 entity_hashes:
   func:StepAddressInfo: d5b5813fe5d1d5af
   overview: f4c7e4e155655b30
-  style_tokens: b1b761a6e8929d20
-generated_at: 2026-05-27T11:52:43Z
+  style_tokens: 7a84088359f41f22
+generated_at: 2026-05-27T18:30:58Z
 ---
 
 ## Genel Bakış
@@ -55061,9 +54083,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `border-light-gray`, `border-primary-navy`, `border-slate-200`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-white`, `text-xl`, `text-xs`
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `border-light-gray`, `border-primary-navy`, `border-slate-200`, `focus-visible:border-primary-navy`, `hover:text-secondary-blue`, `placeholder:text-slate-400`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-white`, `text-xl`
 - **Layout:** `block`, `flex`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `h-10`, `items-center`, `items-start`, `justify-between`, `justify-end`, `md:col-span-2`, `md:grid-cols-2`
-- **Responsive:** `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `md:`, `placeholder:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${shippingMethod`, `-mt-2`, `:`, `===`, `border`, `cursor-pointer`, `express`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `focus-visible:ring-primary-navy/20`, `font-medium`, `font-semibold`, `hover:underline`, `mb-2`
 
 ---
 # FILE: src\views\checkout\StepCustomerInfo.md
@@ -55077,8 +54100,8 @@ skeleton_hash: 0f6c10a75d5ca248
 entity_hashes:
   func:StepCustomerInfo: 2698d0acd17fa1de
   overview: 3962b33f58fa703d
-  style_tokens: 7e2cf916d8e002e3
-generated_at: 2026-05-27T11:51:09Z
+  style_tokens: 61f2a39b43a19a77
+generated_at: 2026-05-27T18:31:01Z
 ---
 
 ## Genel Bakış
@@ -55168,9 +54191,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `border-slate-200`, `text-industrial-gray`, `text-sm`, `text-white`, `text-xl`
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `border-slate-200`, `focus-visible:border-primary-navy`, `placeholder:text-slate-400`, `text-industrial-gray`, `text-sm`, `text-white`, `text-xl`
 - **Layout:** `block`, `flex`, `gap-4`, `grid`, `grid-cols-1`, `h-10`, `items-center`, `md:grid-cols-2`, `p-2`, `w-full`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `focus-visible:`, `md:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-medium`, `font-semibold`, `mb-2`, `mb-6`, `px-4`, `rounded-lg`, `space-x-3`, `space-y-6`, `transition-colors`
 
 ---
 # FILE: src\views\checkout\buildPaymentRequest.md
@@ -55513,8 +54537,8 @@ skeleton_hash: 51959c03f2b8ee36
 entity_hashes:
   func:HubPage: ae5a0ef5e997bc98
   overview: 92f1bd1bc9a0b472
-  style_tokens: c268b09644e71fe8
-generated_at: 2026-05-27T12:24:28Z
+  style_tokens: 8d8885134f307444
+generated_at: 2026-05-27T18:31:03Z
 ---
 
 ## Genel Bakış
@@ -55643,8 +54667,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-amber-500`, `bg-cyan-50`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-gradient-to-b`, `bg-slate-200/50`, `bg-slate-400`, `bg-slate-50`, `bg-slate-900`, `bg-slate-950`, `bg-transparent`, `bg-white`, `bg-white/5`, `border-cyan-500/20`
-- **Layout:** `absolute`, `backdrop-blur-xl`, `block`, `flex`, `flex-wrap`, `from-slate-950/80`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `group-focus-within:opacity-100`, `group-hover:bg-cyan-500/20`, `group-hover:text-cyan-600`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Layout:** `absolute`, `backdrop-blur-xl`, `block`, `flex`, `flex-wrap`, `from-slate-950/80`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `h-1.5`, `h-64`, `h-full`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-focus-within:`, `group-hover:`, `hover:`, `lg:`, `md:`, `placeholder:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `$`, `:`, `===`, `activeTag`, `animate-pulse`, `blur-100`, `blur-2xl`, `border`, `duration-500`, `focus-visible:ring-0`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `grayscale`
 
 ---
 # FILE: src\views\knowledge\TopicPage.md

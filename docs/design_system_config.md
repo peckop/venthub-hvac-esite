@@ -156,3 +156,18 @@ Opacity modifier destekli: `bg-surface-deep/40`, `text-brand-cyan/80`
 | `opacity-2` | `0.02` |
 | `opacity-3` | `0.03` |
 | `opacity-5` | `0.05` |
+
+---
+
+## Global CSS Polish & Base Kuralları (index.css)
+
+Tasarım sisteminin temel seviyede tarayıcı davranışlarıyla entegrasyonu için aşağıdaki global kurallar `src/index.css` üzerinde tanımlanmıştır:
+
+### Accent Color & Color Scheme
+- **`accent-color`**: Tarayıcıya ait varsayılan interaktif elemanların (checkbox, radio, range vb.) vurgu rengi olarak marka rengimiz olan `--brand-cyan` (`#22d3ee`) atanmıştır.
+- **`color-scheme`**: Sistem genelinde açık ve koyu mod uyumluluğunu en üst düzeye çıkarmak için `dark light` bildirilmiştir.
+
+### Seçim ve Kaydırma Standartları
+- **Selection (`::selection`)**: Metin seçildiğinde arka plan rengi olarak `--brand-cyan / 0.2` (şeffaf cyan) ve metin rengi olarak temiz beyaz atanmıştır.
+- **Modern Scrollbar**: Firefox ve Chromium tabanlı tüm modern tarayıcılarda estetik, ince ve pürüzsüz kaydırma sağlayan custom scrollbar yapısı base katmanına işlenmiştir.
+

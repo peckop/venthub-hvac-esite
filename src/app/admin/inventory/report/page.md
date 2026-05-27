@@ -4,11 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\report\page.tsx
 skeleton_hash: a90c7fedc66c4a2a
-generated_at: 2026-05-23T21:47:57Z
+entity_hashes:
+  func:InventoryReportPage: bfcc8ccf4dbc326a
+  overview: 186bde0cd4ca9cee
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-27T17:59:05Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki envanter rapor sayfasının ana giriş noktasını oluşturur. `InventoryReportPage` adlı tek bileşen, sayfanın tüm yapısını kapsayan üst düzey bir view bileşenini dinamik olarak yükler ve render eder. Böylece envanter raporlarının liste, grafik ve filtreleme gibi alt bileşenleri tek bir sayfada birleşir.
+Bu modül, yönetim panelindeki envanter rapor sayfasının ana giriş noktasıdır. Tek bir fonksiyon, sayfanın üst düzey bileşenini dinamik olarak yükleyip render eder, böylece raporların listesi, grafikleri ve filtreleme seçenekleri tek bir sayfada birleşir.
 
 ## Fonksiyon Grupları
 ### Sayfa Render ve Bileşen Yönlendirme
@@ -17,21 +21,25 @@ Bu grup, rapor sayfasının kök bileşenini tanımlar ve asıl görünüm katma
 
 ---
 
+---
+
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### InventoryReportPage
-**Ne yapar**: Bu fonksiyon, admin panelinde envanter rapor sayfasını görüntülemek için kullanılan bir React fonksiyonel bileşenidir. Sayfa, kullanıcıya envanter raporlarını listeleyip yönetme imkanı sunar.
-**Nasıl yapar**: Herhangi bir parametre almaz ve doğrudan `AdminInventoryReportPage` bileşenini döndürür. Bu sayede admin envanter rapor sayfasının modüler bir şekilde oluşturulmasını sağlar.
-**Parametreler**:
-- (parametre yok)
-**Dönüş**: JSX.Element — `AdminInventoryReportPage` adlı alt bileşeni döndürür. Bu bileşen, envanter raporlarına ait tüm kullanıcı arayüzü öğelerini içerir.
+**Ne yapar**: `InventoryReportPage` bileşenini render eder ve `<AdminInventoryReportPage />` JSX elemanını döndürür. Bu sayede yönetim panelindeki envanter raporu sayfası görüntülenir.  
+
+**Nasıl yapar**: Fonksiyon, React fonksiyonel bileşeni olarak tanımlanmıştır; içinde tek bir return ifadesi bulunur ve doğrudan `AdminInventoryReportPage` bileşenini JSX olarak döndürür.  
+
+**Parametreler**:  
+- *Hiç yok* — Fonksiyon parametre almaz; sabit bir bileşen döndürür.  
+
+**Dönüş**:  
+- `JSX.Element` — `<AdminInventoryReportPage />` bileşenini temsil eden JSX elemanı.
 
 ---
 
@@ -43,10 +51,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/inventory/report/page.tsx::InventoryReportPage
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\inventory\report\page.tsx::InventoryReportPage
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX element (AdminInventoryReportPage bileşenini döndürür)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element (React bileşeni `<AdminInventoryReportPage />` döndürür)
 
 ---
 
@@ -59,3 +67,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryReportPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`

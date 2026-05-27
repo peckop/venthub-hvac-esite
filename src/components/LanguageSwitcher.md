@@ -4,11 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx
 skeleton_hash: 8a850a2b7d984e21
-generated_at: 2026-05-23T22:08:35Z
+entity_hashes:
+  func:LanguageSwitcher: e20e68a6d834aa54
+  overview: 7882320662f1fa31
+  style_tokens: 93059c02fd156e45
+generated_at: 2026-05-27T18:07:01Z
 ---
 
 ## Genel Bakış
-LanguageSwitcher, uygulamanın dil seçimini sağlayan bir React bileşenidir. Kullanıcıya mevcut dillerden birini seçme ve seçimi uygulama durumu yönetimiyle güncelleme imkanı sunar.
+LanguageSwitcher modülü, uygulamanın dil seçimini sağlayan basit bir React bileşenidir. Kullanıcıya mevcut dillerden birini seçme ve bu seçimi uygulama genelinde güncelleme imkanı sunar.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
@@ -18,30 +22,35 @@ Bu grup, dil değiştirme işlevselliğini tek bir fonksiyonda toplar.
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Dil değiştirme işlevini yerine getiren bu React bileşeninin çalışması için uygulama içi dil yönetimi altyapısının ve React çalışma ortamının erişilebilir olması zorunludur.
+
+[Aksiyom 1]: Eğer uygulama genelinde paylaşılan global dil durumu (dil state'i) bileşen tarafından erişilebilir değilse, kullanıcının seçtiği dil uygulama genelindeki hiçbir içeriği etkilemez, bileşen tamamen işlevsiz kalır.
+[Aksiyom 2]: Eğer desteklenen dillerin listesi bileşen tarafından erişilebilir değilse, kullanıcıya seçim yapabileceği hiçbir dil seçeneği sunulamaz, bileşen boş olarak render edilir.
+[Aksiyom 3]: Eğer dil değişikliğini uygulama genelinde uygulayacak global callback fonksiyonu tanımlı ve erişilebilir değilse, kullanıcı herhangi bir dil seçse bile dil değişikliği işlemi gerçekleştirilemez, uygulama mevcut dilinde kalır.
+[Aksiyom 4]: Eğer React kütüphanesi bileşenin çalıştığı istemci ortamında erişilebilir değilse, bileşen hiçbir şekilde render edilemez, çalışmaz.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### LanguageSwitcher
-**Ne yapar**: Uygulamada dil değiştirme seçeneği sunan bir React bileşeni render eder.  
-**Nasıl yapar**: Kullanıcıya mevcut dillerin listesi gösterir ve bir dil seçildiğinde içerik dilini güncelleyen bir callback fonksiyonunu tetikler.  
+**Ne yapar**: LanguageSwitcher fonksiyonu, uygulama içinde dil seçimini sağlayan bir React bileşeni döndürür.  
+**Nasıl yapar**: Fonksiyon, React.FC arayüzünü uygulayarak JSX döndürür; içeriğinde dil seçeneklerini gösteren öğeler ve kullanıcı etkileşimini yöneten mantık bulunur (örneğin, bir buton veya açılır menü).  
 **Parametreler**:  
 - (parametre yok)  
-**Dönüş**: `React.FC` türünde bir bileşen döndürür; bu bileşen render edildiğinde dil seçiciyi içeren JSX elemanı üretir.
+**Dönüş**: React.FC türünde bir fonksiyon; bu fonksiyon render edildiğinde dil değiştirme kullanıcı arayüzünü gösterir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/LanguageSwitcher.tsx::LanguageSwitcher
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx::LanguageSwitcher
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lang` — current locale string ('tr' or 'en') obtained from the `useI18n` hook; determines which language button is active and is passed to the translation function.
-  - `setLang` — function returned by `useI18n` to update the locale; invoked when the TR or EN button is clicked.
-  - `t` — translation function from `useI18n`; used to retrieve localized strings for `aria-label` attributes and button labels.
-- **Dönüş**: JSX element (React.FC) rendering the language switcher UI with TR/EN buttons.
+  - `lang` — Mevcut aktif uygulama dili kodu, useI18n kancası aracılığıyla alındı
+  - `setLang` — Uygulamanın aktif dilini güncellemek için kullanılan fonksiyon, useI18n kancası tarafından sağlandı
+  - `t` — Yerelleştirilmiş metin dizelerini almak için kullanılan çeviri fonksiyonu, useI18n kancası tarafından sağlandı
+- **Dönüş**: React.FC
 
 ---
 
@@ -66,6 +75,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-white/90`, `border-light-gray`, `text-industrial-gray`, `text-sm`, `text-white`
+- **Renkler:** `bg-primary-navy`, `bg-white/90`, `border-light-gray`, `hover:bg-light-gray`, `text-industrial-gray`, `text-sm`, `text-white`
 - **Layout:** `backdrop-blur`, `bottom-4`, `fixed`, `flex`, `gap-1`, `items-center`, `p-1`, `right-4`, `shadow-sm`, `z-50`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${lang`, `:`, `===`, `border`, `en`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `outline-none`, `px-3`, `py-1`, `rounded-full`, `tr`

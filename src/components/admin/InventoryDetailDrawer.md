@@ -7,8 +7,8 @@ skeleton_hash: b4c161454e49e38a
 entity_hashes:
   func:InventoryDetailDrawer: 3a57400ca0f546b7
   overview: 92caa1481da5cee7
-  style_tokens: 05c1509659776517
-generated_at: 2026-05-27T11:45:04Z
+  style_tokens: 4b283d8541dc151c
+generated_at: 2026-05-27T18:10:44Z
 ---
 
 ## Genel Bakış
@@ -137,6 +137,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-lg`, `rounded-hvac-xl`, `shadow-glow-md`, `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500`, `bg-black/60`, `bg-cyan-400`, `bg-cyan-400/10`, `bg-white/2`, `bg-white/3`, `border-b`, `border-cyan-400/20`, `border-l`, `border-none`, `border-white/10`, `border-white/5`, `text-3xl`, `text-base`, `text-cyan-300`
+- **Renkler:** `bg-amber-500`, `bg-black/60`, `bg-cyan-400`, `bg-cyan-400/10`, `bg-white/2`, `bg-white/3`, `border-b`, `border-cyan-400/20`, `border-l`, `border-none`, `border-white/10`, `border-white/5`, `focus-visible:border-cyan-400/40`, `hover:bg-cyan-300`, `hover:border-amber-400/30`
 - **Layout:** `-right-8`, `-top-8`, `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `animate-in`, `animate-ping`, `animate-pulse`, `blur-3xl`, `border`, `cursor-default`, `disabled:opacity-50`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `font-mono`, `glass`

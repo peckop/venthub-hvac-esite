@@ -15,8 +15,8 @@ entity_hashes:
   func:renderSuggestion: 843bcfdde37f5fbe
   func:renderSuggestions: 8f7a31a904a04209
   overview: 1ded2cd49051df65
-  style_tokens: 63fb12683ce25606
-generated_at: 2026-05-27T12:27:00Z
+  style_tokens: dd6869457e23a7f7
+generated_at: 2026-05-27T18:09:20Z
 ---
 
 ## Genel Bakış  
@@ -295,12 +295,12 @@ graph TD
     SearchOverlay_tsx__renderResults["renderResults"]
     SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
     SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
 ```
 
@@ -334,5 +334,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-air-blue/10`, `bg-amber-50`, `bg-gray-100`, `bg-gray-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-900/40`, `bg-transparent`, `bg-white`, `border-amber-100`, `border-b`, `border-gray-100`, `border-gray-200`, `border-primary-ocean/30`, `border-slate-100`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-white`
-- **Responsive:** `sm:` prefix kullanımları
+- **Layout:** `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `h-10`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `focus:`, `group-hover:`, `hover:`, `placeholder:`, `sm:`, `xs:` önekleri
+- **Yardımcı Sınıflar:** `${isActive`, `:`, `animate-in`, `animate-spin`, `border`, `cursor-pointer`, `divide-gray-100`, `divide-y`, `duration-200`, `duration-300`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-bold`
