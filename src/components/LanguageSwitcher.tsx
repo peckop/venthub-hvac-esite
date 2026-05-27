@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import type { Route } from 'next'
 
 const LanguageSwitcher: React.FC = () => {
-  const { lang, t } = useI18n()
+  const { lang, setLang, t } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
 
@@ -20,6 +20,9 @@ const LanguageSwitcher: React.FC = () => {
     try {
       localStorage.setItem('lang', newLang)
     } catch {}
+
+    // İstemci tarafı state'ini anında güncelle (Buton ve client çevirileri için)
+    setLang(newLang)
 
     const segments = pathname.split('/').filter(Boolean)
     const firstSegment = segments[0]
