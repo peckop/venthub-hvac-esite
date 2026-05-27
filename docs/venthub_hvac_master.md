@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-26T19:23:29.021415+00:00
+compiled_at: 2026-05-27T04:54:43.891410+00:00
 total_compiled_files: 434
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-26T19:23:29.021415+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-27T04:54:43.891410+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -7808,16 +7808,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LazyInView.tsx
-skeleton_hash: ca0372509251befd
-generated_at: 2026-05-23T22:16:38Z
+skeleton_hash: 1f246a34a210785e
+generated_at: 2026-05-27T04:44:35Z
 ---
 
 ## Genel Bakış
-`LazyInView.tsx` modülü, bir öğenin görüntü alanına girmesini bekleyerek içeriğin gecikmeli olarak yüklenmesini sağlayan bir React bileşenidir. Görünür olana kadar belirtilen yer tutucu gösterilir ve öğe görünür hale geldiğinde `loader` prop’u ile verilen içerik dinamik olarak render edilir.
+`LazyInView.tsx` modülü, React uygulamalarında sayfa yüklenirken hemen ihtiyaç duyulmayan içerikleri erteleyerek performansı artıran bir gecikmeli yükleme (lazy loading) bileşeni sağlar. Bileşen, kendisi görüntü alanına (viewport) girene kadar bir yer tutucu (placeholder) gösterir; görünür hale geldiğinde ise tanımlanan yükleyici işlevi çağrılır ve dinamik içerik render edilir.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen Tanımı
-Bu grup, modülün tek dışa aktarılan işlevi olan `LazyInView` bileşenini içerir; props olarak gelen `loader` fonksiyonunu ve varsayılan yer tutucuyu yöneterek görünüme giren öğeler için lazy loading mantığını uygular.
+Modülün tek bir dışa aktarılmış React bileşenini içerir; bekleme ve yükleme durumlarını yöneterek öğelerin yalnızca gerekli olduğunda işlenmesini sağlar.
 - LazyInView
 
 ---
@@ -7832,15 +7832,20 @@ Bu modül için özel aksiyomlar tanımlanmıştır.
 
 ---
 
+---
+
 ## FONKSIYON DETAYLARI
 
 ### LazyInView
-**Ne yapar**: Belirtilen loader fonksiyonunu görüntüye girildiğinde çalıştırarak içerik yüklemesini erteler, placeholder gösterir.  
-**Nasıl yapar**: IntersectionObserver veya benzeri mekanizma kullanılarak öğenin viewport içinde olup olmadığı izlenir; görünür olduğunda loader çağrılır ve sonuç render edilir, aksi takdirde placeholder gösterilir.  
+**Ne yapar**: Verilen `loader` fonksiyonunu ve isteğe bağlı `placeholder` bileşenini alarak, içerik görünür olduğunda tembel (lazy) yükleme işlemini gerçekleştirir.  
+
+**Nasıl yapar**: `loader` prop’u bir asenkron yükleme işlemi tanımlar; bileşen ekrana geldiğinde bu fonksiyon tetiklenir. `placeholder` prop’u, içerik henüz yüklenmemişken gösterilecek JSX öğesini temsil eder.  
+
 **Parametreler**:
-- loader: type — içerik yüklemesini sağlayan fonksiyon veya dinamik import çağrısı (tipi kaynakta belirtilmemiş)  
-- placeholder: JSX.Element — görünür değilken gösterilecek yer tutucu elementi, varsayılan olarak `<div className="min-h-[160px]" aria-hidden="true">`  
-**Dönüş**: void veya bilinmiyor — fonksiyonun dönüş tipi kaynakta net olarak belirtilmemiş
+- `loader`: `() => Promise<T>` — İçeriği dinamik olarak getiren asenkron fonksiyon.
+- `placeholder`: `React.ReactNode` — İçerik yüklenene kadar gösterilecek yedek UI öğesi. Varsayılan değer `<div className="min-h-160px" aria-hidden="true" />` dir.  
+
+**Dönüş**: `void` (bileşen render edildiğinde yan etki oluşturur, doğrudan bir değer döndürmez).
 
 ---
 
@@ -7858,55 +7863,21 @@ Bu modül için özel aksiyomlar tanımlanmıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/LazyInView.tsx::LazyInView
-- **params**: loader, placeholder, rootMargin, once, className, componentProps
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LazyInView.tsx::LazyInView
+- **params**: `loader`, `placeholder = <div className="min-h-160px" aria-hidden="true" />`, `rootMargin = '200px 0px'`, `once = true`, `className`, `componentProps`
 - **ic_degiskenler**:
-  - `ref` — reference to the DOM element used for IntersectionObserver
-  - `shouldLoad` — boolean flag indicating whether the lazy load has been triggered
-  - `setShouldLoad` — setter function for the `shouldLoad` state
-  - `Loaded` — the loaded component type or `null` before loading
-  - `setLoaded` — setter function for the `Loaded` state
-- **Dönüş**: JSX.Element
-
-### [N2_NASIL] AST Pointer: src/components/LazyInView.tsx::useEffect_pointerListener
-- **params**: yok
-- **ic_degiskenler**:
-  - `enable` — function that sets `shouldLoad` to true when called
-- **Dönüş**: cleanup function (void)
-
-### [N3_NASIL] AST Pointer: src/components/LazyInView.tsx::cleanup_pointerListener
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N4_NASIL] AST Pointer: src/components/LazyInView.tsx::useEffect_intersectionObserver
-- **params**: yok
-- **ic_degiskenler**:
-  - `el` — current DOM element referenced by `ref`
-  - `io` — IntersectionObserver instance observing the element
-- **Dönüş**: cleanup function (void)
-
-### [N5_NASIL] AST Pointer: src/components/LazyInView.tsx::intersectionObserverCallback
-- **params**: entries
-- **ic_degiskenler**:
-  - `entry` — first IntersectionObserverEntry from the entries list
-- **Dönüş**: yok
-
-### [N6_NASIL] AST Pointer: src/components/LazyInView.tsx::useEffect_loadModule
-- **params**: yok
-- **ic_degiskenler**:
-  - `cancelled` — flag to prevent state updates after the component unmounts
-- **Dönüş**: cleanup function (void)
-
-### [N7_NASIL] AST Pointer: src/components/LazyInView.tsx::loadModule_then
-- **params**: mod
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: src/components/LazyInView.tsx::loadModule_catch
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
+  - `ref` — `React.useRef<HTMLDivElement | null>(null)`: DOM elemanına referans tutar, IntersectionObserver ve event listener'ların hedefi.
+  - `shouldLoad` — `React.useState(false)`'in değer kısmı: Bileşenin içeriğinin yüklenip yüklenmeyeceğini belirten boolean flag.
+  - `setShouldLoad` — `React.useState(false)`'in set fonksiyonu: `shouldLoad` değerini `true` yapmak için kullanılır.
+  - `Loaded` — `React.useState<React.ComponentType<T> | null>(null)`'in değer kısmı: Yüklenen modülün default export'ı (component) burada saklanır.
+  - `setLoaded` — `React.useState<React.ComponentType<T> | null>(null)`'in set fonksiyonu: `Loaded` değerini günceller.
+  - `enable` — `() => setShouldLoad(true)`: `pointerdown` ve `touchstart` event'leri tetiklendiğinde `shouldLoad`'u `true` yapar.
+  - `el` — `ref.current`: Observer'ın gözlemleyeceği DOM elemanı.
+  - `io` — `new IntersectionObserver(...)`: Görünürlük değişikliklerini izleyen observer nesnesi.
+  - `entry` — `entries[0]`: Observer callback'inde gelen ilk `IntersectionObserverEntry`, elemanın görünür olup olmadığını kontrol eder.
+  - `cancelled` — `false` başlangıç değeri: Asenkron `loader` çağrısının iptal edilip edilmediğini izler.
+  - `mod` — `loader()` promise'inin çözüldüğü değer: Modülün default export'ı (`mod.default`) `Loaded` state'ine atanır.
+- **Dönüş**: JSX `<div ref={ref} className={className}>…</div>` döndürür; fonksiyonun yan etkileri arasında event listener ekleme/kaldırma, IntersectionObserver yönetimi ve dinamik modül yüklemesi bulunur.
 
 ---
 
@@ -7925,20 +7896,15 @@ Bu modül için özel aksiyomlar tanımlanmıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `min-h-[160px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
-- **Layout:** (yok)
+- **Layout:** `min-h-160px`
 - **Responsive:** (yok)
-
 
 ---
 # FILE: src\components\LeadModal.md
@@ -12992,23 +12958,67 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx
-skeleton_hash: 9307ed16600356f2
-generated_at: 2026-05-23T21:53:07Z
+skeleton_hash: b3421236e71cdedd
+generated_at: 2026-05-27T04:46:09Z
 ---
 
-## Genel Bakış
-`InventoryCsvImport` bileşeni, yöneticilerin envanter verilerini CSV dosyası aracılığıyla sisteme aktarmasını sağlayan bir diyalog penceresidir. Açılır/kapanır durum yönetimi, dosya okuma, veri doğrulama ve başarılı aktarım sonrası geri bildirim gibi sorumlulukları tek bir bileşende toplar.
+## Genel Bakış  
+`InventoryCsvImport` bileşeni, yöneticilerin envanter verilerini CSV dosyası üzerinden sisteme aktarmasını sağlayan bir modal penceresidir. Kullanıcı dosya seçtiğinde dosya içeriği okunur, satırlar ayrıştırılır ve iş kurallarına göre doğrulanır; ardından bir ön izleme tablosu gösterilir ve onaylandığında veri aktarımı tamamlanıp geri bildirim verilir.
+
+## Fonksiyon Grupları  
+
+### UI & Dialog Yönetimi  
+Bu grup, modalın açılıp kapanması, kullanıcı etkileşimlerinin yakalanması ve bileşenin temel render mantığını içerir.  
+- `InventoryCsvImport`, `closeDialog`, `confirmImport`
+
+### CSV Okuma & Ayrıştırma  
+Dosya içeriğinin ham metinden satır‑satır bölünmesi, her satırın hücrelerine ayrılması ve temel veri tipine dönüştürülmesi bu fonksiyonlar tarafından yapılır.  
+- `handleCsvImport`, `split`, `parseCsvLines`
+
+### Doğrulama & İş Kuralları  
+Ayrıştırılan satırlar, SKU varlığı, miktar formatı ve iş eşiği gibi kurallara göre kontrol edilir; hatalı satırlar toplanır.  
+- `validateRows`, `collectErrors`, `getEffectiveThreshold`
+
+### Ön İzleme & Geri Bildirim  
+Doğrulama sonrası oluşturulan satırlar üzerinden delta (değişim) hesaplanır, ön izleme tablosu hazırlanır ve kullanıcıya hatalar ya da başarı mesajı gösterilir.  
+- `buildPreviewRows`, `computeDelta`, `showPreview`, `showSuccessMessage`, `showErrorList`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
----
+**Aksiyom 1**: Eğer `isOpen` prop’u sağlanmazsa, bileşen hiçbir zaman görüntülenmez ve kullanıcı CSV içe aktarma işlemini başlatamaz.  
+**Aksiyom 2**: Eğer `onClose` prop’u sağlanmazsa, kullanıcı diyalog penceresini kapattığında hiçbir geri çağırma (callback) çalışmaz; bu da üst katmanın (parent component) kapanma durumunu yönetememesine yol açar.  
+**Aksiyom 3**: Eğer `onSuccess` prop’u sağlanmazsa, CSV başarılı bir şekilde içe aktarıldıktan sonra üst katmana bildirim gönderilemez; bu da UI’da “başarılı” mesajı gösterilmemesine ve olası sonraki adımların (ör. liste yenileme) otomatik olarak tetiklenmemesine neden olur.  
+**Aksiyom 4**: Eğer `effectiveThreshold` fonksiyonu tanımlı değilse veya `null` döndürürse, ürün başına eşik değeri hesaplanamaz; bu durumda “critical”/“out” durumları belirlenemez ve satır‑satır doğrulama mantığı eksik kalır.  
+**Aksiyom 5**: Eğer `effectiveThreshold` fonksiyonu bir sayı döndürürse, bu sayı ürünün kritik eşik değeri olarak kabul edilir; eşik değerin altında kalan `new` değerleri “critical” olarak işaretlenir.  
+**Aksiyom 6**: Eğer `effectiveThreshold` fonksiyonu `null` döndürürse, o ürün için eşik kontrolü atlanır ve `status` alanı `null` kalır.  
+
+*Domain‑specific kural*: `effectiveThreshold` fonksiyonunun döndürdüğü sayı, “critical” durumunu belirlemek için kullanılan eşik değeridir; bu eşik değerin kesin bir sınırı (ör. 0‑100) belgelenmemiştir, bu yüzden değer aralığı **bilinmiyor**.
 
 ---
 
+## FONKSIYON DETAYLARI
 
+### InventoryCsvImport
+**Ne yapar**: CSV dosyasından stok verilerini okuyarak ürünlerin mevcut stok miktarlarını günceller veya bir önizleme sunar. Kullanıcıya kuru çalıştırma (simülasyon) seçeneği ve işlem sonrası hataları indirme imkanı verir. İşlem tamamlandığında başarı mesajı ve ilgili hareketlerin listesine yönlendirme sağlar.  
+
+**Nasıl yapar**: 
+- Açık olduğunda (`isOpen`) bileşen, dosya seçimi ve sürükle‑bırak aracılığıyla bir CSV dosyası alır.  
+- `handleCsvImport` fonksiyonu dosyayı metin olarak okur, başlık satırını analiz eder ve `sku` ile `qty`/`quantity`/`stock`/`new_stock` sütunlarını bulur.  
+- Satırları ayrıştırıp geçerli SKU ve miktarları doğrular, hatalı satırları toplar ve veritabanındaki eşleşen ürünlerle birleştirerek bir önizleme (`csvPreview`) oluşturur.  
+- `processCSV` fonksiyonu, önizleme verisini toplu (batch) olarak `adjust_stock` RPC çağrısı ile günceller; `dryRun` aktifse sadece simülasyon yapılır.  
+- İşlem sırasında ilerleme yüzdesi (`csvProgress`) ve işlem durumu (`csvProcessing`) güncellenir, hatalar toplanır ve kullanıcıya indirme butonu ile CSV hata raporu sunulur.  
+- Başarıda `onSuccess` ve `onClose` callback’leri tetiklenir, ayrıca geri alma (undo) işlemi için `reverse_inventory_batch` RPC çağrısı sağlanır.  
+
+**Parametreler**:
+- `isOpen`: boolean — Bileşenin görünür olup olmadığını belirler; `false` ise bileşen render edilmez.  
+- `onClose`: () => void — Kullanıcı kapanış butonuna bastığında veya işlem tamamlandığında çağrılan fonksiyon.  
+- `onSuccess`: () => void — CSV işleme başarılı bir şekilde tamamlandığında tetiklenen geri bildirim fonksiyonu.  
+- `effectiveThreshold`: (productId: string) => number \| null — Bir ürünün kritik stok eşiğini döndüren, ürün ID’sine göre çalışan fonksiyon.  
+
+**Dönüş**: React bileşeni JSX döndürür; fonksiyonun kendisi bir UI komponenti olduğundan tipik olarak `JSX.Element` (veya `null` if `!isOpen`).
 
 ---
 
@@ -13032,155 +13042,102 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx::handleCsvImport
-- **params**: `file` (File) — user-selected CSV file to parse
+### [N1_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleCsvImport
+- **params**: (file: File)
 - **ic_degiskenler**:
-  - `textRaw` — ham dosya içeriği (`file.text()`)
-  - `text` — BOM silinmiş dosya içeriği
-  - `lines` — satırlara bölünmüş, boş satırlardan arındırılmış dizi
-  - `split` — CSV satırını düzgün şekilde ayıran fonksiyon (tırnak içi virgülleri korur)
-  - `headerRaw` — başlık satırındaki sütun adları (küçük harf, trimlenmiş)
-  - `skuIdx` — 'sku' sütununun index numarası
-  - `qtyIdx` — miktar sütununun index numarası (sırayla qty/quantity/stock/new_stock arar)
-  - `parsedRows` — çözümlenmiş geçerli satırlar ({ line, sku, newQty })
-  - `errors` — hatalı satırlar listesi ({ line, sku, message })
-  - `i` — for döngüsü sayacı
-  - `cells` — split ile ayrılmış bir satırın hücreleri
-  - `sku` — bir satırdaki SKU değeri (trimlenmiş)
-  - `qtyStr` — bir satırdaki miktar string değeri (trimlenmiş)
-  - `newQty` — bir satırdaki sayısal miktar (NaN veya positive integer)
-  - `skus` — tüm parsedRows'daki unique SKU'lar (Set → Array)
-  - `products` — supabase'den gelen eşleşen ürün listesi (id, sku, name, stock_qty)
-  - `skuToProduct` — SKU → { id, name, stock } haritası
-  - `preview` — önizleme satırları dizisi (CsvPreviewRow tipinde)
-  - `row` — parsedRows üzerinde dönen her bir satır
-  - `product` — skuToProduct'ten eşleşen ürün bilgisi
-  - `th` — `effectiveThreshold(product.id)` ile alınan eşik değeri
-  - `status` — yeni miktara göre hesaplanan stok durumu ('out' | 'critical' | null)
-  - `setCsvPreview` — state güncelleme fonksiyonu (CSV önizlemesini ayarlar)
-  - `toast.error` — hata mesajı gösterimi
-  - `supabase` — Supabase istemcisi (database sorgusu için)
-  - `effectiveThreshold` — ürüne özel eşik değeri döndüren prop fonksiyonu
-  - `console.error` — hata loglama (catch bloğunda)
-- **Dönüş**: yok (void; yan etki: setCsvPreview çağrılır, toaster mesajları gösterilir)
+  - `file` — the uploaded CSV file object
+  - `textRaw` — raw text content of the file
+  - `text` — UTF‑8 BOM‑stripped text
+  - `lines` — array of non‑empty lines from the CSV
+  - `split` — helper function that splits a CSV line into cells
+  - `headerRaw` — array of header names lower‑cased and trimmed
+  - `skuIdx` — index of the `sku` column in the header
+  - `qtyIdx` — index of the quantity column (`qty`, `quantity`, `stock`, or `new_stock`)
+  - `parsedRows` — array of objects `{ line, sku, newQty }` for valid rows
+  - `errors` — array of objects `{ line, sku, message }` for rows that failed validation
+  - `skus` — set of unique SKUs extracted from parsed rows
+  - `products` — array of product records fetched from Supabase
+  - `skuToProduct` — Map from SKU to `{ id, name, stock }`
+  - `preview` — array of `CsvPreviewRow` objects built from parsed rows and product data
+- **Dönüş**: yok (side effects: updates state and shows toast messages)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx::processCsv
-- **params**: yok (closure üzerinden state/proplara erişir)
+### [N2_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::processCsv
+- **params**: ()
 - **ic_degiskenler**:
-  - `skus` — csvPreview'deki tüm SKU'lar (dizi)
-  - `products` — supabase'den SKU’larla eşleşen ürün listesi (id, sku)
-  - `skuToId` — SKU → product ID haritası
-  - `dryRun` — kuru çalıştırma modu bayrağı (state/ref'ten kapatma)
-  - `successCount` — başarıyla güncellenen ürün sayısı
-  - `errors` — işlem sırasında oluşan hatalar ({ sku, message })
-  - `batchId` — generateId() ile oluşturulmuş işlem batch ID'si
-  - `BATCH_SIZE` — her toplu işlemdeki maksimum ürün sayısı (20)
-  - `i` — for döngüsü sayacı
-  - `chunk` — csvPreview'in dilimlenmiş parçası (BATCH_SIZE kadar)
-  - `_productId` — her bir item için product ID (skuToId üzerinden)
-  - `reason` — stok hareket açıklaması
-  - `error` — supabase.rpc'den dönen hata nesnesi
-  - `logAdminAction` — dinamik import edilen audit fonksiyonu
-  - `header` — hata CSV'si için başlık satırı (['sku','message'])
-  - `lines` — hata CSV'si için satır dizisi
-  - `csv` — oluşturulan CSV içeriği (BOM ile başlar)
-  - `blob` — CSV içeriğini saran Blob nesnesi
-  - `url` — Blob için oluşturulan geçici URL
-  - `a` — download linki olarak kullanılan geçici DOM elemanı
-  - `setCsvProcessing` — state güncelleme (işlem durumu)
-  - `setCsvProgress` — state güncelleme (ilerleme yüzdesi)
-  - `supabase` — Supabase istemcisi
-  - `toast` — bildirim gösterimi (react-hot-toast)
-  - `generateId` — unique ID oluşturma fonksiyonu
-  - `onClose` — modal kapatma prop fonksiyonu
-  - `onSuccess` — başarı callback prop fonksiyonu
-  - `csvUndoingRef` — geri alma işleminin devam edip etmediğini tutan ref
-  - `console.error` — hata loglama
-  - `downloadErrors` — aynı fonksiyon içinde tanımlı, hata CSV'sini indiren iç fonksiyon
-- **Dönüş**: yok (void; yan etki: stok güncellemeleri, toaster bildirimleri, onClose/onSuccess çağrıları)
+  - `csvPreview` — current preview data from state
+  - `setCsvProcessing` — state setter for processing flag
+  - `setCsvProgress` — state setter for progress indicator
+  - `skus` — array of SKUs extracted from preview
+  - `products` — array of product records fetched from Supabase
+  - `skuToId` — Map from SKU to product ID
+  - `dryRun` — boolean flag indicating whether to perform a dry run
+  - `batchId` — unique identifier for the current import batch
+  - `successCount` — counter of successfully updated products
+  - `errors` — array of `{ sku, message }` for failures
+  - `chunk` — slice of preview rows processed in a batch
+  - `item` — individual preview row being processed
+  - `_productId` — product ID corresponding to the current SKU
+  - `reason` — string describing the stock adjustment reason
+  - `logAdminAction` — imported audit logging function
+  - `downloadErrors` — function that creates and downloads a CSV of errors
+  - `toast` — toast notification library
+  - `onClose` — callback to close the modal
+  - `onSuccess` — callback to signal successful completion
+  - `csvUndoingRef` — ref tracking whether an undo operation is in progress
+- **Dönüş**: yok (side effects: updates state, shows toast, triggers callbacks)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx::processItem
-- **params**: `item` (object with `sku`, `delta` properties) — işlenecek CSVP PREVIEW satırı
+### [N3_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::updateItemStock
+- **params**: (item)
 - **ic_degiskenler**:
-  - `_productId` — SKU'ya karşılık gelen ürün ID (skuToId Map'inden)
-  - `reason` — stok değişimi açıklaması (CSV import: add/remove X)
-  - `error` — supabase.rpc'den dönen hata
-  - `logAdminAction` — audit log fonksiyonu (dinamik import)
-  - `skuToId` — üstten kapatma (SKU → ID haritası)
-  - `supabase` — Supabase istemcisi
-  - `batchId` — üstten kapatma (işlem batch ID)
-  - `successCount` — üstten kapatma (başarılı sayacı, incremente edilir)
-  - `errors` — üstten kapatma (hata listesi, push eklenir)
-  - `console.error` — hata loglama
-- **Dönüş**: yok (void; yan etki: stok güncellemesi yapar, audit log kaydeder, successCount/errors güncellenir)
+  - `item` — preview row being processed
+  - `_productId` — product ID retrieved from `skuToId`
+  - `reason` — reason string for the stock adjustment
+  - `logAdminAction` — imported audit logging function
+  - `successCount` — incremented on successful adjustment
+  - `errors` — appended with error details on failure
+- **Dönüş**: yok (side effects: RPC call, audit log, state updates)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx::downloadErrors
-- **params**: yok (errors dizisini closure üzerinden kullanır)
+### [N4_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::downloadErrors
+- **params**: ()
 - **ic_degiskenler**:
-  - `errors` — hata listesi (her eleman { sku, message })
-  - `header` — CSV başlığı (['sku','message'])
-  - `lines` — her hatadan oluşturulmuş CSV satırları (tırnak içinde kaçışlı)
-  - `csv` — tam CSV içeriği (BOM ile başlar)
-  - `blob` — oluşturulan CSV Blob'u
-  - `url` — geçici Blob URL'si
-  - `a` — indirme bağlantısı DOM elemanı
-  - `document` — tarayıcı DOM API'si (createElement, click)
-  - `URL` — geçici URL yönetimi (createObjectURL, revokeObjectURL)
-- **Dönüş**: yok (void; yan etki: hata CSV'sini tarayıcıya indirtir)
+  - `errors` — array of error objects from the import process
+  - `header` — CSV header array `['sku', 'message']`
+  - `lines` — array of CSV lines constructed from error objects
+  - `csv` — BOM‑prefixed CSV string
+  - `blob` — Blob object created from the CSV string
+  - `url` — object URL for the Blob
+  - `a` — temporary anchor element used to trigger download
+- **Dönüş**: yok (side effect: triggers file download)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx::renderToastContent
-- **params**: `t` (toast object) — react-hot-toast'un sağladığı toast tanıtıcısı
+### [N5_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::undoBatch
+- **params**: ()
 - **ic_degiskenler**:
-  - `successCount` — başarılı güncelleme sayısı
-  - `batchId` — işlem batch ID'si
-  - `errors` — hata listesi
-  - `t.id` — toast tanıtıcısının ID'si (bildirimi kapatmak için)
-  - `csvUndoingRef` — geri alma işleminin durumunu tutan ref
-  - `supabase` — Supabase istemcisi
-  - `toast.dismiss` — toast bildirimini kapatma fonksiyonu
-  - `toast.success` — başarılı bildirim gösterme fonksiyonu
-  - `toast.error` — hata bildirimi gösterme fonksiyonu
-  - `onSuccess` — başarı callback prop fonksiyonu
-  - `downloadErrors` — hata CSV'sini indirme fonksiyonu (closure’dan)
-  - `console.error` — hata loglama
-  - `CheckCircle2` — lucide-react simgesi
-  - `React.createElement` — JSX render için
-- **Dönüş**: JSX elemanı (div) — toast içeriği olarak gösterilir
+  - `csvUndoingRef` — ref indicating if an undo is already running
+  - `batchId` — identifier of the batch to reverse
+  - `undone` — number of movements reversed returned from RPC
+- **Dönüş**: yok (side effects: RPC call, toast notifications, callback)
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx::undoHandler
-- **params**: yok (closure üzerinden batchId, csvUndoingRef, supabase, toast, onSuccess alır)
+### [N6_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleFileChange
+- **params**: (e)
 - **ic_degiskenler**:
-  - `csvUndoingRef` — geri alma işleminin devam edip etmediğini tutan ref (okunur ve yazılır)
-  - `batchId` — geri alınacak batch'in ID'si
-  - `data` — reverse_inventory_batch RPC'sinden dönen geri alınan hareket sayısı
-  - `error` — RPC çağrısından dönen hata
-  - `undone` — sayıya dönüştürülmüş geri alınan hareket sayısı
-  - `supabase` — Supabase istemcisi
-  - `toast.success` — başarılı bildirim
-  - `toast.error` — hata bildirimi
-  - `toast.dismiss` — toast kapatma
-  - `onSuccess` — başarı callback prop
-  - `console.error` — hata loglama
-- **Dönüş**: yok (void; yan etki: inventory_movements batch'ini tersine çevirir, toaster bildirimleri gösterir, onSuccess çağrılır)
+  - `e` — change event from the file input
+  - `file` — first selected file from `e.target.files`
+- **Dönüş**: yok (side effect: calls `handleCsvImport`)
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx::handleFileChange
-- **params**: `e` (React.ChangeEvent<HTMLInputElement>) — file input değişim olayı
+### [N7_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::toggleDryRun
+- **params**: (e)
 - **ic_degiskenler**:
-  - `file` — `e.target.files[0]` (seçilen dosya)
-  - `handleCsvImport` — dosya işleme fonksiyonu (closure üzerinden)
-- **Dönüş**: yok (void; yan etki: dosya seçildiğinde handleCsvImport'u çağırır)
+  - `e` — keyboard event from the dry‑run toggle
+- **Dönüş**: yok (side effect: toggles `dryRun` state)
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx::handleDryRunToggleKey
-- **params**: `e` (React.KeyboardEvent) — klavye olayı
+### [N8_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::renderRow
+- **params**: (item, idx)
 - **ic_degiskenler**:
-  - `dryRun` — mevcut dryRun durumu (state'ten kapatma)
-  - `setDryRun` — dryRun state güncelleme fonksiyonu
-- **Dönüş**: yok (void; yan etki: tuşa basıldığında dryRun durumunu tersine çevirir)
+  - `item` — preview row data
+  - `idx` — index of the row in the preview array
+- **Dönüş**: JSX element representing a table row
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx::renderCsvRow
-- **params**: `item` (CsvPreviewRow) — satır verisi (`sku`, `name`, `current`, `new`, `delta`, `status` alanları); `idx` (number) — satır index'i
-- **ic_degiskenler**: (yok; doğrudan param alanlarına erişilir)
-- **Dönüş**: JSX elemanı (tr) — önizleme tablosunun bir satırını render eder
+---
 
 ---
 
@@ -13199,20 +13156,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_0_10px_rgba(245,158,11,0.3)]`, `shadow-[0_0_20px_rgba(34,211,238,0.3)]`, `shadow-[0_40px_100px_rgba(0,0,0,0.6)]`
-- **height:** `max-h-[300px]`, `max-h-[85vh]`
-- **width:** `max-w-[200px]`
-- **spacing:** (yok)
-- **diğer:** `border-t-[#0A0F1E]`, `tracking-[0.2em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `rounded-hvac-lg`, `rounded-hvac-xl`
+- `rounded-hvac-2xl`, `rounded-hvac-lg`, `rounded-hvac-xl`, `shadow-glow-md`, `shadow-glow-sm`, `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-400`, `bg-black/60`, `bg-cyan-400`, `bg-rose-500/20`, `bg-surface-deep/20`, `bg-surface-midnight`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/5`, `bg-white/[0.02]`, `border-2`, `border-b`, `border-dashed`, `border-none`
+- **Renkler:** `bg-amber-400`, `bg-black/60`, `bg-cyan-400`, `bg-rose-500/20`, `bg-surface-deep/20`, `bg-surface-midnight`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/2`, `bg-white/5`, `border-2`, `border-b`, `border-dashed`, `border-none`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `group-hover:bg-cyan-400`, `group-hover:scale-110`, `group-hover:text-slate-300`, `group-hover:text-surface-deep`
 - **Responsive:** (yok)
-
 
 ---
 # FILE: src\components\admin\InventoryDetailDrawer.md
@@ -32516,18 +32468,45 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\design-system\tokens.js
-skeleton_hash: bc38de88ce673b9c
-generated_at: 2026-05-26T11:43:03Z
+skeleton_hash: 49c7465326318d5b
+generated_at: 2026-05-27T04:43:17Z
 ---
 
-## Genel Bakış
+## Genel Bakış  
+Bu dosya, **tasarım sisteminin temel yapı taşlarını** (design tokens) tanımlayan tamamen statik bir yapılandırma dosyasıdır. İçerisinde fonksiyon, sınıf veya yan etkili kod bulunmaz; yalnızca `zIndex`, `maxWidth`, `borderRadius`, `fontSize` ve `boxShadow` gibi görsel tutarlılık için gerekli sabit nesneler tanımlanır ve dışa aktarılır. Böylece proje genelinde tek bir doğruluk kaynağı (single source of truth) sağlanır.
 
-Bu modül, Venture Home HVAC projesinin **tasarım sisteminin temel yapı taşlarını (design tokens)** tanımlayan tamamen statik ve bildirime dayalı (declarative) bir yapılandırma dosyasıdır. Herhangi bir fonksiyon tanımı, iş mantığı, ortam değişkeni kullanımı veya harici API/veritabanı sorgusu içermez. Dosyanın tek sorumluluğu, kullanıcı arayüzünün görsel tutarlılığını sağlamak için gerekli olan en düşük seviyeli tasarım kararlarını — `zIndex` (katman sıralaması), `maxWidth` (maksimum genişlik sınırları), `borderRadius` (köşe yuvarlaklık değerleri), `fontSize` (yazı tipi boyut skalası) ve `boxShadow` (gölge/yükseklik efektleri) — merkezi bir yerde sabit değerler olarak tutmak ve dışa aktarmaktır. Bu yapısıyla, projedeki diğer tüm UI bileşenleri için **tek bir doğruluk kaynağı (single source of truth)** görevi görür.
+## Fonksiyon Grupları  
+### Sabit Tanımlar  
+Bu grup, UI bileşenlerinin tutarlı bir şekilde stil almasını sağlayan temel tasarım tokenlarını içerir.  
+- `zIndex`  
+- `maxWidth`  
+- `borderRadius`  
+- `fontSize`  
+- `boxShadow`  
+
+Bu sabitler, uygulamanın farklı bölümlerinde aynı görsel değerlerin tekrar kullanılmasını ve sürdürülmesini kolaylaştırır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, tasarım sisteminin statik token değerlerini dışa aktaran bir JavaScript nesnesi olarak tanımlanmıştır; bu nedenle aşağıdaki sabitlerin tanımlı ve doğru yapılandırılmış olması gerekir.
+
+**Aksiyom 1**: Eğer `zIndex` nesnesi tanımlı değilse, katman sıralaması belirlenemez ve UI bileşenlerinin üst‑alt ilişkileri hatalı olur.  
+**Aksiyom 2**: Eğer `maxWidth` nesnesi tanımlı değilse, genişlik sınırlamaları uygulanamaz ve responsive tasarım bozulur.  
+**Aksiyom 3**: Eğer `borderRadius` nesnesi tanımlı değilse, köşe yuvarlatma stilleri tutarsız olur ve tasarım bütünlüğü kaybolur.  
+**Aksiyom 4**: Eğer `fontSize` nesnesi tanımlı değilse, tipografi ölçeklendirmesi yapılamaz; metinler beklenen boyutta render edilmez.  
+**Aksıyon 5**: Eğer `boxShadow` nesnesi tanımlı değilse, gölge efektleri uygulanamaz ve UI derinlik algısı eksik olur.  
+**Aksiyom 6**: Eğer `height` nesnesi tanımlı değilse, sabit yükseklik değerleri kullanılamaz; bileşenlerin dikey boyutlandırması belirsiz olur.  
+**Aksiyom 7**: Eğer `minHeight` nesnesi tanımlı değilse, minimum yükseklik kısıtlamaları uygulanamaz; içerik taşması riski artar.  
+**Aksiyom 8**: Eğer `maxHeight` nesnesi tanımlı değilse, maksimum yükseklik sınırları yok olur; layout overflow hataları ortaya çıkabilir.  
+**Aksiyom 9**: Eğer `width` nesnesi tanımlı değilse, sabit genişlik değerleri kullanılamaz; bileşenlerin yatay boyutu belirsiz kalır.  
+**Aksiyom 10**: Eğer `minWidth` nesnesi tanımlı değilse, minimum genişlik kısıtlamaları eksik olur; UI elemanları çok dar görünebilir.  
+**Aksiyom 11**: Eğer `transitionDuration` nesnesi tanımlı değilse, geçiş süreleri belirlenemez; animasyonların tutarlılığı bozulur.  
+**Aksiyom 12**: Eğer `transitionTimingFunction` nesnesi tanımlı değilse, geçiş zamanlama fonksiyonları eksik olur; animasyonların hissiyatı tutarsızlaşır.  
+**Aksiyom 13**: Eğer `blur` nesnesi tanımlı değilse, bulanıklaştırma efektleri uygulanamaz; görsel hiyerarşi kaybolur.  
+**Aksiyom 14**: Eğer `transitionProperty` nesnesi tanımlı değilse, hangi CSS özelliklerinin geçişe dahil edileceği belirlenemez; istenmeyen stil değişiklikleri aniden gerçekleşir.  
+
+*Domain‑specific kural*: Bu sabitlerin her biri, tasarım sisteminin **declarative** doğasına uygun olarak, sabit (immutable) değerler içermelidir; değerlerin runtime’da değiştirilmesi tasarım tutarlılığını bozar. (Değerlerin kendisi hakkında bilgi eksik olduğundan “bilinmiyor” olarak işaretlenmiştir.)
 
 ---
 
@@ -32551,9 +32530,45 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   'hva...`
 - **fontSize** (object) — `{
   'display': ['var(--font-size-display)', { lineHeight: '1.1' }],
-}`
+  '7px': ...`
 - **boxShadow** (object) — `{
-  'hvac': '0 4px 6px -1px rgba(30, 64, 175, 0.1), 0 2px 4px -1px rgba(30, 6...`
+  // Mevcut korunanlar
+  'hvac':                  '0 4px 6px -1px rgba(30,6...`
+- **height** (object) — `{
+  'hvac-input':   '40px',   // 5×8
+  'hvac-thumb':   '72px',   // 9×8
+  'hv...`
+- **minHeight** (object) — `{
+  'hvac-input':   '40px',
+  'hvac-card':    '160px',  // 20×8
+  'hvac-panel...`
+- **maxHeight** (object) — `{
+  'hvac-menu':    '300px',
+  'hvac-panel':   '480px',  // 60×8
+  'hvac-moda...`
+- **width** (object) — `{
+  'hvac-menu':    '360px',  // 45×8 (toast, küçük panel)
+  'hvac-modal':   ...`
+- **minWidth** (object) — `{
+  'hvac-btn':     '120px',  // 15×8
+  'hvac-menu':    '140px',
+  'hvac-sele...`
+- **transitionDuration** (object) — `{
+  'hvac-fast':   '150ms',
+  'hvac-normal': '250ms',
+  'hvac-slow':   '600ms...`
+- **transitionTimingFunction** (object) — `{
+  'hvac-ease':   'cubic-bezier(0.16, 1, 0.3, 1)',
+  'hvac-spring': 'cubic-b...`
+- **blur** (object) — `{
+  '80':  '80px',
+  '100': '100px',
+  '120': '120px',
+  '150': '150px',
+  '2...`
+- **transitionProperty** (object) — `{
+  'opacity-transform':           'opacity, transform',
+  'opacity-only':   ...`
 
 ---
 
@@ -32568,10 +32583,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: blur
   export: borderRadius
   export: boxShadow
   export: fontSize
+  export: height
+  export: maxHeight
   export: maxWidth
+  export: minHeight
+  export: minWidth
+  export: transitionDuration
+  export: transitionProperty
+  export: transitionTimingFunction
+  export: width
   export: zIndex
 
 ---
