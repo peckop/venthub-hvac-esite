@@ -8,7 +8,7 @@ entity_hashes:
   func:HubPage: ae5a0ef5e997bc98
   overview: 92f1bd1bc9a0b472
   style_tokens: c268b09644e71fe8
-generated_at: 2026-05-27T12:16:48Z
+generated_at: 2026-05-27T12:24:28Z
 ---
 
 ## Genel Bakış

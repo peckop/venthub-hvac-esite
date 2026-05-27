@@ -8,7 +8,7 @@ entity_hashes:
   func:ProductsGrid: 3dd0bc95cb82a18e
   overview: b0875b8b603aa680
   style_tokens: 85ab299eedf71c41
-generated_at: 2026-05-27T12:19:14Z
+generated_at: 2026-05-27T12:25:30Z
 ---
 
 ## Genel Bakış
@@ -60,19 +60,13 @@ Domain-specific kurallar: bilinmiyor (verilen imza ve modül bilgileri dışınd
 
 ---
 
-We need to produce AST POINTERS section for the given source file. The file is a React component file: ProductsGrid.tsx. The function signature given: ProductsGrid({ products, viewMode, loading, onViewModeChange, onSortChange, sortBy = 'name' }) -> React.FC<ProductsGridProps>. Actually it's an arrow function component.
+## AST POINTERS
 
-We need to list each function. There are two functions: the main component function (arrow function) and the inner map callback: product => ( ... ). The map callback is inside JSX but it's a function.
-
-We need to produce for each function: a heading like ### [N1_NASIL] AST Pointer: {rel_path}::fonksiyon_adı
-
-We need to compute relative path? The source_path given: C:\Users\alize\venthub-hvac\src\components\products\ProductsGrid.tsx. Probably relative path from project root? Not given. We'll just use the file name? Usually they'd want something like src/components/products/ProductsGrid.tsx. We'll assume that's the relative path.
-
-Thus for main function: ### [N1_NASIL] AST Pointer: src/components/products/ProductsGrid.tsx::ProductsGrid
-
-For inner map callback: maybe name it as map callback? Could be something like ProductsGrid::mapCallback or just the arrow function. We'll name it as ProductsGrid::mapProduct (or just the inline function). We'll need to decide.
-
-We need to list params, ic_degiskenler (variables
+### [N1_NASIL] AST Pointer: src/components/products/ProductsGrid.tsx::ProductsGrid
+- **params**: `products`, `viewMode`, `loading`, `onViewModeChange`, `onSortChange`, `sortBy` (varsayılan `'name'`)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook’undan alınan çeviri/yerelleştirme fonksiyonu; `t('...')` çağrılarıyla UI metinlerini döndürür.
+- **Dönüş**: React.ReactNode (JSX elementi)
 
 ---
 
