@@ -2,21 +2,21 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\page.tsx
-skeleton_hash: c1785ce6cd56727b
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\page.tsx
+skeleton_hash: 44a3f6e6a3fd837a
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: 281c4a012ddfb7d3
+  overview: 8bcc27d9f8041805
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:59:02Z
+generated_at: 2026-05-28T09:43:17Z
 ---
 
 ## Genel Bakış
-`src/app/account/page.tsx` modülü, uygulamanın **/account** rotasında gösterilen kullanıcı hesabı sayfasının kök bileşenini tanımlar. Tek bir fonksiyon (`Page`) aracılığıyla sayfanın UI’ı oluşturulur ve gerekli veri/kimlik doğrulama işlemleri bu bileşen içinde yürütülür.
+Bu modül, dil parametresi (`[lang]`) içeren rotada kullanıcının hesap sayfasını sunan kök bileşeni tanımlar. Tek bir `Page` fonksiyonu aracılığıyla sayfanın ana kullanıcı arayüzü oluşturulur; bu bileşen doğrudan JSX döndürerek görsel katmanı sağlar.
 
 ## Fonksiyon Grupları
-### Sayfa Render ve İş Mantığı
-Bu grup, hesap sayfasının kullanıcı arayüzünü oluşturur, sayfa yaşam döngüsü içinde veri çekme ve yetkilendirme kontrollerini gerçekleştirir.  
+### Sayfa Görünümü
+Sayfanın tamamını temsil eden React bileşenini render eder. Herhangi bir yardımcı işlev veya durum yönetimi içermez, yalnızca üst düzey sunum katmanını oluşturur.  
 - Page
 
 ---
@@ -33,25 +33,23 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Nasıl yapar**: Fonksiyon içinde doğrudan JSX döndürülür; herhangi bir durum yönetimi veya yan etki yoktur.  
 **Parametreler**:
 - *hiç parametre yok*  
-**Dönüş**: `<PageComponent />` JSX öğesi (React Element)  
-
----
+**Dönüş**: `<PageComponent />` JSX öğesi (React Element)
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/account/page.tsx::Page
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\[lang]\account\page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**: yok
-- **Dönüş**: <PageComponent /> bileşeni döner
+- **Dönüş**: JSX.Element (React bileşeni olarak `<PageComponent />` döndürür)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\account\page.tsx
-  function: src\app\account\page.tsx::Page
+  file: src\app\[lang]\account\page.tsx
+  function: src\app\[lang]\account\page.tsx::Page
 
 ---
 

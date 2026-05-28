@@ -2,27 +2,48 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\layout.tsx
-skeleton_hash: 5148683d09e343c5
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\layout.tsx
+skeleton_hash: 98955b5d231542eb
 entity_hashes:
   func:Layout: f1cd59870391c992
-  overview: df5f26f87596d6fd
+  overview: 3aba322b2667e63f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:28Z
+generated_at: 2026-05-28T09:44:50Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın hesap (account) bölümünde yer alan tüm sayfalar için ortak bir düzen (layout) tanımlar. Tek bir `Layout` bileşeni ile alt sayfaların içeriği sarılır, böylece giriş, kayıt, profil gibi sayfalar arasında tutarlı bir yapı ve kullanıcı deneyimi sağlanır.
+Bu modül, uygulamanın hesap (account) bölümündeki tüm sayfalar için ortak bir düzen sağlar. Tek bir `Layout` bileşeni, sayfa içeriğini sararak tutarlı bir yapı ve kullanıcı deneyimi oluşturur.
 
 ## Fonksiyon Grupları
 ### Sayfa Düzeni Sağlayıcı
-Hesap alt sayfalarının görüntüleneceği çerçeveyi oluşturur; ortak stilleri, gezinme öğelerini veya paylaşılan diğer yapılandırmaları içerebilir.
+Hesap alt sayfalarının görüntüleneceği çerçeveyi oluşturur; içeriği (`children`) alıp ortak bir sarmalayıcı içinde render eder.
 - Layout
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Aksiyom 1**: Eğer `children` prop’u **verilmez** ya da `undefined`/`null` ise, `Layout` bileşeni **boş bir `<div>` (veya benzeri bir sarmalayıcı) render eder** ve içeriği göstermez.  
+*Sebep*: `children` bir `React.ReactNode` tipinde zorunlu olduğundan, bileşenin çalışması için bir node beklenir; yoksa render çıktısı anlamsız olur.
+
+**Aksiyom 2**: Eğer `children` prop’u **geçerli bir React elemanı** değilse (ör. bir sayı, string dışındaki bir primitive ya da hatalı nesne), `Layout` **render sırasında bir hata fırlatır**.  
+*Sebep*: `React.ReactNode` tipine uymayan değerler React’in render sürecinde tip hatası üretir; bu hatanın yakalanması bileşenin bütünlüğünü korur.
+
+**Aksiyom 3**: Eğer `Layout` bileşeni **başka bir React bağlamı (Context) içinde** kullanılırsa, bu bağlamdan gelen değerler **`Layout` içinde doğrudan erişilebilir** ve **bağlamın eksikliği** durumunda **varsayılan (default) değerler** kullanılır.  
+*Sebep*: Layout genellikle ortak stil, tema veya oturum bilgisi gibi paylaşılan verileri tüketir; bağlam yoksa bileşen çalışabilmelidir.
+
+**Aksiyom 4**: Eğer `Layout` bileşeni **SSR (Server‑Side Rendering)** ortamında çalıştırılırsa, **`children` içeriği sunucu tarafında da aynı şekilde render edilir**; aksi takdirde **hydrate hatası** ortaya çıkar.  
+*Sebep*: React‑SSR’de istemci ve sunucu çıktısının tutarlı olması gerekir; `children` eksikse veya farklıysa uyumsuzluk oluşur.
+
+**Aksiyom 5**: Eğer `Layout` bileşeni **CSS‑in‑JS** ya da **global stil dosyaları** aracılığıyla stil alıyorsa, bu stil **modül yüklendiği anda** (import zamanında) **uygulanır**; stil dosyası **yüklenmezse** bileşen **varsayılan (unstyled) bir yapı** ile render olur.  
+*Sebep*: Stil bağımlılıkları opsiyoneldir; eksik stil dosyası uygulamanın çökmesini engellemek için varsayılan görünüm sağlanır.
+
+**Aksiyom 6**: Eğer `Layout` içinde **navigasyon (örn. Next.js `Link` veya router)** öğeleri bulunuyorsa, bu öğeler **router’ın mevcut konfigürasyonu** ile uyumlu olmalıdır; **router tanımlı değilse** navigasyon öğeleri **pasif (tıklanamaz) hâle gelir**.  
+*Sebep*: Navigasyonun çalışması için router bağlamı gerekir; yoksa kullanıcı deneyimi bozulur.
+
+**Aksiyom 7**: Eğer `Layout` bileşeni **performans optimizasyonu** (memoization, lazy loading vb.) içeriyorsa, bu optimizasyonlar **`children` prop’unun referans değişikliğine** duyarlı olacaktır; **referans değişmezse** yeniden render **tetiklenmez**.  
+*Sebep*: React‑in memoizasyon mekanizmaları referans eşitliğine dayanır; bu sayede gereksiz render’lar önlenir.
 
 ---
 
@@ -39,18 +60,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/account/layout.tsx::Layout
-- **params**: 
-  - `children` — React.ReactNode tipinde, içeriğe yerleştirilecek alt bileşenleri temsil eder
+### [N1_NASIL] AST Pointer: src/app/[lang]/account/layout.tsx::Layout
+- **params**: children
 - **ic_degiskenler**: (yok)
-- **Dönüş**: `<LayoutComponent>` bileşeni içine sarılmış `children` ile birlikte JSX döndürür (React.ReactElement)
+- **Dönüş**: JSX element (React.ReactElement)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\account\layout.tsx
-  function: src\app\account\layout.tsx::Layout
+  file: src\app\[lang]\account\layout.tsx
+  function: src\app\[lang]\account\layout.tsx::Layout
 
 ---
 

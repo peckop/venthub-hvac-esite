@@ -2,17 +2,21 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\addresses\page.tsx
-skeleton_hash: 63d85d6ab42b769a
-generated_at: 2026-05-23T21:47:10Z
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\addresses\page.tsx
+skeleton_hash: 257d63d68f82e19b
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 3abd4459140e249f
+  style_tokens: 9144ece4bffe7964
+generated_at: 2026-05-28T09:44:08Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı hesabı içinde adreslerin listelendiği ve yönetildiği sayfanın ana bileşenini tanımlar. Tek bir `Page` fonksiyonu, ilgili UI bileşenlerini bir araya getirerek adres verilerini gösterir ve etkileşimleri yönetir.
+Bu modül, kullanıcının hesabındaki adresleri yönetmesine olanak tanıyan, dile duyarlı bir sayfanın ana bileşenini barındırır. Tek bir `Page` fonksiyonu, adres listeleme, düzenleme ve yeni adres ekleme gibi işlemleri yürüten arayüzü oluşturur.
 
 ## Fonksiyon Grupları
-### Sayfa Render ve UI Bileşenleri
-Bu grup, adres sayfasının görsel çıktısını oluşturmak ve kullanıcı arayüzünü yapılandırmaktan sorumludur.  
+### Sayfa Bileşeni
+Bu grup, adres yönetim sayfasının görsel çıktısını üretmek ve ilgili UI parçalarını birleştirmekten sorumludur.  
 - Page
 
 ---
@@ -22,45 +26,63 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Hesap adresleri sayfasının ana bileşenini döndürür. Kullanıcının kayıtlı adreslerini listeleme, düzenleme veya yeni adres ekleme gibi işlemleri gerçekleştiren bir arayüz sağlar.
-**Nasıl yapar**: Herhangi bir parametre almaz. İç mantık, dosya içeriğinde tanımlanan JSX yapısı ve olası React hook'ları ile şekillenir. Bu dokümanda iç detay belirtilmediğinden, sayfanın standart bir Next.js bileşeni olarak render edildiği varsayılır.
-**Parametreler**:
-- (parametre yok)
-**Dönüş**: `<PageComponent />` – React JSX elementi. Kullanıcının adres yönetimi işlemlerini gerçekleştirdiği sayfa arayüzünü temsil eder.
+**Ne yapar**: `Page` fonksiyonu, React bileşeni olarak tanımlanmış bir fonksiyondur ve `<PageComponent />` JSX elemanını döndürerek ilgili sayfanın içeriğini render eder.  
+
+**Nasıl yapar**: Fonksiyon, doğrudan bir JSX ifadesi olan `<PageComponent />`'i return eder; ek bir mantık, durum yönetimi veya yan etki (side‑effect) içermez.  
+
+**Parametreler**:  
+- *Yok* — Fonksiyon herhangi bir argüman almaz.
+
+**Dönüş**:  
+- `JSX.Element` — `<PageComponent />` bileşenini temsil eden JSX elemanı döndürür.
 
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../views/account/AccountAddressesPage'), {
-  ssr...`
+- **PageComponent** (call) — `dynamic(() => import('../../../../views/account/AccountAddressesPage'), {
+  ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: account/addresses/page.tsx::anonymous
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.ReactNode (loading spinner)
+### [N1_NASIL] AST Pointer: `src/app/[lang]/account/addresses/page.tsx`::anonymous function
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX (loading spinner container with `animate-spin` elementi)
 
-### [N2_NASIL] AST Pointer: account/addresses/page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.ReactNode (<PageComponent />)
+### [N2_NASIL] AST Pointer: `src/app/[lang]/account/addresses/page.tsx`::Page
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX (`<PageComponent />`)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\account\addresses\page.tsx
-  function: src\app\account\addresses\page.tsx::Page
+  file: src\app\[lang]\account\addresses\page.tsx
+  function: src\app\[lang]\account\addresses\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-b-2`, `border-primary-navy`
+- **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`

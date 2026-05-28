@@ -2,21 +2,23 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\about\page.tsx
-skeleton_hash: e96bf4d40e2325e9
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\about\page.tsx
+skeleton_hash: 708bd09a728ef850
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: 8871c1e7b993cf8e
+  overview: 88bd7364c1f1d9ae
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:13Z
+generated_at: 2026-05-28T09:42:50Z
 ---
 
 ## Genel Bakış
-`src/app/about/page.tsx` modülü, uygulamanın “Hakkında” (About) sayfasını oluşturan tek bir React fonksiyonel bileşeni içerir. `Page` fonksiyonu, Next.js tarafından `/about` rotası ziyaret edildiğinde çağrılır ve statik içerik sağlayan JSX ağacını döndürür. Modülün tek sorumluluğu, bu sayfanın render edilmesini sağlamaktır.
+
+`src/app/[lang]/about/page.tsx` modülü, çoklu dil desteğine sahip "Hakkında" sayfasını oluşturan tek bir React fonksiyonel bileşeni barındırır. `Page` fonksiyonu, Next.js App Router'da `[lang]/about` rotası ziyaret edildiğinde çağrılır ve sayfanın statik içeriğini sarmalayan bir JSX yapısı döndürür. Modülün tek sorumluluğu, bu sayfanın sunumunu sağlamaktır.
 
 ## Fonksiyon Grupları
+
 ### Sayfa Renderlama
-Bu grup, “Hakkında” sayfasının kullanıcıya sunulacak JSX yapısını üreten tek bileşeni kapsar.  
+Bu grup, dil parametresini dikkate alarak "Hakkında" sayfasının kullanıcıya gösterilecek JSX çıktısını üreten bileşeni kapsar.
 - Page
 
 ---
@@ -38,17 +40,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\about\page.tsx::Page
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\[lang]\about\page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (React bileşeni `<PageComponent />` döndürür)
+- **Dönüş**: JSX element `<PageComponent />` (rendered component)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\about\page.tsx
-  function: src\app\about\page.tsx::Page
+  file: src\app\[lang]\about\page.tsx
+  function: src\app\[lang]\about\page.tsx::Page
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx
-skeleton_hash: 3e610cb029e1dc4e
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\invoices\page.tsx
+skeleton_hash: 0ad86876ec50ba32
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 3abd4459140e249f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-27T17:58:18Z
+generated_at: 2026-05-28T09:42:36Z
 ---
 
 ## Genel Bakış
@@ -41,8 +41,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../views/account/AccountInvoicesPage'), {
-  ssr:...`
+- **PageComponent** (call) — `dynamic(() => import('../../../../views/account/AccountInvoicesPage'), {
+  s...`
 
 ---
 
@@ -62,8 +62,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: src\app\account\invoices\page.tsx
-  function: src\app\account\invoices\page.tsx::Page
+  file: src\app\[lang]\account\invoices\page.tsx
+  function: src\app\[lang]\account\invoices\page.tsx::Page
 
 ---
 

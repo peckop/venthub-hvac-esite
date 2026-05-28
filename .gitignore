@@ -59,3 +59,4 @@ memory-engine/data/*.db
 session_catalog.db
 
 mcp_config_for_claude_code.json
+.vercel

@@ -2,21 +2,21 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\orders\detail\page.tsx
-skeleton_hash: 7cf33906c20b5fc7
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\orders\detail\page.tsx
+skeleton_hash: 7bb377ff6cc3f51d
 entity_hashes:
   func:Page: 9e0b3aa05006aa66
-  overview: cd40b01c876ac3a5
+  overview: c1af68d41814429f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:09Z
+generated_at: 2026-05-28T09:44:16Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı hesabındaki bir siparişin detay sayfasını oluşturup render eden tek bir sorumluluğa sahiptir. `Page` bileşeni, ilgili sipariş verilerini alır ve gerekli alt bileşenleri bir araya getirerek kullanıcıya bütünsel bir detay görünümü sunar. Ayrıca `Suspense` kullanarak asenkron veri yükleme sırasında kullanıcıya yükleniyor geri bildirimi sağlar.
+Bu modül, kullanıcı hesabındaki bir siparişin detay sayfasını render eden tek bir React bileşeni içerir. `Page` fonksiyonu, asenkron olarak yüklenecek `PageComponent`i `Suspense` içinde sararak veri yüklenirken bir “loading” mesajı gösterir ve veri hazır olduğunda detay içeriğini sunar.  
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Uygulamanın "account/orders/detail" sayfasının ana giriş noktasıdır. Sayfa düzeyinde bir React bileşeni döndürür ve dinamik içeriğin hazır olana kadar bekleme deneyimini yönetir.
+Sayfanın giriş noktasıdır; `Page` bileşeni `Suspense` ile asenkron veri/komponent yüklemesini yönetir ve kullanıcıya bekleme geri bildirimi sağlar.  
 - Page
 
 ---
@@ -42,18 +42,21 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\orders\detail\page.tsx::Page
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/app/[lang]/account/orders/detail/page.tsx::Page
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `t` — `tr` sözlüğünün bir referansı; `t.common.loading` ifadesiyle yükleme metnini elde etmek için kullanılır.
-- **Dönüş**: React element (JSX içinde `<Suspense>` ve `<PageComponent />` içeren bir bileşen)
+  - `t` — `tr` fonksiyonundan dönen Türkçe sözlük nesnesi, `t.common.loading` ile yükleme metnine erişmek için kullanılır
+  - `PageComponent` — (bileşen olarak kullanılır, değişkene atanmamış doğrudan JSX içinde kullanılan import edilmiş bileşen)
+  - `<Suspense fallback={<div>{t.common.loading}</div>}>` — React Suspense bileşeni, alt bileşen yüklenirken `t.common.loading` metnini gösterir
+  - `<PageComponent />` — gerçek sipariş detay sayfasını render eden bileşen
+- **Dönüş**: JSX elemanı (React nodu)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\account\orders\detail\page.tsx
-  function: src\app\account\orders\detail\page.tsx::Page
+  file: src\app\[lang]\account\orders\detail\page.tsx
+  function: src\app\[lang]\account\orders\detail\page.tsx::Page
 
 ---
 

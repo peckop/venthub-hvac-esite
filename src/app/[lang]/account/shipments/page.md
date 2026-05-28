@@ -2,21 +2,21 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\shipments\page.tsx
-skeleton_hash: ec39e9ffa86e6b02
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\shipments\page.tsx
+skeleton_hash: f252b5d33929db96
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: d9c0633b70be8b36
+  overview: 196d231af4e46298
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:59:43Z
+generated_at: 2026-05-28T09:43:18Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun kullanıcı hesap bölümündeki sevkiyatlar (shipments) sayfasını oluşturan Next.js sayfa bileşenidir. Kullanıcıların kendi hesaplarına ait tüm sevkiyat bilgilerini görüntüleyebileceği sayfa düzeyinde kullanıcı arayüzünü oluşturur. Platformun yönlendirme yapısıyla uyumlu çalışarak, hesap altındaki sevkiyatlar rotasında otomatik olarak yüklenen ana bileşen görevi görür.
+Bu modül, VentHub HVAC platformunun kullanıcı hesap sayfası altındaki sevkiyatlar (shipments) bölümünü görüntüleyen, dil parametresini destekleyen Next.js sayfa bileşenidir. Kullanıcıların kendilerine ait sevkiyat bilgilerine erişebileceği ana sayfa olarak işlev görür ve uygulamanın yönlendirme yapısına uyumlu şekilde, hesap altındaki sevkiyatlar rotasında otomatik yüklenir.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Sevkiyatlar sayfasının tüm görsel ve işlevsel yapısını inşa eden, alt bileşenler ve durum yönetimi araçlarından faydalanarak kullanıcıya bilgi sunumunu sağlayan ana girişi barındırır.
+Sevkiyatlar sayfasının tüm görsel yapısını oluşturan ana giriş noktası. Alt bileşenleri kullanarak kullanıcı arayüzünü sunar ve herhangi bir iş mantığı barındırmaz.
 - Page
 
 ---
@@ -38,17 +38,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\shipments\page.tsx::Page
-- **params**: yok (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX (PageComponent bileşeni)
+### [N1_NASIL] AST Pointer: src/app/[lang]/account/shipments/page.tsx::Page
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\account\shipments\page.tsx
-  function: src\app\account\shipments\page.tsx::Page
+  file: src\app\[lang]\account\shipments\page.tsx
+  function: src\app\[lang]\account\shipments\page.tsx::Page
 
 ---
 

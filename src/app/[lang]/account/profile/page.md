@@ -2,26 +2,27 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\profile\page.tsx
-skeleton_hash: 7307aa753f2b0d22
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\profile\page.tsx
+skeleton_hash: 6e3e50ca3ec4eb15
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: 86bd78de58fe85bd
+  overview: 7cf783e7a557a530
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:15Z
+generated_at: 2026-05-28T09:42:49Z
 ---
 
 ## Genel Bakış
-Bu modül, `/account/profile` rotasında kullanıcı profilini gösteren bir Next.js sayfa bileşeni sağlar. Tek bir `Page` fonksiyonu, profil arayüzünün bütün JSX yapısını oluşturur ve dışa aktarılır.
+Bu modül, Next.js App Router yapısında `/account/profile` yoluna karşılık gelen sayfa bileşenini tanımlar. Tek bir `Page` fonksiyonu, profil sayfasının bütün JSX çıktısını üretir ve dışa aktarılır.
 
 ## Fonksiyon Grupları
 ### Sayfa Render Grubu
-Profil sayfasının tam UI’sını tek noktadan üretmek ve dışa aktarmakla sorumludur.  
+Profil sayfasının UI’sını tek bir noktadan oluşturup dışa aktarmaktan sorumludur.  
 - Page
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -38,17 +39,17 @@ Profil sayfasının tam UI’sını tek noktadan üretmek ve dışa aktarmakla s
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\profile\page.tsx::Page
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\[lang]\account\profile\page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element (`<PageComponent />`)
+- **Dönüş**: JSX.Element (React bileşeni olarak `<PageComponent />` döndürür)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\account\profile\page.tsx
-  function: src\app\account\profile\page.tsx::Page
+  file: src\app\[lang]\account\profile\page.tsx
+  function: src\app\[lang]\account\profile\page.tsx::Page
 
 ---
 

@@ -2,17 +2,21 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\auth\register\page.tsx
-skeleton_hash: 592d49cfe5a139d2
-generated_at: 2026-05-23T21:48:33Z
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\register\page.tsx
+skeleton_hash: 72fc541941e01b71
+entity_hashes:
+  func:Page: bc1b43d61a04fc17
+  overview: d837ef1ff30aab7f
+  style_tokens: 9144ece4bffe7964
+generated_at: 2026-05-28T09:44:43Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı kayıt sayfasının sunum ve etkileşim mantığını üstlenen tek bir React bileşeni olan `Page`'i tanımlar. Bileşen, kayıt formunu görüntüler, kullanıcı girdilerini yönetir ve kayıt işlemini başlatmak için arka uç çağrılarını tetikler.
+Bu modül, kullanıcı kayıt sayfasının arayüzünü ve etkileşim mantığını yöneten tek bir React bileşeni olan `Page` fonksiyonunu içerir. Kayıt formunu görüntüler, kullanıcı girdilerini takip eder ve gönderildiğinde arka uç ile iletişimi başlatır.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Kayıt sayfasının kullanıcı arayüzünü oluşturur, form durumunu denetler ve gönderme sürecini yönetir.
+Kayıt sayfasının kullanıcı arayüzünü oluşturur, form durumunu kontrol eder ve gönderme sürecini yönetir.
 - Page
 
 ---
@@ -22,35 +26,51 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Bu fonksiyon, `/app/auth/register/page.tsx` dosyasında tanımlanmıştır ve uygulamanın kayıt sayfasını temsil eder. Yeni kullanıcıların kayıt olması için gerekli arayüzü sağlaması beklenir.
-**Nasıl yapar**: İşlevin iç mantığına dair bir dokümantasyon (docstring) bulunmamaktadır. Dosya yolu ve isimlendirme standartlarına göre, Next.js App Router yapısında bir sayfa bileşeni olduğu, muhtemelen bir React bileşeni döndürdüğü varsayılabilir. Kesin uygulama detayları belirtilmemiştir.
-**Parametreler**: Herhangi bir parametre almaz.
-**Dönüş**: Dönüş tipi kaynak kodda açıkça belirtilmemiştir. Yaygın kullanıma göre büyük olasılıkla bir React JSX öğesi (React.ReactNode) döndürür, ancak bu kesin değildir.
+**Ne yapar**: `Page` fonksiyonu, uygulamanın kayıt sayfasını render eder ve içerik yüklenirken bir bekleme animasyonu gösterir.
+
+**Nasıl yapar**: Fonksiyon, `Suspense` bileşeni içinde `RegisterPage` bileşenini sarmalar. `Suspense`’un `fallback` özelliği, `RegisterPage` hâlâ yüklenirken ekranın ortasında dönen bir spinner gösterir; bu sayfa içeriği hazır olduğunda spinner kaldırılır ve `RegisterPage` görünür hale gelir.
+
+**Parametreler**:  
+- (parametre yok)
+
+**Dönüş**: Fonksiyon bir JSX elementi döndürür; dönüş tipi `void` olarak kabul edilir (React bileşeni olduğu için doğrudan bir değer döndürmez).
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\auth\register\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `Suspense` — React Suspense bileşeni, yüklenme durumunda fallback içeriği gösterir.
-  - `RegisterPage` — Kayıt sayfası bileşeni, uygulamanın kayıt formunu içerir.
-- **Dönüş**: React JSX elemanı (React.ReactNode)
+### [N1_NASIL] AST Pointer: src/app/[lang]/auth/register/page.tsx::Page
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\auth\register\page.tsx
-  function: src\app\auth\register\page.tsx::Page
+  file: src\app\[lang]\auth\register\page.tsx
+  function: src\app\[lang]\auth\register\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-b-2`, `border-primary-navy`
+- **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
