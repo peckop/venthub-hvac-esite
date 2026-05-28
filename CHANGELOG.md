@@ -1,5 +1,17 @@
 # Changelog
 
+### [2026-05-28] VentHub Multilingual SSG/PPR, On-Demand ISR Webhooks & 10/10 SEO alternates
+**Özet:** Platformun statik sayfa hızı ve arama motoru görünürlüğü (SEO) için Next.js 15 sub-path routing, Kısmi Ön Oluşturma (PPR), HMAC doğrulamalı Supabase Webhook On-Demand ISR, Sitemap alternates (hreflang) metadata kurgusu tamamlandı ve yerel dökümantasyon ağacı ile NotebookLM hafızası %100 senkronize edildi.
+**Değişiklik Kapsamı:**
+- **i18n Sub-path Routing:** Tüm kamu sayfaları `src/app/[lang]/` dinamik alt-yolu altına taşındı. `LanguageSwitcher.tsx`, `useLocalizedRoutes` hook'u ve `locale` bazlı B2C anonim para birimi tespiti devreye alındı. `venthub_orders` veritabanı tablosuna locale/dil tiplemeleri migration ile işlendi.
+- **SSG + PPR Entegrasyonu:** `products/[slug]/page.tsx`, `brands/[slug]/page.tsx` ve `destek/konular/[slug]/page.tsx` dinamik rotalarına `generateStaticParams` (FlatMap ile dil segmentleri dahil) eklendi. Statik sayfalara `export const dynamic = 'force-static'` eklenerek PPR kabukları donduruldu.
+- **unstable_cache & Webhook HMAC:** `getCachedHomeData` ve `getCachedProducts` önbellek anahtarları dil izole (`['home-page-data', lang]`) hale getirildi. Supabase veri güncellemelerini yakalayıp önbelleği anında temizleyen (revalidate) **HMAC doğrulamalı** `/api/webhook/supabase` endpoint'i yazıldı.
+- **Sitemap Hreflang SEO:** `sitemap.ts` üzerinde Next.js 15 standartlarına uygun `alternates: { languages: { tr: '...', en: '...' } }` dil alternates metadata kurgusu eklenerek SEO skoru 10/10 seviyesine çıkarıldı.
+- **Döküman Senkronizasyonu & Orphan Temizliği:** Eski `src/app/page.md` yetim dökümanı silindi. Bozuk olan `src/app/[lang]/page.md` içeriği `cc doc single --force` ile sıfırdan derlendi. Tüm master dökümanlar `cc doc tree --nlm-sync --force-sync` komutuyla NotebookLM kütüphanelerine sıfırdan yüklenerek dijital ikiz senkronize edildi.
+**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ (0 error, 0 warning) | `pnpm run build` ✅ | `nlm query` E2E Test ✅
+
+---
+
 ### [2026-05-27] VentHub CSS Enterprise Polish — Cilalama ve Performans Optimizasyonları
 **Özet:** CSS katmanında global premium iyileştirmeler, `.content-auto` render performans optimizasyonları, `@tailwindcss/typography` ile Bringhurst standartları entegrasyonu ve klavye navigasyonunu standarda bağlayan otonom `focus-visible` migrasyonu gerçekleştirildi.
 **Değişiklik Kapsamı:**

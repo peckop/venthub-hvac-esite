@@ -209,12 +209,12 @@ RBAC `user_profiles.role` alanı + `useRole()` hook + Edge Function auth middlew
 
 ---
 
-## 8. i18n (Çoklu Dil)
+## 8. i18n (Çoklu Dil) ve Yerelleştirme Mimarisi
 
-- **Sözlükler:** `src/i18n/dictionaries/tr.ts`, `src/i18n/dictionaries/en.ts`
-- **Context:** `I18nProvider` + `useI18n()` hook
-- **Tarih/Saat:** `src/i18n/datetime.ts` (locale-aware format)
-- **Sayı/Para:** `src/i18n/format.ts` (TRY/USD formatlama)
+*   **Sub-path Routing:** Uygulama Next.js App Router üzerinde `/[lang]/` klasör hiyerarşisiyle çalışır. Dil tespiti ve URL yönlendirmeleri `src/middleware.ts` üzerinden sunucu tarafında (Server-side) yapılır.
+*   **Proxy Hook (Routes):** React bileşenlerinde URL oluştururken manuel dil kodu eklemek yasaktır. Rotalar, aktif dili otomatik algılayıp enjekte eden `useLocalizedRoutes` hook'u üzerinden (Örn: `Routes.category('jet-fan')` -> `/tr/category/jet-fan`) çağrılmalıdır.
+*   **Sözlükler (SSOT):** `src/i18n/dictionaries/tr.ts` ve `en.ts`. Bileşenlerde erişim `I18nProvider` ve `useI18n()` hook'u ile sağlanır.
+*   **Dinamik DB Çevirileri:** Veritabanı tablolarında (`categories`, `products`) çeviri için ayrı ilişkisel tablolar kullanılmaz. Tip güvenli **JSONB** (`metadata->>lang`) formatı benimsenmiştir. Dönüşümler `src/lib/type-converters.ts` üzerinden yapılır.
 
 ---
 
@@ -321,6 +321,11 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 11. **content-auto Render Performans Standardı:** Sayfa dışı (below-the-fold) ağır veri tabloları, Kanban panoları veya 3D canvas gibi yoğun bileşenlerde viewport dışı render yükünü sıfırlamak ve LCP/FID performansını korumak amacıyla `.content-auto` (content-visibility: auto) utility sınıfı zorunlu olarak kullanılmalıdır.
 12. **focus-visible Klavye Erişilebilirlik Standardı:** Proje genelinde erişilebilirlik (A11y) uyumunu en üst seviyede tutmak için, tüm interaktif elemanlarda (button, a, input, select, textarea) fare tıklamalarında beliren halkaları engellemek ama klavye sekmelerinde premium odak çizgilerini korumak amacıyla `focus:` yerine **`focus-visible:`** state seçicileri kullanılmalıdır.
 13. **Typography prose Standartları:** Yasal sözleşme sayfaları veya bilgi merkezi Hub/Topic teknik makale sayfaları gibi metin yoğunluklu arayüzlerin tamamında, Bringhurst tipografi standardına (Premium UI) tam uyum sağlamak amacıyla `prose dark:prose-invert max-w-prose` sınıfları standart okuma sarmalayıcısı olarak kullanılmalıdır.
+14. **PPR (Kısmi Ön Oluşturma) ve Suspense Sınırı:** Kategori ve ürün arama sayfaları gibi filtreleme barındıran sayfalarda, `useSearchParams` hook'unu veya arama parametrelerini kullanan hiçbir bileşen "çıplak" bırakılamaz. "SSR Zehirlenmesini" engellemek ve ana sayfa kabuğunun SSG ile statik üretilmesini garanti etmek için, bu bileşenler istisnasız olarak `<Suspense fallback={<Skeleton />}>` ile sarmalanmalıdır.
+15. **unstable_cache İzole Edilmesi (Cache Collision Guard):** Next.js App Router üzerinde sunucu tarafı veri önbellekleme (`unstable_cache`) kullanıldığında (örneğin `getCachedHomeData` içinde), önbellek sızıntılarını ve diller arası veri karışmasını engellemek için ikinci parametre olan `cache_keys` dizisine kullanıcının aktif dil kodu (`lang`) zorunlu olarak eklenmelidir (Örn: `['home-page-data', lang]`).
+16. **On-Demand ISR ve Webhook Senkronizasyonu:** Stok yönetimi veya ürün güncellemeleri sonrasındaki statik önbellek gecikmelerini engellemek için; `products`, `categories` ve `inventory_movements` tablolarındaki tüm değişiklikler `src/app/api/webhook/supabase/route.ts` tarafından dinlenmelidir. İşlemler, x-webhook-secret (HMAC) doğrulaması geçtikten sonra `revalidatePath` veya `revalidateTag` ile Next.js önbelleğini anında temizlemelidir.
+17. **SEO ve Sitemap Hreflang Standartları:** Arama motoru örümcekleri (Googlebot vb.) için HTML ve `sitemap.ts` üretilirken istemci tarafı (Client) hook'lar (`useLocalizedRoutes` gibi) kullanılamaz. Dinamik rotalarda (`generateStaticParams` ve `sitemap.ts`), her bir kategori ve ürün URL'i için saf TypeScript kullanılarak Türkçe ve İngilizce varyasyonlar `alternates: { languages: { tr: '...', en: '...' } }` (Hreflang) nesneleri şeklinde zorunlu olarak sunulmalıdır.
+18. **Edge Functions & Mikroservis Standartları (Contextual Locale İzolasyonu):** Supabase Edge Functions (`order-confirmation`, `delivery-notification` vb.) istemcinin (tarayıcının) hangi dilde olduğunu doğrudan bilemez. Bu nedenle sipariş oluşturma süreçlerinde kullanıcının aktif dil tercihi (lang) veritabanına (`user_locale` veya metadata olarak) kaydedilmelidir. E-posta şablonları oluşturulurken ürün adları (JSONB) bu `locale` bilgisine göre süzülüp müşteriye kendi dilinde gönderilmelidir ("Black-box" ihlali koruması).
 
 ---
 
@@ -336,6 +341,6 @@ Bu projede kullanılan Antigravity CLI (`agy.exe`) konuşmalarını isimlendirme
 
 ---
 
-*Son güncelleme: 2026-05-27*
+*Son güncelleme: 2026-05-28*
 
 

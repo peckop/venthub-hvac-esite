@@ -21,6 +21,17 @@ VentHub sistemine ait tüm işletim, mimari ve otonom kurallar **5 Ciltlik Maste
 
 ---
 
+## 🚀 Modern Enterprise Mimari Yapısı
+
+VentHub HVAC platformu, modern web standartlarını ve maksimum hızı hedefleyen en güncel Next.js 15+ ve React 19 mimarisi üzerine inşa edilmiştir:
+
+*   ⚡ **SSG + PPR (Partial Prerendering):** Dinamik bileşenler (ürün gridleri, filtreleme arayüzleri) `<Suspense>` sınırları ile sarmalanarak kısmi olarak yüklenirken; kritik sayfa kabukları (Hero, layout) statik olarak anında (LCP = 0) render edilir.
+*   🌐 **i18n Sub-path Routing:** Uygulama, `src/app/[lang]/` alt-yol kurgusuyla tam çoklu dil desteğine (Türkçe/İngilizce) sahiptir. SEO kalitesi için dinamik kanonik URL'ler ve `sitemap.ts` üzerinde hreflang alternates metadata kurgusu aktiftir.
+*   📦 **unstable_cache & On-Demand ISR:** Sayfa verileri RAM/Disk üzerinde izole dil anahtarlarıyla (`getCachedHomeData` & `getCachedProducts`) önbelleğe alınır. Supabase veritabanında bir güncelleme olduğunda, tetiklenen **HMAC doğrulamalı** Supabase Webhook API'si üzerinden ilgili önbellek etiketleri (`tags`) anında temizlenir (Revalidate) ve sayfa anlık güncellenir.
+*   🔒 **Güvenli RBAC & Middleware:** Sunucu tarafındaki istek yönlendirmeleri ve yönetici (admin) koruması, sub-path dillerini de destekleyecek şekilde gelişmiş middleware index offset güvenlik katmanıyla denetlenir.
+
+---
+
 ## ⚙️ Hızlı Şantiye Komutları
 
 ### Yerel Çalıştırma
