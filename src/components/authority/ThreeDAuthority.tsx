@@ -82,7 +82,7 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
             className={`relative rounded-3xl bg-slate-50 border border-slate-200 shadow-inner overflow-hidden ${className}`}
             style={{ minHeight: '400px' }}
         >
-            <Canvas shadows dpr={[1, 2]}>
+            <Canvas shadows="percentage" dpr={[1, 2]}>
                 <PerspectiveCamera makeDefault position={[0, 0, metadata.config?.initialZoom ?? 5]} fov={45} />
                 
                 <ambientLight intensity={0.5} />

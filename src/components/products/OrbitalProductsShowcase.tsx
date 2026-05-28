@@ -828,7 +828,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             style={{ backgroundColor: CONFIG.backgroundColor, height: containerHeight }}
         >
             <Canvas
-                shadows
+                shadows="percentage"
                 gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
                 frameloop={isInView ? "always" : "demand"}
                 dpr={typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio) : [1, 1.5]}
