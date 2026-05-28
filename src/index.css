@@ -120,7 +120,7 @@ html {
   position: absolute;
   height: 1px;
   width: 96px;
-  background: linear-gradient(90deg, transparent, #22D3EE, transparent);
+  background: linear-gradient(90deg, transparent, hsl(var(--brand-cyan)), transparent);
   animation: flow 3s linear infinite backwards;
   opacity: 0;
 }
