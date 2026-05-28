@@ -64,6 +64,36 @@ USING (
 - Aynı tablo/rol/aksiyon için birden fazla PERMISSIVE policy yazma (birleştir)
 - `SECURITY DEFINER` fonksiyonlarda `search_path = pg_catalog, public` sabitle
 
+## 🔑 Supabase 2026 Data API Güncellemesi: Altın Üçlü (Golden Triad) Kuralı
+
+Supabase'in 2026 yılındaki Data API (PostgREST / GraphQL) güvenlik güncellemesi uyarınca, `public` şemasında oluşturulan yeni tablolar artık otomatik olarak API rollerine (`anon`, `authenticated`, `service_role`) açık değildir.
+
+Bu nedenle, **bir tablo oluşturulurken aşağıdaki üçlü yapı tek bir ünite olarak ele alınmalı ve sırayla uygulanmalıdır**:
+
+1. **Açık İzinler (GRANT):** API rollerinin tabloya erişebilmesi için yetkiler açıkça verilir. `GRANT` eksikse, Postgres sorguyu RLS politikalarına ulaşmadan `42501 Permission Denied` ile reddeder.
+2. **RLS Aktifleştirme (ENABLE RLS):** Satır bazlı güvenlik açılır.
+3. **RLS Politikaları (CREATE POLICY):** Kimin hangi satırları görebileceği/değiştirebileceği kurallarla sınırlandırılır.
+
+### Şablon:
+```sql
+-- 1. ADIM: İzinlerin Verilmesi (GRANT)
+-- Okuma / Seçme izinleri (Anonim kullanıcılar için gerekliyse)
+GRANT SELECT ON public.my_table TO anon;
+
+-- Giriş yapmış kullanıcılar için (SELECT, INSERT, UPDATE, DELETE)
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.my_table TO authenticated;
+
+-- Sunucu / Servis rolü için (Tüm yetkiler)
+GRANT ALL ON public.my_table TO service_role;
+
+-- 2. ADIM: RLS'in Açılması
+ALTER TABLE public.my_table ENABLE ROW LEVEL SECURITY;
+
+-- 3. ADIM: RLS Politikalarının Yazılması
+CREATE POLICY "my_table_select_policy" ON public.my_table
+FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
+```
+
 ## Migration Yazım Standartları
 
 ### Dosya Adlandırma

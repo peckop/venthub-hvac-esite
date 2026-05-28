@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-27T18:35:08.882020+00:00
-total_compiled_files: 424
+compiled_at: 2026-05-28T08:36:55.672435+00:00
+total_compiled_files: 427
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-27T18:35:08.882020+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-28T08:36:55.672435+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -572,734 +572,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: sitemap
-
----
-# FILE: src\app\about\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\about\page.tsx
-skeleton_hash: e96bf4d40e2325e9
-entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: 8871c1e7b993cf8e
-  style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:13Z
----
-
-## Genel Bakış
-`src/app/about/page.tsx` modülü, uygulamanın “Hakkında” (About) sayfasını oluşturan tek bir React fonksiyonel bileşeni içerir. `Page` fonksiyonu, Next.js tarafından `/about` rotası ziyaret edildiğinde çağrılır ve statik içerik sağlayan JSX ağacını döndürür. Modülün tek sorumluluğu, bu sayfanın render edilmesini sağlamaktır.
-
-## Fonksiyon Grupları
-### Sayfa Renderlama
-Bu grup, “Hakkında” sayfasının kullanıcıya sunulacak JSX yapısını üreten tek bileşeni kapsar.  
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### Page
-**Ne yapar**: `Page` fonksiyonu, uygulamanın "Hakkında" sayfasını temsil eden bir React bileşenidir. Sayfa içeriğini oluşturmak üzere `PageComponent` adlı başka bir bileşeni döndürür.
-**Nasıl yapar**: Herhangi bir işlem veya state yönetimi içermeden doğrudan `PageComponent` bileşenini JSX formatında return eder. Bu, üst düzey bir sayfa bileşeni olarak içeriği sarmalar.
-**Parametreler**: Yok
-**Dönüş**: `JSX.Element` — `<PageComponent />` şeklinde JSX ifadesi döndürür. Bu ifade, React tarafından render edilebilir bir sanal DOM öğesidir.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\about\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (React bileşeni `<PageComponent />` döndürür)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\about\page.tsx
-  function: src\app\about\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** (yok)
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
-
----
-# FILE: src\app\account\layout.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\layout.tsx
-skeleton_hash: 5148683d09e343c5
-entity_hashes:
-  func:Layout: f1cd59870391c992
-  overview: df5f26f87596d6fd
-  style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:28Z
----
-
-## Genel Bakış
-Bu modül, uygulamanın hesap (account) bölümünde yer alan tüm sayfalar için ortak bir düzen (layout) tanımlar. Tek bir `Layout` bileşeni ile alt sayfaların içeriği sarılır, böylece giriş, kayıt, profil gibi sayfalar arasında tutarlı bir yapı ve kullanıcı deneyimi sağlanır.
-
-## Fonksiyon Grupları
-### Sayfa Düzeni Sağlayıcı
-Hesap alt sayfalarının görüntüleneceği çerçeveyi oluşturur; ortak stilleri, gezinme öğelerini veya paylaşılan diğer yapılandırmaları içerebilir.
-- Layout
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### Layout
-**Ne yapar**: Verilen `children` propunu `LayoutComponent` içine sararak sayfa düzenini sağlar.  
-**Nasıl yapar**: Fonksiyon, destructured `children` parametresini alır ve doğrudan `<LayoutComponent>{children}</LayoutComponent>` JSX'ini döndürür; ek mantık veya side‑effect yoktur.  
-**Parametreler**:
-- children: React.ReactNode — Layout içinde görüntülenecek içerik (JSX elemanları, metin veya başka React bileşenleri).  
-**Dönüş**: JSX elementi — `LayoutComponent` içinde `children` içeren bir React elementi.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/app/account/layout.tsx::Layout
-- **params**: 
-  - `children` — React.ReactNode tipinde, içeriğe yerleştirilecek alt bileşenleri temsil eder
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `<LayoutComponent>` bileşeni içine sarılmış `children` ile birlikte JSX döndürür (React.ReactElement)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\layout.tsx
-  function: src\app\account\layout.tsx::Layout
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Layout
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** (yok)
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
-
----
-# FILE: src\app\account\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\page.tsx
-skeleton_hash: c1785ce6cd56727b
-entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: 281c4a012ddfb7d3
-  style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:59:02Z
----
-
-## Genel Bakış
-`src/app/account/page.tsx` modülü, uygulamanın **/account** rotasında gösterilen kullanıcı hesabı sayfasının kök bileşenini tanımlar. Tek bir fonksiyon (`Page`) aracılığıyla sayfanın UI’ı oluşturulur ve gerekli veri/kimlik doğrulama işlemleri bu bileşen içinde yürütülür.
-
-## Fonksiyon Grupları
-### Sayfa Render ve İş Mantığı
-Bu grup, hesap sayfasının kullanıcı arayüzünü oluşturur, sayfa yaşam döngüsü içinde veri çekme ve yetkilendirme kontrollerini gerçekleştirir.  
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### Page
-**Ne yapar**: `Page` fonksiyonu, React bileşeni olarak `<PageComponent />` öğesini döndürür. Bu, sayfanın ana görsel bileşenini render eder.  
-**Nasıl yapar**: Fonksiyon içinde doğrudan JSX döndürülür; herhangi bir durum yönetimi veya yan etki yoktur.  
-**Parametreler**:
-- *hiç parametre yok*  
-**Dönüş**: `<PageComponent />` JSX öğesi (React Element)  
-
----
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/app/account/page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: <PageComponent /> bileşeni döner
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\page.tsx
-  function: src\app\account\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** (yok)
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
-
----
-# FILE: src\app\account\addresses\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\addresses\page.tsx
-skeleton_hash: 63d85d6ab42b769a
-generated_at: 2026-05-23T21:47:10Z
----
-
-## Genel Bakış
-Bu modül, kullanıcı hesabı içinde adreslerin listelendiği ve yönetildiği sayfanın ana bileşenini tanımlar. Tek bir `Page` fonksiyonu, ilgili UI bileşenlerini bir araya getirerek adres verilerini gösterir ve etkileşimleri yönetir.
-
-## Fonksiyon Grupları
-### Sayfa Render ve UI Bileşenleri
-Bu grup, adres sayfasının görsel çıktısını oluşturmak ve kullanıcı arayüzünü yapılandırmaktan sorumludur.  
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
----
-
-## FONKSIYON DETAYLARI
-
-### Page
-**Ne yapar**: Hesap adresleri sayfasının ana bileşenini döndürür. Kullanıcının kayıtlı adreslerini listeleme, düzenleme veya yeni adres ekleme gibi işlemleri gerçekleştiren bir arayüz sağlar.
-**Nasıl yapar**: Herhangi bir parametre almaz. İç mantık, dosya içeriğinde tanımlanan JSX yapısı ve olası React hook'ları ile şekillenir. Bu dokümanda iç detay belirtilmediğinden, sayfanın standart bir Next.js bileşeni olarak render edildiği varsayılır.
-**Parametreler**:
-- (parametre yok)
-**Dönüş**: `<PageComponent />` – React JSX elementi. Kullanıcının adres yönetimi işlemlerini gerçekleştirdiği sayfa arayüzünü temsil eder.
-
----
-
-## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../views/account/AccountAddressesPage'), {
-
-  ssr...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: account/addresses/page.tsx::anonymous
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.ReactNode (loading spinner)
-
-### [N2_NASIL] AST Pointer: account/addresses/page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.ReactNode (<PageComponent />)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\addresses\page.tsx
-  function: src\app\account\addresses\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-
----
-# FILE: src\app\account\invoices\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx
-skeleton_hash: 3e610cb029e1dc4e
-entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: 3abd4459140e249f
-  style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-27T17:58:18Z
----
-
-## Genel Bakış
-Bu dosya, kullanıcı hesabı altındaki fatura listesi sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, dinamik olarak yüklenen `AccountInvoicesPage` bileşenini döndürerek sayfanın veri çekme, yetkilendirme ve kullanıcı arayüzü düzenlemesini yönetir.
-
-## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Hesap faturaları sayfasının kök bileşenini oluşturur. Dinamik içe aktarma (dynamic import) yoluyla ilgili görünümü yükler ve render eder.
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### Page
-**Ne yapar**: React bileşeni `Page` fonksiyonu, JSX içinde `<PageComponent />` öğesini döndürerek bir sayfa görünümü oluşturur.  
-
-**Nasıl yapar**: Fonksiyon, doğrudan bir JSX ifadesi olan `<PageComponent />`'i return eder; ek bir mantık, durum yönetimi veya yan etki yoktur.  
-
-**Parametreler**:
-- (hiç parametre almaz)
-
-**Dönüş**: JSX.Element — `<PageComponent />` bileşenini temsil eden React öğesi.
-
----
-
-## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../views/account/AccountInvoicesPage'), {
-
-  ssr:...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::anonymous_arrow_function
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: React JSX elementi (merkezlenmiş yükleme spinner bileşeni)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: `<PageComponent />` React bileşeni
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\invoices\page.tsx
-  function: src\app\account\invoices\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `border-b-2`, `border-primary-navy`
-- **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
-
----
-# FILE: src\app\account\orders\detail\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\orders\detail\page.tsx
-skeleton_hash: 7cf33906c20b5fc7
-entity_hashes:
-  func:Page: 9e0b3aa05006aa66
-  overview: cd40b01c876ac3a5
-  style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:09Z
----
-
-## Genel Bakış
-Bu modül, kullanıcı hesabındaki bir siparişin detay sayfasını oluşturup render eden tek bir sorumluluğa sahiptir. `Page` bileşeni, ilgili sipariş verilerini alır ve gerekli alt bileşenleri bir araya getirerek kullanıcıya bütünsel bir detay görünümü sunar. Ayrıca `Suspense` kullanarak asenkron veri yükleme sırasında kullanıcıya yükleniyor geri bildirimi sağlar.
-
-## Fonksiyon Grupları
-### Sayfa Bileşeni
-Uygulamanın "account/orders/detail" sayfasının ana giriş noktasıdır. Sayfa düzeyinde bir React bileşeni döndürür ve dinamik içeriğin hazır olana kadar bekleme deneyimini yönetir.
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### Page
-**Ne yapar**: React uygulamasında bir sayfa bileşeni oluşturur ve içeriği asenkron olarak yüklenirken bir bekleme (loading) mesajı gösterir. `Suspense` bileşeni sayesinde `PageComponent` bileşeni yüklenene kadar kullanıcıya geri bildirim sağlanır.  
-
-**Nasıl yapar**: Fonksiyon içinde `tr` çeviri nesnesi `t` olarak kısaltılır, ardından JSX içinde `Suspense` bileşeni kullanılır. `fallback` özelliği, `t.common.loading` metnini içeren bir `<div>` ile tanımlanır; bu, `PageComponent` henüz render edilmediğinde gösterilir. `PageComponent` başarılı bir şekilde yüklendiğinde, `Suspense` otomatik olarak onu render eder.  
-
-**Parametreler**:
-- *Yok* — Fonksiyon dışarıdan herhangi bir argüman almaz.
-
-**Dönüş**: JSX (React element) – `<Suspense>` içinde `fallback` ve `PageComponent` içeren bir React bileşeni döndürür.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\orders\detail\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — `tr` sözlüğünün bir referansı; `t.common.loading` ifadesiyle yükleme metnini elde etmek için kullanılır.
-- **Dönüş**: React element (JSX içinde `<Suspense>` ve `<PageComponent />` içeren bir bileşen)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\orders\detail\page.tsx
-  function: src\app\account\orders\detail\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** (yok)
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
-
----
-# FILE: src\app\account\returns\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\returns\page.tsx
-skeleton_hash: c13912ed61d7eb77
-entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: 5915b74456bf2b61
-  style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:48Z
----
-
-## Genel Bakış
-`src/app/account/returns/page.tsx` dosyası, hesap (account) bölümündeki iade (returns) sayfasının giriş noktasıdır. Tek bir fonksiyon olan **Page** bu modülün dışa aktarılan bileşenidir ve sayfanın temel UI kapsamını sağlayan alt bileşenleri (ör. `PageComponent`) render eder. Veri çekme, durum yönetimi ve alt bileşenlerin detayları bu fonksiyonun döndürdüğü bileşenler içinde ele alınır.
-
-## Fonksiyon Grupları
-### UI Başlatma ve Sayfa Renderı
-Sayfanın dışarıdan erişilebilen tek giriş noktasıdır; gerekli alt bileşenleri içeren JSX ağacını oluşturur.  
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Aksiyom 1**: Eğer React çalışma zamanı (runtime) ortamı (örn. `react` ve `react-dom` paketleri) mevcut değilse, `Page` fonksiyonu çalıştırılamaz ve render hatası oluşur.  
-
-**Aksiyom 2**: Eğer `Page` fonksiyonu bir React bileşen ağacının (component tree) dışına doğrudan çağrılırsa, JSX/React elementleri oluşturulamaz ve `Page` fonksiyonunun çıktısı geçerli bir UI öğesi olmaz.  
-
-**Aksiyom 3**: Eğer sayfanın alt bileşenleri (ör. `PageComponent` vb.) ihtiyaç duyduğu veri kaynakları (API endpointleri, context sağlayıcıları vb.) sağlanmazsa, `Page` fonksiyonu içinde bu alt bileşenler hata verir veya boş/yanlış veri gösterir.  
-
-**Aksiyom 4**: Eğer `Page` fonksiyonu bir sunucu‑tarafı (SSR) ortamında çalıştırılıyor ve istemci‑tarafı yalnızca tarayıcıya özgü API’ler (ör. `window`, `document`) kullanılmaya çalışılırsa, SSR aşamasında runtime hatası oluşur.  
-
-**Aksiyom 5**: Eğer proje yapılandırmasında (ör. Next.js, Vite, Webpack) `page.tsx` dosyasının bir “route” olarak tanımlanması eksikse, `Page` bileşeni URL yönlendirmesiyle erişilemez ve kullanıcı bu sayfaya ulaşamaz.  
-
-**Aksiyom 6**: Eğer TypeScript tip denetimi devre dışı bırakılmışsa ve `Page` fonksiyonunun dönüş tipi (`React.ReactNode`/JSX.Element) uyumsuz bir şekilde kullanılırsa, derleme zamanında tip hataları ortaya çıkmaz ancak çalışma zamanında UI bozulması meydana gelebilir.  
-
-**Aksiyom 7**: Eğer stil (CSS/SCSS) dosyaları veya tasarım sistemine (ör. Tailwind, Chakra UI) ait bağımlılıklar eksikse, `Page` bileşeninin görsel çıktısı tasarım beklentilerini karşılamaz.  
-
-**Aksiyom 8**: Eğer `Page` fonksiyonunun içinde kullanılan tüm yan etkiler (ör. veri çekme, event listener ekleme) uygun şekilde temizlenmez (cleanup) ise, bileşen unmount edildiğinde bellek sızıntısı veya istenmeyen yan etkiler oluşur.
-
----
-
-## FONKSİYON DETAYLARI
-
-### Page
-**Ne yapar**: React bileşeni `Page` fonksiyonunu tanımlar ve render edildiğinde `<PageComponent />` JSX öğesini döndürür.  
-**Nasıl yapar**: Fonksiyon, doğrudan JSX ifadesi `return <PageComponent />` ile `PageComponent` bileşenini çağırır; ek bir mantık veya yan etki içermez.  
-
-**Parametreler**:
-- (hiç parametre almaz)
-
-**Dönüş**: JSX.Element — `<PageComponent />` bileşeninin render çıktısı.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\returns\page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element (`<PageComponent />` render edilir)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\returns\page.tsx
-  function: src\app\account\returns\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** (yok)
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
-
----
-# FILE: src\app\account\security\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\security\page.tsx
-skeleton_hash: e398f4957f5d633b
-entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: f9d663e29d489ed1
-  style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:30Z
----
-
-## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının kullanıcı hesap güvenliği ayarları sayfasını oluşturan React bileşenidir. Kullanıcıların şifre yönetimi, iki faktörlü kimlik doğrulama gibi hesap güvenliğiyle ilgili işlemleri gerçekleştirebildiği arayüzü sunar.
-
-## Fonksiyon Grupları
-### UI Render Grubu
-Hesap güvenliği sayfasının temel yapısını oluşturur ve ilgili alt güvenlik bileşenlerini bu yapı içinde düzenler. Modülün tek giriş noktası ve dışa aktarılan öğesidir.
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar  
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### Page
-**Ne yapar**: `Page` fonksiyonu, React bileşeni olarak tanımlanmış bir sayfa oluşturur ve içinde `<PageComponent />` bileşenini render eder.  
-
-**Nasıl yapar**: Fonksiyon, JSX sözdizimini kullanarak doğrudan `<PageComponent />` öğesini döndürür; bu sayede React render sürecinde ilgili bileşen ekranda gösterilir.  
-
-**Parametreler**:
-- (Parametre yok)
-
-**Dönüş**: `<PageComponent />` JSX öğesini içeren bir React element'i (JSX) döndürür.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\security\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: Yok
-- **Dönüş**: yok
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\security\page.tsx
-  function: src\app\account\security\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** (yok)
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
-
----
-# FILE: src\app\account\shipments\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\shipments\page.tsx
-skeleton_hash: ec39e9ffa86e6b02
-entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: d9c0633b70be8b36
-  style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:59:43Z
----
-
-## Genel Bakış
-Bu modül, VentHub HVAC platformunun kullanıcı hesap bölümündeki sevkiyatlar (shipments) sayfasını oluşturan Next.js sayfa bileşenidir. Kullanıcıların kendi hesaplarına ait tüm sevkiyat bilgilerini görüntüleyebileceği sayfa düzeyinde kullanıcı arayüzünü oluşturur. Platformun yönlendirme yapısıyla uyumlu çalışarak, hesap altındaki sevkiyatlar rotasında otomatik olarak yüklenen ana bileşen görevi görür.
-
-## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Sevkiyatlar sayfasının tüm görsel ve işlevsel yapısını inşa eden, alt bileşenler ve durum yönetimi araçlarından faydalanarak kullanıcıya bilgi sunumunu sağlayan ana girişi barındırır.
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### Page
-**Ne yapar**: Uygulamanın `src/app/account/shipments/page.tsx` yolunda tanımlı shipments sayfasının ana bileşenini render eder. Sayfanın giriş noktası olarak işlev görür ve kullanıcı arayüzünün yüklenmesini sağlar.
-**Nasıl yapar**: Doğrudan `<PageComponent />` JSX ifadesini döndürerek `PageComponent` bileşenini çağırır. Herhangi bir state yönetimi veya iş mantığı içermez, yalnızca bir sarmalayıcı (wrapper) görevi üstlenir.
-**Parametreler**: Parametre almaz.
-**Dönüş**: `<PageComponent />` — Sayfanın kullanıcı arayüzünü oluşturan React JSX bileşeni.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\shipments\page.tsx::Page
-- **params**: yok (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX (PageComponent bileşeni)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\account\shipments\page.tsx
-  function: src\app\account\shipments\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** (yok)
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
 
 ---
 # FILE: src\app\admin\layout.md
@@ -2583,7 +1855,880 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\auth\callback\page.md
+# FILE: src\app\api\webhook\supabase\route.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: src/app/api/webhook/supabase/route.ts
+generated_at: 2026-05-28T07:31:00Z
+---
+
+## Genel Bakış
+Supabase Webhook Route Handler'ı, veritabanında meydana gelen `INSERT`, `UPDATE` ve `DELETE` olaylarını HMAC doğrulaması ile güvenli bir şekilde yakalayarak, Edge-CDN üzerindeki Next.js `unstable_cache` ve `revalidatePath` önbelleklerini anlık olarak tetikleyen dinamik bir API uç noktasıdır.
+
+## Fonksiyon Grupları
+### HTTP Metotları
+İstekleri karşılayan ve işleyen ana HTTP handler'ı.
+- POST
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu API rotasının çalışması için Supabase veritabanı tetikleyicilerinin ve çevresel HMAC anahtarının tanımlı olması gerekir.
+
+[Aksiyom 1]: `SUPABASE_WEBHOOK_SECRET` çevresel değişkeni tanımlı olmalıdır, aksi takdirde gelen istekler 401 yetkisiz hatasıyla reddedilir.
+[Aksiyom 2]: Tetiklenen olaylar `products`, `categories` veya `inventory_movements` tablolarına ait olmalıdır, aksi takdirde herhangi bir cache geçersiz kılma tetiklenmez.
+[Aksiyom 3]: İsteklerin başlığında `x-webhook-secret` doğrulaması bulunmalıdır, aksi takdirde güvenlik bypass riski oluşur.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### POST
+**Ne yapar**: Supabase veritabanından gelen webhook payload'unu doğrular ve ilgili tablolar için path/tag revalidation işlemlerini gerçekleştirir.  
+**Nasıl yapar**: 
+- Gelen HMAC imzasını (`x-webhook-secret`) doğrular.
+- Payload içindeki `table` ve `type` parametrelerini analiz eder.
+- `products` tablosu için: Dil bazlı ürün yollarını ve `products-discovery` / `home-data` etiketlerini revalidate eder.
+- `categories` tablosu için: Kategori yollarını ve `home-data` etiketlerini revalidate eder.
+- `inventory_movements` tablosu için: Stok hareketine bağlı ürün ve kategori yollarını revalidate eder.
+**Dönüş**: Revalidate edilen yolların ve etiketlerin listesini içeren JSON yanıtı.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/api/webhook/supabase/route.ts::POST
+- **params**:
+  - `request` — Gelen NextRequest nesnesi.
+- **ic_degiskenler**:
+  - `payload` — Supabase tetikleyici payload'u.
+  - `webhookSecret` — İstek başlığından alınan HMAC sırrı.
+  - `expectedSecret` — Sunucuda tanımlı beklenen webhook sırrı.
+- **Dönüş**: NextResponse
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\api\webhook\supabase\route.ts
+  function: src\app\api\webhook\supabase\route.ts::POST
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: POST
+  export: dynamic = 'force-dynamic'
+
+
+---
+# FILE: src\app\[lang]\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\about\page.tsx
+skeleton_hash: e96bf4d40e2325e9
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 8871c1e7b993cf8e
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:13Z
+---
+
+## Genel Bakış
+`src/app/about/page.tsx` modülü, uygulamanın “Hakkında” (About) sayfasını oluşturan tek bir React fonksiyonel bileşeni içerir. `Page` fonksiyonu, Next.js tarafından `/about` rotası ziyaret edildiğinde çağrılır ve statik içerik sağlayan JSX ağacını döndürür. Modülün tek sorumluluğu, bu sayfanın render edilmesini sağlamaktır.
+
+## Fonksiyon Grupları
+### Sayfa Renderlama
+Bu grup, “Hakkında” sayfasının kullanıcıya sunulacak JSX yapısını üreten tek bileşeni kapsar.  
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: `Page` fonksiyonu, uygulamanın "Hakkında" sayfasını temsil eden bir React bileşenidir. Sayfa içeriğini oluşturmak üzere `PageComponent` adlı başka bir bileşeni döndürür.
+**Nasıl yapar**: Herhangi bir işlem veya state yönetimi içermeden doğrudan `PageComponent` bileşenini JSX formatında return eder. Bu, üst düzey bir sayfa bileşeni olarak içeriği sarmalar.
+**Parametreler**: Yok
+**Dönüş**: `JSX.Element` — `<PageComponent />` şeklinde JSX ifadesi döndürür. Bu ifade, React tarafından render edilebilir bir sanal DOM öğesidir.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\about\page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element (React bileşeni `<PageComponent />` döndürür)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\about\page.tsx
+  function: src\app\about\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\app\[lang]\about\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\about\page.tsx
+skeleton_hash: e96bf4d40e2325e9
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 8871c1e7b993cf8e
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:13Z
+---
+
+## Genel Bakış
+`src/app/about/page.tsx` modülü, uygulamanın “Hakkında” (About) sayfasını oluşturan tek bir React fonksiyonel bileşeni içerir. `Page` fonksiyonu, Next.js tarafından `/about` rotası ziyaret edildiğinde çağrılır ve statik içerik sağlayan JSX ağacını döndürür. Modülün tek sorumluluğu, bu sayfanın render edilmesini sağlamaktır.
+
+## Fonksiyon Grupları
+### Sayfa Renderlama
+Bu grup, “Hakkında” sayfasının kullanıcıya sunulacak JSX yapısını üreten tek bileşeni kapsar.  
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: `Page` fonksiyonu, uygulamanın "Hakkında" sayfasını temsil eden bir React bileşenidir. Sayfa içeriğini oluşturmak üzere `PageComponent` adlı başka bir bileşeni döndürür.
+**Nasıl yapar**: Herhangi bir işlem veya state yönetimi içermeden doğrudan `PageComponent` bileşenini JSX formatında return eder. Bu, üst düzey bir sayfa bileşeni olarak içeriği sarmalar.
+**Parametreler**: Yok
+**Dönüş**: `JSX.Element` — `<PageComponent />` şeklinde JSX ifadesi döndürür. Bu ifade, React tarafından render edilebilir bir sanal DOM öğesidir.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\about\page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element (React bileşeni `<PageComponent />` döndürür)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\about\page.tsx
+  function: src\app\about\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\app\[lang]\account\layout.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\account\layout.tsx
+skeleton_hash: 5148683d09e343c5
+entity_hashes:
+  func:Layout: f1cd59870391c992
+  overview: df5f26f87596d6fd
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:28Z
+---
+
+## Genel Bakış
+Bu modül, uygulamanın hesap (account) bölümünde yer alan tüm sayfalar için ortak bir düzen (layout) tanımlar. Tek bir `Layout` bileşeni ile alt sayfaların içeriği sarılır, böylece giriş, kayıt, profil gibi sayfalar arasında tutarlı bir yapı ve kullanıcı deneyimi sağlanır.
+
+## Fonksiyon Grupları
+### Sayfa Düzeni Sağlayıcı
+Hesap alt sayfalarının görüntüleneceği çerçeveyi oluşturur; ortak stilleri, gezinme öğelerini veya paylaşılan diğer yapılandırmaları içerebilir.
+- Layout
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Layout
+**Ne yapar**: Verilen `children` propunu `LayoutComponent` içine sararak sayfa düzenini sağlar.  
+**Nasıl yapar**: Fonksiyon, destructured `children` parametresini alır ve doğrudan `<LayoutComponent>{children}</LayoutComponent>` JSX'ini döndürür; ek mantık veya side‑effect yoktur.  
+**Parametreler**:
+- children: React.ReactNode — Layout içinde görüntülenecek içerik (JSX elemanları, metin veya başka React bileşenleri).  
+**Dönüş**: JSX elementi — `LayoutComponent` içinde `children` içeren bir React elementi.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/account/layout.tsx::Layout
+- **params**: 
+  - `children` — React.ReactNode tipinde, içeriğe yerleştirilecek alt bileşenleri temsil eder
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `<LayoutComponent>` bileşeni içine sarılmış `children` ile birlikte JSX döndürür (React.ReactElement)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\account\layout.tsx
+  function: src\app\account\layout.tsx::Layout
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Layout
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\app\[lang]\account\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\account\page.tsx
+skeleton_hash: c1785ce6cd56727b
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 281c4a012ddfb7d3
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:59:02Z
+---
+
+## Genel Bakış
+`src/app/account/page.tsx` modülü, uygulamanın **/account** rotasında gösterilen kullanıcı hesabı sayfasının kök bileşenini tanımlar. Tek bir fonksiyon (`Page`) aracılığıyla sayfanın UI’ı oluşturulur ve gerekli veri/kimlik doğrulama işlemleri bu bileşen içinde yürütülür.
+
+## Fonksiyon Grupları
+### Sayfa Render ve İş Mantığı
+Bu grup, hesap sayfasının kullanıcı arayüzünü oluşturur, sayfa yaşam döngüsü içinde veri çekme ve yetkilendirme kontrollerini gerçekleştirir.  
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: `Page` fonksiyonu, React bileşeni olarak `<PageComponent />` öğesini döndürür. Bu, sayfanın ana görsel bileşenini render eder.  
+**Nasıl yapar**: Fonksiyon içinde doğrudan JSX döndürülür; herhangi bir durum yönetimi veya yan etki yoktur.  
+**Parametreler**:
+- *hiç parametre yok*  
+**Dönüş**: `<PageComponent />` JSX öğesi (React Element)  
+
+---
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/account/page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: <PageComponent /> bileşeni döner
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\account\page.tsx
+  function: src\app\account\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\app\[lang]\account\addresses\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\account\addresses\page.tsx
+skeleton_hash: 63d85d6ab42b769a
+generated_at: 2026-05-23T21:47:10Z
+---
+
+## Genel Bakış
+Bu modül, kullanıcı hesabı içinde adreslerin listelendiği ve yönetildiği sayfanın ana bileşenini tanımlar. Tek bir `Page` fonksiyonu, ilgili UI bileşenlerini bir araya getirerek adres verilerini gösterir ve etkileşimleri yönetir.
+
+## Fonksiyon Grupları
+### Sayfa Render ve UI Bileşenleri
+Bu grup, adres sayfasının görsel çıktısını oluşturmak ve kullanıcı arayüzünü yapılandırmaktan sorumludur.  
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+---
+
+## FONKSIYON DETAYLARI
+
+### Page
+**Ne yapar**: Hesap adresleri sayfasının ana bileşenini döndürür. Kullanıcının kayıtlı adreslerini listeleme, düzenleme veya yeni adres ekleme gibi işlemleri gerçekleştiren bir arayüz sağlar.
+**Nasıl yapar**: Herhangi bir parametre almaz. İç mantık, dosya içeriğinde tanımlanan JSX yapısı ve olası React hook'ları ile şekillenir. Bu dokümanda iç detay belirtilmediğinden, sayfanın standart bir Next.js bileşeni olarak render edildiği varsayılır.
+**Parametreler**:
+- (parametre yok)
+**Dönüş**: `<PageComponent />` – React JSX elementi. Kullanıcının adres yönetimi işlemlerini gerçekleştirdiği sayfa arayüzünü temsil eder.
+
+---
+
+## SABİTLER
+- **PageComponent** (call) — `dynamic(() => import('../../../views/account/AccountAddressesPage'), {
+
+  ssr...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: account/addresses/page.tsx::anonymous
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.ReactNode (loading spinner)
+
+### [N2_NASIL] AST Pointer: account/addresses/page.tsx::Page
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.ReactNode (<PageComponent />)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\account\addresses\page.tsx
+  function: src\app\account\addresses\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+# FILE: src\app\[lang]\account\invoices\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx
+skeleton_hash: 3e610cb029e1dc4e
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 3abd4459140e249f
+  style_tokens: 9144ece4bffe7964
+generated_at: 2026-05-27T17:58:18Z
+---
+
+## Genel Bakış
+Bu dosya, kullanıcı hesabı altındaki fatura listesi sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, dinamik olarak yüklenen `AccountInvoicesPage` bileşenini döndürerek sayfanın veri çekme, yetkilendirme ve kullanıcı arayüzü düzenlemesini yönetir.
+
+## Fonksiyon Grupları
+### Ana Sayfa Bileşeni
+Hesap faturaları sayfasının kök bileşenini oluşturur. Dinamik içe aktarma (dynamic import) yoluyla ilgili görünümü yükler ve render eder.
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: React bileşeni `Page` fonksiyonu, JSX içinde `<PageComponent />` öğesini döndürerek bir sayfa görünümü oluşturur.  
+
+**Nasıl yapar**: Fonksiyon, doğrudan bir JSX ifadesi olan `<PageComponent />`'i return eder; ek bir mantık, durum yönetimi veya yan etki yoktur.  
+
+**Parametreler**:
+- (hiç parametre almaz)
+
+**Dönüş**: JSX.Element — `<PageComponent />` bileşenini temsil eden React öğesi.
+
+---
+
+## SABİTLER
+- **PageComponent** (call) — `dynamic(() => import('../../../views/account/AccountInvoicesPage'), {
+
+  ssr:...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::anonymous_arrow_function
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: React JSX elementi (merkezlenmiş yükleme spinner bileşeni)
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: `<PageComponent />` React bileşeni
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\account\invoices\page.tsx
+  function: src\app\account\invoices\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-b-2`, `border-primary-navy`
+- **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
+
+---
+# FILE: src\app\[lang]\account\orders\detail\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\account\orders\detail\page.tsx
+skeleton_hash: 7cf33906c20b5fc7
+entity_hashes:
+  func:Page: 9e0b3aa05006aa66
+  overview: cd40b01c876ac3a5
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:09Z
+---
+
+## Genel Bakış
+Bu modül, kullanıcı hesabındaki bir siparişin detay sayfasını oluşturup render eden tek bir sorumluluğa sahiptir. `Page` bileşeni, ilgili sipariş verilerini alır ve gerekli alt bileşenleri bir araya getirerek kullanıcıya bütünsel bir detay görünümü sunar. Ayrıca `Suspense` kullanarak asenkron veri yükleme sırasında kullanıcıya yükleniyor geri bildirimi sağlar.
+
+## Fonksiyon Grupları
+### Sayfa Bileşeni
+Uygulamanın "account/orders/detail" sayfasının ana giriş noktasıdır. Sayfa düzeyinde bir React bileşeni döndürür ve dinamik içeriğin hazır olana kadar bekleme deneyimini yönetir.
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: React uygulamasında bir sayfa bileşeni oluşturur ve içeriği asenkron olarak yüklenirken bir bekleme (loading) mesajı gösterir. `Suspense` bileşeni sayesinde `PageComponent` bileşeni yüklenene kadar kullanıcıya geri bildirim sağlanır.  
+
+**Nasıl yapar**: Fonksiyon içinde `tr` çeviri nesnesi `t` olarak kısaltılır, ardından JSX içinde `Suspense` bileşeni kullanılır. `fallback` özelliği, `t.common.loading` metnini içeren bir `<div>` ile tanımlanır; bu, `PageComponent` henüz render edilmediğinde gösterilir. `PageComponent` başarılı bir şekilde yüklendiğinde, `Suspense` otomatik olarak onu render eder.  
+
+**Parametreler**:
+- *Yok* — Fonksiyon dışarıdan herhangi bir argüman almaz.
+
+**Dönüş**: JSX (React element) – `<Suspense>` içinde `fallback` ve `PageComponent` içeren bir React bileşeni döndürür.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\orders\detail\page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `t` — `tr` sözlüğünün bir referansı; `t.common.loading` ifadesiyle yükleme metnini elde etmek için kullanılır.
+- **Dönüş**: React element (JSX içinde `<Suspense>` ve `<PageComponent />` içeren bir bileşen)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\account\orders\detail\page.tsx
+  function: src\app\account\orders\detail\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\app\[lang]\account\returns\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\account\returns\page.tsx
+skeleton_hash: c13912ed61d7eb77
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: 5915b74456bf2b61
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:48Z
+---
+
+## Genel Bakış
+`src/app/account/returns/page.tsx` dosyası, hesap (account) bölümündeki iade (returns) sayfasının giriş noktasıdır. Tek bir fonksiyon olan **Page** bu modülün dışa aktarılan bileşenidir ve sayfanın temel UI kapsamını sağlayan alt bileşenleri (ör. `PageComponent`) render eder. Veri çekme, durum yönetimi ve alt bileşenlerin detayları bu fonksiyonun döndürdüğü bileşenler içinde ele alınır.
+
+## Fonksiyon Grupları
+### UI Başlatma ve Sayfa Renderı
+Sayfanın dışarıdan erişilebilen tek giriş noktasıdır; gerekli alt bileşenleri içeren JSX ağacını oluşturur.  
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Aksiyom 1**: Eğer React çalışma zamanı (runtime) ortamı (örn. `react` ve `react-dom` paketleri) mevcut değilse, `Page` fonksiyonu çalıştırılamaz ve render hatası oluşur.  
+
+**Aksiyom 2**: Eğer `Page` fonksiyonu bir React bileşen ağacının (component tree) dışına doğrudan çağrılırsa, JSX/React elementleri oluşturulamaz ve `Page` fonksiyonunun çıktısı geçerli bir UI öğesi olmaz.  
+
+**Aksiyom 3**: Eğer sayfanın alt bileşenleri (ör. `PageComponent` vb.) ihtiyaç duyduğu veri kaynakları (API endpointleri, context sağlayıcıları vb.) sağlanmazsa, `Page` fonksiyonu içinde bu alt bileşenler hata verir veya boş/yanlış veri gösterir.  
+
+**Aksiyom 4**: Eğer `Page` fonksiyonu bir sunucu‑tarafı (SSR) ortamında çalıştırılıyor ve istemci‑tarafı yalnızca tarayıcıya özgü API’ler (ör. `window`, `document`) kullanılmaya çalışılırsa, SSR aşamasında runtime hatası oluşur.  
+
+**Aksiyom 5**: Eğer proje yapılandırmasında (ör. Next.js, Vite, Webpack) `page.tsx` dosyasının bir “route” olarak tanımlanması eksikse, `Page` bileşeni URL yönlendirmesiyle erişilemez ve kullanıcı bu sayfaya ulaşamaz.  
+
+**Aksiyom 6**: Eğer TypeScript tip denetimi devre dışı bırakılmışsa ve `Page` fonksiyonunun dönüş tipi (`React.ReactNode`/JSX.Element) uyumsuz bir şekilde kullanılırsa, derleme zamanında tip hataları ortaya çıkmaz ancak çalışma zamanında UI bozulması meydana gelebilir.  
+
+**Aksiyom 7**: Eğer stil (CSS/SCSS) dosyaları veya tasarım sistemine (ör. Tailwind, Chakra UI) ait bağımlılıklar eksikse, `Page` bileşeninin görsel çıktısı tasarım beklentilerini karşılamaz.  
+
+**Aksiyom 8**: Eğer `Page` fonksiyonunun içinde kullanılan tüm yan etkiler (ör. veri çekme, event listener ekleme) uygun şekilde temizlenmez (cleanup) ise, bileşen unmount edildiğinde bellek sızıntısı veya istenmeyen yan etkiler oluşur.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: React bileşeni `Page` fonksiyonunu tanımlar ve render edildiğinde `<PageComponent />` JSX öğesini döndürür.  
+**Nasıl yapar**: Fonksiyon, doğrudan JSX ifadesi `return <PageComponent />` ile `PageComponent` bileşenini çağırır; ek bir mantık veya yan etki içermez.  
+
+**Parametreler**:
+- (hiç parametre almaz)
+
+**Dönüş**: JSX.Element — `<PageComponent />` bileşeninin render çıktısı.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\returns\page.tsx::Page
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element (`<PageComponent />` render edilir)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\account\returns\page.tsx
+  function: src\app\account\returns\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\app\[lang]\account\security\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\account\security\page.tsx
+skeleton_hash: e398f4957f5d633b
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: f9d663e29d489ed1
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:58:30Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC uygulamasının kullanıcı hesap güvenliği ayarları sayfasını oluşturan React bileşenidir. Kullanıcıların şifre yönetimi, iki faktörlü kimlik doğrulama gibi hesap güvenliğiyle ilgili işlemleri gerçekleştirebildiği arayüzü sunar.
+
+## Fonksiyon Grupları
+### UI Render Grubu
+Hesap güvenliği sayfasının temel yapısını oluşturur ve ilgili alt güvenlik bileşenlerini bu yapı içinde düzenler. Modülün tek giriş noktası ve dışa aktarılan öğesidir.
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar  
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: `Page` fonksiyonu, React bileşeni olarak tanımlanmış bir sayfa oluşturur ve içinde `<PageComponent />` bileşenini render eder.  
+
+**Nasıl yapar**: Fonksiyon, JSX sözdizimini kullanarak doğrudan `<PageComponent />` öğesini döndürür; bu sayede React render sürecinde ilgili bileşen ekranda gösterilir.  
+
+**Parametreler**:
+- (Parametre yok)
+
+**Dönüş**: `<PageComponent />` JSX öğesini içeren bir React element'i (JSX) döndürür.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\security\page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok
+- **Dönüş**: yok
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\account\security\page.tsx
+  function: src\app\account\security\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\app\[lang]\account\shipments\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\account\shipments\page.tsx
+skeleton_hash: ec39e9ffa86e6b02
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: d9c0633b70be8b36
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-27T17:59:43Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC platformunun kullanıcı hesap bölümündeki sevkiyatlar (shipments) sayfasını oluşturan Next.js sayfa bileşenidir. Kullanıcıların kendi hesaplarına ait tüm sevkiyat bilgilerini görüntüleyebileceği sayfa düzeyinde kullanıcı arayüzünü oluşturur. Platformun yönlendirme yapısıyla uyumlu çalışarak, hesap altındaki sevkiyatlar rotasında otomatik olarak yüklenen ana bileşen görevi görür.
+
+## Fonksiyon Grupları
+### Ana Sayfa Bileşeni
+Sevkiyatlar sayfasının tüm görsel ve işlevsel yapısını inşa eden, alt bileşenler ve durum yönetimi araçlarından faydalanarak kullanıcıya bilgi sunumunu sağlayan ana girişi barındırır.
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: Uygulamanın `src/app/account/shipments/page.tsx` yolunda tanımlı shipments sayfasının ana bileşenini render eder. Sayfanın giriş noktası olarak işlev görür ve kullanıcı arayüzünün yüklenmesini sağlar.
+**Nasıl yapar**: Doğrudan `<PageComponent />` JSX ifadesini döndürerek `PageComponent` bileşenini çağırır. Herhangi bir state yönetimi veya iş mantığı içermez, yalnızca bir sarmalayıcı (wrapper) görevi üstlenir.
+**Parametreler**: Parametre almaz.
+**Dönüş**: `<PageComponent />` — Sayfanın kullanıcı arayüzünü oluşturan React JSX bileşeni.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\shipments\page.tsx::Page
+- **params**: yok (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX (PageComponent bileşeni)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\account\shipments\page.tsx
+  function: src\app\account\shipments\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\app\[lang]\auth\callback\page.md
 
 ---
 domain: general
@@ -2644,7 +2789,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\auth\forgot-password\page.md
+# FILE: src\app\[lang]\auth\forgot-password\page.md
 
 ---
 domain: general
@@ -2706,7 +2851,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\auth\login\page.md
+# FILE: src\app\[lang]\auth\login\page.md
 
 ---
 domain: general
@@ -2764,7 +2909,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\auth\register\page.md
+# FILE: src\app\[lang]\auth\register\page.md
 
 ---
 domain: general
@@ -2824,7 +2969,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\brands\page.md
+# FILE: src\app\[lang]\brands\page.md
 
 ---
 domain: general
@@ -2883,7 +3028,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\brands\[slug]\page.md
+# FILE: src\app\[lang]\brands\[slug]\page.md
 
 ---
 domain: general
@@ -2997,7 +3142,7 @@ graph TD
   export: generateStaticParams
 
 ---
-# FILE: src\app\cart\page.md
+# FILE: src\app\[lang]\cart\page.md
 
 ---
 domain: general
@@ -3055,7 +3200,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\category\[categorySlug]\page.md
+# FILE: src\app\[lang]\category\[categorySlug]\page.md
 
 ---
 domain: general
@@ -3188,7 +3333,7 @@ graph LR
   export: getCategoryData
 
 ---
-# FILE: src\app\category\[categorySlug]\[subCategorySlug]\page.md
+# FILE: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.md
 
 ---
 domain: general
@@ -3293,7 +3438,7 @@ graph LR
   export: getCategoryData
 
 ---
-# FILE: src\app\checkout\page.md
+# FILE: src\app\[lang]\checkout\page.md
 
 ---
 domain: general
@@ -3345,7 +3490,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\contact\page.md
+# FILE: src\app\[lang]\contact\page.md
 
 ---
 domain: general
@@ -3403,7 +3548,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\destek\garanti-servis\page.md
+# FILE: src\app\[lang]\destek\garanti-servis\page.md
 
 ---
 domain: general
@@ -3463,7 +3608,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\destek\hesaplayicilar\hava-perdesi\page.md
+# FILE: src\app\[lang]\destek\hesaplayicilar\hava-perdesi\page.md
 
 ---
 domain: general
@@ -3520,7 +3665,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\destek\hesaplayicilar\hrv\page.md
+# FILE: src\app\[lang]\destek\hesaplayicilar\hrv\page.md
 
 ---
 domain: general
@@ -3576,7 +3721,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\destek\hesaplayicilar\jet-fan\page.md
+# FILE: src\app\[lang]\destek\hesaplayicilar\jet-fan\page.md
 
 ---
 domain: general
@@ -3632,7 +3777,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\destek\hesaplayicilar\kanal\page.md
+# FILE: src\app\[lang]\destek\hesaplayicilar\kanal\page.md
 
 ---
 domain: general
@@ -3694,7 +3839,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\destek\iade-degisim\page.md
+# FILE: src\app\[lang]\destek\iade-degisim\page.md
 
 ---
 domain: general
@@ -3755,7 +3900,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\destek\konular\[slug]\page.md
+# FILE: src\app\[lang]\destek\konular\[slug]\page.md
 
 ---
 domain: general
@@ -3840,7 +3985,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: generateStaticParams
 
 ---
-# FILE: src\app\destek\merkez\page.md
+# FILE: src\app\[lang]\destek\merkez\page.md
 
 ---
 domain: general
@@ -3903,7 +4048,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\destek\sss\page.md
+# FILE: src\app\[lang]\destek\sss\page.md
 
 ---
 domain: general
@@ -3961,7 +4106,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\destek\teslimat-kargo\page.md
+# FILE: src\app\[lang]\destek\teslimat-kargo\page.md
 
 ---
 domain: general
@@ -4020,7 +4165,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\legal\cerez-politikasi\page.md
+# FILE: src\app\[lang]\legal\cerez-politikasi\page.md
 
 ---
 domain: general
@@ -4078,7 +4223,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\legal\gizlilik-politikasi\page.md
+# FILE: src\app\[lang]\legal\gizlilik-politikasi\page.md
 
 ---
 domain: general
@@ -4136,7 +4281,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\legal\kullanim-kosullari\page.md
+# FILE: src\app\[lang]\legal\kullanim-kosullari\page.md
 
 ---
 domain: general
@@ -4195,7 +4340,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\legal\kvkk\page.md
+# FILE: src\app\[lang]\legal\kvkk\page.md
 
 ---
 domain: general
@@ -4255,7 +4400,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\legal\mesafeli-satis-sozlesmesi\page.md
+# FILE: src\app\[lang]\legal\mesafeli-satis-sozlesmesi\page.md
 
 ---
 domain: general
@@ -4313,7 +4458,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\legal\on-bilgilendirme-formu\page.md
+# FILE: src\app\[lang]\legal\on-bilgilendirme-formu\page.md
 
 ---
 domain: general
@@ -4372,7 +4517,7 @@ Bu modül için özel aksiyom tan
   export: Page
 
 ---
-# FILE: src\app\payment-success\page.md
+# FILE: src\app\[lang]\payment-success\page.md
 
 ---
 domain: general
@@ -4432,7 +4577,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\products\page.md
+# FILE: src\app\[lang]\products\page.md
 
 ---
 domain: general
@@ -4489,7 +4634,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   export: Page
 
 ---
-# FILE: src\app\products\[slug]\page.md
+# FILE: src\app\[lang]\products\[slug]\page.md
 
 ---
 domain: general
@@ -7634,12 +7779,8 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx
-skeleton_hash: 8a850a2b7d984e21
-entity_hashes:
-  func:LanguageSwitcher: e20e68a6d834aa54
-  overview: 7882320662f1fa31
-  style_tokens: 93059c02fd156e45
-generated_at: 2026-05-27T18:07:01Z
+skeleton_hash: dfec695a41b4fbe5
+generated_at: 2026-05-28T07:31:30Z
 ---
 
 ## Genel Bakış
@@ -7647,41 +7788,96 @@ LanguageSwitcher modülü, uygulamanın dil seçimini sağlayan basit bir React 
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Bu grup, dil değiştirme işlevselliğini tek bir fonksiyonda toplar.
+Bu grup, dil değiştirme işlevselliğini tek bir fonksiyonda toplar ve kullanıcı arayüzünü render eder.
 - LanguageSwitcher
+
+### Dil Değiştirme Mantığı
+Bu grup, seçilen dili uygulama genelinde güncellemek için kullanılan işlevi içerir.
+- switchLanguage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Dil değiştirme işlevini yerine getiren bu React bileşeninin çalışması için uygulama içi dil yönetimi altyapısının ve React çalışma ortamının erişilebilir olması zorunludur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer uygulama genelinde paylaşılan global dil durumu (dil state'i) bileşen tarafından erişilebilir değilse, kullanıcının seçtiği dil uygulama genelindeki hiçbir içeriği etkilemez, bileşen tamamen işlevsiz kalır.
-[Aksiyom 2]: Eğer desteklenen dillerin listesi bileşen tarafından erişilebilir değilse, kullanıcıya seçim yapabileceği hiçbir dil seçeneği sunulamaz, bileşen boş olarak render edilir.
-[Aksiyom 3]: Eğer dil değişikliğini uygulama genelinde uygulayacak global callback fonksiyonu tanımlı ve erişilebilir değilse, kullanıcı herhangi bir dil seçse bile dil değişikliği işlemi gerçekleştirilemez, uygulama mevcut dilinde kalır.
-[Aksiyom 4]: Eğer React kütüphanesi bileşenin çalıştığı istemci ortamında erişilebilir değilse, bileşen hiçbir şekilde render edilemez, çalışmaz.
+**Aksiyom 1**: Eğer uygulama içinde ortak bir dil durumu (global language state) bulunmuyorsa, `LanguageSwitcher` bileşeni mevcut dili gösteremez ve dil değişikliği yapılamaz.  
+
+**Aksiyom 2**: Eğer `switchLanguage` fonksiyonuna `'tr'` ya da `'en'` dışındaki bir değer (`newLang`) gönderilirse, geçersiz dil hatası oluşur ve dil değişikliği gerçekleşmez.  
+
+**Aksiyom 3**: Eğer React çalışma ortamı (React runtime ve ilgili bağlam sağlayıcıları) mevcut değilse, `LanguageSwitcher` bileşeni render edilemez ve hiçbir etkileşim gerçekleşmez.  
+
+**Aksiyom 4**: Eğer `switchLanguage` fonksiyonu çağrıldığında ilgili dil paketleri (i18n çeviri dosyaları) yüklenmemişse, UI’da yeni dilde metinler gösterilemez ve varsayılan (fallback) dil kullanılır.
 
 ---
 
-## FONKSİYON DETAYLARI
+## FONKSIYON DETAYLARI
 
 ### LanguageSwitcher
-**Ne yapar**: LanguageSwitcher fonksiyonu, uygulama içinde dil seçimini sağlayan bir React bileşeni döndürür.  
-**Nasıl yapar**: Fonksiyon, React.FC arayüzünü uygulayarak JSX döndürür; içeriğinde dil seçeneklerini gösteren öğeler ve kullanıcı etkileşimini yöneten mantık bulunur (örneğin, bir buton veya açılır menü).  
+**Ne yapar**: React uygulamasında dil değiştirme arayüzünü sağlayan bir fonksiyon bileşeni döndürür.  
+**Nasıl yapar**: Fonksiyon, bir React Functional Component (FC) tanımlayarak, kullanıcıların mevcut dili seçebileceği UI öğelerini render eder. Bileşen içinde dil değişimini tetikleyen `switchLanguage` fonksiyonu çağrılabilir.  
 **Parametreler**:  
-- (parametre yok)  
-**Dönüş**: React.FC türünde bir fonksiyon; bu fonksiyon render edildiğinde dil değiştirme kullanıcı arayüzünü gösterir.
+- *Yok* — Bu fonksiyon parametre almaz.  
+**Dönüş**: React.FC — Dil seçici bileşenini temsil eden bir React Functional Component döndürür.
+
+### switchLanguage
+**Ne yapar**: Uygulamanın aktif dilini, verilen yeni dil koduna (`'tr'` veya `'en'`) göre değiştirir.  
+**Nasıl yapar**: Fonksiyon, `newLang` parametresiyle belirtilen dil kodunu alır ve uygulama çapında dil ayarını günceller; genellikle i18n kütüphanesi veya global durum yöneticisi aracılığıyla bu değişikliği yayar.  
+**Parametreler**:  
+- newLang: `'tr' | 'en'` — Değiştirilecek hedef dil kodu.  
+**Dönüş**: Belirtilmemiş — Fonksiyonun dönüş tipi dokümantasyonda tanımlı değildir (muhtemelen `void`).
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx::LanguageSwitcher
+### [N1_NASIL] AST Pointer: src/components/LanguageSwitcher.tsx::LanguageSwitcher
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lang` — Mevcut aktif uygulama dili kodu, useI18n kancası aracılığıyla alındı
-  - `setLang` — Uygulamanın aktif dilini güncellemek için kullanılan fonksiyon, useI18n kancası tarafından sağlandı
-  - `t` — Yerelleştirilmiş metin dizelerini almak için kullanılan çeviri fonksiyonu, useI18n kancası tarafından sağlandı
-- **Dönüş**: React.FC
+  - `lang` — `useI18n` hookundan gelen mevcut dil kodu (`'tr'` | `'en'`).
+  - `setLang` — `useI18n` hookundan gelen fonksiyon, dil değiştiğinde state’i günceller.
+  - `t` — `useI18n` hookundan gelen çeviri fonksiyonu, anahtarları yerelleştirir.
+  - `pathname` — `usePathname` hookundan gelen mevcut URL yolu (string).
+  - `router` — `useRouter` hookundan gelen router nesnesi, `push` ve `refresh` metodlarını sağlar.
+  - `switchLanguage` — iç tanımlı fonksiyon, dil değişimini yönetir.
+- **Dönüş**: React.FC (JSX elemanı döner; yan etkileri: dil cookie ve localStorage güncellenir, router ile yönlendirme yapılır).
+
+### [N2_NASIL] AST Pointer: src/components/LanguageSwitcher.tsx::switchLanguage
+- **params**: `newLang: 'tr' | 'en'`
+- **ic_degiskenler**:
+  - `newLang` — hedef dil kodu, `'tr'` veya `'en'`.
+  - `lang` — dış kapsamdaki `useI18n` hookundan alınan mevcut dil (karşılaştırma için).
+  - `document.cookie` — tarayıcı cookie’sine `NEXT_LOCALE` anahtarıyla yeni dil değerini yazar.
+  - `localStorage` — `setItem('lang', newLang)` ile yeni dili kalıcı olarak saklar (try/catch içinde).
+  - `setLang` — `useI18n` hookundan gelen fonksiyon, client‑side state’i günceller.
+  - `pathname` — dış kapsamdaki `usePathname` hookundan gelen mevcut yol.
+  - `segments` — `pathname.split('/')` sonrası boş olmayan parçalar dizisi.
+  - `firstSegment` — `segments[0]`, yolun ilk bölümü (varsa).
+  - `newPath` — hesaplanan yeni URL yolu (string).
+  - `router` — dış kapsamdaki `useRouter` hookundan gelen nesne; `push` ve `refresh` metodları çağrılır.
+- **Dönüş**: yok (fonksiyon yan etkilerle çalışır; cookie, localStorage, state ve router güncellenir).
+
+---
+
+## ÇAĞRI HARİTASI
+
+### Dışarıya Çağrılar (Outgoing)
+**LanguageSwitcher()** fonksiyonu, **switchLanguage** fonksiyonunu çağırarak dil değiştirme işlemini başlatır.
+
+### Dışarıdan Çağrılanlar (Incoming)
+Verilen veride bu modülü kullanan dış dosya veya fonksiyon belirtilmemiştir.
+
+### İç İçe Fonksiyonlar (Nested)
+Yok
+
+---
+
+## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
+  LanguageSwitcher() → switchLanguage()
+
+```mermaid
+graph LR
+    LanguageSwitcher["LanguageSwitcher()"] --> switchLanguage["switchLanguage()"]
+```
 
 ---
 
@@ -7689,27 +7885,12 @@ Dil değiştirme işlevini yerine getiren bu React bileşeninin çalışması i�
 
   file: src\components\LanguageSwitcher.tsx
   function: src\components\LanguageSwitcher.tsx::LanguageSwitcher
+  function: src\components\LanguageSwitcher.tsx::switchLanguage
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LanguageSwitcher
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-white/90`, `border-light-gray`, `hover:bg-light-gray`, `text-industrial-gray`, `text-sm`, `text-white`
-- **Layout:** `backdrop-blur`, `bottom-4`, `fixed`, `flex`, `gap-1`, `items-center`, `p-1`, `right-4`, `shadow-sm`, `z-50`
-- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `${lang`, `:`, `===`, `border`, `en`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `outline-none`, `px-3`, `py-1`, `rounded-full`, `tr`
 
 ---
 # FILE: src\components\LazyBrandsShowcase.md
@@ -33141,6 +33322,70 @@ Bu modül, React ekosisteminde çalışan özel bir hook olarak, bileşen yaşam
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: useIsMounted
+
+---
+# FILE: src\hooks\useLocalizedRoutes.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: src/hooks/useLocalizedRoutes.ts
+generated_at: 2026-05-28T07:31:00Z
+---
+
+## Genel Bakış
+useLocalizedRoutes hook'u, uygulama genelindeki merkezi `Routes` tanımlarını dinamik olarak o anki aktif dile (`lang`) göre yerelleştirilmiş (localized) rotalara dönüştüren akıllı bir Proxy mekanizması sunar.
+
+## Fonksiyon Grupları
+### Yardımcı Metotlar
+Dil ön eki ekleme ve proxy sarmalama işlemlerini yöneten iç metotlar.
+- localizeUrl
+- createLocalizedProxy
+
+### Ana Hook
+Dile göre yerelleştirilmiş Routes nesnesini döndüren ana kanca.
+- useLocalizedRoutes
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modülün çalışması için yerelleştirilmiş I18nProvider'ın ve merkezi rota nesnesinin erişilebilir olması gerekir.
+
+[Aksiyom 1]: I18nProvider context yapısı erişilebilir olmalıdır, aksi takdirde aktif dil (`lang`) tespit edilemez.
+[Aksiyom 2]: Admin ve API rotaları dil ön eki (`/tr` veya `/en`) almamalıdır, aksi takdirde backend entegrasyonları ve yönetim paneli kilitlenir.
+[Aksiyom 3]: Zaten dil ön eki barındıran rotalar (`/tr/...` veya `/en/...`) tekrar işlenmemelidir, aksi takdirde `/en/en` gibi mükerrer dil segmentli 404 sayfaları oluşur.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### useLocalizedRoutes
+**Ne yapar**: Aktif dil context'ine duyarlı, yerelleştirilmiş bir Routes proxy nesnesi döner.  
+**Nasıl yapar**: `useI18n()` hook'u üzerinden aktif dili okur ve `createLocalizedProxy` fonksiyonunu kullanarak `Routes` nesnesini bu dile göre sarmalar.  
+**Dönüş**: Yerelleştirilmiş rota fonksiyonlarını içeren dinamik Proxy nesnesi.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/hooks/useLocalizedRoutes.ts::useLocalizedRoutes
+- **ic_degiskenler**:
+  - `lang` — useI18n kancası üzerinden okunan aktif dil ön eki.
+- **Dönüş**: Proxy<Routes>
+
+---
+
+## NODE ID STANDARD
+
+  file: src\hooks\useLocalizedRoutes.ts
+  function: src\hooks\useLocalizedRoutes.ts::useLocalizedRoutes
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: useLocalizedRoutes
+
 
 ---
 # FILE: src\hooks\useManualScrollRestoration.md
