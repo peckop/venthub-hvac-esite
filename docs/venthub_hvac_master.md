@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-28T09:47:31.713787+00:00
-total_compiled_files: 427
+compiled_at: 2026-05-28T19:57:53.676323+00:00
+total_compiled_files: 429
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-28T09:47:31.713787+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.676323+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -56,9 +56,7 @@ Bu Venthub HVAC projesine ait Next.js ara katman (middleware) modülü, gelen is
 
 ## SABİTLER
 - **config** (object) — `{
-
   matcher: ['/products/:path*', '/admin/:path*']
-
 }`
 - **UUID_REGEX** (regex) — `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`
 - **ADMIN_ROLES** (new_expression) — `new Set(['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'])`
@@ -1805,6 +1803,85 @@ Bu API rotasının çalışması için Supabase veritabanı tetikleyicilerinin v
   export: POST
   export: dynamic = 'force-dynamic'
 
+
+---
+# FILE: src\app\[lang]\layout.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\layout.tsx
+skeleton_hash: 958c3e3da44dac0f
+entity_hashes:
+  func:LangLayout: 894f6821eb40308a
+  func:generateStaticParams: 8c98a454509d7f36
+  overview: 8fb6408ed372ba76
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T13:49:53Z
+---
+
+## Genel Bakış
+(Sentez hatası)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+(Sentez hatası)
+
+---
+
+## FONKSİYON DETAYLARI
+
+---
+
+## TYPE ALIASES
+
+### Props
+```typescript
+type Props = {
+
+  children: React.ReactNode
+
+  params: Promise<{ lang: string }>
+
+}
+```
+
+---
+
+## AST POINTERS
+(Sentez hatası)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\[lang]\layout.tsx
+  function: src\app\[lang]\layout.tsx::generateStaticParams
+  function: src\app\[lang]\layout.tsx::LangLayout
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: LangLayout
+  export: generateStaticParams
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
 
 ---
 # FILE: src\app\[lang]\page.md
@@ -37276,6 +37353,65 @@ Bu utility modülü, sınıf ismi birleştirme (cn()) ve WhatsApp iletişim bağ
 ## DISA AKTARILANLAR (EXPORTS)
   export: buildWhatsAppLink
   export: cn
+
+---
+# FILE: src\lib\data\preload.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\lib\data\preload.ts
+skeleton_hash: de26798c54572da7
+entity_hashes:
+  func:preloadCategory: 5c31b78ecaccbf15
+  func:preloadProduct: ffb09955ca2af5e6
+  overview: fbf5026e6d49d8ba
+generated_at: 2026-05-28T13:52:58Z
+---
+
+## Genel Bakış
+(Sentez hatası)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+(Sentez hatası)
+
+---
+
+## FONKSİYON DETAYLARI
+
+---
+
+## SABİTLER
+- **getCachedProductBySlug** (call) — `cache(async (slug: string) => {
+  return getProductBySlug(slug)
+})`
+- **getCachedCategoryData** (call) — `cache(async (slug: string) => {
+  const { data, error } = await supabase
+    ...`
+
+---
+
+## AST POINTERS
+(Sentez hatası)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\lib\data\preload.ts
+  function: src\lib\data\preload.ts::preloadProduct
+  function: src\lib\data\preload.ts::preloadCategory
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: getCachedCategoryData
+  export: getCachedProductBySlug
+  export: preloadCategory
+  export: preloadProduct
 
 ---
 # FILE: src\lib\services\address.service.md

@@ -127,11 +127,13 @@ Eğer bu mesajı alırsanız işlem başarılı demektir. Kullanıcıya "Noteboo
 ## Hata Durumları
 
 ### Authentication Expired Hatası
-**ÖNEMLİ KURAL:** Eğer komut "Authentication expired" hatası verirse, durumu kullanıcıya BİLDİRMEYİN veya ondan terminale komut girmesini İSTEMEYİN. Doğrudan otonom olarak şu adımları izleyin:
+**ÖNEMLİ KURAL:** Eğer komut "Authentication expired" hatası verirse otonom olarak şu adımları izleyin:
 
-1. `nlm login` komutunu çalıştırın (auto-login aktif, tarayıcıda otomatik tamamlanır)
-2. Login tamamlandıktan sonra `refresh_auth` MCP tool'unu çağırın
-3. Senkronizasyon komutunu tekrar tetikleyin
+1. `.agent/scripts/nlm-clean-login.ps1` scriptini PowerShell üzerinde bypass politikasıyla çalıştırarak tarayıcı entegrasyonuyla güvenli giriş yapmayı tetikleyin:
+   ```bash
+   powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+   ```
+2. Login tamamlandıktan sonra senkronizasyon komutunu tekrar tetikleyin.
 
 ### cc doc tree Master MD 0 Dosya Hatası
 Eğer `cc doc tree` komutu "→ 0 MD NLM'e birlestirilecek" diyorsa:

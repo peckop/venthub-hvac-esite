@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-28T09:47:31.444657+00:00
+compiled_at: 2026-05-28T19:57:53.413487+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-28T09:47:31.444657+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -84,7 +84,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T09:47:31.444657+00:00 tarihind
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── 📂 **teslimat-kargo/**
 │   │   │   │       └── ✅ `page.tsx`
-│   │   │   ├── ❌ `layout.tsx`
+│   │   │   ├── ✅ `layout.tsx`
 │   │   │   ├── 📂 **legal/**
 │   │   │   │   ├── 📂 **cerez-politikasi/**
 │   │   │   │   │   └── ✅ `page.tsx`
@@ -419,7 +419,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T09:47:31.444657+00:00 tarihind
 │   │   ├── ✅ `audit.ts`
 │   │   ├── ✅ `brands.ts`
 │   │   ├── 📂 **data/**
-│   │   │   └── ❌ `preload.ts`
+│   │   │   └── ✅ `preload.ts`
 │   │   ├── ✅ `ensureSessionFresh.ts`
 │   │   ├── ✅ `errorReporter.ts`
 │   │   ├── ✅ `hvacCalculations.ts`
@@ -603,8 +603,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T09:47:31.444657+00:00 tarihind
 ```
 
 ## Eksik Dokümantasyonlar
-- [ ] `src\app\[lang]\layout.tsx`
-- [ ] `src\lib\data\preload.ts`
+Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
