@@ -1,16 +1,16 @@
 ---
-name: cc-cli
+name: orion-cli
 description: >
-  Corpus Callosum (CC) CLI dokümantasyon pipeline komutlarını öğretir. TETİKLE: Kullanıcı
+  Orion CLI dokümantasyon pipeline komutlarını öğretir. TETİKLE: Kullanıcı
   "doküman üret", "md güncelle", "doc yap", "doc pipeline", "tree oluştur", "NLM sync",
   "schema çıkar", "hook kur", "orion doc" dediğinde veya bir kod dosyası değişikliği sonrası
   dokümantasyon güncellenmesi gerektiğinde. ASLA TETİKLEME: Kullanıcı sadece kod yazmak,
   debug yapmak, test çalıştırmak veya Orion CLI ile ilgisi olmayan işlemler istediğinde.
 ---
 
-# Corpus Callosum (CC) CLI Dokümantasyon Pipeline
+# Orion CLI Dokümantasyon Pipeline
 
-Bu yetenek (Skill), projedeki kaynak koddan Markdown dokümantasyon üretir, bunları tek bir Master MD'de birleştirir ve otonom olarak NotebookLM'e yükler. Tüm dokümantasyon ve hafıza iş akışı `orion` veya `cc` CLI komutları üzerinden yürütülür.
+Bu yetenek (Skill), projedeki kaynak koddan Markdown dokümantasyon üretir, bunları tek bir Master MD'de birleştirir ve otonom olarak NotebookLM'e yükler. Tüm dokümantasyon ve hafıza iş akışı `orion` CLI komutları üzerinden yürütülür.
 
 ## Ön Koşullar
 
@@ -29,7 +29,7 @@ orion doc init
 Bu komut:
 1. `.cc_docs.yaml` oluşturur (proje config)
 2. `.git/hooks/pre-commit` kurar (otomatik doc üretimi)
-3. Bu skill'i `.agent/skills/cc-cli/` altına kopyalar
+3. Bu skill'i `.agent/skills/orion-cli/` altına kopyalar
 
 ### Manuel Kurulum (init yoksa)
 
@@ -199,7 +199,7 @@ Aşağıdaki araçlar, belirtilen ÖN KOŞUL aracı çağrılmadan kullanılmama
 orion memory remember    ← ÖN KOŞUL: orion memory search
 orion memory update-node ← ÖN KOŞUL: orion memory read-node
 orion memory forget      ← ÖN KOŞUL: orion memory read-node
-orion memory synapse     ← ÖNKOŞUL: orion memory search
+orion memory synapse     ← ÖN KOŞUL: orion memory search
 ```
 
 ### A8 — Skill Önceliği
