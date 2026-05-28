@@ -17,6 +17,19 @@ import {
 } from '../types/db-rows'
 import toast from 'react-hot-toast'
 
+/**
+ * A complex custom React hook that orchestrates the entire checkout process state.
+ * Manages steps, customer information, addresses, invoice profiles, and legal consents,
+ * while automatically pre-filling data from the authenticated user's profile and defaults.
+ *
+ * @returns An object containing all checkout state values, setter functions, and step validation handlers
+ *
+ * @example
+ * const { step, handleNextStep, shippingAddress } = useCheckoutOrchestrator()
+ * if (step === 2) {
+ *   renderAddressForm(shippingAddress)
+ * }
+ */
 export const useCheckoutOrchestrator = () => {
   const { user } = useAuth()
   const { t } = useI18n()

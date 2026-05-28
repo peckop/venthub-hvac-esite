@@ -31,10 +31,31 @@ export const getCachedCategoryData = cache(async (slug: string) => {
 })
 
 // Preload pattern functions that can be called early in the render phase
+
+/**
+ * Preloads a product into the Next.js cache early in the render phase.
+ * Calling this before a component is rendered avoids render-blocking waterfalls.
+ *
+ * @param slug - The unique slug identifier of the product to preload
+ * @returns void - The fetch promise is intentionally floating (voided) to initiate the background request
+ *
+ * @example
+ * preloadProduct('premium-vent-fan-5000')
+ */
 export function preloadProduct(slug: string) {
   void getCachedProductBySlug(slug)
 }
 
+/**
+ * Preloads a category into the Next.js cache early in the render phase.
+ * Calling this before a component is rendered avoids render-blocking waterfalls.
+ *
+ * @param slug - The unique slug identifier of the category to preload
+ * @returns void - The fetch promise is intentionally floating (voided) to initiate the background request
+ *
+ * @example
+ * preloadCategory('industrial-fans')
+ */
 export function preloadCategory(slug: string) {
   void getCachedCategoryData(slug)
 }

@@ -37,6 +37,17 @@ function createLocalizedProxy<T extends object>(target: T, lang: string): T {
   })
 }
 
+/**
+ * A React hook that returns a proxy over the global `Routes` object, automatically
+ * prepending the current language code to all returned route paths.
+ * Admin and API routes are explicitly excluded from localization.
+ *
+ * @returns A localized proxy of the standard routing object
+ *
+ * @example
+ * const routes = useLocalizedRoutes()
+ * const localizedUrl = routes.product('vent-fan-123') // returns '/tr/products/vent-fan-123' if lang is 'tr'
+ */
 export function useLocalizedRoutes() {
   const { lang } = useI18n()
   return createLocalizedProxy(Routes, lang)

@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2024-05-18 - JSDoc on Caching Patterns
+**Learning:** Next.js `cache` wrapper implementations in `src/lib/data/preload.ts` effectively use standard functions returning promises that are voided to start background execution.
+**Action:** When documenting preload or cache patterns, emphasize that the return type should be noted as void but mention the side-effect of initiating cache loading.
