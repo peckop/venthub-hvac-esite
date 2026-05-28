@@ -31,6 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changefreq: 'daily',
       priority: route === '' ? 1.0 : 0.8,
+      alternates: {
+        languages: {
+          tr: `${baseUrl}/tr${route}`,
+          en: `${baseUrl}/en${route}`,
+        }
+      }
     }))
   )
 
@@ -41,6 +47,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(cat.updated_at || new Date()),
       changefreq: 'weekly',
       priority: 0.7,
+      alternates: {
+        languages: {
+          tr: `${baseUrl}/tr${Routes.category(cat.slug)}`,
+          en: `${baseUrl}/en${Routes.category(cat.slug)}`,
+        }
+      }
     }))
   )
 
@@ -51,6 +63,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changefreq: 'weekly',
       priority: 0.6,
+      alternates: {
+        languages: {
+          tr: `${baseUrl}/tr${Routes.brand(brand.slug)}`,
+          en: `${baseUrl}/en${Routes.brand(brand.slug)}`,
+        }
+      }
     }))
   )
 
@@ -63,6 +81,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(prod.updated_at || new Date()),
         changefreq: 'daily',
         priority: 0.9,
+        alternates: {
+          languages: {
+            tr: `${baseUrl}/tr${Routes.product(prod.slug!)}`,
+            en: `${baseUrl}/en${Routes.product(prod.slug!)}`,
+          }
+        }
       }))
   )
 
