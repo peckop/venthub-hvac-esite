@@ -121,7 +121,8 @@ html {
   height: 1px;
   width: 96px;
   background: linear-gradient(90deg, transparent, #22D3EE, transparent);
-  animation: flow 3s linear infinite;
+  animation: flow 3s linear infinite backwards;
+  opacity: 0;
 }
 
 /* Enhanced Glass Effect */

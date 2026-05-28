@@ -49,7 +49,7 @@ module.exports = [
     }
   },
   {
-    ignores: [".next/**", "out/**", "public/**", "supabase/**", "node_modules/**", "next-env.d.ts", ".agent/**"]
+    ignores: [".next/**", "out/**", "public/**", "supabase/**", "node_modules/**", "next-env.d.ts", ".agent/**", "scripts/**"]
   },
   {
     // .cjs uzantılı dosyalar Node.js CommonJS kuralıyla çalışır.
