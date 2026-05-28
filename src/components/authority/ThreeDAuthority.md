@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\authority\ThreeDAuthority.tsx
 skeleton_hash: 5889f50b0077d368
-generated_at: 2026-05-23T22:01:08Z
+entity_hashes:
+  func:Model: cad84f3d7aa627bb
+  func:ThreeDAuthority: 003bc9e7ed9ad2d8
+  overview: 53fe48ece7de08da
+  style_tokens: 79effa301ffb588d
+generated_at: 2026-05-28T22:35:41Z
 ---
 
 ## Genel Bakış
@@ -32,7 +37,7 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir:
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Model
 **Ne yapar**: Verilen `url` ve opsiyonel `hotspots` ile bir 3D modeli render eder.  
@@ -100,16 +105,13 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir:
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `opacity-[0.03]`, `tracking-[0.2em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/50`, `bg-white/90`, `border-2`, `border-primary-navy`, `border-slate-200`, `border-t-transparent`, `border-white`, `text-center`, `text-industrial-gray`, `text-slate-400`, `text-slate-500`, `text-steel-gray`
-- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-4`, `flex`, `flex-col`, `group-hover:block`, `group-hover:scale-110`, `h-16`, `h-2`, `h-4`, `h-8`, `hidden`, `items-center`, `justify-center`
-- **Responsive:** (yok)
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-4`, `flex`, `flex-col`, `group-hover:block`, `h-16`, `h-2`, `h-4`, `h-8`, `hidden`, `items-center`, `justify-center`, `left-4`
+- **Varyant/Responsive:** `group-hover:` önekleri
+- **Yardımcı Sınıflar:** `${className`, `animate-pulse`, `animate-spin`, `animate-spin-slow`, `border`, `cursor-pointer`, `font-black`, `font-bold`, `group`, `group-hover:scale-110`, `inset-0`, `leading-tight`, `mb-1`, `mb-2`, `mt-1`

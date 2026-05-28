@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\NeedsAnalysisWizard.tsx
 skeleton_hash: 93154e7b94017606
-generated_at: 2026-05-23T21:59:41Z
+entity_hashes:
+  func:NeedsAnalysisWizard: 21824b9940ba2474
+  func:handleSelection: be5cfa5ce36fcdb3
+  overview: 2c7912dc8f1185c2
+  style_tokens: 4b1fcd41d2094d58
+generated_at: 2026-05-28T22:35:45Z
 ---
 
 ## Genel Bakış
@@ -31,7 +36,7 @@ Bu modül, `onFilterChange` propunun bir fonksiyon ve `handleSelection` metodunu
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### NeedsAnalysisWizard
 **Ne yapar**: Kullanıcının ihtiyaç analizi sürecini adım adım yönlendiren bir sihirbaz bileşeni render eder.  
@@ -93,29 +98,6 @@ Bu modül, `onFilterChange` propunun bir fonksiyon ve `handleSelection` metodunu
 
 ---
 
-## Çağrı Haritası
-
-### Disariya Çağrılar (Outgoing)
-- **NeedsAnalysisWizard()** fonksiyonu, kullanıcı tarafından yapılan seçimi işlemek için **handleSelection** fonksiyonunu çağırır.
-
-### Disarından Çağrılanlar (Incoming)
-- Verilen veri setinde bu modülü çağıran dış bir fonksiyon veya modül belirtilmediği için dışarıdan çağrılan bilgi bulunmamaktadır.
-
-### İç İçe Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  NeedsAnalysisWizard() → handleSelection()
-
-```mermaid
-graph LR
-    NeedsAnalysisWizard["NeedsAnalysisWizard()"] --> handleSelection["handleSelection()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\category\NeedsAnalysisWizard.tsx
@@ -138,6 +120,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-r`, `bg-white`, `bg-white/20`, `border-2`, `border-primary-navy/10`, `from-primary-navy`, `text-blue-100`, `text-gray-400`, `text-gray-500`, `text-gray-700`, `text-gray-800`, `text-left`, `text-lg`, `text-primary-navy`, `text-secondary-blue`
+- **Renkler:** `bg-gradient-to-r`, `bg-white`, `bg-white/20`, `border-2`, `border-primary-navy/10`, `from-primary-navy`, `hover:bg-blue-50`, `hover:bg-orange-50`, `hover:border-blue-500`, `hover:border-orange-500`, `hover:border-secondary-blue`, `hover:text-gray-600`, `text-blue-100`, `text-gray-400`, `text-gray-500`
 - **Layout:** `flex`, `from-primary-navy`, `gap-3`, `grid`, `grid-cols-1`, `grid-cols-2`, `items-center`, `justify-between`, `md:grid-cols-2`, `md:grid-cols-3`, `md:grid-cols-4`, `md:w-auto`, `p-2`, `p-6`, `shadow-lg`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `animate-fadeIn`, `border`, `focus-ring`, `font-bold`, `font-medium`, `hover:scale-105`, `mb-2`, `mb-6`, `ml-4`, `mt-6`, `px-3`, `px-4`, `px-6`, `py-1`, `py-3`

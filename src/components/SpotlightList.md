@@ -4,41 +4,52 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SpotlightList.tsx
 skeleton_hash: 8b7b0b4d8c4518b8
-generated_at: 2026-05-23T22:27:36Z
+entity_hashes:
+  func:SpotlightList: 358dd251b6a56278
+  func:onMove: 0f9106ce87047fd0
+  overview: bdffe404d7317486
+  style_tokens: e561a3ecabc90f8b
+generated_at: 2026-05-28T22:37:15Z
 ---
 
 ## Genel Bakış
-Venthub HVAC projesinin React tabanlı arayüzünde kullanılan bu modül, odaklanmış (spotlight) liste bileşenini barındırır. Kullanıcıların listedeki öğelerle etkileşim kurmasını, özellikle öğeleri taşımasını destekleyen temel işlevleri sunar. Tekrar kullanılabilir bir yapıda tasarlanan bu bileşen, arayüzde listeleme işlemleri için merkezî bir çözüm sunar.
+Venthub HVAC projesinin arayüzünde yer alan bu modül, odaklanmış (spotlight) liste bileşenini oluşturur ve kullanıcıların listedeki öğelerle, özellikle de öğeleri taşıma yoluyla, etkileşim kurmasını sağlar. Üst bileşenlerden gelen veriye ve olay işleyicilerine bağımlı olarak çalışır.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Modülün ana giriş noktası olarak odaklanmış liste arayüzünü oluşturur, listenin sayfada render edilmesini ve tüm temel yapının kurulmasını sağlar.
+Listenin genel yapısını ve görünümünü oluşturur. Listelenecek verileri alır ve arayüzde render edilmesini yönetir.
 - SpotlightList
 
 ### Kullanıcı Etkileşimi İşleyicileri
-Liste üzerinde gerçekleşen fare hareketleri gibi kullanıcı etkileşimlerini yakalayıp işler, liste öğelerinin taşınması gibi dinamik işlemlerin sorunsuz çalışmasını sağlar.
+Liste üzerindeki fare hareketleri gibi etkileşimleri yakalar ve üst bileşene iletir, böylece öğe taşıma gibi dinamik işlemlerin tetiklenmesini sağlar.
 - onMove
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React UI bileşeni, üst bileşenler tarafından iletilen prop'lar, proje içindeki bağımlı bileşenlerin erişilebilirliği ve çalışma ortamının temel web API'lerini desteklemesi koşuluyla çalışan, spotlight listeleme ve kullanıcı etkileşimlerini yöneten bir istemci tarafı bileşenidir.
+Bu modül için React tabanlı arayüzde çalışacak bir liste bileşeni varsayımları tanımlanmıştır.
 
-[Aksiyom 1]: Eğer üst bileşen tarafından SpotlightList'e listelenecek spotlight öğelerinin verisi prop olarak iletilmezse, bileşen boş olarak render edilir ve hiçbir liste öğesi kullanıcıya görüntülenmez.
-[Aksiyom 2]: Eğer olay işleyicisi `onMove` üst bileşen tarafından prop olarak bu bileşene iletilmezse, kullanıcının listedeki öğeleri taşıma/sıralama gibi etkileşimleri hiçbir sonuca yol açmaz.
-[Aksiyom 3]: Eğer `onMove` fonksiyonuna parametre olarak iletilen `e` (olay) nesnesi, beklenen fare/dokunmatik olay özelliklerini barındırmazsa, listedeki öğelerin konum veya sıra güncellemesi hatalı hesaplanır, taşıma işlemi başarısız olur.
-[Aksiyom 4]: Eğer bu bileşenin bağımlı olduğu alt React bileşenleri proje içinde erişilebilir olmazsa, SpotlightList derleme aşamasında hata verir, uygulama başarılı bir şekilde build edilemez.
-[Aksiyom 5]: Eğer bu modülün çalıştığı tarayıcı ortamında temel DOM manipülasyon API'leri erişilebilir olmazsa, SpotlightList bileşeni sayfaya mount olmaz ve hiçbir şekilde kullanıcı tarafından erişilemez.
+[Aksiyom 1]: Eğer React ortamı (JSX/TSX derleyicisi) yoksa, SpotlightList bileşeni sayfada render edilemez.
+
+[Aksiyon 2]: Eğer onMove fonksiyonu çağrıldığında geçerli bir olay nesnesi (Event) parametresi verilmezse, liste öğesi taşıma işlemi doğru işlenemez.
+
+[Aksiyom 3]: Eğer bileşen props olarak gerekli veri (liste öğeleri) almazsa, boş veya hatalı bir liste gösterilir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SpotlightList
-**Ne yapar**: VentHub HVAC projesinin `src/components/SpotlightList.tsx` dosyasında yer alan ana React fonksiyonel bileşenidir. Kullanıcı arayüzünde odaklanabilir (spotlight) nitelikteki liste öğelerini düzenli olarak görüntülemekten ve bu öğelerle gerçekleştirilecek tüm kullanıcı etkileşimlerini koordine etmekten sorumludur. HVAC sistemiyle ilgili öne çıkan içeriklerin listelendiği özel bir arayüz bileşeni olarak çalışır.
-**Nasıl yapar**: React bileşen mimarisine uygun olarak, kendi içinde tanımladığı yerel durumlar ve yardımcı işlevlerle tüm liste yapısını tarayıcı DOM'ına render eder. İçerdiği tüm spot öğelerinin sıralanmasını ve görüntülenmesini yönetir, fare hareketi gibi etkileşimleri işleyen `onMove` gibi olay işleyicilerini ilgili DOM elemanlarına bağlayarak etkileşimli bir yapı oluşturur. Projede içe aktardığı harici bağımlılıkları kullanarak liste performansını ve kullanılabilirliğini artırıcı düzenlemeler gerçekleştirir.
-**Parametreler**: Bu fonksiyonel bileşen herhangi bir harici parametre almaz, tüm işlevselliğini kendi içinde tanımladığı yerel state ve yardımcı işlevler üzerinden yürütür.
-**Dönüş**: `React.FC` türünde, React tarafından işlenip DOM'a eklenebilen bir JSX öğesi döndürür. Bu dönüş değeri, SpotlightList bileşeninin tüm içeriğinin kullanıcı arayüzünde sorunsuz bir şekilde görüntülenmesini sağlar.
+
+**Ne yapar**: SpotlightList, React functional component yapısında tanımlı bir UI bileşenidir ve projede spot ışığı efektli bir liste gösterimi sağlamakla görevlidir.
+
+**Nasıl yapar**: React.FC (Functional Component) dönüş tipiyle tanımlanmıştır. Bu yapı, React'ın modern fonksiyonel bileşen paradigmına uygun olarak state ve lifecycle yönetimini hooks ile gerçekleştirir.
+
+**Parametreler**:
+
+- Bu fonksiyon dışarıdan parametre almamaktadır.
+
+**Dönüş**: `React.FC` — React Functional Component dönüş tipi ile bir JSX elementi döndürür.
 
 ### onMove
 **Ne yapar**: SpotlightList bileşeni içinde tanımlanan, fare hareketi olaylarını yöneten özel React olay işleyicisidir. İlgili HTML div elemanı üzerinde gerçekleşen fare taşıma, sürükleme gibi etkileşimleri algılayıp bu etkileşimlere uygun olarak liste görünümünü veya liste öğelerinin konumunu güncellemekle sorumludur. Kullanıcıların liste öğeleriyle etkileşim kurmasını sağlayan temel işlevlerden biridir.
@@ -51,31 +62,34 @@ Bu React UI bileşeni, üst bileşenler tarafından iletilen prop'lar, proje iç
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SpotlightList.tsx::SpotlightList
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: `src/components/SpotlightList.tsx`::SpotlightList (bileşen gövdesi)
+- **params**: (parametre yok — anonim arrow function, React.FC olarak döner)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, arayüz metinlerini yerelleştirmek için kullanılır
-  - `ref` — useRef ile oluşturulmuş, spotlight efektinin uygulandığı ana grid div elementine referans tutan React ref nesnesi
-  - `ITEMS` - spotlight bölümünde gösterilecek ürün kartlarının tüm verilerini tutan sabit dizi, her elemanında ürün başlığı, açıklaması ve yönlendirme bağlantısı bulunur
-  - `onMove` - fare hareketlerini dinleyerek spotlight efektinin konumunu güncelleyen mouse event handler fonksiyonu
-- **Dönüş**: Tüm spotlight bölümünü oluşturan JSX React elementi
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; bileşen içindeki tüm metinlerin çevirisi için kullanılır
+  - `ref` — `useRef<HTMLDivElement | null>(null)`, spotlight grid konteynerinin DOM referansı; `onMove` handler'ında `getBoundingClientRect()` ile pozisyon hesaplamak ve CSS custom property'leri ayarlamak için kullanılır
+  - `ITEMS` — Spotlight kartlarının sabit dizisi (`as const` ile tip daraltılmış); her eleman `{ title, desc, href }` şeklindedir; JSX'te `.map()` ile döngüye alınarak `<a>` kartları render edilir
+  - `onMove` — `React.MouseEventHandler<HTMLDivElement>` tipinde event handler; fare hareketinde CSS custom property'leri `--sx` ve `--sy` olarak ayarlar; JSX'te div'in `onMouseMove` prop'una bağlanır
+- **Dönüş**: JSX — `<section>` elemanı; başlık, altyazı ve 4 spotlight kartından oluşan grid yapısı döner
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SpotlightList.tsx::onMove
-- **params**: `e` — Fare hareket olayını temsil eden React.MouseEvent<HTMLDivElement> tipinde olay nesnesi
-- **ic_degiskenler**:
-  - `el` — Ana grid div elementine erişmek için ref.current'ten alınan DOM elementi
-  - `rect` — `el.getBoundingClientRect()` ile elde edilen, elementin viewport içindeki konum ve boyutlarını içeren nesne
-  - `x` — Fare konumuna göre hesaplanan yüzdelik x koordinatı, CSS `--sx` değişkenine atanır
-  - `y` — Fare konumuna göre hesaplanan yüzdelik y koordinatı, CSS `--sy` değişkenine atanır
-- **Dönüş**: void (DOM elementi mevcut değilse erken return, aksi takdirde sadece CSS özelliklerini ayarlar, değer döndürmez)
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SpotlightList.tsx::ITEMS.mapCallback
-- **params**: `it` — ITEMS dizisindeki her bir ürün kartı verisini temsil eden nesne
+### [N2_NASIL] AST Pointer: `src/components/SpotlightList.tsx`::onMove
+- **params**:
+  - `e` — `React.MouseEvent<HTMLDivElement>`, fare hareketi event nesnesi; `e.clientX` ve `e.clientY` ile fare koordinatları okunur
 - **ic_degiskenler**:
-  - `it.title` — Ürün kartının başlığını tutan dize, kartın ana başlığı olarak kullanılır
-  - `it.desc` — Ürün kartının açıklama metnini tutan dize, kartın alt metni olarak kullanılır
-  - `it.href` — Ürün kartı tıklandığında yönlendirileceği yol adresini tutan dize
-- **Dönüş**: Her ürün kartı için oluşturulmuş <a> etiketli JSX React elementi
+  - `el` — `ref.current` değerinin atanması; spotlight grid konteynerinin DOM elementi; null kontrolü yapıldıktan sonra üzerinde `getBoundingClientRect()` ve `style.setProperty()` çağrıları yapılır; null ise fonksiyon erken return ile çıkar
+  - `rect` — `el.getBoundingClientRect()` sonucu; elementin viewport'a göre pozisyon (`left`, `top`) ve boyut (`width`, `height`) bilgilerini içerir; fare pozisyonunun yüzdesel hesaplamasında kullanılır
+  - `x` — `((e.clientX - rect.left) / rect.width) * 100` formülü ile hesaplanan fare pozisyonunun yatay yüzdesi; `--sx` CSS custom property'sine `%` birimi ile atanır
+  - `y` — `((e.clientY - rect.top) / rect.height) * 100` formülü ile hesaplanan fare pozisyonunun dikey yüzdesi; `--sy` CSS custom property'sine `%` birimi ile atanır
+- **Dönüş**: yok (void) — yan etki olarak `el.style.setProperty('--sx', ...)` ve `el.style.setProperty('--sy', ...)` çağrılır; bu CSS custom property'leri JSX'teki radial-gradient overlay'ini fare pozisyonuna göre hareket ettirir
+
+---
+
+### [N3_NASIL] AST Pointer: `src/components/SpotlightList.tsx`::map callback (it)
+- **params**:
+  - `it` — `ITEMS` dizisinin bir elemanı; `{ title: string, desc: string, href: string }` yapısındadır; `title` kart başlığı, `desc` kart açıklama metni, `href` tıklama yönlendirme rotası
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `<a>` anchor elemanı; `it.title` hem `key` prop'u hem kart başlığı olarak, `it.desc` kart açıklama metni olarak, `it.href` yönlendirme linki olarak kullanılır; hover'da `shadow-md` efekti veren stillendirilmiş kart render edilir
 
 ---
 
@@ -103,4 +117,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `border-light-gray`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xs`
 - **Layout:** `absolute`, `gap-3`, `grid`, `grid-cols-1`, `hover:shadow-md`, `lg:grid-cols-4`, `max-w-7xl`, `p-4`, `relative`, `sm:grid-cols-2`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `font-semibold`, `inset-0`, `lg:px-8`, `mb-4`, `mt-1`, `mx-auto`, `pointer-events-none`, `px-4`, `py-8`, `rounded-2xl`, `rounded-xl`, `sm:px-6`, `transition`

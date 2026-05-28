@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
 skeleton_hash: 69d84ccf1f15aa32
-generated_at: 2026-05-23T22:02:02Z
+entity_hashes:
+  func:SilentFanTypeComparison: d3f5f980a16f61d9
+  func:tr: b282b53f03d688a5
+  overview: bed9a48986deb76b
+  style_tokens: fb4db20eff738486
+generated_at: 2026-05-28T22:35:47Z
 ---
 
 ## Genel Bakış
@@ -30,7 +35,7 @@ Bu modülün fonksiyon imzalara dayalı aksiyomları aşağıda verilmiştir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SilentFanTypeComparison
 **Ne yapar**: React functional component olarak, silent fan türlerinin karşılaştırılmasını gösteren bir kullanıcı arayüzü oluşturur.  
@@ -89,29 +94,6 @@ Bu modülün fonksiyon imzalara dayalı aksiyomları aşağıda verilmiştir.
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-- **SilentFanTypeComparison()** fonksiyonu, **tr** fonksiyonunu çağırır (örneğin bir çeviri veya dönüşüm işlemi için).
-
-### Disaridan Cagrilanlar (Incoming)
-- Bu modülü çağıran dış fonksiyon veya dosya bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  SilentFanTypeComparison() → tr()
-
-```mermaid
-graph LR
-    SilentFanTypeComparison["SilentFanTypeComparison()"] --> tr["tr()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
@@ -128,16 +110,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[73px]`, `min-h-[300px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `backdrop-blur-[2px]`, `tracking-[0.2em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-600`, `bg-blue-900/40`, `bg-center`, `bg-cover`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/80`, `border-b`, `border-slate-100`, `border-slate-200`, `border-white/5`, `md:text-5xl`, `text-2xl`
-- **Layout:** `absolute`, `backdrop-blur`, `block`, `flex`, `flex-col`, `gap-0`, `gap-12`, `gap-4`, `grid`, `grid-cols-2`, `group-hover:scale-110`, `h-full`, `hidden`, `items-center`, `justify-center`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-blue-600`, `bg-blue-900/40`, `bg-center`, `bg-cover`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/80`, `border-b`, `border-slate-100`, `border-slate-200`, `border-white/5`, `last:border-0`, `md:text-5xl`
+- **Layout:** `absolute`, `backdrop-blur`, `backdrop-blur-2`, `block`, `flex`, `flex-col`, `gap-0`, `gap-12`, `gap-4`, `grid`, `grid-cols-2`, `h-73px`, `h-full`, `hidden`, `items-center`
+- **Varyant/Responsive:** `group-hover:`, `last:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${scrollAnimationClasses.fadeUp(isVisible`, `-mx-48`, `border`, `duration-700`, `font-bold`, `font-extrabold`, `font-medium`, `grayscale`, `group`, `group-hover:scale-110`, `inset-0`, `lg:col-start-3`, `lg:px-8`, `mb-1`, `mb-16`

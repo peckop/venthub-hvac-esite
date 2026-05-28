@@ -4,24 +4,36 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectContext.tsx
 skeleton_hash: 0ca82cae15ab546c
-generated_at: 2026-05-23T22:28:59Z
+entity_hashes:
+  overview: 24280a0c197e7d12
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:37:26Z
 ---
 
 ## Genel Bakış
-Bu React Context modülü, VentHub HVAC uygulamasında proje ile ilgili tüm verilerin uygulama genelindeki tüm bileşenler tarafından güvenli bir şekilde erişilebilmesini sağlamak amacıyla oluşturulmuştur. Supabase entegrasyonundan gelen kullanıcı projeleri, proje öğeleri ve ürün tiplerini içe aktararak, bu verileri saklamak ve paylaşmak için React'in `createContext` fonksiyonuyla `ProjectContext` bağlamını tanımlar. Modül herhangi bir işlem mantığı veya çalıştırılabilir fonksiyon barındırmaz, sadece uygulama genelinde proje verileri akışını sağlamak için gerekli bağlam altyapısını sunar.
+
+Bu modül, VentHub HVAC uygulamasında proje verilerinin uygulama genelinde paylaşılmasını sağlayan React Context tanımıdır. Supabase veritabanından gelen `UserProject`, `ProjectItem` ve `Product` tiplerini içe aktararak, tüm bileşenler tarafından erişilebilir bir `ProjectContext` bağlam nesnesi oluşturur. Dosya herhangi bir iş mantığı veya fonksiyon barındırmaz; sadece proje verileri (projeler, yükleme durumu, ekleme/silme işlemleri) için gerekli bağlam altyapısını tanımlar.
+
+## Modül Yapısı
+
+- **Bağımlılıklar:** React kütüphanesinden `createContext` ve Supabase tipleri (`UserProject`, `ProjectItem`, `Product`) kullanılır
+- **Oluşturulan bağlam:** `ProjectContext` nesnesi, uygulama hiyerarşisindeki tüm alt bileşenlere proje verilerini sağlamak için tasarlanmıştır
+- **İşlevsellik:** Dosya salt tanım (declaration) içerir; gerçek veri işleme ve API çağrıları bu bağlamı sağlayan (Provider) bileşenlerde gerçekleştirilir
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, React ekosisteminde proje verilerini uygulamanın tüm ilgili alt bileşenleriyle paylaşmak için kullanılan bağlam nesnesi (ProjectContext) oluşturur, doğru çalışması için React kütüphanesinin ve Context API'nin çalışma zamanında mevcut olması zorunludur.
+Bu modül, React uygulama ağacındaki alt bileşenlerin proje verilerine erişebilmesi için zorunlu bir Context (bağlam) sağlayıcısı (Provider) altyapısı tanımlar.
 
-[Aksiyom 1]: Eğer React kütüphanesi modülün çalıştığı ortamda mevcut değilse, ProjectContext nesnesi oluşturulamaz, modülün kendisi çalışma sırasında başarısız olur.
-[Aksiyom 2]: Eğer React Context API için gerekli createContext metodu çalışma zamanında erişilebilir değilse, bağlam nesnesi tanımlanamaz, context'i kullanan tüm bileşenler proje verilerine hiçbir şekilde erişemez.
-[Aksiyom 3]: Eğer ProjectContext'i sağlayan (Provider) bir üst bileşen uygulama bileşen hiyerarşisinde mevcut değilse, context'i tüketen tüm alt bileşenler geçersiz/tanımsız veri alır, beklenen şekilde çalışamaz.
+[Aksiyom 1]: Eğer `ProjectContext.Provider` bileşeni, uygulama hiyerarşisinin üst seviyelerinde (`App` veya bir üst düzey layout bileşeni gibi) doğru `value` prop'u ile sarılmamışsa, bu bağlamı kullanan tüm alt bileşenler `undefined` veya varsayılan başlangıç değeri alır ve beklenmeyen davranışlara neden olur.
+
+[Aksiyom 2]: Eğer `ProjectContext`'e sarılan (`Provider` ile çevrelenen) bir bileşen, içinde bulunduğu bağlam nesnesini (`useContext(ProjectContext)`) kullanmıyorsa veya yanlış bir bağlam nesnesi kullanıyorsa, bu bileşen proje verilerine erişemez veya tutarsız veri ile karşılaşır.
+
+[Aksiyom 3]: Eğer `ProjectContext` için tanımlanan başlangıç değeri (initial value) `null`, `undefined` veya geçersiz bir yapıda ise, bağlamı tüketen bileşenlerin ilk render'ında `TypeError` veya “Cannot read property of undefined” gibi hatalar oluşur.
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -63,3 +75,19 @@ Bu modül, React ekosisteminde proje verilerini uygulamanın tüm ilgili alt bil
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProjectContext
   export: ProjectContextType
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

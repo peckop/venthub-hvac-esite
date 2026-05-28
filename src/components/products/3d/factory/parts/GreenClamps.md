@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\GreenClamps.tsx
 skeleton_hash: c0acb58013af37d2
-generated_at: 2026-05-23T22:19:18Z
+entity_hashes:
+  func:GreenClamps: 957b30489f158a33
+  overview: 56ea2345484e125a
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:38Z
 ---
 
 ## Genel Bakış
@@ -28,7 +32,7 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### GreenClamps
 **Ne yapar**: GreenClamps komponenti, yeşil klemenslerin görsel temsili sağlar ve seçime, izolasyonuna, gizlenmesine ve tıklama olayına yanıt verir.  
@@ -93,4 +97,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

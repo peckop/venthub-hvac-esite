@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx
 skeleton_hash: 72b54455bc94e755
-generated_at: 2026-05-26T11:43:52Z
+entity_hashes:
+  func:ApplicationSolutions: f0529a9d9f6e077f
+  overview: f3aec9e6945fdf3a
+  style_tokens: a60445c0b91a13d5
+generated_at: 2026-05-28T22:35:51Z
 ---
 
 ## Genel Bakış
@@ -38,7 +42,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ApplicationSolutions
 **Ne yapar**: Bu bileşen, uygulamanın "Uygulama Çözümleri" bölümünü oluşturmak ve görüntülemekle sorumludur. Kullanıcıya sunulacak çözümlerin listesini veya detaylarını içeren arayüzü temsil eder. Genellikle ana sayfa veya ilgili sayfalarda yer alarak ürün veya hizmet çözümlerini sergiler.
@@ -65,8 +69,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - `title: string`
 - `subtitle: string`
 - `viewAll: string`
-- `items: Record<string, {
-`
+- `items: Record<string, {`
 
 ### ApplicationSolutionsProps
 - `dictionary: LocalizedDict`
@@ -116,16 +119,13 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[1px]`, `h-[300px]`, `lg:h-[450px]`, `sm:h-[400px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`, `transition-[transform]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50/50`, `bg-white`, `bg-white/10`, `border-white/10`, `border-white/20`, `from-slate-950/90`, `sm:text-6xl`, `text-2xl`, `text-4xl`, `text-center`, `text-cyan-400`, `text-cyan-600`
+- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50/50`, `bg-white`, `bg-white/10`, `border-white/10`, `border-white/20`, `from-slate-950/90`, `group-hover:bg-cyan-600`, `group-hover:text-cyan-600`, `sm:text-6xl`, `text-2xl`, `text-4xl`, `text-center`
 - **Layout:** `-skew-x-12`, `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `flex-wrap`, `from-slate-950/90`, `gap-2`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `data-[in-view=true]:`, `group-hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${delayClass`, `${item.span`, `-translate-x-4`, `-translate-y-4`, `border`, `data-[in-view=true]:opacity-100`, `data-[in-view=true]:translate-x-0`, `data-[in-view=true]:translate-y-0`, `delay-100`, `delay-200`, `delay-300`, `duration-1000`, `duration-500`, `duration-700`, `ease-out`

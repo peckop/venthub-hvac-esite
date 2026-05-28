@@ -8,14 +8,16 @@ entity_hashes:
   func:CartToast: a2ae301e9df08eee
   overview: 8dcc105f56ed9e74
   style_tokens: c52e4aa86d11fa3f
-generated_at: 2026-05-27T18:04:22Z
+generated_at: 2026-05-28T22:35:44Z
 ---
 
-
+## Genel Bakış
+(Sentez hatası)
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+(Sentez hatası)
 
 ---
 

@@ -8,7 +8,7 @@ entity_hashes:
   func:CategoryCard3D: b1d42c0fbbe60533
   overview: ac6e8bdef42e2eaf
   style_tokens: 72417c9ee963573b
-generated_at: 2026-05-27T18:20:26Z
+generated_at: 2026-05-28T22:36:12Z
 ---
 
 ## Genel Bakış

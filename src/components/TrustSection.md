@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\TrustSection.tsx
 skeleton_hash: dcedc590bf39b6a9
-generated_at: 2026-05-23T22:27:47Z
+entity_hashes:
+  func:TrustSection: e10e11347e2c2b97
+  overview: 14c5761d5c9dd272
+  style_tokens: 6ca64cf19f9ea7a8
+generated_at: 2026-05-28T22:37:04Z
 ---
 
 ## Genel Bakış
@@ -28,7 +32,7 @@ Venthub HVAC projesindeki React tabanlı frontend TrustSection bileşeninin soru
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### TrustSection
 **Ne yapar**: VentHub HVAC projesinin src/components dizininde yer alan React tabanlı bir kullanıcı arayüzü bileşenidir. Kullanıcı arayüzünde platformun güvenilirliğini vurgulamak amacıyla ayrılmış özel bir bölüm olarak görev alır, kullanıcılara platformun güven odaklı unsurlarını sunan bir bölüm oluşturur.
@@ -83,4 +87,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gradient-to-br`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`, `text-warning-orange`, `to-white`
 - **Layout:** `flex`, `from-gray-50`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `hover:shadow-md`, `items-start`, `lg:grid-cols-3`, `max-w-7xl`, `p-5`, `sm:grid-cols-2`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `font-semibold`, `lg:px-8`, `mb-6`, `mt-0.5`, `mt-1`, `mx-auto`, `px-4`, `py-12`, `rounded-2xl`, `sm:px-6`, `transition`

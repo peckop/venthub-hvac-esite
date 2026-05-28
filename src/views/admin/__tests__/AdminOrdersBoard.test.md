@@ -4,15 +4,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx
 skeleton_hash: eaf39fa2341ceb17
-generated_at: 2026-05-23T22:36:43Z
+entity_hashes:
+  func:getEffectiveStatus: 23e3045303173787
+  overview: e7b9a89704c3bbc1
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:39:15Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun yönetici arayüzündeki sipariş paneli bileşeninin (AdminOrdersBoard) test dosyasıdır. Yönetici sipariş paneliyle ilgili test senaryolarında kullanılacak yardımcı fonksiyonları barındırarak testlerin tutarlı ve doğru çalışmasını sağlar.
+Bu modül, VentHub HVAC platformunun yönetici sipariş paneli (AdminOrdersBoard) için yazılmış bir test dosyasıdır. Modülün temel amacı, test senaryoları sırasında kullanılacak yardımcı fonksiyonları sunarak testlerin güvenilirliğini ve tekrar kullanılabilirliğini sağlamaktır.
 
 ## Fonksiyon Grupları
 ### Test Yardımcı Fonksiyonları
-Test süreçlerinde ihtiyaç duyulan sipariş durumu hesaplaması gibi özel işlemleri gerçekleştiren, test senaryolarında kullanılan tekrar kullanılabilir yardımcı fonksiyonları barındırır.
+Test süreçlerinde ortak ihtiyaçları karşılamak üzere tasarlanmış, tekrar kullanılabilir yardımcı işlevleri barındırır.
 - getEffectiveStatus
 
 ---
@@ -26,7 +30,7 @@ Bu test modülünün AdminOrdersBoard yönetici sipariş paneli bileşenini ve i
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getEffectiveStatus
 **Ne yapar**: Gelen sipariş nesnesinin geçerli durumunu döndüren, tanımlanmamış durumlarda varsayılan beklemede durumunu atayan yardımcı bir fonksiyondur. Admin sipariş paneli testlerinde kullanılarak tüm işlenen siparişlerin standart bir duruma sahip olmasını garanti eder.
@@ -39,162 +43,17 @@ Bu test modülünün AdminOrdersBoard yönetici sipariş paneli bileşenini ve i
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::getEffectiveStatus
-- **params**: [order: unknown]
+### [N1_NASIL] AST Pointer: src\views\admin\__tests__\AdminOrdersBoard.test.tsx::getEffectiveStatus
+- **params**: (order: unknown)
 - **ic_degiskenler**:
-  - `o` — order nesnesini Record<string, unknown> tipine cast ederek alanlarına erişmek için kullanılan yerel değişken
-  - `o.payment_status` — siparişin ödeme durumunu tutan nesne alanı, iade durumlarını kontrol etmek için kullanılır
-  - `o.status` — siparişin genel teslimat durumunu tutan nesne alanı, iade durumu yoksa döndürülmek için kullanılır
-- **Dönüş**: string (refunded, partial_refunded, siparişin kendi status değeri veya varsayılan 'pending')
+  - `o` — `order` parametresinin `Record<string, unknown>` tipine dönüştürülmüş hali. Fonksiyon içinde `o.payment_status` ve `o.status` özelliklerine erişmek için kullanılır.
+- **Dönüş**: string — `payment_status` 'refunded' veya 'partial_refunded' ise onu, aksi halde `status` değerini veya varsayılan olarak 'pending' döner.
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_1
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: src\views\admin\__tests__\AdminOrdersBoard.test.tsx::getColumnForStatus
+- **params**: (status: string)
 - **ic_degiskenler**:
-  - `describe` — Vitest test gruplandırma API'si, test suite'lerini tanımlamak için kullanılır
-  - `it` — Vitest test tanımlama API'si, bireysel test senaryolarını oluşturmak için kullanılır
-  - `expect` — Vitest assertion API'si, test sonuçlarını doğrulamak için kullanılır
-  - `COLUMNS` — Column Matching testinde kullanılan sabit dizi, sipariş durumlarını yönetim paneli sütunlarıyla eşler
-  - `getColumnForStatus` — yerel fonksiyon, girilen sipariş durumuna uygun sütun kimliğini döndürür
-  - `order` — test senaryolarında kullanılan mock sipariş nesneleri, getEffectiveStatus fonksiyonuna girdi olarak verilir
-- **Dönüş**: yok
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::getColumnForStatus_1
-- **params**: [status: string]
-- **ic_degiskenler**:
-  - `COLUMNS` — dışarıdan erişilen sütun tanımları dizisi, durum-sütun eşlemelerini içerir
-  - `c` — COLUMNS.find metodunda kullanılan geçici eleman, döngüdeki her sütun nesnesi
-  - `c.statuses` — sütuna ait tüm durumları içeren dizi, girilen status'un bu listede olup olmadığı kontrol edilir
-  - `c.id` — eşleşen sütunun benzersiz kimliği, bulunduğunda döndürülür
-- **Dönüş**: string (eşleşen sütun kimliği veya varsayılan 'col_new')
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_2
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `it` — Vitest test tanımlama API'si
-  - `expect` — Vitest assertion API'si
-  - `order` — mock sipariş nesneleri, getEffectiveStatus fonksiyonuna test girdisi olarak verilir
-  - `getEffectiveStatus` — test edilen ana fonksiyon
-- **Dönüş**: yok
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_3
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `order` — iade durumu tanımlı mock sipariş nesnesi
-  - `expect` — Vitest assertion API'si
-  - `getEffectiveStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_4
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `order` — kısmi iade durumu tanımlı mock sipariş nesnesi
-  - `expect` — Vitest assertion API'si
-  - `getEffectiveStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_5
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `order` — işlenme durumu olan ödemesi tamamlanmış mock sipariş nesnesi
-  - `expect` — Vitest assertion API'si
-  - `getEffectiveStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_6
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `order` — status alanı tanımlanmamış, ödemesi yapılmamış mock sipariş nesnesi
-  - `expect` — Vitest assertion API'si
-  - `getEffectiveStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_7
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `COLUMNS` — sütun tanımları dizisi, durum-sütun eşlemelerini içerir
-  - `getColumnForStatus` — sütun eşleştirme fonksiyonu
-  - `it` — Vitest test tanımlama API'si
-  - `expect` — Vitest assertion API'si
-- **Dönüş**: yok
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::getColumnForStatus_2
-- **params**: [status: string]
-- **ic_degiskenler**:
-  - `COLUMNS` — dışarıdan erişilen sütun tanımları dizisi
-  - `c` — COLUMNS.find metodunda kullanılan geçici sütun nesnesi
-  - `c.statuses` — sütuna ait durum listesi, girilen status'un üyeliği kontrol edilir
-  - `c.id` — eşleşen sütun kimliği
-- **Dönüş**: string (eşleşen sütun kimliği veya varsayılan 'col_new')
-
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_8
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen sütun eşleştirme fonksiyonu
-- **Dönüş**: yok
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_9
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_10
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_11
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_12
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_13
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N17_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_14
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N18_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_15
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N19_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_16
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen fonksiyon
-- **Dönüş**: yok
-
-### [N20_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx::anonim_17
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `expect` — Vitest assertion API'si
-  - `getColumnForStatus` — test edilen fonksiyon
-- **Dönüş**: yok
+  - `COLUMNS` — Test ortamında tanımlanan sütun dizisi. Her eleman bir nesne olup `id` ve `statuses` özellikleri içerir. Fonksiyon, verilen `status` parametresine göre uygun sütun `id`'sini bulmak için bu dizi üzerinde `find` methodu kullanır.
+- **Dönüş**: string — Verilen duruma karşılık gelen sütun `id`'sini döner, bulunamazsa varsayılan olarak 'col_new' döner.
 
 ---
 
@@ -207,3 +66,19 @@ Bu test modülünün AdminOrdersBoard yönetici sipariş paneli bileşenini ve i
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: getEffectiveStatus
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

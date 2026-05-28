@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\products\ProductCsvImport.tsx
 skeleton_hash: 0f28bb5e343c738d
-generated_at: 2026-05-23T21:55:33Z
+entity_hashes:
+  func:ProductCsvImport: 1375065d67decd2a
+  overview: 8932e2ba04984060
+  style_tokens: d505eb2f0859ff7f
+generated_at: 2026-05-28T22:35:38Z
 ---
 
 ## Genel Bakış
@@ -39,7 +43,7 @@ Bu modülün doğru çalışması için bazı prop varsayımları gereklidir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ProductCsvImport
 **Ne yapar**: Product CSV dosyasının içeri aktarımını yöneten bir React bileşenidir.  
@@ -148,16 +152,13 @@ Bu modülün doğru çalışması için bazı prop varsayımları gereklidir.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[90vh]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gray-50`, `bg-slate-50`, `bg-slate-900/50`, `border-b`, `border-gray-200`, `border-slate-200`, `border-t`, `text-center`, `text-left`, `text-slate-400`, `text-slate-500`, `text-slate-800`, `text-xs`
-- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `gap-3`, `h-10`, `hidden`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `max-w-4xl`, `overflow-x-auto`, `overflow-y-auto`, `p-2`
-- **Responsive:** (yok)
+- **Renkler:** `bg-gray-50`, `bg-slate-50`, `bg-slate-900/50`, `border-b`, `border-gray-200`, `border-slate-200`, `border-t`, `hover:bg-gray-50/50`, `hover:text-slate-600`, `text-center`, `text-left`, `text-slate-400`, `text-slate-500`, `text-slate-800`, `text-xs`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `gap-3`, `h-10`, `hidden`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `max-h-90vh`, `max-w-4xl`, `overflow-x-auto`, `overflow-y-auto`
+- **Varyant/Responsive:** `hover:` önekleri
+- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminButtonSecondaryClass`, `${adminCardClass`, `animate-in`, `divide-gray-100`, `divide-y`, `duration-200`, `fade-in`, `font-semibold`, `inset-0`, `italic`, `rounded-b-2xl`, `transition-colors`, `uppercase`, `whitespace-nowrap`

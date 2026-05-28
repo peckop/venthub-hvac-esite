@@ -4,7 +4,17 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\HeroSection.tsx
 skeleton_hash: 9f5cacce79ae210a
-generated_at: 2026-05-23T22:13:41Z
+entity_hashes:
+  func:ArrowRightIcon: 43bb6823663cb165
+  func:CheckIcon: ee90ea14e17bff20
+  func:HeroPicture: d53db9109152b596
+  func:HeroSection: 6b3d8ce7bade670f
+  func:PhoneIcon: 6455c7f454ee470c
+  func:ShieldIcon: d63a266aca21c203
+  func:TruckIcon: e994b22ca1af860d
+  overview: 71c054a8d6170c84
+  style_tokens: 5b5e73ce2fa1c445
+generated_at: 2026-05-28T22:35:50Z
 ---
 
 ## Genel Bakış
@@ -32,7 +42,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### HeroPicture
 **Ne yapar**: Hero bileşeninin görsel kısmını render eder; genellikle sayfanın baş kısmında büyük bir resim veya animasyon gösterir.  
@@ -202,6 +212,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-primary-navy`, `bg-white`, `border-2`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `from-primary-navy/20`, `lg:text-6xl`, `md:text-5xl`, `text-4xl`, `text-center`, `text-industrial-gray`
-- **Layout:** `absolute`, `bottom-0`, `flex`, `flex-col`, `flex-shrink-0`, `from-air-blue`, `from-primary-navy/20`, `gap-12`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `grid-cols-2`, `group-hover:translate-x-1`, `h-20`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-br`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-primary-navy`, `bg-white`, `border-2`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `from-primary-navy/20`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-white`, `lg:text-6xl`, `md:text-5xl`
+- **Layout:** `absolute`, `bottom-0`, `flex`, `flex-col`, `flex-shrink-0`, `from-air-blue`, `from-primary-navy/20`, `gap-12`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `grid-cols-2`, `h-20`, `hidden`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `font-semibold`, `group`, `group-hover:translate-x-1`, `hero-bg`, `inset-0`, `leading-tight`, `lg:order-2`, `lg:px-8`, `md:opacity-20`, `ml-2`, `mx-auto`, `object-center`, `object-cover`

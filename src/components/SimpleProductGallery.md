@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SimpleProductGallery.tsx
 skeleton_hash: 43203a9a558f7018
-generated_at: 2026-05-23T22:27:19Z
+entity_hashes:
+  func:SimpleProductGallery: 075a0dcd63164c24
+  overview: 66bf30b534632de2
+  style_tokens: 53f28be412fb3039
+generated_at: 2026-05-28T22:37:00Z
 ---
 
 ## Genel Bakış
@@ -28,7 +32,7 @@ React tabanlı basit ürün galerisi bileşeni SimpleProductGallery, çalışma 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SimpleProductGallery
 **Ne yapar**: VentHub HVAC projesinde kullanılan basit ürün galerisi React bileşenidir. Ürün detay sayfalarında satışa sunulan ısıtma, soğutma ve havalandırma ekipmanlarına ait görselleri kullanıcılara sunmak, bu görseller arasında kolayca geçiş yapma imkanı tanımak üzere tasarlanmıştır. Kullanıcıların ürün ile ilgili tüm çekilmiş görselleri tek bir merkezi arayüz üzerinden incelemesini sağlayarak ürün sayfalarının kullanıcı deneyimini artırır.
@@ -78,4 +82,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gray-200`, `border-gray-300`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-steel-gray`
 - **Layout:** `gap-3`, `grid`, `grid-cols-3`, `max-w-7xl`, `md:grid-cols-6`, `sm:grid-cols-4`, `w-full`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `aspect-square`, `border`, `cursor-pointer`, `font-bold`, `group`, `lg:px-8`, `mb-6`, `mt-2`, `mx-auto`, `px-4`, `py-8`, `rounded-lg`, `sm:px-6`

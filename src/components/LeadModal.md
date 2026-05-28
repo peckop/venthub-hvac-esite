@@ -11,7 +11,7 @@ entity_hashes:
   func:validate: 3e57d313017d2565
   overview: 666966080ef15820
   style_tokens: 671fc429a274af0c
-generated_at: 2026-05-27T18:07:03Z
+generated_at: 2026-05-28T22:36:04Z
 ---
 
 ## Genel Bakış

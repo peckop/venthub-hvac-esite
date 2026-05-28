@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutPayment.ts
 skeleton_hash: 0f81e1692b39b882
-generated_at: 2026-05-26T11:42:56Z
+entity_hashes:
+  func:useCheckoutPayment: a8bb41b15d097162
+  overview: 5e2bf25a48045329
+generated_at: 2026-05-28T22:37:44Z
 ---
 
 ## Genel Bakış
@@ -35,7 +38,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useCheckoutPayment
 **Ne yapar**: Checkout sürecinde ödeme akışını yönetir; sepet doğrulamasını yapar, sunucu tarafı fiyatlandırmasını uygular, Iyzico ödeme geçidiyle entegrasyon kurar ve ödeme sonucunu izler.  
@@ -94,32 +97,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - **Dönüş**: Hook’un döndürdüğü nesne  
   `{ loading, iyzToken, paymentUrl, orderId, convId, iyzScriptLoaded, formReady, progressPct, paymentFrameContent, setFormReady, setProgressPct, initiatePayment }`  
   (yan etkileri: state güncellemeleri, router yönlendirmesi, dış script yüklenmesi).
-
----
-
-### [N2_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::initiatePayment
-- **params**: `()` (hiç parametre almaz)
-- **ic_degiskenler**:
-  - `authoritativeTotal` — `getCartTotal()` sonucu, gerekirse sunucu doğrulaması sonrası güncellenen tutar.
-  - `validation` — `validateServerCart({ userId: user?.id })` çağrısının sonucu, sunucu‑tarafı sepet doğrulaması.
-  - `localHash` — `getPriceHashLocal(items)` ile hesaplanan yerel fiyat hash’i.
-  - `serverHash` — `getPriceHashServer(validation?.items, items)` ile hesaplanan sunucu fiyat hash’i.
-  - `requestData` — `buildPaymentRequest({...})` ile oluşturulan ödeme isteği nesnesi.
-  - `data` — `supabase.functions.invoke('iyzico-payment', { body: requestData })` yanıtının `data` kısmı.
-  - `error` — aynı çağrının olası hatası.
-  - `d` — `data.data` içindeki ödeme yanıtı nesnesi.
-- **Dönüş**: `boolean`  
-  - `true` → ödeme başarılı bir şekilde başlatıldı (token alındı veya doğrudan ödeme sayfasına yönlendirme yapıldı).  
-  - `false` → bir hata oluştu; hata mesajı toast ile gösterilir.
-
----
-
-### [N3_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useEffect (order‑status polling)
-- **params**: `()` (useEffect callback, parametresiz)
-- **ic_degiskenler**:
-  - `timer` — `setInterval` ile oluşturulan periyodik kontrol kimliği.
-  - `data` — `supabase.from('venthub_orders').select('status').eq('id', orderId).maybeSingle()` sorgusunun yanıtı.
-- **Dönüş**: `void` (useEffect, yan etkileri: interval başlatma, sipariş durumu “paid” olduğunda intervali temizleme, sepeti temizleme ve `router.push` ile başarı sayfasına yönlendirme).
 
 ---
 

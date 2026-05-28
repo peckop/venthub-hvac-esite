@@ -4,33 +4,46 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\webhook-events\page.tsx
 skeleton_hash: 64ca1a86eba5b3eb
-generated_at: 2026-05-23T21:48:23Z
+entity_hashes:
+  func:Page: 03bf0c7eea267025
+  overview: 3abd4459140e249f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-05-28T22:35:15Z
 ---
 
 ## Genel Bakış
-`src/app/admin/webhook-events/page.tsx` dosyası, yönetim panelinde webhook olaylarının listelenip görüntülendiği sayfanın giriş bileşenini tanımlar. Tek bir React fonksiyonel bileşeni (`Page`) dışa aktarır. Bu bileşen, tüm sayfa yapısını ve mantığını içeren bir alt bileşeni (`AdminWebhookEventsPage`) render eder.
+Bu modül, yönetim panelindeki webhook olayları sayfasını sunan basit bir giriş noktasıdır. Tek bir React bileşeni (`Page`) dışa aktarır ve asıl sayfa yapısını dinamik olarak yüklenen bir alt bileşene (`AdminWebhookEventsPage`) devreder.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Bu grup, webhook olayları sayfasını oluşturan tek fonksiyondan oluşur. Sayfanın dışa açık noktası olarak React ağacına eklenir ve alt bileşeni tetikleyerek kullanıcı arayüzünün sunulmasını sağlar.
+Sayfanın dışa açık tek bileşenini barındırır. Routing yapısı tarafından çağrılır ve ana sayfa arayüzünü render ederek kullanıcıya sunar.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, bir React sayfa bileşeni olup minimal bir sarmalayıcı (wrapper) yapısına sahiptir.
+
+**[Aksiyom 1]**: Eğer `AdminWebhookEventsPage` bileşeni modül erişim alanında (scope) tanımlı veya import edilmiş değilse, `Page` bileşeni render sırasında hata fırlatır.
+
+**[Aksiyom 2]**: Eğer bu bileşen bir Next.js App Router yapısında `/admin/webhook-events` rotasına bağlı değilse, kullanıcı arayüzü beklenen rotada görüntülenmez (bu dosya yolu varsayımının dayandığı rota yapısına bağlıdır).
+
+**[Aksiyom 3]**: Eğer `AdminWebhookEventsPage` bileşeni geçerli bir React bileşeni (fonksiyon veya sınıf) olarak tanımlı değilse, `Page` bileşeni geçerli bir JSX döndüremez.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Admin arayüzünde webhook olaylarının listelendiği sayfayı oluşturan React bileşenini döndürür.
-**Nasıl yapar**: Herhangi bir parametre almadan, `AdminWebhookEventsPage` adlı JSX bileşenini doğrudan döndürür. Bu yapısıyla bir routing/template fonksiyonu görevi görür.
-**Parametreler**: Yok.
-**Dönüş**: `<AdminWebhookEventsPage />` — Webhook olaylarının yönetildiği ana sayfa bileşeni.
+**Ne yapar**: Admin panelindeki webhook olayları sayfasını render eder. Bu fonksiyon, Next.js App Router yapısında `/admin/webhook-events` rotasının sayfa bileşenini tanımlar ve tarayıcıda webhook olaylarının görüntülenmesini sağlar.
+
+**Nasıl yapar**: Fonksiyon, içeriğinde herhangi bir mantık veya state yönetimi barındırmaz. Doğrudan `AdminWebhookEventsPage` adlı alt bileşeni return ederek sayfa yapısının render edilmesini tetikler. Bu basit yapı, sayfa yüklemesi ve yönlendirme işlemlerinin Next.js tarafından otomatik olarak yönetilmesini sağlar.
+
+**Parametreler**:
+- Fonksiyon herhangi bir parametre almaz
+
+**Dönüş**: JSX Element — `AdminWebhookEventsPage` componentinin render edeceği arayüz unsurunu döndürür. Return edilen değer, React tarafından işlenerek tarayıcıda webhook olayları yönetim arayüzü olarak görüntülenir.
 
 ---
 
@@ -46,7 +59,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### [N1_NASIL] AST Pointer: src/app/admin/webhook-events/page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: React JSX element (AdminWebhookEventsPage bileşeni render edilir)
+- **Dönüş**: `<AdminWebhookEventsPage />` JSX bileşeni döndürülür
 
 ---
 
@@ -59,3 +72,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`

@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Silencer.tsx
 skeleton_hash: e4ebd20f97a501f3
-generated_at: 2026-05-23T22:21:59Z
+entity_hashes:
+  func:Silencer: b0d56de6b93be1bd
+  overview: d6a0c154ebf448d9
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:43Z
 ---
 
 ## Genel Bakış
@@ -26,7 +30,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Silencer
 **Ne yapar**: Silencer bileşeni, HVAC sistemlerinde ses azaltma amacıyla kullanılan bir susturucu (silencer) modelini oluşturur. Silindir şeklinde bir dış kabuk ve iç kısmında delikli yüzey barındırarak gürültüyü düşürür.  
@@ -115,4 +119,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

@@ -4,42 +4,47 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-status\index.ts
 skeleton_hash: bdf4bb8403cfeacb
-generated_at: 2026-05-24T10:48:08Z
+entity_hashes:
+  func:jsonResponse: 60e54d50747b3229
+  func:shipping-status_handler: d099b53accac2970
+  overview: 695bc1e855ae9226
+generated_at: 2026-05-28T22:50:01Z
 ---
 
 ## Genel Bakış
-Bu modül, kargo durumu sorgularını karşılamak üzere tasarlanmış bir sunucusuz fonksiyon görevi görür. Gelen HTTP isteklerini işler ve yapılandırılmış JSON yanıtları oluşturmak için bir yardımcı işlevden yararlanarak sonuçları döndürür.
+Bu modül, kargo durumu sorgularını karşılayan bir Supabase edge function'dır. Gelen HTTP isteklerini işleyerek yapılandırılmış JSON yanıtları döndürür ve yanıt oluşturımında tutarlılık sağlamak için bir yardımcı işlev kullanır.
 
 ## Fonksiyon Grupları
-### Yanıt Oluşturma Yardımcıları
-Bu grup, HTTP yanıtlarını JSON formatında standartlaştırmak ve başlıkları yönetmek için kullanılan yardımcı işlevi içerir.
-- jsonResponse
-
 ### İstek İşleyicisi
-Bu grup, gelen kargo durumu isteklerini karşılayan, işleyen ve nihai yanıtı istemciye ileten ana mantığı barındırır.
+Modülün ana giriş noktasıdır ve gelen kargo durumu isteklerini alarak işler, nihai yanıtı istemciye iletir.
 - shipping-status_handler
+
+### Yanıt Oluşturma Yardımcıları
+HTTP yanıtlarını JSON formatında standartlaştırmak için kullanılan yardımcı işlevi içerir.
+- jsonResponse
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, sağlanan iki fonksiyonun imzalarına uygun olarak çalışacak şekilde tasarlanmıştır.
+Bu modül, kargo durumu sorgularını işleyen bir Supabase Edge Function olarak tasarlanmıştır.
 
-[Aksiyom 1]: Eğer shipping-status_handler fonksiyonuna Request türünde olmayan bir argüman geçilirse, fonksiyon doğru şekilde çalışamaz.
-[Aksiyom 2]: Eğer jsonResponse fonksiyonuna beklenenden az veya çok sayıda argüman geçilirse, fonksiyon doğru şekilde çalışamaz.
-[Aksiyom 3]: Eğer jsonResponse fonksiyonuna init parametresi olarak ResponseInit türünden olmayan bir değer geçilirse, fonksiyon doğru şekilde çalışamaz.
-[Aksiyom 4]: Eğer jsonResponse fonksiyonuna body parametresi olarak unknown türünden olmayan bir değer geçilirse, bilinmiyor.
+[Aksiyom 1]: Eğer `shipping-status_handler` fonksiyonuna geçilen `req` parametresi geçerli bir `Request` nesnesi değilse, fonksiyon beklenmeyen davranış sergiler veya hata fırlatır.
+
+[Aksiyom 2]: Eğer `jsonResponse` fonksiyonuna geçilen `init` parametresi geçerli bir `ResponseInit` nesnesi değilse, yanıt oluşturulamaz.
+
+[Aksiyom 3]: Eğer `shipping-status_handler` tarafından üretilen yanıt `jsonResponse` aracılığı ile döndürülmezse, istemciye standart JSON formatında yanıt ulaştırılamaz.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### jsonResponse
-**Ne yapar**: VentHub HVAC projesinin Supabase tabanlı shipping-status edge function'ı içinde kullanılan bir yardımcı fonksiyondur, gelen içerik ve ayarlara uygun standart JSON formatlı HTTP cevapları oluşturmak için tasarlanmıştır. Tüm JSON cevaplarının proje içinde tutarlı bir formatta sunulmasını sağlamak amacıyla geliştirilmiştir.
-**Nasıl yapar**: Aldığı ham içerik verisini JSON string formatına dönüştürür, gelen cevap ayarlarıyla birleştirirken otomatik olarak JSON içeriği için gerekli Content-Type başlığını cevaba ekler. Proje genelinde standartlaştırılmış cevap yapısını korumak için tüm JSON cevabı oluşturma sürecini tek bir noktada yönetir.
+**Ne yapar**: Verilen veriyi JSON formatına dönüştürerek standart bir HTTP yanıtı oluşturur. Bu bir yardımcı fonksiyondur ve genellikle API uç noktalarından gönderilecek tutarlı ve doğru formatta yanıtları paketlemek için kullanılır.
+**Nasıl yapar**: Fonksiyon, `JSON.stringify` metodu ile verilen `body` nesnesini iki boşluk girintili bir JSON dizgesine dönüştürür. Ardından, `new Response` constructor'ı ile bu dizgeyi gövde olarak, varsayılan `content-type` ve `cache-control` başlıklarını içeren, isteğe bağlı olarak其他 başlıklar ve durum kodu eklenebilen bir HTTP yanıtı nesnesi döndürür.
 **Parametreler**:
-- name: body, type: unknown — JSON formatına dönüştürülerek cevap gövdesi olarak kullanılacak, herhangi bir tipte içerik verisi
-- name: init, type: ResponseInit — HTTP cevabının durum kodu, özel başlıkları gibi ek yapılandırma ayarlarını içeren standart web ResponseInit nesnesi
-**Dönüş**: Fonksiyona ait kesin dönüş tipi belirtilmemiştir, oluşturduğu JSON formatlı cevabı kullandığı ana işleyici fonksiyona iletmek üzere çalıştığı varsayılmaktadır.
+- `body`: unknown — Yanıtın gövdesinde yer alacak olan veri. Fonksiyon tarafından JSON dizgesine dönüştürülür.
+- `init`: ResponseInit — Response nesnesinin yapılandırma seçeneklerini içeren isteğe bir nesne. `headers` ve `status` özellikleri desteklenir. Varsayılan değer `{}`.
+**Dönüş**: Response — Oluşturulan HTTP yanıtı nesnesi.
 
 ### shipping-status_handler
 **Ne yapar**: shipping-status edge function'ının ana istek işleyici fonksiyonudur, kargo durumu sorguları için istemciden gelen tüm HTTP isteklerini alır, işler ve uygun cevabı döndürür. VentHub projesinin kargo takip modülünün sunucu tarafı çalışmasının temelini oluşturan bu fonksiyon, tüm gelen istekleri doğrulayıp ilgili iş akışını başlatır.
@@ -52,33 +57,30 @@ Bu modül, sağlanan iki fonksiyonun imzalarına uygun olarak çalışacak şeki
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: shipping-status/functions/jsonResponse
-- **params**: body, init
-- **ic_degiskenler**: 
-  - `yok` — fonksiyon gövdesinde ek bir değişken tanımı yoktur; sadece parametreler kullanılır.
-- **Dönüş**: Response
+### [N1_NASIL] AST Pointer: shipping-status/index.ts::jsonResponse
+- **params**: (body: unknown, init: ResponseInit = {})
+- **ic_degiskenler**:
+  (fonksiyon gövdesinde açıkça tanımlanmış yerel değişken yok)
+- **Dönüş**: Response — JSON içeriği ile HTTP yanıt nesnesi oluşturur ve döndürür.
 
-### [N2_NASIL] AST Pointer: shipping-status/functions/shipping-status_handler
-- **params**: req
-- **ic_degiskenler**: 
-  - `SUPABASE_URL` — `Deno.env.get('SUPABASE_URL')` ile ortam değişkeninden alınan Supabase proje URL’si.
-  - `SERVICE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile ortam değişkeninden alınan Supabase service role anahtarı.
-  - `forwarded` — `req.headers.get('x-forwarded-for')` değeri (boş string olabilir); IP‑based rate limiting için kullanılır.
-  - `ip` — İstemci IP adresi; `x-real-ip`, `cf-connecting-ip` veya `forwarded` başlığından türetilir, bulunamazsa `'unknown'`.
-  - `key` — Rate‑limit anahtarı; `"shipping-status:${ip}"` biçiminde IP’ye özgü bir önbellek anahtarı.
-  - `checkRateLimit` — `../_shared/rate_limit.ts` modülünden içe aktarılan, belirtilen anahtar için sınır kontrolünü yapan async fonksiyon.
-  - `rateLimitHeaders` — Aynı modülden içe aktarılan, mevcut sınır durumunu yansıttı HTTP başlıkları oluştururan fonksiyon.
-  - `result` — `checkRateLimit` çağrısının döndürdüğü nesne; `{ allowed, remaining, resetAt }` alanlarını içerir.
-  - `rlHeaders` — `rateLimitHeaders` fonksiyonuyla üretilen, 429 (Too Many Requests) yanıtına eklenmek üzere hazırlanan başlık nesnesi.
-  - `e` — İç try/catch bloğunda yakalanan hata; rate_limit modülü yükleme veya çalıştırma hatasını loglamak için kullanılır.
-  - `url` — `new URL(req.url)` ile oluşturulan URL nesnesi; sorgu parametrelerine erişim sağlar.
-  - `tracking` — `url.searchParams.get('tracking_number')` değeri (boş string olabilir); kullanıcı tarafından sağlanan takip numarası.
-  - `supabase` — `createClient(SUPABASE_URL, SERVICE_KEY)` ile oluşturulan Supabase istemci örneği.
-  - `query` — `supabase.from('venthub_orders')` ile başlayan ve `select`, `eq`, `limit` zincirleme işlemleriyle oluşturulan sorgu oluşturucusu.
-  - `data` — `query.single()` çağrısının başarılı sonucunda döndürülen kayıt nesnesi (order bilgileri) veya `null`.
-  - `error` — `query.single()` çağrısının hata durumunda döndürülen Supabase hata nesnesi.
-  - `_e` — Dış try/catch bloğunda yakalanan genel istisna; hata yanıtı üretmek ve konsola loglamak için kullanılır.
-- **Dönüş**: Response (her kod yolu `jsonResponse` üzerinden bir `Response` nesnesi döndürür)
+### [N2_NASIL] AST Pointer: shipping-status/index.ts::shipping-status_handler
+- **params**: (req: Request)
+- **ic_degiskenler**:
+  - `SUPABASE_URL` — Deno ortamından alınan Supabase proje URL adresi.
+  - `SERVICE_KEY` — Deno ortamından alınan Supabase servis rolü anahtarı.
+  - `forwarded` — İstemcinin yönlendirme (forwarded-for) IP adresi başlığı değeri.
+  - `ip` — İstemcinin gerçek IP adresi, various başlıklardan çözümlenir.
+  - `key` — IP tabanlı rate limiting için benzersiz anahtar.
+  - `result` — checkRateLimit fonksiyonunun döndüğü sonuç nesnesi, istek izin durumunu içerir.
+  - `rlHeaders` — rateLimitHeaders fonksiyonu tarafından oluşturulan HTTP başlık nesnesi.
+  - `url` — Request URL'sinden oluşturulan URL nesnesi, sorgu parametrelerine erişim sağlar.
+  - `tracking` — Sorgu parametrelerinden alınan kargo takip numarası.
+  - `supabase` — createClient ile oluşturulmuş Supabase istemci nesnesi.
+  - `query` — Supabase veritabanı sorgusu, belirli takip numarasına ait sipariş bilgilerini seçer.
+  - `data` — Supabase sorgusunun başarılı sonucu, sipariş veri nesnesi.
+  - `error` — Supabase sorgusunun hata nesnesi, sorgu başarısız olduğunda dolu olur.
+  - `_e` — Yakalanan genel hata nesnesi, try-catch bloğunda yakalanır.
+- **Dönüş**: Response — Kargo durumu bilgisi veya hata mesajı ile HTTP yanıt nesnesi döndürür.
 
 ---
 

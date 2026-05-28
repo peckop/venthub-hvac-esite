@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\testA11y.tsx
 skeleton_hash: b4d0b31ea211e1da
-generated_at: 2026-05-23T22:34:18Z
+entity_hashes:
+  func:testA11y: 6d4bd31af048cc2e
+  overview: 20d45dae2ce47704
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:38:50Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu modül, UI bileşenlerinin erişilebilirlik (a11y) uygunluğunu test etmek i�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### testA11y
 **Ne yapar**: React tabanlı projelerdeki kullanıcı arayüzü öğelerinin WCAG erişilebilirlik standartlarına uygunluğunu denetleyen bir test yardımcı fonksiyonudur. Saha denetimi yani dinamik erişilebilirlik incelemesi yapan bu fonksiyon, test senaryolarında kullanılarak yazılımın erişilebilirlik gereksinimlerini karşılayıp karşılamadığını doğrulamak amacıyla tasarlanmıştır. Girdi olarak aldığı herhangi bir React öğesi veya HTML DOM öğesi üzerinde otomatik erişilebilirlik taraması gerçekleştirir.
@@ -57,3 +61,19 @@ Bu modül, UI bileşenlerinin erişilebilirlik (a11y) uygunluğunu test etmek i�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: testA11y
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

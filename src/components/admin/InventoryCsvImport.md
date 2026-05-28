@@ -8,7 +8,7 @@ entity_hashes:
   func:InventoryCsvImport: bba4310bb8e97324
   overview: 618d3c1361b05bd5
   style_tokens: 3e4e1345adb17abc
-generated_at: 2026-05-27T18:10:41Z
+generated_at: 2026-05-28T22:35:31Z
 ---
 
 ## Genel Bakış

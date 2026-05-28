@@ -8,21 +8,26 @@ entity_hashes:
   func:LogisticsPage: 70696f052bf11390
   overview: ab1d59ecc97d7bb1
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-27T17:59:17Z
+generated_at: 2026-05-28T22:35:10Z
 ---
 
+## Genel Bakış
+Bu modül, VentHub HVAC yöneticilerinin lojistik operasyonlarını izlemek ve yönetmek için kullandığı web sayfasının giriş noktasıdır. Tek bileşenli bir yapısı olup, asıl lojistik arayüzünü ve işlevselliğini içeren bir alt bileşeni (`AdminLogisticsPage`) yükleyerek sayfayı sunar.
 
+## Fonksiyon Grupları
+### Sayfa Bileşeni
+- Yönetici panelindeki lojistik sayfasının üst düzey bileşenini oluşturur ve render eder.
+  - LogisticsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer React çalışma zamanı (runtime) mevcut değilse, `LogisticsPage` bileşeni render edilemez ve sayfa hatalı olur.  
-[Aksiyom 2]: Eğer `AdminLogisticsPage` bileşeni belirtilen yolda (`C:\Users\alize\venthub‑hvac\src\app\admin\logistics\page.tsx`) bulunamaz veya dinamik import başarısız olursa, `LogisticsPage` içinde bu alt bileşen çağrısı bir hata üretir ve sayfa boş ya da çökük gösterilir.  
-[Aksiyom 3]: Eğer `LogisticsPage` fonksiyonu çağrıldığında gerekli React context (ör. Router, Provider) sağlanmazsa, bileşen içinde kullanılan context‑tüketen alt bileşenler (ör. veri akışı, yetkilendirme) çalışmaz ve beklenen UI davranışı gerçekleşmez.  
-[Aksiyom 4]: Eğer sayfanın stil ve layout dosyaları (CSS/TSX) yüklenemezse, `LogisticsPage` görsel olarak bozulur ancak fonksiyonel olarak hâlâ çalışabilir.  
-[Aksiyom 5]: Eğer `LogisticsPage` içinde asenkron veri çekme (ör. API çağrısı) yapılacaksa ve ağ bağlantısı yoksa, veri eksikliği nedeniyle alt bileşenler boş veri setiyle render olur; bu durumda kullanıcıya uygun bir “yükleniyor/boş veri” durumu gösterilmelidir.
+Bu modül için yalnızca fonksiyon imzası ve modül sabitleri temelinde çıkarılabilen sınırlı aksiyomlar tanımlanmıştır. Fonksiyon gövdesi sağlandığında aksiyomlar güncellenebilir.
+
+**[Aksiyom 1]**: Eğer `AdminLogisticsPage` bileşeni modül kapsaminda tanımlı veya import edilmiş değilse, `LogisticsPage` bileşeni çağrıldığında `ReferenceError` veya `undefined` hata durumu oluşur ve sayfa render edilemez.
+
+**[Aksiyom 2]**: Eğer `LogisticsPage` fonksiyonu parametresiz (`()`) olarak tanımlıysa ve bir React bileşeniyse, çağrıldığı bağlamda (`page.tsx` – Next.js App Router) bir React JSX/Element döndürmesi gerekir; aksi halde React render hatası oluşur.
 
 ---
 

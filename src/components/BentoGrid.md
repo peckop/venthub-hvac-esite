@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BentoGrid.tsx
 skeleton_hash: 976b573fe52900a7
-generated_at: 2026-05-23T21:55:35Z
+entity_hashes:
+  func:BentoCard: 53a5813b914d3796
+  func:BentoGrid: a72cb28991bc9068
+  overview: c92c36199f86a0a5
+  style_tokens: e7a3e4b561023180
+generated_at: 2026-05-28T22:35:42Z
 ---
 
 ## Genel Bakış
@@ -31,7 +36,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### BentoCard
 **Ne yapar**: Verilen `BentoItem` verisini bir kart olarak render eder; `large` bayrağı true olduğunda kartı daha büyük boyutta gösterir.  
@@ -104,16 +109,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `auto-rows-[140px]`, `md:auto-rows-[180px]`, `sm:auto-rows-[160px]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-t`, `bg-white/20`, `bg-white/90`, `border-light-gray`, `from-black/50`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-lg`, `text-sm`, `text-steel-gray`, `text-white`, `text-white/90`, `text-xs`, `to-transparent`
-- **Layout:** `absolute`, `bottom-3`, `drop-shadow`, `flex`, `flex-col`, `from-black/50`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `group-hover:opacity-100`, `h-full`, `inline-flex`, `items-center`, `left-3`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-t`, `bg-white/20`, `bg-white/90`, `border-light-gray`, `from-black/50`, `hover:bg-white`, `hover:bg-white/30`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-lg`, `text-sm`, `text-steel-gray`, `text-white`, `text-white/90`
+- **Layout:** `absolute`, `auto-rows-140`, `bottom-3`, `drop-shadow`, `flex`, `flex-col`, `from-black/50`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `h-full`, `inline-flex`, `items-center`, `left-3`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${large`, `:`, `border`, `duration-500`, `font-bold`, `font-semibold`, `group`, `group-hover:opacity-100`, `inset-0`, `lg:px-8`, `mb-4`, `mx-auto`, `object-center`, `object-cover`, `opacity-0`

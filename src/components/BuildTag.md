@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BuildTag.tsx
 skeleton_hash: e41431e5b77ff240
-generated_at: 2026-05-23T21:55:31Z
+entity_hashes:
+  func:BuildTag: 33fa67732a403b49
+  overview: 5afd4a9c8d0105c9
+  style_tokens: 9c295aa26dd24226
+generated_at: 2026-05-28T22:35:42Z
 ---
 
 ## Genel Bakış
@@ -24,7 +28,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### BuildTag
 **Ne yapar**: BuildTag fonksiyonu, bir etiket (tag) görüntülemek için kullanılan basit bir React functional component’i tanımlar ve döndürür. Bu component, genellikle bir sürüm numarası, durum göstergesi veya benzeri kısa bilgi parçacığını kullanıcıya sunmak için tasarlanmıştır.  
@@ -74,4 +78,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `text-steel-gray`, `text-xs`
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `select-all`

@@ -8,7 +8,7 @@ entity_hashes:
   func:KnowledgeBlock: 6d00cfd06aa7a00e
   overview: 558d6d867468cadc
   style_tokens: 45bee56ab9c18ab4
-generated_at: 2026-05-27T17:46:34Z
+generated_at: 2026-05-28T22:35:52Z
 ---
 
 ## Genel Bakış

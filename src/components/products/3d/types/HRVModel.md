@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\HRVModel.tsx
 skeleton_hash: 6df93aa6828ad3af
-generated_at: 2026-05-23T22:24:01Z
+entity_hashes:
+  func:HRVModel: 0b331f626c131748
+  overview: 84b86c708078850f
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:47Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu React tabanlı 3B bileşen, HRV tipi HVAC cihazının kullanıcı arayüzünd
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### HRVModel
 **Ne yapar**: VentHub HVAC projesinin ürün odaklı 3D bileşenleri grubunda yer alan, Isı Geri Kazanım Ünitesi (HRV) için tasarlanmış React bileşenidir. Hava akışı animasyonu ve fiziksel tabanlı yapısı ile HRV ünitesinin çalışma prensibini 3 boyutlu ortamda görselleştirmek üzere geliştirilmiştir.
@@ -122,4 +126,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

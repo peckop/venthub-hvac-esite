@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\EducationalGuide.tsx
 skeleton_hash: 7e846c4ac4505192
-generated_at: 2026-05-23T21:57:57Z
+entity_hashes:
+  func:EducationalGuide: 062bdc9e16ff212e
+  overview: 6548521c92a45ec1
+  style_tokens: dfe57f52c58ea755
+generated_at: 2026-05-28T22:35:45Z
 ---
 
 ## Genel Bakış
@@ -26,7 +30,7 @@ Bu modül, `categorySlug` propunun mevcut ve geçerli bir string olduğu varsay�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### EducationalGuide
 **Ne yapar**: EducationalGuide bileşeni, verilen `categorySlug` özelliğine göre bir eğitim kılavuzu görüntüler.  
@@ -69,16 +73,13 @@ Bu modül, `categorySlug` propunun mevcut ve geçerli bir string olduğu varsay�
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `min-h-[48px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-50`, `bg-gray-50`, `bg-orange-50`, `bg-white`, `border-gray-100`, `border-y`, `text-2xl`, `text-center`, `text-gray-600`, `text-gray-700`, `text-green-500`, `text-industrial-gray`, `text-orange-500`, `text-secondary-blue`, `text-sm`
-- **Layout:** `absolute`, `flex`, `flex-shrink-0`, `gap-8`, `grid`, `grid-cols-1`, `group-hover:opacity-20`, `items-center`, `items-start`, `max-w-4xl`, `max-w-7xl`, `md:grid-cols-2`, `overflow-hidden`, `p-3`, `p-4`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-blue-50`, `bg-gray-50`, `bg-orange-50`, `bg-white`, `border-gray-100`, `border-y`, `hover:border-orange-500/50`, `hover:border-secondary-blue/50`, `text-2xl`, `text-center`, `text-gray-600`, `text-gray-700`, `text-green-500`, `text-industrial-gray`, `text-orange-500`
+- **Layout:** `absolute`, `flex`, `flex-shrink-0`, `gap-8`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `max-w-4xl`, `max-w-7xl`, `md:grid-cols-2`, `min-h-12`, `overflow-hidden`, `p-3`, `p-4`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `group`, `group-hover:opacity-20`, `lg:px-8`, `mb-10`, `mb-2`, `mb-6`, `mr-2`, `mt-0.5`, `mx-auto`, `opacity-10`, `px-4`, `py-12`, `rounded-lg`

@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ui\Skeleton.tsx
 skeleton_hash: 41c38e19c2e20ef6
-generated_at: 2026-05-23T22:27:56Z
+entity_hashes:
+  func:Skeleton: b70faa0883864e7c
+  overview: dd78551ca6caccba
+  style_tokens: 9afb047eb7d0beac
+generated_at: 2026-05-28T22:37:05Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu React tabanlı UI yükleme iskeleti (Skeleton) bileşeninin doğru görsel ve
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Skeleton
 **Ne yapar**: React tabanlı kullanıcı arayüzlerinde içeriklerin yüklenme sürecinde, yüklenecek içeriğin yerini tutan görsel yükleme göstergesi (skeleton) bileşenidir. Kullanıcıya yükleme işleminin aktif olduğunu iletirken, sayfa içeriğinin nihai düzenini önceden temsil ederek ani içerik kaymalarını önler.
@@ -82,4 +86,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`, `rounded-md`

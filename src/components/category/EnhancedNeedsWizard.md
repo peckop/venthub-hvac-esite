@@ -3,8 +3,15 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx
-skeleton_hash: af396943246e8025
-generated_at: 2026-05-23T22:26:36Z
+skeleton_hash: 83e168b3983c2755
+entity_hashes:
+  func:EnhancedNeedsWizard: ca7bec73e049fe61
+  func:getUsageLocations: 1e08ffb88dd30b7d
+  func:nextStep: 173c7fd2dc919ffb
+  func:prevStep: ac646de7f0306b72
+  overview: ef7448c5718a23ce
+  style_tokens: 4dfca29db2f1dc25
+generated_at: 2026-05-28T22:35:45Z
 ---
 
 ## Genel Bakış
@@ -37,7 +44,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getUsageLocations
 **Ne yapar**: Verilen çeviri fonksiyonu `t` kullanılarak kullanım konumlarıyla ilgili metinleri hazırlar veya ilgili veri yapısını doldurur.  
@@ -118,148 +125,17 @@ type WizardStep = 1 | 2 | 3 | 4 | 5 | 6
 
 ---
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::EnhancedNeedsWizard
-- **params**: isOpen: boolean, onClose: () => void, parentSlug: string
-- **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
-  - `state` — sihirbazın tüm durumunu tutan nesne: adım numarası, seçilen lokasyon, kapı ölçüleri, rüzgar durumu, trafik yoğunluğu, ısıtma ihtiyacı vb.
-  - `setState` — sihirbaz state'ini güncellemek için React useState hook fonksiyonu
-  - `matchedProducts` — kullanıcı ihtiyaçlarıyla eşleşen ilk 3 ürünün listesi
-  - `setMatchedProducts` — eşleşen ürünler listesini güncelleme fonksiyonu
-  - `loading` — ürün eşleştirme işleminin yükleme durumunu tutan boolean
-  - `setLoading` — yükleme durumunu güncelleme fonksiyonu
-  - `matchProducts` — ürün eşleştirmesi yapan useCallback ile sarılmış async fonksiyon
-  - `nextStep` — sihirbazda bir sonraki adıma geçme fonksiyonu
-  - `prevStep` — sihirbazda bir önceki adıma dönme fonksiyonu
-- **Dönüş**: Modal bileşeni JSX elementi, eğer isOpen false ise null döner
 
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::nextStep
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `prev` — state'i güncellerken kullanılan önceki sihirbaz durumu nesnesi
-  - `prev.step` — önceki adım numarası, 1 artırılarak yeni adım oluşturulur
-- **Dönüş**: yok
-
----
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::prevStep
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `prev` — state'i güncellerken kullanılan önceki sihirbaz durumu nesnesi
-  - `prev.step` — önceki adım numarası, 1 azaltılarak yeni adım oluşturulur
-- **Dönüş**: yok
-
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::matchProducts
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setLoading` — yükleme durumunu true/false yapmak için kullanılan fonksiyon
-  - `data` — Supabase'den dönen aktif ürünlerin ham verisi
-  - `error` — Supabase sorgusu sırasında oluşan hata nesnesi
-  - `supabase` — Supabase istemcisi, veritabanı sorguları için kullanılır
-  - `calculateAirCurtain` — Hava perdesi hesaplamaları yapan harici fonksiyon
-  - `state.doorWidth` — kullanıcının girdiği kapı genişliği
-  - `state.doorHeight` — kullanıcının girdiği kapı yüksekliği
-  - `state.windCondition` — kullanıcının seçtiği rüzgar durumu
-  - `state.trafficIntensity` — kullanıcının seçtiği trafik yoğunluğu
-  - `state.usageLocation` — kullanıcının seçtiği kullanım lokasyonu
-  - `rawProducts` — DbProduct tipine cast edilen Supabase'den gelen ham ürün listesi
-  - `domainProducts` — toUIProductList ile UI formatına dönüştürülmüş ürün listesi
-  - `scored` — puanlanmış, sıralanmış ve ilk 3 ürüne kesilmiş liste
-  - `err` — catch bloğunda yakalanan hata nesnesi
-  - `setMatchedProducts` — eşleşen ürünleri state'e kaydetmek için kullanılan fonksiyon
-- **Dönüş**: yok (async void)
-
----
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::domainProductMapCallback
-- **params**: p: DomainProduct (işlenen tekil ürün nesnesi)
-- **ic_degiskenler**:
-  - `score` — ürünün kullanıcı ihtiyaçlarıyla uyum puanı, başlangıçta 0
-  - `reason` — uyum puanının açıklaması, "Kapasite uyumu" olarak sabit
-  - `specs` — ürünün teknik özellikleri nesnesi, null olabilecek
-  - `pWidth` — ürünün desteklediği maksimum kapı genişliği (metre cinsinden)
-  - `pHeight` — ürünün desteklediği maksimum kapı yüksekliği (metre cinsinden)
-  - `state.doorWidth` — kullanıcının girdiği kapı genişliği, pWidth ile karşılaştırılır
-  - `state.doorHeight` — kullanıcının girdiği kapı yüksekliği, pHeight ile karşılaştırılır
-  - `state.heatingNeeded` — kullanıcının ısıtma ihtiyacı durumu, ürün adındaki "ısıtıcı" ifadesiyle kontrol edilir
-- **Dönüş**: Orijinal ürün nesnesine eklenmiş matchScore ve matchReason içeren yeni nesne
-
----
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::stepChangeEffectCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `state.step` — mevcut sihirbaz adımı, 6 olup olmadığı kontrol edilir
-  - `matchProducts` — adım 6 ise tetiklenen ürün eşleştirme fonksiyonu
-- **Dönüş**: yok
-
----
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::progressStepMapCallback
-- **params**: s: number (işlenen adım numarası, 1-6 arası)
-- **ic_degiskenler**:
-  - `state.step` — mevcut sihirbaz adımı, s ile karşılaştırılarak ilerleme çubuğu stili belirlenir
-- **Dönüş**: İlerleme çubuğu tekil hücresi için JSX div elementi
-
----
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::usageLocationMapCallback
-- **params**: loc: UsageLocation (işlenen tekil lokasyon nesnesi)
-- **ic_degiskenler**:
-  - `loc.id` — lokasyonun benzersiz tanımlayıcısı, key olarak ve state'e kaydedilir
-  - `setState` — seçilen lokasyonu state'e kaydetmek için kullanılan fonksiyon
-  - `prev` — state'i güncellerken kullanılan önceki sihirbaz durumu
-  - `nextStep` — lokasyon seçimi sonrası bir sonraki adıma geçme fonksiyonu
-  - `loc.icon` — lokasyonu temsil eden React ikonu
-  - `loc.title` — lokasyonun görünen başlığı
-  - `loc.description` — lokasyonun açıklaması
-- **Dönüş**: Lokasyon seçim butonu için JSX button elementi
-
----
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::matchedProductMapCallback
-- **params**: p: MatchedProduct (işlenen tekil eşleşmiş ürün nesnesi)
-- **ic_degiskenler**:
-  - `p.id` — ürünün benzersiz kimliği, key olarak kullanılır
-  - `Routes.product` — ürün detay sayfası rotasını oluşturan fonksiyon
-  - `p.slug` — ürünün url slug'i, rota oluşturmak için kullanılır
-  - `p.image_url` — ürün görselinin adresi, img etiketine source olarak verilir
-  - `p.name` — ürünün adı, görsel alternatif metni ve başlık olarak kullanılır
-  - `t` — çeviri fonksiyonu, uyum puanı metnini çevirmek için kullanılır
-  - `p.matchScore` — ürünün uyum puanı, ekranda gösterilir
-  - `p.brand` — ürünün markası, ekranda gösterilir
-- **Dönüş**: Ürün kartı için Next.js Link JSX elementi
-
----
-
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-EnhancedNeedsWizard() fonksiyonu, kullanım konumlarını toplamak ve sihirbazın sonraki adımına geçmek için getUsageLocations ve nextStep fonksiyonlarını çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Veri sağlanmadığı için bu modülü çağıran dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  EnhancedNeedsWizard() → getUsageLocations()
-  EnhancedNeedsWizard() → nextStep()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    EnhancedNeedsWizard["EnhancedNeedsWizard()"] --> getUsageLocations["getUsageLocations()"]
-    EnhancedNeedsWizard["EnhancedNeedsWizard()"] --> nextStep["nextStep()"]
+graph TD
+    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard["EnhancedNeedsWizard"]
+    EnhancedNeedsWizard_tsx__getUsageLocations["getUsageLocations"]
+    EnhancedNeedsWizard_tsx__nextStep["nextStep"]
+    EnhancedNeedsWizard_tsx__prevStep["prevStep"]
+    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__nextStep
+    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__getUsageLocations
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -285,16 +161,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[90vh]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - `rounded-hvac-2xl`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `accent-cyan-500`, `bg-cyan-500`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50`, `bg-slate-50/50`, `bg-slate-900/60`, `bg-slate-950`, `bg-white`, `border-b`, `border-none`, `border-slate-100`, `border-slate-200`, `text-3xl`, `text-4xl`
+- **Renkler:** `accent-cyan-500`, `bg-cyan-500`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50`, `bg-slate-50/50`, `bg-slate-900/60`, `bg-slate-950`, `bg-white`, `border-b`, `border-none`, `border-slate-100`, `border-slate-200`, `group-hover:bg-cyan-500`, `group-hover:text-white`
 - **Layout:** `absolute`, `backdrop-blur-xl`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-12`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`
-- **Responsive:** `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${s`, `:`, `<=`, `animate-in`, `animate-pulse`, `appearance-none`, `aspect-square`, `border`, `cursor-default`, `cursor-pointer`, `duration-500`, `fade-in`, `focus-ring`, `font-black`, `font-bold`

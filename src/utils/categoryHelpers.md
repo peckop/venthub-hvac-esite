@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\categoryHelpers.ts
 skeleton_hash: b52c89accc9fb1f4
-generated_at: 2026-05-23T22:33:54Z
+entity_hashes:
+  func:getCategoryDescription: 59a2fb71a2f4949e
+  func:getCategoryDisplayName: 403835a175ba4a6a
+  func:getCategoryMarketingTitle: 72c2aaa786c01ff4
+  func:parsePriceToNumber: 42be44b6c84206bc
+  overview: 61e31d74a200c4af
+generated_at: 2026-05-28T22:38:44Z
 ---
 
 ## Genel Bakış
@@ -31,7 +37,7 @@ Bu modül, veritabanından gelen kategori nesnelerini kullanıcı arayüzü içi
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getCategoryDisplayName
 **Ne yapar**: Verilen kategori nesnesi için en uygun yerelleştirilmiş görünüm adını belirler. Kullanıcı arayüzlerinde kategorilerin okunabilir, konuma göre çevrilmiş isimlerini göstermek amacıyla tasarlanmıştır, null veya undefined kategori değerleri için de güvenli şekilde çalışır.
@@ -40,33 +46,6 @@ Bu modül, veritabanından gelen kategori nesnelerini kullanıcı arayüzü içi
 - category: DbCategory | null | undefined — Görünüm adı çıkarılacak veritabanı kategori nesnesi, null veya undefined olması durumunda hata fırlatmadan güvenli şekilde çalışır
 - t?: (key: string) => string — İsteğe bağlı olarak sağlanan, i18next veya özel bir hook'tan gelen çeviri fonksiyonu, çeviri anahtarı alıp yerelleştirilmiş string döndürür
 **Dönüş**: string, çözümlenmiş yerelleştirilmiş kategori görünüm adı, her zaman geçerli bir string olarak döndürülür
-
----
-
-### getCategoryMarketingTitle
-**Ne yapar**: Bir kategori için pazarlama odaklı özel başlığı çözümler. Pazarlama sayfalarında, ürün listelemelerinde veya promosyon içeriklerinde kategorinin dikkat çekici, özel olarak hazırlanmış başlığını göstermek için kullanılır.
-**Nasıl yapar**: Öncelikle veritabanında kategori için tanımlanmış özel `marketing_title` alanını kontrol eder, eğer bu alan doluysa onu öncelikli olarak kullanır. Eğer özel pazarlama başlığı mevcut değilse standart kategori görünüm adına geri dönerek boş veya geçersiz bir başlık döndürmesini engeller.
-**Parametreler**:
-- category: DbCategory | null | undefined — Pazarlama başlığı çıkarılacak veritabanı kategori nesnesi, null veya undefined değerlerini de güvenli şekilde işler
-**Dönüş**: string, çözümlenmiş pazarlama başlığı veya varsayılan standart görünüm adından oluşan geçerli başlık string'i
-
----
-
-### getCategoryDescription
-**Ne yapar**: Bir kategori için birincil açıklama metnini çıkarır. Kategori detay sayfalarının açılış bölümünde, kategori listelerinde veya arama sonuçlarında kategorinin tanımlayıcı metnini göstermek için kullanılır.
-**Nasıl yapar**: İlk olarak kategori nesnesinin JSON formatındaki `metadata` alanı içinde yer alan `hero_description` özel açılış açıklamasını kontrol eder, eğer bu alan doluysa onu kullanır. Eğer hero_description mevcut değilse standart `description` alanına geri döner, hiçbir açıklama alanı dolu değilse boş string döndürerek tür uyumluluğunu korur.
-**Parametreler**:
-- category: DbCategory | null | undefined — Açıklaması çıkarılacak veritabanı kategori nesnesi, null veya undefined değerlerini güvenli şekilde işler
-**Dönüş**: string, çözümlenmiş kategori açıklaması, hiçbir geçerli açıklama alanı dolu değilse boş string döndürür
-
----
-
-### parsePriceToNumber
-**Ne yapar**: Bilinmeyen türdeki ham bir fiyat değerini güvenli bir şekilde işlenebilir sayısal fiyata dönüştürür. Sepet hesaplamaları, fiyat sıralamaları veya tüm matematiksel işlemlerde ham formatlanmış fiyat verilerini kullanılabilir hale getirmek için tasarlanmıştır.
-**Nasıl yapar**: Fiyat string'lerinde sıkça karşılaşılan binlik ayırıcı noktalar, ondalık ayırıcı virgüller, boşluklar ve para birimi sembolleri gibi biçimlendirme öğelerini temizler, geriye kalan değeri kayan noktalı sayıya dönüştürür. Eğer ayrıştırma işlemi herhangi bir nedenle başarısız olursa varsayılan olarak 0 döndürerek hesaplamalarda hata oluşmasını engeller.
-**Parametreler**:
-- val: unknown — Ayrıştırılacak ham fiyat değeri, '1.250,50 ₺' gibi formatlanmış string veya 1500 gibi ham sayı olabilir, her türlü bilinmeyen değeri güvenli şekilde işler
-**Dönüş**: number, ayrıştırılmış güvenli kayan noktalı fiyat değeri, ayrıştırma başarısız olursa 0 değerini döndürür
 
 ---
 
@@ -100,28 +79,16 @@ Bu modül, veritabanından gelen kategori nesnelerini kullanıcı arayüzü içi
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Sadece dosya içindeki getCategoryMarketingTitle() fonksiyonu, pazarlama amaçlı kategori başlığı oluşturmak için aynı dosyadaki getCategoryDisplayName fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  getCategoryMarketingTitle() → getCategoryDisplayName()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    getCategoryMarketingTitle["getCategoryMarketingTitle()"] --> getCategoryDisplayName["getCategoryDisplayName()"]
+graph TD
+    categoryHelpers_ts__getCategoryDescription["getCategoryDescription"]
+    categoryHelpers_ts__getCategoryDisplayName["getCategoryDisplayName"]
+    categoryHelpers_ts__getCategoryMarketingTitle["getCategoryMarketingTitle"]
+    categoryHelpers_ts__parsePriceToNumber["parsePriceToNumber"]
+    categoryHelpers_ts__getCategoryMarketingTitle --> categoryHelpers_ts__getCategoryDisplayName
 ```
-
----
 
 ## NODE ID STANDARD
 

@@ -4,15 +4,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventoryReportPage.tsx
 skeleton_hash: a56a35773cb7c54e
-generated_at: 2026-05-23T22:37:35Z
+entity_hashes:
+  func:AdminInventoryReportPage: d037654ecb70b8e0
+  overview: 56c65fe409f6c493
+  style_tokens: 23d781c8192db1b8
+generated_at: 2026-05-28T22:39:07Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC sisteminin yönetici arayüzünde yer alan envanter raporları ekranını sunan React tabanlı bir sayfa bileşenidir. Yalnızca yetkili yönetici kullanıcıların erişimine açık olan bu modül, sistemdeki stok ve envanter verilerinin görüntülenip raporlanmasını sağlayan ana arayüzü barındırır. Yönetici ekibinin envanter takibi ihtiyacına yönelik olarak özel olarak geliştirilmiştir.
+Bu modül, VentHub HVAC sistem yöneticilerine yönelik geliştirilmiş bir React sayfasıdır. Amacı, sistemdeki envanter ve stok durumuna dair raporları yetkili kullanıcıların hizmetine sunmaktır. Sayfa, yönetici arayüzünün bir parçası olarak işlev görür ve temel olarak veri görüntüleme odaklıdır.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Yönetici paneli envanter raporları sayfasının tüm temel yapısını oluşturmak, ilgili içerik ve sayfa düzenini yetkili kullanıcılara sunmak.
+Bu modülün tek ve ana bileşenidir. Yönetici panelindeki envanter raporları ekranının tüm yapısını, düzenini ve içerik akışını oluşturur.
 - AdminInventoryReportPage
 
 ---
@@ -27,7 +31,7 @@ Bu React tabanlı admin envanter raporu görüntüleme sayfası modülünün sor
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminInventoryReportPage
 **Ne yapar**: VentHub HVAC projesinin admin arayüzünde yer alan envanter raporları sayfasını oluşturan ana bileşendir. Yalnızca admin yetkisine sahip kullanıcıların erişebildiği bu sayfa, projenin envanter verilerini raporlamak amacıyla geliştirilmiştir.
@@ -192,3 +196,19 @@ Bu React tabanlı admin envanter raporu görüntüleme sayfası modülünün sor
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminInventoryReportPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `tracking-hvac-normal`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-emerald-400/10`, `bg-emerald-500/5`, `bg-rose-400/10`, `bg-rose-500/5`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50`, `border-b`, `border-emerald-100/10`, `border-emerald-400/20`, `border-emerald-500/10`, `border-l-4`, `border-l-emerald-500`, `border-l-indigo-500`, `border-l-rose-500`
+- **Layout:** `absolute`, `flex`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `h-4`, `h-5`, `h-72`, `h-8`, `h-80`, `h-full`, `items-center`
+- **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `!px-4`, `!py-2.5`, `!rounded-2xl`, `!rounded-3xl`, `!rounded-xl`, `${adminButtonSecondaryClass`, `${adminCardClass`, `${stats.net`, `0`, `:`, `<`, `>`, `animate-in`, `animate-pulse`, `border`

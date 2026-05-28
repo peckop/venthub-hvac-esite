@@ -4,37 +4,47 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\audit.ts
 skeleton_hash: 7826bc787cad34e3
-generated_at: 2026-05-23T22:30:55Z
+entity_hashes:
+  func:logAdminAction: 83ab9f1273deee6a
+  overview: beb3974c7555e069
+generated_at: 2026-05-28T22:38:01Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun denetim modülü, sistemdeki yönetici hesapları tarafından gerçekleştirilen tüm önemli eylemlerin kaydını tutmak için tasarlanmıştır. Supabase veritabanı entegrasyonu üzerinden bu kayıtları güvenli bir şekilde saklayarak, sorumluluk takibi ve sistem denetimi için altyapı sağlar.
+VentHub HVAC platformunun denetim modülü, yönetici hesapları tarafından gerçekleştirilen tüm önemli işlemlerin izlenebilirliğini sağlamak amacıyla tasarlanmıştır. Supabase veritabanı üzerinden tekli veya toplu olarak gelen eylem kayıtlarını kalıcı olarak depolar. Bu sayede sistemdeki değişikliklerin sorumluluk takibi ve denetim Traili tek bir merkezi noktadan yürütülebilir.
 
 ## Fonksiyon Grupları
-### Yönetici Eylemi Kaydetme İşlevleri
-Tekli veya toplu halde gelen yönetici eylemi verilerini alır, Supabase istemcisi ile entegre çalışarak kalıcı denetim kayıtlarına dönüştürüp saklar.
+### Yönetici Eylemi Kaydetme
+Yönetici panelinde gerçekleştirilen tüm işlemleri denetim günlüğüne aktarmaktan sorumludur. Tek bir eylem veya birden fazla eylem koleksiyonu alarak Supabase istemcisi aracılığıyla güvenli bir şekilde saklar.
 - logAdminAction
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, sistem yöneticilerinin gerçekleştirdiği işlemlerin denetim kaydını oluşturmak üzere tasarlanmıştır, çalışması için fonksiyonuna iletilen zorunlu parametrelerin tam ve geçerli olarak sağlanması şarttır.
+Bu modül, yönetici eylemlerinin denetim kaydını oluşturmak ve saklamak için tasarlanmıştır; temel işlevsellik için geçerli bir Supabase istemcisi ve en az bir geçerli eylem kaydı verisi zorunludur.
 
-[Aksiyom 1]: Eğer yetkili ve çalışır durumda bir SupabaseClient nesnesi sağlanmazsa, hiçbir denetim kaydı kalıcı olarak saklanamaz ve tüm loglama işlemleri başarısız olur.
-[Aksiyom 2]: Eğer AdminAuditLogInput tipinde tekil veya bu tipin dizisi formatında geçerli bir girdi nesnesi sağlanmazsa, logAdminAction fonksiyonu çalışamaz ve hiçbir log kaydı oluşturulamaz.
-[Aksiyom 3]: Eğer girdi olarak sağlanan dizi içindeki herhangi bir eleman AdminAuditLogInput tip uyumsuzluğu taşıyorsa, toplu loglama işlemi başarıyla tamamlanamaz.
+[Aksiyom 1]: Eğer `client` parametresi, Veritabanı ile güvenli bir bağlantıyı temsil eden geçerli bir `SupabaseClient` instance'ı değilse, eylem kaydı veritabanına yazılamaz ve fonksiyon başarısız olur.
+
+[Aksiyom 2]: Eğer `input` parametresi `AdminAuditLogInput` veya `AdminAuditLogInput[]` türünde geçerli bir veri içermiyorsa (örneğin `null`, `undefined` veya boş bir dizi `[]` ise), veritabanına hiçbir kayıt eklenmez ve fonksiyon sessizce tamamlanır.
+
+[Aksiyom 3]: Eğer `input` tekil bir `AdminAuditLogInput` nesnesi olarak verilmişse, bu nesnenin `AdminAuditLogInput` arayüzünün tanımladığı tüm zorunlu alanları içermesi gerekir; aksi halde veritabanı INSERT işlemi başarısız olur.
+
+[Aksiyom 4]: Eğer `input` bir dizi (`AdminAuditLogInput[]`) olarak verilmişse, dizideki her bir eleman için ayrı ayrı denetim kaydı oluşturulması beklenir; toplu ekleme işleminde bir elemanın hatalı olması durumunda, diğer elemanların akıbeti fonksiyonun iç uygulamasına bağlıdır (bilinmiyor).
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### logAdminAction
-**Ne yapar**: Yönetici (admin) paneli üzerinden gerçekleştirilen tüm işlemleri sistemin denetim günlüğüne (audit log) kaydetmekle sorumludur. Tek bir işlem kaydını veya aynı anda birden fazla işlem koleksiyonunu kaydedebilir, tüm yönetici kaynaklı değişiklik ve erişim hareketlerinin merkezi, izlenebilir bir yerde toplanmasını sağlar. Tüm denetim kayıtlarının güvenli bir şekilde saklanması sayesinde sistemdeki yetkisiz veya hatalı işlemlerin sonradan tespit edilmesine olanak tanır.
-**Nasıl yapar**: Aldığı girdi verisini tekil veya çoklu yapısına bakmaksızın standart bir formata dönüştürür, ardından Supabase istemcisinin veritabanı yazım metodlarını kullanarak denetim kayıtlarını ilgili veritabanı tablosuna ekler. İşlem asenkron olarak yürütülür, kayıt işlemi sırasında oluşabilecek tüm hataları yakalayıp ilgili hata akışına yönlendirir, kaydedilen tüm girdilerin eksiksiz bir şekilde veritabanına işlenmesini garanti eder.
+**Ne yapar**: Admin panelinde gerçekleştirilen işlemleri ve yapılan değişiklikleri denetim amacıyla Supabase veritabanındaki `admin_audit_log` tablosuna kaydeder. Tek bir işlem veya birden fazla işlem toplu olarak bu fonksiyonla loglanabilir.
+
+**Nasıl yapar**: Fonksiyon, girdi olarak verilen veya girdi dizisine dönüştürülen her bir `AdminAuditLogInput` nesnesini işler. Mevcut oturumdaki kullanıcının kimliğini (actor) belirlemek için öncelikle `getSession` metodunu, başarısız olursa `getUser` metodunu dener. Eğer girdi nesnesinde `actor` alanı açıkça belirtilmemişse, bu bilgiyi otomatik olarak tespit edilen kullanıcı kimliği ile doldurur. Hazırlanan satırları `insert` metodunu kullanarak veritabanına ekler ve `.select('id')` zinciriyle isteğin hemen gerçekleştirilmesini sağlar. Tüm sürecin hata yönetimi `try-catch` blokları ile sarılmıştır; hatalar yalnızca konsola uyarı olarak yazdırılır ve ana iş akşı durdurulmaz.
+
 **Parametreler**:
-- name: client — type: SupabaseClient — Sistemin Supabase ile olan yetkilendirilmiş veritabanı bağlantısını yöneten istemci nesnesi; kayıt işlemlerinin güvenli bir şekilde veritabanına iletilmesini sağlar
-- name: input — type: AdminAuditLogInput | AdminAuditLogInput[] — Kaydedilecek yönetici işleminin tüm detaylarını içeren, tekil veya birden fazla olabilen girdi nesnesi; her bir girdi işlem tarihi, yönetici kimliği, işlem türü ve ilgili veri detaylarını barındırır
-**Dönüş**: Promise<void> — Hiçbir doğrudan değer döndürmeyen, işlemin başarıyla tamamlanmasını veya bir hatayla karşılaşmasını işaret eden asenkron promise nesnesi; await ile beklenerek kayıt işleminin tamamlanması sağlanabilir.
+- `client`: SupabaseClient — Veritabanı ve kimlik doğrulama işlemleri için kullanılacak Supabase istemcisi
+- `input`: AdminAuditLogInput | AdminAuditLogInput[] — Tek bir denetim kaydı nesnesi veya birden fazla kaydı içeren dizi
+
+**Dönüş**: Promise<void — Fonksiyon herhangi bir değer döndürmez; işlemi arka planda sessizce tamamlar.
 
 ---
 
@@ -57,30 +67,6 @@ Bu modül, sistem yöneticilerinin gerçekleştirdiği işlemlerin denetim kayd�
 ```typescript
 type AdminAuditAction = 'INSERT' | 'UPDATE' | 'DELETE' | 'CUSTOM'
 ```
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\audit.ts::logAdminAction
-- **params**: client: SupabaseClient, input: AdminAuditLogInput | AdminAuditLogInput[]
-- **ic_degiskenler**:
-  - `rows` — Girdi olarak alınan log verisini tek tip diziye standartlaştıran, tüm log girişlerini tutan dizi değişkeni
-  - `userId` — Oturum açmış mevcut kullanıcının ID'sini tutan, loglarda eksikse actor olarak atanacak null olabilen string değişken
-  - `sessData` — `client.auth.getSession()` çağrısından dönen oturum verisi, oturum içindeki kullanıcı ID'sini almak için kullanılır
-  - `data` — `client.auth.getUser()` çağrısından dönen kullanıcı verisi, getSession'dan ID alınamazsa kullanıcı ID'sini almak için kullanılır
-  - `prepared` — Orijinal log dizisi (rows) üzerinden işlenerek eksikse actor alanı eklenmiş, veritabanı eklemesine hazır log dizisi
-  - `r` — Log dizisini işleyen map fonksiyonunda sırasıyla işlenen her tekil AdminAuditLogInput türündeki log girdisi
-  - `hasActor` — İşlenen log girdisinde `actor` özelliğinin tanımlı ve null olmadığını kontrol eden boolean değer
-  - `error` - Supabase `admin_audit_log` tablosuna ekleme işlemi sırasında oluşabilecek hata nesnesi
-  - `e` — Ana try bloğu içinde oluşan yakalanan genel istisna nesnesi
-- **Dönüş**: Promise<void>
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\audit.ts::rows.map callback
-- **params**: r: AdminAuditLogInput
-- **ic_degiskenler**:
-  - `hasActor` — İşlenen log girdisinde `actor` özelliğinin nesnede tanımlı ve null olmadığını kontrol eden boolean değer
-- **Dönüş**: Orijinal log girdisi veya actor alanı eklenmiş genişletilmiş log girdisi (AdminAuditLogInput & { actor: string | null })
 
 ---
 

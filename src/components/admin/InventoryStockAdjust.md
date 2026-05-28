@@ -8,7 +8,7 @@ entity_hashes:
   func:InventoryStockAdjust: 140b16e336bb5af7
   overview: 3b1f0525645c9b2f
   style_tokens: 333546eed756e72e
-generated_at: 2026-05-27T18:10:46Z
+generated_at: 2026-05-28T22:35:34Z
 ---
 
 ## Genel Bakış

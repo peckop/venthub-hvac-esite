@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx
 skeleton_hash: 3990bf5913c326a6
-generated_at: 2026-05-26T12:21:16Z
+entity_hashes:
+  func:TrustProofSection: ff4459fea67ab188
+  overview: ecbeef82efa3251a
+  style_tokens: fd859472e8c1a696
+generated_at: 2026-05-28T22:35:57Z
 ---
 
 ## Genel Bakış
@@ -22,7 +26,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### TrustProofSection
 **Ne yapar**: Verilen çeviri sözlükleri (`dictionary` ve `trustStripDict`) kullanılarak güven kanıtı (trust proof) içeren bir React bileşeni oluşturur. Bu bileşen, uygulamanın ana sayfasında güvenilirlik göstergelerini görsel olarak sunar.  
@@ -45,8 +49,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `subtitle?: string`
 - `visualAlt?: string`
 - `badge?: string`
-- `items?: Record<string, {
-`
+- `items?: Record<string, {`
 
 ### TrustStripDict
 
@@ -112,16 +115,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `aspect-[16/9]`, `tracking-[0.2em]`, `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `rounded-hvac-xl`
+- `rounded-hvac-2xl`, `rounded-hvac-xl`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/50`, `bg-white`, `border-slate-100`, `border-slate-200`, `from-slate-900/60`, `sm:text-6xl`, `text-4xl`, `text-base`, `text-center`, `text-cyan-600`, `text-lg`, `text-primary-navy`
-- **Layout:** `absolute`, `flex`, `flex-col`, `from-slate-900/60`, `gap-16`, `gap-3`, `gap-6`, `grid`, `grid-cols-2`, `group-hover:bg-primary-navy`, `group-hover:bg-primary-navy/20`, `group-hover:rotate-6`, `group-hover:text-white`, `h-12`, `h-2`
-- **Responsive:** `lg:`, `md:`, `sm:`, `xl:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/50`, `bg-white`, `border-slate-100`, `border-slate-200`, `from-slate-900/60`, `group-hover:bg-primary-navy`, `group-hover:bg-primary-navy/20`, `group-hover:text-white`, `hover:bg-white`, `hover:border-primary-navy/10`, `sm:text-6xl`, `text-4xl`
+- **Layout:** `absolute`, `flex`, `flex-col`, `from-slate-900/60`, `gap-16`, `gap-3`, `gap-6`, `grid`, `grid-cols-2`, `h-12`, `h-2`, `h-full`, `hover:shadow-2xl`, `hover:shadow-primary-navy/5`, `hover:shadow-slate-200/50`
+- **Varyant/Responsive:** `data-[in-view=true]:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `${delayClass`, `-translate-x-4`, `aspect-video`, `border`, `data-[in-view=true]:opacity-100`, `data-[in-view=true]:translate-x-0`, `data-[in-view=true]:translate-y-0`, `delay-200`, `delay-300`, `duration-300`, `duration-500`, `duration-700`, `ease-out`, `font-bold`, `font-light`

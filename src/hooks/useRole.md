@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useRole.ts
 skeleton_hash: 2c18158cd6a4a6f5
-generated_at: 2026-05-23T22:30:18Z
+entity_hashes:
+  func:useRole: fc94b629f746b287
+  overview: a47ed3737adf4eba
+generated_at: 2026-05-28T22:37:48Z
 ---
 
 ## Genel Bakış
@@ -25,7 +28,7 @@ Bu React özel hook modülü, uygulama içindeki kullanıcı rol bilgisini yöne
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useRole
 **Ne yapar**: React uygulamaları için özel olarak geliştirilmiş bir hook olup, mevcut oturum açmış kullanıcının Rol Tabanlı Erişim Kontrolü (RBAC) izinlerini hesaplar ve kullanıma hazır hale getirir. Uygulama genelinde tutarlı bir şekilde izin denetimi yapmayı sağlayarak, her bileşende tekrar izin mantığı yazma gereksinimini ortadan kaldırır. Sisteme tanımlı kullanıcı rollerine göre özelleştirilmiş erişim kontrolleri sunar.

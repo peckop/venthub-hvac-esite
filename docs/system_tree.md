@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-28T19:57:53.413487+00:00
+compiled_at: 2026-05-28T22:52:22.836294+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-28T22:52:22.836294+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -17,7 +17,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   ├── 📂 **app/**
 │   │   ├── 📂 **[lang]/**
 │   │   │   ├── 📂 **about/**
-│   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── 📂 **account/**
 │   │   │   │   ├── 📂 **addresses/**
 │   │   │   │   │   └── ✅ `page.tsx`
@@ -27,7 +27,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   │   │   ├── 📂 **orders/**
 │   │   │   │   │   ├── 📂 **detail/**
 │   │   │   │   │   │   └── ✅ `page.tsx`
-│   │   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   ├── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **profile/**
 │   │   │   │   │   └── ✅ `page.tsx`
@@ -116,13 +116,13 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   │   │   │       └── ✅ `page.tsx`
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **coupons/**
-│   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **error-groups/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **errors/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **inventory/**
-│   │   │   │   ├── ❌ `page.tsx`
+│   │   │   │   ├── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **report/**
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── 📂 **settings/**
@@ -138,9 +138,9 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   │   ├── 📂 **products/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **returns/**
-│   │   │   │   └── ✅ `page.tsx`
-│   │   │   ├── 📂 **settings/**
 │   │   │   │   └── ❌ `page.tsx`
+│   │   │   ├── 📂 **settings/**
+│   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **users/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   └── 📂 **webhook-events/**
@@ -148,10 +148,10 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   ├── 📂 **api/**
 │   │   │   └── 📂 **webhook/**
 │   │   │       └── 📂 **supabase/**
-│   │   │           └── ✅ `route.ts`
+│   │   │           └── ❌ `route.ts`
 │   │   ├── ✅ `layout.tsx`
 │   │   ├── ✅ `robots.ts`
-│   │   └── ✅ `sitemap.ts`
+│   │   └── ❌ `sitemap.ts`
 │   ├── 📂 **assets/**
 │   │   └── 📂 **images/**
 │   ├── 📂 **components/**
@@ -161,7 +161,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   ├── ✅ `BentoGrid.tsx`
 │   │   ├── ✅ `BrandsShowcase.tsx`
 │   │   ├── ✅ `BuildTag.tsx`
-│   │   ├── ❌ `CartToast.tsx`
+│   │   ├── ✅ `CartToast.tsx`
 │   │   ├── ✅ `CaseStudySection.tsx`
 │   │   ├── ✅ `CategoriesShowcase.tsx`
 │   │   ├── ✅ `CategoryFlow.tsx`
@@ -181,11 +181,12 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   ├── ✅ `LoadingSpinner.tsx`
 │   │   ├── ✅ `MagneticCTA.tsx`
 │   │   ├── ✅ `MegaMenu.tsx`
-│   │   ├── ✅ `PaymentWatcher.tsx`
-│   │   ├── ❌ `ProductCard.tsx`
+│   │   ├── ❌ `PaymentWatcher.tsx`
+│   │   ├── ✅ `ProductCard.tsx`
 │   │   ├── ✅ `QuickViewModal.tsx`
 │   │   ├── ✅ `ResourcesSection.tsx`
 │   │   ├── ✅ `ScrollLinkedProcess.tsx`
+│   │   ├── ✅ `ScrollReveal.tsx`
 │   │   ├── ✅ `ScrollToTop.tsx`
 │   │   ├── ✅ `SearchOverlay.tsx`
 │   │   ├── ✅ `SecurityRibbon.tsx`
@@ -195,10 +196,10 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   ├── ✅ `SpotlightList.tsx`
 │   │   ├── ✅ `StickyHeader.tsx`
 │   │   ├── ✅ `SubcategoryFlow.tsx`
-│   │   ├── ✅ `TiltCard.tsx`
+│   │   ├── ❌ `TiltCard.tsx`
 │   │   ├── ✅ `TrustSection.tsx`
 │   │   ├── ✅ `UndecidedUserCTA.tsx`
-│   │   ├── ❌ `VisualShowcase.tsx`
+│   │   ├── ✅ `VisualShowcase.tsx`
 │   │   ├── ✅ `WhatsAppFloat.tsx`
 │   │   ├── ✅ `WhyVentHubEnhanced.tsx`
 │   │   ├── 📂 **admin/**
@@ -228,7 +229,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   │   ├── 📂 **categories/**
 │   │   │   │   └── ✅ `CategoryFormModal.tsx`
 │   │   │   ├── 📂 **dashboard/**
-│   │   │   │   ├── ✅ `AbcPieChart.tsx`
+│   │   │   │   ├── ❌ `AbcPieChart.tsx`
 │   │   │   │   ├── ✅ `ActivityHeatmap.tsx`
 │   │   │   │   ├── ✅ `RecentOrdersTable.tsx`
 │   │   │   │   ├── ✅ `SalesChart.tsx`
@@ -279,16 +280,16 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   │   ├── ✅ `FinalCTA.tsx`
 │   │   │   ├── ✅ `GuidedCategoryDiscovery.tsx`
 │   │   │   ├── ✅ `HomePageClientWrapper.tsx`
-│   │   │   ├── ❌ `HomeSinevizyon.tsx`
+│   │   │   ├── ✅ `HomeSinevizyon.tsx`
 │   │   │   ├── ✅ `KnowledgeBlock.tsx`
 │   │   │   ├── ✅ `QuickEntryRail.tsx`
 │   │   │   ├── ✅ `RevealSection.tsx`
 │   │   │   ├── ✅ `StrategicBrands.tsx`
 │   │   │   └── ✅ `TrustProofSection.tsx`
 │   │   ├── 📂 **layout/**
-│   │   │   ├── ✅ `ClientLayout.tsx`
+│   │   │   ├── ❌ `ClientLayout.tsx`
 │   │   │   ├── ✅ `MainLayout.tsx`
-│   │   │   └── ✅ `PageShell.tsx`
+│   │   │   └── ❌ `PageShell.tsx`
 │   │   ├── 📂 **navigation/**
 │   │   │   ├── ✅ `Breadcrumb.tsx`
 │   │   │   ├── ✅ `CategoryCard3D.tsx`
@@ -298,13 +299,13 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   │   ├── ✅ `MegaMenu3DBackground.tsx`
 │   │   │   ├── ✅ `NavActionButton.tsx`
 │   │   │   ├── ✅ `NavBrand.tsx`
-│   │   │   ├── ❌ `NavPrimaryRail.tsx`
+│   │   │   ├── ✅ `NavPrimaryRail.tsx`
 │   │   │   ├── ✅ `NavSearchTrigger.tsx`
-│   │   │   ├── ✅ `NavSecondaryRail.tsx`
-│   │   │   ├── ✅ `NavShell.tsx`
+│   │   │   ├── ❌ `NavSecondaryRail.tsx`
+│   │   │   ├── ❌ `NavShell.tsx`
 │   │   │   └── ✅ `NavUtilityRail.tsx`
 │   │   ├── 📂 **product/**
-│   │   │   └── ✅ `ProductSmartInference.tsx`
+│   │   │   └── ❌ `ProductSmartInference.tsx`
 │   │   ├── 📂 **products/**
 │   │   │   ├── 📂 **3d/**
 │   │   │   │   ├── ✅ `AutoCenter.tsx`
@@ -312,7 +313,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   │   │   ├── ✅ `Product3DViewer.tsx`
 │   │   │   │   ├── ✅ `SmartCenterScale.tsx`
 │   │   │   │   ├── 📂 **factory/**
-│   │   │   │   │   ├── ✅ `Assembler.tsx`
+│   │   │   │   │   ├── ❌ `Assembler.tsx`
 │   │   │   │   │   ├── ✅ `VorticeLineoModel.tsx`
 │   │   │   │   │   ├── 📂 **blueprints/**
 │   │   │   │   │   └── 📂 **parts/**
@@ -355,7 +356,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   │   ├── ✅ `BlueprintCanvas.tsx`
 │   │   │   ├── ✅ `Category3DIcon.tsx`
 │   │   │   ├── ✅ `CategoryOrbitCarousel.tsx`
-│   │   │   ├── ✅ `CategoryPreviewPanel.tsx`
+│   │   │   ├── ❌ `CategoryPreviewPanel.tsx`
 │   │   │   ├── ✅ `CategoryShowcaseCards.tsx`
 │   │   │   ├── ✅ `InfiniteProductsShowcase.tsx`
 │   │   │   ├── ✅ `OrbitalProductsShowcase.tsx`
@@ -364,7 +365,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
-│   │   │   ├── ✅ `SeriesCard.tsx`
+│   │   │   ├── ❌ `SeriesCard.tsx`
 │   │   │   └── 📂 **visual-models/**
 │   │   └── 📂 **ui/**
 │   │       ├── ✅ `ScrollObserver.tsx`
@@ -374,10 +375,10 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   ├── ✅ `admin.ts`
 │   │   ├── ✅ `applications.ts`
 │   │   ├── ✅ `legal.ts`
-│   │   ├── ✅ `orbitalCarouselConfig.ts`
+│   │   ├── ❌ `orbitalCarouselConfig.ts`
 │   │   └── ✅ `siteUrl.ts`
 │   ├── 📂 **contexts/**
-│   │   ├── ✅ `AuthContext.tsx`
+│   │   ├── ❌ `AuthContext.tsx`
 │   │   ├── ✅ `AuthContextDefinition.ts`
 │   │   ├── ✅ `CartContext.tsx`
 │   │   ├── ✅ `CartProvider.tsx`
@@ -385,7 +386,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   ├── ✅ `ProjectContext.tsx`
 │   │   └── ✅ `ProjectProvider.tsx`
 │   ├── 📂 **design-system/**
-│   │   └── ✅ `tokens.js`
+│   │   └── ❌ `tokens.js`
 │   ├── 📂 **hooks/**
 │   │   ├── ✅ `use-mobile.tsx`
 │   │   ├── ✅ `useApiCall.ts`
@@ -425,18 +426,18 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   │   ├── ✅ `hvacCalculations.ts`
 │   │   ├── ✅ `order.ts`
 │   │   ├── ✅ `orderStatusService.ts`
-│   │   ├── ✅ `pdfAssets.ts`
+│   │   ├── ❌ `pdfAssets.ts`
 │   │   ├── ✅ `pdfGenerator.ts`
 │   │   ├── ✅ `productsApi.ts`
 │   │   ├── ✅ `rbac.ts`
 │   │   ├── 📂 **services/**
 │   │   │   ├── ✅ `address.service.ts`
 │   │   │   ├── ✅ `cart.service.ts`
-│   │   │   ├── ✅ `category.service.ts`
+│   │   │   ├── ❌ `category.service.ts`
 │   │   │   ├── ✅ `invoice.service.ts`
-│   │   │   ├── ✅ `pricing.service.ts`
+│   │   │   ├── ❌ `pricing.service.ts`
 │   │   │   ├── ✅ `product.service.ts`
-│   │   │   └── ✅ `project.service.ts`
+│   │   │   └── ❌ `project.service.ts`
 │   │   ├── ✅ `supabase.ts`
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `utils.ts`
@@ -445,7 +446,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   ├── 📂 **types/**
 │   │   ├── ✅ `admin-shared.ts`
 │   │   ├── ✅ `authority.ts`
-│   │   ├── ✅ `database.ts`
+│   │   ├── ❌ `database.ts`
 │   │   ├── ✅ `database.types.ts`
 │   │   ├── ✅ `db-rows.ts`
 │   │   ├── ✅ `inventory.ts`
@@ -454,9 +455,9 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │   ├── 📂 **utils/**
 │   │   ├── ✅ `3dModelOffsets.ts`
 │   │   ├── ✅ `adminUi.ts`
-│   │   ├── ✅ `analytics.ts`
+│   │   ├── ❌ `analytics.ts`
 │   │   ├── ✅ `applicationLinks.ts`
-│   │   ├── ✅ `applicationUi.tsx`
+│   │   ├── ❌ `applicationUi.tsx`
 │   │   ├── ✅ `breadcrumbUtils.ts`
 │   │   ├── ✅ `categoryHelpers.ts`
 │   │   ├── ✅ `checkoutHelpers.ts`
@@ -478,7 +479,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │       ├── ✅ `AboutPage.tsx`
 │       ├── ✅ `AuthCallbackPage.tsx`
 │       ├── ✅ `BrandDetailPage.tsx`
-│       ├── ✅ `BrandsPage.tsx`
+│       ├── ❌ `BrandsPage.tsx`
 │       ├── ✅ `CartPage.tsx`
 │       ├── ✅ `CategoryMasterView.tsx`
 │       ├── ✅ `CategoryPage.tsx`
@@ -490,8 +491,8 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │       ├── ✅ `OrdersPage.tsx`
 │       ├── ✅ `PaymentSuccessPage.tsx`
 │       ├── ✅ `ProductDetailPage.tsx`
-│       ├── ✅ `ProductsDiscoveryView.tsx`
-│       ├── ✅ `ProductsPage.tsx`
+│       ├── ❌ `ProductsDiscoveryView.tsx`
+│       ├── ❌ `ProductsPage.tsx`
 │       ├── ✅ `RegisterPage.tsx`
 │       ├── 📂 **account/**
 │       │   ├── ✅ `AccountAddressesPage.tsx`
@@ -526,7 +527,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │       │   ├── ✅ `AdminWebhookEventsPage.tsx`
 │       │   └── ✅ `CategoryBuilderView.tsx`
 │       ├── 📂 **calculators/**
-│       │   ├── ✅ `AirCurtainCalcPage.tsx`
+│       │   ├── ❌ `AirCurtainCalcPage.tsx`
 │       │   ├── ✅ `DuctCalcPage.tsx`
 │       │   ├── ✅ `HRVCalcPage.tsx`
 │       │   └── ✅ `JetFanCalcPage.tsx`
@@ -546,7 +547,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
 │       │   ├── ✅ `SecurePaymentOverlay.tsx`
 │       │   ├── ✅ `StepAddressInfo.tsx`
 │       │   ├── ✅ `StepCustomerInfo.tsx`
-│       │   └── ✅ `buildPaymentRequest.ts`
+│       │   └── ❌ `buildPaymentRequest.ts`
 │       ├── 📂 **knowledge/**
 │       │   ├── ✅ `HubPage.tsx`
 │       │   └── ✅ `TopicPage.tsx`
@@ -567,7 +568,7 @@ Bu belge, otonom derleyici tarafından 2026-05-28T19:57:53.413487+00:00 tarihind
     └── 📂 **functions/**
         ├── 📂 **_shared/**
         │   ├── ✅ `notify.ts`
-        │   ├── ✅ `rate_limit.ts`
+        │   ├── ❌ `rate_limit.ts`
         │   └── ✅ `sentry.ts`
         ├── 📂 **admin-create-coupon/**
         ├── 📂 **admin-iyzico-reconcile/**
@@ -610,12 +611,34 @@ Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
 
 ## Geçersiz Şablon (Invalid Format)
 Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:
-- [❌] `src\app\[lang]\account\orders\page.md`
-- [❌] `src\app\admin\coupons\page.md`
-- [❌] `src\app\admin\inventory\page.md`
-- [❌] `src\app\admin\settings\page.md`
-- [❌] `src\components\CartToast.md`
-- [❌] `src\components\ProductCard.md`
-- [❌] `src\components\VisualShowcase.md`
-- [❌] `src\components\home\HomeSinevizyon.md`
-- [❌] `src\components\navigation\NavPrimaryRail.md`
+- [❌] `src\app\[lang]\about\page.md`
+- [❌] `src\app\admin\returns\page.md`
+- [❌] `src\app\api\webhook\supabase\route.md`
+- [❌] `src\app\sitemap.md`
+- [❌] `src\components\PaymentWatcher.md`
+- [❌] `src\components\TiltCard.md`
+- [❌] `src\components\admin\dashboard\AbcPieChart.md`
+- [❌] `src\components\layout\ClientLayout.md`
+- [❌] `src\components\layout\PageShell.md`
+- [❌] `src\components\navigation\NavSecondaryRail.md`
+- [❌] `src\components\navigation\NavShell.md`
+- [❌] `src\components\product\ProductSmartInference.md`
+- [❌] `src\components\products\3d\factory\Assembler.md`
+- [❌] `src\components\products\CategoryPreviewPanel.md`
+- [❌] `src\components\products\SeriesCard.md`
+- [❌] `src\config\orbitalCarouselConfig.md`
+- [❌] `src\contexts\AuthContext.md`
+- [❌] `src\design-system\tokens.md`
+- [❌] `src\lib\pdfAssets.md`
+- [❌] `src\lib\services\category.service.md`
+- [❌] `src\lib\services\pricing.service.md`
+- [❌] `src\lib\services\project.service.md`
+- [❌] `src\types\database.md`
+- [❌] `src\utils\analytics.md`
+- [❌] `src\utils\applicationUi.md`
+- [❌] `src\views\BrandsPage.md`
+- [❌] `src\views\ProductsDiscoveryView.md`
+- [❌] `src\views\ProductsPage.md`
+- [❌] `src\views\calculators\AirCurtainCalcPage.md`
+- [❌] `src\views\checkout\buildPaymentRequest.md`
+- [❌] `supabase\functions\_shared\rate_limit.md`

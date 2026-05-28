@@ -4,41 +4,38 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\return-status-notification\index.ts
 skeleton_hash: 23ba0ccb2f46a67a
-generated_at: 2026-05-24T10:46:31Z
+entity_hashes:
+  func:return-status-notification_handler: 7d2592fd30deaf05
+  overview: 54a0239dcbdbb346
+generated_at: 2026-05-28T22:48:43Z
 ---
 
 ## Genel Bakış
-Bu modül, ürün iadelerindeki durum değişikliklerini ele alan ve bildirim akışını yöneten bir Supabase fonksiyonudur. Gelen HTTP isteklerini karşılayarak iade detaylarını işler, CORS yapılandırmasını uygular ve uygun bir yanıt döner.
+Bu modül, ürün iadelerindeki durum değişikliklerini izleyen bir Supabase Edge Function'dır. Dış sistemlerden gelen HTTP isteklerini karşılayarak iade bildirim akışını yönetir, CORS politikalarını uygular ve işlemlerin sonucuna göre uygun HTTP yanıtları üretir.
 
 ## Fonksiyon Grupları
-### İstek İşleme
-Bu grup, dış sistemlerden gelen iade durum bildirimlerini kabul etmek, gerekli başlık ayarlarını yönetmek ve yanıt üretmekten sorumludur.
+### İstek İşleme ve Yanıt Oluşturma
+Dış sistemlerden gelen iade durum bildirimlerini kabul eder, istek doğrulamalarını ve CORS yapılandırmalarını yöneterek HTTP yanıtını üretir.
 - return-status-notification_handler
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül, işlevin doğru çalışabilmesi için bir HTTP isteği nesnesi (`req`) sağlanmasını varsayar.
 
-[Aksiyom 1]: Eğer `req` parametresi fonksiyona geçirilmezse veya `undefined`/`null` ise, fonksiyon içindeki `req` üzerindeki özellik erişimleri hata (örneğin `TypeError: Cannot read property ... of undefined`) verebilir.  
-[Aksiyom 2]: Eğer `req` bir obje değilse (örneğin string, sayı, boolean), fonksiyonun `req` üzerindeki özellik okuma işlemleri çalışma zamanında hata fırlatabilir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### return-status-notification_handler
-**Ne yapar**:  
-Bu fonksiyon, `return-status-notification` Supabase Edge Function'ına gelen HTTP isteklerini işleyen ana işleyicidir. İstek içeriğine bağlı olarak ilgili mantığı çalıştırır ve uygun bir HTTP yanıtı döndürür. Fonksiyon, dönüş durumu bildirimleriyle ilgili süreçleri yönetmek üzere tasarlanmıştır.
 
-**Nasıl yapar**:  
-İşlev, bir istek nesnesi (`Request`) alarak başlar. Bu isteği ayrıştırır, gerekli doğrulamaları yapar ve iş mantığını yürütür. Ardından, işlemin sonucuna göre bir `Response` nesnesi oluşturup geri döndürür. Detaylı uygulama içeriği bu dokümantasyon kapsamında sağlanmamıştır.
+**Ne yapar**: Return (iade) durum değişikliklerini bildirim olarak işleyen bir HTTP istek yöneticisi fonksiyonudur. Supabase Edge Function yapısında çalışarak, iade taleplerinin durum güncelleme işlemlerini tetikleyen bildirimleri yönetir.
 
-**Parametreler**:  
-- **req**: Request — Gelen HTTP isteğini temsil eden standart Request nesnesi. İsteğin gövdesi, başlıkları ve diğer özelliklerine erişim sağlar.
+**Nasıl yapar**: Fonksiyon, gelen HTTP isteğini (`req` parametresi) alır ve bu istek içindeki iade durum bilgilerini işler. Edge Function mimarisi içinde çalışarak, istemci tarafından gönderilen iade durum değişikliğini alır, gerekli bildirim mantığını uygular ve bir `Response` nesnesi döndürerek işlem sonucunu iletir.
 
-**Dönüş**:  
-**Response** — HTTP yanıtı olarak döndürülen Response nesnesi. Yanıt, işlemin başarı veya başarısızlık durumuna göre uygun status code ve body ile oluşturulur.
+**Parametreler**:
+- `req`: Request — HTTP istek nesnesi. İade durum bildirimi için gerekli verileri (iade ID'si, yeni durum, kullanıcı bilgileri vb.) içeren istek gövdesi ve meta bilgilerini barındırır.
+
+**Dönüş**: `Response` — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarılı bildirim gönderiminde onay mesajı, hata durumunda ise hata bilgisi ve uygun HTTP durum kodunu döndürür.
 
 ---
 
@@ -59,59 +56,49 @@ Bu fonksiyon, `return-status-notification` Supabase Edge Function'ına gelen HTT
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\return-status-notification\index.ts::return-status-notification_handler
-- **params**: [req: Request]
+### [N1_NASIL] AST Pointer: supabase/functions/return-status-notification/index.ts::return-status-notification_handler
+- **params**: (req: Request)
 - **ic_degiskenler**:
-  - `corsHeaders` — CORS izinlerini tanımlayan header objesi, tüm API cevaplarında kullanılır
-  - `body` - İstek gövdesinden parse edilen JSON nesnesi, ReturnStatusNotificationRequest tipinde tip dönüşümü yapılmıştır
-  - `return_id` - İade kaydının benzersiz kimliği, istek gövdesinden ayrıştırılmıştır
-  - `old_status` - İadenin önceki durumu, istek gövdesinden ayrıştırılmıştır
-  - `new_status` - İadenin güncellendiği yeni durumu, istek gövdesinden ayrıştırılmıştır
-  - `reason` - İade durumu değişikliğinin sebebi, istek gövdesinden ayrıştırılmıştır
-  - `description` - İade durumu değişikliği için ek açıklama, istek gövdesinden ayrıştırılmıştır
-  - `order_id` - İadenin ait olduğu siparişin kimliği, önce istek gövdesinden alınır, sonradan Supabase'den güncellenir
-  - `order_number` - İadenin ait olduğu siparişin numarası, önce istek gövdesinden alınır, sonradan Supabase'den güncellenir
-  - `supabaseUrl` - Supabase proje URL'i, ortam değişkeninden alınır
-  - `serviceKey` - Supabase servis rolü erişim anahtarı, ortam değişkeninden alınır
-  - `authHeader` - İstekten alınan Authorization header değeri, yetki kontrolü için kullanılır
-  - `isAuthorized` - İsteği yapan kullanıcının işleme erişim yetkisi olup olmadığını tutan boolean değer
-  - `anonKey` - Supabase anon erişim anahtarı, yetki kontrolü sırasında kullanılır
-  - `createClient` - Supabase istemci nesnesi oluşturma fonksiyonu, dinamik olarak import edilir
-  - `authClient` - Kullanıcı oturumunu doğrulamak için oluşturulan Supabase istemcisi
-  - `user` - Oturumu doğrulanmış kullanıcı nesnesi, Supabase auth servisinden alınır
-  - `roleCheck` - Kullanıcının admin rolünü sorgulamak için veritabanına yapılan fetch isteği cevabı
-  - `arr` - Rol sorgusundan dönen JSON dizisi
-  - `role` - Kullanıcının veritabanındaki rolü, yetki kontrolü için kullanılır
-  - `err` - Yetki kontrolü sırasında oluşan hatayı tutan değişken
-  - `customer_email` - Bildirimin gönderileceği müşterinin email adresi, istek gövdesinden veya Supabase'den alınır
-  - `customer_name` - Bildirimin gönderileceği müşterinin adı, istek gövdesinden veya Supabase'den alınır
-  - `user_id` - Müşterinin platformdaki kullanıcı kimliği, iade/sipariş kaydından alınır
-  - `retRes` - İade kaydını veritabanından çekmek için yapılan fetch isteği cevabı
-  - `retArr` - İade sorgusundan dönen JSON dizisi
-  - `ret` - İade kaydı nesnesi, sorgu sonucu dönen dizinin ilk elemanı
-  - `ordRes` - Sipariş kaydını veritabanından çekmek için yapılan fetch isteği cevabı
-  - `ordArr` - Sipariş sorgusundan dönen JSON dizisi
-  - `ord` - Sipariş kaydı nesnesi, sorgu sonucu dönen dizinin ilk elemanı
-  - `authRes` - Kullanıcı bilgilerini Supabase auth API'den çekmek için yapılan fetch isteği cevabı
-  - `u` - Auth API'den dönen kullanıcı nesnesi
-  - `meta` - Kullanıcının auth servisindeki metadata'sı, müşteri adını almak için kullanılır
-  - `prettyOrderNo` - Kullanıcıya gösterilmek üzere formatlanmış okunabilir sipariş numarası
-  - `getStatusLabel` - Statü kodlarını Türkçe etiketlere çeviren tanımlı iç fonksiyon
-  - `statusLabel` - Yeni iade durumu için elde edilen insan okunabilir etiket
-  - `subject` - Gönderilecek emailin konusu
-  - `resendApiKey` - Resend email servisi API anahtarı, ortam değişkeninden alınır
-  - `emailFrom` - Bildirim emailinin gönderici adresi, ortam değişkeninden alınır
-  - `emailResponse` - Resend API'ye email göndermek için yapılan POST isteği cevabı
-  - `errorText` - Email gönderme hatasında API'den dönen hata mesajı
-  - `error` - Ana işlem bloğunda oluşan genel hata nesnesi
-  - `msg` - Hata nesnesinden çıkarılan okunabilir hata mesajı
-- **Dönüş**: Response
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\return-status-notification\index.ts::getStatusLabel
-- **params**: [status: string]
-- **ic_degiskenler**:
-  - `labels` - İade statü kodlarını Türkçe insan okunabilir etiketlere eşleyen sözlük, tüm olası statülerin çevirisini içerir
-- **Dönüş**: string
+  - `corsHeaders` — CORS başlık nesnesi, izin verilen origins, headers ve methods tanımlar
+  - `body` — Request JSON gövdesinden parse edilmiş ReturnStatusNotificationRequest tipinde veri
+  - `return_id` — body.return_id'den alınan iade talebi ID'si
+  - `old_status` — body.old_status'ten alınan önceki durum
+  - `new_status` — body.new_status'ten alınan yeni durum
+  - `reason` — body.reason'dan alınan iade sebebi
+  - `description` — body.description'dan alınan iade açıklaması (opsiyonel)
+  - `order_id` — body.order_id'den alınan sipariş ID'si (sonradan güncellenebilir)
+  - `order_number` — body.order_number'dan alınan sipariş numarası (sonradan güncellenebilir)
+  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile alınan Supabase URL'i
+  - `serviceKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile alınan servis rolü anahtarı
+  - `authHeader` — req.headers.get('Authorization') ile alınan yetkilendirme başlığı
+  - `isAuthorized` — Yetkilendirme durumunu tutan boolean bayrak
+  - `anonKey` — Deno.env.get('SUPABASE_ANON_KEY') ile alınan anonim anahtar (yalnızca auth fallback'de kullanılır)
+  - `authClient` — Supabase istemcisi, anonim anahtar ile oluşturulur
+  - `user` — authClient.auth.getUser() sonucu elde edilen kullanıcı nesnesi
+  - `roleCheck` — Kullanıcı rolünü kontrol etmek için yapılan fetch isteği sonucu
+  - `arr` — roleCheck yanıtının JSON array'i
+  - `role` — arr[0]?.role ile alınan kullanıcı rolü
+  - `customer_email` — Müşteri e-posta adresi, çeşitli kaynaklardan güncellenebilir
+  - `customer_name` — Müşteri adı, çeşitli kaynaklardan güncellenebilir
+  - `user_id` — Kullanıcı ID'si, çeşitli kaynaklardan güncellenebilir
+  - `retRes` — venthub_returns tablosundan iade bilgisi sorgulama isteği sonucu
+  - `retArr` — retRes yanıtının JSON array'i
+  - `ret` — retArr dizisinin ilk elemanı veya null
+  - `ordRes` — venthub_orders tablosundan sipariş bilgisi sorgulama isteği sonucu
+  - `ordArr` — ordRes yanıtının JSON array'i
+  - `ord` — ordArr dizisinin ilk elemanı veya null
+  - `authRes` — auth/v1/admin/users API'sinden kullanıcı bilgisi alma isteği sonucu
+  - `u` — authRes yanıtının JSON nesnesi veya null
+  - `meta` — u.user_metadata nesnesi, full_name veya name alanlarını içerir
+  - `getStatusLabel` — Durum kodunu Türkçe etikete dönüştüren iç fonksiyon
+  - `statusLabel` — getStatusLabel(new_status) ile elde edilen durum etiketi
+  - `subject` — E-posta konusu, sipariş numarası ile formatlanmış
+  - `resendApiKey` — Deno.env.get('RESEND_API_KEY') ile alınan Resend API anahtarı
+  - `emailFrom` — Deno.env.get('EMAIL_FROM') ile alınan e-posta gönderici adresi
+  - `emailResponse` — Resend API'ye e-posta gönderme isteği sonucu
+  - `errorText` — emailResponse başarısız olduğunda alınan hata metni
+  - `msg` — Yakalanan hata nesnesinin message özelliği
+- **Dönüş**: Response (JSON içinde success: true ve return_id, new_status alanları) veya hata Response'ları
 
 ---
 

@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx
 skeleton_hash: a6449980d65a3ace
-generated_at: 2026-05-23T22:35:05Z
+entity_hashes:
+  func:LocationProbe: 5b91bc45de71299f
+  func:chainResult: 1b5aa5b5378b3f99
+  overview: 83e96a7c5f4325c8
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:38:51Z
 ---
 
 ## Genel Bakış
@@ -31,7 +36,7 @@ Bu OrdersPage test modülünün başarıyla derlenmesi, çalıştırılması ve 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### chainResult
 **Ne yapar**: Test ortamlarında kullanılan, gelen veriyi zincirleme sorgu metodlarıyla sarmalayan bir yardımcı fonksiyondur. OrdersPage testlerinde asenkron veri akışını simüle etmek için tasarlanmış olan bu fonksiyon, testlerde kullanılan mock veri yapılarını standart bir formatta sunar. Sadece test sürecinde kullanılan geçici bir yapı olarak görev alır, üretim kodunda kullanılmaz.
@@ -181,3 +186,19 @@ Bu OrdersPage test modülünün başarıyla derlenmesi, çalıştırılması ve 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LocationProbe
   export: chainResult
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

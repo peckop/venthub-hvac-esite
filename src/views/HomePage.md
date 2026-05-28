@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\HomePage.tsx
 skeleton_hash: 70b0198d89a0a975
-generated_at: 2026-05-23T22:40:51Z
+entity_hashes:
+  func:HomePage: f427f64434101e03
+  overview: 07b61b3f60f731c1
+  style_tokens: 481a957f2fef5bcd
+generated_at: 2026-05-28T22:40:08Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ HomePage ana sayfa bileşeninin sorunsuz çalışması ve tüm görüntüleme/i�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### HomePage
 **Ne yapar**: VentHub HVAC projesinin ana giriş sayfası olarak görev yapan bir React fonksiyonel bileşenidir. Kendiisine aktarılan kategori ve ürün verilerini kullanarak ana sayfa arayüzünü oluşturur, sayfanın ihtiyaç duyduğu tüm veri ve bağımlılık entegrasyonunu yönetir. Uygulama içindeki ana rota üzerinden çağrıldığında kullanıcıya ilk karşılaşılan arayüzü sunar.
@@ -83,3 +87,19 @@ HomePage ana sayfa bileşeninin sorunsuz çalışması ve tüm görüntüleme/i�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: HomePage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-b`, `bg-white`, `from-slate-950`, `selection:bg-cyan-100`, `selection:text-cyan-900`, `text-slate-900`, `to-white`
+- **Layout:** `absolute`, `from-slate-950`, `h-32`, `lg:h-64`, `min-h-screen`, `overflow-hidden`, `relative`, `z-10`
+- **Varyant/Responsive:** `lg:`, `selection:` önekleri
+- **Yardımcı Sınıflar:** `-mt-16`, `inset-0`, `lg:space-y-48`, `opacity-100`, `pb-32`, `space-y-32`

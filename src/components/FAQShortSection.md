@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\FAQShortSection.tsx
 skeleton_hash: ff1b91887f689998
-generated_at: 2026-05-23T22:03:07Z
+entity_hashes:
+  func:FAQShortSection: 7bb9721e0805f313
+  overview: d0f44cf5d692e4cb
+  style_tokens: a7a934931b64d2ac
+generated_at: 2026-05-28T22:35:49Z
 ---
 
 ## Genel Bakış
@@ -22,7 +26,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### FAQShortSection
 **Ne yapar**: FAQShortSection işlevi, bir FAQ (Sık Sorulan Sorular) bölümünün kompakt versiyonunu render eden bir React fonksiyonel bileşenidir. Bu bileşen, sayfada sık sorulan sorular ve cevapların listesini göstererek kullanıcıya hızlı bilgi sağlar.
@@ -76,4 +80,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gradient-to-br`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `to-white`
 - **Layout:** `flex`, `from-gray-50`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-start`, `max-w-7xl`, `md:grid-cols-3`, `p-5`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `font-medium`, `font-semibold`, `hover:underline`, `lg:px-8`, `mb-6`, `mt-1`, `mt-3`, `mx-auto`, `px-4`, `py-12`, `rounded-2xl`, `sm:px-6`

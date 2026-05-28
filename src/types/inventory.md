@@ -4,25 +4,36 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\inventory.ts
 skeleton_hash: b6300d6fc404b991
-generated_at: 2026-05-23T22:33:05Z
+entity_hashes:
+  overview: 0673781afc683fb3
+generated_at: 2026-05-28T22:38:41Z
 ---
 
 ## Genel Bakış
-Bu TypeScript modülü, VentHub HVAC projesinin envanter yönetimi sistemi için gerekli ortak tür tanımlarını toplayan bir tür merkezidir. Envanterle ilgili tüm kodlarda tutarlı tip kullanımını sağlamak amacıyla Supabase veritabanı entegrasyonundan gelen kategori tipini, admin paneli ortak tiplerinden yoğunluk ve yük durumu tiplerini içe aktararak projenin ilgili tüm bölümlerine sunar. Herhangi bir çalıştırılabilir işlem, sabit ya da işlev barındırmayan bu modül, tamamen envanter işlemlerinin tip güvenliğini sağlamak için tasarlanmıştır.
+Bu modül, VentHub HVAC projesinin envanter yönetim sistemi için merkezi TypeScript tip tanımlarını barındıran bir tür deposudur. Supabase veritabanından gelen `Category` tipini, admin paneli ortak tiplerinden `Density` ve `LoadState` tiplerini içe aktararak envanter verilerinin proje genelinde güvenli ve tutarlı bir şekilde işlenmesini sağlar. Herhangi bir işlev, sabit veya çalıştırılabilir kod içermeyen bu dosya, tamamen derleme zamanı tip güvenliği amacıyla var olur ve `InventoryRow` gibi envanter satır yapılarının tanımını merkezileştirir.
+
+## Modül Yapısı
+Bu dosya salt tip tanımı (type definition) modülüdür — çalışabilir fonksiyon veya modül-seviyesi executable kod barındırmaz. Sunduğu tipler, projenin envanter ile ilgili tüm katmanlarında (API çağrıları, bileşen prop'ları, veri işleme) kullanılarak veri akışının tipsel olarak doğrulanmasını mümkün kılar. Doğru çalışması, projenin TypeScript yapılandırmasında doğru yola sahip olmasına ve gerçek envanter veri şemasıyla uyumlu olmasına bağlıdır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu TypeScript tip tanımı (inventory.ts) modülü, VentHub HVAC projesinin envanter varlıkları için tip güvenliği sağlamak amacıyla kullanılır; doğru çalışması için TypeScript derleyicisi tarafından erişilebilir ve proje içindeki gerçek envanter veri yapılarıyla tutarlı olması gereklidir.
 
-[Aksiyom 1]: Eğer TypeScript derleyicisi bu dosyaya proje yapılandırmasında (tsconfig vb.) tanımlı yol üzerinden erişemiyorsa, dosya içindeki tipleri kullanan tüm modüllerde derleme zamanı hatası oluşur.
-[Aksiyom 2]: Eğer dosya içindeki tip tanımları, projedeki gerçek envanter veri yapısının formatıyla eşleşmiyorsa, TypeScript'in sağladığı tip güvenliği ortadan kalkar, çalışma zamanı veri uyumsuzluğu hataları meydana gelir.
-[Aksiyom 3]: Eğer dosyada geçerli olmayan TypeScript sözdizimi (syntax hatası) varsa, projenin tamamı derlenemez.
-[Aksiyom 4]: Eğer bu dosya projenin derleme ve paketleme zincirine dahil edilmemişse, üretim ortamında tipler referans gösterilemez, uygulama çalıştırılamaz.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+**Gerekçe:** Bu modül (`inventory.ts`) yalnızca TypeScript tip tanımları içeren bir type-definition dosyasıdır. Fonksiyon gövdesi, çalıştırılabilir kod veya sabit içermemektedir. Verilen modül imzası listesi de boş (yok) olarak belirtilmiştir. Aksiyomlar yalnızca fonksiyon gövdelerinden üretilebildiği ve docstring/yorum/variable isminden bilgi çıkarılamayacağı için, bu modül için mimari varsayım türetilmemiştir.
 
+**Not:** Bu modülün gerçek anlamda işlevsel olabilmesi için şu **dolaylı bağımlılıklar** (fonksiyon gövdesinden üretilmeyen, dış kaynak notları olarak sunulan) söylenebilir:
+- Supabase veritabanı tarafındaki ilgili tablo tanımlarının var olması gerekir
+- `admin` panelinden içe aktarılan tip tanımlarının (`yoğunluk`, `yük durumu`) var olması gerekir
+
+Ancak bu bilgiler modülün kendi fonksiyon gövdesinden türetilmediği için aksiyom formatına dahil edilmemiştir.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -73,9 +84,8 @@ type VisibleCols = {
 ---
 
 ## AST POINTERS
-İlişkili kaynak dosyası `C:\Users\alize\venthub-hvac\src\types\inventory.ts` içerisinde analiz edilecek herhangi bir fonksiyon gövdesi, sınıf metodu veya çağrılabilir varlık tanımlı değildir. Dosyada yalnızca tip importları bulunmaktadır:
-- `../lib/supabase` modülünden import edilen `Category` tipi
-- `./admin-shared` modülünden import edilen `Density` ve `LoadState` tipleri
+
+Bu dosyada fonksiyon gövdesi bulunmamaktadır.
 
 ---
 

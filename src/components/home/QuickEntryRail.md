@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\QuickEntryRail.tsx
 skeleton_hash: affff31675ac0604
-generated_at: 2026-05-23T22:06:53Z
+entity_hashes:
+  func:QuickEntryRail: 075f03157b98bfeb
+  overview: 401a0936bbfac549
+  style_tokens: 400b6fdf74ed7abd
+generated_at: 2026-05-28T22:35:54Z
 ---
 
 ## Genel Bakış
@@ -25,7 +29,7 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### QuickEntryRail
 **Ne yapar**: Kullanıcıya hızlı giriş seçenekleri sunan bir rail (çubuk) bileşenini renderlar.  
@@ -87,16 +91,13 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_18px_35px_-30px_rgba(15,23,42,0.45)]`
-- **height:** `min-h-[88px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `bg-[linear-gradient(135deg,rgba(15,23,42,0.02),rgba(37,99,235,0.06))]`, `hover:shadow-[0_22px_40px_-28px_rgba(37,99,235,0.45)]`, `tracking-[0.24em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-lg`
+- `rounded-hvac-lg`, `tracking-hvac-24`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-primary-navy/[0.06]`, `bg-white`, `bg-white/95`, `border-b`, `border-primary-navy/10`, `border-primary-navy/15`, `border-slate-200`, `border-slate-200/75`, `sm:text-xl`, `text-left`, `text-lg`, `text-primary-navy`, `text-slate-950`, `text-sm`
-- **Layout:** `block`, `flex`, `gap-3`, `grid`, `group-hover:bg-primary-navy/10`, `group-hover:bg-secondary-blue`, `group-hover:border-primary-navy/20`, `h-11`, `hidden`, `inline-flex`, `items-center`, `items-start`, `justify-between`, `justify-center`, `lg:block`
-- **Responsive:** `lg:`, `sm:`, `xl:` prefix kullanımları
+- **Renkler:** `bg-entry-rail-gradient`, `bg-primary-navy`, `bg-primary-navy/6`, `bg-white`, `bg-white/95`, `border-b`, `border-primary-navy/10`, `border-primary-navy/15`, `border-slate-200`, `border-slate-200/75`, `group-hover:bg-primary-navy/10`, `group-hover:bg-secondary-blue`, `group-hover:border-primary-navy/20`, `hover:border-primary-navy/20`, `hover:border-primary-navy/25`
+- **Layout:** `block`, `flex`, `gap-3`, `grid`, `h-11`, `hidden`, `hover:shadow-hvac-rail-2`, `inline-flex`, `items-center`, `items-start`, `justify-between`, `justify-center`, `lg:block`, `max-w-7xl`, `max-w-md`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `border`, `duration-300`, `font-semibold`, `group`, `hover:-translate-y-0.5`, `leading-6`, `lg:px-8`, `lg:py-6`, `mt-1`, `mt-4`, `mx-auto`, `px-4`, `py-4`, `py-5`, `rounded-2xl`

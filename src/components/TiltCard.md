@@ -4,48 +4,52 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\TiltCard.tsx
 skeleton_hash: 11168335cd8d8a31
-generated_at: 2026-05-23T22:28:05Z
+entity_hashes:
+  func:TiltCard: bfd1d2a43ccba8c3
+  func:clamp: 6b6f2a3bb4b3c92e
+  func:onEnter: 6efee232fcfe2e0b
+  func:onLeave: 47432f2c7853fc8a
+  func:onMove: 855a2394d5f31485
+  overview: 49812a020a38dab5
+  style_tokens: 9c70068ed275c69c
+generated_at: 2026-05-28T22:37:19Z
 ---
 
 ## Genel Bakış
-Bu modül, React tabanlı VentHub HVAC projesinde kullanılan, fare etkileşimleriyle 3D eğilme (tilt) efekti sunan TiltCard UI bileşenini barındırır. Kart bileşeni, içerdiği herhangi bir içeriği sararak kullanıcı etkileşimlerine duyarlı modern bir görsel deneyim sunar, maksimum eğilme açısı gibi temel ayarlar özelleştirilebilir.
+TiltCard, fare etkileşimleriyle üç boyutlu eğilme efekti sunan interaktif bir React kart bileşenidir. Kullanıcı faresini kart üzerinde hareket ettirdiğinde, kart真实世界'deki bir nesne gibi eğilerek modern ve dinamik bir görsel deneyim yaratır. Maksimum eğilme açısı dışarıdan özelleştirilebilir.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-TiltCard'ın temel yapısını oluşturur, gelen özelleştirme parametrelerini alır ve eğilme efektinin çalışması için gerekli ortamı hazırlar.
+TiltCard'ın temel yapısını oluşturarak içeriği sarar ve eğilme efekti için yapılandırma parametrelerini tanımlar. Bu grup, bileşenin dışarıya açılan arayüzünü ve yaşam döngüsünü yönetir.
 - TiltCard
 
-### Yardımcı Sınırlama Fonksiyonu
-Eğilme açısı gibi sayısal değerleri belirlenen minimum ve maksimum aralıkta tutmak için kullanılır, aşırı değerlerin efektin bozulmasına neden olmasını engeller.
-- clamp
-
-### Fare Olayı İşleyicileri
-Kullanıcının kart üzerindeki fare hareketlerini takip eder; fare kart üzerine girdiğinde, kart üzerinde hareket ettiğinde ve karttan ayrıldığında tetiklenerek 3D eğilme efektinin anlık olarak çalışmasını sağlar.
+### Fare Etkileşim Yöneticileri
+Kullanıcının kart üzerindeki fare hareketlerini yakalayarak eğilme hesaplamalarını tetikler. Fare kart üzerine geldiğinde, hareket ettiğinde ve ayrıldığında分别 ilgili efekt başlangıç, güncelleme ve bitiş işlemlerini yürütür.
 - onMove, onEnter, onLeave
 
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu client tarafında çalışan UI bileşeni, fare etkileşimleriyle kartın belirtilen maksimum açıda eğilmesini sağlar, doğru çalışması için tarayıcı DOM ortamının ve içerdiği olay işleyicilerinin sorunsuz çalışması zorunludur.
-
-[Aksiyom 1]: Eğer sayısal değerleri sınırlamak için kullanılan clamp() fonksiyonu çalışmıyorsa, kartın eğilme açısı tanımlı maxTilt sınırını aşar, görsel bozulmalar meydana gelir.
-[Aksiyom 2]: Eğer tarayıcı DOM'ında fare hareketi, fare öğe üzerine girme ve fare öğeden çıkma olayları tetiklenemiyorsa, TiltCard bileşeninin eğilme etkisi hiç devreye girmez, statik bir kart olarak kalır.
-[Aksiyom 3]: Eğer TiltCard bileşenine aktarılan maxTilt parametresi geçerli bir sayısal değer değilse, eğilme açısı hesaplamaları başarısız olur, kartın konumunda görsel hatalar oluşur.
-[Aksiyom 4]: Eğer TiltCard bileşenine children prop'u aktarılmazsa, kart içinde hiçbir içerik görüntülenmez, boş bir eğilebilir alan ortaya çıkar.
-[Aksiyom 5]: Eğer onMove(), onEnter() ve onLeave() olay işleyicileri DOM olaylarına bağlanamıyorsa, fare etkileşimleri algılanamaz, eğilme işlevi tamamen devre dışı kalır.
+### Değer Sınırlandırma Aracı
+Eğilme açısı gibi hesaplanan sayısal değerleri tanımlı minimum ve maksimum aralıkta tutarak efektin kontrollü çalışmasını garanti eder. Aşırı değerlerin önüne geçerek görsel tutarlılığı korur.
+- clamp
 
 ---
 
-## FONKSIYON DETAYLARI
+
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### clamp
-**Ne yapar**: Girdi olarak alınan sayısal bir değeri, belirtilen minimum ve maksimum sayısal sınırlar arasına sığdırmak üzere tasarlanmış yardımcı bir fonksiyondur. Değerin sınırların dışına çıkmasını engelleyerek tüm hesaplamalarda tutarlı bir aralıkta kalmasını sağlar.
-**Nasıl yapar**: Gelen orijinal değeri önce minimum sınırla, sonra maksimum sınırla karşılaştırır. Eğer değer minimum değerden küçükse minimum değeri, maksimum değerden büyükse maksimum değeri kullanır, değer aralıktaysa orijinal değerini korur. Bu işlemi tüm hesaplamalarda sınır kontrolü sağlamak için kullanır.
+**Ne yapar**: Bir sayısal değeri, belirtilen minimum ve maximum sınırlar arasında sıkıştırır (clipping). Değer aralık dışındaysa en yakın sınaira sabitlenir.
+
+**Nasıl yapar**: Fonksiyon, verilen `v` değerini `min` ve `max` değerleri ile karşılaştırır. `v`, `min` değerinden küçükse `min` değerini, `max` değerinden büyükse `max` değerini, aksi halde `v` değerinin kendisini döndürür. Bu, genellikle mouse hareketi veya animasyon hesaplamalarında değerin kontrollü kalmasını sağlamak için kullanılır.
+
 **Parametreler**:
-- name: v — type: number — Sınırlandırılmak istenen orijinal sayısal değer, herhangi bir sayısal giriş olabilir.
-- name: min — type: number — Değerin alabileceği en düşük kabul edilebilir sınır değeri.
-- name: max — type: number — Değerin alabileceği en yüksek kabul edilebilir sınır değeri.
-**Dönüş**: Kayıtlarda dönüş tipi void veya bilinmiyor olarak işaretlenmiştir, işlevi gereği aralığa sığdırılmış sayısal değeri döndürmesi beklenir.
+- v: number — Sınırlanacak olan sayısal değer
+- min: number — İzin verilen değer aralığının alt sınırı
+- max: number — İzin verilen değer aralığının üst sınırı
+
+**Dönüş**: Fonksiyonun dönüş tipi sağlanan bilgide açıkça belirtilmemiştir. Ancak bu tür clamp fonksiyonları genellikle number tipinde değer döndürür.
 
 ### TiltCard
 **Ne yapar**: Fare hareketlerine göre eğme (tilt) efekti uygulayan, tekrarlanabilir bir React bileşenidir. İçerisindeki tüm çocuk içerikleri sarmalayarak, kullanıcı kartla etkileşime girdiğinde 3D benzeri eğim efekti sunar. Maksimum eğme açısı dışarıdan yapılandırılabilir, varsayılan bir değerle kullanıma hazırdır.
@@ -79,82 +83,76 @@ Bu client tarafında çalışan UI bileşeni, fare etkileşimleriyle kartın bel
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\TiltCard.tsx::clamp
-- **params**: v: number, min: number, max: number
-- **ic_degiskenler**: yok (sadece parametreler kullanılıyor)
-- **Dönüş**: yok
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\TiltCard.tsx::TiltCard
-- **params**: children, maxTilt?: number (varsayılan değer: 18)
-- **ic_degiskenler**:
-  - `wrapperRef` — HTMLDivElement tipinde ana sarmalayıcı div'e referans tutan React useRef nesnesi
-  - `innerRef` — HTMLDivElement tipinde iç kart div'ine referans tutan React useRef nesnesi
-  - `mounted` — Componentin DOM'a mount olup olmadığını takip eden boolean state değişkeni
-  - `setMounted` — mounted state'ini güncellemek için kullanılan useState setter fonksiyonu
-  - `hover` — Farenin kart üzerinde olup olmadığını takip eden boolean state değişkeni
-  - `setHover` — hover state'ini güncellemek için kullanılan useState setter fonksiyonu
-  - `supportsTilt` — Tarayıcının hassas imleç ve hover desteği olup olmadığını kontrol eden boolean değişken
-  - `prefersReduced` — Kullanıcının azaltılmış hareket tercihinin aktif olup olmadığını kontrol eden boolean değişken
-  - `shouldSkip` — Tilt efektini atlayıp basit sarmalayıcı döndürme kararını veren boolean değişken
-  - `onMove` — Farenin kart üzerinde hareket etmesiyle tetiklenen React.MouseEventHandler fonksiyonu
-  - `onEnter` — Farenin karta girmesiyle tetiklenen React.MouseEventHandler fonksiyonu
-  - `onLeave` — Farenin karttan çıkmasıyla tetiklenen React.MouseEventHandler fonksiyonu
-- **Dönüş**: React JSX elementi
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\TiltCard.tsx::onMove
-- **params**: e: React.MouseEvent<HTMLDivElement>
-- **ic_degiskenler**:
-  - `container` — wrapperRef.current ile alınan ana sarmalayıcı div DOM elementi
-  - `el` — innerRef.current ile alınan iç kart div DOM elementi
-  - `rect` — container div'in ekran konum ve boyutlarını içeren DOMRect nesnesi
-  - `x` — Fare konumunun container genişliği üzerinden normalize edilmiş 0-1 arası x koordinatı
-  - `y` — Fare konumunun container yüksekliği üzerinden normalize edilmiş 0-1 arası y koordinatı
-  - `rx` — Kartın 3D rotateX açısını hesaplayan sayısal değer
-  - `ry` — Kartın 3D rotateY açısını hesaplayan sayısal değer
-  - `sx` — Kart gölgesinin x ofsetini piksel cinsinden hesaplayan değer
-  - `sy` — Kart gölgesinin y ofsetini piksel cinsinden hesaplayan değer
-- **Dönüş**: yok (void)
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\TiltCard.tsx::onEnter
-- **params**: e: React.MouseEvent<HTMLDivElement>
-- **ic_degiskenler**:
-  - `setHover` — Üst kapsamdaki hover state'ini true yapmak için kullanılan state setter
-  - `onMove` — Fare karta girer girmez konum hesaplaması yapmak için çağrılan üst kapsamdaki onMove işleyicisi
-- **Dönüş**: yok (void)
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\TiltCard.tsx::onLeave
-- **params**: (kullanılan parametre yok)
-- **ic_degiskenler**:
-  - `setHover` — Üst kapsamdaki hover state'ini false yapmak için kullanılan state setter
-  - `el` — innerRef.current ile alınan iç kart div DOM elementi
-- **Dönüş**: yok (void)
+### [N1_NASIL] AST Pointer: TiltCard.tsx::clamp
+- **params**: `(v: number, min: number, max: number)`
+- **ic_degiskenler**: (fonksiyon gövdesi verilmemiş, çağrı侧dan çağrılmış)
+- **Dönüş**: number — v değerini min ve max arasında sıkıştırılmış olarak döndürür
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-TiltCard() ana fonksiyonu, değerleri izin verilen aralıkta tutmak için clamp fonksiyonunu, kullanıcı hareketlerini yönetmek içinse onMove fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veride bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
+### [N2_NASIL] AST Pointer: TiltCard.tsx::TiltCard
+- **params**: `({ children, maxTilt = 18 })` — children: kart içeriği, maxTilt: eğim açısı üst limiti (derece)
+- **ic_degiskenler**:
+  - `wrapperRef` — useRef, dış sarmalayıcı div referansı
+  - `innerRef` — useRef, iç div referansı (transform uygulanan eleman)
+  - `mounted` — useState, bileşenin mount olup olmadığını takip eder
+  - `hover` — useState, mouse'un kart üzerinde olup olmadığını belirtir
+  - `supportsTilt` — boolean, cihazın hover ve fine pointer destekleyip desteklemediğini kontrol eder
+  - `prefersReduced` — boolean, kullanıcının reduced-motion tercihi olup olmadığını kontrol eder
+  - `shouldSkip` — boolean, tilt efektinin atlanıp atlanmayacağını belirler (supportsTilt veya prefersReduced durumuna göre)
+  - `onMove` — React.MouseEventHandler, mouse hareketi handler'ı
+  - `onEnter` — React.MouseEventHandler, mouse giriş handler'ı
+  - `onLeave` — React.MouseEventHandler, mouse çıkış handler'ı
+- **Dönüş**: JSX Element — shouldSkip true ise basit div, değil ise tilt efektli div yapısı
 
 ---
 
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  TiltCard() → clamp()
-  TiltCard() → onMove()
+### [N3_NASIL] AST Pointer: TiltCard.tsx::onMove
+- **params**: `(e: React.MouseEvent<HTMLDivElement>)` — mouse hareket olayı
+- **ic_degiskenler**:
+  - `container` — wrapperRef.current, dış sarmalayıcı div DOM elemanı
+  - `el` — innerRef.current, iç div DOM elemanı (transform uygulanacak)
+  - `rect` — container.getBoundingClientRect(), container'ın ekran koordinatları ve boyutları
+  - `x` — mouse'un container içindeki yatay pozisyonu (0-1 arası oran)
+  - `y` — mouse'un container içindeki dikey pozisyonu (0-1 arası oran)
+  - `rx` — X ekseni dönüş açısı (derece), clamp ile -maxTilt ile maxTilt arasında sınırlanmış
+  - `ry` — Y ekseni dönüş açısı (derece), clamp ile -maxTilt ile maxTilt arasında sınırlanmış
+  - `sx` — gölge yatay ofseti (piksel), x pozisyonuna göre hesaplanır
+  - `sy` — gölge dikey ofseti (piksel), y pozisyonuna göre hesaplanır
+- **Kullanılan dış değişkenler**: wrapperRef, innerRef, maxTilt, hover, clamp
+- **Dönüş**: yok — container CSS değişkenlerini (--px, --py) ve el transform/shadow değerlerini yan etki olarak değiştirir
 
+---
+
+### [N4_NASIL] AST Pointer: TiltCard.tsx::onEnter
+- **params**: `(e: React.MouseEvent<HTMLDivElement>)` — mouse giriş olayı
+- **ic_degiskenler**: (yok)
+- **Kullanılan dış değişkenler**: setHover (true yapar), onMove (e ile çağrılarak başlangıç transform'u uygulanır)
+- **Dönüş**: yok — hover durumunu true yapar ve onMove'u tetikler
+
+---
+
+### [N5_NASIL] AST Pointer: TiltCard.tsx::onLeave
+- **params**: `(parametre yok)`
+- **ic_degiskenler**:
+  - `el` — innerRef.current, iç div DOM elemanı (transform sıfırlanacak)
+- **Kullanılan dış değişkenler**: setHover (false yapar), innerRef
+- **Dönüş**: yok — hover durumunu false yapar, el transform ve box-shadow değerlerini sıfırlar
+
+---
+
+
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    TiltCard["TiltCard()"] --> clamp["clamp()"]
-    TiltCard["TiltCard()"] --> onMove["onMove()"]
+graph TD
+    TiltCard_tsx__TiltCard["TiltCard"]
+    TiltCard_tsx__clamp["clamp"]
+    TiltCard_tsx__onEnter["onEnter"]
+    TiltCard_tsx__onLeave["onLeave"]
+    TiltCard_tsx__onMove["onMove"]
+    TiltCard_tsx__TiltCard --> TiltCard_tsx__clamp
+    TiltCard_tsx__TiltCard --> TiltCard_tsx__onMove
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -183,5 +181,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
-- **Layout:** `absolute`, `group-hover:opacity-100`, `relative`
-- **Responsive:** (yok)
+- **Layout:** `absolute`, `relative`
+- **Varyant/Responsive:** `group-hover:` önekleri
+- **Yardımcı Sınıflar:** `duration-200`, `group`, `group-hover:opacity-100`, `inset-0`, `opacity-0`, `pointer-events-none`, `rounded-xl`, `transition-opacity`, `transition-transform`, `will-change-transform`

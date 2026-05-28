@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\applicationLinks.ts
 skeleton_hash: a3f89a40a70ad803
-generated_at: 2026-05-23T22:33:23Z
+entity_hashes:
+  func:getCategoryUrlFromTopic: 179f53035c1027b6
+  overview: e1865700dc78efd4
+generated_at: 2026-05-28T22:38:50Z
 ---
 
 ## Genel Bakış
@@ -27,14 +30,17 @@ Bu modül, konu (topic) slug'larını kategori URL'lerine eşlemek için sabit b
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getCategoryUrlFromTopic
-**Ne yapar**: Bilgi merkezindeki bir konunun benzersiz slug'ından ilgili ürün kategori sayfası için tam erişim URL'si üretir. Daha iyi kullanıcı deneyimi sağlanması amacıyla kullanılması önerilen bu fonksiyon, oluşturduğu standart URL ile doğrudan doğru ürün kategorisi sayfasına yönlendirme yapılmasını mümkün kılar. Kullanıcıların yanlış veya çalışmayan bağlantılarla karşılaşmasını önleyen güvenilir bir yönlendirme değeri sunar.
-**Nasıl yapar**: Uygulama içinde tanımlı merkezi kayıt defteri (Registry) entegrasyonu kullanarak gelen konu slug'ını standart kategori sayfası yoluna dönüştürür. Manuel URL oluşturma süreçlerinde ortaya çıkabilecek yazım hataları veya yol çakışmalarını ortadan kaldıran, uygulama genelinde tutarlı bağlantı yapısı sağlayan bir mantık ile çalışır.
+**Ne yapar**: Verilen bir bilgi merkezi topic slug'ı (ör. 'hava-perdesi') için, ilgili ürün kategorisi sayfasının tam URL'ini döndürür. Bu, kullanıcı deneyimini iyileştirmek için önerilen bir geçiş yoludur.
+
+**Nasıl yapar**: Fonksiyon, önceden tanımlı bir nesne olan `TOPIC_TO_CATEGORY_URL` haritasında `topicSlug` parametresini anahtar olarak arar. Haritada eşleşen bir URL varsa onu, yoksa varsayılan olarak `'/products'` adresini döndürür.
+
 **Parametreler**:
-- name: topicSlug, type: string — Bilgi merkezindeki konunun benzersiz kısa kimliği (slug'ı), örnek olarak HVAC sistemleri için 'hava-perdesi' değeri verilebilir
-**Dönüş**: string tipinde, ilgili ürün kategori sayfasına sorunsuz erişim sağlamak için kullanılabilecek tam, geçerli URL değerini döndürür
+- `topicSlug`: `string` — Bilgi merkezi topic slug'ı (ör. 'hava-perdesi')
+
+**Dönüş**: `string` — Tam kategori sayfası URL'i. Slug haritada bulunamazsa varsayılan `/products` adresi döndürülür.
 
 ---
 

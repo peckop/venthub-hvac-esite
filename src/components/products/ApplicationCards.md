@@ -4,36 +4,49 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\ApplicationCards.tsx
 skeleton_hash: 546a8c4566d1ccd8
-generated_at: 2026-05-23T22:25:36Z
+entity_hashes:
+  func:ApplicationCards: 105c8c349085c448
+  overview: 73aa0d0a41c7f4d8
+  style_tokens: 4a2aa4afe5f4d9fa
+generated_at: 2026-05-28T22:37:03Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun ürünler bölümünde yer alan bu React modülü, ürünlerin farklı uygulama senaryoları ve kullanım alanlarını kart formatında kullanıcılara sunmak üzere tasarlanmıştır. Modül tek ana bileşen üzerinden çalışarak, ürün sayfalarında yer alacak uygulama kartları kümesini render eder ve platformun ürün bölümü görsel-işlevsel bütünlüğüne katkı sağlar.
+Bu React tabanlı modül, VentHub HVAC platformunun ürün bölümünde yer alır ve ürünlerin farklı uygulama alanlarını ve kullanım senaryolarını görsel kartlar formatında kullanıcılara sunmakla sorumludur. Modül, yüksek performanslı bir e-ticaret deneyimi için optimize edilmiş bir kart yapısı oluşturarak ürün sunum zenginliğine katkı sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Modülün temel sorumluluğunu yerine getiren, tüm uygulama kartları yapısını oluşturan ve React ortamına sunan tek ana bileşeni barındırır.
+Modülün tüm sorumluluğunu üstlenen, uygulama kartları yapısını oluşturup React ekosistemi için render eden temel bileşeni tanımlar.
 - ApplicationCards
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu uygulamalara özel kartları render eden React tabanlı bileşen, yalnızca modül içindeki applications dizisinin erişilebilir olması ve React çalışma zamanının mevcut olması koşuluyla doğru şekilde çalışır.
 
-[Aksiyom 1]: Eğer modülün sabiti olan applications dizisi tanımlı değilse veya erişilemez durumdaysa, bileşen hiçbir kart içeriği üretemez ve boş bir çıktı döndürür.
-[Aksiyom 2]: Eğer ApplicationCards bileşenini çalıştıracak React uyumlu çalışma zamanı ortamı mevcut değilse, bileşen hiçbir şekilde yüklenemez, initialize edilemez ve sayfada görüntülenemez.
-[Aksiyom 3]: Eğer applications dizisi içinde geçersiz elemanlar (null, tanımsız veya uygun tipten olmayan değerler) varsa, bileşen render sırasında çalışma zamanı hatası fırlatır.
+Bu modül, modül düzeyinde tanımlı `applications` dizisine bağımlı olarak çalışan, parametresiz bir React bileşenidir.
+
+**[Aksiyom 1]:** Eğer `applications` sabit dizisi (modül kapsamı) tanımlı veya erişilebilir değilse, bileşen kartları render edemez ve boş/bozuk çıktı üretir.
+
+**[Aksiyom 2]:** Eğer `applications` dizisi boş dizi (`[]`) ise, bileşen herhangi bir uygulama kartı göstermez (sıfır kart render eder).
+
+**[Aksiyom 3]:** Eğer `ApplicationCards` bileşeni React çalışma ortamının dışında (örn. saf Node.js) çağrılırsa, JSX dönüşümü çalışmayacağından bileşen render edilemez.
+
+**[Aksiyom 4]:** Bileşen parametresiz (`()`) olarak tanımlı olduğundan, bileşenin davranışını dışarıdan değiştirecek bir prop mekanizması yoktur;所有 davranış yalnızca modül içi `applications` dizisinin içeriğine bağlıdır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ApplicationCards
-**Ne yapar**: VentHub HVAC projesinin Products Hub bölümünde kullanılan uygulama alanı kartları bileşenidir, yüksek performanslı e-ticaret senaryoları için özel olarak optimize edilmiştir. Ürünlerin hangi kullanım alanlarında faaliyet gösterebileceğini görsel olarak kullanıcılara sunmak amacıyla geliştirilmiştir.
-**Nasıl yapar**: Next.js'in yerleşik Image bileşenini kullanarak kartlarda yer alan görsellerin yükleme performansını artırır, rafine edilmiş düzen ayarlarıyla farklı ekran boyutlarında tutarlı ve kullanıcı dostu bir görünüm sunar. React tip sistemiyle tip güvenliği sağlanarak projenin bileşen yapısıyla sorunsuz entegre çalışacak şekilde yapılandırılmıştır.
+
+**Ne yapar**: ApplicationCards, ürünlerin uygulama alanlarını görsel kartlar halinde sergileyen bir React bileşenidir. Ürün Hub'ı bölümünde, ürünlerin hangi uygulama alanlarında kullanılabileceğini kullanıcıya sunar.
+
+**Nasıl yapar**: Next.js'in Image bileşenini kullanarak görselleri optimize eder ve yüksek performanslı bir e-ticaret deneyimi sağlar. Bileşen, uygulama alanı verilerini alarak her birini rafine edilmiş bir yerleşim düzeninde kartlar halinde render eder. Lazy loading ve responsive görsel optimizasyonları sayesinde sayfa yükleme hızını artırır.
+
 **Parametreler**:
-- Herhangi bir giriş parametresi almaz, bağımsız olarak çalışır ve kendi içindeki içeriklerle uygulama alanı kartlarını render eder.
-**Dönüş**: React.FC tipinde bir React bileşeni döndürür, bu dönüş değeri sayesinde bileşen projenin ilgili sayfalarında import edilerek kolayca entegre edilebilir ve ekranda gösterilebilir.
+Bu bileşen harici parametre almamaktadır (propsless bileşen yapılandırması). Gerekli verileri doğrudan iç state veya context üzerinden elde eder.
+
+**Dönüş**: `React.FC` — ApplicationCards, fonksiyonel bir React bileşenidir ve JSX elemanları (uygulama alanı kartlarından oluşan bir grid/liste yapısı) döndürür. Her kart, bir uygulama alanını temsil eder ve görsel, başlık gibi bilgileri içerir.
 
 ---
 
@@ -63,19 +76,21 @@ Bu uygulamalara özel kartları render eden React tabanlı bileşen, yalnızca m
 ### [N1_NASIL] AST Pointer: src/components/products/ApplicationCards.tsx::ApplicationCards
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `applications` — Uygulama kartlarında gösterilecek tüm verileri tutan sabit array, üzerinde map ile iterasyon yapılarak her eleman için ayrı kart oluşturulur
-- **Dönüş**: React JSX elementi, ana bölüm kapsamında tüm uygulama kartlarını içeren ana component çıktısı
+  - `applications` — modül seviyesinde tanımlanmış sabit array, uygulama kartlarının verilerini (id, href, image, title, icon, description) tutar; `applications.map()` ile her uygulama için JSX kartı oluşturulur
+- **Dönüş**: JSX `<section>` — 4 sütunlu grid yapısında uygulama kartları gösteren React bileşeni; her kart `Link`, `Image`, `ArrowRight` bileşenlerini ve `app.icon` lucide ikonunu içerir
 
-### [N2_NASIL] AST Pointer: src/components/products/ApplicationCards.tsx::applications.mapCallback
-- **params**: [app]
+---
+
+### [N2_NASIL] AST Pointer: src/components/products/ApplicationCards.tsx::map_callback (applications.map içindeki arrow function)
+- **params**: `app` — `applications` array'inden gelen tek bir uygulama objesi (id, href, image, title, icon, description alanlarını içerir)
 - **ic_degiskenler**:
-  - `app.id` — Link componentine benzersiz key olarak atanan uygulama kimliği, 'restoran' değeriyle ilk görüntülenen karttaki Image'e priority özelliği eklemek için kullanılır
-  - `app.href` — Link componentinin yönlendireceği rota olarak kullanılan uygulama detay sayfası adresi
-  - `app.image` — Next.js Image componenti tarafından yüklenen kart görselinin kaynak adresi
-  - `app.title` — Image'in alt metni ve kart başlığı olarak kullanılan uygulama ismi
-  - `app.icon` — Kartın üst sol köşesindeki kaplamada gösterilen uygulama kategorisini temsil eden Lucide ikonu
-  - `app.description` — Kart içeriğinde açıklama metni olarak kullanılan uygulama tanımı
-- **Dönüş**: Tüm içeriği dolu, tek uygulama için oluşturulmuş React JSX Link elementi
+  - `app.id` — uygulamanın benzersiz tanımlayıcısı; `key` prop'u olarak ve `app.id === 'restoran'` koşulunda `priority` prop'unu belirlemek için kullanılır
+  - `app.href` — uygulama detay sayfasının URL'i; `Link` bileşeninin `href` prop'una `import('next').Route` tipine cast edilerek bağlanır
+  - `app.image` — uygulama görselinin dosya yolu; `Image` bileşeninin `src` prop'una bağlanır
+  - `app.title` — uygulamanın başlık metni; hem `Image` bileşeninin `alt` prop'unda hem de `<h3>` içinde gösterilir
+  - `app.icon` — uygulamaya ait lucide React ikon bileşeni; görselin sol üstündeki overlay div içinde render edilir
+  - `app.description` — uygulamanın kısa açıklama metni; `line-clamp-2` ile 2 satırla sınırlandırılmış `<p>` içinde gösterilir
+- **Dönüş**: JSX `<Link>` bileşeni — görsel, ikon overlay, başlık, açıklama ve "Detayları Gör" butonu içeren tam kart bileşeni
 
 ---
 
@@ -100,6 +115,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gray-100`, `bg-white`, `bg-white/90`, `border-gray-100`, `text-base`, `text-gray-500`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-6`, `grid`, `grid-cols-1`, `group-hover:opacity-100`, `group-hover:scale-105`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `group-hover:translate-x-1`, `h-10`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-gray-100`, `bg-white`, `bg-white/90`, `border-gray-100`, `group-hover:text-primary-navy`, `hover:border-primary-navy/20`, `text-base`, `text-gray-500`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-6`, `grid`, `grid-cols-1`, `h-10`, `h-40`, `hover:shadow-xl`, `items-center`, `justify-center`, `left-4`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `duration-300`, `duration-500`, `font-bold`, `font-semibold`, `group`, `group-hover:opacity-100`, `group-hover:scale-105`, `group-hover:scale-110`, `group-hover:translate-x-1`, `leading-relaxed`, `mb-2`, `mb-4`, `mb-6`, `mt-auto`

@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\ExportMenu.tsx
 skeleton_hash: ce1680439765f206
-generated_at: 2026-05-23T21:53:22Z
+entity_hashes:
+  func:ExportMenu: 9e536638b7cdf449
+  overview: fcef70276d80a8c4
+  style_tokens: 7659c3683121a964
+generated_at: 2026-05-28T22:35:34Z
 ---
 
 ## Genel Bakış
@@ -22,17 +26,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
-
-### ExportMenu
-**Ne yapar**: Bu bileşen, yönetici panellerinde veya veri yoğun sayfalarda kullanıcıların verileri çeşitli formatlarda dışa aktarmasını sağlayan bir dropdown menüsü oluşturur. Kullanıcıya sunulan dışa aktarma seçenekleri (`items` prop'u ile) esnek bir şekilde tanımlanabilir ve menü tetikleyici düğme metni özelleştirilebilir.
-**Nasıl yapar**: Bileşen, bir düğmeye tıklandığında açılan bir kutu (dropdown) mantığı ile çalışır. `items` dizisini döngüye sokarak her bir öğe için bir liste elemanı oluşturur ve bu elemanlara tıklanınca ilgili dışa aktarma işlemini tetikler. Dahili olarak açık/kapalı durumunu yönetir ve seçeneklerin görünürlüğünü kontrol eder.
-**Parametreler**:
-- `items: ExportMenuItem[]` — Kullanıcıya sunulacak dışa aktarma seçeneklerinin listesini tanımlar. Her bir öğe genellikle bir `label` (etiket) ve `onClick` (tıklama olayı) içerir.
-- `buttonLabel?: string` — Menüyü açan tetikleyici düğmenin üzerinde görüntülenecek metindir. İsteğe bağlıdır; bu prop sağlanmazsa bileşen varsayılan bir metin kullanabilir.
-**Dönüş**: **JSX.Element** — Ekrana basılmaya hazır, tetikleyici düğme ve koşullu olarak görüntülenen açılır menüyü içeren bir React kullanıcı arayüzü öğesi döndürür. Bileşen geçersiz bir durumdaysa `null` döndürebilir.
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -64,8 +58,6 @@ type ExportMenuItem = {
 
 ---
 
----
-
 ## NODE ID STANDARD
 
   file: src\components\admin\ExportMenu.tsx
@@ -82,16 +74,13 @@ type ExportMenuItem = {
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_30px_60px_rgba(0,0,0,0.5)]`
-- **height:** (yok)
-- **width:** `min-w-[140px]`, `min-w-[200px]`
-- **spacing:** (yok)
-- **diğer:** `tracking-[0.2em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-lg`
+- `rounded-hvac-lg`, `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500/10`, `border-white/10`, `text-emerald-400`, `text-slate-300`, `text-slate-500`, `text-xs`
-- **Layout:** `flex`, `gap-2`, `gap-3`, `h-12`, `h-8`, `items-center`, `justify-center`, `p-2`, `w-8`, `z-50`, `zoom-in-95`
-- **Responsive:** (yok)
+- **Renkler:** `bg-emerald-500/10`, `border-white/10`, `hover:bg-white/5`, `hover:text-white`, `text-emerald-400`, `text-slate-300`, `text-slate-500`, `text-xs`
+- **Layout:** `flex`, `gap-2`, `gap-3`, `h-12`, `h-8`, `items-center`, `justify-center`, `min-w-140px`, `min-w-200px`, `p-2`, `shadow-elevation-5`, `w-8`, `z-50`, `zoom-in-95`
+- **Varyant/Responsive:** `hover:` önekleri
+- **Yardımcı Sınıflar:** `animate-in`, `border`, `cursor-pointer`, `duration-200`, `fade-in`, `font-black`, `font-bold`, `glass-strong`, `italic`, `mb-1`, `outline-none`, `pb-2`, `pt-2`, `px-3`, `px-4`

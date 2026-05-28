@@ -77,13 +77,8 @@ Bu nedenle, **bir tablo oluşturulurken aşağıdaki üçlü yapı tek bir ünit
 ### Şablon:
 ```sql
 -- 1. ADIM: İzinlerin Verilmesi (GRANT)
--- Okuma / Seçme izinleri (Anonim kullanıcılar için gerekliyse)
 GRANT SELECT ON public.my_table TO anon;
-
--- Giriş yapmış kullanıcılar için (SELECT, INSERT, UPDATE, DELETE)
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.my_table TO authenticated;
-
--- Sunucu / Servis rolü için (Tüm yetkiler)
 GRANT ALL ON public.my_table TO service_role;
 
 -- 2. ADIM: RLS'in Açılması
@@ -93,6 +88,12 @@ ALTER TABLE public.my_table ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "my_table_select_policy" ON public.my_table
 FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 ```
+
+## 🔑 Webhook Güvenlik Standartları
+- Tüm webhook endpoint'leri (`/api/webhook/supabase` ve Edge Functions) `x-webhook-secret` (HMAC-SHA256) başlığıyla korunmalı ve tekrar oynatma saldırılarına karşı `x-timestamp` kontrolünden geçirilmelidir.
+
+## 🔑 Postgres View RLS Güvenliği (Security Invoker)
+- Postgres view'larının RLS kurallarını bypass etmesini önlemek amacıyla, oluşturulan tüm veritabanı görünümlerinde `security_invoker = true` ayarının (Postgres 15+ `ALTER VIEW ... SET (security_invoker = on)`) kullanılması zorunludur. `SECURITY DEFINER` view'lar yetki sızıntısı yarattığından yasaktır.
 
 ## Migration Yazım Standartları
 
@@ -137,33 +138,15 @@ CREATE POLICY "policy_name" ON table_name ...;
 | `user` | Sadece kendi hesabı |
 | `anon` | Public okuma |
 
-## Karar Ağacı: Policy Nasıl Yazılır?
-
-1. **Tablo public mi?** (products, categories)
-   - Evet → `SELECT TO public USING (is_active = true)`
-2. **Kullanıcıya özel mi?** (orders, cart)
-   - Evet → `USING (user_id = (SELECT auth.uid()))`
-3. **Admin işlemi mi?** (stok güncelleme, ürün silme)
-   - Evet → Role check with `user_profiles.role`
-4. **Hassas veri mi?** (fiyat, maliyet)
-   - Evet → RPC ile sar, direkt erişim verme
-
-## Mevcut RLS Dosyaları (Referans)
-- `20260101_rls_consolidation.sql` — Ana konsolidasyon
-- `20251212_fix_rls_performance.sql` — Performans düzeltmeleri
-- `docs/SECURITY_AND_PERF_CHECKLIST.md` — Detaylı kontrol listesi
-
 ## ⚠️ İleri Düzey Güvenlik Tuzakları
 
 ### JWT & Metadata
-- **`user_metadata` YASAK** — JWT yetkilendirme kararlarında `raw_user_meta_data` kullanılamaz (kullanıcı tarafından düzenlenebilir). Her zaman `app_metadata` kullan
+- **`user_metadata` YASAK** — JWT yetkilendirme kararlarında `raw_user_meta_data` kullanılamaz (kullanıcı tarafından düzenlenebilir). Her zaman `app_metadata` kullan.
 - **Token ömrü** — Kullanıcı silmek aktif token'ı geçersiz kılmaz → önce `auth.signOut()` çağır
 
 ### RLS İleri Kuralları
 - **`TO authenticated` tek başına yetmez** — Bu kimlik doğrulamadır (authn), yetkilendirme (authz) değildir. `USING` ile satır sahipliği kontrolü şart
 - **UPDATE politikası: USING + WITH CHECK birlikte zorunlu** — `WITH CHECK` olmadan kullanıcı `user_id`'yi başka birine atayabilir
-- **View'lar RLS'i bypass eder** — Postgres 15+'da `CREATE VIEW ... WITH (security_invoker = true)` kullan
-- **`SECURITY DEFINER` → public schema'da tehlikeli** — Postgres `EXECUTE` yetkisini `PUBLIC`'e otomatik verir
 
 ### Migration'da FK İndeks Kontrolü
 Her `REFERENCES` (Foreign Key) tanımında karşılık gelen index'in varlığını doğrula.

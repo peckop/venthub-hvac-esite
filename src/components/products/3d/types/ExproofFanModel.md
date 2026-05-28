@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\ExproofFanModel.tsx
 skeleton_hash: dfe4cdea0afb8b94
-generated_at: 2026-05-23T22:23:32Z
+entity_hashes:
+  func:ExproofFanModel: 9ab526a69ad42620
+  overview: 7f95db9ecbcd6088
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:47Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu React tabanlı 3D ürün modeli bileşeni, exproof (patlamaya dayanıklı) s�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ExproofFanModel
 **Ne yapar**: VentHub HVAC projesinin ürünler bölümünde kullanılan, patlamaya dayanıklı (exproof) fanların 3B modelini render eden React fonksiyonel bileşenidir. Sadece exproof fan ürünleri için özel olarak geliştirilmiş bu bileşen, platformdaki ürün detay sayfalarında fanın 3 boyutlu görünümünü kullanıcıya sunmakla görevlidir. Proje içindeki 3B ürün modeli standartlarına uygun olarak tüm exproof fan tipleri için tutarlı bir görselleştirme sunar.
@@ -117,4 +121,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

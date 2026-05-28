@@ -2,8 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: src/hooks/useLocalizedRoutes.ts
-generated_at: 2026-05-28T07:31:00Z
+source_path: C:\Users\alize\venthub-hvac\src\hooks\useLocalizedRoutes.ts
+skeleton_hash: 6befadb027c593fb
+entity_hashes:
+  func:createLocalizedProxy: fe510a2a1776b976
+  func:localizeUrl: cc0ed6edc9446b73
+  func:useLocalizedRoutes: c1fffb3d151d0025
+  overview: 4cb1ca7dbbecdb31
+generated_at: 2026-05-28T22:37:47Z
 ---
 
 ## Genel Bakış
@@ -39,6 +45,15 @@ Bu modülün çalışması için yerelleştirilmiş I18nProvider'ın ve merkezi 
 
 ---
 
+## TYPE ALIASES
+
+### RouteFunction
+```typescript
+type RouteFunction = (...args: unknown[]) => string
+```
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useLocalizedRoutes.ts::useLocalizedRoutes
@@ -48,12 +63,27 @@ Bu modülün çalışması için yerelleştirilmiş I18nProvider'ın ve merkezi 
 
 ---
 
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    useLocalizedRoutes_ts__createLocalizedProxy["createLocalizedProxy"]
+    useLocalizedRoutes_ts__localizeUrl["localizeUrl"]
+    useLocalizedRoutes_ts__useLocalizedRoutes["useLocalizedRoutes"]
+    useLocalizedRoutes_ts__useLocalizedRoutes --> useLocalizedRoutes_ts__createLocalizedProxy
+    useLocalizedRoutes_ts__createLocalizedProxy --> useLocalizedRoutes_ts__localizeUrl
+```
+
 ## NODE ID STANDARD
 
   file: src\hooks\useLocalizedRoutes.ts
+  function: src\hooks\useLocalizedRoutes.ts::localizeUrl
+  function: src\hooks\useLocalizedRoutes.ts::createLocalizedProxy
   function: src\hooks\useLocalizedRoutes.ts::useLocalizedRoutes
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: createLocalizedProxy
+  export: localizeUrl
   export: useLocalizedRoutes

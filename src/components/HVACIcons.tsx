@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 
 interface IconProps {
   className?: string
@@ -294,15 +295,14 @@ export const BrandIcon: React.FC<{ brand: string; className?: string }> = ({
   }
 
   return (
-    <img 
-      src={src} 
-      alt={alt} 
-      className={`object-contain ${className}`}
-      loading="lazy"
-    />
+    <div className={`relative w-full h-full ${className}`}>
+      <Image 
+        src={src} 
+        alt={alt} 
+        fill
+        sizes="(max-width: 768px) 100vw, 25vw"
+        className="object-contain"
+      />
+    </div>
   )
 }
-
-
-
-

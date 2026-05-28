@@ -4,47 +4,61 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\robots.ts
 skeleton_hash: d7f5ac351db900a3
-generated_at: 2026-05-23T21:50:07Z
+entity_hashes:
+  func:robots: 04938e582a28c5d6
+  overview: f391529836fd465a
+generated_at: 2026-05-28T22:35:21Z
 ---
 
 ## Genel Bakış
-`robots.ts` modülü, Next.js uygulamasının `robots.txt` dosyasını dinamik olarak oluşturan tek bir rota işleyicisi sunar. Bu modül sayesinde arama motoru botlarının siteyi nasıl tarayacağı (izin verilen ve engellenen yollar) ve site haritasının yeri belirlenir.
+Bu modül, Next.js uygulamasının arama motorları için `robots.txt` dosyasını dinamik olarak oluşturan bir rota işleyicisidir. Tek bir fonksiyon aracılığıyla tarayıcıların erişim izinlerini ve site haritası konumunu yapılandırarak site trafiğini ve indekslemeyi yönetir.
 
 ## Fonksiyon Grupları
 ### Robots Metadata Üretimi
-Bu grup, `robots.txt` dosyasının yapılandırmasını oluşturup döndürmekle sorumludur.  
+Bu grup, arama motoru botlarının siteyi nasıl tarayacağına dair yapılandırma verisini programatik olarak oluşturur ve döndürür.
 - robots
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca fonksiyon imzasından çıkarılabilecek temel aksiyomlar tanımlanmıştır.
+
+**[Aksiyom 1]**: Eğer `robots()` fonksiyonu çağrıldığında geçerli bir Next.js metadata formatında (MetadataRoute.Robots) dönüş sağlanmazsa, arama motorları siteyi taramak için gerekli kuralları alamaz ve varsayılan tarama davranışına geçilir.
+
+**[Aksiyom 2]**: Eğer `robots()` fonksiyonu parametre almıyorsa, döndürülen robots.txt yapılandırması dinamik veriye (kullanıcı, istek bağlamı vb.) bağlı olamaz; statik veya modül-seviyesinde tanımlı sabitlerden oluşmalıdır.
+
+**[Aksiyom 3]**: Eğer bu modül `/robots.ts` rotasında bir Next.js App Router metadata işleyicisi olarak kullanılıyorsa, dönüş değerinin `userAgent`, `allow`, `disallow` ve `sitemap` alanlarını içermesi beklenir; aksi halde arama motoru botları site haritasını bulamaz veya engellenen yolları yanlış yorumlar.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### robots
-**Ne yapar**: Bu fonksiyon, Venthub HVAC uygulamasının arama motoru optimizasyonu (SEO) için kritik olan `robots.txt` dosyasının içeriğini programatik olarak tanımlar. Web tarayıcılarının sitenin hangi alanlarına erişebileceğini ve hangi sayfaları indeksleyebileceğini belirleyerek tarama trafiğini yönetir.
 
-**Nasıl yapar**: Next.js 13+ App Router mimarisinde yerleşik bir convention olarak çalışır. Uygulama derlendiğinde veya sunucu tarafında çalıştırıldığında, Next.js bu fonksiyonun döndürdüğü `MetadataRoute.Robots` nesnesini otomatik olarak `/robots.txt` rotasına yönlendirir. Herhangi bir ek route tanımı veya özel sunucu mantığı gerektirmez.
+**Ne yapar**: Web sitesi için arama motoru botlarının (crawler) izlemesi gereken kuralları ve site haritası URL'ini tanımlayan metadata nesnesi oluşturur. Bu fonksiyon, Next.js'in built-in SEO desteği kapsamında search engine optimization süreçlerini yapılandırır.
 
-**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+**Nasıl yapar**: Fonksiyon sabit bir nesne döndürerek arama motoru botlarına sitenin hangi bölümlerine erişebileceği ve hangilerine erişemeyeceği talimatını verir. `SITE_URL` sabitini kullanarak dinamik site haritası URL'i oluşturur ve robots.txt dosyasının içeriğini programatik olarak tanımlar.
 
-**Dönüş**: `MetadataRoute.Robots`
-- Geriye, arama motoru botlarına yönelik tarama politikalarını içeren bir `MetadataRoute.Robots` nesnesi döndürür. Bu nesne, hangi user-agent'ların hangi dizinlere erişebileceğini tanımlayan `rules` dizisini ve isteğe bağlı olarak site haritası URL'lerini listeleyen `sitemap` alanını barındırır.
+**Parametreler**:
+Bu fonksiyon herhangi bir parametre almamaktadır.
+
+**Dönüş**: `MetadataRoute.Robots` — Next.js'in robots metadata tipi ile uyumlu nesne döndürür. Döndürülen nesne şu yapıya sahiptir:
+- `rules`: Arama motoru botları için erişim kuralları
+  - `userAgent: '*'` — Tüm botları kapsar
+  - `allow: '/'` — Ana sayfaya ve genel erişime izin verir
+  - `disallow` dizisi — `/admin/`, `/auth/`, `/account/`, `/checkout/` dizinlerini botlara kapatır
+- `sitemap`: Site haritası dosyasının tam URL'i (`${SITE_URL}/sitemap.xml` formatında)
+
+**Notlar**: `disallow` listesinde yer alan dizinler, kullanıcının oturum açmasını veya yetkilendirme gerektiren bölümlerdir. Bu alanların botlar tarafından indekslenmesi engellenerek, hassas sayfaların arama sonuçlarında görünmesi ve duplicate content sorunları önlenir.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/robots.ts::robots
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `SITE_URL` — import edilen sabit değişken, sitemap URL'sini oluşturmak için kullanılır (`${SITE_URL}/sitemap.xml`)
-- **Dönüş**: MetadataRoute.Robots
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `MetadataRoute.Robots` — robots.txt yapısını döndürür; `rules` içinde user agent `*` için `/` yoluna izin verir, `/admin/`, `/auth/`, `/account/`, `/checkout/` yollarını engeller; `sitemap` alanı template literal ile `${SITE_URL}/sitemap.xml` olarak ayarlanır
 
 ---
 

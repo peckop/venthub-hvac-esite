@@ -8,7 +8,7 @@ entity_hashes:
   func:InventoryDetailDrawer: 3a57400ca0f546b7
   overview: 92caa1481da5cee7
   style_tokens: 4b283d8541dc151c
-generated_at: 2026-05-27T18:10:44Z
+generated_at: 2026-05-28T22:35:31Z
 ---
 
 ## Genel Bakış

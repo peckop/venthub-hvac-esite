@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BrandsShowcase.tsx
 skeleton_hash: 91024db7e88f6112
-generated_at: 2026-05-23T21:56:15Z
+entity_hashes:
+  func:BrandsShowcase: 396bbfa4a2991af7
+  func:Lane: 607c875efec6621a
+  overview: 2292d0c89c7cdbbb
+  style_tokens: 90e49e0ab0d8115d
+generated_at: 2026-05-28T22:35:42Z
 ---
 
 ## Genel Bakış
@@ -30,7 +35,7 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Lane
 **Ne yapar**: `Lane` bileşeni, verilen `items` listesini belirli bir süre içinde gösteren bir şerit (lane) oluşturur.  
@@ -38,7 +43,7 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 **Parametreler**:
 - items: typeof HVAC_BRANDS — gösterilecek marka veya ürün öğelerinin listesi  
 - durationSec: number — şeritin geçiş/animasyon süresi (saniye cinsinden), belirtilmezse 50 kullanılır  
-**Dönüş**: React.FC — JSX elementi olarak şerit görüntüsünü döndürür  
+**Dönüş**: React.FC — JSX elementi olarak şerit görüntüsünü döndürür
 
 ### BrandsShowcase
 **Ne yapar**: `BrandsShowcase` bileşeni, markaları sergileyen bir gösterim alanı oluşturur.  
@@ -87,16 +92,13 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `bg-[radial-gradient(circle_at_center,rgba(248,250,252,1)_0%,rgba(255,255,255,1)_100%)]`, `tracking-[0.3em]`, `tracking-[0.4em]`, `tracking-[0.5em]`, `transition-[filter,transform,opacity]`, `transition-[width,background-color]`, `transition-[width]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-loose`, `tracking-hvac-relaxed`, `tracking-hvac-wide`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-500/40`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-slate-200`, `bg-white`, `from-white`, `sm:text-5xl`, `text-3xl`, `text-center`, `text-cyan-600`, `text-slate-400`, `text-slate-900`, `text-slate-950`, `text-xs`, `to-transparent`
-- **Layout:** `absolute`, `flex`, `flex-col`, `from-white`, `gap-20`, `gap-4`, `gap-6`, `group-hover/brand:grayscale-0`, `group-hover/brand:opacity-100`, `group-hover/brand:scale-110`, `group-hover/brand:w-12`, `group-hover:bg-cyan-500`, `group-hover:w-16`, `h-24`, `h-px`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-brands-radial`, `bg-cyan-500/40`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-slate-200`, `bg-white`, `from-white`, `group-hover:bg-cyan-500`, `hover:text-cyan-600`, `sm:text-5xl`, `text-3xl`, `text-center`, `text-cyan-600`, `text-slate-400`, `text-slate-900`
+- **Layout:** `absolute`, `flex`, `flex-col`, `from-white`, `gap-20`, `gap-4`, `gap-6`, `group-hover/brand:w-12`, `group-hover:w-16`, `h-24`, `h-px`, `inline-flex`, `items-center`, `justify-center`, `left-0`
+- **Varyant/Responsive:** `group-hover/brand:`, `group-hover:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `-0.05em]`, `duration-500`, `duration-700`, `font-black`, `font-bold`, `font-extralight`, `font-medium`, `grayscale`, `group`, `group-hover/brand:grayscale-0`, `group-hover/brand:opacity-100`, `group-hover/brand:scale-110`, `group/brand`, `inset-0`, `inset-y-0`

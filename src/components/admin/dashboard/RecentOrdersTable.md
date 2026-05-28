@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\RecentOrdersTable.tsx
 skeleton_hash: d2394b025a352665
-generated_at: 2026-05-23T21:52:23Z
+entity_hashes:
+  func:RecentOrdersTable: 74faabf4e70dfa3a
+  func:getStatusLabel: 2edd561db46db1dc
+  func:getStatusStyles: 419f18093a05eeeb
+  overview: a050d41dafb624cc
+  style_tokens: ec5c1233acb1b783
+generated_at: 2026-05-28T22:35:30Z
 ---
 
 ## Genel Bakış
@@ -32,31 +38,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
 ## FONKSİYON DETAYLARI
-
-### RecentOrdersTable
-**Ne yapar**: Bir React bileşeni olarak, son siparişlerin listelendiği bir tabloyu görüntüler. Bileşen, müşteri bilgisi, sipariş kalemleri, toplam tutar ve durum gibi alanları içeren bir tablo oluşturur.
-**Nasıl yapar**: Bileşen, `orders` dizisindeki her bir sipariş için bir tablo satırı render eder. Her satırda sipariş numarası, müşteri adı, ürünler, toplam ve durum bilgisi yer alır. Durum bilgisi, `getStatusStyles` ve `getStatusLabel` yardımcı fonksiyonları kullanılarak biçimlendirilir.
-**Parametreler**:
-- `orders: Array` — Görüntülenecek sipariş listesi. Her bir eleman sipariş detaylarını içerir.
-- `title: string` — Tablonun başlık metni.
-**Dönüş**: `React.FC<RecentOrdersTableProps>` — Siparişleri listeleyen bir React fonksiyonel bileşeni döndürür.
-
-### getStatusStyles
-**Ne yapar**: Bir sipariş durumu için CSS stillerini veya sınıf adlarını döndürür. Durum koduna göre tablodaki durum hücresine uygulanacak biçimlendirmeyi belirler.
-**Nasıl yapar**: `status` parametresini bir dizi durum değeriyle karşılaştırır (örneğin: `'completed'`, `'pending'`, `'cancelled'`). Eşleşen duruma göre ilgili CSS sınıfını veya stil nesnesini döndürür.
-**Parametreler**:
-- `status: string` — Sipariş durumunu temsil eden metin (örneğin `'completed'`, `'pending'`).
-**Dönüş**: Verilen bilgide dönüş tipi belirtilmemiştir. Genellikle bir CSS sınıf adı (`string`) veya bir stil nesnesi (`object`) döndürür.
-
-### getStatusLabel
-**Ne yapar**: Bir sipariş durumu kodu için okunabilir bir etiket (label) metni döndürür. Durum kodunu kullanıcı arayüzünde gösterilecek daha anlaşılır bir ifadeye dönüştürür.
-**Nasıl yapar**: `s` parametresini bir dizi durum koduyla karşılaştırır. Örneğin `'completed'` durumu için `'Tamamlandı'`, `'pending'` için `'Beklemede'` gibi karşılık gelen metni döndürür.
-**Parametreler**:
-- `s: string` — Durum kodu (örneğin `'completed'`, `'pending'`).
-**Dönüş**: Verilen bilgide dönüş tipi belirtilmemiştir. Genellikle bir metin (`string`) döndürür.
 
 ---
 
@@ -105,77 +87,16 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: `src/components/admin/dashboard/RecentOrdersTable.tsx`::getStatusStyles
 
-- **params**:  
-  - `status` — string; sipariş durumu (‘completed’, ‘pending’, ‘processing’, ‘cancelled’ veya diğer).  
-
-- **ic_degiskenler**: (yok)  
-
-- **Dönüş**: `string` – duruma uygun Tailwind CSS sınıfı (renk, arka plan, halka stilleri).
-
----
-
-### [N3_NASIL] AST Pointer: `src/components/admin/dashboard/RecentOrdersTable.tsx`::getStatusLabel
-
-- **params**:  
-  - `s` — string; sipariş durumu (‘completed’, ‘pending’, ‘processing’, ‘cancelled’ veya diğer).  
-
-- **ic_degiskenler**: (yok)  
-
-- **Dönüş**: `string` – durumun Türkçe etiketi (bilinmiyorsa `s` aynen döner).
-
----
-
-### [N4_NASIL] AST Pointer: `src/components/admin/dashboard/RecentOrdersTable.tsx`::(orders.map callback)
-
-- **params**:  
-  - `r` — sipariş/teklif nesnesi; `id`, `order_number`, `created_at`, `total_amount`, `status` alanlarına erişilir.  
-  - `index` — number; listede sıra, animasyon gecikmesi hesaplamada kullanılır.  
-
-- **ic_degiskenler**:  
-  - `r.id` — `r`’nin benzersiz kimliği; detay linki (`/admin/orders/${r.id}`) oluşturmak ve geri kalan karakterlerle (order_number yoksa) sipariş numarasını türetmek için kullanılır.  
-  - `r.order_number` — siparişin kullanıcıya gösterilen numarası; varsa, `r.id` yerine tercih edilir ve son 8 karaktere kısaltılır.  
-  - `r.created_at` — sipariş oluşturma zamanı; `formatDateTime(r.created_at, lang)` ile formatlanır.  
-  - `r.total_amount` — sipariş toplam tutarı; `formatCurrency(r.total_amount, lang)` ile formatlanır.  
-  - `r.status` — sipariş durumu; `getStatusStyles(r.status)` ve `getStatusLabel(r.status)` ile görsel etiket üretilir.  
-  - `lang` — bileşenden yakalanan dil kodu; tarih ve para formatlamada kullanılır.  
-  - `formatDateTime` — import edilmiş tarih/saat formatlayıcı.  
-  - `formatCurrency` — import edilmiş para birimi formatlayıcı.  
-  - `getStatusStyles` — bileşenden yakalanan yardımcı; durum CSS sınıflarını döndürür.  
-  - `getStatusLabel` — bileşenden yakalanan yardımcı; durum Türkçe etiketini döndürür.  
-  - `adminTableCellClass` — import edilmiş CSS sınıf sabiti; tüm veri hücrelerinin (`<td>`) stilleri.  
-  - `Link` — `next/link` bileşeni; detay sayfasına giden köprü.  
-  - `ExternalLink` — `lucide-react` ikonu; detay linkindeki dışa açılma simgesi.  
-
-- **Dönüş**: `React.JSX.Element` – her sipariş satırı için `<tr>` öğesi.
-
----
-
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-RecentOrdersTable() fonksiyonu, getStatusStyles ve getStatusLabel fonksiyonlarını çağırıyor.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen veride bu modülü kullanan dış dosya ya da fonksiyon belirtilmemiş.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok.
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  RecentOrdersTable() → getStatusLabel()
-  RecentOrdersTable() → getStatusStyles()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    RecentOrdersTable["RecentOrdersTable()"] --> getStatusLabel["getStatusLabel()"]
-    RecentOrdersTable["RecentOrdersTable()"] --> getStatusStyles["getStatusStyles()"]
+graph TD
+    RecentOrdersTable_tsx__RecentOrdersTable["RecentOrdersTable"]
+    RecentOrdersTable_tsx__getStatusLabel["getStatusLabel"]
+    RecentOrdersTable_tsx__getStatusStyles["getStatusStyles"]
+    RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusLabel
+    RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusStyles
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -194,16 +115,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `blur-[100px]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`
+- `rounded-hvac-2xl`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-current`, `bg-cyan-500`, `bg-cyan-500/0`, `bg-cyan-500/5`, `bg-white/5`, `bg-white/[0.02]`, `border-collapse`, `border-white/5`, `text-center`, `text-cyan-400/90`, `text-left`, `text-right`, `text-slate-400`, `text-slate-500`, `text-sm`
-- **Layout:** `-right-24`, `-top-24`, `absolute`, `backdrop-blur-md`, `custom-scrollbar`, `flex`, `flex-col`, `gap-2`, `gap-3`, `group-hover/btn:translate-x-1`, `group-hover/link:opacity-100`, `group-hover/row:bg-cyan-500`, `group-hover/row:bg-white/10`, `group-hover/row:opacity-100`, `group-hover/row:scale-105`
-- **Responsive:** (yok)
+- **Renkler:** `bg-current`, `bg-cyan-500`, `bg-cyan-500/0`, `bg-cyan-500/5`, `bg-white/2`, `bg-white/5`, `border-collapse`, `border-white/5`, `group-hover/row:bg-cyan-500`, `group-hover/row:bg-white/10`, `group-hover/row:text-white`, `group-hover/table:text-cyan-400`, `hover:bg-cyan-500`, `hover:bg-white/3`, `hover:text-surface-deep`
+- **Layout:** `-right-24`, `-top-24`, `absolute`, `backdrop-blur-md`, `custom-scrollbar`, `flex`, `flex-col`, `gap-2`, `gap-3`, `h-0.5`, `h-1.5`, `h-48`, `h-6`, `h-full`, `inline-flex`
+- **Varyant/Responsive:** `active:`, `first:`, `group-hover/btn:`, `group-hover/link:`, `group-hover/row:`, `group-hover/table:`, `hover:`, `last:` önekleri
+- **Yardımcı Sınıflar:** `${adminTableCellClass`, `${adminTableContainerClass`, `${adminTableHeadCellClass`, `${getStatusStyles(r.status`, `-ml-8`, `active:scale-95`, `animate-in`, `animate-pulse`, `blur-100`, `border`, `divide-white/5`, `divide-y`, `duration-300`, `duration-500`, `fade-in`

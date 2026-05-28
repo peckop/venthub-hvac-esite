@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\ProductsSkeleton.tsx
 skeleton_hash: 301cb056fb6b24f1
-generated_at: 2026-05-23T22:26:25Z
+entity_hashes:
+  func:ProductsSkeleton: c84366c03612870d
+  overview: 3d054fd83bb81226
+  style_tokens: b29c323410064a82
+generated_at: 2026-05-28T22:36:53Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu React tabanlı ürün listesi yükleme iskeleti (ProductsSkeleton) bileşeni,
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ProductsSkeleton
 **Ne yapar**: VentHub HVAC projesinin ürünler bileşenleri kategorisinde tanımlanan ProductsSkeleton, ürün listelerinin yüklenme sürecinde içeriğin yerini tutan yükleme iskeleti (skeleton) bileşenidir. Ürün verileri yüklenirken kullanıcının boş ekranla karşılaşmasını engelleyerek, uygulamanın yanıt vermediği algısını ortadan kaldırır ve yükleme durumunu şeffaf bir şekilde iletir.
@@ -85,4 +89,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gray-100`, `bg-gray-200`
 - **Layout:** `flex`, `flex-1`, `flex-col`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`, `h-12`, `h-4`, `h-5`, `hidden`, `lg:block`, `lg:flex-row`, `lg:grid-cols-3`
-- **Responsive:** `lg:`, `sm:`, `xl:` prefix kullanımları
+- **Varyant/Responsive:** `lg:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `animate-pulse`, `aspect-square`, `lg:px-8`, `mb-6`, `mb-8`, `mx-auto`, `px-4`, `py-6`, `rounded`, `rounded-2xl`, `rounded-xl`, `sm:px-6`, `sm:py-8`, `space-y-2`, `space-y-4`

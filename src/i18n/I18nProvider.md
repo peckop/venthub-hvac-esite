@@ -3,8 +3,15 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx
-skeleton_hash: 23b8d1de91b3f660
-generated_at: 2026-05-23T22:31:18Z
+skeleton_hash: 329481657406985a
+entity_hashes:
+  func:I18nProvider: e23d74154d179265
+  func:get: f83a743aef414d1c
+  func:interpolate: 02cc51f0bd59e8d6
+  func:useI18n: f453a53ec7b45d5a
+  overview: 94f7fbb5ed9d8128
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:37:50Z
 ---
 
 ## Genel Bakış
@@ -37,7 +44,7 @@ React tabanlı uluslararasılaştırma (i18n) modülüdür, uygulama genelinde �
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### get
 **Ne yapar**: i18n sisteminde çeviri anahtarlarına erişmek için kullanılan, verilen nesne üzerinden belirtilen yoldaki değeri çeken yardımcı fonksiyondur. Sözlük yapısındaki çeviri metinlerine hiyerarşik olarak erişim sağlayarak geliştiricilerin derinlemesine nesne yapılarında kolayca değer çekmesini mümkün kılar.
@@ -55,13 +62,6 @@ React tabanlı uluslararasılaştırma (i18n) modülüdür, uygulama genelinde �
 - params?: Record<string, unknown> — Yer tutucuları doldurmak için kullanılan anahtar-değer sözlüğü, opsiyoneldir, belirtilmediğinde şablon değişmeden döndürülür.
 **Dönüş**: string — Yer tutucuları parametrelerle doldurulmuş, kullanıma hazır son string.
 
-### LanguageUrlWatcher
-**Ne yapar**: Uygulama URL'sindeki lang (dil) parametresini sürekli izleyen, herhangi bir arayüz öğesi oluşturmayan yardımcı React bileşenidir. URL'deki dil değişikliklerini algılayarak bu değişikliği uygulama genelinde duyurmak için tasarlanmıştır. Sadece izleme görevi üstlendiği için sayfada herhangi bir görünürlüğü yoktur.
-**Nasıl yapar**: React'in useSearchParams hookunu kullanarak URL'deki arama parametrelerini takip eder, lang parametresinin değeri her değiştiğinde kendisine iletilen onLangChange geri çağırma fonksiyonunu yeni dil değeri ile tetikler. useSearchParams'ın gerektirdiği yapısal nedenlerden dolayı sadece Suspense bileşeni içinde kullanıldığında hatasız çalışır.
-**Parametreler**:
-- onLangChange: (l: Lang) => void — Dil değişikliği tespit edildiğinde çağrılacak geri çağırma fonksiyonu, algılanan yeni dil değerini parametre olarak alır.
-**Dönüş**: null — Herhangi bir arayüz öğesi oluşturmadığı için sürekli olarak null döndürür.
-
 ### I18nProvider
 **Ne yapar**: Tüm i18n sistemini uygulamanın alt bileşenlerine sunan React context sağlayıcısıdır. Aktif dil ayarı, tüm çeviri sözlükleri, dil değiştirme ve çeviri çekme gibi tüm fonksiyonları saklayarak, I18nProvider ile sarmalanmış herhangi bir bileşenin bu özelliklere erişmesini sağlar. Uygulamanın kök kısmında sarmalanarak tüm sayfaların i18n sistemini kullanmasını mümkün kılar.
 **Nasıl yapar**: React'in yerel context API'sini kullanarak oluşturduğu bağlamı tüm çocuk bileşenlere paylaşır, i18n ile ilgili tüm durum ve metotları tek bir merkezde yönetir. Alt bileşenler useI18n özel hooku ile bu merkezi bağlama erişerek tüm i18n özelliklerini kullanabilir.
@@ -74,6 +74,15 @@ React tabanlı uluslararasılaştırma (i18n) modülüdür, uygulama genelinde �
 **Nasıl yapar**: React'in yerel useContext hookunu kullanarak I18nProvider tarafından oluşturulan i18n bağlam nesnesini çeker ve kullanıcıya sunar. Geliştiricilerin bileşenlerinde i18n özelliklerini kullanmasını kolaylaştıran basit bir arayüz sunar, tüm bağlamdaki verileri ve metotları tek bir nesne altında toplar.
 **Parametreler**: Herhangi bir parametre almaz.
 **Dönüş**: ctx — İçinde aktif dil bilgisi, çeviri alma, dil değiştirme gibi tüm i18n ile ilgili metotları ve verileri barındıran bağlam nesnesi.
+
+---
+
+## INTERFACES
+
+### I18nProviderProps
+- `children: React.ReactNode`
+- `lang?: Lang`
+- `dictionary?: AppDictionary`
 
 ---
 
@@ -142,37 +151,23 @@ type Dict = Record<string, unknown>
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-I18nProvider() fonksiyonu, kendi dosyası içerisindeki get ve interpolate fonksiyonlarını çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen çağrı verisinde bu modülü kullanan dış kaynaklı herhangi bir dosya veya fonksiyon belirtilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  I18nProvider() → get()
-  I18nProvider() → interpolate()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    I18nProvider["I18nProvider()"] --> get["get()"]
-    I18nProvider["I18nProvider()"] --> interpolate["interpolate()"]
+graph TD
+    I18nProvider_tsx__I18nProvider["I18nProvider"]
+    I18nProvider_tsx__get["get"]
+    I18nProvider_tsx__interpolate["interpolate"]
+    I18nProvider_tsx__useI18n["useI18n"]
+    I18nProvider_tsx__I18nProvider --> I18nProvider_tsx__get
+    I18nProvider_tsx__I18nProvider --> I18nProvider_tsx__interpolate
 ```
-
----
 
 ## NODE ID STANDARD
 
   file: src\i18n\I18nProvider.tsx
   function: src\i18n\I18nProvider.tsx::get
   function: src\i18n\I18nProvider.tsx::interpolate
-  function: src\i18n\I18nProvider.tsx::LanguageUrlWatcher
   function: src\i18n\I18nProvider.tsx::I18nProvider
   function: src\i18n\I18nProvider.tsx::useI18n
 
@@ -180,7 +175,22 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: I18nProvider
-  export: LanguageUrlWatcher
   export: get
   export: interpolate
   export: useI18n
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

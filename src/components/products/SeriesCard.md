@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\SeriesCard.tsx
 skeleton_hash: d5dbc3aad85a1db0
-generated_at: 2026-05-23T22:26:34Z
+entity_hashes:
+  func:SeriesCard: cf8b7a8f3470f163
+  overview: d4236c58f6d08940
+  style_tokens: f167f421a986922b
+generated_at: 2026-05-28T22:37:11Z
 ---
 
 ## Genel Bakış
@@ -17,29 +21,26 @@ Kendisine iletilen seri adı, görseli, ürün sayısı, en düşük fiyat ve y�
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu sunum bileşeni olan SeriesCard, ürün serilerini kullanıcıya eksiksiz göstermek ve detay sayfasına yönlendirmek için tüm zorunlu prop'ların üst bileşenden formatına uygun, eksiksiz olarak iletilmesini varsayar.
 
-[Aksiyom 1]: Eğer name prop'u üst bileşenden iletilmezse, ürün serisinin adı görüntülenemez, kullanıcı ilgili seriyi tanıyamaz.
-[Aksiyom 2]: Eğer image prop'u geçerli bir resim kaynağı olarak iletilmezse, ürün serisinin kapak görseli yüklenmez, görsel alanı hatalı veya boş olarak gösterilir.
-[Aksiyom 3]: Eğer productCount sayısal bir değer olarak iletilmezse, seride bulunan toplam ürün sayısı doğru şekilde kullanıcıya sunulamaz.
-[Aksiyom 4]: Eğer minPrice prop'u geçerli sayısal bir fiyat değeri olarak iletilmezse, serinin başlangıç fiyatı görüntülenemez.
-[Aksiyom 5]: Eğer href prop'u geçerli bir yönlendirme adresi olarak iletilmezse, kart tıklamasındaki detay sayfası yönlendirmesi çalışmaz, kullanıcı serinin detaylarına erişemez.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SeriesCard
-**Ne yapar**: Ürün serilerini görselleştirmek için tasarlanmış bir React kart bileşenidir. Kullanıcı arayüzünde herhangi bir ürün serisinin temel bilgilerini tek bir kart üzerinde toplayarak sunar, kullanıcıların ilgili serinin detay sayfasına erişmesini sağlayan tıklanabilir bir arayüz öğesi olarak çalışır. Venthub HVAC uygulamasının ürün listeleme arayüzlerinde serileri kategorize etmek ve sunmak için kullanılır.
-**Nasıl yapar**: Kendisine iletilen prop verilerini kullanarak kartın tüm içeriğini dinamik olarak doldurur, gelen her veriyi doğru arayüz alanında görüntüler. TypeScript ile tanımlanmış SeriesCardProps tipini kullanarak prop türlerinin güvenliğini sağlar, React'in fonksiyonel bileşen yapısıyla çalışarakJSX çıktısı üretir. Tıklandığında kendisine iletilen href adresine yönlendirme işlemini tetikler.
+
+**Ne yapar**: HVAC ürün serilerini kart formatında gösteren bir UI bileşenidir. Her bir ürün serisi için görsel, isim, ürün sayısı, minimum fiyat ve detay sayfasına yönlendirme linki gibi bilgileri kart içinde sunar.
+
+**Nasıl yapar**: Bileşen, SeriesCardProps tipinde tanımlanan prop'ları alır ve bu verileri kullanarak seriyi temsil eden bir kart bileşeni render eder. Gelen name, image, productCount, minPrice ve href değerlerini kartın ilgili bölümlerine yerleştirerek kullanıcıya ürün serisi hakkında özet bilgi sunar. href prop'u ile kullanıcıyı ilgili ürün serisinin detay sayfasına yönlendirir.
+
 **Parametreler**:
-- name: any — Ürün serisinin resmi görünen adı, kartın başlık alanında kullanılarak serinin kimliğini belirtir
-- image: any — Seriyi temsil eden kapak görselinin erişim adresi veya dosya yolu, kartın görsel bölümünde yüklenerek serinin görsel temsilini sunar
-- productCount: any — İlgili seri bünyesinde yer alan toplam ürün sayısı, kart üzerinde serinin içeriğinin büyüklüğünü kullanıcılara bildirmek için görüntülenir
-- minPrice: any — Serideki tüm ürünler arasındaki en düşük geçerli fiyat, kullanıcılara seriye başlangıç fiyatını göstermek üzere kullanılır
-- href: any — Kullanıcı kartı tıkladığında yönlendirileceği ürün serisi detay sayfasının bağlantısı, yönlendirme işlemi için kullanılır
-**Dönüş**: React.FC<SeriesCardProps> — Props türü tanımlanmış, uygulama arayüzünde kullanılabilir bir React fonksiyonel bileşeni döndürür, bu bileşen tanımlanan tüm prop verilerini işleyerek görsel kart çıktısını üretir.
+- name: string — Ürün serisinin adını belirtir, kart üzerinde başlık olarak görüntülenir
+- image: string — Ürün serisine ait görselin URL'ini veya yolunu temsil eder, kartın görsel alanında kullanılır
+- productCount: number — İlgili serideki toplam ürün sayısını belirtir, kart üzerinde bilgi olarak gösterilir
+- minPrice: number — Serideki ürünlerin başlangıç fiyatını veya minimum fiyatını temsil eder, fiyat aralığının alt sınırını gösterir
+- href: string — Ürün serisinin detay sayfasına yönlendirme linkini belirtir, kart tıklandığında bu adrese navigasyon sağlanır
+
+**Dönüş**: `React.FC<SeriesCardProps>` — SeriesCardProps arayüzüne uygun olarak yapılandırılmış bir React fonksiyonel bileşeni döndürür. Bu bileşen, verilen prop'lara göre render edilmiş bir ürün serisi kartı sunar.
 
 ---
 
@@ -84,16 +85,13 @@ Bu sunum bileşeni olan SeriesCard, ürün serilerini kullanıcıya eksiksiz gö
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `aspect-[4/3]`, `hover:shadow-[0_20px_40px_-15px_rgba(30,41,59,0.1)]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/10`, `bg-slate-100`, `bg-slate-50`, `bg-white`, `bg-white/90`, `border-slate-100`, `border-slate-50`, `border-t`, `text-lg`, `text-primary-navy`, `text-slate-300`, `text-slate-900`, `text-sm`, `text-steel-gray`, `text-steel-gray/60`
-- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-1`, `flex-col`, `group-hover:bg-primary-navy`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `group-hover:text-white`, `h-10`, `h-full`, `items-center`, `justify-between`, `justify-center`, `left-4`
-- **Responsive:** (yok)
+- **Renkler:** `bg-air-blue/10`, `bg-slate-100`, `bg-slate-50`, `bg-white`, `bg-white/90`, `border-slate-100`, `border-slate-50`, `border-t`, `group-hover:bg-primary-navy`, `group-hover:text-primary-navy`, `group-hover:text-white`, `hover:border-primary-navy/20`, `text-lg`, `text-primary-navy`, `text-slate-300`
+- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-1`, `flex-col`, `h-10`, `h-full`, `hover:shadow-series-card-hover`, `items-center`, `justify-between`, `justify-center`, `left-4`, `line-clamp-2`, `overflow-hidden`, `p-6`
+- **Varyant/Responsive:** `group-hover:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `aspect-4/3`, `border`, `duration-300`, `duration-500`, `duration-700`, `font-bold`, `group`, `group-hover:scale-110`, `hover:-translate-y-1`, `mb-2`, `mb-6`, `mt-auto`, `object-contain`, `pt-4`, `px-3`

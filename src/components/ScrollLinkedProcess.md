@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ScrollLinkedProcess.tsx
 skeleton_hash: c25957b394b2bf51
-generated_at: 2026-05-23T22:27:08Z
+entity_hashes:
+  func:ScrollLinkedProcess: 5a92a40886643dd7
+  func:scrollTo: ee292d22ad2f3df1
+  overview: a4bd4fd5da1416a4
+  style_tokens: dffb84eddfacefbd
+generated_at: 2026-05-28T22:36:57Z
 ---
 
 ## Genel Bakış
@@ -31,7 +36,7 @@ Bu React tabanlı ScrollLinkedProcess modülü, aynı sayfa içindeki sıralı s
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ScrollLinkedProcess
 **Ne yapar**: VentHub HVAC projesinde süreç adımlarını tarayıcı kaydırma hareketleriyle ilişkilendiren React bileşeni üreten bir fabrika fonksiyonudur. Proje içindeki süreç takibi arayüzlerinin aktif adımını sayfa kaydırmasıyla senkronize tutmak için özel olarak tasarlanmıştır, kullanıcıların süreç akışını takip etmesini kolaylaştırır.
@@ -110,29 +115,6 @@ Bu React tabanlı ScrollLinkedProcess modülü, aynı sayfa içindeki sıralı s
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-ScrollLinkedProcess() fonksiyonu, kaydırma işlemini tetiklemek için sadece scrollTo fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen çağrı grafiği verisinde bu modülü kullanan herhangi bir dış modül, dosya veya fonksiyon belirtilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  ScrollLinkedProcess() → scrollTo()
-
-```mermaid
-graph LR
-    ScrollLinkedProcess["ScrollLinkedProcess()"] --> scrollTo["scrollTo()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\ScrollLinkedProcess.tsx
@@ -155,6 +137,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy/5`, `bg-white`, `border-light-gray`, `border-primary-navy`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-left`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`
+- **Renkler:** `bg-primary-navy/5`, `bg-white`, `border-light-gray`, `border-primary-navy`, `hover:bg-gray-50`, `md:text-3xl`, `text-2xl`, `text-industrial-gray`, `text-left`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`
 - **Layout:** `gap-6`, `grid`, `grid-cols-1`, `lg:col-span-1`, `lg:col-span-3`, `lg:grid-cols-4`, `max-w-7xl`, `p-6`, `shadow-sm`, `sticky`, `top-20`, `w-full`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${i`, `:`, `===`, `active`, `border`, `font-bold`, `font-semibold`, `lg:px-8`, `mb-1`, `mb-2`, `mb-6`, `mx-auto`, `px-3`, `px-4`, `py-12`

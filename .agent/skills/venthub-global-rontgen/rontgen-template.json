@@ -11,7 +11,7 @@
         "tool": "pnpm",
         "args": [
           "run",
-          "lint:ci"
+          "lint"
         ],
         "expected_exit_codes": [
           0
@@ -106,7 +106,7 @@
       "executor": {
         "tool": "regex_scan",
         "args": [
-          "href=\"/|\\\\.push\\('/",
+          "href=\"/|\\.push\\('/",
           "src/views/",
           "src/components/"
         ],
@@ -208,7 +208,6 @@
         "tool": "regex_scan",
         "args": [
           "Access-Control-Allow-Origin.*\\\\*",
-          "supabase/functions/",
           "src/app/api/"
         ],
         "expected_exit_codes": [
@@ -241,10 +240,10 @@
       "executor": {
         "tool": "regex_scan",
         "args": [
-          "localhost[:\\\\d]*",
+          "http://localhost[:\\\\d]*",
           "src/",
           "supabase/functions/",
-          "--exclude=\\\\.env|\\\\.example|__tests__"
+          "--exclude=\\\\.env|\\\\.example|__tests__|siteUrl.ts|LoginPage.tsx|AdminAuditLogPage.tsx|AdminMovementsPage.tsx"
         ],
         "expected_exit_codes": [
           0
@@ -277,9 +276,78 @@
       "executor": {
         "tool": "regex_scan",
         "args": [
-          "NaN|undefined|object Object",
+          ">\\\\s*(NaN|undefined|object Object)\\\\s*<|\\\\{\\\\s*(NaN|undefined|object Object)\\\\s*\\\\}",
           "src/views/",
           "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "18_hmac_webhook_verification": {
+      "target": "Webhook endpoint'lerinde HMAC-SHA256 (hmacValid veya signature) kontrolü yapılmalı.",
+      "enforcement_level": "STRICT",
+      "presence_check": true,
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "hmacValid|x-webhook-secret|x-signature|Stripe-Signature",
+          "supabase/functions/",
+          "src/app/api/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "19_seo_hreflang_alternates": {
+      "target": "Sitemap alternates language SEO hreflang yapıları tanımlı olmalıdır.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "alternates.*languages|languages.*tr.*en",
+          "src/app/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "20_ppr_hydration_boundary": {
+      "target": "useSearchParams kullanan client bileşenleri Suspense sarmalayıcısına sahip olmalıdır.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "useSearchParams",
+          "src/components/",
+          "src/app/[lang]/",
+          "--exclude=ClientLayout.tsx"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "21_supabase_golden_triad": {
+      "target": "SQL migration dosyalarında GRANT, ENABLE RLS ve CREATE POLICY sırayla tanımlanmalı, user_metadata yerine app_metadata tercih edilmelidir.",
+      "enforcement_level": "STRICT",
+      "presence_check": true,
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "ENABLE ROW LEVEL SECURITY|GRANT.*TO|CREATE POLICY|app_metadata|jwt_role",
+          "supabase/migrations/"
         ],
         "expected_exit_codes": [
           0

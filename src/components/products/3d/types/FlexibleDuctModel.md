@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\FlexibleDuctModel.tsx
 skeleton_hash: c528a6e230f99d4c
-generated_at: 2026-05-23T22:24:07Z
+entity_hashes:
+  func:FlexibleDuctModel: 37698f17927cf0cb
+  overview: a748c200cfba6807
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:47Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Venthub HVAC platformunun 3D ürün görselleştirme katmanında kullanılan, es
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### FlexibleDuctModel
 **Ne yapar**: Meksika dalgası animasyonlu, fiziksel tabanlı esnek hava kanalı modelini oluşturan bir React bileşenidir. VentHub HVAC projesinin ürün odaklı 3D görselleştirme katmanında görev alan bu component, HVAC sistemlerinde kullanılan esnek hava kanallarının gerçekçi, animasyonlu bir temsilini ekrana sunar. Proje içindeki 3D ürün bileşenleri ailesinin bir parçası olarak, esnek kanal tiplerinin özel olarak modelllenmesini sağlar.
@@ -114,4 +118,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

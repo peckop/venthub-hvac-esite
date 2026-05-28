@@ -3,8 +3,18 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\authority\AuthorityRenderer.tsx
-skeleton_hash: fbc85d7de70e793e
-generated_at: 2026-05-23T22:01:26Z
+skeleton_hash: a5da5b7f6225ccf6
+entity_hashes:
+  func:AuthorityRenderer: b497d8ee6938f090
+  func:ComparisonBlock: 3b92c32ed036d564
+  func:CtaBannerBlock: d3489e335a9aa81e
+  func:FeaturesGridBlock: 007c341f14e3aa81
+  func:HeroBlock: 004bad6f0e03f1b8
+  func:IconRenderer: 6dea11b29c7fd6b8
+  func:SpecsBlock: 02f28da6bc471010
+  overview: 205541493453ffae
+  style_tokens: 783b613fb0128036
+generated_at: 2026-05-28T22:35:41Z
 ---
 
 ## Genel Bakış
@@ -35,7 +45,7 @@ Bu varsayımlar, modülün işlevselliğini korumak için giriş verilerinin ve 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### IconRenderer
 **Ne yapar**: Verilen `name` ve opsiyonel `className` parametrelerine göre bir simge (icon) öğesini render eder.  
@@ -200,6 +210,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-2xl`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/10`, `bg-indigo-600`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/20`, `bg-white/5`, `border-2`, `border-8`, `border-dashed`, `border-red-100`, `border-slate-100`, `border-slate-200`, `md:text-5xl`
+- **Renkler:** `bg-black/10`, `bg-indigo-600`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/20`, `bg-white/5`, `border-2`, `border-8`, `border-dashed`, `border-red-100`, `border-slate-100`, `border-slate-200`, `hover:bg-indigo-50`
 - **Layout:** `absolute`, `bottom-0`, `bottom-6`, `flex`, `flex-col`, `gap-1`, `gap-12`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`, `h-12`, `h-14`, `h-16`, `h-6`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Varyant/Responsive:** `active:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `-mb-32`, `-ml-32`, `-mr-48`, `-mt-48`, `-translate-x-1/2`, `active:scale-95`, `aspect-video`, `authority-content-wrapper`, `blur-3xl`, `border`, `brightness-0`, `dark`, `duration-500`, `font-black`, `font-bold`

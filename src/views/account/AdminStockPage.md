@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminStockPage: c624fd2be5fee91c
   overview: 62b56555e7eaf8c3
   style_tokens: d6523eb6a70db49b
-generated_at: 2026-05-27T18:30:38Z
+generated_at: 2026-05-28T22:38:52Z
 ---
 
 ## Genel Bakış

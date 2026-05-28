@@ -8,7 +8,7 @@ entity_hashes:
   func:CategoryGridView: 7b1f2c5723260534
   overview: 24b0f5382275b1f2
   style_tokens: 9b61cf001b5ee023
-generated_at: 2026-05-27T18:30:56Z
+generated_at: 2026-05-28T22:39:38Z
 ---
 
 ## Genel Bakış

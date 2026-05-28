@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\JsonDiffViewer.tsx
 skeleton_hash: bb6a751ee807919b
-generated_at: 2026-05-23T21:54:21Z
+entity_hashes:
+  func:JsonDiffViewer: 00fa2648afca347e
+  func:safeStringify: 9ba27221b507c072
+  overview: 2279b25945479824
+  style_tokens: 6a22f095496c6ef9
+generated_at: 2026-05-28T22:35:36Z
 ---
 
 ## Genel Bakış
@@ -26,7 +31,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### JsonDiffViewer
 **Ne yapar**: Bu bileşen, `before` ve `after` props'larını alır ve bir React functional component döndürür.  
@@ -83,29 +88,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-- JsonDiffViewer() fonksiyonu, JSON verisini güvenli bir şekilde stringe dönüştürmek için safeStringify fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-- Veri setinde bu modülü çağıran dış fonksiyon veya dosya bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  JsonDiffViewer() → safeStringify()
-
-```mermaid
-graph LR
-    JsonDiffViewer["JsonDiffViewer()"] --> safeStringify["safeStringify()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\admin\JsonDiffViewer.tsx
@@ -122,16 +104,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[400px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500`, `bg-emerald-500/10`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-800/30`, `bg-slate-800/80`, `bg-slate-900`, `border-b`, `border-r`, `border-slate-700`, `border-slate-800`, `text-center`, `text-emerald-300`, `text-rose-300`, `text-slate-400`
-- **Layout:** `flex`, `flex-1`, `gap-2`, `h-2`, `items-center`, `overflow-hidden`, `overflow-x-auto`, `p-3`, `shadow-xl`, `w-2`, `w-full`
-- **Responsive:** (yok)
+- **Renkler:** `bg-emerald-500`, `bg-emerald-500/10`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-800/30`, `bg-slate-800/80`, `bg-slate-900`, `border-b`, `border-r`, `border-slate-700`, `border-slate-800`, `hover:bg-slate-800/50`, `text-center`, `text-emerald-300`, `text-rose-300`
+- **Layout:** `flex`, `flex-1`, `gap-2`, `h-2`, `items-center`, `max-h-400px`, `overflow-hidden`, `overflow-x-auto`, `p-3`, `shadow-xl`, `w-2`, `w-full`
+- **Varyant/Responsive:** `:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${isAdded`, `${isRemoved`, `:`, `border`, `font-mono`, `font-semibold`, `isAdded`, `isChanged`, `isRemoved`, `italic`, `leading-relaxed`, `mr-2`, `opacity-70`, `px-2`, `py-1`

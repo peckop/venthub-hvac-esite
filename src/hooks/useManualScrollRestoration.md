@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useManualScrollRestoration.ts
 skeleton_hash: 3b3d57951e288ef3
-generated_at: 2026-05-23T22:30:12Z
+entity_hashes:
+  func:useManualScrollRestoration: c36f5fe9ca492bf5
+  overview: fbb89d52cd2f5084
+generated_at: 2026-05-28T22:37:47Z
 ---
 
 ## Genel Bakış
@@ -27,7 +30,7 @@ Bu modül, React tabanlı web uygulamalarında sayfa yönlendirmeleri veya yenid
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useManualScrollRestoration
 **Ne yapar**: Async olarak veri yüklenen sayfalarda "Geri" (POP) navigasyonu sonrası kullanıcının önceki scroll pozisyonunu manuel olarak geri yükler. Tarayıcının kendi native scroll restorasyon özelliğinin yetersiz kaldığı, özellikle skeleton loading gibi gecikmeli içerik yükleme senaryolarında çalışmak üzere tasarlanmıştır. Veri yüklemesi devam ederken scroll restorasyon işlemini beklemede tutar, böylece içerik tam olarak yüklenmeden sayfanın yanlış pozisyona kaydırılması engellenir.

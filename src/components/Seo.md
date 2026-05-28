@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\Seo.tsx
 skeleton_hash: 9d54ba234eeb2cf7
-generated_at: 2026-05-23T22:27:22Z
+entity_hashes:
+  func:Seo: efb90eeb61c051d0
+  overview: c4b11b13e9e25b50
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:59Z
 ---
 
 ## Genel Bakış
@@ -29,7 +33,7 @@ Bu React tabanlı SEO bileşeni, web sayfalarının arama motorları tarafından
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Seo
 **Ne yapar**: VentHub HVAC projesinin React tabanlı kod yapısında yer alan, sayfaların arama motorları ve sosyal medya platformlarıyla uyumlu olmasını sağlayan SEO odaklı bir React bileşenidir. Tüm standart meta etiketleri ile Open Graph protokolü gerektiren etiketleri tek bir yapıda oluşturarak, her sayfa için özel SEO yapılandırması yapılmasını kolaylaştırır. Sayfaların arama motoru sonuçlarında doğru şekilde listelenmesini, sosyal medyada paylaşıldığında içeriğine uygun başlık, açıklama ve görselle gösterilmesini sağlar.
@@ -98,4 +102,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

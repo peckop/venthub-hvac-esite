@@ -4,7 +4,9 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\adminUi.ts
 skeleton_hash: 3ae172a5374fdd7a
-generated_at: 2026-05-26T12:20:50Z
+entity_hashes:
+  overview: f513c1020f198680
+generated_at: 2026-05-28T22:38:44Z
 ---
 
 ## Genel Bakış
@@ -15,11 +17,20 @@ Bu modül hiçbir ortam değişkeni kullanmaz, harici API'ler ile iletişime ge�
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, yalnızca sabit değerler (CSS sınıfları ve stil nesnesi) içeren bir yardımcı modüldür; çalıştırılabilir fonksiyon barındırmaz.
+
+[Aksiyom 1]: Eğer `adminCardClass` sabiti string (template) formatında tanımlanmamışsa, projede bu sabiti import eden yönetici kart bileşenleri geçerli CSS sınıfı alamaz ve kartlar beklenmeyen görsel hata gösterir.
+
+[Aksiyom 2]: Eğer `adminCardPaddedClass` sabiti string (template) formatında tanımlanmamışsa, dolgulu kart bileşenleri iç kenar boşluğunu alamaz ve içerik kenarlıklara yapışık render edilir.
+
+[Aksiyom 3]: Eğer `adminSelectStyle` sabiti geçerli bir JavaScript nesnesi (CSS stilleri içeren key-value çiftleri) olarak tanımlanmamışsa, yönetici panelindeki seçim alanları (select) stilsiz veya tarayıcı varsayılan stiliyle görüntülenir ve tasarım tutarlılığı bozulur.
+
+[Aksiyom 4]: Eğer bu modül projedeki bileşenler tarafından import edilemez (yani `adminUi.ts` dosyası doğru konumda değilse veya export yapılmamışsa), tüm yönetici arayüz bileşenleri tutarsız görsel stiller kullanır ve proje genelinde统一 bir görünüm sağlanamaz.
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -33,10 +44,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-Sağlanan kaynak dosyasında (`C:\Users\alize\venthub-hvac\src\utils\adminUi.ts`) analiz edilecek herhangi bir fonksiyon tanımı, sınıf metodu veya çalıştırılabilir fonksiyon gövdesi bulunmamaktadır. Sadece aşağıdaki sabitler tanımlıdır:
-- `adminCardClass` — Şablon (template) kullanımı için tanımlanmış CSS sınıfı değeri
-- `adminCardPaddedClass` — Şablon (template) kullanımı için tanımlanmış dolgulu admin kartı CSS sınıfı değeri
-- `adminSelectStyle` — Admin arayüzü select bileşenleri için stil tanımları içeren nesne
+Bu dosyada fonksiyon bulunmamaktadır.
+
+---
+
+### Sabitler (Fonksiyon Dışı Tanımlar)
+
+| Sabit | Tür | Açıklama |
+|-------|-----|----------|
+| `adminCardClass` | `string` (template) | Admin paneli kartları için CSS class string'i |
+| `adminCardPaddedClass` | `string` (template) | Padding içeren admin kartları için CSS class string'i |
+| `adminSelectStyle` | `object` | Admin select elementleri için inline stil objesi |
 
 ---
 

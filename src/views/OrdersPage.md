@@ -12,7 +12,7 @@ entity_hashes:
   func:getStatusText: 248f40bb51719423
   overview: fc7e5a9a85876ec8
   style_tokens: 4894888e4850f9b4
-generated_at: 2026-05-27T18:30:24Z
+generated_at: 2026-05-28T22:40:07Z
 ---
 
 ## Genel Bakış
@@ -239,9 +239,9 @@ graph TD
     OrdersPage_tsx__formatPrice["formatPrice"]
     OrdersPage_tsx__getStatusColor["getStatusColor"]
     OrdersPage_tsx__getStatusText["getStatusText"]
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusColor
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatDate
 ```
 

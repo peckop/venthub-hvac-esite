@@ -8,7 +8,7 @@ entity_hashes:
   func:AccountProfilePage: 754183d7e2ba9791
   overview: 6f24907adef049a2
   style_tokens: d7513d5d715e48fe
-generated_at: 2026-05-27T18:30:31Z
+generated_at: 2026-05-28T22:38:52Z
 ---
 
 ## Genel Bakış

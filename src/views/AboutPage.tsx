@@ -1,11 +1,7 @@
-'use client'
-
 import { Routes } from '@/utils/routes';
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useI18n } from '../i18n/I18nProvider'
-import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import { 
   Award, Shield, Target, Globe, Zap, 
   Factory, Microscope
@@ -13,37 +9,53 @@ import {
 import Seo from '../components/Seo'
 import { BrandIcon } from '../components/HVACIcons'
 import { HVAC_BRANDS } from '../lib/brands'
+import ScrollReveal from '../components/ScrollReveal'
+import { tr } from '../i18n/dictionaries/tr'
+import { en } from '../i18n/dictionaries/en'
 
-const AboutPage: React.FC = () => {
-  const { t } = useI18n()
-  const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
-  const [heroTitleRef, heroTitleVisible] = useScrollAnimation<HTMLHeadingElement>({ threshold: 0.2 })
-  const [heroTextRef, heroTextVisible] = useScrollAnimation<HTMLParagraphElement>({ threshold: 0.2 })
-  const [statsRef, statsVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
-  const [storyRef, storyVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
-  const [valuesRef, valuesVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
+interface AboutPageProps {
+  lang?: string
+}
+
+const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
+  const dict = lang === 'en' ? en : tr
+
+  // Server-component safe translation helper
+  const t = (key: string): string => {
+    const parts = key.split('.')
+    let current: unknown = dict
+    for (const part of parts) {
+      const obj = current as Record<string, unknown>
+      if (obj && obj[part] !== undefined) {
+        current = obj[part]
+      } else {
+        return key
+      }
+    }
+    return typeof current === 'string' ? current : key
+  }
 
   const stats = [
-    { value: '15+', label: 'Yıllık Tecrübe', icon: Zap },
-    { value: '5', label: 'Global Distribütörlük', icon: Award },
-    { value: '500+', label: 'Tamamlanan Proje', icon: Factory },
-    { value: '81', label: 'İl Sevkiyat Ağı', icon: Globe }
+    { value: '15+', label: t('aboutPage.experience'), icon: Zap },
+    { value: '5', label: t('aboutPage.distributorship'), icon: Award },
+    { value: '500+', label: t('aboutPage.completedProject'), icon: Factory },
+    { value: '81', label: t('aboutPage.shippingNetwork'), icon: Globe }
   ]
 
   const coreValues = [
     {
-      title: 'Mühendislik Hassasiyeti',
-      description: 'Sadece ürün satmıyoruz; her projeye özel debi, basınç ve verimlilik hesaplamalarıyla mühendislik çözümü sunuyoruz.',
+      title: t('aboutPage.precisionTitle'),
+      description: t('aboutPage.precisionDesc'),
       icon: Microscope
     },
     {
-      title: 'Global Standartlar',
-      description: 'Dünya devi HVAC markalarının Türkiye temsilcisi olarak, en güncel ve sertifikalı teknolojileri yerel pazara taşıyoruz.',
+      title: t('aboutPage.standardsTitle'),
+      description: t('aboutPage.standardsDesc'),
       icon: Target
     },
     {
-      title: 'Operasyonel Güven',
-      description: 'Teknopark İstanbul merkezli yönetimimiz ve geniş stok ağımızla, proje takvimlerinize sadık kalarak tam zamanında teslimat yapıyoruz.',
+      title: t('aboutPage.trustTitle'),
+      description: t('aboutPage.trustDesc'),
       icon: Shield
     }
   ]
@@ -52,7 +64,7 @@ const AboutPage: React.FC = () => {
     <div className="min-h-screen bg-white">
       <Seo
         title={`${t('aboutPage.title')} | VentHub`}
-        description="VentHub: Türkiye'nin premium HVAC distribütörü. 15 yıllık tecrübe ve mühendislik odaklı havalandırma çözümleri."
+        description={t('aboutPage.seoDescription')}
       />
 
       {/* Cinematic Hero */}
@@ -60,43 +72,45 @@ const AboutPage: React.FC = () => {
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/hvac_installation_close_up_premium_3.png"
-            alt="VentHub Engineering"
+            alt=""
             fill
             sizes="100vw"
             className="object-cover opacity-30 grayscale brightness-50"
             priority
-          />          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950" />
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950" />
         </div>
 
         <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div ref={heroBadgeRef} className={scrollAnimationClasses.fadeUp(heroBadgeVisible) + " inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"}>
+          <ScrollReveal animation="fadeUp" as="div" className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8">
             <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-400">Engineering Excellence Since 2009</span>
-          </div>
+            <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-400">{t('aboutPage.heroBadge')}</span>
+          </ScrollReveal>
 
-          <h1 ref={heroTitleRef} className={scrollAnimationClasses.scaleIn(heroTitleVisible) + " text-5xl lg:text-8xl font-extralight tracking-tighter leading-hvac-11 mb-10"}>
-            Havayı <span className="font-medium text-white italic">Yeniden Tanımlıyoruz</span>
-          </h1>
+          <ScrollReveal animation="scaleIn" as="h1" className="text-5xl lg:text-8xl font-extralight tracking-tighter leading-hvac-11 mb-10">
+            {t('aboutPage.heroTitle')} <span className="font-medium text-white italic">{t('aboutPage.heroTitleItalic')}</span>
+          </ScrollReveal>
 
-          <p ref={heroTextRef} className={scrollAnimationClasses.fadeIn(heroTextVisible) + " max-w-2xl mx-auto text-xl text-slate-400 font-light leading-relaxed"}>
-            VentHub, modern yaşam ve endüstriyel alanlar için yüksek verimli, teknolojik ve sürdürülebilir havalandırma sistemlerinin Türkiye'deki otoritesidir.
-          </p>
+          <ScrollReveal animation="fadeIn" as="p" className="max-w-2xl mx-auto text-xl text-slate-400 font-light leading-relaxed">
+            {t('aboutPage.heroDesc')}
+          </ScrollReveal>
         </div>
       </section>
 
       {/* Stats Grid */}
       <section className="py-24 bg-slate-50 border-b border-slate-100">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
-          <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
             {stats.map((stat, i) => (
-              <div
+              <ScrollReveal
                 key={i}
-                className={scrollAnimationClasses.fadeUp(statsVisible) + " text-center"}
-                style={scrollAnimationClasses.staggerChild(i)}
+                animation="fadeUp"
+                className="text-center"
+                staggerIndex={i}
               >
                 <div className="text-5xl lg:text-7xl font-bold text-slate-900 tracking-tighter mb-4">{stat.value}</div>
                 <div className="text-xs font-black uppercase tracking-hvac-relaxed text-cyan-600">{stat.label}</div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -106,30 +120,26 @@ const AboutPage: React.FC = () => {
       <section className="py-24 lg:py-32 overflow-hidden">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
-            <div ref={storyRef} className={scrollAnimationClasses.slideLeft(storyVisible) + " relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden"}>
+            <ScrollReveal animation="slideLeft" className="relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden">
               <Image 
                 src="/images/ekran/homepage beğendiğim yapı.png" 
-                alt="VentHub Story" 
+                alt="" 
                 fill 
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover grayscale hover:grayscale-0 transition-transform duration-1000"
               />
               <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
-            </div>
+            </ScrollReveal>
 
             <div>
-              <div className="text-cyan-600 text-xs font-black uppercase tracking-hvac-wide mb-8">Our Vision</div>
+              <div className="text-cyan-600 text-xs font-black uppercase tracking-hvac-wide mb-8">{t('aboutPage.vision')}</div>
               <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-hvac-11 mb-12 text-slate-900">
-                Geleceğin İklimini <br />
-                <span className="font-medium text-slate-950 italic">Bugün Kuruyoruz</span>
+                {t('aboutPage.storyTitle')} <br />
+                <span className="font-medium text-slate-950 italic">{t('aboutPage.storyTitleItalic')}</span>
               </h2>
               <div className="space-y-8 text-lg text-slate-500 font-light leading-relaxed">
-                <p>
-                  VentHub, havalandırma sektöründe sadece bir tedarikçi değil, teknolojik bir çözüm ortağı olarak konumlanmaktadır. 15 yılı aşkın süredir, Avrupa'nın en prestijli markalarını Türkiye'nin en büyük projeleriyle buluşturuyoruz.
-                </p>
-                <p>
-                  Teknopark İstanbul'daki merkezimizden yönettiğimiz operasyonlarımızda, mühendislik etiği ve operasyonel mükemmeliyeti her şeyin önünde tutuyoruz. Bizim için her ürün bir bileşen, her proje ise bir havalandırma sanatı eseridir.
-                </p>
+                <p>{t('aboutPage.storyDesc1')}</p>
+                <p>{t('aboutPage.storyDesc2')}</p>
               </div>
               
               <div className="mt-12 flex items-center gap-8">
@@ -138,7 +148,7 @@ const AboutPage: React.FC = () => {
                     <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden relative">
                       <Image 
                         src={`/images/hvac_installation_close_up_premium_3.png`} 
-                        alt="Team" 
+                        alt="" 
                         fill 
                         sizes="48px"
                         className="object-cover" 
@@ -147,8 +157,8 @@ const AboutPage: React.FC = () => {
                   ))}
                 </div>
                 <div className="text-sm font-bold text-slate-900">
-                  50+ Uzman Mühendis & <br /> 
-                  <span className="text-slate-400 font-medium tracking-tight">Teknik Operasyon Kadrosu</span>
+                  {t('aboutPage.teamTitle')} <br /> 
+                  <span className="text-slate-400 font-medium tracking-tight">{t('aboutPage.teamSubtitle')}</span>
                 </div>
               </div>
             </div>
@@ -160,8 +170,10 @@ const AboutPage: React.FC = () => {
       <section className="py-24 bg-slate-950 text-white">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <div className="text-cyan-400 text-xs font-black uppercase tracking-hvac-wide mb-6">Strategic Partnerships</div>
-            <h2 className="text-3xl lg:text-5xl font-extralight tracking-tight">Resmi Distribütör <span className="text-cyan-400 font-medium italic">Ağımız</span></h2>
+            <div className="text-cyan-400 text-xs font-black uppercase tracking-hvac-wide mb-6">{t('aboutPage.whySubtitle')}</div>
+            <h2 className="text-3xl lg:text-5xl font-extralight tracking-tight">
+              {t('aboutPage.brandTitle')} <span className="text-cyan-400 font-medium italic">{t('aboutPage.brandTitleItalic')}</span>
+            </h2>
           </div>
           
           <div className="flex flex-wrap justify-center items-center gap-12 lg:gap-24">
@@ -180,19 +192,20 @@ const AboutPage: React.FC = () => {
       {/* Values Grid */}
       <section className="py-24 lg:py-32 bg-white">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
-          <div ref={valuesRef} className="grid lg:grid-cols-3 gap-16">
+          <div className="grid lg:grid-cols-3 gap-16">
             {coreValues.map((value, i) => (
-              <div
+              <ScrollReveal
                 key={i}
-                className={scrollAnimationClasses.fadeUp(valuesVisible) + " group"}
-                style={scrollAnimationClasses.staggerChild(i)}
+                animation="fadeUp"
+                className="group"
+                staggerIndex={i}
               >
                 <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">
                   <value.icon size={32} strokeWidth={1} />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-6 tracking-tight">{value.title}</h3>
                 <p className="text-slate-500 font-light leading-relaxed">{value.description}</p>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -202,21 +215,21 @@ const AboutPage: React.FC = () => {
       <section className="py-24 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter text-slate-900 mb-12 leading-tight">
-            Mühendislik Ortağınızla <br />
-            <span className="font-medium italic">Tanışmaya Hazır mısınız?</span>
+            {t('aboutPage.ctaTitle')} <br />
+            <span className="font-medium italic">{t('aboutPage.ctaTitleItalic')}</span>
           </h2>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link 
               href={Routes.contact()} 
               className="bg-slate-950 text-white px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-shadow shadow-xl"
             >
-              İletişime Geçin
+              {t('aboutPage.ctaContact')}
             </Link>
             <Link 
               href={Routes.products()} 
               className="bg-white text-slate-950 border border-slate-200 px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 transition-colors"
             >
-              Ürünleri Keşfedin
+              {t('aboutPage.ctaExplore')}
             </Link>
           </div>
         </div>

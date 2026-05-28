@@ -11,7 +11,7 @@ entity_hashes:
   func:getCachedHomeData: a2f13e97ef6730bc
   overview: 2cb52e693d36cf5a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T09:47:00Z
+generated_at: 2026-05-28T22:34:48Z
 ---
 
 ## Genel Bakış

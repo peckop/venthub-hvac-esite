@@ -3,8 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\authority\VideoAuthority.tsx
-skeleton_hash: 3a9367f9d49670fc
-generated_at: 2026-05-23T21:54:50Z
+skeleton_hash: ab89d91ee94c3aeb
+entity_hashes:
+  func:VideoAuthority: e820e802f63e86c2
+  overview: 6991295f943a61c1
+  style_tokens: ee9eb5151ad04adf
+generated_at: 2026-05-28T22:35:41Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### VideoAuthority
 **Ne yapar**: P01-012: VideoAuthority Merkezi video yönetim bileşeni. Farklı sağlayıcılardan (Cloudflare, YouTube) gelen videoları tek bir standartta render eder.  
@@ -87,6 +91,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-t`, `bg-primary-navy/80`, `bg-slate-100`, `bg-slate-900`, `from-black/60`, `text-slate-400`, `text-white`, `text-white/80`, `text-xs`, `to-transparent`
-- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-col`, `from-black/60`, `group-hover:opacity-100`, `h-full`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `overflow-hidden`, `p-2`, `p-4`, `relative`
-- **Responsive:** (yok)
+- **Renkler:** `bg-gradient-to-t`, `bg-primary-navy/80`, `bg-slate-100`, `bg-slate-900`, `from-black/60`, `hover:text-white`, `text-slate-400`, `text-white`, `text-white/80`, `text-xs`, `to-transparent`
+- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-col`, `from-black/60`, `h-full`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `overflow-hidden`, `p-2`, `p-4`, `relative`, `w-full`
+- **Varyant/Responsive:** `group-hover:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${className`, `blur-sm`, `font-black`, `font-bold`, `group`, `group-hover:opacity-100`, `inset-0`, `object-cover`, `opacity-0`, `opacity-50`, `pointer-events-auto`, `pointer-events-none`, `rounded-2xl`, `rounded-full`, `space-x-2`

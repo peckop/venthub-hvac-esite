@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\calculators\StepIndicator.tsx
 skeleton_hash: 30b5aabc3b20c3fd
-generated_at: 2026-05-23T21:56:30Z
+entity_hashes:
+  func:StepIndicator: 203f6e11e7ae2ca6
+  overview: 4bdcabdf1533e7e3
+  style_tokens: a71e92d8d5570ada
+generated_at: 2026-05-28T22:35:43Z
 ---
 
 ## Genel Bakış
@@ -30,7 +34,7 @@ StepIndicator bileşeni, steps, currentStep ve onStepClick prop'larının belirl
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### StepIndicator
 **Ne yapar**: Wizard veya çok adımlı formlarda kullanıcıya hangi adımda bulunduğunu, tamamlanan adımları ve gelecek adımları gösteren bir adım göstergesi bileşeni render eder.  
@@ -97,4 +101,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gray-200`, `bg-primary-navy`, `bg-success-green`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-steel-gray/70`, `text-white`, `text-xs`
 - **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `h-0.5`, `h-10`, `h-2`, `h-full`, `hidden`, `items-center`, `justify-between`, `justify-center`, `left-0`, `lg:block`, `md:flex`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${isActive`, `${isClickable`, `${isCompleted`, `:`, `cursor-default`, `cursor-pointer`, `duration-300`, `duration-500`, `font-medium`, `font-semibold`, `group`, `hover:scale-110`, `inset-y-0`, `isActive`, `mb-2`

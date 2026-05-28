@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\pdfGenerator.ts
 skeleton_hash: f96114bf98ce13c8
-generated_at: 2026-05-23T22:31:34Z
+entity_hashes:
+  func:arrayBufferToBase64: ac0cb07b30bf5c01
+  func:generateProductDatasheet: ad0f52b2a314b0b1
+  overview: 21e435fcd4d46430
+generated_at: 2026-05-28T22:37:58Z
 ---
 
 ## Genel Bakış
@@ -33,7 +37,7 @@ Bu PDF üretim modülü, ürün veri sayfası oluşturulması ve ham binary veri
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### generateProductDatasheet
 **Ne yapar**: Premium tasarım standartlarında ve Türkçe karakter desteğiyle HVAC ürünü için özel ürün veri sayfası (datasheet) PDF'i üreten ana PDF üretim servisidir. İstenen dil ve özelleştirmelere uygun olarak son kullanıcıya yönelik profesyonel ürün dokümanı oluşturur.
@@ -99,29 +103,6 @@ Bu PDF üretim modülü, ürün veri sayfası oluşturulması ve ham binary veri
   - `len` — byte dizisinin toplam uzunluğu
   - `i` — byte dizisi üzerinde döngü kuran sayaç değişkeni
 - **Dönüş**: string (giriş ArrayBuffer'ının base64 kodlanmış string halini döndürür)
-
----
-
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki `generateProductDatasheet()` fonksiyonu, oluşturduğu ürün veri sayfası verisini base64 formatına dönüştürmek amacıyla `arrayBufferToBase64` fonksiyonunu çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Bu modülü kullanan herhangi bir dış dosya, modül veya fonksiyon sağlanan veride belirtilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  generateProductDatasheet() → arrayBufferToBase64()
-
-```mermaid
-graph LR
-    generateProductDatasheet["generateProductDatasheet()"] --> arrayBufferToBase64["arrayBufferToBase64()"]
-```
 
 ---
 

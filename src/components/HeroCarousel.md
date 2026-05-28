@@ -8,7 +8,7 @@ entity_hashes:
   func:HeroCarousel: ab714744003cac86
   overview: 4f1991c46b287359
   style_tokens: 08751a5dc318cad7
-generated_at: 2026-05-27T18:05:10Z
+generated_at: 2026-05-28T22:35:48Z
 ---
 
 ## Genel Bakış

@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx
 skeleton_hash: a88f0daa446dde1f
-generated_at: 2026-05-23T22:25:15Z
+entity_hashes:
+  func:SnailFanModel: 43312a20c26f093f
+  overview: 6e44ab631bd58611
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:50Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Tarayıcıda çalışan React tabanlı 3D HVAC ürün modeli bileşenidir, proje
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SnailFanModel
 **Ne yapar**: VentHub HVAC projesinde kullanılan standart santrifüj (salyangoz) fan tipinin 3B modelini render eden React fonksiyonel bileşenini tanımlar ve döndürür. Ürün sayfalarında ilgili HVAC ekipmanının üç boyutlu olarak kullanıcılara sunulmasını sağlayan özel bileşen ailesinin bir parçasıdır, yalnızca salyangoz fan modelinin görselleştirilmesi için özel olarak geliştirilmiştir.
@@ -126,4 +130,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

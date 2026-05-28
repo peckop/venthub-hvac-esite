@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\format.ts
 skeleton_hash: a1aee483816db6d5
-generated_at: 2026-05-23T22:30:43Z
+entity_hashes:
+  func:formatCurrency: a5c5acb7b633147a
+  overview: 272343283b681615
+generated_at: 2026-05-28T22:37:51Z
 ---
 
 ## Genel Bakış
@@ -27,7 +30,7 @@ Bu i18n modülündeki formatCurrency fonksiyonu, para birimi değerlerinin hedef
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### formatCurrency
 **Ne yapar**: venthub-hvac projesinin i18n modülü içerisinde yer alan, gönderilen para değerini belirtilen dil ayarları ve özel biçimlendirme seçenekleri doğrultusunda uluslararası standartlara uygun para birimi formatına dönüştüren yardımcı bir fonksiyondur. Tüm uygulama genelinde tutarlı para biçimlendirmesi sağlamak amacıyla kullanılır, uluslararasılaştırma ihtiyaçlarını karşılamak için tasarlanmıştır.

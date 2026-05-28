@@ -11,6 +11,7 @@ import { toUIProductList, type DomainProduct } from '../../lib/type-converters'
 import { DbProduct, DbJson } from '../../types/db-rows'
 import { calculateAirCurtain } from '../../lib/hvacCalculations'
 import { Routes } from '../../utils/routes'
+import Image from 'next/image'
 
 // Types
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6
@@ -301,7 +302,13 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                             className="group block p-6 rounded-hvac-2xl bg-white border border-slate-100 hover:border-cyan-500/20 hover:shadow-2xl transition-shadow duration-500"
                                         >
                                             <div className="aspect-square relative mb-6 grayscale group-hover:grayscale-0 transition-transform">
-                                                <img src={p.image_url || ''} alt={p.name} className="w-full h-full object-contain" />
+                                                <Image 
+                                                    src={p.image_url || '/images/placeholder.png'} 
+                                                    alt={p.name || ''} 
+                                                    fill 
+                                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                                    className="object-contain" 
+                                                />
                                             </div>
                                             <div className="text-xs font-black uppercase tracking-widest text-cyan-600 mb-2">{t('needsWizard.matchScore', { score: p.matchScore })}</div>
                                             <h4 className="font-bold text-slate-900 mb-2 line-clamp-2">{p.name}</h4>

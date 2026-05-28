@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LoadingSpinner.tsx
 skeleton_hash: 1429988b8b8756c2
-generated_at: 2026-05-23T22:11:56Z
+entity_hashes:
+  func:LoadingSpinner: 420e244c3ab22ba8
+  overview: 055c22213f5fb1f9
+  style_tokens: b21c3354ed86bc3e
+generated_at: 2026-05-28T22:36:06Z
 ---
 
 ## Genel Bakış
@@ -25,7 +29,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### LoadingSpinner
 **Ne yapar**: LoadingSpinner, bir yükleme göstergesi (spinner) render eden bir React bileşenidir.  
@@ -72,16 +76,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `min-h-[400px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `border-2`, `border-primary-navy`, `border-t-transparent`
-- **Layout:** `flex`, `inline-block`, `items-center`, `justify-center`
-- **Responsive:** (yok)
+- **Layout:** `flex`, `inline-block`, `items-center`, `justify-center`, `min-h-400px`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `${sizeClasses[size]`, `animate-spin`, `rounded-full`

@@ -8,7 +8,7 @@ entity_hashes:
   func:BlockEditor: 214d29bf0d4fb6bd
   overview: 451c6f0d8f51e9a4
   style_tokens: bc113824a6724140
-generated_at: 2026-05-27T18:10:50Z
+generated_at: 2026-05-28T22:35:21Z
 ---
 
 ## Genel Bakış

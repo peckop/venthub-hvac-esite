@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutOrchestrator.ts
 skeleton_hash: ff7c7a77d0655691
-generated_at: 2026-05-25T09:58:19Z
+entity_hashes:
+  func:useCheckoutOrchestrator: 6b4ccd36fef055f6
+  overview: e38002628c0c705b
+generated_at: 2026-05-28T22:37:43Z
 ---
 
 ## Genel Bakış
@@ -24,7 +27,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useCheckoutOrchestrator
 **Ne yapar**: VentHub HVAC projesinin satın alma (checkout) akışını tek merkezden koordine eden React özel hook'udur. Tüm ödeme ve teslimat sürecindeki adım yönetimi, durum takibi, hata yönetimi ve ilgili servis entegrasyonlarının sorumluluğunu üstlenir, satın alma sürecinin farklı bileşenleri arasında tutarlı bir iletişim ve veri akışı sağlar. Kullanıcıların sepet içeriğiyle başlayıp siparişin başarıyla tamamlanmasına kadar geçen tüm adımlarda merkezi bir yönetim noktası olarak çalışır, proje içindeki tekrar eden kod kullanımını ortadan kaldırır.
@@ -86,74 +89,6 @@ type CheckoutOrchestrator = ReturnType<typeof useCheckoutOrchestrator>
   - `validateAddress` — adres objesini doğrulayan fonksiyon (aşağıda ayrı AST pointer’da tanımlı).
   - `handleNextStep` — checkout adımlarını ilerleten async fonksiyon (aşağıda ayrı AST pointer’da tanımlı).
 - **Dönüş**: Hook’un dışarıya döndürdüğü obje; içinde tüm state değerleri, setter’lar ve yardımcı fonksiyonlar bulunur (yan etkileri: UI’da gösterim ve veri akışı).
-
----
-
-### [N2_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::preFillCustomerInfoEffect
-- **params**: (none) – `useEffect` callback.
-- **ic_degiskenler**:
-  - `fullName` — `user.user_metadata?.full_name` değerinden elde edilen tam ad string’i; boş ise `''`.
-  - `parts` — `fullName.split(' ')` ile elde edilen ad parçalarının dizisi.
-- **Dönüş**: `void` (state setterları `setCustomerInfo` ile yan etki yaratır).
-
----
-
-### [N3_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::loadInvoiceProfilesEffect
-- **params**: (none) – `useEffect` callback.
-- **ic_degiskenler**:
-  - `rows` — `await listInvoiceProfiles()` çağrısından dönen `InvoiceProfile[]` dizisi.
-  - `defProfile` — `rows.find(r => r.is_default) || rows[0]`; varsayılan ya da ilk profil.
-  - `pType` — profil tipine göre `'individual'` ya da `'corporate'` olarak belirlenen tip.
-- **Dönüş**: `void` (state setterları `setSavedInvoiceProfiles`, `setInvoiceType`, `setInvoiceInfo` ile yan etki yaratır).
-
----
-
-### [N4_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::handleSelectInvoiceProfile
-- **params**: `(p: InvoiceProfile)`
-- **ic_degiskenler**:
-  - `p` — seçilen fatura profili objesi.
-  - `pType` — `p.profile_type` değerine göre `'individual'` ya da `'corporate'`.
-- **Dönüş**: `void` (state güncellemeleri ve `toast.success` ile yan etki).
-
----
-
-### [N5_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::loadAddressesEffect
-- **params**: (none) – `useEffect` callback.
-- **ic_degiskenler**:
-  - `rows` — `await listAddresses()` çağrısından dönen `UserAddress[]` dizisi.
-  - `defShip` — `rows.find(r => r.is_default_shipping)`; varsayılan gönderim adresi.
-  - `addr` — `defShip` verileriyle oluşturulan `CheckoutAddressInfo` objesi.
-- **Dönüş**: `void` (state setterları `setSavedAddresses`, `setShippingAddress`, `setBillingAddress` ile yan etki).
-
----
-
-### [N6_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::validateCustomerInfo
-- **params**: (none) – `useCallback` callback.
-- **ic_degiskenler**:
-  - `customerInfo` – dışarıdan kapalı değişken; ad, e‑posta, telefon vb.
-- **Dönüş**: `boolean` – tüm kontroller geçerse `true`, aksi takdirde `false` (hata durumunda `toast.error` ile yan etki).
-
----
-
-### [N7_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::validateAddress
-- **params**: `(address: CheckoutAddressInfo)`
-- **ic_degiskenler**:
-  - `address` – doğrulanacak adres objesi.
-  - `full` – `address.full_address` veya `address.fullAddress` birleşiminden temizlenmiş string.
-- **Dönüş**: `boolean` – adres geçerli ise `true`, aksi takdirde `false` (hata durumunda `toast.error` ile yan etki).
-
----
-
-### [N8_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::handleNextStep
-- **params**: `(initiatePayment: () => Promise<boolean | undefined>)`
-- **ic_degiskenler**:
-  - `step` – mevcut checkout adımı.
-  - `shippingAddress` – gönderim adresi objesi.
-  - `validateCustomerInfo` – müşteri bilgisi doğrulama fonksiyonu.
-  - `validateAddress` – adres doğrulama fonksiyonu.
-  - `setStep` – adım state’ini güncelleyen setter.
-  - `success` – `await initiatePayment()` sonucunda elde edilen boolean/undefined.
-- **Dönüş**: `Promise<void>` – adım geçişlerini yönetir, ödeme başarılıysa adımı 4’e yükseltir (yan etki: `setStep`).
 
 ---
 

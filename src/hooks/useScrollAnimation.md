@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useScrollAnimation.ts
 skeleton_hash: 99d2f3e7dcd66a94
-generated_at: 2026-05-23T22:30:37Z
+entity_hashes:
+  func:useScrollAnimation: 82da0eb2280833d9
+  overview: d9bfa1798829a924
+generated_at: 2026-05-28T22:37:49Z
 ---
 
 ## Genel Bakış
@@ -28,7 +31,7 @@ Bu modül, tarayıcı tabanlı uygulamalarda kullanılmak üzere tasarlanmış, 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useScrollAnimation
 **Ne yapar**: Scroll ile tetiklenen animasyonları yönetmek için tasarlanmış özel bir React hook'udur. IntersectionObserver API'sini kullanarak hedef DOM elemanının görünürlük durumunu takip eder, eleman kullanıcının viewport'una girdiğinde animasyonları tetiklemek için gereken tüm verileri tüketici bileşene sunar. Döndürdüğü referans ile hedef elemana kolayca bağlantı kurabilir, görünürlük state'i ile animasyon tetikleme koşulunu merkezi olarak yönetebilirsiniz.
@@ -51,7 +54,7 @@ Bu modül, tarayıcı tabanlı uygulamalarda kullanılmak üzere tasarlanmış, 
 ## SABİTLER
 - **scrollAnimationClasses** (object) — `{
     fadeUp: (isVisible: boolean) =>
-        `transition-all duration-700 ...`
+        `transition-colors duration-7...`
 
 ---
 

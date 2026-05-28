@@ -4,24 +4,21 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\config\orbitalCarouselConfig.ts
 skeleton_hash: a8316a8cfcf9cfd2
-generated_at: 2026-05-23T22:28:28Z
+entity_hashes:
+  overview: eca02fed19b4de2a
+generated_at: 2026-05-28T22:37:25Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin yapılandırma katmanında yer alan, yalnızca sabit yapılandırma verileri barındıran bir üst seviye script modülüdür. Projede kullanılan orbital karozel (döner taşıyıcı) bileşeninin tüm standart çalışma ayarlarını tek bir merkezde toplayan ORBITAL_CAROUSEL_CONFIG sabitini barındırır. Herhangi bir dış bağımlılığı, fonksiyonu, ortam değişkeni kullanımı ya da API/veri tabanı sorgusu bulunmaz, projenin bu bileşene ihtiyaç duyan tüm modülleri tarafından doğrudan erişilmek üzere tasarlanmıştır.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül, proje içindeki orbital carousel bileşeni için sabit yapılandırma nesnesi barındıran bir TypeScript yapılandırma modülüdür; tüm aksiyomlar, bu tek sabit nesnenin bağımlı modüller tarafından doğru şekilde kullanılabilmesi için var olması gereken koşulları kapsar.
-
-[Aksiyom 1]: Eğer ORBITAL_CAROUSEL_CONFIG nesnesi modül tarafından dışarı aktarılmamış (export edilmemiş) yoksa, bu yapılandırmayı kullanacak tüm bağımlı modüller nesneye erişemez ve çalıştırılamaz.
-[Aksiyom 2]: Eğer ORBITAL_CAROUSEL_CONFIG nesnesi, onu kullanan tüm modüllerin beklediği alan ve tür yapısına sahip değilse, TypeScript derleme sürecinde hata oluşur, derleme başarısız olur.
-[Aksiyom 3]: Eğer ORBITAL_CAROUSEL_CONFIG nesnesinin içindeki yapılandırma değerleri, orbital carousel bileşeninin çalışması için gereken temel koşulları karşılamıyorsa, ilgili bileşen hiç çalışmaz veya beklenen işlevini yerine getiremez.
+Bu modül, VentHub HVAC projesindeki orbital karousel (döner taşıyıcı) bileşeninin yapılandırma ayarlarını barındıran bir üst seviye sabit tanımlama dosyasıdır. Tek bir `ORBITAL_CAROUSEL_CONFIG` nesnesi dışa aktararak, bu yapılandırmaya ihtiyaç duyan tüm modüllere merkezi bir erişim noktası sunar. Dosyada herhangi bir işlev (fonksiyon), ortam değişkeni okuması veya dış API/veri tabanı sorgusu bulunmamakta olup, saf bir yapılandırma verisi deposu olarak tasarlanmıştır.
 
 ---
 
 
+
+---
+
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -42,9 +39,13 @@ type OrbitalCarouselConfig = typeof ORBITAL_CAROUSEL_CONFIG
 ---
 
 ## AST POINTERS
-- İşlenen dosyada tanımlı herhangi bir fonksiyon bulunmamaktadır.
-- Dosyada tanımlı tek sabit değer:
-  - `ORBITAL_CAROUSEL_CONFIG` — C:\Users\alize\venthub-hvac\src\config\orbitalCarouselConfig.ts dosyasında tanımlanmış object tipinde sabit konfigürasyon nesnesi
+
+Bu dosyada fonksiyon bulunmamaktadır. Dosya salt bir yapılandırma (config) dosyasıdır.
+
+### [N1_NASIL] AST Pointer: src/config/orbitalCarouselConfig.ts::ORBITAL_CAROUSEL_CONFIG (sabit)
+- **Tür**: `const ORBITAL_CAROUSEL_CONFIG` — orbital carousel bileşeninin konfigürasyon nesnesi
+- **İçerik**: Objelerden oluşan bir yapılandırma sabiti; fonksiyon, method veya hesaplama içermeyen statik veri tanımı
+- **Dönüş**: Yok (dışa aktarılan sabit nesne)
 
 ---
 

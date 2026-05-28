@@ -4,35 +4,51 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavUtilityRail.tsx
 skeleton_hash: c11c21aa3ef25bad
-generated_at: 2026-05-23T22:17:33Z
+entity_hashes:
+  func:NavUtilityRail: efe2f36f82cc6787
+  overview: 25d3844473822124
+  style_tokens: 66d394971c83165e
+generated_at: 2026-05-28T22:36:33Z
 ---
 
 ## Genel Bakış
-NavUtilityRail.tsx, uygulama içinde gezinti çubuğunun yanında ekstra işlevsellik sağlayan bir bileşendir. Bu bileşen, içeriği sarmalayarak stil ve düzen özelliklerini uygulayan bir kapsayıcı görevi görür.
+NavUtilityRail, navigasyon araç çubuğunun yanında ekstra işlevsellik sağlayan, içeriği sarmalayarak stil ve düzen uygulayan bir React sarmalayıcı bileşenidir. Modül, yalnızca children prop'unu alıp uygun bir konteyner içinde render ederek UI yapısını oluşturmaktadır.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Bileşenin temel işlevi, alınan çocuk elementleri uygun bir düzen içinde render etmektir.
+Modülün tek ve temel bileşeni, children prop'unu alarak utility rail alanını oluşturur.
 - NavUtilityRail
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, `children` prop'una dayalı olarak render işlemi yapar ve bu prop'un sağlanmasıyla ilgili varsayımlara dayanır.
 
-[Aksiyom 1]: Eğer `children` prop'u sağlanmazsa, component hiçbir şey render etmez (null/boş döndürür).  
-[Aksiyom 2]: Eğer `children` prop'u geçerli bir React öğesi (dizi, string, sayı veya başka bir component) değilse, çalışma zamanında React tarafından uyumsuz tip uyarısı veya hatası oluşabilir.
+Bu modül, sadece `children` prop'unu alarak render eden basit bir sarmalayıcı (wrapper) bileşendir. Hiçbir modül sabit tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+**[Aksiyom 1]:** Eğer `children` prop'u `undefined` veya `null` olarak verilirse, bileşen boş bir fragment veya null render eder; bileşen görünmez olur ancak hata vermez.
+
+**[Aksiyom 2]:** Eğer `children` prop'u geçerli bir React node (React elementi, string, number, fragment, array veya null) değilse (örneğin bir object veya function verilirse), React çalışma zamanında bir hata fırlatır.
+
+**[Aksiyom 3]:** Bu bileşen kendi başına herhangi bir navigasyon işlevselliği sağlamaz; sadece `children` içeriğini sarmalayan bir layout wrapper'ıdır. Navigasyon işlevselliği, `children` içindeki bileşenler tarafından sağlanmalıdır.
+
+**[Aksiyom 4]:** Bu bileşen, `className` veya `style` gibi ek prop'ları kabul etmez; sadece `children` prop'u ile çalışır. Stillendirme, üst bileşen veya CSS sınıfları tarafından kontrol edilmelidir.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### NavUtilityRail
-**Ne yapar**: NavUtilityRail, uygulama içinde navigasyon araç çubuğu (utility rail) bileşenini render eden bir React fonksiyonel bileşendir.  
-**Nasıl yapar**: Bileşen, props üzerinden gelen `children` öğelerini alır ve genellikle bir `<nav>` veya `<div>` konteyneri içinde yerleştirerek UI'yi oluşturur; stil ve düzenleme dışındaki mantık genellikle CSS veya başka stil dosyaları tarafından yönetilir.  
-**Parametreler**:  
-- children: React.ReactNode — Bileşenin içeriği olarak görüntülenecek JSX öğeleri veya metin.  
-**Dönüş**: React.FC<NavUtilityRailProps> — Render edilmiş utility rail öğesini temsil eden bir React elementi.
+
+**Ne yapar**: `NavUtilityRail`, navigasyon sisteminde yardımcı araç çubuğunu (utility rail) temsil eden bir React bileşenidir. Bu bileşen, genellikle yan tarafta yer alan ve kullanıcılara ek navigasyon seçenekleri veya yardımcı işlevler sunan bir konteyner görevi görür.
+
+**Nasıl yapar**: Fonksiyon, React functional component yapısıyla tanımlanmıştır. `children` prop'unu alarak, bileşen içine yerleştirilecek其他 alt bileşenleri veya içerikleri dinamik olarak render eder. Bu sayede farklı sayfa veya durumlarda farklı yardımcı araçlar gösterilebilir.
+
+**Parametreler**:
+- `children`: `React.ReactNode` — Bileşen içinde render edilecek olan alt bileşen veya içerikler. Bu prop, utility rail içerisinde gösterilecek yardımcı navigasyon elemanlarını veya araçları barındırır.
+
+**Dönüş**: `React.FC<NavUtilityRailProps>` — Tanımlı NavUtilityRailProps arayüzüne uygun bir React fonksiyonel bileşeni döner. Bileşen, children prop'u ile gelen içeriği renders eden bir yapıya sahiptir.
 
 ---
 
@@ -46,9 +62,9 @@ Bu modül, `children` prop'una dayalı olarak render işlemi yapar ve bu prop'un
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/navigation/NavUtilityRail.tsx::NavUtilityRail
-- **params**: children — destructured prop that receives the child elements to be rendered inside the utility rail container
+- **params**: `{ children }` — Bileşenin alt bileşenlerini/child'larını temsil eder, JSX olarak render edilir
 - **ic_degiskenler**: (yok)
-- **Dönüş**: React.ReactNode (JSX element representing the styled `<div>` wrapper)
+- **Dönüş**: JSX elemanı (`<div>` containing `{children}`) — children'ı ml-auto hizalı, bulanık arka planlı, yuvarlatılmış köşeli bir konteynır içine render eder
 
 ---
 
@@ -67,16 +83,13 @@ Bu modül, `children` prop'una dayalı olarak render işlemi yapar ve bu prop'un
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_14px_30px_-26px_rgba(15,23,42,0.45)]`
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - `rounded-hvac-lg`
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white/80`, `border-slate-200/80`
-- **Layout:** `backdrop-blur-md`, `flex`, `gap-1`, `items-center`, `justify-end`, `p-1`, `sm:gap-1.5`, `sm:p-1.5`
-- **Responsive:** `sm:` prefix kullanımları
+- **Layout:** `backdrop-blur-md`, `flex`, `gap-1`, `items-center`, `justify-end`, `p-1`, `shadow-hvac-nav-rail`, `sm:gap-1.5`, `sm:p-1.5`
+- **Varyant/Responsive:** `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `duration-500`, `ease-in-out`, `ml-auto`, `transition-colors`

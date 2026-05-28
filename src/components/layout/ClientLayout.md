@@ -4,48 +4,50 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\layout\ClientLayout.tsx
 skeleton_hash: d3b4d3734259a93f
-generated_at: 2026-05-23T22:09:53Z
+entity_hashes:
+  func:ClientLayout: 6950fd4597251d25
+  func:ClientLayoutInner: 23353a9d63803b3a
+  func:NavigationTracker: 42dc03a7f1389152
+  func:Providers: 17b4bbfa6b876fcf
+  overview: a03fb83dd971b4d9
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:18Z
 ---
 
 ## Genel Bakış
-Bu modül, istemci tarafı uygulamasının temel yapısını ve ortak işlevselliğini sağlar. React bileşenleri aracılığıyla sağlayıcıları (providers) yapılandırır, gezinti izleme mantığını yönetir ve sayfa düzenini (layout) tanımlayan iç içe geçmiş bileşenleri bir araya getirir.
+Bu modül, istemci tarafı uygulamasının temel yapısını ve ortak işlevselliğini sağlar. React bileşenleri aracılığıyla uygulama genelindeki sağlayıcıları yapılandırır, gezinti izleme mantığını yönetir ve sayfa düzenini (layout) tanımlayan iç içe geçmiş bileşenleri bir araya getirir.
 
 ## Fonksiyon Grupları
 ### Sağlayıcı Yapılandırması
-Uygulama genelinde gerekli olan bağlam (context) sağlayıcıları oluşturur ve çocuk içeriği bu sağlayıcıların içinde render eder.
+Uygulama genelinde gerekli olan bağlam (context) sağlayıcılarını oluşturur ve çocuk içeriği bu sağlayıcıların içinde render ederek globally erişilebilir kılar.
 - Providers
 
 ### Gezinti İzleme
-Sayfa geçişlerini ve URL değişikliklerini izleyen mantığı içerir, böylece diğer bileşenler gezinti durumuna göre tepki verebilir.
+Sayfa geçişlerini ve URL değişikliklerini izleyen mantığı içerir; böylece diğer bileşenler gezinti durumuna göre tepki verebilir.
 - NavigationTracker
 
 ### Düzen Bileşenleri
-Sayfa yapısının temel bloklarını oluşturur; dıştaki `ClientLayout` genel çerçeveyi tanımlarken, içteki `ClientLayoutInner` ise içerik alanının yerleşimini ve stilini yönetir.
+Sayfa yapısının temel bloklarını oluşturur; dıştaki `ClientLayout` bileşeni genel çerçeveyi tanımlarken, içteki `ClientLayoutInner` bileşeni ise içerik alanının yerleşimini ve stilini yönetir.
 - ClientLayout
 - ClientLayoutInner
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül, React tabanlı bir kullanıcı arayüzü bileşeni olduğu için React ortamının mevcut ve işlevli olması gerekir.
 
-- Eğer **Providers**, **NavigationTracker**, **ClientLayoutInner** veya **ClientLayout** fonksiyonlarından biri tanımlı değilse veya çağrılamıyorsa, modül çalışmaz ve çalışma zamanı hatası verir.  
-- Eğer **children** prop’u **React.ReactNode** türünde bir değerle sağlanmazsa (örneğin `undefined` veya yanlış tip), tip denetleyicisi hata üretir ve bileşen beklenen şekilde render olmaz.  
-- Eğer **React** kütüphanesi projeye dahil edilmezse veya JSX dönüştürücü aktif değilse, dosyadaki JSX sözdizimi tarayıcı tarafından yorumlanamaz ve modül yüklenemez.  
-- Eğer **ClientLayout** fonksiyonu dışa aktarım kısmında eksikse, diğer modüller bu bileşeni içeri aktaramaz ve kullanılamaz.  
-- Eğer **NavigationTracker** fonksiyonu taraf etkisi (örneğin olay dinleyici, zamanlayıcı) içeriyorsa, bu etkilerin çalışabilmesi için bir tarayıcı veya benzeri ortam (window, document gibi globals) mevcut olmalıdır.  
-- Eğer **ClientLayoutInner** fonksiyonu eksikse veya doğru şekilde tanımlanmazsa, **ClientLayout** içindeki görüntüleme mantığı bozulur ve beklenenden farklı bir çıktı üretir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Providers
-**Ne yapar**: Verilen `children` prop'ını render eder; genellikle uygulama genelinde sağlayıcı (provider) bileşenlerini sarmalamak için kullanılır.  
-**Nasıl yapar**: Fonksiyon, aldığı `children` öğesini doğrudan JSX içinde döndürür; ekstra mantık veya durum yönetimi içermez.  
-**Parametreler**:  
-- children: React.ReactNode — Render edilecek alt öğeler veya içerik  
-**Dönüş**: void (veya belirtilmemiş) – fonksiyon bir JSX elementi döndürür, bu yüzden etkili olarak render çıktısı üretir.
+**Ne yapar**: Uygulama genelinde kullanılacak olan bağlam (context) sağlayıcılarını çocuk bileşenlerin üzerine katmanlar halinde sararak, tüm alt bileşenlerin bu bağlam verilerine erişmesini sağlar.
+
+**Nasıl yapar**: Beş farklı sağlayıcıyı iç içe bir yapıda sıralar: I18nProvider → AuthProvider → CategoryProvider → CartProvider → ProjectProvider. Sıralama önemlidir çünkü dış katmandaki sağlayıcılar, iç katmanlardaki sağlayıcıların verilerine erişebilir. `{children}` en iç katmanda yer alarak tüm bağlam verilerini miras alır.
+
+**Parametreler**:
+- `children`: `React.ReactNode` — Bu sağlayıcıların sarmalayacağı tüm alt bileşenlerin düğüm yapısıdır. Tüm uygulama içeriği bu parameter aracılığıyla sağlayıcılara dahil edilir.
+
+**Dönüş**: JSX yapısı döndürür. Doğrudan `{children}` düğümünü, sağlanan bağlam katmanlarının içine yerleştirilmiş biçimde render eder.
 
 ### NavigationTracker
 **Ne yapar**: `useSearchParams` hook'u üzerinden geçerli URL arama parametrelerini izleyerek navigasyon değişikliklerini takip eder.  
@@ -71,36 +73,36 @@ Bu modül, React tabanlı bir kullanıcı arayüzü bileşeni olduğu için Reac
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::Providers
-- **params**: children — React.ReactNode, the child elements to wrap with all context providers
-- **ic_degiskenler**: (none)
-- **Dönüş**: JSX.Element (the nested provider tree wrapping `children`)
+### [N1_NASIL] AST Pointer: ClientLayout.tsx::Providers
+- **params**: `{ children }: { children: React.ReactNode }`
+- **ic_degiskenler**: (yok — sadece JSX döndürür, hiçbir iç değişken tanımlamaz)
+- **Dönüş**: JSX — `I18nProvider > AuthProvider > CategoryProvider > CartProvider > ProjectProvider` sarmalayıcı zincirini oluşturup `children`'ı en içe yerleştirir
 
-### [N2_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::NavigationTracker
-- **params**: (none)
+### [N2_NASIL] AST Pointer: ClientLayout.tsx::NavigationTracker
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `pathname` — current URL pathname from `usePathname()` hook
-  - `searchParams` — URL search parameters from `useSearchParams()` hook
-  - `handlePopState` — function that writes `vh_is_pop=true` to sessionStorage on `popstate`
-  - `handleInteraction` — function that writes `vh_is_pop=false` to sessionStorage on mousedown/keydown events
-  - `updateStack` — function that reads/updates the navigation stack (`vh_nav_stack`) in sessionStorage based on the current full path
-  - `search` — stringified `searchParams` value or empty string
-  - `hash` — `window.location.hash` value or empty string
-  - `currentFullPath` — concatenation of `pathname`, `search`, and `hash` representing the full current URL
-  - `stack` — array of strings holding the navigation history retrieved from sessionStorage
-  - `lastItem` — last element of the `stack` array (`stack[stack.length‑1]`)
-  - `secondLastItem` — second‑to‑last element of the `stack` array (`stack[stack.length‑2]`)
-- **Dönüş**: null (the component renders nothing; its purpose is purely side‑effects)
+  - `pathname` — `usePathname()` hook'undan gelen mevcut URL path'i; navigasyon stack mantığında sayfa kimliği olarak kullanılır
+  - `searchParams` — `useSearchParams()` hook'undan gelen URL arama parametreleri; query string'i olarak tam yola eklenir
+  - `handlePopState` — arrow function; tarayıcı geri/ileri butonu tetiklendiğinde `sessionStorage`'a `vh_is_pop` = `'true'` yazar
+  - `handleInteraction` — arrow function; `mousedown` ve `keydown` olaylarında `sessionStorage`'a `vh_is_pop` = `'false'` yazar
+  - `updateStack` — arrow function; navigasyon geçmişini `sessionStorage`'taki `vh_nav_stack` JSON array'inde tutan ana mantık fonksiyonu
+  - `search` — `searchParams?.toString() || ''` sorgu dizgesi; mevcut query string'i temsil eder
+  - `hash` — `window.location.hash || ''` URL fragment'i; mevcut hash değerini temsil eder
+  - `currentFullPath` — `pathname + search + hash` birleştirilmesiyle oluşan tam URL yolu
+  - `stack` — `JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]')` sonucu; navigasyon geçmişi dizisi, `try-catch` ile parse edilir hata olursa boş diziye düşer
+  - `lastItem` — `stack[stack.length - 1]` erişimi; stack'in son elemanı, mevcut yolun tekrar eklenip eklenmeyeceğini kontrol eder
+  - `secondLastItem` — `stack[stack.length - 2]` erişimi; sondan ikinci eleman, geri tuşu durumunu tespit etmek için kullanılır
+- **Dönüş**: `null` — JSX üretmez; yan etkisi olarak `sessionStorage`'a navigasyon bilgisi yazar, `popstate`/`hashchange`/`mousedown`/`keydown` event listener'ları ekler, cleanup'ta temizler
 
-### [N3_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::ClientLayoutInner
-- **params**: children — React.ReactNode, the child elements to render inside the layout
-- **ic_degiskenler**: (none)
-- **Dönüş**: JSX.Element (`<MainLayout>` wrapping `children` and a `<Suspense>`‑wrapped `<NavigationTracker />`)
+### [N3_NASIL] AST Pointer: ClientLayout.tsx::ClientLayoutInner
+- **params**: `{ children }: { children: React.ReactNode }`
+- **ic_degiskenler**: (yok — sadece JSX döndürür, iç değişken tanımı yok)
+- **Dönüş**: JSX — `MainLayout` sarmalayıcısı içinde `children` ve `Suspense` sarmalayıcısı içinde `NavigationTracker` bileşenini render eder
 
-### [N4_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::ClientLayout
-- **params**: children — React.ReactNode, the child elements to pass down to `ClientLayoutInner`
-- **ic_degiskenler**: (none)
-- **Dönüş**: JSX.Element (`<ClientLayoutInner>` wrapping `children`)
+### [N4_NASIL] AST Pointer: ClientLayout.tsx::ClientLayout
+- **params**: `{ children }: { children: React.ReactNode }`
+- **ic_degiskenler**: (yok — sadece JSX döndürür, iç değişken tanımı yok)
+- **Dönüş**: JSX — `children`'ı `ClientLayoutInner` bileşeninin içine sararak döndürür
 
 ---
 
@@ -143,4 +145,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

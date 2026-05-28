@@ -9,7 +9,7 @@ entity_hashes:
   func:toggleBrand: 67afbe53ea415719
   overview: e7958b385edc9e41
   style_tokens: 57cd966a2983f774
-generated_at: 2026-05-27T18:10:59Z
+generated_at: 2026-05-28T22:35:42Z
 ---
 
 ## Genel Bakış

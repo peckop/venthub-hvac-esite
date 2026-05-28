@@ -9,7 +9,7 @@ entity_hashes:
   func:getInitialContent: d68640fe30ab6ebc
   overview: 03c5d2aeedc01c1b
   style_tokens: debe507a4c224f1e
-generated_at: 2026-05-27T18:10:48Z
+generated_at: 2026-05-28T22:35:21Z
 ---
 
 ## Genel Bakış

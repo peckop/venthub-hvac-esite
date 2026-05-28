@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx
 skeleton_hash: ad9dd151fef88357
-generated_at: 2026-05-23T22:24:37Z
+entity_hashes:
+  func:RoofFanModel: 00a33874d8f27b4a
+  overview: 3c2ffd258e9e4913
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:50Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu modül, VentHub HVAC projesinin ürünler bölümünde kullanılan çatı tip
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### RoofFanModel
 **Ne yapar**: Venthub HVAC projesinin ürünler bölümündeki 3B modelleme bileşenleri ailesinde yer alan RoofFanModel, çatı tipi fanların interaktif 3 boyutlu modelini kullanıcı arayüzünde görüntüleyen bir React bileşenidir. Kullanıcıların ürünlerin fiziksel görünümünü ve yapısal detaylarını dijital ortamda inceleyebilmesini sağlayarak ürün vitrini deneyimini geliştirir.
@@ -142,4 +146,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

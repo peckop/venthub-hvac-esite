@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminToolbar: af143a8f279e1c1e
   overview: abe2ed456058d747
   style_tokens: f914d27adccfd567
-generated_at: 2026-05-27T18:10:33Z
+generated_at: 2026-05-28T22:35:21Z
 ---
 
 ## Genel Bakış

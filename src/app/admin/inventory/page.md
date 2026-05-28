@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 3abd4459140e249f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-27T17:59:14Z
+generated_at: 2026-05-28T22:35:04Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,19 @@ Bu grup, envanter sayfasının ana bileşenini dinamik olarak içe aktarır ve s
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için, verilen fonksiyon imzası ve modül sabitleri temelinde aşağıdaki mimari varsayımlar tanımlanmıştır:
+
+[Aksiyom 1]: Eğer `PageComponent` sabiti (çağrılabilir fonksiyon/bileşen) yoksa veya geçerli bir React bileşeni değilse, `Page` fonksiyonu sayfayı doğru şekilde render edemez ve uygulama hata verir.
+
+[Aksiyom 2]: Eğer `PageComponent`'i dinamik olarak yükleyen `import()` promise'i başarısız olursa (örn: modül dosyası mevcut değilse, ağ hatası oluşursa), `Page` fonksiyonu hata durumunu işlemezse kullanıcıya boş veya bozuk bir sayfa gösterilir.
+
+[Aksiyom 3]: Eğer `Page` fonksiyonu çağrılmazsa, envanter sayfası hiçbir zaman tarayıcıda oluşturulmaz ve kullanıcı erişemez.
+
+[Aksiyom 4]: Eğer `PageComponent` asenkron olarak yükleniyorsa, yüklenme tamamlanana kadar sayfada bir yükleme göstergisi (skeleton/spinner) gösterilmesi beklenir; aksi halde kullanıcı boş bir sayfa ile karşılaşır.
+
+> **Not:** Bu aksiyomlar, yalnızca `Page()` fonksiyon imzası ve `PageComponent` sabitinin varlığı referans alınarak çıkarılmıştır. Fonksiyon gövdesindeki uygulama detayları bilinmediğinden, spesifik hata işleme mekanizmaları veya yükleme durumu hakkında kesin bir aksiyom tanımlanamamaktadır.
 
 ---
 

@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\breadcrumbUtils.ts
 skeleton_hash: 118288454cb930a5
-generated_at: 2026-05-23T22:33:34Z
+entity_hashes:
+  func:buildCategoryBreadcrumb: 75f26731c077f8ae
+  overview: f70a9db5a198b67e
+generated_at: 2026-05-28T22:38:44Z
 ---
 
 ## Genel Bakış
@@ -27,7 +30,7 @@ Bu modül, domain kategori nesnelerinden ekmek kırıntısı (breadcrumb) listel
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### buildCategoryBreadcrumb
 **Ne yapar**: Kategori sayfaları için gezinme amacıyla kullanılacak breadcrumb (ekmek kırıntısı) öğeleri listesi oluşturan bir yardımcı fonksiyondur. Web sitesi içi gezinme deneyimini iyileştirmek amacıyla kullanıcının o anda bulunduğu kategori hiyerarşisini net bir şekilde görmesini sağlayan, kullanılmaya hazır navigasyon öğeleri üretir. Null veya undefined olabilecek kategori verilerini de güvenli bir şekilde işleyerek uygulama içi hataların önüne geçer.

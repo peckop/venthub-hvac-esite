@@ -4,7 +4,14 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx
 skeleton_hash: bc305732fcc469c5
-generated_at: 2026-05-23T22:25:40Z
+entity_hashes:
+  func:EdgeOverlay: 48aefc8964111cb4
+  func:InteractivePart: d4921a7aaa094ed5
+  func:MountingChassis: 3daf7b9afda8d603
+  func:SilentChannelFanModel: 98c6a822fa24c046
+  overview: a2db499a1d227db1
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:50Z
 ---
 
 ## Genel Bakış
@@ -39,7 +46,7 @@ Bu 3B sessiz kanal fanı modelini render eden React bileşeni, üç boyutlu geom
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### EdgeOverlay
 **Ne yapar**: SilentChannelFanModel 3B sahnesinde kullanılan, kenar çizimlerini üst katman olarak render eden React bileşenidir. Sessiz kanal fanı modelinin geometrik kenarlarının belirtilen stilde gösterilmesini sağlar.
@@ -121,113 +128,6 @@ Bu 3B sessiz kanal fanı modelini render eden React bileşeni, üç boyutlu geom
 
 ---
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx::MountingChassis
-- **params**: bodyHalfLen: number, neckLen: number, neckRad: number, bRad: number, material: THREE.Material, displayStyle: string
-- **ic_degiskenler**:
-  - `chassisWidth` — Şasi genişliği, boyut hesaplaması için kullanılır, neckRad * 2.2 olarak atanır
-  - `chassisLen` — Şasi uzunluğu, boyut hesaplaması için kullanılır, (bodyHalfLen + neckLen) * 2 olarak atanır
-  - `wallZ` — Yan duvarların Z ekseni konumu, duvar yerleşimi için hesaplanır
-  - `wallHeight` — Yan duvarların yüksekliği, boyut hesaplaması için kullanılır, bRad * 0.9 olarak atanır
-  - `baseThick` — Şasi tabanının kalınlığı, 0.012 olarak sabit tanımlanır
-  - `wallThick` — Yan duvarların kalınlığı, 0.012 olarak sabit tanımlanır
-  - `baseExtrudeSettings` — Taban geometrisinin ekstrüzyon ayarları, useMemo ile önbelleğe alınır
-  - `baseShape` — Şasi tabanının 2D şekli, içine yuva delikleri eklenmiş THREE.Shape nesnesi, useMemo ile önbelleğe alınır
-  - `wallExtrudeSettings` — Yan duvar geometrisinin ekstrüzyon ayarları, useMemo ile önbelleğe alınır
-  - `wallShape` — Yan duvarların 2D şekli, useMemo ile önbelleğe alınmış THREE.Shape nesnesi
-  - `EdgeOverlay` — Tüm şasi geometrilerine kenar çizimi eklemek için çağrılan alt component
-- **Dönüş**: Şasi elemanlarını içeren Three.js JSX grubu
-
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx::baseShapeAnonim
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `s` — Oluşturulan ana taban şekli, THREE.Shape nesnesi
-  - `w` — Taban şeklinin yarım genişliği, şekil köşelerini çizmek için kullanılır
-  - `l` — Taban şeklinin yarım uzunluğu, şekil köşelerini çizmek için kullanılır
-  - `slotW` — Taban üzerindeki yuvaların genişliği, delik oluşturmak için kullanılır
-  - `slotL` — Taban üzerindeki yuvaların uzunluğu, delik oluşturmak için kullanılır
-  - `slotR` — Yuva köşelerinin yuvarlatma yarıçapı, eğrisel kenarlar için kullanılır
-  - `xOff` — Döngü değişkeni, iki adet yuvanın X ekseni ofsetini tutar
-  - `hole` — Her yuva için oluşturulan THREE.Path nesnesi, ana şeklin delikler listesine eklenir
-- **Dönüş**: İçine yuva delikleri eklenmiş THREE.Shape nesnesi
-
----
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx::wallShapeAnonim
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `s` — Oluşturulan yan duvar ana şekli, THREE.Shape nesnesi
-  - `w` — Duvar şeklinin yarım genişliği, şekil köşelerini çizmek için kullanılır
-  - `h` — Duvar şeklinin yüksekliği, şekil köşelerini çizmek için kullanılır
-- **Dönüş**: Tamamlanmış yan duvar THREE.Shape nesnesi
-
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx::InteractivePart
-- **params**: name: string, children: React.ReactNode, onPartClick: function, onHover: function, hiddenParts: string[], isolatedPart: string
-- **ic_degiskenler**:
-  - `hovered` — Parça üzerinde fare olup olmadığını tutan state değişkeni, useState ile oluşturulur
-  - `setHover` — hovered state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `useCursor` — Fare imlecini hover durumuna göre değiştirmek için çağrılan drei hook'u
-  - `hiddenParts?.includes(name)` — Parça gizli listesinde mi diye kontrol eden koşul
-  - `isolatedPart && isolatedPart !== name` — Sadece tek parça gösteriliyorsa bu parça o mu diye kontrol eden koşul
-  - `group` — Tüm alt elemanları gruplayan, etkileşim eventlerine sahip Three.js grubu
-- **Dönüş**: Koşullar sağlanmazsa null, aksi takdirde etkileşimli parça JSX'i
-
----
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx::InteractivePart_onClick
-- **params**: e: React.PointerEvent<THREE.Group>
-- **ic_degiskenler**:
-  - `e.stopPropagation()` — Event'in üst elemanlara yayılmasını engeller
-  - `onPartClick?.(name)` — Parça tıklandığında üst componentlere bildiren opsiyonel callback, parça adını gönderir
-- **Dönüş**: yok
-
----
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx::InteractivePart_onPointerOver
-- **params**: e: React.PointerEvent<THREE.Group>
-- **ic_degiskenler**:
-  - `e.stopPropagation()` — Event'in yayılmasını engeller
-  - `setHover(true)` — Fare parça üzerine gelince hover state'ini aktif eder
-  - `onHover?.(name)` — Üst componentlere fare bu parça üzerinde diye bildiren callback
-- **Dönüş**: yok
-
----
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx::InteractivePart_onPointerOut
-- **params**: e: React.PointerEvent<THREE.Group>
-- **ic_degiskenler**:
-  - `e.stopPropagation()` — Event'in yayılmasını engeller
-  - `setHover(false)` — Fare parça üzerinden çıkınca hover state'ini kapatır
-  - `onHover?.(null)` — Üst componentlere fare bu parça üzerinde artık değil diye bildiren callback
-- **Dönüş**: yok
-
----
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx::SilentChannelFanModel
-- **params**: explode: number, onPartClick: function, selectedPart: string, isolatedPart: string, hiddenParts: string[], displayStyle: string, enableTooltip: boolean
-- **ic_degiskenler**:
-  - `materials` — Fan parçalarının materyallerini döndüren özel hook, useFanMaterials ile alınır
-  - `hoveredPart` — Üzerinde fare olan parça adını tutan state değişkeni, useState ile oluşturulur
-  - `setHoveredPart` — hoveredPart state'ini güncelleyen setter fonksiyonu
-  - `bRad` — Fan dış gövdesinin ana yarıçapı, tüm boyut hesaplamaları için temel değer
-  - `sphereEndRad` — Fan gövdesi uç küresinin yarıçapı
-  - `neckRad` — Fan orta bağlantı bölümünün yarıçapı
-  - `bodyHalfLen` — Fan ana gövdesinin yarım uzunluğu
-  - `internalAssemblyLen` — Fan iç montajının toplam uzunluğu
-  - `phiLimit` — Küre geometrisinin kesme açısı, gövde şeklini oluşturmak için kullanılır
-  - `naturalHeight` — Gövdenin doğal yüksekliği, oran hesaplamaları için kullanılır
-  - `compensatoryStretch` — Gövde boyut bozukluklarını düzeltmek için hesaplanan uzama katsayısı
-  - `Html` — Tooltip göstermek için kullanılan drei Html componenti
-  - `InteractivePart` — Tüm fan parçalarını sarmalayan etkileşimli component
-  - `MountingChassis` — Montaj şasisini render eden alt component
-  - `EdgeOverlay` — Tüm geometrilere kenar çizimi ekleyen component
-- **Dönüş**: Tüm fan modelini içeren ana Three.js JSX grubu
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -267,4 +167,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

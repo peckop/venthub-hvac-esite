@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\buildPaymentRequest.ts
 skeleton_hash: d8e58db5a87487ca
-generated_at: 2026-05-23T22:40:19Z
+entity_hashes:
+  func:buildPaymentRequest: 874080c807e1dee1
+  overview: 8c8c4c1fa405942e
+generated_at: 2026-05-28T22:40:07Z
 ---
 
 ## Genel Bakış
@@ -17,17 +20,11 @@ Modülün temel sorumluluğu olan ödeme talebi oluşturma işlemini gerçekleş
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu müşteri tarafı ödeme talebi oluşturma modülü, sipariş ödeme sürecini başlatmak için ödeme sağlayıcılarının işleyebileceği geçerli bir istek nesnesi üretmek üzere tasarlanmıştır; tüm işlevselliği giriş verilerinin bütünlüğüne ve çalışma ortamının erişim izinlerine bağlıdır.
 
-[Aksiyom 1]: Eğer fonksiyona iletilen `args` nesnesi `BuildPaymentArgs` tip tanımına uygun yapıya sahip değilse, ödeme talebi nesnesi doğru şekilde yapılandırılamaz ve ödeme süreci kesintiye uğrar.
-[Aksiyom 2]: Eğer `args` nesnesi içerisinde ödeme işlemi için zorunlu olan temel alanlar (kullanıcı kimliği, sipariş tutarı, teslimat/fatura adresi vb.) eksik veya hatalıysa, oluşturulan ödeme talebi ödeme sağlayıcısı tarafından reddedilir.
-[Aksiyom 3]: Eğer modülün çalıştığı istemci (client) ortamında entegre edilen ödeme sağlayıcılarının API'lerine istek göndermek için gerekli CORS izinleri yoksa, oluşturulan ödeme talebi ile ödeme başlatılamaz, istek tarayıcı tarafından engellenir.
-[Aksiyom 4]: Eğer modül, ödeme sağlayıcılarının kabul ettiği standart veri formatlarına uygun yapılandırılmamışsa, üretilen ödeme talebi geçersiz sayılarak sipariş süreci sonlanır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### buildPaymentRequest
 **Ne yapar**: VentHub HVAC platformunun ödeme adımında çalışan bu fonksiyon, checkout sürecinde toplanan tüm verilerden geçerli, servisler tarafından kabul edilebilir bir ödeme talebi nesnesi oluşturur. Ödeme işlemlerinin sorunsuz başlatılabilmesi için yerel sistem verilerini harici ödeme sağlayıcılarının standartlarına uygun hale getirme görevini üstlenir. Checkout akışının kritik bir parçası olarak, eksik veya hatalı veri kaynaklı ödeme hatalarının önüne geçmek için standartlaştırılmış bir istek yapısı sunar.

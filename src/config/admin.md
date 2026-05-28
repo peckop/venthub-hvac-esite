@@ -4,7 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\config\admin.ts
 skeleton_hash: 18e39c650595c52a
-generated_at: 2026-05-23T22:28:46Z
+entity_hashes:
+  func:checkAdminAccess: 0195cef58edf96a2
+  func:getUserRole: dc4585911f66490b
+  func:isAdminByEmail: 97d57e6b9c4cf9a2
+  func:isDevAdmin: 527f404e6ee96806
+  func:listAdminUsers: 808d0c796a469da9
+  func:setUserAdminRole: 34515a99f07fc282
+  overview: 3d7af3e502cf1294
+generated_at: 2026-05-28T22:37:31Z
 ---
 
 ## Genel Bakış
@@ -33,15 +41,19 @@ Bu modül, VentHub HVAC sisteminin yönetici erişim kontrolünü ve rol yöneti
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getUserRole
-**Ne yapar**: Veritabanından belirtilen kullanıcının rolünü getirir, opsiyonel olarak sağlanan kullanıcı e-postasını ID ile rol erişimi sağlanamadığında fallback olarak kullanabilir. Tüm kimlik doğrulama ve yetkilendirme akışlarında kullanıcının sahip olduğu yetki seviyesini belirlemek için kullanılan temel asenkron fonksiyondur.
-**Nasıl yapar**: Öncelikle zorunlu parametre olarak aldığı kullanıcı ID'si ile veritabanı sorgusu gerçekleştirir. Eğer ID üzerinden kullanıcı rolünü başarıyla çekemezse, opsiyonel olarak sağlanan kullanıcı e-postasını kullanarak aynı sorguyu tekrarlar. Asenkron yapısı sayesinde tüm işlem tamamlanana kadar promise döndürür, işlem bittikten sonra rol bilgisini iletir.
+
+**Ne yapar**: Belirli bir kullanıcının rolünü (super_admin, admin, user vb.) belirler. Fonksiyon, veritabanından rol bilgisini çekerken aynı zamanda e-posta tabanlı bir güvenlik ağı sunar. Bu sayede veritabanı erişiminin olmadığı veya hata oluştuğu durumlarda bile admin kullanıcıların doğru şekilde tanımlanmasını sağlar.
+
+**Nasıl yapar**: Fonksiyon öncelikle opsiyonel olarak gelen e-posta adresini kontrol eder. Eğer e-posta adresi `isAdminByEmail` fonksiyonu tarafından onaylanırsa, özel super_admin e-postaları (`recep.varlik@gmail.com`, `recepvarlk@gmail.com`) için `'super_admin'`, diğer onaylı e-postalar için `'admin'` döner. E-posta kontrolü başarısız olursa veya sağlanmamışsa, Supabase veritabanından `user_profiles` tablosunda ilgili kullanıcının `role` alanını sorgular. Sorgu sonucunda hata oluşursa veya veri bulunamazsa varsayılan olarak `'user'` rolü döner. Tüm işlemler sırasında异常 durumları yakalanır ve konsola uyarı yazdırılarak `'user'` rolüyle devam edilir.
+
 **Parametreler**:
-- userId: string — Kontrol edilmek istenen kullanıcının benzersiz, sistemde tanımlı kimliği, zorunlu parametredir
-- userEmail?: string — Kullanıcı ID'si ile rol erişimi sağlanamadığında kullanılacak opsiyonel kullanıcı e-posta adresi
-**Dönüş**: Promise<string> — Asenkron olarak gerçekleşen işlem sonucunda kullanıcının rolünü içeren string tipinde bir promise döndürür
+- `userId`: `string` — Kimliği doğrulanmış kullanıcının benzersiz tanımlayıcısı. Veritabanında `user_profiles` tablosundaki `id` alanıyla eşleşir.
+- `userEmail`: `string` (opsiyonel) — Kullanıcının e-posta adresi. Veritabanı sorgusu başarısız olduğunda veya kullanıcı kaydı henüz oluşturulmamışken devreye giren fallback mekanizması için kullanılır.
+
+**Dönüş**: `Promise<string>` — Kullanıcının rolü olarak bir string döner. Olası değerler: `'super_admin'`, `'admin'`, `'user'`. Herhangi bir hata veya belirsizlik durumunda `'user'` döner.
 
 ### isAdminByEmail
 **Ne yapar**: E-posta adresi bazlı olarak kullanıcının admin yetkisine sahip olup olmadığını kontrol eden senkron fallback kontrol fonksiyonudur. Genellikle ana rol sorgusu çalışmadığında veya önbellekte rol bilgisi bulunamadığında yetki doğrulamak için kullanılır.
@@ -95,9 +107,13 @@ Admin user interface for type safety
 
 ## SABİTLER
 - **FALLBACK_ADMIN_EMAILS** (array) — `[
+
   'admin@venthub.com',
+
   'info@venthub.com',
+
   'alize@venthub.com',
+
   '...`
 
 ---
@@ -105,78 +121,62 @@ Admin user interface for type safety
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/config/admin.ts::getUserRole
-- **params**: ["userId: string", "userEmail?: string"]
+- **params**: `userId` (string), `userEmail` (optional string)
 - **ic_degiskenler**:
-  - `supabase` -- "../lib/supabase" modülünden dinamik olarak import edilen veritabanı istemcisi
-  - `data` -- supabase üzerinden user_profiles tablosundan çekilen kullanıcı rolü içeren veri nesnesi
-  - `error` -- supabase sorgusu sırasında oluşabilecek hata nesnesi
-- **Dönüş**: Promise<string>
+  - `data` — supabase'den `user_profiles` tablosundan sorgulanan kullanıcının `role` alanını tutar
+  - `error` — supabase sorgusundan dönen hata nesnesi; varsa hata yönetimi yapılır
+- **Dönüş**: `Promise<string>` — `'super_admin'`, `'admin'` veya `'user'`
 
 ### [N2_NASIL] AST Pointer: src/config/admin.ts::isAdminByEmail
-- **params**: ["email?: string"]
+- **params**: `email` (optional string)
 - **ic_degiskenler**: yok
-- **Dönüş**: boolean
+- **Dönüş**: `boolean` — email `FALLBACK_ADMIN_EMAILS` listesinde yer alıyorsa `true`
 
 ### [N3_NASIL] AST Pointer: src/config/admin.ts::isDevAdmin
-- **params**: (parametre yok)
+- **params**: parametre yok
 - **ic_degiskenler**:
-  - `isDev` -- Uygulamanın geliştirme ortamında çalışıp çalışmadığını tutan boolean değişken
-  - `isLocalhost` - Çalışma ortamının tarayıcı olup sunucu hostname'inin localhost olup olmadığını kontrol eden boolean değişken
-- **Dönüş**: boolean
+  - `isDev` — `process.env.NODE_ENV` değerinin `'development'` olup olmadığını kontrol eder
+  - `isLocalhost` — tarayıcı ortamında `window.location.hostname` değerinin `'localhost'` olup olmadığını kontrol eder
+- **Dönüş**: `boolean` — hem development modu hem localhost ortamı aynı anda aktifse `true`
 
 ### [N4_NASIL] AST Pointer: src/config/admin.ts::checkAdminAccess
-- **params**: ["user: { email?: string; user_metadata?: { role?: string } } | null"]
+- **params**: `user` — `{ email?: string; user_metadata?: { role?: string } } | null` türünde nesne veya null
 - **ic_degiskenler**:
-  - `lowerEmail` -- Kullanıcının email adresini küçük harfe çevirerek saklayan değişken
-  - `metadataRole` -- Kullanıcının user_metadata alanındaki rol bilgisini tutan değişken
-- **Dönüş**: boolean
+  - `lowerEmail` — `user.email` değerinin küçük harfe dönüştürülmüş hali; email karşılaştırmalarında kullanılır
+  - `metadataRole` — `user.user_metadata?.role` erişiminden elde edilen Supabase metadata rolü; izin verilen roller listesiyle kontrol edilir
+- **Dönüş**: `boolean` — kullanıcı admin erişimine sahipse `true`
 
 ### [N5_NASIL] AST Pointer: src/config/admin.ts::setUserAdminRole
-- **params**: ["userId: string", "role: string"]
+- **params**: `userId` (string), `role` (string)
 - **ic_degiskenler**:
-  - `supabase` -- "../lib/supabase" modülünden dinamik olarak import edilen veritabanı istemcisi
-  - `data` -- set_user_admin_role rpc çağrısının dönüş verisi
-  - `error` -- rpc çağrısı sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<boolean>
+  - `data` — `supabase.rpc('set_user_admin_role')` çağrısının başarılı sonucu; `true` ise atama başarılı demektir
+  - `error` — rpc çağrısından dönen hata nesnesi; varsa `false` döner
+- **Dönüş**: `Promise<boolean>` — rol ataması başarılıysa `true`, değilse `false`
 
 ### [N6_NASIL] AST Pointer: src/config/admin.ts::listAdminUsers
-- **params**: (parametre yok)
+- **params**: parametre yok
 - **ic_degiskenler**:
-  - `ensureSessionFresh` -- "../lib/ensureSessionFresh" modülünden dinamik import edilen oturum geçerliliğini yenileyen fonksiyon
-  - `supabase` -- "../lib/supabase" modülünden dinamik import edilen veritabanı istemcisi
-  - `rpcRes` -- admin_list_users rpc çağrısının tüm dönüş değeri
-  - `rpcErr` -- rpc dönüşündeki hata nesnesi
-  - `rpcData` -- rpc'den dönen AdminUser tipindeki veri dizisi
-- **Dönüş**: Promise<AdminUser[]>
+  - `rpcRes` — `supabase.rpc('admin_list_users')` çağrısının ham sonucu; hata ve data alanları barındırır
+  - `rpcErr` — `rpcRes` objesinden çıkarılan `error` alanı; varsa hata yönetimi yapılır
+  - `rpcData` — `rpcRes.data` alanından elde edilen `AdminUser[]` dizisi; RPC verisi boşsa boş dizi fallback'i kullanılır
+- **Dönüş**: `Promise<AdminUser[]>` — admin kullanıcıların listesi; hata durumunda boş dizi
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-getUserRole() fonksiyonu kullanıcı rolünü doğrulamak amacıyla yalnızca isAdminByEmail fonksiyonunu çağırır; checkAdminAccess() fonksiyonu yönetici erişim kontrolü yapmak için hem isAdminByEmail hem de isDevAdmin fonksiyonlarını çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı verisinde bu modülün fonksiyonlarını kullanan herhangi bir dış dosya veya fonksiyon belirtilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  checkAdminAccess() → isAdminByEmail()
-  checkAdminAccess() → isDevAdmin()
-  getUserRole() → isAdminByEmail()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    checkAdminAccess["checkAdminAccess()"] --> isAdminByEmail["isAdminByEmail()"]
-    checkAdminAccess["checkAdminAccess()"] --> isDevAdmin["isDevAdmin()"]
-    getUserRole["getUserRole()"] --> isAdminByEmail["isAdminByEmail()"]
+graph TD
+    admin_ts__checkAdminAccess["checkAdminAccess"]
+    admin_ts__getUserRole["getUserRole"]
+    admin_ts__isAdminByEmail["isAdminByEmail"]
+    admin_ts__isDevAdmin["isDevAdmin"]
+    admin_ts__listAdminUsers["listAdminUsers"]
+    admin_ts__setUserAdminRole["setUserAdminRole"]
+    admin_ts__checkAdminAccess --> admin_ts__isDevAdmin
+    admin_ts__getUserRole --> admin_ts__isAdminByEmail
+    admin_ts__checkAdminAccess --> admin_ts__isAdminByEmail
 ```
-
----
 
 ## NODE ID STANDARD
 

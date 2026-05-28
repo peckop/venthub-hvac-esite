@@ -8,14 +8,23 @@ entity_hashes:
   func:Page: 556d56b0dab8a0be
   overview: 3abd4459140e249f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-27T17:58:51Z
+generated_at: 2026-05-28T22:35:00Z
 ---
 
+## Genel Bakış
+Bu modül, admin panelindeki kupon yönetimi sayfasını sunan bir Next.js sayfa yönlendiricisidir. Tek bir `Page` bileşeni içermektedir ve bu bileşen, asıl kupon yönetim arayüzünü (`AdminCouponsPage`) dinamik olarak yükleyerek render eder.
 
+## Fonksiyon Grupları
+
+### Sayfa Yönlendirici
+Modülün tek sorumluluğu, admin kupon sayfasının tarayıcıda görüntülenmesini sağlamaktır. Dinamik import ile `AdminCouponsPage` bileşeni yüklenerek sayfa içerik olarak sunulur.
+- `Page`
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 

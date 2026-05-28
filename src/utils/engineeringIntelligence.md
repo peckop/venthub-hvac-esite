@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\engineeringIntelligence.ts
 skeleton_hash: 39367cd3f19a2c7e
-generated_at: 2026-05-23T22:34:07Z
+entity_hashes:
+  func:generateEngineeringSummary: e027e9800497ecbe
+  func:getEfficiencyInference: 05c710f909e9d6a9
+  func:getMotorInference: ef91c03ee063a82d
+  func:getNoiseInference: 9266c31de55779b5
+  overview: 4c2f93faa4920bde
+generated_at: 2026-05-28T22:38:46Z
 ---
 
 ## Genel Bakış
@@ -32,7 +38,7 @@ Bu mühendislik zekâsı modülü, ürünlere ait temel mühendislik metriklerin
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getNoiseInference
 **Ne yapar**: Giriş olarak alınan desibel cinsinden ses basınç seviyesini, insanların bu ses seviyesini nasıl algıladığına dair mühendislik standartlarına uygun yorumlar. Bu yorumu içeren bir çıkarım nesnesi döndürür, geçersiz giriş durumunda null değerini üretir.
@@ -84,65 +90,18 @@ Bu mühendislik zekâsı modülü, ürünlere ait temel mühendislik metriklerin
 
 ---
 
-### [N2_NASIL] AST Pointer: src/utils/engineeringIntelligence.ts::getEfficiencyInference
-- **params**: [efficiency?: number]
-- **ic_degiskenler**: yok
-- **Dönüş**: EngineeringInference | null
 
----
-
-### [N3_NASIL] AST Pointer: src/utils/engineeringIntelligence.ts::getMotorInference
-- **params**: [motorType?: string]
-- **ic_degiskenler**:
-  - `mt` — motorType parametresinin küçük harfe dönüştürülmüş hali, motor tipi içeren string kontrollerinde kullanılır
-- **Dönüş**: EngineeringInference | null
-
----
-
-### [N4_NASIL] AST Pointer: src/utils/engineeringIntelligence.ts::generateEngineeringSummary
-- **params**: [product: Product]
-- **ic_degiskenler**:
-  - `inferences: EngineeringInference[]` — Tüm geçerli mühendislik çıkarımlarını toplamak için başlatılan boş dizi, fonksiyonun nihai dönüş değeridir
-  - `specs` — product.technical_specs'ın tip kontrolünden geçirilerek Record<string, unknown> tipine dönüştürülmüş hali, teknik özelliklere güvenli erişim sağlar
-  - `product.noise_level` — Ürünün kayıtlı gürültü seviyesi, getNoiseInference fonksiyonuna parametre olarak geçilir
-  - `noise` — getNoiseInference'den dönen geçerli gürültü çıkarımı nesnesi, inferences dizisine eklenir
-  - `efficiencyValue` - Ürünün verimlilik değerini farklı olası property isimlerinden (efficiency, verilik, isi_gerikazanım_verimi) çeken genel değişken
-  - `numericEff` - efficiencyValue'nun string'ten temizlenerek sayısal türe dönüştürülmüş hali, geçerli sayı olup olmadığı kontrol edilir
-  - `eff` - getEfficiencyInference'den dönen geçerli verimlilik çıkarımı nesnesi, inferences dizisine eklenir
-  - `motorType` - Ürünün motor tipi değerini farklı olası property isimlerinden (motor_tipi, motor_type, elektrik_motoru) çeken genel değişken
-  - `motor` - getMotorInference'den dönen geçerli motor teknolojisi çıkarımı nesnesi, inferences dizisine eklenir
-  - `product.airflow_capacity` - Ürünün hava akışı kapasitesi, endüstriyel/yüksek akış etiketini oluşturmak için kullanılır
-  - `isIndustrial` - product.airflow_capacity'nin 2000'den büyük olup olmadığını belirten boolean, kullanılacak i18n anahtarlarını seçer
-- **Dönüş**: EngineeringInference[]
-
----
-
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-generateEngineeringSummary() fonksiyonu, mühendislik özeti oluşturmak için dosya içindeki üç yardımcı fonksiyon olan getEfficiencyInference, getNoiseInference ve getMotorInference fonksiyonlarını çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veride bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  generateEngineeringSummary() → getEfficiencyInference()
-  generateEngineeringSummary() → getMotorInference()
-  generateEngineeringSummary() → getNoiseInference()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    generateEngineeringSummary["generateEngineeringSummary()"] --> getEfficiencyInference["getEfficiencyInference()"]
-    generateEngineeringSummary["generateEngineeringSummary()"] --> getMotorInference["getMotorInference()"]
-    generateEngineeringSummary["generateEngineeringSummary()"] --> getNoiseInference["getNoiseInference()"]
+graph TD
+    engineeringIntelligence_ts__generateEngineeringSummary["generateEngineeringSummary"]
+    engineeringIntelligence_ts__getEfficiencyInference["getEfficiencyInference"]
+    engineeringIntelligence_ts__getMotorInference["getMotorInference"]
+    engineeringIntelligence_ts__getNoiseInference["getNoiseInference"]
+    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getNoiseInference
+    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getEfficiencyInference
+    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getMotorInference
 ```
-
----
 
 ## NODE ID STANDARD
 

@@ -9,7 +9,7 @@ entity_hashes:
   func:handleSubmit: 460293fdfa9263b6
   overview: 230126d511311554
   style_tokens: 90202b3fc6cca016
-generated_at: 2026-05-27T18:30:20Z
+generated_at: 2026-05-28T22:40:06Z
 ---
 
 ## Genel Bakış

@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ScrollToTop.tsx
 skeleton_hash: b72ab5d4ecf79309
-generated_at: 2026-05-23T22:27:04Z
+entity_hashes:
+  func:ScrollToTop: 67a45bb41004286e
+  overview: 3fbf0b01314ba145
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:37:05Z
 ---
 
 ## Genel Bakış
@@ -18,16 +22,20 @@ Modülün tüm sorumluluğunu üstlenen tek ana bileşendir, uygulama içindeki 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu frontend ScrollToTop bileşeni, uygulama içi istemci tarafı rota değişiklikleri algılandığında görünür pencerenin scroll pozisyonunu en üste taşımak üzere tasarlanmıştır, doğru çalışması için uygulama mimarisi ve platform erişim koşullarının tamamının sağlanması zorunludur.
 
-[Aksiyom 1]: Eğer projede React Router veya benzeri istemci tarafı yönlendirme kütüphanesinin location değişikliğini izleyen entegrasyonu yoksa, rota geçişleri algılanamaz ve scroll pozisyonu hiçbir zaman sıfırlanmaz.
-[Aksiyom 2]: Eğer bileşen çalıştığı ortamda tarayıcının window nesnesi ve scrollTo() DOM API'sine erişemiyorsa (sunucu tarafı render (SSR) sırasında olduğu gibi), scroll işlemi gerçekleştirilemez ve uygulama çalışma zamanı hatası alır.
-[Aksiyom 3]: Eğer bu bileşen uygulamanın tüm rota değişikliklerini izleyebileceği bir üst seviye konumda (kök route bileşeni altı gibi) konumlandırılmamışsa, rota geçişlerini yakalayamaz ve görevini yerine getiremez.
-[Aksiyom 4]: Eğer proje içinde React'in temel hook'ları (özellikle rota değişikliği sonrası işlemleri tetikleyen useEffect) çalışmayacak şekilde bir yapı bozukluğu varsa, scroll sıfırlama işlemi hiçbir zaman aktif olmaz.
+Bu modül, React rota (routing) sistemiyle birlikte çalışarak sayfa değişimlerinde kaydırma pozisyonunu sıfırlayan bir UI bileşenidir. Aşağıdaki varsayımlar, fonksiyon gövdesinden ve eski dokümandan türetilen yapısal gerekliliklerdir.
+
+**[Aksiyom 1]:** Eğer React Router (`useLocation` veya eşdeğeri) bağlamı mevcut değilse, bileşen rota değişikliklerini algılayamaz ve kaydırma sıfırlama işlemi hiçbir zaman tetiklenmez.
+
+**[Aksiyom 2]:** Eğer `window` nesnesi veya DOM erişimi (tarayıcı ortamı) yoksa, bileşen kaydırma konumunu (`window.scrollTo` veya `scrollTop`) değiştiremez ve sayfa en üste taşınmaz.
+
+**[Aksiyom 3]:** Eğer bileşen React Hook yaşam döngüsünün (`useEffect`) dışında render edilirse veya uygun bağımlılık dizisi (dependency array) sağlanmazsa, rota değişiklikleri dinlenemez; yalnızca ilk yüklemede kaydırma gerçekleştirilir.
+
+**[Aksiyom 4]:** Eğer bileşen `<Router>` veya `<BrowserRouter>` hiyerarşisi dışında mount edilirse, rota bağlamı (`location`) boş veya geçersiz olur ve kaydırma sıfırlama tetiklenemez.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ScrollToTop
 **Ne yapar**: Uygulama içerisindeki rota değişiklikleri sırasında sadece tarayıcı geçmişine yeni bir giriş ekleyen PUSH tipi rota aksiyonlarında sayfayı anında en üste kaydırır. Geri dönüş gibi POP tipi rota değişikliklerinde hiçbir işlem yapmaz, tarayıcının kendi yerleşik kaydırma konumu geri yükleme (native scroll restorasyon) özelliğinin sorunsuz çalışmasına izin verir. Bu sayede yeni sayfalara geçildiğinde kullanıcılar sayfanın en başından başlamayı, önceki sayfalara döndüğünde ise kaldıkları konumdan devam etmeyi deneyimler.
@@ -48,18 +56,6 @@ Bu frontend ScrollToTop bileşeni, uygulama içi istemci tarafı rota değişikl
   - `useLayoutEffect` — React'in DOM güncellemelerinden hemen sonra çalışan efekt hook'u, pathname değiştiğinde scroll sıfırlama işlemini yönetmek için kullanılır
   - `[pathname]` — useLayoutEffect'in bağımlılık dizisi, yalnızca pathname değiştiğinde efektin yeniden çalışmasını sağlar
 - **Dönüş**: null, React bileşeni olarak herhangi bir DOM öğesi render etmez
-
----
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ScrollToTop.tsx::scrollResetEffectCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `isPop` — Geri dönüş (POP) navigasyonu olup olmadığını belirten boolean değişken; önce tarayıcı ortamında çalıştığını kontrol eder, ardından sessionStorage'daki 'vh_is_pop' bayrağının değerini doğrular
-  - `typeof window !== 'undefined'` — Sunucu tarafı çalışmalarda window nesnesine erişim hatasını önlemek için yapılan çalışma ortamı kontrolü
-  - `sessionStorage.getItem('vh_is_pop')` — Oturum deposundan POP navigasyonu bayrağını okumak için çağrılan tarayıcı API metodu
-  - `window.location.hash` — Mevcut sayfa URL'sinde hash anchor'u olup olmadığını kontrol etmek için kullanılan window nesnesinin location özniteliğinin hash değeri
-  - `window.scrollTo` — Sayfa kaydırmasını sol üst noktaya getirmek için çağrılan tarayıcı API'si, `{ top: 0, left: 0, behavior: 'auto' }` parametreleri ile anlık kaydırma işlemi gerçekleştirir
-- **Dönüş**: Eğer isPop true ise veya URL'de hash varsa erken dönüş yapar, açık bir dönüş değeri yoktur
 
 ---
 
@@ -86,4 +82,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

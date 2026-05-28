@@ -4,73 +4,93 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\CinematicProductShowcase.tsx
 skeleton_hash: cab5a4cfb9723539
-generated_at: 2026-05-23T22:05:49Z
+entity_hashes:
+  func:CinematicProductShowcase: 3aa8752ddebafcfc
+  func:Hotspot: de57d250f854e416
+  func:handleMouseLeave: 60d41c470a6d0032
+  func:handleMouseMove: 717aaec7fdab40a5
+  overview: cc9625ba5ae503da
+  style_tokens: a631f55105b3a4d3
+generated_at: 2026-05-28T22:36:14Z
 ---
 
 ## Genel Bakış
-CinematicProductShowcase modülü, ürünleri görsel olarak etkileşimli bir şekilde sunan bir bileşen kümesidir. Kullanıcı fare hareketlerini takip ederek ürün üzerindeki hotspot noktalarını vurgular ve detay bilgilerin gösterilmesini sağlar.
+CinematicProductShowcase, ürünleri sinematik ve etkileşimli bir şekilde sergileyen bir React bileşenidir. Hotspot noktaları aracılığıyla kullanıcıların ürün üzerindeki ilgi alanlarını keşfetmesini sağlar. Fare hareketlerine bağlı olarak hotspot'ların aktif durumunu dinamik olarak yönetir.
 
 ## Fonksiyon Grupları
 ### UI Bileşenleri
-Kullanıcı arayüzünü oluşturan ve ürün görsellerini, açıklamaları ile etkileşimli noktaları bir araya getiren fonksiyonlar bu grupta yer alır.
-- Hotspot
-- CinematicProductShowcase
+Ürün görselleri üzerindeki interaktif noktaları ve ana gösterim alanını oluşturan bileşenlerdir.
+- CinematicProductShowcase, Hotspot
 
-### Etkileşim İşleyicileri
-Fare hareketlerini izleyerek hotspotların aktif/pasif durumlarını güncelleyen ve kullanıcı deneyimini canlandıran fonksiyonlar bu grupta bulunur.
-- handleMouseMove
-- handleMouseLeave
+### Etkileşim Kontrolcüleri
+Fare girişlerini dinleyerek hotspot'ların görünürlük ve aktiflik durumlarını yöneten olay işleyicilerdir.
+- handleMouseMove, handleMouseLeave
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması gerekir.
 
-[Aksiyom 1]: Eğer `productImages` tanımsız veya boş bir dizi değilse, `CinematicProductShowcase` en az bir görüntü render edebilir; aksi takdirde görüntü gösterilemez ve bileşen boş görünebilir.  
-[Aksiyom 2]: Eğer `Hotspot` bileşenine `x` ve `y` sayısal değerler (piksel veya yüzde) verilmezse, hotspot konumu hesaplanamadığı için görselde doğru konumda görünmez veya taşabilir.  
-[Aksiyom 3]: Eğer `Hotspot`’e `label` prop’u string olarak verilmezse, tooltip veya açıklama metni boş veya tanımsız görünebilir.  
-[Aksiyom 4]: Eğer `Hotspot`’e `detail` prop’u string olarak verilmezse, detay içeriği boş görünebilir.  
-[Aksiyom 5]: Eğer `Hotspot`’e `isActive` prop’u boolean değeri verilmezse, aktif/pasif durum mantığı çalışmayacak ve görsel durum (örneğin renk, animasyon) beklenen şekilde güncellenmeyebilir.  
-[Aksiyom 6]: Eğer `Hotspot`’e `onToggle` prop’u bir fonksiyon verilmezse, hotspot üzerine tıklandığında durum değişikliği tetiklenmeyeceği için etkileşim işlevi kaybolur.  
-[Aksiyom 7]: Eğer `handleMouseMove` fonksiyonuna `React.MouseEvent` türünde bir nesne (clientX, clientY gibi özellikler içeren) geçilmezse, fare hareketi koordinatları okunamadığı için imleç takibi veya hover etkileri çalışmayabilir.  
-[Aksiyom 8]: Eğer `handleMouseLeave` fonksiyonu çağrılmadığı veya tanımsız bırakılırsa, fare bileşenin üzerinden çıktığında durum sıfırlanmayabilir (örneğin aktif hotspot kalmaya devam edebilir).  
-
-Bu varsayımlar, modülün mevcut fonksiyon imzaları ve `productImages` sabiti doğrultusunda türetilmiştir; dışarıdan eklenebilecek ek prop’lar, state yönetimi veya stil dosyaları hakkında varsayım yapılmamıştır.
+Bu modül, ürün görselleri üzerinde etkileşimli hotspot noktaları sunarak kullanıcı deneyimi sağlayan bir bileşen kümesidir.
 
 ---
 
-## FONKSIYON DETAYLARI
+**[Aksiyom 1]:** Eğer `productImages` dizisi boş veya tanımsız ise, `CinematicProductShowcase` bileşeni görüntülenecek ürün içeriği sunamaz ve boş bir gösterim oluşur.
+
+**[Aksiyom 2]:** Eğer `Hotspot` bileşenine `x` ve `y` koordinatları sağlanmazsa, hotspot noktası doğru konumda render edilemez ve görsel konumlandırma hatası oluşur.
+
+**[Aksiyom 3]:** Eğer `Hotspot` bileşenine `onToggle` callback fonksiyonu sağlanmazsa, kullanıcı hotspot üzerine tıklandığında `isActive` durumu değiştirilemez ve etkileşim çalışmaz.
+
+**[Aksiyom 4]:** Eğer `handleMouseMove` fonksiyonuna geçerli bir `React.MouseEvent` nesnesi ulaşmazsa, fare pozisyonu takip edilemez ve hotspot vurgulama mekanizması devre dışı kalır.
+
+**[Aksiyom 5]:** Eğer `Hotspot` bileşenine `label` veya `detail` değerleri sağlanmazsa, hotspot noktasının kullanıcılara gösterilecek açıklayıcı içeriği bulunmaz.
+
+**[Aksiyom 6]:** Eğer `handleMouseLeave` tetiklenmezse (fare bileşen alanı terk etmezse), aktif hotspot durumları sıfırlanmayabilir ve eski vurgulama ekranda kalabilir.
+
+**[Aksiyom 7]:** Eğer `productImages` dizisindeki elemanlar geçerli görsel referansları içermiyorsa, bileşen kırık görsel gösterimi ile karşılaşır.
+
+**[Aksiyom 8]:** Eğer `isActive` boolean tipinde sağlanmazsa, hotspot bileşeni aktif/pasif durumunu doğru şekilde yorumlayamaz.
+
+---
+
+### Domain-Specific Kurallar
+- `Hotspot` bileşeni minimum olarak `x`, `y`, `isActive`, `onToggle` değerlerine ihtiyaç duyar (konum ve etkileşim için zorunlu)
+- `label` ve `detail` opsiyonel görünse de, iyi bir UX için sağlanmalıdır
+- Fare etkileşimi `React.MouseEvent` tipinde olmalıdır (standart browser event)
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### Hotspot
-**Ne yapar**: Verilen koordinatlarda bir etiket ve detay gösteren etkileşimli bir nokta (hotspot) bileşeni render eder.  
-**Nasıl yapar**: Props olarak alınan `x` ve `y` değerlerini stil ile konumlandırma için kullanır, `label` ve `detail` içeriğini gösterir, `isActive` durumuna göre görsel étatsını değiştirir ve `onToggle` fonksiyonunu çağırarak durum değişikliğini dışarıya bildirir.  
-**Parametreler**:  
-- x: number — Hotspotun X eksenindeki konumu (piksel veya yüzde)  
-- y: number — Hotspotun Y eksenindeki konumu (piksel veya yüzde)  
-- label: string — Hotspotun üstünde gösterilecek kısa başlık metni  
-- detail: string — Hotspotun üzerine gelindiğinde veya tıklandığında gösterilecek daha uzun açıklama metni  
-- isActive: boolean — Hotspotun aktif olup olmadığını belirleyen durum bayrağı  
-- onToggle: () => void — Hotspotun aktif/pasif durumu değiştiğinde çağrılacak geri çağırım fonksiyonu  
-**Dönüş**: React.FC<HotspotProps> — Hotspot bileşeni, verilen props ile render edilerek döndürülür.
+**Ne yapar**: Hotspot bileşeni, belirli bir koordinatta (x, y) bir etiket ve detay bilgisi gösteren interaktif bir nokta oluşturur. Bu bileşen, aktif durumuna göre daha fazla bilgi sunabilir ve kullanıcı etkileşimi ile durumunu değiştirebilir.
+**Nasıl yapar**: Hotspot, onToggle fonksiyonunu çağırarak aktif hot spot'un durumunu değiştirir. Eğer zaten aktif olan hot spot tıklanırsa deaktif eder, aksi halde aktif eder. Bu mantık, setActiveHotspot fonksiyonu ile yönetim merkezinde saklanan bir duruma bağlıdır.
+**Parametreler**:
+- x: number — Hot spot'un yatay konumunu belirtir.
+- y: number — Hot spot'un dikey konumunu belirtir.
+- label: string — Hot spot'un üzerinde görünecek kısa etiket metni.
+- detail: string — Hot spot hakkında daha fazla bilgi sağlayan açıklama metni.
+- isActive: boolean — Hot spot'un şu anda aktif olup olmadığını belirten bayrak.
+- onToggle: () => void — Hot spot tıklandığında çağrılan, durumu değiştiren geri çağırma işlevi.
+**Dönüş**: React.FC<HotspotProps> — Hotspot bileşenini döndürür.
 
 ### CinematicProductShowcase
-**Ne yapar**: Sinematik bir ürün vitrini gösteren ana bileşeni render eder.  
-**Nasıl yapar**: Props almayıp, içindeki JSX yapısını doğrudan döndürerek ürün görselleri, açıklamalar ve etkileşimli öğeleri sunar.  
-**Parametreler**: (yok)  
-**Dönüş**: React.FC — Bileşen örneği, UI ağacına entegrasyon için hazır olarak döndürülür.
+**Ne yapar**: CinematicProductShowcase bileşeni, ürünleri sinematik bir şekilde sergileyen bir vitrin oluşturur. Bu bileşen, genellikle ana sayfada veya ürün sayfalarında kullanılarak ürünlerin görsel sunumunu zenginleştirir.
+**Nasıl yapar**: Bileşen, ürün verilerini alarak sinematik efektlerle birlikte görsel bir gösteri sunar. Animasyonlar ve geçişler kullanarak ürünleri dikkat çekici bir şekilde sunabilir. Detaylı uygulama iç mantığı, sağlanan bilgilerde yer almamaktadır.
+**Parametreler**: Parametre almaz.
+**Dönüş**: React.FC — CinematicProductShowcase bileşenini döndürür.
 
 ### handleMouseMove
-**Ne yapar**: Fare hareketi olayını yakalar ve ilgili işlemi gerçekleştirir.  
-**Nasıl yapar**: `React.MouseEvent` türünde gelen olay nesnesini alır, genellikle fare koordinatlarını okur ve bu bilgiyi state veya başka bir işlemle kullanır.  
-**Parametreler**:  
-- e: React.MouseEvent — Fare olay nesnesi, konum, tuş durumu ve diğer meta verileri içerir  
-**Dönüş**: void (veya bilinmiyor) — Fonksiyon bir değer döndürmez; yan etkisiyle durum güncellenir veya başka bir tetikleme yapılır.
+**Ne yapar**: handleMouseMove, fare hareketi olayını işleyerek bileşen içindeki fare konumunu günceller veya fare hareketine bağlı işlevsellik sağlar.
+**Nasıl yapar**: Bu işlev, farenin harekettiği her noktada çağrılır ve olay nesnesinden fare koordinatlarını alarak bileşenin durumunu güncelleyebilir. Fare hareketine bağlı animasyonlar, etkileşimler veya konum hesaplamaları yapabilir. Sağlanan bilgilerde iç mantık detayı bulunmamaktadır.
+**Parametreler**:
+- e: React.MouseEvent — Fare hareketi olayı nesnesini temsil eder ve fare konumu gibi bilgileri içerir.
+**Dönüş**: void — Fonksiyon bir değer döndürmez.
 
 ### handleMouseLeave
-**Ne yapar**: Fare öğenin sınırlarından çıktığında tetiklenen olay işleyicisini tanımlar.  
-**Nasıl yapar**: Parametre almaz; fare öğeden çıktığında çağrılır ve genellikle geçici efektleri sıfırlar veya state'i varsayılan hale getirir.  
-**Parametreler**: (yok)  
-**Dönüş**: void (veya bilinmiyor) — Fonksiyon bir değer döndürmez; yan etkisiyle öğenin görünümü veya durumu geri alınır.
+**Ne yapar**: handleMouseLeave, fare bileşenin alanından ayrıldığında çağrılan bir olay işleyicisidir ve fare bırakma durumunu yönetir.
+**Nasıl yapar**: Bu işlev, fare bileşenin sınırlarından çıktığında tetiklenir ve genellikle fare ile ilişkilendirilmiş geçici durumları sıfırlamak veya etkileşimleri sonlandırmak için kullanılır. Fare離開后, bileşenin görünümünü veya durumunu orijinal haline döndürebilir. İç mantık detayı sağlanmamıştır.
+**Parametreler**: Parametre almaz.
+**Dönüş**: void — Fonksiyon bir değer döndürmez.
 
 ---
 
@@ -99,53 +119,69 @@ Bu varsayımlar, modülün mevcut fonksiyon imzaları ve `productImages` sabiti 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/home/CinematicProductShowcase.tsx::Hotspot
-- **params**: x, y, label, detail, isActive, onToggle
+### [N1_NASIL] AST Pointer: CinematicProductShowcase.tsx::Hotspot
+- **params**: `x` — hotspot'in yatay yüzdesi (number), `y` — hotspot'in dikey yüzdesi (number), `label` — hotspot başlık metni (string), `detail` — hotspot açıklama metni (string), `isActive` — bu hotspot'in aktif olup olmadığı (boolean), `onToggle` — tıklanma durumunu toggogle eden callback fonksiyon
 - **ic_degiskenler**:
-  - `t` — translation function from useI18n used for labels and details
-- **Dönüş**: JSX element
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu
+- **Dönüş**: JSX element (button ile popup tooltip içeren absolute pozisyonlu div)
 
-### [N2_NASIL] AST Pointer: src/components/home/CinematicProductShowcase.tsx::CinematicProductShowcase
-- **params**: 
+---
+
+### [N2_NASIL] AST Pointer: CinematicProductShowcase.tsx::CinematicProductShowcase
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — translation function from useI18n
-  - `activeHotspot` — currently selected hotspot key (string | null)
-  - `setActiveHotspot` — setter for the activeHotspot state
-  - `activeImageIdx` — index of the currently displayed product image
-  - `setActiveImageIdx` — setter for the activeImageIdx state
-  - `containerRef` — ref to the container div used for mouse‑tracking
-  - `mouseX` — motion value representing normalized horizontal mouse offset (‑0.5 → 0.5)
-  - `mouseY` — motion value representing normalized vertical mouse offset (‑0.5 → 0.5)
-  - `springConfig` — configuration object for the spring animation (damping = 25, stiffness = 150)
-  - `rotateX` — spring‑based motion value for X‑rotation derived from mouseY
-  - `rotateY` — spring‑based motion value for Y‑rotation derived from mouseX
-  - `handleMouseMove` — event handler that updates mouseX/Y based on cursor position
-  - `handleMouseLeave` — event handler that resets mouse values and clears the active hotspot
-  - `currentHotspots` — array of hotspot objects for the active image (`productImages[activeImageIdx].hotspots`)
-- **Dönüş**: JSX element
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, sayfa içi metin çevirileri için kullanılır
+  - `activeHotspot` — şu an aktif olan hotspot'in key değeri veya null (useState<string | null>)
+  - `setActiveHotspot` — activeHotspot state'ini güncellemek için setter fonksiyonu
+  - `activeImageIdx` — şu an gösterilen ürün görselinin indeksi (useState<number>, başlangıç: 0)
+  - `setActiveImageIdx` — activeImageIdx state'ini güncellemek için setter fonksiyonu
+  - `containerRef` — 3D mouse hareketi için referans olan HTMLDivElement ref'i
+  - `mouseX` — mouse'un yatay konumunu Framer Motion ile takip eden motion value (useMotionValue, başlangıç: 0)
+  - `mouseY` — mouse'un dikey konumunu takip eden motion value (useMotionValue, başlangıç: 0)
+  - `springConfig` — spring animasyonu için yapılandırma nesnesi ({ damping: 25, stiffness: 150 })
+  - `rotateX` — mouseY motion value'sinden türetilen X- ekseni rotasyon değeri, spring ile yumuşatılmış ([-10, 10] aralığı)
+  - `rotateY` — mouseX motion value'sinden türetilen Y- ekseni rotasyon değeri, spring ile yumuşatılmış ([-15, 15] aralığı)
+  - `handleMouseMove` — mouse hareketlerini yakalayıp mouseX/mouseY'yi güncelleyen olay dinleyici fonksiyonu
+  - `handleMouseLeave` — mouse離開tığında mouseX, mouseY'yi sıfırlayıp activeHotspot'u temizleyen fonksiyon
+  - `currentHotspots` — productImages[activeImageIdx].hotspots ile o anki görselin hotspot dizisi
+- **Dönüş**: JSX element (section içinde 3D perspektif ürün görseli, hotspot'ler, görsel navigasyon thumbnail'leri ve metin içerik)
 
-### [N3_NASIL] AST Pointer: src/components/home/CinematicProductShowcase.tsx::handleMouseMove
-- **params**: e
+---
+
+### [N3_NASIL] AST Pointer: CinematicProductShowcase.tsx::handleMouseMove
+- **params**: `e` — React.MouseEvent (fare hareket olayı)
 - **ic_degiskenler**:
-  - `rect` — bounding rectangle of `containerRef.current`
-  - `x` — normalized horizontal offset (`(clientX‑left)/width‑0.5`)
-  - `y` — normalized vertical offset (`(clientY‑top)/height‑0.5`)
-- **Dönüş**: yok
+  - `rect` — containerRef.current.getBoundingClientRect() ile elde edilen DOM rect nesnesi, container'ın viewport içindeki pozisyon ve boyut bilgisi
+  - `x` — mouse'un container genişliğine göre normalize edilmiş yatay pozisyonu, -0.5 ile 0.5 arasında (formül: (e.clientX - rect.left) / rect.width - 0.5)
+  - `y` — mouse'un container yüksekliğine göre normalize edilmiş dikey pozisyonu, -0.5 ile 0.5 arasında (formül: (e.clientY - rect.top) / rect.height - 0.5)
+- **Dönüş**: yok (yan etki: mouseX.set(x) ve mouseY.set(y) ile 3D rotasyon değerlerini günceller)
 
-### [N4_NASIL] AST Pointer: src/components/home/CinematicProductShowcase.tsx::handleMouseLeave
-- **params**: 
-- **ic_degiskenler**: 
-- **Dönüş**: yok
+---
 
-### [N5_NASIL] AST Pointer: src/components/home/CinematicProductShowcase.tsx::Hotspot map callback (spot)
-- **params**: spot
-- **ic_degiskenler**: 
-- **Dönüş**: JSX element (returns `<Hotspot />`)
+### [N4_NASIL] AST Pointer: CinematicProductShowcase.tsx::handleMouseLeave
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — sadece üst kapsam değişkenlerine erişir)
+- **Dönüş**: yok (yan etki: mouseX ve mouseY'yi 0'a, activeHotspot'u null'a sıfırlar)
 
-### [N6_NASIL] AST Pointer: src/components/home/CinematicProductShowcase.tsx::Product image map callback (img, idx)
-- **params**: img, idx
-- **ic_degiskenler**: 
-- **Dönüş**: JSX element (returns `<button />`)
+---
+
+### [N5_NASIL] AST Pointer: CinematicProductShowcase.tsx::Hotspot.map callback
+- **params**: `spot` — productImages[activeImageIdx].hotspots dizisindeki tek bir hotspot nesnesi (içerir: key, x, y)
+- **ic_degiskenler**:
+  - `t` — üst kapsamdan (CinematicProductShowcase) gelen çeviri fonksiyonu
+  - `activeHotspot` — üst kapsamdan gelen aktif hotspot state'i
+  - `setActiveHotspot` — üst kapsamdan gelen state setter
+- **Dönüş**: Hotspot bileşeni JSX'i (key: `${activeImageIdx}-${spot.key}`, x, y, label, detail, isActive, onToggle)
+
+---
+
+### [N6_NASIL] AST Pointer: CinematicProductShowcase.tsx::productImages.map callback
+- **params**: `img` — productImages dizisindeki tek bir görsel nesnesi (içerir: src, label), `idx` — görselin dizideki indeksi
+- **ic_degiskenler**:
+  - `activeImageIdx` — üst kapsamdan gelen aktif görsel indeksi state'i
+  - `setActiveImageIdx` — üst kapsamdan gelen state setter
+  - `setActiveHotspot` — üst kapsamdan gelen hotspot state setter'ı
+- **Dönüş**: Thumbnail buton JSX'i (onClick ile görsel değiştirme, Image bileşeni, aktif duruma göre koşullu stil)
 
 ---
 
@@ -178,16 +214,13 @@ graph TD
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_0_15px_#22D3EE]`, `shadow-[0_0_20px_rgba(34,211,238,0.4)]`, `shadow-[0_20px_50px_rgba(0,0,0,0.5)]`
-- **height:** `h-[500px]`, `h-[600px]`, `h-[70%]`
-- **width:** `w-[500px]`, `w-[600px]`, `w-[70%]`
-- **spacing:** (yok)
-- **diğer:** `bg-[linear-gradient(rgba(56,189,248,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.03)_1px,transparent_1px)]`, `bg-[size:100px_100px]`, `blur-[120px]`, `blur-[150px]`, `drop-shadow-[0_50px_100px_rgba(0,0,0,0.8)]`, `hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]`, `inset-[-4px]`, `leading-[1.1]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-3xl`
+- `h-hvac-hero`, `hover:shadow-glow-lg`, `rounded-hvac-3xl`, `shadow-glow-md`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-cyan-500/50`, `bg-gradient-to-r`, `bg-indigo-500/10`, `bg-slate-900`, `bg-slate-900/95`, `bg-slate-950`, `bg-white`, `bg-white/10`, `bg-white/[0.01]`, `border-2`, `border-b`
-- **Layout:** `absolute`, `backdrop-blur-3xl`, `backdrop-blur-xl`, `bottom-0`, `bottom-10`, `bottom-full`, `flex`, `flex-col`, `flex-wrap`, `from-transparent`, `gap-20`, `gap-3`, `gap-4`, `gap-6`, `grid`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-cyan-500/50`, `bg-cyan-grid`, `bg-gradient-to-r`, `bg-grid-100`, `bg-indigo-500/10`, `bg-slate-900`, `bg-slate-900/95`, `bg-slate-950`, `bg-white`, `bg-white/1`, `bg-white/10`
+- **Layout:** `absolute`, `backdrop-blur-3xl`, `backdrop-blur-xl`, `bg-cyan-grid`, `bg-grid-100`, `bottom-0`, `bottom-10`, `bottom-full`, `drop-shadow-cinematic-drop`, `flex`, `flex-col`, `flex-wrap`, `from-transparent`, `gap-20`, `gap-3`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${activeImageIdx`, `${isActive`, `-inset-1`, `-translate-x-1/2`, `-translate-y-1.5`, `:`, `===`, `animate-ping`, `animate-pulse`, `aspect-square`, `blur-120`, `blur-150`, `blur-3xl`, `border`, `duration-500`

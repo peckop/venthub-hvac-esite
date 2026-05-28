@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\support\ReturnsPage.tsx
 skeleton_hash: 5e7613c20eb0ce3f
-generated_at: 2026-05-23T22:42:04Z
+entity_hashes:
+  func:ReturnsPage: 58d2fb57da45461b
+  overview: 95b133e51b479d65
+  style_tokens: f66481541679296a
+generated_at: 2026-05-28T22:40:22Z
 ---
 
 ## Genel Bakış
@@ -28,24 +32,29 @@ Bu React tabanlı iade işlemleri sayfa modülü, VentHub HVAC platformunun dest
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ReturnsPage
-**Ne yapar**: VentHub HVAC projesinin destek modülü kapsamında yer alan iadeler sayfasını oluşturan ana React bileşenidir. Kullanıcıların iade işlemlerini erişebileceği, görüntüleyebileceği ve yönetebileceği özel kullanıcı arayüzünü sunmakla görevlidir. Genel domainli proje dokümantasyonu kapsamında destek sayfaları ailesinin bir parçası olarak çalışır.
-**Nasıl yapar**: Typescript ile tip güvenliği sağlanmış bir fonksiyonel React bileşeni olarak tanımlanmıştır, projenin `C:\Users\alize\venthub-hvac\src\views\support\ReturnsPage.tsx` dosyası içinde barınır. Bağımsız bir sayfa bileşeni olarak rota sisteminden çağrılarak çalışır, harici bir yapılandırma veya giriş olmadan kendi içindeki iade işlevleri ve arayüzünü render eder.
-**Parametreler**: Bu fonksiyonel React bileşenine herhangi bir parametre veya React prop'u iletilmez, bağımsız sayfa yapısı gereği doğrudan kendi işlevlerini yerine getirir.
-**Dönüş**: React.FC tipinde, iadeler sayfasının tüm kullanıcı arayüzünü ve işlevlerini barındıran geçerli bir React bileşeni döndürür.
+
+**Ne yapar**: ReturnsPage, uygulamanın destek/yardım bölümünde yer alan iade sayfasını render eden React fonksiyonel bileşenidir. Bu bileşen, kullanıcıların ürün iade süreçlerini görüntüleyebileceği ve yönetebileceği arayüzü sunar.
+
+**Nasıl yapar**: Fonksiyonel React bileşen yapısı kullanılarak oluşturulmuştur. ReturnsPage.tsx dosyasında tanımlanan bu bileşen, support (destek) modülü altında konumlandırılmıştır ve iade talepleriyle ilgili kullanıcı arayüzünü kontrol eder. Bileşen, React'in fonksiyonel paradigmına uygun olarak state ve effect hook'larını kullanarak dinamik içerik yönetimi sağlayabilir.
+
+**Parametreler**:
+- Bileşen prop almamaktadır (props-free bileşen)
+
+**Dönüş**: `React.FC` — React Fonksiyonel Bileşeni döndürür. Bu bileşen, iade sayfasının tam HTML/JSX yapısını render ederek tarayıcıda görüntülenen arayüzü oluşturur.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\ReturnsPage.tsx::ReturnsPage
+### [N1_NASIL] AST Pointer: src/views/support/ReturnsPage.tsx::ReturnsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `router` — Next.js `useRouter` hook'undan alınan yönlendirme nesnesi, geri dönüş butonunun tıklama olayında `router.back()` ile önceki sayfaya yönlendirme yapmak için kullanılır
-  - `t` — `useI18n` hook'undan alınan çeviri fonksiyonu, sayfadaki tüm metinsel içerikleri (geri butonu etiketi, sayfa başlığı, açıklama metinleri) çevirmek için kullanılır
-- **Dönüş**: React JSX elementi (React.FC uyumlu sayfa bileşeni)
+  - `router` — `useRouter()` hookundan elde edilen yönlendirici nesnesi; `router.back()` ile bir önceki sayfaya dönmek için kullanılır
+  - `t` — `useI18n()` hookundan elde edilen çeviri fonksiyonu; UI metinlerini uluslararasılaştırmak için kullanılır
+- **Dönüş**: JSX markup (React bileşeni) — Destek/İade sayfasını oluşturan HTML yapısı; başlık, açıklama metinleri ve geri dönüş butonu içerir
 
 ---
 
@@ -58,3 +67,19 @@ Bu React tabanlı iade işlemleri sayfa modülü, VentHub HVAC platformunun dest
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ReturnsPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `border-light-gray`, `hover:text-primary-navy`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`
+- **Layout:** `inline-flex`, `items-center`, `max-w-4xl`, `p-6`
+- **Varyant/Responsive:** `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `lg:px-8`, `mb-4`, `mb-6`, `mr-1`, `mx-auto`, `px-4`, `py-10`, `rounded-xl`, `sm:px-6`, `space-y-4`, `transition-colors`

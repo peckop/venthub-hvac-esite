@@ -8,7 +8,7 @@ entity_hashes:
   func:PrivacyPolicyPage: 40c3e34ff307a7eb
   overview: f7094466668600a6
   style_tokens: 59b3a50b22e1661e
-generated_at: 2026-05-27T17:46:49Z
+generated_at: 2026-05-28T22:40:07Z
 ---
 
 ## Genel Bakış

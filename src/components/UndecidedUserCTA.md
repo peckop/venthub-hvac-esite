@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\UndecidedUserCTA.tsx
 skeleton_hash: 0a3483208ef6d9f8
-generated_at: 2026-05-23T22:28:09Z
+entity_hashes:
+  func:UndecidedUserCTA: e9ab9b6769bffef9
+  overview: 6734a4b4c3b6cbe2
+  style_tokens: d1dc68fb1553bbf5
+generated_at: 2026-05-28T22:37:07Z
 ---
 
 ## Genel Bakış
@@ -28,7 +32,7 @@ Bu istemci tarafı React bileşeni, kararsız kullanıcılara yönelik harekete 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### UndecidedUserCTA
 **Ne yapar**: VentHub HVAC projesinin kullanıcı arayüzünde, henüz herhangi bir işlem yapmamış veya karar vermemiş kararsız kullanıcılar için harekete geçirme çağrısı (CTA) sunan bir React fonksiyonel bileşenidir. Kullanıcıları ilgili aksiyonlara yönlendiren içerikler ve etkileşimli öğeler barındıran, projenin genelinde yeniden kullanılabilir bir arayüz katmanı oluşturur.
@@ -67,16 +71,13 @@ Bu istemci tarafı React bileşeni, kararsız kullanıcılara yönelik harekete 
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `hover:scale-[1.02]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gradient-to-r`, `bg-white`, `bg-white/10`, `bg-white/20`, `from-primary-navy`, `sm:text-2xl`, `sm:text-base`, `text-primary-navy`, `text-sm`, `text-white`, `text-white/80`, `text-xl`, `to-secondary-blue`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-col`, `from-primary-navy`, `gap-2`, `gap-5`, `gap-6`, `group-hover:translate-x-1`, `h-12`, `h-32`, `h-64`, `hover:shadow-xl`, `inline-flex`
-- **Responsive:** `md:`, `sm:` prefix kullanımları
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-col`, `from-primary-navy`, `gap-2`, `gap-5`, `gap-6`, `h-12`, `h-32`, `h-64`, `hover:shadow-xl`, `inline-flex`, `items-center`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `-translate-x-1/3`, `-translate-y-1/2`, `blur-2xl`, `blur-3xl`, `font-bold`, `group`, `group-hover:translate-x-1`, `hover:scale-102`, `leading-relaxed`, `mb-12`, `mb-2`, `mt-8`, `px-6`, `py-3.5`, `rounded-2xl`

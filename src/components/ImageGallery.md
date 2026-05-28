@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ImageGallery.tsx
 skeleton_hash: b504c74305128bd7
-generated_at: 2026-05-23T22:13:07Z
+entity_hashes:
+  func:ImageGallery: ed5cc2a855b5b9b8
+  func:handleMouseLeave: 60d41c470a6d0032
+  func:handleMouseMove: b68c1278669bcb7a
+  overview: 8b6fae0642827a18
+  style_tokens: 01bec99debdcd366
+generated_at: 2026-05-28T22:35:59Z
 ---
 
 ## Genel Bakış
@@ -35,7 +41,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ImageGallery
 **Ne yapar**: Bir ürünün görsellerini gösteren bir bileşen render eder.  
@@ -45,14 +51,14 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - productName: string — Ürünün adı, başlık veya alt metin olarak gösterilir  
 - slug: string — Ürünün URL slug'ı, navigasyon veya SEO amaçlı kullanılır  
 - modelType: string — Ürünün model tipi, filtreleme veya sınıflandırma için kullanılır  
-**Dönüş**: React.FC<ImageGalleryProps> — JSX elementi döndüren fonksiyonel bileşen  
+**Dönüş**: React.FC<ImageGalleryProps> — JSX elementi döndüren fonksiyonel bileşen
 
 ### handleMouseMove
 **Ne yapar**: Fare hareketi olayını yakalayıp, görsel galerisinde etkileşim (örneğin zoom veya hareket efekti) için gerekli koordinatları işler.  
 **Nasıl yapar**: Olay nesnesinden clientX ve clientY değerlerini çıkararak state veya ref üzerinden güncellenen pozisyon bilgilerini ayarlar; bu sayede görselin üzerine gelen fareye göre dinamik efekt sağlanır.  
 **Parametreler**:  
 - e: React.MouseEvent<HTMLDivElement> — Fare hareketi olayı, hedef bir <div> elementi üzerinden tetiklenir  
-**Dönüş**: void — Fonksiyon bir değer döndürmez  
+**Dönüş**: void — Fonksiyon bir değer döndürmez
 
 ### handleMouseLeave
 **Ne yapar**: Fare galeriye dışarı çıktığında tetiklenen olay işleyicisidir; aktif etkileşimi sıfırlayarak görseli varsayılan duruma döndürür.  
@@ -191,16 +197,13 @@ graph TD
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[90vh]`
-- **width:** `max-w-[90vw]`, `md:max-w-[55vh]`
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/20`, `bg-black/95`, `bg-gray-100`, `bg-white`, `bg-white/10`, `bg-white/80`, `bg-white/95`, `border-2`, `border-gray-200`, `border-primary-navy`, `border-transparent`, `border-white`, `text-blue-600`, `text-gray-400`, `text-gray-700`
-- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-6`, `cursor-zoom-in`, `fixed`, `flex`, `flex-col`, `flex-wrap`, `gap-0.5`, `gap-2`, `group-hover:opacity-100`, `h-14`, `h-16`, `h-full`
-- **Responsive:** `md:` prefix kullanımları
+- **Renkler:** `bg-black/20`, `bg-black/95`, `bg-gray-100`, `bg-white`, `bg-white/10`, `bg-white/80`, `bg-white/95`, `border-2`, `border-gray-200`, `border-primary-navy`, `border-transparent`, `border-white`, `hover:bg-white`, `hover:bg-white/20`, `hover:border-gray-300`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-6`, `cursor-zoom-in`, `fixed`, `flex`, `flex-col`, `flex-wrap`, `gap-0.5`, `gap-2`, `h-14`, `h-16`, `h-full`, `items-center`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${!is3DMode`, `${activeIdx`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `===`, `activeIdx`, `aspect-square`, `border`, `duration-200`, `ease-out`, `font-bold`, `group`, `group-hover:opacity-100`, `hover:opacity-100`

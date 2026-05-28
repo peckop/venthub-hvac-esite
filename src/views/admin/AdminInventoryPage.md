@@ -9,7 +9,7 @@ entity_hashes:
   func:fetchData: 3334aa9b134a3cd8
   overview: 2651cee931ba15f0
   style_tokens: 6c71c306ec3450e6
-generated_at: 2026-05-27T18:30:47Z
+generated_at: 2026-05-28T22:38:58Z
 ---
 
 ## Genel Bakış

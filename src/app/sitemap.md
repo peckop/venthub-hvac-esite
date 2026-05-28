@@ -4,73 +4,54 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\sitemap.ts
 skeleton_hash: ebc623b3db63a7de
-generated_at: 2026-05-23T21:50:36Z
+entity_hashes:
+  func:sitemap: a12c36cfd19cfa1a
+  overview: 1f20e97deb68e19e
+generated_at: 2026-05-28T22:35:27Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js uygulamasının dinamik site haritasını (sitemap) oluşturmaktan sorumludur. Tek bir asenkron fonksiyon içerir; bu fonksiyon, kategoriler ve ürünler gibi dinamik içeriklerin URL’lerini toplayarak arama motoru indekslemesi için gerekli meta veriler (son değişme tarihi, değişim sıklığı, öncelik) ile zenginleştirir ve `MetadataRoute.Sitemap` tipinde bir Promise döndürür.
+Bu modül, Next.js uygulaması için site haritasını (sitemap) dinamik olarak oluşturmaktan sorumludur. Asenkron bir fonksiyon kullanarak uygulamadaki kategoriler ve ürünler gibi farklı içerik türlerinin URL'lerini toplar ve arama motorları için gerekli olan son değişiklik tarihi, değişim sıklığı ve öncelik gibi meta verilerle zenginleştirerek standart bir site haritası yapısı üretir.
 
 ## Fonksiyon Grupları
 ### Site Haritası Oluşturma
-Bu grup, site haritası verisinin hazırlanmasını üstlenir. Uygulamadaki statik ve dinamik rotaları derleyip her biri için uygun URL ve meta bilgilerini içeren bir yapı oluşturur.
+Bu grup, uygulamanın tüm rotalarının (hem statik hem de dinamik) taranarak arama motoru dostu bir site haritası verisi hazırlanmasını yönetir.
 - sitemap
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### sitemap
-**Ne yapar**: Next.js projesi için `MetadataRoute.Sitemap` türünde bir sitemap verisi döndürür. Bu veri, uygulamanın sitemap.xml dosyasının oluşturulmasında kullanılır ve arama motorlarına site yapısı hakkında bilgi sağlar.
-**Nasıl yapar**: Async fonksiyon olarak tanımlanmış olup `Promise` ile sarılmış bir `MetadataRoute.Sitemap` değeri döndürür. Fonksiyonun iç mantığı docstring içinde belirtilmediğinden hangi kaynaklardan yararlandığı veya hangi sayfaları kapsadığı bu dokümanda açıklanamamaktadır.
-**Parametreler**: Yok.
-**Dönüş**: `Promise<MetadataRoute.Sitemap>` — site haritası bilgisi içeren bir Promise. Dönen nesne genellikle URL, son değişiklik tarihi, değişim sıklığı gibi metadata alanlarını içerir.
+**Ne yapar**: Bu fonksiyon, web sitesi için tüm sayfaları (statik sayfalar, kategoriler, markalar ve ürünler) içeren bir XML sitemap dosyası oluşturur. Fonksiyon, sitenin arama motorları tarafından doğru ve eksiksiz bir şekilde indekslenmesini sağlar.
+
+**Nasıl yapar**: Fonksiyon asenkrondur ve `Promise.all` kullanarak kategori ve ürün verilerini paralel olarak çeker. Ardından, her bir rota türü (statik, kategori, marka, ürün) için bir dizi URL nesnesi oluşturur. Her URL nesnesi; mutlak URL, son güncellenme tarihi, güncelleme sıklığı, öncelik sırası ve alternatif dil versiyonları (hreflang) bilgilerini içerir. Tüm rota dizileri birleştirilerek ana sitemap dizisi döndürülür.
+
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz. Verileri kendi içindeki sabit değerlerden (`SITE_URL`, `HVAC_BRANDS`) ve asenkron çağrılarla (`getCategories`, `getAllProducts`) elde eder.
+
+**Dönüş**: `Promise<MetadataRoute.Sitemap>` tipinde bir değer döndürür. Bu, her bir sayfa için gerekli SEO meta verilerini taşıyan bir nesne dizisidir (`url`, `lastModified`, `changefreq`, `priority`, `alternates`).
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\sitemap.ts::sitemap
-- **params**: yok
-- **ic_degiskenler**:
-  - `baseUrl` — `SITE_URL` sabitinden alınan temel site URL’si
-  - `categories` — `getCategories()` çağrısı sonucu dönen kategori dizisi (hata durumunda boş dizi)
-  - `products` — `getAllProducts()` çağrısı sonucu dönen ürün dizisi (hata durumunda boş dizi)
-  - `staticRoutes` — statik yollar (ana sayfa, `/products`, `/brands`, `/contact`, `/about`, `/destek/merkez`, `/cart`) için sitemap girişlerini içeren dizi
-  - `categoryRoutes` — her bir kategori için sitemap girişlerini içeren dizi
-  - `brandRoutes` — `HVAC_BRANDS` sabitindeki her marka için sitemap girişlerini içeren dizi
-  - `productRoutes` — `slug` değeri olan her ürün için sitemap girişlerini içeren dizi
-- **Dönüş**: `staticRoutes`, `categoryRoutes`, `brandRoutes`, `productRoutes` dizilerinin birleşimi (`MetadataRoute.Sitemap`)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\sitemap.ts::staticRoutes callback
-- **params**: `route` — statik yolun string değeri
-- **ic_degiskenler**:
-  - `baseUrl` — closure’dan erişilen temel site URL’si
-- **Dönüş**: `{ url: \`${baseUrl}${route}\`, lastModified: new Date(), changefreq: 'daily', priority: route === '' ? 1.0 : 0.8 }` şeklinde sitemap girişi
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\sitemap.ts::categoryRoutes callback
-- **params**: `cat` — kategori objesi (`slug`, `updated_at` alanları)
-- **ic_degiskenler**:
-  - `baseUrl` — closure’dan erişilen temel site URL’si
-- **Dönüş**: `{ url: \`${baseUrl}${Routes.category(cat.slug)}\`, lastModified: new Date(cat.updated_at || new Date()), changefreq: 'weekly', priority: 0.7 }` şeklinde sitemap girişi
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\sitemap.ts::brandRoutes callback
-- **params**: `brand` — marka objesi (`slug` alanı)
-- **ic_degiskenler**:
-  - `baseUrl` — closure’dan erişilen temel site URL’si
-- **Dönüş**: `{ url: \`${baseUrl}${Routes.brand(brand.slug)}\`, lastModified: new Date(), changefreq: 'weekly', priority: 0.6 }` şeklinde sitemap girişi
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\sitemap.ts::productRoutes callback
-- **params**: `prod` — ürün objesi (`slug`, `updated_at` alanları)
-- **ic_degiskenler**:
-  - `baseUrl` — closure’dan erişilen temel site URL’si
-- **Dönüş**: `{ url: \`${baseUrl}${Routes.product(prod.slug!)}\`, lastModified: new Date(prod.updated_at || new Date()), changefreq: 'daily', priority: 0.9 }` şeklinde sitemap girişi
+- **params**: (parametre yok)
+- **ic_degiskenler**: 
+  - `baseUrl` — SITE_URL sabit değerini tutar, sitemap URL'lerinin temelini oluşturur
+  - `locales` — Dil kodlarını içeren dizi ['tr', 'en'], her rotanın çok dilli versiyonlarını oluşturmak için kullanılır
+  - `categories` — Veritabanından getCategories() ile çekilen tüm kategorilerin dizisi, Promise.all ile await edilir
+  - `products` — Veritabanından getAllProducts() ile çekilen tüm ürünlerin dizisi, Promise.all ile await edilir
+  - `staticRoutesList` — Statik sayfa rotalarının dizisi (anasayfa, ürünler, markalar vb.)
+  - `staticRoutes` — Statik rotalar için oluşturulan MetadataRoute.Sitemap dizisi, her dil için haritalama yapar
+  - `categoryRoutes` — Kategoriler için oluşturulan MetadataRoute.Sitemap dizisi, dinamik kategori rotalarını temsil eder
+  - `brandRoutes` — Markalar için oluşturulan MetadataRoute.Sitemap dizisi, HVAC_BRANDS sabitinden gelen marka rotalarını temsil eder
+  - `productRoutes` — Ürünler için oluşturulan MetadataRoute.Sitemap dizisi, sadece slug değeri olan ürünleri filtreler ve haritalandırır
+- **Dönüş**: Promise<MetadataRoute.Sitemap> — Tüm rotaları (statik, kategori, marka, ürün) birleştirip döner
 
 ---
 

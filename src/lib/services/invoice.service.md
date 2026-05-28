@@ -4,76 +4,93 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\invoice.service.ts
 skeleton_hash: 7c49e10c92ebc240
-generated_at: 2026-05-23T22:32:11Z
+entity_hashes:
+  func:createInvoiceProfile: f92c262499835920
+  func:deleteInvoiceProfile: 3a57f0436c08a151
+  func:fetchDefaultInvoiceProfile: a2ee326679328cb7
+  func:listInvoiceProfiles: 6371218f2a71c64a
+  func:setDefaultInvoiceProfile: c7e86c4c92702d78
+  func:updateInvoiceProfile: cee09476b26f89da
+  overview: e67bb84253f40f2b
+generated_at: 2026-05-28T22:38:21Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC işletme platformu için fatura profili yönetimini merkezleyen bir servis modülüdür. Tüm fatura profiliyle ilgili veritabanı işlemlerini tek noktadan yürüterek, platformdaki tüm bileşenlerin tutarlı bir şekilde fatura profillerine erişmesini sağlar. Hem temel profil yönetimi hem de varsayılan profil atama işlemlerini kapsayan tüm işlevleri sunar.
+Bu modül, fatura profillerinin lifecycle yönetimini sağlayan servis katmanıdır. Platform genelinde kullanılacak fatura profillerinin CRUD işlemleri ve varsayılan profil belirleme mantığını merkezi olarak sunar.
 
 ## Fonksiyon Grupları
 ### Temel Fatura Profili CRUD İşlemleri
-Fatura profillerinin oluşturulması, listelenmesi, güncellenmesi ve silinmesi gibi temel yaşam döngüsü işlemlerini yönetir. Tüm mevcut fatura profillerine erişim ve mevcut profillerde değişiklik yapma imkanı sunar.
+Fatura profillerinin veritabanında oluşturulması, listelenmesi, güncellenmesi ve silinmesi işlemlerini yönetir.
 - listInvoiceProfiles, createInvoiceProfile, updateInvoiceProfile, deleteInvoiceProfile
 
 ### Varsayılan Fatura Profili Yönetimi
-Sürekli kullanılacak işletme varsayılanı fatura profilinin ayarlanması ve gerektiğinde çekilmesi işlemlerini gerçekleştirir. Tekrarlayan fatura kesim süreçlerinde her seferinde profil seçme gereksinimini ortadan kaldırır.
+İşletmenin sürekli kullanacağı varsayılan fatura profilinin ayarlanması ve sorgulanması işlemlerini gerçekleştirir.
 - setDefaultInvoiceProfile, fetchDefaultInvoiceProfile
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, sistemdeki fatura profillerinin CRUD işlemlerini ve varsayılan fatura profili yönetimini hatasız çalıştırmak için çalışan bir veritabanı bağlantısına, veri tip uyumluluğuna ve erişim kontrol mekanizmasına sahip olmayı varsayar.
 
-[Aksiyom 1]: Eğer fatura profillerinin saklandığı veritabanıyla sürekli bağlantı kurulmasını sağlayan altyapı yoksa, bu modüldeki tüm fatura profili yönetimi fonksiyonları (listeleme, oluşturma, güncelleme, silme, varsayılan ayarlama/çekme) çalışmaz, tüm servis çağrıları hata döndürür.
-[Aksiyom 2]: Eğer createInvoiceProfile fonksiyonuna gönderilen payload DbInvoiceProfileInsert tip tanımına uygun değilse, fatura profili oluşturma işlemi başarısız olur veya veritabanında tutarsız finansal veri oluşur.
-[Aksiyom 3]: Eğer updateInvoiceProfile, deleteInvoiceProfile veya setDefaultInvoiceProfile fonksiyonlarına parametre olarak gönderilen id string değeri veritabanında kayıtlı mevcut bir fatura profiline ait değilse, ilgili güncelleme, silme veya varsayılan yapma işlemleri başarısız olur.
-[Aksiyom 4]: Eğer fetchDefaultInvoiceProfile fonksiyonu çağrıldığında sistemde daha önce setDefaultInvoiceProfile ile atanmış geçerli bir varsayılan fatura profili yoksa, fonksiyon geçerli bir sonuç döndüremez, bu modülü kullanan fatura üretme gibi finansal işlemler tamamen aksar.
-[Aksiyom 5]: Eğer bu modülün tüm fonksiyonlarına erişen kullanıcıların ilgili işlemi yapmaya yetkili olduğunu doğrulayan bir yetkilendirme mekanizması yoksa, yetkisiz kullanıcılar fatura profillerini değiştirebilir veya silebilir, finansal güvenlik ihlali oluşur.
+Bu modül, fatura profili yönetimi için CRUD ve varsayılan profil yönetim işlemlerini içeren bir servis katmanıdır.
+
+**[Aksiyom 1]:** Eğer `updateInvoiceProfile` fonksiyonuna geçersiz veya mevcut olmayan bir `id` parametresi verilirse, güncelleme işlemi başarısız olur.
+
+**[Aksiyom 2]:** Eğer `deleteInvoiceProfile` fonksiyonuna geçersiz veya mevcut olmayan bir `id` parametresi verilirse, silme işlemi başarısız olur.
+
+**[Aksiyom 3]:** Eğer `createInvoiceProfile` fonksiyonuna `DbInvoiceProfileInsert` tipinde geçersiz bir `payload` verilirse, profil oluşturma işlemi başarısız olur.
+
+**[Aksiyom 4]:** Eğer `setDefaultInvoiceProfile` fonksiyonuna geçersiz veya mevcut olmayan bir `id` parametresi verilirse, varsayılan profil atama işlemi başarısız olur.
+
+**[Aksiyom 5]:** Eğer `updateInvoiceProfile` fonksiyonuna `DbInvoiceProfileUpdate` tipinde geçersiz bir `payload` verilirse, güncelleme işlemi başarısız olur.
+
+**[Aksiyom 6]:** `fetchDefaultInvoiceProfile` fonksiyonu çağrıldığında, sistemde tanımlanmış bir varsayılan fatura profili yoksa, sonuç olarak boş veya null bir değer döner.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### listInvoiceProfiles
-**Ne yapar**: Sistemde kayıtlı tüm fatura profillerini veritabanından çekerek listeler. Kullanıcı veya işletmeye ait tüm fatura profillerine erişim sağlamak için tasarlanmış okuma işlemini gerçekleştirir. Fatura profili seçim ekranları gibi tüm kayıtlara ihtiyaç duyan arayüzler için temel veri sağlayıcısıdır.
-**Nasıl yapar**: Asenkron çalışma prensibiyle veritabanında DbInvoiceProfile tipindeki tüm kayıtları çeken sorguyu çalıştırır. İşlem boyunca herhangi bir veri filtrelemesi yapmadan tüm mevcut kayıtları olduğu gibi iletir, hata durumunda promise üzerinden hatayı fırlatır.
-**Parametreler**: Bu fonksiyon herhangi bir giriş parametresi almaz.
-**Dönüş**: Promise<DbInvoiceProfile[]> — İşlem başarılı olduğunda tüm fatura profili kayıtlarını içeren bir dizi döndüren asenkron promise nesnesi.
+**Ne yapar**: Kullanıcıya ait tüm fatura profillerini listeler. Varsayılan profil en üstte olacak şekilde sıralanmış olarak döner.
+**Nasıl yapar**: Supabase istemcisi ile `user_invoice_profiles` tablosuna `select('*')` sorgusu gönderir. Sonuçları önce `is_default` alanına göre azalan, sonra `created_at` alanına göre azalan sırada düzenler. Veritabanı tablosu mevcut değilse boş bir dizi döner, diğer hatalarda fırlatır.
+**Parametreler**:
+- Yok
+**Dönüş**: `Promise<DbInvoiceProfile[]>` — Kullanıcının tüm fatura profillerini içeren bir dizi. Tablo mevcut değilse boş dizi döner.
 
 ### createInvoiceProfile
-**Ne yapar**: Verilen giriş verileriyle veritabanına yeni bir fatura profili kaydı ekler. Kullanıcıların yeni fatura düzenleme, arşivleme veya gönderim ayarları tanımlamak için kullanabileceği yeni profil oluşturma işlemini yönetir. Oluşturulan kaydın tam halini döndürerek arayüzün anlık olarak güncellenmesini sağlar.
-**Nasıl yapar**: Gelen payload verisindeki zorunlu alanları doğruladıktan sonra veritabanı ekleme sorgusunu çalıştırır. Oluşturulan yeni kayda otomatik olarak atanan benzersiz kimlik ve diğer sistem alanlarını da ekleyerek tam bir DbInvoiceProfile nesnesi olarak döndürür, tüm işlemi asenkron olarak gerçekleştirir.
+**Ne yapar**: Yeni bir fatura profili oluşturur ve oluşturan kullanıcının kimliğini otomatik olarak ekler.
+**Nasıl yapar**: Önce `supabase.auth.getUser()` ile kimlik doğrulaması yapar. Kullanıcı kimliğini `payload` nesnesine `user_id` alanı olarak ekler. Ardından `user_invoice_profiles` tablosuna bu veriyi ekler (`insert`) ve eklenen kaydı (`select('*').single()`) geri döner. Kimlik doğrulama başarısız olursa hata fırlatır.
 **Parametreler**:
-- payload: DbInvoiceProfileInsert — Yeni fatura profili oluşturmak için gereken tüm zorunlu ve opsiyonel kullanıcı tanımlı alanları içeren veri objesi
-**Dönüş**: Promise<DbInvoiceProfile> — Veritabanına kaydedilmiş tam haliyle yeni fatura profilini döndüren asenkron promise nesnesi.
+- `payload`: `DbInvoiceProfileInsert` — Oluşturulacak fatura profilinin verileri. `user_id` alanı otomatik olarak üzerine yazılır.
+**Dönüş**: `Promise<DbInvoiceProfile>` — Yeni oluşturulmuş fatura profilini temsil eden nesne.
 
 ### updateInvoiceProfile
-**Ne yapar**: Mevcut bir fatura profilini, benzersiz kimliğiyle bularak istenen alanlarını günceller. Kullanıcıların mevcut fatura profillerindeki ayarları değiştirmesi, iletişim bilgilerini güncellemesi veya düzenleme işlemlerini gerçekleştirmesi için kullanılır. Sadece istenen alanları değiştirerek gereksiz veri trafiğini önler.
-**Nasıl yapar**: Önce parametre olarak gelen id ile eşleşen fatura profili kaydını veritabanında bulur, ardından payload içinde gönderilen yalnızca değiştirilmek istenen alanları mevcut kayıtla birleştirir. Güncellenmiş kaydı veritabanına kaydeder ve tüm işlemi asenkron olarak yürütür.
+**Ne yapar**: Belirli bir ID'ye sahip mevcut fatura profilini günceller.
+**Nasıl yapar**: Verilen `id` ile eşleşen kaydı bulur (`eq('id', id)`) ve `payload` içindeki alanlarıyla günceller (`update(payload)`). Güncellenen kaydı `select('*').single()` ile sorgular ve döner. Kayıt bulunamazsa veya başka bir veritabanı hatası oluşursa hata fırlatır.
 **Parametreler**:
-- id: string — Güncellenecek fatura profilinin benzersiz veritabanı kimliği
-- payload: DbInvoiceProfileUpdate — Sadece güncellenmek istenen alanları içeren kısmi veri objesi, zorunlu temel alanlar olmadan güncelleme işlemi için tasarlanmıştır
-**Dönüş**: Promise<DbInvoiceProfile> — Son haliyle güncellenmiş fatura profili kaydını döndüren asenkron promise nesnesi.
+- `id`: `string` — Güncellenecek fatura profilinin benzersiz tanımlayıcısı (UUID).
+- `payload`: `DbInvoiceProfileUpdate` — Güncellenecek alanları içeren nesne.
+**Dönüş**: `Promise<DbInvoiceProfile>` — Güncelleme sonrası fatura profilinin güncel hali.
 
 ### deleteInvoiceProfile
-**Ne yapar**: Verilen benzersiz kimliğe sahip fatura profili kaydını veritabanından kalıcı olarak siler. Kullanıcıların kullanmadıkları, geçersiz kıldıkları fatura profillerini sistemden kaldırmasını sağlar. Silme işleminin başarısını net bir şekilde bildirerek arayüzün uygun aksiyonu almasını sağlar.
-**Nasıl yapar**: Gelen id ile eşleşen kaydı veritabanında bulur, öncelikle profilin varsayılan olarak ayarlanıp ayarlanmadığını kontrol eder (gerekirse varsayılan ayarını sıfırlar) ardından kalıcı silme işlemini gerçekleştirir. Tüm işlemi asenkron olarak yürütür, hata durumunda promise üzerinden hatayı iletir.
+**Ne yapar**: Belirli bir ID'ye sahip fatura profilini kalıcı olarak siler.
+**Nasıl yapar**: `user_invoice_profiles` tablosunda verilen `id` ile eşleşen kaydı bulur (`eq('id', id)`) ve `delete()` metodu ile siler. İşlem başarılıysa `true` döner, herhangi bir veritabanı hatası oluşursa hata fırlatır.
 **Parametreler**:
-- id: string — Silinecek fatura profilinin benzersiz veritabanı kimliği
-**Dönüş**: Promise<boolean> — Silme işleminin başarılı olup olmadığını bildiren boolean değer içeren asenkron promise nesnesi, işlem başarılıysa true döndürür.
+- `id`: `string` — Silinecek fatura profilinin benzersiz tanımlayıcısı (UUID).
+**Dönüş**: `Promise<boolean>` — Silme işlemi başarılı olursa `true`.
 
 ### setDefaultInvoiceProfile
-**Ne yapar**: Verilen kimliğe sahip fatura profilini sistemin varsayılan olarak kullanacağı fatura profili olarak işaretler. Tüm yeni fatura işlemlerinde otomatik olarak seçilecek ana profili belirlemek için kullanılır. Aynı anda sadece bir profilin varsayılan olmasını garantiler.
-**Nasıl yapar**: Önce sistemde kayıtlı tüm fatura profillerinin varsayılan bayrağını kapatır, ardından parametre olarak gelen id'ye sahip profilin varsayılan bayrağını aktif eder. Bu değişiklikleri veritabanına kaydeder, tüm işlemi asenkron olarak gerçekleştirir.
+**Ne yapar**: Belirli bir fatura profilini kullanıcının varsayılan profili olarak ayarlar.
+**Nasıl yapar**: İlk olarak kimlik doğrulaması yapar. Ardından, kullanıcının *tüm* mevcut fatura profillerindeki `is_default` alanını `false` olarak günceller, böylece sadece bir profilin `is_default` değeri `true` olabilir. Bu temizleme işleminden sonra, belirtilen `id`ye sahip profili `is_default: true` olarak günceller ve güncel halini döner. Her iki veritabanı işlemi de hata fırlatabilir.
 **Parametreler**:
-- id: string — Varsayılan olarak ayarlanacak fatura profilinin benzersiz veritabanı kimliği
-**Dönüş**: Promise<DbInvoiceProfile> — Varsayılan olarak ayarlanan son haliyle fatura profili kaydını döndüren asenkron promise nesnesi.
+- `id`: `string` — Varsayılan olarak ayarlanacak fatura profilinin benzersiz tanımlayıcısı (UUID).
+**Dönüş**: `Promise<DbInvoiceProfile>` — Varsayılan olarak ayarlanmış fatura profilinin güncel hali.
 
 ### fetchDefaultInvoiceProfile
-**Ne yapar**: Sistemde şu anda varsayılan olarak ayarlı olan aktif fatura profilini getirir. Yeni fatura oluşturma, toplu fatura gönderimi gibi otomatik profil seçimi gerektiren işlemlerde varsayılan profili hızlıca erişime sunar. Hiç varsayılan profil tanımlanmamışsa boş durum yönetimi için uygun değer döndürür.
-**Nasıl yapar**: Veritabanında varsayılan bayrağı aktif olan tek fatura profili kaydını sorgulayarak çeker, eğer hiç kayıt eşleşmezse null değeri döndürür. Tüm işlemi asenkron olarak yürütür, hata durumunda hatayı promise üzerinden iletir.
-**Parametreler**: Bu fonksiyon herhangi bir giriş parametresi almaz.
-**Dönüş**: Promise<DbInvoiceProfile | null> — Varsayılan fatura profili bulunursa ilgili kaydı, hiç kayıt tanımlanmamışsa null değerini döndüren asenkron promise nesnesi.
+**Ne yapar**: Kimliği doğrulanmış kullanıcının mevcut varsayılan fatura profilini getirir.
+**Nasıl yapar**: Kimlik doğrulaması yapar. Sonra `user_invoice_profiles` tablosunda, kullanıcının (`user_id`) ve `is_default` alanı `true` olan kaydı sorgular. Sonuçları `updated_at` alanına göre azalan sırada sıralar ve en fazla bir kayıt (`limit(1)`) getirir. Sorgulama başarısız olursa ve hata tablonun mevcut olmadığını belirtiyorsa (`PGRST205` kodu veya belirli bir mesaj), `null` döner. Diğer hatalarda异常 fırlatır. Sorgu sonucu boşsa yine `null` döner.
+**Parametreler**:
+- Yok
+**Dönüş**: `Promise<DbInvoiceProfile | null>` — Kullanıcının varsayılan fatura profili veya böyle bir profil yoksa/oluşan bir hata tablo mevcut değilse `null`.
 
 ---
 

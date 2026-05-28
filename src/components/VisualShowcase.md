@@ -15,7 +15,7 @@ entity_hashes:
   func:usePrefersReducedMotion: 11085ad489b48f61
   overview: 7e4ec691259cb85e
   style_tokens: 2f11e16677a4f30c
-generated_at: 2026-05-27T18:10:31Z
+generated_at: 2026-05-28T22:37:07Z
 ---
 
 ## Genel Bakış
@@ -36,7 +36,8 @@ Gezinme ve oynatma/duraklatma kontrolleri için kullanılan, boyut ve stil özel
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+(Sentez hatası)
 
 ---
 

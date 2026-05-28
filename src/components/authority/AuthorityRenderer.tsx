@@ -17,6 +17,7 @@ import ThreeDAuthority from './ThreeDAuthority';
 import TechnicalDrawingAuthority from './TechnicalDrawingAuthority';
 import * as LucideIcons from 'lucide-react';
 import DOMPurify from 'isomorphic-dompurify';
+import Image from 'next/image';
 
 // --- YARDIMCI BİLEŞENLER ---
 
@@ -56,9 +57,15 @@ const HeroBlock: React.FC<{ block: HeroBlockType }> = ({ block }) => (
        )}
     </div>
     {block.content.imageUrl && (
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <img src={block.content.imageUrl} alt="" className="w-full h-full object-cover" />
-      </div>
+       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+         <Image 
+           src={block.content.imageUrl} 
+           alt="" 
+           fill 
+           sizes="100vw"
+           className="object-cover" 
+         />
+       </div>
     )}
   </section>
 );
@@ -115,7 +122,13 @@ const ComparisonBlock: React.FC<{ block: ComparisonBlockType }> = ({ block }) =>
             <div className="relative aspect-video bg-white flex flex-col items-center justify-center p-8 text-center group">
                 <span className="absolute top-6 left-6 px-4 py-1 rounded-full bg-slate-100 text-xs font-black uppercase tracking-widest text-slate-400">{block.content.leftLabel}</span>
                 {block.content.leftImage ? (
-                    <img src={block.content.leftImage} alt={block.content.leftLabel} className="w-full h-full object-contain" />
+                    <Image 
+                      src={block.content.leftImage} 
+                      alt={block.content.leftLabel || ""} 
+                      fill 
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-contain" 
+                    />
                 ) : (
                     <LucideIcons.AlertCircle className="w-12 h-12 text-slate-200" />
                 )}
@@ -123,7 +136,13 @@ const ComparisonBlock: React.FC<{ block: ComparisonBlockType }> = ({ block }) =>
             <div className="relative aspect-video bg-indigo-600 flex flex-col items-center justify-center p-8 text-center group">
                 <span className="absolute top-6 right-6 px-4 py-1 rounded-full bg-white/20 text-xs font-black uppercase tracking-widest text-white">{block.content.rightLabel}</span>
                 {block.content.rightImage ? (
-                    <img src={block.content.rightImage} alt={block.content.rightLabel} className="w-full h-full object-contain brightness-0 invert" />
+                    <Image 
+                      src={block.content.rightImage} 
+                      alt={block.content.rightLabel || ""} 
+                      fill 
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-contain brightness-0 invert" 
+                    />
                 ) : (
                     <LucideIcons.CheckCircle2 className="w-12 h-12 text-white/20" />
                 )}
@@ -228,10 +247,12 @@ export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> =
                     />
                   )}
                   {mediaBlock.content.mediaType === 'image' && (
-                    <img 
+                    <Image 
                       src={mediaBlock.content.mediaId} 
                       alt={mediaBlock.content.title || ''} 
-                      className="w-full h-full object-cover" 
+                      fill
+                      sizes="100vw"
+                      className="object-cover" 
                     />
                   )}
                 </div>

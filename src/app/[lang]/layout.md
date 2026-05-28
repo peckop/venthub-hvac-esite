@@ -9,7 +9,7 @@ entity_hashes:
   func:generateStaticParams: 8c98a454509d7f36
   overview: 8fb6408ed372ba76
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T13:49:53Z
+generated_at: 2026-05-28T22:34:58Z
 ---
 
 ## Genel Bakış
@@ -23,6 +23,20 @@ generated_at: 2026-05-28T13:49:53Z
 ---
 
 ## FONKSİYON DETAYLARI
+
+### generateStaticParams
+
+**Ne yapar**: Next.js uygulamasının statik olarak oluşturulabilecek dil yollarını belirler. Bu fonksiyon, build aşamasında hangi dil varyantları için sayfaların önceden oluşturulacağını tanımlar.
+
+**Nasıl yapar**: Fonksiyon, desteklenen dil kodlarından oluşan bir dizi döndürür. Bu sayede Next.js, `tr` ve `en` dilleri için gerekli statik yolları önceden oluşturabilir ve statik site oluşturma (SSG) süreçlerinde kullanabilir.
+
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: Array<{ lang: string }> — Desteklenen dil kodlarını içeren nesne dizisi. Her nesne bir `lang` özelliği taşır ve değer olarak `'tr'` veya `'en'` bulunur.
+
+### LangLayout
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -39,7 +53,20 @@ type Props = {
 ---
 
 ## AST POINTERS
-(Sentez hatası)
+
+### [N1_NASIL] AST Pointer: src/app/[lang]/layout.tsx::generateStaticParams
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde değişken tanımlanmamış)
+- **Dönüş**: `{ lang: string }[]` — statik olarak tanımlanmış iki nesne içeren dizi: `{ lang: 'tr' }` ve `{ lang: 'en' }`
+
+---
+
+### [N2_NASIL] AST Pointer: src/app/[lang]/layout.tsx::LangLayout
+- **params**: `{ children: React.ReactNode, params: Promise<{ lang: string }> }`
+- **ic_degiskenler**:
+  - `lang` — `await params` sonucu destructured ile elde edilen dil kodu; `'tr'` veya `'en'` değerini alır
+  - `dictionary` — `lang === 'en'` koşuluna göre `en` veya `tr` sözlük nesnesini seçer; `AppDictionary` tipindedir
+- **Dönüş**: JSX — `<I18nProvider>` bileşeninin içine `lang` ve `dictionary` prop olarak geçirilip `children` sarılır
 
 ---
 

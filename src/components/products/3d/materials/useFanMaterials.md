@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\materials\useFanMaterials.ts
 skeleton_hash: dd608e774ce8a871
-generated_at: 2026-05-23T22:19:58Z
+entity_hashes:
+  func:useFanMaterials: 61fbb447cfb5105d
+  overview: 457832609e7ab6a2
+generated_at: 2026-05-28T22:36:41Z
 ---
 
 ## Genel Bakış
@@ -26,7 +29,7 @@ Bu modül için aşağıdaki mimari varsayımlar geçerlidir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useFanMaterials
 **Ne yapar**: Bilinmiyor (verilen bilgiye göre fonksiyonun görevi belirtilmemiştir).  

@@ -4,80 +4,80 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts
 skeleton_hash: 6c450008f0499c83
-generated_at: 2026-05-23T22:32:34Z
+entity_hashes:
+  func:addProductToProject: 8bfc690cdaa7e8d6
+  func:createProject: 76dd09d8df26fd26
+  func:deleteProject: 7aed632c205d7700
+  func:listProjectItems: 528a3d2806e287b2
+  func:listUserProjects: 33fe12e5edabd8d0
+  func:removeProductFromProject: de6b4aa428a3db2d
+  overview: d3d6cc5a6efc3fd8
+generated_at: 2026-05-28T22:38:29Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun merkezi proje yönetim servisi olarak çalışan bu modül, kullanıcıların oluşturduğu projelerin ve bu projelere ekledikleri ürünlerin tüm veritabanı işlemlerini tek noktadan yönetir. Ön yüz bileşenlerine tutarlı bir arayüz sunarak kullanıcı özelinde proje erişimi ve proje içeriği yönetimini güvenli şekilde gerçekleştirir.
+VentHub HVAC platformunda kullanıcıların projelerini oluşturmalarını, yönetmelerini ve projelerine ürün ekleyip çıkarmalarını sağlayan merkezi bir proje yönetim servisidir. Bu modül, ön yüz bileşenlerinden gelen talepleri işleyerek kullanıcı bazlı proje erişimi ve proje içeriği yönetimini veritabanında güvenli ve tutarlı bir şekilde yürütür.
 
 ## Fonksiyon Grupları
 ### Temel Proje Yaşam Döngüsü İşlemleri
-Kullanıcının kendi projeleriyle ilgili temel işlemleri yürütür, projelerin oluşturulmasından silinmesine kadar tüm lifecycle adımlarını yönetir.
+Kullanıcının kendi projeleriyle ilgili temel işlemleri yönetir; projelerin listelenmesinden oluşturulmasına ve silinmesine kadar tüm yaşam döngüsü adımlarını kontrol eder.
 - listUserProjects, createProject, deleteProject
 
 ### Proje İçerik Yönetimi
-Mevcut bir projeye ait ürünlerin yönetimini üstlenir, projeye ürün ekleme, çıkarma ve projeye ait tüm ürünleri listeleme işlemlerini gerçekleştirir.
+Mevcut bir projeye bağlı ürünlerin yönetimini üstlenir; projeye ürün ekleme, projeden ürün çıkarma ve projeye ait tüm ürünleri listeleme işlemlerini gerçekleştirir.
 - addProductToProject, removeProductFromProject, listProjectItems
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül, kullanıcıların kendi projelerini oluşturup yönetmesini, projelere ürün ekleyip çıkarılmasını sağlayan iş servisidir; tüm fonksiyonlarının doğru çalışması için veritabanı erişimi, kullanıcı yetkilendirmesi ve geçerli giriş parametrelerinin varlığı zorunludur.
 
-[Aksiyom 1]: Eğer servisin eriştiği veritabanındaki 'user_projects' ve ilişkili proje öğeleri tablolarına okuma/yazma izni yoksa, tüm proje listeleme, oluşturma, silme ve ürün ekleme/çıkarma işlemleri başarısız olur.
-[Aksiyom 2]: Eğer createProject fonksiyonuna gönderilen proje nesnesi, 'user_projects' tablosunun zorunlu alanlarını içermiyorsa, proje oluşturma işlemi veritabanı doğrulama hatasıyla başarısız olur.
-[Aksiyom 3]: Eğer deleteProject, addProductToProject, removeProductFromProject, listProjectItems fonksiyonlarına gönderilen projeId veya productId parametreleri geçerli string formatında değilse, hedef kaynağa ulaşılamadığı için ilgili işlem başarısız olur.
-[Aksiyom 4]: Eğer addProductToProject fonksiyonuna gönderilen quantity parametresi 0'dan büyük sayısal bir değer değilse, projeye ürün ekleme işlemi geçersiz miktar verisiyle başarısız olur veya yanlış kaydedilir.
-[Aksiyom 5]: Eğer işlemi gerçekleştiren kullanıcının ilgili proje üzerinde erişim ve değişiklik yapma yetkisi yoksa, tüm projeye özel işlemler yetki hatasıyla başarısız olur.
-[Aksiyom 6]: Eğer addProductToProject fonksiyonunda iletilen productId sistemdeki mevcut ürünler kataloğunda bulunmuyorsa, var olmayan ürün projeye eklenemediği için işlem başarısız olur.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### listUserProjects
-**Ne yapar**: Mevcut oturumu açık, kimliği doğrulanmış kullanıcıya ait tüm projeleri getirir. Projeler son güncellenme zaman damgasına göre azalan sırada sıralanarak döndürülür, kullanıcıya ait hiç proje yoksa boş bir dizi döndürülür.
-**Nasıl yapar**: Doğrulanmış kullanıcının kimliği temel alınarak veritabanında sorgu çalıştırır, elde edilen proje kayıtlarını son güncelleme zamanına göre sıralar ve kullanıcıya sunar. Veritabanı sorgusunda herhangi bir hata oluşması durumunda işlem Error fırlatarak sonlanır.
-**Parametreler**: Bu fonksiyon herhangi bir dış parametre almaz.
-**Dönüş**: Promise<DbUserProject[]> tipinde bir değer döndürür. Promise çözüldüğünde kullanıcıya ait tüm proje kayıtlarını içeren bir dizi elde edilir, hiç proje yoksa boş dizi döner. Veritabanı sorgusu başarısız olursa Error fırlatır.
+**Ne yapar**: Kimliği doğrulanmış kullanıcının tüm projelerini getirir.
+**Nasıl yapar**: Supabase istemcisi üzerinden `user_projects` tablosuna sorgu gönderir. Tüm projeleri (`*`) seçer ve `updated_at` alanına göre azalan sırada (`ascending: false`) sıralar. Veritabanı sorgusu başarılıysa elde edilen veriyi `DbUserProject[]` dizisine dönüştürerek döndürür; herhangi bir hata oluşursa hatayı fırlatır. Sorgu sonucunda veri yoksa boş bir dizi döner.
+**Parametreler**: Bu fonksiyonun herhangi bir parametresi yoktur.
+**Dönüş**: `Promise<DbUserProject[]>` — Kullanıcının projelerini temsil eden bir dizi döner. Kullanıcının projesi yoksa boş bir dizi döner.
 
 ### createProject
-**Ne yapar**: Oturumu açık kimliği doğrulanmış kullanıcı için yeni bir proje oluşturur. Gelen proje detaylarının veritabanı şemasına uygunluğu kontrol edilerek yeni kayıt oluşturulur, oluşturulan yeni proje kaydı tam olarak geri döndürülür.
-**Nasıl yapar**: Fonksiyona iletilen proje detaylarını veritabanının user_projects tablosunun ekleme şemasına uygun olarak kaydeder, ekleme işlemi sonrası oluşturulan tam proje kaydını kullanıcıya iletir. Veritabanına ekleme işlemi başarısız olursa işlem Error fırlatarak sonlanır.
+**Ne yapar**: Kimliği doğrulanmış kullanıcı için yeni bir proje oluşturur.
+**Nasıl yapar**: Verilen proje nesnesini (`project`) `user_projects` tablosuna ekler. Ekledikten sonra `select()` ile eklenen kaydı geri çeker ve `.single()` ile tek bir kayıt olarak alır. Veritabanı ekleme işlemi başarılıysa yeni oluşan `DbUserProject` kaydını döndürür; bir hata oluşursa hatayı fırlatır.
 **Parametreler**:
-- project: TablesInsert<'user_projects'> — Veritabanı şemasına uygun, eklenecek yeni projenin tüm detaylarını içeren nesne
-**Dönüş**: Promise<DbUserProject> tipinde bir değer döndürür. Promise çözüldüğünde yeni oluşturulan tam proje kaydı elde edilir. Veritabanı ekleme işlemi başarısız olursa Error fırlatır.
+- project: `TablesInsert<'user_projects'>` — Veritabanı şemasıyla eşleşen, oluşturulacak projenin detaylarını içeren nesne.
+**Dönüş**: `Promise<DbUserProject>` — Yeni oluşturulan kullanıcı projesi kaydını temsil eden bir nesne döner.
 
 ### deleteProject
-**Ne yapar**: Kullanıcıya ait belirli bir projeyi ve projeyle ilişkili tüm öğeleri siler. Projeye ait bağımlı kayıtların silinmesi genellikle veritabanı seviyesindeki ardışık silme (cascade) mekanizmasıyla yönetilir. Silme işlemi başarılı olursa olumlu sonuç döndürülür.
-**Nasıl yapar**: Fonksiyona iletilen benzersiz proje kimliği üzerinden veritabanında silme sorgusu çalıştırır, projeye ait tüm bağımlı kayıtların silinmesini veritabanının yerleşik cascade özelliği ile otomatik olarak yönetir. Silme işlemi başarısız olursa işlem Error fırlatarak sonlanır.
+**Ne yapar**: Belirtilen kimliğe sahip kullanıcı projesini ve ilişkili tüm öğelerini siler (kaskad silme veritabanı tarafından ele alınır).
+**Nasıl yapar**: `user_projects` tablosunda `id` alanı verilen parametreye eşleşen kaydı siler. İşlem başarılıysa `true` değerini döndürür; bir hata oluşursa hatayı fırlatır.
 **Parametreler**:
-- id: string — Silinecek projenin benzersiz kimlik değeri
-**Dönüş**: Promise<boolean> tipinde bir değer döndürür. Promise çözüldüğünde silme işlemi başarılıysa true değeri elde edilir. Veritabanı silme işlemi başarısız olursa Error fırlatır.
+- id: `string` — Silinecek projenin benzersiz tanımlayıcısı.
+**Dönüş**: `Promise<boolean>` — Silme işlemi başarılıysa `true` döner.
 
 ### addProductToProject
-**Ne yapar**: Kullanıcı projesine belirli bir ürünü, istenilen adet miktarıyla ekler. Adet parametresi isteğe bağlıdır, belirtilmediği takdirde varsayılan olarak 1 değeri atanır. Yeni eklenen proje öğesi kaydı tam olarak geri döndürülür.
-**Nasıl yapar**: İletilen proje kimliği, ürün kimliği ve adet değerleriyle veritabanında yeni bir proje öğesi kaydı oluşturur. Ekleme işlemi sırasında herhangi bir hatayla karşılaşılması durumunda işlem Error fırlatarak sonlanır.
+**Ne yapar**: Belirli bir ürünü, belirli bir projeye istenen miktar kadar ekler.
+**Nasıl yapar**: `project_items` tablosuna, verilen `projectId`, `productId` ve `quantity` değerlerini içeren yeni bir kayıt ekler. Ekledikten sonra `select()` ile eklenen kaydı geri çeker ve `.single()` ile tek bir kayıt olarak alır. İşlem başarılıysa yeni oluşan `DbProjectItem` kaydını döndürür; bir hata oluşursa hatayı fırlatır. Miktar parametresi opsiyoneldir ve varsayılan olarak 1'dir.
 **Parametreler**:
-- projectId: string — Ürünün ekleneceği hedef projenin benzersiz kimlik değeri
-- productId: string — Projeye eklenecek ürünün benzersiz kimlik değeri
-- quantity: number — Projeye eklenecek ürün adedi, varsayılan olarak 1 değerini alır
-**Dönüş**: Promise<DbProjectItem> tipinde bir değer döndürür. Promise çözüldüğünde yeni oluşturulan tam proje öğesi kaydı elde edilir. Veritabanı ekleme işlemi başarısız olursa Error fırlatır.
+- projectId: `string` — Ürünün ekleneceği hedef projenin benzersiz tanımlayıcısı.
+- productId: `string` — Eklenen ürünün benzersiz tanımlayıcısı.
+- quantity: `number` — Eklenecek birim sayısı (varsayılan değer 1'dir).
+**Dönüş**: `Promise<DbProjectItem>` — Yeni oluşan proje öğesi kaydını temsil eden bir nesne döner.
 
 ### removeProductFromProject
-**Ne yapar**: Kullanıcı projesinden belirli bir ürünü tamamen kaldırır. Hedef proje ve kaldırılacak ürün kimlikleri üzerinden ilgili proje öğesi kaydı veritabanından silinir, silme işlemi başarılı olursa olumlu sonuç döndürülür.
-**Nasıl yapar**: İletilen proje kimliği ve ürün kimliği ile eşleşen proje öğesi kaydını bulmak için veritabanı sorgusu çalıştırır, eşleşen kaydı kalıcı olarak siler. Silme işlemi sırasında herhangi bir hatayla karşılaşılması durumunda işlem Error fırlatarak sonlanır.
+**Ne yapar**: Belirli bir projeden belirli bir ürünü kaldırır.
+**Nasıl yapar**: `project_items` tablosunda `project_id` ve `product_id` alanları verilen parametrelere eşleşen kaydı siler. İşlem başarılıysa `true` değerini döndürür; bir hata oluşursa hatayı fırlatır.
 **Parametreler**:
-- projectId: string — Ürünün kaldırılacağı hedef projenin benzersiz kimlik değeri
-- productId: string — Projeden kaldırılacak ürünün benzersiz kimlik değeri
-**Dönüş**: Promise<boolean> tipinde bir değer döndürür. Promise çözüldüğünde silme işlemi başarılıysa true değeri elde edilir. Veritabanı silme işlemi başarısız olursa Error fırlatır.
+- projectId: `string` — Ürünün kaldırılacağı hedef projenin benzersiz tanımlayıcısı.
+- productId: `string` — Kaldırılacak ürünün benzersiz tanımlayıcısı.
+**Dönüş**: `Promise<boolean>` — Silme işlemi başarılıysa `true` döner.
 
 ### listProjectItems
-**Ne yapar**: Belirtilen proje içindeki tüm öğeleri, her öğeye ait ilgili alan ürün verileriyle birleştirilerek zenginleştirilmiş şekilde getirir. Projedeki her öğenin tüm ürün detaylarına erişilebilir hale gelmesi sağlanır, hiç öğe yoksa boş dizi döndürülür.
-**Nasıl yapar**: İletilen proje kimliği üzerinden veritabanında birleştirme (join) içeren sorgu çalıştırır, proje öğeleri tablosunu ürünler tablosuyla ilişkilendirerek her öğenin tam ürün detaylarını içeren bir dizi oluşturur. Sorgu çalışması sırasında herhangi bir hatayla karşılaşılması durumunda işlem Error fırlatarak sonlanır.
+**Ne yapar**: Belirli bir projedeki tüm ürünleri, karşılıklı gelen alan ürün verileriyle birlikte getirir.
+**Nasıl yapar**: `project_items` tablosunda `project_id` alanı verilen parametreye eşleşen tüm kayıtları sorgular. `product:products(*)` seçimi ile her bir proje öğesinin ilişkili `products` tablosundaki tam verisini de (sol dış birleştirme) çeker. Sonuçta her bir `DbProjectItem` nesnesi, `product` alanı olarak ilgili `DbProduct` nesnesini içerir. Ham veritabanı verisi, `mapDatabaseProductToDomain` yardımcı fonksiyonu kullanılarak alan modeline dönüştürülür. Veritabanı sorgusu başarısız olursa hata fırlatılır.
 **Parametreler**:
-- projectId: string — Tüm öğeleri getirilecek hedef projenin benzersiz kimlik değeri
-**Dönüş**: Promise<ProjectItem[]> tipinde bir değer döndürür. Promise çözüldüğünde her biri kendi tam ürün detaylarıyla zenginleştirilmiş proje öğeleri dizisi elde edilir. Veritabanı sorgusu başarısız olursa Error fırlatır.
+- projectId: `string` — Öğelerin getirileceği hedef projenin benzersiz tanımlayıcısı.
+**Dönüş**: `Promise<ProjectItem[]>` — Her biri tam ürün ayrıntılarıyla zenginleştirilmiş proje öğelerini temsil eden bir dizi döner.
 
 ---
 

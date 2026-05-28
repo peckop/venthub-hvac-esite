@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminAuditLogPage: 50d17db2bc55805a
   overview: 2053e68b7986a9b1
   style_tokens: d2a1c3bee3a34f52
-generated_at: 2026-05-27T18:30:42Z
+generated_at: 2026-05-28T22:38:53Z
 ---
 
 ## Genel Bakış

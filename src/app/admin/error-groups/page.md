@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: b47a5eb18beb6937
   overview: 3abd4459140e249f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-27T17:58:44Z
+generated_at: 2026-05-28T22:34:54Z
 ---
 
 ## Genel Bakış
@@ -49,9 +49,7 @@ Bu modül, **Page** fonksiyonunun yönetim panelindeki “Hata Grupları” sayf
 **Nasıl yapar**: Fonksiyon, React bileşeni olarak tanımlanmış olup, JSX içinde `<AdminErrorGroupsPage />` etiketini render eder. Bu sayede sayfa, hata gruplarının yönetim ekranını sunar.  
 **Parametreler**:
 - *None*  
-**Dönüş**: `<AdminErrorGroupsPage />` bileşeni (React element)  
-
----
+**Dönüş**: `<AdminErrorGroupsPage />` bileşeni (React element)
 
 ---
 

@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx
 skeleton_hash: 2f5b4133310167a3
-generated_at: 2026-05-23T22:37:25Z
+entity_hashes:
+  func:AdminErrorsPage: a54e992b31a4d175
+  func:fmt: f911ea01809e8b2a
+  overview: d3ea8e7075148ca6
+  style_tokens: a98ae3ae7fce0104
+generated_at: 2026-05-28T22:38:59Z
 ---
 
 ## Genel Bakış
@@ -31,7 +36,7 @@ Bu React TypeScript tabanlı admin paneli hata görüntüleme sayfası modülün
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminErrorsPage
 **Ne yapar**: VentHub HVAC sisteminin yönetici paneli için geliştirilmiş hata kayıtları sayfası React bileşenidir. Yöneticilerin sistemde oluşan tüm hataları tek bir merkezden görüntülemesine ve incelemesine olanak tanır.
@@ -198,29 +203,6 @@ Bu React TypeScript tabanlı admin paneli hata görüntüleme sayfası modülün
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-AdminErrorsPage() fonksiyonu, metin formatlama ve çıktı alma işlemleri için standart fmt modülünü çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon belirtilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  AdminErrorsPage() → fmt()
-
-```mermaid
-graph LR
-    AdminErrorsPage["AdminErrorsPage()"] --> fmt["fmt()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\views\admin\AdminErrorsPage.tsx
@@ -231,3 +213,19 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminErrorsPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `tracking-hvac-normal`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-50`, `bg-rose-50`, `bg-sky-50`, `bg-surface-deep`, `bg-surface-deep/40`, `bg-surface-deep/80`, `bg-white/3`, `bg-white/5`, `border-b`, `border-red-100`, `border-t`, `border-white/10`, `border-white/5`, `hover:bg-white/10`, `hover:bg-white/2`
+- **Layout:** `backdrop-blur-md`, `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `gap-6`, `grid`, `inline-flex`, `items-center`, `justify-between`, `justify-end`, `max-h-80`, `md:grid-cols-2`, `min-w-full`, `overflow-auto`
+- **Varyant/Responsive:** `:`, `disabled:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${adminCardClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${r.level`, `:`, `===`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-30`, `error`, `font-black`, `font-bold`, `font-medium`, `font-mono`, `glass-strong`

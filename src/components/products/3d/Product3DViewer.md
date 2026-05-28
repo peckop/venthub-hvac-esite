@@ -4,7 +4,17 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\Product3DViewer.tsx
 skeleton_hash: e0b3af0734045fbc
-generated_at: 2026-05-23T22:24:08Z
+entity_hashes:
+  func:ErrorBoundary:constructor: 7de390ca1471a8c5
+  func:ErrorBoundary:getDerivedStateFromError: 55b37af114c0da98
+  func:ErrorBoundary:render: d1b28a5536b042f6
+  func:Loader: 7d9f8e9183b1d56a
+  func:ModelRotator: 16e4e30d89b449dd
+  func:Product3DViewer: 6adac65ce4a11e86
+  func:handleViewChange: ea99a6a2d5d89bd3
+  overview: 381553906a41f958
+  style_tokens: d2e480f938f25b44
+generated_at: 2026-05-28T22:36:44Z
 ---
 
 ## Genel Bakış
@@ -41,7 +51,7 @@ Modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Loader
 **Ne yapar**: Yüklenme durumunu gösteren basit bir bileşen render eder.  
@@ -75,27 +85,6 @@ Modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
 **Parametreler**:  
 - view: 'front' | 'top' | 'right' | 'back' | 'bottom' | 'left' | 'iso' — Uygulanacak görünüme yön  
 **Dönüş**: Bilinmiyor (verilen bilgiye göre `void` veya dönüş değeri yoktur).
-
-### constructor (ErrorBoundary.constructor)
-**Ne yapar**: `ErrorBoundary` sınıfının örneğini oluşturur ve başlangıç props'larını alır.  
-**Nasıl yapar**: `props` nesnesini alır; bu nesne içinde `children` (render edilecek içerik) ve `t` (çeviri işlevi) özelliklerini bulur ve sınıfın durumunu başlatır (detaylı durum başlatma kodu verilmedi).  
-**Parametreler**:  
-- props: { children: React.ReactNode, t: (key: string) => string } — Bileşenin içeriği ve çeviri fonksiyonu  
-**Dönüş**: Bilinmiyor (constructor genellikle `void` döndürür).
-
-### getDerivedStateFromError
-**Ne yapar**: Bir hata oluştuğunda `ErrorBoundary` bileşeninin durumunu günceller; hata durumunu göstermek için state'i ayarlar.  
-**Nasıl yapar**: Yakalanan `error` nesnesini alır ve `{ hasError: true, error }` şeklinde bir nesne döndürerek React'in bu state'i kullanarak hata UI'sini render etmesini sağlar.  
-**Parametreler**:  
-- error: Error — Yakalanan hata nesnesi  
-**Dönüş**: `{ hasError: true, error }` nesnesi.
-
-### render (ErrorBoundary.render)
-**Ne yapar**: Hata yoksa bileşenin çocuklarını render eder; hata durumu varsa bu metot tarafından alternatif UI render edilmez (sağlanan bilgiye göre sadece çocuklar döner).  
-**Nasıl yapar**: Bileşenin mevcut `this.props.children` özelliğini döndürür; bu, hata sınırı içinde yer alan içeriği gösterir.  
-**Parametreler**:  
-- Parametre yok  
-**Dönüş**: `this.props.children` (render edilecek çocuk JSX elemanları).
 
 ---
 
@@ -188,28 +177,19 @@ Modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
 
 ---
 
-## Çağrı Haritası
 
-### Disariya Cagrilar (Outgoing)
-- **Product3DViewer()** fonksiyonu, görüntü değişikliğini işlemek için **handleViewChange** fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-- Veri sağlanmadı; bu modülü dışarıdan çağıran fonksiyon veya dosya belirtilmemiş.
-
-### Ic Ice Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  Product3DViewer() → handleViewChange()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    Product3DViewer["Product3DViewer()"] --> handleViewChange["handleViewChange()"]
+graph TD
+    Product3DViewer_tsx__Loader["Loader"]
+    Product3DViewer_tsx__ModelRotator["ModelRotator"]
+    Product3DViewer_tsx__Product3DViewer["Product3DViewer"]
+    Product3DViewer_tsx__constructor["constructor"]
+    Product3DViewer_tsx__getDerivedStateFromError["getDerivedStateFromError"]
+    Product3DViewer_tsx__handleViewChange["handleViewChange"]
+    Product3DViewer_tsx__render["render"]
+    Product3DViewer_tsx__Product3DViewer --> Product3DViewer_tsx__handleViewChange
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -241,16 +221,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#cde0f5_100%)]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-50`, `bg-red-50`, `bg-white`, `bg-white/80`, `bg-white/90`, `bg-white/95`, `border-gray-200`, `border-gray-300`, `border-light-gray`, `border-red-200`, `fill-current`, `text-blue-600`, `text-center`, `text-gray-600`, `text-left`
+- **Renkler:** `bg-blue-50`, `bg-product-3d-radial`, `bg-red-50`, `bg-white`, `bg-white/80`, `bg-white/90`, `bg-white/95`, `border-gray-200`, `border-gray-300`, `border-light-gray`, `border-red-200`, `fill-current`, `hover:bg-blue-50`, `hover:bg-gray-100`, `hover:text-primary-navy`
 - **Layout:** `absolute`, `backdrop-blur-md`, `bottom-4`, `fixed`, `flex`, `flex-col`, `gap-0.5`, `gap-1`, `gap-2`, `h-full`, `items-center`, `left-0`, `left-1/2`, `left-4`, `overflow-hidden`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${autoRotate`, `${isFullscreen`, `${rotationMode`, `${tb.font`, `${tb.minW`, `${tb.pad`, `${tb.top`, `-translate-x-1/2`, `:`, `===`, `animate-spin`, `border`, `break-words`, `font-bold`, `free`

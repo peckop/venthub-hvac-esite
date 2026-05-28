@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminLayout.tsx
 skeleton_hash: f9a4b14f366ee150
-generated_at: 2026-05-23T22:37:23Z
+entity_hashes:
+  func:AdminLayout: f3d3a8a9833ef080
+  overview: d411381d25a05687
+  style_tokens: dab87eff3332d515
+generated_at: 2026-05-28T22:39:01Z
 ---
 
 ## Genel Bakış
@@ -26,7 +30,7 @@ Bu React tabanlı yönetim paneli layout bileşeni, sadece yetkilendirilmiş adm
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminLayout
 **Ne yapar**: VentHub HVAC projesinin admin paneli için tüm admin sayfalarında ortak olarak kullanılan temel düzen (layout) bileşenidir. Admin arayüzünün paylaşılan iskeletini oluşturur, kendisine iletilen sayfaya özel içerikleri bu düzenin içerisinde render ederek tüm admin sayfaları için tutarlı bir görünüm ve kullanıcı deneyimi sunar.
@@ -101,3 +105,19 @@ Bu React tabanlı yönetim paneli layout bileşeni, sadece yetkilendirilmiş adm
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminLayout
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400/10`, `bg-gradient-to-br`, `bg-primary-navy/20`, `bg-secondary-blue/10`, `bg-surface-deep`, `bg-surface-deep/60`, `bg-white/2`, `bg-white/5`, `border-b`, `border-b-2`, `border-cyan-400`, `border-cyan-400/20`, `border-r`, `border-t`, `border-white/10`
+- **Layout:** `-left-10%`, `-right-10%`, `-top-10%`, `absolute`, `backdrop-blur-xl`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-none`, `from-cyan-500/20`, `gap-3`, `gap-4`, `h-1/2`
+- **Varyant/Responsive:** `:`, `active:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${sidebarOpen`, `-translate-x-full`, `:`, `===`, `active:scale-95`, `animate-spin`, `blur-100`, `blur-120`, `border`, `duration-300`, `ease-in-out`, `font-black`, `font-bold`, `font-sans`

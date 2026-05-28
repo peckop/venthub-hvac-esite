@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\getCategoryIcon.tsx
 skeleton_hash: 33a55071e2999970
-generated_at: 2026-05-23T22:33:43Z
+entity_hashes:
+  func:getCategoryIcon: e7e3d3061db761f5
+  overview: c7c53a125873016e
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:38:46Z
 ---
 
 ## Genel Bakış
@@ -26,7 +30,7 @@ Bu modül, verilen kategori slug'ına uygun ikon bileşeni döndürmek üzere ta
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getCategoryIcon
 **Ne yapar**: VentHub HVAC projesi için kategori bazlı ikon eşleştirmesi yapan React yardımcı fonksiyonudur. Gelen kategori tanımlayıcısına göre ilgili ikon bileşenini seçerek, istenen özelliklerle birlikte kullanıma sunar. Farklı HVAC kategorileri için proje genelinde tutarlı ikon kullanımı sağlamak amacıyla merkezi bir yapı sunar.
@@ -67,3 +71,19 @@ type IconProps = { className?: string; size?: number }
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: getCategoryIcon
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

@@ -4,48 +4,24 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\design-system\tokens.js
 skeleton_hash: 49c7465326318d5b
-generated_at: 2026-05-27T04:43:17Z
+entity_hashes:
+  overview: 604c676f787fff08
+generated_at: 2026-05-28T22:37:44Z
 ---
 
 ## Genel Bakış  
-Bu dosya, **tasarım sisteminin temel yapı taşlarını** (design tokens) tanımlayan tamamen statik bir yapılandırma dosyasıdır. İçerisinde fonksiyon, sınıf veya yan etkili kod bulunmaz; yalnızca `zIndex`, `maxWidth`, `borderRadius`, `fontSize` ve `boxShadow` gibi görsel tutarlılık için gerekli sabit nesneler tanımlanır ve dışa aktarılır. Böylece proje genelinde tek bir doğruluk kaynağı (single source of truth) sağlanır.
+Bu modül, tasarım sisteminin temel yapı taşlarını (design tokens) tanımlayan tamamen statik bir yapılandırma dosyasıdır. İçerisinde fonksiyon, sınıf veya yan etkili kod bulunmaz; yalnızca `zIndex`, `maxWidth`, `borderRadius`, `fontSize`, `boxShadow`, `height`, `width`, `transitionDuration` ve `blur` gibi görsel tutarlılık için gerekli sabit nesneler tanımlanır ve dışa aktarılır.  
 
 ## Fonksiyon Grupları  
-### Sabit Tanımlar  
-Bu grup, UI bileşenlerinin tutarlı bir şekilde stil almasını sağlayan temel tasarım tokenlarını içerir.  
-- `zIndex`  
-- `maxWidth`  
-- `borderRadius`  
-- `fontSize`  
-- `boxShadow`  
-
-Bu sabitler, uygulamanın farklı bölümlerinde aynı görsel değerlerin tekrar kullanılmasını ve sürdürülmesini kolaylaştırır.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül, tasarım sisteminin statik token değerlerini dışa aktaran bir JavaScript nesnesi olarak tanımlanmıştır; bu nedenle aşağıdaki sabitlerin tanımlı ve doğru yapılandırılmış olması gerekir.
-
-**Aksiyom 1**: Eğer `zIndex` nesnesi tanımlı değilse, katman sıralaması belirlenemez ve UI bileşenlerinin üst‑alt ilişkileri hatalı olur.  
-**Aksiyom 2**: Eğer `maxWidth` nesnesi tanımlı değilse, genişlik sınırlamaları uygulanamaz ve responsive tasarım bozulur.  
-**Aksiyom 3**: Eğer `borderRadius` nesnesi tanımlı değilse, köşe yuvarlatma stilleri tutarsız olur ve tasarım bütünlüğü kaybolur.  
-**Aksiyom 4**: Eğer `fontSize` nesnesi tanımlı değilse, tipografi ölçeklendirmesi yapılamaz; metinler beklenen boyutta render edilmez.  
-**Aksıyon 5**: Eğer `boxShadow` nesnesi tanımlı değilse, gölge efektleri uygulanamaz ve UI derinlik algısı eksik olur.  
-**Aksiyom 6**: Eğer `height` nesnesi tanımlı değilse, sabit yükseklik değerleri kullanılamaz; bileşenlerin dikey boyutlandırması belirsiz olur.  
-**Aksiyom 7**: Eğer `minHeight` nesnesi tanımlı değilse, minimum yükseklik kısıtlamaları uygulanamaz; içerik taşması riski artar.  
-**Aksiyom 8**: Eğer `maxHeight` nesnesi tanımlı değilse, maksimum yükseklik sınırları yok olur; layout overflow hataları ortaya çıkabilir.  
-**Aksiyom 9**: Eğer `width` nesnesi tanımlı değilse, sabit genişlik değerleri kullanılamaz; bileşenlerin yatay boyutu belirsiz kalır.  
-**Aksiyom 10**: Eğer `minWidth` nesnesi tanımlı değilse, minimum genişlik kısıtlamaları eksik olur; UI elemanları çok dar görünebilir.  
-**Aksiyom 11**: Eğer `transitionDuration` nesnesi tanımlı değilse, geçiş süreleri belirlenemez; animasyonların tutarlılığı bozulur.  
-**Aksiyom 12**: Eğer `transitionTimingFunction` nesnesi tanımlı değilse, geçiş zamanlama fonksiyonları eksik olur; animasyonların hissiyatı tutarsızlaşır.  
-**Aksiyom 13**: Eğer `blur` nesnesi tanımlı değilse, bulanıklaştırma efektleri uygulanamaz; görsel hiyerarşi kaybolur.  
-**Aksiyom 14**: Eğer `transitionProperty` nesnesi tanımlı değilse, hangi CSS özelliklerinin geçişe dahil edileceği belirlenemez; istenmeyen stil değişiklikleri aniden gerçekleşir.  
-
-*Domain‑specific kural*: Bu sabitlerin her biri, tasarım sisteminin **declarative** doğasına uygun olarak, sabit (immutable) değerler içermelidir; değerlerin runtime’da değiştirilmesi tasarım tutarlılığını bozar. (Değerlerin kendisi hakkında bilgi eksik olduğundan “bilinmiyor” olarak işaretlenmiştir.)
+Bu dosyada herhangi bir fonksiyon bulunmamaktadır. Modül, üst düzey (top-level) sabit tanımlamalarından oluşmaktadır ve yalnızca nesne dışa aktarımı yapmaktadır.
 
 ---
 
 
+
+---
+
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -108,6 +84,28 @@ Bu modül, tasarım sisteminin statik token değerlerini dışa aktaran bir Java
 ---
 
 ## AST POINTERS
+
+Bu dosya (`tokens.js`) **fonksiyon içermemektedir**. Dosya yalnızca dışa aktarılan (export edilen) sabit tasarım token nesnelerinden oluşmaktadır:
+
+| Sabit | Tür | Açıklama |
+|---|---|---|
+| `zIndex` | object | Z-index katman değerleri |
+| `maxWidth` | object | Maksimum genişlik değerleri |
+| `borderRadius` | object | Köşe yuvarlaklığı değerleri |
+| `fontSize` | object | Yazı tipi boyutu değerleri |
+| `boxShadow` | object | Kutu gölgesi değerleri |
+| `height` | object | Yükseklik değerleri |
+| `minHeight` | object | Minimum yükseklik değerleri |
+| `maxHeight` | object | Maksimum yükseklik değerleri |
+| `width` | object | Genişlik değerleri |
+| `minWidth` | object | Minimum genişlik değerleri |
+| `transitionDuration` | object | Geçiş süresi değerleri |
+| `transitionTimingFunction` | object | Geçiş zamanlama fonksiyonu değerleri |
+| `blur` | object | Bulanıklık değerleri |
+| `transitionProperty` | object | Geçiş özelliği değerleri |
+
+**Fonksiyon gövdesi:** `(yok)`
+**AST Pointer üretilecek fonksiyon bulunmamaktadır.**
 
 ---
 

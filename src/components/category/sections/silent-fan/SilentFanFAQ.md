@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanFAQ.tsx
 skeleton_hash: 6c6af5e226009042
-generated_at: 2026-05-23T22:00:44Z
+entity_hashes:
+  func:SilentFanFAQ: 514de334aa5d1d84
+  func:tr: b282b53f03d688a5
+  overview: 04a22bd0b6f69650
+  style_tokens: 325897ca39ea7e85
+generated_at: 2026-05-28T22:35:47Z
 ---
 
 ## Genel Bakış
@@ -26,7 +31,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SilentFanFAQ
 **Ne yapar**: SilentFan ürünüyle ilgili sık sorulan soruların (FAQ) bölümünü render eden bir React fonksiyonel bileşenidir.  
@@ -73,29 +78,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-- `SilentFanFAQ()` fonksiyonu, `tr` fonksiyonunu çağırır (muhtemelen çeviri veya metin dönüşümü işlemi için).
-
-### Disaridan Cagrilanlar (Incoming)
-- Bu modülü çağıran dış fonksiyon veya dosya bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  SilentFanFAQ() → tr()
-
-```mermaid
-graph LR
-    SilentFanFAQ["SilentFanFAQ()"] --> tr["tr()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\category\sections\silent-fan\SilentFanFAQ.tsx
@@ -112,16 +94,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[500px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-blue-100`, `bg-blue-600`, `bg-slate-100`, `bg-slate-50`, `bg-white`, `border-blue-500`, `border-slate-200`, `border-slate-50`, `border-t`, `md:text-4xl`, `text-3xl`, `text-blue-600`, `text-center`, `text-left`, `text-lg`
-- **Layout:** `flex`, `flex-shrink-0`, `gap-4`, `h-16`, `h-8`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `max-h-0`, `max-w-4xl`, `overflow-hidden`, `shadow-blue-500/5`, `shadow-sm`, `shadow-xl`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Layout:** `flex`, `flex-shrink-0`, `gap-4`, `h-16`, `h-8`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `max-h-0`, `max-h-500px`, `max-w-4xl`, `overflow-hidden`, `shadow-blue-500/5`, `shadow-sm`
+- **Varyant/Responsive:** `:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${isOpen`, `${scrollAnimationClasses.fadeUp(isVisible`, `:`, `border`, `duration-300`, `ease-in-out`, `focus-ring`, `font-bold`, `leading-relaxed`, `lg:px-8`, `mb-12`, `mb-6`, `mt-1`, `mx-auto`, `opacity-0`

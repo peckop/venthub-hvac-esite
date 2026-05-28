@@ -4,40 +4,60 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx
 skeleton_hash: 9638f08d7e7c62f9
-generated_at: 2026-05-23T22:38:00Z
+entity_hashes:
+  func:AdminErrorGroupsPage: 2df4b29ac83c8598
+  func:bulkApplyStatus: 2e737880df202268
+  func:loadLatestClientErrors: e416e263b6cc2d92
+  func:toggleSelect: b57335e143909cca
+  func:toggleSort: 10891db6bc49b5bf
+  func:updateAssignedTo: 115d7b001b19d674
+  func:updateNotes: 57b7793991d9e6a2
+  func:updateStatus: 6c7719de765f38dd
+  overview: d1130a512219291d
+  style_tokens: 5e40817d604cd18b
+generated_at: 2026-05-28T22:39:07Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC platformunun yönetici arayüzünde sistem tarafından kaydedilen istemci hatalarını gruplar halinde yönetmek için geliştirilmiş bir React sayfa bileşenidir. Yöneticilerin hata gruplarını görüntülemesi, sıralaması, durumlarını güncellemesi, sorumlu ataması, not eklemesi ve toplu işlemler yapması gibi tüm temel yönetim işlevlerini tek bir noktada sunar.
+Bu modül, Venthub HVAC yönetici panelindeki hata grupları yönetim sayfasıdır. Sistemde kaydedilen istemci hatalarının gruplar halinde görüntülenmesini, sıralanmasını, durumlarının değiştirilmesini, sorumlu atanmasını ve toplu işlemler uygulanmasını sağlar.
 
 ## Fonksiyon Grupları
-### Ana Bileşen ve Temel Arayüz Etkileşimleri
-Sayfanın ana React bileşenini ve yöneticinin arayüzde hata gruplarını sıralama, tekil grupları seçim listesine ekleme/çıkarma gibi temel etkileşimlerini yöneten fonksiyonları barındırır.
+
+### Ana Bileşen ve Görünüm Kontrolleri
+Sayfanın temel yapısını oluşturan ana React bileşeni ile yöneticinin hata gruplarını filtreleme ve seçim yapma gibi arayüz etkileşimlerini yöneten fonksiyonları içerir.
 - AdminErrorGroupsPage, toggleSort, toggleSelect
 
-### Tekil Hata Grubu Yönetim İşlevleri
-Seçilen tek bir hata grubu üzerinde durum güncelleme, sorumlu kullanıcı atama, not ekleme ve gruba ait en yeni hataları yükleme gibi detay yönetim işlemlerini gerçekleştiren asenkron fonksiyonlardır.
+### Hata Grubu Detay Yönetimi
+Tek bir hata grubu üzerinde gerçekleştirilen durum güncelleme, kullanıcı atama, not ekleme ve gruba ait güncel hataları getirme gibi bireysel yönetim işlemlerini yöneten asenkron fonksiyonlardır.
 - updateStatus, updateAssignedTo, updateNotes, loadLatestClientErrors
 
-### Toplu Hata Grubu İşlemleri
-Birden fazla seçili hata grubuna aynı anda işlem uygulamak için kullanılan fonksiyondur, seçili tüm gruplara toplu olarak durum atanmasını sağlar.
+### Toplu İşlem Fonksiyonları
+Birden fazla seçili hata grubuna aynı anda durum değişikliği uygulamak için kullanılan toplu işleme fonksiyonudur.
 - bulkApplyStatus
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı admin paneli hata grupları yönetim sayfası modülünün sorunsuz çalışması için yetkili kullanıcı oturumu, hata grupları üzerinde okuma/yazma işlemlerini destekleyen çalışan bir arka uç API'si ve tüm fonksiyonlara gönderilen parametrelerin tanımlı tip kısıtlamalarına uyması zorunludur.
 
-[Aksiyom 1]: Eğer `toggleSort` fonksiyonuna gönderilen `by` parametresi sadece 'last_seen' veya 'count' değerlerinden birini almıyorsa, sayfadaki hata grubu sıralama mantığı çalışmaz, gruplar yanlış veya hiç sıralanmadan görüntülenir.
-[Aksiyom 2]: Eğer `updateStatus`, `updateAssignedTo`, `updateNotes`, `loadLatestClientErrors` ve `toggleSelect` fonksiyonlarına gönderilen `id`/`groupId` parametreleri sistemde kayıtlı mevcut bir hata grubu kimliği ile eşleşmiyorsa, ilgili işlemler hedef gruba uygulanamaz, sayfa state'inde beklenmedik hatalar oluşur.
-[Aksiyom 3]: Eğer `updateStatus` fonksiyonuna gönderilen `newStatus` parametresi 'open', 'resolved' veya 'ignored' değerlerinden birini almıyorsa, durum güncelleme isteği arka uç tarafından reddedilir, ilgili grubun durumu değişmez.
-[Aksiyom 4]: Eğer arka uç API, bu modüldeki tüm yazma işlemleri (durum, atama, not, toplu durum güncelleme) isteklerine başarılı yanıt vermiyorsa, kullanıcı tarafından yapılan tüm değişiklikler kalıcı olarak kaydedilemez, sayfa yenilenmesiyle tüm işlemler kaybolur.
-[Aksiyom 5]: Eğer `bulkApplyStatus` fonksiyonu çalıştırılmadan önce hiçbir hata grubu `toggleSelect` ile seçilmemişse, toplu durum uygulama işlemi hiçbir grubu etkilemez, kullanıcıya herhangi bir değişiklik sunulamaz.
-[Aksiyom 6]: Eğer sayfaya erişen kullanıcının admin yetkisi bulunmuyorsa, tüm yazma izni gerektiren fonksiyonların istekleri arka uç tarafından reddedilir, hiçbir işlem kalıcı olarak kaydedilemez.
+Bu modül, hata gruplarının yönetimi için bir yönetici arayüzü sunan React bileşenidir ve aşağıdaki mimari varsayımlara dayanır:
+
+**[Aksiyom 1]:** Eğer backend API'si hata grupları için `open`, `resolved` veya `ignored` durum değerlerini desteklemiyorsa, `updateStatus` fonksiyonu geçersiz durum hatası ile karşılaşır.
+
+**[Aksiyom 2]:** Eğer sıralama alanı olarak `last_seen` veya `count` dışında bir değer gönderilirse, `toggleSort` fonksiyonu beklenmeyen davranış gösterir (TypeScript seviyede engellenir).
+
+**[Aksiyom 3]:** Eğer `bulkApplyStatus` çağrıldığında en az bir hata grubu seçilmediyse (`toggleSelect` ile `on=true` olarak işaretlenen grup yoksa), toplu durum güncellemesi uygulanacak hedef bulunamaz.
+
+**[Aksiyom 4]:** Eğer `loadLatestClientErrors` fonksiyonuna geçersiz veya var olmayan bir `groupId` verilirse, sunucu tarafında ilgili hatalar bulunamaz ve boş sonuç döner.
+
+**[Aksiyom 5]:** Eğer `updateAssignedTo` fonksiyonuna geçerli bir `userId` yerine boş string (`''`) verilirse, hata grubunun sorumluluğu kaldırılır (atanmamış duruma geçer).
+
+**[Aksiyom 6]:** Eğer `updateNotes` fonksiyonuna boş string verilirse, hata grubunun not alanı temizlenir.
+
+**[Aksiyom 7]:** Eğer `toggleSelect` fonksiyonu ile bir grup seçildiyse (`on=true`), `bulkApplyStatus` bu grubu hedeflemelidir; grup seçimi kaldırıldıysa (`on=false`) o grup toplu işlem kapsamı dışına çıkar.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminErrorGroupsPage
 **Ne yapar**: VentHub HVAC sisteminin admin paneline ait hata gruplarını görüntüleyen ve yöneten ana sayfa React bileşenidir. Tüm hata grubu yönetim işlevlerini barındıran ana arayüzü oluşturur, adminlerin sistemde oluşan tüm hata gruplarını tek bir yerden takip etmesini sağlar.
@@ -336,38 +356,25 @@ Bu React tabanlı admin paneli hata grupları yönetim sayfası modülünün sor
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki ana fonksiyon AdminErrorGroupsPage(), hata grupları sayfasının tüm işlevlerini yürütmek için sıralama, hata listesi yükleme, sorumlu atama, durum güncelleme, seçim işlemleri ve not güncelleme süreçlerini yönetmek üzere toggleSort, loadLatestClientErrors, updateAssignedTo, updateStatus, toggleSelect ve updateNotes fonksiyonlarını çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veride bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  AdminErrorGroupsPage() → loadLatestClientErrors()
-  AdminErrorGroupsPage() → toggleSelect()
-  AdminErrorGroupsPage() → toggleSort()
-  AdminErrorGroupsPage() → updateAssignedTo()
-  AdminErrorGroupsPage() → updateNotes()
-  AdminErrorGroupsPage() → updateStatus()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    AdminErrorGroupsPage["AdminErrorGroupsPage()"] --> loadLatestClientErrors["loadLatestClientErrors()"]
-    AdminErrorGroupsPage["AdminErrorGroupsPage()"] --> toggleSelect["toggleSelect()"]
-    AdminErrorGroupsPage["AdminErrorGroupsPage()"] --> toggleSort["toggleSort()"]
-    AdminErrorGroupsPage["AdminErrorGroupsPage()"] --> updateAssignedTo["updateAssignedTo()"]
-    AdminErrorGroupsPage["AdminErrorGroupsPage()"] --> updateNotes["updateNotes()"]
-    AdminErrorGroupsPage["AdminErrorGroupsPage()"] --> updateStatus["updateStatus()"]
+graph TD
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage["AdminErrorGroupsPage"]
+    AdminErrorGroupsPage_tsx__bulkApplyStatus["bulkApplyStatus"]
+    AdminErrorGroupsPage_tsx__loadLatestClientErrors["loadLatestClientErrors"]
+    AdminErrorGroupsPage_tsx__toggleSelect["toggleSelect"]
+    AdminErrorGroupsPage_tsx__toggleSort["toggleSort"]
+    AdminErrorGroupsPage_tsx__updateAssignedTo["updateAssignedTo"]
+    AdminErrorGroupsPage_tsx__updateNotes["updateNotes"]
+    AdminErrorGroupsPage_tsx__updateStatus["updateStatus"]
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateStatus
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateAssignedTo
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSort
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateNotes
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__loadLatestClientErrors
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSelect
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -385,3 +392,19 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminErrorGroupsPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `tracking-hvac-normal`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-500/10`, `bg-cyan-500/10`, `bg-gray-50`, `bg-rose-500/10`, `bg-sky-500/10`, `bg-surface-deep`, `bg-white`, `bg-white/5`, `border-b`, `border-cyan-500/20`, `border-red-100`, `border-t`, `border-white/10`, `border-white/5`, `hover:bg-white/10`
+- **Layout:** `!h-10`, `!h-8`, `backdrop-blur-md`, `flex`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-1`, `h-7`, `inline-flex`, `items-center`, `justify-between`, `justify-center`
+- **Varyant/Responsive:** `:`, `disabled:`, `hover:`, `last:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `!px-2`, `!py-1`, `!text-xs`, `$`, `${adminCardClass`, `${adminInputClass`, `${adminSelectClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${cellPad`, `${headPad`, `:`, `===`, `border`, `break-all`

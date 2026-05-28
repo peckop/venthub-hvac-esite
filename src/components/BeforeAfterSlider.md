@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BeforeAfterSlider.tsx
 skeleton_hash: 98863d9789f4629d
-generated_at: 2026-05-23T21:55:17Z
+entity_hashes:
+  func:BeforeAfterSlider: f6df4a2541ee7895
+  overview: 51a709a058824937
+  style_tokens: ae3c52abb33abdfe
+generated_at: 2026-05-28T22:35:42Z
 ---
 
 ## Genel Bakış
@@ -26,7 +30,7 @@ Bu modül, gerekli görüntü özelliklerinin sağlandığını ve alt özelliğ
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### BeforeAfterSlider
 **Ne yapar**: İki görseli (önce ve sonra) yan yana göstererek kullanıcıya sürükleyebileceği bir bölücüyle karşılaştırma imkanı sunar.  
@@ -82,4 +86,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `accent-primary-navy`, `bg-white`, `border-light-gray`, `md:text-3xl`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-steel-gray`
 - **Layout:** `absolute`, `bottom-3`, `h-56`, `h-full`, `left-1/2`, `lg:h-80`, `max-w-7xl`, `overflow-hidden`, `relative`, `sm:h-72`, `top-0`, `w-1`, `w-3/4`, `w-full`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `-ml-0.5`, `-translate-x-1/2`, `border`, `font-bold`, `inset-0`, `lg:px-8`, `mb-4`, `mx-auto`, `object-center`, `object-cover`, `px-4`, `py-10`, `rounded-2xl`, `shadow`, `sm:px-6`

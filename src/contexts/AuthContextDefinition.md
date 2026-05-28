@@ -4,26 +4,27 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\AuthContextDefinition.ts
 skeleton_hash: a2d540bab1caba16
-generated_at: 2026-05-23T22:28:43Z
+entity_hashes:
+  overview: bd987590e3d0b068
+generated_at: 2026-05-28T22:37:32Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin kimlik doğrulama akışını desteklemek amacıyla React tabanlı merkezi bir kimlik doğrulama bağlamı (Auth Context) tanımlar. Uygulamanın tüm bileşenlerinde paylaşılacak kullanıcı oturumu, kullanıcı bilgisi ve yetki verilerine erişimi standartlaştırmak için React'in yerleşik createContext utility'sini kullanır.
-Supabase'in sunduğu yerleşik kullanıcı ve oturum tipleri ile uygulama özelinde tanımlanmış kullanıcı rolü tipini içe aktararak bağlamın tip güvenliğini garanti eder; herhangi bir ortam değişkeni, harici API çağrısı veya veritabanı sorgusu gerçekleştirmez, yalnızca üst seviye bağlam tanımı ve tip aktarımı işlemlerini içerir.
+
+Bu modül, VentHub HVAC projesinde kimlik doğrulama verilerinin uygulama geninde paylaşılmasını sağlayan merkezi bir React Context tanımıdır. Supabase'in `User` ve `Session` tiplerini, uygulama özelinde tanımlanmış `UserRole` rol tipi ile birleştirerek tip güvenli bir `AuthContext` nesnesi oluşturur.
+
+Modül herhangi bir iş mantığı, API çağrısı veya veritabanı sorgusu içermez; yalnızca üst seviye bir bağlam tanımı ve tip aktarımı realizasyonudur. Kimlik doğrulama akışının yürütülmesi (`AuthProvider`, `useAuth` hook'u vb.) bu dosyanın sorumluluğu dışında, ilgili bileşenlerde gerçekleşir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu TypeScript modülü, uygulama geneline kimlik doğrulama verilerini paylaşmak amacıyla AuthContext nesnesini tanımlar, çalışması için AuthContext'in ait olduğu React Context API'sinin projeye entegre edilmiş ve erişilebilir olması zorunludur.
+Bu modül, React uygulamasında kimlik doğrulama bağlamı (context) tanımı yapmakla yükümlüdür.
 
-[Aksiyom 1]: Eğer projeye React Context API entegre edilmemiş ve AuthContext tanımı için erişilebilir kılınmamışsa, AuthContext nesnesi oluşturulamaz ve kimlik doğrulama verileri uygulama geneline paylaşılamaz.
-[Aksiyom 2]: Eğer bu modülde tanımlanan AuthContext, bir sağlayıcı (Provider) bileşeni ile uygulama bileşenlerini sarmalayacak şekilde kullanılmazsa, bağlamı tüketen tüm bileşenlerde geçersiz/boş bağlam değeri hatası oluşur.
-[Aksiyom 3]: Eğer bu modülün proje içindeki içe aktarma (import) yolları yanlış yapılandırılmışsa, AuthContext nesnesine diğer uygulama modülleri tarafından erişilemez ve uygulama derleme aşamasında hata alır.
-[Aksiyom 4]: Eğer kullanılan TypeScript sürümü bu modüldeki AuthContext tanım sözdizimini desteklemiyorsa, modül derlenemez ve uygulama çalıştırılamaz.
+[Aksiyom 1]: Eğer React'ten createContext fonksiyonu içe akt
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -53,10 +54,10 @@ Bu TypeScript modülü, uygulama geneline kimlik doğrulama verilerini paylaşma
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\AuthContextDefinition.ts::AuthContext
-- **params**: (createContext çağrısına aktarılan parametreler, sağlanan fonksiyon gövdesi verisi eksikliği nedeniyle tespit edilemedi)
-- **ic_degiskenler**: Sağlanan kod bloğunda tanımlı ve kullanılan iç değişken bulunamadı
-- **Dönüş**: React'in `createContext` fonksiyonu ile oluşturulmuş tip güvenli React Context nesnesi (AuthContext)
+### [N1_NASIL] AST Pointer: src/contexts/AuthContextDefinition.ts::AuthContext
+- **params**: `(call) createContext<AuthContextValue | undefined>(undefined)` — createContext çağrısı ile AuthContext oluşturulur, başlangıç değeri `undefined` olarak atanır
+- **ic_degiskenler**: yok — dosya sadece context tanımı içerir, fonksiyon gövdesi bulunmamaktadır
+- **Dönüş**: `React.Context<AuthContextValue | undefined>` — React Context nesnesi döner;供給cısı olmayan bileşenler `undefined` alır
 
 ---
 

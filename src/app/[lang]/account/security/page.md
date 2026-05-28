@@ -2,27 +2,35 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\security\page.tsx
-skeleton_hash: e398f4957f5d633b
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\security\page.tsx
+skeleton_hash: 0f7c017ab53e1631
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: f9d663e29d489ed1
+  overview: d3e2cc3bf7442df0
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:58:30Z
+generated_at: 2026-05-28T22:34:48Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının kullanıcı hesap güvenliği ayarları sayfasını oluşturan React bileşenidir. Kullanıcıların şifre yönetimi, iki faktörlü kimlik doğrulama gibi hesap güvenliğiyle ilgili işlemleri gerçekleştirebildiği arayüzü sunar.
+Bu modül, VentHub HVAC uygulamasının kullanıcı hesap güvenliği ayarları sayfasını oluşturan ana React bileşenidir. Sayfa yapısını oluşturarak şifre yönetimi ve iki faktörlü kimlik doğrulama gibi güvenlik ayarları için arayüzü sunar.
 
 ## Fonksiyon Grupları
-### UI Render Grubu
-Hesap güvenliği sayfasının temel yapısını oluşturur ve ilgili alt güvenlik bileşenlerini bu yapı içinde düzenler. Modülün tek giriş noktası ve dışa aktarılan öğesidir.
+### UI Render
+Sayfanın temel yapısını oluşturur ve ilgili alt güvenlik bileşenlerini ekrana render eder. Modülün tek giriş noktası ve dışa aktarılan bileşenidir.
 - Page
 
 ---
 
-## AXIOMS – Mimari Varsayımlar  
-Bu modül için özel aksiyom tanımlanmamıştır.
+## AXIOMS – Mimari Varsayımlar
+Bu modül, VentHub HVAC uygulamasının kullanıcı hesap güvenliği sayfasını oluşturan bir React bileşenidir.
+
+[Aksiyom 1]: Eğer `Page` fonksiyonu React bileşeni olarak render edilmezse (örneğin, JSX döndürmeyip null veya hata döndürürse), hesap güvenliği sayfası kullanıcıya gösterilmez.
+
+[Aksiyom 2]: Eğer `Page` bileşeni Next.js sayfa yapısının gerekliliklerini karşılamıyorsa (örneğin, dinamik segmentleri doğru işleyemiyor veya layout bileşenine entegre olamıyorsa), sayfa yönlendirmeleri ve URL yapıları bozulur.
+
+[Aksiyom 3]: Eğer `Page` bileşeni React Server Components (RSC) veya istemci tarafı bileşen olarak yanlış yapılandırılmışsa, hesap güvenliği ile ilgili dinamik içerikler (şifre değiştirme, 2FA yönetimi vb.) düzgün çalışmayabilir.
+
+[Aksiyom 4]: Eğer `Page` bileşeni uygulamanın authentication/context sağlayıcılarına erişemiyorsa (örneğin, oturum açmış kullanıcı bilgisi alınamıyorsa), güvenli sayfa içeriği gösterilemez veya yetkilendirme hataları oluşur.
 
 ---
 
@@ -42,17 +50,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\security\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: Yok
-- **Dönüş**: yok
+### [N1_NASIL] AST Pointer: `src/app/[lang]/account/security/page.tsx`::Page
+- **params**: (yok)
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde herhangi bir değişken tanımlanmamıştır)
+- **Dönüş**: `<PageComponent />` — Import edilen `AccountSecurityPage` bileşenini JSX olarak render eder; herhangi bir mantık veya veri dönüştürme içermez, doğrudan alt bileşene yönlendirme yapar
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\account\security\page.tsx
-  function: src\app\account\security\page.tsx::Page
+  file: src\app\[lang]\account\security\page.tsx
+  function: src\app\[lang]\account\security\page.tsx::Page
 
 ---
 

@@ -4,7 +4,9 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\I18nContext.ts
 skeleton_hash: 302e96caa0762906
-generated_at: 2026-05-23T22:30:39Z
+entity_hashes:
+  overview: 62a58f78d8be0f4b
+generated_at: 2026-05-28T22:37:51Z
 ---
 
 ## Genel Bakış
@@ -21,7 +23,7 @@ Bu modül, uygulama genelinde uluslararasılaştırma (i18n) verilerini paylaşm
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 

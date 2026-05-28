@@ -4,38 +4,44 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx
 skeleton_hash: bd8655db740d4e93
-generated_at: 2026-05-23T22:35:56Z
+entity_hashes:
+  func:AccountOverviewPage: 5d6b23de15a52581
+  overview: 9631e42766ab0678
+  style_tokens: 98f0536966ac7e31
+generated_at: 2026-05-28T22:39:29Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin kullanıcı hesapları bölümünde yer alan ana hesap özet sayfasını barındıran frontend bileşenidir. Uygulamanın hesap rotası altında yüklenerek kullanıcılara hesaplarıyla ilgili genel bilgilere erişim sağlayan ana arayüzü sunar. Hesap yönetimi işlevlerinin merkezinde yer alan bu sayfa, sadece hesap erişimi olan kullanıcılar tarafından görüntülenebilir.
+Bu modül, VentHub HVAC uygulamasındaki kullanıcı hesap özet sayfasını oluşturan temel React bileşenidir. Kullanıcının hesap bilgilerini görüntülediği ana arayüz sayfası olarak görev yapar ve hesap yönetimi işlevlerinin giriş noktasıdır.
 
 ## Fonksiyon Grupları
-### Ana Hesap Özeti Bileşeni
-Hesap genel bakış sayfasının tüm arayüzünü yönetmek ve kullanıcıya sunmakla sorumlu ana bileşendir, hesap bölümünün ana giriş noktası olarak görev alır.
+### Sayfa Bileşeni
+Hesap özet sayfasının tamamını oluşturan ve kullanıcıya sunan ana React bileşenidir. Sayfa düzenini, içeriğini ve hesap verilerinin gösterimini yönetir.
 - AccountOverviewPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, kullanıcıların kişisel hesap bilgilerini görüntülemesine olanak tanıyan HVAC izleme platformunun frontend hesap özet sayfası bileşenidir, doğru çalışması için platformun frontend mimarisinin sağladığı tüm temel bağımlılıkların varlığı zorunludur.
-
-[Aksiyom 1]: Eğer React.js çalışma zamanı ortamı proje içinde mevcut değilse, bu bileşen hiçbir şekilde render edilemez, uygulama başlatılamaz.
-[Aksiyom 2]: Eğer kullanıcı kimlik doğrulama (authentication) mekanizması bu sayfada entegre edilmemişse, yetkisiz kullanıcılar hassas hesap verilerine erişebilir, veri güvenliği ihlal edilir.
-[Aksiyom 3]: Eğer kullanıcı hesap verilerini sunan backend API servisleri erişilemez durumdaysa, sayfada hiçbir kullanıcıya özel hesap bilgisi görüntülenemez, boş veya hatalı bir ekran oluşur.
-[Aksiyom 4]: Eğer uygulama içi yönlendirme (routing) yapılandırmasında bu sayfa için erişim rotu tanımlanmamışsa, kullanıcılar bu hesap özeti sayfasına hiçbir şekilde erişemez, yönlendirme yapılamaz.
-[Aksiyom 5]: Eğer modülün bağımlı olduğu projenin ortak UI bileşenleri (ana şablon, hesap menüsü, navigasyon çubuğu vb.) proje içinde mevcut değilse, sayfa düzgün görüntülenemez, tasarım bozulur veya çalışma zamanı hatası alınır.
+Bu modül için fonksiyon gövdesi verilmemiştir; dolayısıyla güvenilir mimari varsayımlar üretilemez.
 
 ---
 
-## FONKSIYON DETAYLARI
+**Not:** Verilen `AccountOverviewPage()` fonksiyonu için sadece imza (parametresiz) mevcut olup, fonksiyon gövdesi paylaşılmamıştır. AXIOMS'lar yalnızca fonksiyon gövdesinden üretilen kabul edildiğinden, bu durumda çıkarım yapılamamaktadır.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### AccountOverviewPage
-**Ne yapar**: Venthub HVAC projesinin hesap yönetimi modülünün ana giriş sayfası bileşenidir. Kullanıcıların hesaplarına ait tüm özet bilgileri tek bir merkezi arayüz üzerinden görüntülemesini sağlar, platformun hesapla ilgili tüm işlemlere erişim noktası olarak çalışır. Kaynak kodunda `src\views\account\AccountOverviewPage.tsx` konumunda yer alan bu React bileşeni, genel kullanıcı domainine hitap eden hesap yönetimi işlevlerinin merkezinde yer alır.
-**Nasıl yapar**: React tabanlı bir fonksiyonel sayfa bileşeni olarak uygulamanın yönlendirme mekanizması tarafından hesap genel görünümü rotası tetiklendiğinde otomatik olarak çağrılır. İçerisinde hesap özeti, bağlı HVAC cihazları, fatura bilgileri gibi hesapla ilgili alt bileşenleri birleştirerek bütünleşik bir görünüm oluşturur, oturum kontrolü yaparak yetkili olmayan erişimleri engelleyerek güvenli bir görünüm sunar.
+
+**Ne yapar**: Kullanıcının hesap özet sayfasını渲染 eden ana React bileşenidir. Kullanıcının sipariş geçmişi, aktif kargo durumu, adres bilgileri ve istatistiklerini tek bir dashboard görünümünde sunar.
+
+**Nasıl yapar**: Bileşen, `useAuth` hook'u ile oturum açmış kullanıcı bilgisini alır. `useEffect` içinde asenkron olarak kullanıcının adreslerini `listAddresses` fonksiyonu ile ve siparişlerini Supabase veritabanından `venthub_orders` tablosundan çeker. Sipariş çekerken hata durumunda fallback bir sorgu ile daha az alan döndürecek şekilde güvenli bir mekanizma uygular. Veriler yüklendiğinde istatistik hesaplamaları yaparak aktif sipariş sayısını, tamamlanan sipariş sayısını ve toplam hacmi hesaplar.
+
 **Parametreler**:
-- Bu fonksiyona herhangi bir girdi parametresi aktarılmaz; React uygulamasının yönlendirme sistemi tarafından dahili olarak tetiklenir.
-**Dönüş**: Kaynak kodunda return tipi olarak void veya bilinmiyor olarak işaretlenmiş olsa da, işlevsel olarak React JSX formatında hesap genel görünümünün kullanıcı arayüzünü döndürür. Bu döndürülen JSX yapısı tarayıcıda DOM elementlerine çevrilerek son kullanıcıya görüntülenir.
+- Parametre almaz (React fonksiyonel bileşeni)
+
+**Dönüş**: JSX element döndürür — Loading durumunda spinner animasyonu, yükleme tamamlandığında dashboard kartları, kargo takip widget'ı, son siparişler listesi, adres kartı, güvenlik kartı ve destek kartı içeren tam bir sayfa düzeni döndürür.
 
 ---
 
@@ -58,109 +64,52 @@ Bu modül, kullanıcıların kişisel hesap bilgilerini görüntülemesine olana
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx::AccountOverviewPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: AccountOverviewPage::useEffect
+- **params**: ()
 - **ic_degiskenler**:
-  - `mounted` — Bileşenin mount durumunu takip eden bayrak, unmount sonrası gereksiz state güncellemelerini engellemek için kullanılır
-  - `load` — Bileşen yüklendiğinde adres ve sipariş verilerini yüklemek için çağrılan async iç fonksiyon
-  - `user` — Oturum açmış mevcut kullanıcı nesnesi, verileri kullanıcının id'sine göre çekmek için kullanılır
-  - `setLoading` - Yükleme durumunu güncelleyen state setter fonksiyonu
-  - `setAddresses` - Kullanıcı adresleri state'ini güncelleyen setter fonksiyonu
-  - `setOrders` - Kullanıcı siparişleri state'ini güncelleyen setter fonksiyonu
-- **Dönüş**: Bileşen temizleme (cleanup) fonksiyonu, unmount olduğunda `mounted` bayrağını false olarak ayarlar
+  - `mounted` — Boolean bayrak, bileşenin monte edilip edilmediğini takip eder, async işlemler için güvenlik kontrolü sağlar
+- **Dönüş**: Cleanup fonksiyonu döndürür (mounted=false yapar)
 
----
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx::load
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: AccountOverviewPage::load
+- **params**: ()
 - **ic_degiskenler**:
-  - `user` - Mevcut oturum açmış kullanıcı, kullanıcı verisi yoksa yükleme işlemini iptal etmek için kontrol edilir
-  - `setLoading` - Yükleme başladığında true, bittiğinde false yapmak için kullanılan state setter
-  - `listAddresses` - Kullanıcının kayıtlı adreslerini Supabase'den çeken API fonksiyonu
-  - `addrData` - `listAddresses` çağrısından dönen adres listesi verisi
-  - `setAddresses` - Çekilen adres verilerini state'e kaydetmek için kullanılan setter
-  - `orderData` - Çekilen tüm sipariş verilerini tutan `ShipmentRecord[]` tipinde dizi
-  - `supabase` - Veritabanı sorguları için kullanılan Supabase istemci nesnesi
-  - `data` - İlk tam kapsamlı sipariş sorgusundan dönen başarılı sonuç verisi
-  - `error` - İlk sipariş sorgusunda oluşan hata nesnesi, PGRST100 kodu kontrolü için kullanılır
-  - `fallback` - İlk sorgu başarısız olursa çalışan yedek sınırlı kapsamlı sipariş sorgusunun sonucu
-  - `e` - Genel blokta yakalanan tüm hataları tutan hata nesnesi
-  - `setOrders` - İşlenmiş sipariş verilerini state'e kaydetmek için kullanılan setter
-  - `mounted` - Bileşen hala mount durumunda ise state güncellemelerini yapmak için kontrol edilen bayrak
-- **Dönüş**: Promise<void>, async fonksiyon olarak herhangi bir değer döndürmez
+  - `orderData` — ShipmentRecord[] tipinde boş dizi, tüm sipariş verilerini tutar, fallback senaryosunda yeniden doldurulur
+  - `addrData` — `listAddresses()` çağrısından dönen adres verisi, kullanıcı adreslerini temsil eder
+  - `data` — Supabase'den dönen sipariş verisi (başarılı senaryo)
+  - `error` — Supabase hata nesnesi, PGRST100 kodu kontrol edilir
+  - `fallback` — Ana sorgu hata verdiğinde alternatif sorgu sonucu
+  - `d` — Record<string, unknown> tipinde her bir fallback satırı, map işleminde kullanılır
+- **Dönüş**: yok (async void)
 
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx::fallbackOrderMapCallback
-- **params**: d - Yedek sorgudan dönen ham kayıt nesnesi (`Record<string, unknown>` tipinde)
+### [N3_NASIL] AST Pointer: AccountOverviewPage::renderOrderItem
+- **params**: `(o: ShipmentRecord)`
 - **ic_degiskenler**:
-  - `...d` - Orijinal kaydın tüm mevcut özellikleri yeni nesneye kopyalanır
-  - `carrier` - Eksik alan olarak eklenen null değerli taşıyıcı bilgisi
-  - `tracking_number` - Eksik alan olarak eklenen null değerli kargo takip numarası
-  - `shipped_at` - Eksik alan olarak eklenen null değerli gönderim tarihi
-  - `delivered_at` - Eksik alan olarak eklenen null değerli teslimat tarihi
-- **Dönüş**: Tüm zorunlu alanlara sahip `ShipmentRecord` tipinde standartlaştırılmış sipariş nesnesi
+  - `isDelivered` — Boolean, siparişin teslim edilip edilmediğini status alanına bakarak kontrol eder
+  - `code` — String, sipariş numarasını formatlar: order_number varsa `#${order_number.split('-')[1]}`, yoksa `#${id.slice(-8).toUpperCase()}`
+  - `activeShipStatusBadge` — JSX elementi döndüren fonksiyon çağrısı, sipariş durumuna göre badge gösterir
+- **Dönüş**: JSX elementi (React.ReactNode)
 
----
+### [N4_NASIL] AST Pointer: AccountOverviewPage::getShipStatus
+- **params**: `(row?: ShipmentRecord)`
+- **ic_degiskenler**: yok
+- **Dönüş**: `'delivered' | 'shipped' | 'preparing'` (siparişin kargo durumunu belirten string)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx::getShipStatus
-- **params**: row - Durumu hesaplanacak sipariş nesnesi (`ShipmentRecord` tipinde, opsiyonel)
+### [N5_NASIL] AST Pointer: AccountOverviewPage::getStatusBadge
+- **params**: `(status: 'delivered' | 'shipped' | 'preparing')`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX elementi (React.ReactNode - duruma göre renkli badge)
+
+### [N6_NASIL] AST Pointer: AccountOverviewPage::getStepIndex
+- **params**: `(status: 'delivered' | 'shipped' | 'preparing')`
+- **ic_degiskenler**: yok
+- **Dönüş**: number (0, 1 veya 2 - duruma göre adım indeksi)
+
+### [N7_NASIL] AST Pointer: AccountOverviewPage::renderStepItem
+- **params**: `(step: {key: string, icon: React.ComponentType, label: string}, idx: number)`
 - **ic_degiskenler**:
-  - `row.delivered_at` - Siparişin teslim edildiği tarih, teslimat kontrolü için kullanılır
-  - `row.status` - Siparişin metin olarak durumu, durum doğrulaması için kullanılır
-  - `row.shipped_at` - Siparişin gönderildiği tarih, kargoda kontrolü için kullanılır
-  - `row.tracking_number` - Siparişin kargo takip numarası, gönderim kontrolü için kullanılır
-- **Dönüş**: Siparişin genel durumu: `'delivered' | 'shipped' | 'preparing'`
-
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx::activeShipStatusBadge
-- **params**: status - Gösterilecek sevkiyat durumu (`'delivered' | 'shipped' | 'preparing'`)
-- **ic_degiskenler**:
-  - `CheckCircle` - Teslim edildi durumu için kullanılan ikon bileşeni
-  - `Truck` - Kargoda durumu için kullanılan ikon bileşeni
-  - `Clock` - Hazırlanıyor durumu için kullanılan ikon bileşeni
-- **Dönüş**: Duruma özel stil verilmiş JSX elementi, durum rozeti olarak kullanılır
-
----
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx::getActiveStepIndex
-- **params**: status - Adım indeksi hesaplanacak sevkiyat durumu (`'delivered' | 'shipped' | 'preparing'`)
-- **ic_degiskenler**: yok (sadece durum karşılaştırması yapılır)
-- **Dönüş**: Sevkiyat adım sırasını belirten sayısal değer: 2 (teslim edildi), 1 (kargoda), 0 (hazırlanıyor)
-
----
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx::renderShipStep
-- **params**: step - İşlenecek sevkiyat adımı nesnesi, idx - Adımın listedeki indeks numarası
-- **ic_degiskenler**:
-  - `active` - Adımın aktif olup olmadığını belirten bayrak, stillendirme için kullanılır
-  - `StepIcon` - Adımda gösterilecek ikon bileşeni
-  - `shipSteps` - Tüm sevkiyat adımlarının tutulduğu ana liste, son adım kontrolü için kullanılır
-- **Dönüş**: Adımın render edilmiş JSX fragmenti
-
----
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx::renderOrderCard
-- **params**: o - İşlenecek sipariş nesnesi
-- **ic_degiskenler**:
-  - `isDelivered` - Siparişin teslim edilip edilmediğini belirten bayrak, kart stillendirmesi için kullanılır
-  - `code` - Kartta gösterilecek formatlanmış sipariş kodu
-  - `o.id` - Siparişin benzersiz kimliği, yönlendirme ve anahtar değer olarak kullanılır
-  - `o.order_number` - Siparişin resmi numarası, kod oluşturmak için kullanılır
-  - `o.total_amount` - Siparişin toplam tutarı, para formatlaması için kullanılır
-  - `o.created_at` - Siparişin oluşturulma tarihi, tarih formatlaması için kullanılır
-  - `Package` - Sipariş kartında kullanılan ikon bileşeni
-  - `Link` - Next.js yönlendirme bileşeni, sipariş detay sayfasına link vermek için kullanılır
-  - `formatCurrency` - Para tutarını kullanıcı diline göre formatlayan fonksiyon
-  - `lang` - Kullanıcının aktif dil kodu, formatlamalar için kullanılır
-  - `Calendar` - Tarih göstergesi olarak kullanılan ikon bileşeni
-  - `formatDate` - Tarihi kullanıcı diline göre formatlayan fonksiyon
-  - `activeShipStatusBadge` - Sipariş durumu rozeti oluşturan fonksiyon
-  - `getShipStatus` - Siparişin genel durumunu hesaplayan fonksiyon
-  - `router` - Next.js yönlendirici nesnesi, buton tıklamasında yönlendirme için kullanılır
-  - `ArrowRight` - Detay butonunda kullanılan ikon bileşeni
-- **Dönüş**: Tek sipariş kartının render edilmiş JSX elementi
+  - `active` — Boolean, idx'in activeStepIdx'den küçük olup olmadığını kontrol eder, adımın aktif/pasif durumunu belirler
+  - `StepIcon` — React bileşeni, step.icon'dan alınan ikon bileşeni, JSX içinde render edilir
+- **Dönüş**: JSX elementi (React.ReactNode - adım gösterge bileşeni)
 
 ---
 
@@ -178,3 +127,19 @@ Bu modül, kullanıcıların kişisel hesap bilgilerini görüntülemesine olana
 
 ## BILEŞIM (CONTAINS)
   contains: OrderRecord
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-50`, `bg-amber-500/10`, `bg-blue-400/5`, `bg-blue-50`, `bg-blue-500/10`, `bg-emerald-50`, `bg-emerald-500/10`, `bg-gradient-to-br`, `bg-green-500/10`, `bg-orange-50`, `bg-orange-500/10`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-purple-500/10`, `bg-slate-200`
+- **Layout:** `-bottom-4`, `-left-10%`, `-right-10%`, `-right-20%`, `-right-4`, `-right-6`, `-top-1/2`, `-top-20%`, `-top-6`, `-z-10`, `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `bottom-0`, `flex`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `lg:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `${active`, `${activeStepIdx`, `${isDelivered`, `-translate-x-1/4`, `-translate-y-1/2`, `1`, `:`, `>=`, `animate-pulse`, `animate-spin`, `blur-2xl`, `blur-3xl`, `border`, `divide-slate-100`, `divide-y`

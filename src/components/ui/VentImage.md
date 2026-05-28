@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ui\VentImage.tsx
 skeleton_hash: 32849b176eb758a0
-generated_at: 2026-05-23T22:28:22Z
+entity_hashes:
+  func:VentImage: 5527f2e63e5e22a5
+  func:getImageUrl: 8f32f9a0d260d353
+  overview: 3c6f819afe9328c0
+  style_tokens: 1d628435b48e7258
+generated_at: 2026-05-28T22:37:06Z
 ---
 
 ## Genel Bakış
@@ -31,7 +36,7 @@ Bu React UI bileşeni, resim yükleme hatalarında önceden tanımlanmış yedek
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### VentImage
 **Ne yapar**: VentHub HVAC uygulaması için özel olarak geliştirilmiş profesyonel React görsel bileşenidir. Tüm uygulama genelindeki görsel ihtiyaçlarını Supabase Storage entegrasyonu, otomatik hata yönetimi ve performans odaklı optimizasyonlar ile tek bir bileşende toplar. Erişilebilirlik standartlarına uygun, kullanıcı deneyimini artıran ve bakımı kolay bir görsel sunum altyapısı sunar.
@@ -103,29 +108,6 @@ Bu React UI bileşeni, resim yükleme hatalarında önceden tanımlanmış yedek
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki VentImage() fonksiyonu çalışma prensibi gereği yalnızca getImageUrl fonksiyonunu çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veride bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  VentImage() → getImageUrl()
-
-```mermaid
-graph LR
-    VentImage["VentImage()"] --> getImageUrl["getImageUrl()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\ui\VentImage.tsx
@@ -150,4 +132,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gray-100/50`
 - **Layout:** `absolute`, `h-auto`, `transform-gpu`, `w-full`, `z-0`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${className`, `${isFillMode`, `:`, `duration-300`, `ease-in-out`, `inset-0`, `isLoaded`, `object-cover`, `opacity-0`, `opacity-100`, `props.priority`, `transition-opacity`, `||`

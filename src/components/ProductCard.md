@@ -7,7 +7,7 @@ skeleton_hash: a9c5f54f770565d8
 entity_hashes:
   overview: f6fc01dbf8632730
   style_tokens: 19c7d9ec430fc71d
-generated_at: 2026-05-27T18:09:15Z
+generated_at: 2026-05-28T22:36:39Z
 ---
 
 ## Genel Bakış
@@ -15,7 +15,20 @@ Bu modül, HVAC ürünlerini görsel olarak sunan ve kullanıcı etkileşimini y
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül için fonksiyon gövdesi verilmemiş olup, yalnızca arayüz tanımı ve genel bakış bilgisi mevcuttur. Aşağıdaki varsayımlar bu bilgilere dayanarak çıkarılmıştır.
 
+[Aksiyom 1]: Eğer `Product` nesnesinin yapısı `ProductCard` bileşeninin beklentileriyle (örn: görsel, fiyat, marka alanı) uyumlu değilse, bileşen render hataları verir veya eksik bilgi gösterir.
+
+[Aksiyom 2]: Eğer `formatCurrency` yardımcı fonksiyonu çağrılamıyorsa (örn: modül içe aktarımı eksik), bileşen fiyat gösteremez.
+
+[Aksiyom 3]: Eğer `useCart` hook'u çağrılamıyorsa veya `addToCart` metodu sağlamıyorsa, sepete ekleme işlevi çalışmaz.
+
+[Aksiyom 4]: Eğer `onQuickView` prop'u sağlandığında ilgili işlevsellik (örn: modal açma) bileşen içinde uygulanmamışsa, prop çağrılsa bile hiçbir şey olmaz.
+
+[Aksiyom 5]: Eğer `product.id` değeri yoksa veya geçersizse, `Link` bileşeninin yönlendirdiği ürün detay sayfası (örn: `/products/${id}`) hedefine ulaşılamaz.
+
+[Aksiyom 6]: Eğer `layout` prop'u `'grid'` veya `'list'` değerlerinden farklı bir değer alırsa (örn: `undefined` olmadan farklı bir string), bileşen beklenmeyen bir düzen ile render olabilir veya stil bozukluğu oluşur.
 
 ---
 

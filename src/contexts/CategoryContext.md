@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx
 skeleton_hash: 68788c4cd2c40323
-generated_at: 2026-05-23T22:29:05Z
+entity_hashes:
+  func:CategoryProvider: 664f5248857922aa
+  func:useCategories: bc181eebe7b5a618
+  overview: b140c4299b34113c
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:37:42Z
 ---
 
 ## Genel Bakış
@@ -22,16 +27,24 @@ Tanımlanan kategori context'ine herhangi bir bileşenden kolayca ve güvenli bi
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React Context modülü, uygulama genelindeki kategori verilerini tüm alt bileşenlere paylaştırmak için tasarlanmıştır, doğru çalışması yalnızca modülün kurulum ve çalışma zamanı koşullarına tam uyulmasıyla mümkündür.
 
-[Aksiyom 1]: Eğer CategoryProvider bileşeni, useCategories() hook'unu çağıran tüm bileşenleri içeren bir üst ağaçta konumlanmamışsa, useCategories() çağrısı çalışma zamanı hatası fırlatır, kategori verilerine erişim sağlanamaz.
-[Aksiyom 2]: Eğer CategoryProvider bileşenine zorunlu children prop'u geçirilmezse, provider tarafından sarmalanması gereken hiçbir alt bileşen çalışmaz, ekrana ilgili içerik yansıtılamaz.
-[Aksiyom 3]: Eğer CategoryContext nesnesi çalışma zamanında tanımsız veya bozuk kalırsa, provider ile alt bileşenler arasındaki durum aktarımı tamamen kesilir, tüm kategori ile ilgili işlemler başarısız olur.
-[Aksiyom 4]: Eğer uygulama çalışma zamanı React Context API ve hook mekanizmalarını desteklemiyorsa, modülün hiçbir bileşeni çalışmaz, kategori durum paylaşımı hiçbir şekilde gerçekleştirilemez.
+Bu modül, React Context yapısı üzerine kuruludur ve kategori verilerinin paylaşımını merkezileştirir.
+
+**[Aksiyom 1]:** Eğer `CategoryContext` nesnesi (`React.createContext` ile) oluşturulmamışsa, `CategoryProvider` bileşeni bağlam değerini alt bileşenlere iletemez ve `useCategories` hook'u geçersiz bir bağlam döndürür.
+
+**[Aksiyom 2]:** Eğer `CategoryProvider` bileşeni `children` prop'u olmadan çağrılırsa, hiyerarşide alt bileşen render edilmez; uygulama içinde kategori bağlamına ihtiyaç duyan hiçbir bileşen çalışmaz.
+
+**[Aksiyom 3]:** Eğer `useCategories()` hook'u, `CategoryProvider` sarmalayıcısı dışında bir bileşende çağrılırsa, hook bağlam değerini `undefined` olarak döndürür veya hata fırlatır (React'in `useContext` davranışına bağlı).
+
+**[Aksiyom 4]:** Eğer `CategoryProvider` içeresinde sağlanan bağlam değeri değiştirilirse (örn. kategori listesi güncellenirse), `useCategories()` kullanan tüm abone bileşenler yeniden render edilir.
 
 ---
 
-## FONKSIYON DETAYLARI
+> **Not:** Fonksiyon imzalarında kategori verisinin yapısı, yükleme durumu veya hata yönetimi gibi detaylar açıkça tanımlı değildir; bu nedenle bu alanlarda varsayımda bulunulmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### CategoryProvider
 **Ne yapar**: Uygulama genelinde merkezi kategori otoritesi olarak çalışan React Context sağlayıcısıdır, tüm uygulama ağacındaki bileşenlerin paylaşılan kategori hiyerarşisine erişmesini ve bu veriyi tutarlı şekilde yönetmesini sağlar. Tüm uygulama genelinde kategori verisinin tek merkezden yönetilmesini mümkün kılar.
@@ -68,86 +81,89 @@ Bu React Context modülü, uygulama genelindeki kategori verilerini tüm alt bil
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx::CategoryProvider
-- **params**: children: React.ReactNode
+### [N1_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::CategoryProvider
+- **params**: `children` — React.ReactNode, provider bileşeninin içinde render edilen çocuk elemanlar
 - **ic_degiskenler**:
-  - `categories` — DomainCategory tipinde tüm kategori listesini tutan React state'i
-  - `setCategories` — categories state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `loading` — Kategori yükleme işleminin durumunu tutan boolean state, true iken yükleme devam ediyor
-  - `setLoading` — loading state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `error` - Yükleme sırasında oluşan hataları tutan string | null state'i
-  - `setError` — error state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `loadCategories` — Kategorileri veritabanından çekip state'leri güncelleyen useCallback ile sarmalanmış async fonksiyon
-  - `categoryTree` — Ana kategorileri (parent_id'si olmayan) içeren sıralanmış ağaç yapısı, useMemo ile önbelleğe alınmış
-  - `categoriesSlugMap` - Slug üzerinden kategoriye O(1) erişim sağlayan Map nesnesi, useMemo ile önbelleğe alınmış
-  - `categoriesParentMap` - Üst kategori ID'si üzerinden alt kategorilere erişim sağlayan Map nesnesi, useMemo ile önbelleğe alınmış
-  - `getCategoryBySlug` - Slug ile kategori sorgulayan useCallback ile sarmalanmış yardımcı fonksiyon
-  - `getSubCategories` - Üst kategori ID'si ile alt kategorileri sorgulayan useCallback ile sarmalanmış yardımcı fonksiyon
-  - `value` - Context sağlayıcısı tarafından paylaşılan tüm state ve fonksiyonları içeren nesne, useMemo ile önbelleğe alınmış
-- **Dönüş**: <CategoryContext.Provider> ile sarmalanmış JSX elementi
+  - `categories` — useState ile tanımlanan DomainCategory[] state'i, tüm kategorileri tutar
+  - `loading` — useState ile tanımlanan boolean state, veri yükleme durumunu belirtir
+  - `error` — useState ile tanımlanan string | null state, hata mesajını tutar
+  - `loadCategories` — useCallback ile tanımlanan asenkron fonksiyon, kategorileri getirir ve state'i günceller
+  - `categoryTree` — useMemo ile hesaplanan, parent_id olmayan sıralanmış ana kategori listesi
+  - `categoriesSlugMap` — useMemo ile hesaplanan Map<string, DomainCategory>, slug ile O(1) erişim sağlar
+  - `categoriesParentMap` — useMemo ile hesaplanan Map<string, DomainCategory[]>, parent_id ile alt kategorileri gruplar
+  - `getCategoryBySlug` — useCallback ile tanımlanan, slug'a göre kategori döndüren fonksiyon
+  - `getSubCategories` — useCallback ile tanımlanan, parentId ile alt kategorileri döndüren fonksiyon
+  - `value` — useMemo ile hesaplanan context value nesnesi, sağlanması gereken tüm değer ve fonksiyonları birleştirir
+- **Dönüş**: JSX — CategoryContext.Provider bileşeni, value ile children'ı sarar
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx::loadCategories
+### [N2_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::loadCategories
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `data` — Supabase'den çekilen ham kategori verisi
-  - `domainCats` — Ham verinin domain tipine dönüştürülmüş kategori listesi
-  - `err` - Try-catch bloğunda yakalanan yükleme hatası nesnesi
-- **Dönüş**: Promise<void>
+  - `data` — getCategories() API çağrısından dönen ham kategori verisi
+  - `domainCats` — toUICategoryList(data) ile DomainCategory[] formatına dönüştürülmüş kategori listesi
+  - `err` — catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: Promise\<void\> — async fonksiyon, state'leri yan etkilerle günceller (setCategories, setError, setLoading)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx::CategoryProvider.useEffect_callback
+### [N3_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::useEffect_callback
 - **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok
+- **ic_degiskenler**: (yok — doğrudan loadCategories() çağırır)
+- **Dönüş**: void — bileşen mounts oldığında loadCategories'i tetikler
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx::CategoryProvider.categoryTree_memo_callback
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `mainCats` - parent_id'si olmayan ana kategorilerin filtrelendiği geçici liste
-  - `orderA` - Sıralama için a kategorisinin sort_order metadata değeri
-  - `orderB` - Sıralama için b kategorisinin sort_order metadata değeri
-- **Dönüş**: Sıralanmış ana kategori listesi (DomainCategory[])
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx::CategoryProvider.categoryTree_sort_callback
-- **params**: a: DomainCategory, b: DomainCategory
-- **ic_degiskenler**:
-  - `orderA` - a kategorisinin sıralama için kullanılan sort_order metadata değeri
-  - `orderB` - b kategorisinin sıralama için kullanılan sort_order metadata değeri
-- **Dönüş**: Sıralama farkını belirten number
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx::CategoryProvider.categoriesSlugMap_memo_callback
+### [N4_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::categoryTree
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `map` - Slug ile kategori eşleştirmesi yapan yeni Map nesnesi
-  - `c` - Dizi döngüsünde işlenen geçici kategori nesnesi
-- **Dönüş**: Slug üzerinden erişim sağlayan Map<string, DomainCategory>
+  - `mainCats` — categories.filter(c => !c.parent_id) ile elde edilen, kök (ana) kategoriler listesi
+  - `a` — sort karşılaştırmasında birinci DomainCategory nesnesi
+  - `b` — sort karşılaştırmasında ikinci DomainCategory nesnesi
+  - `orderA` — a.metadata?.sort_order ?? 0 ile elde edilen birinci kategorinin sıralama değeri
+  - `orderB` — b.metadata?.sort_order ?? 0 ile elde edilen ikinci kategorinin sıralama değeri
+- **Dönüş**: DomainCategory[] — sort_order'a göre artan sıralanmış ana kategoriler dizisi
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx::CategoryProvider.categoriesParentMap_memo_callback
+### [N5_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::sort_comparator
+- **params**: `a` — DomainCategory, sıralanacak birinci kategori; `b` — DomainCategory, sıralanacak ikinci kategori
+- **ic_degiskenler**:
+  - `orderA` — (a.metadata as CategoryMetadata | null)?.sort_order ?? 0 — a kategorisinin metadata sort_order değeri, null ise 0
+  - `orderB` — (b.metadata as CategoryMetadata | null)?.sort_order ?? 0 — b kategorisinin metadata sort_order değeri, null ise 0
+- **Dönüş**: number — orderA - orderB farkı, negatif/sıfır/pozitif
+
+### [N6_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::categoriesSlugMap
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `map` - Üst kategori ID'si ile alt kategori listelerini eşleştiren yeni Map nesnesi
-  - `c` - İlk döngüde işlenen geçici kategori nesnesi
-  - `siblings` - Aynı üst kategoriye sahip alt kategorilerin geçici listesi
-  - `a` - Alt kategori sıralamasında işlenen ilk kategori nesnesi
-  - `b` - Alt kategori sıralamasında işlenen ikinci kategori nesnesi
-- **Dönüş**: Üst kategori ID'si üzerinden alt kategorilere erişim sağlayan Map<string, DomainCategory[]>
+  - `map` — new Map<string, DomainCategory>(), slug anahtarlı lookup haritası
+  - `c` — for döngüsünde gezilen her bir DomainCategory nesnesi
+- **Dönüş**: Map<string, DomainCategory> — slug ile O(1) kategori erişimi sağlayan harita
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx::CategoryProvider.value_memo_callback
+### [N7_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::categoriesParentMap
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `categories` - Tüm kategori listesi
-  - `categoryTree` - Sıralanmış ana kategori ağacı
-  - `loading` - Yükleme durumu
-  - `error` - Yükleme hatası
-  - `refresh` - Yeniden yükleme için kullanılan loadCategories referansı
-  - `getCategoryBySlug` - Slug ile kategori sorgulama fonksiyonu
-  - `getSubCategories` - Üst ID ile alt kategori sorgulama fonksiyonu
-- **Dönüş**: Context tarafından paylaşılan tüm değerleri içeren nesne
+  - `map` — new Map<string, DomainCategory[]>(), parent_id anahtarlı, alt kategorileri gruplayan harita
+  - `c` — birinci for döngüsünde gezilen her bir DomainCategory nesnesi
+  - `siblings` —同一 parent_id'ye sahip kategorilerin listesi (map.get ile alınır veya oluşturulur)
+  - `[key, siblings]` — ikinci for döngüsünde map.entries() ile iterasyon yapılan her entry
+  - `a` — inner sort karşılaştırmasında birinci DomainCategory nesnesi
+  - `b` — inner sort karşılaştırmasında ikinci DomainCategory nesnesi
+- **Dönüş**: Map<string, DomainCategory[]> — parent_id ile alt kategorileri gruplayan ve her grubu sort_order'a göre sıralamış harita
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx::useCategories
+### [N8_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::getCategoryBySlug
+- **params**: `slug` — string, aranacak kategorinin slug değeri
+- **ic_degiskenler**: (yok — doğrudan categoriesSlugMap.get(slug) çağırır)
+- **Dönüş**: DomainCategory | undefined — slug eşleşen kategori veya bulunamazsa undefined
+
+### [N9_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::getSubCategories
+- **params**: `parentId` — string, alt kategorileri getirilecek üst kategorinin ID'si
+- **ic_degiskenler**: (yok — doğrudan categoriesParentMap.get(parentId) || [] çağırır)
+- **Dönüş**: DomainCategory[] — parentId'e ait alt kategoriler dizisi, bulunamazsa boş dizi
+
+### [N10_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::value
+- **params**: (yok)
+- **ic_degiskenler**: (yok — doğrudan literal object döndürür)
+- **Dönüş**: Object — { categories, categoryTree, loading, error, refresh, getCategoryBySlug, getSubCategories } context value nesnesi
+
+### [N11_NASIL] AST Pointer: src/contexts/CategoryContext.tsx::useCategories
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `context` - useContext ile çekilen CategoryContext değeri
-- **Dönüş**: CategoryContext nesnesi
+  - `context` — useContext(CategoryContext) ile alınan CategoryContext değeri, undefined olabilir
+- **Dönüş**: CategoryContextType — context değeri; provider dışında kullanılırsa Error fırlatır
 
 ---
 
@@ -162,3 +178,19 @@ Bu React Context modülü, uygulama genelindeki kategori verilerini tüm alt bil
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryProvider
   export: useCategories
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

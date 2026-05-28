@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\CategoryShowcaseCards.tsx
 skeleton_hash: c9323980a66641e5
-generated_at: 2026-05-23T22:26:04Z
+entity_hashes:
+  func:CategoryShowcaseCards: 9b0bb8ea765e96ba
+  overview: d96a1007895e124d
+  style_tokens: dcf5f92ec64d08ce
+generated_at: 2026-05-28T22:37:02Z
 ---
 
 ## Genel Bakış
@@ -18,22 +22,28 @@ Modülün tek ve ana işlevi olarak tüm kategori kartları sergileme sorumlulu�
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC projesinde ürün kategorilerini kullanıcıya kart formatında sunmak üzere tasarlanmış bir React bileşenidir, çalışması için projenin React çalışma zamanı ortamına, üst bileşenlerden iletilen gerekli iş verilerine ve proje içindeki temel bağımlılıkların erişilebilir olmasına tamamen bağımlıdır.
 
-[Aksiyom 1]: Eğer bu React bileşenini çalıştıracak uygun sürümde React çalışma zamanı ortamı yoksa, bu JSX tabanlı bileşen hiçbir şekilde derlenemez ve çalıştırılamaz, uygulama genelinde çalışma zamanı hatası fırlatır.
-[Aksiyom 2]: Eğer bu bileşene üst bileşen tarafından gösterilecek kategori listesi ve her kategori için kart oluşturmak üzere gerekli temel veriler aktarılmazsa, ekranda hiçbir kategori kartı görüntülenemez, ilgili bölüm tamamen boş kalır.
-[Aksiyom 3]: Eğer bu bileşenin import etmesi gereken ortak UI bileşenleri, stil dosyaları, statik asset altyapısı veya uygulama içi yönlendirme (routing) sistemi proje içerisinde çalışır/erişilebilir durumda değilse, kategori kartları görüntülenemez, stil kaybı yaşar ya da tıklama sonrası hedef kategori sayfasına yönlendirme işlemi hiç gerçekleşemez.
+Bu modül, parametresiz bir React (TSX) bileşeni olup, yalnızca fonksiyon imzasından çıkarılabilecek minimal mimari varsayımlar aşağıdadır.
+
+**[Aksiyom 1]:** Eğer React çalışma ortamı (React kütüphanesi ve TSX derleyici desteği) yoksa, bileşen render edilemez ve uygulama hata verir.
+
+**[Aksiyom 2]:** Eğer bileşen parametre almıyorsa, kategori verilerinin bileşen dışından (örn: üst bileşen, context, veya statik import) sağlanması gerekir; veri kaynağı sağlanmazsa bileşen boş/bozuk render edilir.
+
+> **Not:** Fonksiyon gövdesi paylaşılmadığı için, bileşenin iç mantığına (veri dönüşümü, koşullu render, eşik değerleri vb.) ilişkin aksiyomlar **bilinmiyor** olarak değerlendirilmiş ve üretilmemiştir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryShowcaseCards
-**Ne yapar**: VentHub HVAC projesinin ürün bölümünde kullanılan, premium tasarımlı kategori vitrin kartları React bileşenidir. Kullanıcıların ürün kategorilerini kolayca keşfedip erişebilmesi için kart formatında yapılandırılmış bir sunum oluşturur. Next.js Image bileşeniyle resim optimizasyonları yapılarak performans odaklı çalışır, yüksek kaliteli izometrik ürün görselleri kullanarak profesyonel ve tutarlı bir görsel deneyim sunar.
-**Nasıl yapar**: İç mantığında Next.js'in yerleşik resim optimizasyon özelliklerini kullanarak görsel yükleme sürelerini kısaltır, cihaz ekran boyutuna ve internet hızına uygun şekilde resimleri sunarak kullanıcı deneyimini iyileştirir. Tüm kategori kartlarında standart izometrik ürün renderları kullanarak modern, bütüncül bir görsel yapı oluşturur, herhangi bir dış bağımlılığa ihtiyaç duymadan bağımsız olarak çalışan bir bileşen olarak yapılandırılmıştır.
+**Ne yapar**: Premium kategori vitrin kartlarını render eden bir React fonksiyonel bileşenidir. HVAC ürünlerinin yüksek kaliteli izometrik renders görsellerini kullanarak kategorileri görsel bir şekilde sunar.
+
+**Nasıl yapar**: Next.js Image bileşenini optimize ederek yüksek kaliteli görselleri performanslı bir şekilde yükler. İzometrik ürün renderları kullanarak premium bir görünüm sağlar ve ürün kategorilerini kartlar halinde sergiler.
+
 **Parametreler**:
-- Bu bileşen herhangi bir giriş parametresi almaz, tüm içerik ve yapılandırmasını kendi içinde yönetir.
-**Dönüş**: React.FC (React Fonksiyonel Bileşeni) türünde bir değer döndürür. Bu dönüş değeri, tarayıcı DOM'ına eklenerek son kullanıcıya kategorileri sergileyen etkileşimli arayüzü sunan geçerli bir React node'udur.
+Bu bileşen parametre almaz — stateless bir sunum bileşenidir.
+
+**Dönüş**: `React.FC` — Render edilmiş premium kategori showcase kartları içeren JSX yapısı döndürür.
 
 ---
 
@@ -41,12 +51,8 @@ Bu modül, VentHub HVAC projesinde ürün kategorilerini kullanıcıya kart form
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\CategoryShowcaseCards.tsx::CategoryShowcaseCards
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `Link` — Next.js istemci tarafı yönlendirme bileşeni, her kategori kartını ilgili kategori sayfasına bağlamak için kullanılır
-  - `Image` — Next.js resim optimizasyonu sağlayan resim bileşeni, her karttaki ürün görsellerini yüklemek için kullanılır
-  - `ChevronRight` — Lucide React kütüphanesinden sağ ok ikonu, kart altındaki "Keşfet" CTA butonlarında yönlendirme göstergesi olarak kullanılır
-  - `Routes` — Uygulama rota yapısını yöneten yardımcı nesne, kategori sayfalarının rotalarını oluşturmak için `category` metodu üç kez çağrılır
-- **Dönüş**: React JSX elementi, üç kategori ürün kartını içeren bölüm (section) bileşeni
+- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımlanmamıştır)
+- **Dönüş**: React.FC — JSX formatında bölüm (section) içeren React bileşeni. Fonksiyon, hava perdeleri, endüstriyel fanlar ve ısı geri kazanım üniteleri için kartların yer aldığı ızgara yapısını render eder.
 
 ---
 
@@ -65,16 +71,13 @@ Bu modül, VentHub HVAC projesinde ürün kategorilerini kullanıcıya kart form
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `min-h-[140px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-b`, `bg-white/5`, `border-slate-600/50`, `border-white/20`, `from-slate-700/80`, `text-center`, `text-cyan-400`, `text-gray-400`, `text-lg`, `text-sm`, `text-white`, `to-slate-900`, `via-slate-800`
-- **Layout:** `flex`, `flex-1`, `flex-col`, `from-slate-700/80`, `gap-2`, `gap-5`, `grid`, `grid-cols-1`, `group-hover:scale-105`, `hover:shadow-2xl`, `items-center`, `justify-center`, `md:grid-cols-3`, `overflow-hidden`, `p-5`
-- **Responsive:** `md:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-b`, `bg-white/5`, `border-slate-600/50`, `border-white/20`, `from-slate-700/80`, `hover:bg-white/10`, `hover:border-slate-400/50`, `text-center`, `text-cyan-400`, `text-gray-400`, `text-lg`, `text-sm`, `text-white`, `to-slate-900`, `via-slate-800`
+- **Layout:** `drop-shadow-hvac-card-drop`, `flex`, `flex-1`, `flex-col`, `from-slate-700/80`, `gap-2`, `gap-5`, `grid`, `grid-cols-1`, `hover:shadow-2xl`, `items-center`, `justify-center`, `md:grid-cols-3`, `min-h-140px`, `overflow-hidden`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `border`, `duration-300`, `duration-500`, `font-bold`, `font-medium`, `group`, `group-hover:scale-105`, `leading-relaxed`, `mb-2`, `mb-4`, `object-contain`, `pb-2`, `pt-2`, `px-5`, `px-6`

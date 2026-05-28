@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\prefetch.ts
 skeleton_hash: 14e3b7f45da627b0
-generated_at: 2026-05-23T22:34:05Z
+entity_hashes:
+  func:prefetchProductsPage: 1087d9febfcd8d00
+  overview: d39d9fa31cbd8eda
+generated_at: 2026-05-28T22:38:48Z
 ---
 
 ## Genel Bakış
@@ -27,7 +30,7 @@ Bu modül, VentHub HVAC platformunun ürün sayfası içeriklerinin kullanıcı 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### prefetchProductsPage
 **Ne yapar**: Ürünler (Products) sayfası bileşenine ait kod parçacığını (chunk) önceden indirerek (prefetch) ilgili sayfaya yapılacak navigasyonun anında gerçekleşmesini sağlar. Genellikle "/products" yoluna yönlendiren bağlantının üzerine fare ile gelinmesi gibi erken etkileşimlerde tetiklenmek üzere tasarlanmıştır, böylece kullanıcı bağlantıya tıkladığında herhangi bir yükleme gecikmesi yaşanmaz.

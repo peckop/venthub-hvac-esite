@@ -9,7 +9,7 @@ entity_hashes:
   func:handleAdd: 552a96581034d630
   overview: 3c7154223e99d479
   style_tokens: a0d16d1087294b08
-generated_at: 2026-05-27T18:09:18Z
+generated_at: 2026-05-28T22:36:55Z
 ---
 
 ## Genel Bakış

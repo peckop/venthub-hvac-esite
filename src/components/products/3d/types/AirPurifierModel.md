@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\AirPurifierModel.tsx
 skeleton_hash: 20ce6830cb167a2d
-generated_at: 2026-05-23T22:22:50Z
+entity_hashes:
+  func:AirPurifierModel: 93d1bb16d07d8fad
+  overview: e95c6e9614a2d036
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:45Z
 ---
 
 ## Genel Bakış
@@ -25,7 +29,7 @@ Bu modülün temel varsayımı, `AirPurifierModel` fonksiyonunun parametre almad
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AirPurifierModel
 **Ne yapar**: AirPurifierModel adlı bir React fonksiyonel bileşenidir; bu dosya bir .tsx uzantılı bileşen tanımlar.  
@@ -85,4 +89,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

@@ -4,7 +4,23 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts
 skeleton_hash: ce90d4c146fcd38a
-generated_at: 2026-05-23T22:32:52Z
+entity_hashes:
+  func:adminSearchProducts: d82f672cc3cb2725
+  func:fetchProductBy: 2c22c85b2ca7707b
+  func:ftsSearchProducts: e2045b1b030cf498
+  func:getAllProducts: fb30aaaf1192fd53
+  func:getFeaturedProducts: ce2290fa54f07744
+  func:getProductById: 39d8c9602edac602
+  func:getProductBySlug: 5bee9bf12ed840a1
+  func:getProductBySlugOrId: e50b297daf7da36f
+  func:getProducts: c5caebe00b005aea
+  func:getProductsByCategory: 421eee0fd23cd3ba
+  func:getProductsBySubcategory: 9f964a8a8e92ec44
+  func:getProductsEnriched: 4ad9736650c504d9
+  func:getSearchSuggestions: 308ade07871464ce
+  func:searchProducts: badc1baaea7844a1
+  overview: 8d50b0daa21b556b
+generated_at: 2026-05-28T22:38:24Z
 ---
 
 ## Genel Bakış
@@ -39,7 +55,7 @@ Bu modül, sistemdeki ürün kayıtlarının saklandığı merkezi veri deposuna
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getProductsEnriched
 **Ne yapar**: Sistemdeki ürünleri belirtilen filtre, sıralama ve sayfalama parametrelerine göre çekip, ek ilişkili verilerle zenginleştirilmiş şekilde sunan ana ürün listeleme fonksiyonudur. HVAC ürünlerinin ön yüzde listelenmesi için tüm gerekli tamamlayıcı bilgileri tek seferde sağlar.
@@ -50,260 +66,135 @@ Bu modül, sistemdeki ürün kayıtlarının saklandığı merkezi veri deposuna
 
 ---
 
-### getSearchSuggestions
-**Ne yapar**: Kullanıcının arama kutusuna girdiği metne göre otomatik tamamlama amaçlı arama önerileri üreten fonksiyondur. Arama deneyimini hızlandırmak için önceden indekslenmiş terimler üzerinden eşleşme sunar.
-**Nasıl yapar**: Gelen arama metniyle sistemdeki önbelleklenmiş veya veritabanındaki indekslenmiş arama terimleri üzerinde kısmi eşleşme arar. Belirtilen limit sayısına kadar en uygun, en çok aranan terimleri sıralayarak sonuç döndürür.
-**Parametreler**:
-- name: q, type: string — Kullanıcının girdiği, önerilerin üretileceği temel arama metnidir
-- name: limit, type: number — Dönülecek maksimum arama önerisi sayısını belirten sayısal değerdir
-**Dönüş**: Promise<SearchSuggestion[]> — Arama önerisi nesnelerinden oluşan bir dizi içeren asenkron promise nesnesidir. Otomatik tamamlama listelerinde kullanılacak verileri sunar.
-
----
-
-### ftsSearchProducts
-**Ne yapar**: Ürün isimleri ve açıklamaları üzerinde tam metin araması (Full Text Search) yapan, istenirse kategori filtresi uygulayarak belirli sayıda sonuç döndüren kapsamlı arama fonksiyonudur. Büyük ürün envanterlerinde hızlı ve doğru arama yapmayı sağlar.
-**Nasıl yapar**: Veritabanının tam metin arama altyapısını kullanarak gelen arama terimiyle eşleşen ürünleri bulur. Opsiyonel olarak gelen kategori kimliği filtresini sorguya ekleyerek sadece ilgili kategorideki ürünleri arar, limit parametresiyle belirtilen sayıda sonucu sıralayarak döndürür.
-**Parametreler**:
-- name: q, type: string — Aranacak metin terimini içeren string değeri, tam metin aramasının temelini oluşturur
-- name: limit, type: number — Dönülecek maksimum arama sonucu sayısını belirten sayısal değerdir
-- name: filters, type: { category_id?: string }, opsiyonel — Aramaya uygulanacak ek filtreleri içeren nesnedir, sadece belirli bir kategorideki ürünleri aramak için category_id parametresi alabilir
-**Dönüş**: Promise<FtsProductResult[]> — Tam metin aramasıyla eşleşen ürün nesnelerinden oluşan bir dizi içeren asenkron promise nesnesidir. Arama sonuçları sayfalarında kullanılacak verileri sunar.
-
----
-
-### getProducts
-**Ne yapar**: Basit kullanımlar için sınırlı sayıda temel ürün verisi çeken genel amaçlı küçük ölçekli listeleme fonksiyonudur. Yan menü, küçük öneri listeleri gibi alanlarda kullanılır.
-**Nasıl yapar**: Opsiyonel olarak gelen limit parametresini veritabanı sorgusuna ekleyerek varsayılan sıralamayla belirtilen sayıda ürünü çeker, herhangi bir ek zenginleştirme veya karmaşık filtreleme yapmadan temel ürün verilerini döndürür.
-**Parametreler**:
-- name: limit, type: number, opsiyonel — Çekilecek maksimum ürün sayısını belirten sayısal değerdir, gönderilmediği takdirde sistem varsayılan limiti kullanılır
-**Dönüş**: Promise<Product[]> — Temel ürün verileriyle dolu Product nesnelerinden oluşan dizi içeren asenkron promise nesnesidir. Basit listelemeler için gerekli verileri sunar.
-
----
-
-### getAllProducts
-**Ne yapar**: Sistemdeki tüm kayıtlı ürünleri eksiksiz olarak çeken fonksiyondur. Arka plan toplu işlemleri, tam envanter listelemeleri gibi tüm ürünlere erişim gereken durumlarda kullanılır.
-**Nasıl yapar**: Herhangi bir sınırlama, filtreleme veya sayfalama uygulamadan veritabanındaki tüm ürün kayıtlarını çeker, temel ürün verilerini olduğu gibi döndürür. Sadece tüm ürünlere ihtiyaç duyulan özel kullanım senaryoları için tasarlanmıştır.
-**Parametreler**: Hiçbir harici parametre almaz.
-**Dönüş**: Promise<Product[]> — Sistemdeki tüm ürünleri içeren Product nesneleri dizisini döndüren asenkron promise nesnesidir. Tam envantere erişim sağlar.
-
----
-
-### getProductsByCategory
-**Ne yapar**: Belirtilen ana kategoriye ait tüm ürünleri çeken fonksiyondur. Ana kategori detay sayfalarında ürün listelemek amacıyla kullanılır.
-**Nasıl yapar**: Gelen kategori kimliğini veritabanı sorgusuna filtre olarak ekler, sadece o ana kategoriye kayıtlı tüm ürünleri çeker, temel ürün verilerini döndürür.
-**Parametreler**:
-- name: categoryId, type: string — Ürünlerinin çekileceği ana kategorinin benzersiz kimlik stringidir
-**Dönüş**: Promise<Product[]> -> İlgili ana kategoriye ait tüm ürünleri içeren asenkron Product nesneleri dizisidir. Kategori sayfası içeriklerini oluşturmak için kullanılır.
-
----
-
-### getProductsBySubcategory
-**Ne yapar**: Belirtilen alt kategoriye ait tüm ürünleri çeken fonksiyondur. Alt kategori detay sayfalarında ürün listelemek amacıyla kullanılır.
-**Nasıl yapar**: Gelen alt kategori kimliğini veritabanı sorgusuna filtre olarak ekler, sadece o alt kategoriye kayıtlı tüm ürünleri çeker, temel ürün verilerini döndürür.
-**Parametreler**:
-- name: subcategoryId, type: string — Ürünlerinin çekileceği alt kategorinin benzersiz kimlik stringidir
-**Dönüş**: Promise<Product[]> -> İlgili alt kategoriye ait tüm ürünleri içeren asenkron Product nesneleri dizisidir. Alt kategori sayfası içeriklerini oluşturmak için kullanılır.
-
----
-
-### fetchProductBy
-**Ne yapar**: Sadece id veya slug olmak üzere belirtilen iki sütundan biri üzerinden eşleşen tek bir ürün kaydını çeken genel amaçlı tek ürün çekme fonksiyonudur. Diğer tek ürün çekme fonksiyonlarının temelini oluşturur.
-**Nasıl yapar**: Gelen sütun ismi ve değerini kullanarak veritabanı sorgusu oluşturur, eşleşen ilk ürün kaydını çeker. throwOnError parametresinin değerine göre ürün bulunamadığında hata fırlatma veya null döndürme davranışını yönetir.
-**Parametreler**:
-- name: column, type: 'id' | 'slug' — Ürün aramak için kullanılacak veritabanı sütunu, sadece id veya slug değerlerini alabilir
-- name: value, type: string — Aranan sütunda eşleştirilecek benzersiz değer stringidir
-- name: throwOnError, type: boolean — Ürün bulunamadığında hata fırlatılıp fırlatılmayacağını belirten boolean değeri, true ise hata fırlatır, false ise null döndürür
-**Dönüş**: Promise<Product | null> — Eşleşen ürün bulunduysa Product nesnesi, bulunamadıysa yapılandırmaya göre ya hata fırlatan ya da null dönen asenkron promise nesnesidir.
-
----
-
-### getProductById
-**Ne yapar**: Benzersiz ürün kimliği (id) üzerinden tek bir ürün kaydını çeken özel fonksiyondur. Ürün detay sayfalarında id ile ürün çekmek amacıyla kullanılır.
-**Nasıl yapar**: İçerisinde temel fetchProductBy fonksiyonunu çağırarak, arama sütununu 'id' olarak ayarlar, gelen id değerini ve hata yönetimi parametrelerini ileterek eşleşen ürünü döndürür. Tekrarlayan kod kullanımını önler.
-**Parametreler**:
-- name: id, type: string — Çekilecek ürünün benzersiz kimlik stringidir
-**Dönüş**: Promise<Product | null> — İlgili id değerine sahip ürün bulunduysa Product nesnesi, bulunamadıysa null dönen asenkron promise nesnesidir.
-
----
-
-### getProductBySlugOrId
-**Ne yapar**: Gelen genel tanımlayıcının id mi yoksa slug mı olduğunu otomatik olarak algılayarak, her iki durumda da eşleşen ürünü çeken esnek tek ürün çekme fonksiyonudur. URL'den gelen tanımlayıcı ile ürün çekmek için idealdir.
-**Nasıl yapar**: Gelen identifier değerinin formatını analiz ederek id veya slug olduğunu belirler, ardından uygun şekilde fetchProductBy fonksiyonunu çağırarak eşleşen ürünü döndürür. Tek bir uç noktadan hem id hem slug ile ürün çekmeye olanak tanır.
-**Parametreler**:
-- name: identifier, type: string — Ürünü çekmek için kullanılan, id veya slug olabilecek genel tanımlayıcı stringidir
-**Dönüş**: Promise<Product | null> — Tanımlayıcıyla eşleşen ürün bulunduysa Product nesnesi, bulunamadıysa null dönen asenkron promise nesnesidir.
-
----
-
-
-### getProductBySlug
-**Ne yapar**: Benzersiz slug tanımlayıcısına göre tek bir ürün kaydını çeken asenkron servis fonksiyonudur. Ürün detay sayfalarını yüklemek için kullanılır, ilgili ürün bulunamazsa null değeri döndürür.
-**Nasıl yapar**: Gelen string tipindeki slug parametresini kullanarak veritabanında eşleşen ürün kaydı için sorgu çalıştırır. Eşleşen ürün bulunursa Product nesnesine dönüştürerek promise olarak iletir, hiç kayıt bulunamazsa Promise çözümünde null değerini döndürür.
-**Parametreler**:
-- name: slug, type: string — Ürüne ait okunabilir, benzersiz tanımlayıcı, genellikle ürün adı üzerinden oluşturulur ve URL'lerde kullanılır
-**Dönüş**: Promise<Product | null> — Asenkron çalışan işlem sonucunda bulunan ürünün Product tipindeki nesnesini ya da hiç ürün eşleşmezse null değerini döndürür. İşlem sırasında oluşan hatalarda promise reddedilir.
-
-### getFeaturedProducts
-**Ne yapar**: Platformda öne çıkarılmış olarak işaretlenmiş tüm ürünleri listeleyen asenkron servis fonksiyonudur. Ana sayfa, kampanya bölümleri gibi kullanıcıların ilk karşılaştığı alanlarda sergilenecek ürünleri çekmek için tasarlanmıştır.
-**Nasıl yapar**: Veritabanında "öne çıkarılmış" bayrağı aktif olan tüm ürün kayıtlarını çekecek sorguyu çalıştırır, gelen kayıtları standart Product tipindeki nesnelere dönüştürerek bir dizi halinde iletir.
-**Parametreler**: Bu fonksiyonun herhangi bir girdi parametresi bulunmamaktadır.
-**Dönüş**: Promise<Product[]> — Başarılı sorgu sonucunda öne çıkarılmış tüm ürünleri içeren Product tipinde dizi döndüren asenkron promisetur. Hiç öne çıkarılmış ürün yoksa boş bir dizi iletilir.
-
-### searchProducts
-**Ne yapar**: Genel kullanıcılar için ürün araması gerçekleştiren asenkron servis fonksiyonudur. Kullanıcıların girdiği arama metnine göre herkese açık ürünlerde eşleşme bulur ve listeler.
-**Nasıl yapar**: Gelen arama sorgusunu güvenlik kontrollerinden geçirerek temizler, yalnızca genel erişime açık ürünler arasında metinsel arama yapacak veritabanı sorgusunu çalıştırır. Eşleşen tüm kayıtları Product nesneleri dizisi olarak geri döndürür.
-**Parametreler**:
-- name: query, type: string — Kullanıcı tarafından girilen arama metni, ürün adı, kategorisi veya temel özellikleri içerebilir
-**Dönüş**: Promise<Product[]> — Arama sorgusuyla eşleşen tüm genel kullanıcılara açık ürünleri içeren Product tipinde dizi döndüren asenkron promisetur. Hiç eşleşen ürün bulunamazsa boş dizi iletilir.
-
-### adminSearchProducts
-**Ne yapar**: Yönetici paneli için sayfalama ve kategori filtresi desteği sunan gelişmiş ürün arama servisidir. Yöneticilerin platformdaki tüm ürünleri (sadece genel kullanıcılara açık olmayanlar dahil) filtreleyerek listelemesini sağlar.
-**Nasıl yapar**: Gelen limit ve offset parametreleriyle sayfalama yapılandırır, opsiyonel categoryId değeri varsa sorguya kategori filtresi ekler. Yönetici erişim haklarına uygun olarak tüm ürün havuzunda arama yapar, sonuçları yönetici paneli ihtiyaçlarına özel DbAdminSearchResult tipinde sunar.
-**Parametreler**:
-- name: q, type: string — Yönetici tarafından girilen arama metni, tüm ürün alanlarında eşleşme aramak için kullanılır
-- name: limit, type: number — Tek bir sayfada listelenecek maksimum ürün sayısını belirten sayısal değer
-- name: offset, type: number — Kaçıncı kayıttan itibaren listelemeye başlanacağını belirten sayfalama ofset değeri
-- name: categoryId, type: string, opsiyonel — Sadece belirtilen kategori kimliğine ait ürünleri aramak için kullanılan opsiyonel filtre parametresi
-**Dönüş**: Promise<DbAdminSearchResult[]> — Arama ve filtreleme koşullarına uyan tüm ürünleri içeren, yönetici paneli ihtiyaçlarına göre yapılandırılmış DbAdminSearchResult tipinde dizi döndüren asenkron promisetur. Hiç eşleşen ürün bulunamazsa boş dizi iletilir.
-
----
-
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getProductsEnriched
-- **params**: params: GetProductsParams (varsayılan: {})
+### [N1_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductsEnriched
+- **params**: `params: GetProductsParams = {}`
 - **ic_degiskenler**:
-  - `resolvedCategoryIds` — params'tan alınan kategori kimlikleri listesi, slug formatındaki kimlikleri gerçek UUID'lere çevirmek için işlenir, tüm veritabanı sorgularında filtre olarak kullanılır
-  - `potentialSlugs` — UUID formatına uymayan, muhtemelen kategori slug'ı olan kimliklerin filtrelenmiş listesi, veritabanından karşılık gelen ID'leri almak için kullanılır
-  - `categories` — supabase categories tablosundan potansiyel slug'lar için çekilen, id ve slug alanlarını içeren kategori verisi
-  - `slugToIdMap` — kategori slug'larını ID'lerine eşleyen Map nesnesi, slug formatındaki kimlikleri UUID'ye çevirmek için kullanılır
-  - `data` — `get_products_enriched` veritabanı RPC'sinden dönen ana ürün listesi verisi
-  - `error` — `get_products_enriched` RPC çağrısında oluşan hata nesnesi
-  - `fallbackData` — ana RPC çağrısı başarısız olursa, products tablosundan çekilen yedek ürün verisi
-  - `enrichedProducts` — RPC'den gelen ürün verilerine eksik alanlar eklenerek DbProduct tipine dönüştürülen son işlenmiş ürün listesi
-- **Dönüş**: Promise<Product[]>
+  - `resolvedCategoryIds` — `params.categoryIds` değerini tutar, slug ise UUID'ye dönüştürülerek güncellenir
+  - `potentialSlugs` — `resolvedCategoryIds` içinden UUID regex'e uymayan (slug olan) elemanları filtreler
+  - `categories` — `supabase.from('categories').select('id, slug').in('slug', potentialSlugs)` sonucu, slug→ID eşleme için kullanılır
+  - `slugToIdMap` — `categories` dizisinden oluşturulmuş `Map<slug, id>` lookup haritası
+  - `data` — `supabase.rpc('get_products_enriched', {...})` sonucu, zenginleştirilmiş ürün listesi
+  - `error` — RPC çağrısındaki hata nesnesi
+  - `enrichedProducts` — `data` dizisinin her elemanına `meta_description: null, meta_title: null, purchase_price: null, is_category_manual: null` eklenmiş hali
+  - `fallbackData` — RPC hata durumunda `supabase.from('products').select(...)` ile çekilen yedek ürün listesi (iki ayrı blokta, biri filtreli diğeri filtresiz)
+- **Dönüş**: `Product[]` — `toUIProductList` ile dönüştürülmüş ürün listesi
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getSearchSuggestions
-- **params**: q: string, limit: number (varsayılan: 6)
+### [N2_NASIL] AST Pointer: src/lib/services/product.service.ts::getSearchSuggestions
+- **params**: `q: string`, `limit: number = 6`
 - **ic_degiskenler**:
-  - `data` — `get_search_suggestions` RPC'sinden dönen arama önerileri verisi
-  - `error` — RPC çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<SearchSuggestion[]>
+  - `data` — `supabase.rpc('get_search_suggestions', { p_q: q, p_limit: limit })` sonucu, arama önerileri listesi
+  - `error` — RPC çağrısındaki hata nesnesi
+- **Dönüş**: `SearchSuggestion[]` — RPC sonucu veya hata durumunda boş dizi
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::ftsSearchProducts
-- **params**: q: string, limit: number (varsayılan: 20), filters?: { category_id?: string }
+### [N3_NASIL] AST Pointer: src/lib/services/product.service.ts::ftsSearchProducts
+- **params**: `q: string`, `limit = 20`, `filters?: { category_id?: string }`
 - **ic_degiskenler**:
-  - `payload` — veritabanı RPC'sine gönderilecek, arama parametrelerini içeren yük nesnesi
-  - `data` — `fts_search_products` RPC'sinden dönen tam metin araması sonuç verisi
-  - `error` — RPC çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<FtsProductResult[]>
+  - `payload` — `supabase.rpc` için oluşturulan `{ p_q, p_limit, p_filters }` nesnesi, `filters` yoksa boş obje kullanılır
+  - `data` — `supabase.rpc('fts_search_products', payload)` sonucu, full-text search ürün sonuçları
+  - `error` — RPC çağrısındaki hata nesnesi
+- **Dönüş**: `FtsProductResult[]` — RPC sonucu
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getProducts
-- **params**: limit?: number
+### [N4_NASIL] AST Pointer: src/lib/services/product.service.ts::getProducts
+- **params**: `limit?: number`
 - **ic_degiskenler**:
-  - `query` — supabase üzerinde oluşturulan, kademeli olarak filtre ve sıralama eklenen ürün sorgusu nesnesi
-  - `data` — products tablosundan çekilen aktif ürünlerin ham verisi
-  - `error` — ürün sorgusu çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<Product[]>
+  - `query` — `supabase.from('products').select(...).eq('status', 'active').order(...)` chain'i; `limit` varsa `.limit(limit)` eklenir
+  - `data` — `query` sonucu, aktif ürün listesi
+  - `error` — sorgu hata nesnesi
+- **Dönüş**: `Product[]` — `toUIProductList` ile dönüştürülmüş aktif ürünler
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getAllProducts
+### [N5_NASIL] AST Pointer: src/lib/services/product.service.ts::getAllProducts
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — products tablosundan çekilen tüm aktif ürünlerin ham verisi
-  - `error` — ürün sorgusu çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<Product[]>
+  - `data` — `supabase.from('products').select(...).eq('status', 'active').order(...)` sonucu, tüm aktif ürünler
+  - `error` — sorgu hata nesnesi
+- **Dönüş**: `Product[]` — `toUIProductList` ile dönüştürülmüş tüm aktif ürünler
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getProductsByCategory
-- **params**: categoryId: string
+### [N6_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductsByCategory
+- **params**: `categoryId: string`
 - **ic_degiskenler**:
-  - `data` — products tablosundan belirtilen kategori ID'sine ait çekilen aktif ürünlerin ham verisi
-  - `error` — ürün sorgusu çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<Product[]>
+  - `data` — `supabase.from('products').select(...).or('category_id.eq.${categoryId}, subcategory_id.eq.${categoryId}').eq('status', 'active')` sonucu; hem category_id hem subcategory_id eşleşen aktif ürünler
+  - `error` — sorgu hata nesnesi
+- **Dönüş**: `Product[]` — `toUIProductList` ile dönüştürülmüş kategoriye ait ürünler
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getProductsBySubcategory
-- **params**: subcategoryId: string
+### [N7_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductsBySubcategory
+- **params**: `subcategoryId: string`
 - **ic_degiskenler**:
-  - `data` — products tablosundan belirtilen alt kategori ID'sine ait çekilen aktif ürünlerin ham verisi
-  - `error` — ürün sorgusu çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<Product[]>
+  - `data` — `supabase.from('products').select(...).eq('subcategory_id', subcategoryId).eq('status', 'active')` sonucu
+  - `error` — sorgu hata nesnesi
+- **Dönüş**: `Product[]` — `toUIProductList` ile dönüştürülmüş alt kategoriye ait ürünler
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::fetchProductBy
-- **params**: column: 'id' | 'slug', value: string, throwOnError: boolean (varsayılan: false)
+### [N8_NASIL] AST Pointer: src/lib/services/product.service.ts::fetchProductBy
+- **params**: `column: 'id' | 'slug'`, `value: string`, `throwOnError: boolean = false`
 - **ic_degiskenler**:
-  - `query` — belirtilen sütun ve değere göre ürün aramak için oluşturulan supabase sorgu nesnesi
-  - `data` - sorgu sonucu dönen tek ürün verisi
-  - `error` — ürün sorgusu çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<Product | null>
+  - `query` — `supabase.from('products').select(...).eq(column, value).maybeSingle()` sorgu zinciri; `column` parametresine göre id veya slug ile tekil sorgu yapar
+  - `data` — sorgu sonucu tek ürün nesnesi
+  - `error` — sorgu hata nesnesi
+- **Dönüş**: `Product | null` — `mapDatabaseProductToDomain(data)` ile dönüştürülmüş tek ürün veya null
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getProductById
-- **params**: id: string
+### [N9_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductById
+- **params**: `id: string`
+- **ic_degiskenler**: (yok — doğrudan `fetchProductBy` çağrısı)
+- **Dönüş**: `Product | null` — `fetchProductBy('id', id, true)` sonucu
+
+### [N10_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductBySlugOrId
+- **params**: `identifier: string`
 - **ic_degiskenler**:
-  - `fetchProductBy` çağrısı — ID'ye göre ürün getirmek için genel fetchProductBy fonksiyonu tetiklenir
-- **Dönüş**: Promise<Product | null>
+  - `isUuid` — `identifier`'ın UUID formatında olup olmadığını test eden regex sonucu (`/^[0-9a-f]{8}-...$/i.test(identifier)`)
+- **Dönüş**: `Product | null` — `isUuid` true ise `fetchProductBy('id', ...)` , değilse `fetchProductBy('slug', ...)`
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getProductBySlugOrId
-- **params**: identifier: string
-- **ic_degiskenler**:
-  - `isUuid` — Gelen tanımlayıcının UUID formatında olup olmadığını kontrol eden regex testinin sonucu (boolean)
-  - `fetchProductBy` çağrısı — tanımlayıcının türüne göre ID veya slug ile ürün getirmek için fetchProductBy tetiklenir
-- **Dönüş**: Promise<Product | null>
+### [N11_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductBySlug
+- **params**: `slug: string`
+- **ic_degiskenler**: (yok — doğrudan `fetchProductBy` çağrısı)
+- **Dönüş**: `Product | null` — `fetchProductBy('slug', slug, false)` sonucu
 
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getProductBySlug
-- **params**: slug: string
-- **ic_degiskenler**:
-  - `fetchProductBy` çağrısı — slug'a göre ürün getirmek için genel fetchProductBy fonksiyonu tetiklenir
-- **Dönüş**: Promise<Product | null>
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::getFeaturedProducts
+### [N12_NASIL] AST Pointer: src/lib/services/product.service.ts::getFeaturedProducts
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — products tablosundan öne çıkan ve aktif olan ürünlerin ham verisi
-  - `error` — ürün sorgusu çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<Product[]>
+  - `data` — `supabase.from('products').select(...).eq('is_featured', true).eq('status', 'active').limit(6)` sonucu, öne çıkan aktif ürünler
+  - `error` — sorgu hata nesnesi
+- **Dönüş**: `Product[]` — `toUIProductList` ile dönüştürülmüş en fazla 6 öne çıkan ürün
 
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::searchProducts
-- **params**: query: string
+### [N13_NASIL] AST Pointer: src/lib/services/product.service.ts::searchProducts
+- **params**: `query: string`
 - **ic_degiskenler**:
-  - `data` — arama sorgusuna uyan aktif ürünlerin ham verisi
-  - `error` — ürün sorgusu çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<Product[]>
+  - `data` — `supabase.from('products').select(...).or('name.ilike.%${query}%, brand.ilike.%${query}%, sku.ilike.%${query}%, model_code.ilike.%${query}%, description.ilike.%${query}%').eq('status', 'active').limit(20)` sonucu; name, brand, sku, model_code, description alanlarında partial match ile arama
+  - `error` — sorgu hata nesnesi
+- **Dönüş**: `Product[]` — `toUIProductList` ile dönüştürülmüş en fazla 20 arama sonucu
 
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts::adminSearchProducts
-- **params**: q: string, limit: number (varsayılan: 50), offset: number (varsayılan: 0), categoryId?: string
+### [N14_NASIL] AST Pointer: src/lib/services/product.service.ts::adminSearchProducts
+- **params**: `q: string`, `limit = 50`, `offset = 0`, `categoryId?: string`
 - **ic_degiskenler**:
-  - `payload` — admin arama RPC'sine gönderilecek, tüm arama parametrelerini içeren yük nesnesi
-  - `data` — `admin_search_products` RPC'sinden dönen yönetici paneli arama sonuçları
-  - `error` — RPC çağrısında oluşan hata nesnesi
-- **Dönüş**: Promise<DbAdminSearchResult[]>
+  - `payload` — `supabase.rpc` için `{ p_q, p_limit, p_offset, p_category_id? }` nesnesi; `categoryId` varsa `p_category_id` alanına eklenir
+  - `data` — `supabase.rpc('admin_search_products', payload)` sonucu, admin arama sonuçları
+  - `error` — RPC çağrısındaki hata nesnesi
+- **Dönüş**: `DbAdminSearchResult[]` — RPC sonucu, admin paneli için zenginleştirilmiş arama sonuçları
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki `getProductById()`, `getProductBySlug()` ve `getProductBySlugOrId()` fonksiyonlarının hepsi, ürün verisini getirmek için aynı dosyadaki `fetchProductBy` fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen veri setinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmadığından, dışarıdan gelen çağrı ilişkisi tespit edilememiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  getProductById() → fetchProductBy()
-  getProductBySlug() → fetchProductBy()
-  getProductBySlugOrId() → fetchProductBy()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    getProductById["getProductById()"] --> fetchProductBy["fetchProductBy()"]
-    getProductBySlug["getProductBySlug()"] --> fetchProductBy["fetchProductBy()"]
-    getProductBySlugOrId["getProductBySlugOrId()"] --> fetchProductBy["fetchProductBy()"]
+graph TD
+    product_service_ts__adminSearchProducts["adminSearchProducts"]
+    product_service_ts__fetchProductBy["fetchProductBy"]
+    product_service_ts__ftsSearchProducts["ftsSearchProducts"]
+    product_service_ts__getAllProducts["getAllProducts"]
+    product_service_ts__getFeaturedProducts["getFeaturedProducts"]
+    product_service_ts__getProductById["getProductById"]
+    product_service_ts__getProductBySlug["getProductBySlug"]
+    product_service_ts__getProductBySlugOrId["getProductBySlugOrId"]
+    product_service_ts__getProducts["getProducts"]
+    product_service_ts__getProductsByCategory["getProductsByCategory"]
+    product_service_ts__getProductsBySubcategory["getProductsBySubcategory"]
+    product_service_ts__getProductsEnriched["getProductsEnriched"]
+    product_service_ts__getSearchSuggestions["getSearchSuggestions"]
+    product_service_ts__searchProducts["searchProducts"]
+    product_service_ts__getProductById --> product_service_ts__fetchProductBy
+    product_service_ts__getProductBySlug --> product_service_ts__fetchProductBy
+    product_service_ts__getProductBySlugOrId --> product_service_ts__fetchProductBy
 ```
-
----
 
 ## NODE ID STANDARD
 

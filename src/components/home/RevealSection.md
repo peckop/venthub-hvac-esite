@@ -4,15 +4,19 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\RevealSection.tsx
 skeleton_hash: 3c04c6123362e9cb
-generated_at: 2026-05-23T22:07:51Z
+entity_hashes:
+  func:RevealSection: ba33115191e442f1
+  overview: 83509008900591e6
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:08Z
 ---
 
 ## Genel Bakış
-RevealSection, sayfa içinde görünebilecek bölümleri kaydırma sırasında gizli veya görünür hale getiren bir React bileşenidir. İçerdiği içerikleri (children) koşullu olarak renderlayarak kullanıcı deneyimini yumuşak geçişlerle zenginleştirir.
+RevealSection, temel bir React sarmalayıcı (wrapper) bileşenidir. Bu bileşen, dışarıdan gelen içeriği (children) doğrudan ekrana render ederek, içeriği sarmalayan veya gruplayan bir işlev görür. Bileşen kendi içinde herhangi bir durum yönetimi veya mantık içermez.
 
 ## Fonksiyon Grupları
-### Görünürlük Yönetimi
-Bileşen, içeriğinin görünürlüğünü izleyip gerektiğinde göstermek veya gizlemek için mantık içerir.
+### İçerik Sarmalayıcı
+Bileşen, verilen React düğümlerini (children) doğrudan ekranda göstermekle sorumludur.
 - RevealSection
 
 ---
@@ -25,7 +29,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### RevealSection
 **Ne yapar**: RevealSection, dışarıdan gelen `children` prop'ını alarak onu ekrana render eden bir React fonksiyonel bileşenidir. Bileşen kendi içinde ekstra bir görsel veya etkisel mantık uygulamaz; yalnızca içeriklerini olduğu gibi gösterir.
@@ -72,4 +76,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

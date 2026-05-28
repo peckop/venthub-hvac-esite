@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\TypeComparison.tsx
 skeleton_hash: e64ca2d20ec08be2
-generated_at: 2026-05-23T22:02:21Z
+entity_hashes:
+  func:TypeComparison: 4dc351c7c18b2642
+  overview: e7e7315fa09b979c
+  style_tokens: ef09d8c28bb43bb7
+generated_at: 2026-05-28T22:35:48Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu modül, `onOpenWizard` ve `onSelectType` prop'larının fonksiyon olarak sağ
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### TypeComparison
 **Ne yapar**: Elektrikli sistemler ile ortam havalı sistemlerini yan yana göstererek kullanıcıların fayda, maliyet ve verimlilik açısından karşılaştırmasını sağlar; ayrıca karşılaştırma sonucunda hâlâ kararsız kalan kullanıcılar için bir sihirbaz (wizard) açarak daha detaylı yönlendirme yapar.  
@@ -98,16 +102,13 @@ Bu modül, `onOpenWizard` ve `onSelectType` prop'larının fonksiyon olarak sağ
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `aspect-[16/9]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-gray-100`, `bg-purple-600`, `border-2`, `border-purple-100`, `from-purple-50`, `from-white`, `md:text-4xl`, `sm:text-3xl`, `sm:text-lg`, `text-2xl`, `text-base`, `text-center`, `text-gray-500`
+- **Renkler:** `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-gray-100`, `bg-purple-600`, `border-2`, `border-purple-100`, `from-purple-50`, `from-white`, `hover:bg-purple-700`, `md:text-4xl`, `sm:text-3xl`, `sm:text-lg`, `text-2xl`, `text-base`, `text-center`
 - **Layout:** `flex`, `flex-shrink-0`, `flex-wrap`, `from-purple-50`, `from-white`, `gap-2`, `gap-4`, `gap-6`, `grid`, `inline`, `inline-flex`, `items-center`, `items-start`, `justify-center`, `max-w-2xl`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${isHovered`, `${scrollAnimationClasses.fadeUp(isVisible`, `${scrollAnimationClasses.scaleIn(isVisible`, `${type.colorClasses.bg`, `${type.colorClasses.button`, `${type.colorClasses.text`, `aspect-video`, `border`, `duration-300`, `focus-ring`, `font-bold`, `font-medium`, `font-semibold`, `lg:px-8`, `mb-2`

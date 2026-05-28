@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useNavigationState.ts
 skeleton_hash: f3e59739ac20c686
-generated_at: 2026-05-23T22:30:19Z
+entity_hashes:
+  func:useNavigationState: 312ef38a3d9c5c5d
+  overview: cee2f65a2ff09739
+generated_at: 2026-05-28T22:37:47Z
 ---
 
 ## Genel Bakış
@@ -26,7 +29,7 @@ Bu React özel hook'u olan useNavigationState, yalnızca React runtime ortamınd
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useNavigationState
 **Ne yapar**: Uygulamanın navigasyon elemanlarının UI durumunu yönetir. Yönettiği durum kapsamına menü, kategori merkezi, arama katmanı gibi aktif navigasyon yüzeyleri ve sayfa kaydırma konumuna bağlı görünüm modları dahildir. Aynı anda yalnızca bir ana navigasyon yüzeyinin aktif olmasını garanti eder, yeni bir yüzey açıldığında mevcut tüm diğer açık yüzeyleri otomatik olarak kapatır.

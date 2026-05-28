@@ -4,37 +4,40 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx
 skeleton_hash: 348e12a8da4fe548
-generated_at: 2026-05-23T22:38:49Z
+entity_hashes:
+  func:AdminUsersPage: ee013d03ee079db2
+  overview: 3fe4b4182e26dc08
+  style_tokens: 8daaaf9992883c4d
+generated_at: 2026-05-28T22:39:48Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC sisteminin yönetici panelinde yer alan kullanıcı yönetimi sayfasını oluşturan React bileşenini barındırır. Sistemin yetkili yöneticilerinin platformdaki tüm kullanıcı hesaplarını görüntülemesi ve yönetmesi için gereken arayüzün temel yapısını sunar.
+Bu modül, VentHub HVAC sisteminin yönetici panelinde yer alan kullanıcı yönetimi sayfasını oluşturan React bileşenini barındırır. Yöneticilerin platformdaki tüm kullanıcı hesaplarını görüntülemesi, düzenlemesi ve yönetmesi için gereken arayüzün temel yapısını sunar. Sayfa, yetkili yöneticilerin kullanıcı tablosunu filtrelemesi, detay görmesi ve gerekli işlemleri yapabilmesi için gerekli işlevselliği tek bir bileşen altında toplar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Yönetici kullanıcılar sayfasının tüm işlevselliğini tek bir çatıda toplayan, sayfanın renderlanmasından ve temel iş akışından sorumlu ana bileşendir. Yönetici arayüzünün kullanıcı yönetimi bölümünün sorunsuz şekilde çalışmasını sağlar.
-- AdminUsersPage
+Yönetici kullanıcılar sayfasının tüm işlevselliğini tek bir bileşen altında toplayan, sayfanın renderlanmasından ve temel iş akışından sorumlu ana bileşendir. Kullanıcı listeleme arayüzünün yönetici paneli ortamında sorunsuz çalışmasını sağlar.
+- `AdminUsersPage`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC sisteminin yönetici paneli kullanıcı yönetimi sayfası React TypeScript bileşenidir, çalışması için geçerli yönetici oturumu doğrulaması, desteklenen frontend runtime ortamı, bağımlı arayüz bileşenleri, backend API erişimi ve doğru ağ yapılandırmaları zorunludur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer bu sayfaya erişen kullanıcının yönetici rolüne sahip olduğunu doğrulayan oturum kontrol mekanizması yoksa, yetkisiz kullanıcıların kullanıcı yönetimi işlemlerine erişmesi sağlanır, sistem güvenliği tamamen ihlal edilir.
-[Aksiyom 2]: Eğer modülün çalıştığı ortamda React hook'larını destekleyen TypeScript frontend runtime ortamı yoksa, AdminUsersPage bileşeni hiçbir şekilde render edilemez, kullanıcıya boş veya hatarlı bir arayüz gösterilir.
-[Aksiyom 3]: Eğer yönetici panelinin ortak kullanılan bağımlı arayüz bileşenleri (yan menü, üst gezinme çubuğu, kullanıcı listeleme tablosu vb.) bu modül tarafından erişilebilir durumda değilse, sayfa tam olarak yüklenemez, kullanıcı arayüzü işlevsiz ve bozuk görünür.
-[Aksiyom 4]: Eğer bu modülün kullanıcı listeleme, düzenleme, silme gibi işlemler için ihtiyaç duyduğu backend API'lerine ağ erişimi yoksa, tüm kullanıcı yönetimi işlevleri devre dışı kalır, hiçbir işlem başarılı olmaz.
-[Aksiyom 5]: Eğer bu modülün çalıştığı ortamda CORS, erişim izinleri gibi ağ güvenliği yapılandırmaları doğru ayarlanmamışsa, tarayıcı tarafından kaynaklara erişim engellenir, sayfa hiç yüklenemez veya içerik gösterilemez.
+**Not:** Fonksiyon gövdesi verilmediği için mimari varsayımlar üretilememektedir. Aksiyom üretimi için AdminUsersPage bileşeninin implementasyon koduna ihtiyaç vardır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminUsersPage
-**Ne yapar**: VentHub HVAC projesinin admin paneli bünyesinde yer alan kullanıcı yönetimi sayfasını oluşturan React bileşenidir. Sadece yetkili yönetici kullanıcıların erişebildiği, platformdaki tüm kullanıcıların yönetim işlemlerini gerçekleştireceği arayüzü sunan ana yönetim sayfası bileşenidir.
-**Nasıl yapar**: Projenin kaynak kod yapısında `src\views\admin` dizini altında konumlanmış TSX dosyası olarak çalışır, projenin genel domain kapsamında yönetim paneli işlevlerini destekleyen bir sayfa bileşeni olarak projenin rota sistemi üzerinden çağrılarak kullanıma sunulur.
-**Parametreler**: Bu fonksiyon herhangi bir giriş parametresi almaz.
-**Dönüş**: Dönüş tipi açıkça tanımlanmamıştır, void veya bilinmeyen bir dönüş tipi olarak belirtilmiştir. Bir React sayfa bileşeni olarak çalışması nedeniyle, ekrana render edilmek üzere uygun arayüz çıktısı üretmesi beklenir.
+**Ne yapar**: Admin panelinde kullanıcı yönetimi sayfasını oluşturur. Admin kullanıcılarını ve tüm sisteme kayıtlı kullanıcıları listeler, rol değiştirme işlemlerini yönetir, arama ve filtreleme imkanı sağlar.
+
+**Nasıl yapar**: useAuth hook'uyla oturum bilgisini, useRole hook'uyla yetki seviyesini alır. Sayfa yüklenirken admin olmayan kullanıcıları login sayfasına yönlendirir. Aktif sekmeye göre (adminler veya tüm kullanıcılar) ilgili veriyi Supabase'den çeker. Kullanıcı profilleri tablosundan veri alırken manuel join ile tam isim bilgisini zenginleştirir. Rol değiştirme işlemlerinde audit log kaydı oluşturarak değişiklikleri izlenebilir hale getirir. LocalStorage aracılığıyla sütun görünürlüğü ve yoğunluk ayarlarını kalıcı olarak saklar.
+
+**Parametreler**: Parametre almaz (React functional component).
+
+**Dönüş**: JSX element döndürür — Kullanıcı yönetimi arayüzü veya erişim engellendi uyarı sayfası.
 
 ---
 
@@ -60,225 +63,174 @@ Bu modül, VentHub HVAC sisteminin yönetici paneli kullanıcı yönetimi sayfas
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_isAdminDurumuAyarla
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: AdminUsersPage::roleCheckEffect
+- **params**: () — effect callback, parametre yok
 - **ic_degiskenler**:
-  - `setIsAdmin` — Kullanıcının admin olup olmadığını state'e kaydetmek için kullanılan React state setter fonksiyonu
-  - `role` — Kullanıcının mevcut sistem rolünü tutan değişken, super_admin veya admin olup olmadığını kontrol etmek için kullanılır
-- **Dönüş**: yok
+  - `role` — useAuth'tan gelen kullanıcının mevcut rolü, super_admin/admin olup olmadığı kontrol edilir
+- **Dönüş**: yok (state setter çağrısı: `setAdminUsers`)
 
 ---
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_oturumKontroluYap
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: AdminUsersPage::authRedirectEffect
+- **params**: () — effect callback, parametre yok
 - **ic_degiskenler**:
-  - `loading` - Kullanıcı verisi yükleme durumunu tutan state değişkeni
-  - `user` - Oturum açmış mevcut kullanıcı nesnesi
-  - `router` - Next.js yönlendirme işlemleri için kullanılan router nesnesi
-  - `Routes.auth.login` - Giriş sayfası rotasını oluşturan fonksiyon, parametre olarak dönüş adresi alır
-- **Dönüş**: Kullanıcı yoksa erken return, aksi takdirde yok
+  - `loading` — useAuth'tan gelen oturum yükleme durumu
+  - `user` — useAuth'tan gelen mevcut kullanıcı nesnesi
+- **Dönüş**: yok (yan etki: `router.push` ile login sayfasına yönlendirme)
 
 ---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_loadAdminUsersCagir
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: AdminUsersPage::loadAdminUsersEffect
+- **params**: () — effect callback, parametre yok
 - **ic_degiskenler**:
-  - `loadAdminUsers` - İçeride tanımlanan admin kullanıcıları yükleyen async fonksiyon
-  - `isAdmin` - Mevcut kullanıcının admin yetkisi olup olmadığını tutan state değişkeni
-  - `user` - Oturum açmış mevcut kullanıcı nesnesi
-  - `setIsLoading` - Yükleme durumunu state'e kaydeden state setter
-  - `listAdminUsers` - Admin kullanıcı listesini getiren API fonksiyonu
-  - `supabase` - Supabase veritabanı istemcisi
-  - `setAdminUsers` - Yüklenen admin kullanıcı listesini state'e kaydeden state setter
-  - `console.error` - Hata mesajlarını konsola yazan fonksiyon
-  - `toast.error` - Hata bildirimi gösteren toast fonksiyonu
-  - `_t` - Çeviri işlemi için kullanılan i18n fonksiyonu
-- **Dönüş**: Koşullar sağlanmazsa erken return, aksi takdirde yok
+  - `loadAdminUsers` — asenkron iç fonksiyon, admin kullanıcı listesini yükler ve çağrılır
+- **Dönüş**: yok (effect side-effect olarak veri çeker)
 
 ---
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::loadAdminUsers
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: AdminUsersPage::loadAdminUsers
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `isAdmin` - Mevcut kullanıcının admin yetkisi olup olmadığını tutan state değişkeni
-  - `user` - Oturum açmış mevcut kullanıcı nesnesi
-  - `setIsLoading` - Yükleme durumunu state'e kaydeden state setter
-  - `listAdminUsers` - Admin kullanıcı listesini getiren API fonksiyonu
-  - `supabase` - Supabase veritabanı istemcisi, user_profiles tablosundan veri çekmek için kullanılır
-  - `setAdminUsers` - Zenginleştirilmiş admin kullanıcı listesini state'e kaydeden state setter
-  - `console.error` - Hata mesajlarını konsola yazan fonksiyon
-  - `toast.error` - Hata bildirimi gösteren toast fonksiyonu
-  - `_t` - Çeviri işlemi için kullanılan i18n fonksiyonu
-- **Dönüş**: Koşullar sağlanmazsa erken return, aksi takdirde yok
+  - `isAdmin` — kullanıcının admin olup olmadığını belirleyen boolean, true değilse fonksiyon erken döner
+  - `user` — mevcut oturum kullanıcısı, null ise fonksiyon erken döner
+  - `isLoading` — yükleme durumu flag'i, true yapılarak spinner tetiklenir (`setIsLoading(true)`)
+  - `data` — `listAdminUsers()` API çağrısından dönen admin kullanıcı dizisi
+  - `profiles` — `supabase.from('user_profiles').select(...)` sorgusundan dönen profil dizisi, manuel join için kullanılır
+  - `profiles?.find(p => p.id === u.id)?.full_name` — her admin user'ın id'sine karşılık gelen profil tam adı
+  - `u.full_name` — profil bulunamazsa fallback olarak kullanılır
+  - `enrichedAdmins` — `data.map(...)` ile genişletilmiş, full_name zenginleştirilmiş admin kullanıcı dizisi
+  - `_t('admin.users.toasts.adminsLoadFailed')` — hata toast mesajı için çeviri anahtarı
+- **Dönüş**: yok (yan etki: `setAdminUsers(enrichedAdmins)` ile state güncellenir)
 
 ---
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_adminKullaniciZenginlestir
-- **params**: `u` - İşlenen orijinal admin kullanıcı nesnesi
+### [N5_NASIL] AST Pointer: AdminUsersPage::enrichAdminProfileMap
+- **params**: `u` — `AdminUser` tipinde tek bir admin kullanıcı nesnesi (map callback)
 - **ic_degiskenler**:
-  - `u` - Üzerinde işlem yapılan orijinal kullanıcı nesnesi
-  - `profiles` - user_profiles tablosundan çekilen tüm profil verileri listesi
-- **Dönüş**: full_name alanı eklenmiş/güncellenmiş yeni kullanıcı nesnesi
+  - `u` — genişletme yapılan orijinal admin user nesnesi, spread ile kopyalanır (`...u`)
+  - `profiles` — üst kapsamdan gelen supabase profil sorgusu sonucu
+  - `profiles?.find(p => p.id === u.id)?.full_name` — eşleşen profil tam adı
+  - `u.full_name` — profil eşleşmezse fallback tam ad
+- **Dönüş**: `{ ...u, full_name: ... }` — tam ad alanı zenginleştirilmiş admin user nesnesi
 
 ---
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_loadAllUsersCagir
-- **params**: (parametre yok)
+### [N6_NASIL] AST Pointer: AdminUsersPage::loadAllUsersEffect
+- **params**: () — effect callback, parametre yok
 - **ic_degiskenler**:
-  - `loadAllUsers` - İçeride tanımlanan tüm kullanıcıları yükleyen async fonksiyon
-  - `isAdmin` - Mevcut kullanıcının admin yetkisi olup olmadığını tutan state değişkeni
-  - `user` - Oturum açmış mevcut kullanıcı nesnesi
-  - `activeTab` - Sekme durumunu tutan değişken, sadece 'all' sekmesindeyse çalışır
-  - `setIsLoading` - Yükleme durumunu state'e kaydeden state setter
-  - `ensureSessionFresh` - Oturumun geçerliliğini kontrol eden fonksiyon
-  - `supabase` - Supabase veritabanı istemcisi
-  - `setAllUsers` - Yüklenen tüm kullanıcı listesini state'e kaydeden state setter
-  - `console.error` - Hata mesajlarını konsola yazan fonksiyon
-  - `toast.error` - Hata bildirimi gösteren toast fonksiyonu
-  - `_t` - Çeviri işlemi için kullanılan i18n fonksiyonu
-- **Dönüş**: Koşullar sağlanmazsa erken return, aksi takdirde yok
+  - `loadAllUsers` — asenkron iç fonksiyon, tüm kullanıcıları yükler ve çağrılır
+- **Dönüş**: yok (effect side-effect olarak veri çeker)
 
 ---
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::loadAllUsers
-- **params**: (parametre yok)
+### [N7_NASIL] AST Pointer: AdminUsersPage::loadAllUsers
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `isAdmin` - Mevcut kullanıcının admin yetkisi olup olmadığını tutan state değişkeni
-  - `user` - Oturum açmış mevcut kullanıcı nesnesi
-  - `activeTab` - Sekme durumunu tutan değişken, sadece 'all' sekmesindeyse çalışır
-  - `setIsLoading` - Yükleme durumunu state'e kaydeden state setter
-  - `ensureSessionFresh` - Oturumun geçerliliğini kontrol eden fonksiyon
-  - `supabase` - Supabase veritabanı istemcisi, user_profiles tablosundan tüm kullanıcıları çeker
-  - `setAllUsers` - Yüklenen tüm kullanıcı listesini state'e kaydeden state setter
-  - `profileError` - Veritabanı sorgusu sırasında oluşan hata nesnesi
-  - `console.error` - Hata mesajlarını konsola yazan fonksiyon
-  - `toast.error` - Hata bildirimi gösteren toast fonksiyonu
-  - `_t` - Çeviri işlemi için kullanılan i18n fonksiyonu
-- **Dönüş**: Koşullar sağlanmazsa erken return, aksi takdirde yok
+  - `isAdmin` — admin yetkisi kontrolü, false ise erken dönüş
+  - `user` — oturum kullanıcısı, null ise erken dönüş
+  - `activeTab` — mevcut aktif sekme, 'all' değilse erken dönüş
+  - `isLoading` — yükleme durumu flag'i (`setIsLoading(true)` ile tetiklenir)
+  - `profiles` — `supabase.from('user_profiles').select('id, role, created_at, full_name')` sorgusundan delen tüm kullanıcı profil dizisi
+  - `profileError` — supabase sorgusundan dönen hata nesnesi, varsa fırlatılır
+  - `_t('admin.users.toasts.allLoadFailed')` — hata toast mesajı için çeviri anahtarı
+- **Dönüş**: yok (yan etki: `setAllUsers(profiles)` ile state güncellenir, hata durumunda `setAllUsers([])` ile temizlenir)
 
 ---
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_rolGuncelle
-- **params**: `userId: string`, `newRole: 'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer'`
+### [N8_NASIL] AST Pointer: AdminUsersPage::handleRoleChange
+- **params**: `userId` (string) — rolü değiştirilecek kullanıcının benzersiz kimliği, `newRole` ('user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer') — hedef rol
 - **ic_degiskenler**:
-  - `hasWriteAccess` - Kullanıcının rol değiştirme yetkisi olup olmadığını tutan değişken
-  - `toast.error` - Hata bildirimi gösteren toast fonksiyonu
-  - `_t` - Çeviri işlemi için kullanılan i18n fonksiyonu
-  - `setUpdatingRole` - Rol güncelleme işleminin hangi kullanıcı için yapıldığını state'e kaydeden setter
-  - `setUserAdminRole` - Kullanıcının rolünü veritabanında güncelleyen API fonksiyonu
-  - `logAdminAction` - Dinamik import edilen denetim kaydı oluşturan fonksiyon
-  - `supabase` - Supabase veritabanı istemcisi, denetim kaydı için kullanılır
-  - `allUsers` - Tüm kullanıcıları tutan state listesi, eski rolünü almak için kullanılır
-  - `toast.success` - Başarı bildirimi gösteren toast fonksiyonu
-  - `setAllUsers` - Yerel kullanıcı listesini güncellemek için kullanılan state setter
-  - `listAdminUsers` - Güncel admin listesini yeniden yüklemek için kullanılan API fonksiyonu
-  - `setAdminUsers` - Yeni admin listesini state'e kaydeden setter
-  - `console.error` - Hata mesajlarını konsola yazan fonksiyon
-- **Dönüş**: Yetki yoksa erken return, aksi takdirde yok
+  - `hasWriteAccess` — kullanıcının yazma yetkisi olup olmadığı boolean, false ise fonksiyon erken döner
+  - `userId` — hedef kullanıcının ID'si
+  - `newRole` — atanmak istenen yeni rol
+  - `success` — `setUserAdminRole(userId, newRole)` çağrısının başarı durumu boolean
+  - `logAdminAction` — dinamik import ile yüklenen audit log fonksiyonu (`../../lib/audit` modülünden)
+  - `supabase` — audit log çağrısında kullanılan supabase istemcisi
+  - `allUsers` — mevcut tüm kullanıcı dizisi, eski rolü bulmak için `allUsers.find(u => u.id === userId)?.role` kullanılır
+  - `data` — `listAdminUsers()` ile yeniden yüklenen admin kullanıcı listesi
+  - `_t('admin.users.permissionsError')` — yetki hatası toast mesajı
+  - `_t('admin.users.toasts.roleUpdated')` — başarı toast mesajı, `{ role: _t(...) }` parametre ile
+  - `_t('admin.users.toasts.roleNotUpdated')` — başarısızlık toast mesajı
+  - `_t('admin.users.toasts.roleUpdateError')` — genel hata toast mesajı
+- **Dönüş**: yok (yan etki: `setAllUsers(prev => prev.map(...))` ile local state güncellenir, `setAdminUsers(data)` ile admin listesi yenilenir)
 
 ---
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_rolGuncelleMapCallback
-- **params**: `prev` - Önceki tüm kullanıcı listesi state'i
+### [N9_NASIL] AST Pointer: AdminUsersPage::updateAllUsersState
+- **params**: `prev` — mevcut `AllUser[]` state dizisi (React state updater callback)
 - **ic_degiskenler**:
-  - `prev` - Güncelleme öncesi mevcut kullanıcı listesi
-  - `u` - Üzerinde işlem yapılan tekil kullanıcı nesnesi
-  - `userId` - Rolü güncellenecek kullanıcının ID'si
-  - `newRole` - Kullanıcıya atanacak yeni rol
-- **Dönüş**: Güncellenmiş kullanıcı listesi
+  - `prev` — önceki tüm kullanıcılar dizisi
+  - `u` — `prev.map` içindeki her bir kullanıcı nesnesi
+  - `userId` — hedef kullanıcı ID'si, eşleşme kontrolü yapılır (`u.id === userId`)
+  - `newRole` — atanacak yeni rol stringi
+- **Dönüş**: `{ ...u, role: newRole }` veya orijinal `u` — güncellenmiş `AllUser[]` dizisi
 
 ---
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_aramaFiltresi1
-- **params**: `user` - Filtrelenecek kullanıcı nesnesi
-- **ic_degiskenler**:
-  - `user` - Üzerinde arama yapılan kullanıcı nesnesi
-  - `searchQuery` - Kullanıcının girdiği arama metni
-- **Dönüş**: Arama kriterlerine uyan kullanıcılar için true, aksi takdirde false
+### [N10_NASIL] AST Pointer: AdminUsersPage::getRoleIcon
+- **params**: `roleCode` (string) — rol kodu ('super_admin', 'admin', 'warehouse', 'sales' veya diğer)
+- **ic_degiskenler**: yok (switch statement doğrudan parametreyi kullanır)
+- **Dönüş**: JSX.Element — ilgili role karşılık gelen Lucide icon bileşeni (Crown, Shield, ShieldCheck veya Users)
 
 ---
 
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_aramaFiltresi2
-- **params**: `user` - Filtrelenecek kullanıcı nesnesi
+### [N11_NASIL] AST Pointer: AdminUsersPage::loadPreferencesEffect
+- **params**: () — effect callback, parametre yok
 - **ic_degiskenler**:
-  - `user` - Üzerinde arama yapılan kullanıcı nesnesi
-  - `searchQuery` - Kullanıcının girdiği arama metni
-- **Dönüş**: Arama kriterlerine uyan kullanıcılar için true, aksi takdirde false
+  - `c` — `localStorage.getItem(...)` ile okunan sütun görünürlükleri JSON stringi, parse edilerek `visibleCols` state'ine merged
+  - `d` — `localStorage.getItem(...)` ile okunan yoğunluk tercihi stringi, 'compact' veya 'comfortable' ise `density` state'ine set edilir
+  - `STORAGE_KEY` — localStorage anahtar öneki, sütun tercihleri için kullanılır
+- **Dönüş**: yok (yan etki: `setVisibleCols`, `setDensity` state setter'ları çağrılır)
 
 ---
 
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::getRoleIcon
-- **params**: `roleCode: string` - Rolün kod adı
+### [N12_NASIL] AST Pointer: AdminUsersPage::saveColumnsEffect
+- **params**: () — effect callback, parametre yok
 - **ic_degiskenler**:
-  - `roleCode` - Karşılığı gelen ikonun seçileceği rol kodu
-  - `Crown` - super_admin rolü için kullanılan lucide ikonu
-  - `Shield` - admin rolü için kullanılan lucide ikonu
-  - `ShieldCheck` - warehouse/sales rolleri için kullanılan lucide ikonu
-  - `Users` - varsayılan kullanıcı rolü için kullanılan lucide ikonu
-- **Dönüş: Rol koduna göre React element olarak ikon bileşeni
+  - `visibleCols` — mevcut sütun görünürlük nesnesi, JSON string olarak localStorage'a yazılır
+  - `STORAGE_KEY` — localStorage anahtar öneki
+- **Dönüş**: yok (yan etki: `localStorage.setItem(...)` ile sütun tercihleri kaydedilir)
 
 ---
 
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_yerelDepolamaAyarlariniYukle
-- **params**: (parametre yok)
+### [N13_NASIL] AST Pointer: AdminUsersPage::saveDensityEffect
+- **params**: () — effect callback, parametre yok
 - **ic_degiskenler**:
-  - `STORAGE_KEY` - Yerel depolama anahtarlarını oluşturmak için kullanılan sabit anahtar
-  - `localStorage.getItem` - Tarayıcı yerel deposundan veri çeken fonksiyon
-  - `setVisibleCols` - Görünür tablo sütunlarını state'e kaydeden setter
-  - `setDensity` - Tablo yoğunluğunu state'e kaydeden setter
-- **Dönüş**: yok, hata durumunda catch bloğunda sonlanır
+  - `density` — yoğunluk tercihi stringi ('compact' veya 'comfortable'), localStorage'a yazılır
+  - `STORAGE_KEY` — localStorage anahtar öneki
+- **Dönüş**: yok (yan etki: `localStorage.setItem(...)` ile yoğunluk tercihi kaydedilir)
 
 ---
 
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_sutunAyarlariniKaydet
-- **params**: (parametre yok)
+### [N14_NASIL] AST Pointer: AdminUsersPage::UserAvatar
+- **params**: `{ name, email }` — `name?` (string, opsiyonel — kullanıcının tam adı), `email?` (string, opsiyonel — kullanıcının e-posta adresi)
 - **ic_degiskenler**:
-  - `STORAGE_KEY` - Yerel depolama anahtarını oluşturmak için kullanılan sabit anahtar
-  - `visibleCols` - Mevcut görünür sütun ayarları
-  - `localStorage.setItem` - Tarayıcı yerel deposuna veri kaydeden fonksiyon
-- **Dönüş**: yok, hata durumunda catch bloğunda sonlanır
+  - `initial` — `(name || email || '?').charAt(0).toUpperCase()` ile hesaplanan avatar baş harfi, büyük harfe dönüştürülür
+- **Dönüş**: JSX.Element — gradient arka planlı, baş harf içeren dairesel avatar bileşeni
 
 ---
 
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_yoğunlukAyariniKaydet
-- **params**: (parametre yok)
+### [N15_NASIL] AST Pointer: AdminUsersPage::renderUserRow
+- **params**: `userItem` — `AdminUser | AllUser` tipinde tek bir kullanıcı nesnesi
 - **ic_degiskenler**:
-  - `STORAGE_KEY` - Yerel depolama anahtarını oluşturmak için kullanılan sabit anahtar
-  - `density` - Mevcut tablo yoğunluğu ayarı
-  - `localStorage.setItem` - Tarayıcı yerel deposuna veri kaydeden fonksiyon
-- **Dönüş**: yok, hata durumunda catch bloğunda sonlanır
-
----
-
-### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::UserAvatar
-- **params**: `{ name?: string, email?: string }` - Kullanıcının adı ve e-posta adresi
-- **ic_degiskenler**:
-  - `name` - Kullanıcının tam adı
-  - `email` - Kullanıcının e-posta adresi
-  - `initial` - Avatar üzerinde gösterilecek ilk harf, name/email'den alınır
-- **Dönüş**: Kullanıcı avatarı olarak render edilen React elementi
-
----
-
-### [N17_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx::anonim_kullaniciSatiriRender
-- **params**: `userItem` - Render edilecek tekil kullanıcı nesnesi
-- **ic_degiskenler**:
-  - `userItem` - Üzerinde işlem yapılan ve render edilen kullanıcı nesnesi
-  - `userItem.id` - Kullanıcının benzersiz ID'si, anahtar olarak kullanılır
-  - `visibleCols` - Hangi sütunların gösterileceğini tutan state nesnesi
-  - `adminTableCellClass` - Tablo hücreleri için ortak CSS sınıfı
-  - `cellPad` - Hücre içi dolgu için CSS sınıfı
-  - `UserAvatar` - Kullanıcı avatarını render eden bileşen
-  - `getRoleIcon` - Rol koduna göre ikon döndüren fonksiyon
-  - `_t` - Çeviri işlemi için kullanılan i18n fonksiyonu
-  - `formatDate` - Tarih formatlama fonksiyonu
-  - `lang` - Mevcut dil kodu
-  - `handleRoleChange` - Kullanıcının rolünü değiştirmek için tetiklenen fonksiyon
-  - `updatingRole` - Şu anda rolü güncellenen kullanıcının ID'si
-  - `hasWriteAccess` - Mevcut kullanıcının rol değiştirme yetkisi olup olmadığı
-  - `role` - Mevcut kullanıcının rolü
-  - `Crown` / `Shield` / `Package` / `Tag` / `Eye` / `Users` - İşlem butonlarında kullanılan lucide ikonları
-- **Dönüş**: Kullanıcı satırı olarak render edilen HTML tr elementi
+  - `userItem.id` — satır key'i ve rol değiştirme butonlarında kullanıcı tanımlayıcısı
+  - `userItem.email` — kullanıcının e-posta adresi, UserAvatar'a ve tablo hücresine yazdırılır
+  - `userItem.full_name` — kullanıcının tam adı, UserAvatar'a ve tablo hücresine yazdırılır
+  - `userItem.role` — kullanıcının mevcut rolü, rol ikonu ve aksiyon butonlarının koşullarında kullanılır
+  - `userItem.created_at` — kullanıcının hesap oluşturma tarihi, `formatDate(userItem.created_at, lang)` ile formatlanır
+  - `visibleCols.user` — email/sütununun görünürlük flag'i
+  - `visibleCols.role` — rol sütununun görünürlük flag'i
+  - `visibleCols.created` — tarih sütununun görünürlük flag'i
+  - `visibleCols.actions` — aksiyon butonları sütununun görünürlük flag'i
+  - `role` — mevcut oturum kullanıcısının rolü, super_admin/admin kontrollerinde kullanılır
+  - `hasWriteAccess` — yazma yetkisi boolean, butonların disabled durumunu belirler
+  - `updatingRole` — şu an rolü güncellenen kullanıcının ID'si, butonları devre dışı bırakmak için kullanılır
+  - `_t(...)` — çeviri fonksiyonu, rol etiketleri ve buton başlıkları için kullanılır
+  - `lang` — mevcut dil kodu, `formatDate` fonksiyonuna geçirilir
+  - `handleRoleChange` — rol değiştirme handler fonksiyonu, her butonun onClick'inde çağrılır
+  - `adminTableCellClass` — tablo hücreleri için ortak CSS sınıfı
+  - `cellPad` — tablo hücre iç;padding sınıfı
+- **Dönüş**: JSX.Element — `<tr>` tablo satırı, içinde email, rol, tarih ve aksiyon butonları hücreleri
 
 ---
 
@@ -291,3 +243,19 @@ Bu modül, VentHub HVAC sisteminin yönetici paneli kullanıcı yönetimi sayfas
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminUsersPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-lg`, `rounded-hvac-xl`, `shadow-glow-md`, `tracking-hvac-normal`, `tracking-hvac-snug`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-cyan-400/5`, `bg-gradient-to-br`, `bg-red-500/10`, `bg-white/5`, `border-red-500/20`, `border-white/10`, `border-white/5`, `from-white/10`, `group-hover:bg-cyan-400/10`, `group-hover:border-cyan-400/30`, `group-hover:text-cyan-400`, `hover:bg-amber-500/10`, `hover:bg-blue-400/10`, `hover:bg-emerald-400/10`
+- **Layout:** `absolute`, `custom-scrollbar`, `flex`, `flex-1`, `flex-col`, `from-white/10`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`, `h-10`, `h-16`, `h-8`
+- **Varyant/Responsive:** `:`, `active:`, `group-hover/item:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${activeTab`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${cellPad`, `${headPad`, `-mr-48`, `-mt-48`, `:`, `===`, `active:scale-95`, `admins`, `all`, `blur-120`, `border`, `divide-white/5`

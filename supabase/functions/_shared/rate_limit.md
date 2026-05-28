@@ -4,60 +4,57 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\rate_limit.ts
 skeleton_hash: d2e039f95972e4b1
-generated_at: 2026-05-24T10:45:21Z
+entity_hashes:
+  func:checkRateLimit: eb2ddca9002ea24b
+  func:rateLimitHeaders: 8e57db019805fbe0
+  overview: 2d23853bbec3dccf
+generated_at: 2026-05-28T22:51:38Z
 ---
 
 ## Genel Bakış
-Bu modül, sunucusuz fonksiyonlara gelen isteklerin belirli bir zaman dilimi içinde izin verilen eşiği aşmasını engelleyen bir hız sınırlama sistemi sağlar. Her istemci için benzersiz bir anahtar ve Supabase servis rolü anahtarı kullanarak güvenli bir şekilde sınır kontrolü yapar. Kontrol sonucu, istemci tarafında yorumlanabilmesi için standart HTTP başlıklarına dönüştürülür.
+Bu modül, sunucusuz fonksiyonlara yönelik istekleri belirli bir zaman aralığında izin verilen eşik değerleri dahilinde tutarak kontrolsüz kullanımı önler. Supabase veritabanı üzerinde her istemci anahtarı için bir sayaç tutar ve bu sayaca dayanarak isteğin kabul edilip edilmeyeceğine karar verir. Kontrol sonucunda istemci tarafının anlayabileceği standart HTTP başlıkları üretilir.
 
 ## Fonksiyon Grupları
-### Hız Sınırı Karar Mekanizması
-İstek anahtarını ve hizmet konfigürasyonunu kullanarak Supabase üzerinde ilgili kaydı sorgular ve isteğin geçerli zaman penceresinde kabul edilip edilmeyeceğine karar verir.
+### İstek Kotası Doğrulama
+Verilen istemci anahtarı ve servis bilgilerini kullanarak Supabase üzerindeki kota kaydını sorgular. Zaman penceresi içindeki istek sayısını kontrol eder ve limit aşılıp aşılmadığını döndürür.
 - checkRateLimit
 
-### Yanıt Başlıkları Üreticisi
-Hız sınırı kontrolü sonucunda elde edilen limit, kalan hak ve sıfırlanma zamanı bilgilerini standart HTTP başlık formatına dönüştürür.
+### Yanıt Başlığı Oluşturma
+Kota kontrolü sonrasında elde edilen limit, kalan hak ve sıfırlanma zamanı değerlerini HTTP yanıt başlıklarına dönüştürür. Bu başlıklar istemci tarafında kota durumunu yorumlamak için kullanılır.
 - rateLimitHeaders
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `key` boş bir string ise, `checkRateLimit` işlevi geçerli bir istemci kimliği sağlayamadığı için sınır kontrolü yapılamaz.  
-[Aksiyom 2]: Eğer `fetchBase` boş bir string ise, Supabase endpointine ulaşılmadığı için istek gönderilemez ve fonksiyon hataya yol açar.  
-[Aksiyom 3]: Eğer `serviceRoleKey` boş bir string ise, Supabase servisiyle yetkisiz erişim denemesi yapıldığı için işlem yetkisiz reddedilir.  
-[Aksiyom 4]: Eğer `opts` nesnesi sağlanıyorsa ve `opts.limit` tanımlıysa, bu değer sıfır veya negatif bir sayı ise, sınırlama mantığı anlamını yitirir ve geçersiz bir sınır değeri kabul edilir.  
-[Aksiyom 5]: Eğer `opts` nesnesi sağlanıyorsa ve `opts.windowSec` tanımlıysa, bu değer sıfır veya negatif bir sayı ise, zaman penceresinin geçerli bir süre olmadığı için sınırlama kontrolü doğru çalışmaz.  
-[Aksiyom 6]: Eğer `rateLimitHeaders` fonksiyonuna `limit` parametresi negatif bir sayı geçerse, başlıkta bildirilen izin verilen istek sayısı anlamsız olur.  
-[Aksiyom 7]: Eğer `rateLimitHeaders` fonksiyonuna `remaining` parametresi negatif bir sayı geçerse, kalan hak değeri mantıksız olur ve istemciye yanlış bilgi iletilir.  
-[Aksiyom 8]: Eğer `rateLimitHeaders` fonksiyonuna `resetAt` parametresi geçerli bir tarih‑saat stringi (ISO 8601 vb.) değilse, başlıkta sıfırlanma zamanı bilgisi istemci tarafından çözülemez.  
-[Aksiyom 9]: Eğer `rateLimitHeaders` fonksiyonuna `remaining` değeri `limit` değerinden büyükse, kalan hak izin verilen sınırı aşmış olur; bu durum sistem tutarsızlığını gösterir ve başlık bilgisi güvenilir değildir.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### checkRateLimit
-**Ne yapar**: Belirtilen anahtar (`key`) için, verilen temel URL (`fetchBase`) ve servis rolü anahtarı (`serviceRoleKey`) kullanarak, bir rate limit kontrolü gerçekleştirir. Bu kontrol, isteğin geçerli limit içinde olup olmadığını belirler ve kalan izinli istek sayısını döndürür.  
-**Nasıl yapar**: Fonksiyon, `fetchBase` üzerinden bir HTTP isteği göndererek ilgili servisden rate limit bilgilerini alır. Gelen yanıtın içinde limit, pencere süresi ve kalan istek sayısı bulunur. Opsiyonel `opts` parametresi ile limit ve pencere süresi üzerine geçersiz kılma (override) yapılabilir. İstek başarılı ise, `result` alanı `true` olarak işaretlenir; aksi takdirde `false` döner.  
+**Ne yapar**: Bir anahtar için hız limiti kontrolü yapar, isteklerin izin verilip verilmediğini belirler ve kalan kota ile sıfırlanma zamanını döndürür.
+
+**Nasıl yapar**: Fonksiyon, belirtilen anahtar için veritabanındaki `bump_rate_limit` RPC fonksiyonunu çağırarak mevcut durumu sorgular ve kota sayacını artırır. Varsayılan olarak dakikada 60 istek limiti ve 60 saniyelik pencere süresi kullanılır; bu değerler `opts` parametresiyle veya ortam değişkenleriyle (`RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_WINDOW_SEC`) değiştirilebilir. Sınırlar geçersiz veya negatif olduğunda otomatik olarak 60 değerine geri döner. RPC çağrısı başarısız olursa bir hata fırlatır, veritabanından geçersiz bir yanıt alınırsa varsayılan olarak isteğe izin veren bir sonuç nesnesi oluşturulur.
+
 **Parametreler**:
-- key: string — Rate limit kontrolü yapılacak benzersiz anahtar (örneğin kullanıcı ID veya IP adresi).
-- fetchBase: string — Rate limit bilgilerini almak için kullanılan temel API URL’si.
-- serviceRoleKey: string — API’ye erişim için kullanılan servis rolü anahtarı.
-- opts?: { limit?: number; windowSec?: number } — Opsiyonel yapılandırma nesnesi; `limit` ile maksimum istek sayısı, `windowSec` ile pencere süresi (saniye cinsinden) belirlenebilir.
-**Dönüş**: `{ result, limit, windowSec }` — `result` (boolean) istek limit içinde olup olmadığını gösterir; `limit` (number) geçerli limit değeri; `windowSec` (number) geçerli pencere süresi.
+- key: string — Rate limit kontrolü yapılacak benzersiz anahtar; genellikle bir kullanıcı kimliği, IP adresi veya API anahtarı olabilir
+- fetchBase: string — Supabase projesinin taban URL'si (örneğin `https://xyzcompany.supabase.co`); RPC çağrısı bu adres üzerinden yapılır
+- serviceRoleKey: string — Supabase service_role anahtarı; yetkilendirme ve API kimlik doğrulama başlıklarında kullanılır
+- opts: { limit?: number; windowSec?: number } — Opsiyonel yapılandırma nesnesi; limit dakika başına izin verilen maksimum istek sayısını, windowSec ise pencere süresini saniye cinsinden belirtir
+
+**Dönüş**: `{ result: RateLimitResult, limit: number, windowSec: number }` — result nesnesi `allowed` (boolean, isteğe izin verilip verilmediği), `remaining` (number, pencerede kalan kota sayısı) ve `resetAt` (string, pencerenin sıfırlanacağı ISO 8601 zaman damgası) alanlarını içerir; limit ve windowSec ise hesaplamada kullanılan nihai parametre değerlerini temsil eder.
 
 ### rateLimitHeaders
-**Ne yapar**: Rate limit ile ilgili bilgileri HTTP yanıt başlıklarına ekler. Bu başlıklar, istemcinin kalan istek sayısı, limit ve reset zamanını bilmesini sağlar.  
-**Nasıl yapar**: Fonksiyon, `limit`, `remaining` ve `resetAt` parametrelerini alarak, uygun başlık adlarını (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`) oluşturur ve bunları yanıt nesnesine ekler. Başlıkların formatı, standart rate limit uygulamalarına uygun olarak belirlenir.  
+**Ne yapar**: HTTP rate limit yanıtları için standart başlık anahtar-değer çiftlerinden oluşan bir nesne üretir.
+
+**Nasıl yapar**: Verilen limit, kalan kota ve sıfırlanma zamanı değerlerini HTTP rate limit başlık formatına dönüştürür. `RateLimit-Remaining` değeri negatif olmasını engellemek için `Math.max(0, ...)` ile korunur; `RateLimit-Reset` değeri ise mevcut zamandan sıfırlanma zamanına kadar geçen saniye sayısını hesaplar ve minimum 1 saniye olmasını garantiler. Döndürülen nesne `Record<string, string>` tipindedir ve doğrudan HTTP yanıt başlıklarına eklenebilir.
+
 **Parametreler**:
-- limit: number — Günlük veya periyodik maksimum istek sayısı.
-- remaining: number — Şu anda kalan izinli istek sayısı.
-- resetAt: string — Limitin sıfırlanacağı zaman dilimini ISO 8601 formatında gösterir.  
-**Dönüş**: `void` — Fonksiyon yanıt başlıklarını günceller, doğrudan bir değer döndürmez.
+- limit: number — Pencere süresi boyunca izin verilen toplam istek sayısı
+- remaining: number — Mevcut pencere süresi içinde hâlâ izin verilen istek sayısı
+- resetAt: string — Pencere süresinin sona ereceği zaman; ISO 8601 formatında bir tarih dizesi olarak beklenir
+
+**Dönüş**: `Record<string, string>` — `RateLimit-Limit` (toplam kota), `RateLimit-Remaining` (kalan kota, en az 0) ve `RateLimit-Reset` (sıfırlanmaya kalan saniye, en az 1) başlıklarını içeren anahtar-değer nesnesi.
 
 ---
 
@@ -72,22 +69,24 @@ type RateLimitResult = { allowed: boolean; remaining: number; resetAt: string }
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/_shared/rate_limit.ts::checkRateLimit
-- **params**: key: string, fetchBase: string, serviceRoleKey: string, opts?: { limit?: number; windowSec?: number }
+### [N1_NASIL] AST Pointer: _shared/rate_limit.ts::checkRateLimit
+- **params**: (key: string, fetchBase: string, serviceRoleKey: string, opts?: { limit?: number; windowSec?: number })
 - **ic_degiskenler**:
-  - `limit` — number derived from opts?.limit or env var RATE_LIMIT_PER_MINUTE (default 60), clamped to minimum 1
-  - `windowSec` — number derived from opts?.windowSec or env var RATE_LIMIT_WINDOW_SEC (default 60), clamped to minimum 1
-  - `body` — RPC payload object { p_key: key, p_limit: limit, p_window_seconds: windowSec } sent to the Supabase function
-  - `resp` — Response from fetch to the bump_rate_limit RPC endpoint
-  - `data` — parsed JSON array from resp.json(); fallback to empty array on error
-  - `row` — first element of data if present, otherwise a fallback object with allowed true, remaining limit-1, reset_at set to now+windowSec seconds
-  - `result` — RateLimitResult object containing allowed (boolean), remaining (number), resetAt (ISO string) extracted from row
-- **Dönüş**: { result: RateLimitResult, limit: number, windowSec: number }
+  - `limit` — uygulanacak istek limiti; opts?.limit'ten, Deno.env['RATE_LIMIT_PER_MINUTE']'den veya varsayılan 60'tan alınır; geçersizse 60'a resetlenir
+  - `windowSec` — rate limit penceresi (saniye); opts?.windowSec'ten, Deno.env['RATE_LIMIT_WINDOW_SEC']'den veya varsayılan 60'tan alınır; geçersizse 60'a resetlenir
+  - `body` — Supabase RPC'ye gönderilen JSON body; p_key, p_limit, p_window_seconds alanlarını içerir
+  - `resp` — fetch() çağrısının döndürdüğü Response nesnesi; ok değilse hata fırlatılır
+  - `data` — resp.json() ile parse edilen yanıt; `{ allowed, remaining, reset_at }`物件ları içeren dizi
+  - `row` — data[0] mevcutsa ilk satır, aksi halde varsayılan {allowed: true, remaining: limit-1, reset_at: ...} nesnesi
+  - `result` — RateLimitResult nesnesi; allowed boolean, remaining number, resetAt string değerlerini tutar
+- **Dönüş**: `{ result: RateLimitResult, limit: number, windowSec: number }`
 
-### [N2_NASIL] AST Pointer: supabase/functions/_shared/rate_limit.ts::rateLimitHeaders
-- **params**: limit: number, remaining: number, resetAt: string
-- **ic_degiskenler**: - (yok)
-- **Dönüş**: Record<string,string> containing RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset headers
+---
+
+### [N2_NASIL] AST Pointer: _shared/rate_limit.ts::rateLimitHeaders
+- **params**: (limit: number, remaining: number, resetAt: string)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `Record<string,string>` — RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset HTTP header'larını içeren nesne
 
 ---
 

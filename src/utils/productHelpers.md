@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\productHelpers.ts
 skeleton_hash: cdb04e41cfaea839
-generated_at: 2026-05-23T22:34:22Z
+entity_hashes:
+  func:formatSpecValue: 0b8f9bc746e92a72
+  func:groupTechnicalSpecs: 51db2787f818ddff
+  func:translateSpecKey: 29d8d7c9441eed5b
+  overview: 4b30ef2d65385d1e
+generated_at: 2026-05-28T22:38:49Z
 ---
 
 ## Genel Bakış
@@ -33,7 +38,7 @@ Tek bir nesne olarak gelen tüm ham teknik özellik kümesini mantıksal kategor
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### translateSpecKey
 **Ne yapar**: Teknik spesifikasyon anahtarlarını insan tarafından okunabilir Türkçe etiketlere çevirir. Eğer ilgili anahtar önceden tanımlanmış çeviri sözlüğünde bulunamazsa, anahtarı alt çizgilerden ayırıp Başlık Formatı'na (Title Case) çevirerek yedek bir görünüm ismi üretir. Tüm bilinen ve yeni eklenen spesifikasyonlar için anlaşılır bir standart görünüm ismi sağlar.

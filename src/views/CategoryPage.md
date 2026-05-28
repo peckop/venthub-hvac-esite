@@ -4,38 +4,54 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CategoryPage.tsx
 skeleton_hash: d6a1aef6630b0f1d
-generated_at: 2026-05-23T22:39:51Z
+entity_hashes:
+  func:CategoryPage: 58a326ade322bfe1
+  overview: 4a1165b4bde9da1a
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:39:56Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC platformunun görünüm katmanında yer alan kategori sayfası React bileşenidir. İlgili kategori, alt kategoriler ve ürünlere ait başlangıç verilerini alarak kullanıcılara özel kategori içerikli bir sayfa sunmak üzere tasarlanmıştır.
+CategoryPage modülü, Venthub HVAC platformunda dinamik kategori sayfalarının görüntülenmesinden sorumlu bir React view bileşenidir. Kategori, alt kategori ve ürün verilerini üst bileşenden alarak sayfanın temel yapısını oluşturur ve tüm iş mantığı ile sunum süreçlerini CategoryMasterView bileşenine devrederek sayfayı render eder.
 
 ## Fonksiyon Grupları
-### Kategori Sayfası Ana Bileşeni
-Modülün tek ana sorumluluğunu üstlenen bu React fonksiyonu, dışarıdan aktarılan başlangıç verilerini alarak kategori sayfasının temel yapısını oluşturur ve ilgili içeriği kullanıcıya sunacak şekilde render eder.
+### Kategori Sayfası Görünümü
+Modülün tek bileşeni olarak kategori sayfasının dışa açılan giriş noktasıdır. Başlangıç verilerini (kategori bilgisi, ürünler, alt kategoriler) üst bileşenden alır, doğrular ve Unified Category Shell yapısıyla sayfanın tamamını oluşturma sorumluluğunu CategoryMasterView bileşenine aktarır.
 - CategoryPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React CategoryPage view modülünün kategori içeriğini eksiksiz ve hatasız şekilde kullanıcıya sunması, aldığı üç zorunlu prop'un geçerli ve uygun formatta parent component tarafından sağlanması zorunludur.
+Bu bir React view bileşeni olup, fonksiyon gövdesi verilmediğinden yalnızca fonksiyon imzasından çıkarılabilen minimum mimari varsayımlar tanımlanmıştır.
 
-[Aksiyom 1]: Eğer initialCategory prop'u geçerli bir ana kategori nesnesi olarak sağlanmazsa, sayfada kategori başlığı, açıklaması gibi temel kategori meta verileri gösterilemez, sayfa hatalı içerikle veya boş başlıkla render edilir.
-[Aksiyom 2]: Eğer initialProducts prop'u geçerli bir ürün listesi olarak sağlanmazsa, kategori altında listelenecek ürünler hiç gösterilemez, sayfa üzerindeki ürün sıralama, filtreleme gibi işlevler çalışmaz.
-[Aksiyom 3]: Eğer initialSubCategories prop'u geçerli bir alt kategori listesi olarak sağlanmazsa, sayfa içindeki alt kategori navigasyon yapısı oluşturulamaz, kullanıcı mevcut alt kategorilere erişim sağlayamaz.
+[Aksiyom 1]: Eğer parent bileşen `initialCategory` prop'u sağlamazsa, bileşen undefined değerle çalışır ve beklenmeyen davranış oluşur (hiçbir default değer tanımlı değildir).
+
+[Aksiyom 2]: Eğer parent bileşen `initialProducts` prop'u sağlamazsa, bileşen undefined değerle çalışır ve ürün listesi oluşturulamaz (hiçbir default değer tanımlı değildir).
+
+[Aksiyom 3]: Eğer parent bileşen `initialSubCategories` prop'u sağlamazsa, bileşen undefined değerle çalışır ve alt kategori listesi oluşturulamaz (hiçbir default değer tanımlı değildir).
+
+[Aksiyom 4]: Eğer `initialCategory`, `initialProducts` veya `initialSubCategories` geçerli bir React prop'undan (obje/liste) farklı bir tipte gelirse, bileşen içeriği doğru şekilde render edilemez.
+
+[Aksiyom 5]: Eğer bileşen içeriği sunmak için这三个 prop'un iç yapı alanlarına (örn: `initialCategory.name`, `initialProducts[].id` gibi) erişiyorsa ve bu alanlar mevcut değilse, runtime hatası oluşur.
+
+**Not:** Fonksiyon gövdesi verilmediğinden, bileşenin hangi alt alanlara eriştiği ve hangi iç mantığı uyguladığı **bilinmiyor** olup, yalnızca imzada belirtilen üç prop'un varlığının zorunluluğu belirlenebilmiştir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryPage
-**Ne yapar**: VentHub HVAC projesinde dinamik kategori sayfasının ana giriş noktası olarak görev yapar. Kategori sayfasında ihtiyaç duyulan tüm iş mantığı ve sunum süreçlerini Unified Category Shell olarak adlandırılan CategoryMasterView bileşenine devreder, sayfanın sorunsuz bir şekilde render edilmesi için gerekli tüm başlangıç verilerini hedef bileşene güvenli şekilde iletir.
-**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanan CategoryPage, kendisine iletilen tüm başlangıç verilerini doğrudan delegasyon yaptığı CategoryMasterView bileşenine ileterek kendi başına ek işlem yürütmez. Tüm ürün filtreleme, alt kategori gezintisi, state yönetimi ve kullanıcı etkileşimleri gibi süreçlerin tamamen CategoryMasterView üzerinden yönetilmesini sağlar, bu şekilde kod tekrarı önlenir ve kategori mantığı tek merkezde toplanır.
+
+**Ne yapar**: Dinamik kategori sayfasının giriş noktası olarak görev yapan React bileşenidir. Kullanıcılar bir kategoriye tıkladığında bu bileşen yüklenerek ilgili kategorinin ürünlerini ve alt kategorilerini görüntüler.
+
+**Nasıl yapar**: Bu bileşen bir "Controller" veya "Entry Point" mantığıyla çalışır. Kendisi doğrudan UI render etmez; bunun yerine tüm iş mantığını ve sunum katmanını Unified Category Shell (CategoryMasterView) bileşenine delege eder. Bu sayede sorumluluklar ayrışmış ve bileşen yeniden kullanılabilir hale gelmiştir.
+
 **Parametreler**:
-- initialCategory: CategoryPageProps prop'u — Sayfanın ait olduğu ana kategorinin tüm temel verilerini içeren başlangıç nesnesi, kategori kimliği, adı, açıklaması gibi gerekli meta verileri barındırır
-- initialProducts: CategoryPageProps prop'u — Kategori sayfasında görüntülenecek ürünlerin ilk yükleme anındaki tam listesini içeren dizi, sayfa açıldığında anında ürünlerin kullanıcıya sunulmasını sağlar
-- initialSubCategories: CategoryPageProps prop'u — Ana kategoriye bağlı tüm alt kategorilerin başlangıç listesini tutan dizi, kullanıcının alt kategoriler arasında rahatça gezinmesine olanak tanıyan verileri içerir
-**Dönüş**: React.FC<CategoryPageProps> tipinde geçerli bir React bileşeni döndürür. Dönen bileşen, kategori sayfasının DOM ağacına işlenmesi için gerekli tüm React elementlerini ve alt bileşen referanslarını içerir, sayfanın tarayıcıda sorunsuz bir şekilde render edilmesini sağlar.
+- `initialCategory` — Kategorinin başlangıç verisi. Sayfa yüklendiğinde görüntülenecek kategori bilgisini içerir
+- `initialProducts` — Başlangıç ürün listesi. İlgili kategorideki ürünlerin önceden yüklenmiş halini tutar
+- `initialSubCategories` — Başlangıç alt kategorileri. Kategori hiyerarşisindeki alt kategorilerin verisini barındırır
+
+**Dönüş**: `React.FC<CategoryPageProps>` — CategoryPageProps tipinde tanımlı props'ları kabul eden fonksiyonel bir React bileşeni döndürür.
 
 ---
 
@@ -45,15 +61,6 @@ Bu React CategoryPage view modülünün kategori içeriğini eksiksiz ve hatası
 - `initialCategory?: DomainCategory | null`
 - `initialProducts?: DomainProduct[]`
 - `initialSubCategories?: DomainCategory[]`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\CategoryPage.tsx::CategoryPage
-- **params**: [initialCategory, initialProducts, initialSubCategories]
-- **ic_degiskenler**: Lokal değişken tanımlanmamıştır, yalnızca fonksiyona gelen giriş parametreleri kullanılmıştır
-- **Dönüş**: Gelen parametreleri iletetilen CategoryMasterView bileşenini içeren React JSX elementi
 
 ---
 
@@ -67,3 +74,19 @@ Bu React CategoryPage view modülünün kategori içeriğini eksiksiz ve hatası
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryPage
   export: CategoryPageProps
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

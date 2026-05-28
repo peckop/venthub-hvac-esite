@@ -8,7 +8,7 @@ entity_hashes:
   func:InventoryReportPage: bfcc8ccf4dbc326a
   overview: 186bde0cd4ca9cee
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-27T17:59:05Z
+generated_at: 2026-05-28T22:35:10Z
 ---
 
 ## Genel Bakış
@@ -21,10 +21,17 @@ Bu grup, rapor sayfasının kök bileşenini tanımlar ve asıl görünüm katma
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için fonksiyon gövdesine erişim olmadığından, sadece imza bilgisinden yola çıkarak güvenilir bir aksiyom üretilememektedir.
+
+**[Aksiyom 1]**: Eğer `InventoryReportPage` çağrıldığında bileşen ağacı (component tree) düzgün render edilecek bir React ortamı (provider'lar, layout) yoksa, sayfa render hatası ile karşılaşır.
+
+**[Aksiyom 2]**: Eğer sayfa dinamik içeriğini yüklemek için bağımlı olduğu modüller/bileşenler erişilebilir konumda değilse (örn. lazy load edilen alt sayfa bileşenleri), rapor içeriği kullanıcıya gösterilmez.
+
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+> **Not**: Fonksiyon imzası `InventoryReportPage()` — parametresiz, default değer içermeyen, saf bir React sayfa bileşenidir. Fonksiyon gövdesine ait kod olmadığı için (kod kesik/eksik), domain-specific eşik değerleri, veri bağımlılıkları veya iş kuralı aksiyomları **bilinmiyor** durumdadır. Aksiyomların genişletilmesi için fonksiyon gövdesinin tamamının sağlanması gereklidir.
 
 ---
 

@@ -6,23 +6,34 @@ source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx
 skeleton_hash: 38d8482f76de1dcf
 entity_hashes:
   func:AddToCartToast: 581f14d900d31bb4
-  overview: 1552c020db2333e5
-  style_tokens: de89d51e5d28158c
-generated_at: 2026-05-27T09:49:37Z
+  overview: 9eae019706928365
+  style_tokens: 7c669d9ccd4d6a62
+generated_at: 2026-05-28T22:35:29Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı bir ürünü sepete eklediğinde ekranda kısa süreli bir bildirim (toast) gösteren tek bir React fonksiyonel bileşeninden oluşur. Bileşen, bildirimin görünürlüğünü, otomatik kapanmasını ve kullanıcının sepeti görüntüleme ya da kapatma gibi aksiyonlar almasını sağlar.
+Bu modül, bir ürünün sepete eklenmesi sonrasında kullanıcıya kısa süreli bir bildirim (toast) göstermekle sorumlu olan tek bir React fonksiyonel bileşenini içerir. Bileşen, bildirimin görünür hale gelmesini, belirli bir süre sonra otomatik kaybolmasını ve kullanıcıya sepeti görüntüleme veya bildirimi kapatma gibi aksiyonlar sunmasını yönetir.
 
 ## Fonksiyon Grupları
-### Toast Görüntüleme ve Yönetim
-Bildirimin açılıp kapanması, zamanlayıcı ile otomatik kapanma, çeviri metinlerinin kullanımı ve özel olay (CustomEvent) ile tetiklenme gibi tüm toast mantığını kapsar.
+### Toast Bileşeni Tanımı ve Davranışı
+Bu grup, sepete ekleme bildiriminin tüm yaşam döngüsünü ve kullanıcı etkileşimlerini yöneten ana (ve tek) bileşeni barındırır. Bileşen, olaylarla tetiklenir, zamanlayıcı ile kapanır ve çeviri metinlerini kullanır.
 - AddToCartToast
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, parametresiz bir React fonksiyonel bileşenidir. Fonksiyon imzasında herhangi bir parametre tanımlı değildir.
+
+[Aksiyom 1]: Eğer React Runtime (JSX/TSX çalışma ortamı) yoksa, bileşen render edilemez ve çalışma zamanı hatası oluşur.
+
+[Aksiyom 2]: Eğer bileşen bir React Component Tree içerisine yerleştirilmemişse, DOM'da herhangi bir toast bildirimi görüntülenemez.
+
+[Aksiyom 3]: Eğer bileşen bağımsız olarak çağrılacaksa (parametre almadığından), gerekli tüm durum (state) ve mantık (logic) kendi içinde veya React Context/hooks aracılığıyla sağlanmalıdır.
+
+---
+
+**Not:** Fonksiyon imzası `AddToCartToast()` olarak verilmiş olup herhangi bir parametre veya default değer içermemektedir. Bu nedenle, bileşenin iç mantığına (state yönetimi, event handling, timer mekanizması vb.) ilişkin varsayımlar fonksiyon gövdesi analiz edilmeden çıkarılamaz.
 
 ---
 
@@ -39,39 +50,34 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx::AddToCartToast
+### [N1_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n` hook'undan dönen, uluslararasılaştırma metinlerine erişim sağlayan bir fonksiyon.
-  - `visible` — Sepete ekleme bildiriminin görünür olup olmadığını kontrol eden bir boolean state değişkeni.
-  - `setVisible` — `visible` state değişkenini güncelleyen setter fonksiyonu.
-  - `product` — Sepete eklenen ürünün bilgilerini (Product tipi) tutan state değişkeni. Başlangıçta `null`'dır.
-  - `setProduct` — `product` state değişkenini güncelleyen setter fonksiyonu.
-  - `hideTimer` — Bildirimi otomatik olarak gizlemek için kullanılan `setTimeout` zamanlayıcısının referansını tutan bir ref objesi.
-  - `onAdded` — `EVENT` dinleyicisi tarafından çağrılan olay işleyici fonksiyonu. Sepete ürün eklendiğinde tetiklenir.
-  - `e` — `onAdded` fonksiyonuna parametre olarak gelen olay objesi.
-  - `detail` — `e` olay objesinin `detail` özelliğinden çıkarılan, eklenen ürün bilgilerini içeren obje.
-- **Dönüş**: `visible` veya `product` `null` ise `null` döner, aksi takdirde React elementi (JSX) döner.
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; bileşen içi metinleri çevirir
+  - `visible` — `React.useState<boolean>(false)` state'i; toast bildiriminin görünürlüğünü tutar
+  - `product` — `React.useState<Product | null>(null)` state'i; sepete eklenen ürün verisini tutar
+  - `hideTimer` — `React.useRef<number | null>(null)` ref'i; otomatik kapatma timeout ID'sini saklar
+  - `onAdded` — useEffect içinde tanımlı arrow callback; CustomEvent dinleyicisi, ürün verisini alıp state'leri günceller ve 5 sn sonra gizler
+  - `detail` — `(e as CustomEvent).detail as { product?: Product }` CustomEvent payload'u; sepete eklenen ürün bilgisini içerir
+- **Dönüş**: `React.FC` — JSX (toast bildirim UI'ı) veya `null` (görünür değilse)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx::useEffect_callback
+### [N2_NASIL] AST Pointer: src/components/AddToCartToast.tsx::useEffect callback (initializer)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `onAdded` — `EVENT` dinleyicisi tarafından çağrılan olay işleyici fonksiyonu. Sepete ürün eklendiğinde tetiklenir.
-  - `e` — `onAdded` fonksiyonuna parametre olarak gelen olay objesi.
-  - `detail` — `e` olay objesinin `detail` özelliğinden çıkarılan, eklenen ürün bilgilerini içeren obje.
-- **Dönüş**: Temizleme fonksiyonu döner.
+  - `onAdded` — event handler callback; `detail.product` varsa `setProduct`, `setVisible(true)` çağırır, mevcut timeout'u temizler, 5000ms'lik yeni timeout ayarlar
+  - `detail` — `(e as CustomEvent).detail as { product?: Product }` CustomEvent payload'u
+- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener` ile `onAdded` kaldırır, `hideTimer.current` varsa timeout'u temizler
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx::onAdded
-- **params**:
-  - `e` — `CustomEvent` tipinde, sepete ürün ekleme olayını temsil eden olay objesi.
+### [N3_NASIL] AST Pointer: src/components/AddToCartToast.tsx::onAdded (inner callback)
+- **params**: `(e: Event)` — pencereden gelen custom event nesnesi
 - **ic_degiskenler**:
-  - `detail` — `e` olay objesinin `detail` özelliğinden çıkarılan, eklenen ürün bilgilerini içeren obje. `product` özelliği opsiyoneldir.
-- **Dönüş**: yok (state güncellemeleri ve zamanlayıcı ayarlaması yapar).
+  - `detail` — `(e as CustomEvent).detail as { product?: Product }` CustomEvent payload'u; `product` alanını opsiyonel olarak içerir
+- **Dönüş**: yok (void) — `setProduct`, `setVisible`, `window.setTimeout` ile yan etki olarak state ve zamanlayıcıları günceller
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx::cleanup_function
+### [N4_NASIL] AST Pointer: src/components/AddToCartToast.tsx::cleanup (inner arrow)
 - **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (olay dinleyicisini kaldırır ve zamanlayıcıyı temizler).
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (void) — `window.removeEventListener` ile `onAdded` kaldırır, `hideTimer.current` varsa `window.clearTimeout` ile zamanlayıcıyı temizler
 
 ---
 
@@ -96,6 +102,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-light-gray`, `border-primary-navy`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`, `text-white`, `text-xs`
+- **Renkler:** `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-light-gray`, `border-primary-navy`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-industrial-gray`, `hover:text-white`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`
 - **Layout:** `bottom-3`, `fixed`, `flex`, `flex-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `items-start`, `justify-center`, `max-w-92vw`, `md:bottom-6`, `md:gap-3`
-- **Responsive:** `md:` prefix kullanımları
+- **Varyant/Responsive:** `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `animate-slide-up`, `border`, `font-medium`, `font-semibold`, `inset-x-3`, `md:inset-auto`, `md:pb-4`, `md:px-4`, `md:py-2`, `mt-2`, `pb-3`, `pt-0`, `px-3`, `py-3`, `ring-1`

@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\checkoutHelpers.ts
 skeleton_hash: 86380db8e7148a1a
-generated_at: 2026-05-23T22:33:59Z
+entity_hashes:
+  func:getPriceHashLocal: 13f64c7a6218a753
+  func:getPriceHashServer: 9916fbf1157483b4
+  func:getTranslationWithFallback: 017e759a3be126ab
+  func:to2: b98feff70eaa59fa
+  overview: 88f2922b0a8d3c89
+generated_at: 2026-05-28T22:38:45Z
 ---
 
 ## Genel Bakış
@@ -37,7 +43,7 @@ Bu modül, ödeme (checkout) adımında kullanılan yerel/sunucu fiyat hash hesa
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### to2
 **Ne yapar**: Girdi olarak aldığı sayısal değeri güvenli bir şekilde 2 ondalık basamağa dönüştürür. Genellikle para birimi hesaplamaları gibi hassasiyet gerektiren işlemlerde kullanılır, ondalık basamak sayısını standartlaştırarak hesaplama hatalarının önüne geçer.
@@ -100,30 +106,17 @@ Bu modül, ödeme (checkout) adımında kullanılan yerel/sunucu fiyat hash hesa
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki `getPriceHashLocal()` ve `getPriceHashServer()` fonksiyonları her ikisi de yine aynı dosyada bulunan `to2()` fonksiyonunu çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veri setinde bu modülü kullanan herhangi bir dış modül veya fonksiyon bilgisi bulunmamaktadır, incoming çağrı ilişkisi kaydedilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  getPriceHashLocal() → to2()
-  getPriceHashServer() → to2()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    getPriceHashLocal["getPriceHashLocal()"] --> to2["to2()"]
-    getPriceHashServer["getPriceHashServer()"] --> to2["to2()"]
+graph TD
+    checkoutHelpers_ts__getPriceHashLocal["getPriceHashLocal"]
+    checkoutHelpers_ts__getPriceHashServer["getPriceHashServer"]
+    checkoutHelpers_ts__getTranslationWithFallback["getTranslationWithFallback"]
+    checkoutHelpers_ts__to2["to2"]
+    checkoutHelpers_ts__getPriceHashLocal --> checkoutHelpers_ts__to2
+    checkoutHelpers_ts__getPriceHashServer --> checkoutHelpers_ts__to2
 ```
-
----
 
 ## NODE ID STANDARD
 

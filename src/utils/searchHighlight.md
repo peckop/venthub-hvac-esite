@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\searchHighlight.tsx
 skeleton_hash: 9a7ae38ff9331cf8
-generated_at: 2026-05-23T22:34:23Z
+entity_hashes:
+  func:highlightMatch: 6d9d01916ecad5ec
+  overview: 57ecd39f68f023ec
+  style_tokens: 9f79124e858dad58
+generated_at: 2026-05-28T22:38:50Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu TSX modülü, React tabanlı projelerde verilen metin içindeki arama sorgusu
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### highlightMatch
 **Ne yapar**: Belirtilen ana metin içinde arama sorgusundaki terimi büyük-küçük harf farkı gözetmeksizin (case-insensitive) bulur ve bulunan tüm eşleşmeleri HTML <mark> etiketi ile sararak vurgular. Eğer arama sorgusu boşsa veya metin içinde eşleşme tespit edilemezse orijinal metni olduğu gibi döndürür, sonuç olarak React uygulamalarında doğrudan görüntülenebilecek bir içerik sunar.
@@ -79,3 +83,19 @@ Bu TSX modülü, React tabanlı projelerde verilen metin içindeki arama sorgusu
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: highlightMatch
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-yellow-100`, `text-primary-navy`
+- **Layout:** `bg-yellow-100`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `font-semibold`, `px-0.5`, `rounded-sm`

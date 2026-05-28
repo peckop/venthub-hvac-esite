@@ -13,6 +13,8 @@ Agent olarak UI'a yeni metin eklerken bu kurallara uymalıyım.
 1. **Hardcoded string YASAK** — Tüm kullanıcıya görünen metinler i18n üzerinden gelmeli
 2. **Türkçe öncelikli** — `tr.ts` ana sözlük, `en.ts` çeviri
 3. **Hiyerarşik anahtarlar** — `section.subsection.key` formatı
+4. **Proxy Hook Zorunluluğu:** Geliştiricilerin ve ajanların URL'leri elle birleştirmesi tamamen yasaktır. Rotalar kesinlikle `useLocalizedRoutes` hook'u üzerinden `Routes.category()` şeklinde çağrılmalıdır. Manuel string birleştirme (`/${lang}/...`) mimari ihlaldir.
+5. **JSONB Veri Çevirisi Kuralı:** Veritabanı tablolarında (categories, products) çeviri için ayrı ilişkisel (relational) tablolar oluşturulması yasaktır. Dil verisi kesinlikle JSONB (`metadata->>lang`) formatında tutulmalıdır.
 
 ## Dosya Yapısı
 

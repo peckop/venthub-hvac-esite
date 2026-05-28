@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useDragScroll.ts
 skeleton_hash: dd772fadde55503c
-generated_at: 2026-05-23T22:29:59Z
+entity_hashes:
+  func:useDragScroll: 285567f9f95bbe2e
+  overview: d2bada94c0377681
+generated_at: 2026-05-28T22:37:45Z
 ---
 
 ## Genel Bakış
@@ -28,7 +31,7 @@ Bu modül, React tabanlı projelerde DOM elemanları üzerinde kullanıcı sür�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useDragScroll
 **Ne yapar**: Kaydırılabilir bir konteyner elementine eklendiğinde yatay sürükleerek kaydırma (drag-to-scroll) işlevselliği sağlayan bir callback referansı sunar. Fare etkileşimlerini kullanarak dokunmatik cihazlardaki kaydırma (panning) deneyimini masaüstü ortamında simüle eder, ayrıca sürükleme işlemi sırasında kazara tıklama tetiklenmesini önlemek için bir hareket eşik değeri kullanır.

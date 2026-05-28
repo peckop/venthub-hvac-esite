@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SecurityRibbon.tsx
 skeleton_hash: 280aae49acbb2909
-generated_at: 2026-05-23T22:27:17Z
+entity_hashes:
+  func:SecurityRibbon: a7c5f379d943c103
+  overview: 549cf1e90e5e7dc2
+  style_tokens: 3e379506fde07599
+generated_at: 2026-05-28T22:36:58Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ React tabanlı SecurityRibbon UI bileşeni, marka ve ödeme sağlayıcısı bilg
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SecurityRibbon
 **Ne yapar**: Venthub HVAC platformu için kullanıcı güvenini artırmak amacıyla güvenlik bilgilerini ekranlarda bir şerit olarak sunan React fonksiyonel bileşenidir. Genellikle ödeme gibi hassas süreçlerde kullanıcının karşısına çıkarak güvenilir marka ve hizmet sağlayıcı bilgilerini iletmek için tasarlanmıştır, eksik kalan prop değerleri için ön tanımlı varsayılanlar sunarak herhangi bir çalışma hatası oluşmadan kullanılır.
@@ -84,4 +88,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-primary-navy/10`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xs`
 - **Layout:** `flex`, `flex-wrap`, `gap-2`, `gap-3`, `h-9`, `items-center`, `justify-between`, `justify-center`, `w-9`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `font-semibold`, `rounded-full`

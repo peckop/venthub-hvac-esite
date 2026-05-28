@@ -4,56 +4,50 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\ActivityHeatmap.tsx
 skeleton_hash: 2c5758de78bc1dee
-generated_at: 2026-05-23T21:52:24Z
+entity_hashes:
+  func:ActivityHeatmap: bd94540a2dbd025e
+  func:CustomTooltip: 99bc62d30dc2bdeb
+  overview: 0c663e64337450d6
+  style_tokens: 92623035906e7e7c
+generated_at: 2026-05-28T22:35:38Z
 ---
 
 ## Genel Bakış
-`ActivityHeatmap` bileşeni, yönetim panelinde kullanılan bir ısı haritası görselleştirmesidir; dışarıdan aldığı veri setini takvim benzeri bir ısı haritasına dönüştürür ve başlıkla birlikte sunar. `CustomTooltip` ise bu ısı haritasının üzerine gelindiğinde görünen bilgi balonunu oluşturur, aktif durumu ve ilgili veri noktasının detaylarını biçimlendirerek kullanıcıya gösterir.
+Bu modül, yönetim panelinde aktivite verilerini görselleştirmek için kullanılan bir ısı haritası bileşenidir. Dışarıdan gelen veri setini takvim benzeri bir arayüze dönüştürerek yoğunluk bilgisini renk kodlamasıyla sunar ve fare etkileşimlerinde detaylı bilgi sağlamak için özel bir tooltip bileşeni içerir.
 
 ## Fonksiyon Grupları
-### Ana Isı Haritası Görselleştirme
-Isı haritasının ana render mantığını, veri alımını ve bileşenin dışarıya sunduğu arayüzü (props) yönetir.
+### Isı Haritası Ana Bileşeni
+Bileşenin temel yapısını, veri işleme mantığını ve render çıkışını yönetir; dışarıdan aldığı veri ve başlık bilgisiyle ısı haritasını oluşturur.
 - ActivityHeatmap
 
-### Tooltip Bileşeni
-Fare etkileşimleri sırasında gösterilecek ayrıntılı bilgi balonunun görünümünü ve içeriğini hazırlar.
+### Bilgi Baloncuğu (Tooltip)
+Isı haritası üzerindeki veri noktalarına fare ile gelindiğinde gösterilen detaylı bilgi balonunun görünümünü ve içeriğini hazırlar.
 - CustomTooltip
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için aksiyomlar, sadece fonksiyon imzalarından ve bileşen yapısından türetilmiştir.
 
-[Aksiyom 1]: Eğer `data` parametresi `ActivityHeatmap` fonksiyonuna geçilmezse, bileşen bir hata üretir ve render edilmez.  
-[Aksiyom 2]: Eğer `title` parametresi `ActivityHeatmap` fonksiyonuna geçilmezse, bileşen bir hata üretir ve render edilmez.  
-[Aksiyom 3]: Eğer `data` dizisi boşsa, `ActivityHeatmap` bileşeni boş bir heatmap görüntüler (hiç veri gösterilmez).  
-[Aksiyom 4]: Eğer `CustomTooltip` fonksiyonuna `active` değeri `false` olarak geçilirse, tooltip gösterilmez.  
-[Aksiyom 5]: Eğer `CustomTooltip` fonksiyonuna `payload` değeri `undefined` veya boş bir dizi olarak geçilirse, tooltip gösterilmez.  
-[Aksiyom 6]: Eğer `payload` dizisinde bulunan nesneler `payload` özelliği içermiyorsa, tooltip gösterilmez.  
-[Aksiyom 7]: Eğer `payload` dizisinde bulunan nesnelerin `payload` özelliği `HeatmapData & { dayName: string }` tipinde değilse, tooltip gösterilmez.  
-[Aksiyom 8]: Eğer `CustomTooltip` fonksiyonuna `active` değeri `true` ve `payload` değeri geçerli bir dizi ise, tooltip gösterilir ve `payload` içindeki verilerle doldurulur.
+[Aksiyom 1]: Eğer `data` parametresi (HeatmapData[] yapısı) verilmemiş veya `undefined`/`null` ise, ActivityHeatmap bileşeni ısı haritası görselleştirmesi oluşturamaz.
+
+[Aksiyom 2]: Eğer `title` parametresi verilmemiş veya boş string ise, bileşen başlıksız çalışır; bileşenin başlık alanı boş kalır.
+
+[Aksiyom 3]: Eğer CustomTooltip `active` parametresi `false` ise, tooltip görünmez durumda olur.
+
+[Aksiyom 4]: Eğer CustomTooltip `payload` parametresi `undefined` veya boş dizi ise, tooltip içinde gösterilecek veri içeriği olmaz.
+
+[Aksiyom 5]: Eğer CustomTooltip `payload[0].payload` yapısı `{ payload: HeatmapData & { dayName: string } }` formatında değilse, tooltip düzgün biçimlendirilemez.
+
+[Aksiyom 6]: HeatmapData yapısının ısı haritası verisini temsil edecek gerekli alanları (örn: değer, tarih/tanımlayıcı) içermesi gerekir; aksi takdirde ısı haritası hücreleri anlamsız değerler gösterebilir.
 
 ---
 
+**Not:** Bu aksiyomlar sadece fonksiyon imzaları ve bileşen tanımları referans alınarak oluşturulmuştur. Fonksiyon gövdesindeki detaylı doğrulama, varsayılan değer处理 ve hata yönetimi mantığı bilinmemektedir.
+
 ---
 
-## FONKSIYON DETAYLARI
-
-### ActivityHeatmap
-**Ne yapar**: Bir aktivite ısı haritası bileşeni oluşturan React fonksiyonel bileşenidir. Bu bileşen, belirtilen veri setini takvim tabanlı bir ısı haritası şeklinde görselleştirir ve bir başlık ile birlikte sunar.
-**Nasıl yapar**: `data` ve `title` prop'larını alır; dışarıdan gelen `ActivityHeatmapProps` tipindeki prop nesnesini parçalayarak bileşen içinde kullanır. Harita görünümü ve stil detayları prop'lar aracılığıyla özelleştirilebilir, ancak iç mantığında tam olarak hangi kütüphanelerin (örneğin Recharts, tarih işleme) kullanıldığı belirtilmemiştir.
-**Parametreler**:
-- `data`: (tip: `ActivityHeatmapProps` içindeki karşılığı) — Isı haritasında gösterilecek aktivite verilerini içeren dizi veya yapı. Hücrelerin değerlerini ve zaman dilimlerini tanımlar.
-- `title`: (tip: `ActivityHeatmapProps` içindeki karşılığı) — Bileşenin üst kısmında görüntülenecek başlık metni.
-**Dönüş**: `React.FC<ActivityHeatmapProps>` tipinde bir fonksiyonel bileşen. Bu bileşen React'te kullanıldığında, ısı haritasını oluşturan JSX elemanlarını döndürür.
-
-### CustomTooltip
-**Ne yapar**: Recharts tabanlı ısı haritası için özel bir tooltip (ipucu kutusu) bileşenidir. Fare ile bir hücrenin üzerine gelindiğinde ilgili günün detay bilgilerini gösterir.
-**Nasıl yapar**: `active` ve `payload` prop'larına bağlı olarak çalışır. `active` true olduğunda tooltip görünür hale gelir; `payload` dizisindeki her bir veri noktasından `HeatmapData` ve türetilmiş `dayName` bilgisini çekerek ekrana yansıtır. Detaylı render mantığı (hücre içeriği, stil) kaynak kodda tanımlanmıştır ancak bu özette belirtilmemiştir.
-**Parametreler**:
-- `active`: `boolean` (isteğe bağlı) — Tooltip'in görünür olup olmadığını belirleyen Recharts tarafından sağlanan kontrol değişkeni.
-- `payload`: `{ payload: HeatmapData & { dayName: string } }[]` (isteğe bağlı) — Üzerine gelinen veri noktalarının listesi. Her bir eleman, ısı haritası verisi (`HeatmapData`) ve ek olarak gün adı (`dayName`) içerir.
-**Dönüş**: Belirtilmemiş (bilinmiyor). Büyük olasılıkla oluşturulan JSX elemanlarını veya aktivite durumuna bağlı olarak `null` döndürür; kesin tip bilgisi dokümantasyonda yer almamaktadır.
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -103,8 +97,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
 ## NODE ID STANDARD
 
   file: src\components\admin\dashboard\ActivityHeatmap.tsx
@@ -121,16 +113,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_0_15px_rgba(34,211,238,0.7)]`, `shadow-[0_20px_50px_rgba(0,0,0,0.5)]`
-- **height:** `min-h-[300px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `blur-[80px]`, `drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `shadow-glow-md`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-cyan-500/30`, `bg-cyan-500/5`, `border-cyan-400/20`, `border-white/10`, `border-white/5`, `text-cyan-400`, `text-slate-500`, `text-slate-600`, `text-sm`, `text-white`, `text-xs`
-- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `group-hover/heatmap:text-cyan-400`, `group-hover/heatmap:w-20`, `h-0.5`, `h-2.5`, `h-48`, `h-full`, `items-center`, `justify-center`, `justify-end`
-- **Responsive:** (yok)
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500/30`, `bg-cyan-500/5`, `border-cyan-400/20`, `border-white/10`, `border-white/5`, `group-hover/heatmap:text-cyan-400`, `hover:fill-white`, `text-cyan-400`, `text-slate-500`, `text-slate-600`, `text-sm`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `drop-shadow-heatmap-glow`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `group-hover/heatmap:w-20`, `h-0.5`, `h-2.5`, `h-48`, `h-full`, `items-center`, `justify-center`, `justify-end`
+- **Varyant/Responsive:** `group-hover/heatmap:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `-ml-6`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-in`, `blur-80`, `border`, `cursor-pointer`, `duration-200`, `duration-700`, `fade-in`, `font-black`, `glass`, `glass-strong`, `group/heatmap`, `italic`

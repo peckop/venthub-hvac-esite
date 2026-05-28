@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx
 skeleton_hash: 3afe3b019d6c8aed
-generated_at: 2026-05-23T22:41:52Z
+entity_hashes:
+  func:FAQPage: 912e82de3e4ccdbe
+  overview: 2138e252fedb352a
+  style_tokens: 8147bd10a70e8b20
+generated_at: 2026-05-28T22:40:24Z
 ---
 
 ## Genel Bakış
@@ -28,7 +32,7 @@ Bu projenin frontend mimarisinde yer alan FAQ sayfası görünüm bileşeninin s
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### FAQPage
 **Ne yapar**: VentHub HVAC projesinin destek kategorisi altındaki Sıkça Sorulan Sorular (FAQ) sayfasını oluşturan React işlevsel bileşenidir. Kullanıcıların platformla ilgili en yaygın karşılaştıkları soruların cevaplarına tek bir merkezden erişmesini, destek ekibine başvurmadan önce kendi sorunlarını çözmelerini kolaylaştırır.
@@ -41,26 +45,24 @@ Bu fonksiyon herhangi bir giriş parametresi almamaktadır, tanımında dış gi
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx::FAQPage
+### [N1_NASIL] AST Pointer: FAQPage.tsx::FAQPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, arayüzdeki tüm metinlerin yerel ayara göre çevrilmesini sağlar
-  - `faqs` - SSS soru ve cevap nesnelerini tutan dizi, ekrana basılmak üzere map fonksiyonu ile işlenir
-  - `router` — Next.js useRouter hook'undan alınan yönlendirme nesnesi, önceki sayfaya dönüş işlemi için kullanılır
-- **Dönüş**: FAQ sayfasının tamamını oluşturan React JSX elementi
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, metin yerelleştirme için kullanılır
+  - `faqs` — SSS soru ve cevaplarını içeren dizi, destek sayfasındaki ana bilgi kaynağıdır
+  - `router` — useRouter hook'undan gelen yönlendirme nesnesi, sayfa navigasyonu için kullanılır
+- **Dönüş**: React JSX bileşeni, SSS sayfasının tüm içeriğini render eder
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx::FAQPage.faqs_map_callback
-- **params**: item, idx
-- **ic_degiskenler**:
-  - `item` — faqs dizisindeki tekil SSS nesnesi, içindeki q (soru) ve a (cevap) property'leri ekrana basılır
-  - `idx` — faqs dizisindeki elemanın sıra numarası, React listeleme key değeri olarak kullanılır
-- **Dönüş**: Tekil SSS bloğunu oluşturan React JSX details elementi
+### [N2_NASIL] AST Pointer: FAQPage.tsx::mapCallback
+- **params**: `item` — SSS dizisindeki tek bir soru-cevap nesnesi, `q` ve `a` özellikleri içerir
+- **ic_degiskenler**: (yok)
+- **Dönüş**: React JSX bileşeni, tek bir SSS kalemini `<details>` elementi olarak render eder
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx::FAQPage.whatsapp_render_callback
+### [N3_NASIL] AST Pointer: FAQPage.tsx::whatsappSupportIIFE
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `whatsappLink` — getSupportLink utility fonksiyonundan oluşturulan WhatsApp iletişim linki, iletişime geç butonunun hedef adresi olarak kullanılır
-- **Dönüş**: whatsappLink null ise null, aksi takdirde WhatsApp destek bloğunu oluşturan React JSX div elementi
+  - `whatsappLink` — getSupportLink() fonksiyonu ile oluşturulan WhatsApp iletişim linki, destek mesajı ile birlikte gelir
+- **Dönüş**: React JSX bileşeni, WhatsApp iletişim bölümünü render eder veya null döner
 
 ---
 
@@ -73,3 +75,19 @@ Bu fonksiyon herhangi bir giriş parametresi almamaktadır, tanımında dış gi
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FAQPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `border-light-gray`, `hover:text-primary-navy`, `text-3xl`, `text-center`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xl`
+- **Layout:** `flex`, `inline-flex`, `items-center`, `justify-center`, `max-w-4xl`, `p-4`, `whatsapp-btn`, `whatsapp-container`, `whatsapp-subtext`, `whatsapp-text`
+- **Varyant/Responsive:** `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `cursor-pointer`, `font-bold`, `font-medium`, `font-semibold`, `lg:px-8`, `mb-2`, `mb-4`, `mb-6`, `mr-1`, `mt-10`, `mt-2`, `mx-auto`, `px-4`, `py-10`

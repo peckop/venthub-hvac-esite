@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Housing.tsx
 skeleton_hash: 0d92c96336f20e12
-generated_at: 2026-05-23T22:21:32Z
+entity_hashes:
+  func:Flange: aa8addd79c82b57e
+  func:Housing: 5e80dc3de87ab9cf
+  func:SnailHousing: e93db710a7808387
+  overview: f65ca24cfa337066
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:42Z
 ---
 
 ## Genel Bakış
@@ -36,7 +42,7 @@ Bu modülün fonksiyon imzalarından türetilen varsayımlar aşağıda belirtil
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Flange
 **Ne yapar**: Verilen propsa dayalı bir React bileşeni (JSX) döndürür.  
@@ -141,4 +147,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

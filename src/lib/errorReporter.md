@@ -4,15 +4,18 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\errorReporter.ts
 skeleton_hash: a9a1ef9b05b73e77
-generated_at: 2026-05-23T22:31:01Z
+entity_hashes:
+  func:reportError: 08ffee8a5f783d08
+  overview: 99b24f9de09b5423
+generated_at: 2026-05-28T22:37:58Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinde kullanılan bu modül, tüm uygulama genelinde hata yönetimini standartlaştıran merkezi bir hata raporlama bileşenidir. Uygulamanın farklı katmanlarında oluşabilecek her türlü hatayı, ait olduğu bağlamsal bilgilerle birlikte standart formatta raporlamak üzere tasarlanmıştır. Tüm hata raporlama taleplerini tek noktada toplayarak loglama ve hata takibi süreçlerinde tutarlılık sağlar.
+VentHub HVAC projesindeki bu modül, uygulama genelinde oluşabilecek her türlü hatayı merkezi bir noktada toplayarak standart bir raporlama süreci başlatır. Hatalarla birlikte opsiyonel bağlam bilgilerini de alarak tutarlı ve izlenebilir hata kayıtları oluşturmayı amaçlar.
 
 ## Fonksiyon Grupları
-### Merkezi Hata Raporlama İşlevi
-Tüm uygulama genelindeki hata raporlama ihtiyaçlarını karşılamak üzere tasarlanmış tek ana fonksiyonu barındırır. Gelen hataları ve isteğe bağlı bağlam bilgilerini işleyerek standart bir raporlama süreci başlatır.
+### Merkezi Hata Raporlama
+Tüm uygulama katmanlarından gelen hata raporlama taleplerini tek bir giriş noktası üzerinden karşılar. Alınan hata nesnesi ve varsa bağlam bilgisi işlenerek standart raporlama akışı tetiklenir.
 - reportError
 
 ---
@@ -27,27 +30,33 @@ Bu hata raporlama modülünün sistemdeki hataları doğru şekilde toplaması v
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### reportError
-**Ne yapar**: Uygulama içerisinde oluşan hataları, tanımlanmış özel raporlayıcıya güvenli bir şekilde ileten standart bir hata raporlama utility fonksiyonudur. Hiçbir özel raporlayıcı tanımlanmamışsa geliştirme ortamında hatayı görünür kılan bir geri dönüş mekanizması sunarken, üretim ortamında uygulamanın ana akışının çökmesini önlemek amacıyla sessizce çalışmasını sonlandırır. Tüm uygulama genelinde tutarlı hata raporlama standartları oluşturmak için tasarlanmıştır.
-**Nasıl yapar**: İlk olarak bilinmeyen türünde gelen hata değerini güvenli bir şekilde işleyerek tür kaynaklı hataların önüne geçer, ardından sistemde yapılandırılmış manuel bir raporlayıcı olup olmadığını kontrol eder. Eğer raporlayıcı mevcutsa hatayı ve varsa ilişkili bağlam verisini bu raporlayıcıya ileterek raporlamayı tamamlar. Raporlayıcı yoksa çalışma ortamını kontrol eder: geliştirme ortamında konsol gibi araçlar üzerinden hatayı ve bağlamını geliştiriciye sunar, üretim ortamında ise hiçbir işlem yapmadan uygulamanın çalışmaya devam etmesini sağlar.
+
+**Ne yapar**: Yapılandırılmış hata raporlayıcısına (manualReporter) hata bilgisini güvenli bir şekilde iletir. Hata raporlayıcı kurulmamışsa geliştirme ortamında konsola uyarı yazdırarak sessiz bir geri dönüş sağlar; üretim ortamında ise uygulamanın çökmesini önlemek adına tamamen sessiz kalır.
+
+**Nasıl yapar**: Fonksiyon öncelikle modül seviyesinde tanımlı `manualReporter` değişkeninin varlığını kontrol eder. Eğer bir raporlayıcı kuruluysa, hata nesnesini ve opsiyonel bağlam bilgisini doğrudan bu raporlayıcıya aktarır. Raporlayıcı kurulu değilse, ortamın tarayıcı tabanlı olup olmadığını ve `NODE_ENV` değerinin `production` olup olmadığını kontrol eder. Geliştirme ortamındaysa, hatanın raporlanmadığını belirten bir uyarı mesajını konsola yazar; üretim ortamında ise herhangi bir işlem yapmaz.
+
 **Parametreler**:
-- name: err, type: unknown — Raporlanacak olan hata nesnesi ya da bilinmeyen türündeki herhangi bir sorun değeri, uygulama içinde fırlatılan tüm istisnalar veya beklenmedik durum değerleri bu parametre üzerinden iletilir
-- name: context, type: Record<string, unknown> — Hatanın oluştuğu ortama ait isteğe bağlı metaveri veya bağlam bilgileri, hatanın kök nedenini analiz etmek için faydalı olan kullanıcı oturumu, işlem adımları, işlem kimliği gibi ek verileri içerebilir
-**Dönüş**: void, herhangi bir değer döndürmez, raporlama işlemi başarısız olsa bile uygulama akışını etkileyecek herhangi bir istisna fırlatmaz, tüm hata durumlarını kendi bünyesinde yönetir.
+- `err`: unknown — Raporlanacak hata nesnesi veya bilinmeyen türdeki değer. Fonksiyon, bu değeri doğrudan raporlayıcıya iletir.
+- `context` (opsiyonel): Record\<string, unknown\> — Hata çevresindeki opsiyonel metadata veya bağlam bilgisi. Örneğin, hatanın oluştuğu sayfa, kullanıcı durumu veya ek ayarlar gibi bilgiler taşınabilir.
+
+**Dönüş**: void — Fonksiyon herhangi bir değer döndürmez. Hata raporlama işlemi yan etki olarak gerçekleştirilir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\errorReporter.ts::reportError
-- **params**: err: unknown, context?: Record<string, unknown>
-- **ic_degiskenler**:
-  - `manualReporter` — Gelen hata ve bağlam verisini iletmek için koşullu olarak çağrılan önceden tanımlı özel hata raporlama fonksiyonu
-  - `typeof window` — Kodun tarayıcı ortamında çalışıp çalışmadığını tespit etmek için kullanılan global nesne tipi sorgusu
-  - `process.env.NODE_ENV` — Uygulamanın çalışma ortamının production olup olmadığını kontrol etmek için erişilen çevre değişkeni
-  - `console.warn` — Geliştirme ortamında hata ve bağlam bilgisini konsola loglamak için çağrılan konsol fonksiyonu
+### [N1_NASIL] AST Pointer: src/lib/errorReporter.ts::reportError
+- **params**:
+  - `err: unknown` — raporlanacak hata nesnesi
+  - `context?: Record<string, unknown>` — opsiyonel bağlam bilgisi, hatayla ilişkili ek veriler
+- **ic_degiskenler**: (yerel değişken yok)
+- **Referanslar**:
+  - `manualReporter` — modül seviyesinde tanımlı, yüklenmiş hata raporlayıcı fonksiyon; varsa çağrılır
+  - `window` — tarayıcı ortam kontrolü, `typeof window !== 'undefined'`
+  - `process.env.NODE_ENV` — ortam değişkeni, production olmadığında fallback uyarı basılır
 - **Dönüş**: yok
 
 ---

@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\WhatsAppFloat.tsx
 skeleton_hash: b5ead15e45e8d41c
-generated_at: 2026-05-23T22:28:21Z
+entity_hashes:
+  func:WhatsAppFloat: 594fe2409e378878
+  overview: 27f525e3029fcecb
+  style_tokens: 74a4b829716b6fee
+generated_at: 2026-05-28T22:37:07Z
 ---
 
 ## Genel Bakış
@@ -28,7 +32,7 @@ Bu React TypeScript ile geliştirilmiş WhatsApp iletişim float butonu bileşen
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### WhatsAppFloat
 **Ne yapar**: VentHub HVAC projesinde kullanıcıların tek tıkla WhatsApp üzerinden iletişim kurmasını sağlayan bağımsız React bileşenidir. Tüm proje sayfalarında sabit konumda duran yüzen (float) bir buton olarak sunulur, kullanıcıların sitede gezinirken her an erişebileceği kesintisiz bir iletişim kanalı sunar. Sitenin mobil ve masaüstü görünümlerinde uyumlu şekilde çalışarak tüm kullanıcılar için eşit erişilebilirlik sağlar.
@@ -76,5 +80,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `text-sm`
-- **Layout:** `absolute`, `group-hover:opacity-100`, `hidden`, `left-14`, `lg:block`, `whatsapp-float`
-- **Responsive:** `lg:` prefix kullanımları
+- **Layout:** `absolute`, `hidden`, `left-14`, `lg:block`, `whatsapp-float`
+- **Varyant/Responsive:** `group-hover:`, `lg:` önekleri
+- **Yardımcı Sınıflar:** `duration-300`, `font-bold`, `group`, `group-hover:opacity-100`, `opacity-0`, `pointer-events-none`, `shrink-0`, `transition-opacity`, `whitespace-nowrap`

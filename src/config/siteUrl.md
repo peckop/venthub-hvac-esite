@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\config\siteUrl.ts
 skeleton_hash: 983ce403cd9ecad5
-generated_at: 2026-05-23T22:28:43Z
+entity_hashes:
+  func:getSiteUrl: d80f85481d8cb42c
+  overview: 90b68bbba66e5b1c
+generated_at: 2026-05-28T22:37:17Z
 ---
 
 ## Genel Bakış
@@ -18,16 +21,20 @@ Uygulamanın tüm bileşenleri için geçerli, ortama uygun site URL'sini güven
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC uygulamasının tüm modüllerinde kullanacağı kök site URL'sini sağlamak üzere tasarlanmıştır, çalışması için SITE_URL sabitinin erişilebilir, tanımlı ve getSiteUrl() fonksiyonunun dışarıya aktarılmış olması zorunludur.
 
-[Aksiyom 1]: Eğer modül içindeki SITE_URL sabiti tanımlı değilse, getSiteUrl() fonksiyonu geçerli bir site adresi döndüremez, uygulamanın tüm kaynak yükleme, yönlendirme ve bağlantı oluşturma işlevleri başarısız olur.
-[Aksiyom 2]: Eğer SITE_URL çağrıldığında geçerli bir URL değeri dönmüyorsa, getSiteUrl() tarafından sağlanan adres ile yapılan tüm istekler hedeflenen kaynağa ulaşamaz.
-[Aksiyom 3]: Eğer getSiteUrl() fonksiyonu modül dışına export edilmemişse, uygulamanın diğer modülleri site URL'sine erişemez ve URL'ye bağımlı işlevlerini çalıştıramaz.
-[Aksiyom 4]: Eğer SITE_URL modül içinden erişilebilir değilse, getSiteUrl() çalıştığında hata fırlatır, uygulamanın URL'ye bağımlı tüm iş akışları kesintiye uğrar.
+Bu modül, uygulama genelinde kullanılmak üzere site URL'sini sağlayan konfigürasyon modülüdür.
+
+[Aksiyom 1]: Eğer `SITE_URL` sabiti modül kapsamında tanımlı/expo edilmemişse, `getSiteUrl()` fonksiyonu geçerli bir URL döndüremez.
+
+[Aksiyom 2]: Eğer `getSiteUrl()` fonksiyonu modül tarafından export edilmemişse, diğer modüller site URL'sine erişemez.
+
+[Aksiyom 3]: Eğer `SITE_URL` içeriği geçerli bir URI formatında değilse (örn: `https://domain.com`), uygulama genelinde geçersiz URL kullanımı oluşur.
+
+[Aksiyom 4]: Eğer `getSiteUrl()` çağrıldığında `SITE_URL`'a karşılık gelen değer `undefined` veya `null` ise,调用 yapan modül geçersiz bir URL ile çalışır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getSiteUrl
 **Ne yapar**: VentHub HVAC projesinin yapılandırma katmanında yer alan bu fonksiyon, uygulama genelinde kullanılacak merkezi site adresine erişim sağlamak üzere tasarlanmıştır. Tüm modüller arasında tutarlı site URL'si kullanımını desteklemek amacıyla tek bir kaynaktan adres değerini çekmeyi hedefler. Uygulamanın farklı noktalarından site adresine ihtiyaç duyulduğunda merkezi yapılandırmaya erişim imkanı sunar.

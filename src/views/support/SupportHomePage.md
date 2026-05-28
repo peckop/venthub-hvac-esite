@@ -4,67 +4,45 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\support\SupportHomePage.tsx
 skeleton_hash: a7680126eb44d722
-generated_at: 2026-05-23T22:42:07Z
+entity_hashes:
+  func:SupportHomePage: 3948e4e66c4520c4
+  overview: 61ab53b5d314a5dd
+  style_tokens: b5a45cdfc4067170
+generated_at: 2026-05-28T22:40:35Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC projesinin destek bölümünün ana giriş sayfasını oluşturan React tabanlı ön yüz bileşenini barındırır. Kullanıcıların destek kaynaklarına, yardım araçlarına ve iletişim kanallarına erişmesini sağlayan ana arayüzü hayata geçirmekle sorumludur.
+VentHub HVAC projesinin destek bölümünün ana giriş sayfasını oluşturan React tabanlı arayüz bileşenidir. Kullanıcıların destek kaynaklarına, yardım araçlarına ve iletişim kanallarına merkezi bir noktadan erişmesini sağlar. Bu bileşen, destek süreçlerinin ilk temas noktası olarak projenin genel destek deneyimini yönlendirir.
 
 ## Fonksiyon Grupları
-### Ana Destek Sayfası Bileşeni
-Destek bölümünün kullanıcıyla ilk karşılaşılan ana arayüzünü oluşturur, tüm destek içeriklerini bir araya getirerek eksiksiz bir deneyim sunar.
+### Destek Ana Sayfası Bileşeni
+Destek bölümünün kullanıcıya sunulan birincil arayüzünü oluşturarak ilgili tüm destek içeriklerini, menüleri ve yönlendirmeleri entegre edip sunar.
 - SupportHomePage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı destek ana sayfası görüntüleme bileşeninin doğru şekilde render edilmesi ve çalışması için projenin frontend derleme ve çalışma zamanı altyapısının belirli zorunlu koşulları sağlaması gerekmektedir.
+Bu parametresiz React bileşeninin doğru render edilmesi için temel React çalışma zamanı altyapısının mevcut olması gerekmektedir. Fonksiyon gövdesi verilmediği için bileşenin iç bağımlılıkları ve spesifik UI gereksinimleri hakkında kesin çıkarım yapılamamaktadır.
 
-[Aksiyom 1]: Eğer uygulama çalışma ortamında React runtime ortamı aktif ve erişilebilir değilse, bu fonksiyonel bileşen hiçbir şekilde DOM'a eklenip kullanıcıya sunulamaz, çalışma zamanı hatası oluşur.
-[Aksiyom 2]: Eğer uygulamanın rota yönetim (routing) mekanizması bu bileşeni destek ana sayfası için yapılandırılmış rota ile ilişkilendirmediği takdirde, kullanıcı bu sayfaya hiçbir şekilde erişemez.
-[Aksiyom 3]: Eğer projenin TypeScript derleyicisi bu TSX modülünü hatasız derleyemiyorsa, modül üretim ortamına aktarılamaz, derleme aşamasında süreç sonlanır.
-[Aksiyom 4]: Eğer bu modülün proje içindeki `src/views/support/` dosya yolu, proje derleme yapılandırmasında tanımlı kaynak yolları arasında yer almıyorsa, modül uygulama tarafından import edilemez, hiçbir yerde çağrılamaz.
+[Aksiyom 1]: Eğer React runtime ortamı (React kütüphanesi ve JSX dönüştürücüsü) yoksa, SupportHomePage bileşeni render edilemez ve uygulama hata verir.
+
+[Aksiyom 2]: Eğer bileşenin import ettiği bağımlılıklar (state hook'ları, alt bileşenler, sayfalar vb.) bulunamazsa, modül çalışma zamanında derleme hatası ile karşılaşır.
+
+[Aksiyom 3]: Eğer bileşen props alıyorsa (fonksiyon imzasında belirtilmemiştir), istenen tiplerde veri sağlanamazsa bileşen hatalı çalışır veya hata fırlatır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SupportHomePage
-**Ne yapar**: VentHub HVAC projesinin destek modülünün ana giriş sayfasını oluşturan React fonksiyonel bileşenidir. Genel domain kapsamında yer alan projenin destek süreçlerinin kullanıcıya sunulduğu ana arayüz olarak görev alır, destek sistemiyle ilgili tüm içerik ve alt işlevlerin barındığı ana sayfayı oluşturur.
-**Nasıl yapar**: TypeScript ile tanımlanmış bir React bileşeni olarak projenin kaynak kod ağacında `src/views/support` dizini altında konumlanmıştır. Projenin dosya organizasyon standartlarına uygun şekilde destek modülünün ana bileşeni olarak yapılandırılmıştır, yalnızca kendi kapsamındaki React elementlerini render edecek şekilde tasarlanmıştır.
-**Parametreler**: Bu fonksiyona herhangi bir parametre aktarılmaz.
-**Dönüş**: React.FC türünde bir değer döndürür. Bu dönüş değeri, tarayıcıda render edilebilir React elementlerini barındıran standart React fonksiyonel bileşen nesnesidir.
+**Ne yapar**: SupportHomePage, HVAC destek sisteminin ana sayfasını gösteren üst düzey bir React fonksiyonel bileşenidir. Kullanıcının destek talepleri, SSY (Sıkça Sorulan Sorular) ve iletişim seçeneklerine erişebileceği ana sayfa arayüzünü render eder.
 
----
+**Nasıl yapar**: Fonksiyonel bir React bileşeni olarak tanımlanmıştır. Herhangi bir prop almadan doğrudan JSX döndürür. Bileşen, destek sayfasının tüm alt bölümlerini ve navigasyonструктурını compose ederek kullanıcıya sunar.
 
-## AST POINTERS
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\SupportHomePage.tsx::SupportHomePage
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, tüm arayüz metinlerinin yerelleştirilmesi için kullanılır
-  - `cards` — destek sayfasında gösterilen yönlendirme kartlarını içeren dizi, her elemanın başlık, açıklama, rota ve ikon alanları bulunur
-  - `router` — useRouter hook'undan alınan Next.js yönlendirme nesnesi, geri dönüş butonunda `router.back()` çağrısı için kullanılır
-- **Dönüş**: JSX React elementi (Support ana sayfa arayüzü)
-
----
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\SupportHomePage.tsx::cards_map_callback
-- **params**: `{ title, desc, to, icon: Icon }` — döngüdeki tek kart nesnesinin yıkımlanmış alanları
-- **ic_degiskenler**:
-  - `title` — kartın başlık metni, arayüzde kullanıcılara gösterilir
-  - `desc` — kartın açıklama metni, arayüzde kullanıcılara gösterilir
-  - `to` — kart tıklandığında yönlendirilecek uygulama rotası
-  - `Icon` — kartta gösterilecek Lucide ikon bileşeni
-- **Dönüş**: Link sarmalında tek kart JSX bileşeni
-
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\support\SupportHomePage.tsx::whatsapp_render_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `whatsappLink` — `getSupportLink` fonksiyonu ile oluşturulan WhatsApp iletişim linki, iletişim butonunun href özelliğine atanır
-- **Dönüş**: WhatsApp destek bloğu JSX elementi veya link geçersizse null
+**Dönüş**: `React.FC` — Support sayfasının tüm arayüzünü içeren JSX yapısını döndürür. Boş prop tipi ile tanımlanmış fonksiyonel bir React bileşenidir.
 
 ---
 
@@ -77,3 +55,19 @@ Bu React tabanlı destek ana sayfası görüntüleme bileşeninin doğru şekild
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SupportHomePage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy/10`, `bg-white`, `border-light-gray`, `group-hover:text-primary-navy`, `hover:border-primary-navy/40`, `hover:text-primary-navy`, `text-3xl`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`
+- **Layout:** `block`, `flex`, `flex-1`, `flex-shrink-0`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `hover:shadow-md`, `inline-flex`, `items-center`, `items-start`, `max-w-6xl`, `md:grid-cols-2`, `p-3`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `font-semibold`, `group`, `lg:px-8`, `mb-2`, `mb-4`, `mb-8`, `mr-1`, `mt-1`, `mt-8`, `mx-auto`, `px-4`, `py-10`, `rounded-lg`

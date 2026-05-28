@@ -4,37 +4,42 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts
 skeleton_hash: 00770ccd49233591
-generated_at: 2026-05-23T22:29:10Z
+entity_hashes:
+  func:useApiCall: ad3857eabf77c233
+  overview: 0635a829e467e31a
+generated_at: 2026-05-28T22:37:51Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin React tabanlı kod yapısında API çağrılarını yönetmek için özel bir hook sunuyor. Proje genelinde tüm API isteklerinde tutarlı bir iletişim standardı oluşturan bu modül, isteğe bağlı varsayılan ayarlarla farklı kullanım senaryolarına uyarlanabiliyor.
+Bu modül, React uygulamalarında API çağrılarını merkezi ve standart bir şekilde yönetmek için tasarlanmış bir hook sunar. Tüm HTTP isteklerinin durumunu takip etmeyi, hata yönetimi sağlamayı ve istek yapılandırmalarını opsiyonel parametrelerle özelleştirmeyi amaçlar.
 
 ## Fonksiyon Grupları
-### Merkezi API Çağrı Yönetimi
-API isteklerinin durum takibi, hata yönetimi ve standartlaştırılmasını sağlayan ana işlevi barındıran bu grup, tüm uygulama genelindeki API iletişimlerini tek bir merkezden yönetme imkanı sunuyor. İsteğe bağlı yapılandırma seçenekleriyle özelleştirilebilen hook, bileşenlerin API ile güvenli ve tutarlı bir şekilde iletişim kurmasını kolaylaştırıyor.
+### Merkezi API Çağrı Orkestrasyonu
+Bu grup, uygulama genelindeki tüm API etkileşimlerini başlatan, izleyen ve sonlandıran temel işlevi barındırır. Hook, istek ömrü boyunca yüklenme, başarı ve hata durumlarını yöneterek bileşenlere tutarlı bir veri akışı sağlar.
+- useApiCall
+
+### Özelleştirilebilir İstek Yapılandırması
+Bu grup, varsayılan API davranışını ve istek parametrelerini uygulama ihtiyaçlarına göre ayarlama imkanı sunar. Hook'a iletilen opsiyonel yapılandırma seçenekleri, kimlik doğrulama, zaman aşımları veya özel başlıklar gibi parametrelerin merkezi olarak belirlenmesine olanak tanır.
 - useApiCall
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React hook modülü, uygulama içindeki API çağrılarını state yönetimi ile birlikte yürütmek için tasarlanmıştır, çalışması için React altyapısı, TypeScript ortamı ve erişilebilir bir HTTP istemci bağımlılığı zorunludur.
-
-[Aksiyom 1]: Eğer React 16.8 ve üzeri sürümle uyumlu, hook çalıştırmaya izin veren bir React bileşen ortamı yoksa, useApiCall hook'u hiç çalışmaz, tüm API çağrıları ve state yönetimi işlemleri başarısız olur.
-[Aksiyom 2]: Eğer UseApiCallOptions tipi proje içinde geçerli olarak tanımlanmamışsa, TypeScript derleme süreci başarısız olur, modül projeye entegre edilemez.
-[Aksiyom 3]: Eğer hook'un çağrılması sırasında API istekleri için gerekli kimlik doğrulama bilgileri, hedef API adresi gibi zorunlu konfigürasyonlar iletilmemişse, tüm API istekleri yetkisiz veya hatalı hedef nedeniyle başarısız olur.
-[Aksiyom 4]: Eğer proje içinde HTTP istekleri göndermek için kullanılan temel API istemci kütüphanesi modül tarafından erişilebilir durumda değilse, hiçbir API çağrısı oluşturulamaz, modül tamamen işlevsiz kalır.
+Bu hook, VentHub HVAC projesi içinde API çağrılarını merkezi olarak yönetmek ve stand
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useApiCall
-**Ne yapar**: Asenkron API çağrıları için yükleme, gelen veri ve oluşan hata durumlarını yöneten özel bir React hook'tur. Proje genelinde API işlemlerini standartlaştırarak tutarlı bir yapı sunar, yerleşik toast bildirimleri ile tüm başarılı ve başarısız API çağrıları için kullanıcıya bildirim gönderilmesini sağlar. Tekrar kullanılabilir yapısı ile her API çağrısı için ayrı durum yönetimi yazma gereksinimini ortadan kaldırır.
-**Nasıl yapar**: Kullanıcının ilettiği opsiyonel varsayılan ayarları alarak tüm API çağrılarına uygular, kendi içinde React state'leri kullanarak loading, data ve error durumlarını anlık olarak takip eder. Dışarıya sunduğu execute metodu ile API çağrısını tetikler, çağrı süresince state'leri güncelleyerek arayüzün doğru şekilde yeniden render edilmesini sağlar. Çağrının başarılı veya başarısız bitmesine göre ayarlanan toast mesajlarını gösterir, reset metodu ile tüm state'leri başlangıç değerlerine döndürerek yeni bir çağrı için hazır hale getirir.
+**Ne yapar**: Asenkron API çağrıları için `loading`, `data` ve `error` durumlarını yöneten özel bir React hook'u oluşturur. API çağrılarının yürütülmesi sırasında otomatik olarak durum yönetimi sağlar ve başarı/hata senaryoları için toast bildirimleri sunar.
+
+**Nasıl yapar**: `useState` ile `ApiCallState<T>` tipinde bir durum nesnesi oluşturur. Bu durum nesnesi `data`, `loading` ve `error` alanlarını içerir. Hook, çağrıcıya `execute` ve `reset` adlı iki方法 döndürür. `execute` çağrıldığında önce `loading: true` ayarlanır, ardından verilen asenkron fonksiyon çalıştırılır. Fonksiyon başarıyla tamamlanırsa `data` güncellenir ve opsiyonel bir başarı mesajı toast ile gösterilir. Hata durumunda ise `error` state'e yazılır ve hata mesajı toast ile bildirilir. Varsayılan seçenekler, çağrı bazında gelen seçeneklerle birleştirilerek her çağrı için özelleştirme imkanı tanır.
+
 **Parametreler**:
-- name: defaultOptions — type: UseApiCallOptions — Tüm API yürütmelerinde uygulanacak toast mesajları ve diğer varsayılan ayarları içeren, isteğe bağlı olarak iletilen nesnedir.
-**Dönüş**: İçerisinde mevcut durumun parçası olan API'den dönen veriyi tutan `data`, çağrının devam edip etmediğini belirten boolean `loading` ve çağrı sırasında oluşan hatayı tutan `error` alanlarını barındıran state nesnesi bulunur. Ayrıca API çağrısını tetiklemek için kullanılan `execute` metodu ve tüm state'leri sıfırlayarak hook'u başlangıç durumuna getiren `reset` metodunu içeren bir nesne döndürür.
+- `defaultOptions`: `UseApiCallOptions | undefined` — Tüm execute çağrılarına uygulanacak varsayılan ayarlar. `showToast`, `successMessage` ve `errorMessage` özelliklerini içerebilir. Tanımlanmazsa herhangi bir varsayılan toast ayarı uygulanmaz.
+
+**Dönüş**: `{ data: T | null, loading: boolean, error: Error | null, execute: (apiFunc: () => Promise<T>, options?: UseApiCallOptions) => Promise<T | null>, reset: () => void }` — Mevcut durumu (`data`, `loading`, `error`) ve iki methods (`execute`, `reset`) içeren bir nesne. `data` başarılı çağrı sonucunu, `loading` devam eden bir işlem olup olmadığını, `error` ise son hatayı temsil eder.
 
 ---
 
@@ -55,31 +60,26 @@ Bu React hook modülü, uygulama içindeki API çağrılarını state yönetimi 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::useApiCall
-- **params**: [defaultOptions?: UseApiCallOptions]
+- **params**: (defaultOptions?: UseApiCallOptions)
 - **ic_degiskenler**:
-  - `state` — API çağrısının durumunu tutan React state nesnesi; `data`, `loading`, `error` alanları içerir
-  - `setState` - state nesnesini güncellemek için kullanılan useState tarafından döndürülen state setter fonksiyonu
-  - `execute` - API fonksiyonunu çalıştırmak için useCallback ile sarmalanmış iç asenkron fonksiyon
-  - `reset` - state'i başlangıç değerlerine döndürmek için useCallback ile sarmalanmış iç fonksiyon
-- **Dönüş**: `{ ...state, execute, reset }` obje, tüm durum bilgileri ve kontrol fonksiyonları döndürülür
+  - `state` — useApiCall hook'unun state'i, ApiCallState<T> tipinde, data, loading ve error değerlerini tutar
+  - `setState` — state'i güncellemek için kullanılan setter fonksiyonu
+  - `execute` — useCallback ile sarılmış, API çağrısını yöneten async fonksiyon
+  - `reset` — useCallback ile sarılmış, state'i sıfırlayan fonksiyon
+- **Dönüş**: `{ ...state, execute, reset }` nesnesi
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::useApiCall::execute
-- **params**: [apiFunc: () => Promise<T>, options?: UseApiCallOptions]
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::execute
+- **params**: (apiFunc: () => Promise<T>, options?: UseApiCallOptions)
 - **ic_degiskenler**:
-  - `mergedOptions` - varsayılan ve çağrı sırasında verilen opsiyonları birleştiren konfigürasyon nesnesi
-  - `prev` - setState fonksiyonu içinde kullanılan önceki state değeri
-  - `result` - hedef API fonksiyonundan dönen başarı sonucu verisi
-  - `err` - try bloğunda yakalanan ham hata nesnesi
-  - `error` - standard Error nesnesine dönüştürülmüş, işlenebilir hata nesnesi
-  - `toast.success` - react-hot-tostat kütüphanesinin başarı bildirimi göstermek için kullanılan fonksiyonu
-  - `toast.error` - react-hot-toast kütüphanesinin hata bildirimi göstermek için kullanılan fonksiyonu
-- **Dönüş**: Promise<T | null>
+  - `mergedOptions` — defaultOptions ve options'un birleşimi, spread operatörü ile oluşturulmuş
+  - `result` — apiFunc() çağrısının başarıyla döndürdüğü değer
+  - `error` — catch bloğunda yakalanan hata nesnesi, Error instancesi veya string'den oluşturulmuş
+- **Dönüş**: Promise<T | null>, başarıda result, hata durumunda null
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::useApiCall::reset
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setState` - ana state'i başlangıç değerlerine sıfırlamak için kullanılan state setter fonksiyonu
-- **Dönüş**: yok
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::reset
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (state'i sıfırlar, setState çağrısı yapar)
 
 ---
 

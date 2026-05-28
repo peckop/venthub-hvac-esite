@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\NicotraFanModel.tsx
 skeleton_hash: 2757b76fcef78562
-generated_at: 2026-05-23T22:24:50Z
+entity_hashes:
+  func:NicotraFanModel: 2bdd08e329a67558
+  overview: 59760c892c559506
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:48Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Venthub projesi kapsamında geliştirilen 3D HVAC ürün modeli olan NicotraFanM
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### NicotraFanModel
 **Ne yapar**: Venthub HVAC projesinin ürünler bölümünde yer alan 3B modelleme bileşenleri ailesinden biridir, yalnızca Nicotra marka fanlara ait 3B modeli React tabanlı uygulama içinde sunmak üzere tasarlanmış fonksiyonel bir React bileşenidir. Proje içindeki tüm fan 3B modelleri için belirlenen standart entegrasyon kurallarına uygun olarak çalışır.
@@ -140,4 +144,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

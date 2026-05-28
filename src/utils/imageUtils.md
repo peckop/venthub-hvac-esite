@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\imageUtils.ts
 skeleton_hash: e6d60b653470869f
-generated_at: 2026-05-23T22:34:08Z
+entity_hashes:
+  func:compressImage: 52ddf4e7747053ca
+  overview: da4b1ecf34cfb8bc
+generated_at: 2026-05-28T22:38:46Z
 ---
 
 ## Genel Bakış
@@ -27,7 +30,7 @@ Bu görüntü sıkıştırma modülü, tarayıcı ortamında çalışmak üzere 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### compressImage
 **Ne yapar**: Gelen görüntü dosyasını WebP formatına dönüştürerek sıkıştırır, maksimum genişliğini 1200 piksel ile sınırlar. Temel amacı Supabase Storage platformuna yüklenecek görüntülerin dosya boyutunu küçülterek yükleme ve erişim performansını artırmaktır. Tüm görüntü yükleme süreçlerinde ön işlem adımı olarak kullanılır.
@@ -49,63 +52,6 @@ Bu görüntü sıkıştırma modülü, tarayıcı ortamında çalışmak üzere 
   - `reader.onload` - Dosya başarıyla okunduğunda tetiklenecek event handler ataması
   - `reader.onerror` - Dosya okuma hatası oluştuğunda tetiklenecek event handler ataması
 - **Dönüş**: Promise<Blob>
-
----
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\imageUtils.ts::Promise_executor_callback
-- **params**: [resolve: Function, reject: Function]
-- **ic_degiskenler**:
-  - `file` - Ana fonksiyondan gelen sıkıştırılacak orijinal dosya nesnesi
-  - `reader` - Dosya okuma işlemini yönetmek için oluşturulan FileReader instance'ı
-  - `reader.readAsDataURL` - Dosyayı veri URL formatında okumak için kullanılan API çağrısı
-  - `reader.onload` - Dosya başarılı okuma sonrası tetiklenecek handler ataması
-  - `reader.onerror` - Dosya okuma hatası durumunda tetiklenecek handler ataması
-- **Dönüş**: yok
-
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\imageUtils.ts::FileReader_onload_handler
-- **params**: [event: ProgressEvent<FileReader>]
-- **ic_degiskenler**:
-  - `event.target?.result` - FileReader ile okunan dosyanın base64 formatlı verisi
-  - `img` - Görüntü verisini yüklemek için oluşturulan HTML Image nesnesi
-  - `img.src` - Image nesnesine yüklenecek kaynak olarak base64 verisinin atanması
-  - `img.onload` - Görüntü başarılı şekilde yüklendiğinde tetiklenecek handler ataması
-  - `reject` - İşlem hatalarını ana promise'a iletmek için kullanılan dışarıdan gelen reject fonksiyonu
-  - `resolve` - Başarılı işlem sonucunu ana promise'a iletmek için kullanılan dışarıdan gelen resolve fonksiyonu
-- **Dönüş**: yok
-
----
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\imageUtils.ts::Image_onload_handler
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `img` - Boyutları hesaplanacak yüklü orijinal HTML Image nesnesi
-  - `canvas` - Görüntüyü yeniden boyutlandırıp sıkıştırmak için oluşturulan HTML Canvas nesnesi
-  - `document.createElement('canvas')` - Geçici canvas nesnesi oluşturan DOM API çağrısı
-  - `MAX_WIDTH` - Sıkıştırılmış görüntünün sabit maksimum genişliği (1200px)
-  - `scaleSize` - Görüntüyü orantılı küçültmek için hesaplanan ölçekleme oranı
-  - `newWidth` - Hesaplanan yeni görüntü genişliği, maksimum genişliği aşmayacak şekilde ayarlanır
-  - `newHeight` - Ölçekleme oranı ile hesaplanan yeni görüntü yüksekliği, oran korunur
-  - `canvas.width` - Canvas nesnesinin genişliğine hesaplanan newWidth'in atanması
-  - `canvas.height` - Canvas nesnesinin yüksekliğine hesaplanan newHeight'in atanması
-  - `ctx` - Canvas'ın 2D çizim bağlamı, görüntüyü canvas üzerine çizmek için kullanılır
-  - `canvas.getContext('2d')` - Canvas'ın 2D çizim bağlamını almak için yapılan API çağrısı
-  - `ctx.drawImage` - Orijinal görüntüyü yeni boyutlarla canvas üzerine çizen API çağrısı
-  - `canvas.toBlob` - Canvas üzerindeki görüntüyü Blob formatına dönüştüren API çağrısı
-  - `reject` - Canvas bağlamı alınamadığında hata fırlatmak için kullanılan dışarıdan gelen reject fonksiyonu
-  - `resolve` - Sıkıştırılmış blob'u döndürmek için kullanılan dışarıdan gelen resolve fonksiyonu
-- **Dönüş**: yok
-
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\imageUtils.ts::Canvas_toBlob_handler
-- **params**: [blob: Blob | null]
-- **ic_degiskenler**:
-  - `blob` - Canvas'tan dönen sıkıştırılmış görüntü Blob nesnesi
-  - `resolve` - Blob geçerliyse ana promise'ı bu blob ile çözmek için kullanılan dışarıdan gelen resolve fonksiyonu
-  - `reject` - Blob null ise sıkıştırma hatası olarak ana promise'ı reddetmek için kullanılan dışarıdan gelen reject fonksiyonu
-- **Dönüş**: yok
 
 ---
 

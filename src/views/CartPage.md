@@ -4,83 +4,71 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CartPage.tsx
 skeleton_hash: 01b5e10d140ded8a
-generated_at: 2026-05-23T22:39:26Z
+entity_hashes:
+  func:CartPage: 47b501309afc6903
+  overview: 9ff04da92205cbab
+  style_tokens: 0ec1062a71699875
+generated_at: 2026-05-28T22:39:49Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin kullanıcı arayüzünde yer alan sepet sayfasını oluşturan React modülüdür. Uygulamanın sepet ekranının temel kök yapısını sunarak, kullanıcıların sepet içerikleriyle etkileşim kuracağı ana görünüm katmanını oluşturur.
+VentHub HVAC projesinin sepet sayfasını oluşturan React modülüdür. Kullanıcıların sepet içeriklerini görüntüleyebileceği, miktar güncelleyebileceği ve sipariş akışına geçebileceği ana sayfa görünümünü tanımlar.
 
 ## Fonksiyon Grupları
-### Ana Sepet Sayfası Kök Bileşeni
-Modülün tek sorumluluğu olan sepet sayfasını render eden ana React bileşenidir, tüm sepet ekranının işleyiş ve görünümünün başlangıç noktası olarak çalışır.
+### Ana Sepet Sayfası Bileşeni
+Modülün tek bileşeni olan CartPage, sepet sayfasının tüm içeriğini, etkileşimlerini ve alt bileşenlerini bir araya getiren kök React bileşenidir.
 - CartPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu HVAC platformu React tabanlı sepet sayfası görünüm modülünün sorunsuz çalışması için uygulamanın frontend yönlendirme, durum yönetimi ve bağımlı UI bileşeni mimarisinin tam olarak yapılandırılmış ve erişilebilir olması zorunludur.
+CartPage, parametresiz bir React fonksiyonel bileşenidir; bu nedenle dışarıdan prop alımı beklenmez, bağımlılıklarını iç bağımlılık enjeksiyonu (hook) veya global bağlam yoluyla sağlamak zorundadır.
 
-[Aksiyom 1]: Eğer uygulama yönlendirme (router) yapılandırmasında CartPage'e ait erişim rotası tanımlanmamışsa, kullanıcılar sepet sayfasına hiçbir şekilde ulaşamaz olur.
-[Aksiyom 2]: Eğer sepet içerik verilerini barındıran global durum yönetimi katmanı CartPage bileşeninin kapsamında erişilebilir değilse, sepet içeriği ekranda gösterilemez ve hiçbir sepet işlemi (ürün silme, miktar güncelleme vb.) gerçekleştirilemez olur.
-[Aksiyom 3]: Eğer CartPage tarafından kullanılan temel UI bileşenleri (buton, ürün listeleme kartı, fiyat etiketi bileşeni gibi) modül tarafından erişilemez durumdaysa, sepet sayfası düzgün şekilde render edilemez ve kullanıcı deneyimi kesintiye uğrar.
-[Aksiyom 4]: Eğer sipariş akışını başlatan üst seviye sipariş yönetimi servisi CartPage tarafından tüketilemiyorsa, kullanıcılar sepetten ödeme/sipariş onay adımına geçemez olur.
-[Aksiyom 5]: Eğer oturum açmış kullanıcı doğrulaması CartPage rota veya bileşen seviyesinde tanımlanmamışsa, yetkisiz kullanıcılar sepet verilerine erişebilir veya yetkisiz işlem yapabilir olur.
+[Aksiyom 1]: Eğer React Çalışma Zamanı (React Runtime) mevcut değilse, bileşen çağrılamaz ve render işlemi başarısız olur.
+
+[Aksiyom 2]: Eğer bileşen bir React Ağaç (Tree) içine yerleştirilmemişse, DOM'a herhangi bir çıktı üretmez.
+
+[Aksiyom 3]: Eğer bileşen çağrı.getParam('id') gibi bir erişim içeriyorsa ve bu bağlam (Context/Router) sağlanmamışsa, çalışma zamanı hatası oluşur.
+
+[Aksiyom 4]: Bileşen parametresiz olduğundan, işlevsellik tamamen iç hook'lara veya dış global state'e bağımlıdır; eğer bu state kaynağa erişilebilir değilse bileşen boş/bozuk render eder.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CartPage
-**Ne yapar**: VentHub HVAC projesinin alışveriş sepeti sayfasını oluşturan ana React fonksiyonel bileşenidir. Kullanıcının sepetindeki ürünleri görüntülemesi, sepet içeriğini yönetmesi ve sipariş sürecine geçmesi için gereken temel arayüz yapısını sunar. Projenin genel kullanıcı deneyimi akışına entegre olarak çalışan, genel domain kapsamında yer alan görünüm katmanı bileşenidir.
-**Nasıl yapar**: C:\Users\alize\venthub-hvac\src\views\CartPage.tsx dosyasında TypeScript ile tanımlanmış bir React bileşeni olarak çalışır. React'in state ve context yapılarını kullanarak sepet verilerini yönetir, kullanıcı etkileşimlerini algılar ve dinamik olarak sayfa içeriğini günceller. Görünüm katmanında yer alan diğer bileşenlerle birlikte işlev görerek sepet sayfasının tamamını tek bir bileşen olarak sunar.
+
+**Ne yapar**: Sepet sayfasını görüntüleyen React bileşenidir. Kullanıcıların alışveriş sepetlerini görüntülemesini ve yönetmesini sağlayan ana sayfa görünümüdür.
+
+**Nasıl yapar**: Bu bileşen, React functional component olarak tanımlanmıştır. Kaynak dosya yolundan (src/views/CartPage.tsx) anlaşılacağı üzere, uygulamanın "views" katmanında yer alan ve.sepetime ait sayfa görünümünü render eden bir bileşendir.
+
 **Parametreler**:
-- Bu bileşene aktarılan herhangi bir parametre tanımlanmamıştır, React bileşeni standartlarına uygun olarak kendi içindeki ve proje genelindeki context verileriyle çalışır.
-**Dönüş**: React.FC türünde bir değer döndürür. Bu dönüş değeri, alışveriş sepeti sayfasının tüm görsel ve işlevsel yapısını içeren JSX formatında bir React öğesidir, projenin yönlendirme sistemi tarafından ilgili rota tetiklendiğinde render edilmek üzere kullanılır.
+Bu bileşen için belgelenmiş parametre bulunmamaktadır.
+
+**Dönüş**: 
+- React.FC — React Functional Component türünde bir bileşen döndürür. Sepet sayfasının tüm görünüm yapısını içeren JSX elementini render eder.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/CartPage.tsx::CartPage
+### [N1_NASIL] AST Pointer: CartPage.tsx::CartPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `items` — useCart hook'undan alınan sepetteki ürünleri içeren liste, boşluk kontrolü ve ürünlerin listelenmesi için kullanılır
-  - `updateQuantity` — useCart'tan alınan sepet ürünlerinin miktarını güncelleyen fonksiyon, miktar arttırma/azaltma butonlarında çağrılır
-  - `removeFromCart` — useCart'tan alınan sepetten ürün silen fonksiyon, ürün silme butonunda çağrılır
-  - `clearCart` — useCart'tan alınan tüm sepeti tek seferde temizleyen fonksiyon, sepeti temizle butonunda kullanılır
-  - `getCartTotal` — useCart'tan alınan sepetin toplam tutarını hesaplayan fonksiyon, sipariş özeti bölümünde kullanılır
-  - `getCartCount` — useCart'tan alınan sepetteki toplam ürün adedini döndüren fonksiyon, sayfa başlığında ürün sayısını göstermek için kullanılır
-  - `t` — useI18n hook'undan alınan çok dilli çeviri fonksiyonu, tüm metinlerin çevrilmesi için kullanılır
-  - `lang` — useI18n hook'undan alınan mevcut aktif dil kodu, para birimi formatlamasında kullanılır
-  - `formatCurrency` — para tutarlarını yerel ayarlara göre formatlayan fonksiyon, tüm fiyat gösterimlerinde kullanılır
-  - `Routes` — uygulama rota tanımları nesnesi, tüm sayfa içi yönlendirme linklerinin oluşturulması için kullanılır
-  - `ShoppingBag, ArrowLeft, Minus, Plus, Trash2` — Lucide ikon kütüphanesinden alınan arayüz ikonları
-  - `Link` — Next.js Link bileşeni, istemci tarafı yönlendirmeler için kullanılır
-  - `BrandIcon` — Projeye özel marka ikonu bileşeni, ürün kartlarında marka görseli olarak kullanılır
-  - `SecurityRibbon` — Projeye özel güvenlik bilgilendirme bileşeni, sayfa üstünde gösterilir
-- **Dönüş**: React.ReactNode (boş veya dolu sepet arayüzünü içeren JSX elementi)
+  - `items` — useCart hook'undan gelen, sepetteki ürünleri tutan dizi
+  - `updateQuantity` — useCart hook'undan gelen, ürün miktarını güncellemek için kullanılan fonksiyon
+  - `removeFromCart` — useCart hook'undan gelen, ürünü sepetten kaldırmak için kullanılan fonksiyon
+  - `clearCart` — useCart hook'undan gelen, sepeti tamamen temizlemek için kullanılan fonksiyon
+  - `getCartTotal` — useCart hook'undan gelen, sepetin toplam tutarını hesaplayan fonksiyon
+  - `getCartCount` — useCart hook'undan gelen, sepetteki toplam ürün sayısını döndüren fonksiyon
+  - `t` — useI18n hook'undan gelen, çeviri metinlerini döndüren fonksiyon
+  - `lang` — useI18n hook'undan gelen, mevcut dil kodunu tutan değişken
+- **Dönüş**: JSX bileşeni — Sepet sayfasını render eder. Boş sepet durumunda boş sepet mesajı, dolu sepet durumunda ürün listesi ve sipariş özeti gösterir.
 
-### [N2_NASIL] AST Pointer: src/views/CartPage.tsx::CartPage.items.map_callback
-- **params**: (item: sepet ürünü nesnesi)
-- **ic_degiskenler**:
-  - `item` — map fonksiyonuna parametre olarak gelen tekil sepet ürünü, ürünün tüm detaylarını barındırır
-  - `item.id` — Sepet ürününün benzersiz kimliği, JSX anahtarı olarak kullanılır
-  - `item.product.brand` — Ürünün marka adı, BrandIcon bileşenine parametre olarak geçirilir
-  - `item.product.slug` — Ürünün URL dostu kimliği, ürün detay sayfası linkinde kullanılır
-  - `item.product.name` — Ürünün görünen adı, ürün kartında başlık olarak gösterilir
-  - `item.product.sku` — Ürünün stok takip kodu, ürün bilgilerinde gösterilir
-  - `item.unitPrice` — Ürünün sepete eklendiğindeki birim fiyatı, varsa öncelikli olarak kullanılır
-  - `item.product.price` — Ürünün orijinal taban fiyatı, unitPrice mevcut değilse kullanılır
-  - `item.quantity` — Sepetteki üründen alınan adet, miktar kontrolünde ve satır toplamı hesaplamasında kullanılır
-  - `item.product.id` — Ürünün benzersiz kimliği, miktar güncelleme ve silme fonksiyonlarına parametre olarak geçirilir
-  - `updateQuantity` — Üst kapsamdan alınan ürün miktarını güncelleyen fonksiyon, miktar butonlarında çağrılır
-  - `removeFromCart` — Üst kapsamdan alınan sepetten ürün silen fonksiyon, silme butonunda çağrılır
-  - `t` — Üst kapsamdan alınan çeviri fonksiyonu, metinlerin çevrilmesi için kullanılır
-  - `lang` — Üst kapsamdan alınan aktif dil kodu, para formatlamasında kullanılır
-  - `formatCurrency` — Para tutarlarını formatlayan fonksiyon, fiyat gösterimlerinde kullanılır
-  - `Routes` — Rota tanımları nesnesi, ürün detay sayfası linkinin oluşturulması için kullanılır
-  - `BrandIcon, Minus, Plus, Trash2, Link` — Arayüzde kullanılan ikon ve yönlendirme bileşenleri
-- **Dönüş**: Tekil sepet ürününü temsil eden JSX elementi
+### [N2_NASIL] AST Pointer: CartPage.tsx::items.map callback
+- **params**: (item — sepetteki her bir ürünü temsil eden nesne)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX bileşeni — Sepet içindeki bir ürünü gösteren kart bileşeni.
 
 ---
 
@@ -93,3 +81,19 @@ Bu HVAC platformu React tabanlı sepet sayfası görünüm modülünün sorunsuz
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CartPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-air-blue`, `bg-gradient-to-br`, `bg-light-gray`, `bg-primary-navy`, `bg-white`, `border-2`, `border-light-gray`, `border-primary-navy`, `from-air-blue`, `hover:bg-light-gray`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-primary-navy`, `hover:text-red-500`, `hover:text-white`
+- **Layout:** `block`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `from-air-blue`, `gap-8`, `grid`, `grid-cols-1`, `h-20`, `h-24`, `inline-flex`, `items-center`, `items-start`, `justify-between`
+- **Varyant/Responsive:** `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `font-medium`, `font-semibold`, `lg:px-8`, `mb-1`, `mb-2`, `mb-4`, `mb-6`, `mb-8`, `mr-2`, `mt-3`, `mt-4`, `mt-6`, `mx-auto`

@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\AccessoryModel.tsx
 skeleton_hash: 94f95d667c5d4783
-generated_at: 2026-05-23T22:22:20Z
+entity_hashes:
+  func:AccessoryModel: 5a654d447c80c9c1
+  overview: af9a58f742b9d985
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:44Z
 ---
 
 ## Genel Bakış
@@ -22,7 +26,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AccessoryModel
 **Ne yapar**: Fonksiyonun amacı sağlanan kaynakta dokümante edilmemiştir; sadece imzası mevcuttur.  
@@ -71,4 +75,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

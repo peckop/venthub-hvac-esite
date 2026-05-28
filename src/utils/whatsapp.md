@@ -4,7 +4,20 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\whatsapp.ts
 skeleton_hash: c727517c04e461de
-generated_at: 2026-05-23T22:35:14Z
+entity_hashes:
+  func:createWhatsAppLink: 48e63882e6e926f6
+  func:formatPhoneNumber: d061dc961d242dd9
+  func:generateContactMessage: e8ee883ed141fd52
+  func:generateFAQSupportMessage: 4d0baf056a250a84
+  func:generateStockInquiryMessage: 70140afcddbd0bcd
+  func:generateSupportMessage: c235bb122d3c44da
+  func:generateTechnicalQuoteMessage: 06a0d3f0059092a0
+  func:getStockInquiryLink: 5b98cfd06bb736c1
+  func:getSupportLink: c9557dee0e999816
+  func:getWhatsAppNumber: 1b0300022a29e138
+  func:isWhatsAppAvailable: 424fa5ec202a97c6
+  overview: 3ca7064f9419922a
+generated_at: 2026-05-28T22:38:51Z
 ---
 
 ## Genel Bakış
@@ -37,7 +50,7 @@ Bu modül, WhatsApp iletişimi için telefon numarası formatlama, şablonlu mes
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getWhatsAppNumber
 **Ne yapar**: Ortam değişkenlerinden WhatsApp telefon numarasını alır, temizler ve geçerliliğini kontrol eder. Eğer ortam değişkeni eksikse veya numara 10 haneden kısaysa null döndürür, kullanıma hazır sadece sayılardan oluşan bir numara sunar.
@@ -116,16 +129,6 @@ Bu modül, WhatsApp iletişimi için telefon numarası formatlama, şablonlu mes
 
 ---
 
-
-### getSupportLink
-**Ne yapar**: WhatsApp üzerinden genel destek talepleri gönderilmek üzere kullanılacak tam, standartlara uygun bir WhatsApp URL'si oluşturan fonksiyondur. Sistemde WhatsApp servisi için gerekli konfigürasyonlar tanımlanmamışsa null döndürerek bağlantı açma gibi işlemlerde oluşabilecek hataları önler. İsteğe bağlı olarak gelen talep konusunu da URL içine entegre ederek kullanıcının destek talebini kolayca iletebilmesini sağlar.
-**Nasıl yapar**: Öncelikle uygulama içindeki WhatsApp konfigürasyonunun geçerliliğini kontrol eder, eğer konfigürasyon eksik veya geçersizse hiç URL yapısı oluşturmadan direkt null değerini döndürür. Konfigürasyon geçerliyse opsiyonel olarak gönderilen subject parametresini URL güvenliği için encode ederek, standart WhatsApp tıklanabilir sohbet URL formatına uygun tam bir bağlantı oluşturur. Oluşturulan bu bağlantı, kullanıcıyı doğrudan destek ekibiyle WhatsApp sohbetine, önceden doldurulmuş talep konusuyla yönlendirir.
-**Parametreler**:
-- name: subject, type: string (opsiyonel) — Destek talebinin konusunu belirten metin, URL yapısına eklenerek WhatsApp sohbet ekranındaki mesaj kutusuna otomatik olarak yazılır. Herhangi bir konu belirtilmemesi durumunda boş bir mesaj kutusuyla yönlendirme gerçekleştirilir.
-**Dönüş**: string | null — Uygulamada WhatsApp servisi doğru şekilde konfigüre edilmişse, tam olarak yapılandırılmış tıklanabilir WhatsApp URL'si döndürülür. Eğer WhatsApp konfigürasyonu eksik veya geçersizse herhangi bir URL yerine null değeri döndürülür. Kullanım örneğinde görüldüğü gibi null durumu kontrol edilerek pencere açma işlemleri güvenli bir şekilde gerçekleştirilebilir.
-
----
-
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\whatsapp.ts::getWhatsAppNumber
@@ -199,40 +202,29 @@ Bu modül, WhatsApp iletişimi için telefon numarası formatlama, şablonlu mes
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-getStockInquiryLink() stok sorgusu WhatsApp bağlantısı oluşturmak için createWhatsAppLink, getWhatsAppNumber ve generateStockInquiryMessage fonksiyonlarını çağırır. getSupportLink() destek talebi WhatsApp bağlantısı oluşturmak için createWhatsAppLink, getWhatsAppNumber ve generateSupportMessage fonksiyonlarını çağırır. isWhatsAppAvailable() WhatsApp'ın kullanılabilirliğini kontrol etmek için telefon numarası bilgisini çeken getWhatsAppNumber fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veride bu modülü kullanan herhangi bir dış dosya veya fonksiyona dair bilgi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  getStockInquiryLink() → createWhatsAppLink()
-  getStockInquiryLink() → generateStockInquiryMessage()
-  getStockInquiryLink() → getWhatsAppNumber()
-  getSupportLink() → createWhatsAppLink()
-  getSupportLink() → generateSupportMessage()
-  getSupportLink() → getWhatsAppNumber()
-  isWhatsAppAvailable() → getWhatsAppNumber()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    getStockInquiryLink["getStockInquiryLink()"] --> createWhatsAppLink["createWhatsAppLink()"]
-    getStockInquiryLink["getStockInquiryLink()"] --> generateStockInquiryMessage["generateStockInquiryMessage()"]
-    getStockInquiryLink["getStockInquiryLink()"] --> getWhatsAppNumber["getWhatsAppNumber()"]
-    getSupportLink["getSupportLink()"] --> createWhatsAppLink["createWhatsAppLink()"]
-    getSupportLink["getSupportLink()"] --> generateSupportMessage["generateSupportMessage()"]
-    getSupportLink["getSupportLink()"] --> getWhatsAppNumber["getWhatsAppNumber()"]
-    isWhatsAppAvailable["isWhatsAppAvailable()"] --> getWhatsAppNumber["getWhatsAppNumber()"]
+graph TD
+    whatsapp_ts__createWhatsAppLink["createWhatsAppLink"]
+    whatsapp_ts__formatPhoneNumber["formatPhoneNumber"]
+    whatsapp_ts__generateContactMessage["generateContactMessage"]
+    whatsapp_ts__generateFAQSupportMessage["generateFAQSupportMessage"]
+    whatsapp_ts__generateStockInquiryMessage["generateStockInquiryMessage"]
+    whatsapp_ts__generateSupportMessage["generateSupportMessage"]
+    whatsapp_ts__generateTechnicalQuoteMessage["generateTechnicalQuoteMessage"]
+    whatsapp_ts__getStockInquiryLink["getStockInquiryLink"]
+    whatsapp_ts__getSupportLink["getSupportLink"]
+    whatsapp_ts__getWhatsAppNumber["getWhatsAppNumber"]
+    whatsapp_ts__isWhatsAppAvailable["isWhatsAppAvailable"]
+    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__generateStockInquiryMessage
+    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__createWhatsAppLink
+    whatsapp_ts__getSupportLink --> whatsapp_ts__createWhatsAppLink
+    whatsapp_ts__getSupportLink --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__isWhatsAppAvailable --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__getSupportLink --> whatsapp_ts__generateSupportMessage
 ```
-
----
 
 ## NODE ID STANDARD
 

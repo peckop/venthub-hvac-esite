@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\CaseStudySection.tsx
 skeleton_hash: c9cb07153aed4f00
-generated_at: 2026-05-23T21:57:25Z
+entity_hashes:
+  func:CaseStudySection: 30e263b0ef69a0a4
+  func:openLead: 3d89ba2774c36aa2
+  overview: 5af9581c1e08259f
+  style_tokens: de735ee559e96a8f
+generated_at: 2026-05-28T22:35:44Z
 ---
 
 ## Genel Bakış
@@ -32,7 +37,7 @@ Bu modülün doğru çalışması için React ortamı ve ilgili UI bağımlılı
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CaseStudySection
 **Ne yapar**: Fonksiyonun amacı belgelenmemiştir.  
@@ -77,29 +82,6 @@ Bu modülün doğru çalışması için React ortamı ve ilgili UI bağımlılı
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-CaseStudySection() fonksiyonu, bir lead kaydını açmak için openLead() fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen dosya-ici çağrı verisinde dışarıdan bu modülü kullanan fonksiyon veya dosya belirtilmedi; bu yüzden dışarıdan çağrılan yok.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  CaseStudySection() → openLead()
-
-```mermaid
-graph LR
-    CaseStudySection["CaseStudySection()"] --> openLead["openLead()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\CaseStudySection.tsx
@@ -122,6 +104,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `bg-light-gray`, `bg-primary-navy`, `bg-white`, `border-light-gray`, `from-gray-50`, `md:text-4xl`, `text-3xl`, `text-center`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-white`, `text-xl`, `to-white`
+- **Renkler:** `bg-gradient-to-br`, `bg-light-gray`, `bg-primary-navy`, `bg-white`, `border-light-gray`, `from-gray-50`, `hover:bg-secondary-blue`, `md:text-4xl`, `text-3xl`, `text-center`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-white`, `text-xl`
 - **Layout:** `flex`, `flex-wrap`, `from-gray-50`, `gap-2`, `gap-6`, `grid`, `grid-cols-1`, `hover:shadow-md`, `inline-flex`, `items-center`, `justify-center`, `max-w-7xl`, `md:grid-cols-2`, `p-6`, `shadow-sm`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `font-medium`, `font-semibold`, `lg:px-8`, `mb-8`, `mr-1`, `mt-2`, `mt-4`, `mt-6`, `mx-auto`, `px-3`, `px-4`, `px-5`, `py-1`

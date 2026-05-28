@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\RadialActionMenu.tsx
 skeleton_hash: f217216778420e8a
-generated_at: 2026-05-23T22:27:02Z
+entity_hashes:
+  func:RadialActionMenu: 0b7a99200882ee32
+  func:getItemPosition: fe5533094bc4f10c
+  func:getSubcategoryPosition: baca01aa62eeaa95
+  overview: 2386ff7b1f3a01a9
+  style_tokens: 398c177ac8f627cc
+generated_at: 2026-05-28T22:36:55Z
 ---
 
 ## Genel Bakış
@@ -34,7 +40,7 @@ Bu modül, seçilen ana kategoriye ait alt kategorileri radyal düzlemde konumla
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### RadialActionMenu
 **Ne yapar**: VentHub HVAC projesinin ürünler sayfasında kullanılan, iki seviyeli çalışan dairesel aksiyon menüsü bileşenidir. Seviye 1'de ana menü seçenekleri (Alt Kategoriler, Ürünleri Gör, Teklif Al) barındırır, Seviye 2'de dinamik olarak yüklenen alt kategori seçeneklerini kullanıcıya sunar. Kullanıcıların kategoriler ve ürünler hakkında hızlı aksiyonlar almasını sağlayan açılır menü işlevi görür.
@@ -215,30 +221,16 @@ Bu modül, seçilen ana kategoriye ait alt kategorileri radyal düzlemde konumla
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-RadialActionMenu() ana fonksiyonu, menü öğelerinin konumlarını belirlemek amacıyla dosya içindeki getItemPosition ve getSubcategoryPosition fonksiyonlarını çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  RadialActionMenu() → getItemPosition()
-  RadialActionMenu() → getSubcategoryPosition()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    RadialActionMenu["RadialActionMenu()"] --> getItemPosition["getItemPosition()"]
-    RadialActionMenu["RadialActionMenu()"] --> getSubcategoryPosition["getSubcategoryPosition()"]
+graph TD
+    RadialActionMenu_tsx__RadialActionMenu["RadialActionMenu"]
+    RadialActionMenu_tsx__getItemPosition["getItemPosition"]
+    RadialActionMenu_tsx__getSubcategoryPosition["getSubcategoryPosition"]
+    RadialActionMenu_tsx__RadialActionMenu --> RadialActionMenu_tsx__getItemPosition
+    RadialActionMenu_tsx__RadialActionMenu --> RadialActionMenu_tsx__getSubcategoryPosition
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -258,16 +250,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** `max-w-[120px]`
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/40`, `bg-gradient-to-br`, `bg-gradient-to-t`, `bg-slate-900/90`, `border-2`, `border-white/10`, `border-white/20`, `border-white/30`, `from-cyan-500/20`, `from-slate-600`, `from-transparent`, `text-white`, `text-white/70`, `text-xs`, `to-purple-500/20`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `fixed`, `flex`, `flex-col`, `from-cyan-500/20`, `from-slate-600`, `from-transparent`, `gap-2`, `group-hover:border-cyan-400/50`, `group-hover:shadow-2xl`, `group-hover:shadow-cyan-500/30`, `group-hover:shadow-xl`, `h-14`, `h-16`
-- **Responsive:** (yok)
+- **Renkler:** `bg-black/40`, `bg-gradient-to-br`, `bg-gradient-to-t`, `bg-slate-900/90`, `border-2`, `border-white/10`, `border-white/20`, `border-white/30`, `from-cyan-500/20`, `from-slate-600`, `from-transparent`, `group-hover:border-cyan-400/50`, `hover:bg-white/10`, `text-white`, `text-white/70`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `fixed`, `flex`, `flex-col`, `from-cyan-500/20`, `from-slate-600`, `from-transparent`, `gap-2`, `group-hover:shadow-2xl`, `group-hover:shadow-cyan-500/30`, `group-hover:shadow-xl`, `h-14`, `h-16`, `h-5`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${!isDisabled`, `${isDisabled`, `${item.color`, `${item.glowColor`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `border`, `cursor-not-allowed`, `cursor-pointer`, `duration-300`, `font-medium`, `font-semibold`, `group`, `inset-0`

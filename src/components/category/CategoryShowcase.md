@@ -8,7 +8,7 @@ entity_hashes:
   func:CategoryShowcase: 27f451ff64c2aa4f
   overview: 7308f814cbfe1bd6
   style_tokens: 74c7a2fe586c3948
-generated_at: 2026-05-27T18:14:23Z
+generated_at: 2026-05-28T22:35:43Z
 ---
 
 ## Genel Bakış

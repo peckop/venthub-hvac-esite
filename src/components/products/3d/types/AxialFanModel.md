@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\AxialFanModel.tsx
 skeleton_hash: 4c4f6a930c88d840
-generated_at: 2026-05-23T22:22:31Z
+entity_hashes:
+  func:AxialFanModel: cc382cf8a620825d
+  overview: c92f209b9e895d7e
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:45Z
 ---
 
 ## Genel Bakış
@@ -28,7 +32,7 @@ Bu modül, silencer özelliğinin etkinliği `hasSilencer` bayrağıyla kontrol 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AxialFanModel
 **Ne yapar**: AxialFanModel bileşenini render eder, gelen `hasSilencer`, `silencerRadius` ve `silencerLength` özelliklerine göre modelin yapılandırmasını yapar.  
@@ -123,4 +127,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

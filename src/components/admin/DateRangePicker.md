@@ -11,7 +11,7 @@ entity_hashes:
   func:handleSelect: fdeacf6bd5ee123e
   overview: 83cabe93bf8f0d23
   style_tokens: 8f057de8409875ea
-generated_at: 2026-05-27T18:10:37Z
+generated_at: 2026-05-28T22:35:31Z
 ---
 
 ## Genel Bakış

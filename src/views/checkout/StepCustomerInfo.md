@@ -8,7 +8,7 @@ entity_hashes:
   func:StepCustomerInfo: 2698d0acd17fa1de
   overview: 3962b33f58fa703d
   style_tokens: 61f2a39b43a19a77
-generated_at: 2026-05-27T18:31:01Z
+generated_at: 2026-05-28T22:40:06Z
 ---
 
 ## Genel Bakış

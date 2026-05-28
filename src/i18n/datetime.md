@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\datetime.ts
 skeleton_hash: 3517abf8a058c0b3
-generated_at: 2026-05-23T22:30:55Z
+entity_hashes:
+  func:formatDate: 14e0f22f55add348
+  func:formatDateTime: bca9df36994c09a4
+  func:formatTime: ffcc8071ca9c075f
+  overview: 3b7d66dc5c8cd5fa
+generated_at: 2026-05-28T22:37:50Z
 ---
 
 ## Genel Bakış
@@ -27,7 +32,7 @@ Bu modül, çalışma ortamının ECMAScript Intl API'sini desteklemesi, fonksiy
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### formatDateTime
 **Ne yapar**: VentHub HVAC projesinin i18n altyapısında kullanılan, gelen tarih/saat değerini belirtilen dil ve format ayarlarına göre yerelleştirilmiş biçimde biçimlendiren temel fonksiyondur. UI'de gösterilecek tüm tarih ve saat değerlerinin standart bir formatta sunulmasını sağlar, hem Türkçe hem İngilizce dil ayarlarına uyumlu çalışır.
@@ -83,28 +88,15 @@ Bu modül, çalışma ortamının ECMAScript Intl API'sini desteklemesi, fonksiy
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Sadece dosya içindeki `formatDate()` fonksiyonu, tarih-saat formatlama işlemini tamamlamak için aynı dosyadaki `formatDateTime` fonksiyonunu çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veri setinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi paylaşılmadığı için tespit edilememiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  formatDate() → formatDateTime()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    formatDate["formatDate()"] --> formatDateTime["formatDateTime()"]
+graph TD
+    datetime_ts__formatDate["formatDate"]
+    datetime_ts__formatDateTime["formatDateTime"]
+    datetime_ts__formatTime["formatTime"]
+    datetime_ts__formatDate --> datetime_ts__formatDateTime
 ```
-
----
 
 ## NODE ID STANDARD
 

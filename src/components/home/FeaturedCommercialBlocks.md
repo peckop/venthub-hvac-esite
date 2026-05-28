@@ -4,41 +4,52 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx
 skeleton_hash: cc1ee378f0ab56e9
-generated_at: 2026-05-23T22:05:46Z
+entity_hashes:
+  func:FeaturedCommercialBlocks: 1889811721e866db
+  func:normalizeImageUrl: e7ff2d52e57ce97b
+  overview: 053f00b1dc0bcc57
+  style_tokens: 0fba0ab3cddfc2f6
+generated_at: 2026-05-28T22:35:59Z
 ---
 
 ## Genel Bakış
-Bu modül, ticari ürünlerin öne çıkan blokları olarak görüntülenmesini sağlayan bir React bileşeni içerir. Görsel URL'lerini güvenli bir şekilde hazırlayan bir yardımcı fonksiyonla birlikte, ürün listesini alıp kullanıcıya çekici bir şekilde sunar.
+Bu modül, ana sayfada öne çıkan ticari ürünlere ait görsel ve bilgi bloklarını sergileyen bir React bileşenini tanımlar. Görsel URL'lerinin güvenli bir şekilde işlenmesini sağlayan bir yardımcı fonksiyon ile birlikte, ürün listesini alıp kullanıcıya düzenli bir şekilde sunar.
 
 ## Fonksiyon Grupları
-### Görsel URL Normalizasyonu
-Görsel adreslerinin null veya undefined gibi geçersiz değerleri temizleyip, güvenli bir string formatına dönüştürür.
+### Yardımcı İşlevler
+Görsel adreslerinin boş veya geçersiz olma durumlarını temizleyerek, kullanıma hazır standart bir URL formatı üretir.
 - normalizeImageUrl
 
 ### Ana Bileşen
-Ürün verilerini alarak, öne çıkan ticari blokları düzenler ve render eder; her blokta görsel ve ilgili bilgiler gösterilir.
+Ürün verisini alarak, öne çıkan ticari ürünleri görsel ve ilgili bilgileriyle birlikte düzenler ve ekranda render eder; başlangıç verisi eksikse varsayılan boş bir liste kullanır.
 - FeaturedCommercialBlocks
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için fonksiyonların parametreleri belirtilen tiplere uygun olmalı ve varsayılan değerler beklenildiği şekilde kullanılmalıdır.
 
-[Aksiyom 1]: Eğer `normalizeImageUrl` fonksiyonuna `url` parametresi `string`, `null` veya `undefined` dışında bir değer geçilirse, fonksiyonun dönüş değeri veya hata davranışı garantilenmez.  
-[Aksiyom 2]: Eğer `normalizeImageUrl` fonksiyonuna `url` parametresi `null` veya `undefined` geçilirse, fonksiyon bir hata fırlatmadan bir `string` döndürmelidir.  
-[Aksiyom 3]: Eğer `FeaturedCommercialBlocks` bileşenine `initialProducts` prop'u olarak dizi olmayan bir değer geçilirse, bileşenin render çıktısı beklenmeyen şekilde olabilir.  
-[Aksiyom 4]: Eğer `FeaturedCommercialBlocks` bileşenine `initialProducts` prop'u verilmezse, prop'un değeri boş bir dizi (`[]`) olarak kabul edilir. (Bu varsayım fonksiyon imzasındaki `initialProducts = []` default değerinden doğar.)
+Bu modül için doğrulanabilir mimari aksiyomlar, yalnızca fonksiyon imzalarından çıkarılmıştır.
+
+**[Aksiyom 1]**: Eğer `initialProducts` parametresi çağrıda sağlanmazsa, varsayılan olarak boş dizi (`[]`) kullanılır.
+
+**[Aksiyom 2]**: Eğer `normalizeImageUrl` fonksiyonuna `null` veya `undefined` değerinde bir `url` verilirse, fonksiyon bu geçersiz girişi işleyebilmelidir (fonksiyon imzası bu türleri kabul edecek şekilde tanımlıdır).
+
+**[Aksiyom 3]**: Eğer `FeaturedCommercialBlocks` bileşeni hiç argüman olmadan (`FeaturedCommercialBlocks()`) çağrılırsa, `initialProducts` otomatik olarak `[]` olur ve bileşen bu değerle çalışır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### normalizeImageUrl
-**Ne yapar**: Verilen bir görsel URL'sini standart bir biçime dönüştürür, null veya undefined gibi geçersiz girdileri işler.  
-**Nasıl yapar**: Girdi bir string ise gerekli düzenlemeleri yapar (örneğin protokol ekleme, boşluk temizleme); null/undefined ise boş string veya varsayılan bir URL döndürür.  
-**Parametreler**:  
-- url: string | null | undefined — Normalize edilecek görsel adresi; null veya undefined olabilir.  
-**Dönüş**: string — Normalize edilmiş URL; geçersiz girdi için boş string veya varsayılan değer.
+
+**Ne yapar**: Verilen URL değerini standart ve kullanılabilir bir forma dönüştürür. Boş, undefined veya geçersiz URL durumlarında varsayılan bir placeholder görsel döndürerek bileşenlerin hata almasını engeller.
+
+**Nasıl yapar**: Fonksiyon, gelen url parametresinin null veya undefined olup olmadığını kontrol eder. Eğer geçerli bir URL varsa bunu doğrudan döndürür. Boş veya tanımsız durumlarda ise önceden tanımlanmış varsayılan bir görsel yolunu string olarak geri verir.
+
+**Parametreler**:
+- `url`: `string | null | undefined` — Normalize edilecek görsel URL'si. Null veya undefined olabilir.
+
+**Dönüş**: `string` — Normalize edilmiş geçerli bir görsel URL'si döndürür.
 
 ### FeaturedCommercialBlocks
 **Ne yapar**: Başlangıç ürün listesi ile öne çıkan ticari blokları gösteren bir React bileşenidir.  
@@ -104,29 +115,6 @@ type CommercialTab = 'featured' | 'newArrivals' | 'bestSellers'
 
 ---
 
-## Çağrı Haritası
-
-### Disariya Çağrılar (Outgoing)
-- **FeaturedCommercialBlocks()** fonksiyonu, görsel URL'lerini standartlaştırmak için **normalizeImageUrl** fonksiyonunu çağırır.
-
-### Disarından Çağrılanlar (Incoming)
-- Bu modülü çağıran dış bir fonksiyon veya modül verilmemiştir; dolayısıyla **incoming** çağrı yoktur.
-
-### İç İçe Fonksiyonlar (Nested)
-- İç içe (nested) fonksiyon bulunmamaktadır. → **Yok**
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  FeaturedCommercialBlocks() → normalizeImageUrl()
-
-```mermaid
-graph LR
-    FeaturedCommercialBlocks["FeaturedCommercialBlocks()"] --> normalizeImageUrl["normalizeImageUrl()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\home\FeaturedCommercialBlocks.tsx
@@ -144,16 +132,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `hover:scale-[1.02]`, `lg:grid-cols-[1fr,320px]`, `tracking-[0.3em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`
+- `rounded-hvac-2xl`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-cyan-500/10`, `bg-slate-200/50`, `bg-slate-900`, `bg-slate-950`, `bg-white`, `bg-white/5`, `border-cyan-500/10`, `border-slate-200`, `border-white/10`, `border-white/5`, `sm:text-6xl`, `text-4xl`, `text-center`, `text-cyan-400`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `gap-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `grid-cols-2`, `group-hover:grayscale-0`, `h-1.5`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500/10`, `bg-slate-200/50`, `bg-slate-900`, `bg-slate-950`, `bg-white`, `bg-white/5`, `border-cyan-500/10`, `border-slate-200`, `border-white/10`, `border-white/5`, `hover:bg-cyan-400`, `hover:text-slate-900`, `sm:text-6xl`, `text-4xl`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `gap-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `grid-cols-2`, `h-1.5`, `h-32`
+- **Varyant/Responsive:** `:`, `active:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `$`, `:`, `===`, `active:scale-95`, `activeTab`, `animate-pulse`, `aspect-square`, `blur-3xl`, `border`, `duration-500`, `duration-700`, `font-black`, `font-bold`, `font-light`, `grayscale`

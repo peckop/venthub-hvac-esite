@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryMovementHistory.tsx
 skeleton_hash: b866bc2cf5b15d5f
-generated_at: 2026-05-23T21:53:07Z
+entity_hashes:
+  func:InventoryMovementHistory: 2413e5385b8816cc
+  overview: a9fb0b3f91f018c7
+  style_tokens: 1f29bfe131c33c25
+generated_at: 2026-05-28T22:35:35Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu modül, `movements` prop'una dayalı olarak çalışır; bu prop'un varlığ�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### InventoryMovementHistory
 **Ne yapar**: Envanter hareketlerinin listesini görüntüleyen bir React bileşenidir.  
@@ -78,16 +82,13 @@ Bu modül, `movements` prop'una dayalı olarak çalışır; bu prop'un varlığ�
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** `max-w-[140px]`
-- **spacing:** (yok)
-- **diğer:** `tracking-[0.2em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-transparent`, `bg-white/[0.02]`, `border-b`, `border-separate`, `border-spacing-0`, `border-white/5`, `text-emerald-400`, `text-left`, `text-right`, `text-rose-400`, `text-slate-300`, `text-slate-500`, `text-xs`
-- **Layout:** `group-last:border-0`, `overflow-hidden`, `w-full`
-- **Responsive:** (yok)
+- **Renkler:** `bg-transparent`, `bg-white/2`, `border-b`, `border-separate`, `border-spacing-0`, `border-white/5`, `group-last:border-0`, `hover:bg-white/2`, `text-emerald-400`, `text-left`, `text-right`, `text-rose-400`, `text-slate-300`, `text-slate-500`, `text-xs`
+- **Layout:** `max-w-140px`, `overflow-hidden`, `w-full`
+- **Varyant/Responsive:** `:`, `group-last:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${Number(m.delta`, `0`, `:`, `>`, `font-black`, `font-bold`, `group`, `px-4`, `py-3`, `transition-colors`, `truncate`, `uppercase`

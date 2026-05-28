@@ -4,44 +4,50 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\ReviewSummary.tsx
 skeleton_hash: 115795418e651b3a
-generated_at: 2026-05-23T22:40:42Z
+entity_hashes:
+  func:ReviewSummary: 5797ed029cce22ed
+  overview: 34cecab9410c7f0c
+  style_tokens: e50d4f5a19398e9d
+generated_at: 2026-05-28T22:40:19Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun sipariş tamamlama (checkout) akışında kullanılan bir React bileşenidir. Siparişin onaylanması aşamasında tüm kritik müşteri ve sipariş bilgilerini bir arada göstererek kullanıcının gözden geçirmesini sağlar, ödeme adımına geçmeden önce tüm detayların doğruluğunu teyit etmesine olanak tanır.
+Bu modül, sipariş tamamlama (checkout) sürecinin son aşamasında yer alan bir bileşendir. Ödeme sayfasına geçmeden önce müşteri, teslimat ve fatura bilgilerini bir arada göstererek kullanıcının tüm detayları gözden geçirmesini ve doğruluğunu teyit etmesini sağlar.
 
 ## Fonksiyon Grupları
-### Ana Özet Bileşeni
-Modülün tek giriş noktası olarak çalışan bu fonksiyon, müşteri bilgileri, teslimat ve fatura adres detayları, fatura tipi gibi siparişle ilgili tüm parametreleri alır ve sipariş gözden geçirme arayüzünü kullanıcıya sunar.
+### Özet Görünüm Bileşeni
+Siparişin onay öncesindeki tüm kritik bilgileri —müşteri detayları, teslimat adresi, fatura adresi ve fatura türü— tek bir düzenli arayüzde sunarak kullanıcının son kontrol yapmasına olanak tanır.
 - ReviewSummary
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, sipariş ödeme adımındaki müşteri, teslimat ve fatura bilgilerini son kontrol için kullanıcıya özetlemek üzere tasarlanmıştır; tüm aldığı giriş prop'larının üst komponenler tarafından eksiksiz ve geçerli olarak iletilmesini zorunlu kılar.
+Bu modül, sipariş onay sayfasında müşteri, teslimat ve fatura bilgilerini göstererek kullanıcının siparişini gözden geçirmesini sağlar.
 
-[Aksiyom 1]: Eğer müşteri bilgilerini içeren customer nesnesi yoksa, özet bölümündeki müşteri bilgileri bloğu boş kalır veya bileşen hatalı çalışır.
-[Aksiyom 2]: Eğer teslimat adresi ve detaylarını içeren shipping nesnesi iletilmezse, sipariş özetinde teslimat bilgileri gösterilemez, kullanıcı teslimat adresini son adımda kontrol edemez.
-[Aksiyom 3]: Eğer fatura adresi ve detaylarını içeren billing nesnesi yoksa, fatura bilgileri özet bloğu eksik veriyle çalışır, sonrasında fatura oluşturma sürecinde veri hatası oluşur.
-[Aksiyom 4]: Eğer fatura adresinin teslimat adresiyle aynı olup olmadığını belirten sameAsShipping boolean değeri iletilmezse, fatura adresi özetinin hangi koşullarda gösterileceği belirsizleşir, yanlış adres bilgisi kullanıcıya sunulur.
-[Aksiyom 5]: Eğer fatura türünü tanımlayan invoiceType değeri iletilmezse, özet bölümünde seçilen fatura türü gösterilemez, fatura düzenleme süreçlerinde uyumsuzluk ortaya çıkar.
-[Aksiyom 6]: Eğer yerel ayar/çeviri verilerini içeren in nesnesi bileşene iletilmezse, arayüzdeki tüm metinsel içerikler doğru şekilde gösterilemez, arayüz kullanıcı tarafından anlaşılamaz hale gelir.
+[Aksiyom 1]: Eğer `customer` prop'u (müşteri bilgileri) sağlanmazsa, bileşen müşteri bilgilerini gösteremez ve hata oluşur veya eksik veri gösterir.
+[Aksiyom 2]: Eğer `shipping` prop'u (teslimat adresi bilgileri) sağlanmazsa, bileşen teslimat adresini gösteremez ve hata oluşur veya eksik veri gösterir.
+[Aksiyom 3]: Eğer `billing` prop'u (fatura adresi bilgileri) sağlanmazsa, bileşen fatura adresini gösteremez ve hata oluşur veya eksik veri gösterir.
+[Aksiyom 4
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ReviewSummary
-**Ne yapar**: Venthub HVAC platformunun ödeme (checkout) akışının sipariş özetini gözden geçirme adımını oluşturan bir React fonksiyonel bileşenidir. Kullanıcının sipariş sürecinde girdiği tüm müşteri, teslimat, fatura ve fatura türü verilerini tek bir ekranda toplayarak sunar, kullanıcının siparişi onaylamadan önce tüm bilgileri doğrulamasını sağlar. Sadece ödeme akışının son kontrol adımında kullanılarak, hatalı girilen bilgilerin kesinleşen siparişe yansımasını engeller.
-**Nasıl yapar**: Checkout akışını yöneten üst bileşenlerden kendisine iletilen tüm verileri prop olarak alır, tanımlı ReviewSummaryProps tip kurallarına uygun olarak çalışan bir React bileşeni olarak çıktı üretir. Aldığı verileri kullanıcı dostu bir düzende yapılandırarak, fatura adresinin teslimat adresiyle aynı olması durumunda sameAsShipping bayrağını kullanarak gereksiz tekrarlamaları önler, seçilen fatura türüne göre ek bilgileri özet ekrana ekler. Sadece kendisine iletilen verileri görüntülemekle sorumludur, herhangi bir sipariş verisi üzerinde değişiklik işlemi yapmaz.
+
+**Ne yapar**: Checkout (sipariş tamamlama) sürecinin son aşamasında, müşterinin sipariş özetini görüntülemesini sağlayan React bileşenidir. Müşteri, kargo, fatura bilgilerini ve fatura türünü bir arada göstererek sipariş onayı öncesi tüm detayların kontrol edilmesini sağlar.
+
+**Nasıl yapar**: Fonksiyonel bir React bileşeni olarak çalışır ve props aracılığı ile siparişle ilgili tüm bilgileri alır. sameAsShipping bayrağı sayesinde fatura adresinin kargo adresiyle aynı olup olmadığını kontrol ederek gerekli durumlarda fatura adresi bölümünü gereksiz yere tekrar göstermez. Tüm bilgileri düzenli bir özeti formatında kullanıcıya sunar.
+
 **Parametreler**:
-- customer: ReviewSummaryProps['customer'] — Siparişi oluşturan müşteriye ait kişisel ve iletişim bilgilerini barındıran nesnedir, adres, iletişim, kimlik bilgileri gibi müşteriyle ilgili tüm verileri içerir.
-- shipping: ReviewSummaryProps['shipping'] — Siparişin teslim edileceği lokasyon bilgilerini tutan nesnedir, teslimat adresi için gerekli tüm sokak, ilçe, şehir, posta kodu gibi verileri barındırır.
-- billing: ReviewSummaryProps['billing'] — Faturanın kesileceği adrese ait yasal ve lokasyon bilgilerini tutan nesnedir, fatura işlemleri için gerekli tüm verileri içerir.
-- sameAsShipping: ReviewSummaryProps['sameAsShipping'] — Kullanıcının fatura adresini teslimat adresiyle aynı olarak tanımladığını belirten boolean tipinde bayraktır, true değerinde olduğunda fatura adresi ayrı olarak görüntülenmez.
-- invoiceType: ReviewSummaryProps['invoiceType'] — Sipariş için kullanıcının seçtiği fatura türünü belirten değişkendir, bireysel veya kurumsal fatura gibi seçenekleri değer olarak alır.
-- in: ReviewSummaryProps['in'] — Bileşenin üst akıştan eriştiği, siparişin içeriği veya ödeme akışının mevcut durumu gibi ek bağlam verilerini tutan giriş parametresidir.
-**Dönüş**: React.FC<ReviewSummaryProps> — Tüm alınan prop verilerini işleyerek kullanıcı arayüzünde görüntülenebilir sipariş gözden geçirme ekranını oluşturan, React uygulama ağacına entegre çalışan bir fonksiyonel bileşen döndürür. Bu bileşen, tanımlı tip kurallarına uyarak hata olasılığını en aza indirir ve sadece kendisine tahsis edilen rolde çalışır.
+- `customer` — Siparişi veren müşterinin kişisel bilgilerini içeren nesne
+- `shipping` — Kargo adresi ve teslimat bilgilerini içeren nesne
+- `billing` — Fatura adresi ve ödeme ile ilişkili bilgileri içeren nesne
+- `sameAsShipping` — Fatura adresinin kargo adresi ile aynı olup olmadığını belirten boolean değer
+- `invoiceType` — Fatura türünü (bireysel/kurumsal vb.) belirten değer
+- `in` — Parametre listesi bu noktada kesilmiş, ek parametreler mevcut olabilir
+
+**Dönüş**: `React.FC<ReviewSummaryProps>` — ReviewSummaryProps tipinde prop alan ve JSX döndüren fonksiyonel React bileşeni
 
 ---
 
@@ -72,37 +78,16 @@ type InvoiceType = 'individual' | 'corporate'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\ReviewSummary.tsx::ReviewSummary
-- **params**: customer, shipping, billing, sameAsShipping, invoiceType, invoiceInfo, onEditPersonal, onEditShipping, onEditBilling, onEditInvoice
+### [N1_NASIL] AST Pointer: src/views/checkout/ReviewSummary.tsx::ReviewSummary
+- **params**: (customer, shipping, billing, sameAsShipping, invoiceType, invoiceInfo, onEditPersonal, onEditShipping, onEditBilling, onEditInvoice)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan elde edilen çeviri fonksiyonu, UI'daki tüm metinleri yerelleştirmek için kullanılır
-  - `customer.name` — Müşterinin tam adı, kişisel bilgiler kartında gösterilir
-  - `customer.email` — Müşterinin e-posta adresi, kişisel bilgiler kartında gösterilir
-  - `customer.phone` — Müşterinin telefon numarası, kişisel bilgiler kartında gösterilir
-  - `shipping.fullAddress` — Kargo adresinin tam yazımı, kargo bilgileri kartında gösterilir
-  - `shipping.full_address` — Alternatif formatta kargo adresi, fullAddress tanımsızsa kullanılır
-  - `shipping.district` — Kargo adresinin ilçe bilgisi, kargo adresi metninde kullanılır
-  - `shipping.city` — Kargo adresinin şehir bilgisi, kargo adresi metninde kullanılır
-  - `shipping.postalCode` — Kargo adresinin posta kodu, kargo adresi metninde kullanılır
-  - `shipping.postal_code` — Alternatif formatta kargo posta kodu, postalCode tanımsızsa kullanılır
-  - `billing.fullAddress` — Fatura adresinin tam yazımı, sameAsShipping false ise fatura bilgileri kartında gösterilir
-  - `billing.full_address` — Alternatif formatta fatura adresi, fullAddress tanımsızsa kullanılır
-  - `billing.district` — Fatura adresinin ilçe bilgisi, fatura adresi metninde kullanılır
-  - `billing.city` — Fatura adresinin şehir bilgisi, fatura adresi metninde kullanılır
-  - `billing.postalCode` — Fatura adresinin posta kodu, fatura adresi metninde kullanılır
-  - `billing.postal_code` — Alternatif formatta fatura posta kodu, postalCode tanımsızsa kullanılır
-  - `sameAsShipping` — Fatura adresinin kargo adresiyle aynı olma durumunu belirten bayrak, false ise ayrı fatura adresi kartı render edilir
-  - `invoiceType` — Fatura türü (individual/corporate), fatura bilgilerinin türe göre gösterilmesini sağlar
-  - `invoiceInfo.tckn` — Bireysel fatura için TC Kimlik Numarası, fatura kartında gösterilir
-  - `invoiceInfo.companyName` — Kurumsal fatura için şirket adı, fatura kartında gösterilir
-  - `invoiceInfo.vkn` — Kurumsal fatura için Vergi Kimlik Numarası, fatura kartında gösterilir
-  - `invoiceInfo.taxOffice` — Kurumsal fatura için vergi dairesi bilgisi, fatura kartında gösterilir
-  - `invoiceInfo.eInvoice` — Kurumsal fatura için e-fatura durumu, true ise e‑Fatura etiketi render edilir
-  - `onEditPersonal` — Kişisel bilgileri düzenleme butonunun tıklama olayında çalıştırılan geri çağırım fonksiyonu
-  - `onEditShipping` — Kargo bilgilerini düzenleme butonunun tıklama olayında çalıştırılan geri çağırım fonksiyonu
-  - `onEditBilling` — Fatura bilgilerini düzenleme butonunun tıklama olayında çalıştırılan geri çağırım fonksiyonu
-  - `onEditInvoice` — Fatura türü/bilgilerini düzenleme butonunun tıklama olayında çalıştırılan geri çağırım fonksiyonu
-- **Dönüş**: React JSX elementi, sipariş öncesi tüm müşteri, kargo ve fatura bilgilerinin özetini gösteren checkout sayfa bileşeni
+  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, UI metinlerini uluslararası dilde göstermek için kullanılır
+- **Dönüş**: JSX elementi (React component) — Sipariş özetini gösteren düzenli bir JSX yapısı döner. Kişisel bilgiler, teslimat adresi, fatura adresi (şayet farklıysa) ve fatura bilgilerini içeren dört kart gösterir. Her kartta düzenleme butonu ve ilgili bilgileri visible olarak render eder.
+
+### Notlar:
+- `shipping` ve `billing` objelerinde `fullAddress || full_address` ve `postalCode || postal_code` gibi alternatif property erişimleri yapılır (farklı API yanıt formatlarına uyum için)
+- `sameAsShipping` değişkeni `false` olduğunda fatura adresi kartı render edilir
+- `invoiceInfo` objesinin `tckn`, `companyName`, `vkn`, `taxOffice`, `eInvoice` property'leri fatura türüne göre farklı şekilde gösterilir
 
 ---
 
@@ -117,3 +102,19 @@ type InvoiceType = 'individual' | 'corporate'
   export: InvoiceType
   export: ReviewSummary
   export: ReviewSummaryProps
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white/90`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`
+- **Layout:** `flex`, `gap-4`, `grid`, `grid-cols-1`, `items-center`, `justify-between`, `md:grid-cols-2`, `p-4`
+- **Varyant/Responsive:** `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-medium`, `font-semibold`, `hover:underline`, `mb-2`, `rounded-lg`, `space-y-6`, `whitespace-pre-line`

@@ -4,19 +4,24 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\CategoryBuilderView.tsx
 skeleton_hash: d0d925c567f6b49d
-generated_at: 2026-05-23T22:38:28Z
+entity_hashes:
+  func:CategoryBuilderView: c538d4ad7085f51d
+  func:handleSave: f8b5a865424c16c7
+  overview: 34385cca754b2c32
+  style_tokens: 745d0461670ee6bd
+generated_at: 2026-05-28T22:39:30Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin admin panelinde kategori oluşturma ve düzenleme işlemlerini yöneten React görünüm bileşenidir. Gelen kategoriId parametresiyle hem yeni kategori ekleme hem de mevcut bir kategoriyi düzenleme senaryolarını destekler, kategori işlemleri için gerekli temel işlevleri barındırır.
+Bu modül, VentHub HVAC projesinin admin panelinde kategori yapılandırma işlemlerini yöneten bir React görünüm bileşenidir. Yeni bir kategori oluşturma veya mevcut bir kategoriyi düzenleme senaryolarını tek bir bileşen üzerinden destekler ve temel veri kaydetme işlevini içerir.
 
 ## Fonksiyon Grupları
 ### Ana Görünüm Bileşeni
-Modülün temel React bileşeni olarak admin arayüzünde kategori oluşturma/düzenleme ekranını yükler, gelen kategoriId prop'u ile işlem akışını başlatır.
+Modülün temel React arayüzünü oluşturur ve kullanıcıya kategori bilgilerini gireceği formu sunar. Aldığı `categoryId` parametresiyle mevcut bir kategoriyi düzenleme modunda çalışıp çalışmayacağını belirler.
 - CategoryBuilderView
 
-### Kayıt İşleyici Fonksiyonu
-Oluşturulan veya düzenlenen kategori bilgilerinin kalıcı olarak kaydedilmesi sürecini asenkron olarak yürütür, sunucu ile iletişimi yönetir.
+### Kayıt İşleyici
+Kullanıcı tarafından forma girilen veya düzenlenen kategori bilgilerinin, arka plan servislerine asenkron olarak gönderilmesini ve kaydedilmesini yönetir. İşlem başarısız olursa kullanıcıya geri bildirim sağlama sorumluluğu bu fonksiyondadır.
 - handleSave
 
 ---
@@ -31,7 +36,7 @@ Bu admin paneline ait kategori yapılandırma görünümü modülünün doğru �
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryBuilderView
 **Ne yapar**: VentHub HVAC projesinin admin panelinde kategori oluşturma ve düzenleme işlemlerini sunan React bileşenidir. Sıfırdan yeni kategori ekleme veya var olan bir kategoriyi güncelleme işlemleri için gerekli kullanıcı arayüzünü ekrana render eder.
@@ -57,37 +62,37 @@ Bu admin paneline ait kategori yapılandırma görünümü modülünün doğru �
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\CategoryBuilderView.tsx::CategoryBuilderView
-- **params**: [categoryId] — Düzenlenecek kategorinin benzersiz veritabanı kimliği
-- **ic_degiskenler**: 
-  - `router` — Next.js yönlendirme hook'u ile sayfa gezinmesi işlemlerini yöneten nesne
-  - `category` — DbCategory tipinde yüklenen kategori verisini tutan state, başlangıç değeri null
-  - `setCategory` — category state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `blocks` — AuthorityBlock tipinde kategori içerik düzenleme bloklarını tutan state, başlangıç değeri null
-  - `setBlocks` — blocks state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `loading` — Kategori verilerinin ilk yükleme durumunu tutan boolean state
-  - `setLoading` — loading state değerini güncellemek için kullanılan state setter fonksiyonu
-  - `saving` — Kategori değişikliklerinin kaydedilme durumunu tutan boolean state
-  - `setSaving` — saving state değerini güncellemek için kullanılan state setter fonksiyonu
-  - `previewMode` — Önizleme panelinin görünüm modunu (desktop/mobile) tutan string state, varsayılan 'desktop'
-  - `setPreviewMode` — previewMode state değerini güncellemek için kullanılan state setter fonksiyonu
-  - `showPreview` — Önizleme panelinin görünürlüğünü kontrol eden boolean state, varsayılan true
-  - `setShowPreview` — showPreview state değerini güncellemek için kullanılan state setter fonksiyonu
-  - `load` — Kategori verilerini Supabase'den çeken, eski verileri yeni blok yapısına dönüştüren useCallback ile sarmalanmış async fonksiyon
-  - `supabase` — Veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `toast` — Kullanıcıya bildirim göstermek için kullanılan react-hot-toast kütüphane fonksiyonu
-- **Dönüş**: Kategori düzenleme arayüzünü oluşturan React JSX elementi
+### [N1_NASIL] AST Pointer: CategoryBuilderView.tsx::CategoryBuilderView
+- **params**: `{ categoryId }` — Kategorinin benzersiz tanımlayıcısı, Supabase sorgusu ve child fonksiyonlarda kapanım olarak kullanılır
+- **ic_degiskenler**:
+  - `router` — Next.js useRouter hook'undan dönen yönlendirici nesne, `router.back()` ile geri gitmek için kullanılır
+  - `category` — `DbCategory | null` tipinde state, yüklenen kategori verisini tutar; header'da `category?.name` olarak görüntülenir
+  - `blocks` — `AuthorityBlock[] | null` tipinde state, yetki içerik bloklarını tutar; `AuthorityBuilder`'a `value`, `AuthorityRenderer`'a `content`, `handleSave`'e güncelleme için beslenir
+  - `loading` — `boolean` tipinde state, yükleme durumunu kontrol eder; `true` iken tam sayfa spinner gösterilir
+  - `saving` — `boolean` tipinde state, kaydetme durumunu kontrol eder; `true` iken kaydetme butonu `disabled` ve spinner gösterilir
+  - `previewMode` — `'desktop' | 'mobile'` tipinde state, önizleme panelinin cihaz görünüm modunu belirler; CSS class'ları buna göre değişir
+  - `showPreview` — `boolean` tipinde state, sağ sidebar önizleme panelinin görünürlüğünü kontrol eder
+  - `load` — `useCallback` ile sarılı async fonksiyon referansı, kategori verilerini Supabase'den çeker ve legacy migrasyonunu yapar; `useEffect` içinde çağrılır
+  - `handleSave` — async fonksiyon referansı, `blocks` state'ini Supabase `categories` tablosuna `authority_content` olarak kaydeder; kaydet butonuna `onClick` bağlanır
+- **Dönüş**: `JSX.Element` — Loading durumunda spinner JSX'i, normal durumda tam sayfa editor layout JSX'i (header, main editor area, preview sidebar)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\CategoryBuilderView.tsx::handleSave
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `setSaving` — Kaydetme işleminin yük durumunu güncellemek için kullanılan state setter fonksiyonu
-  - `supabase` — Veritabanı güncelleme işlemleri için kullanılan Supabase istemcisi
-  - `blocks` — Kaydedilecek AuthorityBlock tipinde içerik blokları dizisi
-  - `categoryId` — Güncellenecek kategorinin veritabanı kimliği
-  - `toast` — Kullanıcıya kaydetme başarısı veya hatası bildirimi gösteren react-hot-toast fonksiyonu
-  - `console.error` — Kaydetme sırasında oluşan hataları konsola loglayan fonksiyon
-- **Dönüş**: yok (yalnızca yan etki: Supabase'de kategori verisini günceller, kullanıcıya bildirim gösterir)
+### [N2_NASIL] AST Pointer: CategoryBuilderView.tsx::load
+- **params**: `(parametre yok)` — Closure yoluyla `categoryId`, `setCategory`, `setBlocks`, `setLoading` erişir
+- **ic_degiskenler**:
+  - `data` — Supabase `select` sorgusundan dönen ham kategori verisi, tüm kategori alanlarını içerir (id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content)
+  - `error` — Supabase sorgusundan dönen hata nesnesi; truthy ise `throw` ile yakalanır
+  - `cat` — `data`'nın `DbCategory` tipine cast edilmiş hali, `authority_content` alanından bloklar okunur
+  - `initialBlocks` — `AuthorityBlock[]` tipinde mutable değişken, `cat.authority_content`'ten okunan blokları tutar; `null` ise boş dizi fallback'i alınır; legacy migrasyonunda yeniden atanabilir
+  - `legacyBlocks` — `AuthorityBlock[]` tipinde geçici dizi, eski statik verilerden (`description`, `metadata.metric1/metric2`) oluşturulan bloklar tutulur
+  - `meta` — `cat.metadata`'nın `CategoryMetadata | null` tipine cast edilmiş hali, `meta.metric1` ve `meta.metric2` erişimleri ile eski metrik verilerine ulaşılan nesne
+  - `rows` — `SpecsBlock['content']['rows']` tipinde dizi, legacy specs bloğu için `{ label, value }` satırlar tutulur; `meta.metric1?.label` ve `meta.metric2?.label` kontrol edilerek doldurulur
+- **Dönüş**: `yok` — Yan etkiler: `setLoading(true)` ile başlar, `setCategory(cat)` ile kategoriyi set eder, `setBlocks(initialBlocks)` ile blokları set eder, legacy dönüşüm varsa `toast.success('Eski veriler bloklara dönüştürüldü. Kaydetmeyi unutmayın.')` gösterir, hata durumunda `console.error('Builder load error:', e)` ve `toast.error('Veriler yüklenemedi.')` çağırır, `finally` bloğunda `setLoading(false)` yapar
+
+### [N3_NASIL] AST Pointer: CategoryBuilderView.tsx::handleSave
+- **params**: `(parametre yok)` — Closure yoluyla `blocks`, `categoryId`, `setSaving` erişir
+- **ic_degiskenler**:
+  - `error` — Supabase `update` sorgusundan dönen hata nesnesi; truthy ise `throw` ile yakalanır
+- **Dönüş**: `yok` — Yan etkiler: `setSaving(true)` ile başlar, `supabase.from('categories').update({ authority_content: blocks as DbJson }).eq('id', categoryId)` çağrısı ile veritabanını günceller, başarı durumunda `toast.success('Değişiklikler sisteme mühürlendi.')` gösterir, hata durumunda `console.error('Save error:', e)` ve `toast.error('Kaydetme hatası!')` çağırır, `finally` bloğunda `setSaving(false)` yapar
 
 ---
 
@@ -101,3 +106,19 @@ Bu admin paneline ait kategori yapılandırma görünümü modülünün doğru �
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryBuilderView
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-xl`, `tracking-hvac-loose`, `tracking-hvac-relaxed`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-cyan-500`, `bg-emerald-500`, `bg-emerald-500/10`, `bg-slate-950`, `bg-surface-darkest`, `bg-surface-deep`, `bg-white`, `bg-white/10`, `bg-white/2`, `bg-white/5`, `border-4`, `border-8`, `border-b`, `border-cyan-400/20`
+- **Layout:** `custom-scrollbar`, `custom-scrollbar-light`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `h-1.5`, `h-12`, `h-14`, `h-16`, `h-568px`, `h-full`
+- **Varyant/Responsive:** `:`, `active:`, `disabled:`, `group-hover:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${previewMode`, `${showPreview`, `:`, `===`, `active:scale-95`, `animate-in`, `animate-pulse`, `animate-spin`, `border`, `desktop`, `disabled:opacity-50`, `duration-500`, `font-black`, `font-bold`, `font-sans`

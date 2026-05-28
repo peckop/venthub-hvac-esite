@@ -3,17 +3,26 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\AboutPage.tsx
-skeleton_hash: c4dbc4a4b59c355f
-generated_at: 2026-05-23T22:35:07Z
+skeleton_hash: 4726f670bf91f4bf
+entity_hashes:
+  func:AboutPage: 7a07cf459964f7ab
+  func:t: 470aecfc62464333
+  overview: 508336c7594890ab
+  style_tokens: 6526e41f4914ea4c
+generated_at: 2026-05-28T22:39:07Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin kullanıcı arayüzündeki Hakkında sayfasını oluşturan React tabanlı bir görünüm modülüdür. Uygulama içindeki bu statik sayfa, ziyaretçilere proje, ekip veya hizmetlerle ilgili bilgileri sunmak üzere tasarlanmıştır ve basit, tek bileşenli bir yapıya sahiptir.
+Bu modül, VentHub HVAC projesinin Hakkında sayfasını oluşturan bir React görünümüdür. Sayfa, proje veya ekip hakkında bilgi vermek için tasarlanmış, dil destekli tek bileşenli bir arayüz sunar. Modül, sayfa yapısını ve çok dilli metinleri yönetmek için gerekli temel işlevleri içerir.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Modülün tüm sorumluluğunu üstlenen bu grup, Hakkında sayfasının React tabanlı işleyişini ve arayüz yapısını tek bir bileşen üzerinden yönetir.
+Modülün tüm arayüz ve render sorumluluğunu üstlenen, sayfanın ana yapısını ve düzenini tanımlayan React bileşeni.
 - AboutPage
+
+### Dil Destek Fonksiyonu
+Sayfa içindeki metinleri, belirtilen dile göre çevirmek ve yerelleştirme sağlamak için kullanılan bir yardımcı fonksiyon.
+- t
 
 ---
 
@@ -27,14 +36,34 @@ VentHub HVAC projesinin istemci tarafı uygulamasında yer alan, hakkında sayfa
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AboutPage
-**Ne yapar**: Venthub HVAC projesinin kullanıcı arayüzündeki hakkında sayfasını oluşturan ana React bileşenidir, proje hakkında genel bilgileri son kullanıcılara sunmak üzere geliştirilmiştir. Uygulamanın statik içerikli sayfalarından biri olarak, rota sistemi üzerinden erişildiğinde kullanıcıya gösterilir.
-**Nasıl yapar**: Projenin src/views dizininde yer alan AboutPage.tsx dosyası içinde tanımlanır, projenin rota yapısında ilgili rotaya istek geldiğinde tetiklenir ve içerdiği tüm arayüz öğelerini tarayıcıda sırayla render eder. Sadece kendi bileşen alanı içinde çalışarak diğer uygulama bileşenleriyle uyumlu çalışacak şekilde yapılandırılmıştır.
+**Ne yapar**: Uygulamanın "Hakkında" sayfasını oluşturup tarayıcıda gösteren bir React fonksiyonel bileşenidir. Kullanıcıya projenin veya uygulamanın genel bilgilerini sunar.
+
+**Nasıl yapar**: Fonksiyon, React bileşeni olarak tanımlanmıştır ve props olarak `lang` parametresini alır. `lang` parametresi, sayfanın hangi dilde görüntüleneceğini belirler; bu parametre verilmezse varsayılan olarak `'tr'` (Türkçe) kullanılır. Bileşen, muhtemelen ilgili dil seçeneğine göre sayfa içeriğini render eder, ancak iç yapısı verilmemiştir.
+
 **Parametreler**:
-- Herhangi bir giriş parametresi almaz
-**Dönüş**: React.FC tipinde, DOM'a eklenmek üzere geçerli bir React bileşeni döndürür. Bu döndürülen bileşen, hakkında sayfasının tüm kullanıcı arayüzü öğelerini ve içeriklerini barındırır.
+- `lang`: string — Sayfanın görüntüleneceği dil kodunu belirtir. Örneğin `'tr'` Türkçe, `'en'` İngilizce içindir. Opsiyonel bir parametredir ve verilmezse `'tr'` değerini alır.
+
+**Dönüş**: `React.FC<AboutPageProps>` tipinde bir React bileşeni döndürür. `AboutPageProps` tipi, bu fonksiyonun kabul ettiği prop'ların yapısını tanımlayan bir arayüzdür, ancak bu arayüzün detayları verilmemiştir.
+
+### t
+**Ne yapar**: Uygulama içinde kullanılan bir çeviri (i18n) fonksiyonudur. Verilen bir metin anahtarına karşılık gelen dil çevirisini sözlük nesnesinden bulup döndürür.
+
+**Nasıl yapar**: Fonksiyon, `key` parametresini nokta (`.`) karakterine göre bir diziye böler. Bu dizi, iç içe geçmiş bir sözlük yapısında (`dict`) arama yapmak için kullanılır. Döngüyle her bir anahtar parçasını kontrol ederek `current` değişkenini günceller. Arama sırasında herhangi bir seviyede anahtar bulunamazsa, orijinal `key`字符串i döndürür. Eğer tüm parçalar başarıyla eşleşirse ve sonuç bir `string` ise bu çeviriyi, değilse yine orijinal `key`'i döndürür.
+
+**Parametreler**:
+- `key`: string — Çevirisi istenen metnin anahtarı. Nokta ile ayrılmış iç içe yapıları temsil edebilir (örneğin `'menu.home'`). Bu anahtar, `dict` nesnesinde aranacak yolu belirtir.
+
+**Dönüş**: `string` tipinde bir değer döndürür. Bulunan çeviri metni veya herhangi bir eşleşme olmaması durumunda girdiğimiz orijinal `key`字符串i geri verir.
+
+---
+
+## INTERFACES
+
+### AboutPageProps
+- `lang?: string`
 
 ---
 
@@ -110,8 +139,25 @@ VentHub HVAC projesinin istemci tarafı uygulamasında yer alan, hakkında sayfa
 
   file: src\views\AboutPage.tsx
   function: src\views\AboutPage.tsx::AboutPage
+  function: src\views\AboutPage.tsx::t
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AboutPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-relaxed`, `tracking-hvac-wide`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500`, `bg-cyan-500/10`, `bg-gradient-to-b`, `bg-slate-200`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `bg-white/5`, `border-4`, `border-b`, `border-cyan-500/20`, `border-slate-100`, `border-slate-200`, `border-white`, `border-white/10`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `flex-wrap`, `from-transparent`, `gap-12`, `gap-16`, `gap-24`, `gap-3`, `gap-6`, `gap-8`, `grid`, `grid-cols-2`, `h-12`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `-space-x-4`, `animate-pulse`, `aspect-square`, `border`, `brightness-0`, `brightness-50`, `duration-1000`, `duration-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `grayscale`, `group`

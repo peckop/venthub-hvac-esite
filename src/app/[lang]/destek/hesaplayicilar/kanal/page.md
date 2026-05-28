@@ -2,57 +2,84 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\destek\hesaplayicilar\kanal\page.tsx
-skeleton_hash: b084130b5500161f
-generated_at: 2026-05-23T21:49:14Z
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\kanal\page.tsx
+skeleton_hash: 239399915534bd17
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: b10dad1d55a83f15
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:34:48Z
 ---
 
 ## Genel Bakış
-Bu modül, kanal hesaplayıcı sayfasının giriş noktasıdır ve kullanıcı arayüzünün render edilmesinden sorumludur. Sayfa bileşenini oluşturan tek bir fonksiyon içerir.
+Bu modül, kanal hesaplayıcı sayfasının dil destekli ana giriş noktasıdır. Tek bir React bileşeni (`Page`) aracılığıyla kullanıcıya kanal hesaplama arayüzünü sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Render Grubu
-Sayfanın tüm kullanıcı arayüzünü oluşturup bir React bileşeni olarak döndürür.
+### Sayfa Bileşeni
+Sayfanın tüm kullanıcı arayüzünü ve hesaplama formunu oluşturarak bir React bileşeni olarak sunar.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için temel aksiyomlar aşağıdadır. Fonksiyon gövdesi detaylı biçimde sunulmadığı için, mevcut bilgiye dayalı minimum varsayımlar belirlenmiştir.
+
+**[Aksiyom 1]**: Eğer `Page()` bileşeni geçerli bir React JSX yapısı (ReactElement) döndürmezse, React render hatası oluşur ve sayfa görüntülenemez.
+
+**[Aksiyom 2]**: Eğer bu bileşen Next.js App Router yapısı içinde (`[lang]` segmentli bir yolda) kullanılmak üzere tanımlanmışsa ve bileşen içinden dil parametresi (`params.lang`) erişimi gerekiyorsa, ancak fonksiyon imzasında bu parametre tanımlanmamışsa, dil parametresine erişilemez ve sayfa doğru dilden içerik gösteremez.
+
+**[Aksiyom 3]**: Eğer `Page()` fonksiyonu side-effect (veri çekme, state yönetimi) gerektiren bir sayfa ise, ancak fonksiyon imzasında `async` tanımlanmamışsa, sunucu taraflı veri çekme (server-side data fetching) yapılamaz.
+
+> **Not**: Fonksiyon gövdesi tam olarak sunulmadığı için, bileşenin hangi alt bileşenleri render ettiği, hangi hesaplama mantığını içerdiği ve hangi state'leri yönettiği belirsizdir. Bu aksiyomlar yalnızca mevcut fonksiyon imzası ve modül yapısına dayalı minimum varsayımlardır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Kanal hesaplamaları için ana sayfa bileşenini döndürür. Kullanıcının kanal ile ilgili hesaplama işlemlerini gerçekleştirebileceği arayüzü sunar.
+**Ne yapar**: Bu fonksiyon, bir Next.js sayfa bileşenidir ve tarayıcıda render edilecek olan sayfanın kök bileşenini döndürür. Kanal hesaplayıcı sayfasının giriş noktasını oluşturur.
 
-**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanmıştır. Sayfa içindeki tüm alt bileşenleri, hesaplama mantığını ve kullanıcı etkileşimlerini organize ederek bir JSX yapısı döndürür.
+**Nasıl yapar**: Fonksiyon herhangi bir mantıksal işlem yapmaz, doğrudan `PageComponent` bileşenini döndürür. Bu yapı, sayfa bileşenini sarmalayan bir wrapper (sarmalayıcı) görevi görür. Gerçek sayfa içeriği ve mantığı `PageComponent` içinde yer alır.
 
 **Parametreler**:
-- Herhangi bir parametre almaz.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `<PageComponent />` — Sayfanın tamamını temsil eden React bileşenini döndürür. Bu bileşen, kanal hesaplamalarına yönelik gerekli tüm form, grafik ve sonuç alanlarını içerir.
+**Dönüş**: `JSX.Element` — `PageComponent` bileşeninin render ettiği JSX yapısını döndürür.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\destek\hesaplayicilar\kanal\page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (PageComponent)
+### [N1_NASIL] AST Pointer: src/app/[lang]/destek/hesaplayicilar/kanal/page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde hiç değişken tanımlanmamış)
+- **Dönüş**: `<PageComponent />` JSX elemanı — import edilen `DuctCalcPage` view'ını render eder; sayfa içeriği tamamen `PageComponent` bileşenine aktarılır
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\destek\hesaplayicilar\kanal\page.tsx
-  function: src\app\destek\hesaplayicilar\kanal\page.tsx::Page
+  file: src\app\[lang]\destek\hesaplayicilar\kanal\page.tsx
+  function: src\app\[lang]\destek\hesaplayicilar\kanal\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

@@ -4,7 +4,23 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\OrbitalProductsShowcase.tsx
 skeleton_hash: 641ea3cecbac38f8
-generated_at: 2026-05-23T22:27:05Z
+entity_hashes:
+  func:CarouselItems: 8743b05fe58c4b61
+  func:MotionTransitionFix: 1a110cb52e216641
+  func:OrbitalCard: 5f8b11d8a7df6582
+  func:OrbitalProductsShowcase: bd6af57cea7cdfce
+  func:PlaceholderWireframe: 898e3b157cc5ab58
+  func:Stage: 2be6dd08d71373b2
+  func:SuspendedCardMaterial: 54a137dad175681b
+  func:getRadius: b18a5bb0ae26a40e
+  func:handlePointerDownFull: c1d2f3b5b3e63706
+  func:handlePointerMove: aa98993324c3949d
+  func:handlePointerOut: 16e97883514593a3
+  func:handlePointerOver: b0b11be743d1be3d
+  func:handlePointerUp: 47dcb3f345fcf0ef
+  overview: fb40ef446d83bcbd
+  style_tokens: 41b9c7751fc87745
+generated_at: 2026-05-28T22:36:54Z
 ---
 
 ## Genel Bakış
@@ -47,7 +63,7 @@ Bu modül, 3B uzayda sıralanan ürün kartlarıyla etkileşim kurulmasını sa�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Stage
 **Ne yapar**: Orbital ürün karuselinin hemen yüklenen sahne zemini ve özel efektlerini oluşturan React bileşenidir. 3B sahnenin temel altyapısını oluşturarak tüm alt içeriklerin üzerinde çalışmasını sağlar.
@@ -151,29 +167,6 @@ Bu modül, 3B uzayda sıralanan ürün kartlarıyla etkileşim kurulmasını sa�
 - name: onFrontCardChange, type: (itemId: string) => void | opsiyonel — En ön plandaki ürün değiştiğinde dışarıya bildirmek için kullanılan geri çağırım
 *Girilen imza uyarınca kalan tüm özellikler `OrbitalProductsShowcaseProps` türü içinde tanımlıdır*
 **Dönüş**: `React.FC<OrbitalProductsShowcaseProps>` türünde, tüm orbital ürün karuselini kapsayan ana React bileşeni döndürür.
-
----
-
-
-### handlePointerDownFull
-**Ne yapar**: Orbital ürün vitrini bileşeninde kullanıcının ekran üzerinde pointer (fare, dokunmatik, kalem) ile basma işlemini başlattığı anda tetiklenir, ürün listesini kaydırma hareketinin temel başlangıç verilerini kaydederek kaydırma sürecini aktif hale getirir. Sadece bu başlangıç olayı ile tüm ekran boyutunda pointer hareketini takip edebilmek için gerekli altyapıyı hazırlar.
-**Nasıl yapar**: İlk olarak olayın varsayılan tarayıcı davranışını engelleyerek yanlışlıkla sayfa kaydırması gibi istenmeyen etkileşimleri önler. Pointer olayının başlangıçtaki X ve Y koordinatlarını, zaman damgasını bileşenin iç durumuna kaydeder, aktif kaydırma bayrağını true olarak ayarlar ve ilgili vitrin DOM elemanı üzerinde pointer capture alarak pointer işaretçisinin vitrin alanı dışına çıksa bile hareketinin takip edilmesini sağlar.
-**Parametreler**:
-- name: e, type: React.PointerEvent — Kullanıcının pointer ile başlattığı etkileşimin tüm verilerini (konum, işaretçi türü, tıklama sayısı vb.) barındıran React uyumlu olay nesnesi
-**Dönüş**: void, herhangi bir değer döndürmez, yalnızca bileşenin iç durumunu ve olay akışını yönetir.
-
-### handlePointerMove
-**Ne yapar**: Kullanıcı basılı tuttuğu pointer'ı hareket ettirdikçe sürekli tetiklenir, başlangıç noktasına göre anlık konum farkını hesaplayarak ürün vitrininin yatay kaydırma miktarını dinamik olarak günceller. Aynı zamanda pointer serbest bırakıldıktan sonra uygulanacak atalet hareketi için gerekli hız ve mesafe verilerini toplar.
-**Nasıl yapar**: Önce aktif kaydırma bayrağını kontrol eder, eğer kullanıcı kaydırma işlemini başlatmamışsa hiçbir işlem yapmaz. Kayıtlı başlangıç koordinatları ile olaydaki anlık pointer koordinatları arasındaki farkı hesaplar, bu farkı kullanarak vitrinin CSS transform değerini güncellerek ürünlerin kullanıcı hareketiyle birlikte kaymasını sağlar. Anlık hareket hızını her adımda kaydederek atalet animasyonu için giriş verilerini toplar.
-**Parametreler**:
-- name: e, type: React.PointerEvent — Hareket anındaki pointer'ın güncel konumunu ve diğer etkileşim verilerini içeren React uyumlu olay nesnesi
-**Dönüş**: void, herhangi bir değer döndürmez, yalnızca kaydırma konumunu ve takip verilerini günceller.
-
-### handlePointerUp
-**Ne yapar**: Kullanıcının pointer'ı serbest bıraktığı anda tetiklenir, aktif kaydırma işlemini sonlandırır, toplanan hız verilerine göre doğal atalet kaydırma animasyonunu başlatır ve tüm kaynakları serbest bırakır. Kısa süreli basma işlemlerini tıklama olarak algılayarak ilgili ürünün seçim işlemini tetikleme kontrolünü de yapar.
-**Nasıl yapar**: Önce aktif kaydırma bayrağını false olarak ayarlar, vitrin DOM elemanı üzerindeki pointer capture iznini kaldırır. Kaydırma sırasında toplanan anlık hız değerini kullanarak, pointer serbest bırakıldıktan sonra ürün vitrininin yavaşlayarak durmasını sağlayan atalet animasyonunu tetikler. Eğer toplam kaydırma mesafesi eşik değerin altında kalırsa, işlemi tıklama olarak algılar ve ilgili ürünün detaylarını açmak veya ürün seçmek için gerekli adımları başlatır.
-**Parametreler**: Herhangi bir giriş parametresi almaz.
-**Dönüş**: void, herhangi bir değer döndürmez, yalnızca kaydırma sürecini sonlandırır ve sonrasındaki animasyon veya seçim etkileşimlerini yönetir.
 
 ---
 
@@ -335,28 +328,25 @@ Bu modül, 3B uzayda sıralanan ürün kartlarıyla etkileşim kurulmasını sa�
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki Stage() fonksiyonu sadece getRadius fonksiyonunu, ilgili nesnenin yarıçap değerini almak amacıyla çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan veride bu modülü kullanan herhangi bir dış modül, dosya veya fonksiyon bilgisi paylaşılmamıştır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  Stage() → getRadius()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    Stage["Stage()"] --> getRadius["getRadius()"]
+graph TD
+    OrbitalProductsShowcase_tsx__CarouselItems["CarouselItems"]
+    OrbitalProductsShowcase_tsx__MotionTransitionFix["MotionTransitionFix"]
+    OrbitalProductsShowcase_tsx__OrbitalCard["OrbitalCard"]
+    OrbitalProductsShowcase_tsx__OrbitalProductsShowcase["OrbitalProductsShowcase"]
+    OrbitalProductsShowcase_tsx__PlaceholderWireframe["PlaceholderWireframe"]
+    OrbitalProductsShowcase_tsx__Stage["Stage"]
+    OrbitalProductsShowcase_tsx__SuspendedCardMaterial["SuspendedCardMaterial"]
+    OrbitalProductsShowcase_tsx__getRadius["getRadius"]
+    OrbitalProductsShowcase_tsx__handlePointerDownFull["handlePointerDownFull"]
+    OrbitalProductsShowcase_tsx__handlePointerMove["handlePointerMove"]
+    OrbitalProductsShowcase_tsx__handlePointerOut["handlePointerOut"]
+    OrbitalProductsShowcase_tsx__handlePointerOver["handlePointerOver"]
+    OrbitalProductsShowcase_tsx__handlePointerUp["handlePointerUp"]
+    OrbitalProductsShowcase_tsx__Stage --> OrbitalProductsShowcase_tsx__getRadius
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -392,16 +382,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[72px]`
-- **width:** `w-[72px]`
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-cyan-500/20`, `bg-cyan-950/30`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-slate-900/70`, `bg-slate-900/80`, `border-2`, `border-cyan-400/40`, `border-cyan-500/50`, `border-cyan-500/60`, `border-slate-700/50`, `from-surface-darker`, `md:text-sm`, `text-cyan-300`, `text-slate-200`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `from-surface-darker`, `gap-24`, `gap-3`, `h-16`, `h-8`, `h-9`, `items-center`, `justify-center`, `left-0`, `relative`, `right-0`
-- **Responsive:** `md:`, `sm:` prefix kullanımları
+- **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `from-surface-darker`, `gap-24`, `gap-3`, `h-16`, `h-18`, `h-8`, `h-9`, `items-center`, `justify-center`, `left-0`, `relative`
+- **Varyant/Responsive:** `active:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `active:cursor-grabbing`, `animate-ping`, `animate-pulse`, `blur-md`, `border`, `cursor-grab`, `font-medium`, `font-semibold`, `inset-0`, `inset-y-0`, `pointer-events-none`, `px-3`, `px-4`, `py-1.5`, `rounded-full`

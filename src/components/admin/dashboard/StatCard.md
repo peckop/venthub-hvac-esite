@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\StatCard.tsx
 skeleton_hash: 5d4b7f17de661145
-generated_at: 2026-05-23T21:52:04Z
+entity_hashes:
+  func:StatCard: 42faa1e1d38b732c
+  overview: d5fe2f564e9e4393
+  style_tokens: 3b396ad8fb25d2f9
+generated_at: 2026-05-28T22:35:31Z
 ---
 
 ## Genel Bakış
@@ -26,26 +30,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
----
-
-# FONKSİYON DETAYLARI
-
-## Fonksiyon Grubu 1
-
-### StatCard
-**Ne yapar**: İstatistik panelinde kullanılan, tek bir metriği (başlık, değer, alt başlık) görselleştiren bir React kart bileşenidir. Yüklenme durumunda kullanıcıya geri bildirim verir ve değerleri isteğe bağlı olarak para birimi formatında gösterebilir.
-
-**Nasıl yapar**: Aldığı `StatCardProps` arayüzüne uygun parametreleri destruct ederek işler. `loading` parametresi true ise yer tutucu (skeleton/spinner) gösterir, değilse gerçek veriyi render eder. `isCurrency` parametresi aktifse `value`’yu yerel para birimi formatına çevirip görüntüler. `lan` parametresi ile dil desteği sağlar.
-
-**Parametreler**:
-- `title`: string – Kartın üst bölümünde gösterilecek ana başlık.
-- `subtitle`: string – Başlığın hemen altında yer alan açıklama metni.
-- `value`: number – Görüntülenecek istatistik değeri.
-- `loading`: boolean – Veri henüz hazır değilse true girilir; bileşen yüklenme durumuna geçer.
-- `isCurrency`: boolean – true ise değer para birimi olarak biçimlendirilir.
-- `lan`: string – Kullanıcı arayüz dil kodunu (ör. "tr", "en") belirten parametre.
-
-**Dönüş**: `React.FC<StatCardProps>` – İçinde başlık, alt başlık ve formatlanmış değer barındıran bir React stateless fonksiyonel bileşen döndürür. Loading durumunda ise boş veya animasyonlu bir placeholder döndürür.
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -104,16 +89,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_0_15px_rgba(34,211,238,0.5)]`
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `group-hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]`, `tracking-[0.2em]`, `tracking-[0.3em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `shadow-glow-md`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-400/10`, `bg-gradient-to-br`, `bg-rose-400/10`, `border-white/5`, `from-white/5`, `lg:text-4xl`, `text-3xl`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-white`, `text-xs`, `to-transparent`
-- **Layout:** `-right-12`, `-top-12`, `absolute`, `block`, `bottom-0`, `flex`, `flex-1`, `flex-wrap`, `from-white/5`, `gap-0.5`, `gap-2`, `group-hover:rotate-6`, `group-hover:scale-105`, `group-hover:scale-110`, `group-hover:scale-150`
-- **Responsive:** `lg:` prefix kullanımları
+- **Renkler:** `bg-emerald-400/10`, `bg-gradient-to-br`, `bg-rose-400/10`, `border-white/5`, `from-white/5`, `group-hover:text-slate-400`, `lg:text-4xl`, `text-3xl`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-white`, `text-xs`, `to-transparent`
+- **Layout:** `-right-12`, `-top-12`, `absolute`, `block`, `bottom-0`, `flex`, `flex-1`, `flex-wrap`, `from-white/5`, `gap-0.5`, `gap-2`, `group-hover:shadow-hvac-stat-card-hover`, `h-1`, `h-14`, `h-48`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `lg:` önekleri
+- **Yardımcı Sınıflar:** `${baseClass`, `${currentAccent.accent`, `${currentAccent.iconBg`, `${trend.value`, `0`, `:`, `>=`, `border`, `duration-1000`, `duration-500`, `duration-700`, `font-black`, `group-hover:rotate-6`, `group-hover:scale-105`, `group-hover:scale-110`

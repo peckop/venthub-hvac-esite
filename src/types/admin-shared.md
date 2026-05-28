@@ -4,24 +4,32 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\admin-shared.ts
 skeleton_hash: dc0c5778aaf0e7ba
-generated_at: 2026-05-23T22:32:42Z
+entity_hashes:
+  overview: 050ebb9fda579a9b
+generated_at: 2026-05-28T22:38:30Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin `src/types` dizininde yer alan bu TypeScript modülü, projenin tüm admin paneli bileşenleri arasında paylaşılacak ortak tip tanımlarını barındırmak üzere tasarlanmış merkezi bir paylaşım dosyasıdır. Dosyada henüz herhangi bir içe aktarma, sabit, çalıştırılabilir kod veya tanım bulunmamaktadır, ileride admin paneliyle ilgili tüm ortak veri tiplerinin bu dosyada toplanması planlanmaktadır. Henüz aktif olarak herhangi bir ortam değişkeni, harici API veya veritabanı kaynağı kullanmamakta olup, sadece TypeScript tipi tanımlama amacıyla oluşturulmuştur.
+
+`admin-shared.ts`, VentHub HVAC projesinin admin paneli genelinde kullanılan ortak TypeScript tip tanımlarını merkezi olarak barındıran bir paylaşım dosyasıdır. Dashboard ve tablo bileşenleri arasında tutarlılık sağlamak üzere standartlaştırılmış UI tipleri (örneğin satır yoğunluğu ve sıralama yönü gibi) bu dosyada tanımlanır. Modül yalnızca statik tip bildirimlerinden oluşur; herhangi birruntime mantığı, ortam değişkeni, harici API çağrısı veya veritabanı sorgusu içermez.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu TypeScript modülü yalnızca proje genelinde admin paneli ile paylaşılan ortak tip (type) tanımlarını barındıran bir tür tanım modülüdür, çalıştırılabilir runtime mantığı, fonksiyon veya sabit değer içermez. Projenin hatasız derlenmesi ve tiplerin doğru kullanılabilmesi için aşağıdaki koşulların sağlanması zorunludur.
 
-[Aksiyom 1]: Eğer bu modülün dosya yolu projenin TypeScript derleyicisinin erişebileceği kaynak dosyalar listesinde yer almazsa, bu modüldeki tipleri kullanan tüm bağımlı modüllerde "tanımlı olmayan tip" hatası oluşur, proje hiçbir şekilde derlenemez.
-[Aksiyom 2]: Eğer bu modüldeki tip tanımlarının sözdizimi, projenin kullandığı TypeScript sürümü tarafından desteklenmiyorsa, bu modül ve tüm bağımlı olduğu modüller derleme hatası verir.
-[Aksiyom 3]: Eğer bu modüle projenin içe aktarma (import) yolu yönetim kurallarına uygun olmayan bir konumdan erişilmeye çalışılırsa, tüm içe aktarma işlemleri başarısız olur, proje derlenemez.
+Bu modül için fonksiyon gövdesi, sabit veya çalıştırılabilir kod bulunmadığından, kod tabanlı mimari aksiyom türetilememiştir.
+
+[Aksiyom 1]: Eğer bu dosyada runtime'da değerlendirilen herhangi bir değer (sabit, değişken, fonksiyon) tanımlanırsa, bu yalnızca TypeScript derleme zamanı tip kontrolüne etki eder; üretim (production) ortamında herhangi bir JavaScript çıktısı üretmez.
+
+[Aksiyom 2]: Eğer bu dosya `import` veya `export` içermiyorsa, modül herhangi bir dış bağımlılık oluşturmadan boş bir modül olarak davranır ve başka modüller üzerinde yan etkisi yoktur.
 
 ---
 
+**Not:** Bu dosya (`admin-shared.ts`) mevcut durumda boş bir paylaşımlı tip tanım modülüdür. Çalıştırılabilir mantık, sabit değer veya fonksiyon gövdesi bulunmadığı için, fonksiyon imzası tabanlı detaylı aksiyom üretimi mümkün değildir. İleride bu dosyaya tip tanımları eklendiğinde, tanımların yapısına göre yeniden değerlendirilmelidir.
 
+---
+
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -52,7 +60,10 @@ Common data loading states for views.
 ---
 
 ## AST POINTERS
-İşlenen kaynak dosyada (`C:\Users\alize\venthub-hvac\src\types\admin-shared.ts`) analiz edilecek herhangi bir fonksiyon, sınıf, değişken veya yürütülebilir kod bloğu tanımlanmamıştır. Tüm import, sabit, fonksiyon ve class bildirim bölümleri boştur.
+
+Bu dosyada (`admin-shared.ts`) fonksiyon imzası veya fonksiyon gövdesi bulunmamaktadır. Dosya yalnızca TypeScript type ve interface tanımları içermektedir.
+
+**Analiz sonucu**: Fonksiyon gövdesi içermediği için AST Pointer üretilemez.
 
 ---
 

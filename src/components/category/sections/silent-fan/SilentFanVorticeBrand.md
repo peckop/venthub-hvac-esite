@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanVorticeBrand.tsx
 skeleton_hash: 498d1962230f0b1c
-generated_at: 2026-05-23T22:01:47Z
+entity_hashes:
+  func:SilentFanVorticeBrand: e07a3a521f52112d
+  func:tr: b282b53f03d688a5
+  overview: c14ff90f1c330ae7
+  style_tokens: 40e58eb2e4f109bb
+generated_at: 2026-05-28T22:35:47Z
 ---
 
 ## Genel Bakış
@@ -26,7 +31,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SilentFanVorticeBrand
 **Ne yapar**: Silent Fan Vortice markasıyla ilgili bölümün kullanıcı arayüzünü renderlar.  
@@ -77,29 +82,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-- **SilentFanVorticeBrand()** → `tr` fonksiyonunu çağırır (örnek çeviri veya dönüşüm işlemi için).
-
-### Disaridan Cagrilanlar (Incoming)
-- Bu modülü çağıran dış bir fonksiyon veya dosya bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-- İç içe fonksiyon yok.
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  SilentFanVorticeBrand() → tr()
-
-```mermaid
-graph LR
-    SilentFanVorticeBrand["SilentFanVorticeBrand()"] --> tr["tr()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\category\sections\silent-fan\SilentFanVorticeBrand.tsx
@@ -116,16 +98,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `tracking-[0.2em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`
+- `rounded-hvac-2xl`, `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-blue-600`, `bg-blue-600/20`, `bg-italian-red`, `bg-slate-900`, `bg-vortice-green`, `bg-white`, `bg-white/5`, `border-8`, `border-slate-800`, `border-white/10`, `md:text-5xl`, `text-2xl`, `text-4xl`, `text-blue-400`, `text-blue-500`
 - **Layout:** `-bottom-10`, `-right-10`, `-z-10`, `absolute`, `flex`, `flex-wrap`, `gap-16`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-2`, `h-12`, `h-6`, `h-64`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${i`, `${scrollAnimationClasses.slideLeft(isVisible`, `0`, `:`, `===`, `blur-3xl`, `border`, `font-black`, `font-bold`, `leading-relaxed`, `leading-tight`, `lg:px-8`, `mb-10`, `mb-8`, `mx-auto`

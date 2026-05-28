@@ -3,8 +3,21 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx
-skeleton_hash: ae7570796c6088cb
-generated_at: 2026-05-23T22:09:28Z
+skeleton_hash: d2cbc3fc80ec701c
+entity_hashes:
+  func:AccessoriesIcon: df362ba93a01a32a
+  func:AirCurtainIcon: a991d6630fad3258
+  func:AirPurifierIcon: 6d358290affcacb3
+  func:BrandIcon: abc1dbe6a42bf303
+  func:DehumidifierIcon: 40d30033e6855f3e
+  func:FanIcon: 4fb3ddee9fac4362
+  func:FlexibleDuctIcon: 252d34888f5ec8da
+  func:HeatRecoveryIcon: 821f62398bcddd32
+  func:SpeedControlIcon: dbb6f424f34e3326
+  func:WhatsAppIcon: e7d41d76023d8693
+  overview: dff8b3ed99dcf496
+  style_tokens: 3b0534c287cddb44
+generated_at: 2026-05-28T22:36:16Z
 ---
 
 ## Genel Bakış
@@ -31,15 +44,18 @@ Bu modül, prop tiplerinin ve varsayılan değerlerinin beklendiği şekilde sa�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### FanIcon
-**Ne yapar**: Verilen `className` ve `size` özelliklerine göre bir fan simgesi render eden bir React bileşeni döndürür.  
-**Nasıl yapar**: İçerisinde SVG veya path elemanları bulunan bir ikon tanımı alır, dışardan gelen `className` stilini ve `size` boyutunu uygulayarak ekrana gösterir.  
+**Ne yapar**: HVAC sistemlerindeki fan bileşenini temsil eden SVG ikonunu render eder. Fan sembolünü görsel olarak göstermek için kullanılır.
+
+**Nasıl yapar**: className ve size parametrelerini alarak, bir SVG elementi oluşturur ve fan şeklinde bir ikon çizer. Varsayılan olarak 48x48 piksel boyutunda render edilir.
+
 **Parametreler**:
-- className: string — Ekstra CSS sınıfları için kullanılır, stil özelleştirmeyi sağlar.  
-- size: number — İkonun piksel cinsinden genişlik ve yükseklik değerini belirler, varsayılan 48.  
-**Dönüş**: `React.FC<IconProps>` türünde bir fonksiyonel bileşen; JSX olarak ikonu döndürür.
+- className: string — İkon üzerine uygulanacak CSS sınıfı. Varsayılan değer boş stringdir.
+- size: number — İkonun boyutunu piksel cinsinden belirler. Varsayılan değer 48'dir.
+
+**Dönüş**: React.FC<IconProps> — Render edilmiş SVG ikon bileşeni döndürür.
 
 ### HeatRecoveryIcon
 **Ne yapar**: Isı geri kazanım sistemini simgeleyen bir ikon bileşeni üretir.  
@@ -257,5 +273,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-slate-100`, `text-slate-400`, `text-xs`
-- **Layout:** `flex`, `items-center`, `justify-center`, `p-2`
-- **Responsive:** (yok)
+- **Layout:** `flex`, `h-full`, `items-center`, `justify-center`, `p-2`, `relative`, `w-full`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `${className`, `font-bold`, `object-contain`, `rounded-lg`, `tracking-tighter`, `uppercase`

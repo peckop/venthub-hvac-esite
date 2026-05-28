@@ -4,24 +4,39 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\media.types.ts
 skeleton_hash: 123cc93a1fc43c33
-generated_at: 2026-05-23T22:33:10Z
+entity_hashes:
+  overview: c22dcf353dfe0240
+generated_at: 2026-05-28T22:38:53Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin TypeScript kod yapısında medya varlıklarıyla ilgili tip tanımlarını barındıran, yalnızca tip güvenliği sağlamak amacıyla oluşturulmuş bir tür modülüdür. İçerisinde hiç çalıştırılabilir kod, fonksiyon, dış bağımlılık veya çalışma zamanında kullanılan değişken/sabit bulunmaz, tamamen derleme zamanında tip kontrolü için hizmet verir. Projede medya yükleme, görüntüleme veya medya yönetimi gibi işlevleri gerçekleştiren tüm bileşenler tarafından referans gösterilerek, medya objeleriyle ilgili tip uyumsuzluklarının önüne geçer.
+Bu modül, VentHub HVAC projesinde medya varlıklarıyla ilgili standart TypeScript tip ve arayüz tanımlarını içeren, yalnızca derleme zamanında tip güvenliği sağlamak için kullanılan bir tür modülüdür. Çalışma zamanında herhangi bir kod çalıştırmaz, dış bağımlılık içermez ve medya yönetimi ile ilgili tüm bileşenler tarafından referans alınarak veri bütünlüğü ile tür uyumsuzluklarını önler.
+
+## Modülün Amacı ve Kullanım Ortamı
+Modülün temel amacı, medya nesneleri (örneğin videolar) için merkezi ve tutarlı tip tanımları sunarak projedeki veri yapısını standartlaştırmaktır. Ortam değişkenleri, harici API çağrıları veya veritabanı sorguları içermez; tamamen yerel ve静sel tip tanımlarıyla çalışır. Tip tanımları, medya yükleme, depolama ve görüntüleme süreçlerinde kullanılacak arayüzleri ve yardımcı tipleri kapsar.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu TypeScript tür modülü, VentHub HVAC projesindeki tüm medya varlıklarının standartlaştırılmış, merkezi tür tanımlarını barındırır, sadece proje içindeki TypeScript tabanlı kodlar tarafından kullanılması üzere tasarlanmıştır.
 
-[Aksiyom 1]: Eğer projenin tsconfig.json yapılandırmasında bu modülün dosya yolunun TypeScript derleyicisi tarafından çözülebilir olması sağlanmamışsa, bu modülü import etmeye çalışan tüm kodlarda derleme zamanı hatası oluşur, medya varlıkları için tür kontrolü işlemi hiçbir şekilde gerçekleştirilemez.
-[Aksiyom 2]: Eğer proje içindeki medya ile ilgili iş mantığı geliştiricileri bu modüldeki standart tür tanımlarını kullanmak yerine kendi özel tür tanımlarını oluşturursa, servisler arası medya verisi alışverişi yapılan tüm noktalarda tür uyumsuzlukları ortaya çıkar, çalışma zamanı veri bütünlüğü hataları oluşur.
-[Aksiyom 3]: Eğer TypeScript projesinde sıkı tür kontrolü (strict mode) etkinleştirilmemişse, bu modül ile sağlanan tür güvenliği avantajı tamamen kaybolur, tanımlanan türlere uymayan geçersiz veri atamaları derleyici tarafından yakalanamaz.
+Bu modül yalnızca TypeScript tip tanımları (type/interface) içeren, çalıştırılabilir kod barındırmayan saf bir tür modülüdür. Fonksiyon gövdesi, modül sabiti veya varsayılan değerli imza bulunmadığından, fonksiyon tabanlı mimari varsayım üretilememektedir.
+
+**Bu modül için aksiyom tanımlanamaz.**
 
 ---
 
+**Gerekçe:** Mimari varsayımlar, yalnızca verilen fonksiyon imzaları ve modül sabitlerinden türetilebilir. Bu modül `media.types.ts` olup:
 
+- ✗ Fonksiyon içermiyor
+- ✗ Çalıştırılabilir kod içermiyor  
+- ✗ Modül sabiti içermiyor
+- ✗ Default değere sahip parametre içermiyor
+
+**Not:** Tip tanımlama modülleri, derleme zamanında TypeScript derleyicisi tarafından zorunlu tutulan yapısal kurallar (type-checking) dışında mimicari varsayım gerektirmez. Bu modülün doğru kullanımı, projede reference eden bileşenlerin TypeScript derleyici ayarlarına (strict mode vb.) bağımlıdır.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -82,7 +97,7 @@ type MediaMetadata = VideoMetadata | ThreeDMetadata | TechnicalDrawingMetadata
 
 ## AST POINTERS
 
-Sağlanan kaynak dosya içeriğinde tanımlı herhangi bir fonksiyon, sınıf veya analiz edilecek kod bloğu bulunmadığından AST pointer üretilecek geçerli öğe mevcut değildir.
+Bu dosya (`media.types.ts`) tip tanımı dosyasıdır — **hiçbir fonksiyon gövdesi içermemektedir**. Dosya yalnızca TypeScript type/interface/enum tanımlarından ibarettir. Dolayısıyla AST Pointer üretilecek fonksiyon bulunmamaktadır.
 
 ---
 

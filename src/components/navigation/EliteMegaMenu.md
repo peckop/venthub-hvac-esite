@@ -11,7 +11,7 @@ entity_hashes:
   func:handleLinkClick: 44a1929f40d26342
   overview: 4a63a261d39e78bd
   style_tokens: 950eb84fcf443cff
-generated_at: 2026-05-27T18:20:28Z
+generated_at: 2026-05-28T22:36:16Z
 ---
 
 ## Genel Bakış
@@ -145,9 +145,9 @@ graph TD
     EliteMegaMenu_tsx__MobileMegaMenu["MobileMegaMenu"]
     EliteMegaMenu_tsx__getSubCategories["getSubCategories"]
     EliteMegaMenu_tsx__handleLinkClick["handleLinkClick"]
-    EliteMegaMenu_tsx__MobileMegaMenu --> EliteMegaMenu_tsx__getSubCategories
     EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__handleLinkClick
     EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
+    EliteMegaMenu_tsx__MobileMegaMenu --> EliteMegaMenu_tsx__getSubCategories
 ```
 
 ## NODE ID STANDARD

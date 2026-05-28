@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanHowItWorks.tsx
 skeleton_hash: ea7a36092eb9fbd6
-generated_at: 2026-05-23T22:00:17Z
+entity_hashes:
+  func:SilentFanHowItWorks: 1d9f7bbf01c39f23
+  func:tr: b282b53f03d688a5
+  overview: 5f3bf85694f8ac81
+  style_tokens: b11a600d5d7c65a7
+generated_at: 2026-05-28T22:35:47Z
 ---
 
 ## Genel Bakış
@@ -26,7 +31,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SilentFanHowItWorks
 **Ne yapar**: Silent fan'ın çalışma prensibini açıklayan bir React bileşeni render eder.  
@@ -70,29 +75,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## Çağrı Haritası
-
-### Dışarıya Çağrılar (Outgoing)
-- `SilentFanHowItWorks()` fonksiyonu, çeviri veya metin dönüşüm işlevi olan `tr()` fonksiyonunu çağırır (muhtemelen bir dizi çeviri veya yerelleştirme amaçlı).
-
-### Dışarından Çağrılanlar (Incoming)
-- Bu modülü çağıran dış dosya veya fonksiyon bulunmamaktadır (veri sağlanmadı).
-
-### İç İçe Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  SilentFanHowItWorks() → tr()
-
-```mermaid
-graph LR
-    SilentFanHowItWorks["SilentFanHowItWorks()"] --> tr["tr()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\category\sections\silent-fan\SilentFanHowItWorks.tsx
@@ -115,6 +97,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-500/10`, `bg-gradient-to-r`, `bg-slate-800`, `bg-slate-900`, `border-blue-500/20`, `border-white/5`, `from-blue-500`, `md:text-5xl`, `sm:text-4xl`, `text-3xl`, `text-blue-400`, `text-lg`, `text-slate-400`, `text-sm`, `text-white`
-- **Layout:** `absolute`, `block`, `flex`, `flex-shrink-0`, `from-blue-500`, `gap-12`, `gap-5`, `grid`, `group-hover:bg-blue-500/20`, `group-hover:opacity-30`, `group-hover:text-blue-300`, `h-12`, `h-auto`, `items-center`, `justify-center`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-blue-500/10`, `bg-gradient-to-r`, `bg-slate-800`, `bg-slate-900`, `border-blue-500/20`, `border-white/5`, `from-blue-500`, `group-hover:bg-blue-500/20`, `group-hover:text-blue-300`, `md:text-5xl`, `sm:text-4xl`, `text-3xl`, `text-blue-400`, `text-lg`, `text-slate-400`
+- **Layout:** `absolute`, `block`, `flex`, `flex-shrink-0`, `from-blue-500`, `gap-12`, `gap-5`, `grid`, `h-12`, `h-auto`, `items-center`, `justify-center`, `lg:grid-cols-2`, `max-w-7xl`, `max-w-xl`
+- **Varyant/Responsive:** `group-hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${scrollAnimationClasses.slideRight(isVisible`, `-inset-0.5`, `blur-xl`, `border`, `font-bold`, `group`, `group-hover:opacity-30`, `inset-0`, `leading-relaxed`, `leading-tight`, `lg:px-8`, `mb-10`, `mb-2`, `mb-3`, `mb-6`

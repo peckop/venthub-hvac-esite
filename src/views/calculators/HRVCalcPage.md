@@ -4,42 +4,62 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx
 skeleton_hash: 27a5cddb63942320
-generated_at: 2026-05-23T22:39:27Z
+entity_hashes:
+  func:HRVCalcPage: f6b36b28ed5f44cd
+  func:reset: 16764b441f7bc7b6
+  overview: f88945634c93d3ea
+  style_tokens: 27adff48ed74fee3
+generated_at: 2026-05-28T22:39:51Z
 ---
 
 ## Genel Bakış
-Venthub HVAC projesinde yer alan bu modül, Isı Geri Kazanımlı Havalandırma (HRV) sistemleri için özel hesaplama arayüzünü sunan React tabanlı bir sayfa bileşenidir. Kullanıcıların HRV ile ilgili teknik hesaplamalar yapmasına olanak tanır, hesaplama sürecini yönetmek için temel işlemleri destekler.
+Bu modül, Isı Geri Kazanımlı Havalandırma (HRV) cihazları için hesaplama işlemlerini sunan React tabanlı bir ön yüz sayfa bileşenidir. Kullanıcıların HRV sistemiyle ilgili teknik hesaplamalar yapmasına olanak tanıyan arayüzü ve temel işlevselliği yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-HRV hesaplayıcı sayfasının tüm kullanıcı arayüzünü ve temel çalışma mantığını yönetir, sayfanın doğru şekilde kullanıcıya sunulmasını sağlar.
+HRV hesaplayıcı sayfasının tüm kullanıcı arayüzünü ve temel çalışma mantığını yöneterek, hesaplama sürecini kullanıcıya sunar.
 - HRVCalcPage
 
-### Hesaplama Yönetim Fonksiyonları
-Kullanıcı tarafından girilen değerleri veya aktif hesaplama sürecini ilk varsayılan haline döndürmek için kullanılan yardımcı işlevi barındırır.
+### Hesaplama Sıfırlama İşlevi
+Kullanıcı tarafından girilen değerleri veya hesaplama sürecini varsayılan başlangıç durumuna döndürmek için kullanılan yardımcı işlevi içerir.
 - reset
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, HVAC sistemleri bünyesindeki Isı Geri Kazanım Havalandırma (HRV) cihazları için hesaplama işlemlerini sunan React tabanlı bir ön yüz sayfa bileşenidir, çalışması için projenin React çalışma zamanı, state yönetimi altyapısı ve gerekli iç bağımlılıkların erişilebilir olması zorunludur.
 
-[Aksiyom 1]: Eğer proje genelinde tanımlı React çalışma zamanı modül tarafından erişilebilir değilse, HRVCalcPage bileşeni hiçbir zaman render edilemez ve uygulama çalışma zamanında kritik hata fırlatır.
-[Aksiyom 2]: Eğer reset() fonksiyonunun bağlı olduğu uygulama yerel state yönetimi altyapısı mevcut değilse, hesaplayıcıdaki kullanıcı girdileri ve hesaplanmış sonuçlar sıfırlanamaz, sıfırlama işlevi tam olarak çalışmaz.
-[Aksiyom 3]: Eğer HRV hesaplama mantığını içeren harici hesaplama motoru veya servisi bu modülden erişilebilir durumda değilse, kullanıcı girdileri üzerinden geçerli sistem değerleri üretilemez.
-[Aksiyom 4]: Eğer uygulama içindeki yönlendirme (routing) sistemi tarafından bu sayfaya erişim izni tanımlanmamışsa, hiçbir kullanıcı bu hesaplayıcı sayfasına ulaşamaz.
-[Aksiyom 5]: Eğer modülün kullanması gereken temel UI bileşenleri proje içindeki kaynaklardan yüklenemiyorsa, hesaplayıcı arayüzü kullanıcıya eksik veya tamamen işlevsiz olarak sunulur.
+Bu modül için verilen fonksiyon gövdeleri (implementation bodies) mevcut değildir, bu nedenle fonksiyon gövdesinden çıkarılabilir mimari varsayım bulunamamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+**Not:** Sağlanan girdiler yalnızca fonksiyon imzaları (parametresiz) ve önceki dokümantasyondan ibarettir. Fonksiyon gövdeleri paylaşılmadığı için "Eğer ... yoksa, ... olur" formatında doğrulanabilir bir mimari aksiyom üretilememiştir.
+
+Mevcut bilgilerden çıkarılabilecek **gözlemlenebilir yapısal notlar** (aksiyom değil):
+
+| Gözlem | Değerlendirme |
+|--------|---------------|
+| `HRVCalcPage()` | Parametresiz – bağımsız bir React sayfa bileşeni olduğu varsayılır |
+| `reset()` | Parametresiz – durumu sıfırlama işlevi olduğu varsayılır |
+| Modül sabitleri | Tanımlı değildir |
+| Domain | general (HVAC/HRV domain'inde olduğu dokümantasyonda belirtilmiştir, fakat gövde kodu doğrulanamamıştır) |
+
+---
+
+⚠️ **Mimari hakem değerlendirmesi:** Bu modül için geçerli ve doğrulanabilir aksiyom üretimi için fonksiyon gövdelerinin (implementation code) paylaşılması gerekmektedir. Mevcut durumda yalnızca imza seviyesinde bilgi mevcut olup, модülün içsel davranış kuralları bilinmemektedir.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### HRVCalcPage
-**Ne yapar**: Venthub HVAC projesinin Isı Geri Kazanım Ventilatörü (HRV) hesaplamalarını sunduğu ana sayfa bileşenidir. Kullanıcıların HRV sistemleri için gerekli teknik hesaplamaları yapabileceği, giriş yapabileceği ve sonuçları görüntüleyebileceği tam bir arayüzü son kullanıcıya sunar.
-**Nasıl yapar**: React tabanlı fonksiyonel bir bileşen olarak, sayfa içindeki hesaplama araçlarını, giriş bileşenlerini ve sonuç gösterim modüllerini tek bir sayfa çatısı altında birleştirir. Sayfa içi durum yönetimini ve bileşenler arası veri akışını destekleyen yapıda çalışarak tüm hesaplama iş akışının sorunsuz işletilmesini sağlar.
+**Ne yapar**: HRV (Heat Recovery Ventilation - Isı Geri Kazanımlı Havalandırma) hesaplama sayfasını render eden ana React bileşenidir. Bu bileşen, kullanıcıların HVAC hesaplamaları yapabilmesini sağlayan bir sayfa sunar.
+
+**Nasıl yapar**: Fonksiyonel bir React bileşeni olarak tanımlanmıştır. `React.FC` (Functional Component) tipini döndürür ve sayfanın tüm arayüzünü ve hesaplama mantığını yönetir. Bileşen kendi içinde state yönetimini ve kullanıcı etkileşimlerini gerçekleştirilir.
+
 **Parametreler**:
-- Herhangi bir giriş parametresi almaz, bağımsız bir React sayfa bileşeni olarak çalışır.
-**Dönüş**: React.FC tipindedir, yani sayfanın tüm arayüz yapısını ve işlevselliğini barındıran React bileşenini döndürür. Bu döndürülen bileşen uygulama DOM'ına eklenerek son kullanıcıya görüntülenir.
+- Parametre almamaktadır (propsless bileşen)
+
+**Dönüş**: `React.FC` — Fonksiyonel React bileşeni döndürür.
 
 ### reset
 **Ne yapar**: HRVCalcPage sayfasındaki tüm kullanıcı girişlerini, hesaplanmış sonuçları ve sayfanın geçici özel ayarlarını sıfırlayarak sayfayı ilk yüklendiği varsayılan durumuna geri döndürür. Kullanıcıların yeni bir hesaplama yapmak veya hatalı girişleri temizlemek istediklerinde tüm değerleri tek tıkla sıfırlamasını sağlar.
@@ -52,73 +72,77 @@ Bu modül, HVAC sistemleri bünyesindeki Isı Geri Kazanım Havalandırma (HRV) 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx::getRecoveryTypeOptions
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — i18n çeviri fonksiyonu, form etiketlerini çevirmek için kullanılır
-  - `ThermometerSun` — Lucide ikonu, HRV seçeneği için gösterilir
-  - `Snowflake` — Lucide ikonu, ERV seçeneği için gösterilir
-- **Dönüş**: {value: string, label: string, description: string, icon: JSX.Element}[] tipinde 2 elemanlı seçenek dizisi
+### [N1_NASIL] AST Pointer: src/views/calculators/HRVCalcPage.tsx::recoveryTypeOptions
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: Array<{value: string, label: string, description: string, icon: JSX.Element}> — HRV ve ERV选项larını döndüren dizi; her seçenek value, label (t() ile çeviri), description ve icon (lucide-react bileşeni) içerir
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx::getBuildingTypeOptions
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — i18n çeviri fonksiyonu, form etiketlerini çevirmek için kullanılır
-- **Dönüş**: {value: string, label: string, description: string}[] tipinde 3 elemanlı bina tipi seçenek dizisi
+### [N2_NASIL] AST Pointer: src/views/calculators/HRVCalcPage.tsx::buildingTypeOptions
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: Array<{value: string, label: string, description: string}> — Bina tiplerini (residential, office, commercial) döndüren dizi; description İngilizce sabit metin olarak verilmiş
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx::getClimateZoneOptions
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — i18n çeviri fonksiyonu, form etiketlerini çevirmek için kullanılır
-- **Dönüş**: {value: string, label: string, description: string}[] tipinde 3 elemanlı iklim bölgesi seçenek dizisi
+### [N3_NASIL] AST Pointer: src/views/calculators/HRVCalcPage.tsx::climateZoneOptions
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: Array<{value: string, label: string, description: string}> — İklim bölgelerini (cold, temperate, hot) döndüren dizi; description coğrafi referans bilgisi içerir
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx::updateUrlQuery
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: src/views/calculators/HRVCalcPage.tsx::updateURL
+- **params**: ()
 - **ic_degiskenler**:
-  - `typeof window` — Tarayıcı ortamı kontrolü için kullanılır, sunucu tarafında çalışmayı engeller
-  - `params` — URLSearchParams nesnesi, sorgu parametrelerini toplamak ve işlemek için kullanılır
-  - `recoveryType` — Formdaki ısı geri kazanım sistemi tipi, varsayılan hrv değilse URL'ye eklenir
-  - `buildingType` — Formdaki bina tipi, varsayılan ofis değilse URL'ye eklenir
-  - `climateZone` — Formdaki iklim bölgesi, varsayılan temperate değilse URL'ye eklenir
-  - `area` — Formdaki bina alanı değeri, varsayılan 100 değilse URL'ye eklenir
-  - `occupancy` — Formdaki kişi kapasitesi değeri, varsayılan 10 değilse URL'ye eklenir
-  - `operatingHours` — Formdaki günlük çalışma saati, varsayılan 10 değilse URL'ye eklenir
-  - `sensibleEfficiency` — Formdaki duyarlı verim oranı, varsayılan 75 değilse URL'ye eklenir
-  - `latentEfficiency` — Formdaki gizli verim oranı, varsayılan 65 değilse URL'ye eklenir
-  - `electricityCost` — Formdaki kWh başına elektrik maliyeti, varsayılan 3.5 değilse URL'ye eklenir
-  - `query` — Stringleştirilmiş URL sorgu parametreleri
-  - `router` — Next.js useRouter hook'u ile alınan router nesnesi, URL'yi güncellemek için kullanılır
-  - `pathname` — Next.js usePathname hook'u ile alınan mevcut sayfa yolu, URL güncellemede kullanılır
-- **Dönüş**: Tarayıcı ortamı yoksa erken dönüş, aksi takdirde yan etki olarak URL'yi günceller, dönüş değeri yok
+  - `params` — URLSearchParams instance'ı; state değerlerini query string'e dönüştürmek için kullanılır
+  - `query` — params.toString() sonucu oluşan query string; boşsa veya doluysa pathname ile birleştirilir
+- **Kullanılan dış değişkenler**:
+  - `recoveryType` — mevcut geri kazanım tipi state'i; 'hrv' dışıysa URL'e eklenir
+  - `buildingType` — mevcut bina tipi state'i; 'office' dışıysa URL'e eklenir
+  - `climateZone` — mevcut iklim bölgesi state'i; 'temperate' dışıysa URL'e eklenir
+  - `area` — alan state'i; '100' dışıysa URL'e eklenir
+  - `occupancy` — doluluk state'i; '10' dışıysa URL'e eklenir
+  - `operatingHours` — çalışma saati state'i; '10' dışıysa URL'e eklenir
+  - `sensibleEfficiency` — sensible verimlilik state'i; '75' dışıysa URL'e eklenir
+  - `latentEfficiency` — latent verimlilik state'i; '65' dışıysa URL'e eklenir
+  - `electricityCost` — elektrik maliyeti state'i; '3.5' dışıysa URL'e eklenir
+  - `router` — next/navigation useRouter hook'u; router.replace() ile URL'i günceller
+  - `pathname` — next/navigation usePathname hook'u; mevcut yol bilgisini verir
+- **API Çağrıları**: `router.replace()` — URL'i sessizce günceller (scroll: false)
+- **Dönüş**: void; state değerlerini URL query parametrelerine senkronize eder
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx::computeHrvResults
-- **params**: (parametre yok)
+### [N5_NASIL] AST Pointer: src/views/calculators/HRVCalcPage.tsx::calculateResults
+- **params**: ()
 - **ic_degiskenler**:
-  - `areaVal` — Formdaki string alan değerini sayıya çevirir, hata durumunda 0 atanır
-  - `occVal` — Formdaki string kişi kapasitesini sayıya çevirir, hata durumunda 0 atanır
-  - `hoursVal` — Formdaki string çalışma saati değerini sayıya çevirir, hata durumunda 0 atanır
-  - `sensEff` — Formdaki string duyarlı verim değerini sayıya çevirir, hata durumunda 0 atanır
-  - `latEff` — Formdaki string gizli verim değerini sayıya çevirir, hata durumunda 0 atanır
-  - `elecCost` — Formdaki string elektrik maliyeti değerini sayıya çevirir, hata durumunda 0 atanır
-  - `recoveryType` — Isı geri kazanım sistemi tipi, hesaplama fonksiyonuna aktarılır
-  - `buildingType` — Bina tipi, hesaplama fonksiyonuna aktarılır
-  - `climateZone` — İklim bölgesi, hesaplama fonksiyonuna aktarılır
-  - `calculateHRV` — Ana HRV hesaplama fonksiyonu, işlenmiş parametrelerle çağrılır
-- **Dönüş**: Giriş değerleri geçersizse null, geçerliyse calculateHRV fonksiyonunun dönüş değeri
+  - `areaVal` — parseFloat(area) ile parse edilen alan değeri; NaN ise 0 döner; hesaplama parametresi olarak kullanılır
+  - `occVal` — parseFloat(occupancy) ile parse edilen doluluk değeri; NaN ise 0 döner; hesaplama parametresi olarak kullanılır
+  - `hoursVal` — parseFloat(operatingHours) ile parse edilen çalışma saati; NaN ise 0 döner; hesaplama parametresi olarak kullanılır
+  - `sensEff` — parseFloat(sensibleEfficiency) ile parse edilen sensible verimlilik yüzdesi; NaN ise 0 döner
+  - `latEff` — parseFloat(latentEfficiency) ile parse edilen latent verimlilik yüzdesi; NaN ise 0 döner
+  - `elecCost` — parseFloat(electricityCost) ile parse edilen elektrik maliyeti; NaN ise 0 döner
+- **Kullanılan dış değişkenler**:
+  - `area` — alan state'i (string)
+  - `occupancy` — doluluk state'i (string)
+  - `operatingHours` — çalışma saati state'i (string)
+  - `sensibleEfficiency` — sensible verimlilik state'i (string)
+  - `latentEfficiency` — latent verimlilik state'i (string)
+  - `electricityCost` — elektrik maliyeti state'i (string)
+  - `recoveryType` — geri kazanım tipi state'i (string)
+  - `buildingType` — bina tipi state'i (string)
+  - `climateZone` — iklim bölgesi state'i (string)
+- **API Çağrıları**: `calculateHRV()` — dışarıdan import edilen hesaplama fonksiyonu; { recoveryType, buildingType, climateZone, area, occupancy, operatingHoursPerDay, sensibleEfficiency, latentEfficiency, electricityCostPerKWh } parametre objesi alır
+- **Dönüş**: HRVCalcResult | null; geçersiz parametrelerde (areaVal <= 0 veya occVal < 0 veya hoursVal <= 0 veya sensEff <= 0) null, aksi halde calculateHRV() sonucunu döner
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx::reset
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setRecoveryType` — State setter'ı, geri kazanım tipi state'ini varsayılan 'hrv' değerine sıfırlar
-  - `setBuildingType` — State setter'ı, bina tipi state'ini varsayılan 'office' değerine sıfırlar
-  - `setClimateZone` — State setter'ı, iklim bölgesi state'ini varsayılan 'temperate' değerine sıfırlar
-  - `setArea` — State setter'ı, alan state'ini varsayılan '100' değerine sıfırlar
-  - `setOccupancy` — State setter'ı, kişi kapasitesi state'ini varsayılan '10' değerine sıfırlar
-  - `setOperatingHours` — State setter'ı, çalışma saati state'ini varsayılan '10' değerine sıfırlar
-  - `setSensibleEfficiency` — State setter'ı, duyarlı verim state'ini varsayılan '75' değerine sıfırlar
-  - `setLatentEfficiency` — State setter'ı, gizli verim state'ini varsayılan '65' değerine sıfırlar
-  - `setElectricityCost` — State setter'ı, elektrik maliyeti state'ini varsayılan '3.5' değerine sıfırlar
-- **Dönüş**: yok, tüm form state'lerini varsayılan değerlere sıfırlayan yan etki üretir
+### [N6_NASIL] AST Pointer: src/views/calculators/HRVCalcPage.tsx::reset
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Kullanılan dış değişkenler (tümü state setter'ları)**:
+  - `setRecoveryType` — recoveryType state setter'ı; 'hrv' değerine sıfırlanır
+  - `setBuildingType` — buildingType state setter'ı; 'office' değerine sıfırlanır
+  - `setClimateZone` — climateZone state setter'ı; 'temperate' değerine sıfırlanır
+  - `setArea` — area state setter'ı; '100' değerine sıfırlanır
+  - `setOccupancy` — occupancy state setter'ı; '10' değerine sıfırlanır
+  - `setOperatingHours` — operatingHours state setter'ı; '10' değerine sıfırlanır
+  - `setSensibleEfficiency` — sensibleEfficiency state setter'ı; '75' değerine sıfırlanır
+  - `setLatentEfficiency` — latentEfficiency state setter'ı; '65' değerine sıfırlanır
+  - `setElectricityCost` — electricityCost state setter'ı; '3.5' değerine sıfırlanır
+- **Dönüş**: void; tüm form state'lerini varsayılan başlangıç değerlerine sıfırlar
 
 ---
 
@@ -132,3 +156,19 @@ Bu modül, HVAC sistemleri bünyesindeki Isı Geri Kazanım Havalandırma (HRV) 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: HRVCalcPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gray-100`, `bg-primary-navy/10`, `bg-success-green/10`, `bg-white`, `border-light-gray`, `border-success-green/20`, `hover:text-industrial-gray`, `text-center`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`
+- **Layout:** `flex`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `grid-cols-2`, `items-center`, `justify-center`, `lg:grid-cols-2`, `p-2`, `p-4`, `p-6`, `shadow-sm`
+- **Varyant/Responsive:** `hover:`, `lg:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-semibold`, `mb-4`, `mb-6`, `mt-4`, `py-12`, `rounded-2xl`, `rounded-full`, `rounded-lg`, `rounded-xl`, `space-y-4`, `space-y-6`, `transition-colors`

@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\BottomCTA.tsx
 skeleton_hash: 1f08a41bd7ff999f
-generated_at: 2026-05-23T21:58:44Z
+entity_hashes:
+  func:BottomCTA: c122a8232d826ce8
+  func:scrollToTop: 40a3c590b7862492
+  overview: 55c7f6e0cceee5e1
+  style_tokens: 0b28756a678eed77
+generated_at: 2026-05-28T22:35:45Z
 ---
 
 ## Genel Bakış
@@ -32,7 +37,7 @@ Bu modül, gerekli callback fonksiyonlarının ve `categoryN` propunun sağland�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### BottomCTA
 **Ne yapar**: Sayfa sonu CTA (Çağrı Eylemi) bölümünü renderlar ve kullanıcıya belirli aksiyonlar sunar: modelleri inceleme, bana uygun olanı bulma (wizard), uzman desteği alma ve sayfanın başına dönme.  
@@ -42,7 +47,7 @@ Bu modül, gerekli callback fonksiyonlarının ve `categoryN` propunun sağland�
 - onShowProducts: type not specified — Ürün listesini göstermek için çağrılacak fonksiyon  
 - showWizard: boolean — Wizardın görünürlüğünü kontrol eder; varsayılan değer `true`  
 - categoryN: type not specified — Bileşenin bağlamında kullanılan kategori tanımlayıcısı (örnek: kimlik veya isim)  
-**Dönüş**: React.FC<BottomCTAProps> — Bileşenin props tipine uygun bir React fonksiyon bileşeni döner  
+**Dönüş**: React.FC<BottomCTAProps> — Bileşenin props tipine uygun bir React fonksiyon bileşeni döner
 
 ### scrollToTop
 **Ne yapar**: Sayfanın en üstüne kaydırma yapar.  
@@ -100,6 +105,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-400`, `bg-emerald-500`, `bg-gradient-to-br`, `bg-secondary-blue`, `bg-white/10`, `bg-white/20`, `border-blue-400/30`, `border-white/20`, `from-primary-navy`, `from-secondary-blue`, `md:text-4xl`, `text-3xl`, `text-blue-100`, `text-center`, `text-gray-300`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-col`, `from-primary-navy`, `from-secondary-blue`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `group-hover:-translate-y-1`, `group-hover:bg-white/30`, `group-hover:scale-110`, `h-14`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-blue-400`, `bg-emerald-500`, `bg-gradient-to-br`, `bg-secondary-blue`, `bg-white/10`, `bg-white/20`, `border-blue-400/30`, `border-white/20`, `from-primary-navy`, `from-secondary-blue`, `group-hover:bg-white/30`, `hover:bg-white/20`, `hover:border-white/40`, `hover:text-white`, `md:text-4xl`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `bottom-0`, `flex`, `flex-col`, `from-primary-navy`, `from-secondary-blue`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `h-14`, `h-96`, `items-center`, `justify-center`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${showWizard`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `blur-3xl`, `border`, `focus-ring`, `font-bold`, `group`, `group-hover:-translate-y-1`, `group-hover:scale-110`, `hover:scale-105`, `inset-0`, `lg:px-8`, `mb-1`

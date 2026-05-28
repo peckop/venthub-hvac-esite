@@ -9,7 +9,8 @@ const projectRoot = path.resolve(__dirname, '../../../');
 
 const dirsToScan = [
   path.join(projectRoot, 'src', 'views'),
-  path.join(projectRoot, 'src', 'components')
+  path.join(projectRoot, 'src', 'components'),
+  path.join(projectRoot, 'src', 'app')
 ];
 
 let leakages = [];

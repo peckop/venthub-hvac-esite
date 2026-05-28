@@ -4,24 +4,35 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\authority.ts
 skeleton_hash: ea0c6fd958f262af
-generated_at: 2026-05-23T22:32:52Z
+entity_hashes:
+  overview: 08381c41a177b637
+generated_at: 2026-05-28T22:38:32Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin `src/types` dizininde yer alan bu TypeScript modülü, projenin yetki (authority) yönetimi ile ilgili tip tanımlarını barındırmak üzere oluşturulmuştur. Henüz modül içinde herhangi bir kod unsuru (import, sabit, değişken, fonksiyon vb.) tanımlanmamıştır; gelecekte projenin yetki sistemine ait tüm tür tanımlamaları bu dosyaya eklenecektir.
+
+Bu TypeScript modülü, VentHub HVAC projesinde kullanılan otorite sayfası (authority page) içerik bloklarının tip tanımlamalarını içerir. Modül, her biri `BaseAuthorityBlock` arayüzünü genişleten farklı içerik bloğu türleri (hero, specs, media, performance vb.) için arayüzler tanımlayarak, sayfa oluşturma sürecinde tutarlı veri yapılarının kullanılmasını sağlar.
+
+## Fonksiyon Grupları
+
+Bu dosyada herhangi bir fonksiyon bulunmamaktadır. Modül yalnızca statik tip tanımlamaları (arayüzler) içerir ve çalışma zamanı işlevi barındırmaz.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu TypeScript modülünün, proje genelinde merkezi yetki (authority) tanımlamaları için tür bildirimleri içerdiği, yalnızca statik tip denetimi için kullanıldığı, çalıştırılabilir işlev barındırmadığı varsayılmıştır.
+Bu modül, VentHub HVAC projesinde yetki (authority) sistemiyle ilgili TypeScript tip tanımlamalarını barındırmak üzere tasarlanmış, yalnızca bildirim (declaration) içeren kaynak bir dosyadır.
 
-[Aksiyom 1]: Eğer proje TypeScript derleyicisi (tsc) ile statik tip denetimi gerçekleştirmiyorsa, bu modülde tanımlanan yetki türlerinin doğruluğu kontrol edilemez, proje boyunca yanlış formatta yetki nesneleri kullanımı nedeniyle çalışma zamanı hataları ortaya çıkar.
-[Aksiyom 2]: Eğer bu modülde tanımlanan yetki türleri, proje içindeki tüm erişim denetimi katmanlarında zorunlu olarak referans alınmıyorsa, dağınık yetki tanımlamaları nedeniyle tutarsız erişim kontrolleri ve yetki yükseltme güvenlik açıkları oluşur.
-[Aksiyom 3]: Eğer bu TypeScript modülü projenin derleme sürecine dahil edilmemişse, yetki türleriyle ilgili geliştirme aşamasındaki uyumsuzluklar derleme aşamasında yakalanamaz, üretim ortamında çalışma zamanı hataları meydana gelir.
+**[Aksiyom 1]:** Eğer bu modülde herhangi bir `export` bildirimi (type, interface, enum vb.) bulunmazsa, modül dışarı hiçbir tip ihraç etmez ve projenin diğer bölümleri bu modüldeki türleri referans alamaz.
+
+**[Aksiyom 2]:** Eğer bu modülde çalıştırılabilir kod (fonksiyon gövdesi, class instance, değişken ataması) tanımlanırsa, modülün "statik tip bildirimi" rolü ihlal edilmiş olur.
+
+**[Aksiyom 3]:** Eğer TypeScript derleyicisi (`tsc`) bu modülü derleme sürecine dahil etmezse, modüldeki tip tanımlamaları proje genelinde geçerli olmaz ve tür hataları yakalanamaz.
+
+**[Aksiyom 4]:** Eğer modül, projenin `src/types` dizin yapısı dışında farklı bir konuma taşınırsa, projedeki import yolları kırılabilir (modülün konumu sabittir: `src/types/authority.ts`).
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -103,7 +114,11 @@ type AuthorityContent = AuthorityBlock[]
 
 ## AST POINTERS
 
-Analiz edilen `C:\Users\alize\venthub-hvac\src\types\authority.ts` kaynak dosyasında AST pointer oluşturulabilecek herhangi bir fonksiyon, sınıf, değişken veya diğer kod öğesi tespit edilememiştir. Dosyada tanımlı hiç bir yürütülebilir kod parçası, sabit veya referanslanabilir nesne bulunmamaktadır.
+Bu dosyada fonksiyon bulunmamaktadır.
+
+**Kaynak:** `C:\Users\alize\venthub-hauc\src\types\authority.ts`
+
+**Açıklama:** Dosya yapısı incelendiğinde, `.ts` uzantılı bir **type/interface tanımlama dosyası** olduğu görülmektedir. Bu tür dosyalarda fonksiyon gövdeleri yer almaz; yalnızca TypeScript type veya interface tanımları bulunur. Dolayısıyla AST Pointer üretilebilecek herhangi bir fonksiyon imzası veya gövedesi mevcut değildir.
 
 ---
 

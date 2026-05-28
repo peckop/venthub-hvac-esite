@@ -3,8 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: 0ef5baec42ff8847
-generated_at: 2026-05-25T09:09:35Z
+skeleton_hash: 0e2c147c5732f94e
+entity_hashes:
+  overview: 3b73d1e6813a6921
+generated_at: 2026-05-28T22:37:50Z
 ---
 
 ## Genel Bakış
@@ -24,13 +26,7 @@ Bu modül, VentHub HVAC projesinin uluslararasılaştırma (i18n) altyapısı i�
 
 ---
 
-
-
----
-
----
-
-
+## FONKSİYON DETAYLARI
 
 ---
 

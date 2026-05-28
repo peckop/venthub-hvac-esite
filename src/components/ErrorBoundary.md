@@ -12,8 +12,8 @@ entity_hashes:
   func:isChunkLoadError: 31516cfb6918b024
   func:serializeError: 2f05a1b7f35a9398
   overview: 4d67cf292bff82fe
-  style_tokens: a43b820f80ab122e
-generated_at: 2026-05-27T12:17:27Z
+  style_tokens: 1ab7ecfdeff4b247
+generated_at: 2026-05-28T22:35:49Z
 ---
 
 ## Genel Bakış
@@ -58,34 +58,6 @@ Bu modül React tabanlı uygulamalarda alt bileşenlerin fırlattığı çalış
 **Parametreler**:
 - `error`: unknown — Kontrol edilecek hata nesnesi.  
 **Dönüş**: `boolean` — Hata bir chunk yükleme hatasıysa `true`, aksi takdirde `false`.
-
-### constructor
-**Ne yapar**: `ErrorBoundary` bileşeninin başlangıç durumunu (state) oluşturur ve React’in `Component` sınıfının kurucusunu çağırır.  
-**Nasıl yapar**: `super(props)` ile üst sınıfın kurucusu çalıştırılır, ardından `this.state` `{ hasError: false }` olarak başlatılır.  
-**Parametreler**:
-- `props`: Props — Bileşene dışarıdan geçirilen özellikler.  
-**Dönüş**: Yok (constructor, sınıf örneği oluşturur).
-
-### getDerivedStateFromError
-**Ne yapar**: React’ın hata yakalama yaşam döngüsü içinde, bir hata oluştuğunda bileşenin state’ini güncelleyerek hata durumunu işaretler.  
-**Nasıl yapar**: Statik bir metod olarak tanımlanır; gelen `error` nesnesini alır, `hasError` true, `error` nesnesi ve `isChunkError` (chunk hatası kontrolü) değerlerini içeren yeni bir state objesi döndürür.  
-**Parametreler**:
-- `error`: Error — Yakalanan hata nesnesi.  
-**Dönüş**: `State` — `{ hasError: true, error: error, isChunkError: isChunkLoadError(error) }` şeklinde yeni state.
-
-### componentDidCatch
-**Ne yapar**: React’ın hata yakalama mekanizmasında, bir hata ve ek hata bilgisi alındığında konsola log yazar ve chunk yükleme hatalarını özel olarak bildirir.  
-**Nasıl yapar**: `console.error` ile hatayı ve `errorInfo`yu loglar; hata bir chunk hatasıysa `console.warn` ile kullanıcıya sayfayı yenilemesi gerektiği uyarısını verir.  
-**Parametreler**:
-- `error`: Error — Yakalanan hata nesnesi.  
-- `errorInfo`: ErrorInfo — Hata hakkında ek bilgi (örn. component stack).  
-**Dönüş**: Yok (yan etkili bir metod).
-
-### render
-**Ne yapar**: Bileşenin UI’sını üretir; hata durumunda özel bir hata ekranı, hata yoksa çocuk bileşenleri render eder.  
-**Nasıl yapar**: `I18nContext.Consumer` üzerinden çeviri fonksiyonu alır, `this.state.hasError` kontrolü yapar. Hata varsa fallback UI veya varsayılan hata mesajı gösterilir; chunk hatasıysa yenileme butonu, diğer hatalarda yeniden deneme ve yenileme butonları sunulur. Geliştirme modunda `serializeError` ile hata detayları da gösterilir.  
-**Parametreler**: Yok.  
-**Dönüş**: JSX element — Hata ekranı veya `this.props.children`.
 
 ---
 
@@ -213,6 +185,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gray-100`, `bg-primary-navy`, `border-gray-300`, `text-amber-500`, `text-center`, `text-gray-500`, `text-gray-600`, `text-gray-700`, `text-gray-800`, `text-left`, `text-sm`, `text-white`, `text-xl`, `text-xs`
+- **Renkler:** `bg-gray-100`, `bg-primary-navy`, `border-gray-300`, `hover:bg-gray-50`, `hover:bg-secondary-blue`, `hover:text-gray-700`, `text-amber-500`, `text-center`, `text-gray-500`, `text-gray-600`, `text-gray-700`, `text-gray-800`, `text-left`, `text-sm`, `text-white`
 - **Layout:** `flex`, `h-16`, `h-4`, `inline-flex`, `items-center`, `justify-center`, `max-h-40`, `max-w-md`, `min-h-400px`, `overflow-auto`, `p-3`, `p-8`, `w-16`, `w-4`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** `hover:` önekleri
+- **Yardımcı Sınıflar:** `border`, `cursor-pointer`, `font-semibold`, `mb-2`, `mb-4`, `mb-6`, `mr-2`, `mr-3`, `mt-2`, `mt-6`, `mx-auto`, `px-4`, `px-6`, `py-2`, `rounded`

@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\AirCurtainModel.tsx
 skeleton_hash: c5aee3650ad9e4cd
-generated_at: 2026-05-23T22:25:25Z
+entity_hashes:
+  func:AirCurtainModel: 09901c99492ff3cd
+  func:AirFlow: 81dacbadcdba22a8
+  func:showHeatedParts: c81e416e4f17f4ca
+  overview: 379feb67ed1d69c2
+  style_tokens: eb58aa6049595205
+generated_at: 2026-05-28T22:36:45Z
 ---
 
 ## Genel Bakış
@@ -31,7 +37,7 @@ Modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AirCurtainModel
 **Ne yapar**: AirCurtainModel, verilen `isHeated` ve `showMixed` özelliklerine göre bir havalama perdesi modelinin görsel temsili oluşturur.  
@@ -116,28 +122,15 @@ Modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-- **AirCurtainModel()** fonksiyonu, ısıtma parçalarını göstermek için **showHeatedParts** fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-- Belirtilen veri setinde bu modülü çağıran dış bir fonksiyon veya modül bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  AirCurtainModel() → showHeatedParts()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    AirCurtainModel["AirCurtainModel()"] --> showHeatedParts["showHeatedParts()"]
+graph TD
+    AirCurtainModel_tsx__AirCurtainModel["AirCurtainModel"]
+    AirCurtainModel_tsx__AirFlow["AirFlow"]
+    AirCurtainModel_tsx__showHeatedParts["showHeatedParts"]
+    AirCurtainModel_tsx__AirCurtainModel --> AirCurtainModel_tsx__showHeatedParts
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -167,4 +160,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-blue-600`, `bg-white`, `border-blue-200`, `text-primary-navy`, `text-xs`
 - **Layout:** `flex`, `gap-1`, `h-2`, `items-center`, `shadow-inner`, `w-2`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `border`, `font-black`, `pointer-events-none`, `px-2`, `py-0.5`, `rounded-full`, `rounded-sm`, `select-none`, `tracking-tighter`

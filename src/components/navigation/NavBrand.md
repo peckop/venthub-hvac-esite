@@ -4,20 +4,31 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavBrand.tsx
 skeleton_hash: 763b9381e9c28a6a
-generated_at: 2026-05-23T22:15:41Z
+entity_hashes:
+  overview: c6785379bea85d87
+  style_tokens: f2b8e78bf7817c52
+generated_at: 2026-05-28T22:36:27Z
 ---
 
 ## Genel Bakış
-NavBrand.tsx, uygulamanın üst navigasyon çubuğunda marka veya logoyu gösteren bir React bileşenidir. Next.js’nin `Link` bileşeniyle sayfa içi gezinmeyi sağlar ve yönlendirme hedefi olarak `utils/routes` modülünden gelen `Routes` sabitini kullanır. Bu modül harici bir API çağrısı yapmaz, ortam değişkenine bağımlı değildir ve sadece statik kullanıcı arayüzü öğesi sunar.
+NavBrand.tsx, uygulamanın üst navigasyon çubuğunda marka logosunu ve adını gösteren statik bir React bileşenidir. Bu modül, Next.js'in Link bileşenini kullanarak ana sayfaya yönlendirme yapar ve bu bağlantı için `utils/routes` modülündeki `Routes` sabitinden yararlanır. Modül herhangi bir harici API çağrısı yapmaz, ortam değişkeni kullanmaz ve yalnızca bir kullanıcı arayüzü parçası sunar.
+
+## Fonksiyon Grupları
+Dosya içinde çağrılabilecek veya yeniden kullanılabilecek herhangi bir fonksiyon veya method bulunmamaktadır. Kod, doğrudan bir React bileşeni (`NavBrand`) olarak modül seviyesinde tanımlanmıştır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+[Aksiyom 1]: Eğer `brandName` prop'u sağlanmıyorsa, bileşen tip tanımlaması (`NavBrandProps`) gereği bileşen hatalı çalışır veya `undefined` bir değer render edilir.
+
+[Aksiyom 2]: Eğer `utils/routes` modülünden import edilen `Routes` sabiti tanımlı değilse veya geçerli bir rota içermiyorsa, `Link` bileşeninin `href` değeri tanımsız olur ve navigasyon çalışması bozulur.
+
+[Aksiyom 3]: Eğer bileşen Next.js `Link` component'ini kullanıyorsa, bu bileşenin bir Next.js (`next/link`) ortamında render edilmesi gerekir; aksi takdirde `Link` çalışmaz veya hata fırlatır.
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -38,11 +49,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/navigation/NavBrand.tsx::NavBrand
-- **params**: brandName
-- **ic_degiskenler**: 
-  - `Routes` — imported utility object that provides route path helpers; used to obtain the home page URL via `Routes.home()`
-- **Dönüş**: JSX element (a `<Link>` component wrapping the brand logo and name)
+### [N1_NASIL] AST Pointer: components/navigation/NavBrand.tsx::NavBrand
+- **params**: `{ brandName }` — marka adını tutan prop, JSX içinde `{brandName}` olarak render edilir
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde bağımsız değişken tanımlanmamış)
+- **Dönüş**: JSX — `<Link>` bileşeni; `Routes.home()` href'ine sahip, içinde "VH" logosu div'i ve `{brandName}` metnini barındıran anchor elementi döner
 
 ---
 
@@ -55,16 +65,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** `shadow-[0_18px_35px_-20px_rgba(37,99,235,0.7)]`
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3),transparent_55%)]`, `group-hover:shadow-[0_22px_40px_-18px_rgba(37,99,235,0.75)]`, `tracking-[0.08em]`, `tracking-[0.22em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-08`, `tracking-hvac-22`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `border-r`, `border-slate-200/80`, `from-primary-navy`, `text-lg`, `text-slate-900`, `text-white`, `text-xs`, `to-secondary-blue`, `via-primary-navy`
-- **Layout:** `absolute`, `block`, `flex`, `from-primary-navy`, `gap-3`, `group-hover:-translate-y-0.5`, `group-hover:text-primary-navy`, `items-center`, `min-w-0`, `overflow-hidden`, `relative`, `w-auto`
-- **Responsive:** `lg:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-br`, `bg-nav-brand-radial`, `border-r`, `border-slate-200/80`, `from-primary-navy`, `group-hover:text-primary-navy`, `text-lg`, `text-slate-900`, `text-white`, `text-xs`, `to-secondary-blue`, `via-primary-navy`
+- **Layout:** `absolute`, `block`, `flex`, `from-primary-navy`, `gap-3`, `group-hover:shadow-elevation-4`, `items-center`, `min-w-0`, `overflow-hidden`, `relative`, `shadow-elevation-3`, `w-auto`
+- **Varyant/Responsive:** `group-hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `duration-300`, `font-bold`, `font-semibold`, `group`, `group-hover:-translate-y-0.5`, `inset-0`, `lg:pr-5`, `opacity-80`, `pr-3`, `px-3`, `py-2`, `rounded-2xl`, `shrink-0`, `sm:pr-4`, `transition-colors`

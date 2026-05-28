@@ -4,143 +4,103 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\__tests__\ReviewSummary.test.tsx
 skeleton_hash: 1d7e64bb894898be
-generated_at: 2026-05-23T22:40:10Z
+entity_hashes:
+  func:wrap: 89e2dfa3f5986ebc
+  overview: f36b2fc79d41d1f9
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:40:23Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC platformu ödeme akışında yer alan ReviewSummary (Özet İnceleme) React bileşeninin testlerini destekleyen bir test yardımcı modülüdür. Test senaryolarında bileşenlerin güvenilir şekilde render edilmesini sağlamak için gerekli ortam ayarlama ve sarmalama işlemlerini gerçekleştiren fonksiyon barındırır.
+Bu modül, HVAC platformu ödeme akışındaki ReviewSummary bileşeninin test süreçlerini kolaylaştıran bir test yardımcı modülüdür. Tek bir wrap fonksiyonu içerir; bu fonksiyon, test senaryolarında bileşenlerin tutarlı ve doğru ortamda render edilmesini sağlar.
 
 ## Fonksiyon Grupları
 ### Test Ortamı Sarmalama Fonksiyonları
-Testlerde kullanılacak React bileşenlerini test ortamının gerektirdiği yapılandırmalarla sarmalayarak, tüm testlerin tutarlı bir ortamda çalışmasını sağlayan yardımcı işlevi içerir.
+Testlerde doğrudan bileşen render etmek yerine, ortam bağımlılıklarını (örn. i18n sağlayıcıları) otomatik olarak ekleyerek bileşenleri sarmalayan yardımcı işlevi içerir.
 - wrap
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React test modülü, ReviewSummary bileşeninin testlerinin sorunsuz çalıştırılabilmesi için test ortamının, ilgili React bağımlılıklarının ve modül içe aktarımlarının sorunsuz çalışmasını varsayar.
 
-[Aksiyom 1]: Eğer Jest/Vitest gibi test çalıştırıcı ortamında React kütüphanesi kurulu ve yapılandırılmamışsa, React.ReactElement tipi tanımsız kalır, wrap fonksiyonu çalışmaz ve tüm testler derleme hatası ile başarısız olur.
-[Aksiyom 2]: Eğer wrap fonksiyonuna iletilen ui parametresi geçerli bir React.ReactElement türünde değilse, test edilen bileşen render edilemez, ilgili test case'i başarısız olur.
-[Aksiyom 3]: Eğer test edilen ReviewSummary ana bileşeni bu test modülünden içe aktarılamıyorsa, modül import hatası ile çalışmaz, tüm testler çalıştırılamadan başarısız olur.
-[Aksiyom 4]: Eğer projenin derleme yapılandırmasında .tsx uzantılı dosyalar desteklenmiyorsa, bu test modülü hiçbir şekilde derlenip çalıştırılamaz.
+Bu modül, ReviewSummary test senaryolarında bileşenleri test ortamında sarmalayan bir test yardımcı fonksiyonu içerir. Aşağıdaki varsayımlar fonksiyon imzasından ve test yardımcı modülü olma niteliğinden türetilmiştir.
+
+[Aksiyom 1]: Eğer `wrap` fonksiyonuna `React.ReactElement` türünde bir değer sağlanmazsa, fonksiyonun davranışı tanımsızdır veya hata fırlatır.
+
+[Aksiyom 2]: Eğer React test çalıştırma ortamı (ör. jsdom) aktif değilse, `wrap` fonksiyonunun döndürdüğü JSX DOM'a render edilemez ve testler çalıştırılamaz.
+
+[Aksiyom 3]: Eğer `wrap` fonksiyonu çağrılmadan önce ReviewSummary bileşeninin bağımlı olduğu bağlam sağlayıcıları (context provider) ortamda mevcut değilse, bileşen render sırasında hata verir.
+
+[Aksiyom 4]: Eğer test ortamında ilgili modül (ReviewSummary) import edilemezse veya modül yükleme hatası alırsa, `wrap` çağrısı başarısız olur.
 
 ---
 
-## FONKSIYON DETAYLARI
+**Not:** Bu modül bir test yardımcı modülüdür; `wrap` fonksiyonunun iç implementasyonu (hangi sağlayıcıları sarmaladığı, hangi kütüphane kullanıldığı) fonksiyon imzasından çıkarılamadığından, aksiyomlar yalnızca girdi türü ve test ortamı gereksinimleri düzeyinde tanımlanmıştır. Fonksiyon gövdesinde hangi context'lerin sağlandığı bilinmiyor.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### wrap
-**Ne yapar**: Özellikle test ortamında kullanılmak üzere, herhangi bir React arayüz elemanını uluslararasılaştırma (i18n) desteği sağlayan I18nProvider bileşeni ile sarmalayıp render eden test yardımcı fonksiyonudur. ReviewSummary bileşeninin testlerinde, test edilen componente çeviri fonksiyonları ve i18n bağlam (context) değerlerine erişim imkanı sunmak için özel olarak geliştirilmiştir.
-**Nasıl yapar**: Parametre olarak alınan React arayüz elemanını I18nProvider bileşeninin alt öğesi olarak içerir, ardından React Testing Library kütüphanesinin yerleşik render fonksiyonu ile bu sarmalanmış yapıyı test DOM'ına ekler. Böylece production ortamındaki I18nProvider çalışma prensibi tam olarak test ortamında da taklit edilir, sarmalanan eleman tüm i18n özelliklerine doğal olarak erişebilir.
+
+**Ne yapar**: Verilen React elementini `I18nProvider` ile sararak test ortamında render eder.Uluslararası dil desteği gerektiren bileşen testleri için test sarmalayıcı (wrapper) olarak kullanılır.
+
+**Nasıl yapar**: Fonksiyon, önce tarayıcı ortamının varlığını kontrol eder (`window` nesnesi tanımlı mı diye bakar). Eğer tarayıcı ortamındaysa, `localStorage`'a `'lang'` anahtarıyla `'tr'` değerini yazarak Türkçe dil ayarını yapar. Ardından, verilen `ui` elemanını `I18nProvider` bileşeninin içine sarar ve `render` fonksiyonu ile React Testing Library aracılığıyla render eder.
+
 **Parametreler**:
-- name: ui, type: React.ReactElement — Test edilecek olan ana React arayüz elemanı, I18nProvider içine alınacak ve render edilecek olan herhangi bir React bileşen örneği
-**Dönüş**: React Testing Library'nin render fonksiyonu tarafından döndürülen, testlerde DOM öğelerini sorgulamak ve doğrulamak için kullanılan tüm yerleşik yöntemleri içeren nesnedir. Bu sayede testler sarmalanmış ReviewSummary veya herhangi bir başka componente ait DOM elemanlarına sorunsuzca erişip işlem yapabilir.
+- `ui`: React.ReactElement — Sarmalanacak ve test ortamında render edilecek React bileşeni. Genellikle test edilen bileşenin kendisi buraya geçilir.
+
+**Dönüş**: `RenderResult` — React Testing Library'nin `render` fonksiyonunun döndürdüğü nesne. İçinde `getByText`, `queryByText`, `container` gibi test yardımcılarını barındırır.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\__tests__\ReviewSummary.test.tsx::anon_i18n_generator
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `tr.checkout.review.title` — Sipariş özeti bölümü başlık metni
-  - `tr.checkout.review.edit` — Düzenleme butonu metni
-  - `tr.checkout.personal.title` — Kişisel bilgiler bölümü başlık metni
-  - `tr.checkout.shipping.title` — Teslimat adresi bölümü başlık metni
-  - `tr.checkout.billing.title` — Fatura adresi bölümü başlık metni
-  - `tr.checkout.invoice.title` — Fatura bilgileri bölümü başlık metni
-  - `tr.checkout.invoice.individual` — Bireysel fatura tipi metni
-  - `tr.checkout.invoice.corporate` — Ticari fatura tipi metni
-- **Dönüş**: Türkçe çeviri değerlerini içeren i18n nesnesi
+### [N1_NASIL] AST Pointer: ReviewSummary.test.tsx::translationsFactory
+- **params**: () 
+- **ic_degiskenler**: 
+  - `None` — Fonksiyon parametre almaz ve içinde değişken tanımlamaz
+- **Dönüş**: `object` — `tr` anahtarını içeren çeviri nesnesi döner. `checkout.review.title`, `checkout.review.edit`, `checkout.personal.title`, `checkout.shipping.title`, `checkout.billing.title`, `checkout.invoice.title`, `checkout.invoice.individual`, `checkout.invoice.corporate` değerlerini içerir
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\__tests__\ReviewSummary.test.tsx::wrap
-- **params**: ui: React.ReactElement
-- **ic_degiskenler**:
-  - `window` — Tarayıcı global nesnesi, localStorage erişimi için kontrol edilir
-  - `window.localStorage` — Tarayıcı yerel depolama alanı, dil ayarını kaydetmek için kullanılır
-  - `I18nProvider` — Uygulama çeviri sağlayıcısı, test edilen bileşeni sarmalamak için kullanılır
-  - `render` — @testing-library/react tarafından sağlanan React bileşenini DOM'a işleme fonksiyonu
-- **Dönüş**: @testing-library/react render metodunun döndürdüğü test nesnesi
+### [N2_NASIL] AST Pointer: ReviewSummary.test.tsx::wrap
+- **params**: `ui` — React bileşeni olarak test edilecek JSX
+- **ic_degiskenler**: 
+  - `None` — Fonksiyon içinde değişken tanımlamaz
+- **Dönüş**: `render result` — `@testing-library/react`'in `render` fonksiyonunun döndürdüğü nesne. `I18nProvider` ile sarmalanmış bileşeni render eder
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\__tests__\ReviewSummary.test.tsx::anon_main_test_suite
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `it` — Vitest test tanımlama metodu, her bir test senaryosunu tanımlamak için kullanılır
-  - `customer` — ReviewSummary bileşenine iletilen müşteri verisi nesnesi
-  - `ship` — ReviewSummary'ye iletilen teslimat adresi verisi nesnesi
-  - `bill` — ReviewSummary'ye iletilen fatura adresi verisi nesnesi
-  - `vi.fn()` — Vitest mock callback oluşturma metodu, testlerde sahte işlevler üretmek için kullanılır
-  - `wrap` — Bileşeni test ortamında sarmalamak için kullanılan yardımcı fonksiyon
-  - `ReviewSummary` — Test edilen sipariş özeti React bileşeni
-  - `screen.getByRole` — @testing-library/react DOM sorgulama metodu, elementi rolüne göre bulmak için kullanılır
-  - `heading` - "Siparişi Gözden Geçir" başlık elementi, bölüm kapsayıcısını bulmak için kullanılır
-  - `section` — Başlığa ait bölüm kapsayıcı div'i, içindeki elementleri sorgulamak için kullanılır
-  - `within` — @testing-library/react metodudur, belirli bir kapsayıcı içinde DOM sorguları yapmak için kullanılır
-  - `edits` — Bölüm içindeki tüm "Düzenle" butonları listesi, sayısı doğrulanır
-  - `expect` — Vitest assertion metodu, test koşullarını doğrulamak için kullanılır
-  - `onPersonal` — Kişisel bilgiler düzenleme mock callback'i
-  - `onShipping` — Teslimat adresi düzenleme mock callback'i
-  - `onBilling` — Fatura adresi düzenleme mock callback'i
-  - `onInvoice` — Fatura bilgileri düzenleme mock callback'i
-  - `fireEvent` — @testing-library/react DOM olay tetikleme metodu, buton tıklamalarını simüle etmek için kullanılır
-  - `buttons` — Bölüm içindeki tüm düzenleme butonları listesi, tıklama olayları tetiklenir
-- **Dönüş**: yok
+### [N3_NASIL] AST Pointer: ReviewSummary.test.tsx::testSuite
+- **params**: () 
+- **ic_degiskenler**: 
+  - `None` — `describe` bloğu içinde değişken tanımlamaz, sadece `it` bloklarını çağırır
+- **Dönüş**: `undefined` — Test suite'i tanımlayan yan etkili fonksiyon
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\__tests__\ReviewSummary.test.tsx::anon_test_case_1
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `customer` — ReviewSummary'ye iletilen müşteri verisi nesnesi
-  - `ship` — ReviewSummary'ye iletilen teslimat adresi verisi nesnesi
-  - `bill` — ReviewSummary'ye iletilen fatura adresi verisi nesnesi
-  - `vi.fn()` — Vitest mock callback üretme metodu
-  - `wrap` — Test bileşeni sarmalama yardımcı fonksiyonu
-  - `ReviewSummary` — Test edilen sipariş özeti bileşeni
-  - `screen.getByRole` — DOM elementini rolüne göre bulma metodu
-  - `heading` — Sayfa başlık elementi, bölüm kapsayıcısını bulmak için kullanılır
-  - `section` — Başlığın ait olduğu bölüm kapsayıcı div'i
-  - `within` — Kapsayıcı içinde DOM sorgusu yapma metodu
-  - `edits` — Bölüm içindeki "Düzenle" butonları listesi
-  - `expect` — Test doğrulama metodu, buton sayısının 3 olduğunu doğrular
-- **Dönüş**: yok
+### [N4_NASIL] AST Pointer: ReviewSummary.test.tsx::testSameAsShippingTrue
+- **params**: () 
+- **ic_degiskenler**: 
+  - `heading` — `screen.getByRole('heading', { name: 'Siparişi Gözden Geçir' })` ile bulunan başlık elementi
+  - `section` — `heading.closest('div')!` ile bulunan başlığın üst div'i
+  - `edits` — `within(section).getAllByRole('button', { name: 'Düzenle' })` ile bulunan tüm düzenle butonları
+- **Dönüş**: `undefined` — Test asertiflerini çalıştırır
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\__tests__\ReviewSummary.test.tsx::anon_test_case_2
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `customer` — ReviewSummary'ye iletilen müşteri verisi nesnesi
-  - `ship` — ReviewSummary'ye iletilen teslimat adresi verisi nesnesi
-  - `bill` — ReviewSummary'ye iletilen fatura adresi verisi nesnesi
-  - `vi.fn()` — Vitest mock callback üretme metodu
-  - `wrap` — Test bileşeni sarmalama yardımcı fonksiyonu
-  - `ReviewSummary` — Test edilen sipariş özeti bileşeni
-  - `screen.getByRole` — DOM elementini rolüne göre bulma metodu
-  - `heading` — Sayfa başlık elementi, bölüm kapsayıcısını bulmak için kullanılır
-  - `section` — Başlığın ait olduğu bölüm kapsayıcı div'i
-  - `within` — Kapsayıcı içinde DOM sorgusu yapma metodu
-  - `edits` — Bölüm içindeki "Düzenle" butonları listesi
-  - `expect` — Test doğrulama metodu, buton sayısının 4 olduğunu doğrular
-- **Dönüş**: yok
+### [N5_NASIL] AST Pointer: ReviewSummary.test.tsx::testSameAsShippingFalse
+- **params**: () 
+- **ic_degiskenler**: 
+  - `heading` — `screen.getByRole('heading', { name: 'Siparişi Gözden Geçir' })` ile bulunan başlık elementi
+  - `section` — `heading.closest('div')!` ile bulunan başlığın üst div'i
+  - `edits` — `within(section).getAllByRole('button', { name: 'Düzenle' })` ile bulunan tüm düzenle butonları
+- **Dönüş**: `undefined` — Test asertiflerini çalıştırır
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\__tests__\ReviewSummary.test.tsx::anon_test_case_3
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `onPersonal` — Kişisel bilgiler düzenleme mock callback'i
-  - `onShipping` — Teslimat adresi düzenleme mock callback'i
-  - `onBilling` — Fatura adresi düzenleme mock callback'i
-  - `onInvoice` — Fatura bilgileri düzenleme mock callback'i
-  - `vi.fn()` — Vitest mock callback üretme metodu
-  - `customer` — ReviewSummary'ye iletilen müşteri verisi nesnesi
-  - `ship` — ReviewSummary'ye iletilen teslimat adresi verisi nesnesi
-  - `bill` — ReviewSummary'ye iletilen fatura adresi verisi nesnesi
-  - `wrap` — Test bileşeni sarmalama yardımcı fonksiyonu
-  - `ReviewSummary` — Test edilen sipariş özeti bileşeni
-  - `screen.getByRole` — DOM elementini rolüne göre bulma metodu
-  - `heading` — Sayfa başlık elementi, bölüm kapsayıcısını bulmak için kullanılır
-  - `section` — Başlığın ait olduğu bölüm kapsayıcı div'i
-  - `within` — Kapsayıcı içinde DOM sorgusu yapma metodu
-  - `buttons` — Bölüm içindeki tüm "Düzenle" butonları listesi
-  - `fireEvent` — DOM olay tetikleme metodu, buton tıklamalarını simüle eder
-  - `expect` — Test doğrulama metodu, tüm callback'lerin çağrıldığını onaylar
-- **Dönüş**: yok
+### [N6_NASIL] AST Pointer: ReviewSummary.test.tsx::testEditCallbacks
+- **params**: () 
+- **ic_degiskenler**: 
+  - `onPersonal` — `vi.fn()` ile oluşturulan mock fonksiyon (kişisel bilgi düzenleme callback'i)
+  - `onShipping` — `vi.fn()` ile oluşturulan mock fonksiyon (teslimat düzenleme callback'i)
+  - `onBilling` — `vi.fn()` ile oluşturulan mock fonksiyon (fatura düzenleme callback'i)
+  - `onInvoice` — `vi.fn()` ile oluşturulan mock fonksiyon (fatura tipi düzenleme callback'i)
+  - `heading` — `screen.getByRole('heading', { name: 'Siparişi Gözden Geçir' })` ile bulunan başlık elementi
+  - `section` — `heading.closest('div')!` ile bulunan başlığın üst div'i
+  - `buttons` — `within(section).getAllByRole('button', { name: 'Düzenle' })` ile bulunan tüm düzenle butonları
+- **Dönüş**: `undefined` — Test asertiflerini çalıştırır
 
 ---
 
@@ -153,3 +113,19 @@ Bu React test modülü, ReviewSummary bileşeninin testlerinin sorunsuz çalış
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: wrap
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

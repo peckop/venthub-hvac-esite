@@ -8,7 +8,7 @@ entity_hashes:
   func:AddToProjectModal: 27f66ff6372a1fa9
   overview: 4e046c22462f1ac6
   style_tokens: 49ec4d1f3ff40796
-generated_at: 2026-05-27T18:30:09Z
+generated_at: 2026-05-28T22:36:49Z
 ---
 
 ## Genel Bakış

@@ -11,31 +11,22 @@ Agent olarak yeni dosya oluştururken veya mevcut kodu nereye koyacağıma karar
 ## Proje Yapısı
 
 ```
-venthub-hvac/
-├── src/
-│   ├── components/     # React bileşenleri (alt klasörlerle organize)
-│   │   ├── navigation/ # Header, MegaMenu, Footer
-│   │   ├── products/   # Ürün kartları, listeler, vitrinler
-│   │   ├── admin/      # Admin panel bileşenleri
-│   │   └── ui/         # Genel UI primitives (Button, Dialog, etc.)
-│   ├── pages/          # Sayfa bileşenleri (route başına bir dosya)
-│   │   ├── admin/      # Admin sayfaları
-│   │   └── calculators/# Hesaplayıcı sayfaları
-│   ├── hooks/          # Custom React hooks
-│   ├── contexts/       # React context providers
-│   ├── lib/            # Utility libraries (supabase client, analytics)
-│   ├── utils/          # Helper functions
-│   ├── config/         # Configuration files (categoryRegistry, etc.)
-│   ├── i18n/           # Internationalization (ayrı skill var)
-│   └── types/          # TypeScript type definitions
-├── supabase/
-│   ├── migrations/     # SQL migrations (tarih prefix ile)
-│   └── functions/      # Edge Functions
-├── docs/               # Proje dokümantasyonu
-├── scripts/            # Yardımcı scriptler (analiz, fix, vb.)
-└── .agent/
-    ├── skills/         # Agent yetenekleri (bu dosyalar)
-    └── workflows/      # Adım adım iş akışları
+src/
+├── components/     # React bileşenleri (alt klasörlerle organize)
+│   ├── navigation/ # Header, MegaMenu, Footer
+│   ├── products/   # Ürün kartları, listeler, vitrinler
+│   ├── admin/      # Admin panel bileşenleri
+│   └── ui/         # Genel UI primitives (Button, Dialog, etc.)
+├── pages/          # Sayfa bileşenleri (route başına bir dosya)
+│   ├── admin/      # Admin sayfaları
+│   └── calculators/# Hesaplayıcı sayfaları
+├── hooks/          # Custom React hooks
+├── contexts/       # React context providers
+├── lib/            # Utility libraries (supabase client, analytics)
+├── utils/          # Helper functions
+├── config/         # Configuration files (categoryRegistry, etc.)
+├── i18n/           # Internationalization
+└── types/          # TypeScript type definitions
 ```
 
 ## Dosya Adlandırma Kuralları
@@ -51,46 +42,12 @@ venthub-hvac/
 
 ## Performans ve Render Standartları (90+ Puan Hedefi)
 
-### 1. Server Components (RSC) Önceliği
-- Tüm ana sayfalar (`page.tsx`) varsayılan olarak **Server Component** olmalıdır.
-- Veri çekme işlemleri (Supabase RPC, getProducts vb.) doğrudan sunucu tarafında yapılmalıdır.
-- `'use client'` direktifi sadece etkileşimli (buton, input, modal) uç bileşenlerde kullanılmalıdır.
-
-### 2. SSR ve Streaming (Suspense)
-- Ana rotalarda (`products`, `brands`, `home` vb.) `ssr: false` kullanımı KESİNLİKLE yasaktır.
-- Ağır veri yüklemeleri için `React.lazy` yerine Next.js `dynamic` import ve mutlaka `Suspense` kullanılmalıdır.
-- Her `Suspense` alanı için görsel bir `Skeleton` (İskelet) bileşeni tanımlanmalıdır.
-
-### 3. Client-Side Bağımlılıkları (window/document)
-- `window`, `document`, `localStorage` gibi objeler `'use client'` bileşenlerinde bile sadece `useEffect` içinde veya dinamik kontrollerle (`typeof window !== 'undefined'`) kullanılmalıdır.
-- URL parametreleri yönetimi için `window.location` yerine `next/navigation` (`useSearchParams`, `usePathname`) kullanılmalıdır.
-
-### 4. Layout Shift (CLS) Koruması
-- Resimlere (`<Image />`) mutlaka `width` ve `height` (veya `aspect-ratio`) verilmelidir.
-- Dinamik yüklenen alanlar için `min-h-[value]` (minimum yükseklik) rezerve edilmelidir.
-
-### Örnek Bileşen Yapısı:
-```tsx
-import { useI18n } from '@/i18n/I18nProvider';
-
-interface ProductCardProps {
-  product: Product;
-  onSelect?: (id: string) => void;
-}
-
-export function ProductCard({ product, onSelect }: ProductCardProps) {
-  const { t } = useI18n();
-  
-  return (
-    <div className="rounded-lg border p-4">
-      <h3>{product.name}</h3>
-      <button onClick={() => onSelect?.(product.id)}>
-        {t('common.getQuote')}
-      </button>
-    </div>
-  );
-}
-```
+1. **Server Components (RSC) Önceliği:** Tüm ana sayfalar (`page.tsx`) varsayılan olarak **Server Component** olmalıdır. Veri çekme işlemleri (Supabase RPC, getProducts vb.) doğrudan sunucu tarafında yapılmalıdır. `'use client'` direktifi sadece etkileşimli (buton, input, modal) uç bileşenlerde kullanılmalıdır.
+2. **SSR ve Streaming (Suspense):** Ana rotalarda (`products`, `brands`, `home` vb.) `ssr: false` kullanımı KESİNLİKLE yasaktır. Ağır veri yüklemeleri için `React.lazy` yerine Next.js `dynamic` import ve mutlaka `Suspense` kullanılmalıdır. Her `Suspense` alanı için görsel bir `Skeleton` (İskelet) bileşeni tanımlanmalıdır.
+3. **Client-Side Bağımlılıkları:** `window`, `document`, `localStorage` gibi objeler `'use client'` bileşenlerinde bile sadece `useEffect` içinde veya dinamik kontrollerle (`typeof window !== 'undefined'`) kullanılmalıdır. URL parametreleri yönetimi için `window.location` yerine `next/navigation` (`useSearchParams`, `usePathname`) kullanılmalıdır.
+4. **Layout Shift (CLS) Koruması:** Resimlere (`<Image />`) mutlaka `width` ve `height` (veya `aspect-ratio`) verilmelidir. Dinamik yüklenen alanlar için `min-h-[value]` (minimum yükseklik) rezerve edilmelidir.
+5. **Hibrit PPR (Partial Prerendering) Sınırları:** Arama, filtreleme gibi sayfalarda `useSearchParams` hook'unu kullanan tüm bileşenler kesinlikle ve istisnasız `<Suspense fallback={<ProductGridSkeleton />}>` sınırı içerisine alınmalıdır. useSearchParams'ın direkt sayfa kabuğuna sızması engellenerek SSR zehirlenmesi önlenir.
+6. **Adaptör (Adapter) Deseni ve Saf Metrik Motor Kuralı:** Uygulamanın çekirdek mühendislik hesaplamalarını barındıran `src/lib/hvacCalculations.ts` gibi saf (pure) fonksiyonların iç mantığına emperyal birim (CFM, Fahrenheit, in-wg vb.) dönüşümleri KESİNLİKLE eklenemez. Yabancı ölçü birimi gereksinimleri, UI katmanı ile iş mantığı katmanı arasına çekilecek bir `useEngineeringAdapter` gibi bir "Gateway" hook'u üzerinden (Adaptör Deseni ile) çözülmelidir.
 
 ## Karar Ağacı: Dosya Nereye Gider?
 
@@ -115,10 +72,10 @@ E-ticaret sayfalarında aşağıdaki yapılandırılmış veriler zorunludur:
 | Blog/Bilgi | Article | headline, image, datePublished, author |
 
 ### SSR Zorunluluğu
-- Schema markup ve meta etiketleri Server Component veya generateMetadata ile render edilmeli
-- CSR-only sayfalar botlara boş HTML gösterir → SEO sıfır
+- Schema markup ve meta etiketleri Server Component veya generateMetadata ile render edilmelidir.
+- CSR-only sayfalar botlara boş HTML gösterir → SEO sıfırdır.
 
 ### Canonical URL Tutarlılığı
 - www vs non-www: tek bir tercih ve yönlendirme
 - Trailing slash tutarlılığı
-- HTTP → HTTPS yönlendirmesi zorunlu
+- HTTP → HTTPS yönlendirmesi zorunludur

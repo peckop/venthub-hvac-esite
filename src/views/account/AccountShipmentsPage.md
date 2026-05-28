@@ -3,8 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx
-skeleton_hash: ea67175519e8f30e
-generated_at: 2026-05-23T22:36:49Z
+skeleton_hash: e34a62b9fc709adb
+entity_hashes:
+  func:AccountShipmentsPage: 6c41daabba3ddc39
+  overview: 3b6888fa00b79a10
+  style_tokens: 0076231c43efae4d
+generated_at: 2026-05-28T22:38:52Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu modül, VentHub HVAC projesinin kullanıcı hesap bölümünde yer alan kargo
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AccountShipmentsPage
 **Ne yapar**: VentHub HVAC projesinin hesap yönetimi modülündeki sevkiyatlar sayfasını oluşturan ana bileşendir. Kullanıcıların kendi hesaplarıyla ilişkili tüm sevkiyat kayıtlarını görüntülemesine olanak tanıyan ilgili sayfanın temel giriş noktasıdır.
@@ -209,3 +213,19 @@ type ShipFilter = 'all' | 'shipped' | 'delivered'
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AccountShipmentsPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-amber-50`, `bg-green-50`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-purple-50`, `bg-slate-200`, `bg-slate-50`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-white`, `border-amber-200`, `border-b`, `border-b-2`, `border-green-200`, `border-primary-navy`
+- **Layout:** `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-3`, `grid`, `grid-cols-1`, `h-1`, `h-10`, `h-11`, `h-16`, `h-3.5`
+- **Varyant/Responsive:** `:`, `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${active`, `${activeStepIdx`, `${filter`, `1`, `:`, `===`, `>=`, `animate-spin`, `border`, `break-all`, `font-bold`, `font-medium`, `hover:scale-102`, `hover:underline`, `idx`

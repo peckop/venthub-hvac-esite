@@ -4,25 +4,32 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\__tests__\OrderDetailPageTabs.test.tsx
 skeleton_hash: 1a4659abce57dd8b
-generated_at: 2026-05-23T22:35:30Z
+entity_hashes:
+  overview: 35ebdfc915114955
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:38:57Z
 ---
 
 ## Genel Bakış
-Bu dosya, VentHub HVAC projesinin kullanıcı hesapları görünümünde yer alan sipariş detay sayfası sekmelerinin işlevselliğini test etmek için oluşturulmuş bir Vitest test dosyasıdır. React Testing Library ve Vitest araçlarını kullanarak, ilgili OrderDetailPage bileşeninin test ortamında doğru şekilde render edilmesi, kullanıcı etkileşimlerine yanıt vermesi gibi temel davranışları doğrular. Modül içerisinde sadece yerel test senaryoları için tanımlanmış sahte veriler ve gezinme fonksiyonu kullanır, herhangi bir harici API sorgulaması veya ortam değişkeni kullanmadan tamamen izole test ortamında çalışır.
+Bu dosya, VentHub HVAC projesindeki sipariş detay sayfası sekmelerinin (OrderDetailPageTabs) bileşen testlerini içeren bir Vitest test dosyasıdır. React Testing Library kullanılarak bileşenin doğru render edilmesi ve kullanıcı etkileşimlerine verdiği tepkiler doğrulanır. Dosya, tamamen izole bir test ortamında çalışır; harici API çağrısı veya ortam değişkeni kullanmaz, yalnızca yerel mock veriler (örnek sipariş satırı ve sahte navigasyon fonksiyonu) ile senaryoları yürütür.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC projesinin kullanıcı hesabı bölümündeki OrderDetailPageTabs sipariş detayları sekme bileşeninin unit testlerini çalıştırmak amacıyla oluşturulmuştur, çalışması için test ortamı ve tüm ilgili bağımlılıkların erişilebilir olması zorunludur.
 
-[Aksiyom 1]: Eğer testlerde yönlendirme simülasyonu için kullanılan mockNavigate çağrısı test ortamında doğru şekilde oluşturulup ilgili bileşene inject edilmemişse, bileşenin yönlendirme işlemlerini test eden senaryoların tamamı başarısız olur.
-[Aksiyom 2]: Eğer testlerde örnek sipariş verisi olarak kullanılan orderRow nesnesi, test edilen OrderDetailPageTabs bileşeninin beklediği tüm zorunlu alanlara sahip olacak şekilde tanımlanmamışsa, sipariş verisinin ekrana yüklenmesini doğrulayan test senaryoları hata alarak başarısız olur.
-[Aksiyom 3]: Eğer test edilen asıl OrderDetailPageTabs bileşeni, bu test modülünün import edebileceği dosya yolunda mevcut değilse, tüm test senaryoları import hatası ile çalıştırılamadan sonlanır.
-[Aksiyom 4]: Eğer test modülünün çalıştığı ortamda React bileşenlerini render etmeye ve test etmeye imkan veren test araçları kurulu ve erişilebilir değilse, OrderDetailPageTabs bileşeninin hiçbir test senaryosu çalıştırılamaz.
+Bu modül, OrderDetailPageTabs bileşeninin test senaryolarını çalıştıran izole bir test modülüdür.
+
+[Aksiyom 1]: Eğer `mockNavigate` fonksiyonu (call) mevcut değilse, navigasyon davranışı test edilemez ve testler başarısız olur.
+
+[Aksiyom 2]: Eğer `orderRow` nesnesi (object) mevcut değilse, test verisi sağlanamadığından bileşen render edilemez ve testler başarısız olur.
 
 ---
 
+**Not:** Bu dosya bir test modülü olup, fonksiyon imzası tanımlamamaktadır. Belirtilen iki sabit (mockNavigate ve orderRow), test ortamının izole çalışması için zorunlu olan minimum bağımlılıklardır. Modül harici API veya ortam değişkeni kullanmaz.
 
+---
+
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -155,3 +162,19 @@ Bu modül, VentHub HVAC projesinin kullanıcı hesabı bölümündeki OrderDetai
 ## NODE ID STANDARD
 
   file: src\views\account\__tests__\OrderDetailPageTabs.test.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

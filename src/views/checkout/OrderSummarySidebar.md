@@ -4,11 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\OrderSummarySidebar.tsx
 skeleton_hash: a5b0e7a434933e80
-generated_at: 2026-05-23T22:40:28Z
+entity_hashes:
+  func:OrderSummarySidebar: d1d455540c8e8d0c
+  overview: ce3348034c2766ed
+  style_tokens: ed45dfd73f706270
+generated_at: 2026-05-28T22:40:13Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun ödeme (checkout) sürecinde yer alan bu modül, sipariş özetini kullanıcı arayüzünün kenar çubuğunda sunmak üzere tasarlanmış bir React bileşeni barındırır. Ödeme akışı sırasında kullanıcının siparişine ait tüm maliyet kalemlerini tek bir noktada görmesini sağlayarak şeffaf bir satın alma deneyimi sunar.
+VentHub HVAC platformunun ödeme sürecinde yer alan bu modül, sipariş özetini kullanıcı arayüzünün kenar çubuğunda sunmak üzere tasarlanmış bir React bileşeni barındırır. Ödeme akışı sırasında kullanıcının siparişine ait tüm maliyet kalemlerini tek bir noktada görmesini sağlayarak şeffaf bir satın alma deneyimi sunar.
 
 ## Fonksiyon Grupları
 ### Ana Sipariş Özeti Kenar Çubuğu Bileşeni
@@ -18,28 +22,41 @@ Tüm sipariş ve maliyet verilerini alarak, ödeme sayfasının kenar çubuğund
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı sipariş özeti kenar çubuğu bileşeni, ödeme akışında sipariş kalemlerini ve tüm fiyatlandırma tutarlarını doğru görüntüleyebilmek için aldığı tüm giriş prop'larının geçerli, formatına uygun ve aralarında tutarlı olmasını varsayar.
 
-[Aksiyom 1]: Eğer sipariş kalemlerini içeren `items` prop'u geçerli bir dizi olarak iletilmezse, bileşen sipariş içeriğini listeleyemez, arayüzde çökme veya tamamen boş bir özet alanı oluşur.
-[Aksiyom 2]: Eğer ara toplam tutarını temsil eden `totalAmount` prop'u geçerli pozitif sayısal bir değer olarak iletilmezse, tüm alt toplam ve nihai tutar gösterimleri yanlış olur, faturalama doğruluğu ve kullanıcı güveni bozulur.
-[Aksiyom 3]: Eğer KDV tutarını temsil eden `vatAmount` prop'u geçerli sayısal bir değer olarak iletilmezse, vergi tutarı doğru görüntülenemez, yasal faturalama gereksinimleri ve fiyat şeffaflığı karşılanamaz.
-[Aksiyom 4]: Eğer son ödeme tutarını temsil eden `finalAmount` prop'u geçerli pozitif sayısal bir değer olarak iletilmezse, kullanıcının ödeyeceği nihai tutar doğru sunulamaz, ödeme akışı kesintiye uğrar.
-[Aksiyom 5]: Eğer kupon uygulama durumunu temsil eden `couponApp` prop'u geçerli formatta iletilmezse, uygulanan kuponun indirim etkisi doğru gösterilemez, tüm fiyat hesaplamalarında tutarsızlık oluşur.
+Bu sipariş özeti kenar çubuğu bileşeni, ödeme sayfasında maliyet kalemlerini sunmak için zorunlu veri parametrelerine ihtiyaç duyar.
+
+[Aksiyom 1]: Eğer `items` parametresi (sipariş kalemleri listesi) sağlanmazsa, kenar çubuğunda hangi ürünlerin sipariş edildiği gösterilemez.
+
+[Aksiyom 2]: Eğer `totalAmount` (ara toplam)parametresi sağlanmazsa, vergi ve indirim öncesi tutar kullanıcıya sunulamaz.
+
+[Aksiyom 3]: Eğer `vatAmount` (KDV tutarı) parametresi sağlanmazsa, vergi kalemi sipariş özetinde gösterilemez.
+
+[Aksiyom 4]: Eğer `finalAmount` (ödenecek nihai tutar) parametresi sağlanmazsa, kullanıcının ne kadar ödeyeceği belirsiz kalır.
+
+[Aksiyom 5]: Fonksiyon imzası `couponApp` ile kesilmiş olup tam parametre adı bilinmemektedir; bu parametrenin tipi, zorunluluğu ve ilişkili işlevi fonksiyon gövdesi incelenmeden belirlenemez.
 
 ---
 
-## FONKSIYON DETAYLARI
+**Not:** Fonksiyon imzasında hiçbir parametrenin default değeri tanımlı değildir; tüm parametreler调用ıcı tarafından sağlanmalıdır veya bileşen içi varsayılan değer mekanizması gövde içinde tanımlı olabilir (gövde analiz edilmemiştir). Fonksiyon gövdesi erişilebilir olmadığından, bileşenin hangi HTML/JSX yapısını render ettiği, fiyatların nasıl formatlandığı veya kupon indirim mantığı gibi detaylar hakkında çıkarım yapılamamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### OrderSummarySidebar
-**Ne yapar**: VentHub HVAC projesinin ödeme adımında kullanılmak üzere tasarlanmış, siparişin tüm ürün ve finansal detaylarını müşteriye sunan yan bar React bileşenidir. Sepetteki ürünleri, ara toplam, vergi, kupon uygulama durumu ve nihai ödeme tutarını tek bir alanda toplayarak kullanıcının siparişini onaylamadan önce tüm detayları kontrol etmesini sağlar.
-**Nasıl yapar**: Tanımlandığı OrderSummarySidebar.tsx dosyasında kendisine iletilen tüm prop değerlerini kullanarak çalışır, gelen sipariş kalemlerini arayüzde listeler, önceden hesaplanmış tutarları düzenli bir şekilde kullanıcının görüntüleyebileceği şekilde ekrana yansıtır. Ödeme sayfasının yan tarafında sabit olarak görüntülenmek üzere yapılandırılmış olması sayesinde kullanıcının tüm ödeme süreci boyunca sipariş özetine erişimini korumasını sağlar.
+
+**Ne yapar**: Sipariş özetini ve ödeme detaylarını gösteren bir kenar bileşenidir. Kullanıcıya sepetteki ürünler, ara toplam, KDV tutarı ve ödenmesi gereken nihai miktar hakkında bilgi sunar.
+
+**Nasıl yapar**: Verilen props'ları alarak sipariş özeti bölümünü render eder. Ürün listesini, ara toplamı, KDV tutarını ve kupon indirimi uygulanmış nihai fiyatı sırasıyla gösterir. Bileşen, ödeme sayfasının yan tarafında sabit bir konumda yer alarak kullanıcının sipariş detaylarını her an görebilmesini sağlar.
+
 **Parametreler**:
-- items: dizi — Siparişe dahil edilen tüm ürün kalemlerinin detaylarını barındıran, sepet içeriğini temsil eden dizi
-- totalAmount: sayı — Kupon indirimleri ve vergiler hesaplanmadan önceki, tüm ürün fiyatlarının toplamından oluşan ara toplam tutarı
-- vatAmount: sayı — Siparişe uygulanan toplam KDV tutarını, hesaplanmış vergi miktarını içeren sayısal değer
-- finalAmount: sayı — Tüm indirimler ve vergiler uygulandıktan sonra müşterinin ödemekle yükümlü olduğu nihai toplam tutar
-- couponApp: boolean — Siparişe herhangi bir kupon kodunun başarıyla uygulanıp uygulanmadığını belirten durum bayrağı
-**Dönüş**: React.FC<OrderSummarySidebarProps> — Sipariş özet yan barını oluşturan, arayüzde render edilebilir React fonksiyonel bileşenini döndürür. Bu bileşen, ödeme adımı boyunca ekranda kalarak kullanıcının sipariş detaylarını her an görüntülemesine olanak tanır.
+- `items` — Array (sipariş içindeki ürün listesi, her bir ürünün adını, miktarını ve fiyatını içerir)
+- `totalAmount` — number — Products toplam tutarı (KDV ve indirim öncesi ara toplam)
+- `vatAmount` — number — Hesaplanan KDV tutarı (vergi dahil fiyat hesaplaması için kullanılır)
+- `finalAmount` — number — Kupon indirimi uygulandıktan sonra müşteri tarafından ödenmesi gereken nihai tutar
+- `couponApp` — object | undefined — Uygulanan kupon bilgilerini içeren nesne (kupon kodu, indirim tutarı veya yüzdesi gibi detayları barındırır, kupon yoksa undefined olabilir)
+
+**Dönüş**: `React.FC<OrderSummarySidebarProps>` — Sipariş özetini gösteren JSX bileşeni döndürür. Bileşen, sipariş özeti panelini ve ilgili ödeme detaylarını render eder.
 
 ---
 
@@ -69,26 +86,27 @@ Bu React tabanlı sipariş özeti kenar çubuğu bileşeni, ödeme akışında s
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/checkout/OrderSummarySidebar.tsx::OrderSummarySidebar
-- **params**: items, totalAmount, vatAmount, finalAmount, couponApplied, couponCode, setCouponCode, onApplyCoupon, onRemoveCoupon, t, lang
+- **params**: `items`, `totalAmount`, `vatAmount`, `finalAmount`, `couponApplied`, `couponCode`, `setCouponCode`, `onApplyCoupon`, `onRemoveCoupon`, `t`, `lang`
 - **ic_degiskenler**:
-  - `formatCurrency` — i18n modülünden import edilen para tutarlarını yerel ayarlara göre formatlayan fonksiyon
-  - `Lock` — lucide-react'ten import edilen 256-bit SSL güvenlik bilgisi bölümünde kullanılan kilit ikonu bileşeni
-  - `items.map` — siparişteki tüm ürünleri listelemek için kullanılan dizi döngü metodu
-  - `e.target.value` — kupon kodu input alanına girilen yeni değer, kupon state'ini güncellemek için kullanılır
-- **Dönüş**: JSX formatında, ödeme sayfasında sabitlenen sipariş özeti kenar çubuğu React bileşeni
+  - `items` — Sepet öğeleri dizisi; her biri ürün adı, miktar, birim fiyat bilgisi taşır, `items.map()` ile dönülerek her öğe render edilir
+  - `totalAmount` — Ara toplam tutarı; `formatCurrency(totalAmount, lang, ...)` ile para birimi formatlanarak gösterilir
+  - `vatAmount` — KDV dahil tutar; `formatCurrency(vatAmount, lang, ...)` ile para birimi formatlanarak gösterilir
+  - `finalAmount` — Kupon indirimi sonrası nihai toplam; `formatCurrency(finalAmount, lang, ...)` ile para birimi formatlanarak gösterilir
+  - `couponApplied` — Uygulanan kupon nesnesi (veya `null`); `.code` ve `.discount` özellikleri JSX'te koşullu olarak okunur, truthy ise indirim satırı render edilir
+  - `couponCode` — Kupon kodu input alanının kontrolsüz olmayan (controlled) değeri; `<input value={couponCode}>` bağlanır
+  - `setCouponCode` — `couponCode` state setter'ı; input'un `onChange` handler'ında `setCouponCode(e.target.value)` çağrısıyla güncellenir
+  - `onApplyCoupon` — Kupon uygulama callback'i; "Uygula" butonunun `onClick` handler'ına bağlanır
+  - `onRemoveCoupon` — Kupon kaldırma callback'i; "Kaldır" butonunun `onClick` handler'ına bağlanır, sadece `couponApplied` truthy ise render edilir
+  - `t` — Çeviri fonksiyonu; `t('checkout.summaryTitle')`, `t('checkout.summaryThumb')`, `t('orders.qtyCol')`, `t('cart.subtotal')`, `t('cart.vatIncluded')`, `t('cart.shipping')`, `t('cart.free')`, `t('checkout.couponDiscount', { code: couponApplied.code })`, `t('cart.total')`, `t('checkout.security.secureNote')` çağrılarıyla UI metinleri alınır
+  - `lang` — Dil kodu; `formatCurrency` çağrılarına passed olarak para birimi formatlamada kullanılır
+  - `item` — `items.map()` iterasyonundaki her bir sepet öğesi; `item.id`, `item.product.name`, `item.quantity`, `item.unitPrice`, `item.product.price` erişimleri ile herbir öğe render edilir
+- **Dönüş**: JSX (`<div>` root element — React element) — kupon input alanları, toplam satırları, öğe listesi ve güvenlik bilgisi barındıran sidebar JSX'i
 
-### [N2_NASIL] AST Pointer: src/views/checkout/OrderSummarySidebar.tsx::items.map iterator callback
-- **params**: item
+### [N2_NASIL] AST Pointer: src/views/checkout/OrderSummarySidebar.tsx::items.map callback (item) => (...)
+- **params**: `item` — `items` dizisindeki tek bir sepet öğesi
 - **ic_degiskenler**:
-  - `item.id` — listedeki her sipariş kaleminin benzersiz kimliği, React listelemesi için anahtar olarak kullanılır
-  - `item.product.name` — ilgili ürünün ekranda gösterilecek tam adı
-  - `item.quantity` — siparişte alınan ilgili üründen kaç adet olduğunu belirten sayısal değer
-  - `item.unitPrice` - ürünün siparişteki özel birim fiyatı, mevcut değilse ürün temel fiyatı kullanılır
-  - `item.product.price` — ürünün platformdaki temel listeleme fiyatı, unitPrice tanımlı değilse kullanılır
-  - `lang` — ana bileşenden gelen arayüz dili kodu, para tutarlarını kullanıcının diline uygun formatlamak için kullanılır
-  - `t` — ana bileşenden gelen çeviri fonksiyonu, tüm sabit metinleri yerelleştirmek için kullanılır
-  - `formatCurrency` — para tutarlarını standart formata sokan import edilen fonksiyon, ürün satır toplamını göstermek için kullanılır
-- **Dönüş**: Her sipariş kalemi için oluşturulan, listede gösterilecek tekil ürün satırı JSX elementi
+  - `item` — Döngü değişkeni; `.id` key prop'u için, `.product.name` ürün adı gösterimi için, `.quantity` miktar gösterimi için, `.unitPrice` birim fiyat (nullable, fallback olarak `.product.price` kullanılır) fiyat gösterimi için okunur
+- **Dönüş**: JSX (`<div>` element — tek bir sepet öğesinin satır JSX'i); `item.product.name`, birim fiyat × miktar hesaplaması, toplam tutar formatlaması içerir
 
 ---
 
@@ -103,3 +121,19 @@ Bu React tabanlı sipariş özeti kenar çubuğu bileşeni, ödeme akışında s
   export: OrderSummaryItem
   export: OrderSummarySidebar
   export: OrderSummarySidebarProps
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-air-blue`, `bg-light-gray`, `bg-primary-navy`, `bg-white`, `border-light-gray`, `text-center`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`, `text-white`, `text-xs`
+- **Layout:** `flex`, `flex-1`, `gap-2`, `h-12`, `items-center`, `justify-between`, `justify-center`, `max-h-64`, `min-w-0`, `overflow-y-auto`, `p-3`, `p-6`, `shadow-sm`, `sticky`, `top-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `border`, `font-medium`, `font-semibold`, `mb-1`, `mb-4`, `mb-6`, `mt-3`, `px-3`, `py-2`, `rounded`, `rounded-lg`, `rounded-xl`, `space-x-2`, `space-x-3`, `space-y-2`

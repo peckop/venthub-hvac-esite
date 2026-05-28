@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SmokeExhaustFanModel.tsx
 skeleton_hash: 062084050a189af2
-generated_at: 2026-05-23T22:25:10Z
+entity_hashes:
+  func:SmokeExhaustFanModel: c61745ed6f96bf83
+  overview: dbcf102fe547cb19
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:50Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu React tabanlı 3D duman egzoz fanı modeli bileşeninin doğru çalışması,
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SmokeExhaustFanModel
 **Ne yapar**: Venthub HVAC projesinin ürünler modülünde kullanılan duman tahliye fanı 3B model bileşenidir. Projenin src/components/products/3d/types dizininde yer alan bu React bileşeni, platformun ilgili sayfalarında duman egzoz fanının 3 boyutlu olarak görüntülenmesini sağlar. Ürün detay ekranlarında kullanıcının fan modelini incelemesine olanak tanıyan temel yapı taşlarından biridir.
@@ -47,58 +51,6 @@ Bu React tabanlı 3D duman egzoz fanı modeli bileşeninin doğru çalışması,
   - `useFrame` — react-three-fiber kütüphanesinin her render frame'de çalışan hook'u, rotor dönüşünü uygular
   - `bladeGeometry` — useMemo ile önbelleğe alınan, fan pervanelerinin 3D geometrisi nesnesi
 - **Dönüş**: React Three Fiber `<group>` JSX elementi, 3D duman egzos fanı modelini temsil eder
-
----
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SmokeExhaustFanModel.tsx::useFrame_callback
-- **params**: (state, delta)
-- **ic_degiskenler**:
-  - `state` — useFrame hook'u tarafından gelen global sahne state nesnesi, kullanılmaz
-  - `delta` — frame arası geçen zaman, rotorun sabit hızda dönmesini sağlamak için çarpan olarak kullanılır
-  - `rotorRef.current` — rotor grubu referansının mevcut örneği, dönüş animasyonu için rotation.z değeri güncellenir
-- **Dönüş**: yok
-
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SmokeExhaustFanModel.tsx::useMemo_bladeGeometry_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `shape` — THREE.Shape nesnesi, 2D pervane kesitini çizmek ve tanımlamak için kullanılır
-  - `extrudeSettings` — THREE.ExtrudeGeometry ayarları nesnesi, 3D extrüzyon derinliği, pahlama (bevel) parametrelerini içerir
-- **Dönüş**: THREE.ExtrudeGeometry nesnesi, fan pervanelerinin son 3D geometrisi
-
----
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SmokeExhaustFanModel.tsx::flange_map_callback
-- **params**: (zPos, i)
-- **ic_degiskenler**:
-  - `zPos` — flanşın Z ekseni konumu, iki ayrı flanşın farklı konumda durmasını sağlar
-  - `i` — flanşın index değeri, benzersiz anahtar oluşturmak ve cıvata konumlarını ayarlamak için kullanılır
-  - `materials.smokeCoating` — duman kaplaması materyali, gövde ve flanş sabit bileşenlerinde kullanılır
-  - `materials.boltMaterial` — metal cıvata materyali, flanşlardaki sabitleme cıvatalarına uygulanır
-- **Dönüş**: Tek flanş grubunu temsil eden `<group>` JSX elementi
-
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SmokeExhaustFanModel.tsx::bolt_map_callback
-- **params**: (_, b)
-- **ic_degiskenler**:
-  - `_` — kullanılmayan dizi elemanı değeri
-  - `b` — cıvata index değeri, cıvatanın dairesel konumunu hesaplamak ve benzersiz anahtar oluşturmak için kullanılır
-  - `i` — üst kapsamdaki flanş index'i, cıvatanın Z ekseni konumunu ayarlamak için kullanılır
-  - `materials.boltMaterial` — metal cıvata materyali, her cıvata mesh'ine uygulanır
-- **Dönüş**: Tek cıvatayı temsil eden `<mesh>` JSX elementi
-
----
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SmokeExhaustFanModel.tsx::blade_map_callback
-- **params**: (_, i)
-- **ic_degiskenler**:
-  - `_` — kullanılmayan dizi elemanı değeri
-  - `i` — pervane index değeri, 6 pervanenin eşit açılarla yerleştirilmesini sağlamak ve benzersiz anahtar oluşturmak için kullanılır
-  - `bladeGeometry` — önbelleğe alınan pervane 3D geometrisi, her pervane mesh'ine uygulanır
-  - `materials.castBladeMat` — döküm metal pervane materyali, tüm fan pervanelerine uygulanır
-- **Dönüş**: Tek pervaneyi içeren `<group>` JSX elementi
 
 ---
 
@@ -125,4 +77,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

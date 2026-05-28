@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryReservedTable.tsx
 skeleton_hash: 83eea5dd1bd8d79e
-generated_at: 2026-05-23T21:53:18Z
+entity_hashes:
+  func:InventoryReservedTable: 126336fe1c94b592
+  overview: e173f7662e40b92c
+  style_tokens: 45cb66bf7519a761
+generated_at: 2026-05-28T22:35:35Z
 ---
 
 ## Genel Bakış
@@ -31,7 +35,7 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### InventoryReservedTable
 **Ne yapar**: Rezervasyon alınan siparişlerin bir tablosunu görüntüler.  
@@ -96,16 +100,13 @@ type ReservedRow = {
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `tracking-[0.2em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-transparent`, `bg-white/[0.02]`, `border-b`, `border-separate`, `border-spacing-0`, `border-white/5`, `text-cyan-400`, `text-left`, `text-right`, `text-slate-300`, `text-slate-500`, `text-xs`
-- **Layout:** `group-last:border-0`, `overflow-hidden`, `w-full`
-- **Responsive:** (yok)
+- **Renkler:** `bg-transparent`, `bg-white/2`, `border-b`, `border-separate`, `border-spacing-0`, `border-white/5`, `group-last:border-0`, `hover:bg-white/2`, `text-cyan-400`, `text-left`, `text-right`, `text-slate-300`, `text-slate-500`, `text-xs`
+- **Layout:** `overflow-hidden`, `w-full`
+- **Varyant/Responsive:** `group-last:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `font-black`, `font-bold`, `font-mono`, `group`, `px-4`, `py-3`, `tracking-tighter`, `transition-colors`, `uppercase`

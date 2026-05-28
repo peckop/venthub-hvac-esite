@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\support\ShippingPage.tsx
 skeleton_hash: 8fbd46e3bbbcb13e
-generated_at: 2026-05-23T22:42:05Z
+entity_hashes:
+  func:ShippingPage: 321c885e2ea88a49
+  overview: 2fb078273ffdbcdc
+  style_tokens: f66481541679296a
+generated_at: 2026-05-28T22:40:29Z
 ---
 
 ## Genel Bakış
@@ -18,34 +22,35 @@ Modülün temel sorumluluğu olan kargo yönetimi sayfasının tüm görünüm v
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu VentHub HVAC projesinin destek modülünde yer alan React tabanlı ShippingPage (Kargo Detay Sayfası) bileşeninin sorunsuz çalışması için uygulamanın rota yönetimi, oturum doğrulama mekanizması, backend entegrasyonu ve ortak UI bağımlılıklarının sürekli erişilebilir olması zorunludur.
 
-[Aksiyom 1]: Eğer ana uygulama React Router yapısı bu sayfa için tanımlanmış rotayı barındırmıyorsa, kullanıcılar hiçbir şekilde ShippingPage içeriğine erişemez.
-[Aksiyom 2]: Eğer proje genelinde kullanılan oturum doğrulama (authentication) mekanizması bu sayfa erişiminde devreye alınmamışsa, yetkisiz kullanıcılar müşterilere ait özel kargo ve teslimat bilgilerine erişebilir, veri gizliliği ihlali ortaya çıkar.
-[Aksiyom 3]: Eğer kullanıcıların kargo detaylarını çekmek için kullanılan backend API servisi erişilemez durumdaysa, sayfa üzerinde hiçbir kullanıcıya özel teslimat verisi gösterilemez, kullanıcı deneyimi tamamen bozulur.
-[Aksiyom 4]: Eğer bu sayfanın bağımlı olduğu ortak proje bileşenleri (sayfa şablonu, yükleme göstergesi, hata bildirim bileşeni) import edilebilir veya erişilebilir değilse, ShippingPage hiçbir şekilde doğru şekilde render edilemez.
+Bu modül için fonksiyon gövdesi, parametre veya sabit değeri verilmediğinden dolayı, modüle özgü mimari aksiyom çıkarılamamıştır.
+
+**Not:** `ShippingPage()` fonksiyon imzası parametresizdir ve modül sabitleri tanımlı değildir. Fonksiyon gövdesi paylaşılmadığı için çalışması için gerekli koşullar belirlenememiştir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ShippingPage
-**Ne yapar**: Venthub HVAC projesinin destek modülü kapsamında yer alan kargo işlemleri sayfasını oluşturan React fonksiyonel bileşenidir. Kullanıcıların destek sürecindeki gönderim takibi, kargo yönetimi gibi tüm ilgili işlevleri barındıran kullanıcı arayüzünü sunmakla görevli olan bu bileşen, uygulamanın destek bölümündeki kargo sayfasının temel yapı taşını oluşturur.
-**Nasıl yapar**: TypeScript ile geliştirilmiş React tabanlı bir fonksiyonel bileşen olarak çalışır, proje kaynak kodlarının belirtilen src/views/support/ShippingPage.tsx konumunda tanımlıdır. Sayfaya ait tüm içerik, stil ve temel iş mantığını tek bir bileşen altında toplayarak, uygulamanın yönlendirme sistemi tarafından çağrıldığında render edilmek üzere React çalışma zamanına sunulur.
+**Ne yapar**: `ShippingPage`, projenin destek/yardım bölümünde yer alan kargo ve gönderim süreciyle ilgili bilgilerin sunulduğu bir React bileşenidir. Kullanıcılara sevk bilgileri, teslimat süreleri, kargo şirketleriyle ilgili politikalar gibi konularda yardımcı olmak amacıyla tasarlanmış bir sayfa yapısı sunar.
+
+**Nasıl yapar**: Fonksiyonel bir React bileşeni olarak, JSX (JavaScript XML) kullanarak bir sayfa düzeni (layout) oluşturur. Bu düzen muhtemelen başlık, açıklama metinleri, olası bir iletişim formu veya bilgi kartları gibi bileşenleri içerebilir. Bileşen kendi içinde durum (state) yönetimi veya yan etkiler (side effects) kullanmayan, saf bir sunum (presentational) bileşeni olarak karşımıza çıkmaktadır.
+
 **Parametreler**:
-- Bu fonksiyonel bileşen tanımında herhangi bir giriş parametresi bulunmamaktadır, harici prop veya harici veri girişi almak üzere yapılandırılmamıştır.
-**Dönüş**: React.FC tipinde bir React fonksiyonel bileşiği döndürür. Bu dönen değer, React'in DOM yönetim mekanizması tarafından işlenerek tarayıcıda kargo işlemleri sayfasının kullanıcıya görünür hale gelmesini sağlar.
+- Bu bileşen herhangi bir props (özellik) almaz.
+
+**Dönüş**: JSX elementini (`JSX.Element`) döndürür. Sayfa yapısını temsil eden bir React bileşeni ağacı (React component tree)返回 eder.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/support/ShippingPage.tsx::ShippingPage
+### [N1_NASIL] AST Pointer: `src/views/support/ShippingPage.tsx`::ShippingPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `router` — Next.js `useRouter` hook'u ile alınan yönlendirme nesnesi, geri dönüş butonunun tıklama olayında `router.back()` çağrılarak önceki sayfaya dönmek için kullanılır
-  - `t` — `useI18n` hook'undan alınan çeviri fonksiyonu, sayfadaki tüm metinleri i18n anahtarları üzerinden lokalize etmek için kullanılır
-- **Dönüş**: React JSX elementi (kargo bilgilerini içeren destek sayfasının arayüzü)
+  - `router` — useRouter() hook'undan dönen router nesnesi, sayfa navigasyonu için kullanılır (örn: `router.back()`)
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, çok dilli metinleri getirmek için kullanılır (örn: `t('auth.back')`)
+- **Dönüş**: JSX element (React bileşeni) — destek sayfası için nakliye bilgilerini gösteren React bileşeni
 
 ---
 
@@ -58,3 +63,19 @@ Bu VentHub HVAC projesinin destek modülünde yer alan React tabanlı ShippingPa
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ShippingPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-white`, `border-light-gray`, `hover:text-primary-navy`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`
+- **Layout:** `inline-flex`, `items-center`, `max-w-4xl`, `p-6`
+- **Varyant/Responsive:** `hover:`, `lg:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `lg:px-8`, `mb-4`, `mb-6`, `mr-1`, `mx-auto`, `px-4`, `py-10`, `rounded-xl`, `sm:px-6`, `space-y-4`, `transition-colors`

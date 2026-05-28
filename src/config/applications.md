@@ -4,7 +4,9 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\config\applications.ts
 skeleton_hash: 66a67e1c0079217c
-generated_at: 2026-05-23T22:28:29Z
+entity_hashes:
+  overview: f2506fc587bf463a
+generated_at: 2026-05-28T22:37:09Z
 ---
 
 ## Genel Bakış
@@ -21,7 +23,7 @@ Bu modül, VentHub HVAC sisteminin ilgili tüketen birimleri tarafından kullan�
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 

@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ProductDetailPage.tsx
 skeleton_hash: d6f68c082d77d75b
-generated_at: 2026-05-23T22:42:04Z
+entity_hashes:
+  func:ProductDetailPage: e3b845e07eaace73
+  func:handleAddToCart: 8138c2a65eca7059
+  func:scrollToSection: 6dbf1d98eb628a0a
+  overview: 97e3d78ab968b394
+  style_tokens: cb34affefefbb1cb
+generated_at: 2026-05-28T22:40:32Z
 ---
 
 ## Genel Bakış
@@ -30,7 +36,7 @@ Bu modül, ürün detaylarını görüntülemek, sayfa içi gezinme ve sepete ü
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ProductDetailPage
 **Ne yapar**: VentHub HVAC projesinde ürün detaylarını görüntülemek için tasarlanmış ana React sayfa bileşenidir. Kullanıcıların ilgili ürüne ait tüm özellikleri, görselleri, fiyat bilgilerini ve diğer detayları erişebilmesini sağlar. Sayfa içerisindeki tüm interaktif eylemleri yöneterek tutarlı bir kullanıcı deneyimi sunar.
@@ -72,160 +78,118 @@ type DbProductImage = Tables['product_images']['Row']
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::ProductDetailPage
-- **params**: initialProduct
+### [N1_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::ProductDetailPage`
+- **params**: `{ initialProduct }` — sunucudan gelen ilk ürün verisi
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
-  - `lang` — useI18n hook'undan alınan aktif dil kodu
-  - `params` — useParams hook'undan alınan rota parametreleri
-  - `currentSlug` — params.slug'dan temizlenerek elde edilen geçerli ürün slug'ı
-  - `addToCart` — useCart hook'undan alınan sepete ekleme fonksiyonu
-  - `categories` — useCategories hook'undan alınan kategori listesi
-  - `wrapCategory` — useCategoryViewModel hook'undan alınan kategori sarmalama fonksiyonu
-  - `product` — useState ile tutulan aktif ürün nesnesi, null da olabilir
-  - `setProduct` — ürün durumunu güncellemek için kullanılan state setter fonksiyonu
-  - `loading` — ürün yükleme durumunu tutan state
-  - `setLoading` — loading state'ini güncelleyen setter
-  - `images` — ürüne ait resim listesini tutan state
-  - `setImages` — resim listesini güncelleyen setter
-  - `quantity` — sepete eklenecek ürün miktarını tutan state
-  - `setQuantity` — miktar state'ini güncelleyen setter
-  - `activeSection` — aktif olan ürün detay sayfası bölümünün id'sini tutan state
-  - `setActiveSection` — aktif bölüm state'ini güncelleyen setter
-  - `leadOpen` — teklif modalının açık olma durumunu tutan state
-  - `setLeadOpen` — lead modal durumunu güncelleyen setter
-  - `isProjectModalOpen` — projeye ekleme modalının açık olma durumu
-  - `setIsProjectModalOpen` — proje modal state'ini güncelleyen setter
-  - `isNavSticky` — gezinti çubuğunun sabitlenme durumu
-  - `setIsNavSticky` — sticky nav state'ini güncelleyen setter
-  - `sectionRefs` — useRef ile tutulan bölüm DOM elemanları kayıt nesnesi
-  - `navTriggerRef` — useRef ile tutulan sticky nav tetikleyici DOM elemanı
-  - `hierarchy` — useMemo ile hesaplanan ana ve alt kategori nesneleri
-  - `breadcrumbItems` — useMemo ile hesaplanan ekmek kırıntısı öğeleri listesi
-  - `scrollToSection` — belirtilen bölüme kaydırma fonksiyonu
-  - `handleAddToCart` — sepete ekleme işlemini yöneten fonksiyon
-  - `sections` — ürün detay sayfasındaki bölümleri tanımlayan sabit liste
-  - `categoryMetadata` — ana kategorinin ham metadatasını tipleyen nesne
-- **Dönüş**: React JSX elemanı, ürün detay sayfası arayüzü
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
+  - `lang` — useI18n() hook'undan gelen dil kodu, formatCurrency'e传递
+  - `params` — useParams() ile alınan URL parametreleri
+  - `currentSlug` — params.slug'dan türetilen, sonundaki 'cc' kesilerek normalize edilmiş ürün tanımlayıcı
+  - `addToCart` — useCart() hook'undan gelen sepete ekleme fonksiyonu
+  - `categories` — useCategories() hook'undan gelen kategori listesi
+  - `wrapCategory` — useCategoryViewModel() hook'undan gelen ham kategori nesnesini sarmalayan fonksiyon
+  - `product` — useState: aktif ürün verisi, initialProduct'tan başlatılır veya API ile yüklenir
+  - `loading` — useState: veri yüklenme durumu bayrağı
+  - `images` — useState: ürün resimlerinin {path, alt} listesi
+  - `quantity` — useState: Sepete eklenecek ürün adedi, başlangıç 1
+  - `activeSection` — useState: Sticky nav'da aktif olan bölüm ID'si, scroll spy ile güncellenir
+  - `leadOpen` — useState: LeadModal açma/kapama durumu
+  - `isProjectModalOpen` — useState: ProjeyeEkleModal açma/kapama durumu
+  - `isNavSticky` — useState: Sticky navigasyonun sabitlenme durumu
+  - `sectionRefs` — useRef<Record<string, HTMLElement | null>>: Bölüm DOM elementlerinin referans haritası
+  - `navTriggerRef` — useRef<HTMLDivElement>: Sticky nav'ın tetiklendiği sentinel element referansı
+  - `hierarchy` — useMemo: {main, sub} kategori hiyerarşisi, product ve categories'ten hesaplanır
+  - `breadcrumbItems` — useMemo: Breadcrumb navigasyon öğeleri dizisi
+  - `categoryMetadata` — hierarchy.main?.raw?.metadata'dan türetilen kategori meta verisi (hide_price kontrolü için kullanılır)
+  - `sections` — Dizi: Sayfa bölümlerinin id, title, icon, bgClass bilgileri
+- **Dönüş**: JSX — Ürün detay sayfasının tam render çıktısı (hero, galeri, fiyat, sepete ekle, sticky nav, bölüm içerikleri)
 
-### [N2_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::useMemo.hierarchyCalculator
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::hierarchy (useMemo callback)`
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `product` — ana fonksiyondan erişilen aktif ürün nesnesi
-  - `categories` — ana fonksiyondan erişilen kategori listesi
-  - `wrapCategory` — ana fonksiyondan erişilen kategori sarmalama fonksiyonu
-  - `categoryMap` — kategorileri id'leri ile eşleyen Map nesnesi
-  - `rawSub` — ham alt kategori nesnesi, veritabanından gelen ham veri
-  - `rawMain` — ham ana kategori nesnesi, veritabanından gelen ham veri
-- **Dönüş**: { main: sarmalanmış ana kategori, sub: sarmalanmış alt kategori } nesnesi, her ikisi de null olabilir
+  - `categoryMap` — categories dizisinden oluşturulmuş Map<id, Category>, hızlı lookup için
+  - `rawSub` — product.subcategory_id ile categoryMap'ten çekilen ham alt kategori nesnesi
+  - `rawMain` — product.category_id ile categoryMap'ten çekilen ham ana kategori nesnesi
+- **Dönüş**: `{ main: WrappedCategory | null, sub: WrappedCategory | null }` — wrapCategory ile sarılmış ana ve alt kategori
 
-### [N3_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::useMemo.breadcrumbCalculator
-- **params**: (yok)
+### [N3_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::breadcrumbItems (useMemo callback)`
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `hierarchy` — ana fonksiyondan erişilen kategori hiyerarşisi nesnesi
-  - `product` — ana fonksiyondan erişilen aktif ürün nesnesi
-  - `t` — ana fonksiyondan erişilen çeviri fonksiyonu
-  - `items` — oluşturulacak ekmek kırıntısı öğelerini tutan geçici liste
-- **Dönüş**: Ekmek kırıntısı öğelerinden oluşan { label, href } nesneleri listesi
+  - `items` — Başlangıçta [{label: t('category.breadcrumbHome'), href: '/'}] olan breadcrumb öğeleri dizisi, koşullara göre ürün eklenir
+- **Dönüş**: `Array<{ label: string, href: string }>` — Tam breadcrumb yolu
 
-### [N4_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::useEffect.fetchProduct
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::fetchProduct (useEffect içinde)`
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `currentSlug` — ana fonksiyondan erişilen geçerli ürün slug'ı
-  - `product` — ana fonksiyondan erişilen aktif ürün nesnesi
-  - `initialProduct` — ana fonksiyona parametre olarak gelen başlangıç ürünü
-  - `setProduct` — ürün state'ini güncelleyen setter fonksiyonu
-  - `setLoading` — yükleme state'ini güncelleyen setter
-  - `setImages` — resim listesini güncelleyen setter
-  - `productData` — API'den çekilen ürün verisi nesnesi
-  - `imgs` — supabase sorgusundan dönen ürün resimleri verisi
-  - `list` — işlenerek state'e aktarılacak resim listesi
-  - `error` — ürün çekerken oluşan hata nesnesi
-- **Dönüş**: Promise<void> (async void)
+  - `productData` — getProductBySlugOrId(currentSlug) ile çekilen ürün verisi, null olabilir
+  - `imgs` — supabase.from('product_images') sorgusundan dönen {data: imgs} destructuring ile alınan ham görsel listesi
+  - `list` — imgs dizisinin map ile {path, alt} formatına dönüştürülmüş hali
+  - `error` — try-catch bloğunda yakalanan hata nesnesi, console.error ile loglanır
+- **Dönüş**: yok (yan etki: setProduct, setImages, setLoading çağrıları ile state günceller)
 
-### [N5_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::useEffect.handleScroll
-- **params**: (yok)
+### [N5_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::scrollToSection`
+- **params**: `(sectionId: string)` — Kaydırılacak bölümün ID'si
 - **ic_degiskenler**:
-  - `navTriggerRef` — ana fonksiyondan erişilen tetikleyici ref nesnesi
-  - `setIsNavSticky` — sticky nav state'ini güncelleyen setter
-  - `window.scrollY` — mevcut dikey kaydırma konumu
-  - `navTriggerRef.current.offsetTop` — tetikleyici elemanın dikey konumu
-- **Dönüş**: void
+  - `element` — sectionRefs.current[sectionId] ile alınan DOM elementi referansı
+  - `navEl` — document.getElementById('pdp-sticky-nav') ile bulunan sticky navigasyon elementi, offset hesaplaması için
+- **Dönüş**: yok (yan etki: window.scrollTo ile smooth kaydırma yapar)
 
-### [N6_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::useEffect.handleScrollSpy
-- **params**: (yok)
+### [N6_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::handleAddToCart`
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `sectionRefs` — ana fonksiyondan erişilen bölüm ref'leri kayıt nesnesi
-  - `setActiveSection` — aktif bölüm state'ini güncelleyen setter
-  - `navEl` — sticky nav DOM elemanı, document.getElementById ile alınan
-  - `headerOffset` — hesaplanan başlık yüksekliği ofseti
-  - `scrollPosition` — mevcut kaydırma konumu + header offset ile hesaplanan eşik değeri
-  - `sectionOffsets` — her bölümün üst ve alt konumlarını içeren işlenmiş liste
-- **Dönüş**: void
+  - (fonksiyon gövdesinde ek değişken yok, sadece product ve quantity dış scope'tan erişilir)
+- **Dönüş**: yok (yan etki: addToCart(product, quantity) ile sepete ürün ekler)
 
-### [N7_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::handleScrollSpy.sectionOffsetMapper
-- **params**: sectionId, ref
+### [N7_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::handleScrollSpy (useEffect içinde)`
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `sectionId` — işlenen bölümün string id'si
-  - `ref` — bölümün DOM elemanı referansı
-  - `ref.offsetTop` — bölümün dikey üst konumu
-  - `ref.offsetHeight` — bölümün yüksekliği
-- **Dönüş**: { id, top, bottom } nesnesi veya geçersizse null
+  - `navEl` — document.getElementById('pdp-sticky-nav'), offset yüksekliği hesaplamak için
+  - `headerOffset` — navEl varsa navEl.offsetHeight + 120, yoksa 200 sabit değeri
+  - `scrollPosition` — window.scrollY + headerOffset toplamı, mevcut kaydırma pozisyonu
+  - `sectionOffsets` — sectionRefs.current'ın Object.entries ile dönülüp map/filter ile {id, top, bottom} dizisine dönüştürülmüş hali
+  - `section` — for döngüsündeki her bir bölüm offset nesnesi
+- **Dönüş**: yok (yan etki: setActiveSection ile aktif bölümü günceller)
 
-### [N8_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::scrollToSection
-- **params**: sectionId: string
+### [N8_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::useEffect scroll handler (isNavSticky)`
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `sectionRefs` — ana fonksiyondan erişilen bölüm ref'leri kayıt nesnesi
-  - `element` — hedeflenen bölümün DOM elemanı
-  - `navEl` — sticky nav DOM elemanı, document.getElementById ile alınan
-- **Dönüş**: void
+  - `handleScroll` — İç arrow function: navTriggerRef.current varsa, window.scrollY > navTriggerRef.current.offsetTop - 80 koşulunu kontrol eder
+- **Dönüş**: yok (yan etki: setIsNavSticky ile sticky durumu güncellenir, scroll event listener eklenir/kaldırılır)
 
-### [N9_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::sectionsMap.navButtonClickHandler
-- **params**: section (bölüm nesnesi)
+### [N9_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::sectionRefs nav map callback`
+- **params**: `(section)` — sections dizisindeki tek bir bölüm nesnesi {id, title, icon, bgClass}
 - **ic_degiskenler**:
-  - `section.id` — tıklanan bölümün id'si
-  - `scrollToSection` — bölüm kaydırma fonksiyonu
-- **Dönüş**: void
+  - (ek değişken yok, section.id, section.icon, section.title dış scope'tan erişilir)
+- **Dönüş**: `JSX.Element` — Aktif/pasif durumuna göre stillendirilmiş navigasyon butonu
 
-### [N10_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::sectionsMap.sectionRefSetter
-- **params**: el (DOM elemanı)
+### [N10_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::sectionRefs content map callback`
+- **params**: `(section)` — sections dizisindeki tek bir bölüm nesnesi {id, title, icon, bgClass}
 - **ic_degiskenler**:
-  - `section.id` — işlenen bölümün id'si
-  - `sectionRefs.current` — bölüm ref'leri kayıt nesnesi
-- **Dönüş**: void
+  - (ek değişken yok, section.id, section.bgClass, section.icon, section.title, product.description dış scope'tan erişilir)
+- **Dönüş**: `JSX.Element` — Section başlığı ve 'genel' bölümü için RichTextRenderer ile ürün açıklaması içeren PageShell
 
-### [N11_NASIL] AST Pointer: src\views\ProductDetailPage.tsx::handleAddToCart
-- **params**: (yok)
+### [N11_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::useEffect scrollSpy setup`
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `product` — ana fonksiyondan erişilen aktif ürün nesnesi
-  - `quantity` — ana fonksiyondan erişilen seçilen ürün miktarı
-  - `addToCart` — useCart hook'undan alınan sepete ekleme fonksiyonu
-- **Dönüş**: void
+  - `handleScrollSpy` — İç async function: scroll pozisyonuna göre aktif section'ı belirler (detaylı analiz için N7'ye bak)
+- **Dönüş**: yok (yan etki: scroll event listener eklenir, cleanup'ta kaldırılır)
+
+### [N12_NASIL] AST Pointer: `src/views/ProductDetailPage.tsx::hierarchy categoryMap callback`
+- **params**: `(c)` — categories dizisindeki tek bir kategori nesnesi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `[c.id, c]` tuple'ı — Map oluşturmak için key-value çifti
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Aynı dosyadaki ProductDetailPage() fonksiyonu, sayfa içindeki ilgili bölüme kaydırma işlemini yapmak için scrollToSection fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  ProductDetailPage() → scrollToSection()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    ProductDetailPage["ProductDetailPage()"] --> scrollToSection["scrollToSection()"]
+graph TD
+    ProductDetailPage_tsx__ProductDetailPage["ProductDetailPage"]
+    ProductDetailPage_tsx__handleAddToCart["handleAddToCart"]
+    ProductDetailPage_tsx__scrollToSection["scrollToSection"]
+    ProductDetailPage_tsx__ProductDetailPage --> ProductDetailPage_tsx__scrollToSection
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -239,3 +203,19 @@ graph LR
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProductDetailPage
   export: ProductDetailPageProps
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500`, `bg-cyan-500/10`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-950`, `bg-white`, `bg-white/90`, `border-2`, `border-b`, `border-b-2`, `border-cyan-500/20`, `border-primary-navy`, `border-slate-100`, `border-slate-50`, `hover:bg-cyan-600`
+- **Layout:** `backdrop-blur-2xl`, `block`, `fixed`, `flex`, `flex-col`, `gap-12`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `h-0`, `h-10`, `h-12`
+- **Varyant/Responsive:** `:`, `active:`, `disabled:`, `group-hover:`, `hover:`, `last:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `${activeSection`, `${isNavSticky`, `${section.bgClass`, `:`, `===`, `active:scale-95`, `animate-pulse`, `animate-spin`, `border`, `disabled:opacity-50`, `duration-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`

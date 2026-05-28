@@ -2,17 +2,21 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\destek\hesaplayicilar\jet-fan\page.tsx
-skeleton_hash: a86800d66892e5fc
-generated_at: 2026-05-23T21:49:07Z
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\jet-fan\page.tsx
+skeleton_hash: bb8025f9b95570ef
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: ed78a418e47b7805
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:34:48Z
 ---
 
 ## Genel Bakış
-Bu modül, jet fan hesaplayıcısının kullanıcı arayüzünü oluşturan tek bir React bileşeni içerir. `Page` fonksiyonu, sayfanın tamamını render ederek alt bileşenleri ve düzeni bir araya getirir.
+Bu modül, jet fan hesaplayıcısı için kullanıcı arayüzünü sunan tek bir React sayfa bileşeninden oluşur. `Page` fonksiyonu, hesaplama formunu ve ilgili tüm alt bileşenleri bir araya getirerek sayfanın genel yapısını ve düzenini oluşturur.
 
 ## Fonksiyon Grupları
-### UI Rendering
-Bu grup, sayfanın görsel yapısını ve bileşen hiyerarşisini tanımlar.  
+### Sayfa Oluşturma ve Düzenleme
+Bu grup, jet fan hesaplayıcı sayfasının tamamını oluşturan ve kullanıcıya sunan temel bileşeni tanımlar.
 - Page
 
 ---
@@ -22,31 +26,51 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Jet Fan Hesaplayıcı sayfasının ana bileşenini oluşturur. Kullanıcının jet fan hesaplamalarını yapabilmesi için gerekli kullanıcı arayüzünü sunar. Bu sayfa, giriş alanları ve sonuçları içeren bir hesaplayıcı formunu barındırır.
-**Nasıl yapar**: React bileşeni olarak tasarlanan Page, JSX çıktısı üretir. Sayfanın genel düzenini oluşturur, ilgili alt bileşenleri (giriş alanları, butonlar, sonuç bölümü) birleştirir ve hesaplama mantığını tetikleyen yapıyı kurar. Bileşen, state management ve event handling mekanizmalarını kullanarak kullanıcı etkileşimini yönetir.
-**Parametreler**: Bu fonksiyon parametre almaz.
-**Dönüş**: React tarafından render edilebilen bir JSX.Element (PageComponent) döndürür. Bu bileşen, Jet Fan Hesaplayıcı sayfasını temsil eden eksiksiz bir arayüzdür.
+**Ne yapar**: Bu fonksiyon, bir web sayfasının ana bileşenini (sayfa yapısını) oluşturan ve sunan üst düzey bir React bileşenidir. Sayfanın görünümünü ve temel yapısını tanımlayan `PageComponent` bileşenini render ederek tarayıcıya aktarır.
+
+**Nasıl yapar**: Fonksiyon, doğrudan ve basit bir yapıdadır. Herhangi bir mantık, koşul veya veri işleme gerçekleştirmez. Sadece import edilmiş olan `PageComponent` bileşenini fonksiyonel bileşen olarak döndürür. React'ın bu bileşeni-render-etme mekanizmasını devreye sokar.
+
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: `JSX.Element` (React bileşeni). `PageComponent` bileşeninin oluşturduğu React ağacı (virtual DOM) yapısını döndürür.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\destek\hesaplayicilar\jet-fan\page.tsx::Page
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/app/[lang]/destek/hesaplayicilar/jet-fan/page.tsx::Page
+- **params**: (yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (`<PageComponent />` render edilir)
+- **Dönüş**: `<PageComponent />` JSX bileşeni döndürülür
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\destek\hesaplayicilar\jet-fan\page.tsx
-  function: src\app\destek\hesaplayicilar\jet-fan\page.tsx::Page
+  file: src\app\[lang]\destek\hesaplayicilar\jet-fan\page.tsx
+  function: src\app\[lang]\destek\hesaplayicilar\jet-fan\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

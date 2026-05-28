@@ -4,7 +4,9 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\navigationConfig.ts
 skeleton_hash: 3201df6265b40cce
-generated_at: 2026-05-23T22:33:55Z
+entity_hashes:
+  overview: 0c8e815324d6c567
+generated_at: 2026-05-28T22:38:48Z
 ---
 
 ## Genel Bakış
@@ -22,7 +24,7 @@ Bu modül, HVAC uygulaması için kullanıcı arayüzü navigasyon yapısını t
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 

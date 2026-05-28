@@ -4,47 +4,57 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCartHook.ts
 skeleton_hash: 65924fd41c1d17d7
-generated_at: 2026-05-23T22:29:22Z
+entity_hashes:
+  func:useCart: 24a780c5d0077b33
+  overview: a6bb925fcf63c562
+generated_at: 2026-05-28T22:37:41Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun frontend altyapısında yer alan, alışveriş sepeti işlevlerini merkezileştiren özel React hook modülüdür. Uygulama içindeki tüm bileşenlerin sepet verilerine ve işlemlerine tutarlı bir şekilde erişmesini sağlamak için tasarlanmıştır. Modülün tek ana dışa aktarımı olan useCart hook'u, sepet işlevselliğini tüm proje genelinde kullanılabilir kılar.
+Bu modül, uygulama genelinde alışveriş sepeti işlevselliğini yönetmek ve merkezileştirmek için tasarlanmış bir React hook'udur. Sepetin durumunu, öğelerini ve ilgili tüm işlemleri (ekleme, kaldırma, güncelleme) kontrol ederek tutarlı bir kullanıcı deneyimi sağlar.
 
 ## Fonksiyon Grupları
 ### Merkezi Sepet Yönetimi Hook'u
-Alışveriş sepetinin durum yönetimini ve ilgili tüm işlem erişimini tek bir noktada toplayarak, uygulamanın her bölümünden sepet işlemlerinin basit ve tutarlı bir şekilde kullanılmasını sağlar.
+Uygulamanın tüm bölümlerinden erişilebilen, sepet verisiyle ilgili tüm durum ve işlemleri tek bir接口 üzerinden sunar.
 - useCart
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React alışveriş sepeti yönetim hook'u, projenin kullanıcı oturum yönetimi, global state yönetimi, istemci tarafı depolama ve backend iletişim altyapılarının sorunsuz çalışmasına bağlı olarak tüm sepet yönetimi işlevlerini yerine getirebilir.
 
-[Aksiyom 1]: Eğer hook'un erişmesi gereken SepetContext global React context'i uygulama geneline sağlanmamışsa, hook sepet verilerine erişemez ve hiçbir sepet işlemi gerçekleştirilemez.
-[Aksiyom 2]: Eğer kullanıcı oturum yönetimi modülü tarafından geçerli, tanımlı kullanıcı kimliği hook'a iletilmiyorsa, sepetin kullanıcı özelinde backend ile senkronize edilmesi işlemleri yapılamaz.
-[Aksiyom 3]: Eğer istemci tarafı yerel depolama (localStorage) hook tarafından erişilebilir değilse, kullanıcı oturumları arasında sepet verisi korunamaz, sayfa yenilendiğinde sepet içeriği sıfırlanır.
-[Aksiyom 4]: Eğer sepet verilerini backend ile senkronize etmek için kullanılan API istekleri başarısız olursa, yerel sepet verisi ile uzaktan kayıtlı sepet verisi arasında kalıcı tutarsızlık oluşur.
+Fonksiyon gövdesi (function body) sağlanmadığından, bu modüle özgü somut mimari varsayımlar çıkarılamamıştır. Aşağıda yalnızca fonksiyon imzasından türetilen minimal aksiyomlar yer almaktadır:
+
+**[Aksiyom 1]:** Eğer `useCart()` bir React hook olarak çağrılmıyorsa (React bileşen içi veya başka bir hook içinde değilse), React Hook kuralları ihlal edilir ve beklenmeyen davranış oluşur.
 
 ---
 
-## FONKSIYON DETAYLARI
+> ⚠️ **Not:** Gerçek fonksiyon gövdesi (içerik, state tanımlamaları, return yapısı, bağımlılıklar) paylaşılmadığı için, bu modülün hangi state management aracını kullandığı, ne döndürdüğü, hangi API'leri çağırdığı veya hangi dış bağımlılıklara sahip olduğu **bilinmiyor** olarak değerlendirilmiştir. Somut aksiyon üretmek için fonksiyon gövdesinin tamamı gereklidir.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### useCart
-**Ne yapar**: Alışveriş sepeti durumunu ve tüm sepet ile ilgili aksiyonları güvenli bir şekilde tüketmek için tasarlanmış özel React hook'udur. CartContext'i kullanarak sepet verilerini tüm uygulama bileşenlerine erişime açar, özellikle CartProvider bileşeninin kapsamı dışında kullanıldığında çalışma zamanı hatalarını tamamen engellemek için hiçbir işlem yapmayan güvenli bir geri dönüş nesnesi sunar. Hem üretim ortamında hem de izole testler, statik derlemeler gibi özel senaryolarda sorunsuz çalışacak şekilde tasarlanmıştır.
-**Nasıl yapar**: React'in yerleşik useContext hook'u ile proje içinde tanımlı CartContext nesnesini çeker, öncelikle bağlamın geçerli olup olmadığını kontrol eder. Eğer CartProvider bileşeni altında kullanılmadığı için bağlam nesnesi geçersiz veya boş çıkarsa, orijinal context ile aynı arayüze sahip ama tüm modifikasyon fonksiyonları herhangi bir değişiklik yapmayan (no-op) bir geri dönüş nesnesi döndürür. Bu sayede uygulamanın çökmesine neden olacak referans hatalarını önceden engeller, her senaryoda stabil çalışmayı garanti eder.
+**Ne yapar**: React uygulamasında alışveriş sepeti bağlamını (context) güvenli bir şekilde tüketerek sepetteki ürünler, toplamlar ve sepet üzerinde yapılabilecek işlemleri sağlar. Fonksiyon, CartProvider dışında (örneğin statik build'lerde veya izole test ortamlarında) kullanıldığında runtime hatalarını önlemek için güvenli, boş (no-op) fallback nesnesi döndürür.
+
+**Nasıl yapar**: React'in `useContext` hook'unu kullanarak `CartContext` değerini alır. Eğer context değeri `null` veya `undefined` ise (yani bileşen bir CartProvider içinden render edilmiyorsa), sepet işlevselliğini taklit eden ancak hiçbir yan etkisi olmayan boş fonksiyonlar içeren bir nesne döndürür. Bu sayede uygulama bütünlüğü korunur ve.sepetsiz ortamlarda bile hata fırlatılmaz.
+
 **Parametreler**:
-- Bu fonksiyon herhangi bir giriş parametresi almaz.
-**Dönüş**: CartContext türünde bir nesne döndürür. Bu nesne içerisinde sepetin içindeki ürünleri listeleyen `items` verisi, sepetin toplam tutarlarını içeren `totals` nesnesi ve sepete ürün ekleme, çıkarma, güncelleme gibi tüm işlemleri gerçekleştiren modifikasyon fonksiyonları barındırır. Eğer CartProvider dışında kullanılırsa aynı arayüze sahip, hiçbir işlem yapmayan güvenli bir geri dönüş nesnesi döndürülür.
+Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: 
+- Type: `CartContext` veya `FallbackCartObject`
+- Dönüş değeri, `items` (ürün dizisi), `syncing` (senkronizasyon durumu), `addToCart` (ürün ekleme), `removeFromCart` (ürün kaldırma), `updateQuantity` (miktar güncelleme), `clearCart` (sepeti temizleme), `getCartTotal` (toplam tutarı hesaplama), `getCartCount` (ürün sayısını hesaplama) ve `applyServerPricing` (sunucu fiyatlandırmasını uygulama) içerir. CartProvider mevcut değilse tüm fonksiyonlar no-op olarak çalışır ve sayısal değerler sıfır döner.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCartHook.ts::useCart
+### [N1_NASIL] AST Pointer: src/hooks/useCartHook.ts::useCart
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `context` — useContext hook'u ile CartContext'ten alınan sepet durumunu ve işlevlerini içeren bağlam nesnesi, null olup olmadığı kontrol edilerek işlenir
-- **Dönüş**: Koşullu olarak ya CartContext'ten gelen orijinal bağlam nesnesi, ya da izole/statik ortamlar için güvenli varsayılan değerlere sahip geri dönüş nesnesi (boş sepet öğeleri listesi, false senkronizasyon durumu, boş callback fonksiyonları, 0 döndüren toplam/adet hesaplama fonksiyonları içerir)
+  - `context` — `useContext(CartContext)` çağrısıyla elde edilen sepet context değeri; CartContext provider içindeyse gerçek seket state ve metodlarını, değilse `null/undefined` döner
+- **Dönüş**: CartContext nesnesi veya fallback nesne — `context` truthy ise doğrudan `context` döner; falsy ise `{ items: [], syncing: false, addToCart: () => {}, removeFromCart: () => {}, updateQuantity: () => {}, clearCart: () => {}, getCartTotal: () => 0, getCartCount: () => 0, applyServerPricing: () => {} }` yapısı döner (statik build/izole ortam güvenli fallback)
 
 ---
 

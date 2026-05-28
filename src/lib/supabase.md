@@ -4,25 +4,32 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\supabase.ts
 skeleton_hash: 0bb8187b63eb38da
-generated_at: 2026-05-23T22:32:24Z
+entity_hashes:
+  overview: e6186c84d9a0cbfa
+generated_at: 2026-05-28T22:38:34Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin Supabase veritabanı entegrasyonunu merkezi olarak yöneten bu modül, projenin tüm bölümlerinde kullanılmak üzere tekil Supabase istemcisini tanımlar. Supabase bağlantısı için zorunlu olan `SUPABASE_URL` ve `SUPABASE_ANON_KEY` ortam değişkenlerini kontrol eder, eksik olmaları durumunda uyarı mekanizmasını devreye sokar. Tarayıcı ve sunucu tarafı kullanımlarına uygun Supabase istemci API'lerini, projeye özel veritabanı ve arayüz tipleriyle entegre ederek tip güvenli işlemleri mümkün kılar, ayrıca HVAC markalarına ait sabit listeyi depolar.
+Bu modül, VentHub HVAC projesindeki tüm Supabase veritabanı işlemlerinin merkezi noktasıdır. Temel amacını, projenin her yerinde kullanılmak üzere tek bir Supabase istemcisi oluşturmaktır. Modül, zorunlu ortam değişkenlerini kontrol eder, eksik veya hatalı durumlarda uyarı verir ve proje için gerekli olan tip güvenli istemci yapısını ve sabit listeyi sağlar.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül proje için Supabase istemcisini initialize etmek ve HVAC sistemleri için geçerli marka listesini tutmak amacıyla tasarlanmıştır, çalışması için gerekli ortam değişkenlerinin işletim ortamında tanımlı olması temel koşuldur.
+Bu modül Supabase istemcisini başlatmak ve HVAC markaları listesini tutmak için tasarlanmıştır.
 
-[Aksiyom 1]: Eğer SUPABASE_URL ve SUPABASE_ANON_KEY ortam değişkenleri işletim ortamında tanımlı değilse, modül içindeki missingEnv bayrağı true olur, supabase istemcisi oluşturulamaz ve bu modülü kullanan tüm servisler Supabase ile veri alışverişi yapamaz.
-[Aksiyom 2]: Eğer SUPABASE_URL ve SUPABASE_ANON_KEY değişkenleri tanımlı olsa da geçersiz formatta ise, supabase istemcisi oluşturulsa bile tüm kimlik doğrulama ve veri erişim sorguları başarısız olur.
-[Aksiyom 3]: Eğer HVAC_BRANDS sabiti eksik veya geçersiz öğeler içeren bir dizi olarak tanımlıysa, bu modülü kullanan HVAC ile ilgili listeleme, filtreleme veya doğrulama işlemleri hatalı çalışır.
-[Aksiyom 4]: Eğer modülü kullanan servisler missingEnv bayrağının durumunu kontrol etmeden supabase istemcisini kullanmaya çalışırsa, ortam değişkenleri eksik olduğunda sessiz hata oluşur ve sorun kök nedeninin tespiti gecikir.
+**[Aksiyom 1]:** Eğer `SUPABASE_URL` ortam değişkeni tanımlı değilse, `missingEnv` değişkeni truthy değer alır ve `supabase` istemcisi güvenli bir şekilde başlatılamaz.
+
+**[Aksiyom 2]:** Eğer `SUPABASE_ANON_KEY` ortam değişkeni tanımlı değilse, `missingEnv` değişkeni truthy değer alır ve `supabase` istemcisi güvenli bir şekilde başlatılamaz.
+
+**[Aksiyom 3]:** Eğer hem `SUPABASE_URL` hem de `SUPABASE_ANON_KEY` ortam değişkenleri tanımlıysa, `supabase` ternary ifadesi tarafından geçerli bir istemci nesnesi oluşturulur.
+
+**[Aksiyom 4]:** Eğer ortam değişkenleri eksik olmasına rağmen `supabase` nesnesi üzerinden veritabanı işlemi başlatılırsa, istemci yapılandırması eksik olacağından hata oluşur.
+
+**[Aksiyom 5]:** `HVAC_BRANDS` dizisi modül içinde sabit olarak tanımlı olmalı ve geçerli HVAC markalarını içermelidir; aksi takdirde marka bazlı filtreleme/listeleme işlemleri beklenen sonuçları vermez.
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -100,12 +107,7 @@ type ProjectItem = DbProjectItem & { product?: Product }
 
 ## AST POINTERS
 
-Analiz edilen `C:\Users\alize\venthub-hvac\src\lib\supabase.ts` kaynak dosyasında herhangi bir fonksiyon imzası veya fonksiyon gövdesi tanımlanmamıştır. Yalnızca global düzeyde aşağıdaki sabit değişkenler bulunmaktadır:
-- `SUPABASE_URL` — İkili ifade ile tanımlanmış Supabase servis erişim URL'si sabiti
-- `SUPABASE_ANON_KEY` — İkili ifade ile tanımlanmış anonim kullanıcı erişim anahtarı sabiti
-- `missingEnv` — Gerekli ortam değişkenlerinin eksikliğini işaret eden ikili ifade ile tanımlı kontrol sabiti
-- `supabase` — Üçlü (koşullu) ifade ile tanımlanmış Supabase istemcisi nesnesi değişkeni
-- `HVAC_BRANDS` — HVAC sektörü markalarını içeren dizi türünde sabit
+(No function bodies were provided for analysis.)
 
 ---
 

@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanProblem.tsx
 skeleton_hash: 666108ab9c17b196
-generated_at: 2026-05-23T22:01:23Z
+entity_hashes:
+  func:SilentFanProblem: f3ccc67c9bb4f247
+  func:tr: b282b53f03d688a5
+  overview: 9c713c60ca011b94
+  style_tokens: 3b3553271e7a0f67
+generated_at: 2026-05-28T22:35:47Z
 ---
 
 ## Genel Bakış
@@ -29,7 +34,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SilentFanProblem
 **Ne yapar**: SilentFanProblem, silent fan (sessiz fan) ile ilgili sorunları gösteren bir React bileşenidir.  
@@ -95,29 +100,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-- **SilentFanProblem()** → `tr` fonksiyonunu çağırır (muhtemelen çeviri veya metin dönüşümü için).
-
-### Disaridan Cagrilanlar (Incoming)
-- Bu modülü çağıran dış fonksiyon veya dosya bulunmamaktadır. (**Yok**)
-
-### Ic Ice Fonksiyonlar (Nested)
-- İç içe fonksiyon tanımlanmamıştır. (**Yok**)
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  SilentFanProblem() → tr()
-
-```mermaid
-graph LR
-    SilentFanProblem["SilentFanProblem()"] --> tr["tr()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\category\sections\silent-fan\SilentFanProblem.tsx
@@ -134,16 +116,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `md:aspect-[21/9]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/20`, `bg-blue-400`, `bg-blue-500`, `bg-blue-500/20`, `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-red-400`, `bg-red-500`, `bg-white`, `border-blue-400/30`, `border-gray-100`, `border-white/10`, `from-black/80`, `from-gray-50`, `md:text-4xl`
-- **Layout:** `absolute`, `backdrop-blur-md`, `block`, `flex`, `from-black/80`, `from-gray-50`, `gap-2`, `gap-4`, `gap-8`, `grid`, `grid-cols-2`, `group-hover:scale-110`, `h-1.5`, `h-10`, `h-8`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-black/20`, `bg-blue-400`, `bg-blue-500`, `bg-blue-500/20`, `bg-gradient-to-b`, `bg-gradient-to-r`, `bg-red-400`, `bg-red-500`, `bg-white`, `border-blue-400/30`, `border-gray-100`, `border-white/10`, `from-black/80`, `from-gray-50`, `hover:border-gray-200`
+- **Layout:** `absolute`, `backdrop-blur-md`, `block`, `flex`, `from-black/80`, `from-gray-50`, `gap-2`, `gap-4`, `gap-8`, `grid`, `grid-cols-2`, `h-1.5`, `h-10`, `h-8`, `h-full`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${color.bg`, `${scrollAnimationClasses.fadeUp(isVisible`, `${scrollAnimationClasses.scaleIn(isVisible`, `aspect-video`, `border`, `duration-300`, `font-bold`, `font-semibold`, `group`, `group-hover:scale-110`, `inset-0`, `lg:px-8`, `mb-1`, `mb-12`, `mb-2`

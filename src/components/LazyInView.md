@@ -4,43 +4,50 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LazyInView.tsx
 skeleton_hash: 1f246a34a210785e
-generated_at: 2026-05-27T04:44:35Z
+entity_hashes:
+  func:LazyInView: a6cf07d9fd7df258
+  overview: dcd89aaa1940f652
+  style_tokens: 884aa794c8b33f43
+generated_at: 2026-05-28T22:36:24Z
 ---
 
 ## Genel Bakış
-`LazyInView.tsx` modülü, React uygulamalarında sayfa yüklenirken hemen ihtiyaç duyulmayan içerikleri erteleyerek performansı artıran bir gecikmeli yükleme (lazy loading) bileşeni sağlar. Bileşen, kendisi görüntü alanına (viewport) girene kadar bir yer tutucu (placeholder) gösterir; görünür hale geldiğinde ise tanımlanan yükleyici işlevi çağrılır ve dinamik içerik render edilir.
+`LazyInView` modülü, React uygulamalarında performans optimizasyonu için tasarlanmış bir tembel yükleme (lazy loading) bileşenidir. Bileşen, içeriğin yalnızca görünüm alanına (viewport) girmesi durumunda yüklenmesini sağlayarak sayfa yüklenme süresini iyileştirir.
 
 ## Fonksiyon Grupları
-### Ana Bileşen Tanımı
-Modülün tek bir dışa aktarılmış React bileşenini içerir; bekleme ve yükleme durumlarını yöneterek öğelerin yalnızca gerekli olduğunda işlenmesini sağlar.
+### Çekirdek Bileşen ve Yükleme Mantığı
+Modülün temel işlevini yöneten, görünüm takibi ve asenkron içerik yükleme süreçlerini birleştiren ana React bileşenini tanımlar.
 - LazyInView
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyomlar tanımlanmıştır.
+Bu modül için temel mimari varsayımlar tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `loader` prop'u sağlanmazsa, TypeScript derleme hatası olur ve component render edilemez.  
-[Aksiyom 2]: Eğer `placeholder` prop'u sağlanmazsa, varsayılan `<div className="min-h-[160px]" aria-hidden="true"/>` elementi kullanılır.  
-[Aksiyom 3]: Eğer `loader` prop'u bir fonksiyon değilse (örneğin `null` veya `undefined`), component beklenen içerik yükleyemez ve beklenen davranışı göstermeyebilir.  
-[Aksiyom 4]: Eğer `placeholder` prop'u bir JSX elementi değilse, component beklenen yer tutucu görünümünü sağlayamayabilir.
+**[Aksiyom 1 - Zorunlu Loader Prop'u]:** Eğer `loader` prop'u sağlanmazsa, TypeScript derleme hatası oluşur ve bileşen render edilemez; çünkü `loader` parametresinin varsayılan değeri yoktur.
+
+**[Aksiyom 2 - Placeholder Varsayılan Değeri]:** Eğer `placeholder` prop'u sağlanmazsa, `<div className="min-h-160px" aria-hidden="true" />` varsayılan olarak kullanılır; bileşen her durumda bir yer tutucu gösterir.
+
+**[Aksiyom 3 - Tek Prop Objesi]:** Eğer bileşen birden fazla bağımsız argüman ile çağrılmazsa, tüm prop'lar tek bir nesne olarak destructure edilmelidir (fonksiyon imzası tek bir `{ loader, placeholder }` objesi bekler).
+
+**[Aksiyom 4 - Generik Tip Parametresi]:** Eğer `T` tipi belirtilmezse, TypeScript'in tip çıkarımı ile belirlenir; `loader`'ın döndüreceği içeriğin tipi bu generik parametreye bağlıdır.
 
 ---
 
----
-
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### LazyInView
-**Ne yapar**: Verilen `loader` fonksiyonunu ve isteğe bağlı `placeholder` bileşenini alarak, içerik görünür olduğunda tembel (lazy) yükleme işlemini gerçekleştirir.  
 
-**Nasıl yapar**: `loader` prop’u bir asenkron yükleme işlemi tanımlar; bileşen ekrana geldiğinde bu fonksiyon tetiklenir. `placeholder` prop’u, içerik henüz yüklenmemişken gösterilecek JSX öğesini temsil eder.  
+**Ne yapar**: LazyInView, içeriğin görüntü alanına (viewport) girdiğinde yüklenmesini sağlayan bir React lazy loading (tembel yükleme) bileşenidir. Bu bileşen, sayfa performansını optimize etmek için yalnızca görünür alandaki içeriklerin yüklenmesini mümkün kılar.
+
+**Nasıl yapar**: Intersection Observer API'sini kullanarak placeholder elemanının ekranda görünüp görünmediğini izler. Bileşen görünür alana girdiğinde, `loader` prop'unu değerlendirerek asıl içeriği yükler ve placeholder'ı bu içerikle değiştirir. Generik `<T>` yapısı sayesinde farklı veri tipleri ile çalışabilir.
 
 **Parametreler**:
-- `loader`: `() => Promise<T>` — İçeriği dinamik olarak getiren asenkron fonksiyon.
-- `placeholder`: `React.ReactNode` — İçerik yüklenene kadar gösterilecek yedek UI öğesi. Varsayılan değer `<div className="min-h-160px" aria-hidden="true" />` dir.  
+- `loader`: ReactNode veya () => ReactNode tipinde — Görünür alana girildiğinde yüklenecek olan asıl içeriği temsil eder. Genellikle bir fonksiyon veya React bileşenidir ve lazy yükleme tetiklendiğinde render edilir
+- `placeholder`: ReactNode tipinde (varsayılan: `<div className="min-h-160px" aria-hidden="true" />`) — İçerik yüklenene kadar görüntülenen geçici elemandır. Varsayılan değer, ekran okuyucular tarafından yok sayılan 160px yüksekliğinde boş bir divdir
+- `T`: Generic tip parametresi — Bileşenin işleyebileceği veri tipini belirler. Lazy yüklenecek içeriğin türünü tanımlamak için kullanılır
 
-**Dönüş**: `void` (bileşen render edildiğinde yan etki oluşturur, doğrudan bir değer döndürmez).
+**Dönüş**: JSX.Element — Lazy yükleme mantığı uygulanmış React bileşeni döndürür. Bileşen, placeholder'ı veya yüklenmiş içeriği render eder
 
 ---
 
@@ -58,21 +65,55 @@ Bu modül için özel aksiyomlar tanımlanmıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\LazyInView.tsx::LazyInView
-- **params**: `loader`, `placeholder = <div className="min-h-160px" aria-hidden="true" />`, `rootMargin = '200px 0px'`, `once = true`, `className`, `componentProps`
+### [N1_NASIL] AST Pointer: src/components/LazyInView.tsx::LazyInView
+- **params**: `(loader, placeholder = <div className="min-h-160px" aria-hidden="true" />, rootMargin = '200px 0px', once = true, className, componentProps)`
 - **ic_degiskenler**:
-  - `ref` — `React.useRef<HTMLDivElement | null>(null)`: DOM elemanına referans tutar, IntersectionObserver ve event listener'ların hedefi.
-  - `shouldLoad` — `React.useState(false)`'in değer kısmı: Bileşenin içeriğinin yüklenip yüklenmeyeceğini belirten boolean flag.
-  - `setShouldLoad` — `React.useState(false)`'in set fonksiyonu: `shouldLoad` değerini `true` yapmak için kullanılır.
-  - `Loaded` — `React.useState<React.ComponentType<T> | null>(null)`'in değer kısmı: Yüklenen modülün default export'ı (component) burada saklanır.
-  - `setLoaded` — `React.useState<React.ComponentType<T> | null>(null)`'in set fonksiyonu: `Loaded` değerini günceller.
-  - `enable` — `() => setShouldLoad(true)`: `pointerdown` ve `touchstart` event'leri tetiklendiğinde `shouldLoad`'u `true` yapar.
-  - `el` — `ref.current`: Observer'ın gözlemleyeceği DOM elemanı.
-  - `io` — `new IntersectionObserver(...)`: Görünürlük değişikliklerini izleyen observer nesnesi.
-  - `entry` — `entries[0]`: Observer callback'inde gelen ilk `IntersectionObserverEntry`, elemanın görünür olup olmadığını kontrol eder.
-  - `cancelled` — `false` başlangıç değeri: Asenkron `loader` çağrısının iptal edilip edilmediğini izler.
-  - `mod` — `loader()` promise'inin çözüldüğü değer: Modülün default export'ı (`mod.default`) `Loaded` state'ine atanır.
-- **Dönüş**: JSX `<div ref={ref} className={className}>…</div>` döndürür; fonksiyonun yan etkileri arasında event listener ekleme/kaldırma, IntersectionObserver yönetimi ve dinamik modül yüklemesi bulunur.
+  - `ref` — React ref nesnesi, bir HTMLDivElement'ye atıfta bulunur, IntersectionObserver için DOM elemanını izlemek için kullanılır
+  - `shouldLoad` — boolean state, bileşenin yüklenme işleminin tetiklenip tetiklenmediğini kontrol eder
+  - `Loaded` — React.ComponentType state, yüklenecek bileşen modülünü tutar (null olarak başlar)
+- **Dönüş**: JSX (div elementi içinde Loaded bileşeni veya placeholder)
+
+### [N2_NASIL] AST Pointer: src/components/LazyInView.tsx::pointerdown/touchstart effect callback
+- **params**: `()`
+- **ic_degiskenler**:
+  - `enable` — arrow fonksiyon, shouldLoad state'ini true yaparak yükleme işlemini tetikler
+- **Dönüş**: cleanup fonksiyonu (event listener'ları kaldırır)
+
+### [N3_NASIL] AST Pointer: src/components/LazyInView.tsx::effect1 cleanup callback
+- **params**: `()`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
+
+### [N4_NASIL] AST Pointer: src/components/LazyInView.tsx::IntersectionObserver effect callback
+- **params**: `()`
+- **ic_degiskenler**:
+  - `el` — IntersectionObserver tarafından izlenecek DOM elemanı (ref.current'dan alınır)
+  - `io` — IntersectionObserver instance'ı, elemanı gözlemlemek için oluşturulur
+- **Dönüş**: cleanup fonksiyonu (observer'ı disconnect eder)
+
+### [N5_NASIL] AST Pointer: src/components/LazyInView.tsx::IntersectionObserver entries callback
+- **params**: `(entries)`
+- **ic_degiskenler**:
+  - `entries` — IntersectionObserverEntry dizisi, gözlemelenen elemanların durumunu içerir
+  - `entry` — entries[0], ilk gözlemenen elemanın durum nesnesi
+- **Dönüş**: void
+
+### [N6_NASIL] AST Pointer: src/components/LazyInView.tsx::loader effect callback
+- **params**: `()`
+- **ic_degiskenler**:
+  - `cancelled` — boolean flag, useEffect cleanup işleminde kullanılır, asenkron yükleme işlemini iptal etmek için kontrol edilir
+- **Dönüş**: cleanup fonksiyonu (cancelled flag'ini true yapar)
+
+### [N7_NASIL] AST Pointer: src/components/LazyInView.tsx::loader().then callback
+- **params**: `(mod)`
+- **ic_degiskenler**:
+  - `mod` — import edilen modül nesnesi, mod.default içinde yüklenecek bileşen bulunur
+- **Dönüş**: void
+
+### [N8_NASIL] AST Pointer: src/components/LazyInView.tsx::loader().catch callback
+- **params**: `()`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
 
 ---
 
@@ -99,4 +140,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** `min-h-160px`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

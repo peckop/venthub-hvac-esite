@@ -10,7 +10,7 @@ entity_hashes:
   func:saveGeneralSettings: e292d3d4a2e6fa04
   overview: 59445d0b8972e8c9
   style_tokens: 114083f4641bd38f
-generated_at: 2026-05-27T18:30:49Z
+generated_at: 2026-05-28T22:38:59Z
 ---
 
 ## Genel Bakış

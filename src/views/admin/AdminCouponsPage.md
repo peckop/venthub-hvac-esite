@@ -13,7 +13,7 @@ entity_hashes:
   func:toggleActive: bde4db4c0f16dfdc
   overview: bf9bd25b077ab626
   style_tokens: 4a0b7c9fcb1d8a38
-generated_at: 2026-05-27T18:30:44Z
+generated_at: 2026-05-28T22:38:55Z
 ---
 
 ## Genel Bakış
@@ -247,9 +247,9 @@ graph TD
     AdminCouponsPage_tsx__isAllowedCouponType["isAllowedCouponType"]
     AdminCouponsPage_tsx__saveCoupon["saveCoupon"]
     AdminCouponsPage_tsx__toggleActive["toggleActive"]
-    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__isAllowedCouponType
-    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__filtered
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__toggleActive
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__filtered
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__isAllowedCouponType
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__dbToUi
 ```
 

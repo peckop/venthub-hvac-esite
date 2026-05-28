@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\StrategicBrands.tsx
 skeleton_hash: c335ec57d52a12da
-generated_at: 2026-05-26T11:44:57Z
+entity_hashes:
+  func:StrategicBrands: cf2c83a7b060b93b
+  overview: 3329d9ad42f18a85
+  style_tokens: 908950a4b058f189
+generated_at: 2026-05-28T22:36:04Z
 ---
 
 ## Genel Bakış  
@@ -38,22 +42,24 @@ Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağı
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### StrategicBrands
-**Ne yapar**: Bu React işlevsel bileşeni, VentHub HVAC platformunun ana sayfasındaki stratejik markalar bölümünü render eder. Kullanıcıların platformla çalıştığı resmi markaları görmesini sağlayan, duyarlı ve yerelleştirilmiş bir UI bölümü oluşturur.
-**Nasıl yapar**: Bileşen, aldığı destructured props içindeki `dictionary` değerini `t` olarak takma adlandırır. Bu prop aracılığıyla uygulamanın i18n çeviri sözlüğüne erişir, bileşenin tüm statik metinlerini yerelleştirir. Standart React render akışını kullanarak marka logoları, isimleri ve ilgili açıklama metinlerini içeren bir container yapısı oluşturur ve ekrana basar.
+**Ne yapar**: StrategicBrands, bir React fonksiyonel bileşenidir ve uygulamanın "Strategic Brands" (Stratejik Markalar) bölümünü render eder. Bu bileşen, dışarıdan bir sözlük nesnesi alarak sayfa içeriğini dil veya metin bazlı olarak dinamik hale getirir.
+
+**Nasıl yapar**: Fonksiyon, props olarak gelen `dictionary` nesnesini (`t` olarak adlandırılır) kullanır. Bu nesne muhtemelen çeviri anahtarları veya bölüm için gerekli tüm metinleri içerir. Bileşen, bu sözlük nesnesindeki değerleri referans alarak JSX içinde ilgili HTML ve React elementlerini oluşturur ve tarayıcıda gösterilecek şekilde döndürür.
+
 **Parametreler**:
-- dictionary: StrategicBrandsProps["dictionary"] — Bileşene iletilen çeviri sözlüğü veya fonksiyonudur, kod içinde `t` olarak kısaltılır. Yerelleştirilmiş metinler kullanarak bileşenin dil bağımsız çalışmasını sağlar.
-**Dönüş**: React.FC<StrategicBrandsProps> tipinde bir bileşen döner, yani belirtilen props tipini alarak geçerli bir React UI elemanı render eder.
+- dictionary: `t` (veya `StrategicBrandsProps` içindeki karşılığı) — Bileşenin render edeceği metinleri veya çevirileri içeren bir nesne. Bu nesne, üst bileşen tarafından sağlanan sözlük yapısına bağlıdır.
+
+**Dönüş**: `React.FC<StrategicBrandsProps>` — React fonksiyonel bileşeni döndürür. Dönüş tipi, `StrategicBrandsProps` arayüzüne uygun bir fonksiyonel bileşendir.
 
 ---
 
 ## INTERFACES
 
 ### StrategicBrandsProps
-- `dictionary: {
-`
+- `dictionary: {`
 
 ---
 
@@ -85,16 +91,13 @@ Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağı
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** (yok)
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `sm:text-6xl`, `text-4xl`, `text-cyan-600`, `text-lg`, `text-slate-500`, `text-slate-950`, `text-xs`
 - **Layout:** `flex`, `flex-col`, `gap-6`, `justify-between`, `max-w-3xl`, `max-w-md`, `max-w-page`, `md:flex-row`, `md:items-end`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Varyant/Responsive:** `data-[in-view=true]:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `-translate-x-4`, `data-[in-view=true]:opacity-100`, `data-[in-view=true]:translate-x-0`, `data-[in-view=true]:translate-y-0`, `delay-200`, `delay-300`, `duration-700`, `ease-out`, `font-bold`, `font-light`, `leading-relaxed`, `lg:px-8`, `mb-16`, `mb-4`, `mx-auto`

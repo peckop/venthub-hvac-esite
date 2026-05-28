@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\MainChassis.tsx
 skeleton_hash: 6015fae74239eb8e
-generated_at: 2026-05-23T22:20:23Z
+entity_hashes:
+  func:MainChassis: 6dd2e12708a32b7b
+  func:buildInnerLathePoints: b3728666b0ee9845
+  func:buildLathePoints: 1c464dd2bea08bfc
+  overview: aa2dd6f5bcc0a3eb
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:39Z
 ---
 
 ## Genel Bakış
@@ -37,7 +43,7 @@ Bu varsayımlar, modülün mevcut fonksiyon imzaları ve sabitleri çerçevesind
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### buildLathePoints
 **Ne yapar**: Bir torun (lathe) geometrisi için 2D noktalar dizisi oluşturur. Bu noktalar, bir eksen çevresinde döndürülerek 3D bir modelin profilini tanımlar.  
@@ -78,8 +84,10 @@ Bu varsayımlar, modülün mevcut fonksiyon imzaları ve sabitleri çerçevesind
 
 ## SABİTLER
 - **PROFILE_POINTS** (array) — `[
+
   [-0.76, 0.485], [-0.74, 0.496], [-0.72, 0.500], [-0.70, 0.497], [-0.66, ...`
 - **INNER_PROFILE_POINTS** (array) — `[
+
   [-0.72, 0.460], [-0.60, 0.455], [-0.45, 0.445], [-0.30, 0.432], [-0.15, ...`
 
 ---
@@ -128,30 +136,16 @@ Bu varsayımlar, modülün mevcut fonksiyon imzaları ve sabitleri çerçevesind
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-- **MainChassis()** fonksiyonu, chassisin dış ve iç profil noktalarını oluşturmak için **buildLathePoints** ve **buildInnerLathePoints** fonksiyonlarını çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-- Verilen veri setinde bu modülü çağıran dış fonksiyon veya dosya belirtilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  MainChassis() → buildInnerLathePoints()
-  MainChassis() → buildLathePoints()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    MainChassis["MainChassis()"] --> buildInnerLathePoints["buildInnerLathePoints()"]
-    MainChassis["MainChassis()"] --> buildLathePoints["buildLathePoints()"]
+graph TD
+    MainChassis_tsx__MainChassis["MainChassis"]
+    MainChassis_tsx__buildInnerLathePoints["buildInnerLathePoints"]
+    MainChassis_tsx__buildLathePoints["buildLathePoints"]
+    MainChassis_tsx__MainChassis --> MainChassis_tsx__buildLathePoints
+    MainChassis_tsx__MainChassis --> MainChassis_tsx__buildInnerLathePoints
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -180,4 +174,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

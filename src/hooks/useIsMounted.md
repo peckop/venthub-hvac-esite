@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useIsMounted.ts
 skeleton_hash: 60e0e6a606c5ed0f
-generated_at: 2026-05-23T22:29:55Z
+entity_hashes:
+  func:useIsMounted: ae14f2fca3691906
+  overview: 77f3711e51ed33d0
+generated_at: 2026-05-28T22:37:46Z
 ---
 
 ## Genel Bakış
@@ -27,7 +30,7 @@ Bu modül, React ekosisteminde çalışan özel bir hook olarak, bileşen yaşam
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useIsMounted
 **Ne yapar**: Next.js 15 ve genel SSR (Sunucu Tarafı Oluşturma) mimarilerinde Hydration Mismatch (Sıvılandırma Uyumsuzluğu) hatalarını önlemek için kullanılan özel bir React hook'tur. İlk sunucu tarafı render sürecinde false değeri döndürür, bileşen istemcide tam olarak mount olduktan sonra true değerine geçer. Yaygın kullanım senaryosunda, true değerine geçene kadar iskelet (skeleton) yükleme bileşeni gösterilerek yalnızca istemci tarafında çalışması gereken bileşenlerin erken render edilmesi engellenir, sunucu ve istemci içerikleri arasındaki uyumsuzluklardan kaynaklanan hatalar ortadan kaldırılır.

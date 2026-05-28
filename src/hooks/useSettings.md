@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useSettings.ts
 skeleton_hash: 9aca7355dd0ea4fc
-generated_at: 2026-05-23T22:30:27Z
+entity_hashes:
+  func:useSettings: 0139115fd60135da
+  overview: be44b38718294952
+generated_at: 2026-05-28T22:37:49Z
 ---
 
 ## Genel Bakış
@@ -27,7 +30,7 @@ Bu React custom hook'u, uygulama genelindeki ayar değerlerine merkezi erişim s
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useSettings
 **Ne yapar**: Supabase veritabanında yer alan `app_settings` tablosundan global uygulama ayarlarını çekip state'te tutan, React uygulamaları için tasarlanmış özel bir custom hook'tur. Ayarların alınma sürecindeki yükleme durumu, oluşabilecek hatalar ve ayarların kendisini yöneterek uygulamanın tüm bölümlerinden güvenli bir şekilde global ayarlara erişilmesini sağlar. Tek bir merkezden yönetilen ayarların tutarlı bir şekilde tüm uygulama genelinde kullanılmasını garanti eder.

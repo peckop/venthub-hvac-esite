@@ -8,7 +8,7 @@ entity_hashes:
   func:NavActionButton: 9e352ab0f1dc93af
   overview: 42d52b47442e736b
   style_tokens: 7a26081e3b2c4d09
-generated_at: 2026-05-27T18:24:23Z
+generated_at: 2026-05-28T22:36:18Z
 ---
 
 ## Genel Bakış

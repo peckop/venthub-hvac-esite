@@ -4,40 +4,45 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\SecurePaymentOverlay.tsx
 skeleton_hash: 6b77d0737b6e26dc
-generated_at: 2026-05-23T22:40:27Z
+entity_hashes:
+  func:SecurePaymentOverlay: 2034f9e5c072e96b
+  overview: abfd0850fbcc2e8a
+  style_tokens: 5b40eb77343c895c
+generated_at: 2026-05-28T22:40:23Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun ödeme adımında kullanılan güvenli ödeme kaplama (overlay) React bileşenini barındırır. Ödeme işlemi süresince kullanıcılara sunulan geçici ekranın görünürlüğünü, işlem adımlarını ve ilerleme yüzdesini yönetir. Ödeme akışının kullanıcıya şeffaf bir şekilde aktarılmasını sağlayarak güvenli ödeme deneyimini destekler.
+VentHub HVAC ödeme akışında kullanılan güvenli ödeme kaplama bileşenidir. Ödeme işlemi sırasında kullanıcıya geçici bir ekran sunarak sürecin görünürlüğünü, hangi adımda olduğunu ve tamamlanma oranını gösterir.Uluslararasılaştırma desteği ile çok dilli arayüz sağlar.
 
 ## Fonksiyon Grupları
-### Ana Ödeme Kaplama Bileşeni
-Modülün tüm sorumluluğunu üstlenen ana React bileşenidir, aldığı girdilere göre ödeme kaplamasının tüm temel durumlarını ve görünümünü yönetir.
+### Ödeme Kaplama Bileşeni
+Ödeme süreci boyunca kullanıcıya sunulan kaplama ekranının tüm durumlarını ve görünümünü yöneten ana React bileşenidir.
 - SecurePaymentOverlay
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı güvenli ödeme kaplama bileşeni, aldığı tüm giriş prop'larının üst bileşen tarafından geçerli formatta ve doğru değerlerle iletilmesi şartıyla çalışır, aksi takdirde ödeme arayüzü kullanıcıya doğru şekilde sunulamaz.
+Bu React tabanlı güvenli ödeme kaplama bileşeni, üst bileşen tarafından传递 edilen prop'ların geçerliliğine ve tutarlılığına bağlıdır. Eğer prop'lar eksik, null/undefined veya beklenmeyen türde ise, bileşenin render edilmesi veya doğru çalışması garanti edilemez.
 
-[Aksiyom 1]: Eğer overlayVisible boolean türünde geçerli bir görünürlük durumu değeri olarak iletilmezse, ödeme kaplaması gerektiğinde gösterilemez veya gizlenemez, kullanıcı arayüzünde kalıcı olarak açık kalma veya hiç açılmama gibi beklenmedik hatalar oluşur.
-[Aksiyom 2]: Eğer overlayStep ödeme sürecinin mevcut adımını temsil eden geçerli bir değer olarak iletilmezse, kullanıcıya ödeme sürecinde hangi aşamada olduğu bildirilemez, kullanıcı süreci takip edemez.
-[Aksiyom 3]: Eğer overlayPercent ödeme sürecinin tamamlanma oranını temsil eden sayısal bir değer olarak iletilmezse, arayüzdeki ilerleme göstergesi çalışmaz, kullanıcıya sürecin ilerlemesi yanlış aktarılır.
-[Aksiyom 4]: Eğer uluslararasılaştırma (çeviri) fonksiyonu t geçerli olarak iletilmezse, kaplama arayüzündeki tüm metin içerikleri doğru şekilde gösterilemez, çok dilli kullanım imkanı ortadan kalkar.
+[Aksiyom 1]: Eğer `overlayVisible` prop'u verilmemiş veya geçerli bir boolean (true/false) değilse, bileşenin görünürlüğü kontrol
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SecurePaymentOverlay
-**Ne yapar**: VentHub HVAC sisteminin ödeme onayı (checkout) sürecinde güvenli ödeme akışını kullanıcıya sunan React bileşenidir. Ödeme sürecinin ilerleyişini gösteren geçici bir ekran örtüsü olarak çalışır, kullanıcının ödeme adımlarını takip etmesini ve sürecin durumunu görmesini sağlar.
-**Nasıl yapar**: Kendisine iletilen prop değerlerini kullanarak arayüzünü dinamik olarak günceller. Görünürlük durumu, aktif adım ve tamamlanma yüzdesi bilgilerini işleyerek kullanıcıya doğru arayüzü sunar, ayrıca çeviri fonksiyonu ile metinleri kullanıcının dil tercihine uygun şekilde görüntüler.
+
+**Ne yapar**: Güvenli ödeme sürecinde kullanıcıya adım adım ilerleyen bir overlay (yer kaplayan üst panel) bileşenidir. Ödeme işleminin farklı aşamalarında (hazırlık, doğrulama, sonuç) kullanıcıya görsel geri bildirim sunar.
+
+**Nasıl yapar**: Bileşen, `overlayVisible` durumuna göre ekranda görünür olup olmadığını kontrol eder. `overlayStep` prop'u ile mevcut ödeme adımını belirler ve her adıma karşılık gelen farklı içeriği render eder. `overlayPercent` değeri ile işlem ilerleme yüzdesini gösteren bir progress bar sunar. `t` fonksiyonu ile çok dilli çeviri desteği sağlar, böylece farklı dil kullanıcılarına yerelleştirilmiş mesajlar gösterir.
+
 **Parametreler**:
-- overlayVisible: boolean — Güvenli ödeme örtüsünün ekranda görünür olup olmayacağını belirten boolean değer, true değeri aldığında bileşen aktif olarak ekrana gelir
-- overlayStep: string | number — Ödeme sürecinin şu anki aktif adımını tanımlayan değer, adımın sıra numarası veya metinsel açıklaması olabilir
-- overlayPercent: number — Ödeme sürecinin toplam tamamlanma oranını yüzde olarak ifade eden sayısal değer, genellikle 0 ile 100 arasında değer alır ve arayüzdeki ilerleme çubuğunda kullanılır
-- t: Function — Uluslararasılaştırma (i18n) entegrasyonu için kullanılan çeviri fonksiyonu, bileşen içindeki tüm kullanıcıya yönelik metinleri ilgili dile çevirerek gösterir
-**Dönüş**: React.FC<SecurePaymentOverlayProps> — Tanımlanmış prop tiplerine uygun bir React fonksiyonel bileşeni olarak, güvenli ödeme sürecini gösteren arayüz elementini DOM'a eklemek için gerekli React çıktısını döndürür.
+- `overlayVisible` — `boolean` — Overlay'ın ekranda görünüp görünmeyeceğini kontrol eden mantıksal değer. `true` olduğunda overlay aktif olarak gösterilir, `false` olduğunda gizlenir.
+- `overlayStep` — `string | number` — Mevcut ödeme işleminin hangi aşamada olduğunu belirtir. Bu değere bağlı olarak overlay içinde farklı içerik ve mesajlar render edilir.
+- `overlayPercent` — `number` — Ödeme işleminin tamamlanma yüzdesini (0-100 aralığında) temsil eder. Genellikle bir ilerleme çubuğu (progress bar) bileşenine bağlanarak görsel geri bildirim sağlar.
+- `t` — `(key: string) => string` — Çeviri fonksiyonu. Bileşen içindeki tüm kullanıcıya dönük metinlerin, bu fonksiyon aracılığıyla ilgili dil dosyasından çekilmesini sağlar. Örneğin `t('payment.processing')` çağrısı ile o anki dile göre "İşleniyor..." gibi bir metin döner.
+
+**Dönüş**: `React.FC<SecurePaymentOverlayProps>` — Bileşen, JSX elementi döndüren bir React fonksiyonel bileşenidir. Verilen prop değerlerine göre koşullu olarak overlay arayüzünü render eder veya `null` döner.
 
 ---
 
@@ -51,20 +56,6 @@ Bu React tabanlı güvenli ödeme kaplama bileşeni, aldığı tüm giriş prop'
 
 ---
 
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\SecurePaymentOverlay.tsx::SecurePaymentOverlay
-- **params**: [overlayVisible, overlayStep, overlayPercent, t]
-- **ic_degiskenler**: 
-  - `overlayVisible` — Ödeme katmanının görünürlüğünü kontrol eden boolean değer; false olması halinde fonksiyon doğrudan null döndürerek katmanı render etmez
-  - `overlayStep` — Ödeme sürecindeki mevcut adımı belirten tamsayı değer; adım durum metni ve ilerleme adımlarının vurgulanması için kullanılır
-  - `overlayPercent` -- Ödeme sürecindeki toplam ilerleme yüzdesini tutan sayısal değer; ilerleme çubuğunun genişliğini dinamik olarak ayarlamak için kullanılır
-  - `t` — Çeviri fonksiyonu; arayüzdeki tüm metinleri ilgili dile çevirmek için kullanılır, 10 farklı arayüz metni anahtarıyla çağrılır
-  - `Lock` — lucide-react kütüphanesinden import edilen ikon bileşeni; güvenlik göstergesi olarak katman başlığında render edilir
-- **Dönüş**: overlayVisible false ise null, aksi halde güvenli ödeme katmanı içeren React JSX elementi
-
----
-
 ## NODE ID STANDARD
 
   file: src\views\checkout\SecurePaymentOverlay.tsx
@@ -74,3 +65,19 @@ Bu React tabanlı güvenli ödeme kaplama bileşeni, aldığı tüm giriş prop'
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: SecurePaymentOverlay
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/35`, `bg-gradient-to-r`, `bg-light-gray/70`, `bg-primary-navy/10`, `bg-white/80`, `bg-white/85`, `bg-white/90`, `border-2`, `border-b`, `border-light-gray/60`, `border-primary-navy`, `border-t-transparent`, `border-white/60`, `from-primary-navy`, `text-center`
+- **Layout:** `backdrop-saturate-150`, `fixed`, `flex`, `from-primary-navy`, `gap-3`, `grid`, `grid-cols-3`, `h-12`, `h-2`, `h-9`, `h-full`, `items-center`, `justify-between`, `justify-center`, `max-w-xl`
+- **Varyant/Responsive:** `:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${overlayStep`, `1`, `2`, `3`, `:`, `>=`, `animate-spin`, `border`, `duration-500`, `font-medium`, `font-semibold`, `inset-0`, `md:px-8`, `mt-3`, `mt-4`

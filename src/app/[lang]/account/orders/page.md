@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\account\orders\page.tsx
-skeleton_hash: 390e12b128002cd7
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\orders\page.tsx
+skeleton_hash: 32022cd7918a95b0
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 3abd4459140e249f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-27T17:58:18Z
+generated_at: 2026-05-28T22:34:48Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,8 @@ Bu grup, sipariş sayfasının ana giriş noktası olarak React bileşenini dön
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -36,9 +37,9 @@ Bu grup, sipariş sayfasının ana giriş noktası olarak React bileşenini dön
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../views/OrdersPage'), {
+- **PageComponent** (call) — `dynamic(() => import('../../../../views/OrdersPage'), {
   ssr: false,
-  loadin...`
+  loa...`
 
 ---
 
@@ -59,8 +60,8 @@ Bu grup, sipariş sayfasının ana giriş noktası olarak React bileşenini dön
 
 ## NODE ID STANDARD
 
-  file: src\app\account\orders\page.tsx
-  function: src\app\account\orders\page.tsx::Page
+  file: src\app\[lang]\account\orders\page.tsx
+  function: src\app\[lang]\account\orders\page.tsx::Page
 
 ---
 

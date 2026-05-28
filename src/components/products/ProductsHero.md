@@ -8,7 +8,7 @@ entity_hashes:
   func:ProductsHero: 23bf6f05c6d119a9
   overview: 9bf8d11aa62d961e
   style_tokens: e2ac21d82aa84114
-generated_at: 2026-05-27T18:30:13Z
+generated_at: 2026-05-28T22:36:51Z
 ---
 
 ## Genel Bakış  

@@ -8,7 +8,7 @@ entity_hashes:
   func:KVKKPage: aa86d51285a03cb2
   overview: f3246c955e327a67
   style_tokens: ceaea319d6812937
-generated_at: 2026-05-27T17:46:43Z
+generated_at: 2026-05-28T22:40:07Z
 ---
 
 ## Genel Bakış

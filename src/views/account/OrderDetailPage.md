@@ -5,10 +5,10 @@ namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx
 skeleton_hash: 622dd4d11cb43f53
 entity_hashes:
-  func:OrderDetailPage: 86e76b4c00c9f2fc
+  func:OrderDetailPage: 9d9093210e07827e
   overview: 91762eaa328b7587
   style_tokens: 2d7ff3d6e2a546ab
-generated_at: 2026-05-27T18:30:40Z
+generated_at: 2026-05-28T22:38:55Z
 ---
 
 ## Genel Bakış

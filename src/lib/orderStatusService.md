@@ -4,7 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\orderStatusService.ts
 skeleton_hash: 0a44e1c65e5ee81d
-generated_at: 2026-05-23T22:32:46Z
+entity_hashes:
+  func:isReturnStatus: b72fd60a31916058
+  func:resolveDbFields: bb3f04ce63170b18
+  func:restoreStockForOrder: 47390fe85340bd62
+  func:syncOrderFromReturn: def4e517f5ee096b
+  func:syncReturnsRecord: dc5a56e469e899d4
+  func:updateOrderStatus: 75269bd84f6e60f2
+  overview: db3f9f8f046b864c
+generated_at: 2026-05-28T22:37:56Z
 ---
 
 ## Genel Bakış
@@ -43,7 +51,7 @@ Bu modül, sistemdeki siparişlerin durum yönetimi, iade işlemleriyle sipariş
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### resolveDbFields
 **Ne yapar**: UI katmanından gelen sipariş statüsünü veritabanı yapısına uygun status ve opsiyonel payment_status alanları çiftine dönüştürür. Gelen UI statüsünün türüne göre gerekli veritabanı alanlarını doldurur, örneğin "refunded" UI statüsünü { status: "cancelled", payment_status: "refunded" } nesnesine, "shipped" UI statüsünü ise { status: "shipped", payment_status: undefined } nesnesine çevirir.
@@ -160,34 +168,21 @@ Bu modül, sistemdeki siparişlerin durum yönetimi, iade işlemleriyle sipariş
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-updateOrderStatus() fonksiyonu, sipariş durumunu güncelleme sürecinde iade durumu kontrolü için isReturnStatus, stok geri yükleme işlemi için restoreStockForOrder, iade kayıtlarını senkronize etmek için syncReturnsRecord ve veritabanı alanlarını düzenlemek için resolveDbFields fonksiyonlarını çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi paylaşılmamıştır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  updateOrderStatus() → isReturnStatus()
-  updateOrderStatus() → resolveDbFields()
-  updateOrderStatus() → restoreStockForOrder()
-  updateOrderStatus() → syncReturnsRecord()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    updateOrderStatus["updateOrderStatus()"] --> isReturnStatus["isReturnStatus()"]
-    updateOrderStatus["updateOrderStatus()"] --> resolveDbFields["resolveDbFields()"]
-    updateOrderStatus["updateOrderStatus()"] --> restoreStockForOrder["restoreStockForOrder()"]
-    updateOrderStatus["updateOrderStatus()"] --> syncReturnsRecord["syncReturnsRecord()"]
+graph TD
+    orderStatusService_ts__isReturnStatus["isReturnStatus"]
+    orderStatusService_ts__resolveDbFields["resolveDbFields"]
+    orderStatusService_ts__restoreStockForOrder["restoreStockForOrder"]
+    orderStatusService_ts__syncOrderFromReturn["syncOrderFromReturn"]
+    orderStatusService_ts__syncReturnsRecord["syncReturnsRecord"]
+    orderStatusService_ts__updateOrderStatus["updateOrderStatus"]
+    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__resolveDbFields
+    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__restoreStockForOrder
+    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__syncReturnsRecord
+    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__isReturnStatus
 ```
-
----
 
 ## NODE ID STANDARD
 

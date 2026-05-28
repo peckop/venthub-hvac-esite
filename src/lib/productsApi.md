@@ -4,20 +4,24 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\productsApi.ts
 skeleton_hash: abf7f572746ed92f
-generated_at: 2026-05-23T22:31:45Z
+entity_hashes:
+  func:fetchHomeProducts: 71fca451ebe96a52
+  func:srf: 8a471a81c6ce4ef0
+  overview: 0f31af6086d3c14d
+generated_at: 2026-05-28T22:38:07Z
 ---
 
 ## Genel Bakış
-src/lib/productsApi.ts, VentHub HVAC projesinde ürünlerle ilgili tüm API iletişimini yöneten merkezi bir servis modülüdür. Uygulamanın farklı bölümlerinin ürün verilerine güvenli ve yapılandırılmış bir şekilde erişmesini sağlayarak, backend ile iletişim kurma işlemlerini tek bir noktada toplar.
+Bu modül, VentHub HVAC uygulamasında ürün verilerine erişmek için kullanılan temel bir API iletişim katmanıdır. Merkezi bir yapıyla, hem genel HTTP isteklerini yönetir hem de uygulamanın belirli bölümleri için gerekli olan ürün listeleme gibi spesifik veri çekme işlemlerini gerçekleştirir.
 
 ## Fonksiyon Grupları
 ### Temel API İstemcisi
-Modül içindeki tüm dış istekler için ortak altyapıyı sunan, adres ve parametreleri alarak standart API çağrıları yapan temel işlevi barındırır. Modüldeki diğer tüm işlevler bu temel işlevi kullanarak istek gönderir.
-- srf
+Tüm dış API çağrıları için ortak bir temel oluşturur. Adres ve parametreleri yapılandırarak standart HTTP istekleri gönderir; modüldeki diğer tüm işlevler bu altyapıyı kullanır.
+- `srf`
 
 ### Spesifik Ürün Verisi Çekme İşlevleri
-Uygulamanın belirli sayfaları için ihtiyaç duyulan özel ürün verilerini getirmek üzere temel API istemcisini kullanan işlevleri içerir. Özellikle ana sayfa için istenen sayıda ürün listesini çekmek üzere tasarlanmıştır.
-- fetchHomeProducts
+Uygulamanın belirli ekranları için gerekli olan hazır ürün verilerini getirir. Genellikle ana sayfa gibi sayfalarda展示ilecek ürün listelerini, temel istemciyi kullanarak sunar.
+- `fetchHomeProducts`
 
 ---
 
@@ -32,7 +36,7 @@ Bu modül, VentHub HVAC platformunun ürün servisi ile iletişim kurarak ana sa
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### srf
 **Ne yapar**: Ürün API'si içindeki tüm veri çekme işlemlerinde temel olarak kullanılan genel amaçlı düşük seviyeli HTTP isteği sarmalayıcı fonksiyonudur. Farklı API uç noktalarına standart formatta istek gönderilmesini sağlayarak kod tekrarını önler.
@@ -93,29 +97,6 @@ Bu modül, VentHub HVAC platformunun ürün servisi ile iletişim kurarak ana sa
   - `listRes.ok` — Genel ürün listesi isteğinin başarılı olup olmadığını kontrol eden Response nesnesi özelliği
   - `list` — listRes yanıtından parse edilen JSON verisi, LiteProduct tipinde genel ürünler listesi
 - **Dönüş**: { featured: LiteProduct[], list: LiteProduct[] } içeren nesne
-
----
-
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-Sadece dosya içindeki `fetchHomeProducts()` fonksiyonu, aynı dosyada tanımlı `srf` fonksiyonunu çağırmaktadır, başka bir fonksiyon çağrısı kaydedilmemiştir.
-
-### Disaridan Cagrilanlar (Incoming)
-Bu modülü hangi dış dosya veya fonksiyonların kullandığına dair herhangi bir veri sağlanmamıştır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  fetchHomeProducts() → srf()
-
-```mermaid
-graph LR
-    fetchHomeProducts["fetchHomeProducts()"] --> srf["srf()"]
-```
 
 ---
 

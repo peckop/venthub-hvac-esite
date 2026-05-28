@@ -4,11 +4,15 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx
 skeleton_hash: ffd02b4bb0002d84
-generated_at: 2026-05-23T22:39:00Z
+entity_hashes:
+  func:AuthCallbackPage: b8296e20d27a327c
+  overview: 4e4abcf032bc136f
+  style_tokens: 404ab1f16440192d
+generated_at: 2026-05-28T22:39:23Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin kimlik doğrulama akışında, harici kimlik sağlayıcısından geri dönüş yapılan özel React sayfa bileşenini barındırır. Kimlik doğrulama işlemi sonrası kullanıcının oturum süreçlerini yönetip ana uygulamaya yönlendirmek üzere tasarlanmış tek sorumluluklu bir görsel modüldür.
+Bu modül, VentHub HVAC projesinin kimlik doğrulama akışında, harici kimlik sağlayıcısından geri dönüş yapılan özel React sayfa bileşenini barındırır. Kimlik doğrulama sonrası kullanıcının oturum süreçlerini yönetip ana uygulamaya yönlendirmek üzere tasarlanmış tek sorumluluklu bir görsel modüldür.
 
 ## Fonksiyon Grupları
 ### Ana Giriş Noktası Bileşeni
@@ -18,17 +22,26 @@ Modülün tek dışa aktarılan ana bileşeni olarak, kimlik doğrulama geri dö
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, platform kimlik doğrulama sürecinin son adımı olan kimlik sağlayıcısı geri dönüş işlemini yönetir, çalışması için kimlik doğrulama altyapısı, rota yapılandırması ve API entegrasyonunun eksiksiz olması zorunludur.
 
-[Aksiyom 1]: Eğer uygulama genelinde tanımlı kimlik doğrulama sağlayıcısının bu sayfaya yönlendirme yapmasını sağlayacak rota eşleştirmesi yoksa, kimlik sağlayıcısından geri dönen kullanıcı bu sayfaya ulaşamaz ve oturum açma süreci tamamen başarısız olur.
-[Aksiyom 2]: Eğer kimlik doğrulama akışı sırasında oluşturulan güvenlik state parametresiyle eşleşen oturum verisi kullanıcının tarayıcısında mevcut değilse, CSRF koruması tetiklenerek erişim reddedilir ve kullanıcı oturumu açılamaz.
-[Aksiyom 3]: Eğer bu modülün kimlik sağlayıcısından gelen yetkilendirme kodunu sunucu tarafına ileterek erişim/yenileme tokenleri almasını sağlayacak API istemcisi entegrasyonu yoksa, kullanıcı için geçerli oturum oluşturulamaz.
-[Aksiyom 4]: Eğer oturum açma işlemi sonrası kullanıcıyı platformun ana sayfasına veya girişten önce erişmek istediği özel sayfaya yönlendirecek uygulama içi yönlendirme altyapısı yoksa, kullanıcı oturum açsa bile platformun kullanılabilir kısımlarına erişemez.
-[Aksiyom 5]: Eğer geri dönüş sürecinde oluşan hataları (geçersiz kod, süre aşımı vb.) kullanıcıya iletecek bildirim altyapısı yoksa, oluşan sorunlar hakkında kullanıcı bilgilendirilemez ve sorun giderme süreci imkansız hale gelir.
+Bu modül, kimlik doğrulama geri dönüş sayfası olarak çalışır; fonksiyon gövdesi sağlanmadığı için aksiyomlar modülün amacına dayalı minimal varsayımlardır.
+
+[Aksiyom 1]: Eğer kimlik sağlayıcı (OAuth/Identity Provider) yapılandırması yoksa, kimlik doğrulama geri dönüş parametreleri alınamaz ve kullanıcı oturumu başlatılamaz.
+
+[Aksiyom 2]: Eğer uygulama rotaları arasında AuthCallbackPage'e yönlendirme tanımı yoksa, kimlik sağlayıcısı geri dönüş URL'i bu sayfaya ulaşamaz.
+
+[Aksiyom 3]: Eğer tarayıcı URL parametrelerinde (token, code, state vb.) kimlik doğrulama verileri yoksa, oturum oluşumu başarısız olur ve kullanıcı ana uygulamaya yönlendirilemez.
+
+[Aksiyom 4]: Eğer kimlik doğrulama API'si (session/token exchange) erişilebilir değilse, kullanıcı bilgileri sunucu tarafında doğrulanamaz.
+
+[Aksiyom 5]: Eğer istemci tarafı oturum yönetimi mekanizması (localStorage, cookie, context) yoksa, kimlik bilgileri saklanamaz ve uygulama içindeki erişim kontrolü çalışamaz.
 
 ---
 
-## FONKSIYON DETAYLARI
+**Not:** Bu modül için fonksiyon gövdesi (implementasyon kodu) sağlanmamıştır. Bu nedenle aksiyomlar modülün kimlik doğrulama callback sayfası olmasından yola çıkılarak türetilmiştir. Detaylı ve kesin aksiyonlar için `AuthCallbackPage` fonksiyon gövdesinin incelenmesi gerekmektedir.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### AuthCallbackPage
 **Ne yapar**: VentHub HVAC projesinin kimlik doğrulama akışının geri dönüş (callback) adımını yöneten React tabanlı bir sayfa bileşenidir. Üçüncü taraf kimlik doğrulama sağlayıcısından kullanıcının platforma tekrar yönlendirildiği durumda devreye girer, oturum açma sürecinin başarılı bir şekilde sonlandırılmasını sağlar. Projenin görünüm (view) katmanında özel bir rota üzerinden çalışan, kimlik doğrulama süreçleri için ayrılmış özel bir sayfa bileşenidir.
@@ -115,3 +128,19 @@ Bu modül, platform kimlik doğrulama sürecinin son adımı olan kimlik sağlay
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AuthCallbackPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-error-red`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-success-green`, `bg-white/90`, `border-b-2`, `border-primary-navy`, `border-white/20`, `from-air-blue`, `hover:bg-secondary-blue`, `text-center`, `text-industrial-gray`, `text-steel-gray`, `text-white`, `text-xl`
+- **Layout:** `backdrop-blur-sm`, `flex`, `from-air-blue`, `h-12`, `items-center`, `justify-center`, `max-w-md`, `min-h-screen`, `p-8`, `shadow-hvac-lg`, `w-12`, `w-full`
+- **Varyant/Responsive:** `hover:` önekleri
+- **Yardımcı Sınıflar:** `animate-spin`, `border`, `font-bold`, `font-semibold`, `mb-2`, `mb-4`, `mx-4`, `mx-auto`, `px-4`, `py-2`, `rounded-2xl`, `rounded-full`, `rounded-lg`, `transition-colors`

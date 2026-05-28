@@ -4,20 +4,22 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\layout\PageShell.tsx
 skeleton_hash: 7ca98b70fc84e47d
-generated_at: 2026-05-23T22:11:14Z
+entity_hashes:
+  overview: 09c986d2dcf8a577
+  style_tokens: f9c95184ddfe4989
+generated_at: 2026-05-28T22:36:18Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulama sayfalarının düzenini tutarlı bir şekilde yöneten bir React bileşeni sağlar. `PageShell` adlı `forwardRef` bileşeni, sayfa içeriğine önceden tanımlanmış genişlik ve boşluk stillerini uygulayarak düzenli ve yanıtşabilir bir düzen sunar. Modül, ortam değişkenlerine veya harici API'lere doğrudan erişim yapmaz; yalnızca stil sabitlerini kullanarak görsel düzeni oluşturur.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, uygulama sayfalarının düzenini tutarlı ve modüler bir şekilde yöneten bir React düzen kabuğu (`PageShell`) bileşeni sağlar. Bileşen, `forwardRef` kullanılarak oluşturularak, içeriğe önceden tanımlanmış genişlik ve boşluk stillerini uygulayan bir `<section>` elemanı render eder. Modül, ortam değişkenlerine veya harici API'lere/veritabanı tablolarına doğrudan erişim yapmaz; yalnızca prop'lar aracılığıyla gelen stillere ve içeriğe odaklanır.
 
 ---
 
 
+
+---
+
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -47,18 +49,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/layout/PageShell.tsx::PageShell
-- **params**: (children, width = 'contained', spacing = 'md', className = '', ...props, ref)
-- **ic_degiskenler**:
-  - `widthStyles` — object mapping width values to CSS class strings; used to compute class via `widthStyles[width]`
-  - `spacingStyles` — object mapping spacing values to CSS class strings; used via `spacingStyles[spacing]`
-  - `width` — prop determining layout width; default `'contained'`; used to index `widthStyles`
-  - `spacing` — prop determining spacing; default `'md'`; used to index `spacingStyles`
-  - `className` — additional className string from consumer; appended to the class attribute
-  - `props` — rest of component props spread onto the `<section>` element
-  - `children` — React nodes rendered inside the section
-  - `ref` — forwardRef reference attached to the `<section>` element
-- **Dönüş**: JSX.Element
+### [N1_NASIL] AST Pointer: components/layout/PageShell.tsx::PageShell
+- **params**: ({ children, width = 'contained', spacing = 'md', className = '', ...props }, ref)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX (`<section>` elementi)
 
 ---
 
@@ -79,4 +73,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `${className`, `${spacingStyles[spacing]`, `${widthStyles[width]`

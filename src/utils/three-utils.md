@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\three-utils.ts
 skeleton_hash: 6ce946fde0ea1c53
-generated_at: 2026-05-23T22:34:38Z
+entity_hashes:
+  func:createTimerClock: 1d910dacdf033235
+  overview: 187ea45b56401b65
+generated_at: 2026-05-28T22:38:50Z
 ---
 
 ## Genel Bakış
@@ -26,7 +29,7 @@ Bu modül VentHub HVAC projesinin Three.js tabanlı görselleştirme katmanı i�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### createTimerClock
 **Ne yapar**: VentHub HVAC projesinin üç boyutlu görselleştirme modülünde kullanılmak üzere, zaman takibi işlemlerini gerçekleştirebilen özel bir saat nesnesi oluşturur. Bu saat nesnesi, HVAC sistemlerinin simülasyon akışını, cihazların çalışma sürelerini veya 3B ortamdaki animasyonların zamanlamasını yönetmek için tasarlanmıştır.

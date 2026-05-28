@@ -8,7 +8,7 @@ entity_hashes:
   func:NavSearchTrigger: 685a255257840b8c
   overview: f880d1849bdfe091
   style_tokens: 76073a5206e1d6d6
-generated_at: 2026-05-27T18:30:06Z
+generated_at: 2026-05-28T22:36:19Z
 ---
 
 ## Genel Bakış

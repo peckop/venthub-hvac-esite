@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\GuidedCategoryDiscovery.tsx
 skeleton_hash: bf54d167d56982ec
-generated_at: 2026-05-23T22:05:49Z
+entity_hashes:
+  func:GuidedCategoryDiscovery: 3b7f2bdef4872624
+  func:normalizeImageUrl: 52049e5c49068b7a
+  overview: 7fd7e15085073901
+  style_tokens: ba1e7efd5f41a7fe
+generated_at: 2026-05-28T22:35:52Z
 ---
 
 ## Genel Bakış
@@ -29,7 +34,7 @@ Bu modül için özel aksiyomlar fonksiyon imzalardan türetilmiştir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### normalizeImageUrl
 **Ne yapar**: Verilen bir görsel URL’sini alır, null veya undefined gibi geçersiz değerleri temizler ve standart bir string URL formatına dönüştürür.  
@@ -84,29 +89,6 @@ Bu modül için özel aksiyomlar fonksiyon imzalardan türetilmiştir.
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-- `GuidedCategoryDiscovery()` fonksiyonu, görsel URL'lerini standart bir formata dönüştürmek için `normalizeImageUrl` fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-- Verilen veri setinde bu modülü çağıran dış bir fonksiyon veya dosya bilgisi bulunmamaktadır (bilinmiyor).
-
-### Ic Ice Fonksiyonlar (Nested)
-- Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  GuidedCategoryDiscovery() → normalizeImageUrl()
-
-```mermaid
-graph LR
-    GuidedCategoryDiscovery["GuidedCategoryDiscovery()"] --> normalizeImageUrl["normalizeImageUrl()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\home\GuidedCategoryDiscovery.tsx
@@ -125,16 +107,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[1px]`
-- **width:** `max-w-[200px]`, `sm:w-[320px]`, `w-[280px]`
-- **spacing:** (yok)
-- **diğer:** `duration-[1.5s]`, `grayscale-[0.3]`, `lg:aspect-[0.85/1]`, `tracking-[0.1em]`, `tracking-[0.3em]`, `transition-[opacity,transform]`, `transition-[opacity]`, `transition-[width,background-color]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-relaxed`, `tracking-hvac-tight`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-950`, `bg-slate-950/40`, `bg-white`, `bg-white/30`, `border-b`, `border-l`, `border-r`, `border-t`, `border-white/20`, `from-slate-950/80`, `lg:text-2xl`, `sm:text-6xl`, `text-4xl`
-- **Layout:** `absolute`, `block`, `bottom-8`, `flex`, `flex-col`, `flex-shrink-0`, `from-slate-950/80`, `gap-4`, `gap-6`, `group-hover:-translate-y-2`, `group-hover:bg-cyan-500`, `group-hover:bg-slate-950/20`, `group-hover:border-cyan-500/50`, `group-hover:grayscale-0`, `group-hover:max-h-24`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-t`, `bg-slate-100`, `bg-slate-950`, `bg-slate-950/40`, `bg-white`, `bg-white/30`, `border-b`, `border-l`, `border-r`, `border-t`, `border-white/20`, `from-slate-950/80`, `group-hover:bg-cyan-500`, `group-hover:bg-slate-950/20`, `group-hover:border-cyan-500/50`
+- **Layout:** `absolute`, `block`, `bottom-8`, `flex`, `flex-col`, `flex-shrink-0`, `from-slate-950/80`, `gap-4`, `gap-6`, `group-hover:max-h-24`, `group-hover:w-24`, `h-4`, `h-full`, `h-px`, `items-center`
+- **Varyant/Responsive:** `data-[in-view=true]:`, `group-hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${delayClass`, `-translate-x-4`, `aspect-square`, `data-[in-view=true]:opacity-100`, `data-[in-view=true]:translate-x-0`, `data-[in-view=true]:translate-y-0`, `delay-200`, `delay-300`, `duration-1.5s`, `duration-500`, `duration-700`, `ease-out`, `font-bold`, `font-extralight`, `font-light`

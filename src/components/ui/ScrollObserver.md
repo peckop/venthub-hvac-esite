@@ -4,107 +4,104 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx
 skeleton_hash: 5ac84f8d2580c8f3
-generated_at: 2026-05-23T22:28:05Z
+entity_hashes:
+  func:ScrollObserver: 862e0356d80495a5
+  overview: 165bc7baf7c13a58
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:37:29Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin kullanıcı arayüzü katmanında yer alan, sayfa kaydırma (scroll) hareketlerini ve DOM elemanlarının görünürlük değişimlerini takip etmek için tasarlanmış yeniden kullanılabilir bir React UI bileşeni sunar. Uygulamanın farklı bölümlerinde ihtiyaç duyulan scroll tabanlı etkileşimleri tek merkezden yönetmek amacıyla geliştirilmiştir.
+Bu modül, VentHub HVAC projesinin kullanıcı arayüzü katmanında yer alan, sayfa kaydırma hareketlerini ve DOM elemanlarının görünürlük değişimlerini takip eden yeniden kullanılabilir bir React bileşenidir. Scroll tabanlı etkileşimleri merkezi bir yapıda yöneterek, uygulamanın farklı bölümlerinde tekrar eden scroll gözlemleme mantığını tek bir bileşende toplar.
 
 ## Fonksiyon Grupları
-### Ana Scroll Takip Bileşeni
-Modülün tüm sorumluluğunu üstlenen, uygulama genelinde entegre edilerek scroll gözlemleme işlevlerini yerine getiren ana React bileşenini barındırır. Sayfa üzerindeki kaydırma hareketleri veya eleman görünürlükleriyle ilgili tüm takip işlemlerini tek bir bileşen üzerinden sunar.
+### Scroll Takip Bileşeni
+Modülün tek ve ana bileşeni olarak sayfa kaydırma olaylarını ve eleman görünürlük değişimlerini izler; bu verileri tüketen alt bileşenlere veya mantık katmanlarına gözlem mekanizması sağlar.
 - ScrollObserver
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-VentHub HVAC projesinin UI katmanında çalışan ScrollObserver modülü, tarayıcı ortamında DOM tabanlı scroll olaylarını dinleyerek ilgili tetikleyicileri çalıştırmak üzere tasarlanmıştır, çalışması için tarayıcı DOM API'leri ve React hook çalışma zamanının mevcut olması zorunludur.
+## AXIOMS – Mimari Varsayimlari
 
-[Aksiyom 1]: Eğer tarayıcının standart olay dinleme API'leri (addEventListener, removeEventListener) mevcut değilse, ScrollObserver bileşeni hiçbir sayfa kaydırma işlemini algılayamaz, bağlı tüm işlevler çalışmaz.
-[Aksiyom 2]: Eğer React çalışma zamanında hook'lar (useRef, useEffect) desteklenmiyorsa, ScrollObserver bileşeni mount olamaz, çalışma zamanında hata fırlatır.
-[Aksiyom 3]: Eğer ScrollObserver'ın sarmaladığı root DOM elementi sayfa DOM ağacına eklenmemişse, scroll olayları dinlenemez, tüm izleme işlevselliği devre dışı kalır.
-[Aksiyom 4]: Eğer proje derleyicisi (Vite, Webpack vb.) TSX modül desteği sunmuyorsa, ScrollObserver modülü derlenemez, proje build veya geliştirme çalışması sırasında hata alır.
+ScrollObserver modulu icin mimari varsayimlar, fonksiyon imzasindan (parametresiz bir React bileseni) ve modulun kaynak dosya konumundan cikarilmistir.
+
+**[Aksiyom 1]:** Eger ScrollObserver bir React bileseni olarak render edilmiyorsa, bilesenin DOM'a baglanamaz ve scroll gozlemleme islevi calismaz.
+
+**[Aksiyom 2]:** Eger tarayici ortami (window/document DOM erisimi) mevcut degilse, scroll olaylari veya IntersectionObserver gibi browser API'leri kullanilamaz ve bilesen islevsiz kalir.
+
+**[Aksiyom 3]:** Eger ScrollObserver bir React icinde render ediliyorsa, bu modulun bağımsız (standalone) olarak calistirilmasi beklenmez; ust bilesen hiyerarsisi icinde var olmasi gerekir.
 
 ---
 
-## FONKSIYON DETAYLARI
+> **Not:** Bu modulun fonksiyon imzasi `ScrollObserver()` seklinde parametresiz tanimlanmistir. Fonksiyon gobdesine erisim olmadigindan, iceriksel varsayimlar (ornegin hangi DOM elementlerini hedefledigi, IntersectionObserver esik degerleri, callback yapisi gibi) hakkinda kesin tespit yapilmamistir. Belirtilen varsayimlar, modulun **var olmasi icin zorunlu olan en dusuk kosullari** yansitmaktadir.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### ScrollObserver
-**Ne yapar**: Venthub HVAC projesinin UI katmanında kullanılmak üzere tasarlanmış, kaydırma (scroll) olaylarını izleyen bir React bileşeni üretir. Genel amaçlı domain için uyarlanmış bu bileşen, DOM elemanlarının görünürlük durumunu tespit etmek üzere kullanılır; ekran kaydırıldığında hedef elemanların görünür hale gelmesiyle tetiklenmesi gereken animasyon, içerik yükleme veya herhangi bir özel işlem için altyapı sunar. Proje içindeki tüm sayfalarda ve alt bileşenlerde yeniden kullanılabilir yapıya sahiptir.
-**Nasıl yapar**: Modern web standartlarındaki Intersection Observer API'sini temel alarak çalışır, sürekli scroll olaylarını dinlemekten kaynaklanan performans yükünü tamamen ortadan kaldırır. Kaydırma sırasında yalnızca hedef DOM elemanları görünürlük eşiğini aştığında işlem tetikler, gereksiz yeniden hesaplamaları ve bileşen yeniden render işlemlerini engelleyerek uygulamanın genel akıcılığını korur. TypeScript ile yazılan proje yapısına uygun şekilde React bileşeni kalıplarına entegre edilir.
+**Ne yapar**: Bu fonksiyon, bir React fonksiyonel bileşeni olan ScrollObserver'ı tanımlar. Adından anlaşıldığı üzere, belirli bir kaydırma (scroll) olayını gözlemlemek ve bu duruma tepki vermek için kullanılan bir UI bileşenidir.
+
+**Nasıl yapar**: Fonksiyonel bir React bileşeni yapısında tanımlanmıştır. Bileşenin iç mantığı, prop'ları veya içinde bulunduğu durum (state) hakkında kaynak kodunda doğrudan bilgi verilmemiştir. Genel olarak, bir React bileşeni olarak render edeceği bir arayüzü ve davranışları belirleyen bir fonksiyondur.
+
 **Parametreler**:
-- Ana ScrollObserver fonksiyonu herhangi bir giriş parametresi almaz. Döndürdüğü React.FC türündeki kullanılabilir bileşen ise standart React children prop'u ile birlikte görünürlük eşiği, ilk tetikleme sonrası izlemeyi durdurma gibi isteğe bağlı yapılandırma prop'larını proje UI standardına uygun olarak kabul eder.
-**Dönüş**: React.FC türünde, proje genelinde içe aktarılıp kullanılabilecek kaydırma izleyici React bileşeni döndürür. Bu dönen bileşen TypeScript tip denetimleriyle tam uyumlu çalışır, projenin tip güvenliğini sağlarken tüm ekran boyutlarında stabil görünürlük tespiti işlevini sunar.
+- Parametreler hakkında kaynak kodunda veya docstring'de belirli bir bilgi bulunmamaktadır. Bileşenin aldığı prop'lar, kullanıldığı bağlama göre değişiklik gösterebilir.
+
+**Dönüş**: `React.FC` tipinde bir React bileşeni döndürür.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx::ScrollObserver
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/ui/ScrollObserver.tsx::ScrollObserver
+- **params**: ()
 - **ic_degiskenler**:
-  - `useEffect` — React yaşam döngüsü hook'u, bileşen mount edildiğinde bir kez çalışacak yan etki işlevini tanımlar, boş bağımlılık dizisi ile yalnızca ilk renderda tetiklenir
-  - `window` — Tarayıcı pencere nesnesi, sunucu tarafı render (SSR) olup olmadığını kontrol etmek için kullanılır
-  - `observer` — IntersectionObserver sınıfından oluşturulmuş DOM görünürlük izleyici örneği
-  - `observeNodes` - İzlenecek uygun DOM elemanlarını bulan ve izleyiciye kaydeden yardımcı işlev
-  - `timerId` — setTimeout tarafından döndürülen zamanlayıcı kimliği, temizlik aşamasında zamanlayıcıyı iptal etmek için kullanılır
-- **Dönüş**: null, hiçbir DOM elemanı render etmemek için React'e null döndürülür
+  - `useEffect` — React hook that manages side effects in functional components
+- **Dönüş**: React.FC (bileşen `null` döndürür, yan etkisi useEffect ile IntersectionObserver kurulumudur)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx::useEffect_callback
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/components/ui/ScrollObserver.tsx::useEffectCallback
+- **params**: ()
 - **ic_degiskenler**:
-  - `typeof window` — SSR ortamı olup olmadığını anlamak için pencere nesnesinin tipini sorgular, window tanımsızsa erken dönüş yapar
-  - `observer` — DOM elemanlarının görünürlüğünü izlemek için oluşturulan IntersectionObserver örneği
-  - `observeNodes` — Uygun DOM elemanlarını bulup izleyiciye kaydeden yardımcı işlev
-  - `timerId` — 100ms gecikme ile observeNodes'u çalıştırmak için oluşturulan zamanlayıcının kimliği
-  - `clearTimeout` — Bileşen unmount olduğunda zamanlayıcıyı temizlemek için kullanılan tarayıcı API'si
-  - `observer.disconnect` — Tüm IntersectionObserver izleme işlemlerini sonlandıran metot
-- **Dönüş**: Temizlik işlevi, React bileşen unmount edildiğinde çalıştırılacak kaynak temizleme işlevi döndürülür
+  - `window` — typeof kontrolü ile tarayıcı ortamı olup olmadığı doğrulanır, sunucu tarafı renderingde çalışmayı engeller
+  - `observer` — IntersectionObserver örneği, `data-observe` özellikli elementleri izler, görünür olduklarında `data-in-view` ekler
+  - `observeNodes` — `data-observe` özellikli ve henüz izlenmemiş elementleri DOM'dan sorgulayan fonksiyon
+  - `timerId` — setTimeout tarafından döndürülen zamanlayıcı ID'si, 100ms gecikme ile `observeNodes` çağrısını planlar
+- **Dönüş**: Temizlik fonksiyonu (clearTimeout ve observer.disconnect)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx::intersectionObserver_callback
-- **params**: entries (görünürlüğü değişen DOM elemanlarının IntersectionObserverEntry nesnelerinden oluşan dizi), obs (izlemeyi yöneten IntersectionObserver örneği)
+### [N3_NASIL] AST Pointer: src/components/ui/ScrollObserver.tsx::intersectionObserverCallback
+- **params**: (entries, obs)
 - **ic_degiskenler**:
-  - `entries.forEach` — Tüm görünürlük değişikliği yaşayan elemanları döngüye alan dizi metodu
-  - `entry` — Döngüdeki her bir IntersectionObserverEntry nesnesi
-  - `entry.isIntersecting` — İlgili DOM elemanının görünür olup olmadığını belirten boolean değer
-  - `entry.target` — Görünürlüğü değişen ilgili DOM elemanı
-  - `setAttribute` — DOM elemanına `data-in-view="true"` özniteliğini ekleyerek görünür olduğunu işaretler
-  - `obs.unobserve` — Görünür olan elemanı izleme listesinden çıkararak CPU kullanımını azaltır
+  - `entries` — IntersectionObserverEntry dizisi, izlenen elementlerin durum bilgilerini içerir
+  - `obs` — IntersectionObserver örneği, unobserve işlemi için kullanılır
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx::entry_forEach_callback
-- **params**: entry (tek bir IntersectionObserverEntry nesnesi, ilgili DOM elemanının görünürlük bilgilerini taşır)
+### [N4_NASIL] AST Pointer: src/components/ui/ScrollObserver.tsx::forEachCallback
+- **params**: (entry)
 - **ic_degiskenler**:
-  - `entry.isIntersecting` — Elemanın görünür olup olmadığını kontrol eden boolean değer
-  - `entry.target` — İzlenen ilgili DOM elemanı
-  - `setAttribute` — Elemana `data-in-view="true"` özniteliğini ekleyerek görünür olduğunu işaretler
-  - `obs.unobserve` — Görünür hale gelen elemanın izlenmesini sonlandırır
+  - `entry` — Tek bir IntersectionObserverEntry nesnesi, izlenen bir elementin durumunu temsil eder
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx::observeNodes
-- **params**: (parametre yok)
+### [N5_NASIL] AST Pointer: src/components/ui/ScrollObserver.tsx::observeNodes
+- **params**: ()
 - **ic_degiskenler**:
-  - `document.querySelectorAll` — DOM'da seçiciye uyan tüm elemanları getirir, henüz görünmemiş ve izlenmemiş `data-observe` öznitelikli elemanları seçer
-  - `forEach` — Seçilen DOM elemanlarını döngüye alan metot
-  - `el` — Döngüdeki her bir DOM elemanı
-  - `observer.observe` — Elemanı IntersectionObserver ile izlemeye başlar
-  - `el.setAttribute` — Elemana `data-is-observed="true"` özniteliğini ekleyerek tekrar kaydedilmesini engeller
+  - `document` — DOM'a erişim için kullanılır, querySelectorAll ile elementleri seçer
+  - `observer` — Dış kapsamdaki IntersectionObserver örneği, seçilen elementleri izler
+  - `el` — querySelectorAll ile bulunan her bir element, observer.observe() ile izlenir
 - **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx::el_forEach_callback
-- **params**: el (izlemeye alınacak DOM elemanı)
+### [N6_NASIL] AST Pointer: src/components/ui/ScrollObserver.tsx::querySelectorAllCallback
+- **params**: (el)
 - **ic_degiskenler**:
-  - `observer.observe` — Elemanı IntersectionObserver izleme listesine ekler
-  - `el.setAttribute` — Elemana `data-is-observed="true"` özniteliğini atayarak birden fazla kez kaydedilmesini önler
+  - `el` — `[data-observe]` seçicisiyle bulunan tek bir HTMLElement
+  - `observer` — Dış kapsamdaki IntersectionObserver örneği, bu elementi izler
 - **Dönüş**: yok
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx::cleanup_callback
-- **params**: (parametre yok)
+### [N7_NASIL] AST Pointer: src/components/ui/ScrollObserver.tsx::cleanupFunction
+- **params**: ()
 - **ic_degiskenler**:
-  - `timerId` — Önceden oluşturulan gecikmeli işlem zamanlayıcısının kimliği
-  - `clearTimeout` — Kullanılmayan zamanlayıcıyı temizleyen tarayıcı API'si
-  - `observer` — Kullanılan IntersectionObserver örneği
-  - `observer.disconnect` — Tüm aktif izleme işlemlerini sonlandıran IntersectionObserver metodu
+  - `clearTimeout` — Tarayıcı global fonksiyonu, timerId ile belirtilen zamanlayıcıyı iptal eder
+  - `timerId` — Dış kapsamdaki zamanlayıcı ID'si, observeNodes zamanlamasını temizler
+  - `observer` — Dış kapsamdaki IntersectionObserver örneği, disconnect() ile tüm izlemeyi durdurur
 - **Dönüş**: yok
 
 ---
@@ -132,4 +129,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

@@ -8,7 +8,7 @@ entity_hashes:
   func:EditableCell: c69e143b78ab0750
   overview: 4312d2a15431d150
   style_tokens: 2f2ada2707ada249
-generated_at: 2026-05-27T18:10:39Z
+generated_at: 2026-05-28T22:35:31Z
 ---
 
 ## Genel Bakış

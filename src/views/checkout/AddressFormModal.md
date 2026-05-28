@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx
 skeleton_hash: dbb4f3205dcd696a
-generated_at: 2026-05-23T22:39:58Z
+entity_hashes:
+  func:AddressFormModal: 22dcfc4163aec036
+  func:handleSave: 51987ec8847e1d2c
+  overview: 6d8dac3b90fdee5f
+  style_tokens: 4fa16246087d5121
+generated_at: 2026-05-28T22:39:51Z
 ---
 
 ## Genel Bakış
@@ -32,7 +37,7 @@ Bu React tabanlı adres formu modal bileşeni, dışarıdan alınan tüm prop'la
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AddressFormModal
 **Ne yapar**: VentHub HVAC sisteminin ödeme adımında kullanılan, adres ekleme veya mevcut adresi düzenleme işlemleri için tasarlanmış bir React modal bileşenidir. Kullanıcıların adres bilgilerini girmesine, işlemi iptal etmesine veya girdiği bilgileri kaydetmesine olanak tanır.
@@ -103,3 +108,19 @@ Bu React tabanlı adres formu modal bileşeni, dışarıdan alınan tüm prop'la
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AddressFormModal
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-black/40`, `bg-primary-navy`, `bg-white`, `border-b`, `border-t`, `hover:bg-secondary-blue`, `hover:text-primary-navy`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-white`, `text-xs`
+- **Layout:** `block`, `fixed`, `flex`, `flex-wrap`, `gap-2`, `gap-4`, `grid`, `grid-cols-2`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `max-w-lg`, `min-h-20`, `overflow-hidden`
+- **Varyant/Responsive:** `disabled:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `border`, `disabled:opacity-50`, `font-medium`, `font-semibold`, `inset-0`, `mb-1`, `pt-2`, `pt-4`, `px-3`, `px-5`, `px-6`, `py-2`, `py-4`, `rounded-2xl`, `rounded-lg`

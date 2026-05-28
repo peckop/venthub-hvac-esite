@@ -4,84 +4,78 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutCoupon.ts
 skeleton_hash: 0ddc8afaae2a88ab
-generated_at: 2026-05-23T22:29:51Z
+entity_hashes:
+  func:useCheckoutCoupon: 4495b524ff78f42b
+  overview: dfde178f4f3b3f1b
+generated_at: 2026-05-28T22:37:53Z
 ---
 
 ## Genel Bakış
-Venthub HVAC projesinin ödeme süreci için geliştirilen bu React özel hook modülü, sipariş toplam tutarına bağlı olarak ödeme adımındaki kupon yönetimi işlemlerini gerçekleştirmek üzere tasarlanmıştır. Modül, kullanıcıların ödeme aşamasında girdikleri kupon kodlarıyla ilgili tüm işlemleri tek bir noktadan yöneterek, ödeme akışında kupon kullanımıyla ilgili ihtiyaçları karşılar.
+Venthub HVAC projesinin ödeme sürecine entegre edilmiş bir React özel hook modülüdür. Kullanıcıların sipariş toplam tutarına göre kupon kodu girişi, doğrulaması ve indirim hesaplama işlemlerini tek bir bileşen üzerinden yönetir. Modül, checkout akışında kupon kullanımının tüm yaşam döngüsünü kontrol eder.
 
 ## Fonksiyon Grupları
-### Ana Kupon Yönetimi Hook'u
-Modülün tüm işlevselliğini kapsayan tek ana bileşen olarak, ödeme sayfasında kupon doğrulama, indirim hesaplama ve kupon uygulamasıyla ilgili tüm işlemleri yürütür.
+### Kupon İşlemleri Hook'u
+Ödeme sayfasında kupon kodu yönetimi için gerekli tüm işlevselliği tek bir hook içinde sunar. Kupon girişi, doğrulama, geçerlilik kontrolü ve indirim tutarının hesaplanmasını kapsar.
 - useCheckoutCoupon
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React hook'u, ödeme (checkout) adımında kullanıcı kuponunu uygulamak için tasarlanmıştır, doğru çalışması için geçerli bir sipariş toplamı ve kupon doğrulama altyapısının erişilebilir olması zorunludur.
 
-[Aksiyom 1]: Eğer useCheckoutCoupon fonksiyonuna aktarılan totalAmount parametresi sayısal veri türünde değilse, kupon tutarı hesaplama ve geçerlilik kontrolü işlemleri çöker veya hatalı sonuç üretir.
-[Aksiyom 2]: Eğer hook'un bağlı olduğu dahili/harici kupon doğrulama servisi yoksa, hiçbir kuponun geçerliliği kontrol edilemez, kullanıcı siparişine indirim uygulayamaz.
-[Aksiyom 3]: Eğer totalAmount parametresi 0'dan küçük negatif bir değer olarak aktarılıyorsa, kupon hesaplamaları mantıksız sonuçlar (negatif indirim, sıfırdan küçük nihai sipariş tutarı vb.) üretir.
-[Aksiyom 4]: Eğer hook'un projenin genel state yönetimi altyapısıyla entegrasyonu sağlanmamışsa, uygulanan kuponun indirim tutarı genel sipariş toplamına yansıtılamaz.
+Bu modül, React hook yapısıyla ödeme sürecinde kupon yönetimi sağlayan bir fonksiyonel bileşendir.
+
+[Aksiyom 1]: Eğer `totalAmount` parametresi number tipinde değilse (veya `NaN`/`undefined`/`null` ise), kupon indirim hesaplaması hatalı sonuç verebilir veya beklenmeyen davranış oluşur.
+
+[Aksiyom 2]: Eğer React hook bağlamı (React component içinde) dışında çağrılırsa, hook kuralları ihlal edilir ve çalışma zamanı hatası oluşur.
+
+[Aksiyom 3]: Eğer `totalAmount` negatif bir değer olarak iletilirse, kupon indirim mantığı tanımsız davranış gösterebilir.
+
+[Aksiyom 4]: Eğer `totalAmount` sıfır ise, kupon uygulaması sonucunda indirim tutarının sıfır veya negatif olmaması beklenir (tutar limitleri bilinmiyor).
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useCheckoutCoupon
-**Ne yapar**: Ödeme sürecinde kupon yönetimi için geliştirilmiş özel React hook'udur. Kupon kodu giriş durumunu yönetir, girilen kodu doğrular, Sepetin mevcut ara toplamı üzerinden indirim uygulamak için gerekli tüm işlevleri sunar. Kupon uygulamak ve kaldırmak gibi temel işlemleri tek bir merkezden yöneterek ödeme sayfası bileşenlerinin kod karmaşıklığını azaltır.
-**Nasıl yapar**: İçerisinde yerel state yönetimi kullanarak kupon kodu, uygulanan indirim miktarı ve olası doğrulama hatalarını takip eder. Girilen kupon kodunu öncelikle temel yerel kontrollerden geçirir, ardından Supabase tabanlı Edge Fonksiyonu üzerinden güvenli bir şekilde sunucu tarafında doğrulamasını ve indirim hesaplamasını gerçekleştirir. Kuponun kaldırılması durumunda tüm state değerlerini sıfırlayarak orijinal sepet tutarına dönülmesini sağlar.
+**Ne yapar**: Bu özel hook, ödeme sayfasında kupon kodunun uygulanma sürecini yönetir. Kullanıcının girdiği kupon kodunu tutar, doğrular ve Supabase Edge Function'ı üzerinden indirimi güvenli bir şekilde aktif hale getirir.
+
+**Nasıl yapar**: Fonksiyon, `useState` ve `useCallback` gibi React hook'larını kullanarak kupon kodu, yükleme durumu ve hata durumu için state yönetimi sağlar. Doğrulama işlemi, kupon kodunun boş olup olmadığını kontrol ederek başlar. Geçerli bir kod girildiğinde, `totalAmount` parametresini de alarak bir fetch isteği ile Supabase Edge Function'ı çağırır ve sonucu state'e yazar.
+
 **Parametreler**:
-- name: totalAmount — type: number — Sepetin kupon uygulanmadan önceki mevcut ara toplam tutarıdır. Değer Türk Lirası (TRY) cinsinden hesaplanmıştır, kuponun geçerlilik şartlarını (örneğin minimum sepet tutarı) kontrol etmek için kullanılır.
-**Dönüş**: İçerisinde kuponun mevcut durumunu, state değerlerini güncellemek için kullanılan setter fonksiyonları, kuponu uygulamak için tetiklenen işlevi ve kuponu kaldırmak için kullanılan metodu barındıran bir nesne döndürür. Dönen nesne, ödeme sayfası bileşeninin tüm kupon işlemlerini yönetmesini sağlayacak tüm gerekli araçları sunar.
+- `totalAmount`: number — Sepetin mevcut toplam tutarı (Türk Lirası cinsinden). Bu değer, Edge Function'a gönderilerek indirimin doğru hesaplanmasında kullanılır.
+
+**Dönüş**: Nesne (Object) — Kupon yönetimine ilişkin durum ve fonksiyonları içeren bir nesne döner. Bu nesnenin yapısı bilinmemekle birlikte, dokümantasyondan kupon durumu (state), bu durumu güncelleyici setter fonksiyonları ve kuponu uygulamak veya kaldırmak için işlevler içerdiği çıkarılabilir. Kesin dönüş tipi ve özellikleri, kaynak kodunun implementasyonuna bağlıdır.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutCoupon.ts::useCheckoutCoupon
-- **params**: [totalAmount: number]
+### [N1_NASIL] AST Pointer: src/hooks/useCheckoutCoupon.ts::useCheckoutCoupon
+- **params**: (totalAmount: number)
 - **ic_degiskenler**:
-  - `couponCode` — Kullanıcının girdiği kupon kodunu tutan React state değişkeni, başlangıç değeri boş string
-  - `setCouponCode` — couponCode state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `couponApplied` — Geçerli uygulanmış kuponun kod ve indirim bilgilerini tutan state değişkeni, null veya {code: string, discount: number} tipinde
-  - `setCouponApplied` — couponApplied state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `applyCoupon` — Kupon kodunu sunucuya gönderip doğrulamak için tanımlanan async iç fonksiyon
-  - `removeCoupon` — Uygulanmış kuponu iptal etmek ve kupon alanını sıfırlamak için tanımlanan iç fonksiyon
-- **Dönüş**: { couponCode, setCouponCode, couponApplied, applyCoupon, removeCoupon } içeren state ve fonksiyonlar nesnesi
+  - `couponCode` — Kullanıcının girdiği kupon kodu, useState ile tutulan string state
+  - `setCouponCode` — couponCode state'ini güncellemek için kullanılan setter fonksiyonu
+  - `couponApplied` — Uygulanan kupon bilgilerini (kod ve indirim miktarı) tutan state, başlangıçta null
+  - `setCouponApplied` — couponApplied state'ini güncellemek için kullanılan setter fonksiyonu
+  - `applyCoupon` — Asenkron fonksiyon, kupon kodunu doğrular ve uygular
+  - `removeCoupon` — Uygulanan kuponu kaldırır ve formu sıfırlar
+- **Dönüş**: { couponCode, setCouponCode, couponApplied, applyCoupon, removeCoupon }
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutCoupon.ts::useCheckoutCoupon/applyCoupon
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/hooks/useCheckoutCoupon.ts::applyCoupon
+- **params**: ()
 - **ic_degiskenler**:
-  - `code` — Girilen kupon kodunun baştaki/sondaki boşlukları temizlenmiş hali, uzunluk kontrolü için kullanılır
-  - `base` — Supabase proje URL'sini ortam değişkeninden alan değişken, boş string varsayılan değeri
-  - `anon` — Supabase anon erişim anahtarını ortam değişkeninden alan değişken, boş string varsayılan değeri
-  - `resp` — apply-coupon edge fonksiyonuna yapılan POST fetch isteğinin cevap nesnesi
-  - `json` — Fetch cevabından ayrıştırılan JSON verisi, ayrıştırma hatasında boş nesne varsayılır
-  - `e` — Try bloğunda yakalanan hata nesnesi, konsola yazdırılır
-- **Dönüş**: Promise<void>
+  - `code` — Trimlenmiş kupon kodu, doğrulama için kullanılır
+  - `base` — Supabase URL'si, process.env.NEXT_PUBLIC_SUPABASE_URL'den alınır veya boş string
+  - `anon` — Supabase anon key'i, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY'den alınır veya boş string
+  - `resp` — Edge Function'dan dönen HTTP response nesnesi
+  - `json` — Response'un JSON içeriği, geçersiz JSON durumunda boş obje ile yakalanır
+  - `e` — Try-catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: void (yan etki: state güncelleme ve toast bildirimleri)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutCoupon.ts::useCheckoutCoupon/removeCoupon
-- **params**: (parametre yok)
-- **ic_degiskenler**: (kendi içerisinde tanımlı yerel değişken yok, üst kapsam state setter'larını kullanır)
-- **Dönüş**: void
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutCoupon.ts::anon_async_apply_coupon
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `code` — Girilen kupon kodunun baştaki/sondaki boşlukları temizlenmiş hali, uzunluk kontrolü için kullanılır
-  - `base` — Supabase proje URL'sini ortam değişkeninden alan değişken, boş string varsayılan değeri
-  - `anon` — Supabase anon erişim anahtarını ortam değişkeninden alan değişken, boş string varsayılan değeri
-  - `resp` — apply-coupon edge fonksiyonuna yapılan POST fetch isteğinin cevap nesnesi
-  - `json` — Fetch cevabından ayrıştırılan JSON verisi, ayrıştırma hatasında boş nesne varsayılır
-  - `e` — Try bloğunda yakalanan hata nesnesi, konsola yazdırılır
-- **Dönüş**: Promise<void>
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutCoupon.ts::anon_remove_coupon
-- **params**: (parametre yok)
-- **ic_degiskenler**: (kendi içerisinde tanımlı yerel değişken yok, üst kapsam state setter'larını kullanır)
-- **Dönüş**: void
+### [N3_NASIL] AST Pointer: src/hooks/useCheckoutCoupon.ts::removeCoupon
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void (yan etki: couponApplied ve couponCode state'lerini sıfırlar)
 
 ---
 

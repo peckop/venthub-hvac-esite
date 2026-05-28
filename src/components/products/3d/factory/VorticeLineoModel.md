@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\VorticeLineoModel.tsx
 skeleton_hash: 44b4850e8bddb8bf
-generated_at: 2026-05-23T22:20:20Z
+entity_hashes:
+  func:VorticeLineoModel: 4d32037362a7371d
+  overview: 36c6bcc733eabf66
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:40Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ VorticeLineoModel componentinin beklendiği gibi çalışabilmesi için aşağı
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### VorticeLineoModel
 **Ne yapar**: Vortice Lineo 100 fanının yüksek fidelite 3D montajını render eden bir React bileşeni döndürür; gövde, kolluklar, terminal kutusu ve impeller gibi profesyonel geometrileri birleştirir.  
@@ -75,4 +79,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

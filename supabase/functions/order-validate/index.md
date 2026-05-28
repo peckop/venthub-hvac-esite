@@ -4,32 +4,62 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts
 skeleton_hash: bf6740246d4dc074
-generated_at: 2026-05-24T10:46:38Z
+entity_hashes:
+  func:order-validate_handler: 5404fb6b36c963fe
+  overview: d54381bf08b3aab6
+generated_at: 2026-05-28T22:47:26Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase ortamında çalışan bir HTTP işlevidir. Gelen sipariş doğrulama isteklerini alır, gerekli kontrolleri yapar ve sonucu bir HTTP yanıtı olarak döndürür. Tek bir işleyici ile sipariş geçerliliğini sağlamak için merkezi bir nokta sunar.
+Bu modül, VentHub HVAC projesi kapsamında Supabase Edge Function olarak deploy edilmiş bir sipariş doğrulama servisidir. Tek bir HTTP işleyicisi aracılığıyla gelen sipariş istemlerini merkezi olarak karşılar, iş kurallarına uygunluk denetimlerini gerçekleştirir ve sonucu istemciye standart HTTP yanıtı olarak iletir.
 
 ## Fonksiyon Grupları
 ### Sipariş Doğrulama İşlemi
-Sipariş verilerinin alınması, doğrulanması ve istemciye uygun yanıtın iletilmesi sorumluluğunu üstlenir.
-- order-validate_handler
+Gelen HTTP isteğinin ayrıştırılmasından başlayarak kullanıcının yetkilendirilmesi, sipariş verilerinin doğrulanması, hesaplamaların kontrol edilmesi ve stok uygunluğunun tespit edilmesi de dahil olmak üzere tüm doğrulama yaşam döngüsünü tek bir çağrı noktası üzerinden yönetir.
+- order_validate_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, Supabase Edge Function ortamında çalışan bir HTTP istek işleyicisidir. Aşağıdaki mimari varsayımlar, fonksiyon imzası ve modül yapısından türetilmiştir.
 
 ---
 
-## FONKSIYON DETAYLARI
+**[Aksiyom 1]:** Eğer `req` parametresi sağlanmazsa, fonksiyon isteği işleyemez ve hata oluşur.
+
+> **Gerekçe:** `order-validate_handler(req)` fonksiyonu tek bir zorunlu parametre alır ve bu parametre için varsayılan bir değer tanımlanmamıştır.
+
+---
+
+**[Aksiyom 2]:** Eğer `req` geçerli bir HTTP istek nesnesi (Request formatı) değilse, fonksiyon beklenmeyen davranış sergileyebilir veya hata fırlatabilir.
+
+> **Gerekçe:** Modül, Supabase Edge Function ortamında çalışmaktadır ve HTTP yanıtı döndürmektedir. Bu nedenle girdinin HTTP istek formatında olması gerekmektedir.
+
+---
+
+**[Aksiyom 3]:** Eğer fonksiyon bir HTTP yanıtı döndüremezse (network hatası, timeout vb.), istemci geçersiz veya eksik yanıt alır.
+
+> **Gerekçe:** Fonksiyonun temel amacı isteği işleyip HTTP yanıtı iletmektir; yanıt iletimi başarısız olursa istemci tarafında hata yönetimi devreye girer.
+
+---
+
+**Not:** Fonksiyon gövdesi (implementation) paylaşılmadığı için, sipariş doğrulama mantığına ilişkin spesifik kurallar (eşik değerleri, geçerlilik kriterleri vb.) belirlenememiştir.
+
+---
+
+## FONKSİYON DETAYLARI
 
 ### order-validate_handler
-**Ne yapar**: VentHub HVAC projesi bünyesinde Supabase üzerinde çalışan sipariş doğrulama fonksiyonunun ana giriş noktasıdır. İstemciden gelen sipariş doğrulama isteklerini alıp işleyerek, ilgili siparişin tüm sistem kurallarına ve iş mantığına uygun olup olmadığını tespit eder. Doğrulama işleminin sonucunu standart HTTP yanıtı formatında istemciye iletir.
-**Nasıl yapar**: Gelen HTTP isteği üzerinden tüm gerekli bilgileri ayrıştırır, öncelikle isteği gönderen kullanıcının yetkilendirme kontrollerini yapar. Ardından istek gövdesindeki sipariş verilerini okuyarak sırasıyla zorunlu alan dolulukları, sipariş tutarı hesaplamalarının doğruluğu, siparişteki ürünlerin stok durumu gibi tüm doğrulama adımlarını çalıştırır. Tüm kontrollerden geçen siparişler için başarılı yanıt, hatası tespit edilen siparişler için uygun hata kodlu yanıt üretir.
+
+**Ne yapar**: Bu fonksiyon, HTTP isteklerini alarak sipariş doğrulama işlemlerini yönetir ve uygun HTTP yanıtı (Response) döndürür. Supabase Edge Function yapısı içinde yer alan bir istek işleyicisidir.
+
+**Nasıl yapar**: Fonksiyon, gelen HTTP istek nesnesini (req) parameter olarak alır. Sipariş doğrulama mantığını çalıştırarak isteğin durumuna göre uygun bir Response nesnesi oluşturur ve döndürür. Fonksiyonun iç detayları docstring'de belirtilmemiştir.
+
 **Parametreler**:
-- req: Request — Supabase Edge Function standartlarına uygun, fonksiyona gelen tüm HTTP isteği verilerini barındıran Request nesnesidir. İsteğin başlıkları, gövdesi, kaynak adresi gibi tüm bilgilere erişim sağlar.
-**Dönüş**: Response — Doğrulama işleminin sonucunu içeren standart HTTP Response nesnesidir. Başarılı doğrulama durumunda 200 OK durum koduyla birlikte onaylanmış sipariş detaylarını, hata durumunda 400 (geçersiz istek), 401 (yetkisiz erişim), 500 (sunucu hatası) gibi uygun HTTP durum kodu ve açıklayıcı hata mesajını içerir.
+- req: Request — Gelen HTTP istek nesnesi. Sipariş doğrulama için gerekli verileri ve header bilgilerini içerir.
+
+**Dönüş**: Response — HTTP yanıt nesnesi. Doğrulama sonucuna göre başarı veya hata durumunu belirten yanıt döndürür.
 
 ---
 
@@ -98,108 +128,99 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts::order-validate_handler
-- **params**: (req: Request)
+### [N1_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::order-validate_handler
+- **params**: `req` — HTTP Request nesnesi, method ve body içerir
 - **ic_degiskenler**:
-  - `cors` — CORS politikasını tanımlayan header nesnesi, tüm HTTP yanıtlarında kullanılır
-  - `supabaseUrl` — Deno ortam değişkeninden alınan Supabase proje URL'si
-  - `serviceRoleKey` — Deno ortam değişkeninden alınan admin yetkili Supabase servis rolü anahtarı
-  - `anonKey` — Deno ortam değişkeninden alınan herkese açık anonim Supabase istemci anahtarı
-  - `authHeader` — İstekten alınan Authorization başlığı, kullanıcı kimlik doğrulaması için kullanılır
-  - `authClient` — Kullanıcı oturumunu doğrulamak için oluşturulan anonim yetkili Supabase istemcisi
-  - `user` — authClient ile alınan doğrulanmış kullanıcı nesnesi
-  - `authErr` — Kullanıcı bilgisi alınırken oluşan hata nesnesi
-  - `headers` — Servis rolü ile yetkilendirilmiş API istekleri için kullanılan header nesnesi
-  - `body` — İstekten parse edilen JSON gövdesi, parse hatasında boş nesne olarak atanır
-  - `userId` — Doğrulanmış kullanıcının benzersiz ID'si
-  - `cartId` — İstekten alınan veya kullanıcıya ait sepet ID'si, string formatına standartlaştırılır
-  - `getJson` — İç içe tanımlanan, Supabase REST API'sinden tipli JSON verisi çeken async yardımcı fonksiyon
-  - `nowIso` — İç içe tanımlanan, şu anki zamanı ISO string formatında döndüren zaman yardımcısı
-  - `carts` — Kullanıcıya ait sepetleri çeken dizi, kullanıcıya ait tek sepeti almak için kullanılır
-  - `carts[0]` — Kullanıcının ilk sepet nesnesi, ID'si cartId'ye atanır
-  - `items` — Sepete ait ürünleri içeren cart_items dizisi, boş olursa boş cevap döndürülür
-  - `_productIds` — Sepetteki benzersiz ürün ID'leri dizisi, ürünleri toplu çekmek için kullanılır
-  - `prods` — Sepetteki ürünlerin detaylarını içeren products dizisi
-  - `pmap` — Ürün ID'si ile ürün nesnesini eşleştiren Map nesnesi, hızlı erişim sağlar
-  - `role` — Kullanıcının rolü, varsayılan 'individual', kullanıcı profiline göre güncellenir
-  - `orgId` — Kullanıcının ait olduğu kuruluşun ID'si, null varsayılanı ile başlar
-  - `tier` — Kullanıcının kuruluşunun seviye puanı, null varsayılanı ile başlar
-  - `prof` — Kullanıcının profilini içeren user_profiles dizisi
-  - `prof[0]` — Kullanıcının ilk profil nesnesi, rolü ve kuruluş ID'si alınır
-  - `org` — Kullanıcının kuruluş detaylarını içeren organizations dizisi
-  - `org[0]` — Kullanıcının ilk kuruluş nesnesi, tier_level değeri alınır
-  - `n` — Şu anki zamanın ISO string formatındaki değeri, fiyat listeleri filtrelemek için kullanılır
-  - `lists` — Tüm aktif fiyat listelerini içeren price_lists dizisi
-  - `flists` — Kullanıcının rolü ve kuruluş seviyesine göre filtrelenmiş geçerli fiyat listeleri dizisi
-  - `chosenListId` — Sıralama sonrası seçilen ilk fiyat listesinin ID'si
-  - `priceFor` — İç içe tanımlanan, bir ürün için geçerli birim fiyatını hesaplayan async yardımcı fonksiyon
-  - `recalculated` — Yeniden hesaplanan sepet öğelerini tutan dizi, son cevapta gönderilir
-  - `mismatches` — Sepetteki kayıtlı fiyat ile hesaplanan gerçek fiyat arasındaki uyumsuzlukları tutan dizi
-  - `stockIssues` - Stokta yeterli ürün olmayan öğeler için oluşan sorunları tutan dizi
-  - `to2` - Sayıyı 2 ondalık basamağa yuvarlayan yardımcı fonksiyon
-  - `toCents` - Tutarı sent cinsine çevirmek için 100 ile çarpıp yuvarlayan yardımcı fonksiyon
-  - `it` - Döngüde işlenen her bir sepet öğesi
-  - `product` - pmap'ten alınan mevcut öğeye ait ürün nesnesi
-  - `pr` - priceFor ile hesaplanan ürünün birim fiyatı ve kullandığı fiyat listesi bilgisi
-  - `unitNorm` - 2 ondalık basamağa yuvarlanmış standartlaştırılmış birim fiyat
-  - `equal` - Sepetteki kayıtlı fiyat ile hesaplanan fiyatın uyumlu olup olmadığını gösteren boolean
-  - `available` - Ürünün mevcut stok miktarı, ürün nesnesindeki yaygın stok alanlarından alınır
-  - `cand` - Ürün nesnesinde stok miktarını bulmak için kontrol edilen alan isimleri listesi
-  - `c` - Döngüde kontrol edilen her bir stok alanı değeri
-  - `qty` - Sepette istenen ürün miktarı, sayıya dönüştürülür
-  - `finalQty` - Stok durumuna göre önerilen nihai ürün miktarı, yetersiz stokta mevcut miktara ayarlanır
-  - `subtotalCents` - Tüm yeniden hesaplanan öğelerin sent cinsinden toplam tutarı
-  - `subtotal` - Sent cinsinden toplamın ana para birimi cinsinden değeri
-  - `ok` - Tüm uyumsuzlukların ve stok sorunlarının sıfır olduğunu gösteren boolean
-  - `_e` - Ana try bloğunda yakalanan genel hata nesnesi
-  - `msg` - Hata nesnesinden alınan okunabilir hata mesajı
-- **Dönüş**: Response, tüm sipariş doğrulama sonuçlarını veya hata mesajlarını içeren HTTP yanıtı
+  - `cors` — CORS başlık nesnesi, tüm Response'larda kullanılır
+  - `supabaseUrl` — Deno.env'den alınan Supabase proje URL'i
+  - `serviceRoleKey` — Deno.env'den alınan service role anahtarı (admin erişimi)
+  - `anonKey` — Deno.env'den alınan anon (public) anahtar
+  - `authHeader` — req.headers.get('Authorization') ile alınan token
+  - `authClient` — anonKey + kullanıcı token'ı ile oluşturulmuş Supabase client
+  - `user` — authClient.auth.getUser() sonucundaki authenticated kullanıcı nesnesi
+  - `authErr` — auth kontrolünden dönen hata (null ise başarılı)
+  - `headers` — serviceRoleKey ile service-role seviyesinde API çağrısı için başlıklar
+  - `body` — req.json() ile parse edilmiş request gövdesi
+  - `userId` — user.id, oturum açmış kullanıcının ID'si
+  - `cartId` — body'den gelen veya user'a göre çözümlenmiş sepet ID'si
+  - `carts` — user_id ile shopping_carts tablosundan getirilen sepet kayıtları
+  - `items` — cart_items tablosundan getirilen sepet ürünleri dizisi
+  - `_productIds` — items içinden benzersiz product_id'ler kümesi
+  - `prods` — products tablosundan getirilen ürün kayıtları
+  - `pmap` — product_id -> Product eşlemesi yapan Map (hızlı arama için)
+  - `role` — user_profiles tablosundaki kullanıcının rolü (varsayılan 'individual')
+  - `orgId` — user_profiles tablosundaki organization_id (yoksa null)
+  - `tier` — organizations tablosundaki tier_level (yoksa null)
+  - `prof` — user_profiles tablosundan getirilen profil verisi
+  - `org` — organizations tablosundan getirilen organizasyon verisi
+  - `n` — şu anki ISO zaman damgası (price_lists filtresi için)
+  - `lists` — aktif ve tarih filtresinden geçmiş price_lists kayıtları
+  - `flists` — role ve tier uyumuna göre filtrelenmiş price lists
+  - `chosenListId` — flists içinden seçilen ilk price list ID'si (yoksa null)
+  - `recalculated` — yeniden hesaplanmış sepet ürünleri dizisi
+  - `mismatches` — fiyat uyuşmazlıkları dizisi
+  - `stockIssues` — stok sorunları dizisi
+  - `to2` — sayıyı 2 ondalık basamağa yuvarlayan yardımcı fonksiyon
+  - `toCents` — sayıyı kuruşa çeviren yardımcı fonksiyon
+  - `it` — items döngüsündeki mevcut sepet öğesi
+  - `product` — pmap'ten looked up ürün nesnesi
+  - `pr` — priceFor() sonucu {unit, listId} nesnesi
+  - `unit` — priceFor() sonucundaki birim fiyat
+  - `unitNorm` — unit'in 2 ondalığa yuvarlanmış hali
+  - `equal` — mevcut fiyat ile beklenen fiyat arasındaki fark < 0.005 ise true
+  - `available` — ürün stok miktarı (product nesnesinin various alanlarından çözümlenir)
+  - `cand` — stok miktarı için aday alanların dizisi
+  - `c` — cand döngüsündeki mevcut aday alan değeri
+  - `qty` — sepetteki talep edilen miktar
+  - `finalQty` - stok durumuna göre nihai miktar (stok yetersizse available'a düşürülür)
+  - `_e` — catch bloğu yakaladığı hata nesnesi
+- **Dönüş**: `Response` — JSON gövdeli HTTP yanıtı (200, 400, 401, 405 veya 500)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts::getJson
-- **params**: (_path: string)
+### [N2_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::getJson
+- **params**: `_path: string` — Supabase REST API yolu (supabaseUrl sonrası kısım)
 - **ic_degiskenler**:
-  - `res` - Supabase REST API'ye yapılan fetch isteğinin cevap nesnesi
-  - `txt` - API cevabından okunan ham metin içeriği
-- **Dönüş**: Promise<T>, Generic tipinde parse edilmiş JSON verisi, parse hatası durumunda null döner
+  - `res` — fetch() çağrısından dönen Response nesnesi
+  - `txt` — res._text() ile alınan ham yanıt metni
+- **Dönüş**: `Promise<T>` — parse edilmiş JSON verisi veya hata fırlatır
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts::flists_filter_cb
-- **params**: (pl: PriceList)
+### [N3_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::nowIso
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` — new Date().toISOString() ile şu anki UTC zaman damgası
+
+### [N4_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::priceFor
+- **params**: `product: Product` — fiyat hesaplanacak ürün nesnesi
 - **ic_degiskenler**:
-  - `rs` - Fiyat listesinin izin verilen kullanıcı rolleri dizisi, null/undefined olabilir
-  - `ts` - Fiyat listesinin izin verilen kuruluş seviyeleri dizisi, null/undefined olabilir
-  - `roleOk` - Kullanıcının rolü fiyat listesine uygun mu diye kontrol eden boolean
-  - `tierOk` - Kullanıcının kuruluş seviyesi fiyat listesine uygun mu diye kontrol eden boolean
-- **Dönüş**: boolean, fiyat listesinin kullanıcı için geçerli olup olmadığını belirtir
+  - `queries` — price list ID sorguları dizisi (chosenListId ve/veya null)
+  - `q` — döngüdeki mevcut price list ID'si veya null
+  - `basePath` — product_prices REST API için temel sorgu yolu
+  - `_path` — price_list_id filtresi eklenmiş tam API yolu
+  - `rows` — product_prices tablosundan dönen fiyat satırları
+  - `pick` — geçerli tarih aralığındaki ilk fiyat satırı (yoksa rows[0])
+  - `base` — pick.base_price'dan convert edilmiş taban fiyat
+  - `sale` — pick.sale_price'dan convert edilmiş indirimli fiyat (null olabilir)
+  - `disc` — pick.discount_percentage'dan convert edilmiş indirim yüzdesi
+  - `v` — base * (1 - disc/100) ile hesaplanan indirimli fiyat
+  - `fb` — product.price alanından fallback fiyat (fallback senaryosu)
+- **Dönüş**: `{unit: number, listId: string|null}` — hesaplanan birim fiyat ve kullanılan price list ID
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts::flists_sort_cb
-- **params**: (a: PriceList, b: PriceList)
+### [N5_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::flists_filter
+- **params**: `pl: PriceList` — filtrelenecek fiyat listesi
 - **ic_degiskenler**:
-  - `ad` - a fiyat listesinin varsayılan olup olmadığını belirten sayısal değer (1: varsayılan, 0: değil)
-  - `bd` - b fiyat listesinin varsayılan olup olmadığını belirten sayısal değer
-  - `at` - a fiyat listesinin geçerlilik başlangıç zamanının timestamp değeri
-  - `bt` - b fiyat listesinin geçerlilik başlangıç zamanının timestamp değeri
-- **Dönüş**: number, sıralama için karşılaştırma sonucu, negatif/pozitif/sıfır olarak sıralamayı yönlendirir
+  - `rs` — pl.allowed_user_roles alanının string[] | null | undefined olarak cast'i
+  - `ts` — pl.organization_tiers alanının number[] | null | undefined olarak cast'i
+  - `roleOk` — rol kontrolü sonucu (rs yoksa veya boşsa veya role içeriyorsa true)
+  - `tierOk` — tier kontrolü sonucu (tier null ise veya ts yoksa veya tier içeriyorsa true)
+- **Dönüş**: `boolean` — pl'nin role ve tier ile uyumlu olup olmadığı
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts::priceFor
-- **params**: (product: Product)
+### [N6_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::flists_sort
+- **params**: `a: PriceList`, `b: PriceList` — sıralanacak iki fiyat listesi
 - **ic_degiskenler**:
-  - `queries` - Sırayla denenecek fiyat listesi ID'leri, önce seçilen liste sonra null (genel fiyatlar)
-  - `q` - Döngüde denenen her bir fiyat listesi ID'si
-  - `basePath` - Ürün fiyatlarını çekmek için kullanılan ortak API yolunun başlangıcı
-  - `_path` - Sorguya göre tam olarak oluşturulmuş ürün fiyatları API yolu
-  - `rows` - getJson ile çekilen ürün fiyatları dizisi
-  - `pick` - Geçerlilik tarihlerine göre seçilen ilk uygun fiyat nesnesi, bulunamazsa ilk öğe seçilir
-  - `r` - rows.find içinde kontrol edilen her bir fiyat nesnesi
-  - `f` - Fiyatın geçerlilik başlangıç tarihinin mevcut zamandan önce olup olmadığını kontrol eden boolean
-  - `t` - Fiyatın geçerlilik bitiş tarihinin mevcut zamandan sonra olup olmadığını kontrol eden boolean
-  - `base` - Fiyatın temel fiyatı, sayıya dönüştürülür
-  - `sale` - Fiyatın indirimli satış fiyatı, null olabilir
-  - `disc` - Fiyatın yüzdesel indirim oranı, sayıya dönüştürülür
-  - `v` - İndirim uygulandıktan sonra hesaplanan ara fiyat değeri
-  - `fb` - Hiçbir uygun fiyat bulunamazsa ürün nesnesindeki varsayılan fiyat
-- **Dönüş**: Promise<{unit: number, listId: string|null}>, Hesaplanan birim fiyatı ve kullanılan fiyat listesi ID'sini içeren nesne
-
----
+  - `ad` — a.is_default değerinin sayısal karşılığı (true→1, false→0)
+  - `bd` — b.is_default değerinin sayısal karşılığı (true→1, false→0)
+  - `at` — a.effective_from'un Date.parse ile timestamp'e çevirimi (yoksa 0)
+  - `bt` — b.effective_from'un Date.parse ile timestamp'e çevirimi (yoksa 0)
+- **Dönüş**: `number` — sıralama karşılaştırma sonucu (önce default olmayanlar, sonra tarihe göre azalan)
 
 ---
 

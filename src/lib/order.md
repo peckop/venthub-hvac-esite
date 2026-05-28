@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\order.ts
 skeleton_hash: 34310d9d2c13f2a6
-generated_at: 2026-05-23T22:31:22Z
+entity_hashes:
+  func:validateServerCart: 5d44a017c1d324c4
+  overview: 24f5c5f866f2e17e
+generated_at: 2026-05-28T22:38:02Z
 ---
 
 ## Genel Bakış
@@ -27,7 +30,7 @@ Bu order.ts modülündeki `validateServerCart` sunucu sepeti doğrulama fonksiyo
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### validateServerCart
 **Ne yapar**: Kullanıcının alışveriş sepetini sunucu üzerinden doğrularak mevcut fiyat ve stok bilgilerinin güncel olup olmadığını teyit eder. Supabase altyapısındaki `order-validate` adlı Edge Function'a istek göndererek sepetin geçerliliğini kontrol eder. Doğrulama sonucunda ortaya çıkan tüm sorunları ve hesaplanan güncel toplamları içeren bir sonuç nesnesi döndürür.
@@ -70,20 +73,19 @@ Bu order.ts modülündeki `validateServerCart` sunucu sepeti doğrulama fonksiyo
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\order.ts::validateServerCart
-- **params**: (input: { cartId?: string; userId?: string })
+### [N1_NASIL] AST Pointer: src/lib/order.ts::validateServerCart
+- **params**: `input` — `{ cartId?: string; userId?: string }` tipinde giriş nesnesi; opsiyonel olarak cartId ve userId içerir
 - **ic_degiskenler**:
-  - `url` — Supabase projesinin genel URL'si, ortam değişkeninden alınır, eksikse varsayılan boş string atanır
-  - `anon` — Supabase anon erişim anahtarı, ortam değişkeninden alınır, eksikse varsayılan boş string atanır
-  - `process.env.NEXT_PUBLIC_SUPABASE_URL` — Supabase URL'sini tutan ortam değişkeni, okunarak url değişkenine atanır
-  - `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon anahtarını tutan ortam değişkeni, okunarak anon değişkenine atanır
-  - `resp` — order-validate edge fonksiyonuna gönderilen POST isteğinin yanıtını tutan Response nesnesi
-  - `input.cartId` — Girişte gelen opsiyonel sepet kimliği, harici doğrulama fonksiyonuna iletilmek üzere istek gövdesine eklenir
-  - `input.userId` — Girişte gelen opsiyonel kullanıcı kimliği, harici doğrulama fonksiyonuna iletilmek üzere istek gövdesine eklenir
-  - `resp.ok` — İstek yanıtının başarı durumunu kontrol eden Response nesnesi özelliği
-  - `resp.text()` — Başarısız istek durumunda hata mesajını çeken Response metodu
-  - `resp.json()` — Başarılı istek durumunda doğrulama sonucunu JSON formatına çeviren Response metodu
-- **Dönüş**: Promise<ValidationResult>; eksik ortam değişkeni veya başarısız istek durumunda Error fırlatır, başarılı durumda sunucu doğrulama sonucunu içeren promise döndürür
+  - `url` — `process.env.NEXT_PUBLIC_SUPABASE_URL` değerini alır, tanımsızsa boş string fallback kullanılır; Supabase edge function URL'sinin temelini oluşturur
+  - `anon` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` değerini alır, tanımsızsa boş string fallback kullanılır; Supabase API isteklerinde `apikey` ve `Authorization` header'larında kullanılır
+  - `resp` — `fetch` çağrısının döndüğü Response nesnesi; HTTP yanıtının durum kodu ve gövdesi bu üzerinden erişilir
+- **Dönüş**: `Promise<ValidationResult>` — Supabase edge function'ın (`order-validate`) döndürdüğü JSON doğrulama sonucu nesnesi; HTTP yanıtı başarısızsa (`!resp.ok`) hata fırlatılır
+
+**Çıkarılan detay akış bilgileri** (fonksiyon gövdesinden):
+- `input.cartId` → `cart_id` olarak JSON body'ye dönüştürülür
+- `input.userId` → `user_id` olarak JSON body'ye dönüştürülür
+- `resp.ok` kontrolü başarısız olursa `resp.text()` ile ham hata mesajı okunur ve `throw new Error(...)` ile fırlatılır
+- `url`, `anon` her ikisi de boş string'e eşitse (yani env tanımsızsa) fonksiyon hemen `throw new Error('Missing Supabase envs')` ile sonlanır
 
 ---
 

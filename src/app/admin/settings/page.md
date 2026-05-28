@@ -8,14 +8,25 @@ entity_hashes:
   func:Page: 9367d1f0b801970c
   overview: a5dfa30287607de2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-27T17:59:58Z
+generated_at: 2026-05-28T22:35:21Z
 ---
 
+## Genel Bakış
+Bu modül, VentHub HVAC uygulamasının admin ayarları sayfasının Next.js route bileşenini tanımlar. Modülün temel sorumluluğu, `/admin/settings` yolu için gelen HTTP isteklerini karşılayacak sayfayı sunmaktır. Bileşen, tüm arayüz ve mantık yükünü `AdminSettingsPage` iç bileşenine devreder ve sayfa için gerekli metadata bilgilerini dışa aktarır.
 
+## Fonksiyon Grupları
+### Sayfa Bileşeni
+Bu grup, belirli bir URL yoluna karşılık gelen React sayfasını tanımlar ve sunar.
+- Page
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül, bir React sayfa bileşeninin en basit formunda olup, yalnızca başka bir bileşeni render eden bir kap (wrapper) işlevi gördüğü için, temel aksiyonları bileşen bağımlılığı ve çalışma ortamına ilişkindir.
 
+[Aksiyom 1]: Eğer `AdminSettingsPage` bileşeni modülün erişim alanında (import edilmiş ve kullanılabilir) değilse, `Page` bileşeni geçerli bir JSX döndüremez ve uygulama hata ile karşılaşır.
+
+[Aksiyom 2]: Eğer `Page` bileşeni bir React çalışma ortamı (tarayıcı DOM'u veya React sunucu tarafı işleme motoru) dışında çalıştırılmaya çalışılırsa, bileşen cümleciği (JSX) işlenemez ve render işlemi başarısız olur.
 
 ---
 

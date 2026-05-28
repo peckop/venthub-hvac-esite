@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx
 skeleton_hash: b3a95bf57068fc98
-generated_at: 2026-05-23T22:30:58Z
+entity_hashes:
+  func:useScrollThrottle: 8c5a736c0985619d
+  overview: cbc1c5af98f49080
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:37:49Z
 ---
 
 ## Genel Bakış
@@ -28,7 +32,7 @@ Bu React scroll throttling hook'u, çalıştığı ortamda tarayıcı olay siste
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useScrollThrottle
 **Ne yapar**: Tarayıcı üzerinde gerçekleşen scroll (kaydırma) olaylarını throttle (hız sınırlama) mekanizmasıyla yöneten özel React hook'udur. Aşırı sık tetiklenen scroll olaylarının yol açtığı gereksiz işlem yükünü ve performans düşüklüğünü önlemek amacıyla geliştirilmiştir, belirtilen ayarlara göre sadece izin verilen zaman aralıklarında ilgili scroll tetiklemelerinin çalışmasını sağlar.
@@ -80,115 +84,6 @@ type ScrollThrottleOptions = {
 
 ---
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx::handleScroll
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `tickingRef` — işlem devam ederken tekrar tetiklenmeyi engelleyen ref
-  - `requestAnimationFrame` — tarayıcının repaint döngüsüne göre işlem planlamak için kullanılan API
-  - `window` — tarayıcı window nesnesi
-  - `scrollTop` — mevcut dikey scroll konumu (window.scrollY değeri)
-  - `isScrolled` — mevcut scroll state değeri
-  - `setIsScrolled` — scroll state'ini güncelleyen setter fonksiyonu
-  - `lastAboveRef` — önceki ölçümde showAt eşği geçilmiş mi saklayan ref
-  - `lastBelowRef` — önceki ölçümde hideBelow altında mıydı saklayan ref
-  - `showAt` — scroll aktifleştirme eşği
-  - `hideBelow` — scroll devre dışı bırakma eşği
-  - `nowAbove` — mevcut scroll konumunun showAt'tan büyük olup olmadığı kontrolü
-  - `nowBelow` — mevcut scroll konumunun hideBelow'dan küçük olup olmadığı kontrolü
-- **Dönüş**: void
-
----
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx::handleScroll_duplicate1
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `tickingRef` — işlem devam ederken tekrar tetiklenmeyi engelleyen ref
-  - `window` — tarayıcı window nesnesi
-  - `scrollTop` — mevcut dikey scroll konumu
-  - `isScrolled` — mevcut scroll state değeri
-  - `setIsScrolled` — scroll state'ini güncelleyen setter fonksiyonu
-  - `lastAboveRef` — önceki ölçümde showAt eşği geçilmiş mi saklayan ref
-  - `lastBelowRef` — önceki ölçümde hideBelow altında mıydı saklayan ref
-  - `showAt` — scroll aktifleştirme eşği
-  - `hideBelow` — scroll devre dışı bırakma eşği
-  - `nowAbove` — mevcut scroll konumunun showAt'tan büyük olup olmadığı kontrolü
-  - `nowBelow` — mevcut scroll konumunun hideBelow'dan küçük olup olmadığı kontrolü
-- **Dönüş**: void
-
----
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx::handleScroll_duplicate2
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `tickingRef` — işlem devam ederken tekrar tetiklenmeyi engelleyen ref
-  - `window` — tarayıcı window nesnesi
-  - `scrollTop` — mevcut dikey scroll konumu
-  - `isScrolled` — mevcut scroll state değeri
-  - `setIsScrolled` — scroll state'ini güncelleyen setter fonksiyonu
-  - `lastAboveRef` — önceki ölçümde showAt eşği geçilmiş mi saklayan ref
-  - `lastBelowRef` — önceki ölçümde hideBelow altında mıydı saklayan ref
-  - `showAt` — scroll aktifleştirme eşği
-  - `hideBelow` — scroll devre dışı bırakma eşği
-  - `nowAbove` — mevcut scroll konumunun showAt'tan büyük olup olmadığı kontrolü
-  - `nowBelow` — mevcut scroll konumunun hideBelow'dan küçük olup olmadığı kontrolü
-- **Dönüş**: void
-
----
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx::throttledScroll
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `timeoutRef` — aktif throttle timeout'unu saklayan ref
-  - `clearTimeout` — mevcut timeout'u iptal etmek için kullanılan API
-  - `setTimeout` — belirli süre sonra işlem planlamak için kullanılan API
-  - `handleScroll` — ana scroll işleyici fonksiyonu
-  - `throttleMs` — throttle gecikme süresi
-- **Dönüş**: void
-
----
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx::useEffect_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `window` — tarayıcı window nesnesi
-  - `initialScrollTop` — useEffect tetiklendiğindeki ilk dikey scroll konumu
-  - `initialTimerRef` — ilk gecikmeli işlem için saklanan timeout ref'i
-  - `clearTimeout` — mevcut timeout'u iptal etmek için API
-  - `hasMountedRef` — komponentin ilk mount olup olmadığını izleyen ref
-  - `showAt` — scroll aktifleştirme eşği
-  - `initialDelayMs` — ilk gecikme süresi
-  - `setIsScrolled` — scroll state'ini güncelleyen setter fonksiyonu
-  - `throttledScroll` — throttlenmiş scroll işleyici fonksiyonu
-  - `addEventListener` — window üzerine scroll event listener'ı eklemek için API
-  - `syncKey` — senkronizasyon tetikleyici anahtarı
-- **Dönüş**: cleanup fonksiyonu (void dönen temizlik fonksiyonu)
-
----
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx::initialTimer_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `window` — tarayıcı window nesnesi
-  - `window.scrollY` — mevcut dikey scroll konumu
-  - `showAt` — scroll aktifleştirme eşği
-  - `setIsScrolled` — scroll state'ini güncelleyen setter fonksiyonu
-- **Dönüş**: void
-
----
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx::useEffect_cleanup
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `window` — tarayıcı window nesnesi
-  - `removeEventListener` — scroll event listener'ını kaldırmak için API
-  - `throttledScroll` — kaldırılacak olan scroll işleyici fonksiyonu
-  - `timeoutRef` — saklanan throttle timeout ref'i
-  - `clearTimeout` — mevcut timeout'u iptal etmek için API
-  - `initialTimerRef` — saklanan ilk zamanlayıcı timeout ref'i
-- **Dönüş**: void
-
----
-
 ## NODE ID STANDARD
 
   file: src\hooks\useScrollThrottle.tsx
@@ -199,3 +94,19 @@ type ScrollThrottleOptions = {
 ## DISA AKTARILANLAR (EXPORTS)
   export: ScrollThrottleOptions
   export: useScrollThrottle
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

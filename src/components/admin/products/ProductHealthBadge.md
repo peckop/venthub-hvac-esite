@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\products\ProductHealthBadge.tsx
 skeleton_hash: 86fcda867d26a586
-generated_at: 2026-05-23T21:53:30Z
+entity_hashes:
+  func:ProductHealthBadge: 7149ab2cdd96084d
+  overview: 300c84dd02e2dca2
+  style_tokens: ee784aad25800471
+generated_at: 2026-05-28T22:35:38Z
 ---
 
 ## Genel Bakış
@@ -22,7 +26,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ProductHealthBadge
 **Ne yapar**: ProductHealthBadge, bir ürünün stok durumu, eşik değeri, genel durumu ve öne çıkanlık durumu gibi özelliklere dayalı olarak ürünün sağlık durumunu gösteren bir rozet (badge) bileşeni render eder.
@@ -94,4 +98,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `text-xs`
 - **Layout:** `h-6`, `inline-flex`, `items-center`, `justify-center`, `shadow-sm`, `w-6`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `${colors[score]`, `border`, `font-bold`, `ring-2`, `ring-offset-1`, `rounded-full`

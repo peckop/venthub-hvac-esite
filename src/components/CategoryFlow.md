@@ -4,7 +4,13 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\CategoryFlow.tsx
 skeleton_hash: 14858b69eaf5c560
-generated_at: 2026-05-23T22:03:36Z
+entity_hashes:
+  func:CategoryCard: 7b7207c85924d5b9
+  func:CategoryFlow: c59bb73d42c6c824
+  func:ScrollingLane: 60b8101731f452e0
+  overview: a01a04adc73072c4
+  style_tokens: 07f0f67443196e1d
+generated_at: 2026-05-28T22:35:49Z
 ---
 
 ## Genel Bakış
@@ -46,7 +52,7 @@ Bu modül için özel aksiyomlar fonksiyon imzalarından ve modül sabitlerinden
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryCard
 **Ne yapar**: Verilen bir kategori için bir kart bileşeni renderlar.  
@@ -162,5 +168,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gradient-to-b`, `bg-gradient-to-br`, `bg-gradient-to-l`, `bg-gradient-to-r`, `bg-gray-100`, `bg-white/10`, `bg-white/20`, `from-gray-50`, `sm:text-3xl`, `sm:text-lg`, `sm:text-sm`, `text-2xl`, `text-base`, `text-center`, `text-gray-600`
-- **Layout:** `-bottom-4`, `-left-4`, `-right-4`, `-top-4`, `absolute`, `bottom-4`, `flex`, `flex-shrink-0`, `from-gray-50`, `gap-4`, `group-hover:opacity-100`, `group-hover:scale-110`, `h-24`, `h-32`, `h-40`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Layout:** `-bottom-4`, `-left-4`, `-right-4`, `-top-4`, `absolute`, `bottom-4`, `flex`, `flex-shrink-0`, `from-gray-50`, `gap-4`, `h-24`, `h-32`, `h-40`, `hover:shadow-xl`, `left-0`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${direction`, `${gradient`, `-translate-x-1/2`, `:`, `===`, `animate-category-scroll-left`, `animate-category-scroll-right`, `animate-pulse`, `duration-300`, `font-bold`, `group`, `group-hover:opacity-100`, `group-hover:scale-110`, `hover:-translate-y-1`, `hover:scale-105`

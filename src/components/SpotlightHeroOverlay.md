@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SpotlightHeroOverlay.tsx
 skeleton_hash: d3aa76214edd8a36
-generated_at: 2026-05-23T22:27:32Z
+entity_hashes:
+  func:SpotlightHeroOverlay: 3df6afb4a4a31d8f
+  overview: 1f157560c005aa84
+  style_tokens: 2d403f9b7fca7034
+generated_at: 2026-05-28T22:37:00Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu React bileşeni, web arayüzünde kullanıcının imlecinin olduğu bölgeyi 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### SpotlightHeroOverlay
 **Ne yapar**: VentHub HVAC projesinde kullanılan bir React fonksiyonel bileşenidir, ana sahne (Hero) bölümü üzerinde spot (odaklanmış sahne ışığı) efektiyle kaplama (overlay) oluşturur. Bileşen, üzerindeki içeriğe kademeli odaklanma efekti ekleyerek kullanıcı deneyimini zenginleştirmek amacıyla tasarlanmıştır, ışığın boyutunu ve şiddetini yapılandırılabilir hale getirir.
@@ -85,4 +89,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** `absolute`, `z-10`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `inset-0`, `pointer-events-none`

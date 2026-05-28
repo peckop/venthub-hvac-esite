@@ -4,20 +4,40 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\db-rows.ts
 skeleton_hash: e7958ace534d8ee4
-generated_at: 2026-05-25T09:09:25Z
+entity_hashes:
+  overview: 28a0ac4ea1b0e18d
+generated_at: 2026-05-28T22:38:39Z
 ---
 
 ## Genel Bakış
-`src/types/db-rows.ts` modülü, VentHub HVAC projesinde veritabanı satırlarının tip güvenliğini sağlamak amacıyla tanımlanan TypeScript tiplerini içerir. Modül yalnızca tip seviyesinde tanımlamalar yapar; çalıştırılabilir kod, fonksiyon veya değişken barındırmaz. Proje içinde `database.types` ve `authority` dosyalarından tip import edilerek, bu tipler üzerinden standart veritabanı satır yapıları oluşturulur. Çalışma zamanı ortam değişkeni, dış API veya veritabanı tablo sorgulaması bulunmaz; sadece derleme aşamasında tip denetimi için hizmet verir.
+`src/types/db-rows.ts` modülü, VentHub HVAC projesinde veritabanı satırlarının TypeScript'te temsil edilmesini sağlayan tip tanımlarını içerir. Dosyada çalıştırılabilir kod veya fonksiyon bulunmaz; yalnızca arayüz tanımları yer alır. Bu tipler, `database.types` ve `authority` modüllerinden import edilen temel tipler üzerine inşa edilerek veritabanı tablolarının satır yapılarını yansıtır.
+
+## Tanımlanan Arayüzler
+Bu modül aşağıdaki veritabanı tablo yapılarına karşılık gelen arayüzleri tanımlar:
+
+- **DbUserProject** — Kullanıcılara ait projelerin (id, isim, açıklama, zaman damgaları) yapısını temsil eder.
+- **DbProjectItem** — Projelerdeki tekil kalemleri (miktar, ürün referansı) ve opsiyonel ürün ilişkisini tanımlar.
+- **DbAppSettings** — Uygulama ayarlarını key-value yapısında (JSON değeri ile) saklayan yapıyı temsil eder.
+- **DbWebhookEvent** — Webhook olaylarının durumunu (beklemede/işlendi/hata), sağlayıcı bilgisini ve payload verisini tutar.
+- **DbProductEnrichedRow** — Ürünlerin zenginleştirilmiş veri yapısını (fiyat, stok, teknik özellikler, hava debisi kapasitesi dahil) tanımlar.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, yalnızca TypeScript tip tanımları içeren derleme zamanı (compile-time) bir modüldür. Çalıştırılabilir kod, fonksiyon veya sabit barındırmaz. Dolayısıyla fonksiyon gövdesinden çıkarılabilir aksiyom bulunmamaktadır.
+
+Bununla birlikte, modülün doğru çalışması için aşağıdaki yapısal varsayımlar geçerlidir:
+
+[Aksiyom 1]: Eğer `database.types` veya `authority` modüllerinde referans verilen tipler tanımlı değilse, derleme zamanı tip hatası oluşur.
+
+[Aksiyom 2]: Eğer veritabanı şeması değiştirilip ilgili tablo alanları eklenip çıkarılmışsa ancak bu tipler güncellenmemişse, çalışma zamanında beklenmeyen `undefined` veya `null` değer erişimleri oluşur.
+
+[Aksiyom 3]: Eğer `DbUserProject` gibi tanımlanan tiplerde `description: string | null` olarak nullable alan mevcutsa, bu alanların kullanımında调用 tarafında null kontrolü yapılması gerekir; aksi halde runtime hatası oluşur.
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -275,6 +295,11 @@ type DbInvoiceProfileUpdate = Tables['user_invoice_profiles']['Update']
 ---
 
 ## AST POINTERS
+
+Bu dosyada herhangi bir fonksiyon gövdesi bulunmamaktadır. Dosya yalnızca TypeScript type import'ları içermektedir:
+
+- `Database`, `Json` → `./database.types`
+- `AuthorityContent` (as `DynamicAuthorityContent`) → `./authority`
 
 ---
 

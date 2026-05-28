@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useProjectLists.ts
 skeleton_hash: feee7340f861ea3d
-generated_at: 2026-05-23T22:30:15Z
+entity_hashes:
+  func:useProjectLists: e3790c9d8b328813
+  overview: b42bbc25ae784887
+generated_at: 2026-05-28T22:37:47Z
 ---
 
 ## Genel Bakış
@@ -26,7 +29,7 @@ Bu custom React hook olan useProjectLists, proje listelerinin uygulamada sorunsu
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useProjectLists
 **Ne yapar**: React tabanlı proje yönetim sisteminde ProjectContext'i güvenli bir şekilde tüketerek, proje listesi durumunu ve tüm proje yönetim aksiyonlarını tüketici bileşenlere sunar. Eğer ProjectProvider bileşeninin sarmaladığı alanın dışında, örneğin statik derleme süreçlerinde veya izole test ortamlarında kullanılırsa, çalışma zamanı hatalarını tamamen önlemek için hiçbir işlem yapmayan (no-op) güvenli bir geri dönüş nesnesi döndürür. Kullanıcı projeleri, yükleme durumu ve yönetim fonksiyonlarını tek bir bağlam nesnesi üzerinden erişilebilir kılar.

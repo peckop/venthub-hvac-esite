@@ -4,63 +4,66 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\category\CategorySeriesView.tsx
 skeleton_hash: bcdfb3824cc92eaf
-generated_at: 2026-05-23T22:39:45Z
+entity_hashes:
+  func:CategorySeriesView: 3515932791ff3914
+  func:getSpec: bd8056751502e13f
+  func:toggleViewMode: 812e9c6634a25d9c
+  overview: c1534a5181804ead
+  style_tokens: 7eddfe831f5ad8ff
+generated_at: 2026-05-28T22:39:55Z
 ---
 
 ## Genel Bakış
-Bu React modülü, VentHub HVAC platformunun kategori sayfalarında ürün serilerini görüntülemekten sorumlu görünüm katmanı bileşenidir. Dışarıdan alınan kategori, üst kategori ve ürün listesi verilerini işleyerek kullanıcılara ilgili ürün serilerini sunan bir arayüz oluşturur. İçindeki yardımcı fonksiyonlar sayesinde görünüm ayarlarını yönetir ve ürünlerden özel özellikleri kolayca çekme imkanı sunar.
+VentHub HVAC platformunda kategori sayfalarına ait ürün serilerini gösteren React görünüm bileşenidir. Kategori, üst kategori ve ürün listesi bilgilerini alarak kullanıcılara düzenli bir seriler arayüzü sunar. Görünüm modu değiştirme ve ürün özelliklerini okuma gibi yardımcı işlevler içerir.
 
 ## Fonksiyon Grupları
 ### Ana Görünüm Bileşeni
-Modülün ana giriş noktası olarak gelen tüm giriş verilerini kullanarak kategori serisi görünümünü bütün işlevleriyle birlikte kullanıcıya sunar.
+Modülün tek giriş noktasıdır; kategori metadatasını, üst kategori bilgisini ve ürün listesini birleştirerek kullanıcılara kategori serisi görünümünü tam olarak sunar.
 - CategorySeriesView
 
-### Arayüz ve Veri İşleme Yardımcıları
-Kullanıcı arayüzü etkileşimlerini yöneten ve ürün verilerinden istenen özel bilgileri çekmek için kullanılan destek fonksiyonlarını barındırır.
+### Yardımcı Fonksiyonlar
+Kullanıcı arayüzündeki görünüm modu geçişlerini yöneten ve DomainProduct nesnelerinden istenen özellik değerlerini güvenli biçimde çıkaran iki küçük yardımcı işlevdir.
 - toggleViewMode, getSpec
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı kategori ürün serisi görüntüleme bileşeninin sorunsuz çalışması, giriş prop'larının ve dahili yardımcı fonksiyonlarının geçerli şekilde sağlanmasına bağlıdır.
 
-[Aksiyom 1]: Eğer bileşene iletilen `category` prop'u geçerli bir kategori nesnesi olarak sağlanmazsa, bileşenin temel kategori metadaları ve başlığı görüntülenemez, boş veya hatalı bir arayüz oluşur.
-[Aksiyom 2]: Eğer `parentCategory` prop'u gerektiğinde geçerli bir üst kategori nesnesi olarak sunulmazsa, kategori hiyerarşisi gösterimi ve üst kategoriye gezinme işlevleri çalışmaz, kullanıcı kategoriler arası geçiş yapamaz.
-[Aksiyom 3]: Eğer `products` prop'u, DomainProduct tipinde geçerli ürün nesnelerinden oluşan bir liste olarak iletilmezse, kategori altındaki tüm ürün listesi yüklenemez, kullanıcı ürünleri görüntüleyemez.
-[Aksiyom 4]: Eğer `getSpec` yardımcı fonksiyonu, herhangi bir DomainProduct nesnesi ve istediği spec anahtarı için geçerli bir değer döndürmezse, tüm ürünlerin özellik bilgileri eksik kalır, ürün kartları hatalı içerikle gösterilir.
-[Aksiyom 5]: Eğer `toggleViewMode` fonksiyonu çağrıldığında girilen seri ismi için görünüm modunu güncellemezse, kullanıcı ürün listesinin görünümünü değiştiremez, sabit görünümde kalır.
+Bu modül, bir React görünüm bileşeni olup fonksiyon imzalarından çıkarılabilecek mimari varsayımlar aşağıdadır.
+
+**[Aksiyom 1]:** Eğer `products` dizisi boş veya tanımsız ise, görüntülenecek ürün serisi olmadığından modül içerik üretmez.
+
+**[Aksiyom 2]:** Eğer `category` parametresi sağlanmazsa, hangi kategoriye ait serilerin listeleneceği belirsiz olduğundan modül doğru çalışmaz.
+
+**[Aksiyom 3]:** Eğer `parentCategory` parametresi sağlanmazsa, üst kategori referansı eksik kalır; bu durumda üst kategoriye dayalı işlevler (örn. geri navigasyon, hiyerarşik bağlam) çalışmaz.
+
+**[Aksiyom 4]:** Eğer `toggleViewMode` fonksiyonuna geçilen `seriesName` değeri mevcut ürünlerin hiçbirinin serisine karşılık gelmiyorsa, görünüm modu değişikliği hiçbir seriyi etkilemez.
+
+**[Aksiyom 5]:** Eğer `getSpec` fonksiyonuna geçirilen `p` parametresi geçerli bir `DomainProduct` nesnesi değilse veya istenen `key` ürününn özellik listesinde bulunmuyorsa,fonksiyon `undefined` veya beklenmeyen bir değer döndürür.
+
+**[Aksiyom 6]:** Bu modülün herhangi bir modül sabiti tanımlamadığından, eşik değer veya sabit konfigürasyon barındırmaz; tüm dinamik veri dışarıdan (`products`, `category`, `parentCategory`) sağlanmalıdır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategorySeriesView
-**Ne yapar**: VentHub HVAC projesinin kategori görünüm modülünde, belirli bir kategori ve onun üst kategorisi kapsamındaki ürün serisini kullanıcılara sunan React fonksiyonel bileşenidir. Props olarak aldığı kategori ve ürün verilerini kullanarak ilgili ürün listesini kullanıcı arayüzünde görüntülemeye hazırlar, kategori hiyerarşisine uygun gezinti imkanı sunar.
-**Nasıl yapar**: Gelen kategori, üst kategori ve ürün listesi prop'larını bileşen içerisine entegre eder, bileşen bünyesinde tanımlı toggleViewMode ve getSpec yardımcı fonksiyonları ile kullanıcı etkileşimlerini ve ürün özelliklerinin erişimini yönetir. React'in reaktif state yapısı sayesinde verilerde oluşan değişikliklerde görünümü otomatik olarak günceller, farklı görünüm modları arasında geçişe izin veren altyapıyı oluşturur.
-**Parametreler**:
-- name: category — Herhangi bir kategori nesnesi, görüntülenecek ürün serisinin ait olduğu mevcut kategorinin tüm metaverilerini içerir
-- name: parentCategory — Herhangi bir kategori nesnesi, mevcut kategorinin üst kategorisi olarak hiyerarşik gezinti (breadcrumb) yapısı için kullanılır
-- name: products — DomainProduct tipinde ürün nesnelerinden oluşan dizi, ilgili kategoriye ait tüm ürünlerin listesini barındırır
-**Dönüş**: CategorySeriesViewProps prop tipini kabul eden bir React fonksiyonel bileşeni döndürür, bu bileşen DOM'a eklendiğinde kategori serisi görünümünü kullanıcıya render eder.
+**Ne yapar**: Kategoriye ait serileri ve ürünleri görüntüleyen bir React bileşenidir. Verilen kategori yapısına göre ürün listesini ve serileri kullanıcıya sunar.
 
----
+**Nasıl yapar**: Bileşen, props olarak aldığı category, parentCategory ve products verilerini kullanarak kategori serileri görünümünü render eder. Seri bazlı gruplandırma ve navigasyon işlevleri sağlar.
+
+**Parametreler**:
+- category: object — Görüntülenen ana kategori nesnesi
+- parentCategory: object — Üst kategori nesnesi, geri dönüş veya hiyerarşik yapı için kullanılır
+- products: array — Kategoriye ait ürün listesi dizisi
+
+**Dönüş**: React.FC<CategorySeriesViewProps> — Tip tanımlı bir React fonksiyonel bileşeni
 
 ### toggleViewMode
-**Ne yapar**: Kategori serisi görünümünde belirli bir ürün serisinin görüntülenme modunu (liste, grid gibi önceden tanımlı görünümler arası) değiştirmek için kullanılan kullanıcı etkileşimi fonksiyonudur. Kullanıcıların ürün listesini istedikleri formatta görmesini sağlayan temel etkileşim fonksiyonudur.
-**Nasıl yapar**: Parametre olarak aldığı seri adı ile hedeflenen ürün serisini tanımlar, bileşen içindeki istemci tarafı state yönetimi aracılığıyla ilgili serinin görünüm modu değerini günceller. Herhangi bir sunucu isteği göndermeden yalnızca yerel state'i değiştirerek görünümün yeniden render edilmesini tetikler, sadece seçilen serinin görünümünü etkiler, diğer serilerin ayarlarını değiştirmez.
-**Parametreler**:
-- name: seriesName — string, görünüm modu değiştirilecek ürün serisinin benzersiz adı veya kimliği, hangi serinin görüntüleme ayarlarının güncelleneceğini belirtmek için kullanılır
-**Dönüş**: Herhangi bir değer döndürmez, işlemi tamamladıktan sonra yalnızca ilgili bileşen state'ini güncelleyerek görünümün yeniden render edilmesini sağlar.
-
----
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getSpec
-**Ne yapar**: Domain katmanında tanımlanan ürün nesnesinden istenen spesifik teknik veya ticari özelliği güvenli bir şekilde almak için kullanılan yardımcı fonksiyondur. Ürün özelliklerinin görünüm katmanında tutarlı bir şekilde erişilmesini sağlar.
-**Nasıl yapar**: Aldığı ürün nesnesi ve istenen özellik anahtarı ile ürün nesnesinin ilgili alanına erişir, gerekli güvenli erişim kontrollerini yaparak tanımsız (undefined) değerlerin uygulama içinde hata oluşturmasının önüne geçer. Görünüm katmanında kullanılmak üzere özellik değerini kullanıma hazır hale getirir, farklı ürün tipleri için ortak bir özellik erişim standardı sunar.
-**Parametreler**:
-- name: p — DomainProduct, özelliği alınacak olan domain katmanı ürün nesnesi, ürünün tüm teknik özelliklerini, metaverilerini ve ticari bilgilerini içerir
-- name: key — string, ürün nesnesinden alınmak istenen spesifik özelliğin anahtar adı, hangi özelliğin seçilip döndürüleceğini belirtir
-**Dönüş**: İstenen özelliğin tipine uygun bir değer döndürür, eğer ilgili anahtar ürün nesnesinde mevcut değilse tanımsız bir değer döndürerek uygulamanın çalışma zamanı hatası almasının önüne geçer.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -75,106 +78,60 @@ Bu React tabanlı kategori ürün serisi görüntüleme bileşeninin sorunsuz ç
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategorySeriesView.tsx::CategorySeriesView
-- **params**: category, parentCategory, products
+### [N1_NASIL] AST Pointer: src/views/category/CategorySeriesView.tsx::CategorySeriesView
+- **params**: `(category, parentCategory, products)`
 - **ic_degiskenler**:
-  - `lang` — useI18n hook'undan alınan mevcut dil kodu, fiyat formatlamada kullanılır
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, arayüz metinlerini çevirmek için kullanılır
-  - `addToCart` — useCart hook'undan alınan sepete ürün ekleme fonksiyonu
-  - `wrapCategory` — useCategoryViewModel'den alınan kategori nesnesini view modeline dönüştüren fonksiyon
-  - `groupProductsBySeries` — useCategoryViewModel'den alınan ürünleri serilerine göre gruplayan fonksiyon
-  - `viewModes` — useState ile yönetilen, her seri için 'grid'/'matrix' görünüm modunu tutan state objesi
-  - `setViewModes` — viewModes state'ini güncellemek için kullanılan state setter fonksiyonu
-  - `vm` — geçerli kategorinin wrapCategory ile oluşturulmuş view modeli
-  - `parentVm` — üst kategorinin wrapCategory ile oluşturulmuş view modeli
-  - `seriesGroups` - ürünlerin groupProductsBySeries ile serilere ayrılmış hali
-  - `breadcrumbItems` — Breadcrumb bileşenine gönderilen gezinme menüsü öğeleri listesi
-  - `heroImage` — kategori için kullanılan ana görsel URL'si, kategori resmi yoksa varsayılan değeri alır
-  - `toggleViewMode` — içeride tanımlanan, serinin görünüm modunu değiştiren fonksiyon
-  - `getSpec` — içeride tanımlanan, üründen teknik özellik çeken yardımcı fonksiyon
-- **Dönüş**: JSX React elementi, kategori sayfasının tüm içeriğini döndürür
+  - `lang` — useI18n() hook'undan gelen aktif dil kodu (ör. 'tr', 'en')
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu; anahtar bazlı metin çevirisi yapar
+  - `addToCart` — useCart() hook'undan gelen sepete ürün ekleme fonksiyonu; ürün ve miktar alır
+  - `wrapCategory` — useCategoryViewModel() hook'undan gelen; ham kategori objesini view model'e dönüştürür
+  - `groupProductsBySeries` — useCategoryViewModel() hook'undan gelen; ürünleri seri adına göre gruplar
+  - `viewModes` — `useState<Record<string, 'grid' | 'matrix'>>` ile oluşturulan state; her seri adı için geçerli görünüm modunu tutar
+  - `setViewModes` — viewModes state'inin setter fonksiyonu
+  - `vm` — `wrapCategory(category)` çağrısıyla elde edilen kategori view model; displayName, slug, description gibi özellikleri içerir
+  - `parentVm` — `wrapCategory(parentCategory)` çağrısıyla elde edilen üst kategori view model; null olabilir
+  - `seriesGroups` — `groupProductsBySeries(products)` çağrısıyla elde edilen seri grupları dizisi; her eleman `{ name, products, minPrice }` yapısındadır
+  - `breadcrumbItems` — breadcrumb navigasyon öğeleri dizisi; ev linki, varsa üst kategori linki ve mevcut kategori linkini içerir
+  - `heroImage` — `category.image_url` veya fallback olarak varsayılan endüstriyel görsel yolunu tutan string
+- **Dönüş**: JSX element (React bileşeni)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategorySeriesView.tsx::toggleViewMode
-- **params**: seriesName: string
+### [N2_NASIL] AST Pointer: src/views/category/CategorySeriesView.tsx::toggleViewMode
+- **params**: `(seriesName: string)`
 - **ic_degiskenler**:
-  - `setViewModes` — üst kapsamdaki görünüm modları state'ini güncellemek için kullanılan setter
-  - `prev` — setViewModes callback'inin aldığı önceki viewModes state değeri
-  - `prev[seriesName]` — önceki state'de ilgili serinin mevcut görünüm modu
-- **Dönüş**: yok (sadece state güncellemesi yapar)
+  - (yok — doğrudan setViewModes callback içinde prev kullanılır)
+- **Dönüş**: yok (void); state updater ile viewModes state'ini günceller, matrix↔grid arası geçiş yapar
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategorySeriesView.tsx::setViewModes_state_callback
-- **params**: prev
+### [N3_NASIL] AST Pointer: src/views/category/CategorySeriesView.tsx::getSpec
+- **params**: `(p: DomainProduct, key: string)`
 - **ic_degiskenler**:
-  - `seriesName` — üst kapsamdaki görünümü değiştirilecek seri adı
-  - `prev[seriesName]` — önceki state'de ilgili serinin kayıtlı görünüm modu
-- **Dönüş**: Record<string, 'grid' | 'matrix'> tipinde yeni state objesi
+  - `specs` — `isRecord(p.technical_specs)` kontrolü sonucu elde edilen teknik özellikler objesi; record değilse boş obje `{}` kullanılır
+  - `val` — `specs[key]` veya `specs[key.toLowerCase()]` ile elde edilen değer; hem orijinal hem küçük harf anahtar ile arama yapar
+- **Dönüş**: string — değer varsa `String(val)` olarak döner, yoksa `'-'` döner
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategorySeriesView.tsx::getSpec
-- **params**: p: DomainProduct, key: string
+### [N4_NASIL] AST Pointer: src/views/category/CategorySeriesView.tsx::(map callback — seriesGroups)
+- **params**: `(series, _idx)`
 - **ic_degiskenler**:
-  - `isRecord` — p.technical_specs'ın geçerli bir obje olup olmadığını kontrol eden fonksiyon
-  - `p.technical_specs` — işlem yapılan ürünün teknik özellikler nesnesi
-  - `specs` — p.technical_specs geçerliyse onu, değilse boş obje olarak atanan değer
-  - `specs[key]` — belirtilen anahtarla aranan teknik özellik değeri
-  - `specs[key.toLowerCase()]` — anahtar küçük harfe çevrilerek aranan teknik özellik değeri
-  - `val` — bulunan özellik değeri
-- **Dönüş**: string — bulunan değerin string hali, değer yoksa '-' string'i döndürür
+  - `isMatrix` — `viewModes[series.name] === 'matrix'` kontrolünden elde edilen boolean; matrix görünümde olup olmadığını belirler
+- **Dönüş**: JSX element — serinin başlık, fiyat, görünüm toggle ve ürün kartları/tablosunu içeren section
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategorySeriesView.tsx::seriesGroups_map_callback
-- **params**: series, _idx
+### [N5_NASIL] AST Pointer: src/views/category/CategorySeriesView.tsx::(map callback — series.products tablo satırı)
+- **params**: `(p: DomainProduct)`
 - **ic_degiskenler**:
-  - `viewModes` — üst kapsamdaki görünüm modları state objesi
-  - `viewModes[series.name]` — işlem yapılan serinin mevcut görünüm modu
-  - `isMatrix` — serinin matrix görünümünde olup olmadığını tutan boolean değer
-  - `toggleViewMode` — görünüm modunu değiştiren üst kapsamdaki fonksiyon
-  - `series.name` — işlem yapılan serinin adı
-  - `series.products` — serideki ürün listesi
-  - `series.minPrice` — serinin en düşük fiyat değeri
-  - `formatCurrency` — fiyatları biçimlendiren yardımcı fonksiyon
-  - `lang` — üst kapsamdaki mevcut dil kodu
-- **Dönüş**: JSX <section> elementi, tek seri bölümünü içeren React elementi
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategorySeriesView.tsx::series_products_map_callback
-- **params**: p
-- **ic_degiskenler**:
-  - `heroImage` — üst kapsamdaki varsayılan görsel URL'si, ürün resmi yoksa kullanılır
-  - `getSpec` — üründen teknik özellik çeken üst kapsamdaki yardımcı fonksiyon
-  - `addToCart` — ürünü sepete ekleyen fonksiyon
-  - `formatCurrency` — ürün fiyatını biçimlendiren fonksiyon
-  - `lang` — mevcut dil kodu
-  - `t` — çeviri fonksiyonu
-  - `p.image_url` — işlem yapılan ürünün görsel URL'si
-  - `p.name` — ürünün adı
-  - `p.sku` — ürünün stok takip numarası
-  - `p.price` — ürünün satış fiyatı
-- **Dönüş**: JSX <tr> elementi, matrix görünümünde ürün satırını içeren React elementi
+  - (yok — doğrudan p özellikleri JSX içinde kullanılır)
+- **Dönüş**: JSX element — `<tr>` satırı; ürün görseli, adı, SKU, debi, ses, güç, fiyat ve sepete ekle butonunu içerir
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Aynı dosyada tanımlı CategorySeriesView() fonksiyonu, dosya içindeki getSpec ve toggleViewMode fonksiyonlarını çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi paylaşılmamıştır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  CategorySeriesView() → getSpec()
-  CategorySeriesView() → toggleViewMode()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    CategorySeriesView["CategorySeriesView()"] --> getSpec["getSpec()"]
-    CategorySeriesView["CategorySeriesView()"] --> toggleViewMode["toggleViewMode()"]
+graph TD
+    CategorySeriesView_tsx__CategorySeriesView["CategorySeriesView"]
+    CategorySeriesView_tsx__getSpec["getSpec"]
+    CategorySeriesView_tsx__toggleViewMode["toggleViewMode"]
+    CategorySeriesView_tsx__CategorySeriesView --> CategorySeriesView_tsx__toggleViewMode
+    CategorySeriesView_tsx__CategorySeriesView --> CategorySeriesView_tsx__getSpec
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -187,3 +144,19 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategorySeriesView
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `tracking-hvac-loose`, `tracking-hvac-relaxed`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500`, `bg-cyan-500/10`, `bg-secondary-blue`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-slate-950`, `bg-white`, `border-b`, `border-collapse`, `border-cyan-500/20`, `border-slate-100`, `border-slate-200`, `hover:bg-slate-50/50`, `hover:text-slate-600`
+- **Layout:** `flex`, `flex-col`, `flex-wrap`, `gap-16`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`, `h-12`, `h-2`, `h-px`, `inline-flex`, `items-center`
+- **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `${!isMatrix`, `${isMatrix`, `:`, `animate-fadeIn`, `animate-pulse`, `border`, `divide-slate-50`, `divide-y`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `group`, `italic`

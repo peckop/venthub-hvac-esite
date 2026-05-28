@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\RichTextRenderer.tsx
 skeleton_hash: 542bfec2554f9519
-generated_at: 2026-05-23T22:26:52Z
+entity_hashes:
+  func:RichTextRenderer: 827584ed75053437
+  overview: c7751cfdcd10bdc7
+  style_tokens: 95b6c3607cdf0117
+generated_at: 2026-05-28T22:36:55Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ React tabanlı bu zengin metin renderlayıcı bileşen, yalnızca üst bileşen 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### RichTextRenderer
 **Ne yapar**: VentHub HVAC platformunun ürün modülünde kullanılan, zengin metin içeriklerini React tabanlı arayüzde güvenli ve tutarlı bir şekilde ekrana sunan bir React bileşenidir. Backend veya içerik yönetim sisteminden gelen HTML formatlı metin içeriklerini standart hale getirerek tüm ürün sayfalarında aynı görsel ve işlevsel yapıda sunulmasını garanti eder.
@@ -107,4 +111,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `text-industrial-gray`, `text-lg`, `text-steel-gray`, `text-success-green`
 - **Layout:** `flex`, `flex-shrink-0`, `items-start`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `font-bold`, `font-semibold`, `leading-relaxed`, `mb-2`, `mr-3`, `mt-1`, `mt-2`, `mt-4`, `space-y-3`, `space-y-6`

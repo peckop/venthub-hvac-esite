@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminDashboardPage.tsx
 skeleton_hash: 07e1183ef19058d5
-generated_at: 2026-05-23T22:37:13Z
+entity_hashes:
+  func:AdminDashboardPage: d9f200a1ae3a63e1
+  overview: 558644615f3ac259
+  style_tokens: 12dd6d905c26f46b
+generated_at: 2026-05-28T22:38:56Z
 ---
 
 ## Genel Bakış
@@ -27,7 +31,7 @@ Bu React tabanlı admin kontrol paneli sayfasının doğru çalışması için u
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminDashboardPage
 **Ne yapar**: VentHub HVAC sisteminin yönetici paneline ait ana gösterim sayfası bileşenidir. Sadece yetkilendirilmiş yönetici hesaplarına açık olan bu sayfa, sistemdeki tüm HVAC cihazlarının genel durumunu, işlem istatistiklerini, son kullanıcı hareketlerini ve yöneticiye özel erişim modüllerini tek bir konsolide arayüzde sunar. Yetkisiz erişim girişimlerini engelleyerek kullanıcıları doğru rotalara yönlendiren güvenlikli bir rota bileşeni olarak görev görür.
@@ -124,3 +128,19 @@ Bu React tabanlı admin kontrol paneli sayfasının doğru çalışması için u
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminDashboardPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-red-50`, `bg-surface-deep/40`, `border-white/5`, `text-red-500`, `text-slate-500`, `text-sm`
+- **Layout:** `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `lg:grid-cols-2`, `lg:grid-cols-4`, `md:grid-cols-2`, `md:grid-cols-3`, `p-4`, `p-8`
+- **Varyant/Responsive:** `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `border`, `font-black`, `glass-card`, `mb-8`, `rounded-xl`, `space-y-10`, `tracking-widest`, `uppercase`

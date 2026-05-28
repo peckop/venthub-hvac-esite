@@ -8,7 +8,7 @@ entity_hashes:
   func:ProductsGrid: 3dd0bc95cb82a18e
   overview: b0875b8b603aa680
   style_tokens: 875e602260424c7a
-generated_at: 2026-05-27T18:30:11Z
+generated_at: 2026-05-28T22:36:51Z
 ---
 
 ## Genel Bakış

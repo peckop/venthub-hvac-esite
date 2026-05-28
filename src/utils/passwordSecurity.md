@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\passwordSecurity.ts
 skeleton_hash: 28b7bd9cec9ece0d
-generated_at: 2026-05-23T22:34:28Z
+entity_hashes:
+  func:hibpPwnedCount: 710f4dd1fd996690
+  func:sha1Hex: 0a8c8ae40a0afcf2
+  overview: ff989043abdda4b6
+generated_at: 2026-05-28T22:38:48Z
 ---
 
 ## Genel Bakış
@@ -30,7 +34,7 @@ Bu modül, şifre hashleme ve harici servis üzerinden şifre ihlal geçmişini 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### sha1Hex
 **Ne yapar**: Verilen girdi stringini SHA-1 kriptografik algoritmasıyla hashler, elde edilen sonucun büyük harfli onaltılık (hexadecimal) gösterimini döndürür. Temel kullanım amacı, düz metin parolaların HaveIBeenPwned (HIBP) k-Anonimlik kontrolleri için gerekli formata dönüştürülmesidir, parolaların güvenli şekilde işlenmesini sağlar.
@@ -93,29 +97,6 @@ Bu modül, şifre hashleme ve harici servis üzerinden şifre ihlal geçmişini 
   - `resp` — HIBP API'sine atılan fetch isteğinden dönen cevap nesnesi
   - `prefix` — Fetch URL'sinde kullanılan, SHA-1 hashinin ilk 5 karakterini içeren kapsam dışı değişken
 - **Dönüş**: Promise<Response> — HIBP API'sinden dönen standart fetch cevap nesnesi
-
----
-
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-hibpPwnedCount() fonksiyonu, hash işlemi gerçekleştirmek için dosya içindeki sha1Hex fonksiyonunu çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Verilen çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon belirtilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  hibpPwnedCount() → sha1Hex()
-
-```mermaid
-graph LR
-    hibpPwnedCount["hibpPwnedCount()"] --> sha1Hex["sha1Hex()"]
-```
 
 ---
 

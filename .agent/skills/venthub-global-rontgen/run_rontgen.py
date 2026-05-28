@@ -54,6 +54,7 @@ def run_regex_scan(pattern, paths):
     Dahili regex tarayıcı: Gelen pattern'i belirtilen yollarda arar.
     paths dizisinin son elemanı --exclude=... olabilir.
     """
+    print(f"DEBUG REGEX_SCAN -> Pattern: '{pattern}' on paths: {paths}")
     exclude_pattern = None
     target_dirs = []
     for p in paths:
@@ -76,13 +77,13 @@ def run_regex_scan(pattern, paths):
             continue
         for root, _, files in os.walk(top):
             for file in files:
-                if file.endswith((".ts", ".tsx", ".js", ".jsx")):
+                if file.endswith((".ts", ".tsx", ".js", ".jsx", ".sql")):
                     filepath = os.path.join(root, file)
                     with open(filepath, "r", encoding="utf-8") as f:
                         lines = f.readlines()
                         for i, line in enumerate(lines):
                             if regex.search(line):
-                                if ex_regex and ex_regex.search(line):
+                                if ex_regex and (ex_regex.search(line) or ex_regex.search(filepath) or ex_regex.search(os.path.basename(filepath))):
                                     continue
                                 matches.append(f"{os.path.relpath(filepath)}:{i+1} -> {line.strip()}")
     
@@ -127,6 +128,13 @@ def main():
         
         if tool == "regex_scan":
             code, output = run_regex_scan(args[0], args[1:])
+            if check_data.get("presence_check", False):
+                if code == 1:
+                    code = 0
+                    output = "Bulundu (Doğrulandı):\n" + output
+                else:
+                    code = 1
+                    output = "Hata: Gerekli güvenlik ifadesi bulunamadı."
         else:
             code, output = run_subprocess(tool, args)
 

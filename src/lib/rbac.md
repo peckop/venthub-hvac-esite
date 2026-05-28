@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\rbac.ts
 skeleton_hash: f10168d29a5bac6b
-generated_at: 2026-05-23T22:31:40Z
+entity_hashes:
+  func:canAccessPage: 8cf66bde9646819e
+  func:canWrite: 289f50aba94e238a
+  func:isReadOnly: 4b13d0168f4b164b
+  overview: e7f0da41b26e494f
+generated_at: 2026-05-28T22:38:00Z
 ---
 
 ## Genel Bakış
@@ -28,7 +33,7 @@ Bu rol tabanlı erişim kontrolü (RBAC) modülünün doğru ve güvenli çalı�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### canAccessPage
 **Ne yapar**: Verilen kullanıcı rolünün, belirtilen sayfa yoluna erişim yetkisine sahip olup olmadığını kontrol eder. Kullanıcının ilgili sayfaya girme izninin olup olmadığını net bir boolean sonuçla döndürür, sistemdeki erişim güvenliğinin temel kontrol adımlarından birini oluşturur.

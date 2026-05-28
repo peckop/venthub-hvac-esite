@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryHero.tsx
 skeleton_hash: 2839fbcf97470680
-generated_at: 2026-05-23T21:58:13Z
+entity_hashes:
+  func:CategoryHero: e691a6ccb1379798
+  func:handleBack: 7a67af4e5dfa77e4
+  overview: 4b47da32e01e754d
+  style_tokens: 6910b683995fc9aa
+generated_at: 2026-05-28T22:35:44Z
 ---
 
 ## Genel Bakış
@@ -32,7 +37,7 @@ CategoryHero bileşeninin render edilmesi ve `handleBack()` fonksiyonunun çağr
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryHero
 **Ne yapar**: Verilen kategori bilgilerini görselleştirerek kullanıcıya kategori sayfasının başlık bölümünü render eder.  
@@ -44,7 +49,7 @@ CategoryHero bileşeninin render edilmesi ve `handleBack()` fonksiyonunun çağr
 - productCount: CategoryHeroProps.productCount — Bu kategorideki ürün adedi (sayısal değer)  
 - loading: CategoryHeroProps.loading — Veri yükleme durumunu gösteren bayrak (true/false)  
 
-**Dönüş**: React.FC türünde bir işlev döndürür; bu işlev JSX ile kategori başlık bölümünü render eder.  
+**Dönüş**: React.FC türünde bir işlev döndürür; bu işlev JSX ile kategori başlık bölümünü render eder.
 
 ### handleBack
 **Ne yapar**: Kullanıcının önceki sayfaya veya üst kategoriye dönmesini sağlayan geri dönüş işlevini tanımlar.  
@@ -109,16 +114,13 @@ CategoryHero bileşeninin render edilmesi ve `handleBack()` fonksiyonunun çağr
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[300px]`, `h-[500px]`, `min-h-[300px]`
-- **width:** `w-[300px]`, `w-[500px]`
-- **spacing:** (yok)
-- **diğer:** `bg-[url('/images/grid-white.svg')]`, `opacity-[0.03]`, `tracking-[0.3em]`, `tracking-[0.4em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-xl`
+- `rounded-hvac-xl`, `tracking-hvac-loose`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-500/10`, `bg-indigo-600/10`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/10`, `bg-white/5`, `border-b`, `border-slate-100`, `border-white/10`, `border-white/5`, `lg:text-5xl`, `lg:text-8xl`, `lg:text-xl`, `text-3xl`
-- **Layout:** `absolute`, `block`, `bottom-0`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-4`, `gap-8`, `group-hover:-translate-x-1`, `h-12`, `h-24`, `h-32`, `h-4`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-cyan-500/10`, `bg-indigo-600/10`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/10`, `bg-white/5`, `border-b`, `border-slate-100`, `border-white/10`, `border-white/5`, `hover:text-primary-navy`, `hover:text-white`, `lg:text-5xl`, `lg:text-8xl`
+- **Layout:** `absolute`, `block`, `bottom-0`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-4`, `gap-8`, `h-12`, `h-24`, `h-300px`, `h-32`, `h-4`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `-mb-32`, `-ml-32`, `-mr-64`, `-mt-64`, `animate-pulse`, `blur-3xl`, `border`, `duration-500`, `duration-700`, `font-black`, `font-bold`, `font-medium`, `group`, `group-hover:-translate-x-1`, `inset-0`

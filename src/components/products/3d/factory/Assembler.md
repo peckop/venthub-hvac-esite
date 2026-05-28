@@ -4,40 +4,42 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\Assembler.tsx
 skeleton_hash: c8cc58b4d1c21209
-generated_at: 2026-05-23T22:18:40Z
+entity_hashes:
+  func:Assembler: fce0437dc1401eb7
+  overview: 1319e0e67eee55ba
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:50Z
 ---
 
 ## Genel Bakış
-Assembler.tsx, 3D ürün modellerini montaj ve görselleştirmek için kullanılan bir React bileşenidir. Blueprint verisini alır, parçaların patlama efekti, tıklama olayları ve seçili parça durumu gibi özellikleri yönetir.
+Assembler.tsx, 3D ürün modellerinin montajını ve görselleştirmesini sağlayan temel bir React bileşenidir. Bu bileşen, bir ürünün tüm parçalarını bir araya getirerek interaktif bir 3D sahne oluşturur ve kullanıcının bu parçalarla etkileşime girmesini (tıklama, patlama efekti) sağlar. Temel amacı, statik bir model sunmak yerine, parçaların relationships'ini ve durumunu (seçili, patlamış) dinamik bir şekilde yönetmektir.
 
 ## Fonksiyon Grupları
-### Ana Render ve Etkileşim
-Bileşen, gelen veriyi işleyerek 3D modeli oluşturur, kullanıcı etkileşimlerini yakalar ve gerekli görsel ayarları yapar.
+### Ana Render ve Etkileşim Yönetimi
+Bileşen, gelen veriyi (blueprint) işleyerek sahneyi oluşturur, tüm 3D parça nesnelerini render eder ve kullanıcı etkileşimlerini (tıklama, seçme) yöneterek ilgili geri çağırma fonksiyonlarını tetikler.
 - Assembler
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Assembler component'ın render edilmesi ve etkileşim sağlanması için belirli prop'ların tanımlı ve beklenen tiplerde olması gerekir.
 
-[Aksiyom 1]: Eğer **blueprint** prop'u tanımlı değilse, component rendersiz hata verir veya boş görüntülenir.  
-[Aksiyom 2]: Eğer **onClickPart** prop'u tanımlı değilse, bir parça tıklandığında hiçbir işlem yapılmaz veya hata oluşur.  
-[Aksiyom 3]: Eğer **selectedPart** prop'u tanımlı değilse, hiçbir parça seçili olarak gösterilmez (varsayılan olarak hiçbiri vurgulanmaz).  
-[Aksiyom 4]: Eğer **explode** prop'u sayısal bir değer değilse, varsayılan değer 0 kullanılarak davranış beklenmedik olabilir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### Assembler
-**Ne yapar**: Verilen blueprint'e göre 3D ürün montajını render eder, parçaların etkileşimli seçimi ve patlama (explode) efekti sağlar.  
-**Nasıl yapar**: Blueprint verisini işleyerek her bir parçayı uygun dönüşümlerle (explode miktarı uygulanarak) bir sahne üzerine yerleştirir; onPartClick callback'ini parçaların tıklama olaylarına bağlar ve selectedPart prop'u ile vurgulanmış parçayı stillendirir.  
-**Parametreler**:  
-- blueprint: object — Montajın yapılandırma ve geometri verisini içeren nesne (örn. parçaların model yolları, konumları, rotasyonlar).  
-- explode: number — Parçaların merkezden ayrılma miktarı; 0 değeri montajı tam birleştirilmiş gösterir, pozitif değerler parçaları dışarı doğru dağıtır.  
-- onClick: (partId: string) => void — Bir parça tıklandığında çağrılan fonksiyon; tıklanan parçanın kimliğini argüman olarak alır.  
-- selectedPart: string | null — Şu anda vurgulanmış parçanın kimliği; null ise hiçbir parça vurgulanmaz.  
-**Dönüş**: React.FC<AssemblerProps> — Assembler component'i, verilen props ile render edilerek etkileşimli 3D montaj görüntüsünü döndürür.
+
+**Ne yapar**: `Assembler`, HVAC ürünleri için 3D montaj (assembly) görüntüleyen bir React bileşenidir. Verilen bir mavi plan (blueprint) yapısına göre parçaları three-dimensional ortamda render eder ve kullanıcının parçalarla etkileşime girmesini sağlar.
+
+**Nasıl yapar**: Bileşen, `blueprint` prop'u aracılığıyla ürünün parçalarını, bağlantılarını ve geometrik verilerini alır. `explode` parametresi ile parçalar arasındaki mesafeyi kontrollü şekilde artırarak "patlatılmış görünüm" (exploded view) oluşturur. Seçili parçayı belirlemek için `selectedPart` prop'unu kullanır ve bir parçaya tıklandığında `onPartClick` callback fonksiyonunu çağırarak üst bileşene bildirimde bulunur. Bu yapı, ürünlerin montaj sırasını ve parça ilişkilerini görsel olarak sunar.
+
+**Parametreler**:
+- `blueprint` — `BlueprintData` (veya benzeri yapı tipi) — 3D montajın temelini oluşturan veri yapısı; parçaların geometrileri, pozisyonları ve ilişkileri hakkında bilgi içerir. Bu, bileşenin görüntülemesini istediği tüm 3D model verilerinin ana kaynağıdır.
+- `explode` — `number` (varsayılan: `0`) — Parçalar arasındaki patlama (exploded) mesafesini belirleyen çarpan değeridir. `0` değeri montaj durumunu (parçalar birleşik), pozitif değerler ise parçaların birbirinden uzaklaştığı exploded view durumunu temsil eder.
+- `onPartClick` — `(partId: string) => void` — Bir parça üzerine tıklandığında tetiklenen geri çağırma fonksiyonudur. Tıklanan parçanın kimliğini (ID) üst bileşene iletir; böylece seçim, detay gösterimi gibi işlemler tetiklenebilir.
+- `selectedPart` — `string | null` — Şu anda seçili olan parçanın kimliğini belirtir. `null` değerinde hiçbir parça seçili değildir. Seçili parça, görsel olarak vurgulanır (highlight) veya farklı renklendirilerek kullanıcıya geri bildirim sağlanır.
+
+**Dönüş**: `React.FC<AssemblerProps>` — Montaj görüntülemesini içeren bir React fonksiyonel bileşeni döndürür. Bu bileşen, 3D sahneyi (scene), kamerayı, ışıklandırmayı ve parçaları içeren tam bir montaj görüntüleyiciyi render eder.
 
 ---
 
@@ -68,18 +70,20 @@ Assembler component'ın render edilmesi ve etkileşim sağlanması için belirli
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\Assembler.tsx::Assembler
-- **params**: blueprint, explode, onPartClick, selectedPart, isolatedPart, hiddenParts
-- **ic_degiskenler**: 
-  - yok
-- **Dönüş**: React.FC<AssemblerProps>
+### [N1_NASIL] AST Pointer: src/components/products/3d/factory/Assembler.tsx::Assembler (ana arrow function)
+- **params**: `blueprint` (React bileşeni için gerekli tüm parça ve yapılandırma verisini içeren nesne), `explode` (number, varsayılan 0 — parçaları merkezden uzaklaştırma oranı), `onPartClick` (function | undefined — parçaya tıklandığında çağrılacak callback), `selectedPart` (string | undefined — şu an seçili olan parçanın adı), `isolatedPart` (string | undefined — yalıtılmış parçanın adı, null ise hiçbir parça yalıtılmamıştır), `hiddenParts` (string[], varsayılan [] — gizli parçaların isim listesi)
+- **ic_degiskenler**:
+  - Yok — return içinde doğrudan JSX döndürür, ara değişken oluşturmaz
+- **Dönüş**: `JSX.Element` — `<group>` elemanı içinde `blueprint.parts.map()` ile her parça için `<group>` ve `<Suspense>` ile sarılmış dinamik React bileşenleri döndürür. `blueprint.scale || 1` ile genel ölçeklendirme uygular.
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\Assembler.tsx::<anonymous>
-- **params**: part, index
-- **ic_degiskenler**: 
-  - `Component` — tutar part.component değerini, React.createElement ile render edilecek bileşen referansı
-  - `explodeOffset` — parçanın patlatılmış görünümü için hesaplanan [x, y, z] offset vektörü
-- **Dönüş**: JSX.Element
+---
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/factory/Assembler.tsx::map callback (part, index)
+- **params**: `part` (blueprint.parts dizisindeki tek bir parçanın nesnesi — `component`, `name`, `position`, `rotation`, `scale`, `props` alanlarını içerir), `index` (number — dizi indeksi, key oluşturmak için kullanılır)
+- **ic_degiskenler**:
+  - `Component` — `part.component` değerinden alınan React bileşeni referansı; `React.createElement` ile dinamik olarak render edilmek üzere kullanılır
+  - `explodeOffset: [number, number, number]` — Parçanın 3D koordinat vektörü; `part.position` koordinatları `explode` oranıyla çarpılarak merkezden uzaklaştırılmış pozisyon hesaplanır. Her eksen için `part.position?.[0]`, `part.position?.[1]`, `part.position?.[2]` subscript erişimleri ile x, y, z değerleri okunur ve `(1 + explode * 2)` çarpanıyla çarpılır; `position` tanımsızsa `0` varsayılır
+- **Dönüş**: `JSX.Element` — Her parça için `<Suspense fallback={null}>` içine sarılmış, `React.createElement` ile dinamik olarak oluşturulmuş React bileşeni döndürür. Component'e şu prop'lar aktarılır: `part.props` spread edilir, `explode`, `isSelected` (`selectedPart === part.name` ile belirlenir), `isIsolated` (`isolatedPart === part.name || isolatedPart === null` ile belirlenir), `isHidden` (`hiddenParts.includes(part.name)` ile belirlenir), `onClick` (callback içinde `onPartClick?.(part.name)` çağrısı). Dış `{/* key: `${part.name}-${index}` */}` ile React key atanır.
 
 ---
 
@@ -106,4 +110,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

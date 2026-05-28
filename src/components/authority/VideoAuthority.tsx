@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Play, Volume2, VolumeX } from 'lucide-react'
 import type { VideoMetadata } from '../../types/media.types'
+import Image from 'next/image'
 
 interface VideoAuthorityProps {
     metadata: VideoMetadata
@@ -59,10 +60,12 @@ export default function VideoAuthority({ metadata, className = '' }: VideoAuthor
         >
             {/* Thumbnail Fallback */}
             {!isLoaded && metadata.thumbnailUrl && (
-                <img 
+                <Image 
                     src={metadata.thumbnailUrl} 
-                    alt={metadata.title} 
-                    className="absolute inset-0 w-full h-full object-cover blur-sm opacity-50"
+                    alt={metadata.title || ""} 
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover blur-sm opacity-50"
                 />
             )}
 

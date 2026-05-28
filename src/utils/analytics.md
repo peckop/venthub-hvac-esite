@@ -4,37 +4,38 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\analytics.ts
 skeleton_hash: 850bc2150819ea68
-generated_at: 2026-05-23T22:33:22Z
+entity_hashes:
+  func:trackEvent: a39f838e00080681
+  overview: 6ae77f9a934c8a05
+generated_at: 2026-05-28T22:38:59Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinde yer alan analiz amaçlı utility modülüdür, uygulama genelinde gerçekleşen tüm kullanıcı ve sistem olaylarının merkezi olarak takibini sağlamak için tasarlanmıştır. Tüm takip işlemlerini tek bir noktada toplayarak analiz süreçlerinde tutarlı veri toplamayı garanti eder.
+VentHub HVAC projesindeki analiz utility modülüdür. Tek bir merkezi fonksiyonla tüm uygulama içi olayların harici analiz servislerine veya geliştirme modunda konsola kaydedilmesini sağlar.
 
 ## Fonksiyon Grupları
 ### Olay Takibi
-Uygulamada kaydedilmesi gereken olayları, yanlarında gelen ek parametrelerle birlikte analiz sistemine iletmekle sorumludur, tüm proje genelinde standartlaştırılmış bir takip arayüzü sunar.
+Uygulamadaki tüm analiz olaylarını standart bir arayüz üzerinden harici servislere veya konsola yönlendirerek merkezi veri toplama sorumluluğunu üstlenir.
 - trackEvent
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modülün yalnızca olay takibi işlevini yerine getirebilmesi için bağlı olduğu harici analiz servislerinin çalışma ortamında erişilebilir olması ve giriş parametrelerinin tip uyumluluğunun sağlanması zorunludur.
 
-[Aksiyom 1]: Eğer trackEvent fonksiyonunun bağlı olduğu harici olay takibi/analiz servisi çalıştırma ortamında tanımlı ve erişilebilir değilse, gönderilen hiçbir olay kaydedilemez, modül temel işlevini yerine getiremez.
-[Aksiyom 2]: Eğer trackEvent fonksiyonuna gönderilen name parametresi geçerli, boş olmayan bir string değilse, ilgili olay takip sisteminde doğru şekilde sınıflandırılamaz, tüm analiz süreçlerinde hatalı veya eksik veri oluşmasına neden olur.
-[Aksiyom 3]: Eğer trackEvent fonksiyonuna gönderilen params nesnesi JSON ile seri hale getirilebilir bir yapıda değilse (örneğin döngüsel referans içeriyorsa), olay parametreleri takip servisine aktarılamaz, eksik bilgilerle kayıt oluşturulur.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### trackEvent
-**Ne yapar**: Güvenli şekilde bir analiz etkinliğini takip eder, etkinlik verisini GA4 (`gtag`) veya GTM (`dataLayer`) servislerine ileterek işlemeyi devreder. Hiçbir analiz servisi mevcut değilse, geliştirme veya hata ayıklama modlarında konsola etkinlik bilgilerini loglar, aksi takdirde herhangi bir aksiyon almadan sorunsuz çalışmaya devam eder.
-**Nasıl yapar**: Çalışma ortamında önce GA4'e ait gtag fonksiyonunun veya GTM'ye ait dataLayer nesnesinin varlığını kontrol eder. İlgili servislerden herhangi biri mevcutsa, almış olduğu etkinlik adı ve ek parametreleri ilgili servise iletir. Eğer hiçbir analiz servisi yüklenmemişse, çalışma moduna göre hareket eder; geliştirme ya da debug modlarında etkinlik detaylarını tarayıcı konsoluna loglar, üretim ortamında ise herhangi bir ekstra işlem yapmadan çalışmaya devam eder.
+**Ne yapar**: Bu fonksiyon, bir analitik (analytics) olayını güvenli bir şekilde izlemeyi sağlar. Görevi, belirtilen olay adı ve ilişkili parametreleri, mevcut bir analitik servisine (Google Analytics 4 veya Google Tag Manager) iletir. Eğer böyle bir servis yoksa sessizce işlevsiz kalır veya geliştirme ortamında bir log mesajı basarak hata vermeden çalışmaya devam eder.
+
+**Nasıl yapar**: Fonksiyon首先, tarayıcı ortamında olup olmadığını kontrol eder. Ardından, `window.gtag` fonksiyonunun varlığına bakarak GA4'e, yoksa `window.dataLayer` dizisinin varlığına bakarak GTM'ye olayı göndermeyi dener. Herhangi bir servise olay iletilememişse ve ortam geliştirme (development) modundaysa, `DEBUG_ANALYTICS` bayrağı aktifse konsola bilgilendirici bir uyarı loglar. Tüm işlem bir `try-catch` bloğu içinde gerçekleşir; olası analitik hataları yakalanarak ana uygulamanın çökmesi engellenir.
+
 **Parametreler**:
-- name: string — Takip edilecek etkinliğin adı (örneğin 'add_to_cart')
-- params: Record<string, unknown> — Etkinliğe ait ek parametreler ve metadata, varsayılan olarak boş nesnedir
-**Dönüş**: void, herhangi bir değer döndürmez.
+- `name`: `string` — İzlenecek olayın adıdır. Örneğin 'add_to_cart', 'page_view' gibi bir string olmalıdır.
+- `params`: `Record<string, unknown>` — Olaya ilişkilendirilecek ek parametreler veya meta verileri temsil eder. Nesne formatındadır ve fonksiyon çağrısında belirtilmezse boş bir nesne (`{}`) olarak atanır.
+
+**Dönüş**: Fonksiyon herhangi bir değer dönmez (`void`). Sadece bir yan etki (analitik servise olay gönderme veya konsola log yazma) oluşturur.
 
 ---
 

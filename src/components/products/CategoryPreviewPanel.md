@@ -4,44 +4,46 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\CategoryPreviewPanel.tsx
 skeleton_hash: 802e40964794158d
-generated_at: 2026-05-23T22:26:15Z
+entity_hashes:
+  func:CategoryPreviewPanel: 87d3be334ca13291
+  func:handleBackdropClick: 535e684993e9dc04
+  func:handleNavigate: a42cd6dc96fcf210
+  overview: aca9af725ec561f2
+  style_tokens: d2b30a32d3e0c389
+generated_at: 2026-05-28T22:37:05Z
 ---
 
 ## Genel Bakış
-Bu React modülü, ürün platformunda belirli bir ürün kategorisinin detaylarını açılır bir önizleme paneli olarak sunan bileşeni barındırır. Dışarıdan iletilen kategori verileri ve panelin açık/kapalı durumuna göre arayüzü render eder, kullanıcı etkileşimleriyle panelin çalışmasını yönetir.
+Bu React modülü, bir ürün kategorisinin detaylarını gösteren açılır bir önizleme paneli bileşenidir. Panel, dışarıdan gelen kategori verisi ve görünürlük durumuna göre arayüzü oluşturur; kullanıcı etkileşimleriyle (arka plana tıklama, sayfa yönlendirme) panelin kapanma ve gezinme süreçlerini yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Önizleme Paneli Bileşeni
-Modülün temel işlevini yerine getiren ana React bileşenidir, dışarıdan kategori bilgisi, panelin görünürlük durumu ve kapanma tetikleyicisini alarak önizleme arayüzünü oluşturur.
+Modülün temelini oluşturan ve tüm arayüzü render eden ana React bileşenidir. Kategori bilgisi, açık/kapalı durumu ve kapanma callback'i alarak panelin içeriğini ve görünürlüğünü kontrol eder.
 - CategoryPreviewPanel
 
 ### Kullanıcı Etkileşimi Yönetici Fonksiyonları
-Panel içindeki kullanıcı hareketlerini işleyen yardımcı fonksiyonlardır, arka plana tıklama ve farklı sayfalara yönlendirme isteklerini yöneterek panelin davranışını kontrol eder.
+Panel içindeki kullanıcı hareketlerini yöneten yardımcı fonksiyonlardır. Kullanıcıların arka plan alanına tıklaması veya içerdeki navigasyon tetikleyicileriyle olan etkileşimlerini işleyerek panelin davranışını kontrol eder.
 - handleBackdropClick, handleNavigate
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu React kategorisi önizleme paneli bileşeninin sorunsuz çalışması için, kendisine iletilen tüm prop'ların geçerli tiplerde olması, çalıştığı ortamın temel React olaylarını ve sayfa yönlendirme altyapısını desteklemesi zorunludur.
 
-[Aksiyom 1]: Eğer component'e `category` prop'u geçerli bir kategori nesnesi olarak iletilmezse, panele herhangi bir kategori içeriği yüklenemez, kullanıcı boş bir panelle karşılaşır.
-[Aksiyom 2]: Eğer component'e `isOpen` boolean tipinde açık/kapalı durumu belirten prop iletilmezse, panelin görünürlüğü yönetilemez, panel hiçbir zaman doğru şekilde açılamaz veya kapatılamaz.
-[Aksiyom 3]: Eğer component'e `onClose` fonksiyon tipinde kapatma işlemini yöneten prop iletilmezse, tüm kullanıcı odaklı kapatma tetikleyicileri çalışmaz, panel sonsuza kadar açık kalır.
-[Aksiyom 4]: Eğer çalıştığı ortam React.MouseEvent interface'ini desteklemiyorsa, `handleBackdropClick` fonksiyonu tetiklenemez, arka plana tıklayarak paneli kapatma özelliği devre dışı kalır.
-[Aksiyom 5]: Eğer uygulamada sayfa yönlendirmesi için gerekli altyapı entegre edilmemişse, `handleNavigate` fonksiyonu çalışmaz, kullanıcı panelden ilgili kategori detay sayfasına yönlendirilemez.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryPreviewPanel
-**Ne yapar**: Ürün kategorileri için sağdan açılan hızlı ön izleme (quick view) paneli olarak çalışan React fonksiyonel bileşenidir. Glassmorphism tema yapısına sahip bu panel, seçilen kategorinin temel bilgilerini kullanıcıya özet olarak sunar.
-**Nasıl yapar**: Props aracılığıyla aldığı kategori verisi, panelin açık/kapalı durumu ve kapatma geri çağırma fonksiyonunu kullanarak panelin görünürlüğünü ve içeriğini yönetir. Panelin konumu, stili ve çalışma mantığı tanımlı tema ve kullanım senaryolarına uygun olarak yapılandırılır.
+**Ne yapar**: Kullanıcıdan ürün kategorisi hakkında hızlı bir ön bilgi gösteren, sağdan açılan bir bilgi panelidir. Glassmorphism (cam efektli) temalı modern bir arayüz sunarak kategori detaylarını隔anlık bir şekilde sunar.
+
+**Nasıl yapar**: React functional component olarak tanımlanmıştır. `isOpen` prop'una bağlı olarak panelin görünürlüğünü kontrol eder. Glassmorphism tasarım diliyle yarı saydam, bulanık arka plan efekti uygulanarak modern bir UI deneyimi sağlar. Kategori verisini `category` prop'undan alarak panel içinde render eder.
+
 **Parametreler**:
-- category: CategoryPreviewPanelProps kapsamında tanımlı kategori nesnesi — Panelde gösterilecek olan ürün kategorisinin tüm detaylarını içeren veri nesnesi
-- isOpen: boolean — Panelin ekranda görünür olup olmadığını belirten durum değeri
-- onClose: function — Kullanıcı panelden çıkmak istediğinde tetiklenerek panelin kapalı duruma geçmesini sağlayan geri çağırma fonksiyonu
-**Dönüş**: CategoryPreviewPanelProps ile uyumlu React.FC (React Fonksiyonel Bileşeni) döndürür, bu bileşen ilgili ön izleme panelini DOM üzerinde render etmek üzere tasarlanmıştır.
+- category: object — Panelde gösterilecek kategori bilgisini içeren veri nesnesi. Kategori adı, açıklaması, görseli gibi detayları barındırır.
+- isOpen: boolean — Panelin açık olup olmadığını belirten durum bayrağı. true olduğunda panel sağdan kayarak görünür hale gelir.
+- onClose: () => void — Panelin kapanma işlemini tetikleyen callback fonksiyonu. Kullanıcı kapatma butonuna tıkladığında veya backdrop'a tıkladığında çağrılır.
+
+**Dönüş**: React.FC<CategoryPreviewPanelProps> — Tip güvenli bir React functional component dönüşü sağlar.
 
 ### handleNavigate
 **Ne yapar**: Ön izleme paneli içindeki kullanıcı gezinme işlemlerini yöneten olay işleyici fonksiyondur. Kullanıcıların panel içinden farklı içeriklere veya sayfalara yönlenmesini sağlamak için tasarlanmıştır.
@@ -161,11 +163,7 @@ graph TD
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `max-h-[calc(100vh-200px)]`
-- **width:** `sm:w-[420px]`
-- **spacing:** (yok)
-- **diğer:** (yok)
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
 - (yok)
@@ -173,4 +171,5 @@ graph TD
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-black/60`, `bg-gradient-to-b`, `bg-gradient-to-br`, `bg-gradient-to-r`, `bg-gradient-to-t`, `bg-slate-800`, `bg-white/5`, `border-b`, `border-l`, `border-white/10`, `from-cyan-500`, `from-cyan-500/5`, `from-slate-900`, `from-slate-900/80`, `from-slate-900/95`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `backdrop-blur-xl`, `bottom-0`, `fixed`, `flex`, `from-cyan-500`, `from-cyan-500/5`, `from-slate-900`, `from-slate-900/80`, `from-slate-900/95`, `gap-2`, `gap-3`, `gap-4`, `grid`
-- **Responsive:** `sm:` prefix kullanımları
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${category.color`, `aspect-video`, `border`, `duration-300`, `font-bold`, `font-medium`, `font-semibold`, `group`, `group-hover:translate-x-1`, `inset-0`, `leading-relaxed`, `mb-1`, `object-cover`, `pointer-events-none`, `px-6`

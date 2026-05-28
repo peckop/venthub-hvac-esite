@@ -4,26 +4,38 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\database.types.ts
 skeleton_hash: 233ffe2c64624783
-generated_at: 2026-05-23T22:33:03Z
+entity_hashes:
+  overview: ce3fb4ce44f2949f
+generated_at: 2026-05-28T22:38:39Z
 ---
 
 ## Genel Bakış
-Bu TypeScript modülü, VentHub HVAC projesinin veritabanı altyapısına ait tüm tür tanımlarını barındıran, proje genelinde tip güvenliği sağlayan bir tür tanım dosyasıdır. Herhangi bir çalıştırılabilir kod, harici bağımlılık veya fonksiyon içermeyen bu dosya, sadece TypeScript derleyicisi tarafından kullanılarak veritabanı etkileşimleri sırasında tür uyumsuzluğu hatalarının geliştirme aşamasında tespit edilmesini sağlar. Proje içindeki tüm veritabanı tablolarının, sütunlarının ve ilişkili veri yapılarının standartlaştırılmış tiplerini sunan bu modül, veritabanı ile tüm etkileşimlerde tutarlı veri yapısı kullanımını zorunlu kılar.
 
-Bu modülde herhangi bir çalıştırılabilir fonksiyon bulunmadığından, fonksiyon grubu listesi oluşturulmamıştır.
+Bu TypeScript dosyası, VentHub HVAC projesinin veritabanı şemasını temsil eden tüm tablo, sütun ve ilişkili veri yapılarının tip tanımlarını içerir. Çalıştırılabilir kod veya fonksiyon barındırmayan modül, proje genelinde tip güvenliğini sağlamak ve veritabanı etkileşimlerinde derleme zamanı hatalarını yakalamak amacıyla kullanılır.
+
+## Fonksiyon Grupları
+
+Bu dosyada herhangi bir fonksiyon bulunmamaktadır; modül yalnızca tip tanımlarından oluşmaktadır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC projesinin veritabanı şema tiplerini tanımlayan sabit tip tanımlama modülüdür; projenin tip güvenliğiyle veritabanı etkileşimlerinin doğru çalışması için tüm proje modüllerinin bu tiplere uygun hareket etmesi zorunludur.
 
-[Aksiyom 1]: Eğer bu modüle proje derleme (build) sürecinde erişilemiyorsa, proje içindeki tüm Typescript dosyaları veritabanı verilerinin tip doğrulamasını yapamaz, derleme zamanında yakalanması gereken tip uyumsuzlukları atlanır ve çalışma zamanı hataları oluşur.
-[Aksiyom 2]: Eğer bu modüldeki tip tanımları, kullanılan canlı veritabanının güncel şemasıyla senkronize değilse, tüm veritabanı sorgulama, okuma ve yazma işlemlerinde şema uyuşmazlığı kaynaklı veri bozulmaları veya çalışma zamanı istisnaları meydana gelir.
-[Aksiyom 3]: Eğer bu modülün içeriği üzerinde yetkisiz/yanlış değişiklik yapılırsa, proje genelinde tüm veritabanı etkileşimleri tutarsız hale gelir ve modülün sağladığı tip güvenliği tamamen devre dışı kalır.
+Bu modül, çalıştırılabilir fonksiyon veya mantık içermeyen salt bir TypeScript tür tanım dosyasıdır; dolayısıyla runtime'da değiştirilecek bir durum veya koşul zinciri yoktur. Ancak, bu türlerin doğru kullanımı için aşağıdaki mimari varsayımlar (aksiyomlar) geçerlidir.
+
+[Aksiyom 1]: Eğer bu modüldeki tür tanımları veritabanı şemasıyla tutarlı değilse, derleme zamanında tip hataları oluşur veya runtime'da beklenmeyen veri yapısı uyumsuzlukları meydana gelir.
+
+[Aksiyom 2]: Eğer projedeki herhangi bir modül, veritabanı etkileşimlerinde bu dosyadaki tipler yerine kendi yerel tiplerini kullanırsa, veri tutarsızlığı ve bakım zorlukları oluşur.
+
+[Aksiyom 3]: Eğer `as_expression` sabiti kullanılmıyorsa, ilgili veritabanı alanlarının tipi belirsiz kalır ve potansiyel tür hataları ortaya çıkabilir.
+
+[Aksiyom 4]: Eğer veritabanı şemasında bir değişiklik yapılırsa ve bu dosya güncellenmezse, proje genelinde tür uyumsuzluğu hataları oluşur.
+
+[Aksiyom 5]: Eğer bu modüldeki türler yanlışlıkla genişletilmez veya üzerlerine ek alanlar eklenmezse, derleyici tarafından yakalanamayan sessiz veri kayıpları veya bozulmaları meydana gelir.
 
 ---
 
-
+## FONKSİYON DETAYLARI
 
 ---
 
@@ -118,7 +130,27 @@ type CompositeTypes = <
 
 ## AST POINTERS
 
-Analiz edilen kaynak dosyası `C:\Users\alize\venthub-hvac\src\types\database.types.ts` içinde herhangi bir fonksiyon, sınıf metodu veya çalıştırılabilir kod bloğu tanımlanmamıştır. Dosyada sadece detayları, kullanım amacı ve erişim şekli fonksiyon gövdesi verilmediği için çıkarılamayan `Constants (as_expression)` adlı bir sabit bildirimi kaydedilmiştir. Listelenecek fonksiyona ait AST Pointer kaydı bulunmamaktadır.
+Bu dosyada **fonksiyon tanımları bulunmamaktadır**.
+
+### Dosya Yapısı Özeti: `database.types.ts`
+
+- **Tur**: TypeScript tip/sabit tanımlama dosyası
+- **Amaç**: Veritabanı şemasına karşılık gelen tipleri ve sabitleri tanımlar
+- **İçerik**:
+  - `Constants` — as_expression ile tanımlanmış sabit yapı (veritabanı enum değerleri, varsayılanlar vb. tutar)
+
+---
+
+### [N1_NASIL] AST Pointer: `database.types.ts::Constants` (Sabit Tanımı)
+
+- **Tur**: `as_expression` (TypeScript tip/sabit dönüşümü)
+- **Icerik**: Veritabanı tablo/alan sabitlerini temsil eden yapı
+- **Fonksiyon gövdesi**: Yok — bu bir sabit tanımıdır, çalıştırılabilir kod içermez
+- **Yan etkileri**: Yok — sadece derleme zamanı tip bilgisi sağlar
+
+---
+
+> **Not**: Bu dosya `src/types/` dizininde bulunduğu için, projedeki diğer modüllerin import edeceği **tip tanım merkezi** konumundadır. Çalışma zamanında herhangi bir kod çalıştırmaz; yalnızca TypeScript derleyicisi tarafından tip kontrolünde kullanılır.
 
 ---
 

@@ -4,45 +4,54 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\BoxAndBase.tsx
 skeleton_hash: 4168a44472e1f65d
-generated_at: 2026-05-23T22:19:01Z
+entity_hashes:
+  func:BoxAndBase: af353be0b7cd10d8
+  overview: 1776944b67282716
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:36:49Z
 ---
 
 ## Genel Bakış
-Bu modül, 3B ürün görselleştirme bağlamında bir kutunun ve tabanının bileşenini tanımlayan bir React bileşeni sağlar. Bileşen, görsel durumları (seçilmiş, izole edilmiş, gizli) ve kullanıcı etkileşimlerini (tıklama, patlama efekti) yöneterek ürün parçasının dinamik bir şekilde render edilmesini sağlar.
+Bu modül, 3B ürün görselleştirmelerinde kullanılan bir kutu ve taban parçası bileşenini tanımlayan bir React modülüdür. Bileşen, parçanın seçilmiş, izole veya gizli gibi görsel durumlarını; tıklama etkileşimi ve isteğe bağlı patlama efekti gibi dinamik davranışları yöneterek esnek ve etkileşimli bir render sağlar.
 
 ## Fonksiyon Grupları
-### Görünüm ve Etkileşim Yönetimi
-Bu grup, bileşenin görsel temsilini oluşturur ve dışardan gelen özelliklere göre durumunu günceller.
+### Bileşen Görselliği ve Etkileşimi
+Bu grup, 3D parçanın temel görsel temsilini oluşturur ve dış prop değerlerine göre görünüm ile etkileşimlerini kontrol eder.
 - BoxAndBase
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-[Bu modül için özel aksiyom tanımlanmamıştır.]
+Bu modül, 3B ürün görselleştirmesinde kutu ve taban bileşenini render eden bir React bileşenidir.
 
-[Aksiyom 1]: Eğer `isSelected` prop'u verilmezse, component beklenen şekilde render edilmez veya hata oluşur.  
-[Aksiyom 2]: Eğer `isIsolated` prop'u verilmezse, component beklenen şekilde render edilmez veya hata oluşur.  
-[Aksiyom 3]: Eğer `isHidden` prop'u verilmezse, component beklenen şekilde render edilmez veya hata oluşur.  
-[Aksiyom 4]: Eğer `onClick` prop'u verilmezse, component üzerindeki tıklama etkileşimi çalışmaz.  
-[Aksiyom 5]: Eğer `explode` prop'u verilmezse, bu parametre için varsayılan değer belirtilmediği için davranış belirsizdir.
+[Aksiyom 1]: Eğer `isSelected` boolean değer olarak sağlanmazsa, bileşen seçili durumunu doğru gösteremez.
+
+[Aksiyom 2]: Eğer `isIsolated` boolean değer olarak sağlanmazsa, bileşen izole durumunu doğru gösteremez.
+
+[Aksiyom 3]: Eğer `isHidden` boolean değer olarak sağlanmazsa, bileşen gizlilik durumunu doğru uygulayamaz.
+
+[Aksiyom 4]: Eğer `onClick` fonksiyonu sağlanmazsa, kullanıcı tıklama etkileşiminde bulunamaz (bileşen tıklanamaz hale gelir).
+
+[Aksiyom 5]: Eğer `explode` değeri verilmezse, varsayılan değer (bilinmiyor) kullanılır ve patlama efekti bu değere göre hesaplanır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### BoxAndBase
-**Ne yapar**: BoxAndBase, bir 3D kutusu ve taban parçasını görselleştiren bir React bileşenidir. Seçim, izolasyon, görünürlük, tıklama olayları ve isteğe bağlı patlama efekti gibi etkileşim durumlarını yönetir.
 
-**Nasıl yapar**: Bileşen, gelen prop değerlerine dayalı olarak sınıf ve stil tanımlamalarını ayarlayarak kutunun ve tabanın render edilmesini sağlar. `onClick` prop’u üzerinden tıklama olayını yakalar, `explode` prop’u belirli bir eşik değeri aşarsa patlama animasyonunu tetikler (animasyon mantığı dışarıdaki bir kütüphane veya CSS ile gerçekleştirilir). `isSelected`, `isIsolated` ve `isHidden` bayrakları, öğenin görünürlüğü ve vurgulanma durumunu dinamik olarak değiştirir.
+**Ne yapar**: BoxAndBase, HVAC ürün görselleştirme sisteminde 3D sahnede bir kutu ve temel (base) birleşiğini temsil eden React bileşenidir. Bu bileşen, ürünün ana gövdesini ve üzerindeki kutu bölümünü three.js tabanlı 3D ortamda render eder.
+
+**Nasıl yapar**: Bileşen, aldığı durum parametrelerine göre 3D nesnenin görünürlüğünü, izolasyon durumunu ve seçim durumunu kontrol eder. Explode parametresi ile bileşenlerin birbirinden ayrılma animasyonunu yönetir. Kullanıcı etkileşimi için onClick handler'ı ile tıklama olaylarını işler.
 
 **Parametreler**:
-- isSelected: boolean — Bileşenin şu anda seçili olup olmadığını gösterir.
-- isIsolated: boolean — Bileşenin izole edilip edilmediğini (tekil görünüm) belirtir.
-- isHidden: boolean — Bileşenin gizlenip gizlenmediğini belirler.
-- onClick: function — Bileşene tıklandığında çağrılan geri çağırım fonksiyonu.
-- explode: (type?) — Patlama animasyonunu tetikleyen isteğe bağlı bayrak; varsayılan değeri kod parçacığında belirtilmemiştir.
+- isSelected: boolean — Bileşenin şu anda seçili olup olmadığını belirtir. Seçili durumda görsel geri bildirim (highlight) uygulanır.
+- isIsolated: boolean — Bileşenin izole modda olup olmadığını belirtir. İzole modda bileşen tek başına vurgulanarak gösterilir.
+- isHidden: boolean — Bileşenin gizli olup olmadığını belirtir. true değerinde bileşen 3D sahneden kaldırılır.
+- onClick: () => void — Bileşene tıklandığında tetiklenen geri çağırım fonksiyonu. Kullanıcı etkileşimini üst bileşene iletir.
+- explode: number (varsayılan: 0) — Bileşenler arasındaki ayrılma mesafesini kontrol eden sayısal değer. 0'da bileşenler birleşik, artan değerlerde birbirinden uzaklaşır.
 
-**Dönüş**: React.FC<BoxAndBaseProps> türünde bir işlev döndürür; bu işlev, verilen prop’lara göre BoxAndBase bileşenini render eder ve JSX çıktısı üretir.
+**Dönüş**: React.FC<BoxAndBaseProps> — BoxAndBaseProps arayüzü ile tanımlı özelliklere sahip React fonksiyonel bileşeni döndürür.
 
 ---
 
@@ -96,4 +105,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

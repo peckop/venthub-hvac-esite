@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\InViewCounter.tsx
 skeleton_hash: 9c5b62f840a3b577
-generated_at: 2026-05-23T22:10:31Z
+entity_hashes:
+  func:InViewCounter: 223b6183b16e2873
+  overview: 61076e120659900f
+  style_tokens: 2ef2cd2897b38d9e
+generated_at: 2026-05-28T22:36:00Z
 ---
 
 ## Genel Bakış
@@ -33,7 +37,7 @@ Bu varsayımlar, modülün fonksiyon imzalarından ve tipik React davranışlar�
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### InViewCounter
 **Ne yapar**: Görünür alana girdiğinde sayısal değeri belirtilen sürede animasyonlu olarak artan bir sayaç bileşeni render eder.  
@@ -152,4 +156,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-white`, `border-light-gray`, `text-4xl`, `text-center`, `text-primary-navy`, `text-steel-gray`
 - **Layout:** `p-6`
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `mt-1`, `rounded-2xl`, `tabular-nums`

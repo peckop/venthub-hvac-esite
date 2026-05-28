@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\CategoriesShowcase.tsx
 skeleton_hash: f358893d4842d0e3
-generated_at: 2026-05-23T21:57:46Z
+entity_hashes:
+  func:CategoriesShowcase: 7ceefb1e66be0555
+  overview: 0e322bf2da6b6e91
+  style_tokens: bfb925fbc086f215
+generated_at: 2026-05-28T22:35:44Z
 ---
 
 ## Genel Bakış
@@ -22,7 +26,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoriesShowcase
 **Ne yapar**: Kategorileri görsel bir vitrinde gösteren bir React bileşeni render eder.  
@@ -95,6 +99,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-light-gray`, `from-air-blue`, `md:text-4xl`, `text-2xl`, `text-3xl`, `text-center`, `text-gold-accent`, `text-industrial-gray`, `text-primary-navy`, `text-secondary-blue`, `text-sm`, `text-steel-gray`
-- **Layout:** `flex`, `flex-1`, `from-air-blue`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `group-hover:scale-110`, `group-hover:text-primary-navy`, `group-hover:text-secondary-blue`, `group-hover:translate-x-1`, `hover:shadow-hvac`, `hover:shadow-sm`, `inline-flex`, `items-center`
-- **Responsive:** `lg:`, `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-br`, `bg-primary-navy`, `bg-white`, `border-light-gray`, `from-air-blue`, `group-hover:text-primary-navy`, `group-hover:text-secondary-blue`, `hover:bg-secondary-blue`, `hover:border-secondary-blue`, `md:text-4xl`, `text-2xl`, `text-3xl`, `text-center`, `text-gold-accent`, `text-industrial-gray`
+- **Layout:** `flex`, `flex-1`, `from-air-blue`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `hover:shadow-hvac`, `hover:shadow-sm`, `inline-flex`, `items-center`, `justify-center`, `lg:grid-cols-4`, `max-w-3xl`, `max-w-7xl`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `duration-200`, `font-bold`, `font-medium`, `font-semibold`, `group`, `group-hover:scale-110`, `group-hover:translate-x-1`, `lg:px-8`, `mb-12`, `mb-16`, `mb-2`, `mb-3`, `mb-4`, `mb-8`

@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryAuthoritySection.tsx
 skeleton_hash: e879f0be7045ffd0
-generated_at: 2026-05-23T21:57:08Z
+entity_hashes:
+  func:CategoryAuthoritySection: 9f02783a8649aa44
+  overview: d22be28e083a031c
+  style_tokens: 5f18a598ea81d3a4
+generated_at: 2026-05-28T22:35:44Z
 ---
 
 ## Genel Bakış
@@ -26,7 +30,7 @@ Bu modül, `content` propunun sağlanması ve belirli bir yapıda olması üzeri
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryAuthoritySection
 **Ne yapar**: Kategori sayfasında otorite içeriğini (örneğin metin blokları, görseller veya diğer bileşenler) gösteren bir sarmalayıcı React bileşenidir.  
@@ -77,4 +81,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** (yok)
-- **Responsive:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `mt-12`

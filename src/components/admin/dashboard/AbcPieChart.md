@@ -4,39 +4,39 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\AbcPieChart.tsx
 skeleton_hash: d9fe34c63e3b0a63
-generated_at: 2026-05-23T21:51:41Z
+entity_hashes:
+  func:AbcPieChart: 7bea9a0163aecd5b
+  overview: fae5c7b54ba69454
+  style_tokens: cc7ba7a958715321
+generated_at: 2026-05-28T22:35:56Z
 ---
 
 ## Genel Bakış
-`AbcPieChart` bileşeni, yönetim panelindeki gösterge tablosunda ABC tipi verileri dairesel (pie) grafik olarak görselleştirir. Gelen veri ve başlık prop’larını kullanarak uygun bir grafik kütüphanesi aracılığıyla pasta grafiği oluşturur ve kullanıcı arayüzünde başlıkla birlikte sunar.
+Bu modül, yönetim panelindeki gösterge tablosunda ABC tipi verileri dairesel grafik (pie chart) olarak görselleştiren bir React bileşeni sunar. Veri ve opsiyonel başlık bilgisini alarak grafik oluşturur ve kullanıcı arayüzünde başlıkla birlikte sunar.
 
 ## Fonksiyon Grupları
-### Pasta Grafiği Oluşturma Grubu
-Veri ve başlık bilgilerini alarak pasta grafiğinin render edilmesinden ve ekranda gösterilmesinden sorumludur.
-- AbcPieChart (tek giriş noktası, prop’ları işler ve grafik bileşenini döndürür)
+### Pasta Grafiği Görselleştirme
+Bileşenin temel sorumluluğunu oluşturur: gelen veriyi ve başlığı işleyerek interaktif bir pasta grafiği bileşeni oluşturma ve ekranda gösterme.
+- AbcPieChart
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AbcPieChart
-**Ne yapar**:  
-Verilen `data` ve `title` prop'ları ile bir pasta grafiği (PieChart) bileşeni tanımlar. Bu bileşen, React ortamında çalışan bir UI elemanıdır ve görselleştirme amaçlı kullanılır.
+**Ne yapar**: Bu React bileşeni, ABC ürün sınıflandırması için interaktif bir pasta grafik gösterir. Veri yoksa veya tüm değerler sıfırsa boş durum ekranını, aksi halde detaylı bir pasta grafik ve merkezde toplam stok sayısını render eder.
 
-**Nasıl yapar**:  
-Bir React fonksiyon bileşenidir. `AbcPieChartProps` tipindeki parametre nesnesini alır; bu nesne üzerinden `data` ve `title` değerlerine erişir. Grafiğin çizim detayları (kullanılan kütüphane/harici bağımlılık) mevcut kod parçacığında belirtilmemiştir.
+**Nasıl yapar**: Fonksiyon, `data` dizisini kontrol ederek başlar: dizi boşsa veya tüm elemanların `value` değeri sıfırsa, `AdminEmptyState` bileşeniyle basit bir boş durum ekranı gösterir. Veri geçerliyse, dizideki tüm `value` değerlerinin toplamını hesaplar. Ardından, `ResponsiveContainer` ve `PieChart` bileşenlerini kullanarak donut (halka) grafik oluşturur. Her veri elemanı için renkli bir dilim (Cell) render eder, araç ipuçları (Tooltip) ve gösterge (Legend) ekler. Grafik merkezinde, hesaplanan toplam değeri "Toplam Stok" etiketiyle konumlandırır.
 
-**Parametreler**:  
-- `data`: `AbcPieChartProps['data']` (bileşenin prop tipinden gelir) — Pasta grafiğinin dilimlerini oluşturacak veri setidir.  
-- `title`: `AbcPieChartProps['title']` (bileşenin prop tipinden gelir) — Grafiğin üzerinde gösterilecek başlık metnidir.
+**Parametreler**:
+- `data`: array of objects — Grafikte gösterilecek veri dizisi. Her eleman en az `value` (number), `color` (string) ve muhtemelen `name` (string) özelliklerine sahip olmalıdır. `value`, stok miktarını veya sınıflandırma değerini; `color`, dilimin rengini belirtir.
+- `title`: string (isteğe bağlı) — Grafik başlığı. Belirtilmezse "ABC Ürün Sınıflandırması" varsayılan değeri kullanılır.
 
-**Dönüş**:  
-Fonksiyon bir React bileşeni olduğundan genellikle `JSX.Element` döndürür; ancak bu kod parçacığında dönüş tipi açıkça belirtilmemiştir (void veya bilinmiyor olarak not edilmiştir).
+**Dönüş**: JSX elementi — React bileşeni, koşullara bağlı olarak boş durum ekranını veya tam grafik arayüzünü içeren JSX döndürür. Doğrudan `void` döndürmez, React'ta bileşenler JSX döndürerek render işlemini gerçekleştirir.
 
 ---
 
@@ -50,19 +50,11 @@ Fonksiyon bir React bileşeni olduğundan genellikle `JSX.Element` döndürür; 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\AbcPieChart.tsx::AbcPieChart
-- **params**: 
-  - `data` — Bir dizi, her elemanı `value` (sayı) ve `color` (renk) özelliklerine sahip; gövdede `d.value`, `entry.color`, `data.value` (doğrudan) şeklinde erişilir
-  - `title` — String, opsiyonel başlık; gösterimde varsayılan "ABC Ürün Sınıflandırması" kullanılır
+### [N1_NASIL] AST Pointer: AbcPieChart.tsx::AbcPieChart
+- **params**: ({ data, title }: AbcPieChartProps)
 - **ic_degiskenler**: 
-  - `totalValue` — `data.reduce((acc, curr) => acc + curr.value, 0)` ile hesaplanan toplam değer, merkezde sergilenir
-  - `d` — `data.every(d => d.value === 0)` callback parametresi, her bir veri noktasını temsil eder; `d.value` ile sıfır kontrolü yapılır
-  - `entry` — `data.map((entry, index) => ...)` callback parametresi, her bir veri noktası; `entry.color` ile `Cell` dolgu rengi alınır
-  - `index` — `data.map((entry, index) => ...)` callback parametresi, `Cell` için benzersiz key (`cell-${index}`) oluşturulur
-  - `value (Tooltip formatter)` — `Tooltip` `formatter` fonksiyonunun ilk parametresi (`value: number`); tooltip'te `{value} Ürün` olarak görüntülenir
-  - `name (Tooltip formatter)` — `Tooltip` `formatter` fonksiyonunun ikinci parametresi (`name: string`); tooltip'te `{name} Sınıfı` olarak görüntülenir
-  - `value (Legend formatter)` — `Legend` `formatter` fonksiyonunun parametresi; etiket metni olarak `value` değişkeni doğrudan kullanılır
-- **Dönüş**: JSX.Element (boş veri veya tüm değerler sıfırsa `AdminEmptyState` bileşeni, aksi halde pasta grafik ve `Tooltip`/`Legend` içeren `PieChart` bileşeni)
+    - `totalValue` — data dizisindeki tüm elemanların value değerlerinin toplamı (stok adetlerinin toplamı)
+- **Dönüş**: JSX.Element (React bileşeni)
 
 ---
 
@@ -81,16 +73,13 @@ Fonksiyon bir React bileşeni olduğundan genellikle `JSX.Element` döndürür; 
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `min-h-[300px]`
-- **width:** (yok)
-- **spacing:** (yok)
-- **diğer:** `drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]`, `tracking-[0.3em]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`
+- `rounded-hvac-2xl`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-500/10`, `bg-cyan-500/30`, `bg-slate-900/40`, `border-white/5`, `text-4xl`, `text-slate-500`, `text-white`, `text-xs`
-- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `group-hover/pie:text-cyan-400`, `group-hover/pie:w-20`, `h-0.5`, `h-full`, `items-center`, `justify-center`, `left-1/2`, `p-10`, `relative`, `top-1/2`, `w-12`
-- **Responsive:** (yok)
+- **Renkler:** `bg-cyan-500/10`, `bg-cyan-500/30`, `bg-slate-900/40`, `border-white/5`, `group-hover/pie:text-cyan-400`, `text-4xl`, `text-slate-500`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `drop-shadow-pie-chart-glow`, `flex`, `flex-1`, `flex-col`, `group-hover/pie:w-20`, `h-0.5`, `h-full`, `items-center`, `justify-center`, `left-1/2`, `min-h-300px`, `p-10`, `relative`, `top-1/2`
+- **Varyant/Responsive:** `group-hover/pie:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `-mt-4`, `-translate-x-1/2`, `-translate-y-1/2`, `blur-3xl`, `border`, `cursor-pointer`, `duration-500`, `duration-700`, `font-black`, `group/pie`, `hover:opacity-80`, `inset-0`, `italic`, `mb-10`, `ml-1`

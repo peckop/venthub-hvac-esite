@@ -4,7 +4,11 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx
 skeleton_hash: 85f4afbf3aec26ee
-generated_at: 2026-05-23T22:35:14Z
+entity_hashes:
+  func:renderWithProviders: 836f0c3bce4ec02c
+  overview: 8400c9916e1ce4f6
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-28T22:38:52Z
 ---
 
 ## Genel Bakış
@@ -26,7 +30,7 @@ Bu React test modülü, AccountSecurityPage hesap güvenliği sayfasının test 
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### renderWithProviders
 **Ne yapar**: Test ortamlarında React bileşenlerini uygulamanın gerçek çalışma bağlamına uygun şekilde render etmek için geliştirilmiş test yardımcı fonksiyonudur. Özellikle AccountSecurityPage testlerinde kullanılan bu fonksiyon, test edilen bileşenin ihtiyaç duyduğu tüm temel bağlamları sağlayarak güvenilir test sonuçları elde edilmesini sağlar.
@@ -230,3 +234,19 @@ Bu React test modülü, AccountSecurityPage hesap güvenliği sayfasının test 
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: renderWithProviders
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

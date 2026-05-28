@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\type-converters.ts
 skeleton_hash: 1897cef0915fb718
-generated_at: 2026-05-23T22:34:33Z
+entity_hashes:
+  func:isRecord: 8ce9e37872c18872
+  func:safeNumber: 2b963d2c4a44b8a1
+  func:safeString: c82cbd1b53f6b21c
+  overview: 7d1f2b251cf19bd1
+generated_at: 2026-05-28T22:38:51Z
 ---
 
 ## Genel Bakış
@@ -31,7 +36,7 @@ Bu modül, TypeScript ile yazılmış tip dönüşüm ve denetim yardımcı fonk
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### safeNumber
 **Ne yapar**: Bilinmeyen türdeki bir değeri güvenli şekilde sayıya dönüştürür. Dönüştürme işlemi başarısız olduğunda tanımlanmış yedek (fallback) sayı değerini döndürür, tüm giriş türlerini güvenli şekilde işleyerek tür uyumsuzluğu hatalarının önüne geçer.

@@ -4,57 +4,72 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\category\CategoryLandingView.tsx
 skeleton_hash: 9b3dfdcebd3ed014
-generated_at: 2026-05-23T22:39:47Z
+entity_hashes:
+  func:CategoryLanding: b0e985c1d7bd0b2f
+  func:handleScrollToTarget: ca9eaec6204d6f95
+  func:handleShowProducts: 47b7e50dc0139438
+  overview: c1d17bc81964dbf7
+  style_tokens: 8da382602e458dce
+generated_at: 2026-05-28T22:39:59Z
 ---
 
 ## Genel Bakış
-Bu modül, ürün platformunun kategori ana sayfa görünümünü oluşturan React bileşenini barındırır. Gelen kategori bilgisi, ilgili ürünler ve alt kategoriler verilerini kullanarak kullanıcı arayüzünü render eder, kullanıcı etkileşimlerini yöneterek sorunsuz bir gezinme deneyimi sunar.
+Bu modül, HVAC ürün platformunun bir kategori sayfasının ana görünümünü ve kullanıcı etkileşimlerini yönetir. Kategori verileri, ürün listesi ve alt kategori yapısını alarak kullanıcıya düzenli bir arayüz sunar ve sayfa içi gezinme fonksiyonlarını sağlar.
 
 ## Fonksiyon Grupları
-### Ana Kategori Sayfası Bileşeni
-Kategori, ürün ve alt kategori verilerini alarak kategori ana sayfasının tüm arayüzünü oluşturan ana React bileşenidir, sayfanın temel işleyişini yönetir.
+### Ana Sayfa Bileşeni
+Kategori, ürün ve alt kategori verilerini kullanarak sayfanın tüm ana arayüzünü render eden temel React bileşenini temsil eder.
 - CategoryLanding
 
-### Kullanıcı Etkileşimi İşleyicileri
-Kullanıcıların sayfa içi aksiyonlarını yöneterek, istenen sayfa bölümüne kaydırma ve ürün listesini görüntüleme gibi kullanıcı taleplerini gerçekleştirir.
+### Kullanıcı Etkileşim İşleyicileri
+Sayfa içindeki kullanıcı aksiyonlarını yönetir, belirli bir bölüme kaydırma ve ürün listesini gösterme gibi navigasyon ve görüntüleme taleplerini işler.
 - handleScrollToTarget, handleShowProducts
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu HVAC platformu kategori açılış sayfası modülünün doğru çalışması için aldığı zorunlu prop'ların eksiksiz ve doğru formatta iletilmesi, dahili fonksiyonların hedeflediği DOM elemanlarının sayfada mevcut olması zorunludur.
 
-[Aksiyom 1]: Eğer CategoryLanding ana bileşenine zorunlu olarak iletilmesi gereken category prop'u iletilmezse, kategori temel bilgilerine erişilemez, sayfa içeriği hatalı veya boş render edilir.
-[Aksiyom 2]: Eğer CategoryLanding ana bileşenine zorunlu olarak iletilmesi gereken products prop'u iletilmezse, kategoriye ait ürün listesi hiç görüntülenemez.
-[Aksiyom 3]: Eğer handleScrollToTarget fonksiyonuna parametre olarak iletilen targetId değerine sahip herhangi bir DOM elemanı sayfada mevcut değilse, kaydırma işlemi gerçekleşmez, kullanıcı ilgili bölüme yönlendirilemez.
-[Aksiyom 4]: Eğer handleShowProducts fonksiyonunun çalışması için gerekli olan ürün listesi kapsayıcı DOM elemanı sayfada mevcut değilse, ürün gösterimi tetikleme işlemi başarısız olur.
-[Aksiyom 5]: Eğer subCategories prop'una dizi formatı dışında bir veri tipi iletilirse, alt kategori listesi hatalı render edilir veya hiç görüntülenmez.
+Bu modül, kategori ana sayfası görünümünü oluşturan bir React bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer `category` prop'u sağlanmazsa veya geçerli bir kategori nesnesi içermiyorsa, bileşen kategori adını, açıklamasını veya ilgili diğer bilgileri doğru şekilde görüntüleyemez ve sayfa yapısı bozulabilir.
+
+[Aksiyom 2]: Eğer `products` prop'u sağlanmazsa veya geçerli bir dizi içermiyorsa, bileşen ürün listesini render edemez ve kategori sayfasında ürün bölümü boş veya hatalı görünür.
+
+[Aksiyom 3]: Eğer `subCategories` prop'u sağlanmazsa (varsayılan olarak boş dizi `[]` kullanılır), bileşen alt kategori bölümünü göstermez veya alt kategori navigasyonu çalışmaz; bu durum normal ve beklenen bir durumdur.
+
+[Aksiyom 4]: Eğer `handleScrollToTarget` fonksiyonu bir `targetId` parametresi almadan çağrılırsa veya geçersiz bir `targetId` verilirse, fonksiyon ilgili sayfa bölümüne kaydırma işlemini gerçekleştiremez ve kullanıcı deneyimi olumsuz etkilenir.
+
+[Aksiyom 5]: Eğer `handleShowProducts` fonksiyonu çağrıldığında sayfada görüntülenecek ürün verisi (`products`) mevcut değilse, fonksiyon ürün listesini gösterme işlemini başlatamaz veya boş bir liste görüntüler.
+
+[Aksiyom 6]: Bileşen, `category` ve `products` verilerinin asenkron olarak yüklenmesini bekleyebilir; bu veriler henüz hazır değilken bileşenin render edilmesi durumunda geçici bir yükleme durumu (loading) veya boş bir arayüz gösterilmelidir (bu durum bileşen içinde yönetilmelidir).
+
+[Aksiyom 7]: `handleScrollToTarget` ve `handleShowProducts` fonksiyonları, React bileşeninin yaşam döngüsü içinde uygun bağlamlarda (örneğin, bir buton tıklaması veya belirli bir koşul gerçekleştiğinde) tetiklenmelidir; aksi takdirde kullanıcı etkileşimleri beklenen sonucu vermez.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### CategoryLanding
-**Ne yapar**: VentHub HVAC projesinin kategori ana sayfa görünümünü oluşturan ana React bileşenidir. İlgili kategoriye ait ürünleri ve alt kategorileri alarak kullanıcıya sunan, kategori sayfalarının temel yapısını oluşturan bir arayüz bileşenidir. Ziyaretçilerin kategorinin tüm içeriğini düzenli bir şekilde keşfetmesini sağlamak için tasarlanmıştır.
-**Nasıl yapar**: Tanımında belirtilen CategoryLandingProps tipini kullanarak aldığı tüm prop'ların tip güvenliğini sağlar, gelen kategori, ürün ve alt kategori verilerini önceden tanımlı sayfa düzenine yerleştirerek arayüzü kullanıcıya sunar. src/views/category/CategoryLandingView.tsx dosyasında tanımlı olan bu bileşen, projenin tüm farklı kategori sayfaları için tekrar kullanılabilir şekilde yapılandırılmıştır.
+**Ne yapar**: Bu fonksiyon, bir kategori sayfasının ana görünümünü oluşturan React functional component'idir. Kategori bilgilerini, alt kategorileri ve ürün listesini alarak ilgili sayfayı render eder.
+**Nasıl yapar**: `React.FC<CategoryLandingProps>` tipinde bir React component'idir. Fonksiyon, gelen props'ları (category, products, subCategories) işleyerek JSX ile kategori landing sayfasının yapısını döndürür.
 **Parametreler**:
-- category: Category — Görüntülenecek ana kategorinin tüm detaylarını (isim, açıklama, kapak görseli vb.) içeren özel nesne tipi
-- products: Product[] — İlgili ana kategoriye ait tüm ürünlerin detaylarını içeren nesne dizisi
-- subCategories: Category[] — Ana kategoriye bağlı alt kategorilerin detaylarını içeren nesne dizisi, varsayılan olarak boş dizi atanmış ve opsiyonel bir parametredir
-**Dönüş**: React.FC<CategoryLandingProps> tipinde bir React bileşeni döndürür, bu bileşen aldığı prop'lar ile kategori ana sayfasını tarayıcıda kullanıcıya render eder.
+- `category`: CategoryLandingProps tipinde (özel tip) — Görüntülenecek ana kategori nesnesini temsil eder. Kategori adı, açıklaması gibi bilgileri içerir.
+- `products`: CategoryLandingProps tipinde (özel tip) — Bu kategoriye ait ürün listesini barındıran dizi. Her bir ürün nesnesi product detaylarını tutar.
+- `subCategories`: CategoryLandingProps tipinde (özel tip, opsiyonel) — Kategorinin alt kategorilerini içeren dizi. Varsayılan değeri boş dizi `[]`'dir.
+**Dönüş**: JSX elementi döndürür. Sayfanın tüm görsel yapısını ve mantığını içeren React bileşenini render eder.
 
 ### handleScrollToTarget
-**Ne yapar**: Kategori sayfası içindeki belirli bir bölüme otomatik kaydırma işlemini gerçekleştiren yardımcı fonksiyondur. Genellikle alt kategori bağlantılarına veya sayfa içi bölümler arası geçiş butonlarına tıklandığında tetiklenerek kullanıcının istediği içeriğe kolayca ulaşmasını sağlar. Sayfa içi navigasyon deneyimini iyileştirmek için tasarlanmış basit bir etkileşim fonksiyonudur.
-**Nasıl yapar**: Parametre olarak aldığı hedef ID değeri ile tarayıcının DOM ağacından ilgili HTML elementini bulur, bulunan elementin konumuna tarayıcının yerleşik kaydırma API'lerini kullanarak geçiş yapar. Genellikle yumuşak kaydırma animasyonu ile kullanıcının konum değişikliğini rahatça algılamasını sağlar.
+**Ne yapar**: Verilen bir HTML element ID'sine (targetId) sahip sayfadaki hedef elemana yumuşak kaydırma (smooth scroll) işlemi başlatır.
+**Nasıl yapar**: Parametre olarak bir `targetId` string'i alır. `document.getElementById` metoduyla bu ID'ye sahip DOM elementini bulur ve `scrollIntoView` methodunu çağırarak sayfayı o elemana kaydırır. Varsayılan olarak yumuşak kaydırma davranışı (`behavior: 'smooth'`) kullanılır.
 **Parametreler**:
-- targetId: string — Kaydırma işleminin hedefleyeceği HTML elementinin benzersiz kimlik (id) değeri
-**Dönüş**: Herhangi bir değer döndürmez, işlevi sadece DOM üzerindeki kaydırma işlemini tetiklemektir, dönüş tipi void olarak tanımlanır.
+- `targetId`: string — Kaydırma işleminin hedefi olacak HTML elementinin `id` örneği. Örneğin `'products-anchor'`.
+**Dönüş**: Fonksiyon herhangi bir değer döndürmez (`void`). Eylemi doğrudan tarayıcı penceresindeki kaydırma durumunu değiştirerek执行 eder.
 
 ### handleShowProducts
-**Ne yapar**: Kategori ana sayfasında ürün listesiyle etkileşimi yöneten kullanıcı eylemi fonksiyonudur. Genellikle "Tüm Ürünleri Göster" gibi bir çağrı butonuna tıklandığında tetiklenir, kullanıcının kategori içindeki ürünlere hızlıca erişmesini sağlar. Kategori sayfasındaki temel etkileşim noktalarından birini yöneterek kullanıcı deneyimini basitleştirir.
-**Nasıl yapar**: Tetiklendiğinde ya sayfa içindeki ürünler bölümüne otomatik kaydırma yapar ya da varsayılan olarak gizli tutulan ürün listesinin görünürlüğünü açarak kullanıcının içeriği görmesini sağlar. Sayfanın yerel durumunu veya DOM öğelerini doğrudan kullanarak işlemlerini gerçekleştirir.
-**Parametreler**: Herhangi bir dış parametre almaz, doğrudan sayfa üzerindeki yerel durum veya DOM öğeleriyle etkileşim kurar.
-**Dönüş**: Herhangi bir değer döndürmez, dönüş tipi void olarak tanımlanır, sadece ilgili kullanıcı arayüzü eylemini gerçekleştirir.
+**Ne yapar**: Ürün listesini gösteren bölümü görünür hale getirir ve ardından sayfayı bu bölümün bulunduğu ankere kaydırarak kullanıcının ürünlere odaklanmasını sağlar.
+**Nasıl yapar**: Bu bir event handler fonksiyonudur. İçerisinde `setShowProducts(true)` çağrısı yaparak durum değişkenini günceller (muhtemelen `use useState` hook'undan gelen bir state). Ardından `setTimeout` ile kısa bir gecikme (100ms) sonrası `handleScrollToTarget` fonksiyonunu `'products-anchor'` parametresiyle çağırarak sayfayı ilgili bölüme kaydırır. Gecikme, DOM'un güncellenmesine zaman tanımak için kullanılır.
+**Parametreler**: Parametre almaz.
+**Dönüş**: Fonksiyon herhangi bir değer döndürmez (`void`). Yan etkileri (durum güncelleme ve kaydırma) vardır.
 
 ---
 
@@ -69,100 +84,88 @@ Bu HVAC platformu kategori açılış sayfası modülünün doğru çalışması
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategoryLandingView.tsx::CategoryLanding
-- **params**: category, products, subCategories = []
+### [N1_NASIL] AST Pointer: CategoryLandingView.tsx::CategoryLanding
+- **params**: `(category, products, subCategories = [])`
+  - `category` — ana kategori nesnesi (DomainCategory), slug, parent_id, image_url içerir
+  - `products` — bu kategorideki ürünlerin dizisi (DomainProduct[])
+  - `subCategories` — alt kategoriler dizisi, varsayılan boş dizi
 - **ic_degiskenler**:
-  - `wrapCategory` — useCategoryViewModel hook'undan alınan kategori sarmalama fonksiyonu
-  - `showProducts` — ürün listesinin görünürlüğünü kontrol eden state değeri
-  - `setShowProducts` — showProducts state'ini güncelleyen setter fonksiyonu
-  - `activeFilter` — ürün filtrelemede kullanılan aktif filtre state değeri
-  - `setActiveFilter` — activeFilter state'ini güncelleyen setter fonksiyonu
-  - `wizardOpen` — ihtiyaç sihirbazının açık/kapalı durumunu tutan state değeri
-  - `setWizardOpen` — wizardOpen state'ini güncelleyen setter fonksiyonu
-  - `disableAnimation` — animasyonların devre dışı olup olmadığını kontrol eden state değeri
-  - `setDisableAnimation` — disableAnimation state'ini güncelleyen setter fonksiyonu
-  - `productListRef` — ürün listesi div elementine erişmek için kullanılan ref nesnesi
-  - `vm` — mevcut kategorinin wrapCategory ile sarmalanmış view model'i
-  - `parentVm` - üst kategorinin (varsa) sarmalanmış view model'i
-  - `isAirCurtain` — mevcut kategorinin hava perdesi kategorisi olup olmadığını belirten boolean
-  - `isSilentFan` — mevcut kategorinin sessiz fan kategorisi olup olmadığını belirten boolean
-  - `isDehumidifier` — mevcut kategorinin nem alma cihazı kategorisi olup olmadığını belirten boolean
-  - `breadcrumbItems` — sayfada gösterilen ekmek kırıntısı öğelerini içeren dizi
-  - `heroImage` — ana görselin kaynak URL'si
-  - `animTimer` — animasyonları gecikmeli başlatmak için kullanılan timeout ID'si
-  - `handleScrollToTarget` — belirtilen ID'ye sahip DOM elementine yumuşak kaydırma yapan yardımcı fonksiyon
-  - `handleShowProducts` — ürün listesini görünür yapıp kaydırma işlemini tetikleyen fonksiyon
-  - `filteredProducts` — aktif filtreye göre süzülmüş ürün listesi
-- **Dönüş**: JSX element (React bileşen çıktısı)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategoryLandingView.tsx::useEffectCleanup
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `animTimer` — önceki useEffect'te tanımlanan timeout nesnesi, temizlemek için kullanılır
-- **Dönüş**: yok
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategoryLandingView.tsx::handleScrollToTarget
-- **params**: targetId: string
-- **ic_degiskenler**:
-  - `anchor` — targetId ile bulunan hedef DOM elementini tutan değişken
-- **Dönüş**: yok
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategoryLandingView.tsx::handleShowProducts
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `setShowProducts` — ürün listesi görünürlüğünü açmak için kullanılan üst kapsam state setter'ı
-  - `handleScrollToTarget` — ürünler bölümüne kaydırma yapmak için çağrılan üst kapsam fonksiyonu
-- **Dönüş**: yok
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategoryLandingView.tsx::productFilterCallback
-- **params**: p: DomainProduct
-- **ic_degiskenler**:
-  - `activeFilter` — üst kapsamdaki aktif filtre değeri, filtreleme koşullarında kullanılır
-  - `p.noise_level` — işlemdeki ürünün gürültü seviyesi, sessiz filtresi için kontrol edilir
-- **Dönüş**: boolean (ürünün filtreden geçip geçmediğini belirten değer)
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategoryLandingView.tsx::filterButtonMapCallback
-- **params**: f
-- **ic_degiskenler**:
-  - `f.key` — filtre benzersiz anahtarı, buton key'i ve aktiflik kontrolü için kullanılır
-  - `f.label` — butonda gösterilecek filtre metni
-  - `setActiveFilter` — butona tıklandığında aktif filtreyi güncellemek için kullanılan üst kapsam setter'ı
-  - `activeFilter` — butonun aktif durumunu belirlemek için kullanılan üst kapsam state değeri
-- **Dönüş**: JSX element (filtre butonu bileşeni)
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\category\CategoryLandingView.tsx::productCardMapCallback
-- **params**: p
-- **ic_degiskenler**:
-  - `p.id` — ürün benzersiz ID'si, ProductCard bileşeninin key değeri olarak kullanılır
-  - `ProductCard` — ürün kartı bileşeni, ürün verileriyle birlikte çağrılır
-- **Dönüş**: JSX element (ürün kartı bileşeni)
+  - `wrapCategory` — `useCategoryViewModel()` hook'undan dönen kategori view model sarmalama fonksiyonu
+  - `showProducts` — `useState(false)`, ürün listesinin gösterilip gizleneceğini kontrol eden boolean state
+  - `activeFilter` — `useState<string>('all')`, ürün filtreleme durumu ('all' veya 'quiet')
+  - `wizardOpen` — `useState(false)`, needs wizard modalının açık/kapalı durumunu tutan state
+  - `disableAnimation` — `useState(true)`, ilk yüklemede animasyonları devre dışı bırakan boolean, 300ms sonra false olur
+  - `productListRef` — `useRef<HTMLDivElement>(null)`, ürün listesi div'ine DOM erişimi sağlayan ref
+  - `vm` — `wrapCategory(category)`, ana kategorinin view model karşılığı (displayName, description, slug içerir)
+  - `parentVm` — `wrapCategory(subCategories.find(s => s.id === category.parent_id))`, üst kategorinin view model karşılığı (bulunamazsa undefined)
+  - `isAirCurtain` — `category.slug === 'air-curtains'` karşılaştırması, boolean, hava perdesi kategorisi olup olmadığını belirler
+  - `isSilentFan` — `category.slug === 'quiet-duct-fans'` karşılaştırması, boolean, sessiz fan kategorisi olup olmadığını belirler
+  - `isDehumidifier` — `category.slug === 'dehumidifiers'` karşılaştırması, boolean, nem alıcı kategorisi olup olmadığını belirler
+  - `breadcrumbItems` — breadcrumb öğeleri dizisi, Ana Sayfa + (varsa üst kategori) + mevcut kategori
+  - `heroImage` — `category.image_url || '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'`, hero bölümündeki görselin URL'i
+  - `filteredProducts` — `products.filter(...)`, activeFilter'a göre filtrelenmiş DomainProduct dizisi
+- **Dönüş**: JSX — kategori landing sayfasının tam render'ı (hero, içerik bölümleri, ürün listesi, CTA, wizard)
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki ana fonksiyon CategoryLanding(), sayfa içi hedefe kaydırma işlemini yönetmek için `handleScrollToTarget` fonksiyonunu, ürün listesini kullanıcıya sunmak içinse `handleShowProducts` fonksiyonunu çağırmaktadır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
+### [N2_NASIL] AST Pointer: CategoryLandingView.tsx::useEffect (animasyon timer)
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `animTimer` — `setTimeout(() => setDisableAnimation(false), 300)` sonucu, 300ms sonra animasyonları etkinleştiren timer ID'si
+- **Dönüş**: cleanup fonksiyonu — `clearTimeout(animTimer)` ile timer'ı temizler
 
 ---
 
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  CategoryLanding() → handleScrollToTarget()
-  CategoryLanding() → handleShowProducts()
+### [N3_NASIL] AST Pointer: CategoryLandingView.tsx::handleScrollToTarget
+- **params**: `(targetId: string)`
+  - `targetId` — kaydırılacak hedef DOM elementinin id niteliği (ör: 'products-anchor', 'landing-content')
+- **ic_degiskenler**:
+  - `anchor` — `document.getElementById(targetId)` ile bulunan DOM elementi, bulunamazsa null
+- **Dönüş**: yok — elementi bulursa `scrollIntoView({ behavior: 'smooth' })` ile yumuşak kaydırma yapar
 
+---
+
+### [N4_NASIL] AST Pointer: CategoryLandingView.tsx::handleShowProducts
+- **params**: (yok)
+- **ic_degiskenler**: (yok — doğrudan setShowProducts ve handleScrollToTarget çağırır)
+- **Dönüş**: yok — `setShowProducts(true)` ile ürün listesini gösterir, 100ms sonra `handleScrollToTarget('products-anchor')` ile ürünlere kaydırır
+
+---
+
+### [N5_NASIL] AST Pointer: CategoryLandingView.tsx::filteredProducts (filter callback)
+- **params**: `(p: DomainProduct)`
+  - `p` — filtrelenen DomainProduct nesnesi, `noise_level` alanına erişilir
+- **ic_degiskenler**: (yok)
+- **Dönüş**: boolean — `activeFilter === 'all'` ise true; `activeFilter === 'quiet'` ise `Number(p.noise_level) || 100 <= 50` koşulu; diğer durumlarda true
+
+---
+
+### [N6_NASIL] AST Pointer: CategoryLandingView.tsx::filter button render (map callback)
+- **params**: `(f)`
+  - `f` — `{ key: string, label: string }` yapısındaki filtre nesnesi (ör: `{ key: 'all', label: 'Tüm Modeller' }`)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `button` elementi, `onClick` ile `setActiveFilter(f.key)` çağırır, aktif filtreye göre farklı CSS sınıfları uygular
+
+---
+
+### [N7_NASIL] AST Pointer: CategoryLandingView.tsx::product render (map callback)
+- **params**: `(p)`
+  - `p` — haritalanan DomainProduct nesnesi, `id` alanına erişilir
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `ProductCard` component'i, `key={p.id}`, `product={p}`, `layout="grid"` props'ları ile render edilir
+
+---
+
+
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    CategoryLanding["CategoryLanding()"] --> handleScrollToTarget["handleScrollToTarget()"]
-    CategoryLanding["CategoryLanding()"] --> handleShowProducts["handleShowProducts()"]
+graph TD
+    CategoryLandingView_tsx__CategoryLanding["CategoryLanding"]
+    CategoryLandingView_tsx__handleScrollToTarget["handleScrollToTarget"]
+    CategoryLandingView_tsx__handleShowProducts["handleShowProducts"]
+    CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleScrollToTarget
+    CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleShowProducts
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -175,3 +178,19 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryLanding
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-3xl`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-l`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-secondary-blue/5`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `border-16`, `border-2`, `border-b`, `border-primary-navy/10`, `border-slate-100`, `border-slate-200`, `border-white`
+- **Layout:** `absolute`, `flex`, `flex-col`, `flex-wrap`, `from-secondary-blue/10`, `gap-16`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`, `grid-cols-2`, `h-full`, `items-center`
+- **Varyant/Responsive:** `:`, `active:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `${activeFilter`, `${disableAnimation`, `${showProducts`, `-inset-10`, `:`, `===`, `active:scale-95`, `animate-fadeIn`, `aspect-square`, `blur-3xl`, `border`, `duration-500`, `duration-hvac-glacial`, `ease-in-out`, `f.key`

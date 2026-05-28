@@ -4,7 +4,10 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts
 skeleton_hash: 2bed405d7e5d7641
-generated_at: 2026-05-23T22:30:14Z
+entity_hashes:
+  func:useHideOnScroll: 8147a4dacc20e5ab
+  overview: 5345c1edebb9abd4
+generated_at: 2026-05-28T22:37:45Z
 ---
 
 ## Genel Bakış
@@ -27,7 +30,7 @@ Bu React hook'u, tarayıcı ortamında çalışarak scroll hareketlerini dinleye
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### useHideOnScroll
 **Ne yapar**: Kullanıcıların scroll hareketlerini izleyerek UI elemanlarının görünürlüğünü dinamik olarak yönetmek için tasarlanmış özel bir React hookudur. Kullanıcının yukarı ya da aşağı yönde scroll yapıp yapmadığını, belirtilen scroll eşiğini geçip geçmediğini ve sayfanın en başında olup olmadığını tespit ederek tüm bu durum bilgilerini kullanıma sunar. Özellikle gezinme çubukları, bildirim bannerları gibi kaydırmayla birlikte görünürlüğünü değiştirmek istenen UI bileşenleri için gerekli state verilerini tek merkezden sağlar.

@@ -4,7 +4,12 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\CategoryOrbitCarousel.tsx
 skeleton_hash: 493ed60f0234b48a
-generated_at: 2026-05-23T22:26:36Z
+entity_hashes:
+  func:CategoryOrbitCarousel: f55930f20c5ff8c5
+  func:getModelTypeForCategory: d5b53316e0d1f0a0
+  overview: 81bcbf9882608552
+  style_tokens: 47138b5b4fa0854f
+generated_at: 2026-05-28T22:37:01Z
 ---
 
 ## Genel Bakış
@@ -22,16 +27,20 @@ Gelen kategori benzersiz adres (slug) değerine göre uygun model tipini belirle
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Ürün kategorilerini kaydırılabilir carousel formatında sunan bu React bileşeni, doğru çalışması için prop olarak iletilen işlevlerin ve harici kategori çözümleme fonksiyonunun sistemde mevcut ve uyumlu veri tipleriyle iletilmiş olmasına tamamen bağlıdır.
 
-[Aksiyom 1]: Eğer CategoryOrbitCarouselProps içindeki zorunlu onSubcategorySelect işlevi sağlanmazsa, kullanıcının bir alt kategori seçmesi durumunda hiçbir işlem tetiklenmez, kategori seçim akışı tamamen kesintiye uğrar.
-[Aksiyom 2]: Eğer kategori çözümleme fonksiyonu getModelTypeForCategory projeye dahil edilmemişse, slug değerine göre uygun ürün modeli türü belirlenemediğinden carousel içindeki kategori kartları doğru içerikle doldurulamaz.
-[Aksiyom 3]: Eğer compact prop'u boolean veri tipi dışında bir türde iletilirse, tanımlı varsayılan false değeri devreye giremeyeceğinden carousel'in görünüm boyutlandırması hatalı çalışır, kullanıcı arayüzünün düzeni bozulur.
-[Aksiyom 4]: Eğer getModelTypeForCategory fonksiyonuna geçirilen slug parametresi geçerli bir kategori tanımlayıcısı değilse, eşleşen model türü döndürülemediğinden ilgili kategori öğesi carousel'de görüntülenemez.
+Bu modül için fonksiyon gövdeleri paylaşılmamıştır, bu nedenle yalnızca fonksiyon imzalarından çıkarılabilecek minimum mimari varsayımlar tanımlanmıştır.
+
+**[Aksiyom 1]:** Eğer `onSubcategorySelect` callback'i `CategoryOrbitCarousel` bileşenine verilmezse, alt kategori seçimi gerçekleştiğinde bileşen dışarıya herhangi bir seçim olayı bildiremez ve navigasyon tetiklenemez.
+
+**[Aksiyom 2]:** Eğer `compact` parametresi belirtilmezse, bileşen `compact = false` (geniş/standart görünüm) varsayılan değeriyle çalışır; bu nedenle bileşenin her iki görünüm modunu da (standart ve kompakt) desteklemesi beklenir.
+
+**[Aksiyom 3]:** Eğer `getModelTypeForCategory` fonksiyonuna `slug` parametresi geçirilmezse (undefined olursa), fonksiyonun bir fallback değer döndürmesi veya undefined davranışıyla başa çıkması beklenir; aksi halde karuselin içerik tiplendirmesi başarısız olur.
+
+**[Aksiyom 4]:** Eğer `onSubcategorySelect` null veya undefined olarak verilirse, bileşen içsel olarak hata fırlatmamalı veya sessizce başarısız olmamalıdır; bileşenin prop drilling (prop iletimi) sırasında bu duruma karşı korumalı olması beklenir.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### getModelTypeForCategory
 **Ne yapar**: İsteğe bağlı olarak gelen kategori slug değerine göre uygun ürün model tipini eşleştirip döndürür, kategori bazlı ürün sınıflandırması işlemini gerçekleştirir. Sadece tanımlı ve geçerli slug değerleri için geçerli bir model tipi sonucu üretir.
@@ -257,29 +266,6 @@ Gelen kategori benzersiz adres (slug) değerine göre uygun model tipini belirle
 
 ---
 
-## ÇAĞRI HARİTASI
-
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki CategoryOrbitCarousel() fonksiyonu, kategoriye ait model türünü almak için aynı dosyadaki getModelTypeForCategory fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı verisinde bu modülü kullanan herhangi bir dış dosya veya fonksiyon bilgisi kaydedilmemiştir.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  CategoryOrbitCarousel() → getModelTypeForCategory()
-
-```mermaid
-graph LR
-    CategoryOrbitCarousel["CategoryOrbitCarousel()"] --> getModelTypeForCategory["getModelTypeForCategory()"]
-```
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\products\CategoryOrbitCarousel.tsx
@@ -297,16 +283,13 @@ graph LR
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-- **shadow:** (yok)
-- **height:** `h-[400px]`
-- **width:** `max-w-[150px]`
-- **spacing:** (yok)
-- **diğer:** `active:scale-[0.98]`, `bg-[radial-gradient(circle_at_center,rgba(30,41,59,0.5)_0%,rgb(2,6,23)_70%)]`, `bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.15)_0%,rgb(2,6,23)_70%)]`, `hover:scale-[1.02]`
+Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `h-hvac-panel`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-r`, `bg-surface-darker`, `bg-white/10`, `border-white/20`, `from-cyan-500`, `md:text-3xl`, `sm:text-sm`, `text-center`, `text-cyan-400`, `text-sm`, `text-white`, `text-white/50`, `text-white/90`, `text-xl`, `text-xs`
-- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-col`, `from-cyan-500`, `gap-2`, `gap-3`, `group-hover:-translate-x-1`, `h-4`, `hover:shadow-cyan-500/30`, `hover:shadow-lg`, `items-center`, `justify-between`, `justify-center`, `left-0`
-- **Responsive:** `md:`, `sm:` prefix kullanımları
+- **Renkler:** `bg-gradient-to-r`, `bg-orbit-radial-1`, `bg-orbit-radial-2`, `bg-surface-darker`, `bg-white/10`, `border-white/20`, `from-cyan-500`, `hover:bg-white/20`, `md:text-3xl`, `sm:text-sm`, `text-center`, `text-cyan-400`, `text-sm`, `text-white`, `text-white/50`
+- **Layout:** `absolute`, `backdrop-blur-md`, `flex`, `flex-col`, `from-cyan-500`, `gap-2`, `gap-3`, `h-4`, `hover:shadow-cyan-500/30`, `hover:shadow-lg`, `items-center`, `justify-between`, `justify-center`, `left-0`, `max-w-150px`
+- **Varyant/Responsive:** `:`, `active:`, `group-hover:`, `hover:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${level`, `:`, `===`, `active:scale-98`, `border`, `container`, `duration-1000`, `duration-300`, `ease-in-out`, `font-bold`, `font-medium`, `group`, `group-hover:-translate-x-1`, `hover:scale-102`, `inset-0`

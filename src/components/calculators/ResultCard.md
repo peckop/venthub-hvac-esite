@@ -4,7 +4,14 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\calculators\ResultCard.tsx
 skeleton_hash: c0c64da9fa96646c
-generated_at: 2026-05-23T21:57:27Z
+entity_hashes:
+  func:Recommendations: 17d93b0b25d10f0e
+  func:ResultCard: 3c33f679c49530b1
+  func:ResultGrid: 1e8853c40a5113bf
+  func:getStatusConfig: 90a49b86c8e12ce2
+  overview: df7a2f788a297b2b
+  style_tokens: 8d8fc38c13829fd7
+generated_at: 2026-05-28T22:35:43Z
 ---
 
 ## Genel Bakış
@@ -36,7 +43,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### ResultCard
 **Ne yapar**: Hesaplama sonucunu bir kart içinde gösterir; kartın duruma göre renk kodlaması ve animasyonu uygulanır.  
@@ -47,13 +54,13 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - unit: type not specified — Değerin birimini ifade eden metin (örn. °C, kW)  
 - status: type not specified (default: 'info') — Kartın durumunu belirler; bu durum renk ve animasyon etkisini yönetir  
 - description: type not specified — Kartın altında gösterilecek ekstra açıklama metni  
-**Dönüş**: React.FC<ResultCardProps> — ResultCard fonksiyonel bileşeni  
+**Dönüş**: React.FC<ResultCardProps> — ResultCard fonksiyonel bileşeni
 
 ### getStatusConfig
 **Ne yapar**: Belirtilmemiş (docstring sağlanmadı)  
 **Nasıl yapar**: Bilinmiyor  
 **Parametreler**: (yok)  
-**Dönüş**: void veya bilinmiyor (belirtilmedi)  
+**Dönüş**: void veya bilinmiyor (belirtilmedi)
 
 ### ResultGrid
 **Ne yapar**: Belirtilmemiş (docstring sağlanmadı)  
@@ -61,7 +68,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 **Parametreler**:
 - children: type not specified — Grid içinde görüntülenecek alt öğeler (React elemanları veya bileşenler)  
 - title: type not specified — Grid'in üst kısmında gösterilecek başlık metni  
-**Dönüş**: React.FC<ResultGridProps> — ResultGrid fonksiyonel bileşeni  
+**Dönüş**: React.FC<ResultGridProps> — ResultGrid fonksiyonel bileşeni
 
 ### Recommendations
 **Ne yapar**: Belirtilmemiş (docstring sağlanmadı)  
@@ -136,28 +143,16 @@ type ResultStatus = 'optimal' | 'acceptable' | 'warning' | 'critical' | 'info'
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-- ResultCard() fonksiyonu, durum yapılandırmasını almak için getStatusConfig fonksiyonunu çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-- Bu modülü çağıran dış fonksiyon veya dosya bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-- İç içe fonksiyon yok.
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  ResultCard() → getStatusConfig()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    ResultCard["ResultCard()"] --> getStatusConfig["getStatusConfig()"]
+graph TD
+    ResultCard_tsx__Recommendations["Recommendations"]
+    ResultCard_tsx__ResultCard["ResultCard"]
+    ResultCard_tsx__ResultGrid["ResultGrid"]
+    ResultCard_tsx__getStatusConfig["getStatusConfig"]
+    ResultCard_tsx__ResultCard --> ResultCard_tsx__getStatusConfig
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -187,4 +182,5 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-secondary-blue/5`, `border-secondary-blue/20`, `text-2xl`, `text-3xl`, `text-industrial-gray`, `text-primary-navy`, `text-secondary-blue`, `text-sm`, `text-steel-gray`, `text-xs`
 - **Layout:** `col-span-full`, `flex`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `hover:shadow-md`, `items-baseline`, `items-center`, `items-start`, `justify-between`, `lg:grid-cols-3`, `md:col-span-2`, `md:grid-cols-2`, `p-4`
-- **Responsive:** `lg:`, `md:` prefix kullanımları
+- **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${config.bgColor`, `${config.borderColor`, `${large`, `:`, `border`, `duration-300`, `font-bold`, `font-medium`, `font-semibold`, `leading-relaxed`, `mb-2`, `mb-3`, `mb-4`, `mt-1`, `mt-2`

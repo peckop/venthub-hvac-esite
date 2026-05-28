@@ -16,7 +16,7 @@ entity_hashes:
   func:renderSuggestions: 8f7a31a904a04209
   overview: 1ded2cd49051df65
   style_tokens: dd6869457e23a7f7
-generated_at: 2026-05-27T18:09:20Z
+generated_at: 2026-05-28T22:36:57Z
 ---
 
 ## Genel Bakış  
@@ -295,13 +295,13 @@ graph TD
     SearchOverlay_tsx__renderResults["renderResults"]
     SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
     SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
 ```
 
 ## NODE ID STANDARD

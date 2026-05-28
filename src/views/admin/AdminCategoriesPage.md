@@ -4,7 +4,16 @@ source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx
 skeleton_hash: 7fff837cc68a3d80
-generated_at: 2026-05-23T22:36:52Z
+entity_hashes:
+  func:AdminCategoriesPage: cf2142f4b075dcd0
+  func:handleCreate: df124e23e226a1a4
+  func:handleDesign: 79d2c0f189098fb1
+  func:handleEdit: c5409fbf6f4f144a
+  func:load: fc235a1ebf177283
+  func:remove: 16990c02664975f8
+  overview: a35a906484de9e32
+  style_tokens: 0e730a4c2dea0604
+generated_at: 2026-05-28T22:39:02Z
 ---
 
 ## Genel Bakış
@@ -26,18 +35,24 @@ Yönetici kullanıcının arayüzde gerçekleştirdiği yeni kategori oluşturma
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-VentHub HVAC projesinin admin arayüzünde kategori yönetimi işlemlerini yürüten bu React bileşeninin doğru çalışması için tüm bağımlı UI bileşenleri, backend veri erişim servisleri ve yetkilendirme mekanizmalarının sağlıklı ve erişilebilir olması zorunludur.
 
-[Aksiyom 1]: Eğer load() fonksiyonunun kategorileri veritabanından çekmek için kullandığı veri servisi erişilebilir değilse, sayfa üzerindeki kategori listesi hiçbir zaman yüklenemez ve kullanıcı boş bir ekranla karşılaşır.
-[Aksiyom 2]: Eğer handleEdit() ve handleDesign() fonksiyonlarına parametre olarak iletilen DbCategory nesnesi erişilebilir değil veya eksik alanlara sahipse, ilgili kategori düzenleme ve tasarım akışları başlatılamaz.
-[Aksiyom 3]: Eğer remove() fonksiyonuna parametre olarak gönderilen string türündeki kategori kimliği geçersiz veya veritabanında mevcut değilse, kategori silme işlemi başarısız olur.
-[Aksiyom 4]: Eğer modülün kullandığı ColumnsMenu ve ExportMenu UI bileşenleri import edilemez veya çalıştırılamaz durumdaysa, sayfadaki sütun özelleştirme ve kategori listesi dışa aktarma işlevleri devre dışı kalır.
-[Aksiyom 5]: Eğer sayfaya erişen kullanıcının admin paneli kullanma yetkisi doğrulanamazsa, bu bileşen hiçbir zaman yüklenemez ve yetkisiz erişim hatası oluşur.
-[Aksiyom 6]: Eğer yeni kategori oluşturma işlemini yürüten handleCreate() fonksiyonunun bağlı olduğu backend oluşturma servisi çalışmıyorsa, hiçbir yeni kategori sisteme eklenemez.
+Bu modül, yönetici panelinde kategori yönetim arayüzü sağlayan bir React bileşenidir. Aşağıda yalnızca fonksiyon imzalarından ve modül sabitlerinden türetilebilen mimari varsayımlar listelenmektedir.
+
+**[Aksiyom 1]:** Eğer `ColumnsMenu` modülü import edilmemiş veya çalıştırılabilir (callable) durumda değilse, kategori tablosunda sütun menüsü arayüzüsunu gösteren bileşen kullanılamaz.
+
+**[Aksiyom 2]:** Eğer `ExportMenu` modülü import edilmemiş veya çalıştırılabilir (callable) durumda değilse, kategori verilerinin dışa aktarım menüsü sunulamaz.
+
+**[Aksiyom 3]:** Eğer `handleEdit(r: DbCategory)` fonksiyonu geçerli bir `DbCategory` nesnesi alamıyorsa (null veya undefined ise), düzenleme işlemi başlatılamaz.
+
+**[Aksiyom 4]:** Eğer `handleDesign(r: DbCategory)` fonksiyonu geçerli bir `DbCategory` nesnesi alamıyorsa (null veya undefined ise), tasarım/ayar düzenleme işlemi başlatılamaz.
+
+**[Aksiyom 5]:** Eğer `remove(id: string)` fonksiyonu geçerli bir string identifier alamıyorsa (boş string, null veya undefined ise), silme işlemi gerçekleştirilemez.
+
+**[Aksiyom 6]:** Eğer `load()` fonksiyonu tarafından erişilen veri kaynağı (API endpoint veya servis) erişilebilir durumda değilse, kategori listesi yüklenemez ve arayüz boş/hata durumunda kalır.
 
 ---
 
-## FONKSIYON DETAYLARI
+## FONKSİYON DETAYLARI
 
 ### AdminCategoriesPage
 **Ne yapar**: VentHub HVAC projesinin yönetici panelinde kategori yönetimi işlemlerinin sunulduğu ana React bileşenidir. Tüm kategori ekleme, düzenleme, silme ve tasarım işlemlerinin barındığı tek sayfa arayüzünü oluşturur.
@@ -227,34 +242,21 @@ VentHub HVAC projesinin admin arayüzünde kategori yönetimi işlemlerini yür�
 
 ---
 
-## ÇAĞRI HARİTASI
 
-### Disariya Cagrilar (Outgoing)
-Dosya içindeki ana AdminCategoriesPage() fonksiyonu, kategori yönetimi iş akışını çalıştırmak için aynı dosyadaki yükleme, düzenleme, silme ve tasarım işlemlerini yönetecek load, handleEdit, remove ve handleDesign fonksiyonlarını çağırır.
-
-### Disaridan Cagrilanlar (Incoming)
-Sağlanan çağrı verisinde bu modülü kullanan dış dosya veya fonksiyon bilgisi bulunmamaktadır.
-
-### Ic Ice Fonksiyonlar (Nested)
-Yok
-
----
-
-## DOSYA-İÇİ ÇAĞRI GRAFİĞİ
-  AdminCategoriesPage() → handleDesign()
-  AdminCategoriesPage() → handleEdit()
-  AdminCategoriesPage() → load()
-  AdminCategoriesPage() → remove()
-
+## MERMAID CALL GRAPH
 ```mermaid
-graph LR
-    AdminCategoriesPage["AdminCategoriesPage()"] --> handleDesign["handleDesign()"]
-    AdminCategoriesPage["AdminCategoriesPage()"] --> handleEdit["handleEdit()"]
-    AdminCategoriesPage["AdminCategoriesPage()"] --> load["load()"]
-    AdminCategoriesPage["AdminCategoriesPage()"] --> remove["remove()"]
+graph TD
+    AdminCategoriesPage_tsx__AdminCategoriesPage["AdminCategoriesPage"]
+    AdminCategoriesPage_tsx__handleCreate["handleCreate"]
+    AdminCategoriesPage_tsx__handleDesign["handleDesign"]
+    AdminCategoriesPage_tsx__handleEdit["handleEdit"]
+    AdminCategoriesPage_tsx__load["load"]
+    AdminCategoriesPage_tsx__remove["remove"]
+    AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__handleDesign
+    AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__load
+    AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__remove
+    AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__handleEdit
 ```
-
----
 
 ## NODE ID STANDARD
 
@@ -270,3 +272,19 @@ graph LR
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminCategoriesPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `tracking-hvac-snug`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-400`, `bg-indigo-500/10`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-700`, `bg-white/5`, `border-b`, `border-indigo-500/20`, `border-white/5`, `group-hover:border-cyan-400/30`, `group-hover:border-white/10`, `group-hover:text-cyan-400`, `group-hover:text-cyan-400/60`, `hover:bg-indigo-500`, `hover:bg-white/2`
+- **Layout:** `custom-scrollbar`, `flex`, `flex-col`, `gap-1.5`, `gap-2`, `gap-4`, `h-1`, `h-1.5`, `h-12`, `h-full`, `h-px`, `inline-block`, `items-center`, `items-start`, `justify-between`
+- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminTableActionClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${cellPad`, `${headPad`, `${r.parent_id`, `:`, `border`, `divide-white/5`, `divide-y`, `duration-300`, `duration-500`, `duration-700`, `font-black`
