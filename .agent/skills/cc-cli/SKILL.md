@@ -1,29 +1,29 @@
 ---
 name: cc-cli
 description: >
-  Corpus Callosum CLI dokümantasyon pipeline komutlarını öğretir. TETİKLE: Kullanıcı
+  Corpus Callosum (CC) CLI dokümantasyon pipeline komutlarını öğretir. TETİKLE: Kullanıcı
   "doküman üret", "md güncelle", "doc yap", "doc pipeline", "tree oluştur", "NLM sync",
-  "schema çıkar", "hook kur", "cc doc" dediğinde veya bir kod dosyası değişikliği sonrası
+  "schema çıkar", "hook kur", "orion doc" dediğinde veya bir kod dosyası değişikliği sonrası
   dokümantasyon güncellenmesi gerektiğinde. ASLA TETİKLEME: Kullanıcı sadece kod yazmak,
-  debug yapmak, test çalıştırmak veya CC CLI ile ilgisi olmayan işlemler istediğinde.
+  debug yapmak, test çalıştırmak veya Orion CLI ile ilgisi olmayan işlemler istediğinde.
 ---
 
-# CC CLI Dokümantasyon Pipeline
+# Corpus Callosum (CC) CLI Dokümantasyon Pipeline
 
-Bu skill, `corpus-callosum` paketinin `cc doc` komutlarını ve proje kurulumunu öğretir.
+Bu yetenek (Skill), projedeki kaynak koddan Markdown dokümantasyon üretir, bunları tek bir Master MD'de birleştirir ve otonom olarak NotebookLM'e yükler. Tüm dokümantasyon ve hafıza iş akışı `orion` veya `cc` CLI komutları üzerinden yürütülür.
 
 ## Ön Koşullar
 
-- `pip install -e corpus-callosum` (veya `pip install corpus-callosum`) kurulu olmalı
-- LLM backend: 9Router (`localhost:20128`) çalışıyor olmalı VEYA `OPENROUTER_API_KEY` tanımlı olmalı
+- `pip install -e orion-ai` (veya `pip install orion-ai`) kurulmuş olmalı
+- `OPENROUTER_API_KEY` ~/.orion/.env.keys veya ortam değişkeninde tanımlı olmalı
 - Tree-sitter dil paketleri: `pip install tree-sitter-javascript tree-sitter-typescript` (JS/TS projeleri için)
 
 ## Proje Kurulumu (Yeni Proje)
 
-Yeni bir projede CC CLI kullanmak için:
+Yeni bir projede Orion CLI kullanmak için:
 
 ```bash
-cc doc init
+orion doc init
 ```
 
 Bu komut:
@@ -52,67 +52,67 @@ extra_masters:
 
 2. Hook kur:
 ```bash
-cc doc install-hook
+orion doc install-hook
 ```
 
 ## Komutlar
 
-### cc doc all
+### orion doc all
 Tüm projeyi tarar, her kod dosyası için `.md` üretir.
 
 ```bash
-cc doc all                    # Sadece yeni/değişen dosyalar (hash kontrolü)
-cc doc all --changed-only     # Sadece son commit'ten beri değişenler
-cc doc all --force            # Tümünü sıfırdan üret (yavaş)
-cc doc all --workers 10       # Paralel worker sayısı (varsayılan: 10)
+orion doc all                    # Sadece yeni/değişen dosyalar (hash kontrolü)
+orion doc all --changed-only     # Sadece son commit'ten beri değişenler
+orion doc all --force            # Tümünü sıfırdan üret (yavaş)
+orion doc all --workers 10       # Paralel worker sayısı (varsayılan: 10)
 ```
 
-### cc doc batch
+### orion doc batch
 Belirli bir dizindeki dosyaları işler.
 
 ```bash
-cc doc batch --batch-dir supabase/functions           # Dizin belirt
-cc doc batch --batch-dir supabase/functions --force    # Sıfırdan üret
+orion doc batch --batch-dir supabase/functions           # Dizin belirt
+orion doc batch --batch-dir supabase/functions --force    # Sıfırdan üret
 ```
 
-### cc doc single
+### orion doc single
 Tek dosya için `.md` üretir.
 
 ```bash
-cc doc single --py-file src/components/Header.tsx --force
+orion doc single --py-file src/components/Header.tsx --force
 ```
 
-### cc doc schema
+### orion doc schema
 Supabase DB şemasını parse eder → `docs/database_schema_master.md` üretir.
 
 ```bash
-cc doc schema
+orion doc schema
 ```
 
 > Supabase olmayan projelerde bu komutu kullanma.
 
-### cc doc tree
+### orion doc tree
 Sistem ağacı oluşturur. NLM sync yapar.
 
 ```bash
-cc doc tree                                    # Sadece system_tree.md oluştur
-cc doc tree --nlm-sync                         # + NLM'e yükle
-cc doc tree --nlm-sync --force-sync            # + format hatalarını atla
+orion doc tree                                    # Sadece system_tree.md oluştur
+orion doc tree --nlm-sync                         # + NLM'e yükle
+orion doc tree --nlm-sync --force-sync            # + format hatalarını atla
 ```
 
-### cc doc changed
+### orion doc changed
 Git diff'teki değişen dosyaları tespit edip doc günceller.
 
 ```bash
-cc doc changed
+orion doc changed
 ```
 
-### cc doc install-hook
+### orion doc install-hook
 Pre-commit hook kurar. Her commit'te değişen dosyalar otomatik dokümante edilir.
 
 ```bash
-cc doc install-hook                                        # Mevcut dizin
-cc doc install-hook --workspace C:/Users/alize/venthub-hvac # Başka proje
+orion doc install-hook                                        # Mevcut dizin
+orion doc install-hook --workspace C:/Users/alize/venthub-hvac # Başka proje
 ```
 
 ## Tam Sync Workflow (NLM Güncelleme)
@@ -124,30 +124,30 @@ Mimari değişiklik sonrası NotebookLM'i güncellemek için sırayla:
 pip install --upgrade notebooklm-mcp-cli
 
 # 2. Kaynak koddan MD üret
-cc doc all --changed-only
+orion doc all --changed-only
 
 # 3. Extra master'lar varsa (supabase vb.)
-cc doc batch --batch-dir supabase/functions
+orion doc batch --batch-dir supabase/functions
 
 # 4. DB şeması varsa
-cc doc schema
+orion doc schema
 
 # 5. Master derle + NLM'e yükle
-cc doc tree --nlm-sync --force-sync
+orion doc tree --nlm-sync --force-sync
 ```
 
 ## Dikkat Edilmesi Gerekenler
 
 ### YAPMA
-- `cc doc tree` yerine kendi master derleme scriptin yazma — mevcut komut tüm filtreleri uygular
+- `orion doc tree` yerine kendi master derleme scriptin yazma — mevcut komut tüm filtreleri uygular
 - `--force` olmadan ilk çalıştırma yapma (hash olmadığı için hiçbir şey üretmez)
 - `source_dirs` dışındaki dizinleri elle master'a ekleme
 
 ### YAP
 - Her zaman `.cc_docs.yaml` üzerinden config yönet
 - `standalone_files`'ı basename olarak yaz (`docs/schema.md` değil `schema.md` — NLM basename kaydeder)
-- Hook'u `cc doc install-hook` ile kur, elle `.git/hooks/pre-commit` düzenleme
-- `--no-verify` ile commit yapıldığında sonra `cc doc changed` çalıştır
+- Hook'u `orion doc install-hook` ile kur, elle `.git/hooks/pre-commit` düzenleme
+- `--no-verify` ile commit yapıldığında sonra `orion doc changed` çalıştır
 
 ### Hata Durumları
 
@@ -168,7 +168,7 @@ Tek Doğru Kaynak (SSOT) koddur. MD dosyaları koddan türetilir, elle yazılmaz
 Her proje kendi `.cc_docs.yaml`'ına sahiptir. Config başka projeden kopyalanmaz.
 
 ### A3 — Master Derleyici
-`cc doc tree` master derleyicisidir. Kendi derleme scripti yazma.
+`orion doc tree` master derleyicisidir. Kendi derleme scripti yazma.
 
 ### A4 — Standalone Ayrımı
 `standalone_files` master'a DAHİL EDİLMEZ. Çift bilgi (duplicate) oluşmasını önler.
@@ -190,20 +190,20 @@ Hiçbir kaynak dosyada, skill'de, script'te veya dokümanda:
 Pre-commit hook bu kuralı otomatik denetler: hardcoded tespit ederse uyarı verir.
 
 ### A6 — Hook Yönetimi
-Hook kurulumu `cc doc install-hook` veya `cc doc init` ile yapılır. Elle `.git/hooks/` düzenleme.
+Hook kurulumu `orion doc install-hook` veya `orion doc init` ile yapılır. Elle `.git/hooks/` düzenleme.
 
-### A7 — Araç Zincirleme (CC Memory Engine kullanan projeler)
+### A7 — Araç Zincirleme (Orion Memory Engine kullanan projeler)
 Aşağıdaki araçlar, belirtilen ÖN KOŞUL aracı çağrılmadan kullanılmamalıdır:
 
 ```
-cc remember    ← ÖN KOŞUL: cc search
-cc update-node ← ÖN KOŞUL: cc read-node
-cc forget      ← ÖN KOŞUL: cc read-node
-cc synapse     ← ÖN KOŞUL: cc search
+orion memory remember    ← ÖN KOŞUL: orion memory search
+orion memory update-node ← ÖN KOŞUL: orion memory read-node
+orion memory forget      ← ÖN KOŞUL: orion memory read-node
+orion memory synapse     ← ÖNKOŞUL: orion memory search
 ```
 
 ### A8 — Skill Önceliği
-`cc need` komutu `skill_ref` döndürdüğünde:
+`orion need` komutu `skill_ref` döndürdüğünde:
 1. İlgili skill'i oku (`.agent/skills/<skill_ref>/SKILL.md`)
 2. Skill talimatlarını uygula — chain'i DEĞİL
 3. Skill talimatları chain'den ÖNCE gelir
