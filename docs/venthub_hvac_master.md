@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-29T12:11:50.513778+00:00
-total_compiled_files: 412
+compiled_at: 2026-05-29T19:02:27.927095+00:00
+total_compiled_files: 404
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-29T12:11:50.513778+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-29T19:02:27.927095+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -2181,32 +2181,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts
-skeleton_hash: f3a6c5de7a590bae
+skeleton_hash: 0f2343958cb843a8
 entity_hashes:
   func:GET: 3a9b2c312d190949
-  overview: 5afd8bfad676573c
-generated_at: 2026-05-29T11:34:00Z
+  overview: c73ec3ea3e37e6ac
+generated_at: 2026-05-29T12:17:34Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın sağlık durumunu kontrol eden bir API endpoint'i sunar. Tek bir GET isteği ile servisin aktif ve çalışır durumda olduğunu doğrular.
+Bu modül, VentHub HVAC uygulamasının sağlık durumunu kontrol eden bir API endpoint'i sunar. Servisin aktif ve çalışır durumda olduğunu doğrulamak için kullanılan standart bir izleme mekanizmasıdır. Genellikle load balancer'lar, monitoring servisleri ve DevOps araçları tarafından periyodik olarak sorgulanır.
 
 ## Fonksiyon Grupları
 ### Sağlık Kontrolü
-Sistemin çalışma durumunu doğrulayan temel bir health check endpoint'i sağlar.
+Sistemin çalışma durumunu doğrulayan temel bir health check endpoint'i sağlar. Durum bilgisi ve zaman damgası içeren JSON yanıt döndürerek servisin ayakta olduğunu teyit eder.
 - GET
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi paylaşılmadığından, yalnızca fonksiyon imzasına dayalı çıkarım yapılmıştır. Detaylı aksiyomlar için GET() fonksiyonunun iç implementasyonuna erişim gereklidir.
+Bu modül, Next.js App Router yapısında bir API sağlık kontrolü endpoint'idir. Fonksiyon imzası `GET()` şeklindedir ve parametre almaz.
 
-[Aksiyom 1]: Eğer HTTP istek methodu GET değilse, modül tanımsız davranış sergiler (varsayılan Next.js App Router davranışı geçerli olur).
+[Aksiyom 1]: Eğer bu dosya `app/api/health/` dizin yapısında değilse, Next.js App Router bu route'u tanımaz ve endpoint erişilemez olur.
+
+[Aksiyom 2]: Eğer `GET` fonksiyonu `export` ile dışa açılmamışsa, Next.js istekleri bu handler'a yönlendiremez ve 404 hatası döner.
+
+[Aksiyom 3]: Eğer `GET()` fonksiyonu geçerli bir `Response` (veya `NextResponse`) nesnesi döndürmeyi ihmal ederse, istemci tanımsız bir yanıt alır veya sunucu hatası oluşur.
+
+[Aksiyom 4]: Eğer `GET()` fonksiyonu çalışırken beklenmeyen bir istisna fırlatırsa ve bu istisna yakalanmazsa, Next.js varsayılan 500 Internal Server Error yanıtını üretir.
 
 ---
 
-**Not:** Mimari aksiyomların güvenilirliği için `GET()` fonksiyonunun **gövde kodu** (return blokları, hata yönetim mantığı, bağımlılık enjeksiyonları vb.) paylaşılmalıdır. Mevcut bilgiyle yalnızca imza tabanlı genel bir varsayım üretilebilmiştir.
+**Not:** Fonksiyon gövdesi (implementasyon) paylaşılmadığından, response body yapısı, durum kodu değerleri veya iç bağımlılıklar hakkında kesin aksiyom üretilememektedir. Bu aksiyomlar yalnızca `GET()` fonksiyon imzası ve Next.js App Router sözleşme gereksinimlerine dayanmaktadır.
 
 ---
 
@@ -2229,10 +2235,10 @@ Bu modül için fonksiyon gövdesi paylaşılmadığından, yalnızca fonksiyon 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/api/health/route.ts`::GET
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesinde bağımsız değişken tanımlanmamıştır — inline nesne doğrudan return edilir)
-- **Dönüş**: `NextResponse.json({ status: "ok", timestamp: new Date().toISOString() })` — HTTP 200 yanıtı döner; `status` alanı `"ok"` string'i, `timestamp` alanı o anki UTC zaman damgasının ISO format karşılığıdır.
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts::GET
+- **params**: (yok)
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde atanmış değişken bulunmamaktadır)
+- **Dönüş**: `NextResponse.json()` — Sağlık durumu bilgisini (status ve timestamp) JSON formatında döndürür
 
 ---
 
@@ -6100,93 +6106,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** (yok)
 
 ---
-# FILE: src\app\_components\ProductDetailPageView.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\_components\ProductDetailPageView.tsx
-skeleton_hash: 342b38f29eeee555
-entity_hashes:
-  func:ProductDetailPage: e3b845e07eaace73
-  overview: 73af6c47c4165729
-  style_tokens: 97bcb7e77cb5d07f
-generated_at: 2026-05-28T22:35:55Z
----
-
-## Genel Bakış  
-`ProductDetailPageView.tsx` dosyası, bir ürünün detay sayfasını oluşturan ana React bileşenini (`ProductDetailPage`) tanımlar. Bu bileşen, dışarıdan gelen `initialProduct` verisini alır, sayfa başlığı, ürün bilgileri, görseller ve etkileşimli aksiyonları (sepete ekleme, favorilere ekleme vb.) bir araya getirerek kullanıcıya tam bir ürün inceleme deneyimi sunar.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### ProductDetailPage
-
-**Ne yapar**: Ürün detay sayfasını render eden ana React bileşenidir. Verilen ilk ürün verisini (initialProduct) kullanarak, bir HVAC ürününün detaylı görünümünü kullanıcıya sunar.
-
-**Nasıl yapar**: Bileşen, sunucu tarafında veya üst bileşen tarafından sağlanan `initialProduct` prop'unu alır ve bu veriyi kullanarak ürün detay sayfasının tamamını render eder. Bu yapı, Next.js gibi framework'lerde sayfa yükleme performansını artırmak için sıkça kullanılan bir SSR/SSG desenidir.
-
-**Parametreler**:
-- `initialProduct` — İlk yüklemede kullanılacak ürün nesnesini temsil eder. Sayfa ilk render edildiğinde bu veri kullanılarak içerik gösterilir, böylece istemci tarafı bekleme süresi azaltılır.
-
-**Dönüş**: `React.FC<ProductDetailPageProps>` tipinde bir React fonksiyonel bileşeni döndürür. Bileşen, `ProductDetailPageProps` arayüzüne uygun olarak yapılandırılmıştır ve `initialProduct` alanını içermelidir.
-
-**İlişkili Tip Tanımı**:
-- `ProductDetailPageProps` — Bileşenin kabul ettiği prop'ların tanımlandığı arayüz. En az `initialProduct` alanını içermelidir.
-
----
-
-## INTERFACES
-
-### ProductDetailPageProps
-- `initialProduct?: Product | null`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: ProductDetailPageView.tsx::getCategoryInfo
-- **params**: () (parametre yok)
-- **ic_degiskenler**:
-  - `sc` — product'un subcategory_id'si ile eşleşen kategori nesnesi veya null
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\_components\ProductDetailPageView.tsx
-  function: src\app\_components\ProductDetailPageView.tsx::ProductDetailPage
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: ProductDetailPage
-  export: ProductDetailPageProps
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`, `tracking-hvac-snug`
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`
-- **Layout:** `absolute`, `backdrop-blur-2`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`
-- **Varyant/Responsive:** `:`, `active:`, `disabled:`, `group-hover:`, `hover:`, `last:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
-- **Yardımcı Sınıflar:** `${activeSection`, `${isNavSticky`, `${isOpen`, `${isWishlisted`, `${section.bgClass`, `${typeof`, `0`, `:`, `===`, `>`, `active:scale-95`, `active:scale-98`, `animate-in`, `animate-ping`, `animate-pulse`
-
----
 # FILE: src\components\AddToCartToast.md
 
 ---
@@ -6306,26 +6225,27 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx
-skeleton_hash: 7805843109ba355b
+skeleton_hash: 9cc228dadd3a82f3
 entity_hashes:
   func:BackToTopButton: c8f2538093a58334
-  overview: bde72dfa4c09c889
-  style_tokens: 5e3169b1c89ec108
-generated_at: 2026-05-28T22:35:38Z
+  func:handleScrollToTop: 94e0754193bc122d
+  overview: cab9522d3717ffc4
+  style_tokens: b29c0a49231e465f
+generated_at: 2026-05-29T18:43:11Z
 ---
 
 ## Genel Bakış
-`BackToTopButton` bileşeni, sayfa kaydırma konumuna göre görünür hâle gelen ve tıklandığında kullanıcıyı sayfanın en üstüne taşıyan bir React fonksiyonel bileşenidir. UI içinde sabit bir konumda yer alır ve kullanıcı deneyimini iyileştirmek için basit bir geri dönüş işlevi sunar.
+BackToTopButton bileşeni, sayfa kaydırma konumuna göre görünürlüğü kontrol edilen ve kullanıcı tıklamasıyla sayfanın en üstüne yumuşak geçiş sağlayan bir React fonksiyonel bileşenidir. Kullanıcı deneyimini iyileştirmek için sabit konumda yer alan, minimal bir navigasyon yardımcısıdır.
 
 ## Fonksiyon Grupları
-### UI Render ve Etkileşim
-Bu grup, butonun görsel çıktısını üretir ve kullanıcı tıklamasını işleyerek sayfayı en üste kaydırır.  
-- BackToTopButton   (bileşenin kendisi, render ve click handler içerir)
+### Bileşen ve Etkileşim
+Butonun görünümünü, görünür olma durumunu ve kullanıcı tıklamasını yöneten ana React bileşenidir.
+- BackToTopButton, handleScrollToTop
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için verilen fonksiyon gövdesi bulunamadığından, mimari varsayımlar üretilememektedir.
 
 ---
 
@@ -6341,23 +6261,40 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 **Dönüş**: `React.FC` — Oluşturulan “Back to Top” butonunu temsil eden bir React functional component.
 
+### handleScrollToTop
+
+**Ne yapar**: Sayfanın en üstüne yumuşak bir şekilde kaydırma işlemi gerçekleştirir. Kullanıcı sayfayı aşağı kaydırdığında görünen "Back to Top" butonuna tıklandığında çağrılır ve pencereyi sayfanın başlangıç konumuna (0,0) geri taşır.
+
+**Nasıl yapar**: `window.scrollTo()` veya `window.scroll()` metodu ile `behavior: 'smooth'` seçeneği kullanarak animasyonlu bir kaydırma efekti oluşturur. Bu sayede kullanıcı deneyimi için ani bir geçiş yerine yumuşak bir geçiş sağlanır.
+
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: `void` — Fonksiyon herhangi bir değer döndürmez, sadece pencere konumunu değiştirir.
+
+---
+
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::BackToTopButton
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: components/BackToTopButton.tsx::BackToTopButton
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `visible` — `useState` ile oluşturulan, butonun görünür olup olmadığını tutan boolean değer.
-  - `setVisible` — `visible` state'ini güncelleyen setter fonksiyonu.
-  - `pos` — `{ bottom: number; right: number }` tipinde, butonun ekrandaki konumunu tutan nesne.
-  - `setPos` — `pos` state'ini güncelleyen setter fonksiyonu.
-  - `t` — `useI18n` hookundan gelen çeviri fonksiyonu, `t('common.backToTop')` ile metin çevirisi yapılır.
-  - `onScroll` — kaydırma olayını dinleyen ve `visible` state'ini ayarlayan iç fonksiyon (aşağıda ayrı bir AST Pointer olarak listelenir).
-  - `computePos` — butonun konumunu hesaplayan ve `pos` state'ini güncelleyen iç fonksiyon (aşağıda ayrı bir AST Pointer olarak listelenir).
-  - `id` — `setInterval` tarafından döndürülen zamanlayıcı kimliği, temizleme sırasında `clearInterval` ile iptal edilir.
-  - `GAP` — layout boşluğu için kullanılan sabit (dosyada tanımlı değil, dışarıdan sağlanır).
-- **Dönüş**: React bileşeni (`React.FC`). Render edilen `<button>` elemanı, `visible` durumuna göre görünürlük ve konum stillerini ayarlar; tıklanınca sayfayı üstteki konuma yumuşak kaydırır.
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, UI metinlerini uluslararası dillere çevirir (örn. `t('common.backToTop')`)
+  - `visible` — `useScrollThrottle` hook'undan dönen boolean değer; scroll pozisyonuna göre butonun görünürlüğünü kontrol eder (400px'de göster, 300px altında gizle)
+  - `handleScrollToTop` — component içinde tanımlı nested arrow fonksiyon; butona tıklandığında sayfayı tepeye kaydırır ve odak yönetimini sağlar
+  - `isReduced` — `handleScrollToTop` içinde tanımlı boolean; kullanıcının `prefers-reduced-motion` tercihini kontrol eder, `true` ise `auto`, `false` ise `smooth` davranış seçer
+  - `mainContent` — `document.getElementById('main-content')` ile elde edilen `HTMLElement | null`; klavye navigasyonu odağını ana içeriğe taşımak için kullanılır
+- **Dönüş**: JSX — yukarı kaydırma butonu (`<button>`), görünürlüğü `visible` state'ine bağlı olarak opacity/scale class'larıyla kontrol edilir
+
+---
+
+### [N2_NASIL] AST Pointer: components/BackToTopButton.tsx::handleScrollToTop
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `isReduced` — `typeof window !== 'undefined'` kontrolü sonrası `window.matchMedia('(prefers-reduced-motion: reduce)').matches` ile alınan boolean; kullanıcı reduced motion istiyorsa `true` döner
+  - `mainContent` — `document.getElementById('main-content')` ile DOM'dan çekilen `HTMLElement | null` referansı; `tabindex` attribute'u ayarlanıp `focus()` ile erişilebilirlik odağı buraya taşınır
+- **Dönüş**: yok (void) — `window.scrollTo()` ile sayfayı tepeye kaydırır, ardından `mainContent` elementine `tabindex='-1'` ekleyip `preventScroll: true` ile focus yükler
 
 ---
 
@@ -6365,6 +6302,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
   file: src\components\BackToTopButton.tsx
   function: src\components\BackToTopButton.tsx::BackToTopButton
+  function: src\components\BackToTopButton.tsx::handleScrollToTop
 
 ---
 
@@ -6383,9 +6321,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-primary-navy`, `border-white/20`, `hover:bg-secondary-blue`, `text-white`
-- **Layout:** `fixed`, `p-3`, `shadow-lg`, `z-40`
+- **Layout:** `p-3`, `shadow-lg`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `${visible`, `:`, `border`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `invisible`, `opacity-0`, `opacity-100`, `pointer-events-none`, `rounded-full`, `transition-shadow`, `translate-y-0`
+- **Yardımcı Sınıflar:** `$`, `:`, `border`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `invisible`, `opacity-0`, `opacity-100`, `pointer-events-none`, `rounded-full`, `scale-100`, `scale-75`
 
 ---
 # FILE: src\components\BeforeAfterSlider.md
@@ -8858,8 +8796,8 @@ entity_hashes:
   func:LanguageSwitcher: e20e68a6d834aa54
   func:switchLanguage: ceec0990f90068b4
   overview: 2f23c86896c74c04
-  style_tokens: 93059c02fd156e45
-generated_at: 2026-05-28T22:36:01Z
+  style_tokens: 819c78943fe15425
+generated_at: 2026-05-29T18:43:11Z
 ---
 
 ## Genel Bakış
@@ -8960,7 +8898,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-primary-navy`, `bg-white/90`, `border-light-gray`, `hover:bg-light-gray`, `text-industrial-gray`, `text-sm`, `text-white`
-- **Layout:** `backdrop-blur`, `bottom-4`, `fixed`, `flex`, `gap-1`, `items-center`, `p-1`, `right-4`, `shadow-sm`, `z-50`
+- **Layout:** `backdrop-blur`, `flex`, `gap-1`, `items-center`, `p-1`, `shadow-sm`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
 - **Yardımcı Sınıflar:** `${lang`, `:`, `===`, `border`, `en`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `outline-none`, `px-3`, `py-1`, `rounded-full`, `tr`
 
@@ -12389,50 +12327,46 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminRealtimeNotifications.tsx
-skeleton_hash: b18e34e7c3235735
+skeleton_hash: eabfe432a624460e
 entity_hashes:
   func:AdminRealtimeNotifications: 1b67a246f8f15ea8
   func:IconForType: b8eaefdda2e3fd3b
   func:clearAll: 256b77623e27b78c
   func:toggleDropdown: 97a60ca3e9e42667
-  overview: 6f7f4eb2973edff9
-  style_tokens: a3d3a41536476850
-generated_at: 2026-05-28T22:36:00Z
+  overview: 9e1475e57b239be9
+  style_tokens: 58e7fc7febbe30f9
+generated_at: 2026-05-29T18:43:38Z
 ---
 
 ## Genel Bakış
-`AdminRealtimeNotifications` modülü, yönetim panelinde gerçek zamanlı bildirimleri görüntüleyen, yöneten ve etkileşimleri işleyen bir React bileşenidir. Bildirim akışını görsel olarak sunar ve kullanıcının bildirimlerle ilgili temel aksiyonlarını (açma/kapama, temizleme) kontrol eder.
+`AdminRealtimeNotifications` bileşeni, yönetim panelinde gerçek zamanlı bildirimleri görsel olarak sunan ve bunlarla etkileşime girilmesini sağlayan bir React UI modülüdür. Bildirimleri listeleme, bildirim menüsünü açma/kapama, tüm bildirimleri temizleme ve bildirim türlerine göre ikon atama gibi temel sorumlulukları barındırır. Bileşen, bildirimlerin durumunu ve kullanıcının bu bildirimler üzerindeki aksiyonlarını yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen ve Render
-Bileşenin temel yapısını ve bildirim listesinin nasıl görüntüleneceğini belirler.
-- AdminRealtimeNotifications
+Modülün ana giriş noktasıdır; bildirim verisini alır, durumunu yönetir ve bileşenin nihai görünümünü (JSX) render eder.
+- `AdminRealtimeNotifications`
 
-### Etkileşim Yönetimi
-Kullanıcının bildirimler üzerindeki eylemlerini (menü açma/kapatma, tümünü temizleme) yönetir.
-- toggleDropdown, clearAll
+### Bildirim Etkileşimleri
+Kullanıcının bildirimler üzerindeki temel eylemlerini işler; bildirim panelinin açılıp kapatılması ve tüm bildirilerin temizlenmesi gibi durum değişikliklerini tetikler.
+- `toggleDropdown`, `clearAll`
 
 ### Görsel Yardımcılar
-Her bildirim türü için uygun ikonu seçerek arayüzde görsel tutarlılık sağlar.
-- IconForType
+Bildirim türlerine (örneğin, uyarı, başarı, bilgi) göre uygun ikonları eşleştirerek arayüzde görsel tutarlılık ve tanımlanabilirlik sağlar.
+- `IconForType`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bir React UI bileşeni olup fonksiyon imzalarından çıkarılabilecek minimal mimari varsayımlar aşağıdadır.
+[Modül, fonksiyon gövdeleri paylaşılmadığı için yalnızca imza analizine dayalı minimal varsayımlar içermektedir.]
 
----
+[Aksiyom 1]: Eğer `IconForType` fonksiyonuna `type` parametresi olarak geçerli bir `string` değeri sağlanmazsa (undefined veya boş string), bileşen için uygun ikon belirlenemez ve render davranışı belirsiz olur.
 
-**[Aksiyom 1]:** Eğer `IconForType` fonksiyonuna geçerli bir `type` string'i verilmezse (boş string, `undefined` veya uyumsuz değer), bileşen ikonu doğru gösteremez ve render hatası oluşur.
+[Aksiyom 2]: Eğer `AdminRealtimeNotifications` ana bileşeni hiç parametre almıyorsa (props yoksa), bildirim verisi fonksiyon gövdesinde erişilen bir dış bağımlılık (React Context, global state vb.) aracılığıyla temin edilmelidir; aksi halde gösterilecek bildirim listesi boş veya tanımsız kalır.
 
-**[Aksiyom 2]:** Eğer `clearAll` fonksiyonu çağrıldığında bileşenin iç state'inde temizlenecek bildirim listesi mevcut değilse (boş dizi/null), fonksiyon anlamlı bir işlem yapmaz veya hata oluşur.
+[Aksiyom 3]: Eğer `toggleDropdown` ve `clearAll` fonksiyonları hiç parametre almıyorsa, bu fonksiyonların etkilediği durum (dropdown açık/kapalı durumu, bildirim listesi) modül içindeki bir state (useState/useRef) veya dış bir state yönetimi ile tutulmalıdır; aksi halde eylemlerin etkisi hiçbir veri üzerinde gerçekleşmez.
 
-**[Aksiyom 3]:** Eğer `toggleDropdown` fonksiyonu çağrıldığında dropdown durumunu tutan iç state (boolean) mevcut değilse, fonksiyon durum değişikliğini doğru şekilde tetikleyemez.
-
-**[Aksiyom 4]:** Eğer `IconForType` fonksiyonu, bilinmeyen veya desteklenmeyen bir `type` değeri alırsa, varsayılan/bilinmeyen bir ikon göstermelidir; aksi takdirde render hatası oluşur.
-
-**[Aksiyom 5]:** Bu modül bir React fonksiyonel bileşeni olduğundan, JSX içeriğini döndürebilmesi için React ortamının (React kütüphanesi ve JSX derleyicisi) mevcut olması gerekir; eğer React ortamı yoksa bileşen oluşturulamaz.
+[Aksiyom 4]: Eğer `IconForType` fonksiyonu tarafından desteklenmeyen bir `type` string'i geçilirse (örneğin bilinmeyen bir bildirim türü), varsayılan/fallback bir ikon gösterilmeli ya da bileşen kırılmalı; bu davranış fonksiyon gövdesinde tanımlı değilse uygulama hata verebilir.
 
 ---
 
@@ -12474,230 +12408,82 @@ Bu modül, bir React UI bileşeni olup fonksiyon imzalarından çıkarılabilece
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::AdminRealtimeNotifications
-- **params**: () — parametre yok, React bileşeni
+### [N1_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::useEffect_InitialFetch
+- **params**: () — useCallback/arrow fonksiyonu, parametre yok
 - **ic_degiskenler**:
-  - `active` — useEffect cleanup flag'i; false olduğunda state güncellemelerini engeller
-  - `fetchRecentActivity` — son sipariş ve stok hareketlerini Supabase'den çeken async fonksiyon
-  - `oData` — supabase.from('venthub_orders').select(...) sonucu dönen sipariş verisi dizisi
-  - `sData` — supabase.from('inventory_movements').select(...) sonucu dönen stok hareket verisi dizisi
-  - `combined` — sipariş ve stok hareketlerinin birleştirildiği AppNotification[]
-  - `pName` — products?.name || 'Bilinmeyen Ürün' — stok hareketine ait ürün adı
-  - `pSku` — products?.sku || '' — stok hareketine ait ürün SKU kodu
-  - `delta` — Number(s.delta || 0) — stok miktarı değişim değeri (pozitif/negatif)
-  - `movementType` — delta > 0 ise 'Giriş', değilse 'Çıkış' — hareket yönü
-  - `absQty` — Math.abs(delta) — mutlak stok miktarı
-  - `ordersChannel` — supabase.channel('admin-orders-realtime') — sipariş INSERT realtime kanalı
-  - `stockChannel` — supabase.channel('admin-stock-realtime') — stok hareketi INSERT realtime kanalı
-  - `handleClickOutside` — dropdown dışına tıklama algılayıcı; MouseEvent parametresi alır
-- **Dönüş**: JSX — bildirim dropdown'ı ve toast'ları içeren React bileşeni
+  - `active` — asenkron işlemlerin hâlâ geçerli olup olmadığını kontrol eden bayrak; temizleme fonksiyonunda `false` yapılır
+  - `fetchRecentActivity` — inner async fonksiyon; siparişleri ve stok hareketlerini Supabase'den çeker, birleştirir
+  - `oData` — `supabase.from('venthub_orders').select(...)` sonucundan dönen sipariş veri dizisi
+  - `sData` — `supabase.from('inventory_movements').select(...)` sonucundan dönen stok hareketi veri dizisi
+  - `combined` — `AppNotification[]` tipinde; sipariş ve stok bildirimlerinin birleştirildiği dizi
+  - `o` — `oData.forEach` iterasyonunda her bir sipariş satırı; `o.id`, `o.total_amount`, `o.created_at`, `o.order_number` erişimleri yapılır
+  - `s` — `sData.forEach` iterasyonunda her bir stok hareketi satırı (`Record<string, unknown>`)
+  - `products` — `s.products` cast edilmiş nesne; `products?.name` ve `products?.sku` erişimleri yapılır
+  - `pName` — `products?.name` değeri veya fallback `'Bilinmeyen Ürün'`
+  - `pSku` — `products?.sku` değeri veya boş string
+  - `delta` — `s.delta` sayısına dönüştürülmüş stok değişim miktarı
+  - `movementType` — `delta > 0` ise `'Giriş'`, değilse `'Çıkış'`
+  - `absQty` — `Math.abs(delta)` ile mutlak değer
+  - `err` — catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: cleanup fonksiyonu `() => { active = false }` döner
 
----
+### [N2_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::fetchRecentActivity
+- **params**: () — inner async fonksiyon, parametre yok
+- **ic_degiskenler**:
+  - `oData` — `supabase.from('venthub_orders').select('id, total_amount, created_at, order_number').order('created_at', { ascending: false }).limit(5)` sonucu; `oData.forEach` ile `o.id`, `o.total_amount`, `o.created_at`, `o.order_number` alanları okunur
+  - `sData` — `supabase.from('inventory_movements').select('id, delta, reason, created_at, products!product_id(name, sku)').order(...).limit(5)` sonucu
+  - `combined` — `AppNotification[]` tipinde boş dizi; bildirimler buraya push edilir
+  - `o` — `oData.forEach` callback parametresi; her sipariş kaydı
+  - `s` — `sData.forEach` callback parametresi; `Record<string, unknown>` tipinde stok hareketi kaydı
+  - `products` — `s.products` alanının `Record<string, unknown> | null` cast'i
+  - `pName` — `products?.name || 'Bilinmeyen Ürün'` — ürün adı
+  - `pSku` — `products?.sku || ''` — ürün SKU kodu
+  - `delta` — `Number(s.delta || 0)` — stok değişim miktarı
+  - `movementType` — `delta > 0 ? 'Giriş' : 'Çıkış'` hareket yönü etiketi
+  - `absQty` — `Math.abs(delta)` — mutlak stok miktarı
+  - `a`, `b` — `combined.sort` callback parametreleri; sıralama için bildirim nesneleri
+  - `err` — catch bloğundaki hata nesnesi
+- **Dönüş**: yok; `setNotifications(combined.slice(0, 10))` ile yan etki
 
-### [N2_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::fetchRecentActivity
+### [N3_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::useEffect_RealtimeSubscriptions
+- **params**: () — useCallback/arrow fonksiyonu, parametre yok
+- **ic_degiskenler**:
+  - `ordersChannel` — `supabase.channel('admin-orders-realtime')` ile oluşturulan sipariş gerçek zamanlı kanalı; `.on('postgres_changes', ...)` ve `.subscribe()` zincirlenir
+  - `stockChannel` — `supabase.channel('admin-stock-realtime')` ile oluşturulan stok gerçek zamanlı kanalı; `.on('postgres_changes', ...)` ve `.subscribe()` zincirlenir
+  - `newOrder` — sipariş INSERT callback'inde `payload.new as Record<string, unknown>` cast edilmiş yeni sipariş nesnesi; `newOrder.id`, `newOrder.total_amount`, `newOrder.order_number`, `newOrder.created_at` alanları okunur
+  - `totalAmt` — `Number(newOrder.total_amount || 0)` — sipariş tutarı
+  - `amt` — `Intl.NumberFormat('tr-TR', ...).format(totalAmt)` ile formatlanmış para birimi stringi
+  - `orderId` — `String(newOrder.id || '')` — sipariş ID'si string karşılığı
+  - `orderNumber` — `newOrder.order_number` varsa String, yoksa `orderId.slice(0, 8)` — sipariş numarası
+  - `notif` — `AppNotification` tipinde; realtime sipariş bildirim nesnesi (`id`, `type`, `title`, `message`, `timestamp`, `isRead`, `link`)
+  - `m` — stok INSERT callback'inde `payload.new as Record<string, unknown>` cast edilmiş stok hareketi nesnesi; `m.id`, `m.delta`, `m.reason`, `m.created_at` alanları okunur
+  - `delta` — `Number(m.delta || 0)` — stok değişim miktarı
+  - `movementType` — `delta > 0 ? 'Giriş' : 'Çıkış'`
+  - `absQty` — `Math.abs(delta)` — mutlak stok miktarı
+  - `id` — `toast.custom` callback parametresi; toast ID'si
+- **Dönüş**: cleanup fonksiyonu `supabase.removeChannel(ordersChannel)` ve `supabase.removeChannel(stockChannel)` çalıştırır
+
+### [N4_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::useEffect_ClickOutside
+- **params**: () — useCallback/arrow fonksiyonu, parametre yok
+- **ic_degiskenler**:
+  - `handleClickOutside` — `(event: MouseEvent) => void` tipinde inner fonksiyon; `event.target`'in `dropdownRef.current` içinde olup olmadığını kontrol eder
+  - `event` — `handleClickOutside` callback parametresi; `MouseEvent` tipinde; `event.target as Node` cast edilir
+- **Dönüş**: cleanup fonksiyonu `document.removeEventListener('mousedown', handleClickOutside)` döner
+
+### [N5_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::toggleDropdown
 - **params**: () — parametre yok
-- **ic_degiskenler**:
-  - `oData` — supabase.from('venthub_orders').select('id, total_amount, created_at, order_number').order('created_at', { ascending: false }).limit(5) sonucu
-  - `sData` — supabase.from('inventory_movements').select('id, delta, reason, created_at, products!product_id(name, sku)').order('created_at', { ascending: false }).limit(5) sonucu
-  - `combined` — AppNotification[] — birleştirilmiş bildirim dizisi
-  - `pName` — products?.name || 'Bilinmeyen Ürün' — s.products içinden ürün adı
-  - `pSku` — products?.sku || '' — s.products içinden SKU kodu
-  - `delta` — Number(s.delta || 0) — stok değişim miktarı
-  - `movementType` — delta > 0 ? 'Giriş' : 'Çıkış' — hareket yönü
-  - `absQty` — Math.abs(delta) — mutlak stok değişim değeri
-  - `err` — catch bloğu yakaladığı hata nesnesi
-- **Dönüş**: yok (setNotifications(combined.slice(0, 10)) ile yan etki)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok; `setOpen(!isOpen)`, `setNotifications(prev => prev.map(...))`, `setUnreadCount(0)` ile yan etki
 
----
-
-### [N3_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::o => callback (sipariş forEach)
-- **params**: `o` — tek bir sipariş satırı (venthub_orders tablosundan gelen satır)
-- **ic_degiskenler**:
-  - `o.id` — sipariş benzersiz kimliği
-  - `o.total_amount` — sipariş tutarı
-  - `o.created_at` — sipariş oluşturma tarihi
-  - `o.order_number` — sipariş numarası
-- **Dönüş**: yok (combined.push ile yan etki — order tipinde AppNotification ekler)
-
----
-
-### [N4_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::s => callback (stok forEach)
-- **params**: `s` — Record<string, unknown> — tek bir stok hareketi satırı
-- **ic_degiskenler**:
-  - `products` — s.products as Record<string, unknown> | null — JOIN ile gelen ilişkili ürün verisi
-  - `pName` — products?.name || 'Bilinmeyen Ürün' — ürün adı
-  - `pSku` — products?.sku || '' — ürün SKU kodu
-  - `delta` — Number(s.delta || 0) — stok değişim miktarı
-  - `movementType` — delta > 0 ? 'Giriş' : 'Çıkış' — hareket yönü
-  - `absQty` — Math.abs(delta) — mutlak stok değişim değeri
-  - `s.id` — stok hareketi benzersiz kimliği
-  - `s.created_at` — stok hareketi tarihi
-- **Dönüş**: yok (combined.push ile yan etki — stock tipinde AppNotification ekler)
-
----
-
-### [N5_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::useEffect — realtime kanal kurulumu
+### [N6_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::clearAll
 - **params**: () — parametre yok
-- **ic_degiskenler**:
-  - `ordersChannel` — supabase.channel('admin-orders-realtime') — venthub_orders INSERT olayını dinleyen Supabase Realtime kanalı
-  - `stockChannel` — supabase.channel('admin-stock-realtime') — inventory_movements INSERT olayını dinleyen Supabase Realtime kanalı
-  - `newOrder` — payload.new as Record<string, unknown> — orders channel payload'undan gelen yeni sipariş verisi
-  - `totalAmt` — Number(newOrder.total_amount || 0) — sipariş toplam tutarı
-  - `amt` — Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalAmt) — TRY formatında tutar
-  - `orderId` — String(newOrder.id || '') — sipariş ID string karşılığı
-  - `orderNumber` — newOrder.order_number ? String(newOrder.order_number) : orderId.slice(0, 8) — sipariş numarası
-  - `notif` — AppNotification — sipariş bildirim nesnesi
-  - `m` — payload.new as Record<string, unknown> — stock channel payload'undan gelen yeni stok hareketi verisi
-  - `delta` — Number(m.delta || 0) — stok değişim miktarı
-  - `movementType` — delta > 0 ? 'Giriş' : 'Çıkış' — hareket yönü
-  - `absQty` — Math.abs(delta) — mutlak stok değişim değeri
-- **Dönüş**: () => { supabase.removeChannel(ordersChannel); supabase.removeChannel(stockChannel) } — cleanup fonksiyonu
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok; `setNotifications([])` ve `setUnreadCount(0)` ile yan etki
 
----
-
-### [N6_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::ordersChannel payload callback
-- **params**: `payload` — postgres_changes event payload nesnesi (payload.new içerir)
-- **ic_degiskenler**:
-  - `newOrder` — payload.new as Record<string, unknown> — INSERT edilen yeni sipariş satırı
-  - `totalAmt` — Number(newOrder.total_amount || 0) — sipariş tutarı sayısal değeri
-  - `amt` — Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalAmt) — TRY formatında tutar stringi
-  - `orderId` — String(newOrder.id || '') — sipariş benzersiz ID'si
-  - `orderNumber` — newOrder.order_number ? String(newOrder.order_number) : orderId.slice(0, 8) — sipariş numarası veya ID'den türetilen kısaltma
-  - `notif` — AppNotification — real-time sipariş bildirim nesnesi
-- **Dönüş**: yok (setNotifications, setUnreadCount, toast.custom ile yan etki)
-
----
-
-### [N7_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::stockChannel payload callback
-- **params**: `payload` — postgres_changes event payload nesnesi
-- **ic_degiskenler**:
-  - `m` — payload.new as Record<string, unknown> — INSERT edilen yeni stok hareketi satırı
-  - `delta` — Number(m.delta || 0) — stok değişim miktarı
-  - `movementType` — delta > 0 ? 'Giriş' : 'Çıkış' — hareket yönü
-  - `absQty` — Math.abs(delta) — mutlak stok değişim miktarı
-  - `notif` — AppNotification — real-time stok bildirim nesnesi
-  - `m.id` — stok hareketi benzersiz kimliği
-  - `m.reason` — stok hareketi sebebi (String olarak kullanılır)
-  - `m.created_at` — stok hareketi oluşturma tarihi
-- **Dönüş**: yok (setNotifications, setUnreadCount, toast.custom ile yan etki)
-
----
-
-### [N8_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::toggleDropdown
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - (ic değişken yok — doğrudan state setter'ları çağırır)
-- **Dönüş**: yok
-  - setIsOpen(!isOpen) ile dropdown açma/kapama
-  - isOpen === false ve unreadCount > 0 ise: tüm bildirimleri okundu olarak işaretler (setNotifications ile map), unreadCount'u sıfırlar
-
----
-
-### [N9_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::clearAll
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - (ic değişken yok)
-- **Dönüş**: yok (setNotifications([]) ve setUnreadCount(0) ile yan etki)
-
----
-
-### [N10_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::IconForType
-- **params**: `{ type }` — `{ type: string }` — bildirim tipi ('order', 'stock' veya diğer)
-- **ic_degiskenler**:
-  - (ic değişken yok — doğrudan JSX döner)
-- **Dönüş**: JSX — type='order' ise ShoppingBag ikonu (mavi), type='stock' ise Box ikonu (yeşil), diğer durumlarda Activity ikonu (gri)
-
----
-
-### [N11_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::useEffect — dış tıklama algılama
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - `handleClickOutside` — (event: MouseEvent) => void — dropdownRef.contains kontrolü ile dışarı tıklama algılar
-- **Dönüş**: () => document.removeEventListener('mousedown', handleClickOutside) — cleanup
-
----
-
-### [N12_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::handleClickOutside
-- **params**: `event` — MouseEvent — DOM mousedown olay nesnesi
-- **ic_degiskenler**:
-  - (ic değişken yok — dropdownRef.current ve event.target kontrol edilir)
-- **Dönüş**: yok (setIsOpen(false) ile dropdown kapatma yan etkisi)
-
----
-
-### [N13_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::toast.orders onClick handler
-- **params**: () — parametre yok (arrow function)
-- **ic_degiskenler**:
-  - `t` — toast instance (üst scope'tan gelir, toast.custom callback parametresi)
-  - `notif` — AppNotification nesnesi (üst scope'tan gelir)
-- **Dönüş**: yok (toast.dismiss(t.id) ve router.push(notif.link) ile yan etki)
-
----
-
-### [N14_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::toast.orders onKeyDown handler
-- **params**: `e` — React.KeyboardEvent — klavye olay nesnesi
-- **ic_degiskenler**:
-  - (e.key === 'Enter' || e.key === ' ') kontrolü yapılır)
-  - `t` — toast instance (üst scope'tan)
-  - `notif` — AppNotification (üst scope'tan)
-- **Dönüş**: yok (e.preventDefault(), toast.dismiss, router.push ile yan etki)
-
----
-
-### [N15_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::toast.stock onClick handler
-- **params**: () — parametre yok (arrow function)
-- **ic_degiskenler**:
-  - `t` — toast instance (üst scope'tan)
-  - `notif` — AppNotification nesnesi (üst scope'tan)
-- **Dönüş**: yok (toast.dismiss(t.id) ve router.push(notif.link) ile yan etki)
-
----
-
-### [N16_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::toast.stock onKeyDown handler
-- **params**: `e` — React.KeyboardEvent — klavye olay nesnesi
-- **ic_degiskenler**:
-  - `t` — toast instance (üst scope'tan)
-  - `notif` — AppNotification (üst scope'tan)
-- **Dönüş**: yok (e.preventDefault(), toast.dismiss, router.push ile yan etki)
-
----
-
-### [N17_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::supabase cleanup
-- **params**: () — parametre yok (arrow function)
-- **ic_degiskenler**:
-  - (ic değişken yok — supabase.removeChannel çağırır)
-- **Dönüş**: yok (ordersChannel ve stockChannel kaldırma yan etkisi)
-
----
-
-### [N18_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::notification item renderer
-- **params**: `notif` — AppNotification — tek bir bildirim nesnesi
-- **ic_degiskenler**:
-  - `notif.id` — bildirim benzersiz kimliği (key olarak kullanılır)
-  - `notif.link` — tıklama halinde gidilecek rota
-  - `notif.isRead` — okundu durumu (stil ve mavi nokta gösterimini belirler)
-  - `notif.title` — bildirim başlığı
-  - `notif.message` — bildirim açıklaması
-  - `notif.type` — bildirim tipi ('order'/'stock')
-  - `notif.timestamp` — bildirim zaman damgası
-  - `e` — React.KeyboardEvent — onKeyDown handler parametresi
-- **Dönüş**: JSX — tek bir bildirim satırı (başlık, mesaj, zaman, okundu göstergesi, icon)
-
----
-
-### [N19_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::notification item onClick handler
-- **params**: () — parametre yok (arrow function)
-- **ic_degiskenler**:
-  - `notif` — AppNotification (üst scope'tan, forEach callback parametresi)
-- **Dönüş**: yok (setIsOpen(false) ve router.push(notif.link) ile yan etki)
-
----
-
-### [N20_NASIL] AST Pointer: `src/components/admin/AdminRealtimeNotifications.tsx`::notification item onKeyDown handler
-- **params**: `e` — React.KeyboardEvent — klavye olay nesnesi
-- **ic_degiskenler**:
-  - `notif` — AppNotification (üst scope'tan)
-- **Dönüş**: yok (e.preventDefault(), setIsOpen(false), router.push(notif.link) ile yan etki)
+### [N7_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::IconForType
+- **params**: `{ type }` — `type: string` — bildirim türü (`'order'`, `'stock'` veya diğer)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `type === 'order'` ise `ShoppingBag` ikonlu mavi daire, `type === 'stock'` ise `Box` ikonlu yeşil daire, aksi halde `Activity` ikonlu gri daire
 
 ---
 
@@ -12738,7 +12524,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Renkler:** `bg-blue-50`, `bg-blue-50/30`, `bg-emerald-50`, `bg-emerald-500/10`, `bg-primary-navy`, `bg-primary-navy/10`, `bg-rose-100`, `bg-rose-500`, `bg-slate-100`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-500/10`, `bg-white`, `border-2`
 - **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-1`, `gap-2`, `gap-3`, `h-10`, `h-12`, `h-2`, `h-2.5`, `items-center`, `justify-between`, `justify-center`
 - **Varyant/Responsive:** `:`, `hover:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${!notif.isRead`, `${notif.link`, `${t.visible`, `:`, `animate-in`, `animate-out`, `animate-pulse`, `border`, `cursor-pointer`, `fade-in`, `fade-out`, `font-bold`, `font-medium`, `hover:shadow`, `leading-relaxed`
+- **Yardımcı Sınıflar:** `${!notif.isRead`, `${notif.link`, `:`, `animate-in`, `animate-pulse`, `border`, `cursor-pointer`, `duration-300`, `fade-in`, `font-bold`, `font-medium`, `hover:shadow`, `leading-relaxed`, `mb-3`, `ml-3`
 
 ---
 # FILE: src\components\admin\AdminSkeleton.md
@@ -13754,42 +13540,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx
-skeleton_hash: 68ab2fd6998e4d6d
+skeleton_hash: df7dad40afd16a13
 entity_hashes:
   func:EditableCell: c69e143b78ab0750
-  overview: 4312d2a15431d150
+  overview: afceb79d7ede9415
   style_tokens: 2f2ada2707ada249
-generated_at: 2026-05-28T22:35:31Z
+generated_at: 2026-05-29T18:44:07Z
 ---
 
 ## Genel Bakış
-`EditableCell` bileşeni, yönetim panelindeki tablo hücrelerinin düzenlenebilir olmasını sağlayan bir React fonksiyonel bileşenidir. Gelen değer, tip ve yer tutucu gibi parametreleri alır, kullanıcı etkileşimi sonrası değişikliği `onSave` callback’i ile dışarı aktarır.
+`EditableCell`, yönetim paneli tablolarındaki hücrelerin tıklanarak düzenlenebilir hale getirilmesini sağlayan bir React bileşenidir. Değer, veri tipi ve yer tutucu gibi yapılandırma parametreleri alarak hücrenin görünümünü ve davranışını kontrol eder; düzenleme işlemi tamamlandığında kaydetme çağrısı ile değişiklikleri üst bileşene iletir.
 
 ## Fonksiyon Grupları
 ### Düzenlenebilir Hücre Bileşeni
-Bu grup, hücrenin görüntülenmesi, düzenleme moduna geçişi ve kaydedilmesi süreçlerini yönetir.  
-- EditableCell  
-
-(İçeride kullanılan yardımcı fonksiyonlar (ör. durum yönetimi, olay işleyicileri) bu bileşenin içinde tanımlanır ve dışarıdan ayrı bir fonksiyon olarak listelenmez.)
+Bu modül, tek bir kapsamlı bileşenden oluşur ve tablo hücrelerinin görüntülenmesi, düzenleme moduna geçişi ile değişikliklerin kaydedilmesi süreçlerini yönetir.
+- EditableCell
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `onSave` fonksiyonu sağlanmazsa, hücrede yapılan değişiklikler kalıcı olarak kaydedilemez ve kullanıcıya bir hata/uyarı gösterilir.  
+Bu modül için varsayımlar, EditableCell bileşeninin doğru çalışması için zorunlu koşulları belirtir.
 
-**Aksiyom 2**: Eğer `type` parametresi belirtilmezse, varsayılan olarak `'text'` tipi kullanılır; bu tip dışındaki bir değer verilirse, tip `'text'` olarak düşürülür.  
+[Axiom 1]: Eğer onSave callback fonksiyonu sağlanmamışsa veya çağrılamıyorsa, kullanıcı düzenlemeleri kaydedemez ve hata oluşur.
 
-**Aksiyom 3**: Eğer `placeholder` parametresi belirtilmezse, varsayılan değer `'-'` kullanılır; bu değer gösterim amaçlıdır ve gerçek veri kaybına yol açmaz.  
-
-**Aksiyom 4**: Eğer `value` parametresi `null` veya `undefined` ise, hücre içeriği `placeholder` değeriyle gösterilir; bu durumda `onSave` çağrısı yapılmadan önce kullanıcı bir giriş yapmalıdır.  
-
-**Aksiyom 5**: Eğer `type` değeri desteklenmeyen bir formatta (ör. `'binary'`, `'object'` vb.) ise, davranış **bilinmiyor**; bu durumda uygulama bir istisna fırlatabilir veya tip `'text'`e geri dönebilir (tasarım kararına bağlı).  
-
-**Domain‑specific kural**: `type` parametresi için kabul edilen değerler **bilinmiyor**; mevcut kod tabanında tanımlı olabilecek tipler (`'text'`, `'number'`, `'date'` vb.) proje dokümantasyonunda belirtilmelidir.  
-
-Bu aksiyomlar, `EditableCell` bileşeninin temel çalışma koşullarını ve eksik/girişik parametrelerin sistem üzerindeki etkilerini tanımlar.
+[Axiom 2]: Eğer type parametresi geçerli bir HTML input type değeri (örn: text
 
 ---
 
@@ -13826,24 +13601,75 @@ Bu aksiyomlar, `EditableCell` bileşeninin temel çalışma koşullarını ve ek
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx::EditableCell
-- **params**: (value, onSave, type = 'text', placeholder = '-', className = '', disabled = false, inputWidth = 'w-24')
+### [N1_NASIL] AST Pointer: EditableCell.tsx::EditableCell
+- **params**: `value` — hücre mevcut değeri; `onSave` — async callback, düzenlenmiş değeri kaydetmek için çağrılır; `type` — input türü (varsayılan `'text'`); `placeholder` — değer boşsa gösterilen yer tutucu (varsayılan `'-'`); `className` — dışarıdan ek CSS sınıfı (varsayılan `''`); `disabled` — düzenlemeyi devre dışı bırakıp bırakmayacağı (varsayılan `false`); `inputWidth` — input genişlik CSS sınıfı (varsayılan `'w-24'`)
 - **ic_degiskenler**:
-  - `editing` — hücrenin düzenleme modunda olup olmadığını tutan boolean state.
-  - `setEditing` — `editing` state'ini güncelleyen set fonksiyonu.
-  - `draft` — kullanıcı tarafından düzenlenen geçici değer; başlangıçta `value`'nun string temsili.
-  - `setDraft` — `draft` state'ini güncelleyen set fonksiyonu.
-  - `saving` — kaydetme işlemi devam ederken gösterilen boolean state.
-  - `setSaving` — `saving` state'ini güncelleyen set fonksiyonu.
-  - `inputRef` — `<input>` elementine referans tutan `useRef` nesnesi.
-  - `startEdit` — düzenleme moduna geçişi başlatan, `disabled` veya `saving` durumunda işlem yapmayan callback.
-  - `cancel` — düzenleme iptal edildiğinde `draft`'ı orijinal `value`'ya sıfırlayan ve `editing`i kapatan callback.
-  - `save` — `draft`'ı `trim()` edip `onSave` async fonksiyonuna gönderen, hata durumunda toast bildirimi gösteren ve ilgili state'leri yöneten async callback.
-    - `trimmed` — `draft`'ın baş ve sondaki boşlukları kaldırılmış hali.
-    - `original` — komponentin başlangıçtaki `value`'nun string temsili.
-  - `handleKeyDown` — klavye olaylarını dinleyen, `Enter` tuşunda `save`i, `Escape` tuşunda `cancel`ı tetikleyen callback.
-    - `e` — `React.KeyboardEvent` nesnesi, tuş bilgisi ve `preventDefault` metodunu içerir.
-- **Dönüş**: React element (JSX) – düzenleme modunda bir `<input>` ve kaydetme animasyonu, düzenleme modunda değilken bir `<button>` döndürür.
+  - `editing` — `useState<boolean>` — hücrenin düzenleme modunda olup olmadığını tutar
+  - `draft` — `useState<string>` — input'taki geçici düzenleme değeri; `value`'dan türetilir, kaydetmeye kadar yerel tutulur
+  - `saving` — `useState<boolean>` — `onSave` çağrısının devam edip etmediğini takip eder, bitene kadar input devre dışı kalır
+  - `inputRef` — `useRef<HTMLInputElement>` — input DOM elemanına erişim sağlar, düzenleme moduna girildiğinde odaklama ve seçim için kullanılır
+  - `useEffect` (draft senkron) — `value` değiştiğinde ve düzenleme modunda değilken `draft`'ı yeni `value` ile senkronize eder
+  - `useEffect` (focus) — `editing` `true` olduğunda input'a otomatik focus veselectAll yapar
+  - `startEdit` — `useCallback` — disabled veya saving değilse draft'ı value'dan doldurur ve editing modunu açar
+  - `cancel` — `useCallback` — draft'ı orijinal value'ya sıfırlar ve editing modunu kapatır
+  - `save` — `useCallback(async)` — draft trimlenmiş hali ile orijinal value karşılaştırır; değişiklik yoksa sadece modu kapatır, varsa `onSave(trimmed)` çağırır, hata olursa toast gösterir ve eski değere döner
+  - `handleKeyDown` — `useCallback` — Enter tuşunda `save()`, Escape tuşunda `cancel()` tetikler
+- **Dönüş**: `JSX.Element` — editing modunda `div` içinde `input` + optional spinner; normal modda `button` ile hücre değeri veya placeholder gösterilir
+
+### [N2_NASIL] AST Pointer: EditableCell.tsx::useEffect[draft-senkron]
+- **params**: yok (useEffect callback)
+- **ic_degiskenler**:
+  - `editing` — dış scope'tan; düzenleme modunda olup olmadığı kontrol edilir
+  - `value` — dış scope'tan; hücrenin güncel değeri, String'e çevrilerek draft'a yazılır
+  - `setDraft` — dış scope'tan; draft state setter'ı
+- **Dönüş**: yok (yan etki: `editing` false iken `draft`'ı `String(value ?? '')` ile günceller)
+
+### [N3_NASIL] AST Pointer: EditableCell.tsx::useEffect[focus]
+- **params**: yok (useEffect callback)
+- **ic_degiskenler**:
+  - `editing` — dış scope'tan; düzenleme modunda olup olmadığı kontrol edilir
+  - `inputRef` — dış scope'tan; input DOM elemanı referansı
+- **Dönüş**: yok (yan etki: editing true ve inputRef.current mevcutsa `focus()` ve `select()` çağırır)
+
+### [N4_NASIL] AST Pointer: EditableCell.tsx::startEdit
+- **params**: yok
+- **ic_degiskenler**:
+  - `disabled` — dış scope'tan; hücre devre dışıysa düzenleme başlatılmaz
+  - `saving` — dış scope'tan; kaydetme devam ediyorsa düzenleme başlatılmaz
+  - `value` — dış scope'tan; mevcut değer `String(value ?? '')` ile draft'a yazılır
+  - `setDraft` — dış scope'tan; draft state setter'ı
+  - `setEditing` — dış scope'tan; editing state setter'ı
+- **Dönüş**: yok (yan etki: disabled/saving değilse draft'ı value ile doldurup editing modunu açar)
+
+### [N5_NASIL] AST Pointer: EditableCell.tsx::cancel
+- **params**: yok
+- **ic_degiskenler**:
+  - `value` — dış scope'tan; mevcut değer `String(value ?? '')` ile draft'a geri yazılır
+  - `setDraft` — dış scope'tan; draft state setter'ı
+  - `setEditing` — dış scope'tan; editing state setter'ı
+- **Dönüş**: yok (yan etki: draft'ı orijinal value'ya sıfırlar ve editing modunu kapatır)
+
+### [N6_NASIL] AST Pointer: EditableCell.tsx::save
+- **params**: yok
+- **ic_degiskenler**:
+  - `draft` — dış scope'tan; input'taki mevcut düzenleme değeri, `.trim()` ile boşlukları temizlenir → `trimmed`
+  - `trimmed` — `draft.trim()` sonucu; karşılaştırma ve kaydetme için kullanılacak temizlenmiş değer
+  - `original` — `String(value ?? '')`; hücrenin orijinal değeri, karşılaştırma ve hata durumunda geri dönüş için kullanılır
+  - `value` — dış scope'tan; orijinal hücre değeri
+  - `onSave` — dış scope'tan; async kaydetme callback'i, `onSave(trimmed)` ile çağrılır
+  - `setEditing` — dış scope'tan; editing state setter'ı
+  - `setSaving` — dış scope'tan; saving state setter'ı
+  - `toast` — `sonner` import'undan; hata durumunda `toast.error('Güncelleme başarısız')` gösterir
+- **Dönüş**: yok (yan etki: değişiklik varsa `onSave(trimmed)` çağırır; hata olursa draft'ı orijinal değere sıfırlar ve hata toast'u gösterir; finally bloğunda saving'i false yapar)
+
+### [N7_NASIL] AST Pointer: EditableCell.tsx::handleKeyDown
+- **params**: `e` — `React.KeyboardEvent` — tuş olayı nesnesi
+- **ic_degiskenler**:
+  - `e.key` — basılan tuşun adı; `'Enter'` veya `'Escape'` kontrol edilir
+  - `e.preventDefault` — varsayılan tarayıcı davranışını engeller
+  - `save` — dış scope'tan; kaydetme fonksiyonu, Enter tuşunda tetiklenir (`void save()`)
+  - `cancel` — dış scope'tan; iptal fonksiyonu, Escape tuşunda tetiklenir
+- **Dönüş**: yok (yan etki: Enter → `save()`, Escape → `cancel()` çağırır; her iki durumda da `preventDefault()` ile varsayılan davranış engellenir)
 
 ---
 
@@ -14057,52 +13883,56 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx
-skeleton_hash: b3421236e71cdedd
+skeleton_hash: 761e75d04491351f
 entity_hashes:
-  func:InventoryCsvImport: bba4310bb8e97324
-  overview: 618d3c1361b05bd5
+  func:InventoryCsvImport: 312fdc52cc14a1c7
+  overview: e2963426468ad6fc
   style_tokens: 3e4e1345adb17abc
-generated_at: 2026-05-28T22:35:31Z
+generated_at: 2026-05-29T18:44:43Z
 ---
 
 ## Genel Bakış
-
-Bu modül, CSV dosyaları aracılığıyla envanter verilerini toplu olarak içe aktarmak için kullanılan bir React bileşenidir. Kullanıcıya bir dosya seçme, yüklenen verileri doğrulama ve belirli bir eşik değerine göre işleme imkanı sunar. İşlem başarıyla tamamlandığında bir geri çağrı fonksiyonu tetiklenir ve kullanıcıya sonuç bildirilir.
+Bu modül, CSV dosyaları aracılığıyla envanter (stok) verilerinin toplu olarak içe aktarılmasını sağlayan bir React bileşenidir. Kullanıcıya dosya yükleme, verileri önizleme ve onaylama, ardından seçilen eşik değerine göre stok ayarlama işlemi sunar.
 
 ## Fonksiyon Grupları
-
 ### Ana Bileşen
-Envanter CSV içe aktarma sürecinin tüm adımlarını yönetir; dosya seçimi, veri çözümleme, doğrulama, eşik değeri uygulama ve sonuç bildirimini tek bir yerde toplar.
+Envanter CSV içe aktarma sürecinin tüm kullanıcı arayüzü ve iş mantığını yönetir; dosya seçimi, doğrulama, önizleme ve nihai işleme adımlarını tek bir yerde toplar.
 - InventoryCsvImport
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, bir modal/dialog yapısı olarak tasarlanmıştır ve dış bağımlılıkların sağlanması gerekmektedir.
+
+[Aksiyom 1]: Eğer `onClose` callback'i sağlanmazsa, kullanıcı modalı kapatamaz ve bileşen çıkışsız kalır.
+
+[Aksiyom 2]: Eğer `onSuccess` callback'i sağlanmazsa, başarılı CSV içe aktarma işlemi sonrasında üst bileşene bildirim yapılamaz.
+
+[Aksiyom 3]: Eğer `effectiveThreshold` değeri sağlanmazsa, envanter verilerinin eşik bazlı işlenmesinde tanımsız davranış oluşur.
+
+[Aksiyom 4]: Eğer `isOpen` false veya tanımsız ise, modal görünür olmaz (bileşen rendered olmayabilir).
+
+[Aksiyom 5]: Eğer bileşen bir üst bileşen tarafından DOM'a yerleştirilmemişse (örn: bir Modal portal içinde değilse), dosya seçme ve doğrulama akışı görünür şekilde çalışmaz.
+
+[Aksiyom 6]: Eğer `effectiveThreshold` geçerli bir sayısal değer değilse (null, undefined veya string), eşik bazlı filtreleme/kabul kriteri uygulanamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### InventoryCsvImport
-**Ne yapar**: CSV dosyasından ürün stok bilgilerini okuyarak önizleme oluşturur, kullanıcıya gösterir ve isteğe bağlı olarak gerçek veritabanı güncellemelerini (veya sadece kuru çalıştırma) gerçekleştirir.  
+**Ne yapar**: CSV dosyasından toplu stok güncelleme yapmak için bir modal arayüzü sunar. Kullanıcının CSV dosyası yüklemesine, stok değişikliklerini önizlemesine ve (isteğe bağlı olarak) veritabanını güncellemesine olanak tanır. Kuru çalıştırma (dry-run) modu ile önce simülasyon yapılabilir.
 
-**Nasıl yapar**:  
-- Bileşen açıldığında (`isOpen` true) dosya seçimi bekler.  
-- `handleCsvImport` dosyayı metin olarak okur, başlık satırını analiz eder ve SKU ile miktar sütunlarını belirler.  
-- Satırları ayrıştırıp geçerli SKU ve sayısal miktarları doğrular; hatalı satırları toplar.  
-- Veritabanından ilgili ürünleri (`supabase.from('products')`) çekerek SKU‑product eşlemesi kurar.  
-- Her satır için yeni stok, mevcut stok ve kritik eşik (`effectiveThreshold`) karşılaştırması yaparak bir önizleme (`CsvPreviewRow`) oluşturur ve `csvPreview` durumuna kaydeder.  
-- `processCSV` fonksiyonu, önizleme verileri mevcutsa, kuru çalıştırma modunda sadece onay verir; aksi takdirde batch‑boyutlu (20) RPC çağrıları (`adjust_stock`) ile stok değişikliklerini uygular, işlem loglarını (`logAdminAction`) kaydeder ve ilerleme yüzdesini `csvProgress` ile günceller.  
-- Başarılı ve hatalı işlemler için toast bildirimleri gösterir, hataları CSV olarak indirilebilir kılar ve geri alma (undo) işlemi için `reverse_inventory_batch` RPC’sini çağırır.  
+**Nasıl yapar**: CSV dosyasını satır satır ayrıştırarak SKU ve miktar bilgilerini çıkarır. Mevcut ürün verisiyle eşleştirerek stok değişimlerini hesaplar ve bir önizleme tablosu oluşturur. `processCSV` fonksiyonu ile toplu veritabanı güncelleme yapar (20'şerli gruplar halinde). İşlem sonrası geri alma (undo) seçeneği sunan bir bildirim gösterir.
 
 **Parametreler**:
-- `isOpen`: boolean — Bileşenin görünür olup olmadığını belirler; false ise bileşen render edilmez.  
-- `onClose`: () => void — Kullanıcı kapanış butonuna tıkladığında veya işlem tamamlandığında çağrılan geri dönüş fonksiyonu.  
-- `onSuccess`: () => void — CSV işleme başarılı bir şekilde tamamlandığında tetiklenen geri dönüş fonksiyonu.  
-- `effectiveThreshold`: (productId: string) => number \| null — Bir ürünün kritik stok eşiğini döndüren fonksiyon; `null` ise eşik yoktur.  
+- isOpen: boolean — Modalın açılıp kapanmasını kontrol eder. `false` olduğunda bileşen `null` döner ve render edilmez.
+- onClose: () => void — Modal kapatıldığında çağrılan geri çağırma fonksiyonu.
+- onSuccess: () => void — Stok güncelleme başarıyla tamamlandığında çağrılan geri çağırma fonksiyonu.
+- effectiveThreshold: (productId: string) => number | null — Belirli bir ürün için stok eşik değerini döndüren fonksiyon. Stok durumu belirlemede kullanılır.
 
-**Dönüş**: void (React bileşeni JSX döndürür; fonksiyonun kendisi bir değer üretmez).
+**Dönüş**: JSX.Element | null — Modal açıkken JSX bileşeni, kapalıyken `null` döner.
 
 ---
 
@@ -14127,29 +13957,138 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleCsvImport
-- **params**: `(file: File)`
+- **params**: `file` (File) — CSV dosyası nesnesi
 - **ic_degiskenler**:
-  - `textRaw` — `await file.text()` ile dosyanın ham metni.
-  - `text` — UTF‑8 BOM kaldırılmış metin.
-  - `lines` — satır sonu karakterlerine göre bölünmüş, boş olmayan satırların dizisi.
-  - `split` — CSV satırlarını virgül dışındaki tırnakları koruyarak ayıran yardımcı fonksiyon.
-  - `headerRaw` — başlık satırının temizlenmiş, küçük harfe dönüştürülmüş hücreleri.
-  - `skuIdx` — `sku` başlığının indeks konumu.
-  - `qtyIdx` — `qty`/`quantity`/`stock`/`new_stock` başlıklarından birinin indeks konumu.
-  - `parsedRows` — geçerli satırların `{ line, sku, newQty }` nesneleri dizisi.
-  - `errors` — satır bazlı hata nesneleri `{ line, sku, message }` dizisi.
-  - `cells` — mevcut satırın `split` ile ayrılmış hücreleri.
-  - `sku` — `skuIdx` konumundaki hücre değeri, boşluklar temizlenmiş.
-  - `qtyStr` — `qtyIdx` konumundaki hücre değeri, boşluklar temizlenmiş.
-  - `newQty` — `qtyStr` sayısal değere dönüştürülmüş; boş ise `NaN`.
-  - `skus` — `parsedRows` içindeki benzersiz `sku` değerlerinin listesi.
-  - `products` — Supabase’dan çekilen ürün kayıtları (`id, sku, name, stock_qty`).
-  - `skuToProduct` — `sku` → `{ id, name, stock }` haritası.
-  - `preview` — `CsvPreviewRow` tipinde önizleme satırları dizisi.
-  - `product` — `skuToProduct` haritasından bulunan ürün bilgisi.
-  - `th` — `effectiveThreshold(product.id)` çağrısının sonucu.
-  - `status` — `row.newQty` ve `th` değerlerine göre `'out' | 'critical' | null`.
-- **Dönüş**: yok (yan etkileri: `setCsvPreview`, `toast` bildirimleri, `errors` toplama)
+  - `csvPreview` — CSV önizleme satırlarını tutan state (başlangıçta temizlenir)
+  - `textRaw` — Dosyadan okunan ham metin içeriği
+  - `text` — BOM karakteri temizlenmiş metin
+  - `lines` — Boş satırları filtrelenmiş CSV satırları dizisi
+  - `split` — CSV satırlarını virgülle ayıran ve tırnak işaretlerini işleyen yardımcı fonksiyon
+  - `headerRaw` — İlk satırın küçük harfe çevrilmiş ve boşlukları temizlenmiş hali
+  - `skuIdx` — SKU sütununun indeksi
+  - `qtyIdx` — Miktar sütununun indeksi (qty/quantity/stock/new_stock alternatifleriyle)
+  - `parsedRows` — Geçerli CSV satırlarının (line, sku, newQty) dizisi
+  - `errors` — Hatalı satırların (line, sku, message) dizisi
+  - `i` — For döngüsü sayaç değişkeni (satır numarası)
+  - `cells` — Mevcut satırın hücre değerleri dizisi
+  - `sku` — Mevcut satırın SKU değeri (trimmed)
+  - `qtyStr` — Mevcut satırın miktar değeri string olarak
+  - `newQty` — Sayıya çevrilmiş miktar (geçersiz ise NaN)
+  - `skus` — Benzersiz SKU değerlerinin dizisi
+  - `products` — Veritabanından getirilen ürün verileri (id, sku, name, stock_qty)
+  - `skuToProduct` — SKU'dan ürüne eşleme Map'i
+  - `preview` — Oluşturulan CsvPreviewRow dizisi
+  - `row` — parsedRows dizisinin her bir elemanı
+  - `product` — Mevcut satırın SKU'suna karşılık gelen ürün
+  - `th` — Ürün için eşik değeri (effectiveThreshold ile hesaplanan)
+  - `status` — Ürünün stok durumu ('out', 'critical' veya null)
+- **Dönüş**: yok (state günceller ve toast gösterir)
+
+### [N2_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleCsvProcess
+- **params**: yok
+- **ic_degiskenler**:
+  - `csvPreview` — İşlenecek CSV önizleme verisi
+  - `csvProcessing` — İşlem durumunu takip eden state
+  - `csvProgress` — İlerleme yüzdesi state'i
+  - `skus` — csvPreview'deki tüm SKU'ların dizisi
+  - `products` — Veritabanından getirilen ürün verileri (id, sku)
+  - `skuToId` — SKU'dan product_id'ye eşleme Map'i
+  - `dryRun` — Kuru çalıştırma modu (true ise gerçek işlem yapılmaz)
+  - `successCount` — Başarılı güncelleme sayısı sayaacı
+  - `errors` — Hatalı işlemlerin (sku, message) dizisi
+  - `batchId` — İşlem batch ID'si (generateId ile oluşturulan)
+  - `BATCH_SIZE` — Toplu işlem boyutu (20)
+  - `i` — For döngüsü sayaç değişkeni
+  - `chunk` — Mevcut toplu iş parçası (csvPreview.slice ile)
+  - `item` — chunk içindeki her bir eleman
+  - `_productId` — Mevcut SKU'nun product_id karşılığı
+  - `reason` — Stok hareketi açıklaması
+  - `error` — supabase.rpc hatası
+  - `logAdminAction` — Dinamik import edilen audit log fonksiyonu
+  - `err` — Try-catch'te yakalanan hata
+  - `downloadErrors` — Hataları CSV olarak indiren yerel fonksiyon
+  - `header` — Hata CSV başlık satırı
+  - `lines` — Hata satırları
+  - `csv` — Oluşturulan hata CSV içeriği
+  - `blob` — CSV verisi için Blob nesnesi
+  - `url` — Blob için oluşturulan URL
+  - `a` — İndirme bağlantısı için HTML anchor elementi
+  - `id` — toast.custom tarafından verilen toast ID'si
+- **Dönüş**: yok (onSuccess() ve onClose() çağırır)
+
+### [N3_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::processItem
+- **params**: `item` (CsvPreviewRow) — İşlenecek CSV satır verisi
+- **ic_degiskenler**:
+  - `skuToId` — SKU'dan product_id'ye eşleme Map'i (dış kapsamdan)
+  - `_productId` — Mevcut SKU'nun product_id karşılığı
+  - `reason` — Stok hareketi açıklaması
+  - `error` — supabase.rpc hatası
+  - `logAdminAction` — Dinamik import edilen audit log fonksiyonu
+  - `batchId` — İşlem batch ID'si (dış kapsamdan)
+  - `err` — Try-catch'te yakalanan hata
+  - `successCount` — Başarılı güncelleme sayacı (dış kapsamdan, güncellenir)
+  - `errors` — Hatalar dizisi (dış kapsamdan, güncellenir)
+- **Dönüş**: yok (successCount artırır veya errors'a ekler)
+
+### [N4_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::downloadErrors
+- **params**: yok
+- **ic_degiskenler**:
+  - `errors` — Hatalı işlemlerin dizisi (dış kapsamdan)
+  - `header` — CSV başlık satırı ['sku', 'message']
+  - `lines` — Her hata için CSV formatında satır
+  - `csv` — BOM ile başlayan tam CSV içeriği
+  - `blob` — CSV verisi için Blob nesnesi
+  - `url` — Blob için oluşturulan URL
+  - `a` — İndirme bağlantısı için HTML anchor elementi
+- **Dönüş**: yok (dosya indirme tetikler)
+
+### [N5_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::renderToastContent
+- **params**: `id` (string) — toast.custom tarafından verilen toast ID'si
+- **ic_degiskenler**:
+  - `successCount` — Başarılı güncelleme sayısı (dış kapsamdan)
+  - `batchId` — İşlem batch ID'si (dış kapsamdan)
+  - `errors` — Hatalı işlemlerin dizisi (dış kapsamdan)
+  - `downloadErrors` — Hataları indiren fonksiyon (dış kapsamdan)
+  - `csvUndoingRef` — Geri alma işlemini takip eden ref
+  - `onSuccess` — Başarı callback'i (dış kapsamdan)
+- **Dönüş**: JSX elementi (toast içeriği)
+
+### [N6_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleUndo
+- **params**: yok
+- **ic_degiskenler**:
+  - `csvUndoingRef` — Geri alma işlemini takip eden ref
+  - `batchId` — İşlem batch ID'si (dış kapsamdan)
+  - `data` — reverse_inventory_batch RPC sonucu
+  - `error` — RPC hatası
+  - `undone` — Geri alınan hareket sayısı
+  - `e` — Try-catch'te yakalanan hata
+- **Dönüş**: yok (toast gösterir ve onSuccess() çağırır)
+
+### [N7_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleFileChange
+- **params**: `e` (ChangeEvent<HTMLInputElement>) — Dosya input değişiklik olayı
+- **ic_degiskenler**:
+  - `file` — Seçilen dosya (e.target.files[0])
+  - `handleCsvImport` — CSV import fonksiyonu (dış kapsamdan)
+- **Dönüş**: yok (handleCsvImport çağırır)
+
+### [N8_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleKeyDown
+- **params**: `e` (KeyboardEvent) — Klavye olayı
+- **ic_degiskenler**:
+  - `dryRun` — Kuru çalıştırma modu state'i
+  - `setDryRun` — dryRun state setter'ı
+- **Dönüş**: yok (dryRun toggle eder)
+
+### [N9_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::renderPreviewRow
+- **params**: 
+  - `item` (CsvPreviewRow) — Önizleme satır verisi
+  - `idx` (number) — Satır indeksi
+- **ic_degiskenler**:
+  - `item.name` — Ürün adı
+  - `item.sku` — Ürün SKU'su
+  - `item.current` — Mevcut stok miktarı
+  - `item.new` — Yeni stok miktarı
+  - `item.delta` — Stok değişim miktarı
+- **Dönüş**: JSX table row elementi
 
 ---
 
@@ -14432,33 +14371,26 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryQrLabel.tsx
-skeleton_hash: 1c3557ada2a9bd3b
+skeleton_hash: ebe773dcc2c30493
 entity_hashes:
   func:printQrLabel: 68158948d578d02a
-  overview: 59c570f5c42e413d
+  overview: ddf13ce18f5512aa
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:35:36Z
+generated_at: 2026-05-29T18:45:03Z
 ---
 
 ## Genel Bakış
-InventoryQrLabel bileşeni, envanter öğeleri için QR kod etiketlerinin oluşturulması ve yazdırılmasından sorumludur. Kullanıcı etkileşimiyle tetiklenen asenkron bir işlem yürütür, yazdırma sürecinin durumunu yönetir ve ilgili UI güncellemelerini sağlar.
+Bu modül, envanter kalemleri için QR kod etiketlerinin yazdırılmasını yöneten tek bir odaklı işlev sunar. Kullanıcının yazdırma tetiklemesiyle asenkron olarak çalışan fonksiyon, yazdırma sürecinin UI üzerindeki durumunu (yazdırılıyor/yazdırıldı) kontrol eder.
 
 ## Fonksiyon Grupları
 ### QR Etiket Yazdırma
-Bu grup, QR kod etiketinin hazırlanması, yazdırma komutunun gönderilmesi ve yazdırma işleminin ilerleyişinin UI’da yansıtılmasından sorumludur.
+Etiket yazdırma sürecinin tüm aşamalarını — hazırlık, basıcıya gönderim ve durum yönetimi — tek bir işlevde kümeler.
 - printQrLabel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması gerekir; koşullar sağlanmazsa fonksiyonun davranışı belirsiz veya hata verebilir.
-
-- **Eğer** `r` parametresi geçerli bir `QrLabelProps` nesnesi **olmazsa**, fonksiyon QR kod verisini hazırlayamayacağından işlem başarısız olur veya bir hata fırlatır.  
-- **Eğer** `setPrintingQr` parametresi bir fonksiyon **olmazsa**, yazdırma sürecinin durumunu UI’a yansıtmak için state güncellenemez; bu da kullanıcıya yazdırma ilerlemesinin gösterilmesini engeller.  
-- **Eğer** `QrLabelProps` içindeki QR kod üretimi için zorunlu veri alanları (örneğin kimlik, açıklama vb.) **eksikse veya geçersizse**, oluşturulan QR kod boş veya hatalı olur ve yazdırma işlemi beklenildiği gibi gerçekleşmez.  
-- **Eğer** fonksiyon asenkron bir işlem (örneğin basıcıyla iletişim) gerçekleştiriyorsa ve bu işlem sırasında bir hata oluşursa, `setPrintingQr(false)` çağrısı yapılarak yazdırma durumunun sıfırlanması beklenir; aksi takdirde UI sürekli “yazdırılıyor” durumunda kalabilir.  
-
-Bu varsayımlar, fonksiyon gövdesindeki dış bağımlılıklar ve veri akışı üzerinden türetilmiştir; docstring, yorum veya değişken isimlerinden çıkarılmamıştır.
+Bu modül, QR etiket yaz
 
 ---
 
@@ -14486,25 +14418,19 @@ Bu varsayımlar, fonksiyon gövdesindeki dış bağımlılıklar ve veri akış�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/InventoryQrLabel.tsx::printQrLabel
-- **params**: r: QrLabelProps, setPrintingQr: (v: boolean) => void
+### [N1_NASIL] AST Pointer: InventoryQrLabel.tsx::printQrLabel
+- **params**: `(r: QrLabelProps, setPrintingQr: (v: boolean) => void)`
+  - `r` — QR etiketi basılacak ürünün bilgilerini taşıyan nesne; `r.product_id`, `r.name`, `r.warehouse_location`, `r.physical_stock` alanları kullanılır
+  - `setPrintingQr` — yazdırma işleminin devam edip etmediğini belirten state setter; `true` ile başlar, `finally` bloğunda `false` yapılır
 - **ic_degiskenler**:
-  - `window` — global object used to check if running in browser (typeof window === 'undefined')
-  - `url` — string containing QR code API URL with encoded product_id
-  - `iframe` — HTMLIFrameElement created to host printable HTML content
-  - `safeName` — sanitized product name with HTML entities escaped
-  - `safeSku` — uppercase first 8 chars of product_id with HTML escaping
-  - `safeLoc` — warehouse location string with HTML escaping, default '-'
-  - `htmlContent` — full HTML string for the label page, includes interpolated variables
-  - `doc` — document object of the iframe's contentWindow, used to write HTML
-  - `toast` — imported react-hot-toast function for error notification
-- **Dönüş**: yok (function returns undefined; side effects: sets printing state, creates iframe, triggers print, shows toast on error)
-
-### [N2_NASIL] AST Pointer: src/components/admin/InventoryQrLabel.tsx::setTimeout callback
-- **params**: (none)
-- **ic_degiskenler**:
-  - `iframe` — reference to the iframe element captured from outer scope; used to check if still attached and remove it from DOM
-- **Dönüş**: yok (callback returns undefined; side effect: removes iframe after delay)
+  - `url` — qrserver.com API'si kullanılarak oluşturulan QR kod görselinin URL adresi; `r.product_id` Base64-URL-encode edilerek dataya eklenir
+  - `iframe` — yazdırma işlemini gerçekleştirmek için DOM'a eklenen gizli iframe elemanı; HTML içeriği içine yazılır ve `window.print()` tetiklenir
+  - `safeName` — `r.name` değerinin XSS-safe hali; `<` ve `>` karakterleri HTML entity'lerine dönüştürülür; HTML template'de ürün adı olarak gösterilir
+  - `safeSku` — `r.product_id`'den ilk 8 karakter alınıp büyük harfe çevrilmiş, XSS-safe SKU kodu; HTML template'de "SKU Kodu" olarak gösterilir
+  - `safeLoc` — `r.warehouse_location` değerinin XSS-safe hali; boşsa `'-'` değeri kullanılır; HTML template'de "Depo Rafı" olarak gösterilir
+  - `htmlContent` — iframe içine yazılacak tam HTML doküman stringi; CSS stilleri, QR görseli, ürün bilgileri ve yazdırma medya sorgularını içerir; `safeSku`, `safeName`, `safeLoc`, `url`, `r.physical_stock` template literal ile interpolatedir
+  - `doc` — `iframe.contentWindow?.document` ifadesinden elde edilen iframe'in Document nesnesi; `null` kontrolü yapılarak `doc.open()`, `doc.write(htmlContent)`, `doc.close()` ile HTML içeriği iframe'a yazılır
+- **Dönüş**: yok — fonksiyon asenkrondür, doğrudan bir değer dönmez; yan etki olarak iframe oluşturur, HTML yazar, 5 saniye sonra iframe'ı DOM'dan kaldırır; hata durumunda `toast.error('Etiket oluşturulamadı')` gösterir; her durumda `setPrintingQr(false)` çağırır
 
 ---
 
@@ -15393,27 +15319,46 @@ entity_hashes:
   func:CategoryFormModal: 45e70a4b9811a0d5
   func:handleImageUpload: 633c0036d64f1044
   func:onSubmit: c1bb6fdd37c1f2b9
-  overview: aa842adfcce629ec
+  overview: ea6088aded43e4e6
   style_tokens: 6073b78732e76f74
-generated_at: 2026-05-28T22:35:21Z
+generated_at: 2026-05-29T18:45:22Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelinde kategori ekleme ve düzenleme işlemlerini yöneten bir form modal bileşenidir. Kullanıcıdan kategori adı, açıklama ve görsel gibi bilgileri alır, geçerlilik kontrollerini yapar ve ilgili API çağrılarını tetikler. Modal açılıp kapanma durumu, mevcut kategori verisi ve başarı durumunda çağrılacak geri çağrı (callback) gibi dışarıdan aldığı özelliklerle (props) esnek bir kullanım sunar.
+Bu modül, yönetici panelinde kategorilerin eklenmesini ve düzenlenmesini sağlayan bir form modalı bileşenidir. Kullanıcıdan kategori adı, açıklama ve görsel bilgilerini toplar, doğrular ve ilgili API isteklerini başlatır. Bileşen, dışarıdan kontrol edilen açılıp kapanma durumu ve mevcut kategori verisi ile esnek bir yapı sunar.
 
 ## Fonksiyon Grupları
-### Form Gönderimi ve Veri İşleme
-Kullanıcının doldurduğu form verilerini alır, doğrular ve yeni bir kategori oluşturmak veya mevcut kategoriyi güncellemek için gerekli işlemleri başlatır.
-- handleImageUpload, onSubmit
-
-### Bileşenin Kendisi
-Form modalının tüm yapısını, görünümünü ve alt bileşenlerini düzenleyen ana fonksiyondur. Açılma/kapanma durumu, başlık, form alanları ve butonlar gibi kullanıcı arayüzü ögelerini içerir.
+### Bileşenin Ana Yapısı
+Tüm modal penceresinin yapısını, başlığını, form alanlarını ve butonlarını oluşturan ve yöneten ana React bileşenidir.
 - CategoryFormModal
+
+### Form İşlemleri ve Veri Yönetimi
+Kullanıcının form verilerini doğrulayan, görsel yükleyen ve form gönderiminde gerekli API çağrılarını tetikleyen iş mantığını barındırır.
+- handleImageUpload, onSubmit
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, kategori formu modal bileşeni olup, formun açılması, doğrulanması ve gönderilmesi için dış bağımlılıklara ve geçerli verilere ihtiyaç duyar.
+
+[Aksiyom 1]: Eğer `open` prop'u `false` olarak verilirse, modal görüntülenmez ve form içeriği sıfırlanmaz (sadece kapanır).
+
+[Aksiyom 2]: Eğer `onOpenChange` callback'i sağlanmazsa, modal'ın kapanma tetikleyicisi çalıştırılamaz ve kullanıcı modal'ı kapatamaz.
+
+[Aksiyom 3]: Eğer `onSuccess` callback'i sağlanmazsa, form başarılı şekilde gönderildiğinde üst bileşene bildirim yapılamaz ve veri yenileme tetiklenemez.
+
+[Aksiyom 4]: Eğer `category` prop'u verilmezse (undefined/null), modal "yeni kategori ekleme" modunda çalışır; verilirse "mevcut kategori düzenleme" moduna geçer.
+
+[Aksiyom 5]: Eğer `categorySchema` (Zod şeması) geçerli bir şema olarak çağrılamazsa (`.parse` veya `.safeParse` hata fırlatırsa), form gönderimi reddedilir ve API isteği gönderilmez.
+
+[Aksiyom 6]: Eğer `handleImageUpload` fonksiyonuna geçerli bir `React.ChangeEvent<HTMLInputElement>` verilmezse veya event içindeki dosya (`e.target.files`) boş/null ise, görsel yükleme işlemi gerçekleştirilmez.
+
+[Aksiyom 7]: Eğer `onSubmit` fonksiyonuna `CategoryFormValues` tipine uymayan bir değer verilirse, TypeScript derleme zamanı hatası oluşur veya runtime'da beklenmeyen davranış gözlemlenebilir.
+
+[Aksiyom 8]: Eğer `categorySchema` doğrulaması başarısız olursa, form hataları gösterilir ve `onSubmit` fonksiyonu çağrılmaz.
+
+[Aksiyom 9]: Eğer `categorySchema` içinde tanımlı alanlar (ad, açıklama, görsel vb.) zorunluysa, kullanıcı bu alanları doldurmadan form gönderimi başarısız olur.
 
 ---
 
@@ -15486,65 +15431,40 @@ type CategoryFormValues = z.infer<typeof categorySchema>
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::CategoryFormModal
-- **params**: `open`, `onOpenChange`, `category`, `onSuccess`
+- **params**: `open` — modal'ın açık olup olmadığını belirler (boolean), `onOpenChange` — modal durumunu değiştiren callback, `category` — düzenlenecek kategori objesi (null ise yeni kategori), `onSuccess` — başarılı işlem sonrası çağrılan callback
 - **ic_degiskenler**:
-  - `fetchParents` — component içinde tanımlı async fonksiyon, parent kategorileri getirir ve `setParentIdOptions` ile state günceller.
-  - `form` — `useForm` hookundan dönen nesne, form değerlerini yönetir (`reset`, `setValue` vb.).
-  - `setParentIdOptions` — parent seçeneklerini tutan state setter.
-  - `setPreviewImage` — seçilen/resim URL’sini tutan state setter.
-  - `setUploadingImage` — resim yükleme sırasında loading state’i yöneten setter.
-  - `setLoading` — form submit sırasında loading state’i yöneten setter.
-  - `handleImageUpload` — resim seçildiğinde çalıştırılan async fonksiyon (aşağıda ayrı pointer).
-  - `onSubmit` — form submit handler (aşağıda ayrı pointer).
-- **Dönüş**: React bileşeni JSX döndürür; yan etkileri (`useEffect`) içinde veri çekme ve form resetleme yapılır.
+  - `fetchParents` — supabase'den parent_id'si null olan kategorileri çekip `parentIdOptions` state'ini güncelleyen inner async fonksiyon; kendi kendine parent olmasını önler (`neq('id', category?.id || '00000000-...')`)
+  - `form` — `useForm` ile oluşturulan form instance, `zodResolver(categorySchema)` ile doğrulanır
+  - `parentIdOptions` — `setParentIdOptions` ile set edilen üst kategori listesi state'i
+  - `previewImage` — `setPreviewImage` ile set edilen önizleme görseli URL'i state'i
+  - `uploadingImage` — `setUploadingImage` ile set edilen yükleme durumu state'i (boolean)
+  - `loading` — `setLoading` ile set edilen form gönderim yüklenme durumu state'i (boolean)
+  - `category?.id` — mevcut kategorinin ID'si, fetchParents'ta self-parenting önlemede kullanılır
+  - `category?.name, .slug, .parent_id, .description, .seo_title, .seo_desc, .is_featured, .sort_order, .image_url` — form reset'te mevcut kategori değerlerinden doldurulan alanlar
+  - `category?.metadata?.metric1?.value, .label, .metadata?.metric2?.value, .label` — metadata içinden metric alanları, form reset'te kullanılır
+  - `p.id`, `p.name` — select option render'ında her üst kategori için id ve adı
+- **Dönüş**: `React.FC<CategoryFormModalProps>` — Dialog, Tabs, form alanları ve submit butonlarından oluşan JSX
 
-### [N2_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::fetchParents
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::handleImageUpload
+- **params**: `e: React.ChangeEvent<HTMLInputElement>` — input change eventi
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen kategori listesi (`id`, `name` alanları).
-- **Dönüş**: `setParentIdOptions(data)` ile state günceller; explicit return yoktur.
+  - `file` — `e.target.files?.[0]` ile elde edilen ilk seçilen dosya; yoksa fonksiyon erken return eder
+  - `compressedFile` — `compressImage(file)` ile sıkıştırılmış dosya, Supabase'e yüklenmeden önce optimize edilir
+  - `fileExt` — `file.name.split('.').pop()` ile elde edilen dosya uzantısı (ör: jpg, png)
+  - `fileName` — `crypto.randomUUID()` ile üretilen benzersiz dosya adı, uzantıyla birleştirilir
+  - `filePath` — `category-images/${fileName}` olarak tanımlı Supabase storage içi tam dosya yolu
+  - `uploadError` — `supabase.storage.from('products').upload()` sonucu dönen hata; varsa fırlatılır
+  - `publicUrl` — `supabase.storage.from('products').getPublicUrl(filePath)` ile elde edilen herkese açık görsel URL'i
+- **Dönüş**: yok (yan etkiler: `form.setValue('image_url', publicUrl)`, `setPreviewImage(publicUrl)`, toast bildirimleri)
 
-### [N3_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::useEffect‑open
-- **params**: (parametre yok) – `useEffect` callback
+### [N3_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::onSubmit
+- **params**: `values: CategoryFormValues` — react-hook-form'dan gelen doğrulanmış form değerleri
 - **ic_degiskenler**:
-  - `open` – component prop, modal açık olduğunda `fetchParents` çağrılır.
-- **Dönüş**: yok (effect içinde yan etki).
-
-### [N4_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::useEffect‑category
-- **params**: (parametre yok) – `useEffect` callback
-- **ic_degiskenler**:
-  - `category` – prop, var ise form `reset` edilir ve `setPreviewImage` çağrılır; yoksa boş değerlerle reset yapılır.
-  - `form` – `useForm` nesnesi, `reset` metodu ile form değerlerini ayarlar.
-  - `setPreviewImage` – resim önizleme state setter.
-- **Dönüş**: yok (effect içinde yan etki).
-
-### [N5_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::handleImageUpload
-- **params**: `e` — `React.ChangeEvent<HTMLInputElement>`
-- **ic_degiskenler**:
-  - `file` — seçilen dosya (`e.target.files?.[0]`).
-  - `compressedFile` — `compressImage(file)` sonucu elde edilen sıkıştırılmış dosya.
-  - `fileExt` — dosya uzantısı (`file.name.split('.').pop()`).
-  - `fileName` — UUID ve uzantıdan oluşan yeni dosya adı.
-  - `filePath` — Supabase storage içinde dosyanın yolu (`category-images/${fileName}`).
-  - `uploadError` — storage upload işlemi sırasında oluşabilecek hata.
-  - `publicUrl` — yüklenen dosyanın herkese açık URL’si (`supabase.storage.from('products').getPublicUrl(filePath)`).
-- **Dönüş**: yok (state güncellemeleri ve toast bildirimleriyle yan etki).
-
-### [N6_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::onSubmit
-- **params**: `values` — `CategoryFormValues`
-- **ic_degiskenler**:
-  - `metadata` — `CategoryMetadata` nesnesi, metric1 ve metric2 bilgilerini içerir.
-  - `updateData` — `CategoryUpdate` nesnesi, mevcut kategori güncellenirken kullanılan alanlar ve `metadata` (JSON’a dönüştürülmüş).
-  - `insertData` — `CategoryInsert` nesnesi, yeni kategori eklenirken kullanılan alanlar, `metadata` ve boş `authority_content` dizisi.
-  - `error` — Supabase `update` veya `insert` işlemi sırasında oluşan hata.
-- **Dönüş**: yok (state güncellemeleri, toast bildirimleri ve `onSuccess`, `onOpenChange` callback’leriyle yan etki).
-
-### [N7_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::optionRender
-- **params**: `p` — parent seçenek nesnesi (`{ id, name }`)
-- **ic_degiskenler**:
-  - `p.id` — option value attribute.
-  - `p.name` — option display text.
-- **Dönüş**: JSX `<option>` elementi; explicit return yoktur (inline render).
+  - `metadata` — `CategoryMetadata` nesnesi; `values.metric1_label`, `values.metric1_value`, `values.metric2_label`, `values.metric2_value` değerlerinden oluşur, Supabase'e JSON olarak kaydedilir
+  - `updateData` — `category` varsa (düzelleme modu) oluşturulan `CategoryUpdate` nesnesi; `values.name, .slug, .parent_id, .description, .seo_title, .seo_desc, .is_featured, .sort_order, .image_url` ve `toSupabaseJson(metadata)` içerir
+  - `insertData` — `category` yoksa (yeni ekleme modu) oluşturulan `CategoryInsert` nesnesi; updateData ile aynı alanlara ek olarak `authority_content: []` içerir
+  - `error` — `supabase.from('categories').update()` veya `.insert()` sonucu dönen hata; varsa fırlatılır
+- **Dönüş**: yok (yan etkiler: `supabase.from('categories').update/insert` ile veritabanı yazma, `onSuccess()` çağrısı, `onOpenChange(false)` ile modal'ı kapatma, toast bildirimleri)
 
 ---
 
@@ -16221,21 +16141,21 @@ skeleton_hash: b97e5d93501ef882
 entity_hashes:
   func:ProductFormModal: 6997b37c35b0ebef
   func:onSubmit: 56cec6a550e2cc75
-  overview: 12f9cde3f23a5605
+  overview: 2b203263d8652482
   style_tokens: 553a7b8fa0cd3c86
-generated_at: 2026-05-28T22:35:35Z
+generated_at: 2026-05-29T18:45:50Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici paneli ürün yönetimi için ürün ekleme ve düzenleme işlemlerini gerçekleştiren bir form modal bileşenidir. Modalın açık/kapalı durumunu, form verilerini ve işlem sonuçlarını dışarıdan gelen prop'lar aracılığıyla yönetir.
+Bu modül, yönetici panelinde ürün ekleme ve düzenleme işlevselliğini sunan bir React form modal bileşenidir. Modül, modalın görünürlüğünü, formun çalışma modunu (yeni kayıt veya mevcut kaydı düzenleme) ve form gönderim sonrasındaki akışı yöneterek kullanıcı arayüzündeki ürün Yönetim sürecini merkezileştirir.
 
 ## Fonksiyon Grupları
-### Modal Ana Bileşeni
-Modalın temel yapısını, görünürlük durumunu ve formun çalışma modunu (yeni ürün ekleme / mevcut ürünü düzenleme) yönetir. Dışarıdan gelen prop'ları işleyerek formun doğru şekilde çalışmasını sağlar.
+### Modal Bileşeni ve Yönetimi
+Bileşenin temel yapısını, dışarıdan kontrol edilen görünürlük durumunu ve formun başlangıç değerlerini (yeni ürün veya mevcut ürün verileriyle doldurma) yönetir. Prop'lar aracılığıyla modunun açılıp kapanmasını ve üst bileşenle olan etkileşim kurallarını belirler.
 - ProductFormModal
 
-### Form Gönderim İşleyicisi
-Formdan alınan verileri işleyerek ürün ekleme veya düzenleme işlemini gerçekleştirir. İşlem başarılı olduğunda ilgili geri çağırmaları tetikleyerek modalın kapanmasını ve ana bileşenin bilgilendirilmesini sağlar.
+### Form Gönderim ve Veri İşleme
+Kullanıcı formu doldurup gönderdiğinde tetiklenen asenkron işlemcidir. Doğrulanmış form verilerini alır, bir API isteği gönderir ve işlemin başarısına veya başarısızlığına göre ilgili geri çağırma fonksiyonlarını (onSuccess, onClose) tetikleyerek uygulamanın durumunu günceller.
 - onSubmit
 
 ---
@@ -16251,11 +16171,28 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 **Aksiyom 4**: Eğer `onSuccess` callback’i tanımlı değilse, form başarılı bir şekilde gönderildiğinde (doğrulama ve API çağrısı başarılı) uygulama başka bir yan etki (örn. bildirim, yönlendirme) gerçekleştirmez.  
 
-**Aksiyom 5**: Eğer `_productId` prop’u sağlanmazsa, modal “yeni ürün ekle” modunda çalışır; sağlanırsa “ürün düzenle” modunda çalışır ve `productSchema`/form başlangıç değerleri bu kimliğe göre doldurulur.  
+**Aksiyom 5**: Eğer `_productId` prop’u sağlanmazsa, modal “yeni ürün ekle” modunda çalışır; sağlanırsa “ürün düzenleme” modunda çalışır ve form alanı mevcut ürün bilgileriyle başlangıç değerleri olarak doldurulur.
 
-**Aksiyom 6**: Eğer `onSubmit` fonksiyonuna geçirilen `values` nesnesi `productSchema` ile uyumlu değilse, gönderim sırasında doğrulama hatası fırlatılır ve `onSuccess` çağrılmaz.  
+---
 
-**Aksiyom 7**: Eğer `ProductFormValues` tipindeki zorunlu alanlar eksik ya da `null`/`undefined` ise, `onSubmit` içinde bu eksiklikler tespit edilir ve form gönderimi reddedilir. (Bu alanların tam listesi **bilinmiyor**; tip tanımından çıkarılamamıştır.)
+## AXIOMS – Mimari Varsayımlar
+Bu modül, bir ürün ekleme/düzenleme formunu yöneten bir React modal bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer `open` prop'u truthy (true veya_truthy bir değer) değilse, modalın görünür olmaması ve formun render edilmemesi gerekir. Aksi takdirde form kullanıcıya hata vermeden gösterilebilir.
+
+[Aksiyom 2]: Eğer `_productId` prop'u sağlanmamışsa (undefined), modülün "yeni ürün ekleme" modunda çalışması ve submit işlemi sırasında bir oluşturma (create) isteği yapması gerekir.
+
+[Aksiyom 3]: Eğer `_productId` prop'u sağlanmışsa (undefined değil), modülün "ürün düzenleme" modunda çalışması, mevcut ürün verilerini form alanlarına doldurması ve submit işlemi sırasında bir güncelleme (update) isteği yapması gerekir.
+
+[Aksiyom 4]: Form alanları `productSchema` ile doğrulanmalıdır. Eğer girilen değerler şemaya uymuyorsa, form submit edilmeli ve kullanıcıya hata gösterilmelidir.
+
+[Aksiyom 5]: Form submit edildiğinde (submit işlemi başarılı olduğunda), `onSuccess` callback'inin çağrılması zorunludur. Çağrılmazsa, dış bileşenler (örn. ürün listesi) güncellenemez.
+
+[Aksiyom 6]: `onClose` callback'inin, modal kapatma isteği (başarılı bir işlem sonrası veya iptal durumunda) oluştuğunda çağrılması beklenir. Çağrılmazsa, modalın açık kalması dışarıdan yönetilemez.
+
+[Aksiyom 7]: Submit işlemi (form verilerinin işlenmesi) asenkron bir süreçtir. İşlem devam ederken formun tekrar tekrar submit edilmesi (çift tıklama vb.) engellenmelidir; aksi halde birden fazla istek gönderilebilir.
+
+[Aksiyom 8`: Modül, `open` prop'unun değişkenliğine (true/false geçişlerine) tepki vererek form durumunu (dolu/boş alanlar, hata durumları) resetlemelidir. Aksi halde önceki form verileri yeni bir açılışta kalabilir.
 
 ---
 
@@ -16317,57 +16254,53 @@ type ProductFormValues = z.infer<typeof productSchema>
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::ProductFormModal
-- **params**: `_productId, open, onClose, onSuccess`
+- **params**: `_productId` — düzenlenecek ürünün ID'si (yeni ürün ise undefined), `open` — modalın açık olup olmadığı boolean, `onClose` — modalı kapatma callback fonksiyonu, `onSuccess` — başarılı işlem sonrası çağrılan callback fonksiyonu
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook’den gelen çeviri fonksiyonu.
-  - `loading` — form ve veri işlemleri sırasında gösterilen yükleme durumu (boolean).
-  - `setLoading` — `loading` değerini güncelleyen state setter.
-  - `categories` — veritabanından çekilen kategori listesi (DbCategory[]).
-  - `setCategories` — `categories` değerini güncelleyen state setter.
-  - `register` — form alanlarını `react-hook-form` ile bağlamak için kullanılan fonksiyon.
-  - `handleSubmit` — form submit olayını `react-hook-form` ile sarmalayan fonksiyon.
-  - `reset` — form alanlarını varsayılan ya da çekilen değerlerle sıfırlayan fonksiyon.
-  - `errors` — form doğrulama hatalarını içeren nesne (`formState.errors`).
-  - `loadProduct` — ürün detaylarını id’ye göre çeken `useCallback` fonksiyonu (aşağıda ayrı olarak tanımlanmıştır).
-  - `onSubmit` — form gönderildiğinde çalıştırılan async fonksiyon (aşağıda ayrı olarak tanımlanmıştır).
-- **Dönüş**: JSX element (React component output). Fonksiyon yan etkileri: state güncellemeleri, veri çekme, toast bildirimleri.
+  - `t` — useI18n hookundan dönen çeviri fonksiyonu, UI metinlerini lokalize etmek için kullanılır
+  - `loading` — form gönderimi veya veri yükleme sırasında true olan boolean durum değişkeni
+  - `setLoading` — loading durumunu güncelleyen state setter
+  - `categories` — DbCategory dizisi, Supabase'den çekilen kategori listesi, formdaki kategori select dropdown'ını doldurur
+  - `setCategories` — categories durumunu güncelleyen state setter
+  - `register` — react-hook-form register fonksiyonu, form inputlarını form state'e bağlar
+  - `handleSubmit` — react-hook-form'un submit wrapper'ı, validasyon sonrası onSubmit callback'ini çağırır
+  - `reset` — form alanlarını sıfırlayan veya varsayılan/fetch edilen değerlerle dolduran react-hook-form fonksiyonu
+  - `errors` — formState içinden alınan validasyon hataları nesnesi, her alan için hata mesajı içerir
+  - `loadProduct` — useCallback ile sarılı async fonksiyon, verilen ID ile Supabase'den ürün çekip form alanlarını doldurur
+  - `onSubmit` — form gönderiminde çalışan async fonksiyon, ürün oluşturma veya güncelleme işlemini yürütür
+- **Dönüş**: JSX element (Dialog bileşeni) veya `null` (modal kapalıyken)
 
 ### [N2_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::loadProduct
-- **params**: `id`
+- **params**: `id` — string, yüklenecek ürünün benzersiz ID'si
 - **ic_degiskenler**:
-  - `setLoading` — dışarıdaki `loading` state’ini `true` yapar.
-  - `product` — `supabase.from('products').select(...).eq('id', id).single()` sorgusundan dönen ürün verisi.
-  - `error` — aynı sorgudan dönen olası hata nesnesi.
-  - `reset` — form alanlarını `product` verisiyle doldurur.
-- **Dönüş**: yok (void). Yan etkileri: `loading` state’i, form `reset`, hata durumunda toast gösterimi.
+  - `product` — Supabase'den dönen `data` alanının alias'ı, tüm ürün alanlarını (name, sku, brand, price, vb.) içeren DbProduct nesnesi; `reset` ile form alanlarına dağıtılır
+  - `error` — Supabase `.single()` sorgusundan dönen hata nesnesi, varsa `throw` edilir
+- **Dönüş**: yok (yan etki: `setLoading` ile loading durumunu değiştirir, `reset` ile formu doldurur, hata olursa `toast.error` gösterir)
 
-### [N3_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::fetchCategories (inner function of useEffect)
-- **params**: (yok)
+### [N3_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::fetchCategoriesEffect
+- **params**: yok
 - **ic_degiskenler**:
-  - `setCategories` — dışarıdaki `categories` state’ini günceller.
-  - `data` — `supabase.from('categories').select(...).order('name').returns<DbCategory[]>()` sorgusundan dönen kategori dizisi.
-- **Dönüş**: yok (void). Yan etkileri: `categories` state’ini doldurur.
+  - `fetchCategories` — useEffect içinde tanımlı async inner fonksiyon, Supabase'den tüm kategorileri çeker ve `setCategories` ile state'e yazar
+- **Dönüş**: yok (yan etki: bileşen mount edildiğinde kategorileri yükler)
 
-### [N4_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::openEffect (second useEffect)
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::fetchCategories
+- **params**: yok
 - **ic_degiskenler**:
-  - `open` — modalın açık/kapalı durumu.
-  - `_productId` — düzenleme modunda mevcut ürün id’si.
-  - `loadProduct` — `_productId` mevcutsa ürün detaylarını çeken fonksiyon.
-  - `reset` — yeni ürün ekleme modunda formu varsayılan değerlere sıfırlar.
-- **Dönüş**: yok (void). Yan etkileri: koşula bağlı olarak `loadProduct` çağrısı veya `reset`.
+  - `data` — Supabase categories tablosundan dönen DbCategory dizisi, `order('name')` ile alfabetik sıralanmış; `setCategories(data || [])` ile state'e atanır
+- **Dönüş**: yok (yan etki: `setCategories` çağrısı ile state güncellenir)
 
-### [N5_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::onSubmit
-- **params**: `values`
+### [N5_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::useEffectOpenHandler
+- **params**: yok
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: modal açıldığında `_productId` varsa `loadProduct(_productId)` çağırır, yoksa formu varsayılan değerlerle `reset` eder)
+
+### [N6_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::onSubmit
+- **params**: `values` — ProductFormValues, react-hook-form tarafından doğrulanmış form değerleri (name, sku, brand, category_id, status, price, vb.)
 - **ic_degiskenler**:
-  - `setLoading` — işlem başlangıcında `true`, sonunda `false` yapar.
-  - `payload` — gönderilecek veri nesnesi; `values` içeriğini yayar ve `technical_specs` alanını `DbJson` tipine dönüştürür. Tipi `_productId` var ise `DbProductUpdate`, yok ise `DbProductInsert`.
-  - `error` — `supabase` insert/update işlemlerinden dönen olası hata.
-  - `toast` — işlem sonucuna göre başarı veya hata mesajı gösterir.
-  - `onSuccess` — dışarıdan gelen, işlem başarılı olduğunda çalıştırılan callback.
-  - `onClose` — modalı kapatan dışarıdan gelen callback.
-  - `t` — hata mesajı çevirisi için kullanılan i18n fonksiyonu.
-- **Dönüş**: yok (void). Yan etkileri: veri tabanı güncellemesi/eklemesi, toast bildirimleri, `onSuccess` ve `onClose` callback’lerinin tetiklenmesi.
+  - `payload` (if dalı) — DbProductUpdate türünde güncelleme yükü, `values` spread edilir ve `technical_specs` DbJson'a cast edilir
+  - `error` (if dalı) — Supabase `.update()` sorgusundan dönen hata nesnesi, varsa `throw` edilir
+  - `payload` (else dalı) — DbProductInsert türünde oluşturma yükü, `values` spread edilir ve `technical_specs` DbJson'a cast edilir
+  - `error` (else dalı) — Supabase `.insert()` sorgusundan dönen hata nesnesi, varsa `throw` edilir
+- **Dönüş**: yok (yan etki: `setLoading` ile loading durumunu değiştirir, `toast.success` gösterir, `onSuccess()` ve `onClose()` callback'lerini çağırır, hata olursa `toast.error` gösterir)
 
 ---
 
@@ -21901,12 +21834,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\layout\MainLayout.tsx
-skeleton_hash: 9565e774eeff6c35
+skeleton_hash: 4aa70162bd38d961
 entity_hashes:
-  func:MainLayout: 0453d85d148de011
+  func:MainLayout: 51353f0c7669626b
   overview: 7e72cc7b6a87bed6
-  style_tokens: bc0163b5a04f2512
-generated_at: 2026-05-28T22:36:12Z
+  style_tokens: c300b80e9d38560c
+generated_at: 2026-05-29T18:46:10Z
 ---
 
 ## Genel Bakış
@@ -21935,20 +21868,15 @@ Bu modül, ana sayfa düzenini sağlayan bir layout bileşenidir ve孩子.childr
 ## FONKSİYON DETAYLARI
 
 ### MainLayout
+**Ne yapar**: MainLayout, uygulamanın ana görünüm yapısını ve düzenini sağlayan üst düzey bir React bileşenidir. Sayfanın mevcut yoluna göre (yönetim paneli veya genel site) farklı düzenler sunar ve küresel arayüz elemanlarını (başlık, alt bilgi, bildirimler vb.) yönetir.
 
-**Ne yapar**: Uygulamanın ana layout yapısını oluşturur. Mevcut sayfanın rotasına (pathname) göre admin paneli veya normal site layout'unu render eder. Sticky header, footer, WhatsApp butonu, toast bildirimleri ve scroll-to-top gibi global bileşenleri yönetir.
-
-**Nasıl yapar**: 
-- `usePathname` hook'u ile mevcut sayfa rotasını alır ve `/admin` ile başlayıp başlamadığını kontrol eder
-- Admin sayfasındaysa minimal bir layout (siyah header + çocuk bileşenler) döner
-- Normal sayfalarda `useScrollThrottle` hook'u ile scroll pozisyonunu takip ederek sticky header'ın gösterilip gizlenmesini kontrol eder
-- Toast ve WhatsApp butonları için performans odaklı lazy loading uygular: Toast, kullanıcı ilk kez tıkladığında veya tuşa bastığında; WhatsApp butonu ise ilk scroll hareketinde etkinleşir
-- `Suspense` ile sarılmış bileşenlerle async loading yönetimi yapar
+**Nasıl yapar**: Fonksiyon, `usePathname` kancasıyla mevcut URL yolunu alır ve bunun `/admin` ile başlayıp başlamadığını kontrol ederek iki ana render dalına ayrılır. Yönetici rotası için minimal, koyu temalı bir düzen; genel site için `StickyHeader`, `Footer`, ve various floating buttons (WhatsApp, dil seçici, yukarı çık) içeren daha zengin bir düzen döndürür. Kullanıcı etkileşimine (pointer olayı, tuş basma veya kaydırma) bağlı olarak `Toaster` ve `WhatsAppFloat` bileşenleri etkinleştirilerek performans optimizasyonu yapılır. `ScrollToTop` ve `PaymentWatcher` gibi bileşenler sayfa geçişlerini ve arka plan işlemlerini yönetir.
 
 **Parametreler**:
-- `children` : `React.ReactNode` — Layout içinde render edilecek sayfa içeriği. MainLayout bileşeninin ana prop'u olup, tüm alt sayfa bileşenleri bu parametre aracılığıyla layout içine yerleştirilir
+- `props`: `MainLayoutProps` — Bileşenin alacağı özellikler objesi.
+  - `children`: `React.ReactNode` — Düzenin içine render edilecek olan alt bileşenler veya sayfa içeriği. Bu, layouts pattern kullanılarak sayfalar arasındaki ortak yapıyı sağlayan zorunlu bir özelliktir.
 
-**Dönüş**: `JSX.Element` — Admin sayfası için basit bir `<div>` yapısı, normal sayfalar için sticky header, ana içerik alanı, WhatsApp butonu, footer ve toast sistemi dahil tam bir sayfa layout'u döner
+**Dönüş**: `JSX.Element` — Seçilen düzene (yönetici veya genel site) göre yapılandırılmış React JSX elemanı.
 
 ---
 
@@ -21960,7 +21888,7 @@ Bu modül, ana sayfa düzenini sağlayan bir layout bileşenidir ve孩子.childr
 ---
 
 ## SABİTLER
-- **Toaster** (call) — `lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))`
+- **Toaster** (call) — `lazy(() => import('sonner').then(m => ({ default: m.Toaster })))`
 - **AddToCartToast** (call) — `lazy(() => import('../AddToCartToast'))`
 - **WhatsAppFloat** (call) — `lazy(() => import('../WhatsAppFloat'))`
 
@@ -21968,17 +21896,17 @@ Bu modül, ana sayfa düzenini sağlayan bir layout bileşenidir ve孩子.childr
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/components/layout/MainLayout.tsx::MainLayout`
-- **params**: `{ children }` — `MainLayoutProps` tipinde, sarmalanan sayfa içeriği
+### [N1_NASIL] AST Pointer: src/components/layout/MainLayout.tsx::MainLayout
+- **params**: `{ children }: MainLayoutProps`
 - **ic_degiskenler**:
-  - `pathname` — `usePathname()` hook'undan gelen mevcut URL yolu (string | null)
-  - `isAdmin` — `pathname?.startsWith('/admin')` ile hesaplanan boolean; admin sayfasında olup olmadığının kontrolü
-  - `isScrolled` — `useScrollThrottle({ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: pathname || '' })` ile dönen boolean; sayfanın belirli px kadar scroll edilip edilmediğini belirtir
-  - `enableToaster` — `useState(false)` ile oluşturulan state; Toaster ve AddToCartToast bileşenlerinin etkinleşip etkinleşmeyeceğini tutar
-  - `setEnableToaster` — `enableToaster` state'ini güncelleyen setter fonksiyonu; useEffect içinde ilk pointerdown veya keydown'da `true` yapılır
-  - `enableWhatsApp` — `useState(false)` ile oluşturulan state; WhatsAppFloat bileşeninin etkinleşip etkinleşmeyeceğini tutar
-  - `setEnableWhatsApp` — `enableWhatsApp` state'ini güncelleyen setter fonksiyonu; useEffect içinde ilk scroll'da `true` yapılır
-- **Dönüş**: JSX — `isAdmin` true ise admin paneli layout'u (minimal sarmalayıcı), false ise ana site layout'u (StickyHeader, main content, BackToTopButton, WhatsAppFloat, PaymentWatcher, LanguageSwitcher, Footer, Toaster, AddToCartToast dahil tam sayfa yapısı)
+  - `pathname` — `usePathname()` hook'undan alınan mevcut sayfa rotası, admin kontrolü ve `useScrollThrottle` parametresi olarak kullanılır
+  - `isAdmin` — `pathname`'in `/admin` ile başlayıp başlamadığını kontrol eden boolean, admin layout dalını tetikler
+  - `isScrolled` — `useScrollThrottle` hook'undan dönen boolean, sayfanın kaydırma durumunu belirtir, `StickyHeader`'a aktarılır
+  - `enableToaster` — `useState(false)` ile tanımlanan state, ilk etkileşim (`pointerdown`/`keydown`) sonrası `true` olur; `Toaster` ve `AddToCartToast`'ın render edilmesini kontrol eder
+  - `setEnableToaster` — `enableToaster` state'ini `true` yapan setter fonksiyonu, `useEffect` içindeki event listener callback'inde çağrılır
+  - `enableWhatsApp` — `useState(false)` ile tanımlanan state, ilk `scroll` olayı sonrası `true` olur; `WhatsAppFloat`'ın render edilmesini kontrol eder
+  - `setEnableWhatsApp` — `enableWhatsApp` state'ini `true` yapan setter fonksiyonu, `useEffect` içindeki `scroll` event listener callback'inde çağrılır
+- **Dönüş**: JSX element (`React.ReactNode`) — `isAdmin` true ise basit admin layout, değilse tam site layout'u (header, main, footer, overlay'ler dahil) döner
 
 ---
 
@@ -22004,9 +21932,9 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gray-50`, `bg-slate-900`, `bg-white`, `bg-white/10`, `hover:bg-white/20`, `text-white`, `text-xs`
-- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-grow`, `gap-3`, `items-center`, `justify-between`, `min-h-screen`, `overflow-auto`, `relative`, `right-6`, `z-50`, `z-modal`
+- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-grow`, `gap-3`, `items-center`, `items-end`, `justify-between`, `min-h-screen`, `overflow-auto`, `relative`, `right-6`, `z-modal`, `z-toast`
 - **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `duration-300`, `font-bold`, `px-3`, `px-6`, `py-1`, `py-3`, `rounded-full`, `shrink-0`, `tracking-tighter`, `tracking-widest`, `transition-colors`, `uppercase`
+- **Yardımcı Sınıflar:** `duration-300`, `font-bold`, `pointer-events-auto`, `pointer-events-none`, `px-3`, `px-6`, `py-1`, `py-3`, `rounded-full`, `shrink-0`, `tracking-tighter`, `tracking-widest`, `transition-colors`, `uppercase`
 
 ---
 # FILE: src\components\navigation\Breadcrumb.md
@@ -31302,10 +31230,10 @@ namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CartProvider.tsx
 skeleton_hash: 1ea6b8991a36c6cf
 entity_hashes:
-  func:CartProvider: d9bed5174f018a15
+  func:CartProvider: 62fae74b03951519
   overview: d316bc96f5e38c53
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:38:06Z
+generated_at: 2026-05-29T18:46:59Z
 ---
 
 ## Genel Bakış
@@ -31331,23 +31259,15 @@ Bu React CartProvider modülü, alışveriş sepeti state'ini uygulama genelinde
 ## FONKSİYON DETAYLARI
 
 ### CartProvider
-**Ne yapar**: React uygulamasında alışveriş sepeti (cart) durumunu yöneten bir context provider bileşenidir. Sepet verilerini hem yerel tarayıcı depolamasına (localStorage) hem de sunucuya (veritabanına) senkronize eder. Kullanıcı oturum açtığında misafir sepetini sunucu sepetiyle birleştirir.
 
-**Nasıl yapar**: Bileşen, useState ile yerel sepet state'ini tutar. Mount olduğunda localStorage'dan sepeti yükler (şema uyumsuzluğu veya son sipariş başarılı ise temizler). items değiştiğinde localStorage'a kaydeder. Kullanıcı değiştiğinde (giriş/çıkış) sunucuyla senkronizasyon sağlar. Cross-tab senkronizasyonu için storage event'lerini dinler. addToCart, removeFromCart, updateQuantity, clearCart gibi callback'leri memoize ederek sağlar. Son olarak CartContext.Provider'a değer olarak verir.
+**Ne yapar**: Sepet (cart) durumunu yöneten React Context sağlayıcısıdır. Tüm sepet verisini (eklenen ürünler, miktarlar, birim fiyatlar) tutar, yerel depolama (localStorage) ile senkronize eder, giriş yapmış kullanıcılar için sunucu tarafı (Supabase) senkronizasyonunu yürütür ve sepetin toplam tutar/sayı bilgilerini hesaplar.
+
+**Nasıl yapar**: Bileşen, `useState` ile sepet öğelerini ve senkronizasyon durumunu, `useRef` ile yerel versiyon numarasını tutar. Mount edildiğinde `useEffect` ile localStorage'dan kayıtlı sepeti yükler; bu sırada şema uyumsuzluğu (deployment güncellemesi) veya başarılı sipariş sonrası temizlik kontrolleri yapar. Öğeler her değiştiğinde localStorage'a yazılır ve versiyon numarası `Date.now()` ile güncellenir. Kullanıcı giriş yaptığında sunucu sepeti ile yerel misafir sepeti birleştirilir (`mergeItems`); sipariş sonrası temizlik bayrakları, fiyat hesaplamaları ve sunucuya upsert işlemleri gerçekleştirilir. Çapraz sekme senkronizasyonu `storage` event'i ile sağlanır — daha yüksek versiyon numarası kazanır. Sunucu tarafı senkronizasyon, `NEXT_PUBLIC_DEBUG` ve `CART_SERVER_SYNC` gibi ortam değişkenlerine bağlı olarak çalışır.
 
 **Parametreler**:
-- `children`: ReactNode — Provider'ın sarmalayacağı alt bileşenler
+- `children`: `ReactNode` — Bu sağlayıcının sarmaladığı alt bileşen ağacı. `CartContext` değerine erişebilecek tüm alt bileşenleri kapsar.
 
-**Dönüş**: JSX elementi (`<CartContext.Provider value={value}>{children}</CartContext.Provider>`) — value nesnesi şu alanları içerir:
-- `items`: CartItem[] — Sepetteki ürünlerin listesi
-- `syncing`: boolean — Sunucuyla senkronizasyon devam ediyor mu?
-- `addToCart`: (product: Product, quantity?: number) => void — Ürünü sepete ekler
-- `removeFromCart`: (productId: string) => void — Ürünü sepetten çıkarır
-- `updateQuantity`: (productId: string, quantity: number) => void — Ürün miktarını günceller
-- `clearCart`: (opts?: { silent?: boolean }) => void — Sepeti temizler
-- `getCartTotal`: () => number — Sepet toplam tutarını hesaplar
-- `getCartCount`: () => number — Sepet toplam ürün sayısını döndürür
-- `applyServerPricing`: (serverItems: { product_id: string, unit_price: number }[]) => void — Sunucudan gelen fiyat listesini yerel sepete uygular
+**Dönüş**: `JSX.Element` — `CartContext.Provider` ile sarılmış `children` öğesini döndürür. Sağlanan value nesnesi şu alanları içerir: `items`, `syncing`, `addToCart`, `removeFromCart`, `updateQuantity`, `clearCart`, `getCartTotal`, `getCartCount`, `applyServerPricing`.
 
 ---
 
@@ -31358,248 +31278,252 @@ Bu React CartProvider modülü, alışveriş sepeti state'ini uygulama genelinde
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/contexts/CartProvider.tsx::loadCartFromLocalStorage (useEffect callback)
+### [N1_NASIL] AST Pointer: src/contexts/CartProvider.tsx::loadCart (useEffect callback)
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `schema` — localStorage'dan okunan mevcut sepet şeması anahtarı
-  - `lastStatus` — son sipariş durumu (localStorage'dan), 'success' ise sepet temizlenir
-  - `savedCart` — localStorage'dan okunan sepet verisi (JSON string)
-  - `savedVer` — localStorage'dan okunan yerel versiyon numarası (string)
-  - `v` — savedVer'in parseInt ile number'a dönüştürülmüş hali
-- **Dönüş**: yok
+  - `schema` — localStorage'dan okunan mevcut sepat şeması
+  - `lastStatus` — son sipariş durumu, "success" ise sepet temizlenir
+  - `savedCart` — localStorage'dan kaydedilmiş sepet JSON string'i
+  - `savedVer` — localStorage'dan kaydedilmiş sepat versiyonu string'i
+  - `v` — savedVer'in parseInt ile elde edilmiş numeric karşılığı
+- **Dönüş**: yok (yan etki: localStorage'dan item'ları yükler, setItems çağırır)
 
-### [N2_NASIL] AST Pointer: src/contexts/CartProvider.tsx::saveCartToLocalStorage (useEffect callback)
+---
+
+### [N2_NASIL] AST Pointer: src/contexts/CartProvider.tsx::saveCart (useEffect callback)
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `v` — Date.now() ile oluşturulan zaman damgası, yerel versiyon olarak saklanır
-- **Dönüş**: yok (yan etki: localStorage'a items ve versiyon yazar)
+  - `v` — Date.now() ile elde edilen zaman damgası, hem localVersionRef.current'a hem localStorage'a yazılır
+- **Dönüş**: yok (yan etki: items'ları JSON.stringify edip localStorage'a yazar)
+
+---
 
 ### [N3_NASIL] AST Pointer: src/contexts/CartProvider.tsx::mergeItems
 - **params**: `(local: CartItem[], server: CartItem[], isGuestCart: boolean)`
 - **ic_degiskenler**:
-  - `map` — product.id -> CartItem eşlemesi; birleştirilmiş sepet ürünlerini tutar, tekrarları önler
-- **Dönüş**: `CartItem[]` — birleştirilmiş sepet dizisi
+  - `map` — Map<string, CartItem>, product.id key ile benzersiz sepat öğelerini tutar
+  - `it` — her iki döngüde de CartItem, haritaya eklenecek tekil öğe
+- **Dönüş**: `Array.from(map.values())` → `CartItem[]` (birleştirilmiş sepat listesi)
 
-### [N4_NASIL] AST Pointer: src/contexts/CartProvider.tsx::serverSyncUseEffect (useEffect callback)
+---
+
+### [N4_NASIL] AST Pointer: src/contexts/CartProvider.tsx::syncWithServer (useEffect callback)
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `cancelled` — async senkronizasyon iptal flag'i; cleanup fonksiyonunda true yapılır
-- **Dönüş**: cleanup fonksiyonu `() => { cancelled = true }` — useEffect temizliği
+  - `cancelled` — boolean, cleanup fonksiyonunda true yapılır, async işlemleri iptal eder
+  - `syncWithServer` — inner async fonksiyon, asıl senkronizasyon mantığını çalıştırır
+- **Dönüş**: cleanup fonksiyonu döner → `() => { cancelled = true }` (yan etki: user değiştiğinde server ile senkronizasyon başlatır)
 
-### [N5_NASIL] AST Pointer: src/contexts/CartProvider.tsx::syncWithServer (async inner function)
+---
+
+### [N5_NASIL] AST Pointer: src/contexts/CartProvider.tsx::syncWithServer (inner async function)
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `cart` — getOrCreateShoppingCart ile elde edilen veya oluşturulan sunucu sepet nesnesi (id içerir)
-  - `currentOwner` — localStorage'dan okunan sepet sahibi kullanıcı ID'si
-  - `isGuestCart` — mevcut kullanıcının misafir sepeti taşıyıp taşımadığını belirten boolean
-  - `discardLocalGuestCart` — misafir sepetinin atılması gerekip gerekmediğini belirten flag
-  - `clearOnce` — sipariş sonrası sunucu sepetini temizleme flag'i (localStorage'dan okunur)
-  - `raw` — localStorage'dan okunan vh_pending_order ham JSON string'i
-  - `data` — JSON.parse ile çözümlenmiş pending order nesnesi (orderId alanı içerir)
-  - `oid` — pending order'ın sipariş ID'si
-  - `ord` — Supabase'den sorgulanan sipariş kaydı (status ve created_at alanları)
-  - `ordErr` — Supabase sipariş sorgulama hatası
-  - `serverRows` — listCartItemsWithProducts ile getirilen sunucu satırları (item ve product içerir)
-  - `serverItems` — serverRows'dan map'lenen CartItem dizisi
-  - `merged` — yerel ve sunucu sepetlerinin birleştirilmiş hali (merge stratejisine göre)
-  - `priceInfoList` — merged ürünlerin her biri için Promise.all ile hesaplanan birim fiyat bilgileri dizisi
-  - `unitMap` — product.id -> unitPrice eşlemesi; fiyat bilgilerini hızlı erişim için saklar
-  - `mergedWithPrices` — birleştirilmiş ürünlerin unitPrice alanlarının güncellenmiş hali
-  - `v` — Date.now() ile oluşturulan zaman damgası, yerel versiyon olarak saklanır
-- **Dönüş**: yok (yan etki: items state'ini, serverCartId'yi günceller; localStorage'ı yazar)
+  - `cart` — `getOrCreateShoppingCart(user.id)` ile elde edilen/seçilen alışveriş sepatı nesnesi, `cart.id` kullanılır
+  - `currentOwner` — localStorage'dan okunan `CART_OWNER_KEY` değeri, misafir sepatı tespiti için
+  - `isGuestCart` — boolean, currentOwner boşsa veya mevcut user.id ile eşleşmiyorsa true
+  - `discardLocalGuestCart` — boolean, recent paid sipariş varsa misafir sepatı atılır
+  - `clearOnce` — boolean, `vh_clear_server_cart_once` flag'inden okunur, post-order temizlik için
+  - `raw` — localStorage'dan okunan `vh_pending_order` JSON string'i
+  - `data` — JSON.parse(raw) sonucu `{ orderId?: string }` tipinde nesne
+  - `oid` — pending order ID string'i
+  - `ord` — Supabase'den sorgulanan sipariş kaydı (status, created_at alanları)
+  - `ordErr` — Supabase sipariş sorgusundaki hata
+  - `serverRows` — `listCartItemsWithProducts(cart.id)` sonucu ham satır dizisi
+  - `serverItems` — CartItem[] dizisi, serverRows'dan map ile dönüştürülmüş, her eleman `row.item.product_id`, `row.product`, `row.item.quantity` kullanır
+  - `merged` — birleştirilmiş CartItem[], stratejiye göre server, local veya mergeItems sonucu
+  - `priceInfoList` — `Promise.all` ile hesaplanan fiyat bilgisi dizisi, her eleman `{ _productId, unitPrice }`
+  - `info` — `getEffectivePriceInfo(it.product)` sonucu `{ unitPrice, priceListId }` nesnesi
+  - `unitMap` — Map<string, number | undefined>, _productId → unitPrice eşlemesi
+  - `mergedWithPrices` — merged dizisinin unitPrice alanları güncellenmiş hali
+- **Dönüş**: yok (yan etki: setItems, setServerCartId, localStorage ve Supabase upsert operations)
 
-### [N6_NASIL] AST Pointer: src/contexts/CartProvider.tsx::serverItemsMapCallback
-- **params**: `(row)` — sunucu sepet satırı nesnesi (item ve product alanları içerir)
-- **ic_degiskenler**: (yok — sadece return ifadesi)
-- **Dönüş**: `{ id: string, product: Product, quantity: number }` — row.verilerinden oluşturulmuş CartItem
+---
 
-### [N7_NASIL] AST Pointer: src/contexts/CartProvider.tsx::upsertPricingCallback
-- **params**: `(it)` — merge edilmiş CartItem nesnesi
+### [N6_NASIL] AST Pointer: src/contexts/CartProvider.tsx::map (serverRows → serverItems)
+- **params**: `(row)` — supabase'den gelen { item: { product_id, quantity }, product: Product } yapısındaki tek satır
 - **ic_degiskenler**:
-  - `info` — getEffectivePriceInfo ile hesaplanan etkin fiyat bilgisi (unitPrice ve priceListId içerir)
-- **Dönüş**: `{ _productId: string, unitPrice: number | undefined }` — ürün ID ve birim fiyat
+  - `row.item.product_id` — sunucudaki ürün ID'si, CartItem.id olarak kullanılır
+  - `row.product` — tam Product nesnesi, CartItem.product olarak kullanılır
+  - `row.item.quantity` — sepetteki miktar, CartItem.quantity olarak kullanılır
+- **Dönüş**: `{ id: row.item.product_id, product: row.product, quantity: row.item.quantity }` → `CartItem`
 
-### [N8_NASIL] AST Pointer: src/contexts/CartProvider.tsx::logoutSync (useEffect callback)
+---
+
+### [N7_NASIL] AST Pointer: src/contexts/CartProvider.tsx::async (it) => { ... } (price upsert per item)
+- **params**: `(it)` — CartItem, fiyat bilgisi hesaplanacak ve sunucuya upsert edilecek sepat öğesi
+- **ic_degiskenler**:
+  - `info` — `getEffectivePriceInfo(it.product)` sonucu `{ unitPrice: number, priceListId?: string }`
+  - `e` — catch bloğundaki hata nesnesi
+- **Dönüş**: `{ _productId: it.product.id, unitPrice: info.unitPrice }` veya hata durumunda `{ _productId: it.product.id, unitPrice: undefined }`
+
+---
+
+### [N8_NASIL] AST Pointer: src/contexts/CartProvider.tsx::logoutCleanup (useEffect callback)
 - **params**: (yok)
-- **ic_degiskenler**: (yok — sadece user kontrolü ve localStorage temizliği)
-- **Dönüş**: yok (yan etki: CART_OWNER_KEY'i kaldırır, serverCartId'yi null yapar)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: user null ise CART_OWNER_KEY'i kaldırır, setServerCartId(null) çağırır)
+
+---
 
 ### [N9_NASIL] AST Pointer: src/contexts/CartProvider.tsx::crossTabSync (useEffect callback)
 - **params**: (yok)
-- **ic_degiskenler**: (yok — iç içe onStorage fonksiyonunu tanımlar)
-- **Dönüş**: cleanup fonksiyonu — storage event listener'ı kaldırır
-
-### [N10_NASIL] AST Pointer: src/contexts/CartProvider.tsx::onStorage (named function)
-- **params**: `(e: StorageEvent)` — tarayıcı storage olay nesnesi
 - **ic_degiskenler**:
-  - `owner` — localStorage'dan okunan sepet sahibi kullanıcı ID'si
-  - `vStr` — localStorage'dan okunan versiyon string'i
-  - `v` — parseInt ile number'a dönüştürülmüş versiyon; yerel versiyondan büyükse senkronize eder
-  - `raw` — localStorage'dan okunan ham sepet JSON string'i
-  - `next` — JSON.parse ile çözümlenmiş sepet dizisi
-- **Dönüş**: yok (yan etki: items state'ini günceller)
+  - `onStorage` — StorageEvent handler fonksiyonu, cross-tab sepet senkronizasyonunu yönetir
+- **Dönüş**: cleanup fonksiyonu → `() => window.removeEventListener('storage', onStorage)` (yan etki: storage event listener ekler)
+
+---
+
+### [N10_NASIL] AST Pointer: src/contexts/CartProvider.tsx::onStorage (inner function)
+- **params**: `(e: StorageEvent)` — tarayıcı storage event'i
+- **ic_degiskenler**:
+  - `owner` — localStorage'dan okunan CART_OWNER_KEY, mevcut sepat sahibinin user.id'si
+  - `vStr` — localStorage'dan okunan CART_VERSION_KEY string'i, varsayılan '0'
+  - `v` — vStr'in parseInt ile parse edilmiş numeric versiyonu
+  - `raw` — localStorage'dan okunan CART_LOCAL_STORAGE_KEY JSON string'i
+  - `next` — JSON.parse(raw) sonucu CartItem[] dizisi
+- **Dönüş**: yok (yan etki: versiyon güncel ise setItems ile local sepatı günceller)
+
+---
 
 ### [N11_NASIL] AST Pointer: src/contexts/CartProvider.tsx::addToCart
-- **params**: `(product: Product, quantity = 1)` — eklenecek ürün ve miktar
+- **params**: `(product: Product, quantity = 1)` — eklenecek ürün ve miktar (varsayılan 1)
 - **ic_degiskenler**:
-  - `serverCartId` — sunucu sepet ID'si (closure'dan); upsertCartItem çağrısında kullanılır
-- **Dönüş**: yok (yan etki: items state'ini günceller; sunucuya upsert yapar; toast/custom event tetikler)
+  - `currentItems` — setItems updater callback'inin mevcut state parametresi, mevcut CartItem[] listesi
+  - `existingItem` — currentItems.find ile bulunan, aynı product.id'ye sahip mevcut sepat öğesi (varsa)
+  - `serverCartId` — context'ten gelen sunucu sepat ID'si (closure), server sync için kullanılır
+  - `items` — context'ten gelen mevcut sepat state'i (closure), server upsert miktar hesabında kullanılır
+  - `info` — getEffectivePriceInfo sonucu, { unitPrice, priceListId }
+  - `curr` — setItems updater callback parametresi, unitPrice güncellemesi için
+- **Dönüş**: yok (yan etki: setItems ile local state günceller, sunucuya upsert gönderir, CustomEvent ve toast tetikler)
 
-### [N12_NASIL] AST Pointer: src/contexts/CartProvider.tsx::addToCart_setItemsUpdater
-- **params**: `(currentItems)` — mevcut sepet ürünleri dizisi (setState updater)
+---
+
+### [N12_NASIL] AST Pointer: src/contexts/CartProvider.tsx::updater (addToCart inner — currentItems =>)
+- **params**: `(currentItems)` — mevcut CartItem[] state'i
 - **ic_degiskenler**:
-  - `existingItem` — aynı product.id'ye sahip mevcut sepet kalemi; varsa miktar artırılır, yoksa yeni eklenir
-- **Dönüş**: `CartItem[]` — güncellenmiş sepet ürünleri dizisi
+  - `existingItem` — currentItems.find ile bulunan, aynı product.id'ye sahip sepat öğesi
+- **Dönüş**: Güncellenmiş CartItem[] — mevcut ürün varsa quantity artırılır, yoksa yeni öğe eklenir
 
-### [N13_NASIL] AST Pointer: src/contexts/CartProvider.tsx::addToCart_mapUpdater
-- **params**: `(item)` — mevcut sepet kalemi (map içinde dolaşılan)
-- **ic_degiskenler**: (yok — sadece koşullu spread ve quantity güncelleme)
-- **Dönüş**: `CartItem` — miktarı artırılmış veya aynen kalmış sepet kalemi
+---
 
-### [N14_NASIL] AST Pointer: src/contexts/CartProvider.tsx::addToCart_supabaseImport
-- **params**: `({ getEffectivePriceInfo, upsertCartItem })` — dinamik import ile gelen fonksiyonlar
+### [N13_NASIL] AST Pointer: src/contexts/CartProvider.tsx::dynamicImportCallback (addToCart — ({ getEffectivePriceInfo, upsertCartItem }) =>)
+- **params**: `({ getEffectivePriceInfo, upsertCartItem })` — dynamic import ile yüklenen Supabase fonksiyonları
 - **ic_degiskenler**:
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-  - `items` — mevcut sepet ürünleri (closure'dan); mevcut ürün miktarını bulmak için kullanılır
-- **Dönüş**: yok (yan etki: sunucuya fiyat hesaplar ve upsert yapar)
+  - `info` — `getEffectivePriceInfo(product)` promise sonucu `{ unitPrice: number, priceListId?: string }`
+  - `err` — catch bloğundaki hata nesnesi
+- **Dönüş**: void (yan etki: upsertCartItem ile sunucuya yazar, setItems ile local unitPrice günceller)
 
-### [N15_NASIL] AST Pointer: src/contexts/CartProvider.tsx::addToCart_priceInfoCallback
-- **params**: `(info)` — getEffectivePriceInfo sonucu { unitPrice, priceListId }
+---
+
+### [N14_NASIL] AST Pointer: src/contexts/CartProvider.tsx::removeFromCart
+- **params**: `(_productId: string)` — sepetteki kaldırılacak ürünün ID'si
 - **ic_degiskenler**:
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-  - `product` — eklenecek ürün nesnesi (closure'dan)
-  - `quantity` — eklenecek miktar (closure'dan)
-  - `items` — mevcut sepet ürünleri (closure'dan); ürünün güncel miktarını bulmak için kullanılır
-- **Dönüş**: yok (yan etki: upsertCartItem çağırır, items state'ini unitPrice ile günceller)
+  - `currentItems` — setItems updater callback parametresi, mevcut CartItem[] listesi
+  - `item` — currentItems.find ile bulunan, kaldırılacak sepat öğesi (toast mesajı için)
+  - `serverCartId` — closure'dan gelen sunucu sepat ID'si
+- **Dönüş**: yok (yan etki: setItems ile item'ı filtreler, soner toast gösterir, sunucudan kaldırır)
 
-### [N16_NASIL] AST Pointer: src/contexts/CartProvider.tsx::removeFromCart
-- **params**: `(_productId: string)` — kaldırılacak ürünün ID'si
-- **ic_degiskenler**:
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-- **Dönüş**: yok (yan etki: items state'inden ürünü filtreler; sunucudan kaldırır; toast gösterir)
+---
 
-### [N17_NASIL] AST Pointer: src/contexts/CartProvider.tsx::removeFromCart_setItemsUpdater
-- **params**: `(currentItems)` — mevcut sepet ürünleri dizisi (setState updater)
-- **ic_degiskenler**:
-  - `item` — kaldırılacak ürünü bulan find sonucu; varsa toast gösterilir
-- **Dönüş**: `CartItem[]` — ilgili ürün filtrelenmiş sepet dizisi
+### [N15_NASIL] AST Pointer: src/contexts/CartProvider.tsx::dynamicImportCallback (removeFromCart — ({ removeCartItem }) =>)
+- **params**: `({ removeCartItem })` — dynamic import ile yüklenen Supabase kaldırma fonksiyonu
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `removeCartItem(serverCartId, _productId)` promise'i
 
-### [N18_NASIL] AST Pointer: src/contexts/CartProvider.tsx::removeFromCart_supabaseImport
-- **params**: `({ removeCartItem })` — dinamik import ile gelen kaldırma fonksiyonu
-- **ic_degiskenler**:
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-  - `_productId` — kaldırılacak ürünün ID'si (closure'dan)
-- **Dönüş**: Promise — removeCartItem sonucu
+---
 
-### [N19_NASIL] AST Pointer: src/contexts/CartProvider.tsx::updateQuantity
+### [N16_NASIL] AST Pointer: src/contexts/CartProvider.tsx::updateQuantity
 - **params**: `(_productId: string, quantity: number)` — güncellenecek ürün ID'si ve yeni miktar
 - **ic_degiskenler**:
-  - `product` — _productId'ye eşleşen ürün nesnesi; fiyat hesaplaması için kullanılır
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-- **Dönüş**: yok (yan etki: quantity <= 0 ise removeFromCart çağırır; items state'ini günceller; sunucuya upsert yapar)
+  - `currentItems` — setItems updater callback parametresi, mevcut CartItem[] listesi
+  - `product` — items.find ile bulunan, _productId'ye karşılık gelen Product nesnesi (sunucu sync için)
+  - `serverCartId` — closure'dan gelen sunucu sepat ID'si
+  - `items` — closure'dan gelen mevcut sepat state'i, product araması için kullanılır
+  - `info` — getEffectivePriceInfo sonucu `{ unitPrice, priceListId }`
+  - `curr` — setItems updater callback parametresi, unitPrice güncellemesi için
+- **Dönüş**: yok (yan etki: quantity <= 0 ise removeFromCart çağırır, aksi halde setItems ile günceller ve sunucuya upsert gönderir)
 
-### [N20_NASIL] AST Pointer: src/contexts/CartProvider.tsx::updateQuantity_setItemsUpdater
-- **params**: `(currentItems)` — mevcut sepet ürünleri dizisi (setState updater)
-- **ic_degiskenler**: (yok — sadece map ile quantity güncelleme)
-- **Dönüş**: `CartItem[]` — ilgili ürünün miktarı güncellenmiş sepet dizisi
+---
 
-### [N21_NASIL] AST Pointer: src/contexts/CartProvider.tsx::updateQuantity_mapUpdater
-- **params**: `(item)` — mevcut sepet kalemi (map içinde dolaşılan)
-- **ic_degiskenler**: (yok — koşul kontrolü ve spread)
-- **Dönüş**: `CartItem` — quantity'si güncellenmiş veya aynen kalmış sepet kalemi
+### [N17_NASIL] AST Pointer: src/contexts/CartProvider.tsx::updater (updateQuantity inner — currentItems =>)
+- **params**: `(currentItems)` — mevcut CartItem[] state'i
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Güncellenmiş CartItem[] — _productId eşleşen öğenin quantity'si yeni değere set edilir
 
-### [N22_NASIL] AST Pointer: src/contexts/CartProvider.tsx::updateQuantity_supabaseImport
-- **params**: `({ getEffectivePriceInfo, upsertCartItem })` — dinamik import ile gelen fonksiyonlar
+---
+
+### [N18_NASIL] AST Pointer: src/contexts/CartProvider.tsx::clearCart
+- **params**: `(opts?: { silent?: boolean })` — opsiyonel, silent=true ise toast gösterilmez
 - **ic_degiskenler**:
-  - `product` — güncellenecek ürün (closure'dan)
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-  - `_productId` — ürün ID'si (closure'dan)
-  - `quantity` — yeni miktar (closure'dan)
-- **Dönüş**: yok (yan etki: fiyat hesaplar ve sunucuya upsert yapar)
+  - `e` — catch bloğundaki hata nesnesi (localStorage temizleme sırasında)
+  - `serverCartId` — closure'dan gelen sunucu sepat ID'si
+- **Dönüş**: yok (yan etki: setItems([]), localStorage temizler, StorageEvent dispatch eder, sunucu sepatını temizler)
 
-### [N23_NASIL] AST Pointer: src/contexts/CartProvider.tsx::updateQuantity_priceInfoCallback
-- **params**: `(info)` — getEffectivePriceInfo sonucu { unitPrice, priceListId }
-- **ic_degiskenler**:
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-  - `_productId` — ürün ID'si (closure'dan)
-  - `quantity` — yeni miktar (closure'dan)
-- **Dönüş**: yok (yan etki: upsertCartItem çağırır, items state'ini unitPrice ile günceller)
+---
 
-### [N24_NASIL] AST Pointer: src/contexts/CartProvider.tsx::clearCart
-- **params**: `(opts?: { silent?: boolean })` — opsiyonel; silent=true ise toast göstermez
-- **ic_degiskenler**: (yok — doğrudan setItems, localStorage temizliği ve sunucu temizliği yapar)
-- **Dönüş**: yok (yan etki: items'ı boşaltır; localStorage'ı temizler; storage event tetikler; sunucudan temizler)
+### [N19_NASIL] AST Pointer: src/contexts/CartProvider.tsx::dynamicImportCallback (clearCart — ({ clearCartItems }) =>)
+- **params**: `({ clearCartItems })` — dynamic import ile yüklenen Supabase temizleme fonksiyonu
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `clearCartItems(serverCartId)` promise'i
 
-### [N25_NASIL] AST Pointer: src/contexts/CartProvider.tsx::clearCart_supabaseImport
-- **params**: `({ clearCartItems })` — dinamik import ile gelen sepet temizleme fonksiyonu
-- **ic_degiskenler**:
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-- **Dönüş**: Promise — clearCartItems sonucu
+---
 
-### [N26_NASIL] AST Pointer: src/contexts/CartProvider.tsx::getCartTotal
+### [N20_NASIL] AST Pointer: src/contexts/CartProvider.tsx::getCartTotal
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `items` — sepet ürünleri dizisi (closure'dan); reduce ile toplam hesaplanır
-- **Dönüş**: `number` — sepet toplam tutarı (birim fiyat × miktar toplamı)
+  - `total` — reduce accumulator'ı, kümülatif toplam tutar
+  - `item` — reduce callback'indeki tekil CartItem
+  - `unit` — birim fiyat, item.unitPrice number ise onu kullanır, aksi halde item.product.price'ı fallback olarak alır
+- **Dönüş**: `number` — sepatın toplam tutarı (birim fiyat × miktar toplamı)
 
-### [N27_NASIL] AST Pointer: src/contexts/CartProvider.tsx::getCartTotal_reduceCallback
-- **params**: `(total, item)` — kümülatif toplam ve mevcut sepet kalemi
-- **ic_degiskenler**:
-  - `unit` — ürün birim fiyatı; item.unitPrice sayıysa onu, değilse product.price'ı kullanır
-- **Dönüş**: `number` — güncellenmiş kümülatif toplam
+---
 
-### [N28_NASIL] AST Pointer: src/contexts/CartProvider.tsx::getCartCount
+### [N21_NASIL] AST Pointer: src/contexts/CartProvider.tsx::getCartCount
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `items` — sepet ürünleri dizisi (closure'dan); reduce ile toplam miktar hesaplanır
-- **Dönüş**: `number` — sepet toplam ürün adedi (quantity'lerin toplamı)
+  - `count` — reduce accumulator'ı, kümülatif ürün adedi
+  - `item` — reduce callback'indeki tekil CartItem
+- **Dönüş**: `number` — sepetteki toplam ürün adedi (miktarların toplamı)
 
-### [N29_NASIL] AST Pointer: src/contexts/CartProvider.tsx::applyServerPricing
-- **params**: `(serverItems: { product_id: string, unit_price: number }[])` — sunucudan gelen ürün-birim fiyat çiftleri dizisi
+---
+
+### [N22_NASIL] AST Pointer: src/contexts/CartProvider.tsx::applyServerPricing
+- **params**: `(serverItems: { product_id: string, unit_price: number }[])` — sunucudan gelen ürün ID + birim fiyat listesi
 - **ic_degiskenler**:
-  - `to2` — sayıyı 2 ondalık basamağa yuvarlayan yardımcı fonksiyon
-  - `nearlyEqual` — iki sayının 2 ondalık hassasiyetle eşit olup olmadığını kontrol eden fonksiyon
-  - `pmap` — product_id -> unitPrice eşlemesi; sunucu fiyatlarını 2 ondalık olarak saklar
-  - `changedIds` — gerçekten fiyatı değişen ürün ID'lerinin kümesi; idempotent davranış sağlar
-  - `items` — mevcut sepet ürünleri (closure'dan)
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-- **Dönüş**: yok (yan etki: items state'indeki unitPrice'ları günceller; değişen kalemleri sunucuya upsert eder)
+  - `to2` — helper fonksiyon, sayıyı 2 ondalık basamağa yuvarlar
+  - `nearlyEqual` — helper fonksiyon, iki sayının 0.01 toleransla eşit olup olmadığını kontrol eder
+  - `pmap` — Map<string, number>, product_id → birim fiyat eşlemesi (normalize edilmiş 2 ondalık)
+  - `pid` — String(it.product_id), normalize edilmiş ürün ID'si
+  - `up` — Number(it.unit_price), numeric birim fiyat
+  - `changedIds` — Set<string>, fiyat değişikliği olan ürün ID'leri
+  - `it` — döngüdeki tekil serverItems veya items elemanı
+  - `nextUnit` — pmap'ten gelen yeni birim fiyat (number | undefined)
+  - `currUnit` — mevcut birim fiyat, item.unitPrice veya fallback item.product.price
+  - `curr` — setItems updater callback parametresi
+  - `tasks` — Promise<unknown>[] dizisi, değişen kalemler için upsert promise'leri
+  - `i` — for döngüsü indeksi
+  - `up` — pmap'ten gelen updated birim fiyat
+- **Dönüş**: yok (yan etki: setItems ile local sepat günceller, değişen kalemleri sunucuya upsert eder)
 
-### [N30_NASIL] AST Pointer: src/contexts/CartProvider.tsx::applyServerPricing_setItemsUpdater
-- **params**: `(curr)` — mevcut sepet ürünleri dizisi (setState updater)
-- **ic_degiskenler**: (yok — map içinde koşullu güncelleme)
-- **Dönüş**: `CartItem[]` — birim fiyatları güncellenmiş sepet dizisi
+---
 
-### [N31_NASIL] AST Pointer: src/contexts/CartProvider.tsx::applyServerPricing_mapUpdater
-- **params**: `(it)` — mevcut sepet kalemi (map içinde dolaşılan)
+### [N23_NASIL] AST Pointer: src/contexts/CartProvider.tsx::dynamicImportCallback (applyServerPricing — ({ upsertCartItem }) =>)
+- **params**: `({ upsertCartItem })` — dynamic import ile yüklenen Supabase upsert fonksiyonu
 - **ic_degiskenler**:
-  - `nextUnit` — sunucudan gelen yeni birim fiyat (pmap'ten); null ise ürün aynen kalır
-  - `currUnit` — ürünün mevcut birim fiyatı; unitPrice sayıysa onu, değilse product.price'ı kullanır
-- **Dönüş**: `CartItem` — birim fiyat güncellenmiş veya aynen kalmış sepet kalemi
+  - `tasks` — Promise<unknown>[] dizisi, her biri bir upsertCartItem promise'i
+  - `i` — for döngüsü indeksi
+  - `it` — items[i], sepetteki tekil CartItem
+  - `up` — pmap.get(it.product.id) ile elde edilen yeni birim fiyat
+  - `e` — catch bloğundaki hata nesnesi
+- **Dönüş**: void (Promise.allSettled ile arka planda çalışır)
 
-### [N32_NASIL] AST Pointer: src/contexts/CartProvider.tsx::applyServerPricing_supabaseImport
-- **params**: `({ upsertCartItem })` — dinamik import ile gelen upsert fonksiyonu
-- **ic_degiskenler**:
-  - `tasks` — Promise dizisi; her değişen ürün için upsertCartItem çağrısı
-  - `items` — mevcut sepet ürünleri (closure'dan)
-  - `changedIds` — fiyatı değişen ürün ID'leri kümesi (closure'dan)
-  - `pmap` — product_id -> unitPrice eşlemesi (closure'dan)
-  - `serverCartId` — sunucu sepet ID'si (closure'dan)
-- **Dönüş**: yok (yan etki: Promise.allSettled ile sunucuya toplu fiyat güncellemesi yapar)
+---
 
-### [N33_NASIL] AST Pointer: src/contexts/CartProvider.tsx::contextValue
+### [N24_NASIL] AST Pointer: src/contexts/CartProvider.tsx::contextValue (useMemo callback)
 - **params**: (yok)
-- **ic_degiskenler**:
-  - `items` — sepet ürünleri (closure'dan)
-  - `syncing` — senkronizasyon durumu flag'i (closure'dan)
-  - `addToCart` — ürün ekleme fonksiyonu (closure'dan)
-  - `removeFromCart` — ürün kaldırma fonksiyonu (closure'dan)
-  - `updateQuantity` — miktar güncelleme fonksiyonu (closure'dan)
-  - `clearCart` — sepet temizleme fonksiyonu (closure'dan)
-  - `getCartTotal` — toplam tutar hesaplama fonksiyonu (closure'dan)
-  - `getCartCount` — toplam adet hesaplama fonksiyonu (closure'dan)
-  - `applyServerPricing` — sunucu fiyatlarını yerel sepete uygulama fonksiyonu (closure'dan)
-- **Dönüş**: `CartContext` — CartContext tipinde nesne; tüm sepet state ve fonksiyonlarını sağlar
+- **ic_degiskenler**: (yok — sadece closure'daki değerleri paketler)
+- **Dönüş**: `{ items, syncing, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal, getCartCount, applyServerPricing }` — CartContext tipinde sepat sağlayıcı değeri
 
 ---
 
@@ -31934,12 +31858,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectProvider.tsx
-skeleton_hash: 6ae7fa1c5d619da2
+skeleton_hash: 8d3b3c56d1a49e26
 entity_hashes:
   func:ProjectProvider: 48fd4159fdf830c0
-  overview: e11e6cdd2715b5f3
+  overview: 07aebfab05dea5e2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:37:36Z
+generated_at: 2026-05-29T18:47:23Z
 ---
 
 ## Genel Bakış
@@ -31954,19 +31878,9 @@ Uygulama içeriğini sarmalayarak proje bağlamını tüm alt bileşenlere ilete
 
 ## AXIOMS – Mimari Varsayımlar
 
-ProjectProvider, React Context API üzerinden proje verilerini alt bileşenlere ileten bir sağlayıcı bileşenidir; doğru çalışması için aşağıdaki mimari varsayımların karşılanması gerekir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
----
-
-**[Aksiyom 1]**: Eğer `ProjectContext` tanımlı değilse veya geçer bir React Context nesnesi içermiyorsa, sağlayıcı bağlam değerlerini alt bileşenlere aktaramaz ve `useProject` gibi tüketici hook'ları `undefined` döner.
-
-**[Aksiyom 2]**: Eğer `children` prop'u verilmezse veya geçer bir ReactNode içermiyorsa, sağlayıcı içinde render edilecek bileşen olmaz ve bağlam hiçbir tüketiciye ulaşmaz.
-
-**[Aksiyom 3]**: Eğer `ProjectProvider`, `ProjectContext`'i tüketen herhangi bir alt bileşenin üst React ağaç yapısında yer almıyorsa, o bileşenler proje verilerine erişemez ve bağımlılık hataları oluşur.
-
-**[Aksiyom 4]**: Eğer `ProjectContext` için sağlanan değer (value) nesnesi, proje verilerini (proje listesi, aktif proje, yükleme durumu vb.) içermiyorsa, alt bileşenler geçersiz veya eksik veri ile çalışır — ancak bu değerlerin içeriği modül imzasından belirlenememektedir.
-
-**[Aksiyom 5]**: Eğer `ProjectProvider` birden fazla kez iç içe kullanılırsa, iç içe geçmiş en içteki sağlayıcının değeri tüm alt bileşenler tarafından görünür olur (React Context override davranışı).
+**Açıklama:** `ProjectProvider` bileşeni, sadece `children` prop'unu kabul eden ve React Context Provider yapısıyla sarmalama (wrapping)职责 üstlenen bir üst seviye sağlayıcı bileşenidir. Fonksiyon gövdesinde herhangi bir koşul kontrolü, veri doğrulama, eşik değeri veya zorunlu bağımlılık bildirimi bulunmamaktadır. Modülün doğru çalışması için gereken koşullar (örn: `ProjectContext`'in doğru sarmalanmış olması, üst bileşen ağacının yapılandırılması vb.) fonksiyon imzası ve gövdesinde açıkça belirtilmediği için bu durumlar **bilinmiyor** olarak değerlendirilmiştir. Aksiyonlar, modül içeriğinden üretilemediği için tanımlanamamıştır.
 
 ---
 
@@ -32008,64 +31922,94 @@ ProjectProvider, React Context API üzerinden proje verilerini alt bileşenlere 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::ProjectProvider
-- **params**: `children` — React.ReactNode, Provider içine yerleştirilecek alt bileşenler
+- **params**: `(children)`
 - **ic_degiskenler**:
-  - `projects` — state, kullanıcının projelerinin listesi (UserProject[])
-  - `setProjects` — projects state'ini güncellemek için setter fonksiyonu
-  - `loading` — state, proje listesi yüklenirken true olan bayrak
-  - `setLoading` — loading state'ini güncellemek için setter fonksiyonu
-  - `user` — useAuth() hook'undan dönen oturum açmış kullanıcı nesnesi
-  - `refreshProjects` — useCallback ile tanımlanmış, projeleri yeniden yükleyen fonksiyon
-  - `addProject` — useCallback ile tanımlanmış, yeni proje ekleyen fonksiyon
-  - `removeProject` — useCallback ile tanımlanmış, projeyi silen fonksiyon
-  - `addItem` — useCallback ile tanımlanmış, ürüne projeye ekleyen fonksiyon
-  - `removeItem` — useCallback ile tanımlanmış, ürünü projeden çıkaran fonksiyon
-  - `getProjectItems` — useCallback ile tanımlanmış, projenin ürünlerini getiren fonksiyon
-  - `value` — useMemo ile hesaplanmış, tüm value ve fonksiyonları içeren context nesnesi
-- **Dönüş**: `<ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>` bileşeni
+  - `projects` — Proje listesini tutan state (UserProject[] tipinde, başlangıçta boş dizi)
+  - `loading` — Yüklenme durumunu tutan state (boolean, başlangıçta true)
+  - `user` — useAuth hook'undan alınan mevcut kullanıcı nesnesi
+  - `refreshProjects` — Projeleri yenileyen async fonksiyon (useCallback ile memoize edilmiş)
+  - `addProject` — Yeni proje oluşturan async fonksiyon (useCallback ile memoize edilmiş)
+  - `removeProject` — Proje silen async fonksiyon (useCallback ile memoize edilmiş)
+  - `addItem` — Projeye ürün ekleyen async fonksiyon (useCallback ile memoize edilmiş)
+  - `removeItem` — Projeden ürün çıkaran async fonksiyon (useCallback ile memoize edilmiş)
+  - `getProjectItems` — Proje ürünlerini getiren async fonksiyon (useCallback ile memoize edilmiş)
+  - `value` — Context değerini oluşturan useMemo nesnesi
+- **Dönüş**: `<ProjectContext.Provider>` JSX elemanı (children ile sarılmış)
 
 ### [N2_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::refreshProjects
-- **params**: (yok)
+- **params**: `(yok)`
 - **ic_degiskenler**:
-  - `data` — listUserProjects() API çağrısından dönen ve UserProject[] türüne cast edilen proje listesi
-- **Dönüş**: void (asenkron, projects state'ini günceller, loading state'ini yönetir)
+  - `user` — useAuth hook'undan gelen mevcut kullanıcı (koşul kontrolü: user varsa devam et)
+  - `setLoading` — Yüklenme durumunu güncelleyen state setter
+  - `data` — listUserProjects API çağrısının dönüş değeri (UserProject[] dizisi)
+  - `setProjects` — Projeleri güncelleyen state setter
+- **Dönüş**: Promise<void> (async fonksiyon, return yok)
 
-### [N3_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useEffect (initial effect)
-- **params**: (yok, arrow function içinde tanımlı)
-- **ic_degiskenler**: (yok, doğrudan state'leri ve fonksiyonları kullanır)
-- **Dönüş**: void (yan etki: user olduğunda refreshProjects çağırır, olmadığında state'leri sıfırlar)
+### [N3_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useEffect callback
+- **params**: `(yok)`
+- **ic_degiskenler**:
+  - `user` — useAuth hook'undan gelen mevcut kullanıcı (koşul kontrolü)
+  - `refreshProjects` — Projeleri yenileyen fonksiyon (koşulda çağrılır)
+  - `setProjects` — Projeleri güncelleyen state setter (user yoksa [] ile çağrılır)
+  - `setLoading` — Yüklenme durumunu güncelleyen state setter (user yoksa false ile çağrılır)
+- **Dönüş**: yok (effect side-effect için)
 
 ### [N4_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::addProject
-- **params**: `name` (string) — oluşturulacak projenin adı, `description?` (string | undefined) — opsiyonel proje açıklaması
+- **params**: `(name: string, description?: string)`
 - **ic_degiskenler**:
-  - `newProject` — createProject() API çağrısından dönen ve projenin tüm verilerini tutan nesne
-- **Dönüş**: UserProject | null (başarılı ise yeni proje nesnesi, değilse null)
+  - `user?.id` — Mevcut kullanıcının ID'si (koşul kontrolü: id varsa devam et)
+  - `toast` — Bildirim gösteren sonner fonksiyonu
+  - `newProject` — createProject API çağrısının dönüş değeri (oluşturulan proje nesnesi)
+  - `setProjects` — Projeleri güncelleyen state setter (önceki listeye yeni projeyi ekler)
+- **Dönüş**: `UserProject | null` (başarılı olursa proje, olmazsa null)
 
 ### [N5_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::removeProject
-- **params**: `id` (string) — silinecek projenin benzersiz tanımlayıcısı
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (asenkron, projects state'inden projeyi çıkarır)
+- **params**: `(id: string)`
+- **ic_degiskenler**:
+  - `id` — Silinecek projenin ID'si
+  - `toast` — Bildirim gösteren sonner fonksiyonu
+  - `deleteProject` — Proje silme API çağrısı (id parametresi ile)
+  - `setProjects` — Projeleri güncelleyen state setter (filtreleme ile silinen projeyi kaldırır)
+- **Dönüş**: Promise<void> (async fonksiyon, return yok)
 
 ### [N6_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::addItem
-- **params**: `projectId` (string) — ürünün ekleneceği projenin ID'si, `_productId` (string) — eklenecek ürünün ID'si, `quantity` (number, varsayılan: 1) — eklenecek ürün miktarı
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (asenkron, sadece toast bildirimi gösterir)
+- **params**: `(projectId: string, _productId: string, quantity: number = 1)`
+- **ic_degiskenler**:
+  - `projectId` — Ürünün ekleneceği projenin ID'si
+  - `_productId` — Eklenecek ürünün ID'si (underscore ile belirtilmiş, doğrudan kullanılmaz)
+  - `quantity` — Eklenecek ürün miktarı (varsayılan 1)
+  - `toast` — Bildirim gösteren sonner fonksiyonu
+  - `addProductToProject` — Ürüne projeye ekleme API çağrısı (projectId, _productId, quantity parametreleri ile)
+- **Dönüş**: Promise<void> (async fonksiyon, return yok)
 
 ### [N7_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::removeItem
-- **params**: `projectId` (string) — ürünün çıkarılacağı projenin ID'si, `_productId` (string) — çıkarılacak ürünün ID'si
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (asenkron, sadece toast bildirimi gösterir)
+- **params**: `(projectId: string, _productId: string)`
+- **ic_degiskenler**:
+  - `projectId` — Ürünün çıkarılacağı projenin ID'si
+  - `_productId` — Çıkarılacak ürünün ID'si (underscore ile belirtilmiş)
+  - `toast` — Bildirim gösteren sonner fonksiyonu
+  - `removeProductFromProject` — Ürünü projeden çıkarma API çağrısı (projectId, _productId parametreleri ile)
+- **Dönüş**: Promise<void> (async fonksiyon, return yok)
 
 ### [N8_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::getProjectItems
-- **params**: `projectId` (string) — ürünleri getirilecek projenin ID'si
+- **params**: `(projectId: string)`
 - **ic_degiskenler**:
-  - `items` — listProjectItems() API çağrısından dönen ve ProjectItem[] türüne cast edilen proje ürünleri listesi
-- **Dönüş**: Promise<ProjectItem[]> (başarılı ise ürün listesi, hata durumunda boş dizi [])
+  - `projectId` — Ürünleri getirilecek projenin ID'si
+  - `items` — listProjectItems API çağrısının dönüş değeri (ProjectItem[] dizisi)
+- **Dönüş**: `Promise<ProjectItem[]>` (başarılı olursa ürünler dizisi, hata olursa boş dizi)
 
 ### [N9_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::value useMemo
-- **params**: (yok, useMemo içindeki arrow function)
-- **ic_degiskenler**: (yok, doğrudan state'leri ve tanımlanmış fonksiyonları bir nesne olarak toplar)
-- **Dönüş**: Object ({ projects, loading, refreshProjects, addProject, removeProject, addItem, removeItem, getProjectItems })
+- **params**: `(yok)`
+- **ic_degiskenler**:
+  - `projects` — Proje listesi state değişkeni
+  - `loading` — Yüklenme durumu state değişkeni
+  - `refreshProjects` — Projeleri yenileyen fonksiyon
+  - `addProject` — Yeni proje oluşturan fonksiyon
+  - `removeProject` — Proje silen fonksiyon
+  - `addItem` — Projeye ürün ekleyen fonksiyon
+  - `removeItem` — Projeden ürün çıkaran fonksiyon
+  - `getProjectItems` — Proje ürünlerini getiren fonksiyon
+- **Dönüş**: `ProjectContextValue` nesnesi (tüm value özelliklerini içeren)
 
 ---
 
@@ -32205,29 +32149,48 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts
-skeleton_hash: 00770ccd49233591
+skeleton_hash: 5c125e59a0aecf21
 entity_hashes:
   func:useApiCall: ad3857eabf77c233
-  overview: 0635a829e467e31a
-generated_at: 2026-05-28T22:37:51Z
+  overview: 301e3e9f7e67faae
+generated_at: 2026-05-29T18:47:35Z
 ---
 
 ## Genel Bakış
-Bu modül, React uygulamalarında API çağrılarını merkezi ve standart bir şekilde yönetmek için tasarlanmış bir hook sunar. Tüm HTTP isteklerinin durumunu takip etmeyi, hata yönetimi sağlamayı ve istek yapılandırmalarını opsiyonel parametrelerle özelleştirmeyi amaçlar.
+Bu modül, React uygulamalarında API çağrılarını merkezi ve yeniden kullanılabilir bir şekilde yönetmek için özel bir hook sunar. Temel amacı, tüm HTTP istekleri için tutarlı bir durum yönetim döngüsü (yükleniyor, başarı, hata) sağlamak ve temel istek yapılandırmalarını merkezileştirmektir.
 
 ## Fonksiyon Grupları
-### Merkezi API Çağrı Orkestrasyonu
-Bu grup, uygulama genelindeki tüm API etkileşimlerini başlatan, izleyen ve sonlandıran temel işlevi barındırır. Hook, istek ömrü boyunca yüklenme, başarı ve hata durumlarını yöneterek bileşenlere tutarlı bir veri akışı sağlar.
+### API Çağrı Orkestrasyonu ve Durum Yönetimi
+Bu grup, tek bir hook ile asenkron API çağrılarının başlatılmasını, yürütülmesini ve sonuçlarının (başarı veya hata) izlenmesini sağlar. Hook, çağrı sürecinde otomatik olarak durum güncellemeleri yaparak bileşenlere stabilized bir veri akışı sunar.
 - useApiCall
 
 ### Özelleştirilebilir İstek Yapılandırması
-Bu grup, varsayılan API davranışını ve istek parametrelerini uygulama ihtiyaçlarına göre ayarlama imkanı sunar. Hook'a iletilen opsiyonel yapılandırma seçenekleri, kimlik doğrulama, zaman aşımları veya özel başlıklar gibi parametrelerin merkezi olarak belirlenmesine olanak tanır.
+Bu grup, varsayılan istek davranışlarının opsiyonel parametrelerle genişletilmesine ve özelleştirilmesine olanak tanır. Uygulama genelindeki ortak yapılandırma ihtiyaçlarını (örn. kimlik doğrulama, zaman aşımları) tek bir noktadan tanımlamayı kolaylaştırır.
 - useApiCall
+
+---
+*Bu hook, VentHub HVAC projesi içindeki tüm API çağrılarını standartlaştırmak ve merkezi olarak yönetmek temel mimari varsayımı üzerine kurulmuştur.*
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu hook, VentHub HVAC projesi içinde API çağrılarını merkezi olarak yönetmek ve stand
+
+Bu hook, API çağrılarını yönetmek için temel bir React hook yapısına ve opsiyonel bir yapılandırma nesnesine bağlıdır. Varsayımlar, fonksiyonun parametreleri ve React hook kuralları üzerine kuruludur.
+
+**[Aksiyom 1]: Eğer `useApiCall` hook'u React fonksiyonel bileşeninin veya başka bir hook'un içinde invok edilmemişse, "Invalid hook call" hatası oluşur.**
+Bu, React'ın hook kurallarına bağlılık varsayımıdır.
+
+**[Aksiyom 2]: Eğer `defaultOptions` parametresi sağlanmazsa veya `null`/`undefined` olarak geçilirse, hook bir varsayılan (muhtemelen boş) yapılandırma nesnesi ile çalışır.**
+Fonksiyon imzasındaki `?` işareti, parametrenin opsiyonel olduğunu belirtir.
+
+**[Aksiyom 3]: Eğer `defaultOptions` içinde bir `url` (API endpoint adresi) veya bunu sağlayan bir `fetchConfig` bileşeni belirtilmemişse, hook'un bir HTTP isteği başlatması mümkün değildir.**
+Hook, bir hedef olmadan API çağrısı yapamaz; bu durum isteği başlatamaz veya bir hata fırlatır.
+
+**[Aksiyom 4]: Eğer `defaultOptions` içindeki `method` parametresi (`GET`, `POST`, `PUT`, `DELETE` vb.) geçerli bir HTTP method değilse, istek başarısız olur veya sunucu tarafından reddedilir.**
+Geçersiz bir method ile yapılan istekler standart HTTP hataları (405 Method Not Allowed gibi) ile sonuçlanır.
+
+**[Aksiyom 5]: Eğer `defaultOptions` içindeki `headers`, `body` veya diğer yapılandırma parametreleri, gönderilen isteğin türü (örn: `GET` isteğinde `body` olması) ile uyumsuzsa, istek hata ile sonuçlanır.**
+İstek yapısının HTTP protokolü ile tutarlı olması bir zorunluluktur.
 
 ---
 
@@ -32261,27 +32224,27 @@ Bu hook, VentHub HVAC projesi içinde API çağrılarını merkezi olarak yönet
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::useApiCall
-- **params**: (defaultOptions?: UseApiCallOptions)
+### [N1_NASIL] AST Pointer: src/hooks/useApiCall.ts::useApiCall
+- **params**: `(defaultOptions?: UseApiCallOptions)` — Hook'a geçirilen varsayılan API çağrı seçenekleri
 - **ic_degiskenler**:
-  - `state` — useApiCall hook'unun state'i, ApiCallState<T> tipinde, data, loading ve error değerlerini tutar
-  - `setState` — state'i güncellemek için kullanılan setter fonksiyonu
-  - `execute` — useCallback ile sarılmış, API çağrısını yöneten async fonksiyon
-  - `reset` — useCallback ile sarılmış, state'i sıfırlayan fonksiyon
-- **Dönüş**: `{ ...state, execute, reset }` nesnesi
+  - `state` — useState ile yönetilen {data, loading, error} durum nesnesi, ApiCallState<T> tipinde
+  - `execute` — useCallback ile sarılmış async fonksiyon, API çağrısı yapar ve state'i günceller
+  - `reset` — useCallback ile sarılmış fonksiyon, state'i başlangıç değerine sıfırlar
+- **Dönüş**: `{ ...state, execute, reset }` — state alanlarını (data, loading, error) ve iki metodu içeren nesne
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::execute
-- **params**: (apiFunc: () => Promise<T>, options?: UseApiCallOptions)
+### [N2_NASIL] AST Pointer: src/hooks/useApiCall.ts::execute
+- **params**: `(apiFunc: () => Promise<T>, options?: UseApiCallOptions)` — Çalıştırılacak API fonksiyonu ve opsiyonel seçenekler
 - **ic_degiskenler**:
-  - `mergedOptions` — defaultOptions ve options'un birleşimi, spread operatörü ile oluşturulmuş
-  - `result` — apiFunc() çağrısının başarıyla döndürdüğü değer
-  - `error` — catch bloğunda yakalanan hata nesnesi, Error instancesi veya string'den oluşturulmuş
-- **Dönüş**: Promise<T | null>, başarıda result, hata durumunda null
+  - `mergedOptions` — `{ ...defaultOptions, ...options }` ile birleştirilmiş seçenekler nesnesi; showToast, successMessage, errorMessage alanlarını içerir
+  - `result` — `await apiFunc()` çağrısının başarılı sonucu, T tipinde
+  - `error` — catch bloğunda yakalanan hata; `err instanceof Error ? err : new Error(String(err))` ile Error nesnesine dönüştürülmüş
+- **Dönüş**: `Promise<T | null>` — Başarılıysa result, hatalıysa null döner
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::reset
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (state'i sıfırlar, setState çağrısı yapar)
+### [N3_NASIL] AST Pointer: src/hooks/useApiCall.ts::reset
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - (yok)
+- **Dönüş**: yok — Yan etki olarak state'i `{ data: null, loading: false, error: null }` değerine sıfırlar
 
 ---
 
@@ -32795,34 +32758,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutCoupon.ts
-skeleton_hash: 0ddc8afaae2a88ab
+skeleton_hash: 579864aa3c6d26bc
 entity_hashes:
   func:useCheckoutCoupon: 4495b524ff78f42b
-  overview: dfde178f4f3b3f1b
-generated_at: 2026-05-28T22:37:53Z
+  overview: f730ef6cfe5f4c6f
+generated_at: 2026-05-29T18:47:48Z
 ---
 
 ## Genel Bakış
-Venthub HVAC projesinin ödeme sürecine entegre edilmiş bir React özel hook modülüdür. Kullanıcıların sipariş toplam tutarına göre kupon kodu girişi, doğrulaması ve indirim hesaplama işlemlerini tek bir bileşen üzerinden yönetir. Modül, checkout akışında kupon kullanımının tüm yaşam döngüsünü kontrol eder.
+Bu modül, Venthub HVAC projesinin ödeme (checkout) sürecinde kupon kodu yönetimini sağlayan bir React özel hook'u içerir. Kullanıcının girdiği kupon kodunu alarak Supabase Edge Function aracılığıyla doğrulanmasını ve sipariş toplam tutarı üzerinden indirim hesaplanmasını yönetir. Modül, tek bir hook bileşeniyle kupon uygulama sürecinin tüm temel adımlarını kapsar.
 
 ## Fonksiyon Grupları
-### Kupon İşlemleri Hook'u
-Ödeme sayfasında kupon kodu yönetimi için gerekli tüm işlevselliği tek bir hook içinde sunar. Kupon girişi, doğrulama, geçerlilik kontrolü ve indirim tutarının hesaplanmasını kapsar.
+### Kupon Doğrulama ve İndirim Hook'u
+Ödeme sayfasında kupon kodunun girişinden indirimin hesaplanmasına kadar olan tüm iş akışını yöneten temel React hook'u.
 - useCheckoutCoupon
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, React hook yapısıyla ödeme sürecinde kupon yönetimi sağlayan bir fonksiyonel bileşendir.
+Bu modül, `totalAmount` parametresine bağımlı çalışan bir React hook'udur ve kupon işlemlerinin hesaplama temelini bu tutar üzerine kurar.
 
-[Aksiyom 1]: Eğer `totalAmount` parametresi number tipinde değilse (veya `NaN`/`undefined`/`null` ise), kupon indirim hesaplaması hatalı sonuç verebilir veya beklenmeyen davranış oluşur.
+[Aksiyom 1]: Eğer `totalAmount` geçerli bir `number` tipinde değilse (örn: `NaN`, `undefined`, `null`), kupon indirim hesaplaması güvenilir sonuç üretmez.
 
-[Aksiyom 2]: Eğer React hook bağlamı (React component içinde) dışında çağrılırsa, hook kuralları ihlal edilir ve çalışma zamanı hatası oluşur.
+[Aksiyom 2]: Eğer `totalAmount` negatif bir değer olarak verilirse, kupon indirim hesaplaması tanımsız davranış gösterir (hesaplama mantığı negatif tutarlar için tanımlı değildir).
 
-[Aksiyom 3]: Eğer `totalAmount` negatif bir değer olarak iletilirse, kupon indirim mantığı tanımsız davranış gösterebilir.
+[Aksiyom 3]: Eğer `totalAmount` sıfır ise, kupon uygulaması sonucu herhangi bir indirim tutarı oluşmaz (indirim, 0 tutarlı bir sipariş üzerinde anlamsızdır).
 
-[Aksiyom 4]: Eğer `totalAmount` sıfır ise, kupon uygulaması sonucunda indirim tutarının sıfır veya negatif olmaması beklenir (tutar limitleri bilinmiyor).
+[Aksiyom 4]: Eğer hook bir React bileşeninin dışında (React render döngüsü dışında) çağrılırsa, React hooks kuralları ihlal edilir ve hook düzgün çalışmaz.
+
+---
+
+**Not:** Bu modül için yalnızca fonksiyon imzası (`useCheckoutCoupon(totalAmount: number)`) bilinmektedir. Hook'un döndürdüğü değerler, içinde yönettiği state'ler, kupon doğrulama mantığı, API çağrıları ve eşik değerleri fonksiyon gövdesi olmadan belirlenemez.
 
 ---
 
@@ -32842,32 +32809,35 @@ Bu modül, React hook yapısıyla ödeme sürecinde kupon yönetimi sağlayan bi
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/hooks/useCheckoutCoupon.ts::useCheckoutCoupon
-- **params**: (totalAmount: number)
+### [N1_NASIL] AST Pointer: useCheckoutCoupon.ts::useCheckoutCoupon
+- **params**: `totalAmount: number` — sepet toplam tutarı, kupon indirimi hesaplamada kullanılır
 - **ic_degiskenler**:
-  - `couponCode` — Kullanıcının girdiği kupon kodu, useState ile tutulan string state
-  - `setCouponCode` — couponCode state'ini güncellemek için kullanılan setter fonksiyonu
-  - `couponApplied` — Uygulanan kupon bilgilerini (kod ve indirim miktarı) tutan state, başlangıçta null
-  - `setCouponApplied` — couponApplied state'ini güncellemek için kullanılan setter fonksiyonu
-  - `applyCoupon` — Asenkron fonksiyon, kupon kodunu doğrular ve uygular
-  - `removeCoupon` — Uygulanan kuponu kaldırır ve formu sıfırlar
-- **Dönüş**: { couponCode, setCouponCode, couponApplied, applyCoupon, removeCoupon }
+  - `couponCode` — useState ile yönetilen string, kullanıcının girdiği kupon kodunu tutar
+  - `setCouponCode` — couponCode state'ini güncelleyen setter fonksiyonu
+  - `couponApplied` — `{ code: string; discount: number } | null` tipinde state, başarıyla uygulanmış kupon bilgisini veya uygulanan kupon olmadığını (null) tutar
+  - `setCouponApplied` — couponApplied state'ini güncelleyen setter fonksiyonu
+  - `applyCoupon` — kupon kodunu Edge Function'a göndererek doğrulayan ve uygulayan async fonksiyon
+  - `removeCoupon` — kuponu kaldırıp formu sıfırlayan fonksiyon
+- **Dönüş**: `{ couponCode, setCouponCode, couponApplied, applyCoupon, removeCoupon }` — kupon yönetim arayüzü
 
-### [N2_NASIL] AST Pointer: src/hooks/useCheckoutCoupon.ts::applyCoupon
-- **params**: ()
+---
+
+### [N2_NASIL] AST Pointer: useCheckoutCoupon.ts::applyCoupon
+- **params**: yok
 - **ic_degiskenler**:
-  - `code` — Trimlenmiş kupon kodu, doğrulama için kullanılır
-  - `base` — Supabase URL'si, process.env.NEXT_PUBLIC_SUPABASE_URL'den alınır veya boş string
-  - `anon` — Supabase anon key'i, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY'den alınır veya boş string
-  - `resp` — Edge Function'dan dönen HTTP response nesnesi
-  - `json` — Response'un JSON içeriği, geçersiz JSON durumunda boş obje ile yakalanır
-  - `e` — Try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: void (yan etki: state güncelleme ve toast bildirimleri)
+  - `code` — `couponCode.trim()` ile elde edilen, baş/son boşlukları temizlenmiş kupon kodu
+  - `base` — `process.env.NEXT_PUBLIC_SUPABASE_URL || ''` Supabase API base URL'i, Edge Function çağrıları için kullanılır
+  - `anon` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''` Supabase anon公众 key'i, API authentication header'ında kullanılır
+  - `resp` — `fetch()` ile `/functions/v1/apply-coupon` endpoint'ine POST isteği sonucu dönen Response nesnesi
+  - `json` — `resp.json()` ile parse edilen yanıt gövdesi; parse hatasında boş obje `{}` döner; `json?.valid` kupon geçerliliğini, `json?.error` hata mesajını, `json.normalized_code` normalize edilmiş kupon kodunu, `json.discount_amount` indirim tutarını içerir
+- **Dönüş**: yok (yan etkiler: `setCouponApplied` ile state günceller, `toast.success`/`toast.error` ile bildirim gösterir)
 
-### [N3_NASIL] AST Pointer: src/hooks/useCheckoutCoupon.ts::removeCoupon
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (yan etki: couponApplied ve couponCode state'lerini sıfırlar)
+---
+
+### [N3_NASIL] AST Pointer: useCheckoutCoupon.ts::removeCoupon
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (yan etkiler: `setCouponApplied(null)` ile kupon bilgisini temizler, `setCouponCode('')` ile input alanını sıfırlar)
 
 ---
 
@@ -32889,27 +32859,42 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutOrchestrator.ts
-skeleton_hash: ff7c7a77d0655691
+skeleton_hash: b0d12f3c2957247a
 entity_hashes:
   func:useCheckoutOrchestrator: 6b4ccd36fef055f6
-  overview: e38002628c0c705b
-generated_at: 2026-05-28T22:37:43Z
+  overview: 6dca858583af2307
+generated_at: 2026-05-29T18:48:40Z
 ---
 
 ## Genel Bakış
-`useCheckoutOrchestrator` hook’u, uygulamanın checkout (satın alma) sürecini yönetmek ve ilgili alt sistemler arasında koordinasyonu sağlamak için tasarlanmıştır. Tek bir giriş noktası üzerinden veri toplama, durum güncellemeleri ve yan etkileri (API çağrıları, yönlendirmeler vb.) birleştirir.
+`useCheckoutOrchestrator` hook'u, VentHub HVAC projesinin satın alma sürecini merkezi olarak yöneten ve koordine eden bir React özel hook'udur. Sepet yönetiminden ödeme ve teslimat adımlarına kadar tüm sürecin akışını, durumunu ve entegrasyonlarını tek bir yerden kontrol ederek tutarlı ve yönetilebilir bir deneyim sunar.
 
 ## Fonksiyon Grupları
-### Checkout Koordinasyonu
-Bu grup, checkout adımlarının sırasını belirler, gerekli verileri (sepet, kullanıcı, ödeme bilgileri) toplar ve sürecin ilerleyişini kontrol eder.  
-- useCheckoutOrchestrator  
-
-(İçerideki yardımcı fonksiyonlar ve callback’ler bu ana hook içinde çağrılır; dışarıdan başka bir fonksiyon bu hook’u doğrudan çağırmaz.)
+### Checkout Süreci Koordinasyonu
+Bu ana hook, satın alma işleminin tüm adımlarını (kullanıcı bilgisi toplama, ödeme alma, siparişi tamamlama) sıralar, ilgili verileri toplar ve sürecin durumunu, başarı ve hata senaryolarını yönetir.
+- useCheckoutOrchestrator
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu hook, parametresiz olarak çağrılan bir React hook'u olup checkout sürecinin koordinasyonunu üstlenir. Aşağıdaki varsayımlar fonksiyon imzasından ve hook'un yapısından türetilmiştir:
+
+---
+
+**[Aksiyom 1]:** Eğer `useCheckoutOrchestrator` bir React hook'sa ve parametresiz çağrılıyorsa, bağımlılıklarının (sepet verisi, kullanıcı oturumu, ödeme servisi vb.) React Context veya iç hook'lar aracılığıyla sağlanmış olması gerekir; eğer dış kaynaklardan bağımlılıklar yoksa, hook geçersiz veri ile çalışır.
+
+**[Aksiyom 2]:** Eğer hook dışı bir bileşen veya modül tarafından `useCheckoutOrchestrator` doğrudan çağrılmıyorsa (sadece içindeki yardımcı fonksiyonlar kullanılıyorsa), hook'un dışarıya döndürdüğü arayüzün (return value) bileşenler tarafından tüketilmesi gerekir; eğer dönüş değeri_consumed edilmezse, checkout süreci tetiklenemez.
+
+**[Aksiyom 3]:** Eğer hook bir React bileşeninin içinde çağrılmıyorsa veya React Hooks kurallarının dışında (koşullu, döngü içinde, nested function içinde) kullanılıyorsa, React çalışma zamanı hatası oluşur.
+
+**[Aksiyom 4]:** Eğer `useCheckoutOrchestrator` içinde bir state yönetimi (useState/useReducer) varsa ve bu state'e birden fazla asenkron işlem aynı anda yazıyorsa (race condition), checkout verileri tutarsız olur — bu nedenle sıralı/koordineli yazma varsayımı gereklidir.
+
+**[Aksiyom 5]:** Eğer hook'un içinde API çağrıları (fetch/axios) yapılıyorsa ve bu çağrıların iptal edilme mekanizması (AbortController, cleanup) yoksa, bileşen unmount edildikten sonra state güncellemesi yapılmaya çalışılır ve "memory leak" veya "state update on unmounted component" uyarısı oluşur.
+
+---
+
+**Not:** Fonksiyon gövdesi (function body) sağlanmadığından, hook'un içindeki spesifik bağımlılık zincirleri, döndürülen değer yapısı ve yan etki detayları hakkında kesin çıkarım yapılamamıştır. Yukarıdaki aksiyomlar, hook'un imzası (parametresiz) ve React hook yapısı genellemesinden türetilmiştir.
 
 ---
 
@@ -32936,45 +32921,121 @@ type CheckoutOrchestrator = ReturnType<typeof useCheckoutOrchestrator>
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator
-- **params**: (none)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `user` — `useAuth()` hook’undan gelen oturum bilgisi, kullanıcı objesi.
-  - `t` — `useI18n()` hook’undan gelen çeviri fonksiyonu.
-  - `step` — checkout sürecinin mevcut adımını tutan state (1‑4).
-  - `setStep` — `step` state’ini güncelleyen setter.
-  - `customerInfo` — müşterinin adı, e‑posta, telefon vb. bilgilerini tutan obje.
-  - `setCustomerInfo` — `customerInfo` state’ini güncelleyen setter.
-  - `shippingAddress` — gönderim adresi bilgilerini tutan obje.
-  - `setShippingAddress` — `shippingAddress` state’ini güncelleyen setter.
-  - `billingAddress` — fatura adresi bilgilerini tutan obje.
-  - `setBillingAddress` — `billingAddress` state’ini güncelleyen setter.
-  - `invoiceType` — fatura tipi (`'individual'` | `'corporate'`).
-  - `setInvoiceType` — `invoiceType` state’ini güncelleyen setter.
-  - `invoiceInfo` — fatura detaylarını tutan obje.
-  - `setInvoiceInfo` — `invoiceInfo` state’ini güncelleyen setter.
-  - `legalConsents` — yasal onayların boolean değerlerini tutan obje.
-  - `setLegalConsents` — `legalConsents` state’ini güncelleyen setter.
-  - `sameAsShipping` — fatura adresinin gönderim adresiyle aynı olup olmadığını belirten boolean.
-  - `setSameAsShipping` — `sameAsShipping` state’ini güncelleyen setter.
-  - `shippingMethod` — seçilen kargo yöntemi (`'standard'` | `'express'`).
-  - `setShippingMethod` — `shippingMethod` state’ini güncelleyen setter.
-  - `showHelp` — yardım modalının gösterim durumunu tutan boolean.
-  - `setShowHelp` — `showHelp` state’ini güncelleyen setter.
-  - `savedAddresses` — kullanıcının kayıtlı adres listesini tutan dizi.
-  - `setSavedAddresses` — `savedAddresses` state’ini güncelleyen setter.
-  - `showAddressModal` — adres seçme modalının gösterim durumu.
-  - `setShowAddressModal` — `showAddressModal` state’ini güncelleyen setter.
-  - `addressPickTarget` — adres seçiminin “shipping” mi “billing” mi olduğunu belirten değer.
-  - `setAddressPickTarget` — `addressPickTarget` state’ini güncelleyen setter.
-  - `savedInvoiceProfiles` — kullanıcının kayıtlı fatura profillerini tutan dizi.
-  - `setSavedInvoiceProfiles` — `savedInvoiceProfiles` state’ini güncelleyen setter.
-  - `showInvoiceModal` — fatura profili modalının gösterim durumu.
-  - `setShowInvoiceModal` — `showInvoiceModal` state’ini güncelleyen setter.
-  - `handleSelectInvoiceProfile` — bir fatura profili seçildiğinde çalışan callback (aşağıda ayrı AST pointer’da tanımlı).
-  - `validateCustomerInfo` — müşteri bilgilerini doğrulayan fonksiyon (aşağıda ayrı AST pointer’da tanımlı).
-  - `validateAddress` — adres objesini doğrulayan fonksiyon (aşağıda ayrı AST pointer’da tanımlı).
-  - `handleNextStep` — checkout adımlarını ilerleten async fonksiyon (aşağıda ayrı AST pointer’da tanımlı).
-- **Dönüş**: Hook’un dışarıya döndürdüğü obje; içinde tüm state değerleri, setter’lar ve yardımcı fonksiyonlar bulunur (yan etkileri: UI’da gösterim ve veri akışı).
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, kimlik bilgilerini tutar
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, metinleri döndürür
+  - `step` — Mevcut checkout adımını tutan state (1=müşteri, 2=adres, 3=ödeme, 4=tamamlandı)
+  - `setStep` — step state'ini güncellemek için setter fonksiyonu
+  - `customerInfo` — Müşteri bilgilerini tutan state nesnesi (name, firstName, lastName, email, phone, identityNumber alanları)
+  - `setCustomerInfo` — customerInfo state'ini güncellemek için setter fonksiyonu
+  - `shippingAddress` — Teslimat adresi bilgilerini tutan state nesnesi (full_name, phone, full_address, fullAddress, city, district, postalCode, postal_code alanları)
+  - `setShippingAddress` — shippingAddress state'ini güncellemek için setter fonksiyonu
+  - `billingAddress` — Fatura adresi bilgilerini tutan state nesnesi (aynı alan yapısına sahip)
+  - `setBillingAddress` — billingAddress state'ini güncellemek için setter fonksiyonu
+  - `invoiceType` — Fatura türünü tutan state ('individual' veya 'corporate')
+  - `setInvoiceType` — invoiceType state'ini güncellemek için setter fonksiyonu
+  - `invoiceInfo` — Fatura detaylarını tutan state nesnesi (type, tckn, companyName, taxOffice, taxNumber alanları)
+  - `setInvoiceInfo` — invoiceInfo state'ini güncellemek için setter fonksiyonu
+  - `legalConsents` — Yasal onay durumlarını tutan state nesnesi (kvkk, sales_agreement, privacy_policy, distanceSales, preInfo, orderConfirm, marketing alanları boolean değerler)
+  - `setLegalConsents` — legalConsents state'ini güncellemek için setter fonksiyonu
+  - `sameAsShipping` — Fatura adresinin teslimat adresiyle aynı olup olmadığını tutan boolean state
+  - `setSameAsShipping` — sameAsShipping state'ini güncellemek için setter fonksiyonu
+  - `shippingMethod` — Kargo yöntemini tutan state ('standard' veya 'express')
+  - `setShippingMethod` — shippingMethod state'ini güncellemek için setter fonksiyonu
+  - `showHelp` — Yardım gösterilip gösterilmeyeceğini tutan boolean state
+  - `setShowHelp` — showHelp state'ini güncellemek için setter fonksiyonu
+  - `savedAddresses` — Kullanıcının kayıtlı adreslerini tutan state array'i (UserAddress tipinde)
+  - `setSavedAddresses` — savedAddresses state'ini güncellemek için setter fonksiyonu
+  - `showAddressModal` — Adres seçim modalinin açık olup olmadığını tutan boolean state
+  - `setShowAddressModal` — showAddressModal state'ini güncellemek için setter fonksiyonu
+  - `addressPickTarget` — Hangi adres türünün seçileceğini tutan state ('shipping' veya 'billing')
+  - `setAddressPickTarget` — addressPickTarget state'ini güncellemek için setter fonksiyonu
+  - `savedInvoiceProfiles` — Kullanıcının kayıtlı fatura profillerini tutan state array'i (InvoiceProfile tipinde)
+  - `setSavedInvoiceProfiles` — savedInvoiceProfiles state'ini güncellemek için setter fonksiyonu
+  - `showInvoiceModal` — Fatura profili seçim modalinin açık olup olmadığını tutan boolean state
+  - `setShowInvoiceModal` — showInvoiceModal state'ini güncellemek için setter fonksiyonu
+  - `handleSelectInvoiceProfile` — useCallback ile sarmalanmış, fatura profili seçen callback fonksiyonu
+  - `validateCustomerInfo` — useCallback ile sarmalanmış, müşteri bilgilerini doğrulayan callback fonksiyonu
+  - `validateAddress` — useCallback ile sarmalanmış, adres bilgisini doğrulayan callback fonksiyonu
+  - `handleNextStep` — useCallback ile sarmalanmış, bir sonraki adıma geçişi yöneten async callback fonksiyonu
+- **Dönüş**: { step, setStep, customerInfo, setCustomerInfo, shippingAddress, setShippingAddress, billingAddress, setBillingAddress, invoiceType, setInvoiceType, invoiceInfo, setInvoiceInfo, legalConsents, setLegalConsents, sameAsShipping, setSameAsShipping, shippingMethod, setShippingMethod, showHelp, setShowHelp, savedAddresses, setSavedAddresses, showAddressModal, setShowAddressModal, addressPickTarget, setAddressPickTarget, savedInvoiceProfiles, setSavedInvoiceProfiles, showInvoiceModal, setShowInvoiceModal, handleSelectInvoiceProfile, validateCustomerInfo, validateAddress, handleNextStep } nesnesi döndürür
+
+### [N2_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useEffect[pre-fill customer info]
+- **params**: () => {}
+- **ic_degiskenler**:
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, user.user_metadata.full_name, user.email, user.user_metadata.phone alanlarını içerir
+  - `fullName` — user.user_metadata.full_name değerinden veya boş stringden oluşan tam ad değişkeni
+  - `parts` — fullName.split(' ') ile oluşturulan, ad ve soyadı ayıran array
+- **Dönüş**: yok (side effect: setCustomerInfo çağrısı ile customerInfo state'ini günceller)
+
+### [N3_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useEffect[load Invoice profiles]
+- **params**: () => {}
+- **ic_degiskenler**:
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, kullanıcı oturum durumunu kontrol eder
+  - `rows` — listInvoiceProfiles() API çağrısından dönen InvoiceProfile array'i
+  - `defProfile` — rows.find(r => r.is_default) || rows[0] ile bulunan varsayılan fatura profili veya ilk profil
+  - `pType` — defProfile.profile_type değerine göre 'individual' veya 'corporate' olarak belirlenen fatura türü string'i
+- **Dönüş**: yok (side effect: setSavedInvoiceProfiles, setInvoiceType, setInvoiceInfo çağrısı ile state'leri günceller)
+
+### [N4_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::loadInvoiceProfiles
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, kullanıcı oturum durumunu kontrol eder
+  - `rows` — listInvoiceProfiles() API çağrısından dönen InvoiceProfile array'i
+  - `defProfile` — rows.find(r => r.is_default) || rows[0] ile bulunan varsayılan fatura profili veya ilk profil
+  - `pType` — defProfile.profile_type değerine göre 'individual' veya 'corporate' olarak belirlenen fatura türü string'i
+- **Dönüş**: Promise<void> (async fonksiyon, doğrudan değer döndürmez, state'leri günceller)
+
+### [N5_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::handleSelectInvoiceProfile
+- **params**: (p: InvoiceProfile) — Seçilen fatura profili nesnesi
+- **ic_degiskenler**:
+  - `pType` — p.profile_type değerine göre 'individual' veya 'corporate' olarak belirlenen fatura türü string'i
+- **Dönüş**: void (yan etki: setInvoiceType, setInvoiceInfo, setShowInvoiceModal çağrısı ile state'leri günceller, toast.success gösterir)
+
+### [N6_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useEffect[load Addresses]
+- **params**: () => {}
+- **ic_degiskenler**:
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, kullanıcı oturum durumunu kontrol eder
+  - `sameAsShipping` — Fatura adresinin teslimat adresiyle aynı olup olmadığını tutan boolean state
+  - `rows` — listAddresses() API çağrısından dönen UserAddress array'i
+  - `defShip` — rows.find(r => r.is_default_shipping) ile bulunan varsayılan teslimat adresi
+  - `addr` — defShip değerlerinden oluşturulmuş CheckoutAddressInfo tipinde nesne (full_address, city, district, postalCode, full_name, phone alanları)
+- **Dönüş**: yok (side effect: setSavedAddresses, setShippingAddress, setBillingAddress çağrısı ile state'leri günceller)
+
+### [N7_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::loadAddresses
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, kullanıcı oturum durumunu kontrol eder
+  - `rows` — listAddresses() API çağrısından dönen UserAddress array'i
+  - `defShip` — rows.find(r => r.is_default_shipping) ile bulunan varsayılan teslimat adresi
+  - `addr` — defShip değerlerinden oluşturulmuş CheckoutAddressInfo tipinde nesne (full_address, city, district, postalCode, full_name, phone alanları)
+- **Dönüş**: Promise<void> (async fonksiyon, doğrudan değer döndürmez, state'leri günceller)
+
+### [N8_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::validateCustomerInfo
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `customerInfo` — Doğrulanacak müşteri bilgilerini tutan state nesnesi (name, email, phone alanlarını içerir)
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
+- **Dönüş**: boolean — Tüm doğrulamalar geçerse true, aksi halde false döndürür ve toast.error gösterir
+
+### [N9_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::validateAddress
+- **params**: (address: CheckoutAddressInfo) — Doğrulanacak adres bilgisi nesnesi
+- **ic_degiskenler**:
+  - `address` — Parametre olarak gelen adres nesnesi (full_address, fullAddress, city, district alanlarını içerir)
+  - `full` — (address.full_address || address.fullAddress || '').trim() ile oluşturulmuş, trimmed tam adres string'i
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
+- **Dönüş**: boolean — Tüm doğrulamalar geçerse true, aksi halde false döndürür ve toast.error gösterir
+
+### [N10_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::handleNextStep
+- **params**: (initiatePayment: () => Promise<boolean | undefined>) — Ödeme işlemini başlatan async callback fonksiyonu
+- **ic_degiskenler**:
+  - `step` — Mevcut checkout adımını tutan state (1, 2 veya 3 olabilir)
+  - `validateCustomerInfo` — Müşteri bilgilerini doğrulayan callback fonksiyonu
+  - `shippingAddress` — Teslimat adresi bilgilerini tutan state nesnesi
+  - `validateAddress` — Adres bilgisini doğrulayan callback fonksiyonu
+  - `success` — initiatePayment() çağrısından dönen boolean veya undefined değer (ödeme başarılı mı)
+- **Dönüş**: Promise<void> (async fonksiyon, doğrudan değer döndürmez, setStep çağrısı ile step state'ini günceller)
 
 ---
 
@@ -32997,20 +33058,20 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutPayment.ts
-skeleton_hash: 0f81e1692b39b882
+skeleton_hash: 68bcfa4f5c8e469e
 entity_hashes:
   func:useCheckoutPayment: a8bb41b15d097162
-  overview: 5e2bf25a48045329
-generated_at: 2026-05-28T22:37:44Z
+  overview: e0e6f5e6a2896df3
+generated_at: 2026-05-29T18:49:02Z
 ---
 
 ## Genel Bakış
-`useCheckoutPayment` modülü, VentHub HVAC uygulamasının ödeme adımını yöneten tek bir React hook'udur. Sepet içeriği, kullanıcı bilgileri ve sunucu tarafı fiyatlandırma gibi dış bağımlılıkları alarak, toplam tutarı hesaplar, fiyatları günceller ve ödeme tamamlandığında sepeti temizler. Böylece ödeme sürecinin bütünlüğü ve tutarlılığı tek bir noktadan kontrol edilir.  
+`useCheckoutPayment` modülü, VentHub HVAC uygulamasının ödeme sürecin yöneten tek bir React hook'udur. Sepet içeriği, kullanıcı bilgileri ve sunucu tarafı fiyatlandırma gibi dış bağımlılıkları alarak, toplam tutarı hesaplar, fiyatları günceller ve ödeme tamamlandığında sepeti temizler. Böylece ödeme sürecinin bütünlüğü ve tutarlılığı tek bir noktadan kontrol edilir.
 
 ## Fonksiyon Grupları
 ### Ödeme Akışı Orkestratörü  
 Bu grup, ödeme sürecinin tüm adımlarını bir araya getirir; gelen verileri doğrular, tutarı hesaplar, fiyatları günceller ve işlem sonunda sepeti temizler.  
-- useCheckoutPayment  
+- useCheckoutPayment
 
 ### Yardımcı Veri ve İşlem Sağlayıcıları  
 Ödeme orkestratörünün ihtiyaç duyduğu dış bağımlılıkları içerir; sepet öğeleri, kullanıcı bilgileri ve fiyatlandırma/temizleme fonksiyonları bu grup altında toplanır.  
@@ -33019,16 +33080,20 @@ Bu grup, ödeme sürecinin tüm adımlarını bir araya getirir; gelen verileri 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `items` parametresi sağlanmazsa, ödeme işlemi başlatılamaz ve hook hata verir.  
-**Aksiyom 2**: Eğer `getCartTotal` fonksiyonu tanımlı değilse, sepet tutarı hesaplanamaz, bu yüzden ödeme tutarı belirlenemez ve hook çalışmaz.  
-**Aksiyom 3**: Eğer `user` nesnesi eksik ya da geçersizse, kimlik doğrulama ve faturalama bilgileri alınamaz; bu durumda ödeme süreci durur.  
-**Aksiyom 4**: Eğer `clearCart` fonksiyonu sağlanmazsa, ödeme tamamlandıktan sonra sepet temizlenemez ve kullanıcı aynı sepeti tekrar görür.  
-**Aksiyom 5**: Eğer `applyServerPricing` fonksiyonu mevcut değilse, sunucu tarafı fiyatlandırma güncellemeleri uygulanamaz; bu da fiyat tutarsızlıklarına yol açar.  
-**Aksiyom 6**: Eğer `UseCheckoutPaymentProps` tipindeki bir nesne (`or` anahtarıyla) sağlanmazsa, hook’un beklediği tüm bağımlılıkların (items, getCartTotal, user, clearCart, applyServerPricing) ayrı ayrı geçirilmesi gerekir; aksi takdirde tip uyumsuzluğu hatası oluşur.  
+Bu hook, ödeme sürecinin yönetimini üstlenir ve dışarıdan sağlanan bağımlılıklar üzerinde çalışır. Doğru işleyiş için aşağıdaki koşulların karşılanması gerekmektedir.
 
-*Domain‑specific bir eşik değeri, kabul kriteri veya başka bir özel kural mevcut değildir; tüm gereksinimler fonksiyon imzasındaki parametrelerin varlığı ve doğru tipte olmasıyla sınırlıdır.*
+[Aksiyom 1]: Eğer `items` parametresi geçerli bir dizi (array) verisi değilse (null, undefined veya başka bir tipte ise), sepet öğeleri işlenemez ve ödeme süreci başlatılamaz.
+
+[Aksiyom 2]: Eğer `getCartTotal` parametresi çağrılabilir bir fonksiyon değilse, sepet toplam tutarı hesaplanamaz ve sipariş özeti oluşturulamaz.
+
+[Aksiyom 3]: Eğer `clearCart` parametresi çağrılabilir bir fonksiyon değilse, başarılı ödeme işleminden sonra sepetteki ürünler temizlenemez; bu durum sepetteki ürünlerin kullanıcının bir sonraki alışveriş seansına kadar korunmasına yol açar.
+
+[Aksiyom 4]: Eğer `applyServerPricing` parametresi çağrılabilir bir fonksiyon değilse, sunucu tarafı fiyatlandırma doğrulaması yapılamaz; bu durum yerel veya eski fiyatların kullanılmasına neden olabilir.
+
+[Aksiyom 5]: Eğer `user` parametresi null veya undefined ise, ödeme süreci başlatılamaz; çünkü siparişin kullanıcıya bağlanması ve ödeme işleminin yürütülmesi için kullanıcı kimliği zorunludur.
+
+[Aksiyom 6]: Eğer `items` dizisi boş ise (toplam öğe sayısı 0), sepet toplamı hesaplanamaz ve ödeme butonu devre dışı kalır.
 
 ---
 
@@ -33069,29 +33134,48 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useCheckoutPayment
-- **params**: `({ items, getCartTotal, user, clearCart, applyServerPricing, orchestrator, couponCode, t }: UseCheckoutPaymentProps)`
+- **params**: (`items`, `getCartTotal`, `user`, `clearCart`, `applyServerPricing`, `orchestrator`, `couponCode`, `t`)
 - **ic_degiskenler**:
-  - `router` — `useRouter()` ile oluşturulan Next.js yönlendirici, sayfa yönlendirmeleri için kullanılır.
-  - `loading` — ödeme işlemi sırasında gösterilen yükleme durumu (`useState(false)`).
-  - `setLoading` — `loading` değerini güncelleyen setter.
-  - `iyzToken` — İyzico’dan alınan ödeme token’ı (`useState('')`).
-  - `setIyzToken` — `iyzToken` değerini güncelleyen setter.
-  - `paymentUrl` — İyzico ödeme sayfasının URL’i (`useState('')`).
-  - `setPaymentUrl` — `paymentUrl` değerini güncelleyen setter.
-  - `orderId` — oluşturulan siparişin kimliği (`useState('')`).
-  - `setOrderId` — `orderId` değerini güncelleyen setter.
-  - `convId` — İyzico konuşma kimliği (`useState('')`).
-  - `setConvId` — `convId` değerini güncelleyen setter.
-  - `iyzScriptLoaded` — dış script’in yüklendiği durum (sabit `false`).
-  - `formReady` — ödeme formunun hazır olup olmadığını gösteren flag (`useState(false)`).
-  - `setFormReady` — `formReady` değerini güncelleyen setter.
-  - `progressPct` — ödeme sürecindeki ilerleme yüzdesi (`useState(20)`).
-  - `setProgressPct` — `progressPct` değerini güncelleyen setter.
-  - `paymentFrameContent` — iframe içeriği (sabit boş string).
-  - `isTest` — test ortamı kontrolü (`'vi' in globalThis`).
-- **Dönüş**: Hook’un döndürdüğü nesne  
-  `{ loading, iyzToken, paymentUrl, orderId, convId, iyzScriptLoaded, formReady, progressPct, paymentFrameContent, setFormReady, setProgressPct, initiatePayment }`  
-  (yan etkileri: state güncellemeleri, router yönlendirmesi, dış script yüklenmesi).
+  - `router` — useRouter hookundan dönen yönlendirme nesnesi, sayfa geçişleri için kullanılır
+  - `loading` — useState ile tanımlanan boolean, ödeme sürecinin yüklenme durumunu tutar
+  - `iyzToken` — useState ile tanımlanan string, iyzico ödeme token'ını tutar
+  - `paymentUrl` — useState ile tanımlanan string, iyzico ödeme sayfası URL'ini tutar
+  - `orderId` — useState ile tanımlanan string, sipariş numarasını tutar
+  - `convId` — useState ile tanımlanan string, iyzico konuşma ID'sini tutar
+  - `iyzScriptLoaded` — useState ile tanımlanan boolean, iyzico scriptinin yüklenip yüklenmediğini tutar (hiç set edilmez)
+  - `formReady` — useState ile tanımlanan boolean, formun hazır olup olmadığını tutar
+  - `progressPct` — useState ile tanımlanan number, ilerleme yüzdesini tutar (başlangıç: 20)
+  - `paymentFrameContent` — useState ile tanımlanan string, ödeme frame içeriğini tutar (hiç set edilmez)
+  - `isTest` — globalThis'de 'vi' olup olmadığını kontrol eden boolean, test ortamı tespiti yapar
+  - `initiatePayment` — async fonksiyon, ödeme sürecini başlatır
+- **Dönüş**: `{ loading, iyzToken, paymentUrl, orderId, convId, iyzScriptLoaded, formReady, progressPct, paymentFrameContent, setFormReady, setProgressPct, initiatePayment }` (object)
+
+### [N2_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::initiatePayment
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `authoritativeTotal` — getCartTotal() ile alınan sepet toplamı, sunucu doğrulamasından sonra güncellenebilir
+  - `validation` — validateServerCart() ile sunucu tarafı sepet doğrulama sonucu
+  - `localHash` — getPriceHashLocal(items) ile yerel sepet için fiyat hash'i
+  - `serverHash` — getPriceHashServer(validation?.items, items) ile sunucu tarafı fiyat hash'i
+  - `buildPaymentRequest` — Dinamik import ile yüklenen ödeme isteği oluşturma fonksiyonu
+  - `requestData` — buildPaymentRequest() ile oluşturulan iyzico ödeme isteği verisi
+  - `data` — supabase.functions.invoke() yanıtındaki veri nesnesi
+  - `error` — supabase.functions.invoke() yanıtındaki hata nesnesi
+  - `d` — data.data objesi, iyzico yanıtının içeriği
+  - `msg` — yakalanan hatanın mesajı
+- **Dönüş**: `true` (başarılı) veya `false` (hatalı) boolean
+
+### [N3_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useEffectCallback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `timer` — setInterval ile oluşturulan zamanlayıcı ID'si, periyodik sipariş durumu kontrolü için kullanılır
+- **Dönüş**: Cleanup fonksiyonu `() => clearInterval(timer)` veya `undefined` (orderId yoksa)
+
+### [N4_NASIL] AST Pointer: src/hooks/useCheckpointPayment.ts::setIntervalCallback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `data` — supabase.from('venthub_orders').select('status') sorgusundan dönen sipariş durumu verisi
+- **Dönüş**: `undefined` (yan etkiler: clearCart() çağırır, router.push() ile yönlendirme yapar)
 
 ---
 
@@ -41631,41 +41715,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx
-skeleton_hash: ffd02b4bb0002d84
+skeleton_hash: c62079cae2908af5
 entity_hashes:
   func:AuthCallbackPage: b8296e20d27a327c
-  overview: 4e4abcf032bc136f
+  overview: 0d7baa0d62a2803d
   style_tokens: 404ab1f16440192d
-generated_at: 2026-05-28T22:39:23Z
+generated_at: 2026-05-29T18:49:17Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin kimlik doğrulama akışında, harici kimlik sağlayıcısından geri dönüş yapılan özel React sayfa bileşenini barındırır. Kimlik doğrulama sonrası kullanıcının oturum süreçlerini yönetip ana uygulamaya yönlendirmek üzere tasarlanmış tek sorumluluklu bir görsel modüldür.
+Bu modül, VentHub HVAC uygulamasında kimlik doğrulama akışının son aşamasını yöneten tek bileşenli bir React sayfasıdır. Harici kimlik sağlayıcısından (OAuth, SSO vb.) geri dönüş sonrasında tarayıcı URL'indeki yetkilendirme verilerini işler, kullanıcı oturumunu başlatır ve ana uygulamaya güvenli bir geçiş sağlar. Tek sorumluluklu yapısı sayesinde kimlik doğrulama geri dönüş sürecini izole ve merkezi bir noktadan kontrol eder.
 
 ## Fonksiyon Grupları
-### Ana Giriş Noktası Bileşeni
-Modülün tek dışa aktarılan ana bileşeni olarak, kimlik doğrulama geri dönüş sürecinin tüm işleyişini yönetir, kullanıcıya yönlendirme ve bekleme durumu arayüzünü sunar.
+### Ana Bileşen ve Akış Yönetimi
+Modülün tek ve ana bileşeni olarak kimlik doğrulama geri dönüş sürecinin tüm yaşam döngüsünü yönetir; URL parametrelerinden token/code gibi verileri çıkarır, oturum oluşumu tetikler, kullanıcıya bekleme arayüzü sunar ve başarısızlık durumunda hata gösterimi yaparak yönlendirme sağlar.
 - AuthCallbackPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kimlik doğrulama geri dönüş sayfası olarak çalışır; fonksiyon gövdesi sağlanmadığı için aksiyomlar modülün amacına dayalı minimal varsayımlardır.
+Bu modül, kimlik doğrulama geri dönüş sayfası olarak çalışır; harici kimlik sağlayıcısından dönen oturum verilerini işleyerek kullanıcıyı uygulamaya yönlendirir.
 
-[Aksiyom 1]: Eğer kimlik sağlayıcı (OAuth/Identity Provider) yapılandırması yoksa, kimlik doğrulama geri dönüş parametreleri alınamaz ve kullanıcı oturumu başlatılamaz.
+**[Aksiyom 1]:** Eğer kimlik doğrulama bağlamı (auth context) sağlayıcısı mevcut değilse, kullanıcının oturum durumu güncellenemez ve sayfa geçerli kimlik bilgisiyle başlatılamaz.
 
-[Aksiyom 2]: Eğer uygulama rotaları arasında AuthCallbackPage'e yönlendirme tanımı yoksa, kimlik sağlayıcısı geri dönüş URL'i bu sayfaya ulaşamaz.
+**[Aksiyom 2]:** Eğer yönlendirme bağlamı (router context) mevcut değilse, kimlik doğrulama sonrası kullanıcı ana sayfaya veya hedef sayfaya yönlendirilemez ve sonsuz bekleme durumunda kalır.
 
-[Aksiyom 3]: Eğer tarayıcı URL parametrelerinde (token, code, state vb.) kimlik doğrulama verileri yoksa, oturum oluşumu başarısız olur ve kullanıcı ana uygulamaya yönlendirilemez.
+**[Aksiyom 3]:** Eğer URL sorgu parametreleri (callback query params) kimlik sağlayıcı tarafından sağlanmıyorsa, token/oturum bilgisi çıkarılamaz ve kimlik doğrulama başarısız olur.
 
-[Aksiyom 4]: Eğer kimlik doğrulama API'si (session/token exchange) erişilebilir değilse, kullanıcı bilgileri sunucu tarafında doğrulanamaz.
+**[Aksiyom 4]:** Eğer tarayıcı oturum depolama mekanizması (sessionStorage/localStorage) kullanılamıyorsa, geçici oturum verileri saklanamaz ve sayfa yeniden yüklendiğinde kimlik bilgisi kaybolur.
 
-[Aksiyom 5]: Eğer istemci tarafı oturum yönetimi mekanizması (localStorage, cookie, context) yoksa, kimlik bilgileri saklanamaz ve uygulama içindeki erişim kontrolü çalışamaz.
+**[Aksiyom 5]:** Eğer kimlik sağlayıcı yanıtında hata parametresi (error/denied) bulunuyorsa, bileşen hata durumu arayüzü göstermeli ve kullanıcıyı giriş sayfasına yönlendirmelidir.
 
----
-
-**Not:** Bu modül için fonksiyon gövdesi (implementasyon kodu) sağlanmamıştır. Bu nedenle aksiyomlar modülün kimlik doğrulama callback sayfası olmasından yola çıkılarak türetilmiştir. Detaylı ve kesin aksiyonlar için `AuthCallbackPage` fonksiyon gövdesinin incelenmesi gerekmektedir.
+**[Aksiyom 6]:** Eğer kimlik sağlayıcı yanıtında geçersiz veya süresi dolmuş token dönüyorsa, oturum başlatılamaz ve kullanıcı yeniden kimlik doğrulama akışına yönlendirilmelidir.
 
 ---
 
@@ -41681,69 +41763,62 @@ Bu modül, kimlik doğrulama geri dönüş sayfası olarak çalışır; fonksiyo
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::AuthCallbackPage
+### [N1_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::AuthCallbackPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `status` — loading, success, error durumlarını tutan state değişkeni, sayfa içeriğini durumuna göre koşullu renderlamak için kullanılır
-  - `setStatus` — status state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `message` — Kullanıcıya gösterilecek durum mesajını tutan state değişkeni, başarı/hata bildirimlerini ekranda göstermek için kullanılır
-  - `setMessage` — message state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `router` — Next.js `useRouter` hook'u ile alınan yönlendirme nesnesi, sayfalar arası geçiş işlemleri için kullanılır
-  - `useEffect` — Bileşen ilk mount edildiğinde auth callback işlemlerini tetiklemek için kullanılan React hook'u, bağımlılık dizisi `[router]`
-- **Dönüş**: JSX element (React.FC olarak auth callback sayfa arayüzü)
+  - `status` — useState hook; loading, success veya error durumunu tutar, UI'da hangi içeriğin gösterileceğini belirler
+  - `message` — useState hook; kullanıcıya gösterilecek bilgi/hata mesajını tutar
+  - `router` — `useRouter()` ile elde edilen Next.js router nesnesi; programlı sayfa yönlendirmeleri için kullanılır
+- **Dönüş**: JSX (React.FC) — loading, success veya error durumuna göre koşullu JSX blokları render eder
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::handleAuthCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `hashFragment` — URL'den alınan hash parçası, auth callback linkinin geçerliliğini kontrol etmek için kullanılır
-  - `window.location.hash` — Tarayıcının mevcut URL'sinin hash kısmı, `hashFragment` değişkenine atanır
-  - `data` — `supabase.auth.getSession()` çağrısından dönen oturum verisi, aktif oturumun varlığını kontrol etmek için kullanılır
-  - `error` — `supabase.auth.getSession()` çağrısından dönen hata nesnesi, oturum alma sırasında oluşan hataları işlemek için kullanılır
-  - `sessionError` — `supabase.auth.exchangeCodeForSession()` çağrısından dönen hata nesnesi, kod-oturum değişimi sırasında oluşan hataları konsola loglamak için kullanılır
-  - `newData` — Kod değişiminden sonra tekrar alınan oturum verisi, yeni oluşturulan oturumun varlığını kontrol etmek için kullanılır
-  - `newError` — İkinci `supabase.auth.getSession()` çağrısından dönen hata nesnesi, tekrar oturum alma sırasında oluşan hataları fırlatmak için kullanılır
-  - `supabase.auth.getSession` — Supabase'in aktif kullanıcı oturum bilgilerini alan API çağrısı
-  - `supabase.auth.exchangeCodeForSession` — URL'deki auth doğrulama kodunu oturuma dönüştüren Supabase API çağrısı
-  - `console.error` — Hata mesajlarını geliştirici konsoluna yazmak için kullanılan fonksiyon
-  - `toast.success` — Başarı bildirimi göstermek için kullanılan react-hot-toast fonksiyonu
-  - `setTimeout` — Kullanıcıya mesajı göstermek için yönlendirmeyi 2-3 saniye geciktirmek için kullanılan zamanlayıcı
-  - `router.push` — Kullanıcıyı hedef rotaya yönlendirmek için kullanılan Next.js router fonksiyonu
-  - `Routes.auth.login` — Giriş sayfası rotasını dinamik olarak oluşturan uygulama yardımcı fonksiyonu
-- **Dönüş**: void (sadece yan etki bırakır, değer döndürmez)
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
+### [N2_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::useEffect → handleAuthCallback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `router.push` — Başarılı doğrulama sonrası kullanıcıyı ana sayfa (/) rotasına yönlendirmek için kullanılan Next.js router fonksiyonu
-- **Dönüş**: void
+  - `hashFragment` — `window.location.hash` değerinden alınır; OAuth callback URL'sindeki hash fragment'ı temsil eder, token verilerini barındırır
+  - `data` — `supabase.auth.getSession()` sonucundan elde edilen session nesnesi; mevcut oturum bilgisini içerir
+  - `error` — `supabase.auth.getSession()` sonucundan elde edilen hata nesnesi; session alma işlemindeki hataları tutar
+  - `sessionError` — `supabase.auth.exchangeCodeForSession(window.location.href)` sonucundaki hata; URL'deki auth kodunun token'a dönüştürme hatası
+  - `newData` — Kod değişimi sonrası ikinci kez çağrılan `supabase.auth.getSession()` sonucundaki data; güncellenmiş session bilgisini tutar
+  - `newError` — İkinci `getSession()` çağrısındaki hata nesnesi
+  - `error` (catch bloğu) — `unknown` tipinde yakalanan beklenmedik hatalar
+- **Dönüş**: yok (side-effect: `setStatus`, `setMessage`, `router.push`, `toast.success` çağırır)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `router.push` — Doğrulama hatası sonrası kullanıcıyı giriş sayfasına yönlendirmek için kullanılan Next.js router fonksiyonu
-  - `Routes.auth.login` — Hata mesajı parametresi ile giriş sayfası rotasını oluşturan yardımcı fonksiyon
-  - `error.message` — Oturum alma sırasında oluşan hatanın kullanıcıya gösterilecek mesajı, rotaya parametre olarak geçirilir
-- **Dönüş**: void
+---
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
+### [N3_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (onClick → router.push login fallback)
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `router.push` — Başarılı oturum oluşturma sonrası kullanıcıyı ana sayfa (/) rotasına yönlendirmek için kullanılan Next.js router fonksiyonu
-- **Dönüş**: void
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — hata durumunda "Giriş Sayfasına Dön" butonuna tıklandığında `router.push(Routes.auth.login())` çalıştırır
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `router.push` — Geçersiz/ süresi dolmuş link durumunda kullanıcıyı giriş sayfasına yönlendirmek için kullanılan Next.js router fonksiyonu
-  - `Routes.auth.login` — "No session found" hata mesajı ile giriş sayfası rotasını oluşturan yardımcı fonksiyon
-- **Dönüş**: void
+---
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
+### [N4_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.home success redirect)
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `router.push` — Beklenmedik hata durumunda kullanıcıyı giriş sayfasına yönlendirmek için kullanılan Next.js router fonksiyonu
-  - `Routes.auth.login` — Ekstra parametresiz standart giriş sayfası rotasını oluşturan yardımcı fonksiyon
-- **Dönüş**: void
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — başarılı doğrulama sonrası 2 saniye bekleyip ana sayfaya yönlendirir
+
+---
+
+### [N5_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.auth.login with error redirect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — session alınamadığında 3 saniye bekleyip hata mesajıyla giriş sayfasına yönlendirir
+
+---
+
+### [N6_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.auth.login catch error redirect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — catch bloğunda yakalanan hatalar sonrası 3 saniye bekleyip giriş sayfasına yönlendirir
+
+---
+
+### [N7_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.auth.login No session redirect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — hash fragment mevcut olup session bulunamadığında 3 saniye bekleyip "No session found" mesajıyla giriş sayfasına yönlendirir
 
 ---
 
@@ -42601,118 +42676,6 @@ graph TD
 - **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `group`, `hover:underline`
 
 ---
-# FILE: src\views\ForgotPasswordPage.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\ForgotPasswordPage.tsx
-skeleton_hash: 28f5aaf598269af6
-entity_hashes:
-  func:ForgotPasswordPage: 40bcbdf4b0d8dfc1
-  func:handleSubmit: 460293fdfa9263b6
-  overview: 230126d511311554
-  style_tokens: 90202b3fc6cca016
-generated_at: 2026-05-28T22:40:06Z
----
-
-## Genel Bakış
-Bu modül, kullanıcıların şifremi unuttum işlemini gerçekleştirebilecekleri bir sayfa bileşeni sunar. Sayfa, e-posta adresi girişi ve gönderim işlemini yöneterek şifre sıfırlama talebini başlatır.
-
-## Fonksiyon Grupları
-### Bileşen Tanımı
-Sayfanın görsel yapısını ve temel render mantığını tanımlar.
-- ForgotPasswordPage
-
-### Form Gönderimi
-Kullanıcının girdiği e-posta adresini alır, form gönderimini yönetir ve ilgili işlemi asenkron olarak gerçekleştirir.
-- handleSubmit
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### ForgotPasswordPage
-**Ne yapar**: Bu fonksiyon, uygulamanın "Şifremi Unuttum" sayfasını temsil eden ana React bileşenini tanımlar. Kullanıcıların şifrelerini sıfırlamak için gerekli arayüzü sunar ve form durumunu yönetir.
-**Nasıl yapar**: React fonksiyonel bileşeni (FC) yapısını kullanarak JSX ile sayfa düzenini oluşturur. Form girdilerini takip etmek için durum yönetimi (state) mekanizmalarını kullanır ve kullanıcı etkileşimlerini `handleSubmit` gibi fonksiyonlara bağlar.
-**Parametreler**: Yok
-**Dönüş**: React.FC — Bir React fonksiyonel bileşeni döner.
-
-### handleSubmit
-**Ne yapar**: Şifre sıfırlama formunun gönderilme anını yakalayan olay yöneticisidir (event handler). Kullanıcının girdiği verileri alarak şifre sıfırlama sürecini başlatır.
-**Nasıl yapar**: Tarayıcının varsayılan form gönderme davranışını (sayfa yenileme) `e.preventDefault()` ile engeller. Form içindeki verileri (genellikle e-posta) toplar, doğrular ve kimlik doğrulama servisine istek gönderir.
-**Parametreler**:
-- e: React.FormEvent — Form gönderildiğinde oluşan olay nesnesi.
-**Dönüş**: void — Herhangi bir değer döndürmez, sadece yan etkiler gerçekleştirir.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\ForgotPasswordPage.tsx::ForgotPasswordPage
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `email` — kullanıcı tarafından girilen e‑posta adresini tutan state.
-  - `setEmail` — `email` state'ini güncelleyen setter fonksiyonu.
-  - `loading` — form gönderimi sırasında bekleme durumunu gösteren boolean state.
-  - `setLoading` — `loading` state'ini güncelleyen setter fonksiyonu.
-  - `emailSent` — şifre sıfırlama e‑postası gönderildikten sonra gösterilecek UI durumunu belirten boolean state.
-  - `setEmailSent` — `emailSent` state'ini güncelleyen setter fonksiyonu.
-  - `resetPassword` — `useAuth` hook'undan alınan, verilen e‑posta ile şifre sıfırlama isteği yapan fonksiyon.
-  - `t` — i18n çeviri fonksiyonu, metinleri yerelleştirir.
-  - `handleSubmit` — form gönderildiğinde çalıştırılan async fonksiyon (aşağıda ayrı olarak tanımlanmıştır).
-- **Dönüş**: React.ReactElement (JSX)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\ForgotPasswordPage.tsx::handleSubmit
-- **params**: e — React.FormEvent nesnesi, form submit olayını temsil eder.
-- **ic_degiskenler**:
-  - `e` — form submit olayını durdurmak için `preventDefault` çağrısı yapılan event nesnesi.
-  - `email` — dış scope'tan alınan state, gönderilecek e‑posta adresi.
-  - `setLoading` — loading durumunu true/false olarak ayarlayan setter.
-  - `resetPassword` — e‑posta ile şifre sıfırlama isteği yapan async fonksiyon.
-  - `error` — `resetPassword` çağrısından dönen nesneden ayrıştırılan hata nesnesi (try bloğu içinde).
-  - `setEmailSent` — başarılı işlemde `emailSent` state'ini true yapan setter.
-  - `toast` — kullanıcıya bildirim göstermek için kullanılan toast kütüphanesi.
-  - `t` — i18n çeviri fonksiyonu, hata ve başarı mesajlarını yerelleştirir.
-  - `error` — catch bloğunda yakalanan istisna nesnesi (hata durumunda toast ve console.error yapılır).
-- **Dönüş**: yok (fonksiyon yan etkiler üretir, UI state ve toast bildirimi günceller)
-
----
-
-## NODE ID STANDARD
-
-  file: src\views\ForgotPasswordPage.tsx
-  function: src\views\ForgotPasswordPage.tsx::ForgotPasswordPage
-  function: src\views\ForgotPasswordPage.tsx::handleSubmit
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: ForgotPasswordPage
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/20`, `bg-gradient-to-br`, `bg-primary-navy`, `bg-repeat`, `bg-success-green`, `bg-white/90`, `border-2`, `border-b-2`, `border-light-gray`, `border-primary-navy`, `border-white`, `border-white/20`, `focus-visible:border-transparent`, `from-air-blue`, `hover:bg-primary-navy`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `from-air-blue`, `h-16`, `h-5`, `inline-flex`, `items-center`, `justify-center`, `left-3`, `max-w-md`, `min-h-screen`, `p-4`, `p-8`
-- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-medium`, `font-semibold`, `inset-0`, `leading-relaxed`, `mb-2`, `mb-4`, `mb-6`
-
----
 # FILE: src\views\HomePage.md
 
 ---
@@ -42829,32 +42792,45 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\LoginPage.tsx
-skeleton_hash: 6b87d2ffe42cdedf
+skeleton_hash: f6d96b66fa9cb91b
 entity_hashes:
   func:LoginPage: c196ecbcf52f1c61
   func:handleGoogleSignIn: 0c49de53cd5a94df
   func:handleSubmit: 460293fdfa9263b6
-  overview: d9286dd8d85a5a34
+  overview: c0be34eb3602618d
   style_tokens: 4dc86ff7a25fa026
-generated_at: 2026-05-28T22:40:07Z
+generated_at: 2026-05-29T18:49:52Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıların uygulamaya giriş yapmasını sağlayan bir giriş sayfası bileşeni sunar. E-posta ve şifre ile geleneksel girişin yanı sıra Google hesabı ile kimlik doğrulama seçeneğini de içerir. Sayfa, form gönderimi ve buton tıklamaları gibi kullanıcı etkileşimlerini yöneten olay işleyicilerle donatılmıştır.
+Bu modül, VentHub HVAC uygulamasının giriş sayfasını sunan React bileşenidir. Kullanıcıların e-posta ve şifreyle veya Google hesabıyla oturum açmasına olanak tanır. Form gönderilirken bekleme durumunu yöneterek kullanıcı deneyimini iyileştirir.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Giriş sayfasının temel yapısını, kullanıcı arayüzünü ve alt bileşenlerin düzenini tanımlar.
+Giriş sayfasının kullanıcı arayüzünü, form alanlarını ve kimlik doğrulama seçeneklerini bir arada sunan ana React bileşenidir.
 - LoginPage
 
-### Giriş İşlemleri
-Kullanıcının kimlik bilgilerini doğrulamak için e-posta/şifre gönderimini ve Google hesabı ile giriş akışını asenkron olarak gerçekleştirir.
+### Kimlik Doğrulama İşlemleri
+Kullanıcının e-posta/şifre bilgilerini sunucuya göndererek veya Google OAuth akışını başlatarak giriş yapmasını sağlayan olay işleyicileridir.
 - handleSubmit, handleGoogleSignIn
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, bir React giriş sayfası bileşenidir ve kimlik doğrulama akışlarını yönetir.
+
+**[Aksiyom 1]:** Eğer React FormEvent nesnesi handleSubmit'e iletilemezse (form elementi mevcut değilse veya event bağlanmamışsa), form gönderimi gerçekleşmez ve kullanıcı giriş yapamaz.
+
+**[Aksiyom 2]:** Eğer Google OAuth kimlik doğrulama servisi yapılandırılmamışsa veya Google istemci ID'si (Client ID) mevcut değilse, handleGoogleSignIn fonksiyonu çalıştırıldığında Google ile giriş akışı başarısız olur.
+
+**[Aksiyom 3]:** Eğer handleSubmit içinde post-submit yönlendirme/sonuç mekanizması tanımlanmamışsa, form başarıyla gönderildikten sonra kullanıcı sayfada kalır ve durum belirsizleşir.
+
+**[Aksiyom 4]:** Eğer handleGoogleSignIn, Google popup/redirect akışını tetikleyen bir kütüphane (örn: firebase auth, gapi) ile entegre değilse, Google ile giriş butonu işlevsiz kalır.
+
+---
+
+**Not:** Bu modül için fonksiyon gövdeleri verilmediğinden, içsel iş mantığı (API çağrı noktaları, state yönetimi, hata işleme stratejileri, yönlendirme mantığı) hakkında kesin çıkarım yapılamamıştır. Aksiyomlar yalnızca fonksiyon imzalarından türetilen yapısal gereksinimleri yansıtmaktadır.
 
 ---
 
@@ -42873,43 +42849,48 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\LoginPage.tsx::LoginPage
+### [N1_NASIL] AST Pointer: `src/views/LoginPage.tsx`::LoginPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `isPending` — `useState(false)` ile tanımlanmış, form gönderimi sırasında bekleme durumunu tutar.
-  - `setIsPending` — `isPending` değerini güncellemek için kullanılan state setter fonksiyonu.
-  - `signIn` — `useAuth()` hookundan alınan, e‑posta ve şifre ile kimlik doğrulama yapan fonksiyon.
-  - `email` — `useState('')` ile tanımlanmış, kullanıcı tarafından girilen e‑posta adresini tutar.
-  - `setEmail` — `email` değerini güncellemek için kullanılan state setter fonksiyonu.
-  - `password` — `useState('')` ile tanımlanmış, kullanıcı tarafından girilen şifreyi tutar.
-  - `setPassword` — `password` değerini güncellemek için kullanılan state setter fonksiyonu.
-  - `showPassword` — `useState(false)` ile tanımlanmış, şifre alanının metin/şifre tipinde gösterilip gösterilmeyeceğini belirler.
-  - `setShowPassword` — `showPassword` değerini güncellemek için kullanılan state setter fonksiyonu.
-  - `rememberMe` — `useState(true)` ile tanımlanmış, “Beni hatırla” seçeneğinin işaretli olup olmadığını tutar.
-  - `setRememberMe` — `rememberMe` değerini güncellemek için kullanılan state setter fonksiyonu.
-  - `router` — `useRouter()` hookundan alınan, sayfa yönlendirmeleri ve yenileme işlemleri için kullanılan nesne.
-  - `searchParams` — `useSearchParams()` hookundan alınan, URL sorgu parametrelerine erişim sağlayan nesne.
-  - `t` — `useI18n()` hookundan alınan, çok‑dilli çeviri fonksiyonu.
-  - `from` — `searchParams?.get('redirect') || '/'` ifadesiyle elde edilen, başarılı giriş sonrası yönlendirilecek yol.
-  - `handleSubmit` — form gönderildiğinde çalıştırılan, kimlik doğrulama, toast bildirimleri ve yönlendirme yapan async fonksiyon.
-  - `handleGoogleSignIn` — Google OAuth ile giriş yapmayı sağlayan async fonksiyon.
-- **Dönüş**: React bileşeni JSX döndürür; yan etkileri yoktur (render).
+  - `isPending` — form gönderim işleminin bekleme durumunu tutar, true olduğunda buton spinner gösterir
+  - `setIsPending` — isPending durumunu güncellemek için setter
+  - `signIn` — `useAuth()` hook'undan alınan giriş fonksiyonu, email/password ile kimlik doğrulama yapar
+  - `email` — kullanıcı tarafından girilen e-posta adresi state'i
+  - `setEmail` — email state'ini güncellemek için setter
+  - `password` — kullanıcı tarafından girilen şifre state'i
+  - `setPassword` — password state'ini güncellemek için setter
+  - `showPassword` — şifrenin görünür/plain-text mi yoksa gizli mi olduğunu tutar
+  - `setShowPassword` — showPassword durumunu toggle eder
+  - `rememberMe` — "beni hatırla" checkbox'ının durumu, varsayılan true
+  - `setRememberMe` — rememberMe state'ini günceller
+  - `router` — `useRouter()` ile alınan Next.js yönlendirici nesnesi, sayfa geçişleri ve refresh için kullanılır
+  - `searchParams` — `useSearchParams()` ile alınan URL query parametreleri nesnesi
+  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu, dil-sensitive metinler için kullanılır
+  - `from` — `searchParams?.get('redirect')` değerinden veya varsayılan `'/'` olarak alınan yönlendirme hedef URL'i
+  - `handleSubmit` — form submit handler, inner async fonksiyon olarak tanımlanır
+  - `handleGoogleSignIn` — Google OAuth giriş handler'ı, inner async fonksiyon olarak tanımlanır
+- **Dönüş**: JSX (React functional component return)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\LoginPage.tsx::handleSubmit
-- **params**: `e` — `React.FormEvent` nesnesi.
+---
+
+### [N2_NASIL] AST Pointer: `src/views/LoginPage.tsx`::handleSubmit
+- **params**: `e: React.FormEvent` — form submit olay nesnesi, varsayılan davranışı durdurmak için kullanılır
 - **ic_degiskenler**:
-  - `e` — form submit olayını temsil eder; `preventDefault()` ile varsayılan gönderim engellenir.
-  - `result` — `await signIn(email, password)` çağrısının döndürdüğü nesne; `error` alanı varsa hata, yoksa başarılı oturum açma.
-  - `isPending` — `setIsPending(true)` ile işlem başladığında true, `finally` bloğunda false yapılır.
-- **Dönüş**: yok (fonksiyon içinde yan etkiler: state güncelleme, toast bildirimleri, router.refresh ve router.push).
+  - `result` — `signIn(email, password)` çağrısının dönüş değeri; `.error` alanını kontrol eder, hata varsa hata mesajı gösterir, yoksa başarılı giriş bildirimi verir
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `e.preventDefault()` ile sayfa yenilenmesini engeller; `toast.error`/`toast.success` ile bildirim gösterir; `router.refresh()` ile sayfa verilerini yeniler; `router.push(from as import('next').Route)` ile redirect URL'ine yönlendirir
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\LoginPage.tsx::handleGoogleSignIn
+---
+
+### [N3_NASIL] AST Pointer: `src/views/LoginPage.tsx`::handleGoogleSignIn
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `origin` — tarayıcı ortamında `window.location.origin`, sunucu ortamında `'http://localhost:3000'` olarak belirlenen temel URL.
-  - `redirectTo` — `${origin}${Routes.auth.callback()}` ifadesiyle oluşturulan, Google OAuth sonrası yönlendirme URL’i.
-  - `error` — `await supabase.auth.signInWithOAuth(... )` çağrısının döndürdüğü nesnedeki hata bilgisi.
-- **Dönüş**: yok (fonksiyon içinde yan etkiler: console.error, toast.error).
+  - `origin` — `window.location.origin` değerini tutar, tarayıcı tarafında çalışıp çalışmadığını kontrol eder (`typeof window !== 'undefined'`); sunucu tarafında ise `'http://localhost:3000'` fallback'i kullanılır
+  - `redirectTo` — Google OAuth callback URL'ini oluşturur: `` `${origin}${Routes.auth.callback()}` ``
+  - `error` — `supabase.auth.signInWithOAuth()` çağrısından destructure edilen hata nesnesi; varsa konsola yazdırır ve toast gösterir
+  - `e` — catch bloğundaki exception değişkeni, beklenmeyen hataları yakalar
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })` ile Google OAuth akışını başlatır; hata durumunda `console.error` ve `toast.error` ile hata bildirimi yapar
 
 ---
 
@@ -42958,39 +42939,49 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx
-skeleton_hash: 5df35a98307945cc
+skeleton_hash: f6ef89c908d298ed
 entity_hashes:
   func:OrdersPage: 438a8bbd716fd9a1
   func:formatDate: cda2f023d87c7e9e
   func:formatPrice: ca980d25e00442de
   func:getStatusColor: 278d94f1c8a522db
   func:getStatusText: 248f40bb51719423
-  overview: fc7e5a9a85876ec8
+  overview: 932001e226017c7d
   style_tokens: 4894888e4850f9b4
-generated_at: 2026-05-28T22:40:07Z
+generated_at: 2026-05-29T18:50:24Z
 ---
 
 ## Genel Bakış
-Bu modül, siparişlerin görüntülendiği bir React sayfa bileşenidir. Sipariş verilerini okunabilir ve kullanıcı dostu formata dönüştürmek için çeşitli yardımcı fonksiyonlar içerir.
+Bu modül, siparişlerin listelendiği ve görüntülendiği bir React sayfasıdır. Sipariş verilerini kullanıcı arayüzünde göstermek için gerekli olan tarih, fiyat ve durum gibi bilgileri formatlayan yardımcı fonksiyonlar içerir.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Siparişler sayfasının temel yapısını, görüntüsünü ve genel işleyişini yöneten ana React bileşenidir.
+Siparişler sayfasının ana yapısını, veri akışını ve kullanıcı arayüzünü yöneten temel React bileşenidir.
 - OrdersPage
 
-### Veri Formatlama Yardımcıları
-Siparişlerle ilgili bilgileri (tarih, fiyat) okunabilir formata dönüştürür ve durum bilgileri için görsel ipuçları sağlar.
+### Veri Görünüm Formatlayıcıları
+Siparişlerle ilgili ham veriyi (tarih, fiyat, durum kodu) kullanıcı dostu metinlere ve arayüz stillerine dönüştüren yardımcı fonksiyonlardır.
 - formatDate, formatPrice, getStatusColor, getStatusText
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, siparişleri görüntüleyen frontend React bileşenidir; çalışması için tüm yardımcı fonksiyonlara iletilen parametrelerin ve ana OrdersPage bileşenine aktarılan sipariş verilerinin tanımlı tür ve formatlarda gelmesi zorunludur.
 
-[Aksiyom 1]: Eğer formatDate fonksiyonuna iletilen dateString parametresi geçerli string türünde değilse, tarih formatlama işlemi başarısız olur, sipariş tarihlerini kullanıcıya doğru şekilde gösteremez.
-[Aksiyom 2]: Eğer formatPrice fonksiyonuna iletilen price parametresi geçerli sayısal (number) türünde değilse, fiyat formatlama işlemi başarısız olur, sipariş tutarları hatalı görüntülenir.
-[Aksiyom 3]: Eğer getStatusColor ve getStatusText fonksiyonlarına iletilen status parametresi geçerli string türünde değilse, sipariş durumunun arayüzde gösterilmesi gereken rengi ve metni üretilemez, arayüzde hatalı durum görünümü oluşur.
-[Aksiyom 4]: Eğer OrdersPage ana bileşenine props olarak her siparişe ait tarih, fiyat, durum gibi zorunlu alanları içeren geçerli sipariş listesi iletilmezse, sayfa içeriğini oluşturamaz, boş ya da hatalı arayüz gösterir.
+Bu modül, fonksiyon imzalarından yola çıkarak belirlenen temel veri tipi ve geçerlilik varsayımlarına dayanır.
+
+**[Aksiyom 1]:** Eğer `formatDate` fonksiyonuna `dateString` parametresi olarak geçerli bir ISO tarih formatı (örn: `YYYY-MM-DDTHH:mm:ss.sssZ`) veya JavaScript tarafından parse edilebilir bir tarih dizisi verilmezse, "Invalid Date" veya beklenmeyen bir çıktı üretilir.
+
+**[Aksiyom 2]:** Eğer `formatPrice` fonksiyonuna `price` parametresi olarak geçerli bir sayısal değer (`number`) verilmezse, para birimi formatlaması hatalı sonuç üretir veya hata fırlatır.
+
+**[Aksiyom 3]:** Eğer `getStatusColor` fonksiyonuna beklenmeyen (tanımsız) bir `status` değeri verilirse, fonksiyonun döndüren renk değeri bilinmeyen veya tutarsız olabilir — işlevsel davranışı fonksiyon gövdesine bağlıdır.
+
+**[Aksiyom 4]:** Eğer `getStatusText` fonksiyonuna beklenmeyen (tanımsız) bir `status` değeri verilirse, fonksiyonun döndüren metin değeri bilinmeyen veya tutarsız olabilir — işlevsel davranışı fonksiyon gövdesine bağlıdır.
+
+**[Aksiyom 5]:** `OrdersPage` bileşeni, işlevsel olabilmesi için ilgili sipariş verilerine (API veya state) erişim sağlamak zorundadır; veri kaynağı mevcut değilse bileşen boş veya hata durumunda görüntülenir.
+
+---
+
+> **Not:** `getStatusColor` ve `getStatusText` için geçerli `status` değerleri (örn: `"pending"`, `"completed"` vb.) fonksiyon gövdesinde tanımlı olmakla birlikte, verilen imza bilgisinden bu değerler kesin olarak çıkarılamamıştır. Dolayısıyla bu fonksiyonların beklenmeyen girdilere karşı davranışları **bilinmiyor** olarak belirtilmiştir.
 
 ---
 
@@ -43077,111 +43068,121 @@ type StatusFilter = 'all' | 'pending' | 'paid' | 'shipped' | 'delivered' | 'fail
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\OrdersPage.tsx::fetchOrders
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/views/OrdersPage.tsx::fetchOrders (async anonim)
+- **params**: (parametre yok — useCallback ile tanımlı anonim fonksiyon)
 - **ic_degiskenler**:
-  - `setLoading` — component state setter, loading durumunu kontrol eder
-  - `supabase` — Supabase client, veritabanı sorguları için kullanılır
-  - `user` — oturum açmış kullanıcı nesnesi, `user?.id` ile filtreleme yapılır
-  - `ordersData` — sorgu sonucu gelen sipariş listesi (raw)
-  - `ordersError` — sorgu hatası nesnesi
-  - `console` — hata loglamak için kullanılır
-  - `toast` — kullanıcıya hata mesajı göstermek için `react-hot-toast` kullanılır
-  - `t` — i18n çeviri fonksiyonu, hata mesajlarını yerelleştirir
-  - `setOrders` — component state setter, formatlanmış siparişleri saklar
-  - `searchParams` — URL sorgu parametreleri, ürün filtresi almak için kullanılır
-  - `setProductFilter` — component state setter, URL’den gelen ürün filtresini saklar
-- **Dönüş**: `void` (state güncellemeleri ve yan etkiler)
+  - `ordersData` — supabase'den dönen ham sipariş verisi (satır listesi), select ile nested order_items dahil
+  - `ordersError` — supabase sorgusundan dönen hata nesnesi, varsa fetch iptal edilir
+  - `formattedOrders` — ham verinin Order[] tipine dönüştürülmüş hali, map ile her rawOrder dönüştürülür
+  - `rawOrder` — map callback'inin her bir ham sipariş satırı parametresi (unknown tip)
+  - `order` — rawOrder'ın Record tipine güvenli dönüştürülmüş hali, alanlara erişim için kullanılır
+  - `itemsList` — order.venthub_order_items dizisi veya boş dizi, array guard ile alınır
+  - `items` — OrderItem[] tipinde dönüştürülmüş sipariş kalemleri listesi
+  - `rawIt` — itemsList map callback'inin her bir ham kalem satırı parametresi
+  - `it` — rawIt'ın Record tipine güvenli dönüştürülmüş hali
+  - `searchParams` — URL arama parametrelerinden product filtresi okunur (useSearchParams hook)
+  - `productQ` — URL'deki `?product=` değerini tutan string
+- **Dönüş**: void (setOrders ile state'i günceller, setLoading ile loading durumunu kapatır, toast ile hata bildirir)
 
-### [N2_NASIL] AST Pointer: src\views\OrdersPage.tsx::mapRawOrder
-- **params**: `rawOrder: unknown`
-- **ic_degiskenler**:
-  - `order` — `rawOrder` bir obje ise onun kopyası, aksi takdirde boş obje
-  - `itemsList` — `order.venthub_order_items` dizisi, yoksa boş dizi
-  - `items` — `itemsList` üzerinden dönüştürülmüş `OrderItem` dizisi
-  - `it` — `rawIt` bir obje ise onun kopyası (inner mapper içinde)
-- **Dönüş**: `Order` (formatlanmış sipariş nesnesi)
+---
 
-### [N3_NASIL] AST Pointer: src\views\OrdersPage.tsx::mapRawItem
-- **params**: `rawIt: unknown`
+### [N2_NASIL] AST Pointer: src/views/OrdersPage.tsx::ordersData.map callback (rawOrder -> Order)
+- **params**: `rawOrder: unknown` — supabase'den dönen tek bir ham sipariş satırı
 - **ic_degiskenler**:
-  - `it` — `rawIt` bir obje ise onun kopyası, aksi takdirde boş obje
-- **Dönüş**: `OrderItem` (formatlanmış sipariş kalemi)
+  - `order` — rawOrder'ın `isRecord(rawOrder)` guard'ı ile Record'a dönüştürülmüş hali
+  - `itemsList` — `order.venthub_order_items` alanından alınan dizi veya boş dizi fallback
+  - `items` — her rawIt'ı OrderItem objesine dönüştüren nested map sonucu, OrderItem[] tipinde
+  - `rawIt` — itemsList içindeki her bir ham kalem verisi (unknown)
+  - `it` — rawIt'ın `isRecord(rawIt)` ile güvenli cast edilmiş Record hali
+- **Dönüş**: `Order` objesi — id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, order_items, order_number, is_demo, payment_data, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at alanlarını içerir
 
-### [N4_NASIL] AST Pointer: src\views\OrdersPage.tsx::authEffect
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `authLoading` — auth hook’dan gelen yükleme durumu
-  - `user` — oturum açmış kullanıcı nesnesi
-  - `router` — Next.js router, yönlendirme için kullanılır
-  - `Routes` — uygulama rotaları sabiti
-  - `fetchOrders` — siparişleri getiren fonksiyon
-- **Dönüş**: `void` (yönlendirme ve veri çekme yan etkileri)
+---
 
-### [N5_NASIL] AST Pointer: src\views\OrdersPage.tsx::formatDate
-- **params**: `dateString: string`
+### [N3_NASIL] AST Pointer: src/views/OrdersPage.tsx::itemsList.map callback (rawIt -> OrderItem)
+- **params**: `rawIt: unknown` — venthub_order_items dizisindeki tek bir ham kalem satırı
 - **ic_degiskenler**:
-  - `formatDateTime` — tarih‑zaman formatlayıcı fonksiyon
-  - `lang` — geçerli dil kodu (i18n provider’dan alınır)
-- **Dönüş**: `string` (formatlanmış tarih)
+  - `it` — rawIt'ın `isRecord(rawIt)` ile Record'a cast edilmiş hali
+- **Dönüş**: `OrderItem` objesi — id (String), product_id (String|undefined), product_name (String), quantity (Number), unit_price (price_at_time'dan Number), total_price (unit_price * quantity), product_image_url (String|undefined)
 
-### [N6_NASIL] AST Pointer: src\views\OrdersPage.tsx::formatPrice
-- **params**: `price: number`
-- **ic_degiskenler**:
-  - `formatCurrency` — para birimi formatlayıcı fonksiyon
-  - `lang` — geçerli dil kodu
-- **Dönüş**: `string` (formatlanmış fiyat)
+---
 
-### [N7_NASIL] AST Pointer: src\views\OrdersPage.tsx::getStatusColor
-- **params**: `status: string`
+### [N4_NASIL] AST Pointer: src/views/OrdersPage.tsx::useEffect guard callback
+- **params**: (parametre yok — useEffect hook callback)
 - **ic_degiskenler**:
-  - `status` — sipariş durumu, küçük harfe dönüştürülerek karşılaştırılır
-- **Dönüş**: `string` (CSS sınıfı, renk kodu)
+  - `authLoading` — useAuth hook'tan gelen yüklenme durumu boolean'ı, true ise henüz kontrol bitmemiştir
+  - `user` — useAuth hook'tan gelen mevcut kullanıcı nesnesi, null ise giriş yapılmamıştır
+  - `router` — useRouter hook'tan gelen Next.js router nesnesi, login sayfasına yönlendirme için kullanılır
+- **Dönüş**: void (auth yoksa login sayfasına push, user varsa fetchOrders çağırır)
 
-### [N8_NASIL] AST Pointer: src\views\OrdersPage.tsx::getStatusText
-- **params**: `status: string`
-- **ic_degiskenler**:
-  - `t` — i18n çeviri fonksiyonu
-  - `status` — sipariş durumu, küçük harfe dönüştürülerek karşılaştırılır
-- **Dönüş**: `string` (yerelleştirilmiş durum metni)
+---
 
-### [N9_NASIL] AST Pointer: src\views\OrdersPage.tsx::orderFilter
-- **params**: `o`
-- **ic_degiskenler**:
-  - `productFilter` — URL’den gelen ürün filtresi
-  - `statusFilter` — seçili durum filtresi
-  - `dateFrom` — başlangıç tarihi filtresi
-  - `dateTo` — bitiş tarihi filtresi
-  - `searchCode` — sipariş kodu arama filtresi
-  - `q` — `productFilter`’ın küçük harfe dönüştürülmüş hali
-  - `match` — ürün adı filtre kontrol sonucu
-  - `code` — sipariş numarasından türetilen kod
-- **Dönüş**: `boolean` (siparişin filtreye uygunluğu)
+### [N5_NASIL] AST Pointer: src/views/OrdersPage.tsx::formatDate
+- **params**: `dateString: string` — formatlanacak tarih stringi (ISO veya benzeri format)
+- **ic_degiskenler**: (yok — doğrudan return)
+- **Dönüş**: `formatDateTime(dateString, lang)` çağırısının sonucu, lang useI18n hook'undan gelen dil kodu
 
-### [N10_NASIL] AST Pointer: src\views\OrdersPage.tsx::orderRowRenderer
-- **params**: `order`
-- **ic_degiskenler**:
-  - `steps` — sipariş aşamaları dizisi
-  - `stepLabel` — aşama etiketleri haritası
-  - `formatDate` — tarih formatlayıcı
-  - `formatPrice` — fiyat formatlayıcı
-  - `getStatusColor` — durum renk sınıfı
-  - `getStatusText` — durum metni
-  - `t` — i18n çeviri fonksiyonu
-  - `router` — Next.js router, detay sayfasına yönlendirme
-  - `order` — mevcut sipariş nesnesi, JSX içinde çeşitli alanları kullanılır
-- **Dönüş**: `JSX.Element` (sipariş kartı)
+---
 
-### [N11_NASIL] AST Pointer: src\views\OrdersPage.tsx::stepRenderer
-- **params**: `s, idx`
+### [N6_NASIL] AST Pointer: src/views/OrdersPage.tsx::formatPrice
+- **params**: `price: number` — formatlanacak para miktarı (sayısal değer)
+- **ic_degiskenler**: (yok — doğrudan return)
+- **Dönüş**: `formatCurrency(price, lang, { maximumFractionDigits: 0 })` çağırısının sonucu, lang useI18n'den gelir, ondalık basamak gösterilmez
+
+---
+
+### [N7_NASIL] AST Pointer: src/views/OrdersPage.tsx::getStatusColor
+- **params**: `status: string` — sipariş durumunu belirten string
+- **ic_degiskenler**: (yok — switch-case içinde return)
+- **Dönüş**: Tailwind CSS renk class string'i — pending: `bg-yellow-100 text-yellow-800`, paid/confirmed: `bg-blue-100 text-blue-800`, shipped: `bg-purple-100 text-purple-800`, delivered: `bg-green-100 text-green-800`, failed/cancelled: `bg-red-100 text-red-800`, default: `bg-gray-100 text-gray-800`
+
+---
+
+### [N8_NASIL] AST Pointer: src/views/OrdersPage.tsx::getStatusText
+- **params**: `status: string` — sipariş durumunu belirten string
+- **ic_degiskenler**: (yok — switch-case içinde return)
+- **Dönüş**: `t()` i18n çeviri fonksiyonu ile çevrilmiş durum metni — pending, paid, shipped, delivered, failed, cancelled, refunded için ayrı çeviriler; bilinmeyen durum için ham status değeri döner
+
+---
+
+### [N9_NASIL] AST Pointer: src/views/OrdersPage.tsx::filter callback (orders.filter)
+- **params**: `o` — filter üzerinde dönülen tek bir Order objesi
 - **ic_degiskenler**:
-  - `order` — dış scope’tan gelen sipariş nesnesi
-  - `steps` — aşama dizisi
-  - `stepLabel` — aşama etiketleri
-  - `normalizedStatus` — `order.status` “confirmed” ise “paid” olarak normalize edilir
-  - `activeIdx` — aktif aşama indeksini belirler
-  - `active` — mevcut indeksin aktif olup olmadığını gösterir
-- **Dönüş**: `JSX.Element` (adım göstergesi)
+  - `productFilter` — URL'den veya input'tan gelen ürün adı filtresi stringi, yoksa bu blok atlanır
+  - `q` — productFilter'ın lowercase karşılığı, karşılaştırma için hazırlanmış
+  - `match` — order_items içindeki product_name'lerin q ile eşleşip eşleşmediğini belirten boolean
+  - `statusFilter` — seçili durum filtresi stringi, 'all' ise bu blok atlanır
+  - `dateFrom` — başlangıç tarihi filtresi stringi
+  - `dateTo` — bitiş tarihi filtresi stringi
+  - `searchCode` — sipariş kodu arama input'undan gelen string
+  - `code` — order_number'dan split ile alınan son parça veya id'nin son 8 karakteri uppercase
+- **Dönüş**: boolean — true ise sipariş filtrelerden geçer ve gösterilir, false ise gizlenir
+
+---
+
+### [N10_NASIL] AST Pointer: src/views/OrdersPage.tsx::renderOrderCard callback
+- **params**: `order` — render edilecek Order objesi
+- **ic_degiskenler**:
+  - `steps` — sipariş durum adımlarını tutan dizi (useMemo veya sabit olarak tanımlı, fonksiyon gövdesinde kullanılır)
+  - `stepLabel` — her adım için çevrilmiş label'ı tutan obje, `stepLabel[s]` ile erişilir
+  - `s` — steps dizisindeki mevcut adım stringi (map callback parametresi)
+  - `idx` — steps dizisindeki mevcut adımın indeksi (map callback parametresi)
+  - `normalizedStatus` — 'confirmed' durumunu 'paid' olarak normalize eden string, progress bar için
+  - `activeIdx` — normalizedStatus'ün steps dizisindeki indeksi, Math.max ile 0'a eşikli
+  - `active` — `idx <= activeIdx` boolean'ı, adımın aktif olup olmadığını belirler
+- **Dönüş**: JSX.Element — sipariş kartı div'i, içinde status stepper, sipariş numarası, tarih, tutar, durum badge'leri ve detay butonu barındırır
+
+---
+
+### [N11_NASIL] AST Pointer: src/views/OrdersPage.tsx::statusStepper map callback
+- **params**: `s` — steps dizisindeki mevcut adım stringi, `idx` — bu adımın indeksi
+- **ic_degiskenler**:
+  - `normalizedStatus` — `order.status`'ün lowercase'i, 'confirmed' ise 'paid' olarak normalize edilir
+  - `activeIdx` — normalizedStatus'un `steps.indexOf(...)` ile bulunan indeksi, `Math.max(..., 0)` ile negatif engellenir
+  - `active` — `idx <= activeIdx` boolean'ı, bu adımın tamamlanmış/aktif olup olmadığını belirler
+  - `steps` — useCallback/hookscope'tan gelen durum adım dizisi
+  - `stepLabel` — her adım için çevrilmiş label haritası
+  - `order` — üst scope'tan gelen mevcut Order objesi
+- **Dönüş**: React.Fragment — her adım için daire (aktif: primary-navy arka plan + beyaz yazı, pasif: slate arka plan) ve adım arası connector çizgisi (aktif: primary-navy, pasif: slate-100)
 
 ---
 
@@ -43194,10 +43195,10 @@ graph TD
     OrdersPage_tsx__formatPrice["formatPrice"]
     OrdersPage_tsx__getStatusColor["getStatusColor"]
     OrdersPage_tsx__getStatusText["getStatusText"]
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusColor
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatDate
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusColor
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
 ```
 
 ## NODE ID STANDARD
@@ -43229,125 +43230,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `h-1`, `h-10`, `h-12`, `h-16`, `h-7`, `inline-flex`, `items-center`, `justify-between`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `md:` önekleri
 - **Yardımcı Sınıflar:** `${active`, `${activeIdx`, `${getStatusColor(order.status`, `1`, `:`, `>=`, `animate-spin`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`, `font-medium`, `hover:scale-102`, `idx`
-
----
-# FILE: src\views\PaymentSuccessPage.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\PaymentSuccessPage.tsx
-skeleton_hash: cc90da8797868667
-entity_hashes:
-  func:PaymentSuccessPage: 1b3614ca0faf5f01
-  overview: 4aae9a09925cda46
-  style_tokens: dcab201fde8662b7
-generated_at: 2026-05-28T22:40:35Z
----
-
-## Genel Bakış
-Bu modül, VentHub HVAC platformunda kullanıcıların ödeme işlemini başarıyla tamamlamasının ardından gösterilen sonuç sayfasını oluşturur. Tek bir React bileşeni üzerinden kullanıcıya durum bildirimi, olası sipariş özeti ve navigasyon seçenekleri sunar.
-
-## Fonksiyon Grupları
-### Ödeme Sonrası Görünüm
-Bu grup, ödeme tamamlandıktan sonra kullanıcıya başarı mesajı ileten ve ana sayfa veya profil gibi alanlara yönlendirmeler sunan ana sayfa bileşenini içerir. Tüm sayfa işlevselliği ve kullanıcı arayüzü tek bir bileşen tarafından yönetilir.
-- PaymentSuccessPage
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-NOT: Verilen fonksiyon imzası `PaymentSuccessPage()` olup, parametre veya prop tanımı içermemektedir. Eski doküman, modülün bir "başarı sayfası" olduğunu belirtmekte; bu nedenle modülün çalışması için gerekli verilerin (örn: sipariş ID, ödeme durumu, başarı mesajı) bir React Prop, Context veya Global State aracılığıyla sağlanması gerektiği doğal bir gerekliliktir. Ancak, bu mekanizmanın varlığı ve yapısı (hangi prop'ların geldiğine dair) mevcut fonksiyon imzasından anlaşılamadığından, somut bir aksiyom oluşturulamamaktadır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### PaymentSuccessPage
-
-**Ne yapar**: PaymentSuccessPage, ödeme işleminin başarılı bir şekilde tamamlanmasını gösteren bir React sayfa bileşenidir. Kullanıcının ödeme sürecini tamamlamasının ardından yönlendirildiği onay sayfasını render eder.
-
-**Nasıl yapar**: Fonksiyon, bir React fonksiyonel bileşeni (FC) olarak tanımlanmıştır ve JSX ile render edilecek bir React elementi döndürür. Sayfa bileşeni olarak ödeme başarılı durumunu kullanıcıya sunar.
-
-**Parametreler**: Bu bileşen herhangi bir prop almaz.
-
-**Dönüş**: `React.FC` — Render edilecek bir React fonksiyonel bileşeni döndürür.
-
----
-
-## TYPE ALIASES
-
-### PaymentInfo
-```typescript
-type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
-```
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src\views\PaymentSuccessPage.tsx::PaymentSuccessPage
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `searchParams` — URL'deki query parametrelerini (conversationId, token, orderId vb.) erişmek için useSearchParams hook'undan alınan nesne
-  - `t` — Çeviri fonksiyonu, useI18n hook'undan alınan metin çeviri nesnesi
-  - `lang` — Geçerli dil kodu, useI18n hook'undan alınan dil belirleyici
-  - `clearCart` — Sepeti temizleyen fonksiyon, useCart hook'undan alınan sepet yöneticisi
-  - `status` — Ödeme durumunu tutan state: 'loading' | 'success' | 'error'
-  - `paymentInfo` — Ödeme bilgilerini tutan state (conversationId, token, errorMessage)
-  - `orderSummary` — Sipariş özetini tutan state (tutar, ürün sayısı, oluşturulma tarihi)
-  - `conversationId` — searchParams'den alınan conversationId parametresi
-  - `token` — searchParams'den alınan token parametresi
-  - `errorMessage` — searchParams'den alınan hata mesajı parametresi
-  - `orderId` — searchParams'den alınan sipariş ID parametresi
-  - `statusParam` — searchParams'den alınan status parametresi
-- **Dönüş**: React.FC (Component, JSX döndürür)
-
-### [N2_NASIL] AST Pointer: src\views\PaymentSuccessPage.tsx::fetchOrderDetails
-- **params**: (oid?: string)
-- **ic_degiskenler**:
-  - `data` — Supabase'den gelen sipariş verisi (total_amount, created_at, venthub_order_items)
-  - `error` — Supabase sorgusundaki hata nesnesi
-  - `items` — Sipariş kalemleri dizisi (venthub_order_items)
-  - `count` — Toplam ürün adedi (kalemlerin quantity değerlerinin toplamı)
-- **Dönüş**: void (sadece orderSummary state'ini günceller)
-
-### [N3_NASIL] AST Pointer: src\views\PaymentSuccessPage.tsx::verify
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `msg` — Hata mesajı (data?.iyzico?.errorMessage veya çeviriden gelen fallback mesaj)
-  - `err` — Try-catch'ten yakalanan hata nesnesi (message özellikli)
-- **Dönüş**: void (status, paymentInfo state'lerini günceller, clearCart çağırır, localStorage temizler)
-
----
-
-## NODE ID STANDARD
-
-  file: src\views\PaymentSuccessPage.tsx
-  function: src\views\PaymentSuccessPage.tsx::PaymentSuccessPage
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: PaymentSuccessPage
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-100`, `bg-light-gray`, `bg-primary-navy`, `bg-red-100`, `bg-success-green/10`, `bg-white`, `border-2`, `border-primary-navy`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-white`, `text-2xl`, `text-center`, `text-industrial-gray`, `text-left`
-- **Layout:** `block`, `flex`, `gap-3`, `grid`, `grid-cols-1`, `h-16`, `items-center`, `justify-between`, `justify-center`, `max-w-md`, `min-h-screen`, `p-8`, `shadow-lg`, `w-16`, `w-full`
-- **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `animate-spin`, `font-bold`, `font-medium`, `font-semibold`, `mb-4`, `mb-6`, `mb-8`, `mx-auto`, `px-6`, `py-3`, `rounded-full`, `rounded-lg`, `rounded-xl`, `space-x-2`, `space-y-3`
 
 ---
 # FILE: src\views\ProductDetailPage.md
@@ -43582,33 +43464,43 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx
-skeleton_hash: d55e7e1f42ff8548
+skeleton_hash: 6664f8dcf5b2ab07
 entity_hashes:
   func:RegisterPage: 595595bc145e81ea
   func:handleChange: c35710484665a43c
   func:handleSubmit: 460293fdfa9263b6
   func:validateForm: 35d7413c1db3ab00
-  overview: f33301e20d1c64f6
+  overview: 471e8191bfc85309
   style_tokens: b4142733c6599819
-generated_at: 2026-05-28T22:40:10Z
+generated_at: 2026-05-29T18:51:05Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı kayıt arayüzünü sağlayan bir React bileşenidir. Form verilerini yönetir, kullanıcı girdilerinin geçerliliğini kontrol eder ve kayıt işlemini başlatır.
+RegisterPage.tsx modülü, kullanıcıların hesap oluşturabilmesi için gerekli olan kayıt sayfasını ve ilgili form yönetim mantığını içeren bir React bileşenidir. Modül, kullanıcının form alanlarına girdiği verileri yönetir, bu verilerin geçerliliğini doğrular ve son olarak kayıt işlemini tetikleyerek sunucuya gönderir.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-Kayıt sayfasının görsel yapısını oluşturur ve kullanıcı arayüzünü sunar.
+### Ana Sayfa Bileşeni
+Tüm kayıt arayüzünü ve form yapısını ekrana çizen, modülün dışa açılan kapısıdır.
 - RegisterPage
 
-### Form Yönetimi ve Doğrulama
-Kullanıcı girdilerini takip eder, verilerin kurallara uygunluğunu sınar ve form gönderme işlemini koordine eder.
+### Form Etkileşimi ve İş Akışı Yönetimi
+Kullanıcı girdilerini takip eden, bu girdilerin tanımlı kurallara göre doğruluğunu sınayan ve nihayetinde formun sunucuya gönderilmesi işlemini başlatan yardımcı fonksiyonlar kümesidir.
 - handleChange, validateForm, handleSubmit
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, kullanıcı kayıt formunu yöneten React bileşenidir.
+
+[Aksiyom 1]: Eğer handleChange, React.ChangeEvent<HTMLInputElement> tipinde parametre almıyorsa, form alanlarındaki input değişiklikleri doğru şekilde yakalanamaz.
+
+[Aksiyom 2]: Eğer validateForm, form geçerlilik durumunu boolean olarak döndürmüyorsa, handleSubmit geçerlilik kontrolüne güvenemez.
+
+[Aksiyom 3]: Eğer handleSubmit, React.FormEvent parametresi almıyorsa, form submit olayının varsayılan davranışı (sayfa yenileme) engellenemez.
+
+[Aksiyom 4]: Eğer RegisterPage, handleChange ve handleSubmit'ü aynı form bileşenine bağlamıyorsa, kullanıcı etkileşimleri form state'ine yansıtılmaz.
+
+[Aksiyom 5]: Eğer validateForm çağrılmadan önce form state'i güncellenmemişse, eski verilerle doğrulama yapılır ve hatalı sonuç üretilebilir.
 
 ---
 
@@ -43641,41 +43533,67 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::RegisterPage
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: React.FC (bileşen render eder, JSX döndürür)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::handleChange
-- **params**: e — `React.ChangeEvent<HTMLInputElement>` (giriş elemanının değişim olayı)
-- **ic_degiskenler**:
-  - `setFormData` — dışarıdan gelen state güncelleme fonksiyonu; form verisini yeni değerle birleştirerek günceller.
-  - `formData` — dışarıdan gelen mevcut form durumu; yeni alan değeriyle genişletilir.
-- **Dönüş**: yok (state günceller, UI yeniden render olur)
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::validateForm
+### [N1_NASIL] AST Pointer: src/views/RegisterPage.tsx::RegisterPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `formData` — form alanlarının mevcut değerleri; `name`, `email`, `password`, `confirmPassword` vb. içerir.
-  - `passedRules` — şifre güvenlik kurallarının kaç tanesinin sağlandığını gösteren sayı.
-  - `toast` — kullanıcıya hata mesajı göstermek için kullanılan bildirim fonksiyonu.
-  - `t` — i18n çeviri fonksiyonu; hata mesajlarını yerelleştirir.
-- **Dönüş**: `boolean` — form geçerli ise `true`, aksi takdirde `false` (hata toastları gösterilir)
+  - `formData` — form alanlarının değerlerini tutan state nesnesi (name, email, password, confirmPassword alanları içerir)
+  - `setFormData` — formData state'ini güncellemek için setter fonksiyonu
+  - `loading` — form gönderim sürecindeki yükleme durumunu tutan boolean state
+  - `setLoading` — loading state'ini güncellemek için setter fonksiyonu
+  - `passedRules` — kullanıcının şifresinin kaç güvenlik kuralını geçtiğini tutan sayısal state
+  - `strengthColor` — şifre gücü seviyesine karşılık gelen renk sınıfı string'i
+  - `setRegistrationComplete` — kayıt işleminin tamamlanma durumunu güncellemek için setter fonksiyonu
+  - `t` — useI18n hook'unun döndürdüğü çeviri fonksiyonu
+  - `signUp` — useAuth hook'unun sağladığı kayıt olma fonksiyonu
+  - `Routes` — uygulama rotalarını tutan sabit nesne
+  - `i` — strength bar için döngü indis sayacı (JSX map içinde)
+  - `rule` — passwordRules dizisindeki tek bir kural nesnesi (key, label, test alanları)
+- **Dönüş**: React.FC (JSX Element — formsayfası, strength bar, password kuralları listesi ve kayıt formu döndürür)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::handleSubmit
-- **params**: e — `React.FormEvent` (form gönderim olayı)
+---
+
+### [N2_NASIL] AST Pointer: src/views/RegisterPage.tsx::handleChange
+- **params**: `e: React.ChangeEvent<HTMLInputElement>` — input değişim olayı nesnesi
 - **ic_degiskenler**:
-  - `e` — form gönderim olayını durdurmak için `preventDefault()` çağrılır.
-  - `validateForm` — form doğrulama fonksiyonu; `false` dönerse işlem durur.
-  - `setLoading` — yükleme durumunu `true/false` olarak ayarlayan state setter.
-  - `toast` — başarı ve hata bildirimleri için kullanılan fonksiyon.
-  - `t` — i18n çeviri fonksiyonu; mesajları yerelleştirir.
-  - `hibpPwnedCount` — şifreyi Have I Been Pwned API'siyle kontrol eden async fonksiyon; `pwned` sayısını döner.
-  - `formData` — gönderilecek kayıt bilgileri (`email`, `password`, `name`).
-  - `signUp` — kullanıcı kaydı yapan async fonksiyon; `{ error }` nesnesi döner.
-  - `setRegistrationComplete` — kayıt tamamlandığında UI durumunu güncelleyen state setter.
-  - `console.error` — beklenmeyen hataları konsola loglar.
-- **Dönüş**: yok (state günceller, toast gösterir, olası hataları yakalar)
+  - `formData` — mevcut form verisi, spread operator ile kopyalanıp güncellenir
+  - `setFormData` — formData state'ini güncellemek için setter
+  - `e.target.name` — değişen input alanının name attribute'u (hangi alanın değiştiğini belirler)
+  - `e.target.value` — değişen input alanının yeni değeri
+- **Dönüş**: yok (state setter ile yan etki: formData güncellenir)
+
+---
+
+### [N3_NASIL] AST Pointer: src/views/RegisterPage.tsx::validateForm
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `formData.name` — kullanıcının adı, trim edilip boş olup olmadığı kontrol edilir
+  - `formData.email` — kullanıcının e-posta adresi, boş ve `@` karakteri içermesi kontrol edilir
+  - `formData.password` — kullanıcının şifresi, passedRules eşiği ile kontrol edilir
+  - `formData.confirmPassword` — kullanıcının şifre tekrar alanı, password ile eşleşme kontrol edilir
+  - `passedRules` — kaç şifre kuralının geçildiği sayısal değer, 4'ten küçükse hata verir
+  - `t` — i18n çeviri fonksiyonu, hata mesajları için kullanılır
+  - `toast` — sonner toast bildirim fonksiyonu, hata mesajlarını gösterir
+- **Dönüş**: boolean (true = form geçerli, false = form geçersiz ve hata toast gösterildi)
+
+---
+
+### [N4_NASIL] AST Pointer: src/views/RegisterPage.tsx::handleSubmit
+- **params**: `e: React.FormEvent` — form submit olayı nesnesi
+- **ic_degiskenler**:
+  - `e` — form submit olayı, `e.preventDefault()` ile sayfa yenilenmesi engellenir
+  - `validateForm` — form validasyon fonksiyonu çağrısı, false dönerse işlem durur
+  - `setLoading` — yükleme durumunu true yapar (try bloğu başında) ve false yapar (finally bloğunda)
+  - `pwned` — hibpPwnedCount fonksiyonunun döndürdüğü sayı, şifrenin bilinen sızıntılarda kaç kez geçtiğini tutar; 0'dan büyükse kayıt engellenir
+  - `hibpPwnedCount` — HIBP API'sine k-anonymity ile sızıntı kontrolü yapan fonksiyon, formData.password argümanı ile çağrılır
+  - `formData.email` — signUp fonksiyonuna传递 edilen e-posta
+  - `formData.password` — signUp fonksiyonuna传递 edilen şifre
+  - `formData.name` — signUp fonksiyonuna传递 edilen kullanıcı adı
+  - `error` — signUp fonksiyonunun `{ error }` destructured sonucu; hata mesajı içerir (already registered / Password should be at least / diğer)
+  - `signUp` — useAuth hook'unun sağladığı asenkron kayıt fonksiyonu, (email, password, name) argümanlarıyla çağrılır
+  - `setRegistrationComplete` — başarılı kayıt sonrası true yapılarak onay ekranına geçişi tetikler
+  - `t` — i18n çeviri fonksiyonu, tüm hata/başarı mesajları için kullanılır
+  - `toast` — sonner toast bildirim fonksiyonu, hata ve başarı mesajlarını gösterir
+- **Dönüş**: yok (yan etkiler: hata/başarı toast gösterimi, state güncellemeleri, signUp API çağrısı)
 
 ---
 
@@ -43727,26 +43645,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx
-skeleton_hash: 85bfbc2f18d6514d
+skeleton_hash: 394b402a26fb5307
 entity_hashes:
   func:AccountAddressesPage: 75c0fb5d7175a123
-  overview: b41befa640558dbe
+  overview: 4b1d634aa140bb3a
   style_tokens: 20e5949307a3284f
-generated_at: 2026-05-28T22:38:51Z
+generated_at: 2026-05-29T18:51:43Z
 ---
 
 ## Genel Bakış
-`AccountAddressesPage` bileşeni, kullanıcının kayıtlı adreslerini görüntüleyen ve yönetmesine olanak tanıyan bir sayfa sunar. React ve TypeScript kullanılarak oluşturulmuş bu modül, adres listesi, ekleme ve düzenleme formları gibi UI öğelerini bir araya getirir.
+Kullanıcının hesap adreslerini görüntülemesini ve yönetmesini sağlayan bir sayfa bileşeni. Adres ekleme, düzenleme, silme ve varsayılan belirleme gibi temel adres yönetim işlemlerini tek bir bileşen içerisinde sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Render ve UI Yönetimi
-Bu grup, sayfanın temel görünümünü oluşturur, adres verilerini alır ve UI bileşenlerini (liste, form, butonlar vb.) render eder.  
+### Adres Sayfası Yönetimi
+Tüm adres yönetim arayüzünü ve iş mantığını içeren ana bileşen. Veri çekme, form yönetimi ve kullanıcı etkileşimlerini merkezi olarak ele alır.
 - AccountAddressesPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, kullanıcının kayıtlı adreslerini görüntüleyip yönetmesini sağlayan bir sayfa bileşenidir.
+
+[Aksiyom 1]: Eğer `emptyForm` sabiti (boş form yapısı) tanımlı değilse, yeni adres eklenirken form alanları başlatılamaz ve kullanıcı form dolduramaz.
+[Aksiyom 2]: Eğer bileşen, kullanıcının adreslerini almak için dış bir API servisine veya veri kaynağına erişemiyorsa, adres listesi boş görüntülenir veya bileşen hata verir.
+[Aksiyom 3]: Eğer bileşen, kullanıcı oturum açmamış veya kimlik doğrulaması yapılmamış durumdaysa, kullanıcıya ait adresler yüklenemez ve sayfa hata durumuna geçer.
 
 ---
 
@@ -43794,80 +43716,91 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::\<anonymous_loadAddresses>
+### [N1_NASIL] AST Pointer: AccountAddressesPage.tsx::AccountAddressesPage
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `emptyForm` — Import edilen, formun başlangıç değerlerini tutan sabit nesne
+- **Dönüş**: yok (JSX return eder, fonksiyon imzası yok olarak belirtilmiş)
+
+### [N2_NASIL] AST Pointer: AccountAddressesPage.tsx::AnonymousFunction_0 (loadAddresses)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — `listAddresses()` API çağrısından dönen adres listesi; `setItems` ile UI’ya aktarılır.
-  - `e` — `try…catch` bloğunda yakalanan hata nesnesi; konsola loglanır ve toast ile kullanıcıya bildirilir.
-- **Dönüş**: `Promise<void>` (asenkron, UI yan etkileri)
+  - `data` — listAddresses() API çağrısının dönüş değeri, kullanıcı adreslerinin listesi
+- **Dönüş**: yok
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::startEdit
-- **params**: `a: UserAddress`
+### [N3_NASIL] AST Pointer: AccountAddressesPage.tsx::startEdit
+- **params**: `(a: UserAddress)` — Düzenlenecek adres objesi
 - **ic_degiskenler**:
-  - `a` — Düzenlenmek istenen adres nesnesi; alanları `setForm` ile form durumuna kopyalanır.
-  - `setForm` — Form state’ini güncelleyen React setter fonksiyonu.
-  - `window.scrollTo` — Mobilde formun görünür olmasını sağlamak için sayfayı kaydırır.
-- **Dönüş**: `void`
+  - `a` — Parametre olarak gelen UserAddress objesi, tüm adres alanlarını içerir
+  - `a.id` — Adresin benzersiz kimliği
+  - `a.label` — Adres etiketi (ör: "Ev", "İş")
+  - `a.full_name` — Adres sahibinin tam adı
+  - `a.phone` — Telefon numarası
+  - `a.address_line` — Adres satırı
+  - `a.city` — Şehir
+  - `a.district` — İlçe
+  - `a.postal_code` — Posta kodu
+  - `a.country` — Ülke kodu
+  - `a.is_default_shipping` — Varsayılan teslimat adresi mi
+  - `a.is_default_billing` — Varsayılan fatura adresi mi
+- **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::resetForm
+### [N4_NASIL] AST Pointer: AccountAddressesPage.tsx::resetForm
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `emptyForm` — Boş form şablonu (sabit obje) ; `setForm` ile form state’i sıfırlanır.
-  - `setForm` — Form state’ini güncelleyen React setter fonksiyonu.
-- **Dönüş**: `void`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::handleSubmit
-- **params**: `e: React.FormEvent`
+### [N5_NASIL] AST Pointer: AccountAddressesPage.tsx::handleSubmit
+- **params**: `(e: React.FormEvent)` — Form submit olay nesnesi
 - **ic_degiskenler**:
-  - `e` — Form submit olayı; `preventDefault()` ile sayfa yenilenmesi engellenir.
-  - `form` — Form state nesnesi; alanları API çağrısına gönderilir.
-  - `user` — Oturum açmış kullanıcı bilgisi; yoksa hata fırlatılır.
-  - `isEditing` — Formun düzenleme modunda olup olmadığını gösteren boolean.
-  - `setSaving` — “Kaydetme” yükleme durumunu yöneten React setter fonksiyonu.
-  - `updateAddress` — Mevcut adresi güncelleyen API fonksiyonu.
-  - `createAddress` — Yeni adres oluşturmak için kullanılan API fonksiyonu.
-  - `toast` — Başarı / hata bildirimleri için `react-hot-toast` arayüzü.
-  - `t` — Çeviri fonksiyonu (`useI18n`); mesajları yerelleştirir.
-  - `resetForm` — İşlem sonrası formu temizler.
-  - `refresh` — Adres listesini yeniden yükleyen fonksiyon (muhtemelen `listAddresses` çağrısı).
-- **Dönüş**: `Promise<void>`
+  - `e` — Form submit olayı, preventDefault() ile varsayılan davranış engellenir
+  - `form` — Form state'inden gelen mevcut form verisi
+  - `form.address_line` — Adres satırı (zorunlu alan kontrolü yapılır)
+  - `form.city` — Şehir (zorunlu alan kontrolü yapılır)
+  - `form.district` — İlçe (zorunlu alan kontrolü yapılır)
+  - `form.id` — Düzenleme modunda ise mevcut adresin ID'si
+  - `isEditing` — Düzenleme modunda olup olmadığı (form.id varsa true)
+  - `user` — Kimlik doğrulanmış kullanıcı objesi
+  - `user.id` — Kullanıcının benzersiz kimliği
+  - `form.label` — Adres etiketi
+  - `form.full_name` — Tam ad
+  - `form.phone` — Telefon
+  - `form.postal_code` — Posta kodu
+  - `form.country` — Ülke
+  - `form.is_default_shipping` — Varsayılan teslimat adresi bayrağı
+  - `form.is_default_billing` — Varsayılan fatura adresi bayrağı
+- **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::handleDelete
-- **params**: `id: string`
+### [N6_NASIL] AST Pointer: AccountAddressesPage.tsx::handleDelete
+- **params**: `(id: string)` — Silinecek adresin ID'si
 - **ic_degiskenler**:
-  - `id` — Silinecek adresin benzersiz kimliği.
-  - `confirm` — Tarayıcı onay penceresi; kullanıcı onay vermezse işlem iptal olur.
-  - `t` — Çeviri fonksiyonu; onay mesajı ve toast metinleri için kullanılır.
-  - `deleteAddress` — Adresi veritabanından kaldıran API fonksiyonu.
-  - `toast` — Başarı / hata bildirimleri.
-  - `refresh` — Adres listesini güncellemek için tekrar veri çekme fonksiyonu.
-  - `form` — Mevcut form state’i; silinen adres formda ise form temizlenir.
-  - `resetForm` — Formu sıfırlar.
-  - `e` — `catch` bloğunda yakalanan hata nesnesi.
-- **Dönüş**: `Promise<void>`
+  - `id` — Silinecek adresin benzersiz kimliği
+  - `form` — Form state'inden gelen mevcut form verisi
+  - `form.id` — Mevcut formda düzenlenecek adresin ID'si (silinen adres ile aynı ise form sıfırlanır)
+- **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::makeDefault
-- **params**: `id: string`, `kind: 'shipping' | 'billing'`
+### [N7_NASIL] AST Pointer: AccountAddressesPage.tsx::makeDefault
+- **params**: `(id: string, kind: 'shipping' | 'billing')` — Adres ID'si ve adres türü
 - **ic_degiskenler**:
-  - `id` — Varsayılan olarak ayarlanacak adresin kimliği.
-  - `kind` — `'shipping'` veya `'billing'`; hangi adres tipinin varsayılan olacağını belirler.
-  - `setDefaultAddress` — Seçilen adresi varsayılan yapan API fonksiyonu.
-  - `toast` — İşlem sonucunu kullanıcıya bildiren toast.
-  - `t` — Çeviri fonksiyonu; toast mesajlarını yerelleştirir.
-  - `refresh` — Varsayılan değişikliği sonrası adres listesini yeniden yükler.
-  - `e` — `catch` bloğunda yakalanan hata nesnesi.
-- **Dönüş**: `Promise<void>`
+  - `id` — Varsayılan yapılacak adresin benzersiz kimliği
+  - `kind` — Adres türü ('shipping' veya 'billing')
+- **Dönüş**: yok
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::renderAddressItem
-- **params**: `a: UserAddress`
+### [N8_NASIL] AST Pointer: AccountAddressesPage.tsx::AnonymousJSXFunction (addressCard)
+- **params**: `(a)` — UserAddress objesi (JSX içinde kullanılır)
 - **ic_degiskenler**:
-  - `a` — Listeden gelen tek bir adres nesnesi; tüm UI alanları (`a.id`, `a.label`, `a.full_name`, `a.address_line`, `a.city`, `a.district`, `a.postal_code`, `a.phone`, `a.is_default_shipping`, `a.is_default_billing`) render edilir.
-  - `startEdit` — Düzenleme butonuna tıklandığında `a` ile `startEdit` fonksiyonunu çağırır.
-  - `handleDelete` — Silme butonuna tıklandığında `a.id` ile `handleDelete` fonksiyonunu çağırır.
-  - `makeDefault` — Varsayılan butonlarına tıklandığında `a.id` ve ilgili `'shipping'`/`'billing'` türü ile `makeDefault` fonksiyonunu çağırır.
-  - `t` — Çeviri fonksiyonu; UI metinlerini yerelleştirir.
-  - `MapPin`, `Edit2`, `Trash2`, `Truck`, `CreditCard`, `CheckCircle` — İkon bileşenleri (görsel amaçlı, fonksiyonel etkisi yok).
-- **Dönüş**: `JSX.Element` (React bileşeni)
+  - `a` — Adres objesi, tüm alanları JSX içinde erişilir
+  - `a.id` — Adresin benzersiz kimliği (butonlarda key ve onClick için kullanılır)
+  - `a.label` — Adres etiketi (gösterilir)
+  - `a.full_name` — Tam ad (gösterilir)
+  - `a.address_line` — Adres satırı (gösterilir)
+  - `a.district` — İlçe (gösterilir)
+  - `a.city` — Şehir (gösterilir)
+  - `a.postal_code` — Posta kodu (gösterilir)
+  - `a.phone` — Telefon (gösterilir)
+  - `a.is_default_shipping` — Varsayılan teslimat adresi mi (badge gösterilir veya buton)
+  - `a.is_default_billing` — Varsayılan fatura adresi mi (badge gösterilir veya buton)
+- **Dönüş**: JSX (adres kartı)
 
 ---
 
@@ -43905,37 +43838,34 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountInvoicesPage.tsx
-skeleton_hash: 1c5506a1b8bb1d08
+skeleton_hash: 33cc8de774e90e04
 entity_hashes:
   func:AccountInvoicesPage: 8b46a7e878bbb3d8
-  overview: e1ec5a6be4856954
+  overview: 9517d7199843f54f
   style_tokens: e9dde5d26cd429fb
-generated_at: 2026-05-28T22:39:12Z
+generated_at: 2026-05-29T18:52:06Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun kullanıcı hesapları bölümünde yer alan faturalar sayfasını uygulayan React tabanlı bir bileşendir. Kullanıcının hesabına ait faturaları güvenli bir şekilde görüntülemesini ve yönetmesini sağlayan, hesap sayfaları mimarisinin ana giriş noktasıdır.
+VentHub HVAC platformundaki kullanıcı hesapları modülünde yer alan fatura yönetim sayfasını oluşturan React bileşenidir. Bu bileşen, kullanıcının hesabına ait faturaları güvenli bir şekilde görüntülemesini ve yönetmesini sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Sayfanın tüm arayüzünü, durum yönetimini ve iş mantığını tek bir merkezi bileşen içinde barındırır, harici bağımlılıklar ve rota parametreleri ile etkileşime geçerek fatura listesini sunar.
+Sayfanın tüm arayüzünü ve iş mantığını tek bir merkezi bileşen içinde barındırarak kullanıcıya fatura listesini sunar.
 - AccountInvoicesPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen fonksiyon gövdesi (implementation) bulunmadığından, yalnızca fonksiyon imzasından çıkarılabilen minimal aksiyomlar tanımlanmıştır.
+Bu modül için verilen fonksiyon gövdesi (implementation) bulunmadığından, yalnızca fonksiyon imzasından yola çıkılarak可靠 (güvenilir) bir mimari varsayım üretilememektedir.
 
-**[Aksiyom 1]:** Eğer React component mount ortamı (React runtime) yoksa, `AccountInvoicesPage` bileşeni render edilemez.
-
-**[Aksiyom 2]:** Eğer `AccountInvoicesPage` bir React Functional Component olarak çalışıyor ve parametre almıyorsa, props bağımsız çalışması beklenir — ancak iç bağımlılıklar (context, hook, servis çağrısı vb.) bilinmiyor.
-
-**[Aksiyom 3]:** Eğer bu bir sayfa (page) bileşeni ise ve modülde modül sabitleri (CONSTANTS) tanımlanmamışsa, sayfa içeriği dinamik olarak dış kaynaklardan (API, context, store) sağlanmalıdır — statik veri kaynağı bilinmiyor.
+Mevcut bilgiler:
+- `AccountInvoicesPage()` — parametresiz, default değer içermeyen bir React bileşen imzası.
 
 ---
 
-> **Not:** Bu modül için yalnızca bileşen imzası (`AccountInvoicesPage()`) verilmiştir. Fonksiyon gövdesi, hook kullanımı, prop tanımları, context tüketimi veya servis bağımlılıkları gibi detaylar kodda mevcut olmadığı için, daha spesifik mimari varsayımlar (örn: authentication zorunluluğu, veri kaynağı, route yapısı) **bilinmiyor** durumdadır. Detaylı aksiyon üretmek için bileşen gövdesinin incelenmesi gereklidir.
+**Sonuç:** Fonksiyon gövdesi sağlanmadığı için aksiyom üretilememektedir. Mimari varsayımların çıkarılabilmesi için modülün implementasyon kodunun (fonksiyon gövdesinin) sunulması gerekmektedir.
 
 ---
 
@@ -43965,68 +43895,63 @@ type InvoiceProfileType = 'individual' | 'corporate'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::AccountInvoicesPage
-- **params**: ()
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `user` — useAuth() hook'undan gelen kullanıcı nesnesi, API çağrılarında user.id olarak kullanılır
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu, buton metinleri için kullanılır
-  - `items` — fatura profilleri listesi (InvoiceProfile[]), API'den yüklenen profil verilerini tutar
-  - `loading` — yükleme durumu (boolean), true iken loader gösterilir
-  - `saving` — kaydetme durumu (boolean), true iken form butonları devre dışıdır
-  - `editingId` — düzenlenen profilin ID'si (string | null), null ise yeni profil oluşturuluyordur
-  - `profileType` — fatura profil türü: 'individual' veya 'corporate', form alanlarını koşullu gösterir
-  - `firstName` — bireysel profil için ad alanı
-  - `lastName` — bireysel profil için soyad alanı
-  - `companyName` — kurumsal profil için firma ünvanı alanı
-  - `taxNumber` — TCKN (bireysel) veya VKN (kurumsal) vergi numarası
-  - `taxOffice` — vergi dairesi adı
-  - `city` — il adı
-  - `district` — ilçe adı
-  - `addressLine` — adres detayı metni
-  - `isDefault` — bu profilin varsayılan profil olup olmadığı (boolean)
-  - `load` — useCallback ile tanımlanan, fatura profillerini API'den yükleyen fonksiyon
-  - `resetForm` — tüm form state'lerini başlangıç değerlerine sıfırlayan fonksiyon
-  - `startEdit` — verilen profili form alanlarına doldurarak düzenleme modunu başlatan fonksiyon
-  - `handleSubmit` — form submit handler'ı, profil oluşturur veya günceller
-  - `handleDelete` — verilen ID ile profili silen fonksiyon
-  - `handleMakeDefault` — verilen profili varsayılan yapan fonksiyon
-- **Dönüş**: JSX (React component)
+  - `user` — useAuth() hook'undan gelen kullanici bilgisi, fatura profilleri ile iliskili kullanici ID'sini saglar
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu, UI metinlerini çevirmek icin kullanilir
+  - `items` — useState<InvoiceProfile[]>([]) ile olusturulan, kullanici fatura profillerinin listesini tutan state dizisi
+  - `loading` — useState(true) ile olusturulan, veri yukleme durumunu takip eden boolean state
+  - `saving` — useState(false) ile olusturulan, form gonderim islemi sirasindaki durumu takip eden boolean state
+  - `editingId` — useState<string | null>(null) ile olusturulan, duzenlenen fatura profilinin ID'sini tutan state (null ise yeni olusturma modu)
+  - `profileType` — useState<InvoiceProfileType>('individual') ile olusturulan, fatura profil tipi state'i (bireysel veya kurumsal)
+  - `firstName` — useState('') ile olusturulan, bireysel profil icin ad bilgisini tutan state
+  - `lastName` — useState('') ile olusturulan, bireysel profil icin soyad bilgisini tutan state
+  - `companyName` — useState('') ile olusturulan, kurumsal profil icin firma unvani bilgisini tutan state
+  - `taxNumber` — useState('') ile olusturulan, vergi numarasi (TCKN/VKN) bilgisini tutan state
+  - `taxOffice` — useState('') ile olusturulan, vergi dairesi bilgisini tutan state
+  - `city` — useState('') ile olusturulan, il bilgisini tutan state
+  - `district` — useState('') ile olusturulan, ilce bilgisini tutan state
+  - `addressLine` — useState('') ile olusturulan, adres detayini tutan state
+  - `isDefault` — useState(false) ile olusturulan, profilin varsayilan olup olmadigini tutan boolean state
+  - `load` — useCallback ile olusturulan, fatura profillerini yukleyen async fonksiyon
+  - `resetForm` — form state'lerini sifirlayan fonksiyon
+  - `startEdit` — mevcut bir profili duzenleme moduna geciren fonksiyon
+  - `handleSubmit` — form gonderim islemini yoneten async fonksiyon
+  - `handleDelete` — profil silme islemini yoneten async fonksiyon
+  - `handleMakeDefault` — profili varsayilan yapma islemini yoneten async fonksiyon
+- **Dönüş**: JSX (React elementi - fatura yonetim sayfasi)
 
 ### [N2_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::load
-- **params**: ()
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — listInvoiceProfiles() async API çağrısından dönen fatura profilleri dizisi
-- **Dönüş**: Promise<void>, items state'ini günceller ve loading state'ini yönetir
+  - `data` — listInvoiceProfiles() API cagrisindan donen fatura profilleri dizisi
+- **Dönüş**: Promise<void> (yukleme tamamlandiktan sonra item state'ini gunceller)
 
 ### [N3_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::resetForm
-- **params**: ()
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — editingId, profileType, firstName, lastName, companyName, taxNumber, taxOffice, city, district, addressLine, isDefault state'lerini başlangıç değerlerine sıfırlar
+- **params**: (parametre yok)
+- **ic_degiskenler**: (degisken yok - sadece state setter cagrilari)
+- **Dönüş**: void (tum form state'lerini varsayilan degerlere sifirlar)
 
 ### [N4_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::startEdit
-- **params**: `p` — düzenlenecek InvoiceProfile nesnesi (p.id, p.profile_type, p.first_name, p.last_name, p.company_name, p.tax_number, p.tax_office, p.city, p.district, p.address_line, p.is_default alanlarını okur)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — editingId, profileType, firstName, lastName, companyName, taxNumber, taxOffice, city, district, addressLine, isDefault state'lerini p değerleriyle doldurur ve sayfayı yukarı kaydırır
+- **params**: `(p: InvoiceProfile)` — duzenlenecek fatura profilinin tam verisi
+- **ic_degiskenler**: (degisken yok - sadece state setter cagrilari)
+- **Dönüş**: void (form alanlarini profil verileri ile doldurur ve sayfayi yukari kaydirir)
 
 ### [N5_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::handleSubmit
-- **params**: `e` — React.FormEvent (form submit event nesnesi)
+- **params**: `(e: React.FormEvent)` — form gonderim olayi
 - **ic_degiskenler**:
-  - `payload` — API'ye gönderilecek fatura profil veri nesnesi: { user_id: user.id, profile_type: profileType, first_name, last_name, company_name, tax_number: taxNumber, tax_office: taxOffice, city, district, address_line: addressLine, is_default: isDefault, country: 'TR' }
-- **Dönüş**: Promise<void> — editingId varsa updateInvoiceProfile(editingId, payload), yoksa createInvoiceProfile(payload) çağırır; başarı sonrası resetForm() ve load() çağırır
+  - `payload` — API'ye gonderilecek fatura profil verileri objesi, tum form alanlarini ve user_id, country gibi ek alanlari icerir
+- **Dönüş**: Promise<void> (form gonderim islemini yonetir, basari/hata durumlarina gore toast mesaji gosterir)
 
 ### [N6_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::handleDelete
-- **params**: `id` — silinecek profilin string ID'si
-- **ic_degiskenler**: yok
-- **Dönüş**: Promise<void> — confirm dialog'u onaylarsa deleteInvoiceProfile(id) çağırır ve load() ile listeyi yeniler
+- **params**: `(id: string)` — silinecek fatura profilinin ID'si
+- **ic_degiskenler**: (degisken yok - sadece API cagrisi ve state guncelleme)
+- **Dönüş**: Promise<void> (profil silme islemini yonetir, onay dialogu gosterir, basari/hata durumlarina gore toast mesaji gosterir)
 
 ### [N7_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::handleMakeDefault
-- **params**: `id` — varsayılan yapılacak profilin string ID'si
-- **ic_degiskenler**: yok
-- **Dönüş**: Promise<void> — setDefaultInvoiceProfile(id) çağırır ve load() ile listeyi yeniler
-
-### [N8_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::items.map callback
-- **params**: `p` — mevcut iterasyondaki InvoiceProfile nesnesi (p.id, p.profile_type, p.first_name, p.last_name, p.company_name, p.tax_office, p.tax_number, p.address_line, p.district, p.city, p.is_default alanlarını JSX içinde kullanır)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX — profil kartı render eder; startEdit(p), handleDelete(p.id), handleMakeDefault(p.id) callback'lerini bağlar
+- **params**: `(id: string)` — varsayilan yapilacak fatura profilinin ID'si
+- **ic_degiskenler**: (degisken yok - sadece API cagrisi ve state guncelleme)
+- **Dönüş**: Promise<void> (profili varsayilan yapma islemini yonetir, basari/hata durumlarina gore toast mesaji gosterir)
 
 ---
 
@@ -44336,315 +44261,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** `${active`, `${activeStepIdx`, `${isDelivered`, `-translate-x-1/4`, `-translate-y-1/2`, `1`, `:`, `>=`, `animate-pulse`, `animate-spin`, `blur-2xl`, `blur-3xl`, `border`, `divide-slate-100`, `divide-y`
 
 ---
-# FILE: src\views\account\AccountProfilePage.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountProfilePage.tsx
-skeleton_hash: 8f54003fdfbd1d91
-entity_hashes:
-  func:AccountProfilePage: 754183d7e2ba9791
-  overview: 6f24907adef049a2
-  style_tokens: d7513d5d715e48fe
-generated_at: 2026-05-28T22:38:52Z
----
-
-## Genel Bakış
-Bu modül, kullanıcı profil bilgilerini gösteren ve düzenleyen bir hesap profili sayfası bileşenini içerir. Sayfa, kullanıcı verilerini alarak arayüzde sunar ve gerekli etkileşimleri yönetir.
-
-## Fonksiyon Grupları
-### Ana Bileşen
-Kullanıcı profil sayfasının görsel yapısını oluşturur ve veri akışını koordin eder.
-- AccountProfilePage
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### AccountProfilePage
-**Ne yapar**: Kullanıcının profil bilgilerini (ad soyad ve telefon) görüntüleyip düzenlemesini sağlayan bir React bileşenidir. Kullanıcı mevcut bilgilerini forma yansıtır, değişiklik yapıp kaydedebilir.
-
-**Nasıl yapar**: `useAuth()` ile mevcut kullanıcıyı alır, `user_metadata` içindeki `full_name` ve `phone` değerlerini `useEffect` ile `fullName` ve `phone` state'lerine yükler. Form gönderildiğinde `onSave` async fonksiyonu çalışır: `supabase.auth.updateUser` ile kullanıcı metadata'sını günceller, başarılı olursa toast ile bildirim gösterir, hata durumunda ise hata mesajı gösterir. Kaydetme işlemi sırasında buton devre dışı kalır ve yüklenme animasyonu gösterilir.
-
-**Parametreler**:
-- (parametre almaz)
-
-**Dönüş**: JSX.Element — Kullanıcı profili düzenleme formunu içeren bir React bileşeni döndürür.
-
----
-
-## INTERFACES
-
-### UserMetadata
-- `full_name?: string`
-- `phone?: string`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src\views\account\AccountProfilePage.tsx::AccountProfilePage
-- **params**: (none)
-- **ic_degiskenler**:
-  - `t` — translation function returned by `useI18n()`, used to localize UI strings.
-  - `user` — current authenticated user object returned by `useAuth()`, contains `user_metadata`.
-  - `fullName` — state variable holding the current value of the full name input field.
-  - `setFullName` — state updater function for `fullName`.
-  - `phone` — state variable holding the current value of the phone input field.
-  - `setPhone` — state updater function for `phone`.
-  - `saving` — state variable indicating whether a save operation is in progress.
-  - `setSaving` — state updater function for `saving`.
-  - `onSave` — event handler function defined within the component, invoked on form submission.
-- **Dönüş**: returns JSX markup for the account profile page.
-
-### [N2_NASIL] AST Pointer: src\views\account\AccountProfilePage.tsx::useEffect callback
-- **params**: (none)
-- **ic_degiskenler**:
-  - `user` — accessed from outer scope to read `user_metadata`.
-  - `meta` — local variable holding the user metadata cast to `UserMetadata`; defaults to an empty object if `user` or `user_metadata` is undefined.
-  - `fullName` — accessed from outer scope to set its state.
-  - `setFullName` — state updater function for `fullName`.
-  - `phone` — accessed from outer scope to set its state.
-  - `setPhone` — state updater function for `phone`.
-- **Dönüş**: no explicit return; side effect updates component state.
-
-### [N3_NASIL] AST Pointer: src\views\account\AccountProfilePage.tsx::onSave
-- **params**: `e` — `React.FormEvent` representing the form submission event.
-- **ic_degiskenler**:
-  - `e` — event object; `e.preventDefault()` stops default form submission.
-  - `setSaving` — state updater function for `saving`; called with `true` at start and `false` in `finally`.
-  - `saving` — accessed only in JSX button `disabled={saving}` (not within this function body).
-  - `supabase` — imported client used to call `supabase.auth.updateUser`.
-  - `fullName` — current value of the full name state, used in the update payload.
-  - `phone` — current value of the phone state, used in the update payload.
-  - `toast` — imported notification library; `toast.success` and `toast.error` are called based on operation outcome.
-  - `t` — translation function used to fetch localized toast messages.
-  - `error` — local variable capturing the `error` property from the Supabase response.
-- **Dönüş**: no explicit return; performs asynchronous update and side‑effects (state changes, notifications).
-
----
-
-## NODE ID STANDARD
-
-  file: src\views\account\AccountProfilePage.tsx
-  function: src\views\account\AccountProfilePage.tsx::AccountProfilePage
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: AccountProfilePage
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `focus-visible:border-primary-navy`, `hover:bg-industrial-gray`, `text-2xl`, `text-primary-navy`, `text-slate-400`, `text-slate-500`, `text-slate-900`, `text-sm`
-- **Layout:** `absolute`, `block`, `flex`, `gap-2`, `h-10`, `h-4`, `h-6`, `items-center`, `justify-end`, `left-0`, `max-w-2xl`, `overflow-hidden`, `p-6`, `relative`, `shadow-primary-navy/20`
-- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-60`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`, `font-medium`, `hover:scale-102`, `inset-y-0`, `mb-1.5`, `mb-8`, `mt-1`, `mt-2`
-
----
-# FILE: src\views\account\AccountReturnsPage.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx
-skeleton_hash: 3a744f7714238bb9
-entity_hashes:
-  func:AccountReturnsPage: b01b740ffc8dc4da
-  overview: 094ef3e3bb6279cc
-  style_tokens: d5328287ff24abb4
-generated_at: 2026-05-28T22:38:52Z
----
-
-## Genel Bakış
-`AccountReturnsPage` bileşeni, kullanıcıların iade işlemlerini görüntüleyebildiği ve yönetebildiği bir sayfa sunar. React/TypeScript ortamında, ilgili veri çekme, durum yönetimi ve UI render işlemlerini tek bir bileşende birleştirir.
-
-## Fonksiyon Grupları
-### Sayfa Render ve Veri Yönetimi
-Bu grup, iade listelerinin alınması, sayfa durumunun (loading, error, empty) yönetilmesi ve UI’nın oluşturulmasından sorumludur.  
-- AccountReturnsPage   (sayfanın ana bileşeni, veri çekme ve render akışını kontrol eder)
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### AccountReturnsPage
-**Ne yapar**: Kullanıcının iade taleplerini listeleyen, yeni iade talebi oluşturulmasını sağlayan ve iade sürecinin durumunu görsel bir zaman çizelgesiyle izletecek bir sayfa bileşeni sunar.  
-
-**Nasıl yapar**:  
-- `useAuth`, `useI18n`, `useSearchParams` ve `useRouter` gibi React hook’larıyla kimlik, çeviri, URL parametreleri ve yönlendirme bilgilerini alır.  
-- `useEffect` içinde iki ayrı asenkron yükleme fonksiyonu (`load` ve `loadOrders`) çalıştırarak Supabase’dan iade kayıtlarını (`venthub_returns`) ve ilgili siparişleri (`venthub_orders`) çeker, hataları yönetir ve bileşen durumlarını (`rows`, `orders`, `loading`) günceller.  
-- Kullanıcı bir sipariş ID’siyle (`?new=`) sayfayı açarsa modal otomatik olarak gösterilir.  
-- Form durumunu (`form`) ve modal görünürlüğünü (`openModal`) `useState` ile yönetir.  
-- `handleCreate` fonksiyonu, form doğrulaması yapar, yeni iade kaydını Supabase’a ekler, başarılı olduğunda listeyi yeniler ve kullanıcıyı yönlendirir.  
-- `statusClass`, `getStatusIcon`, `getStatusLabel` ve `getReturnTimeline` yardımcı fonksiyonları, iade durumuna göre stil, ikon, etiket ve zaman çizelgesi adımlarını üretir.  
-- Render aşamasında, yükleme, boş liste, filtreleme ve iade kartları gibi UI durumlarını koşullu olarak gösterir; ayrıca yeni iade oluşturmak için modal içerir.  
-
-**Parametreler**: *Bu fonksiyon dışarıdan parametre almaz.*  
-
-**Dönüş**: `void` – React bileşeni olarak JSX döndürür, doğrudan bir değer üretmez.
-
----
-
-## INTERFACES
-
-### ReturnRow
-- `id: string`
-- `order_id: string`
-- `reason: string`
-- `description?: string | null`
-- `status: string`
-- `created_at: string`
-
-### OrderLite
-- `id: string`
-- `order_number: string`
-- `created_at: string`
-
-### SupabaseError
-- `code?: string`
-- `status?: number`
-- `message?: string`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::AccountReturnsPage
-- **params**: (none)
-- **ic_degiskenler**:
-  - `mounted` — effect yaşam döngüsü boyunca bileşenin hâlâ monte edilmiş olup olmadığını izler; temizleme fonksiyonunda `false` yapılır.
-  - `load` — returns verisini Supabase’dan çeken ve `setRows`, `setLoading` durumlarını yöneten async iç fonksiyon.
-- **Dönüş**: yok (React bileşeni render eder, yan etkileri `useEffect` içinde yönetir)
-
-### [N2_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::load
-- **params**: (none)
-- **ic_degiskenler**:
-  - `list` — Supabase sorgusundan dönen returns listesi (`data` kısmı).
-  - `error` — Supabase sorgusundan dönen hata nesnesi.
-- **Dönüş**: yok (durum günceller, hata fırlatır)
-
-### [N3_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::loadOrders
-- **params**: (none)
-- **ic_degiskenler**:
-  - `data` — Supabase’dan çekilen sipariş kayıtları.
-  - `error` — Supabase sorgusundan dönen hata nesnesi.
-  - `fb` — alternatif sorgu (sütun eksikliği/400 hatası durumunda) sonucu.
-- **Dönüş**: yok (`setOrders` ile durum günceller)
-
-### [N4_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::prefillEffect
-- **params**: (none)
-- **ic_degiskenler**:
-  - `prefillOrderId` — URL parametresi veya dışarıdan gelen ön‑doldurma değeri.
-- **Dönüş**: yok (modal açma yan etkisi)
-
-### [N5_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::reasonOptions
-- **params**: (none)
-- **ic_degiskenler**: (none, sadece sabit dizi döner)
-- **Dönüş**: `string[]` — iade nedenleri listesi
-
-### [N6_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::submitReturn
-- **params**: (none)
-- **ic_degiskenler**:
-  - `form.order_id` — seçilen sipariş kimliği.
-  - `form.reason` — seçilen iade nedeni.
-  - `form.description` — isteğe bağlı açıklama.
-  - `payload` — Supabase `venthub_returns` tablosuna eklenecek veri nesnesi.
-  - `error` — insert işleminden dönen hata.
-  - `list` — yeni eklenen iade sonrası güncellenen returns listesi.
-- **Dönüş**: yok (toast gösterir, modal kapatır, form sıfırlar, yönlendirir)
-
-### [N7_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::statusClass
-- **params**: `s: string`
-- **ic_degiskenler**:
-  - `v` — `s` değerinin küçük harfe çevrilmiş hali; sınıf seçimi için kullanılır.
-- **Dönüş**: `string` — CSS sınıfı
-
-### [N8_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::getStatusIcon
-- **params**: `status: string`
-- **ic_degiskenler**: (none, sadece `status` üzerinden switch)
-- **Dönüş**: `JSX.Element` — ilgili Lucide‑react ikonu
-
-### [N9_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::getStatusLabel
-- **params**: `status: string`
-- **ic_degiskenler**: (none, sadece `status` üzerinden i18n lookup)
-- **Dönüş**: `string` — yerelleştirilmiş durum etiketi
-
-### [N10_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::getReturnTimeline
-- **params**: `currentStatus: string`
-- **ic_degiskenler**:
-  - `allSteps` — normal akıştaki adımların sabit dizisi.
-  - `currentIndex` — `currentStatus`’ın `allSteps` içindeki konumu.
-- **Dönüş**: `TimelineStep[]` — her adımın tamamlanma ve mevcut olma bilgisiyle dönen dizi
-
-### [N11_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::renderOption
-- **params**: `o: OrderLite`
-- **ic_degiskenler**: (none, sadece `o` üzerinden değer okur)
-- **Dönüş**: `JSX.Element` — `<option>` öğesi
-
-### [N12_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::renderReturnRow
-- **params**: `r: ReturnRow`
-- **ic_degiskenler**:
-  - `o` — `orders` dizisinden `r.order_id` eşleşen sipariş.
-  - `code` — sipariş numarası ya da return id’den türetilen gösterim kodu.
-  - `timeline` — `getReturnTimeline(r.status)` sonucu.
-- **Dönüş**: `JSX.Element` — iade satırı kartı markup’u
-
---- 
-
-*Not: Fonksiyon isimleri, kod içinde açıkça tanımlı olan adlardan alınmıştır; anonim arrow fonksiyonlar (useEffect callbackleri vb.) için mantıksal bir adlandırma yapılmıştır.*
-
----
-
-## NODE ID STANDARD
-
-  file: src\views\account\AccountReturnsPage.tsx
-  function: src\views\account\AccountReturnsPage.tsx::AccountReturnsPage
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: AccountReturnsPage
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-primary-navy/5`, `bg-red-500`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/80`, `bg-slate-900/40`, `bg-white`, `border-b`, `border-b-2`, `border-primary-navy`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-1`
-- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${statusClass(r.status`, `${statusFilter`, `${step.completed`, `:`, `===`, `animate-in`, `animate-spin`, `border`, `cancelled`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `focus-visible:ring-primary-navy/50`
-
----
 # FILE: src\views\account\AccountSecurityPage.md
 
 ---
@@ -44652,26 +44268,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountSecurityPage.tsx
-skeleton_hash: 714d41430b62d140
+skeleton_hash: 3ee88315eea607cf
 entity_hashes:
   func:AccountSecurityPage: c6bf7ae08fac23f0
-  overview: 4253e862f0a8090f
+  overview: 44f19fdf9e73a3e3
   style_tokens: ac89c7eeea9aa372
-generated_at: 2026-05-28T22:38:52Z
+generated_at: 2026-05-29T18:53:04Z
 ---
 
 ## Genel Bakış
-`AccountSecurityPage` bileşeni, kullanıcı hesabının güvenlik ayarlarını görüntülemek ve yönetmek için tasarlanmış bir React sayfasıdır. Sayfa, şifre değişikliği, iki faktörlü kimlik doğrulama ve oturum yönetimi gibi güvenlik ilgili işlemlerin UI mantığını barındırır.
+`AccountSecurityPage`, kullanıcının hesap güvenliğiyle ilgili tüm ayarları yönettiği ana React sayfasıdır. Şifre değiştirme, bağlı kimlik sağlayıcılarını (Google, e-posta vb.) görüntüleme/bağlama ve şifre gücü kontrolü gibi güvenlik işlevlerini tek bir bileşen içinde sunar.
 
 ## Fonksiyon Grupları
-### Güvenlik Ayarları UI
-Bu grup, güvenlik ayarlarını kullanıcıya sunan ve etkileşimlerini yöneten tek bir bileşeni içerir.  
-- AccountSecurityPage   (sayfanın ana render ve durum yönetimi)
+### Güvenlik Ayarları Arayüzü ve Etkileşim
+Sayfanın ana rendered durumunu, form alanlarını ve kullanıcı etkileşimlerini yöneten tek bir kapsamlı bileşeni içerir. Şifre formu alanlarını, durum yönetimini ve tüm UI mantığını barındırır.
+- `AccountSecurityPage` (sayfanın tüm render, durum ve etkileşim mantığını yöneten ana bileşen)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+**Not:** `AccountSecurityPage()` fonksiyon imzası parametresizdir ve modül sabitleri tanımlı değildir. Fonksiyon gövdesi analiz edilmediği için, veri bağımlılıkları, koşullar ve iş mantığı çıkarılamamıştır. Mimari varsayımlar belirlenememiştir.
 
 ---
 
@@ -44691,58 +44311,40 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountSecurityPage.tsx::AccountSecurityPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: `src/views/account/AccountSecurityPage.tsx`::AccountSecurityPage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `router` — `useRouter()` hook'undan gelen router nesnesi; sayfa yönlendirmeleri için kullanılır.
-  - `user` — `useAuth()` hook'undan gelen oturum bilgisi; mevcut kullanıcının e‑posta vb. alanlarına erişim sağlar.
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; UI metinlerini yerelleştirir.
-  - `current` — Mevcut şifre giriş alanının state'i; `setCurrent` ile güncellenir.
-  - `setCurrent` — `current` state'ini güncelleyen setter fonksiyonu.
-  - `password` — Yeni şifre giriş alanının state'i; `setPassword` ile güncellenir.
-  - `setPassword` — `password` state'ini güncelleyen setter fonksiyonu.
-  - `confirm` — Yeni şifre tekrar giriş alanının state'i; `setConfirm` ile güncellenir.
-  - `setConfirm` — `confirm` state'ini güncelleyen setter fonksiyonu.
-  - `saving` — Form gönderimi sırasında gösterilen yükleme durumu; `setSaving` ile güncellenir.
-  - `setSaving` — `saving` state'ini güncelleyen setter fonksiyonu.
-  - `identities` — Bağlı kimlik (google, email vb.) listesi; `setIdentities` ile güncellenir.
-  - `setIdentities` — `identities` state'ini güncelleyen setter fonksiyonu.
-  - `hasProvider` — Belirli bir sağlayıcı (`p`) mevcut mu diye kontrol eden yardımcı fonksiyon; `identities` üzerinden `some` ile arama yapar.
-  - `passwordRules` — Şifre kurallarını tanımlayan nesne dizisi; her kural bir `key`, `label` ve `test` fonksiyonu içerir.
-  - `passedRules` — `passwordRules` içinde `password` değerini geçen kural sayısı; şifre gücünü hesaplamak için kullanılır.
-  - `strengthColor` — `passedRules` değerine göre belirlenen arka plan rengi sınıfı; UI’da şifre gücünü gösterir.
-  - `strengthLabel` — `passedRules` değerine göre belirlenen metin etiketi (Zayıf, Orta, İyi, Güçlü); UI’da şifre gücünü gösterir.
-- **Dönüş**: yok (React bileşeni JSX döndürür; yan etkileri `useEffect` ve iç fonksiyonlarla yönetilir)
+  - `router` — `useRouter()` hookundan dönen Next.js yönlendirici nesnesi, sayfa yönlendirmeleri için kullanılır
+  - `user` — `useAuth()` hookundan destructure edilen mevcut oturum açmış kullanıcı nesnesi
+  - `t` — `useI18n()` hookundan destructure edilen çeviri fonksiyonu, UI metinleri için kullanılır
+  - `current` — `useState('')` state'i, mevcut/eski şifre input değerini tutar
+  - `password` — `useState('')` state'i, yeni şifre input değerini tutar
+  - `confirm` — `useState('')` state'i, şifre tekrar input değerini tutar
+  - `saving` — `useState(false)` state'i, form gönderim işleminin devam edip etmediğini belirtir
+  - `identities` — `useState<Array<{id?: string; provider?: string}>>()` state'i, kullanıcının bağlı kimlik/bağlantı listesini tutar (google, email vb.)
+  - `hasProvider` — arrow fonksiyon, verilen provider string'ine sahip identities elemanı olup olmadığını kontrol eder
+  - `passwordRules` — dizi, her biri `key`, `label`, `test` alanına sahip şifre kuralları nesneleri dizisi (uzunluk, büyük harf, rakam, özel karakter)
+  - `passedRules` — `passwordRules` dizisi üzerinden `password` state'inin test ettiği kural sayısı (0-4 arası)
+  - `strengthColor` — `passedRules` sayısına göre arka plan rengi CSS sınıfı (bg-red-500, bg-orange-400, bg-yellow-400, bg-green-500)
+  - `strengthLabel` — `passedRules` sayısına göre Türkçe güç etiketi string'i (Zayıf, Orta, İyi, Güçlü)
+- **Dönüş**: JSX (React bileşen render çıktısı)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountSecurityPage.tsx::refreshIdentities
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: `src/views/account/AccountSecurityPage.tsx`::refreshIdentities
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `data` — `supabase.auth.getUser()` çağrısının başarılı yanıtı; kullanıcı bilgilerini içerir.
-  - `error` — `supabase.auth.getUser()` çağrısının hata nesnesi; hata kontrolü için kullanılır.
-  - `ids` — `data.user.identities` alanından alınan kimlik listesi; yoksa boş dizi (`[]`) atanır.
-  - `setIdentities` — Üst bileşenden gelen state setter; kimlik listesini günceller.
-  - `supabase` — Supabase istemcisi; kimlik bilgilerini almak için `auth.getUser()` metodunu çağırır.
-- **Dönüş**: yok (state güncellenir, UI yeniden render olur)
+  - `data` — `supabase.auth.getUser()` çağrısından dönen data nesnesi, kullanıcı bilgilerini içerir
+  - `error` — `supabase.auth.getUser()` çağrısından dönen hata nesnesi, hata yoksa undefined
+  - `ids` — `data.user.identities` alanının tip cast edilmiş hali `Array<{id?: string; provider?: string}>`, boş dizi fallback ile `setIdentities(ids)` ile state'e yazılır
+- **Dönüş**: void (yan etki: `identities` state'ini günceller)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountSecurityPage.tsx::handleSubmit
-- **params**: `e` — `React.FormEvent` nesnesi; form gönderimini durdurmak için `preventDefault()` çağrılır.
+### [N3_NASIL] AST Pointer: `src/views/account/AccountSecurityPage.tsx`::handleSubmit
+- **params**: `e: React.FormEvent` — form submit event nesnesi, `e.preventDefault()` ile varsayılan engellenir
 - **ic_degiskenler**:
-  - `e` — Form submit olayı; `e.preventDefault()` ile varsayılan davranış engellenir.
-  - `current` — Mevcut şifre state'i; boş ise hata toast'ı gösterilir.
-  - `passedRules` — Şifre kurallarının kaç tanesinin sağlandığını gösteren sayı; 4’ten azsa hata toast'ı gösterilir.
-  - `password` — Yeni şifre state'i; kurallara uymuyorsa hata toast'ı gösterilir.
-  - `confirm` — Yeni şifre tekrar state'i; `password` ile eşleşmezse hata toast'ı gösterilir.
-  - `setSaving` — Form gönderimi sırasında yükleme durumunu (`saving`) kontrol eden setter; işlem başında `true`, bitişte `false` yapılır.
-  - `user` — `useAuth()` hook'undan gelen oturum bilgisi; `email` alanı `reauth` için kullanılır.
-  - `supabase` — Supabase istemcisi; kimlik doğrulama, şifre güncelleme ve kimlik bağlama işlemlerinde kullanılır.
-  - `toast` — `react-hot-toast` kütüphanesinden gelen toast fonksiyonu; hata ve başarı mesajları gösterir.
-  - `t` — Çeviri fonksiyonu; toast mesajlarını yerelleştirir.
-  - `hibpPwnedCount` — `password`'ün daha önce sızdırılıp sızdırılmadığını kontrol eden async fonksiyon; 0’dan büyükse hata toast'ı gösterilir.
-  - `setCurrent` — `current` state'ini temizleyen setter; işlem başarılı olduğunda boş string atanır.
-  - `setPassword` — `password` state'ini temizleyen setter; işlem başarılı olduğunda boş string atanır.
-  - `setConfirm` — `confirm` state'ini temizleyen setter; işlem başarılı olduğunda boş string atanır.
-  - `console` — Hata yakalama bloklarında hataları konsola loglamak için kullanılır.
-- **Dönüş**: yok (form gönderimi yan etkileriyle (toast, state güncellemeleri, yönlendirme) yönetilir)
+  - `email` — `user?.email || ''` ile elde edilen kullanıcı e-posta adresi, yeniden kimlik doğrulama için kullanılır
+  - `reauth` — `supabase.auth.signInWithPassword({ email, password: current })` çağrısının sonucu, mevcut şifre ile yeniden kimlik doğrulama yanıtı; `reauth.error` varsa yanlış şifre
+  - `pwned` — `hibpPwnedCount(password)` async çağrısının sonucu (sayı), yeni şifrenin Have I Been Pwned veritabanında kaç kez sızdırıldığını gösterir; 0'dan büyükse şifre reddedilir
+  - `error` — `supabase.auth.updateUser({ password })` çağrısından destructure edilen hata nesnesi, şifre güncelleme başarısızsa fırlatılır
+- **Dönüş**: void (yan etkiler: şifre günceller, form alanlarını sıfırlar, toast bildirimleri gösterir)
 
 ---
 
@@ -44783,28 +44385,32 @@ source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.
 skeleton_hash: e34a62b9fc709adb
 entity_hashes:
   func:AccountShipmentsPage: 6c41daabba3ddc39
-  overview: 3b6888fa00b79a10
+  overview: dd1d8e3596e0316c
   style_tokens: 0076231c43efae4d
-generated_at: 2026-05-28T22:38:52Z
+generated_at: 2026-05-29T18:53:28Z
 ---
 
 ## Genel Bakış
-VentHub HVAC sisteminin kullanıcı hesapları bölümünde yer alan bu modül, kullanıcıların kendi hesaplarına ait gönderileri görüntüleyip yönetebileceği özel bir arayüz sunar. Projenin görünüm katmanında konumlanan bu modül, hesap altındaki gönderiler sayfasını oluşturan ana React bileşenini barındırır.
+VentHub HVAC projesinin kullanıcı hesapları bölümüne ait olan bu modül, kullanıcıların kendi hesapları altındaki gönderi ve kargo bilgilerini görüntüleyebileceği ve yönetebileceği tek sayfalık bir arayüz bileşenidir. Bu modül, React tabanlı ön yüz mimarisinde, hesap ile ilgili kargo takip sayfasının ana ve tek giriş noktasını temsil eder.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Modülün tek ve ana işlevini yerine getiren, hesap gönderileri sayfasının tüm kullanıcı arayüzü ve temel iş akışlarını yöneten ana bileşendir.
+### Sayfa Bileşeni
+Modülün tüm sorumluluğunu üstlenen ana ve tek React bileşenidir. Hesap gönderileri sayfasının arayüzünü oluşturur ve gerekli verileri gösterir.
 - AccountShipmentsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC projesinin kullanıcı hesap bölümünde yer alan kargo takip sayfasını oluşturan React tabanlı bir ön yüz bileşenidir, çalışması için projenin ön yüz çalışma zamanı, yönlendirme altyapısı ve tüm bağımlılıklarının bütünlüğü zorunludur.
 
-[Aksiyom 1]: Eğer projeye entegre edilmiş React ve TypeScript çalışma zamanı ortamı mevcut değilse, bu TSX bileşeni derlenemez ve işlenemez, kullanıcı arayüzünde çalışma zamanı hatası oluşur.
-[Aksiyom 2]: Eğer projenin ön yüz yönlendirme (routing) sistemi bu AccountShipmentsPage bileşenini ilgili hesap rotası ile ilişkilendirmemişse, kullanıcı hesap kargoları sayfasına hiçbir şekilde erişim sağlayamaz.
-[Aksiyom 3]: Eğer bu sayfa bileşeninin bağımlı olduğu tüm alt React bileşenleri, yardımcı modüller ve stil dosyaları proje içinde erişilebilir konumda değilse, sayfa tam olarak işlenmez, görsel veya işlevsel kusurlar oluşur.
-[Aksiyom 4]: Eğer bu sayfanın kargo verilerini çektiği arka uç API uç noktaları erişilemez durumdaysa, kullanıcı hiçbir kargo bilgisini görüntüleyemez, sayfada veri eksikliği hatası oluşur.
+Bu modül, parametre almayan bir React fonksiyonel bileşenidir.
+
+[Aksiyom 1]: Eğer React çalışma ortamı (Provider'lar, Router vb.) yoksa, bileşen düzgün render edilemez.
+
+[Aksiyom 2]: Eğer bileşen çağrılmadan önce React DOM bağlamı (root element) oluşturulmamışsa, sayfada hiçbir içerik görüntülenemez.
+
+---
+
+**Not:** Fonksiyon gövdesi paylaşılmadığı için, bileşenin iç bağımlılıkları (API çağrıları, context kullanımı, state yönetimi vb.) hakkında kesin aksiyom üretilememektedir. Fonksiyon gövdesi available olduğunda kapsamlı mimari varsayımlar eklenebilir.
 
 ---
 
@@ -44850,134 +44456,89 @@ type ShipFilter = 'all' | 'shipped' | 'delivered'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::AccountShipmentsPage
+### [N1_NASIL] AccountShipmentsPage AST Pointer: AccountShipmentsPage.tsx::AccountShipmentsPage
+- **params**: (parametre yok)
+- **ic_degiskenler**: Component gövdesinde useState/useAuth hook'larından gelen değişkenler (user, loading, rows, setRows, setLoading, t, lang, router, filter, setFilter, shipSteps, formatDate, formatPrice, handleCopy, getShipStatus, getShipStatusBadge, getStepIndex) — hook'lardan ve üst scope'tan gelen değişkenler, fonksiyon gövdesinde doğrudan atanmaz
+- **Dönüş**: JSX elementi (return ile render edilen JSX)
+
+### [N2_NASIL] AccountShipmentsPage.tsx::load (useEffect icindeki async fonksiyon)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `mounted` — Bileşenin mount durumunu takip eden bayrak, state güncellemelerinde memory leak oluşmasını engeller, cleanup'ta false yapılır
-  - `user` — useAuth hook'undan alınan oturum açmış kullanıcı objesi, gönderi yükleme fonksiyonunu tetiklemek için kullanılır
-  - `setLoading` — Yükleme durumunu yöneten state setter fonksiyonu
-  - `setRows` — Gönderi listesini state'te tutmak için kullanılan state setter fonksiyonu
-  - `load` — Kullanıcının gönderi verilerini Supabase'den çeken async iç fonksiyon
-- **Dönüş**: React cleanup fonksiyonu (bileşen unmount olduğunda çalışır)
+  - `mounted` — cleanup flag; component unmount olduysa state güncellemesini engeller
+  - `baseSelect` — Supabase select sorgusu için seçilecek kolonların virgülle ayrılmış string listesi
+  - `data` — Supabase'den dönen sipariş verisi dizisi (başlangıçta let ile tanımlı, fallback'te yeniden atanabilir)
+  - `error` — Supabase sorgusundan dönen hata nesnesi (let ile tanımlı, fallback'te yeniden atanabilir)
+  - `fallback` — birincil sorgu 400/PGRST100 hatası verdiğinde yapılan yedek Supabase sorgusunun sonucu
+  - `items` — data dizisinin map ile dönüştürülmüş hali; order_number eksikse id ile doldurulur
+  - `filtered` — items içinden herhangi bir shipping bilgisi olan (carrier, tracking_number, tracking_url, shipped_at, delivered_at) siparişlerin filtrelenmiş hali
+- **Dönüş**: yok (cleanup fonksiyonu döner: `() => { mounted = false }`)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::load
-- **params**: (parametre yok)
+### [N3_NASIL] AccountShipmentsPage.tsx::fallback map callback (item => ({...}))
+- **params**: `item` — fallback sorgusundan tek bir sipariş satırı nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: object — item'in tüm alanlarını spread edip shipping kolonlarını null olarak atayan nesne (`{...item, carrier: null, tracking_number: null, tracking_url: null, shipped_at: null, delivered_at: null}`)
+
+### [N4_NASIL] AccountShipmentsPage.tsx::items map callback (item => ({...}))
+- **params**: `item` — data dizisindeki tek bir sipariş satırı nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: object — item'in tüm alanlarını spread edip order_number eksikse item.id ile dolduran nesne (`{...item, order_number: item.order_number || item.id}`)
+
+### [N5_NASIL] AccountShipmentsPage.tsx::formatDate (arrow fonksiyon)
+- **params**: `d?: string | null` — formatlanacak tarih string'i (isteğe bağlı)
+- **ic_degiskenler**: yok
+- **Dönüş**: string — d null/boşsa `'-'` döner, değilse `formatOnlyDate(d, lang)` sonucunu döner
+
+### [N6_NASIL] AccountShipmentsPage.tsx::formatPrice (arrow fonksiyon)
+- **params**: `price: number | string` — formatlanacak fiyat değeri
 - **ic_degiskenler**:
-  - `setLoading` — Yükleme durumunu açıp kapatan state setter
-  - `baseSelect` — İlk Supabase sorgusunda seçilecek tüm sütunları içeren string
-  - `data` — Supabase'den dönen sipariş verilerini tutan değişken
-  - `error` — Sorgu sırasında oluşan hataları tutan değişken
-  - `supabase` — Veritabanı sorguları için kullanılan Supabase istemcisi
-  - `user?.id` — Oturumlu kullanıcının ID'si, sadece kendi siparişlerini çekmek için sorguda filtre olarak kullanılır
-  - `fallback` — İlk sorgu hata verdiğinde çalışan yedek Supabase sorgusunun sonucu, daha az sütun içeren sorgu
-  - `items` — Ham veriyi ShipmentRow tipine dönüştürülmüş işlenmiş sipariş listesi
-  - `filtered` — Sadece herhangi bir kargo bilgisi içeren siparişleri filtreleyen liste
-  - `mounted` — Bileşenin mount durumunu kontrol eden bayrak, sadece mount ise state güncellenir
-  - `setRows` — Filtrelenmiş gönderi listesini state'e kaydeden setter
-  - `console` — Hata loglamak için kullanılan tarayıcı konsol nesnesi
-  - `toast` — Kullanıcıya hata bildirimi göstermek için react-hot-toast fonksiyonu
-  - `t` — Çeviri fonksiyonu, hata mesajını yerelleştirmek için kullanılır
-- **Dönüş**: yok (async void)
+  - `n` — price'ın number'a çevrilmiş hali; Number dönüşümü başarısız olursa 0 kullanılır
+- **Dönüş**: string — `formatCurrency(n, lang, { maximumFractionDigits: 0 })` sonucu
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::fallbackItemMap
-- **params**: item (yedek sorgudan dönen ham sipariş objesi)
+### [N7_NASIL] AccountShipmentsPage.tsx::handleCopy (async arrow fonksiyon)
+- **params**: `text?: string | null` — clipboard'a kopyalanacak metin (isteğe bağlı)
+- **ic_degiskenler**: yok
+- **Dönüş**: Promise<void> — navigator.clipboard.writeText ile metni panoya kopyalar; başarıyla kopyalanırsa `toast.success`, hata olursa `toast.error` gösterir; text boşsa hiçbir şey yapmaz
+
+### [N8_NASIL] AccountShipmentsPage.tsx::getShipStatus (arrow fonksiyon)
+- **params**: `row: ShipmentRow` — kargo durumu belirlenecek sipariş satırı
+- **ic_degiskenler**: yok
+- **Dönüş**: `'delivered' | 'shipped' | 'preparing'` — row.delivered_at varsa `'delivered'`, row.shipped_at veya row.tracking_number varsa `'shipped'`, aksi halde `'preparing'`
+
+### [N9_NASIL] AccountShipmentsPage.tsx::getShipStatusBadge (arrow fonksiyon)
+- **params**: `status: 'delivered' | 'shipped' | 'preparing'` — badge gösterilecek kargo durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX elementi — duruma göre renkli badge ( Teslim Edildi / Kargoda / Hazırlanıyor ) span elementi
+
+### [N10_NASIL] AccountShipmentsPage.tsx::getStepIndex (arrow fonksiyon)
+- **params**: `status: 'delivered' | 'shipped' | 'preparing'` — adım indeksi hesaplanacak kargo durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: number — `'delivered'` ise 2, `'shipped'` ise 1, `'preparing'` ise 0
+
+### [N11_NASIL] AccountShipmentsPage.tsx::filter callback (r => {})
+- **params**: `r` — filtreleme yapılan tek bir ShipmentRow satırı
 - **ic_degiskenler**:
-  - `...item` — Mevcut siparişin tüm özelliklerini kopyalayan spread operatörü
-  - `carrier` — Yedek sorguda eksik olan kargo firması alanına null atanır
-  - `tracking_number` — Eksik takip numarası alanına null atanır
-  - `tracking_url` — Eksik takip linki alanına null atanır
-  - `shipped_at` — Eksik kargoya verilme tarihi alanına null atanır
-  - `delivered_at` — Eksik teslimat tarihi alanına null atanır
-- **Dönüş**: standartlaştırılmış sipariş objesi
+  - `s` — `getShipStatus(r)` çağrısının döndüğü kargo durumu string'i
+- **Dönüş**: boolean — filter `'all'` ise her zaman true; değilse s === filter kontrolü
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::itemToShipmentRowMap
-- **params**: item (veritabanından dönen ham sipariş objesi)
+### [N12_NASIL] AccountShipmentsPage.tsx::filter button render callback (opt => button)
+- **params**: `opt` — filtre seçeneği nesnesi; `{ value: string, label: string }` yapısında
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX elementi — filtre seçeneğine ait `<button>` elementi; seçili olup olmadığına göre farklı stil uygulanır
+
+### [N13_NASIL] AccountShipmentsPage.tsx::order card render callback (o => div)
+- **params**: `o` — tek bir sipariş satırı (ShipmentRow tipinde)
 - **ic_degiskenler**:
-  - `...item` — Mevcut siparişin tüm özelliklerini kopyalayan spread operatörü
-  - `order_number` — Sipariş numarası mevcut değilse yedek olarak sipariş ID'si atanır
-- **Dönüş**: ShipmentRow tipinde standartlaştırılmış gönderi objesi
+  - `shipStatus` — `getShipStatus(o)` çağrısıyla elde edilen kargo durumu string'i
+  - `activeStepIdx` — `getStepIndex(shipStatus)` çağrısıyla elde edilen aktif adım indeksi (0, 1 veya 2)
+  - `orderCode` — sipariş kodu; o.order_number varsa son '-' sonrasını alıp '#' ekler, yoksa o.id'nin son 8 karakterini büyük harfe çevirerek '#XXXXXX' formatında üretir
+- **Dönüş**: JSX elementi — sipariş kartı (`<div>`); kart başlığı, kargo progress stepper, kargo detay bilgileri (kargo firması, takip numarası, takip linki, kargoya verilme tarihi, teslim tarihi) içerir
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::formatDate
-- **params**: d (string | null | undefined, formatlanacak ham tarih değeri)
+### [N14_NASIL] AccountShipmentsPage.tsx::stepper render callback (step, idx => Fragment)
+- **params**: `step` — shipSteps dizisindeki tek bir adım nesnesi (`{ key: string, icon: Component, label: string }` yapısında), `idx` — adımın dizideki indeksi
 - **ic_degiskenler**:
-  - `formatOnlyDate` — Projenin dahili tarih formatlama utility fonksiyonu
-  - `lang` — Kullanıcının mevcut dili, tarih formatlamada kullanılır
-- **Dönüş**: Formatlanmış tarih stringi, geçersiz/null tarihse '-' döndürür
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::formatPrice
-- **params**: price (number | string, formatlanacak para değeri)
-- **ic_degiskenler**:
-  - `n` — Fiyatın sayıya dönüştürülmüş hali, geçersizse 0 atanır
-  - `formatCurrency` — Projenin dahili para formatlama utility fonksiyonu
-  - `lang` — Kullanıcının mevcut dili, para formatlamada kullanılır
-- **Dönüş**: Kullanıcı diline göre formatlanmış para stringi
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::handleCopy
-- **params**: text (string | null | undefined, panoya kopyalanacak metin)
-- **ic_degiskenler**:
-  - `navigator.clipboard` — Tarayıcının panoya yazma API'si
-  - `toast` — Kullanıcıya işlem sonucu bildirimi göstermek için react-hot-toast
-  - `t` — Çeviri fonksiyonu, bildirim metinlerini yerelleştirmek için kullanılır
-- **Dönüş**: yok (async void)
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::getShipStatus
-- **params**: row (ShipmentRow, durumu hesaplanacak gönderi objesi)
-- **ic_degiskenler**:
-  - `row.delivered_at` — Gönderinin teslimat tarihi, ilk kontrol edilen alan
-  - `row.shipped_at` — Gönderinin kargoya verilme tarihi
-  - `row.tracking_number` — Gönderinin takip numarası
-- **Dönüş**: Gönderinin durumu: 'delivered' | 'shipped' | 'preparing'
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::getShipStatusBadge
-- **params**: status ('delivered' | 'shipped' | 'preparing', badge'i oluşturulacak gönderi durumu)
-- **ic_degiskenler**:
-  - `CheckCircle` — Lucide ikonu, teslim edildi durumunda kullanılır
-  - `Truck` — Lucide ikonu, kargoda durumunda kullanılır
-  - `Clock` — Lucide ikonu, hazırlanıyor durumunda kullanılır
-- **Dönüş**: Duruma göre stillendirilmiş React JSX badge elementi
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::getStepIndex
-- **params**: status ('delivered' | 'shipped' | 'preparing', adım indeksi hesaplanacak gönderi durumu)
-- **ic_degiskenler**: yok (sadece durum kontrolleri yapılır)
-- **Dönüş**: İlerleme çubuğu için kullanılacak adım indeksi: 0 (hazırlanıyor), 1 (kargoda), 2 (teslim edildi)
-
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::shipmentFilterCallback
-- **params**: r (ShipmentRow, filtrelenecek gönderi objesi)
-- **ic_degiskenler**:
-  - `filter` — Mevcut seçili filtre değeri ('all', 'delivered', 'shipped', 'preparing')
-  - `getShipStatus` — Gönderinin durumunu hesaplayan fonksiyon
-- **Dönüş**: Boolean, gönderinin listede kalıp kalmayacağını belirtir
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::filterOptionButtonCallback
-- **params**: opt (filtre seçeneği objesi, value ve label özellikleri içeren)
-- **ic_degiskenler**:
-  - `setFilter` — Filtre değerini güncelleyen state setter fonksiyonu
-  - `filter` — Mevcut aktif filtre, butonun stillendirilmesi için kullanılır
-- **Dönüş**: Filtre değiştirme butonu React JSX elementi
-
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::orderCardRenderCallback
-- **params**: o (ShipmentRow, kartı oluşturulacak sipariş objesi)
-- **ic_degiskenler**:
-  - `shipStatus` — Siparişin hesaplanmış gönderi durumu
-  - `activeStepIdx` — İlerleme adımları için son aktif adımın indeksi
-  - `orderCode` — Kullanıcı arayüzünde gösterilecek kısaltılmış sipariş kodu
-  - `router` — Next.js useRouter hook'u, sipariş detay sayfasına yönlendirmek için kullanılır
-  - `formatDate` — Tarih formatlama fonksiyonu
-  - `formatPrice` — Para formatlama fonksiyonu
-  - `getShipStatusBadge` — Durum badge'i oluşturan fonksiyon
-  - `Package` — Lucide ikonu, sipariş kartı başlığında kullanılır
-  - `Copy` — Lucide ikonu, takip numarasını kopyalamak için kullanılır
-  - `ExternalLink` — Lucide ikonu, takip linkinde kullanılır
-  - `shipSteps` — İlerleme çubuğunun adım tanımları listesi
-- **Dönüş**: Sipariş kartı React JSX elementi
-
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx::progressStepRenderCallback
-- **params**: step (ilerleme adımı objesi), idx (adımın sıralı indeksi)
-- **ic_degiskenler**:
-  - `active` — Adımın aktif olup olmadığını belirten bayrak
-  - `StepIcon` - Adımda gösterilecek Lucide ikonu
-  - `activeStepIdx` — Mevcut son aktif adımın indeksi, ilerleme çizgisi ve stillendirme için kullanılır
-- **Dönüş**: İlerleme adımı React Fragment elementi
+  - `active` — bu adımın aktif olup olmadığı; `idx <= activeStepIdx` koşulu ile belirlenir
+  - `StepIcon` — step.icon değerinin React bileşeni referansı
+- **Dönüş**: JSX elementi (React.Fragment) — adım göstergesi (daire + ikon) ve adım arası bağlantı çizgisi; aktif adımlar primary-navy renginde, pasif olanlar slate-400 renginde
 
 ---
 
@@ -45108,563 +44669,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `absolute`, `flex`, `gap-1`, `gap-2`, `items-center`, `justify-between`, `left-3`, `max-w-7xl`, `overflow-hidden`, `relative`, `sm:min-w-72`, `sm:w-96`, `sm:w-auto`, `top-1/2`, `w-16`
 - **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
 - **Yardımcı Sınıflar:** `${qty`, `${threshold`, `-1`, `-translate-y-1/2`, `:`, `<=`, `===`, `border`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `font-medium`, `font-semibold`, `italic`
-
----
-# FILE: src\views\account\OrderDetailPage.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx
-skeleton_hash: 622dd4d11cb43f53
-entity_hashes:
-  func:OrderDetailPage: 9d9093210e07827e
-  overview: 91762eaa328b7587
-  style_tokens: 2d7ff3d6e2a546ab
-generated_at: 2026-05-28T22:38:55Z
----
-
-## Genel Bakış
-Bu modül, kullanıcının bir siparişin tüm detaylarını görüntülemesini sağlayan sayfa bileşenini tanımlar. Sipariş özeti, ürün listesi, teslimat bilgileri ve sipariş durumu gibi temel bilgilerin tek bir ekranda sunulmasından sorumludur.
-
-## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Sipariş detay sayfasının tamamını oluşturan ve ilgili tüm alt bileşenleri bir araya getiren ana fonksiyondur.
-- OrderDetailPage
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Aksiyom 1**: Eğer **React Router** (veya benzeri bir yönlendirme bağlamı) mevcut değilse, `OrderDetailPage` bileşeni doğru URL parametrelerine erişemez ve sayfa içeriği render edilemez.
-
-**Aksiyom 2**: Eğer **global state/store** (ör. Redux, Context API) içinde sipariş detay verisi (`orderDetail`) bulunmuyorsa, `OrderDetailPage` ya bir **yükleme (loading) göstergesi** gösterir ya da **veri bulunamadı** hatası üretir.
-
-**Aksiyom 3**: Eğer **kullanıcı oturum bilgisi** (auth context) sağlanmamışsa, `OrderDetailPage` erişim kontrolü nedeniyle yönlendirme (redirect) yapar veya yetkisiz erişim mesajı gösterir.
-
-**Aksiyom 4**: Eğer **stil/tema sağlayıcısı** (ThemeProvider vb.) eksikse, `OrderDetailPage` stil sınıflarını bulamaz ve varsayılan (fallback) stil ile render olur; bu da UI tutarsızlığına yol açar.
-
-**Aksiyom 5**: Eğer **harici API çağrısı** (ör. sipariş detaylarını getiren endpoint) başarısız olursa, `OrderDetailPage` hata durumunu yakalar ve kullanıcıya **hata mesajı** gösterir; aksi takdirde sayfa boş kalır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### OrderDetailPage
-**Ne yapar**: Kullanıcının sipariş detaylarını gösteren bir sayfa komponenti. Kimlik doğrulama, sipariş verisinin yüklenmesi, sekme yönetimi ve PDF fatura oluşturma gibi işlemleri gerçekleştirir.  
-
-**Nasıl yapar**:  
-- URL parametresinden `id` alır, kimlik doğrulama durumunu kontrol eder; doğrulanmamışsa giriş sayfasına yönlendirir.  
-- `useEffect` içinde Supabase üzerinden sipariş ve ilgili ürün kalemlerini tek sorguda çeker, veriyi tip güvenli nesnelere dönüştürür ve `order` durumuna kaydeder.  
-- Yükleme, kopyalama, PDF oluşturma ve yeniden sipariş (reorder) gibi yardımcı fonksiyonları tanımlar.  
-- Sekme (`overview`, `items`, `shipping`, `invoice`) seçimine göre farklı UI bölümlerini render eder.  
-
-**Parametreler**:  
-- *yok* — Bu bir React fonksiyon komponentidir, dışarıdan parametre almaz.  
-
-**Dönüş**:  
-- `void` – UI render eder, doğrudan bir değer döndürmez.
-
----
-
-## INTERFACES
-
-### ShippingAddress
-- `fullAddress?: string`
-- `street?: string`
-- `city?: string`
-- `district?: string`
-- `state?: string`
-- `postalCode?: string`
-- `postal_code?: string`
-
-### OrderItem
-- `id: string`
-- `product_id?: string`
-- `product_name: string`
-- `quantity: number`
-- `unit_price: number`
-- `total_price: number`
-- `product_image_url?: string | null`
-
-### Order
-- `id: string`
-- `total_amount: number`
-- `status: string`
-- `payment_status?: string`
-- `created_at: string`
-- `customer_name: string`
-- `customer_email: string`
-- `shipping_address: unknown`
-- `order_items: OrderItem[]`
-- `order_number?: string`
-- `is_demo?: boolean`
-- `payment_data?: unknown`
-- `conversation_id?: string`
-- `carrier?: string`
-- `tracking_number?: string`
-- `tracking_url?: string`
-- `shipped_at?: string`
-- `delivered_at?: string`
-- `shipping_method?: 'standard' | 'express' | string`
-- `invoice_type?: string`
-- `invoice_info?: unknown`
-- `legal_consents?: unknown`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::anonymousRedirectEffect
-- **params**: (none)
-- **ic_degiskenler**:
-  - `authLoading` — auth hook‑dan gelen yükleme durumu, yönlendirme kararını etkiler
-  - `user` — oturum açmış kullanıcı nesnesi, yoksa yönlendirme yapılır
-  - `router` — Next.js router, `router.push` ile login sayfasına yönlendirme yapılır
-  - `id` — URL parametresi, yönlendirme URL’sine eklenir
-- **Dönüş**: yok (yan etki: olası yönlendirme)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::loadEffectWrapper
-- **params**: (none)
-- **ic_degiskenler**:
-  - `load` — iç tanımlı async fonksiyon, sipariş verisini çeker
-  - `user` — oturum açmış kullanıcı, yoksa fonksiyon erken döner
-  - `id` — sipariş kimliği, yoksa fonksiyon erken döner
-- **Dönüş**: yok (yan etki: `load` fonksiyonunun çalıştırılması)
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::load
-- **params**: (none)
-- **ic_degiskenler**:
-  - `user` — oturum açmış kullanıcı, müşteri adı/eposta fallback’inde kullanılır
-  - `id` — sipariş kimliği, sorgu filtresi
-  - `setLoading` — state setter, yükleme durumunu yönetir
-  - `supabase` — veritabanı client, `venthub_orders` ve `products` tablolarına sorgu yapar
-  - `orderData` — sorgudan dönen sipariş kaydı, alanları haritalanır
-  - `orderError` — sorgu hatası, fırlatılırsa yakalanır
-  - `rawItems` — `orderData.venthub_order_items` dizisi, tip güvenliği için `Record<string, unknown>[]`
-  - `mappedItems` — `OrderItem[]` tipinde, fiyat ve miktar hesaplamaları yapılır
-  - `mappedOrder` — `Order` nesnesi, UI state’e aktarılır
-  - `setOrder` — state setter, `mappedOrder`’ı kaydeder
-  - `toast` — UI toast bildirimi, hata ve başarı mesajları gösterir
-  - `t` — i18n çeviri fonksiyonu, hata mesajı çevirisi
-- **Dönüş**: yok (yan etki: `setOrder`, `setLoading`, toast bildirimleri)
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::itemMapper
-- **params**: `it`
-- **ic_degiskenler**:
-  - `unit` — `it.price_at_time` değerinin sayısal hâli, varsayılan 0
-  - `qty` — `it.quantity` değerinin sayısal hâli, varsayılan 0
-- **Dönüş**: `OrderItem` nesnesi (id, product_id, product_name, quantity, unit_price, total_price, product_image_url)
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::copyToClipboard
-- **params**: `text?` (opsiyonel string)
-- **ic_degiskenler**:
-  - `text` — kopyalanacak metin, yoksa fonksiyon erken döner
-  - `navigator.clipboard.writeText` — tarayıcı API’si, metni panoya yazar
-  - `toast` — başarı/başarısızlık toast’ları
-  - `t` — i18n çeviri fonksiyonu, mesaj çevirileri
-- **Dönüş**: yok
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::generatePdf
-- **params**: `o: Order`
-- **ic_degiskenler**:
-  - `jsPDF` — dinamik import edilen PDF sınıfı
-  - `autoTable` — PDF içinde tablo oluşturmak için kütüphane
-  - `doc` — yeni PDF belgesi, `jsPDF` örneği
-  - `nf` — para birimi formatlayıcı (`Intl.NumberFormat`)
-  - `orderNo` — sipariş numarası ya da ID’den türetilen kod
-  - `head` — tablo başlıkları, i18n çevirileriyle doldurulur
-  - `body` — sipariş kalemlerinden oluşturulan tablo satırları
-  - `after` — tablo sonrasındaki Y koordinatı
-  - `t` — i18n çeviri fonksiyonu
-  - `formatDateTime` — tarih‑saat formatlayıcı
-  - `toast` — hata toast’ı
-- **Dönüş**: yok (yan etki: PDF dosyasını indirme)
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::reorder
-- **params**: `o: Order`
-- **ic_degiskenler**:
-  - `ids` — ürün‑id’leri listesi (tekil)
-  - `names` — ürün‑adları listesi (tekil, id’si olmayanlar)
-  - `productMap` — `Record<string, Product>`; id veya ad → Product nesnesi
-  - `supabase` — veritabanı client, `products` tablosundan veri çeker
-  - `data` / `error` — sorgu sonuçları
-  - `added` — sepete eklenen toplam miktar
-  - `it` — döngüdeki sipariş kalemi
-  - `prod` — bulunmuş `Product` nesnesi
-  - `addToCart` — sepet ekleme fonksiyonu (dışarıdan import)
-  - `router` — yönlendirme, sepet sayfasına gitmek için
-  - `toast` — başarı/başarısızlık toast’ları
-  - `t` — i18n çeviri fonksiyonu
-- **Dönüş**: yok (yan etki: sepet güncellemesi, toast, yönlendirme)
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::statusColor
-- **params**: `status: string`
-- **ic_degiskenler**:
-  - `status` — sipariş durumu, küçük harfe dönüştürülür
-- **Dönüş**: CSS sınıfı string (renk‑arka plan kombinasyonu)
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::statusText
-- **params**: `status: string`
-- **ic_degiskenler**:
-  - `status` — sipariş durumu, küçük harfe dönüştürülür
-  - `t` — i18n çeviri fonksiyonu, durum metinlerini döndürür
-- **Dönüş**: Çevirilmiş durum metni string
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::stepRenderer
-- **params**: `s, idx`
-- **ic_degiskenler**:
-  - `s` — adım etiketi (status string)
-  - `idx` — adım indeksi
-  - `activeIdx` — mevcut aktif adım indeksi (component state)
-  - `getStatusText` — dışarıdan gelen fonksiyon, `s` için metin döndürür
-  - `steps` — adım dizisi (component state)
-- **Dönüş**: JSX fragment (step göstergesi)
-
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::tabButtonRenderer
-- **params**: `tt`
-- **ic_degiskenler**:
-  - `tt` — sekme anahtarı (`overview`, `items`, `shipping`, `invoice`)
-  - `tab` — seçili sekme (component state)
-  - `setTab` — sekme değiştirici
-  - `t` — i18n çeviri fonksiyonu, sekme başlıklarını döndürür
-- **Dönüş**: JSX button elementi
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::addressRenderer
-- **params**: (none)
-- **ic_degiskenler**:
-  - `order` — component state, sipariş nesnesi
-  - `addr` — `order.shipping_address` cast edilmiş `ShippingAddress`
-  - `line1` — adresin birinci satırı (fullAddress veya street)
-  - `line2` — şehir ve ilçe/state birleşimi
-  - `line3` — posta kodu
-- **Dönüş**: JSX `<div>` içinde adres satırları
-
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::orderItemRow
-- **params**: `item`
-- **ic_degiskenler**:
-  - `item` — `OrderItem` nesnesi
-  - `Routes` — URL helper, ürün detay linki üretir
-  - `VentImage` — resim komponenti
-  - `t` — i18n çeviri (no‑image metni)
-  - `formatPrice` — fiyat formatlayıcı
-- **Dönüş**: JSX `<tr>` satırı
-
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::invoiceInfoRenderer
-- **params**: (none)
-- **ic_degiskenler**:
-  - `order` — component state
-  - `info` — `order.invoice_info` cast edilmiş `Record<string, unknown>`
-  - `iv` — yardımcı fonksiyon, bilgi alanını string’e çevirir veya `-` döndürür
-  - `t` — i18n çeviri (alan etiketleri)
-- **Dönüş**: JSX `<div>` içinde fatura bilgileri
-
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::legalConsentsRenderer
-- **params**: (none)
-- **ic_degiskenler**:
-  - `order` — component state
-  - `cons` — `order.legal_consents` cast edilmiş `Record<string, {accepted?: boolean; ts?: string | null}>`
-  - `row` — iç fonksiyon, her bir onay satırını üretir (label, k)
-  - `lang` — i18n dil kodu, tarih formatlamada kullanılır
-  - `formatDateTime` — tarih‑saat formatlayıcı
-  - `t` — i18n çeviri (toast mesajları)
-- **Dönüş**: JSX fragment içinde onay satırları
-
-### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx::legalConsentRow
-- **params**: `label: string, k: string`
-- **ic_degiskenler**:
-  - `cons` — dışarıdan kapanış (legalConsentsRenderer) erişilen onay nesnesi
-  - `c` — `cons?.[k]` ilgili onay kaydı
-  - `ok` — onayın kabul edilip edilmediği (boolean)
-  - `ts` — onay zaman damgası, `formatDateTime` ile formatlanır
-  - `lang` — dil kodu, tarih formatlamada kullanılır
-- **Dönüş**: JSX `<div>` satırı (onay durumu gösterimi)
-
----
-
-## NODE ID STANDARD
-
-  file: src\views\account\OrderDetailPage.tsx
-  function: src\views\account\OrderDetailPage.tsx::OrderDetailPage
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: OrderDetailPage
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-clean-white`, `bg-green-100`, `bg-orange-100`, `bg-orange-100/80`, `bg-primary-navy`, `bg-primary-navy/5`, `bg-slate-100`, `bg-slate-100/80`, `bg-slate-200`, `bg-slate-50`, `bg-slate-50/80`, `bg-white`, `border-b`, `border-b-2`, `border-gray-100`
-- **Layout:** `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-6`, `grid`, `grid-cols-1`, `h-1`, `h-10`, `h-12`, `h-6`
-- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${activeIdx`, `${getStatusColor(order.status`, `${idx`, `${ok`, `${tab`, `1`, `:`, `<=`, `===`, `>=`, `activeIdx`, `animate-spin`, `border`, `break-all`, `divide-slate-100`
-
----
-# FILE: src\views\account\__tests__\AccountSecurityPage.test.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx
-skeleton_hash: 85f4afbf3aec26ee
-entity_hashes:
-  func:renderWithProviders: 836f0c3bce4ec02c
-  overview: 8400c9916e1ce4f6
-  style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:38:52Z
----
-
-## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının hesap güvenliği sayfasının test süreçlerini destekleyen bir test dosyasıdır. Tüm testlerde tutarlı, standartlaştırılmış bir çalışma ortamı sağlamak amacıyla testlere özel yardımcı fonksiyonlar barındırır.
-
-## Fonksiyon Grupları
-### Test Ortamı Yardımcı Fonksiyonları
-React arayüz elemanlarını testlerde kullanılan sistem sağlayıcılarıyla birlikte sunan, test kullanıcısı için varsayılan iletişim bilgileri tanımlayarak tekrarlayan test ayarlarını ortadan kaldıran yardımcıları barındırır.
-- renderWithProviders
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu React test modülü, AccountSecurityPage hesap güvenliği sayfasının test ortamında doğru şekilde renderlanması, çalıştırılması ve test edilmesi için test altyapısının, tanımlı mock kullanıcı verisinin ve tüm gerekli uygulama provider yapılandırmalarının erişilebilir olmasını varsayar.
-
-[Aksiyom 1]: Eğer renderWithProviders fonksiyonunun çalışması için gereken tüm React uygulama providerları (yetkilendirme kontexti, state yönetimi vb.) ve test bağımlılıkları yoksa, AccountSecurityPage bileşeni testlerde hiçbir şekilde render edilemez ve tüm testler başarısız olur.
-[Aksiyom 2]: Eğer varsayılan test kullanıcısı email'i 'u@example.com' test ortamındaki mock servisler veya test veritabanında kayıtlı, yetkili bir hesaba ait değilse, hesap güvenliği verileri çekilemez ve güvenlik odaklı tüm testler başarısız olur.
-[Aksiyom 3]: Eğer projenin test çalıştırma altyapısı (Jest, TypeScript derleyicisi, React Testing Library vb.) .tsx uzantılı test dosyalarını işleyecek şekilde yapılandırılmamışsa, bu test modülü hiç çalıştırılamaz.
-
----
-
-## FONKSİYON DETAYLARI
-
-### renderWithProviders
-**Ne yapar**: Test ortamlarında React bileşenlerini uygulamanın gerçek çalışma bağlamına uygun şekilde render etmek için geliştirilmiş test yardımcı fonksiyonudur. Özellikle AccountSecurityPage testlerinde kullanılan bu fonksiyon, test edilen bileşenin ihtiyaç duyduğu tüm temel bağlamları sağlayarak güvenilir test sonuçları elde edilmesini sağlar.
-**Nasıl yapar**: Gelen React elemanını evvela uluslararasılaştırma işlemlerini yöneten I18nProvider, ardından kimlik doğrulama verilerini tüm alt bileşenlere aktaran AuthContext.Provider bileşenleri ile sarmalar. Testler için varsayılan bir kullanıcı e-postası atayarak kimlik doğrulama bağlam değerini yapılandırır, son olarak sarmalanmış bileşeni React'in yerel render fonksiyonu ile ekrana yansıtır.
-**Parametreler**:
-- name: ui, type: React.ReactElement — Test ortamında render edilmesi gereken asıl React bileşeni, genellikle test edilen hesap güvenliği sayfası gibi ana bileşendir
-- name: userEmail, type: string — Kimlik doğrulama bağlamında kullanılacak test kullanıcısının e-posta adresi, varsayılan olarak 'u@example.com' değerine sahiptir, özel test senaryoları için bu değer üzerine yazılabilir
-**Dönüş**: React'in yerel render fonksiyonunun döndürdüğü sonuç nesnesini döndürür. Bu nesne üzerinden testlerde DOM elemanlarına erişim, varlık kontrolü, kullanıcı etkileşimleri simülasyonu gibi tüm test işlemleri sorunsuz şekilde gerçekleştirilebilir.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_0
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `useRouter().push` — Next.js router push metodu mock'u
-  - `useRouter().replace` — Next.js router replace metodu mock'u
-  - `useRouter().prefetch` — Next.js router prefetch metodu mock'u
-  - `useSearchParams()` — URLSearchParams nesnesi döndüren mock
-  - `usePathname()` — '/' pathini döndüren mock
-- **Dönüş**: useRouter, useSearchParams, usePathname metotlarını içeren Next.js router mock nesnesi
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_1
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `push` — Router push metodu mock'u
-  - `replace` — Router replace metodu mock'u
-  - `prefetch` — Router prefetch metodu mock'u
-- **Dönüş**: router metotlarını içeren mock nesnesi
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_2
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `toastFn` — Temel toast ana fonksiyonu olarak vi.fn() ile oluşturulmuş mock
-  - `toastFn.error` — Hata mesajı göstermek için mocklanmış toast error metodu
-  - `toastFn.success` — Başarı mesajı göstermek için mocklanmış toast success metodu
-- **Dönüş**: default olarak toast mock nesnesini içeren obje
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_3
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `supabase.auth.signInWithPassword` — Supabase şifre ile giriş metodu mock'u
-  - `supabase.auth.updateUser` — Supabase kullanıcı bilgisi güncelleme metodu mock'u
-- **Dönüş**: mocklanmış supabase nesnesini içeren obje
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_4
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `hibpPwnedCount` — HIBP servisinin ihlal sayısını döndüren, 0 değerini resolve eden mock fonksiyon
-- **Dönüş**: hibpPwnedCount mock'unu içeren obje
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::renderWithProviders
-- **params**: ui, userEmail
-- **ic_degiskenler**:
-  - `authValue.user` — Mock kullanıcı nesnesi, email ve id değerleri atanmış
-  - `authValue.session` — Oturum nesnesi, null olarak ayarlanmış
-  - `authValue.role` — Kullanıcı rolü, null olarak ayarlanmış
-  - `authValue.loading` — Auth yükleme durumu, false olarak ayarlanmış
-  - `authValue.roleLoading` — Rol yükleme durumu, false olarak ayarlanmış
-  - `authValue.signIn` — Giriş metodu mock'u
-  - `authValue.signUp` — Kayıt metodu mock'u
-  - `authValue.signOut` — Çıkış metodu mock'u
-  - `authValue.resetPassword` — Şifre sıfırlama metodu mock'u
-  - `authValue.refreshSession` — Oturum yenileme metodu mock'u
-- **Dönüş**: @testing-library/react render fonksiyonunun sonucu, sarmalanmış providerlarla bileşen render edilir
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_5
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `vi.clearAllMocks` — Tüm vitest mocklarını sıfırlayan fonksiyon
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_6
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `cleanup` - @testing-library/react temizleme fonksiyonu, test sonrası DOM'u temizler
-- **Dönüş**: yok
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_7
-- **params**: (yok)
-- **ic_degiskenler**: Tüm test senaryolarını tanımlayan 6 adet `it` bloğu, her biri ayrı şifre güncelleme senaryosunu test eder
-- **Dönüş**: yok
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_8
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `getByPlaceholderText` — renderWithProviders'ten dönen placeholder ile element bulma metodu
-  - `getByRole` — renderWithProviders'ten dönen rol ile element bulma metodu
-  - `newInput` — "New password" placeholder'ına sahip şifre input elementi
-  - `confirmInput` — "New password (confirm)" placeholder'ına sahip şifre tekrar input elementi
-  - `saveBtn` — "Save" isimli buton elementi
-  - `userEvent.type` — Kullanıcı inputunu simüle eden testing-library metodu
-  - `userEvent.click` — Kullanıcı tıklamasını simüle eden testing-library metodu
-  - `expect` — Vitest assertion metodu
-- **Dönüş**: yok, boş current password senaryosunu test eder
-
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_9
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `getByPlaceholderText` — Element bulma metodu
-  - `getByRole` — Element bulma metodu
-  - `screen.getAllByPlaceholderText` — screen nesnesinden tüm eşleşen placeholder elementlerini bulma metodu
-  - `currentInput[0]` — İlk "Current password" input elementi, HTMLInputElement olarak cast edilmiş
-  - `newInput` — Yeni şifre input elementi
-  - `confirmInput` — Yeni şifre tekrar input elementi
-  - `saveBtn` — Kaydet butonu
-  - `userEvent` — Kullanıcı etkileşimi simülasyon metotları
-- **Dönüş**: yok, kısa yeni şifre senaryosunu test eder
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_10
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `currentInput[0]` — Mevcut şifre input elementi
-  - `newInput` — Yeni şifre input
-  - `confirmInput` — Yeni şifre tekrar input
-  - `saveBtn` — Kaydet butonu
-  - `userEvent` — Kullanıcı etkileşimi metotları
-  - `expect` — Assertion metodu
-- **Dönüş**: yok, eşleşmeyen şifreler senaryosunu test eder
-
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_11
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `vi.mocked` — Vitest mock sarmalama metodu
-  - `supabase.auth.signInWithPassword.mockImplementationOnce` — Giriş metodu için tek kullanımlık implementasyon atama
-  - `currentInput[0]` — Mevcut şifre input
-  - `newInput` — Yeni şifre input
-  - `confirmInput` — Yeni şifre tekrar input
-  - `saveBtn` — Kaydet butonu
-- **Dönüş**: yok, yanlış mevcut şifre senaryosunu test eder
-
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_12
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data.user` — Giriş başarısızlığında null kullanıcı nesnesi
-  - `data.session` — Giriş başarısızlığında null oturum nesnesi
-  - `error` — AuthError tipi hata nesnesi, geçersiz giriş bilgisi mesajı içerir
-- **Dönüş**: Hata içeren promise nesnesi, kimlik doğrulama hatasını simüle eder
-
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_13
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `vi.mocked(supabase.auth.signInWithPassword)` — Mocklanmış giriş metodu
-  - `vi.mocked(supabase.auth.updateUser)` — Mocklanmış kullanıcı güncelleme metodu
-  - `currentInput[0]` — Mevcut şifre input
-  - `newInput` — Yeni şifre input
-  - `confirmInput` — Yeni şifre tekrar input
-  - `saveBtn` — Kaydet butonu
-- **Dönüş**: yok, başarılı şifre güncelleme senaryosunu test eder
-
-### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_14
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data.user` — Başarılı giriş sonrası dolu kullanıcı nesnesi
-  - `data.session` — Başarılı giriş sonrası dolu oturum nesnesi
-  - `error` — null hata değeri
-- **Dönüş**: Başarılı giriş verisini içeren resolved promise
-
-### [N17_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_15
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data.user` — Başarılı güncelleme sonrası dolu kullanıcı nesnesi
-  - `error` — null hata değeri
-- **Dönüş**: Başarılı güncelleme verisini içeren resolved promise
-
-### [N18_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_16
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `vi.mocked(supabase.auth.signInWithPassword)` — Mocklanmış giriş metodu
-  - `vi.mocked(supabase.auth.updateUser)` — Mocklanmış kullanıcı güncelleme metodu
-  - `currentInput[0]` — Mevcut şifre input
-  - `newInput` — Yeni şifre input
-  - `confirmInput` — Yeni şifre tekrar input
-  - `saveBtn` — Kaydet butonu
-- **Dönüş**: yok, güncelleme başarısızlığı senaryosunu test eder
-
-### [N19_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_17
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data.user` — Başarılı ön doğrulama sonrası dolu kullanıcı nesnesi
-  - `data.session` — Başarılı ön doğrulama sonrası dolu oturum nesnesi
-  - `error` — null hata değeri
-- **Dönüş**: Ön doğrulama başarılı verisini içeren resolved promise
-
-### [N20_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_18
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data.user` — Güncelleme başarısızlığında null kullanıcı nesnesi
-  - `error` — Güncelleme hatasını içeren AuthError nesnesi
-- **Dönüş**: Güncelleme hatası içeren resolved promise
-
----
-
-## NODE ID STANDARD
-
-  file: src\views\account\__tests__\AccountSecurityPage.test.tsx
-  function: src\views\account\__tests__\AccountSecurityPage.test.tsx::renderWithProviders
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: renderWithProviders
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** (yok)
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
 
 ---
 # FILE: src\views\account\__tests__\OrderDetailPageTabs.test.md
@@ -46154,44 +45158,54 @@ entity_hashes:
   func:handleEdit: c5409fbf6f4f144a
   func:load: fc235a1ebf177283
   func:remove: 16990c02664975f8
-  overview: a35a906484de9e32
+  overview: 570df85b8e327283
   style_tokens: 0e730a4c2dea0604
-generated_at: 2026-05-28T22:39:02Z
+generated_at: 2026-05-29T18:56:09Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetim platformunun yönetici panelinde yer alan kategori yönetimi sayfasını oluşturur. Admin kullanıcıların sistemdeki tüm kategoriler üzerinde işlem yapabilmesini sağlayan ön yüz mantığını barındıran React bileşenidir, tüm kategoriyle ilgili işlevleri tek noktada toplar.
+Bu modül, VentHub HVAC yönetim platformunun yönetici panelinde yer alan kategori yönetim sayfasını oluşturan React bileşenidir. Sistemdeki kategorilerin yüklenmesi, oluşturulması, düzenlenmesi, tasarlanması ve silinmesi gibi tüm CRUD işlemlerini tek bir arayüz üzerinden yönetir. Admin kullanıcıların kategoriler üzerinde tam kontrole sahip olduğu merkezi bir yönetim noktasıdır.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Modülün ana giriş noktası olarak tüm kategori yönetim arayüzünü ve bağlı işlevleri bir araya getirerek yönetici sayfasını oluşturur.
+Modülün giriş noktası olarak tüm kategori yönetim arayüzünü ve bağlı işlevleri bir araya getirerek yönetici sayfasını oluşturur.
 - AdminCategoriesPage
 
 ### Veri İşleme Fonksiyonları
-Kategori verilerini sunucudan yüklemek ve istenildiğinde kayıt silmek gibi arka uçla entegre çalışan temel veri işlemlerini gerçekleştirir.
+Kategori verilerini sunucudan çekmek ve kalıcı olarak silmek gibi arka uçla entegre çalışan temel veri işlemlerini yürütür.
 - load, remove
 
-### Kullanıcı Eylemi İşleyicileri
-Yönetici kullanıcının arayüzde gerçekleştirdiği yeni kategori oluşturma, mevcut kategoriyi düzenleme ve tasarlama gibi tüm kullanıcı eylemlerini yönetir.
+### Kullanıcı Eylem İşleyicileri
+Yönetici kullanıcının arayüzdeki etkileşimlerine yanıt olarak yeni kategori oluşturma, mevcut kategoriyi düzenleme ve tasarım sayfasını açma gibi tüm kullanıcı odaklı eylemleri yönetir.
 - handleCreate, handleEdit, handleDesign
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, yönetici panelinde kategori yönetim arayüzü sağlayan bir React bileşenidir. Aşağıda yalnızca fonksiyon imzalarından ve modül sabitlerinden türetilebilen mimari varsayımlar listelenmektedir.
+Bu modül, admin panelinde kategori yönetim sayfasını temsil eden bir React bileşenidir. Aşağıda, bileşenin doğru çalışması için gereken mimari varsayımlar listelenmektedir.
 
-**[Aksiyom 1]:** Eğer `ColumnsMenu` modülü import edilmemiş veya çalıştırılabilir (callable) durumda değilse, kategori tablosunda sütun menüsü arayüzüsunu gösteren bileşen kullanılamaz.
+Bu modül için belirli bir eşik değeri veya kabul kriteri belirtilmemiştir. Varsayımlar, fonksiyon imzaları ve modülün genel yapısına dayanmaktadır.
 
-**[Aksiyom 2]:** Eğer `ExportMenu` modülü import edilmemiş veya çalıştırılabilir (callable) durumda değilse, kategori verilerinin dışa aktarım menüsü sunulamaz.
+[Aksiyom 1]: Eğer `DbCategory` tipi veya bu tipe karşılık gelen bir veri yapısı (örneğin, `id`, `name`, `description` gibi alanları içeren bir nesne) yoksa, `handleEdit` ve `handleDesign` fonksiyonları doğru çalışamaz.
 
-**[Aksiyom 3]:** Eğer `handleEdit(r: DbCategory)` fonksiyonu geçerli bir `DbCategory` nesnesi alamıyorsa (null veya undefined ise), düzenleme işlemi başlatılamaz.
+[Aksiyom 2]: Eğer `remove(id: string)` fonksiyonu çağrılmadan önce ilgili kategorinin `id` değerine sahip olduğu doğrulanmamışsa, beklenmeyen bir kategori silinmesine veya hata fırlatılmasına yol açabilir.
 
-**[Aksiyom 4]:** Eğer `handleDesign(r: DbCategory)` fonksiyonu geçerli bir `DbCategory` nesnesi alamıyorsa (null veya undefined ise), tasarım/ayar düzenleme işlemi başlatılamaz.
+[Aksiyom 3]: Eğer `ColumnsMenu` veya `ExportMenu` modül sabitleri (muhtemelen bileşenler) doğru bir şekilde içe aktarılmamışsa veya çağrılamıyorsa, sayfa düzgün render edilemez veya menü işlevleri çalışmaz.
 
-**[Aksiyom 5]:** Eğer `remove(id: string)` fonksiyonu geçerli bir string identifier alamıyorsa (boş string, null veya undefined ise), silme işlemi gerçekleştirilemez.
+[Aksiyom 4]: Eğer `load()` fonksiyonu bileşen mount edildiğinde veya veriye ihtiyaç duyulduğunda çağrılmazsa, kategoriler listesi boş veya güncel olmayabilir.
 
-**[Aksiyom 6]:** Eğer `load()` fonksiyonu tarafından erişilen veri kaynağı (API endpoint veya servis) erişilebilir durumda değilse, kategori listesi yüklenemez ve arayüz boş/hata durumunda kalır.
+[Aksiyom 5]: Eğer `handleCreate` fonksiyonu, yeni bir kategori oluşturmak için gerekli parametreleri (örneğin, kullanıcıdan alınan veri) alamıyorsa, yeni kategori eklenemez.
+
+[Aksiyom 6]: Eğer `AdminCategoriesPage` bileşeni, yönetici panelinde yetkilendirilmiş bir kullanıcı tarafından erişilemez bir rotada render edilirse, bileşen görünmeyebilir veya hata verebilir (bu, rotalama veya yetkilendirme katmanına bağlıdır).
+
+[Aksiyom 7]: Eğer `remove` fonksiyonu, silme işlemini sunucuya iletmeden önce bir onay mekanizması (örneğin, bir modal) içermiyorsa, yanlışlıkla silme riski vardır.
+
+[Aksiyom 8]: Eğer `handleEdit` ve `handleDesign` fonksiyonları, ilgili kategorinin mevcut verilerini (örneğin, `DbCategory` nesnesini) parametre olarak alamıyorsa, düzenleme veya tasarım sayfası doğru verilerle doldurulamaz.
+
+[Aksiyom 9]: Eğer `load` fonksiyonu, kategorileri yüklerken bir hata oluşursa (örneğin, ağ hatası), bileşen hata durumunu göstermeli veya kullanıcıyı bilgilendirmelidir; aksi takdirde kullanıcı veri eksikliğiyle karşılaşabilir.
+
+[Aksiyom 10]: Eğer `AdminCategoriesPage` bileşeni, alt bileşenlere (örneğin
 
 ---
 
@@ -46246,142 +45260,112 @@ Bu modül, yönetici panelinde kategori yönetim arayüzü sağlayan bir React b
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::readLocalStorageSettings
+### [N1_NASIL] AST Pointer: AdminCategoriesPage.tsx::AdminCategoriesPage
+- **params**: (parametre yok)
+- **ic_degiskenler**: Fonksiyon govdesi dogrudan saglanmamis; iceride tanimlanan state'ler (useState): `loading`, `error`, `rows`, `editingId`, `isModalOpen`, `visibleCols`, `density` — bileşen durum yonetimi icin kullanilir
+- **Dönüş**: React.FC (JSX render)
+
+---
+
+### [N2_NASIL] AST Pointer: AdminCategoriesPage.tsx::load
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `typeof window` — sunucu tarafı çalışma durumunu kontrol etmek için kullanılan global window nesnesi tür check'i
-  - `STORAGE_KEY` — localStorage anahtarlarını oluşturmak için kullanılan sabit temel anahtar
-  - `c` — localStorage'dan okunan görünür sütun ayarlarının ham string değeri
-  - `setVisibleCols` — görünür sütun listesini state'de güncellemek için kullanılan React state setter'ı
-  - `JSON.parse` — string formatındaki ayarları JS nesnesine dönüştürmek için kullanılan native fonksiyon
-  - `d` — localStorage'dan okunan tablo satır yoğunluğu ayarının ham string değeri
-  - `setDensity` — tablo satır yoğunluğunu state'de güncellemek için kullanılan React state setter'ı
-- **Dönüş**: void (tarayıcı dışı ortamda veya hata durumunda erken çıkış yapar)
+  - `fetchErr` — supabase `select()` sorgusundan donen hata nesnesi; varsa `throw` ile yakalanir
+  - `data` — supabase'den gelen kategori satirlarinin ham dizisi; `DbCategory[]` tipine cast edilerek `setRows` ile state'e yazilir
+  - `e` — try-catch yakalanan hata nesnesi; `.message` ozelligi `setError` ile hata mesaji olarak kaydedilir
+- **Dönüş**: yok (async); `setLoading`, `setError`, `setRows` ile state gunceller
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::saveVisibleColsToLocalStorage
+---
+
+### [N3_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleCreate
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok; `setEditingId(null)` ile duzenleme kimligini sifirlar, `setIsModalOpen(true)` ile olusturma modalini acar
+
+---
+
+### [N4_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleEdit
+- **params**: `r: DbCategory` — duzenlenecek kategori nesnesi; iceriden `r.id` erisilerek `editingId` state'i guncellenir
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok; `setEditingId(r.id)` ile secilen kategorinin ID'sini kaydeder, `setIsModalOpen(true)` ile duzenleme modalini acar
+
+---
+
+### [N5_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleDesign
+- **params**: `r: DbCategory` — tasarlanacak kategori nesnesi; `r.id` kullanilarak rota olusturulur
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok; `router.push()` ile `/admin/categories/${r.id}/builder` rotasina yonlendirme yapar
+
+---
+
+### [N6_NASIL] AST Pointer: AdminCategoriesPage.tsx::remove
+- **params**: `id: string` — silinecek kategorinin benzersiz kimligi
+- **ic_degiskenler**:
+  - `before` — silinmeden onceki kategori verisi; `rows.find(r => r.id === id)` ile mevcut satirlardan id eslesmesiyle bulunur, bulunamazsa `null` olur; audit log'a onceki deger olarak yazilir
+  - `delErr` — supabase `delete()` isleminden donen hata nesnesi; varsa `throw` ile yakalanir
+  - `e` — try-catch yakalanan hata nesnesi; `alert` ile kullaniciya hata mesaji gosterilir
+- **Dönüş**: yok (async); `confirm` ile onay alir, `supabase.from('categories').delete().eq('id', id)` ile silme islemi yapar, `logAdminAction` ile audit log kaydeder, `load()` ile listeyi yeniler
+
+---
+
+### [N7_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — localStorage sutun yukleyici useEffect)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `typeof window` — sunucu tarafı çalışma durumunu kontrol etmek için kullanılan global window nesnesi tür check'i
-  - `STORAGE_KEY` — localStorage anahtarını oluşturmak için kullanılan sabit temel anahtar
-  - `visibleCols` - state'deki güncel görünür sütun listesi, localStorage'a kaydedilecek değer
-  - `JSON.stringify` - JS nesnesini localStorage için string formatına dönüştürmek için kullanılan native fonksiyon
-- **Dönüş**: void (tarayıcı dışı ortamda veya hata durumunda erken çıkış yapar)
+  - `c` — `localStorage.getItem()` ile okunan sutun gorunurluk ayarlari JSON stringi; parse edilip `setVisibleCols` ile state'e birlestirilir
+  - `d` — `localStorage.getItem()` ile okunan yogunluk (density) ayari stringi; `"compact"` veya `"comfortable"` degeri ise `setDensity` ile state'e yazilir
+- **Dönüş**: yok; `window` kontrolu ile sunucu tarafinda calismayi engeller, try-catch ile localStorage hatalarini yutar
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::saveDensityToLocalStorage
+---
+
+### [N8_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — localStorage sutun kaydedici useEffect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — `visibleCols` state'i kapsamdan okunur)
+- **Dönüş**: yok; `visibleCols` degerini `JSON.stringify` ile serialized olarak `localStorage.setItem` ile kaydeder
+
+---
+
+### [N9_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — localStorage yogunluk kaydedici useEffect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — `density` state'i kapsamdan okunur)
+- **Dönüş**: yok; `density` degerini dogrudan `localStorage.setItem` ile kaydeder
+
+---
+
+### [N10_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — CSV disa aktarim handler'i)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `typeof window` — sunucu tarafı çalışma durumunu kontrol etmek için kullanılan global window nesnesi tür check'i
-  - `STORAGE_KEY` — localStorage anahtarını oluşturmak için kullanılan sabit temel anahtar
-  - `density` - state'deki güncel tablo satır yoğunluğu değeri, localStorage'a kaydedilecek
-- **Dönüş**: void (tarayıcı dışı ortamda veya hata durumunda erken çıkış yapar)
+  - `cols` — disa aktarilacak sutun adlarinin dizisi: `['id', 'name', 'sort_order', 'slug', 'parent_id', 'description']`
+  - `header` — sutun adlarinin virgülle birlestirilmis CSV baslik satiri
+  - `lines` — `filtered` dizisi uzerinden `.map()` ile her kategori satirinin CSV formatina donusturulmus hali; `r.name.replace(/"/g, '""')` ile tirnak isaretleri escape edilir, `r.sort_order || 0` ile bos deger varsayilir
+  - `csv` — BOM karakteri (`\ufeff`) + baslik + satirlarin `\n` ile birlestirilmis tam CSV icerigi
+  - `blob` — CSV metninden olusturulan `Blob` nesnesi; MIME tipi `text/csv;charset=utf-8`
+  - `url` — `URL.createObjectURL(blob)` ile olusturulan gecici dosya URL'i
+  - `a` — `document.createElement('a')` ile olusturulan gecici anchor elementi; `href`, `download` ozellikleri ayarlanip `click()` ile indirme tetiklenir, sonra `URL.revokeObjectURL` ile URL serbest birakilir
+- **Dönüş**: yok (dosya indirme yan etkisi)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::load
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setLoading` - yükleme durumunu state'de güncellemek için kullanılan React state setter'ı
-  - `setError` - hata mesajını state'de güncellemek için kullanılan React state setter'ı
-  - `ensureSessionFresh` - kullanıcı oturumunun geçerliliğini kontrol eden yardımcı fonksiyon
-  - `supabase` - veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `data` - veritabanından çekilen kategori listesi ham değeri
-  - `fetchErr` - kategori çekme işlemi sırasında oluşan hata nesnesi
-  - `setRows` - kategori listesini state'de kaydetmek için kullanılan React state setter'ı
-  - `DbCategory` - kategori verilerinin tipini tanımlayan TypeScript tipi
-- **Dönüş**: void (tüm async işlemler sonrası state güncellemeleri yapar, değer döndürmez)
+---
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::handleCreate
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setEditingId` - düzenleme sırasında seçili kategori ID'sini sıfırlamak için kullanılan React state setter'ı
-  - `setIsModalOpen` - kategori oluşturma/düzenleme modalını açmak için kullanılan React state setter'ı
-- **Dönüş**: void
+### [N11_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — tablo satir renderer'i)
+- **params**: `r: DbCategory` — render edilecek kategori satiri verisi
+- **ic_degiskenler**: (yerel degisken yok; kapsamdan erisilenler: `visibleCols`, `adminTableCellClass`, `cellPad`, `process.env.NEXT_PUBLIC_SUPABASE_URL`, `hasWriteAccess`, `categoryMap`, `adminTableActionClass`, `adminTableActionDangerClass`, `t`, `supabase`, `setRows`, `toast`, `load`, `handleDesign`, `handleEdit`, `remove`)
+- **Dönüş**: JSX `<tr>` elementi; gorunurluk ayarlarina gore `visibleCols.image`, `visibleCols.name`, `visibleCols.sortOrder`, `visibleCols.slug`, `visibleCols.parent`, `visibleCols.description`, `visibleCols.actions` kosullariyla sutunlari sartli olarak render eder
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::handleEdit
-- **params**: r: DbCategory
-- **ic_degiskenler**:
-  - `r.id` - düzenlenecek kategorinin benzersiz kimliği
-  - `setEditingId` - düzenlenen kategori ID'sini state'e kaydeden React state setter'ı
-  - `setIsModalOpen` - kategori düzenleme modalını açan React state setter'ı
-- **Dönüş**: void
+---
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::handleDesign
-- **params**: r: DbCategory
+### [N12_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — kategori adi inline guncelleme handler'i)
+- **params**: `val` — duzeltilmis yeni kategori adi degeri (string)
 - **ic_degiskenler**:
-  - `r.id` - tasarlanacak kategorinin benzersiz kimliği
-  - `router` - Next.js yönlendirme istemcisi, sayfa yönlendirmesi için kullanılır
-- **Dönüş**: void
+  - `upErr` — `supabase.from('categories').update({ name: val }).eq('id', r.id)` sorgusundan donen hata nesnesi; varsa `throw` ile yakalanir
+- **Dönüş**: yok (async); `val` bos veya eski degerle ayni ise erken donus; aksi halde supabase update ile veritabanini gunceller, `setRows` ile yerel state'i gunceller, `toast.success` ile bildirim gosterir
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::remove
-- **params**: id: string
-- **ic_degiskenler**:
-  - `confirm` - kullanıcıdan silme onayı alan yerleşik browser fonksiyonu
-  - `rows` - state'deki mevcut kategori listesi, silinen kategorinin önceki değerini almak için kullanılır
-  - `before` - silinmeden önceki kategori nesnesinin kopyası, denetim kaydı için saklanır
-  - `supabase` - veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `delErr` - kategori silme işlemi sırasında oluşan hata nesnesi
-  - `logAdminAction` - denetim kaydı oluşturmak için içe aktarılan audit modülü fonksiyonu
-  - `load` - silme sonrası kategori listesini yenilemek için çağrılan yükleme fonksiyonu
-  - `alert` - hata durumunda kullanıcıya mesaj gösteren yerleşik browser fonksiyonu
-- **Dönüş**: void
+---
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::exportCategoriesToCsv
-- **params**: (parametre yok)
+### [N13_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — siralama sirasi inline guncelleme handler'i)
+- **params**: `val` — girilen yeni siralama degeri (string olarak girilir, parseInt ile cevrilir)
 - **ic_degiskenler**:
-  - `cols` - CSV dosyasına yazılacak sütun isimleri listesi
-  - `header` - CSV dosyasının başlık satırı, sütun isimlerinden birleştirilir
-  - `filtered` - dışa aktarılacak filtrelenmiş kategori listesi
-  - `lines` - CSV dosyasının veri satırları, her kategori için bir satır oluşturulur
-  - `csv` - tam olarak birleştirilmiş CSV dosyası içeriği
-  - `blob` - CSV içeriğinden oluşturulan Blob nesnesi, indirme için kullanılır
-  - `url` - Blob nesnesinden oluşturulan geçici indirme URL'si
-  - `document.createElement` - indirme bağlantısı için <a> etiketi oluşturan native DOM fonksiyonu
-  - `URL.revokeObjectURL` - kullanım sonrası geçici URL'yi temizleyen native fonksiyon
-- **Dönüş**: void
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::renderCategoryTableRow
-- **params**: r: DbCategory
-- **ic_degiskenler**:
-  - `r.id` - tablo satırının benzersiz anahtarı olarak kullanılan kategori kimliği
-  - `visibleCols.image` - resim sütununun görünürlük durumu
-  - `VentImage` - resim göstermek için kullanılan özel React bileşeni
-  - `process.env.NEXT_PUBLIC_SUPABASE_URL` - Supabase proje URL'si, resim yolu oluşturmak için kullanılır
-  - `r.image_url` - kategoriye ait resmin depodaki yolu
-  - `hasWriteAccess` - kullanıcının yazma yetkisi olup olmadığını belirten bayrak
-  - `EditableCell` - satır içi düzenleme için kullanılan özel React bileşeni
-  - `supabase` - kategori güncelleme işlemleri için kullanılan Supabase istemcisi
-  - `setRows` - güncellenen kategori listesini state'e kaydeden React state setter'ı
-  - `toast.success` - işlem başarısı hakkında kullanıcıya bildirim gösteren fonksiyon
-  - `categoryMap` - üst kategori isimlerini ID'den almak için kullanılan Map nesnesi
-  - `handleDesign` - tasarım sayfasına yönlendiren fonksiyon
-  - `handleEdit` - kategori düzenleme modalını açan fonksiyon
-  - `remove` - kategori silme fonksiyonu
-  - `t` - çeviri fonksiyonu, arayüz metinlerini yerelleştirmek için kullanılır
-- **Dönüş**: JSX.Element (kategori tablosu için bir <tr> elementi döndürür)
-
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::saveCategoryNameUpdate
-- **params**: val: string
-- **ic_degiskenler**:
-  - `val` - EditableCell'den gelen yeni kategori adı değeri
-  - `r.name` - mevcut kategori adı, değişiklik kontrolü için kullanılır
-  - `r.id` - güncellenecek kategorinin benzersiz kimliği
-  - `supabase` - veritabanı güncellemesi için kullanılan Supabase istemcisi
-  - `upErr` - güncelleme işlemi sırasında oluşan hata nesnesi
-  - `setRows` - güncellenen kategori listesini state'e kaydeden React state setter'ı
-  - `toast.success` - işlem başarısı hakkında kullanıcıya bildirim gösteren fonksiyon
-- **Dönüş**: void
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::saveCategorySortOrderUpdate
-- **params**: val: string
-- **ic_degiskenler**:
-  - `val` - EditableCell'den gelen yeni sıralama değeri string hali
-  - `num` - string'ten dönüştürülmüş sayısal sıralama değeri
-  - `r.sort_order` - mevcut sıralama değeri, değişiklik kontrolü için kullanılır
-  - `r.id` - güncellenecek kategorinin benzersiz kimliği
-  - `supabase` - veritabanı güncellemesi için kullanılan Supabase istemcisi
-  - `upErr` - güncelleme işlemi sırasında oluşan hata nesnesi
-  - `setRows` - güncellenen kategori listesini state'e kaydeden React state setter'ı
-  - `toast.success` - işlem başarısı hakkında kullanıcıya bildirim gösteren fonksiyon
-  - `load` - sıralama değişikliği sonrası kategori listesini yenilemek için çağrılan fonksiyon
-- **Dönüş**: void
+  - `num` — `parseInt(val || '0', 10)` ile string degerin donusturulmus sayisal hali; `isNaN` kontrolu ile gecersiz giris onlenir
+  - `upErr` — `supabase.from('categories').update({ sort_order: num }).eq('id', r.id)` sorgusundan donen hata nesnesi; varsa `throw` ile yakalanir
+- **Dönüş**: yok (async); `num` NaN veya eski degerle ayni ise erken donus; aksi halde supabase update ile veritabanini gunceller, `setRows` ile yerel state'i gunceller, `toast.success` ile bildirim gosterir, `load()` ile listeyi yeniler
 
 ---
 
@@ -46448,56 +45432,48 @@ entity_hashes:
   func:isAllowedCouponType: af4b48320744b9de
   func:saveCoupon: 13014c937b37a622
   func:toggleActive: bde4db4c0f16dfdc
-  overview: bf9bd25b077ab626
+  overview: 9005ca0a601ce915
   style_tokens: 4a0b7c9fcb1d8a38
-generated_at: 2026-05-28T22:38:55Z
+generated_at: 2026-05-29T18:56:46Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelinde kupon yönetimi sayfasını oluşturan React bileşenini ve yardımcı işlevleri içerir. Kuponların listelenmesi, filtrelenmesi, yeni kupon eklenmesi ve aktif/pasif durumlarının değiştirilmesi gibi işlemleri yönetir.
+Bu modül, yönetici panelinde kupon yönetimi sayfasını oluşturan React bileşenini ve bu sayfayı destekleyen yardımcı işlevleri içerir. Temel olarak kuponların veritabanından çekilip arayüze dönüştürülmesi, listelenmesi, filtrelenmesi, yeni kupon eklenmesi ve mevcut kuponların aktif/pasif durumlarının değiştirilmesi gibi CRUD benzeri işlemleri yönetir.
 
 ## Fonksiyon Grupları
-
 ### Ana Sayfa Bileşeni
-Sayfanın temel React bileşenini oluşturur, diğer tüm işlevleri bir araya getirir.
+Sayfanın ana yapı taşını ve akışını kontrol eden React bileşenini tanımlar. Kullanıcı arayüzünü oluşturur ve diğer tüm işlevleri entegre eder.
 - AdminCouponsPage
 
-### Veri Dönüşümü ve Doğrulama
-Veritabanından gelen kupon verilerini kullanıcı arayüzü formatına çevirir ve kupon türlerinin geçerliliğini kontrol eder.
-- isAllowedCouponType, dbToUi
+### Veri Dönüştürme ve Doğrulama
+Veritabanından gelen ham kupon verilerini, kullanıcı arayüzünde gösterilecek standart bir formata dönüştürür. Ayrıca, kupon türlerinin izin verilen değerler olup olmadığını doğrular.
+- dbToUi, isAllowedCouponType
 
-### Durum Yönetimi ve Filtreleme
-Mevcut kupon listesini belirli kriterlere göre filtreleyerek görüntülenen veriyi hazırlar.
+### Görüntüleme ve Filtreleme
+Sayfada görüntülenecek kupon listesini, kullanıcının seçtiği filtre kriterlerine göre işler ve hazırlar.
 - filtered
 
-### API İşlemleri
-Kupon ekleme ve aktiflik durumunu değiştirme gibi sunucuyla etkileşim gerektiren işlemleri gerçekleştirir.
+### API ve Durum Yönetimi
+Kupon ekleme ve bir kuponun aktif/pasif durumunu değiştirme gibi sunucu tarafı işlemleri başlatır ve sonucunu yönetir.
 - saveCoupon, toggleActive
 
 ---
 
-## AXIOMS – Mimari Varsayımlar  
-Bu modül için özel aksiyom tanımlanmamıştır. Aşağıdaki aksiyomlar, yalnızca fonksiyon imzalarından çıkarılan zorunlu koşulları ve beklenen sonuçları tanımlar.
+## AXIOMS – Mimari Varsayımlar
 
-**Aksiyom 1**: Eğer `isAllowedCouponType` fonksiyonuna verilen `x` parametresi **tanımsız (undefined) veya null** ise, fonksiyon **false** döner.  
+Bu modül, yönetici panelinde kupon yönetimi sayfası için veritabanı ile UI arasındaki veri akışını ve durum değişimlerini yönetir.
 
-**Aksiyom 2**: Eğer `isAllowedCouponType` fonksiyonuna verilen `x` parametresi **beklenen coupon‑type formatına** (örneğin string ya da enum) uymuyorsa, fonksiyon **false** döner.  
+[Aksiyom 1]: Eğer `DbCouponRow` tipinde geçerli bir veri yapısı (satır) sağlanmamışsa veya alanlar eksik/yanlış tipteyse, `dbToUi` fonksiyonu beklenmeyen davranış gösterir (runtime hatası veya eksik UI alanları).
 
-**Aksiyom 3**: Eğer `dbToUi` fonksiyonuna verilen `row` parametresi **null, undefined** ya da **DbCouponRow tipine uygun değilse**, fonksiyon **bir hata fırlatır** (exception) ya da **null** döner.  
+[Aksiyom 2]: Eğer `isAllowedCouponType` fonksiyonuna verilen `x` parametresi, izin verilen kupon türleri listesinde değilse, `false` değeri döner.
 
-**Aksiyom 4**: Eğer `AdminCouponsPage` bileşeni **gerekli bağlam (React context, router, vb.)** olmadan render edilirse, bileşen **boş** ya da **hata ekranı** gösterir.  
+[Aksiyom 3]: Eğer `filtered()` fonksiyonu çağrıldığında geçerli bir filtre kriteri tanımlanmamışsa, tüm kupon kayıtları (tamamı) döner.
 
-**Aksiyom 5**: Eğer `filtered` fonksiyonu **filtreleme kriterleri** (örn. arama metni, aktif/pasif durumu) **tanımlı değilse**, fonksiyon **tüm kuponları** (yani hiçbir filtre uygulamadan) döner.  
+[Aksiyom 4]: Eğer `toggleActive` fonksiyonuna verilen `id` parametresi mevcut kupon kayıtlarında (veritabanında) eşleşen bir kayıt içermiyorsa, aktif/pasif durum değişikliği gerçekleştirilmez (sessizce başarısız olur).
 
-**Aksiyom 6**: Eğer `saveCoupon` fonksiyonu **geçersiz kupon verisi** (örneğin eksik alanlar, tip uyuşmazlığı) alırsa, fonksiyon **kaydetme işlemini reddeder** ve **hata mesajı** üretir.  
+[Aksiyom 5]: Eğer `saveCoupon` fonksiyonu çalıştırıldığında zorunlu kupon alanları (örn: kod, değer, tarih aralığı) eksik veya geçersizse, kaydetme işlemi başlatılmaz.
 
-**Aksiyom 7**: Eğer `toggleActive` fonksiyonuna verilen `id` **veritabanında mevcut bir kuponu işaret etmiyorsa**, fonksiyon **hiçbir değişiklik yapmaz** ve **başarısızlık durumu** döner.  
-
-**Aksiyom 8**: Eğer `toggleActive` fonksiyonuna verilen `active` değeri **boolean tipinde değilse**, fonksiyon **tip hatası** fırlatır.  
-
-**Domain‑specific kurallar**:  
-- Kupon tipinin izin verilen değerleri (örneğin `"percentage"`, `"fixed_amount"` vb.) **bilinmiyor**; bu değerler `isAllowedCouponType` içinde tanımlı olmalıdır.  
-- `DbCouponRow` yapısının zorunlu alanları (örneğin `id`, `code`, `type`, `value`) **bilinmiyor**; ancak bu alanların eksik olması `dbToUi` fonksiyonunun hata üretmesine yol açar.
+[Aksiyom 6]: Eğer `AdminCouponsPage` bileşeni render edildiğinde kupon listesi için gerekli başlangıç verisi (API çağrısı sonucu) henüz hazır değilse, bileşen yüklenme durumunda (loading) kalır.
 
 ---
 
@@ -46597,80 +45573,107 @@ type DbCouponRow = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::isAllowedCouponType
-- **params**: (x: unknown)
-- **ic_degiskenler**:
-  - `x` — kontrol edilen değer, `'percent'` ya da `'fixed'` olup olmadığı test edilir
-- **Dönüş**: `x is AllowedCouponType` (type guard, boolean)
+### [N1_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::isAllowedCouponType
+- **params**: `x: unknown`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `x is AllowedCouponType` (tip koruma predicate, boolean)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::dbToUi
-- **params**: (row: DbCouponRow)
-- **ic_degiskenler**:
-  - `row.id` — veri tabanındaki kuponun kimliği
-  - `row.code` — kupon kodu
-  - `row.discount_type` — `'percentage'` ya da `'fixed_amount'`, UI tipine çevrilir
-  - `row.discount_value` — sayı olarak saklanan indirim değeri
-  - `row.valid_from` — kuponun geçerli olduğu başlangıç tarih‑zamanı, yoksa `null`
-  - `row.valid_until` — kuponun geçerli olduğu bitiş tarih‑zamanı, yoksa `null`
-  - `row.is_active` — aktiflik bayrağı, UI’da `active` olarak dönüştürülür
-  - `row.usage_limit` — kullanım limiti, yoksa `null`
-  - `row.used_count` — kullanılan miktar, yoksa `0`
-  - `row.created_at` — oluşturulma zaman damgası
-- **Dönüş**: `CouponRow` (UI‑model nesnesi)
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::(anonymous async fetch)
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::dbToUi
+- **params**: `row: DbCouponRow`
 - **ic_degiskenler**:
-  - `setLoading` — yükleme durumunu `true/false` olarak ayarlar
-  - `ensureSessionFresh` — oturumun güncel olup olmadığını kontrol eder
-  - `supabase` — Supabase istemcisi, `coupons` tablosundan veri çeker
-  - `data` — sorgu sonucu dizi (DbCouponRow[]), `null` olma ihtimali
-  - `error` — sorgu hatası, varsa fırlatılır
-  - `mapped` — `data` dizisinin `dbToUi` ile dönüştürülmüş hali
-  - `setRows` — UI’da gösterilecek kupon satırlarını günceller
-- **Dönüş**: yok (yan etki: state güncellenir, console.log hataları)
+  - `id` — row.id'den gelen kupon benzersiz tanımlayıcısı
+  - `code` — row.code'dan gelen kupon kodu
+  - `type` — row.discount_type 'percentage' ise 'percent', aksi halde 'fixed' olarak dönüştürülen indirim tipi
+  - `value` — row.discount_value'in Number ile sayıya dönüştürülmüş indirim değeri
+  - `starts_at` — row.valid_from veya null, kupon geçerlilik başlangıç tarihi
+  - `ends_at` — row.valid_until veya null, kupon geçerlilik bitiş tarihi
+  - `active` — row.is_active'in !! ile boolean'a dönüştürülmüş aktiflik durumu
+  - `usage_limit` — row.usage_limit veya null, kupon kullanım üst limiti
+  - `used_count` — row.used_count veya 0, kuponun kullanma sayısı
+  - `created_at` — row.created_at, kupon oluşturma tarihi
+- **Dönüş**: `CouponRow` (nesne)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::filtered
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `q` — arama sorgusu stringi
-  - `rows` — mevcut kupon satırları dizisi (state)
-  - `s` — `q`’nun küçük harfe dönüştürülmüş hali
-- **Dönüş**: `rows` (filtrelenmemiş) veya `rows.filter(...)` (arama kriterine uyan satırlar)
+---
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::saveCoupon
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::fetchCoupons (anonim async arrow)
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `form.code` — kullanıcı tarafından girilen kupon kodu
-  - `codeTrim` — boşlukları temizlenmiş kod stringi
-  - `issues` — doğrulama hatalarını tutan dizi
-  - `form.type` — kupon tipi (`percent` | `fixed`)
-  - `val` — `form.value`’nin sayısal karşılığı
-  - `form.value` — kullanıcı girişi değer
-  - `form.starts_at`, `form.ends_at` — tarih aralıkları, string ya da `null`
-  - `form.active` — kuponun aktif olup olmadığı
-  - `form.usage_limit` — kullanım limiti sayı ya da `null`
-  - `payload` — API’ye gönderilecek kupon nesnesi
-  - `supabase.functions.invoke` — edge function çağrısı, `admin-create-coupon`
-  - `response` — fonksiyon yanıtı, `{ data, error }`
-  - `data` — oluşturulan `DbCouponRow` veya `null`
-  - `error` — yanıt hatası
-  - `ui` — `dbToUi(data)` ile UI modeli
-  - `setRows` — yeni kuponu listenin başına ekler
-  - `setForm` — formu varsayılan değerlere sıfırlar
-  - `toast` — kullanıcı bildirimleri (`error`, `success`)
-  - `setSaving` — kaydetme işlemi sırasında loading state
-- **Dönüş**: yok (yan etki: state güncellenir, toast gösterilir)
+  - `data` — supabase.select() sorgusundan dönen satır dizisi (DbCouponRow[])
+  - `error` — supabase sorgusundan dönen hata nesnesi veya null
+  - `mapped` — (data || []).map ile her DbCouponRow'ı dbToUi ile CouponRow'a dönüştürülmüş dizi
+  - `e` — catch bloğunda yakalanan hata nesnesi
+- **Yan etkiler**: setLoading(true/false), setRows(mapped), console.error çağrısı
+- **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx::toggleActive
-- **params**: (id: string, active: boolean)
+---
+
+### [N4_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::filtered
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `supabase` — Supabase istemcisi, `coupons` tablosunda `is_active` alanını tersine çevirir
-  - `data` — güncellenmiş satır `{ id, is_active }`
-  - `error` — olası hata, fırlatılır
-  - `setRows` — ilgili satırın `active` alanını yeni değerle günceller
-  - `toast` — işlem sonucunu kullanıcıya bildirir
-- **Dönüş**: yok (yan etki: state güncellenir, toast gösterilir)
+  - `q` — useCallback içinden okunan arama sorgusu stringi (dış state)
+  - `rows` — useCallback içinden okunan kupon satırları dizisi (CouponRow[])
+  - `s` — q.toLowerCase() ile küçük harfe dönüştürülmüş arama metni
+- **Dönüş**: CouponRow[] (filtrelenmiş satır dizisi)
+
+---
+
+### [N5_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::saveCoupon
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `codeTrim` — form.code'un String() ile string'e dönüştürülüp trim edilmiş hali, kupon kodu doğrulaması için
+  - `issues` — string[] tipinde validasyon hata mesajları dizisi
+  - `val` — form.value'un Number() ile sayıya dönüştürülmüş hali, indirim tutarı
+  - `payload` — supabase edge function'a gönderilen kupon verisi nesnesi (code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count alanlarını içerir)
+  - `response` — supabase.functions.invoke() çağrısının sonucu (data ve error alanları)
+  - `data` — response.data'dan destructured, edge function'dan dönen DbCouponRow veya null
+  - `error` — response.error'dan destructured, hata nesnesi veya null
+  - `ui` — dbToUi(data) ile DbCouponRow'dan CouponRow'a dönüştürülmüş kupon
+  - `e` — catch bloğunda yakalanan hata nesnesi
+- **Yan etkiler**: setSaving(true/false), setRows(prev => [ui, ...prev]), setForm(), toast.error(), toast.success(), console.error()
+- **Dönüş**: yok
+
+---
+
+### [N6_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::toggleActive
+- **params**: `id: string` (kupon benzersiz tanımlayıcısı), `active: boolean` (mevcut aktiflik durumu)
+- **ic_degiskenler**:
+  - `data` — supabase.update().select().single() ile dönen güncellenmiş satır ({ id: string; is_active: boolean })
+  - `error` — supabase sorgusundan dönen hata nesnesi veya null
+  - `e` — catch bloğunda yakalanan hata nesnesi
+- **Yan etkiler**: setRows(prev => prev.map(...)) ile ilgili satırın active alanını günceller, toast.success() çağrısı
+- **Dönüş**: yok
+
+---
+
+### [N7_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::usageLimitHandler (e parametreli arrow)
+- **params**: `e` (React.ChangeEvent<HTMLInputElement>)
+- **ic_degiskenler**:
+  - `raw` — e.target.value'Number() ile sayıya dönüştürülmüş hali veya null (boşsa null)
+  - `normalized` — raw 0'dan büyükse raw, aksi halde null (negatif/sıfır değerleri filtreler)
+- **Yan etkiler**: setForm() ile form.usage_limit alanını normalized değeriyle günceller
+- **Dönüş**: (yeni form nesnesi, setForm callback dönüşü)
+
+---
+
+### [N8_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::tableRowRenderer (r, idx parametreli arrow)
+- **params**: `r: CouponRow` (kupon satırı), `idx: number` (satır indeksi)
+- **ic_degiskenler**:
+  - `r` — CouponRow tipinde, render edilecek kupon satır verisi
+  - `idx` — number, satır indeksi (animation gecikmesi için kullanılır)
+- **Erişilen CouponRow alanları**:
+  - `r.code` — kupon kodu, <span> içinde gösterilir
+  - `r.type` — indirim tipi ('percent' veya 'fixed'), koşullu className ve metin belirlemede kullanılır
+  - `r.value` — indirim değeri, koşullu formatCurrency veya % prefix ile gösterilir
+  - `r.active` — aktiflik durumu, koşullu className ve buton metni belirlemede kullanılır
+  - `r.id` — kupon ID'si, key prop'u ve toggleActive çağrısında kullanılır
+  - `r.starts_at` — geçerlilik başlangıç tarihi, formatDateTime ile formatlanır veya '-' gösterilir
+  - `r.ends_at` — geçerlilik bitiş tarihi, formatDateTime ile formatlanır veya 'SÜRESİZ' gösterilir
+  - `r.used_count` — kullanım sayısı, progress bar hesaplamasında ve <span> içinde gösterilir
+  - `r.usage_limit` — kullanım limiti, progress bar hesaplamasında ve '∞' fallback ile gösterilir
+  - `r.created_at` — oluşturma tarihi, formatDateTime ile formatlanır
+- **Dönüş**: JSX (<tr> elementi)
 
 ---
 
@@ -46684,10 +45687,10 @@ graph TD
     AdminCouponsPage_tsx__isAllowedCouponType["isAllowedCouponType"]
     AdminCouponsPage_tsx__saveCoupon["saveCoupon"]
     AdminCouponsPage_tsx__toggleActive["toggleActive"]
-    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__toggleActive
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__filtered
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__isAllowedCouponType
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__dbToUi
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__toggleActive
 ```
 
 ## NODE ID STANDARD
@@ -47530,31 +46533,32 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventoryPage.tsx
-skeleton_hash: 301cb4887a0dcdea
+skeleton_hash: 0e1fc965c11933ba
 entity_hashes:
   func:AdminInventoryPage: 66c4abfcbc4634eb
   func:fetchData: 3334aa9b134a3cd8
-  overview: 2651cee931ba15f0
+  overview: 41fe2e512a59d859
   style_tokens: 6c71c306ec3450e6
-generated_at: 2026-05-28T22:38:58Z
+generated_at: 2026-05-29T18:57:05Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin yönetici paneli envanter sayfasını temsil eden bir React bileşenidir. Sayfanın kullanıcı arayüzünü render etme ve gösterilecek envanter verilerini çekme sorumluluklarına sahiptir.
+Bu modül, VentHub HVAC projesinin yönetici panelindeki envanter yönetim sayfasını oluşturan bir React bileşenidir. Temel olarak, envanter verilerini sunucudan çekerek sayfada görüntülemekten ve kullanıcı arayüzünü sunmaktan sorumludur.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Yönetici paneli envanter sayfasının temel yapısını ve kullanıcı arayüzünü render eder, sayfa içindeki işlemlerin koordinasyonunu sağlar.
+### Sayfa Bileşeni
+Yönetici paneli envanter sayfasının tüm kullanıcı arayüzünü ve sayfa yapısını oluşturarak, veri gösterimini ve etkileşimi yönetir.
 - AdminInventoryPage
 
-### Veri Çekme İşlemleri
-Sayfada görüntülenecek envanterle ilgili verileri eşzamansız olarak kaynaktan çekmekle sorumludur, ana sayfa bileşeni tarafından kullanılır.
+### Veri Yonetimi
+Sayfada gösterilecek envanter verilerini asenkron olarak çekerek bileşenin ihtiyaç duyduğu verileri sağlar.
 - fetchData
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için fonksiyon gövdesi bilgisi verilmediğinden, güvenilir mimari varsayımlar çıkarılamamıştır.
 
 ---
 
@@ -47592,32 +46596,70 @@ type Category = Database['public']['Tables']['categories']['Row']
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\admin\AdminInventoryPage.tsx::AdminInventoryPage
+### [N1_NASIL] AST Pointer: `src/views/admin/AdminInventoryPage.tsx`::AdminInventoryPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `_t` — `useI18n` hook’undan gelen çeviri fonksiyonu (alias)
-  - `loading` — veri yükleniyor mu bilgisini tutan boolean state
-  - `setLoading` — `loading` state’ini güncelleyen setter fonksiyonu
-  - `data` — `inventory_summary` tablosundan gelen satırların listesi (`InventorySummaryRow[]`)
-  - `setData` — `data` state’ini güncelleyen setter fonksiyonu
-  - `categories` — `categories` tablosundan gelen kategori listesi (`Category[]`)
-  - `setCategories` — `categories` state’ini güncelleyen setter fonksiyonu
-  - `searchTerm` — arama kutusuna girilen metin
-  - `setSearchTerm` — `searchTerm` state’ini güncelleyen setter fonksiyonu
-  - `filterCategory` — seçili kategori id’si veya `null`
-  - `setFilterCategory` — `filterCategory` state’ini güncelleyen setter fonksiyonu
-  - `filterStockStatus` — stok filtresi; `'all' | 'low' | 'out'` değerlerinden biri
-  - `fetchData` — API’dan envanter ve kategori verilerini çeken async fonksiyon (aşağıda tanımlı)
-  - `filteredData` — `data` üzerinde arama, kategori ve stok filtresi uygulanıp dönüştürülmüş satır listesi
-- **Dönüş**: JSX element – komponentin render çıktısı (HTML/React element ağacı)
+  - `_t` — `useI18n()` hookundan dönen çeviri fonksiyonu, `_t` olarak yeniden adlandırılmış (kullanılmıyor ama import edilmiş)
+  - `loading` — `useState(true)` ile oluşturulan state, veri yükleme durumunu tutar, `setLoading` ile güncellenir
+  - `data` — `useState<InventorySummaryRow[]>([])` ile oluşturulan state, inventory_summary tablosundan çekilen satır verilerini tutar
+  - `categories` — `useState<Category[]>([])` ile oluşturulan state, categories tablosundan çekilen kategori listesini tutar
+  - `searchTerm` — `useState('')` ile oluşturulan state, ürün arama filtresinin metnini tutar
+  - `filterCategory` — `useState<string | null>(null)` ile oluşturulan state, seçili kategori filtresini tutar
+  - `filterStockStatus` — `useState<'all' | 'low' | 'out'>('all')` ile oluşturulan state, stok durumu filtresini tutar (sadece okunur, set edilmez)
+  - `fetchData` — inner async fonksiyon, supabase'den inventory ve kategori verilerini çeker
+  - `filteredData` — `useMemo` ile hesaplanan, arama/kategori/stok filtrelerine göre süzülmüş ve normalize edilmiş ürün listesi
+- **Dönüş**: JSX — Envanter yönetimi sayfasının tamamını render eden React bileşeni JSX'i
 
-### [N2_NASIL] AST Pointer: src\views\admin\AdminInventoryPage.tsx::fetchData
+---
+
+### [N2_NASIL] AST Pointer: `src/views/admin/AdminInventoryPage.tsx`::fetchData
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `invRes` — `supabase.from('inventory_summary')` sorgusunun sonucu (`{ data?, error? }`)
-  - `catRes` — `supabase.from('categories')` sorgusunun sonucu (`{ data?, error? }`)
-  - `err` — `catch` bloğunda yakalanan hata nesnesi (`unknown`)
-- **Dönüş**: yok (fonksiyon yan etkilerle `loading`, `data`, `categories` state’lerini günceller)
+  - `invRes` — `Promise.all` ile eş zamanlı olarak `supabase.from('inventory_summary').select(...)` çağrısının sonucu, inventory verilerini ve `.error` özelliğini tutar
+  - `catRes` — `Promise.all` ile eş zamanlı olarak `supabase.from('categories').select(...)` çağrısının sonucu, kategori verilerini ve `.error` özelliğini tutar
+  - `err` — `catch` bloğunda yakalanan hata nesnesi, `unknown` tipinde, `console.error` ile loglanır
+- **Dönüş**: yok (yan etki: `loading`, `data`, `categories` state'lerini günceller; hata olursa `toast.error` gösterir)
+
+---
+
+### [N3_NASIL] AST Pointer: `src/views/admin/AdminInventoryPage.tsx`::useEffectCallback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - (yok — doğrudan `fetchData()` çağrısı yapar)
+- **Dönüş**: yok (yan etki: bileşen mount edildiğinde `fetchData`'yı çağırır)
+
+---
+
+### [N4_NASIL] AST Pointer: `src/views/admin/AdminInventoryPage.tsx`::useMemoCallback (filteredData hesaplama)
+- **params**: (parametre yok — `useMemo` callback'i)
+- **ic_degiskenler**:
+  - `item` — `data.filter` callback'inin parametresi, `InventorySummaryRow` tipinde tek bir envanter satırı
+  - `matchesSearch` — boolean, `searchTerm` boşsa true,否则 `item.name` küçük harfe çevrilip `searchTerm` ile karşılaştırılır
+  - `matchesCategory` — boolean, `filterCategory` null ise true,否则 `item.category_id === filterCategory` kontrolü yapılır
+  - `stock` — `item.physical_stock || 0` ifadesinden hesaplanan fiziksel stok miktarı, default 0
+  - `threshold` — sabit `5` değeri, düşük stok eşik değeri olarak kullanılır
+  - `matchesStock` — boolean, `filterStockStatus` değerine göre (`'all'`/`'low'`/`'out'`) stok durumu eşleşmesini kontrol eder
+- **Dönüş**: filtrelenmiş ve normalize edilmiş `{ product_id, name, physical_stock, reserved_stock, available_stock, warehouse_location, supplier_name }` objesi dizisi
+
+---
+
+### [N5_NASIL] AST Pointer: `src/views/admin/AdminInventoryPage.tsx`::filterCallback (item => ...)
+- **params**: `item` — `InventorySummaryRow` tipinde, `data` dizisindeki tek bir satır
+- **ic_degiskenler**:
+  - `matchesSearch` — boolean, ürün adının `searchTerm` ile eşleşip eşleşmediğini tutar
+  - `matchesCategory` — boolean, `item.category_id` ile `filterCategory`'in eşleşip eşleşmediğini tutar
+  - `stock` — `item.physical_stock || 0` hesaplaması ile elde edilen sayısal stok değeri
+  - `threshold` — sabit `5` değeri, düşük stok eşiği
+  - `matchesStock` — boolean, `filterStockStatus` filtresine göre stok durumu eşleşmesini tutar
+- **Dönüş**: boolean — item filtre kriterlerini karşılıyorsa `true`, karşılamıyorsa `false`
+
+---
+
+### [N6_NASIL] AST Pointer: `src/views/admin/AdminInventoryPage.tsx`::mapCallback (item => {...})
+- **params**: `item` — `InventorySummaryRow` tipinde, filtrelenmiş `data` dizisindeki tek bir satır
+- **ic_degiskenler**:
+  - (yok — doğrudan obje döner)
+- **Dönüş**: `{ product_id: string, name: string, physical_stock: number, reserved_stock: number, available_stock: number, warehouse_location: string|undefined, supplier_name: string|undefined }` — normalize edilmiş envanter satırı objesi, `item.product_id || ''`, `item.name || 'İsimsiz Ürün'` gibi fallback değerlerle
 
 ---
 
@@ -48181,32 +47223,36 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminLogisticsPage.tsx
-skeleton_hash: e5d3c48e4a8d4389
+skeleton_hash: 9f9079228d1f2880
 entity_hashes:
   func:AdminLogisticsPage: 5503bc8a0114509c
-  overview: 9e734e9a0852443d
+  overview: a32062894d2b0cbb
   style_tokens: ed7e03291afa4b48
-generated_at: 2026-05-28T22:39:02Z
+generated_at: 2026-05-29T18:57:32Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin yönetici arayüzünde yer alan lojistik işlemleri sayfasını oluşturan React bileşenidir. Sistemin lojistik modülünün yönetici tarafından erişilen ana giriş noktası olarak çalışır, tüm lojistikle ilgili yönetici işlemlerinin tek bir merkezde sunulmasını sağlar.
+AdminLogisticsPage, VentHub HVAC projesinin yönetici panelinde lojistik süreçlerin yönetimini sağlayan bir React sayfa bileşenidir. Tek başına modülün tüm sorumluluğunu üstlenen bu bileşen, admin arayüzünde lojistik verilerinin görüntülenmesi ve yönetilmesi için bir arayüz sunar.
 
 ## Fonksiyon Grupları
-### Ana Lojistik Sayfa Bileşeni
-Yönetici arayüzündeki lojistik sayfasının tüm yapısını barındıran tek ana bileşendir, admin panelindeki lojistik modülünün temel çalışma noktası olarak görev görür.
+### Ana Sayfa Bileşeni
+Yönetici arayüzündeki lojistik yönetim sayfasının tamamını temsil eden tek bileşendir. Admin panelinde lojistik modülünün görünüm ve etkileşim mantığını barındırır.
 - AdminLogisticsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı admin paneli lojistik yönetim sayfası modülünün güvenli, erişilebilir ve tutarlı çalışması için uygulamanın yetkilendirme, yönlendirme, ortak UI bileşenleri ve backend iletişim altyapılarının tam olarak çalışır durumda olması zorunludur.
+Bu modül için fonksiyon gövdesi verilmediğinden, sadece fonksiyon imzasından çıkarılabilecek minimal varsayımlar tanımlanabilir.
 
-[Aksiyom 1]: Eğer kullanıcı rolleri bazlı yetkilendirme mekanizması yoksa, yetkisi olmayan普通 kullanıcılar bu yönetim sayfasına erişebilir, lojistik ve sistem verilerinin güvenliği ihlal olur.
-[Aksiyom 2]: Eğer uygulama içi rota (routing) altyapısı bu sayfayı tanımlı admin rota adresi altında sunmuyorsa, yetkili admin kullanıcıları bile lojistik yönetim arayüzüne erişemez.
-[Aksiyom 3]: Eğer sayfanın lojistik verilerini çekmek ve işlemek için kullandığı backend API servisleri erişilemez durumdaysa, sayfadaki tüm yönetim fonksiyonları devre dışı kalır, hiçbir işlem gerçekleştirilemez.
-[Aksiyom 4]: Eğer uygulamanın diğer admin sayfalarıyla ortak kullanılan temel UI bileşenleri (kenar çubuğu, üst menü, izin kontrolü butonları vb.) bu sayfa ile entegre çalışmıyorsa, AdminLogisticsPage diğer admin arayüzleriyle tutarsız bir deneyim sunar, kullanıcı işlem yapamaz hale gelir.
-[Aksiyom 5]: Eğer sayfada kullanıcı girdilerini temizleyen XSS gibi web güvenliği önlemleri uygulanmamışsa, kötü niyetli girdilerle admin hesabı ele geçirilebilir ya da sistemdeki lojistik veriler değiştirilebilir.
+[Aksiyom 1]: Eğer React runtime veya JSX transformasyonu yoksa, bileşen render edilemez.
+
+[Aksiyom 2]: Eğer bu bileşen çağrıldığında bir React Component dönmüyorsa, üst bileşenin render ağacı kırılır.
+
+[Aksiyom 3]: Fonksiyon imzasında parametre almadığından, bileşen dışarıdan prop ile beslenemez; bağımlılıklarını kendi içinde veya global state üzerinden çözmelidir.
+
+[Aksiyom 4]: AdminLogisticsPage(), bir React sayfa bileşeni olarak tanımlandığından, çağrılmadan önce React ortamının (React, ReactDOM, Router vb.) hazır olması gerekir; eğer bu bağımlılıklar sağlanmamışsa bileşen hata fırlatır.
+
+> **Not:** Fonksiyon gövdesi (body) paylaşılmadığı için, modülün iç işleyişine, state yönetimine, API çağrılarına veya conditional render mantığına dair aksiyom üretmek mümkün değildir. Daha kapsamlı mimari varsayımlar için fonksiyon gövdesi gereklidir.
 
 ---
 
@@ -48235,115 +47281,113 @@ Bu React tabanlı admin paneli lojistik yönetim sayfası modülünün güvenli,
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::AdminLogisticsPage
+### [N1_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::AdminLogisticsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, metinleri çevirmek için kullanılır
-  - `canWrite` — useRole hook'undan gelen yetki kontrol fonksiyonu, yazma izni olup olmadığını kontrol eder
-  - `hasWriteAccess` — lojistik modülü için yazma izni olup olmadığını tutan boolean değer
-  - `dragScrollRef` — sürükleyerek kaydırma işlevi için div elementine bağlanan ref nesnesi
-  - `rows` — bekleyen siparişlerin tutulduğu state, LogisticsRow tipinde dizi
-  - `setRows` — rows state'ini güncellemek için kullanılan setter fonksiyonu
-  - `loading` — veri yükleme durumunu tutan state boolean'ı
-  - `setLoading` — loading state'ini güncelleyen setter fonksiyonu
-  - `saving` — toplu kaydetme işleminin durumunu tutan state boolean'ı
-  - `setSaving` — saving state'ini güncelleyen setter fonksiyonu
-  - `globalCarrier` — tüm siparişlere uygulanacak varsayılan kargo firmasını tutan state string'i
-  - `setGlobalCarrier` — globalCarrier state'ini güncelleyen setter fonksiyonu
-  - `fetchPendingOrders` — bekleyen siparişleri veritabanından çeken useCallback ile sarmalanmış async fonksiyon
-  - `pathname` — Next.js usePathname hook'undan gelen mevcut sayfa yolu
-  - `updateRow` — tek bir sipariş satırındaki alanı güncelleyen fonksiyon
-  - `applyGlobalCarrier` — seçilen global kargo firmasını tüm kaydedilmemiş siparişlere uygulayan fonksiyon
-  - `generateTrackingUrl` — kargo firması ve takip numarasına göre takip bağlantısı oluşturan fonksiyon
-  - `handleBulkSubmit` — tüm kaydedilmemiş geçerli siparişlerin kargo bilgilerini toplu olarak kaydeden async fonksiyon
-- **Dönüş**: Admin lojistik sayfasının JSX elementi
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu, UI metinleri için kullanılır
+  - `canWrite` — useRole() hook'undan gelen rol kontrol fonksiyonu, yazma izni sorgulanır
+  - `hasWriteAccess` — canWrite('logistics') çağrısının sonucu, lojistik modülünde yazma izni olup olmadığını boolean olarak tutar
+  - `dragScrollRef` — useDragScroll<HTMLDivElement>() hook'undan dönen ref, sürükleme ile yatay kaydırma için tablo div'ine bağlanır
+  - `rows` / `setRows` — useState<LogisticsRow[]>([]) ile oluşturulan sipariş satırları dizisi ve setter'ı, bekleyen siparişleri tutar
+  - `loading` / `setLoading` — useState(true) ile oluşturulan yükleme durumu boolean'ı ve setter'ı
+  - `saving` / `setSaving` — useState(false) ile oluşturulan kaydetme durumu boolean'ı ve setter'ı, toplu gönderim sırasında true olur
+  - `globalCarrier` / `setGlobalCarrier` — useState('Yurtiçi') ile oluşturulan global kargo taşıyıcı adı string'i ve setter'ı, "Tümüne Uygula" için kullanılır
+  - `fetchPendingOrders` — useCallback ile sarılmış asenkron fonksiyon, veritabanından bekleyen siparişleri çeker
+  - `pathname` — usePathname() hook'undan gelen mevcut URL yolu, sayfa değişikliğinde veri yenileme tetikler
+- **ic_fonksiyonlar**:
+  - `fetchPendingOrders` — asenkron useCallback fonksiyonu
+  - `updateRow` — tek bir satırın kargo veya takip numarasını güncelleyen fonksiyon
+  - `applyGlobalCarrier` — tüm kaydedilmemiş satırlara seçili global kargo taşıyıcısını uygular
+  - `generateTrackingUrl` — taşıyıcı adı ve takip numarasına göre kargo sorgulama URL'i üretir
+  - `handleBulkSubmit` — asenkron fonksiyon, tüm hazırlanan siparişleri toplu olarak sunucuya gönderir
+- **Dönüş**: JSX (React bileşeni)
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::fetchPendingOrders
+---
+
+### [N2_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::fetchPendingOrders
+- **params**: (parametre yok — useCallback闭包)
+- **ic_degiskenler**:
+  - `data` — supabase.from('view_admin_orders').select() çağrısından dönen satırlar dizisi, ham veri tutar
+  - `error` — supabase select çağrısından dönen hata nesnesi, varsa fırlatılır
+- **Dönüş**: Promise<void> — state'leri (rows, loading) günceller, dönüş değeri yok
+
+---
+
+### [N3_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::map_transform_callback (fetchPendingOrders içindeki data.map)
+- **params**: `r` — supabase'den gelen tek bir sipariş satırı (ham veri objesi)
+- **ic_degiskenler**: (yok — inline transform)
+- **Dönüş**: LogisticsRow objesi — { id, order_number, customer_name, created_at, carrier, tracking_number, saved }
+
+---
+
+### [N4_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::useEffect_callback
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — fetchPendingOrders() çağırarak yan etki oluşturur
+
+---
+
+### [N5_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::updateRow
+- **params**: `id` (string) — güncellenecek satırın benzersiz kimliği, `field` ('carrier' | 'tracking_number') — güncellenecek alan adı, `val` (string) — yeni değer
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — setRows ile state'i günceller, ilgili satırın alanını değiştirir ve saved flag'ini false yapar
+
+---
+
+### [N6_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::applyGlobalCarrier
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — setRows ile globalCarrier değerini kaydedilmemiş tüm satırlara uygular ve toast.success gösterir
+
+---
+
+### [N7_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::generateTrackingUrl
+- **params**: `carrier` (string) — kargo taşıyıcı adı (ör. "Yurtiçi", "Aras"), `tracking` (string) — kargo takip numarası
+- **ic_degiskenler**:
+  - `c` — carrier değerinin küçük harfe çevrilmiş hali, taşıyıcı adı eşleştirmede kullanılır
+- **Dönüş**: string | null — taşyıcıya uygun kargo sorgulama URL'i veya eşleşme yoksa null
+
+---
+
+### [N8_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::handleBulkSubmit
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `setLoading` — yükleme durumunu true'ya çeken state setter'ı
-  - `ensureSessionFresh` — oturumun geçerliliğini kontrol eden async fonksiyon
-  - `supabase` — Supabase istemcisi, veritabanı sorguları için kullanılır
-  - `data` — Supabase sorgusundan dönen sipariş verileri
-  - `error` — Sorgu sırasında oluşan hata nesnesi
-  - `setRows` — işlenmiş sipariş verilerini rows state'ine kaydeden setter
-  - `t` — Çeviri fonksiyonu, boş alanlar için varsayılan metinleri almak için kullanılır
-  - `err` — Try bloğunda yakalanan hata nesnesi
-  - `toast` — Kullanıcıya hata bildirimi gösteren toast fonksiyonu
-- **Dönüş**: void (async)
+  - `targets` — rows dizisinden filtrelenmiş, takip numarası dolu ve henüz kaydedilmemiş satırlar dizisi, toplu gönderim adayları
+  - `errCount` — hata sayacı, her başarısız satır güncellemesinde bir artar
+  - `results` — Promise.all ile tüm supabase fonksiyon çağrılarının sonuçlarının dizisi, her eleman { id, ok } formatında
+- **Dönüş**: Promise<void> — state'leri (rows, saving) günceller, toast bildirimleri gösterir
 
-### [N3_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::useEffect_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `fetchPendingOrders` — Sayfa yüklendiğinde veya yol değiştiğinde bekleyen siparişleri çeken fonksiyon
-- **Dönüş**: yok
+---
 
-### [N4_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::updateRow
-- **params**: id: string, field: 'carrier' | 'tracking_number', val: string
+### [N9_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::handleBulkSubmit_inner_callback (Promise.all içindeki async)
+- **params**: `row` — targets dizisinden gelen tek bir LogisticsRow objesi
 - **ic_degiskenler**:
-  - `setRows` — rows state'ini güncelleyen setter fonksiyonu
-  - `prev` — Güncelleme öncesi mevcut rows state değeri
-- **Dönüş**: yok
+  - `turl` — generateTrackingUrl(row.carrier, row.tracking_number) çağrısından dönen kargo takip URL'i, supabase fonksiyonuna gönderilir
+  - `fnErr` — supabase.functions.invoke('admin-update-shipping') çağrısından dönen hata nesnesi, yoksa succeeded demektir
+- **Dönüş**: { id: string, ok: boolean } — satır kimliği ve başarılı olup olmadığı
 
-### [N5_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::applyGlobalCarrier
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setRows` — Tüm kaydedilmemiş satırların kargo firmasını güncellemek için kullanılan state setter'ı
-  - `prev` — Güncelleme öncesi mevcut rows state değeri
-  - `globalCarrier` — Tüm satırlara uygulanacak seçili global kargo firması değeri
-  - `toast` — İşlem başarılı olduğunda kullanıcıya bildirim gösteren fonksiyon
-  - `t` — Bildirim metnini çevirmek için kullanılan çeviri fonksiyonu
-- **Dönüş**: yok
+---
 
-### [N6_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::generateTrackingUrl
-- **params**: carrier: string, tracking: string
+### [N10_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::setRows_callback_in_handleBulkSubmit
+- **params**: `prev` — güncellenmemiş önceki rows dizisi
 - **ic_degiskenler**:
-  - `c` — Küçük harfe çevrilmiş kargo firması adı, firma kontrolü için kullanılır
-- **Dönüş**: kargo takip bağlantısı string'i veya eşleşme olmazsa null
+  - `res` — results.find(x => x.id === r.id) ile bulunan, mevcut satırın sonuç kaydı { id, ok } veya undefined
+- **Dönüş**: LogisticsRow[] — güncellenmiş satırlar dizisi, başarılı olanların saved alanı true yapılır, bulunamayanlar aynen döner
 
-### [N7_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::handleBulkSubmit
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `rows` — Mevcut tüm sipariş satırlarını içeren state değeri
-  - `targets` — Takip numarası girilmiş ve henüz kaydedilmemiş siparişlerin filtrelenmiş dizisi
-  - `toast` — Kullanıcıya uyarı/bildirim gösteren fonksiyon
-  - `t` — Bildirim metinlerini çevirmek için kullanılan çeviri fonksiyonu
-  - `setSaving` — Kaydetme durumunu true'ya çeken state setter'ı
-  - `errCount` — Kaydetme sırasında oluşan hataların sayısını tutan sayaç
-  - `results` — Tüm siparişlerin kaydetme işlemlerinin sonuçlarını içeren dizi
-  - `setRows` — Başarıyla kaydedilen siparişlerin durumunu güncellemek için kullanılan state setter'ı
-  - `prev` — Güncelleme öncesi mevcut rows state değeri
-  - `res` — Mevcut satırın kaydetme işlemi sonucu, sonuçlar dizisinden bulunur
-- **Dönüş**: void (async)
+---
 
-### [N8_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::targets_map_async_callback
-- **params**: row: LogisticsRow
+### [N11_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::setRows_inner_callback (handleBulkSubmit setRows içindeki r.map callback)
+- **params**: `r` —prev dizisindeki tek bir LogisticsRow objesi
 - **ic_degiskenler**:
-  - `turl` — Oluşturulan kargo takip bağlantısı
-  - `generateTrackingUrl` — Takip bağlantısı oluşturan fonksiyon
-  - `supabase` — Supabase Edge Function'ını çağırmak için kullanılan istemci
-  - `fnErr` — Edge Function çağrısı sırasında oluşan hata nesnesi
-- **Dönüş**: { id: string, ok: boolean } — Siparişin kayıt durumu
+  - `res` — results.find(x => x.id === r.id) ile bulunan sonuç kaydı { id, ok } veya undefined
+- **Dönüş**: LogisticsRow — güncellenmiş satır objesi, ok ise saved:true yapılır, res.ok false ise errCount artırılır, res yoksa aynı satır döner
 
-### [N9_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::setRows_map_callback
-- **params**: r: LogisticsRow
-- **ic_degiskenler**:
-  - `res` — Mevcut satırın kayıt sonucu, sonuçlar dizisinden bulunur
-  - `results` — Tüm siparişlerin kayıt sonuçlarını içeren dizi
-  - `errCount` — Başarısız kayıtların sayısını artırmak için kullanılan sayaç
-- **Dönüş**: Güncellenmiş LogisticsRow nesnesi (kaydedilmiş olarak işaretlenmiş)
+---
 
-### [N10_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::rows_map_jsx_callback
-- **params**: row: LogisticsRow, idx: number
-- **ic_degiskenler**:
-  - `row.id` — Satırın benzersiz kimliği, React anahtarı olarak kullanılır
-  - `row.saved` — Satırın kaydedilme durumu, satır stili ve girişlerin kilit durumu için kullanılır
-  - `hasWriteAccess` — Kullanıcının yazma izni olup olmadığı, girişlerin aktiflik durumu için kullanılır
-  - `saving` — Toplu kayıt işleminin devam edip etmediği, girişlerin kilit durumu için kullanılır
-  - `updateRow` — Satırdaki kargo firması veya takip numarası değiştiğinde alanı güncelleyen fonksiyon
-  - `t` — Tablodaki metinleri çevirmek için kullanılan çeviri fonksiyonu
-  - `idx` — Satırın indeksi, animasyon gecikmesi hesaplamak için kullanılır
-- **Dönüş**: <tr> JSX elementi, sipariş satırını temsil eder
+### [N12_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::table_map_callback (JSX içindeki rows.map)
+- **params**: `row` (LogisticsRow) — render edilecek tek bir sipariş satırı, `idx` (number) — satırın dizideki indeksi, animasyon gecikmesi için kullanılır
+- **ic_degiskenler**: (yok — inline JSX transform)
+- **Dönüş**: JSX tr elementi — sipariş numarası, müşteri adı, kargo taşıyıcı select'i, takip numarası input'u ve durum göstergesini içeren tablo satırı
 
 ---
 
@@ -48767,273 +47811,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** `!px-4`, `${adminCardClass`, `${adminTableActionWarningClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${cellPad`, `${headPad`, `${m.delta`, `0`, `:`, `<`, `>`, `animate-pulse`, `border`, `font-black`
 
 ---
-# FILE: src\views\admin\AdminOrdersBoard.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersBoard.tsx
-skeleton_hash: 000343eece54be5b
-entity_hashes:
-  func:AdminOrdersBoard: 95304a8afde2c182
-  func:MiniDetailPanel: 57eeb99849ddcfbc
-  func:OrderStepper: d81db7fb6641c248
-  func:getEffectiveStatus: ea418f0307dfab79
-  func:shardColor: 021e3e606c5c9dff
-  overview: 29c093f4c4ea3400
-  style_tokens: fede8f2e3790a5c2
-generated_at: 2026-05-28T22:39:31Z
----
-
-## Genel Bakış
-`AdminOrdersBoard` modülü, yönetim panelinde siparişlerin durumlarını görselleştiren ve detaylarını incelemeye yarayan bir arayüz sunar. Sipariş satırlarından etkili durum bilgisini türetir, bu duruma göre renk ve adım göstergesi üretir ve kullanıcı etkileşimlerine (detay paneli açma/kapama, sürükleme) yanıt verir.
-
-## Fonksiyon Grupları
-### UI Bileşenleri
-Bu grup, JSX/React bileşenleri olarak kullanıcı arayüzünü oluşturur ve diğer yardımcı fonksiyonları kullanarak görsel çıktıyı üretir.  
-- **AdminOrdersBoard**, **OrderStepper**, **MiniDetailPanel**
-
-### Yardımcı / İş Mantığı Fonksiyonları
-Durum hesaplamaları ve stil/renk belirlemeleri gibi iş mantığını soyutlayarak UI bileşenlerinin daha temiz kalmasını sağlar.  
-- **getEffectiveStatus**, **shardColor**  
-
-**İlişkiler:**  
-- `AdminOrdersBoard` ana konteyner bileşeni olarak `getEffectiveStatus` ve `shardColor` fonksiyonlarını çağırır; ayrıca `OrderStepper` ve `MiniDetailPanel` bileşenlerini iç içe yerleştirir.  
-- `OrderStepper` muhtemelen `getEffectiveStatus` sonucunu alarak adım göstergesini oluşturur.  
-- `MiniDetailPanel` doğrudan iş mantığı fonksiyonlarını çağırmaz, sadece kendisine gelen `order` nesnesini gösterir.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### getEffectiveStatus
-**Ne yapar**: Bir sipariş nesnesinin gerçek durumunu belirler; ödeme iade edilmişse iade durumunu, aksi takdirde siparişin mevcut durumunu döndürür.  
-**Nasıl yapar**: `order.payment_status` değerini kontrol eder; eğer `'refunded'` veya `'partial_refunded'` ise bu değeri, değilse `order.status` alanını (veya yoksa `'pending'`) döndürür.  
-**Parametreler**:
-- `order`: `AdminOrderRow` — Sipariş verisini içeren nesne; `payment_status` ve `status` alanlarını barındırır.  
-**Dönüş**: `string` — Hesaplanmış etkili sipariş durumu.
-
-### OrderStepper
-**Ne yapar**: Siparişin mevcut adımını görsel bir stepper (adım göstergesi) olarak render eder; iptal veya iade durumunda özel bir uyarı mesajı gösterir.  
-**Nasıl yapar**: `status` değerine göre adım indeksini `getStepIndex` fonksiyonuyla bulur, iptal/ iade kontrolü yapar ve ilgili JSX yapısını döndürür. Stepper içinde adımların etiketleri i18n çevirileriyle oluşturulur ve ilerleme çubuğu dinamik olarak genişletilir.  
-**Parametreler**:
-- `status`: `string` — Siparişin geçerli durumu; stepper’ın hangi adımda olacağını belirler.  
-**Dönüş**: JSX element (React bileşeni) — Stepper UI’si veya iptal/ iade uyarı mesajı.
-
-### MiniDetailPanel
-**Ne yapar**: Seçili bir siparişin detaylarını, notlarını, e‑posta loglarını ve lojistik bilgilerini gösteren modal bir panel sunar; ayrıca yeni not ekleme işlevi sağlar.  
-**Nasıl yapar**: `useEffect` içinde siparişle ilgili not, e‑posta log ve taşıyıcı bilgilerini asenkron olarak Supabase’dan çeker, state’leri günceller. Not ekleme fonksiyonu yetki kontrolü yapar, Supabase’a kaydeder ve UI’yı yeniler. Panel, kapanma işlemi için dış tıklama ve Escape tuşu dinleyicileri içerir.  
-**Parametreler**:
-- `order`: `AdminOrderRow` — Görüntülenecek sipariş nesnesi.  
-- `onClose`: `() => void` — Paneli kapatmak için çağrılan geri dönüş fonksiyonu.  
-- `hasWriteAccess`: `boolean` — Kullanıcının not ekleme yetkisi olup olmadığını belirten bayrak.  
-**Dönüş**: JSX element (React bileşeni) — Detay paneli UI’si.
-
-### AdminOrdersBoard
-**Ne yapar**: Yönetim panelinde siparişleri kanban tarzı bir tablo içinde gösterir; sürükle‑bırak ile durum değişikliği, filtreleme, yenileme ve mobil/masaüstü uyumlu görünüm sağlar.  
-**Nasıl yapar**: `useEffect` ile siparişleri Supabase’dan çeker, `COLUMNS` tanımıyla her durum grubu için kolon konfigürasyonu oluşturur. `react-beautiful-dnd` ile sürükle‑bırak mantığını yönetir, `onDragEnd` içinde yetki kontrolü, durum güncellemesi ve hata yönetimi yapılır. UI, kaydırma butonları, mobil sekme geçişleri ve seçili sipariş için `MiniDetailPanel` entegrasyonu içerir.  
-**Parametreler**: *(yok)*  
-**Dönüş**: JSX element (React bileşeni) — Sipariş panosu UI’si.
-
-### shardColor
-**Ne yapar**: Sipariş durumuna göre renkli bir arka plan “shard” (parçacık) oluşturur; sürükleme sırasında görünmez hâle getirir.  
-**Nasıl yapar**: `status` değerini küçük harfe çevirir, önceden tanımlı durum‑renk eşleştirmesine göre CSS sınıfını seçer ve ilgili `div` elementini döndürür; `isDragging` true ise `null` döner.  
-**Parametreler**:
-- `status`: `string` — Siparişin mevcut dur renk seçimini etkiler.  
-- `isDragging`: `boolean` — Sürükleme durumu; true ise renkli öğe gösterilmez.  
-**Dönüş**: JSX element (`<div>` with color class) veya `null` — Duruma göre renkli arka plan veya boş değer.
-
----
-
-## INTERFACES
-
-### AdminOrderRow
-- `id: string`
-- `status: string`
-- `user_id?: string | null`
-- `total_amount?: number | null`
-- `created_at: string`
-- `customer_name?: string | null`
-- `customer_email?: string | null`
-- `customer_phone?: string | null`
-- `order_number?: string | null`
-- `payment_status?: string | null`
-
-### ColumnDef
-- `id: ColumnId`
-- `title: string`
-- `statuses: string[]`
-- `icon: LucideIcon`
-- `colorClass: string`
-- `bgClass: string`
-- `targetStatus: string`
-
-### ColumnDef
-- `id: ColumnId`
-- `title: string`
-- `statuses: string[]`
-- `icon: LucideIcon`
-- `colorClass: string`
-- `bgClass: string`
-- `targetStatus: string`
-
-### OrderDetail
-- `notes: { id: string; note: string; created_at: string }[]`
-- `emailLogs: { subject: string; created_at: string }[]`
-- `carrier?: string | null`
-- `tracking_number?: string | null`
-
----
-
-## TYPE ALIASES
-
-### ColumnId
-```typescript
-type ColumnId = 'col_new' | 'col_prep' | 'col_shipped' | 'col_done' | 'col_cancel' | 'col_refund'
-```
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: `src/views/admin/AdminOrdersBoard.tsx::getEffectiveStatus`
-- **params**: `(order: AdminOrderRow)` — sipariş nesnesi
-- **ic_degiskenler**:
-  - Yok — doğrudan parametre özellikleri üzerinden okuma yapılır
-- **Dönüş**: `string` — geçerli sipariş durumu (payment_status refunded/partial_refunded ise o, değilse order.status veya 'pending')
-
----
-
-### [N2_NASIL] AST Pointer: `src/views/admin/AdminOrdersBoard.tsx::OrderStepper`
-- **params**: `({ status }: { status: string })` — mevcut sipariş durumu
-- **ic_degiskenler**:
-  - `t` — useI18n() hook'undan çeviri fonksiyonu
-  - `steps` — 5 adımlık sırada ilerleme tanımı dizisi (pending → paid → confirmed → shipped → her birinde key ve label içerir)
-  - `getStepIndex` — inner fonksiyon, durum string'ini adım indeksine (0-4) eşler; completed/delivered→4, shipped→3, confirmed/processing→2, paid→1, diğer→0
-  - `currentIndex` — `getStepIndex(status)` çağrısının sonucu, mevcut adım pozisyonu (0-4 arası tam sayı)
-  - `isCancelled` — boolean, durum cancelled/refunded/partial_refunded ise true
-- **Dönüş**: JSX element (iptal edilmişse rose renkli uyarı div'i, değilse progress stepper bileşeni)
-
----
-
-### [N3_NASIL] AST Pointer: `src/views/admin/AdminOrdersBoard.tsx::MiniDetailPanel`
-- **params**: `({ order, onClose, hasWriteAccess })`
-  - `order: AdminOrderRow` — detayı gösterilecek sipariş nesnesi
-  - `onClose: () => void` — paneli kapatma callback'i
-  - `hasWriteAccess: boolean` — kullanıcının yazma izni olup olmadığı
-- **ic_degiskenler**:
-  - `t` — useI18n() hook'undan çeviri fonksiyonu
-  - `lang` — useI18n() hook'undan aktif dil kodu
-  - `detail` — `useState<OrderDetail | null>(null)` state'i, yüklenen detay verisi (notes, emailLogs, carrier, tracking_number)
-  - `loading` — `useState(true)` state'i, veri yüklenme durumu
-  - `noteInput` — `useState('')` state'i, kullanıcı not giriş alanı değeri
-  - `saving` — `useState(false)` state'i, not kaydetme işlemi devam ediyor mu
-  - `mounted` — useEffect içindeki flag, bileşen unmount olduktan sonra state güncellemesini engeller
-  - `load` — async inner fonksiyon, useEffect içinde tanımlı; ensureSessionFresh() çağırıp Promise.all ile üç paralel supabase sorgusu çalıştırır
-  - `notesRes` — `supabase.from('order_notes').select(...)` sonucu, sipariş notları (id, note, created_at)
-  - `logsRes` — `supabase.from('shipping_email_events').select(...)` sonucu, kargo e-posta event logları (subject, created_at)
-  - `orderRes` — `supabase.from('venthub_orders').select('carrier,tracking_number')` sonucu, kargo taşıyıcı ve takip numarası
-  - `addNote` — async fonksiyon, not ekleme iş mantığı; hasWriteAccess kontrolü, boş input kontrolü, supabase insert, state güncelleme, toast bildirimleri
-  - `data` — `supabase.from('order_notes').insert(...).select(...).single()` sonucu, eklenen yeni not nesnesi
-  - `error` — `supabase.from('order_notes').insert(...)` hata sonucu, hata varsa throw edilir
-- **Dönüş**: yok (JSX modal panel bileşeni render eder)
-
----
-
-### [N4_NASIL] AST Pointer: `src/views/admin/AdminOrdersBoard.tsx::AdminOrdersBoard`
-- **params**: yok (parametresiz React bileşeni)
-- **ic_degiskenler**:
-  - `pathname` — `usePathname()` hook'undan mevcut URL yolu, sayfa yükleme tetikleyicisi olarak kullanılır
-  - `t` — `useI18n()` hook'undan çeviri fonksiyonu
-  - `lang` — `useI18n()` hook'undan aktif dil kodu
-  - `canWrite` — `useRole()` hook'undan rol tabanlı yazma izni kontrol fonksiyonu
-  - `hasWriteAccess` — `canWrite('orders')` çağrısı sonucu boolean, kullanıcının siparişleri düzenleme izni
-  - `orders` — `useState<AdminOrderRow[]>([])` state'i, tüm siparişlerin listesi
-  - `loading` — `useState(true)` state'i, veri yüklenme durumu
-  - `selectedOrder` — `useState<AdminOrderRow | null>(null)` state'i, detay paneli için seçili sipariş
-  - `expandedCol` — `useState<ColumnId | null>('col_new')` state'i, mobilde genişletilmiş/aktif kanban sütunu
-  - `scrollRef` — `useRef<HTMLDivElement>(null)`, yatay kaydırma konteyneri DOM referansı
-  - `COLUMNS` — `React.useMemo` ile memoize edilmiş `ColumnDef[]` dizisi; 6 sütun tanımı (col_new, col_prep, col_shipped, col_done, col_cancel, col_refund), her birinde id, title, statuses, icon, colorClass, bgClass, targetStatus; `t` bağımlılığı
-  - `fetchOrders` — `useCallback` ile memoize edilmiş async fonksiyon; ensureSessionFresh() çağırıp `supabase.from('view_admin_orders').select(...)` ile siparişleri yükler, max 200 kayıt, hata durumunda toast gösterir
-  - `scrollBoard` — `(direction: 'left' | 'right')` parametreli fonksiyon, `scrollRef.current.scrollBy()` ile 340px yatay kaydırma yapar
-  - `getOrdersByCol` — `(colId: ColumnId)` parametreli fonksiyon, sütun tanımını `COLUMNS.find()` ile bulup `orders.filter()` ile ilgili sütununstatuses'ine uyan siparişleri döndürür
-  - `onDragEnd` — `(result: DropResult)` parametreli async fonksiyon, sürükleme-bırakma işlemini yönetir; izin kontrolü, hedef/hedef yoklama, `destCol` (hedef sütun tanımı `COLUMNS.find(c => c.id === destination.droppableId)`), `targetOrder` (sürüklünen sipariş `orders.find(o => o.id === draggableId)`), `targetStatus` (hedef durum `destCol.targetStatus`), `effectiveCurrent` (mevcut etkin durum), `oldStatus` (değişiklik öncesi durum), optimistic state güncelleme (`setOrders`), `res` (`updateOrderStatus()` API çağrısı sonucu)
-  - `destCol` — `onDragEnd` içinde, `COLUMNS.find(c => c.id === destination.droppableId)` ile bulunan hedef sütun tanımı
-  - `targetOrder` — `onDragEnd` içinde, `orders.find(o => o.id === draggableId)` ile bulunan sürüklünen sipariş nesnesi
-  - `targetStatus` — `onDragEnd` içinde, `destCol.targetStatus` değerinden gelen hedef durum string'i
-  - `effectiveCurrent` — `onDragEnd` içinde, `getEffectiveStatus(targetOrder)` çağrısı sonucu
-  - `oldStatus` — `onDragEnd` içinde, `targetOrder.status` değerinden gelen değişiklik öncesi durum
-  - `res` — `onDragEnd` içinde, `updateOrderStatus({...})` API çağrısı sonucu; `res.ok` ile başarı kontrolü
-- **Dönüş**: yok (React bileşeni JSX render eder; loading durumunda AdminSkeleton, normalde DragDropContext ile kanban board + MiniDetailPanel render eder)
-
----
-
-### [N5_NASIL] AST Pointer: `src/views/admin/AdminOrdersBoard.tsx::shardColor`
-- **params**: `(status: string, isDragging: boolean)`
-  - `status` — sipariş durumu string'i
-  - `isDragging` — sürükleme sırasında olup olmadığı flag'i
-- **ic_degiskenler**:
-  - `base` — `status.toLowerCase()` ile küçültülmüş durum string'i
-  - `color` — Tailwind arka plan renk class'ı; duruma göre belirlenir (pending→amber, paid/confirmed/processing→cyan, shipped→blue, delivered/completed→emerald, cancelled→rose, refunded/partial_refunded→orange, diğer→slate)
-- **Dönüş**: JSX element veya `null` (isDragging true ise null, değilse durum rengine göre absolute pozisyonlu blur efektli dekoratif div)
-
----
-
-
-## MERMAID CALL GRAPH
-```mermaid
-graph TD
-    AdminOrdersBoard_tsx__AdminOrdersBoard["AdminOrdersBoard"]
-    AdminOrdersBoard_tsx__MiniDetailPanel["MiniDetailPanel"]
-    AdminOrdersBoard_tsx__OrderStepper["OrderStepper"]
-    AdminOrdersBoard_tsx__getEffectiveStatus["getEffectiveStatus"]
-    AdminOrdersBoard_tsx__shardColor["shardColor"]
-    AdminOrdersBoard_tsx__AdminOrdersBoard --> AdminOrdersBoard_tsx__shardColor
-    AdminOrdersBoard_tsx__AdminOrdersBoard --> AdminOrdersBoard_tsx__getEffectiveStatus
-    AdminOrdersBoard_tsx__MiniDetailPanel --> AdminOrdersBoard_tsx__getEffectiveStatus
-```
-
-## NODE ID STANDARD
-
-  file: src\views\admin\AdminOrdersBoard.tsx
-  function: src\views\admin\AdminOrdersBoard.tsx::getEffectiveStatus
-  function: src\views\admin\AdminOrdersBoard.tsx::OrderStepper
-  function: src\views\admin\AdminOrdersBoard.tsx::MiniDetailPanel
-  function: src\views\admin\AdminOrdersBoard.tsx::AdminOrdersBoard
-  function: src\views\admin\AdminOrdersBoard.tsx::shardColor
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: AdminOrdersBoard
-  export: MiniDetailPanel
-  export: OrderStepper
-  export: getEffectiveStatus
-  export: shardColor
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `rounded-hvac-lg`, `rounded-hvac-xl`, `shadow-glow-md`, `shadow-glow-sm`, `tracking-hvac-normal`, `tracking-hvac-relaxed`, `tracking-hvac-tight`
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-400/5`, `bg-blue-500/10`, `bg-blue-500/20`, `bg-clip-text`, `bg-cyan-400`, `bg-cyan-500`, `bg-cyan-500/5`, `bg-gradient-to-r`, `bg-rose-500/10`, `bg-surface-darker/40`, `bg-white`, `bg-white/10`, `bg-white/2`, `bg-white/3`, `bg-white/5`
-- **Layout:** `!h-42px`, `-right-4`, `-top-4`, `-z-10`, `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `bg-clip-text`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-white`
-- **Varyant/Responsive:** `:`, `disabled:`, `group-hover:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `!px-5`, `${!isExpanded`, `${adminButtonPrimaryClass`, `${col.bgClass`, `${col.colorClass`, `${color`, `${isActive`, `${isCurrent`, `${isExpanded`, `${isPast`, `${snapshot.isDragging`, `${snapshot.isDraggingOver`, `-mx-1`, `-translate-y-1/2`, `:`
-
----
 # FILE: src\views\admin\AdminOrdersPage.md
 
 ---
@@ -49062,77 +47839,62 @@ entity_hashes:
   func:sortIndicator: 43ac755400ab07d3
   func:submitShip: 0b47468e1ba29f91
   func:toggleSort: 5416b105263f00aa
-  overview: f85949eb6d5dc985
+  overview: df69e61bb4e6b055
   style_tokens: 37fc37c91a33397d
-generated_at: 2026-05-28T22:39:02Z
+generated_at: 2026-05-29T18:59:08Z
 ---
 
 ## Genel Bakış
-`AdminOrdersPage.tsx`, yönetici paneli içinde sipariş listesini gösteren ve yönetimi sağlayan bir React bileşenidir. Sayfa, sipariş tablosunu sıralama, filtreleme ve dışa aktarma işlevlerini birleştiren çeşitli modal pencereler aracılığıyla gönderi, log ve not işlemlerini yönetir. Ayrıca, tarih, para birimi ve durum gibi verileri görsel olarak düzenleyen yardımcı fonksiyonlar içerir.
+`AdminOrdersPage.tsx`, yönetici panelinde siparişlerin listelendiği, sıralandığı ve yönetildiği ana sayfa bileşenidir. Bu modül, sipariş verilerini görsel bir tabloda sunarak gönderi takibi, not yönetimi ve toplu işlem gibi kritik işlevleri kontrol eden modal pencereleri ve yardımcı fonksiyonları barındırır.
 
 ## Fonksiyon Grupları
-### Bileşen ve Modal Kontrolleri
-Sayfanın ana render işlevi ve kullanıcı etkileşimlerini tetikleyen modal açma/kapama fonksiyonları yer alır.
+### Ana Bileşen ve Etkileşim Kontrolleri
+Sayfayı oluşturan ana React bileşeni ve kullanıcı etkileşimlerini tetikleyen modal açma/kapama mantığını yönetir.
 - AdminOrdersPage, openShipModal, closeShipModal, openLogsModal, closeLogsModal, openNotesModal, closeNotesModal
 
-### Sipariş İşlemleri ve Eylemler
-Sipariş üzerinden gerçekleştirilen veri değiştirme işlemleri (not ekleme/silme, gönderi onayı, toplu iptal, CSV dışa aktarma) bu grupta toplanmıştır.
+### Sipariş İşlemleri ve Veri Değişiklikleri
+Siparişler üzerinde gerçekleştirilen temel veri değiştirme ve dışa aktarma eylemlerini kapsar.
 - addNote, deleteNote, submitShip, bulkCancelShipping, exportCsv
 
-### Sıralama ve Görselleştirme
-Tablo başlıklarının sıralama durumunu yöneten ve sıralama göstergesi sağlayan fonksiyonlar bulunur.
-- toggleSort, sortIndicator
+### Sıralama ve Tablo Görünümü
+Sipariş tablosunun sıralama mantığını ve durum görselleştirmesi için yardımcı fonksiyonları içerir.
+- toggleSort, sortIndicator, badgeClass, prettyStatus
 
-### Biçimlendirme ve Yardımcı İşlevler
-Tutar, tarih, durum etiketi ve takip URL’si gibi verilerin kullanıcıya sunulması için biçimlendirmeyi ve sınıflandırma görevlerini üstlenen fonksiyonlar yer alır.
-- formatAmount, safeDate, prettyStatus, badgeClass, generateTrackingUrl
+### Veri Biçimlendirme ve Yardımcı Fonksiyonlar
+Ham veriyi (tarih, para birimi) kullanıcıya uygun formatlara dönüştüren ve dış bağlantılar oluşturan yardımcı araçları sunar.
+- formatAmount, safeDate, generateTrackingUrl
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `openShipModal` fonksiyonu çağrılırken `id` parametresi sağlanmazsa, modal hiç açılmaz ve kullanıcıya bir hata/uyarı gösterilir.  
+Bu modül sipariş yönetimi面板ıdır ve üç farklı modal (gönderim, loglar, notlar), sıralama, toplu işlem ve CSV dışa aktarma işlevlerini yönetir.
 
-**Aksiyom 2**: Eğer `closeShipModal` fonksiyonu çağrıldığında gönderim (ship) modalı zaten kapalıysa, hiçbir yan etki (state değişikliği, UI güncellemesi) gerçekleşmez.  
+**[Aksiyom 1]**: `SortKey` tipi (sütun sıralama anahtarları) modül dışında tanımlı olmalıdır. Eğer `SortKey` tipi yoksa, `toggleSort()` ve `sortIndicator()` fonksiyonları çalışamaz.
 
-**Aksiyom 3**: Eğer `openLogsModal` fonksiyonu çağrılırken `id` parametresi eksik ya da boş bir string ise, log modalı açılmaz ve ilgili kayıt bulunamadı mesajı gösterilir.  
+**[Aksiyom 2]**: `Lang` (dil) tipi modül dışında tanımlı olmalıdır. Eğer `Lang` tipi yoksa, `formatAmount()` ve `safeDate()` fonksiyonları doğru dilde formatlama yapamaz.
 
-**Aksiyom 4**: Eğer `closeLogsModal` fonksiyonu çağrıldığında log modalı zaten kapalıysa, sistem mevcut durumu korur ve ek bir işlem yapılmaz.  
+**[Aksiyom 3]**: `prettyStatus()` için `t` parametresi (çeviri fonksiyonu) her çağrımda sağlanmalıdır. Eğer `t` fonksiyonu sağlanmazsa, durum etiketleri ham anahtar olarak gösterilir ve kullanıcı diline çevrilmez.
 
-**Aksiyom 5**: Eğer `openNotesModal` fonksiyonu çağrılırken `id` parametresi geçerli bir sipariş/öğe kimliği değilse, notlar modalı açılmaz ve kullanıcıya “Geçersiz öğe” uyarısı verilir.  
+**[Aksiyom 4]**: `addNote()` çağrılmadan önce not içeriği (örn: state/input) modül içinde dolu olmalıdır. Eğer not içeriği boş/null ise, boş not kaydı oluşur veya ekleme başarısız olur.
 
-**Aksiyom 6**: Eğer `closeNotesModal` fonksiyonu çağrıldığında notlar modalı zaten kapalıysa, hiçbir UI güncellemesi gerçekleşmez.  
+**[Aksiyom 5]**: `openShipModal(id)`, `openLogsModal(id)` ve `openNotesModal(id)` çağrılırken `id` parametresi geçerli bir sipariş ID'si olmalıdır. Eğer geçersiz/boş bir ID verilirse, ilgili modal hatalı veri gösterir veya boş açılır.
 
-**Aksiyom 7**: Eğer `addNote` fonksiyonu çalıştırıldığında not içeriği (ör. bir form alanı) boş ya da geçersizse, not eklenmez ve kullanıcıya “Not boş olamaz” hatası gösterilir.  
+**[Aksiyom 6]**: `deleteNote(noteId)` çağrılacaksa, `noteId` daha önce var olan bir nota ait olmalıdır. Eğer geçersiz bir `noteId` verilirse, silme işlemi başarısız olur.
 
-**Aksiyom 8**: Eğer `deleteNote` fonksiyonu çağrılırken `noteId` parametresi mevcut bir not kimliğine karşılık gelmezse, silme işlemi gerçekleşmez ve “Not bulunamadı” mesajı döndürülür.  
+**[Aksiyom 7]**: `submitShip()` çağrılmadan önce gönderim bilgileri (kargo firması, takip no vb.) state içinde doldurulmuş olmalıdır. Eğer gönderim verileri eksikse, gönderim işlemi başarısız olur veya doğrulama hatası oluşur.
 
-**Aksiyom 9**: Eğer `submitShip` fonksiyonu çalıştırıldığında gönderim (shipping) için gerekli tüm zorunlu alanlar (ör. taşıyıcı, takip numarası) eksikse, gönderim isteği gönderilmez ve kullanıcıya eksik alan hatası bildirilir.  
+**[Aksiyom 8]**: `bulkCancelShipping()` çağrıldığında en az bir sipariş seçili (selected) olmalıdır. Eğer hiç sipariş seçilmediyse, toptan iptal işlemi uygulanacak hedef yoktur.
 
-**Aksiyom 10**: Eğer `toggleSort` fonksiyonu verilen `key` parametresi geçerli bir `SortKey` değilse, sıralama durumu değişmez ve mevcut sıralama korunur.  
+**[Aksiyom 9]**: `safeDate(iso, lang)` fonksiyonuna verilen `iso` parametresi geçerli bir ISO 8601 tarih dizgesi olmalıdır. Eğer geçersiz bir tarih verilirse, "bilinmeyen tarih" gibi güvenli bir dönüş yapılır (çökmez).
 
-**Aksiyom 11**: Eğer `sortIndicator` fonksiyonu verilen `key` parametresi geçerli bir `SortKey` değilse, sıralama göstergesi (ok, ikon vb.) döndürülmez.  
+**[Aksiyom 10]**: `generateTrackingUrl(carrier, tracking)` için hem `carrier` hem de `tracking` boş string olmamalıdır. Eğer herhangi biri boşsa, geçersiz veya boş bir takip URL'i üretilir.
 
-**Aksiyom 12**: Eğer `bulkCancelShipping` fonksiyonu çalıştırıldığında iptal edilecek gönderim kaydı bulunmazsa, toplu iptal işlemi hiçbir etkide bulunmaz ve kullanıcıya “İptal edilecek gönderim yok” mesajı gösterilir.  
+**[Aksiyom 11]**: `formatAmount(v, lang)` – `v` parametresi `undefined` veya `null` olabilir, bu durumda güvenli bir varsayılan gösterim yapılmalıdır. Eğer `v` negatif bir değer olarak verilirse, modülün bunu nasıl gösterdiği fonksiyon gövdesine bağlıdır (bilinmiyor).
 
-**Aksiyom 13**: Eğer `exportCsv` fonksiyonu çalıştırıldığında dışa aktarılacak veri seti boşsa, CSV dosyası oluşturulmaz ve kullanıcıya “Dışa aktarılacak veri yok” uyarısı verilir.  
+**[Aksiyom 12]**: `badgeClass(s)` için `s` parametresi geçerli bir sipariş durum stringi olmalıdır. Eğer bilinmeyen bir durum verilirse, varsayılan/güvenli bir CSS sınıfı döndürülmelidir.
 
-**Aksiyom 14**: Eğer `formatAmount` fonksiyonu `v` parametresi `null` veya `undefined` ise, fonksiyon `null`/`undefined` döndürür (veya varsayılan bir “‑” gösterimi) ve dil (`lang`) parametresi yine de kullanılmaz.  
-
-**Aksiyom 15**: Eğer `safeDate` fonksiyonu `iso` parametresi geçerli bir ISO‑8601 tarih stringi değilse, fonksiyon geçerli bir tarih döndürmez ve “Geçersiz tarih” değeri (ör. `null`) verir.  
-
-**Aksiyom 16**: Eğer `prettyStatus` fonksiyonu `s` parametresi tanımsız bir durum kodu içeriyorsa, çeviri fonksiyonu `t` çağrılmaz ve fonksiyon orijinal `s` değerini döndürür.  
-
-**Aksiyom 17**: Eğer `badgeClass` fonksiyonu `s` parametresi beklenen bir durum (ör. “pending”, “shipped”) ile eşleşmezse, fonksiyon varsayılan bir CSS sınıfı (ör. `badge-default`) döndürür.  
-
-**Aksiyom 18**: Eğer `generateTrackingUrl` fonksiyonu `carrier` parametresi tanımsız ya da desteklenmeyen bir taşıyıcı ise, fonksiyon `null` döndürür ve takip URL’si oluşturulmaz.  
-
-**Domain‑specific kurallar**:  
-- `toggleSort`, `sortIndicator` ve `badgeClass` fonksiyonları için geçerli `SortKey` ve durum değerleri proje içinde tanımlı sabitlerdir; bu sabitlerin dışındaki değerler “geçersiz” kabul edilir.  
-- `formatAmount` ve `safeDate` fonksiyonları, `lang` parametresiyle gelen dil kodunun desteklenip desteklenmediği kontrol edilmez; desteklenmeyen bir dil kodu için yerel ayar (locale) varsayılan sistem diline düşer.  
-
-Bu aksiyomlar, modülün fonksiyonlarının beklenen ön koşullarını ve eksik/yanlış veri durumunda sistemin nasıl davranması gerektiğini tanımlar.
+**[Aksiyom 13]**: `toggleSort(key)` fonksiyonu, mevcut bir sıralama sütunu `key` ile çağrılmalıdır. Eğer SortKey union'ına uym
 
 ---
 
@@ -49305,161 +48067,360 @@ type SortKey = 'id' | 'status' | 'conversation' | 'amount' | 'created'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::AdminOrdersPage
+### [N1_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::AdminOrdersPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `statusOptions` — sabit seçenek listesi, her biri `{value, label}` objesi
-  - `hasQuery` — URL’de `q` veya `preset` parametresi var mı kontrolü
-  - `debounceTimer` — `setTimeout` id, debounced query için
-  - `deepLinkAppliedRef` — `useRef` flag, deep‑link bir kez uygulanıp uygulanmadığını tutar
-  - `urlParams` — `URLSearchParams` nesnesi, pencere URL sorgu parametrelerini okur
-  - `preset` — `urlParams.get('preset')`, preset değeri
-  - `qParam` — `urlParams.get('q')`, arama sorgusu
-  - `searchParams` — `useSearchParams()` sonucu, Next.js arama parametreleri
-  - `isPending` — `preset === 'pendingShipments'` kontrolü
-  - `fetchId` — her fetch çağrısı için artan kimlik
-  - `qb` — Supabase query builder, `view_admin_orders` tablosundan veri çeker
-  - `q` — `debouncedQuery.trim()`, arama metni
-  - `offset` — sayfalama için `(page-1)*PAGE_SIZE`
-  - `data`, `count`, `fetchErr` — Supabase sorgusunun döndürdüğü veri, toplam satır ve hata
-  - `rows` — `setRows` ile güncellenen sipariş satırları (state)
-  - `total` — toplam kayıt sayısı (state)
-  - `shipId` — seçili gönderi sipariş id’si
-  - `carrier`, `tracking` — gönderi bilgileri (state)
-  - `sendEmail` — gönderi e‑posta gönderim onayı (state)
-  - `advRows` — toplu gönderi için gelişmiş satır listesi
-  - `advBulk` — gelişmiş toplu mod flag’i
-  - `targets` — işlem yapılacak sipariş id’leri dizisi
-  - `results` — toplu işlem sonuçları `{id, ok}`
-  - `invalid` — eksik alanları olan satır id’leri
-  - `turl` — `generateTrackingUrl` çıktısı, takip URL’si
-  - `mapById` — `advRows` üzerinden id → satır haritası
-  - `arr` — sıralanmış sipariş kopyası (return)
-- **Dönüş**: React bileşeni; UI render eder, yan etkileri (fetch, modal yönetimi) vardır.
+  - `statusFilterOptions` — durum filtreleme seçeneklerini döndüren memoized callback; value/label çiftleri içerir
+  - `hasActiveFilters` — URL'de `q` veya `preset` parametresi olup olmadığını kontrol eder
+  - `debouncedQueryEffect` — `query` değişiminde 300ms debounce ile `setDebouncedQuery` çağırır; cleanup ile timeout temizler
+  - `deepLinkWindowEffect` — ilk yüklemede `window.location.search`'ten `preset` ve `q` parametrelerini okur; `pendingShipments` preset'i ve arama sorgusunu state'e yazar
+  - `deepLinkSearchParamsEffect` — `searchParams` değişiminde URL parametrelerinden `preset` ve `q` değerlerini okur; `deepLinkAppliedRef` ile çift tetiklemeyi önler
+  - `fetchOrders` — Supabase'den `view_admin_orders` tablosunu sayfalı olarak çeker; durum, tarih aralığı ve arama filtresi uygular; `ensureSessionFresh()` çağırarak oturum tazeler
+  - `viewModeEffect` — `viewMode === 'list'` olduğunda `fetchOrders` çağırır
+  - `status` — seçili sipariş durumu filtresi
+  - `presetPendingShipments` — pending shipments presetinin aktif olup olmadığını belirtir
+  - `debouncedQuery` — debounce edilmiş arama sorgusu
+  - `dateRange` — tarih aralığı filtresi (from/to Date nesneleri)
+  - `page` — mevcut sayfa numarası
+  - `PAGE_SIZE` — sayfa başına satır sabiti
+  - `loading` — yükleme durumu flag'i
+  - `setLoading` — yükleme durumunu günceller
+  - `setRows` — tablo satırlarını günceller
+  - `setTotal` — toplam kayıt sayısını günceller
+  - `lastFetchId` — race condition önleme için incremented fetch ID ref'i
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi
+  - `rows` — mevcut tablo satırları dizisi
+  - `selectedIds` — çoklu seçimde işaretli sipariş ID'leri
+  - `visibleCols` — görünür sütun toggles nesnesi (id, status, conversation, amount, created)
+  - `hasWriteAccess` — yazma izni flag'i
+  - `lang` — mevcut dil kodu (Lang tipi)
+  - `sortKey` — sıralama sütun anahtarı (SortKey tipi)
+  - `sortDir` — sıralama yönü ('asc' veya 'desc')
+  - `sortedRows` — sıralanmış satırlar dizisi (memoized)
+  - `openShipModal` — kargo modalını açar; mevcut taşıyıcı/takip bilgilerini yükler
+  - `openLogsModal` — e-posta log modalını açar
+  - `openNotesModal` — not modalını açar
+  - `setSelectedIds` — seçim dizisini günceller
+  - `openShipModal` — tekli kargo güncelleme modalını açar
+  - `openLogsModal` — log listeleme modalını açar
+  - `openNotesModal` — not yönetimi modalını açar
+  - `submitShip` — tekli veya toplu kargo güncelleme/fişleme işlemini çalıştırır
+  - `bulkCancelShipping` — seçili shipped siparişlerin kargosunu toplu iptal eder
+  - `exportCsv` — siparişleri CSV olarak dışa aktarır
+  - `rowRenderer` — her satır için JSX render callback'ini döndüren fonksiyon
+  - `logRowRenderer` — e-posta log satırı render callback'i
+  - `noteRenderer` — not kartı render callback'i
+  - `formatAmount` — para birimi formatlama
+  - `safeDate` — hata güvenli tarih formatlama
+  - `prettyStatus` — durum kodunu çevrilmiş görünüme dönüştürür
+  - `badgeClass` — duruma göre Tailwind badge CSS class'ı döndürür
+  - `generateTrackingUrl` — kargo firmasına göre takip URL'i üretir
+- **Dönüş**: `React.FC` (JSX)
 
-### [N2_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::openShipModal
-- **params**: `id: string`
-- **ic_degiskenler**:
-  - `fetchId` — `++lastFetchId.current` ile artan kimlik
-  - `setBulkMode` — toplu mod kapatılır
-  - `setShipId` — seçilen sipariş id’si state’e konur
-  - `setCarrier`, `setTracking` — carrier ve tracking state sıfırlanır
-  - `setSendEmail` — e‑posta gönderim flag’i true yapılır
-  - `data` — Supabase `venthub_orders` tablosundan getirilen carrier/tracking
-  - `dto` — `data` tip dönüşümü `{carrier?, tracking_number?}`
-- **Dönüş**: yok (modal açma yan etkisi)
+---
 
-### [N3_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::closeShipModal
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (modal kapama yan etkisi)
-
-### [N4_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::openLogsModal
-- **params**: `id: string`
-- **ic_degiskenler**:
-  - `setLogsOpen`, `setLogsLoading` — modal ve loading state
-  - `data`, `error` — Supabase `shipping_email_events` sorgusundan gelen kayıtlar ve hata
-  - `setEmailLogs` — alınan logları state’e koyar
-- **Dönüş**: yok
-
-### [N5_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::closeLogsModal
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N6_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::openNotesModal
-- **params**: `id: string`
-- **ic_degiskenler**:
-  - `setNotesOrderId`, `setNotesOpen` — ilgili sipariş id ve modal state
-  - `data`, `error` — Supabase `order_notes` sorgusundan gelen notlar
-  - `setNotes` — notları state’e koyar
-- **Dönüş**: yok
-
-### [N7_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::closeNotesModal
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::addNote
+### [N2_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::statusFilterOptions (anonim callback)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `notesOrderId` — notun ekleneceği sipariş id
-  - `noteInput` — kullanıcı girişi
-  - `data`, `error` — Supabase `order_notes` insert sonucu
-  - `setNotes` — yeni notu mevcut listeye ekler
-  - `setNoteInput` — giriş alanını temizler
-- **Dönüş**: yok
+  - `t` — i18n çeviri fonksiyonu; `admin.orders.statusLabels.*` anahtarlarından çeviriler getirir
+- **Dönüş**: `{ value: string, label: string }[]` dizisi
 
-### [N9_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::deleteNote
-- **params**: `noteId: string`
-- **ic_degiskenler**:
-  - `error` — Supabase delete işlem hatası
-  - `setNotes` — silinen notu listeden çıkarır
-- **Dönüş**: yok
+---
 
-### [N10_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::submitShip
+### [N3_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::hasActiveFilters (anonim callback)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `bulkMode`, `shipId`, `carrier`, `tracking`, `sendEmail`, `rows`, `selectedIds`, `advRows`, `advBulk`
-  - `curRow` — `rows.find` ile seçili satır
-  - `isShipped` — mevcut durum kontrolü
-  - `turl` — `generateTrackingUrl` çıktısı
-  - `fnErr` — Supabase function invoke hatası
-  - `logAdminAction` — admin log kaydı
-  - `setRows` — satırların `status` alanını günceller
-  - `setShipOpen` — modal kapanışı
-  - `toast.success` / `toast.error` — kullanıcı bildirimi
-  - `targets` — toplu işlemde seçili ve gönderilmemiş sipariş id’leri
-  - `results`, `invalid` — toplu işlem sonuçları ve geçersiz satırlar
-  - `mapById` — gelişmiş toplu satır haritası
-- **Dönüş**: yok
+  - `qs` — `window.location.search`'ten oluşturulan `URLSearchParams` nesnesi; URL query string'ini parse eder
+- **Dönüş**: `boolean` — `q` veya `preset` parametresi varsa `true`
 
-### [N11_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::toggleSort
-- **params**: `key: SortKey`
-- **ic_degiskenler**:
-  - `sortKey`, `sortDir` — mevcut sıralama anahtarı ve yön state
-- **Dönüş**: yok
+---
 
-### [N12_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::sortIndicator
-- **params**: `key: SortKey`
-- **ic_degiskenler**:
-  - `sortKey`, `sortDir` — mevcut sıralama bilgisi
-- **Dönüş**: string (`''`, `'▲'` veya `'▼'`)
-
-### [N13_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::bulkCancelShipping
+### [N4_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::debouncedQueryEffect (anonim callback)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `targets` — `status === 'shipped'` ve seçili id’ler
-  - `results` — her id için Supabase function invoke sonucu
-  - `failed` — başarısız id listesi
-  - `setRows` — başarılı olanların `status`ını `confirmed` yapar
-  - `setSelectedIds` — seçim temizlenir
-- **Dönüş**: yok
+  - `t` — `setTimeout` dönüşü; cleanup fonksiyonunda `clearTimeout(t)` ile temizlenen timer ID'si
+  - `query` — mevcut arama sorgusu state'i; trim edilip 300ms gecikmeyle `setDebouncedQuery`'ye aktarılır
+  - `setDebouncedQuery` — debounce edilmiş sorgu state'ini günceller
+- **Dönüş**: cleanup fonksiyonu `() => void`
 
-### [N14_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::formatAmount
-- **params**: `v?: number | null, lang: Lang = 'tr'`
-- **ic_degiskenler**: yok
-- **Dönüş**: string (`formatCurrency` sonucu veya `'-'`)
+---
 
-### [N15_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::safeDate
-- **params**: `iso: string, lang: Lang = 'tr'`
-- **ic_degiskenler**: yok
-- **Dönüş**: string (`formatDateTime` sonucu veya orijinal iso)
+### [N5_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::deepLinkWindowEffect (anonim callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `deepLinkAppliedRef` — daha önce deep link uygulanıp uygulanmadığını takip eden ref; tekrar işlenmeyi önler
+  - `urlParams` — `window.location.search`'ten oluşturulan `URLSearchParams`; URL parametrelerini parse eder
+  - `preset` — URL'deki `preset` parametre değeri; `pendingShipments` ise filtre uygulanır
+  - `qParam` — URL'deki `q` parametre değeri; arama sorgusu olarak kullanılır
+  - `setPresetPendingShipments` — pending shipments preset durumunu günceller
+  - `setStatus` — durum filtresini günceller (genellikle sıfırlar)
+  - `setQuery` — arama sorgusu state'ini günceller
+  - `setDebouncedQuery` — debounce edilmiş sorguyu doğrudan set eder
+- **Dönüş**: `void`
 
-### [N16_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::prettyStatus
-- **params**: `s: string, t: (key: string, params?: Record<string, unknown>) => string`
-- **ic_degiskenler**: yok
-- **Dönüş**: string (lokalize edilmiş status etiketi)
+---
 
-### [N17_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::badgeClass
-- **params**: `s: string`
-- **ic_degiskenler**: yok
-- **Dönüş**: string (CSS sınıfı)
+### [N6_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::deepLinkSearchParamsEffect (anonim callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `searchParams` — Next.js `useSearchParams()` hook'undan gelen parametreler; URL parametrelerine erişim sağlar
+  - `deepLinkAppliedRef` — deep link'in daha önce uygulanıp uygulanmadığını kontrol eder; `true` ise fonksiyon erken döner
+  - `preset` — `searchParams.get('preset')` ile alınan preset parametre değeri
+  - `isPending` — `preset === 'pendingShipments'` kontrolü; pending shipments modunda olup olmadığını belirtir
+  - `qParam` — `searchParams.get('q')` ile alınan arama sorgusu parametresi
+  - `setPresetPendingShipments` — pending shipments preset state'ini günceller
+  - `setStatus` — durum filtresini günceller
+  - `setQuery` — arama sorgusu state'ini günceller
+  - `setDebouncedQuery` — debounce edilmiş sorguyu günceller
+- **Dönüş**: `void`
 
-### [N18_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::generateTrackingUrl
-- **params**: `carrier: string, tracking: string`
-- **ic_degiskenler**: yok
-- **Dönüş**: string | null (carrier’a göre oluşturulan takip URL’si)
+---
+
+### [N7_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::fetchOrders (anonim async callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `fetchId` — race condition önleme için `++lastFetchId.current` ile artırılan benzersiz istek ID'si; eski isteklerin state'i bozmasını engeller
+  - `lastFetchId` — en son fetch isteğinin ID'sini tutan ref; birden fazla istek çakıştığında sadece en sonuncunun sonuçları uygulanır
+  - `qb` — Supabase sorgu builder zinciri; `view_admin_orders` tablosunu sütun/filtre/sıralama/pagination ile yapılandırır
+  - `presetPendingShipments` — pending shipments presetinin aktif olup olmadığı; `confirmed`/`processing` ve `shipped_at` null olan siparişleri filtreler
+  - `status` — seçili durum filtresi; `qb.eq('status', status)` ile uygulanır
+  - `debouncedQuery` — debounce edilmiş arama sorgusu; `search_text` sütununda `ilike` ile arama yapılır
+  - `dateRange` — tarih aralığı filtresi; `from` ve `to` değerleri `created_at` sütununda `gte`/`lte` ile filtreler
+  - `page` — mevcut sayfa numarası; offset hesaplamasında kullanılır
+  - `PAGE_SIZE` — sayfa başına satır sayısı sabiti; `range()` hesaplamasında kullanılır
+  - `offset` — `(page - 1) * PAGE_SIZE` ile hesaplanan satır başlangıç indeksi
+  - `data` — Supabase yanıtından dönen satır verisi; `AdminOrderRow[]` dizisine cast edilir
+  - `count` — Supabase yanıtından dönen toplam kayıt sayısı
+  - `fetchErr` — Supabase sorgu hatası; fırlatılır
+  - `setRows` — tablo satırlarını günceller
+  - `setTotal` — toplam kayıt sayısını günceller
+  - `setLoading` — yükleme durumunu false'a çeker (finally bloğunda)
+  - `ensureSessionFresh` — oturum token'ının taze olduğunu garanti altına alan fonksiyon
+  - `t` — i18n çeviri fonksiyonu; hata mesajları için kullanılır
+  - `toast` — bildirim toast nesnesi; hata durumunda `toast.error` çağırır
+- **Dönüş**: `void`
+
+---
+
+### [N8_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::openShipModal (async fonksiyon)
+- **params**: `(id: string)` — kargo modalının açılacağı sipariş ID'si
+- **ic_degiskenler**:
+  - `setBulkMode` — toplu modu kapatır (false)
+  - `setShipId` — modalda düzenlenecek sipariş ID'sini ayarlar
+  - `setCarrier` — taşıyıcı adı state'ini sıfırlar
+  - `setTracking` — takip numarası state'ini sıfırlar
+  - `setSendEmail` — e-posta gönderim flag'ini true yapar
+  - `data` — Supabase'den dönen `venthub_orders` satırı; `carrier` ve `tracking_number` alanlarını içerir
+  - `dto` — `data`'nın typed cast hali `{ carrier?: string | null; tracking_number?: string | null }`
+  - `setShipOpen` — modalın açık/kapalı durumunu `true` yapar
+  - `supabase` — Supabase istemci nesnesi; `venthub_orders` tablosundan `.select('carrier, tracking_number').eq('id', id).maybeSingle()` sorgusu yapar
+- **Dönüş**: `void`
+
+---
+
+### [N9_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::openLogsModal (async fonksiyon)
+- **params**: `(id: string)` — loglarının görüneceği sipariş ID'si
+- **ic_degiskenler**:
+  - `setLogsOpen` — log modalını açar
+  - `setLogsLoading` — log yükleme durumunu aktif eder
+  - `data` — Supabase'den dönen `shipping_email_events` satırları; `subject`, `email_to`, `provider_message_id`, `created_at`, `carrier`, `tracking_number` alanlarını içerir
+  - `error` — Supabase sorgu hatası
+  - `setEmailLogs` — `EmailLog[]` dizisini günceller; hata durumunda boş dizi atanır
+  - `setLogsLoading` — finally bloğunda yükleme durumunu kapatır
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi; hata durumunda `toast.error` çağırır
+  - `supabase` — Supabase istemci nesnesi; `shipping_email_events` tablosundan `order_id` filtreli, `created_at` azalan sıralı, `limit(20)` sorgusu yapar
+- **Dönüş**: `void`
+
+---
+
+### [N10_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::openNotesModal (async fonksiyon)
+- **params**: `(id: string` — notlarının görüneceği sipariş ID'si
+- **ic_degiskenler**:
+  - `setNotesOrderId` — not modalına ait sipariş ID'sini ayarlar
+  - `setNotesOpen` — not modalını açar
+  - `data` — Supabase'den dönen `order_notes` satırları; `id`, `note`, `created_at`, `user_id` alanlarını içerir
+  - `error` — Supabase sorgu hatası
+  - `setNotes` — `OrderNote[]` dizisini günceller; hata durumunda boş dizi atanır
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi
+  - `supabase` — Supabase istemci nesnesi; `order_notes` tablosundan `order_id` filtreli, `created_at` azalan sıralı, `limit(50)` sorgusu yapar
+- **Dönüş**: `void`
+
+---
+
+### [N11_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::addNote (async fonksiyon)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `notesOrderId` — mevcut not modalına ait sipariş ID'si; boşsa veya `noteInput` boş trim ise fonksiyon erken döner
+  - `noteInput` — kullanıcı tarafından girilen not metni; trim edilerek insert edilir
+  - `data` — Supabase insert sonrası dönen tek satır; `id`, `note`, `created_at`, `user_id` alanlarını içerir
+  - `error` — Supabase insert hatası
+  - `setNotes` — mevcut notların başına yeni notu ekler (prepend)
+  - `setNoteInput` — not giriş alanını sıfırlar
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi
+  - `supabase` — Supabase istemci nesnesi; `order_notes` tablosuna `.insert({ order_id: notesOrderId, note: noteInput.trim() }).select(...).single()` yapar
+- **Dönüş**: `void`
+
+---
+
+### [N12_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::deleteNote (async fonksiyon)
+- **params**: `(noteId: string)` — silinecek notun ID'si
+- **ic_degiskenler**:
+  - `error` — Supabase delete hatası
+  - `setNotes` — mevcut notlardan `noteId` eşleşen notu filtreleyerek kaldırır
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi; başarı veya hata durumunda toast gösterir
+  - `supabase` — Supabase istemci nesnesi; `order_notes` tablosundan `.delete().eq('id', noteId)` yapar
+- **Dönüş**: `void`
+
+---
+
+### [N13_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::submitShip (anonim async callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `bulkMode` — toplu kargo modu flag'i; `false` ise tekli, `true` ise toplu güncelleme yapılır
+  - `shipId` — tekli modda güncellenecek siparişin ID'si
+  - `rows` — mevcut tablo satırları dizisi
+  - `selectedIds` — çoklu seçimde işaretli sipariş ID'leri
+  - `curRow` — `shipId` ile eşleşen mevcut satır; `status` alanı kontrol edilir
+  - `isShipped` — siparişin zaten shipped olup olmadığı; `curRow?.status === 'shipped'` kontrolü
+  - `carrier` — taşıyıcı adı state'i
+  - `tracking` — takip numarası state'i
+  - `turl` — `generateTrackingUrl(carrier, tracking)` ile üretilen kargo takip URL'i; null olabilir
+  - `sendEmail` — kargo güncellemesi sonrası e-posta gönderim flag'i
+  - `fnErr` — `supabase.functions.invoke('admin-update-shipping')` çağrısından dönen hata
+  - `supabase.functions` — Supabase Edge Functions API'si; `admin-update-shipping` fonksiyonunu çağırır
+  - `setRows` — tekli modda satır durumunu günceller (shipped veya mevcut durum korunur)
+  - `setShipOpen` — modalı kapatır
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi
+  - `targets` — toplu modda shipped olmayan seçili sipariş ID'leri dizisi
+  - `advBulk` — gelişmiş toplu mod flag'i; her sipariş için ayrı taşıyıcı/takip girilip girilmediğini belirtir
+  - `advRows` — gelişmiş toplu modda her sipariş için `{ id, carrier, tracking }` dizisi
+  - `mapById` — `advRows`'ı ID bazında Map'e dönüştüren nesne; hızlı erişim sağlar
+  - `invalid` — taşıyıcı veya takip numarası boş olan hedef ID'ler dizisi
+  - `results` — `Promise.all` ile çalıştırılan toplu güncelleme sonuçları; her biri `{ id, ok: boolean }` şeklindedir
+  - `logAdminAction` — admin aksiyonunu loglayan fonksiyon; tablo adı, satır PK, aksiyon tipi, before/after değerleri ve yorum alır
+- **Dönüş**: `void`
+
+---
+
+### [N14_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::toggleSort (fonksiyon)
+- **params**: `(key: SortKey)` — sıralanacak sütun anahtarı
+- **ic_degiskenler**:
+  - `sortKey` — mevcut sıralama sütunu; aynı sütun tekrar tıklanırsa yön tersine çevrilir
+  - `setSortDir` — sıralama yönünü `asc`/`desc` olarak toggler
+  - `setSortKey` — sıralama sütununu değiştirir
+- **Dönüş**: `void`
+
+---
+
+### [N15_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::sortIndicator (fonksiyon)
+- **params**: `(key: SortKey)` — sütun anahtarı
+- **ic_degiskenler**:
+  - `sortKey` — mevcut aktif sıralama sütunu; `key` ile eşleşmiyorsa boş dize döner
+  - `sortDir` — sıralama yönü; `'asc'` ise `▲`, `'desc'` ise `▼` gösterir
+- **Dönüş**: `string` — `'▲'`, `'▼'` veya boş dize
+
+---
+
+### [N16_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::bulkCancelShipping (async fonksiyon)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `rows` — mevcut tablo satırları dizisi
+  - `selectedIds` — çoklu seçimde işaretli sipariş ID'leri
+  - `targets` — shipped durumundaki seçili siparişlerin ID'leri dizisi; `status === 'shipped'` filtresi uygulanır
+  - `window.confirm` — onay dialogu; toplu iptal işlemi için kullanıcı onayı alır
+  - `results` — `Promise.all` ile çalıştırılan iptal sonuçları; her biri `{ id, ok: boolean }` şeklindedir
+  - `fnErr` — `supabase.functions.invoke('admin-update-shipping')` çağrısından dönen hata; `cancel: true` body gönderilir
+  - `failed` — başarısız olan sipariş ID'leri dizisi
+  - `setRows` — başarılı iptallerde satır durumunu `'confirmed'` olarak günceller; başarısız olanlarda mevcut durumu korur
+  - `setSelectedIds` — seçim dizisini sıfırlar
+  - `supabase.functions` — `admin-update-shipping` Edge Function'ını `{ cancel: true, send_email: false }` body ile çağırır
+- **Dönüş**: `void`
+
+---
+
+### [N17_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::exportCsv (fonksiyon)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `header` — CSV başlık satırı dizisi; `orderId`, `status`, `amount` başlıkları
+  - `rows` — dışa aktarılacak tablo satırları dizisi
+  - `lines` — her satırın `id`, `status`, `total_amount` değerlerini virgülle ayrılmış ve çift tırnakla escape edilmiş hali
+  - `blob` — CSV verisinden oluşturulan `Blob` nesnesi; BOM (`\ufeff`) ile UTF-8 charset eklenir
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici dosya URL'i
+  - `a` — programatik oluşturulan `<a>` DOM elementi; `download`属性 ile `orders.csv` olarak indirme tetiklenir
+  - `t` — i18n çeviri fonksiyonu; başlık metinleri için kullanılır
+- **Dönüş**: `void`
+
+---
+
+### [N18_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::rowRenderer (anonim callback)
+- **params**: `(r: AdminOrderRow)` — render edilecek sipariş satırı
+- **ic_degiskenler**:
+  - `selectedIds` — işaretli sipariş ID'leri dizisi; checkbox `checked` değerini belirler
+  - `setSelectedIds` — checkbox değişiminde sipariş ID'sini diziden ekler/çıkarır; `e.target.checked` ile toggle yapar
+  - `visibleCols` — sütun görünürlük nesnesi; `id`, `status`, `conversation`, `amount`, `created` alanları ile hangi `<td>`'lerin render edileceği kontrol edilir
+  - `badgeClass` — duruma göre Tailwind badge CSS class'ını döndüren fonksiyon
+  - `prettyStatus` — durum kodunu çevrilmiş metne dönüştüren fonksiyon
+  - `t` — i18n çeviri fonksiyonu; buton metinleri için kullanılır
+  - `formatAmount` — para birimi formatlama fonksiyonu; `r.total_amount` ve `lang` ile çağrılır
+  - `lang` — mevcut dil kodu (Lang tipi)
+  - `safeDate` — tarih formatlama fonksiyonu; `r.created_at` ile çağrılır
+  - `hasWriteAccess` — yazma izni flag'i; kargo butonunun gösterilip gösterilmeyeceğini belirler
+  - `openShipModal` — kargo modalını açan fonksiyon; `r.id` ile çağrılır
+  - `openLogsModal` — log modalını açan fonksiyon; `r.id` ile çağrılır
+  - `openNotesModal` — not modalını açan fonksiyon; `r.id` ile çağrılır
+  - `r.id` — siparişin tam ID'si
+  - `r.order_number` — sipariş numarası; yoksa `r.id.slice(0, 8)` kısaltması gösterilir
+  - `r.status` — sipariş durumu kodu
+  - `r.conversation_id` — konuşma ID'si; yoksa `'-'` gösterilir
+  - `r.total_amount` — sipariş toplam tutarı
+  - `r.created_at` — sipariş oluşturma tarihi (ISO string)
+- **Dönüş**: `JSX.Element` (`<tr>` satırı)
+
+---
+
+### [N19_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::logRowRenderer (anonim callback)
+- **params**: `(l: EmailLog, i: number)` — e-posta log satırı ve indeks
+- **ic_degiskenler**:
+  - `safeDate` — tarih formatlama fonksiyonu; `l.created_at` ile çağrılır
+  - `l.created_at` — e-posta gönderim tarihi (ISO string)
+  - `l.subject` — e-posta konu satırı
+- **Dönüş**: `JSX.Element` (`<tr>` satırı)
+
+---
+
+### [N20_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::noteRenderer (anonim callback)
+- **params**: `(n: OrderNote)` — render edilecek not nesnesi
+- **ic_degiskenler**:
+  - `n.id` — not ID'si; silme butonunda `deleteNote(n.id)` olarak kullanılır
+  - `n.note` — not metni içeriği
+  - `n.created_at` — not oluşturma tarihi (ISO string)
+  - `deleteNote` — notu silen fonksiyon; silme butonunun `onClick` handler'ı
+  - `safeDate` — tarih formatlama fonksiyonu; `n.created_at` ile çağrılır
+- **Dönüş**: `JSX.Element` (not kartı `<div>`'i)
+
+---
+
+### [N21_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::formatAmount (fonksiyon)
+- **params**: `(v?: number | null, lang: Lang = 'tr')` — formatlanacak tutar ve dil kodu
+- **ic_degiskenler**:
+  - `v` — formatlanacak sayısal tutar; `null` veya `undefined` ise `'-'` döner
+  - `lang` — para birimi formatında kullanılacak dil kodu; varsayılan `'tr'`
+- **Dönüş**: `string` — `formatCurrency(v, lang, { maximumFractionDigits: 0 })` sonucu veya `'-'`
+
+---
+
+### [N22_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::safeDate (fonksiyon)
+- **params**: `(iso: string, lang: Lang = 'tr')` — ISO tarih string'i ve dil kodu
+- **ic_degiskenler**:
+  - `iso` — formatlanacak ISO tarih string'i
+  - `lang` — tarih formatında kullanılacak dil kodu; varsayılan `'tr'`
+- **Dönüş**: `string` — `formatDateTime(iso, lang)` sonucu; hata durumunda
 
 ---
 
@@ -49486,17 +48447,17 @@ graph TD
     AdminOrdersPage_tsx__sortIndicator["sortIndicator"]
     AdminOrdersPage_tsx__submitShip["submitShip"]
     AdminOrdersPage_tsx__toggleSort["toggleSort"]
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__badgeClass
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openLogsModal
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__deleteNote
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__toggleSort
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__prettyStatus
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__sortIndicator
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__formatAmount
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openNotesModal
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__safeDate
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openShipModal
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__sortIndicator
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__generateTrackingUrl
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__deleteNote
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__badgeClass
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__toggleSort
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__safeDate
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__formatAmount
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openLogsModal
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__prettyStatus
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openNotesModal
 ```
 
 ## NODE ID STANDARD
@@ -50117,50 +49078,36 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminReturnsPage.tsx
-skeleton_hash: fbf72c5fdd275dd9
+skeleton_hash: 665af8b2e6937d88
 entity_hashes:
   func:AdminReturnsPage: 5655af1a631450c5
-  overview: 82c5d1f5beb81ee1
+  overview: 3de87dcfabc35e1e
   style_tokens: 91f3132d3b13a047
-generated_at: 2026-05-28T22:39:43Z
+generated_at: 2026-05-29T18:59:59Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun yönetici panelindeki iadeler yönetim sayfasıdır. Tek bir React bileşeni olarak, admin kullanıcıların platformdaki tüm iade işlemlerini görüntüleyip yönetebileceği temel arayüzü sunar.
+VentHub HVAC platformunun yönetici panelinde yer alan iade yönetim sayfasıdır. Kimlik doğrulaması ve admin rolü kontrolü yapıldıktan sonra, platform üzerindeki tüm iade işlemlerinin listelenmesi, duruma göre filtrelenmesi ve iade onaylama/reddetme/bilgi isteme gibi yönetimsel işlemlerin gerçekleştirilmesini sağlar.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Modülün tek ve ana bileşeni olarak, admin iadeler sayfasının tüm arayüzünü ve iş mantığını barındırır.
+### Admin İade Sayfası Bileşeni
+Tek bileşen yapısında, iade yönetimi ile ilgili tüm arayüzü ve iş mantığını barındırır. Kullanıcı kimlik ve rol kontrolü, iade listesinin gösterimi, durum bazlı filtreleme ile iade sobrelemelerinin (onaylama, reddetme, bilgi isteme) tetiklenmesini yönetir.
 - AdminReturnsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-VentHub HVAC platformunun admin panelindeki iade yönetim sayfası için temel mimari varsayımlar.
+Bu modül, VentHub HVAC admin panelindeki iade yönetim sayfası için temel mimari varsayımlar.
 
-[Aksiyom 1]: Eğer kullanıcı kimlik doğrulamasından geçmemişse (`isAuthenticated` false), `/login` sayfasına yönlendirme yapılır ve bileşen rendersız kalır.
+[Aksiyom 1]: Eğer kullanıcı admin yetkisine sahip değilse veya kimlik doğrulaması geçerli değilse, iade yönetimi sayfasına erişim sağlanamaz.
 
-[Aksiyom 2]: Eğer kullanıcı `admin` rolüne sahip değilse (`user.role !== 'admin'`), `/dashboard` sayfasına yönlendirme yapılır ve bileşen rendersız kalır.
+[Aksiyom 2]: Eğer iade verileri (returns) API'den başarıyla retrieve edilemezse, sayfa düzgün görüntülenemez.
 
-[Aksiyom 3]: Eğer `useReturns` hook'u geçerli `returns` dizisi döndürmüyorsa (null/undefined), sayfa istatistikleri ve iade listesi görüntülenemez.
+[Aksiyom 3]: Eğer React bileşen hiyerarşisinde geçerli bir router context mevcut değilse, sayfa yönlendirmeleri çalışmaz.
 
-[Aksiyom 4]: Eğer `useReturns` hook'u `loading` durumunu true olarak döndürmüyorsa, yükleme göstergesi gösterilmez ve veri anlık yüklenir.
+---
 
-[Aksiyom 5]: Eğer `ReturnStatus` enum değerleri (PENDING, APPROVED, REJECTED, INFO_REQUESTED, COMPLETED) tanımlı değilse, durum filtreleme ve gruplama çalışamaz.
-
-[Aksiyom 6]: Eğer `approveReturn`, `rejectReturn` veya `requestReturnInfo` fonksiyonları useReturns hook所提供lanmıyorsa, iade onaylama/reddetme/bilgi isteme işlemleri gerçekleştirilemez.
-
-[Aksiyom 7]: Eğer `formatDate` yardımcı fonksiyonu tanımlı değilse, iade tarihleri okunabilir formatta gösterilemez.
-
-[Aksiyom 8]: Eğer `getStatusInfo` helper fonksiyonu tanımlı değilse, iade durumları için etiket ve stil bilgileri üretilemez.
-
-[Aksiyom 9]: Eğer `getStatusCounts` fonksiyonu tanımlı değilse, her durum kategorisi için sayaç değerleri hesaplanamaz ve istatistik kartları gösterilemez.
-
-[Aksiyom 10]: Eğer `toast` (react-hot-toast) kütüphanesi yüklü değilse, işlem bildirimleri kullanıcıya gösterilemez.
-
-[Aksiyom 11]: Eğer `useNavigate` hook'u mevcut değilse, oturum açmamış veya yetkisiz kullanıcılar için yönlendirme yapılamaz.
-
-[Aksiyom 12]: Eğer `selectedReturn` state'i null olarak başlamıyorsa, iade detay modalı başlangıçta açık olur.
+**Not:** Fonksiyon gövdesi (implementation body) paylaşılmadığı için, detaylı akış varsayımları üretilememiştir. Yukarıdaki aksiyomlar, modülün dosya yapısından (.tsx) ve eski doküman bağlamından türetilen genel yapısal gereksinimlerdir. Detaylı aksiyon bazlı aksiyomlar için fonksiyon gövdesi gereklidir.
 
 ---
 
@@ -50204,189 +49151,208 @@ type SortKey = 'order' | 'customer' | 'reason' | 'status' | 'date' | 'amount'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::authGuard
-- **params**: () — React useEffect callback, parametre yok
-- **ic_degiskenler**: (local değişken yok, state'ler dışarıdan)
-  - `loading` — useAuth'tan gelen yükleme durumu, true ise henüz hazır değil
-  - `user` — useAuth'tan gelen oturum kullanıcı nesnesi, null ise giriş yapılmamış
-  - `router` — useRouter hook'undan gelen Next.js router, sayfa yönlendirme için
-- **Dönüş**: yok — useEffect side-effect; user yoksa `router.replace(Routes.auth.login())` ile login sayfasına yönlendirir
+### [N1_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::AuthGuard
+- **params**: () — parametre yok
+- **ic_degiskenler**: (yok — sadece hook'lardan gelen `loading`, `user` ve `router` kullanılır)
+- **Dönüş**: yok (yan etki: `router.replace()` ile login sayfasına yönlendirme)
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::readUrlStatusFilter
-- **params**: () — React useEffect callback, parametre yok
+---
+
+### [N2_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ParseUrlStatusParam
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `params` — `new URLSearchParams(window.location.search)` — URL query string'inden parametreleri parse eder
-  - `stParam` — `params.get('status')` — URL'den `status` parametre değerini alır, virgülle ayrılmış durum listesi beklenir
-  - `next` — `Object.keys(next).forEach(...)` ile sıfırlanan `{ ...statusFilter }` kopyası, URL'deki durumları aktif yapmak için kullanılır
-- **Dönüş**: yok — URL parametrelerini okuyup `setStatusFilter(next)` ile state'i günceller
+  - `params` — `URLSearchParams` nesnesi, `window.location.search`'ten oluşturulur, URL sorgu parametrelerini okumak için
+  - `stParam` — URL'deki `status` parametresinin string değeri (virgülle ayrılmış durum listesi), `null` olabilir
+  - `next` — `statusFilter`'in shallow copy'si, tüm değerleri önce `false`'a set edilip ardından URL'deki durumlar `true` olarak işaretlenir
+  - `k` — `Object.keys(next).forEach` döngüsünün iterasyon değişkeni, her bir durum anahtarını temsil eder
+  - `s` — `stParam.split(',')` döngüsünün iterasyon değişkeni, her bir durum stringini temsil eder
+  - `key` — `s.trim()` ile elde edilen, boşlukları temizlenmiş durum anahtarı
+- **Dönüş**: yok (yan etki: `setStatusFilter(next)` ile state güncellenir)
 
-### [N3_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::loadReturns
-- **params**: () — async callback, parametre yok
+---
+
+### [N3_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::LoadReturns
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `user` — useAuth'tan gelen kullanıcı nesnesi, null ise fonksiyon erken döner
-  - `data` — `supabase.from('venthub_returns').select(...)` sorgusundan dönen satır verisi (ReturnRow[])
-  - `error` — Supabase sorgusundan dönen hata nesnesi, null değilse throw edilir
-  - `returnRows` — `data || []` ile elde edilen ReturnRow dizisi, tipi `ReturnRow[]`
-  - `mapped` — `returnRows.map(...)` ile `ReturnWithOrder[]` tipine dönüştürülmüş dizi; `venthub_orders` iç içe tablodaki alanları (order_number, customer_name, customer_email, total_amount) düz objeye indirger
-- **Dönüş**: yok — `setReturns(mapped)` ile returns state'ini günceller; hata durumunda `toast.error` gösterir; finally'de `setIsLoading(false)` çağırır
+  - `data` — Supabase sorgusundan dönen raw satır dizisi (ilişkisel `venthub_orders` join'li)
+  - `error` — Supabase sorgu sonucu hata nesnesi, `null` olabilir
+  - `returnRows` — `ReturnRow[]` tipinde normalize edilmiş iade kayıtları dizisi, `data || []` fallback'li
+  - `mapped` — `ReturnWithOrder[]` tipinde, `returnRows.map()` ile dönüştürülmüş nesne dizisi; her eleman `item.id`, `item.order_id`, `item.user_id`, `item.reason`, `item.description`, `item.status`, `item.created_at`, `item.updated_at`, `item.venthub_orders?.order_number`, `item.venthub_orders?.customer_name`, `item.venthub_orders?.customer_email`, `item.venthub_orders?.total_amount` alanlarını içerir
+- **Dönüş**: yok (yan etki: `setReturns(mapped)`, `setIsLoading()`, `toast.error()`, `console.error()`)
 
-### [N4_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::mapReturnRow
-- **params**: `(item: ReturnRow)` — tek bir iade satırı
+---
+
+### [N4_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::MapReturnItem
+- **params**: `item` — tek bir `ReturnRow` nesnesi, Supabase'den gelen iade satırı
+- **ic_degiskenler**: (yok — doğrudan `item` özelliklerinden harita oluşturulur)
+- **Dönüş**: `{ id, order_id, user_id, reason, description, status, created_at, updated_at, order_number, customer_name, customer_email, total_amount }` — `ReturnWithOrder` tipinde nesne
+
+---
+
+### [N5_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::EffectLoadReturns
+- **params**: () — parametre yok
+- **ic_degiskenler**: (yok — sadece `loadReturns()` çağrısı)
+- **Dönüş**: yok (yan etki: `loadReturns()` fonksiyonunu çağırır)
+
+---
+
+### [N6_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ApplyFilters
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `item` — ReturnRow tipinde Supabase satırı; `venthub_orders` inner join nesnesi innererir
-- **Dönüş**: `ReturnWithOrder` objesi — item'in tüm alanlarını + `venthub_orders.order_number`, `venthub_orders.customer_name`, `venthub_orders.customer_email`, `venthub_orders.total_amount` alanlarını düz objeye indirger
+  - `filtered` — filtreleme sürecinde kullanılan geçici dizi, başlangıçta `returns` dizisinin referansı, ardından filtrelenmiş hali
+  - `anyStatus` — `Object.values(statusFilter).some(Boolean)` sonucu, herhangi bir durum filtresinin aktif olup olmadığını belirten boolean
+  - `query` — `searchQuery.toLowerCase()` ile oluşturulmuş küçük harfli arama metni
+- **Dönüş**: yok (yan etki: `setFilteredReturns(filtered)` ile state güncellenir)
 
-### [N5_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::triggerLoadReturns
-- **params**: () — React useEffect callback, parametre yok
+---
+
+### [N7_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::SearchFilterPredicate
+- **params**: `r` — tek bir `ReturnWithOrder` nesnesi, filtrelenecek iade kaydı
+- **ic_degiskenler**: (yok — doğrudan `r.order_number`, `r.customer_name`, `r.customer_email`, `r.reason` ve outer scope `query` kullanılır)
+- **Dönüş**: `boolean` — kayıt arama sorgusuyla eşleşiyor mu
+
+---
+
+### [N8_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::SortReturns
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - `arr` — `filteredReturns` dizisinin shallow copy'si (`[...filteredReturns]`), sıralama işlemi orijinal diziyi bozmaması için kopya üzerinde yapılır
+  - `dir` — sıralama yönü çarpanı, `sortDir === 'asc'` ise `1`, aksi halde `-1`
+  - `ao` — `a` elemanının sıralama değeri, `a.order_number` varsa onu aksi halde `a.order_id`'yi kullanır
+  - `bo` — `b` elemanının sıralama değeri, `b.order_number` varsa onu aksi halde `b.order_id`'yi kullanır
+- **Dönüş**: `ReturnWithOrder[]` — sıralanmış dizi
+
+---
+
+### [N9_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::CompareFn
+- **params**: `a` — sıralanacak birinci `ReturnWithOrder` nesnesi, `b` — sıralanacak ikinci `ReturnWithOrder` nesnesi
+- **ic_degiskenler**:
+  - `dir` — sıralama yönü çarpanı, `sortDir === 'asc'` ise `1`, aksi halde `-1`
+  - `ao` — `a` elemanının sıralama değeri (sadece `case 'order'` bloğunda), `a.order_number` varsa onu aksi halde `a.order_id` kullanır
+  - `bo` — `b` elemanının sıralama değeri (sadece `case 'order'` bloğunda), `b.order_number` varsa onu aksi halde `b.order_id` kullanır
+- **Dönüş**: `number` — negatif, sıfır veya pozitif karşılaştırma sonucu
+
+---
+
+### [N10_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ToggleSort
+- **params**: `key: SortKey` — sıralanacak sütunun anahtarı
+- **ic_degiskenler**: (yok — doğrudan `sortKey`, `sortDir`, `setSortKey`, `setSortDir` kullanılır)
+- **Dönüş**: yok (yan etki: `setSortDir()` ve/veya `setSortKey()` ile state güncellenir)
+
+---
+
+### [N11_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::SortIndicator
+- **params**: `key: SortKey` — sıralama göstergesi istenen sütunun anahtarı
+- **ic_degiskenler**: (yok — doğrudan `sortKey` ve `sortDir` kullanılır)
+- **Dönüş**: `string` — sıralama yönüne göre `'▲'`, `'▼'` veya boş string `''`
+
+---
+
+### [N12_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::HandleStatusUpdate
+- **params**: `returnId: string` — güncellenecek iadenin UUID'si, `newStatus: string` — hedef durum stringi
+- **ic_degiskenler**:
+  - `returnItem` — `returns.find(r => r.id === returnId)` ile bulunan iade kaydı nesnesi, bulunamazsa `undefined`
+  - `oldStatus` — `returnItem.status`'ten alınan güncelleme öncesi eski durum stringi
+  - `error` — Supabase `.update()` sorgusundan dönen hata nesnesi
+  - `logAdminAction` — `await import('../../lib/audit')` ile dinamik import edilen audit loglama fonksiyonu
+  - `refundErr` — `supabase.functions.invoke('refund-order-mock')` sonucu hata nesnesi
+  - `invokeError` — `supabase.functions.invoke('return-status-notification')` sonucu hata nesnesi
+  - `emailError` — e-posta bildirim try-catch bloğundaki yakalanan hata nesnesi
+- **Dönüş**: yok (yan etki: `supabase.from().update()`, `setReturns()` state güncellemesi, `syncOrderFromReturn()` orders tablosu senkronizasyonu, `toast.success()`/`toast.error()` bildirimleri, `supabase.functions.invoke()` ile mock refund ve e-posta bildirimi)
+
+---
+
+### [N13_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::SetReturnsMapFn
+- **params**: `prev` — mevcut `returns` state dizisi (callback'in parametresi)
+- **ic_degiskenler**: (yok — doğrudan `prev.map()`, `r.id`, `returnId`, `newStatus` kullanılır)
+- **Dönüş**: `ReturnWithOrder[]` — güncellenmiş iade kayıtları dizisi
+
+---
+
+### [N14_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::GetStatusLabel
+- **params**: `status: string` — durum anahtarı
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `loadReturns()` çağırarak iade verilerini yükler
+- **Dönüş**: `string` — `_t()` ile çevrilmiş durum etiketi, çeviri bulunamazsa orijinal `status` stringi
 
-### [N6_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::filterReturns
-- **params**: () — useMemo callback, parametre yok
-- **ic_degiskenler**:
-  - `filtered` — `returns` dizisinin kopyası, filtreleme zincirinin başlangıç dizisi
-  - `anyStatus` — `Object.values(statusFilter).some(Boolean)` — herhangi bir durum filtresi aktif mi kontrol eder
-  - `query` — `searchQuery.toLowerCase()` — arama metninin küçük harf versiyonu, case-insensitive arama için
-- **Dönüş**: yok — `setFilteredReturns(filtered)` ile filtrelenmiş iade listesini state'e yazar
+---
 
-### [N7_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::searchFilterCallback
-- **params**: `(r: ReturnWithOrder)` — filter() içinde her bir iade satırı
-- **ic_degiskenler**:
-  - `r` — ReturnWithOrder objesi; `order_number`, `customer_name`, `customer_email`, `reason` alanları kontrol edilir
-  - `query` — dış scope'tan gelen küçük harf arama metni
-- **Dönüş**: `boolean` — arama sorgusu ile eşleşiyorsa true
+### [N15_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::GetStatusIcon
+- **params**: `status: string` — durum anahtarı
+- **ic_degiskenler**: (yok — doğrudan `Clock`, `CheckCircle`, `XCircle`, `Truck`, `Package`, `RefreshCw` icon bileşenleri kullanılır)
+- **Dönüş**: `JSX.Element` — duruma karşılık gelen lucide-react icon bileşeni
 
-### [N8_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::sortedReturns
-- **params**: () — useMemo callback, parametre yok
-- **ic_degiskenler**:
-  - `arr` — `filteredReturns` dizisinin shallow kopyası (`[...filteredReturns]`), sıralama dizisi
-  - `sortKey` — hangi sütuna göre sıralama yapılacağını belirten anahtar ('order'|'customer'|'reason'|'status'|'amount'|'date')
-  - `sortDir` — sıralama yönü ('asc' veya 'desc')
-- **Dönüş**: `ReturnWithOrder[]` — sıralanmış iade dizisi
+---
 
-### [N9_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::sortComparator
-- **params**: `(a: ReturnWithOrder, b: ReturnWithOrder)` — Array.sort() karşılaştırma fonksiyonu
-- **ic_degiskenler**:
-  - `a` — karşılaştırmada sol taraftaki iade objesi
-  - `b` — karşılaştırmada sağ taraftaki iade objesi
-  - `dir` — `sortDir === 'asc' ? 1 : -1` — sıralama yön çarpanı
-  - `ao` — `a.order_number ? a.order_number : a.order_id` — order_numarator fallback'i
-  - `bo` — `b.order_number ? b.order_number : b.order_id` — order_numarator fallback'i
-- **Dönüş**: `number` — localeCompare veya numeric karşılaştırma sonucu (dir ile çarpılmış)
+### [N16_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::GetStatusColor
+- **params**: `status: string` — durum anahtarı
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` — Tailwind CSS renk class'ları (bg, text, border) birleştirilmiş string
 
-### [N10_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::toggleSort
-- **params**: `(key: SortKey)` — sıralanacak sütun anahtarı
-- **ic_degiskenler**:
-  - `key` — SortKey tipinde, hangi sütuna tıklandığını belirtir
-- **Dönüş**: yok — `setSortDir` ve/veya `setSortKey` state setter'larını çağırarak sıralama yönünü ve anahtarını günceller
+---
 
-### [N11_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::sortIndicator
-- **params**: `(key: SortKey)` — sütun anahtarı
-- **ic_degiskenler**:
-  - `key` — SortKey tipinde, sütun identifikasyonu
-- **Dönüş**: `string` — aktif sütun ise `'▲'` veya `'▼'`, değilse boş string `''`
-
-### [N12_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::handleStatusUpdate
-- **params**: `(returnId: string, newStatus: string)` — güncellenecek iade ID'si ve hedef durum
-- **ic_degiskenler**:
-  - `returnId` — string, güncellenecek iade kaydının primary key'i
-  - `newStatus` — string, hedef durum (requested, approved, rejected, in_transit, received, refunded, cancelled)
-  - `hasWriteAccess` — boolean, kullanıcının yazma yetkisi varsa true
-  - `returnItem` — `returns.find(r => r.id === returnId)` ile bulunan ReturnWithOrder nesnesi, güncellenen kaydın güncel hali
-  - `oldStatus` — `returnItem.status` — güncelleme öncesi durum, audit log için saklanır
-  - `data` — Supabase update sorgusu sonucu (kullanılmıyor ama destructure edilmiş)
-  - `error` — Supabase update hatası
-- **Dönüş**: yok — çoklu yan etki: Supabase'de status günceller, audit log yazar, `setReturns` ile local state günceller, `syncOrderFromReturn` ile orders tablosunu senkronize eder, `toast.success` gösterir, refunded ise `refund-order-mock` edge function çağırır, `return-status-notification` edge function ile müşteriye e-posta gönderir
-
-### [N13_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::statusUpdateLocalMap
-- **params**: `(prev: ReturnWithOrder[])` — setReturns'in functional updater'ı
-- **ic_degiskenler**:
-  - `prev` — mevcut returns state dizisi
-  - `returnId` — dış scope'tan gelen güncellenen iade ID'si
-  - `newStatus` - dış scope'tan gelen yeni durum
-- **Dönüş**: `ReturnWithOrder[]` — `returnId` eşleşen elemanın status ve updated_at alanlarını güncellenmiş, diğerleri değişmemiş dizi
-
-### [N14_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::getStatusLabel
-- **params**: `(status: string)` — durum kodu stringi
-- **ic_degiskenler**:
-  - `status` — iade durumunu temsil eden string (requested, approved, rejected, in_transit, received, refunded, cancelled)
-- **Dönüş**: `string` — `_t()` i18n fonksiyonu ile çevrilmiş durum etiketi, çeviri bulunamazsa ham status stringi döner
-
-### [N15_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::getStatusIcon
-- **params**: `(status: string)` — durum kodu stringi
-- **ic_degiskenler**:
-  - `status` — iade durumunu temsil eden string
-- **Dönüş**: `JSX.Element` — duruma göre lucide-react icon bileşeni (Clock, CheckCircle, XCircle, Truck, Package, RefreshCw) ve uygun renk class'ı
-
-### [N16_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::getStatusColor
-- **params**: `(status: string)` — durum kodu stringi
-- **ic_degiskenler**:
-  - `status` — iade durumunu temsil eden string
-- **Dönüş**: `string` — Tailwind CSS renk class'ları (bg, text, border) ile badge stil stringi
-
-### [N17_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::exportCsv
+### [N17_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ExportCsv
 - **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `header` — `string[]` — CSV sütun başlıkları, `_t()` ile çevrilmiş (order, customer, email, reason, status, date, amount)
-  - `lines` — `filteredReturns.map(...)` ile üretilen CSV satırları dizisi
-  - `bom` — `'\ufeff'` — UTF-8 BOM karakteri, Excel uyumluluğu için
-  - `csv` — `[header.join(','), ...lines].join('\n')` — birleştirilmiş CSV içeriği
-  - `blob` — `new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })` — tarayıcı Blob nesnesi
-  - `url` — `URL.createObjectURL(blob)` — Blob için geçici URL
-  - `a` — `document.createElement('a')` — DOM'a eklenen gizli anchor elementi
-- **Dönüş**: yok — dosya indirme tetikler; `a.click()` ile CSV dosyası indirilir, `URL.revokeObjectURL(url)` ile URL serbest bırakılır
+  - `header` — `string[]` tipinde CSV sütun başlıkları dizisi, `_t()` ile çevrilmiş 7 başlık
+  - `lines` — `filteredReturns.map()` ile oluşturulmuş CSV satır stringleri dizisi, her satır virgülle ayrılmış ve tırnak işaretleri escape edilmiş
+  - `bom` — UTF-8 BOM karakteri (`'\ufeff'`), Excel'in doğru kodlamayı tanıması için
+  - `csv` — tüm satırları newline ile birleştirilmiş tam CSV stringi
+  - `blob` — `Blob` nesnesi, CSV içeriğini `text/csv;charset=utf-8;` MIME tipiyle paketler
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici dosya URL'i
+  - `a` — `document.createElement('a')` ile oluşturulan DOM anchor elementi, indirme tetikleyicisi
+- **Dönüş**: yok (yan etki: dosya indirme tetiklenir, geçici URL `revokeObjectURL` ile serbest bırakılır)
 
-### [N18_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::csvRowMapper
-- **params**: `(r: ReturnWithOrder)` — filteredReturns map callback'inde tek bir iade satırı
-- **ic_degiskenler**:
-  - `r` — ReturnWithOrder objesi
-- **Dönüş**: `string[]` — 7 elemanlı dizi: order_number (prefixed), customer_name, customer_email, reason, status label, created_at formatlanmış, total_amount formatlanmış; her eleman `"` ile sarılmış ve escape edilmiş
+---
 
-### [N19_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::exportXls
+### [N18_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ExportCsvMapFn
+- **params**: `r` — tek bir `ReturnWithOrder` nesnesi
+- **ic_degiskenler**: (yok — doğrudan `r.order_number`, `r.order_id`, `r.customer_name`, `r.customer_email`, `r.reason`, `r.status`, `r.created_at`, `r.total_amount` kullanılır)
+- **Dönüş**: `string` — virgülle ayrılmış ve escape edilmiş CSV satır stringi
+
+---
+
+### [N19_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ExportXls
 - **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `rowsHtml` — `filteredReturns.map(...)` ile üretilen HTML `<tr>` satırları stringi
-  - `table` — tam HTML dokümanı stringi, `<table>` ile Excel'e aktarılabilir format
-  - `blob` — `new Blob([table], { type: 'application/vnd.ms-excel' })` — Excel format blob
-  - `url` — `URL.createObjectURL(blob)` — Blob için geçici URL
-  - `a` — `document.createElement('a')` — gizli anchor elementi
-- **Dönüş**: yok — `.xls` dosyası indirilir
+  - `rowsHtml` — `filteredReturns.map()` ile oluşturulmuş HTML `<tr>` satırlarının birleştirilmiş stringi
+  - `orderNo` — formate edilmiş sipariş numarası, `r.order_number` varsa `#` + ilk tire sonrası kısım, yoksa `#` + `order_id` son 8 karakteri
+  - `amount` — `formatCurrency()` ile formatlanmış para birimi stringi veya boş string
+  - `table` — tam HTML döküman stringi, `<table>` yapısı ve tüm satırları içerir
+  - `blob` — `Blob` nesnesi, HTML tablosunu `application/vnd.ms-excel` MIME tipiyle paketler
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici dosya URL'i
+  - `a` — `document.createElement('a')` ile oluşturulan DOM anchor elementi
+- **Dönüş**: yok (yan etki: dosya indirme tetiklenir, geçici URL `revokeObjectURL` ile serbest bırakılır)
 
-### [N20_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::xlsRowMapper
-- **params**: `(r: ReturnWithOrder)` — filteredReturns map callback'inde tek bir iade satırı
-- **ic_degiskenler**:
-  - `r` — ReturnWithOrder objesi
-  - `orderNo` — `r.order_number ? '#' + r.order_number.split('-')[1] : '#' + r.order_id.slice(-8).toUpperCase()` — formatlanmış sipariş numarası
-  - `amount` — `typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang) : ''` — formatlanmış tutar
-- **Dönüş**: `string` — HTML `<tr>` satırı içeren string, 7 `<td>` hücresi (orderNo, customer_name, customer_email, reason, status label, created_at, amount)
+---
 
-### [N21_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::statusFilterToggle
-- **params**: `(o: { value: string; label: string })` — durum filtre seçeneği objesi
+### [N20_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ExportXlsMapFn
+- **params**: `r` — tek bir `ReturnWithOrder` nesnesi
 - **ic_degiskenler**:
-  - `o` — `{ value, label }` yapısında durum filtre seçeneği
-- **Dönüş**: `object` — `{ key, label, active, onToggle }` objesi; `active` mevcut filtre durumunu, `onToggle` tıklama handler'ını içerir
+  - `orderNo` — formate edilmiş sipariş numarası, `r.order_number` varsa `#` + split ile alınan kısım, yoksa `#` + `r.order_id.slice(-8).toUpperCase()`
+  - `amount` — `typeof r.total_amount === 'number'` kontrolü sonrası `formatCurrency()` ile formatlanmış string veya boş string
+- **Dönüş**: `string` — HTML `<tr>` satır stringi
 
-### [N22_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::renderTableRow
-- **params**: `(returnItem: ReturnWithOrder, index: number)` — tablo satırı render callback'i
-- **ic_degiskenler**:
-  - `returnItem` — ReturnWithOrder objesi, render edilen iade kaydı
-  - `index` — number, dizi index'i, animasyon gecikmesi için kullanılır (`animationDelay: ${index * 50}ms`)
-  - `orderNo` — `returnItem.order_number ? '#' + returnItem.order_number.split('-')[1] : '#' + returnItem.order_id.slice(-8).toUpperCase()` — formatlanmış sipariş numarası
-  - `hasWriteAccess` — boolean, kullanıcı yazma yetkisine sahipse butonları gösterir
-  - `visibleCols` — object, hangi sütunların görünür olduğunu belirten flag objesi (order, customer, reason, status, date)
-  - `density` — string, tablo yoğunluk modu ('compact' veya diğer)
-  - `updatingStatus` — string|null, şu an status güncellenen iade ID'si (spinner gösterimi için)
-  - `lang` — string, mevcut dil kodu, formatDate/formatTime/formatCurrency için
-- **Dönüş**: `JSX.Element` — `<tr>` elementi, iade verisinin tüm sütunları ve status değiştirme butonlarını içerir
+---
 
-### [N23_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::renderStatusActionButtons
-- **params**: `(status: string)` — iade mevcut durum stringi
+### [N21_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::StatusFilterToggleFn
+- **params**: `o` — `{ value: string, label: string }` tipinde durum filtre seçeneği nesnesi
+- **ic_degiskenler**: (yok — doğrudan `statusFilter` ve `setStatusFilter` kullanılır)
+- **Dönüş**: `{ key: string, label: string, active: boolean, onToggle: () => void }` — filtre butonu için yapılandırılmış nesne
+
+---
+
+### [N22_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::RenderReturnRow
+- **params**: `returnItem` — `ReturnWithOrder` tipinde tek bir iade kaydı, `index` — `number` tipinde dizin sırası
 - **ic_degiskenler**:
-  - `status` — string, mevcut iade durumu
-  - `nextStatuses` — obje, her durum için geçilebilecek sonraki durumlar dizisi (dış scope'tan)
-  - `returnItem` — ReturnWithOrder, dış scope'tan gelen iade objesi
-  - `updatingStatus` — string|null, spinner durumu için
-- **Dönüş**: `JSX.Element[]` — `nextStatuses[status]?.map(...)` ile üretilen durum değiştirme butonları dizisi; her buton `handleStatusUpdate` çağırır, spinner veya label+ChevronRight gösterir
+  - `orderNo` — formate edilmiş sipariş numarası, `returnItem.order_number` varsa `#` + ilk tire sonrası kısım, yoksa `#` + `returnItem.order_id.slice(-8).toUpperCase()`
+- **Dönüş**: `JSX.Element` — `<tr>` HTML tablo satırı bileşeni
+
+---
+
+### [N23_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::StatusActionButton
+- **params**: `status` — `string` tipinde hedef durum anahtarı
+- **ic_degiskenler**: (yok — outer scope `returnItem`, `handleStatusUpdate`, `updatingStatus`, `getStatusLabel` kullanılır)
+- **Dönüş**: `JSX.Element` — durum güncelleme butonu bileşeni
 
 ---
 
@@ -50571,28 +49537,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx
-skeleton_hash: 348e12a8da4fe548
+skeleton_hash: aab27482c6f16b67
 entity_hashes:
   func:AdminUsersPage: ee013d03ee079db2
-  overview: 3fe4b4182e26dc08
+  overview: 0096771747f8ab6c
   style_tokens: 8daaaf9992883c4d
-generated_at: 2026-05-28T22:39:48Z
+generated_at: 2026-05-29T19:00:45Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC sisteminin yönetici panelinde yer alan kullanıcı yönetimi sayfasını oluşturan React bileşenini barındırır. Yöneticilerin platformdaki tüm kullanıcı hesaplarını görüntülemesi, düzenlemesi ve yönetmesi için gereken arayüzün temel yapısını sunar. Sayfa, yetkili yöneticilerin kullanıcı tablosunu filtrelemesi, detay görmesi ve gerekli işlemleri yapabilmesi için gerekli işlevselliği tek bir bileşen altında toplar.
+Bu modül, VentHub HVAC yönetici panelinde yer alan kullanıcı yönetimi sayfasını oluşturan ana React bileşenidir. Yetkili yöneticilerin platformdaki tüm kullanıcı hesaplarını görüntülemesi, filtrelemesi, detay bilgilerini incelemesi ve rol gibi temel bilgileri değiştirebilmesi için gereken arayüzün tamamını sunar. Sayfa, yönetici ve normal kullanıcı sekmeleri arasında geçiş yaparak verileri dinamik şekilde yükler ve yöneticilerin kullanıcıları etkin bir şekilde denetlemesini sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Yönetici kullanıcılar sayfasının tüm işlevselliğini tek bir bileşen altında toplayan, sayfanın renderlanmasından ve temel iş akışından sorumlu ana bileşendir. Kullanıcı listeleme arayüzünün yönetici paneli ortamında sorunsuz çalışmasını sağlar.
+Yönetici kullanıcılar sayfasının tüm arayüz ve işlevselliğini tek bir bileşen altında toplayan, sayfanın renderlanmasından ve temel veri akışından sorumlu ana bileşendir. Oturum kontrolü, veri çekme, filtreleme ve rol değiştirme gibi işlemleri yöneterek yönetici panelinde kullanıcı yönetimini mümkün kılar.
 - `AdminUsersPage`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Not:** Fonksiyon gövdesi verilmediği için mimari varsayımlar üretilememektedir. Aksiyom üretimi için AdminUsersPage bileşeninin implementasyon koduna ihtiyaç vardır.
+Bu modül için fonksiyon gövdesi detayları paylaşılmamıştır, bu nedenle yalnızca fonksiyon imzasından ve modül yapısından çıkarılabilecek minimal aksiyomlar tanımlanmıştır.
+
+---
+
+[Aksiyom 1]: Eğer bileşen bir React sayfa bileşeni olarak render ediliyorsa, bir React Router v6+ ortamında çalışması gerekir. Eğer geçerli bir React Router bağlamı (Router Context) yoksa, bileşen iç navigasyon ve route parametreleri doğru çalışmaz.
+
+[Aksiyom 2]: Eğer bileşen yönetici paneline ait bir sayfa ise, kullanıcı bilgileri ve rol kontrolü için üst seviye bir AuthProvider/Context bağlamı mevcut olmalıdır. Eğer Auth Context bağlantısı yoksa, yönetici yetkilendirme kontrolü yapılamaz ve yetkisiz erişim riski oluşur.
+
+[Aksiyom 3]: Eğer AdminUsersPage fonksiyonu paramet almıyorsa (signature: `AdminUsersPage()`), bileşen props yerine hook'lar (useContext, useNavigate, useQuery vb.) aracılığıyla bağımlılıklarını karşılar. Eğer gerekli hook'lar çalıştırılamıyorsa (örn: bir Provider içinde render edilmemişse), bileşen hata fırlatır.
+
+---
+
+**Not:** Fonksiyon gövdesi detayları paylaşılmadığı için, API çağrıları, state yönetimi, filtreleme eşik değerleri veya veri modeli bağımlılıkları gibi detaylı aksiyomlar türetilememiştir. Fonksiyon implementasyonu paylaşıldığında daha spesifik aksiyomlar eklenebilir.
 
 ---
 
@@ -50631,174 +49608,186 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminUsersPage::roleCheckEffect
-- **params**: () — effect callback, parametre yok
-- **ic_degiskenler**:
-  - `role` — useAuth'tan gelen kullanıcının mevcut rolü, super_admin/admin olup olmadığı kontrol edilir
-- **Dönüş**: yok (state setter çağrısı: `setAdminUsers`)
+### [N1_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::setIsAdminCallback
+- **params**: () — parametre yok
+- **ic_degiskenler**: (yok, doğrudan state setter çağrılır)
+- **Dönüş**: yok (yan etki: `isAdmin` state'ini `role` değerine göre günceller)
 
 ---
 
-### [N2_NASIL] AST Pointer: AdminUsersPage::authRedirectEffect
-- **params**: () — effect callback, parametre yok
-- **ic_degiskenler**:
-  - `loading` — useAuth'tan gelen oturum yükleme durumu
-  - `user` — useAuth'tan gelen mevcut kullanıcı nesnesi
-- **Dönüş**: yok (yan etki: `router.push` ile login sayfasına yönlendirme)
-
----
-
-### [N3_NASIL] AST Pointer: AdminUsersPage::loadAdminUsersEffect
-- **params**: () — effect callback, parametre yok
-- **ic_degiskenler**:
-  - `loadAdminUsers` — asenkron iç fonksiyon, admin kullanıcı listesini yükler ve çağrılır
-- **Dönüş**: yok (effect side-effect olarak veri çeker)
-
----
-
-### [N4_NASIL] AST Pointer: AdminUsersPage::loadAdminUsers
+### [N2_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::redirectIfUnauthenticated
 - **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `isAdmin` — kullanıcının admin olup olmadığını belirleyen boolean, true değilse fonksiyon erken döner
-  - `user` — mevcut oturum kullanıcısı, null ise fonksiyon erken döner
-  - `isLoading` — yükleme durumu flag'i, true yapılarak spinner tetiklenir (`setIsLoading(true)`)
-  - `data` — `listAdminUsers()` API çağrısından dönen admin kullanıcı dizisi
-  - `profiles` — `supabase.from('user_profiles').select(...)` sorgusundan dönen profil dizisi, manuel join için kullanılır
-  - `profiles?.find(p => p.id === u.id)?.full_name` — her admin user'ın id'sine karşılık gelen profil tam adı
-  - `u.full_name` — profil bulunamazsa fallback olarak kullanılır
-  - `enrichedAdmins` — `data.map(...)` ile genişletilmiş, full_name zenginleştirilmiş admin kullanıcı dizisi
-  - `_t('admin.users.toasts.adminsLoadFailed')` — hata toast mesajı için çeviri anahtarı
-- **Dönüş**: yok (yan etki: `setAdminUsers(enrichedAdmins)` ile state güncellenir)
+  - `loading` — useAuth hook'undan gelen yükleme durumu flag'i, true ise henüz oturum kontrolü devam ediyor demektir
+  - `user` — useAuth hook'undan gelen mevcut kullanıcı nesnesi, null ise giriş yapılmamıştır
+  - `router` — useRouter hook'undan gelen Next.js router instance'ı, sayfa yönlendirme için kullanılır
+- **Dönüş**: yok (yan etki: kullanıcı giriş yapmamışsa `/admin/users` login sayfasına yönlendirir)
 
 ---
 
-### [N5_NASIL] AST Pointer: AdminUsersPage::enrichAdminProfileMap
-- **params**: `u` — `AdminUser` tipinde tek bir admin kullanıcı nesnesi (map callback)
-- **ic_degiskenler**:
-  - `u` — genişletme yapılan orijinal admin user nesnesi, spread ile kopyalanır (`...u`)
-  - `profiles` — üst kapsamdan gelen supabase profil sorgusu sonucu
-  - `profiles?.find(p => p.id === u.id)?.full_name` — eşleşen profil tam adı
-  - `u.full_name` — profil eşleşmezse fallback tam ad
-- **Dönüş**: `{ ...u, full_name: ... }` — tam ad alanı zenginleştirilmiş admin user nesnesi
-
----
-
-### [N6_NASIL] AST Pointer: AdminUsersPage::loadAllUsersEffect
-- **params**: () — effect callback, parametre yok
-- **ic_degiskenler**:
-  - `loadAllUsers` — asenkron iç fonksiyon, tüm kullanıcıları yükler ve çağrılır
-- **Dönüş**: yok (effect side-effect olarak veri çeker)
-
----
-
-### [N7_NASIL] AST Pointer: AdminUsersPage::loadAllUsers
+### [N3_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectLoadAdminUsers
 - **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `isAdmin` — admin yetkisi kontrolü, false ise erken dönüş
-  - `user` — oturum kullanıcısı, null ise erken dönüş
-  - `activeTab` — mevcut aktif sekme, 'all' değilse erken dönüş
-  - `isLoading` — yükleme durumu flag'i (`setIsLoading(true)` ile tetiklenir)
-  - `profiles` — `supabase.from('user_profiles').select('id, role, created_at, full_name')` sorgusundan delen tüm kullanıcı profil dizisi
-  - `profileError` — supabase sorgusundan dönen hata nesnesi, varsa fırlatılır
-  - `_t('admin.users.toasts.allLoadFailed')` — hata toast mesajı için çeviri anahtarı
-- **Dönüş**: yok (yan etki: `setAllUsers(profiles)` ile state güncellenir, hata durumunda `setAllUsers([])` ile temizlenir)
+  - `isAdmin` — kullanıcının admin olup olmadığını belirten boolean state, inner function'ın guard kontrolünde kullanılır
+  - `user` — useAuth hook'undan gelen mevcut kullanıcı nesnesi, inner function'ın guard kontrolünde kullanılır
+- **ic_fonksiyonlar**:
+  - `loadAdminUsers` — async inner fonksiyon, admin kullanıcı listesini yükler
+- **Dönüş**: yok (yan etki: `isAdmin` true ve `user` mevcutsa `loadAdminUsers()` çağırır)
 
 ---
 
-### [N8_NASIL] AST Pointer: AdminUsersPage::handleRoleChange
-- **params**: `userId` (string) — rolü değiştirilecek kullanıcının benzersiz kimliği, `newRole` ('user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer') — hedef rol
+### [N4_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::loadAdminUsers
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `hasWriteAccess` — kullanıcının yazma yetkisi olup olmadığı boolean, false ise fonksiyon erken döner
-  - `userId` — hedef kullanıcının ID'si
-  - `newRole` — atanmak istenen yeni rol
-  - `success` — `setUserAdminRole(userId, newRole)` çağrısının başarı durumu boolean
-  - `logAdminAction` — dinamik import ile yüklenen audit log fonksiyonu (`../../lib/audit` modülünden)
-  - `supabase` — audit log çağrısında kullanılan supabase istemcisi
-  - `allUsers` — mevcut tüm kullanıcı dizisi, eski rolü bulmak için `allUsers.find(u => u.id === userId)?.role` kullanılır
-  - `data` — `listAdminUsers()` ile yeniden yüklenen admin kullanıcı listesi
-  - `_t('admin.users.permissionsError')` — yetki hatası toast mesajı
-  - `_t('admin.users.toasts.roleUpdated')` — başarı toast mesajı, `{ role: _t(...) }` parametre ile
-  - `_t('admin.users.toasts.roleNotUpdated')` — başarısızlık toast mesajı
-  - `_t('admin.users.toasts.roleUpdateError')` — genel hata toast mesajı
-- **Dönüş**: yok (yan etki: `setAllUsers(prev => prev.map(...))` ile local state güncellenir, `setAdminUsers(data)` ile admin listesi yenilenir)
+  - `isAdmin` — boolean state, guard kontrolünde kullanılır; false ise fonksiyon erken return eder
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, guard kontrolünde kullanılır; null ise erken return
+  - `data` — `listAdminUsers()` API çağrısının dönüş değeri; admin kullanıcıların dizisi (AdminUser[])
+  - `profiles` — `supabase.from('user_profiles').select(...)` sorgusunun `data` alanı; `{id, full_name}` alanlarını içeren profil nesneleri dizisi
+  - `enrichedAdmins` — `data.map(...)` ile oluşturulan genişletilmiş admin listesi; her user objesine `full_name` alanı profile'dan join edilerek eklenir
+- **API Cagrilari**:
+  - `listAdminUsers()` — admin kullanıcı listesini getiren servis fonksiyonu
+  - `supabase.from('user_profiles').select('id, full_name').in('id', data.map(u => u.id))` — user_profiles tablosundan admin kullanıcıların profil bilgilerini çeker
+- **Dönüş**: yok (yan etki: `setIsLoading(true)`, `setAdminUsers(enrichedAdmins)` state güncellemeleri yapar, hata durumunda `toast.error` gösterir)
 
 ---
 
-### [N9_NASIL] AST Pointer: AdminUsersPage::updateAllUsersState
-- **params**: `prev` — mevcut `AllUser[]` state dizisi (React state updater callback)
+### [N5_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::adminUsersMapCallback
+- **params**: `u` — AdminUser tipinde tek bir admin kullanıcısı nesnesi
 - **ic_degiskenler**:
-  - `prev` — önceki tüm kullanıcılar dizisi
-  - `u` — `prev.map` içindeki her bir kullanıcı nesnesi
-  - `userId` — hedef kullanıcı ID'si, eşleşme kontrolü yapılır (`u.id === userId`)
-  - `newRole` — atanacak yeni rol stringi
-- **Dönüş**: `{ ...u, role: newRole }` veya orijinal `u` — güncellenmiş `AllUser[]` dizisi
+  - `profiles` — outer scope'tan gelen supabase sorgusundan dönen profil dizisi; `.find(p => p.id === u.id)` ile eşleşme aranır
+- **Dönüş**: nesne — `...u` spread ile mevcut alanlar korunur, `full_name` alanı profiles'tan bulunamazsa `u.full_name` fallback kullanılır
 
 ---
 
-### [N10_NASIL] AST Pointer: AdminUsersPage::getRoleIcon
-- **params**: `roleCode` (string) — rol kodu ('super_admin', 'admin', 'warehouse', 'sales' veya diğer)
-- **ic_degiskenler**: yok (switch statement doğrudan parametreyi kullanır)
-- **Dönüş**: JSX.Element — ilgili role karşılık gelen Lucide icon bileşeni (Crown, Shield, ShieldCheck veya Users)
-
----
-
-### [N11_NASIL] AST Pointer: AdminUsersPage::loadPreferencesEffect
-- **params**: () — effect callback, parametre yok
+### [N6_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectLoadAllUsers
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `c` — `localStorage.getItem(...)` ile okunan sütun görünürlükleri JSON stringi, parse edilerek `visibleCols` state'ine merged
-  - `d` — `localStorage.getItem(...)` ile okunan yoğunluk tercihi stringi, 'compact' veya 'comfortable' ise `density` state'ine set edilir
-  - `STORAGE_KEY` — localStorage anahtar öneki, sütun tercihleri için kullanılır
-- **Dönüş**: yok (yan etki: `setVisibleCols`, `setDensity` state setter'ları çağrılır)
+  - `isAdmin` — boolean state, guard kontrolünde kullanılır
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, guard kontrolünde kullanılır
+  - `activeTab` — mevcut aktif sekme state'i; `'all'` değilse fonksiyon erken return eder
+- **ic_fonksiyonlar**:
+  - `loadAllUsers` — async inner fonksiyon, tüm kullanıcı listesini yükler
+- **Dönüş**: yok (yan etki: guard koşulları sağlandığında `loadAllUsers()` çağırır)
 
 ---
 
-### [N12_NASIL] AST Pointer: AdminUsersPage::saveColumnsEffect
-- **params**: () — effect callback, parametre yok
+### [N7_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::loadAllUsers
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `visibleCols` — mevcut sütun görünürlük nesnesi, JSON string olarak localStorage'a yazılır
-  - `STORAGE_KEY` — localStorage anahtar öneki
-- **Dönüş**: yok (yan etki: `localStorage.setItem(...)` ile sütun tercihleri kaydedilir)
+  - `isAdmin` — boolean state, guard kontrolünde kullanılır
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, guard kontrolünde kullanılır
+  - `activeTab` — mevcut sekme state'i; `'all'` değilse fonksiyon erken return
+  - `profiles` — `supabase.from('user_profiles').select(...)` sorgusunun `data` alanı; `{id, role, created_at, full_name}` alanlarını içeren tüm kullanıcı profil dizisi (AllUser[])
+  - `profileError` — supabase sorgusunun `error` alanı; sorgu hatası varsa fırlatılır
+- **API Cagrilari**:
+  - `ensureSessionFresh()` — proaktif oturum tazeleme kontrolü yapar
+  - `supabase.from('user_profiles').select('id, role, created_at, full_name')` — user_profiles tablosundan tüm kullanıcıların temel bilgilerini çeker
+- **Dönüş**: yok (yan etki: `setIsLoading(true/false)`, `setAllUsers(profiles)` state güncellemeleri yapar; hata durumunda `setAllUsers([])` ile listeyi temizler ve `toast.error` gösterir)
 
 ---
 
-### [N13_NASIL] AST Pointer: AdminUsersPage::saveDensityEffect
-- **params**: () — effect callback, parametre yok
+### [N8_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::handleRoleChange
+- **params**: `userId` — string, rolü değiştirilecek kullanıcının benzersiz kimliği; `newRole` — string union tipi (`'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer'`), hedef rol
 - **ic_degiskenler**:
-  - `density` — yoğunluk tercihi stringi ('compact' veya 'comfortable'), localStorage'a yazılır
-  - `STORAGE_KEY` — localStorage anahtar öneki
-- **Dönüş**: yok (yan etki: `localStorage.setItem(...)` ile yoğunluk tercihi kaydedilir)
+  - `hasWriteAccess` — boolean, kullanıcının yazma yetkisi olup olmadığını belirler; false ise toast gösterilip erken return
+  - `success` — `setUserAdminRole(userId, newRole)` çağrısının boolean dönüş değeri; true ise güncelleme başarılı demektir
+  - `logAdminAction` — dinamik import ile `../../lib/audit` modülünden yüklenen audit loglama fonksiyonu
+- **API Cagrilari**:
+  - `setUserAdminRole(userId, newRole)` — kullanıcının rolünü veritabanında günceller
+  - `import('../../lib/audit').logAdminAction(supabase, {...})` — dinamik import ile audit log kaydı oluşturur; `supabase` instance'ı, `table_name: 'user_profiles'`, `row_pk: userId`, `action: 'UPDATE'`, `before: { role: ... }`, `after: { role: newRole }`, `comment: 'role change'` parametreleri ile
+  - `listAdminUsers()` — güncelleme sonrası admin listesini yeniden çeker
+- **Dönüş**: yok (yan etki: `setUpdatingRole(userId/null)`, `setAllUsers(prev => ...)`, `setAdminUsers(data)` state güncellemeleri yapar; success'e göre `toast.success` veya `toast.error` gösterir)
 
 ---
 
-### [N14_NASIL] AST Pointer: AdminUsersPage::UserAvatar
-- **params**: `{ name, email }` — `name?` (string, opsiyonel — kullanıcının tam adı), `email?` (string, opsiyonel — kullanıcının e-posta adresi)
+### [N9_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::setAllUsersMapCallback
+- **params**: `prev` — AllUser[] tipinde mevcut tüm kullanıcılar dizisi (setState'in önceki değeri)
 - **ic_degiskenler**:
-  - `initial` — `(name || email || '?').charAt(0).toUpperCase()` ile hesaplanan avatar baş harfi, büyük harfe dönüştürülür
-- **Dönüş**: JSX.Element — gradient arka planlı, baş harf içeren dairesel avatar bileşeni
+  - `u` — `.map()` iterasyonundaki mevcut kullanıcı nesnesesi
+  - `userId` — outer scope'tan gelen hedef kullanıcı kimliği
+  - `newRole` — outer scope'tan gelen yeni rol değeri
+- **Dönüş**: AllUser[] — her kullanıcı için `u.id === userId` eşleşiyorsa `role` alanı `newRole` ile değiştirilmiş nesne, diğerleri aynen korunur
 
 ---
 
-### [N15_NASIL] AST Pointer: AdminUsersPage::renderUserRow
-- **params**: `userItem` — `AdminUser | AllUser` tipinde tek bir kullanıcı nesnesi
+### [N10_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::searchFilterCallback
+- **params**: `user` — AllUser tipinde tek bir kullanıcı nesnesi
 - **ic_degiskenler**:
-  - `userItem.id` — satır key'i ve rol değiştirme butonlarında kullanıcı tanımlayıcısı
-  - `userItem.email` — kullanıcının e-posta adresi, UserAvatar'a ve tablo hücresine yazdırılır
-  - `userItem.full_name` — kullanıcının tam adı, UserAvatar'a ve tablo hücresine yazdırılır
-  - `userItem.role` — kullanıcının mevcut rolü, rol ikonu ve aksiyon butonlarının koşullarında kullanılır
-  - `userItem.created_at` — kullanıcının hesap oluşturma tarihi, `formatDate(userItem.created_at, lang)` ile formatlanır
-  - `visibleCols.user` — email/sütununun görünürlük flag'i
-  - `visibleCols.role` — rol sütununun görünürlük flag'i
-  - `visibleCols.created` — tarih sütununun görünürlük flag'i
-  - `visibleCols.actions` — aksiyon butonları sütununun görünürlük flag'i
-  - `role` — mevcut oturum kullanıcısının rolü, super_admin/admin kontrollerinde kullanılır
-  - `hasWriteAccess` — yazma yetkisi boolean, butonların disabled durumunu belirler
-  - `updatingRole` — şu an rolü güncellenen kullanıcının ID'si, butonları devre dışı bırakmak için kullanılır
-  - `_t(...)` — çeviri fonksiyonu, rol etiketleri ve buton başlıkları için kullanılır
-  - `lang` — mevcut dil kodu, `formatDate` fonksiyonuna geçirilir
-  - `handleRoleChange` — rol değiştirme handler fonksiyonu, her butonun onClick'inde çağrılır
-  - `adminTableCellClass` — tablo hücreleri için ortak CSS sınıfı
-  - `cellPad` — tablo hücre iç;padding sınıfı
-- **Dönüş**: JSX.Element — `<tr>` tablo satırı, içinde email, rol, tarih ve aksiyon butonları hücreleri
+  - `searchQuery` — outer scope'tan gelen arama sorgusu string'i; küçük harfe dönüştürülerek eşleşme kontrolü yapılır
+- **Dönüş**: boolean — kullanıcının `email` alanı veya `full_name` alanı arama sorgusunu içeriyorsa true, aksi halde false
+
+---
+
+### [N11_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::searchFilterCallbackAll
+- **params**: `user` — AllUser tipinde tek bir kullanıcı nesnesi
+- **ic_degiskenler**:
+  - `searchQuery` — outer scope'tan gelen arama sorgusu string'i; küçük harfe dönüştürülerek eşleşme kontrolü yapılır
+- **Dönüş**: boolean — kullanıcının `email` alanı veya `full_name` alanı arama sorgusunu içeriyorsa true, aksi halde false
+
+---
+
+### [N12_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::getRoleIcon
+- **params**: `roleCode` — string, kullanıcının rol kodu
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element — rol koduna göre ilgili lucide-react icon bileşeni döner: `'super_admin'` → Crown (mor), `'admin'` → Shield (indigo), `'warehouse'`/`'sales'` → ShieldCheck (cyan), diğer tüm roller → Users (slate)
+
+---
+
+### [N13_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectLoadColPrefs
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - `STORAGE_KEY` — outer scope'tan gelen localStorage anahtarının kök değeri; `${STORAGE_KEY}:cols` formatında sütun tercihi okunur
+  - `c` — `localStorage.getItem(...)` çağrısının dönüş string'i; JSON parse edilerek sütun görünürlük nesnesine dönüştürülür
+  - `d` — `localStorage.getItem(...)` çağrısının dönüş string'i; yoğunluk tercihini temsil eder (`'compact'` veya `'comfortable'`)
+  - `prev` — `setVisibleCols` setter'ının callback'indeki mevcut visibleCols state değeri
+- **Dönüş**: yok (yan etki: `setVisibleCols` ile sütun görünürlük state'ini, `setDensity` ile yoğunluk state'ini localStorage'dan yükler)
+
+---
+
+### [N14_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectSaveColPrefs
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - `STORAGE_KEY` — outer scope'tan gelen localStorage anahtarının kök değeri; `${STORAGE_KEY}:cols` formatında sütun tercihi yazılır
+  - `visibleCols` — mevcut sütun görünürlük state nesnesi; JSON.stringify ile string'e dönüştürülüp localStorage'a kaydedilir
+- **Dönüş**: yok (yan etki: `visibleCols` state'ini localStorage'a kaydeder)
+
+---
+
+### [N15_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectSaveDensity
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - `STORAGE_KEY` — outer scope'tan gelen localStorage anahtarının kök değeri; `${STORAGE_KEY}:density` formatında yoğunluk tercihi yazılır
+  - `density` — mevcut yoğunluk state değeri (`'compact'` veya `'comfortable'`); doğrudan string olarak localStorage'a kaydedilir
+- **Dönüş**: yok (yan etki: `density` state'ini localStorage'a kaydeder)
+
+---
+
+### [N16_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::UserAvatar
+- **params**: `name` — string | undefined opsiyonel, kullanıcının tam adı; `email` — string | undefined opsiyonel, kullanıcının e-posta adresi
+- **ic_degiskenler**:
+  - `initial` — avatar içinde gösterilen başharf; `name` mevcutsa onun ilk karakteri, yoksa `email`'in ilk karakteri, o da yoksa `'?'` karakteri; `.toUpperCase()` ile büyük harfe dönüştürülür
+- **Dönüş**: JSX.Element — user'ın başharfini gösteren gradient arka planlı dairesel avatar bileşeni
+
+---
+
+### [N17_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::userTableRow
+- **params**: `userItem` — AllUser veya AdminUser tipinde tek bir kullanıcı nesnesi; tabloda satır olarak render edilecek
+- **ic_degiskenler**:
+  - `visibleCols` — outer scope'tan gelen sütun görünürlük nesnesi; `visibleCols.user`, `visibleCols.role`, `visibleCols.created`, `visibleCols.actions` boolean alanları ile hangi sütunların gösterileceği kontrol edilir
+  - `cellPad` — outer scope'tan gelen hücre padding CSS class string'i
+  - `adminTableCellClass` — outer scope'tan gelen ortak hücre CSS class string'i
+  - `lang` — outer scope'tan gelen dil code string'i, `formatDate` fonksiyonuna geçirilir
+  - `role` — outer scope'tan gelen mevcut giriş yapmış kullanıcının rolü; butonların koşullu gösteriminde kullanılır
+  - `hasWriteAccess` — outer scope'tan gelen boolean, kullanıcının yazma yetkisi varsa butonlar aktif olur
+  - `updatingRole` — outer scope'tan gelen string | null state, şu anda rolü güncellenen kullanıcının ID'si; ilgili butonlar `disabled` olur
+  - `user` — outer scope'tan gelen mevcut kullanıcı nesnesi; `userItem.id === user?.id` kontrolü ile kendi rolünü değiştirmesi engellenir
+- **Fonksiyon Cagrilari**:
+  - `UserAvatar({ name: userItem.full_name || undefined, email: userItem.email })` — avatar bileşeni
+  - `getRoleIcon(userItem.role || 'user')` — rol ikonu
+  - `_t(\`roles.${userItem.role || 'user'}\`)` — rol çevirisi
+  - `formatDate(userItem.created_at, lang)` — tarih formatlama
+  - `handleRoleChange(userItem.id, 'super_admin'|'admin'|'warehouse'|'sales'|'viewer'|'user')` — buton onClick handler'ları
+- **Dönüş**: JSX `<tr>` elementi — kullanıcının bilgilerini (avatar, email, isim, rol, kayıt tarihi, işlem butonları) içeren tablo satırı; sütun görünürlüğüne göre koşullu olarak render edilir
 
 ---
 
@@ -50987,32 +49976,42 @@ skeleton_hash: d0d925c567f6b49d
 entity_hashes:
   func:CategoryBuilderView: c538d4ad7085f51d
   func:handleSave: f8b5a865424c16c7
-  overview: 34385cca754b2c32
+  overview: 248cf966562364e2
   style_tokens: 745d0461670ee6bd
-generated_at: 2026-05-28T22:39:30Z
+generated_at: 2026-05-29T19:01:11Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin admin panelinde kategori yapılandırma işlemlerini yöneten bir React görünüm bileşenidir. Yeni bir kategori oluşturma veya mevcut bir kategoriyi düzenleme senaryolarını tek bir bileşen üzerinden destekler ve temel veri kaydetme işlevini içerir.
+Bu modül, VentHub HVAC admin panelinde kategori yapısı oluşturma ve düzenleme işlemlerini yöneten bir React görünüm bileşenidir. Mevcut bir kategoriyi yeniden yapılandırma veya yeni bir kategori hiyerarşisi tasarlama yeteneği sağlar ve kaydetme işlemini merkezi olarak kontrol eder.
 
 ## Fonksiyon Grupları
 ### Ana Görünüm Bileşeni
-Modülün temel React arayüzünü oluşturur ve kullanıcıya kategori bilgilerini gireceği formu sunar. Aldığı `categoryId` parametresiyle mevcut bir kategoriyi düzenleme modunda çalışıp çalışmayacağını belirler.
+Kullanıcıya kategori verilerini görsel olarak düzenleyebileceği bir arayüz sunar. Modunu (yeni oluşturma veya mevcut kategoriyi düzenleme) belirleyen temel bileşendir.
 - CategoryBuilderView
 
-### Kayıt İşleyici
-Kullanıcı tarafından forma girilen veya düzenlenen kategori bilgilerinin, arka plan servislerine asenkron olarak gönderilmesini ve kaydedilmesini yönetir. İşlem başarısız olursa kullanıcıya geri bildirim sağlama sorumluluğu bu fonksiyondadır.
+### Veri Kaydetme İşleyicisi
+Formda düzenlenen kategori yapısının veya verisinin sunucuya gönderilmesini ve kaydedilmesini koordine eder. Başarılı veya başarısız sonuçlara göre kullanıcı bildirimleri yönetir.
 - handleSave
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu admin paneline ait kategori yapılandırma görünümü modülünün doğru çalışması için gerekli giriş prop'larının, yetki mekanizmalarının ve arka plan entegrasyonlarının eksiksiz olarak sağlanması zorunludur.
 
-[Aksiyom 1]: Eğer CategoryBuilderView bileşenine zorunlu giriş olarak tanımlanan categoryId prop'u sağlanmazsa, hem mevcut kategorinin düzenlenmesi hem de yeni kategorinin sistemde doğru tanımlanması işlemleri başarısız olur.
-[Aksiyom 2]: Eğer handleSave() fonksiyonunu kullanan kullanıcının admin seviyesinde kategori oluşturma/güncelleme yetkisi yoksa, kayıt işlemi reddedilir ve yapılan tüm kategori değişiklikleri kalıcı olarak kaydedilemez.
-[Aksiyom 3]: Eğer handleSave() fonksiyonunun veri göndermesi gereken arka plan servisleri/API uç noktaları erişilemez durumdaysa, kategori değişiklikleri kaydedilemez ve işlem başarısız olur.
-[Aksiyom 4]: Eğer modülün bağlı olduğu React uygulama runtime ortamı sağlanmamışsa, CategoryBuilderView bileşeni hiçbir şekilde render edilemez ve admin panelinin kategori yönetimi ekranı kullanılamaz.
+Bu modül, bir kategori oluşturma/düzenleme formu sunan React görünüm bileşenidir ve temel kaydetme işlevini içerir. Aşağıdaki mimari varsayımlar fonksiyon imzalarına dayanarak çıkarılmıştır.
+
+---
+
+**[Aksiyom 1]:** `CategoryBuilderView` bileşeni bir `categoryId` prop'u ile çağrılır. Eğer `categoryId` değer olarak `undefined` veya `null` gelirse, bileşen "yeni kategori oluşturma" modunda çalışır (varsa mevcut kategori verisi yüklenmez). Eğer geçerli bir `categoryId` değer gelirse, bileşen ilgili kategoriyi düzenleme modunda çalışır.
+
+**[Aksiyom 2]:** `handleSave()` fonksiyonu çağrıldığında, kaydedilecek kategori verisinin (form durumu veya bileşen state'i) önceden doldurulmuş ve geçerli bir durumda olması gerekir. Eğer kaydedilecek geçerli veri yoksa, `handleSave()` işlevinin anlamlı bir kayıt işlemi gerçekleştirmesi beklenemez.
+
+**[Aksiyom 3]:** `CategoryBuilderView` bileşeni, varsa kategori listesini veya kategoriye ait hiyerarşik yapı bilgisini (üst kategori referansları vb.) dışarıdan bir kaynaktan (API, context veya prop) almalıdır. Eğer bu veri kaynağı mevcut değilse, kategori formu ilgili alanları (örn. üst kategori seçimi) eksik veya boş olarak render eder.
+
+**[Aksiyom 4]:** `handleSave()` sonucunda bir API isteği发起lması bekleniyorsa, ilgili API endpoint'inin (kategori oluşturma/güncelleme) erişilebilir veYetkili olması gerekir. Eğer API erişilemezse veya yetkinlik yoksa, kaydetme işlemi başarısız olur.
+
+---
+
+> **Not:** Bu modülde herhangi bir sabit (constant) tanımlı değildir. Fonksiyon gövdelerine ilişkin detaylı bilgi sağlanmadığından, axioms yalnızca fonksiyon imzaları ve modülün amacına ilişkin üst düzey mimari varsayımları içermektedir.
 
 ---
 
@@ -51043,36 +50042,36 @@ Bu admin paneline ait kategori yapılandırma görünümü modülünün doğru �
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CategoryBuilderView.tsx::CategoryBuilderView
-- **params**: `{ categoryId }` — Kategorinin benzersiz tanımlayıcısı, Supabase sorgusu ve child fonksiyonlarda kapanım olarak kullanılır
+- **params**: ({ categoryId })
 - **ic_degiskenler**:
-  - `router` — Next.js useRouter hook'undan dönen yönlendirici nesne, `router.back()` ile geri gitmek için kullanılır
-  - `category` — `DbCategory | null` tipinde state, yüklenen kategori verisini tutar; header'da `category?.name` olarak görüntülenir
-  - `blocks` — `AuthorityBlock[] | null` tipinde state, yetki içerik bloklarını tutar; `AuthorityBuilder`'a `value`, `AuthorityRenderer`'a `content`, `handleSave`'e güncelleme için beslenir
-  - `loading` — `boolean` tipinde state, yükleme durumunu kontrol eder; `true` iken tam sayfa spinner gösterilir
-  - `saving` — `boolean` tipinde state, kaydetme durumunu kontrol eder; `true` iken kaydetme butonu `disabled` ve spinner gösterilir
-  - `previewMode` — `'desktop' | 'mobile'` tipinde state, önizleme panelinin cihaz görünüm modunu belirler; CSS class'ları buna göre değişir
-  - `showPreview` — `boolean` tipinde state, sağ sidebar önizleme panelinin görünürlüğünü kontrol eder
-  - `load` — `useCallback` ile sarılı async fonksiyon referansı, kategori verilerini Supabase'den çeker ve legacy migrasyonunu yapar; `useEffect` içinde çağrılır
-  - `handleSave` — async fonksiyon referansı, `blocks` state'ini Supabase `categories` tablosuna `authority_content` olarak kaydeder; kaydet butonuna `onClick` bağlanır
-- **Dönüş**: `JSX.Element` — Loading durumunda spinner JSX'i, normal durumda tam sayfa editor layout JSX'i (header, main editor area, preview sidebar)
+  - `router` — Next.js useRouter hook'undan gelen router nesnesi, sayfa yönlendirmeleri için kullanılır
+  - `category` — useState ile tutulan kategori verisi (DbCategory tipinde veya null), yüklenen kategorinin tüm bilgilerini barındırır
+  - `blocks` — useState ile tutulan yetkilendirme blokları dizisi (AuthorityBlock[] tipinde veya null), sayfa içeriğini oluşturur
+  - `loading` — useState ile tutulan yükleme durumu (boolean), verilerin yüklenip yüklenmediğini takip eder
+  - `saving` — useState ile tutulan kaydetme durumu (boolean), kaydetme işlemi sırasında buton durumunu kontrol eder
+  - `previewMode` — useState ile tutulan önizleme modu ('desktop' veya 'mobile'), sağ paneldeki cihaz görünümünü belirler
+  - `showPreview` — useState ile tutulan önizleme paneli görünürlüğü (boolean), sağ panelin açılıp kapanmasını kontrol eder
+  - `load` — useCallback ile sarılmış asenkron fonksiyon, kategori verilerini ve blokları yükler
+  - `handleSave` — asenkron fonksiyon, güncellenmiş blokları veritabanına kaydeder
+- **Dönüş**: React.FC<CategoryBuilderViewProps> (JSX)
 
 ### [N2_NASIL] AST Pointer: CategoryBuilderView.tsx::load
-- **params**: `(parametre yok)` — Closure yoluyla `categoryId`, `setCategory`, `setBlocks`, `setLoading` erişir
+- **params**: (parametre yok - useCallback closure'unda categoryId kullanılır)
 - **ic_degiskenler**:
-  - `data` — Supabase `select` sorgusundan dönen ham kategori verisi, tüm kategori alanlarını içerir (id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content)
-  - `error` — Supabase sorgusundan dönen hata nesnesi; truthy ise `throw` ile yakalanır
-  - `cat` — `data`'nın `DbCategory` tipine cast edilmiş hali, `authority_content` alanından bloklar okunur
-  - `initialBlocks` — `AuthorityBlock[]` tipinde mutable değişken, `cat.authority_content`'ten okunan blokları tutar; `null` ise boş dizi fallback'i alınır; legacy migrasyonunda yeniden atanabilir
-  - `legacyBlocks` — `AuthorityBlock[]` tipinde geçici dizi, eski statik verilerden (`description`, `metadata.metric1/metric2`) oluşturulan bloklar tutulur
-  - `meta` — `cat.metadata`'nın `CategoryMetadata | null` tipine cast edilmiş hali, `meta.metric1` ve `meta.metric2` erişimleri ile eski metrik verilerine ulaşılan nesne
-  - `rows` — `SpecsBlock['content']['rows']` tipinde dizi, legacy specs bloğu için `{ label, value }` satırlar tutulur; `meta.metric1?.label` ve `meta.metric2?.label` kontrol edilerek doldurulur
-- **Dönüş**: `yok` — Yan etkiler: `setLoading(true)` ile başlar, `setCategory(cat)` ile kategoriyi set eder, `setBlocks(initialBlocks)` ile blokları set eder, legacy dönüşüm varsa `toast.success('Eski veriler bloklara dönüştürüldü. Kaydetmeyi unutmayın.')` gösterir, hata durumunda `console.error('Builder load error:', e)` ve `toast.error('Veriler yüklenemedi.')` çağırır, `finally` bloğunda `setLoading(false)` yapar
+  - `data` — supabase.from('categories').select() sorgusundan dönen veri (DbCategory veya null)
+  - `error` — supabase sorgusu sırasında oluşabilecek hata nesnesi
+  - `cat` — data'nın DbCategory tipine cast edilmiş hali
+  - `initialBlocks` — cat.authority_content alanından elde edilen AuthorityBlock dizisi veya boş dizi
+  - `legacyBlocks` — eski veri yapısını yeni blok formatına dönüştürmek için oluşturulan AuthorityBlock dizisi
+  - `meta` — cat.metadata alanının CategoryMetadata tipine cast edilmiş hali veya null
+  - `rows` — SpecsBlock['content']['rows'] tipinde dizi, teknik özet satırlarını tutar
+- **Dönüş**: yok (async fonksiyon, verileri state'lere kaydeder)
 
 ### [N3_NASIL] AST Pointer: CategoryBuilderView.tsx::handleSave
-- **params**: `(parametre yok)` — Closure yoluyla `blocks`, `categoryId`, `setSaving` erişir
+- **params**: (parametre yok - closure'unda blocks ve categoryId kullanılır)
 - **ic_degiskenler**:
-  - `error` — Supabase `update` sorgusundan dönen hata nesnesi; truthy ise `throw` ile yakalanır
-- **Dönüş**: `yok` — Yan etkiler: `setSaving(true)` ile başlar, `supabase.from('categories').update({ authority_content: blocks as DbJson }).eq('id', categoryId)` çağrısı ile veritabanını günceller, başarı durumunda `toast.success('Değişiklikler sisteme mühürlendi.')` gösterir, hata durumunda `console.error('Save error:', e)` ve `toast.error('Kaydetme hatası!')` çağırır, `finally` bloğunda `setSaving(false)` yapar
+  - `error` — supabase.from('categories').update() sorgusu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: yok (async fonksiyon, veritabanına kayıt yapar ve toast bildirimleri gösterir)
 
 ---
 
@@ -52332,37 +51331,41 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx
-skeleton_hash: dbb4f3205dcd696a
+skeleton_hash: 7754993243b50714
 entity_hashes:
   func:AddressFormModal: 22dcfc4163aec036
   func:handleSave: 51987ec8847e1d2c
-  overview: 6d8dac3b90fdee5f
+  overview: cddc87ce3d0ec431
   style_tokens: 4fa16246087d5121
-generated_at: 2026-05-28T22:39:51Z
+generated_at: 2026-05-29T19:01:52Z
 ---
 
 ## Genel Bakış
-Bu modül, sipariş tamamlama (checkout) akışında kullanılan bir React modal bileşenidir. Kullanıcıların yeni adres eklemesi veya mevcut adreslerini düzenlemesi için açılan form penceresinin tüm temel işlevlerini yönetir. Dışarıdan alınan veriler ve geri çağırma fonksiyonları aracılığıyla ana uygulama akışıyla entegre çalışır.
+Bu modül, sipariş tamamlama (checkout) sürecinde kullanıcıların adres bilgilerini girmesini veya düzenlemesini sağlayan bir React modal bileşenidir. Temel olarak, bir form aracılığıyla adres verilerinin toplanmasını ve kaydedilmesini yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Modal Bileşeni
-Modülün ana giriş noktası olarak çalışır, dışarıdan gelen adres verisi, modal kapatma ve adres kaydedilmesi sonrası tetiklenecek geri çağırımları alarak modalın temel çalışma altyapısını kurar.
+Modülün dış arayüzünü ve temel yapısını oluşturur, gerekli prop'ları (mevcut adres verisi, kapatma ve kaydetme sonrası çağrılacak fonksiyonlar, çeviri nesnesi) alarak modal penceresinin ana iskeletini kurar.
 - AddressFormModal
 
-### Form İşlem Yöneticileri
-Formun gönderim ve kaydetme sürecini yönetir, form olayını yakalayarak adres verilerinin işlenmesini ve kaydedilmesini sağlar, işlem sonrası ilgili geri çağırımları tetikler.
+### Form Veri İşleme
+Formun gönderilmesi olayını ele alır, kullanıcı tarafından girilen adres verilerini işler ve modülün sunduğu geri çağırma fonksiyonları aracılığıyla verileri üst katmana iletir.
 - handleSave
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı adres formu modal bileşeni, dışarıdan alınan tüm prop'ların eksiksiz ve çalışır durumda olmasını, form işleyicisinin gerektirdiği event nesnesinin erişilebilir olmasını varsayar.
+Bu modül, sipariş tamamlama akışında adres formunu yöneten bir React modal bileşenidir. Aşağıda, bileşenin doğru çalışması için gerekli olan mimari varsayımlar listelenmektedir.
 
-[Aksiyom 1]: Eğer onClose prop'u yoksa, modal bileşeni kapatılamaz, kullanıcı işlemini sonlandırmak için gerekli kapatma aksiyonu tetiklenemez olur.
-[Aksiyom 2]: Eğer onSaved prop'u yoksa, adres başarılı bir şekilde kaydedildikten sonra üst katman bileşenlere kayıt durumu bildirilemez, adres yönetimiyle ilgili state'ler güncellenemez olur.
-[Aksiyom 3]: Eğer t (çeviri) prop'u yoksa, modal içindeki arayüz metinleri işlenemez, kullanıcıya bozuk veya eksik metinler gösterilir olur.
-[Aksiyom 4]: Eğer address prop'u yoksa, form üzerinde mevcut adresi düzenleme işlemi yapılamaz, kullanıcıya varsayılan olarak boş bir adres formu sunulur olur.
-[Aksiyom 5]: Eğer handleSave fonksiyonuna gönderilen React.FormEvent nesnesi eksik veya erişilemez olursa, formun varsayılan gönderim davranışı engellenemez, sayfa yenilenir ve adres kayıt işlemi başarısız olur.
+[Aksiyom 1]: Eğer `address` prop'u verilmezse, modal bileşeni varsayılan olarak yeni bir adres oluşturma modunda başlatılamaz.
+
+[Aksiyom 2]: Eğer `onClose` fonksiyonu verilmezse, modal kapatılamaz ve kullanıcı arayüzünde takılmalara neden olur.
+
+[Aksiyom 3]: Eğer `onSaved` fonksiyonu verilmezse, adres başarıyla kaydedildikten sonra ana uygulama güncellenemez.
+
+[Aksiyom 4]: Eğer `t` (çeviri) fonksiyonu verilmezse, modal içindeki metinler çevrilemez.
+
+[Aksiyom 5]: Eğer `handleSave` fonksiyonu geçerli bir `React.FormEvent` nesnesi alamazsa, form gönderimi sırasında hata oluşur ve adres kaydedilemez.
 
 ---
 
@@ -52399,31 +51402,42 @@ Bu React tabanlı adres formu modal bileşeni, dışarıdan alınan tüm prop'la
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx::AddressFormModal
-- **params**: address, onClose, onSaved, t
+### [N1_NASIL] AST Pointer: src/views/checkout/AddressFormModal.tsx::AddressFormModal
+- **params**: (address, onClose, onSaved, t)
 - **ic_degiskenler**:
-  - `saving` — Adres kaydetme işleminin devam edip etmediğini takip eden boolean state değişkeni
-  - `setSaving` — `saving` state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `form` — Formun tüm alan değerlerini tutan state nesnesi, mevcut adres verileriyle varsayılan olarak doldurulur
-  - `setForm` — `form` state nesnesini güncellemek için kullanılan React state setter fonksiyonu
-  - `handleSave` - Form gönderildiğinde adres güncelleme işlemini yöneten içeride tanımlanan async fonksiyon
-- **Dönüş**: Adres düzenleme modalı ve formunu içeren React JSX elementi
+  - `saving` — Boolean state değişkeni, kayıt işleminin devam edip etmediğini kontrol eder
+  - `form` — Adres formundaki tüm alanları tutan state nesnesi (label, full_name, phone, address_line, city, district, postal_code, is_default_shipping, is_default_billing)
+  - `address?.label` — Var olan adresin etiketi (form başlatılırken kullanılır)
+  - `address?.full_name` — Var olan adresin tam adı (form başlatılırken kullanılır)
+  - `address?.phone` — Var olan adresin telefonu (form başlatılırken kullanılır)
+  - `address?.address_line` — Var olan adresin açık adresi (form başlatılırken kullanılır)
+  - `address?.city` — Var olan adresin şehri (form başlatılırken kullanılır)
+  - `address?.district` — Var olan adresin ilçesi (form başlatılırken kullanılır)
+  - `address?.postal_code` — Var olan adresin posta kodu (form başlatılırken kullanılır)
+  - `address?.is_default_shipping` — Var olan adresin varsayılan kargo adresi olup olmadığı (form başlatılırken kullanılır)
+  - `address?.is_default_billing` — Var olan adresin varsayılan fatura adresi olup olmadığı (form başlatılırken kullanılır)
+  - `handleSave` — Form gönderildiğinde çağrılan asenkron fonksiyon
+- **Dönüş**: JSX element (modal form)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx::handleSave
-- **params**: e: React.FormEvent
+### [N2_NASIL] AST Pointer: src/views/checkout/AddressFormModal.tsx::handleSave
+- **params**: (e: React.FormEvent)
 - **ic_degiskenler**:
-  - `e.preventDefault` — Formun varsayılan sayfa yenileme davranışını engellemek için çağrılan olay metodu
-  - `address` — Bileşene dışarıdan aktarılan mevcut adres nesnesi, boşluk kontrolü yapılıp güncellemede adres kimliği olarak kullanılır
-  - `setSaving` — Kaydetme durumu state'ini güncellemek için kullanılan setter fonksiyonu
-  - `updateAddress` — Supabase entegrasyonu ile veritabanında adresi güncellemek için çağrılan API fonksiyonu
-  - `form.label, form.full_name, form.phone, form.address_line, form.city, form.district, form.postal_code, form.is_default_shipping, form.is_default_billing` — Formdaki güncel kullanıcı giriş değerleri, adres güncelleme verisi olarak gönderilir
-  - `toast.success` — İşlem başarısı durumunda kullanıcıya bildirim göstermek için kullanılan toast kütüphanesi metodu
-  - `t` — Çoklu dil çevirisi yapmak için kullanılan çeviri fonksiyonu, tüm metinleri çevirmek için kullanılır
-  - `onSaved` — Adres başarıyla güncellendikten sonra ana bileşene haber vermek için çağrılan callback fonksiyonu
-  - `onClose` — İşlem sonrası modal penceresini kapatmak için çağrılan callback fonksiyonu
-  - `console.error` - Hata durumunda konsola hata detaylarını loglamak için kullanılan metod
-  - `toast.error` — Hata durumunda kullanıcıya hata bildirimi göstermek için kullanılan toast kütüphanesi metodu
-- **Dönüş**: yok
+  - `saving` — State değişkeni, kayıt işlemini devre dışı bırakmak için true yapılır
+  - `address` — Prop'tan gelen adres nesnesi, var olup olmadığı kontrol edilir ve `id` özelliği kullanılır
+  - `form.label` — Form nesnesinden gelen etiket alanı
+  - `form.full_name` — Form nesnesinden gelen tam ad alanı
+  - `form.phone` — Form nesnesinden gelen telefon alanı
+  - `form.address_line` — Form nesnesinden gelen açık adres alanı
+  - `form.city` — Form nesnesinden gelen şehir alanı
+  - `form.district` — Form nesnesinden gelen ilçe alanı
+  - `form.postal_code` — Form nesnesinden gelen posta kodu alanı
+  - `form.is_default_shipping` — Form nesnesinden gelen varsayılan kargo adresi alanı
+  - `form.is_default_billing` — Form nesnesinden gelen varsayılan fatura adresi alanı
+  - `t('checkout.saved.updated')` — Başarılı kayıt sonrası gösterilen başarı mesajı
+  - `t('checkout.saved.updateError')` — Hata durumunda gösterilen hata mesajı
+  - `onSaved` — Başarılı kayıt sonrası çağrılan callback fonksiyonu
+  - `onClose` — Başarılı kayıt sonrası modalı kapatan fonksiyon
+- **Dönüş**: void (dönüş değeri yok, yan etkiler: state güncelleme, toast gösterme, modal kapatma)
 
 ---
 

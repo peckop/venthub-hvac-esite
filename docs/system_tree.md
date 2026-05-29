@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-29T12:11:50.224972+00:00
+compiled_at: 2026-05-29T19:02:27.648200+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-29T12:11:50.224972+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-29T19:02:27.648200+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -106,7 +106,7 @@ Bu belge, otonom derleyici tarafından 2026-05-29T12:11:50.224972+00:00 tarihind
 │   │   │       │   └── ✅ `page.tsx`
 │   │   │       └── ✅ `page.tsx`
 │   │   ├── 📂 **_components/**
-│   │   │   └── ✅ `ProductDetailPageView.tsx`
+│   │   │   └── ❌ `ProductDetailPageView.tsx`
 │   │   ├── 📂 **admin/**
 │   │   │   ├── 📂 **audit-logs/**
 │   │   │   │   └── ✅ `page.tsx`
@@ -488,11 +488,11 @@ Bu belge, otonom derleyici tarafından 2026-05-29T12:11:50.224972+00:00 tarihind
 │       ├── ✅ `CategoryPage.tsx`
 │       ├── ✅ `CheckoutPage.tsx`
 │       ├── ✅ `ContactPage.tsx`
-│       ├── ✅ `ForgotPasswordPage.tsx`
+│       ├── ❌ `ForgotPasswordPage.tsx`
 │       ├── ✅ `HomePage.tsx`
 │       ├── ✅ `LoginPage.tsx`
 │       ├── ✅ `OrdersPage.tsx`
-│       ├── ✅ `PaymentSuccessPage.tsx`
+│       ├── ❌ `PaymentSuccessPage.tsx`
 │       ├── ✅ `ProductDetailPage.tsx`
 │       ├── ❌ `ProductsDiscoveryView.tsx`
 │       ├── ❌ `ProductsPage.tsx`
@@ -502,12 +502,12 @@ Bu belge, otonom derleyici tarafından 2026-05-29T12:11:50.224972+00:00 tarihind
 │       │   ├── ✅ `AccountInvoicesPage.tsx`
 │       │   ├── ✅ `AccountLayout.tsx`
 │       │   ├── ✅ `AccountOverviewPage.tsx`
-│       │   ├── ✅ `AccountProfilePage.tsx`
-│       │   ├── ✅ `AccountReturnsPage.tsx`
+│       │   ├── ❌ `AccountProfilePage.tsx`
+│       │   ├── ❌ `AccountReturnsPage.tsx`
 │       │   ├── ✅ `AccountSecurityPage.tsx`
 │       │   ├── ✅ `AccountShipmentsPage.tsx`
 │       │   ├── ✅ `AdminStockPage.tsx`
-│       │   └── ✅ `OrderDetailPage.tsx`
+│       │   └── ❌ `OrderDetailPage.tsx`
 │       ├── 📂 **admin/**
 │       │   ├── ✅ `AdminAuditLogPage.tsx`
 │       │   ├── ✅ `AdminCategoriesPage.tsx`
@@ -521,7 +521,7 @@ Bu belge, otonom derleyici tarafından 2026-05-29T12:11:50.224972+00:00 tarihind
 │       │   ├── ✅ `AdminLayout.tsx`
 │       │   ├── ✅ `AdminLogisticsPage.tsx`
 │       │   ├── ✅ `AdminMovementsPage.tsx`
-│       │   ├── ✅ `AdminOrdersBoard.tsx`
+│       │   ├── ❌ `AdminOrdersBoard.tsx`
 │       │   ├── ✅ `AdminOrdersPage.tsx`
 │       │   ├── ✅ `AdminProductsPage.tsx`
 │       │   ├── ✅ `AdminReturnsPage.tsx`
@@ -617,6 +617,7 @@ Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
 Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:
 - [❌] `src\app\[lang]\about\page.md`
 - [❌] `src\app\[lang]\category\[categorySlug]\page.md`
+- [❌] `src\app\_components\ProductDetailPageView.md`
 - [❌] `src\app\admin\returns\page.md`
 - [❌] `src\app\api\webhook\supabase\route.md`
 - [❌] `src\components\PaymentWatcher.md`
@@ -640,8 +641,14 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\utils\analytics.md`
 - [❌] `src\utils\applicationUi.md`
 - [❌] `src\views\BrandsPage.md`
+- [❌] `src\views\ForgotPasswordPage.md`
+- [❌] `src\views\PaymentSuccessPage.md`
 - [❌] `src\views\ProductsDiscoveryView.md`
 - [❌] `src\views\ProductsPage.md`
+- [❌] `src\views\account\AccountProfilePage.md`
+- [❌] `src\views\account\AccountReturnsPage.md`
+- [❌] `src\views\account\OrderDetailPage.md`
+- [❌] `src\views\admin\AdminOrdersBoard.md`
 - [❌] `src\views\calculators\AirCurtainCalcPage.md`
 - [❌] `src\views\checkout\buildPaymentRequest.md`
 - [❌] `supabase\functions\_shared\rate_limit.md`
