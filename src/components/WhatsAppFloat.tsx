@@ -18,7 +18,7 @@ const WhatsAppFloat: React.FC = () => {
       href={link}
       target="_blank"
       rel="noopener noreferrer"
-      className="whatsapp-float group"
+      className="whatsapp-float group relative"
       aria-label={t('common.whatsappAriaLabel')}
       title={t('common.whatsappTitle')}
     >

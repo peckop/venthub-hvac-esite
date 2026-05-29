@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-29T19:23:49.239639+00:00
+compiled_at: 2026-05-29T19:55:45.063707+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-29T19:23:49.239639+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-29T19:55:45.063707+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -157,13 +157,14 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:23:49.239639+00:00 tarihind
 │   ├── 📂 **assets/**
 │   │   └── 📂 **images/**
 │   ├── 📂 **components/**
-│   │   ├── ✅ `AddToCartToast.tsx`
+│   │   ├── ❌ `AddToCartToast.tsx`
+│   │   ├── ✅ `AddToCartToastContent.tsx`
 │   │   ├── ✅ `BackToTopButton.tsx`
 │   │   ├── ✅ `BeforeAfterSlider.tsx`
 │   │   ├── ✅ `BentoGrid.tsx`
 │   │   ├── ✅ `BrandsShowcase.tsx`
 │   │   ├── ✅ `BuildTag.tsx`
-│   │   ├── ✅ `CartToast.tsx`
+│   │   ├── ⚠️ `CartToast.md`
 │   │   ├── ✅ `CaseStudySection.tsx`
 │   │   ├── ✅ `CategoriesShowcase.tsx`
 │   │   ├── ✅ `CategoryFlow.tsx`
@@ -611,7 +612,8 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:23:49.239639+00:00 tarihind
 Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
 
 ## Sahipsiz (Orphan) MD Dosyaları
-Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
+Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
+- [⚠️] `src\components\CartToast.md`
 
 ## Geçersiz Şablon (Invalid Format)
 Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:
@@ -620,6 +622,7 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\app\_components\ProductDetailPageView.md`
 - [❌] `src\app\admin\returns\page.md`
 - [❌] `src\app\api\webhook\supabase\route.md`
+- [❌] `src\components\AddToCartToast.md`
 - [❌] `src\components\PaymentWatcher.md`
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\admin\dashboard\AbcPieChart.md`

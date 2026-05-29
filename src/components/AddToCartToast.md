@@ -3,37 +3,45 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx
-skeleton_hash: 38d8482f76de1dcf
+skeleton_hash: db9ea97a25e2dcc9
 entity_hashes:
   func:AddToCartToast: 581f14d900d31bb4
-  overview: 9eae019706928365
-  style_tokens: 7c669d9ccd4d6a62
-generated_at: 2026-05-28T22:35:29Z
+  overview: 2f0c7613311f5aad
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-29T19:59:05Z
 ---
 
 ## Genel Bakış
-Bu modül, bir ürünün sepete eklenmesi sonrasında kullanıcıya kısa süreli bir bildirim (toast) göstermekle sorumlu olan tek bir React fonksiyonel bileşenini içerir. Bileşen, bildirimin görünür hale gelmesini, belirli bir süre sonra otomatik kaybolmasını ve kullanıcıya sepeti görüntüleme veya bildirimi kapatma gibi aksiyonlar sunmasını yönetir.
+Bu modül, kullanıcıya sepete ekleme işlemi sonrası kısa süreli bir bildirim (toast) gösteren tek bir React fonksiyonel bileşenini tanımlar. Bileşen, bildirimin zamanlamasını, otomatik kaybolmasını ve kullanıcı etkileşimlerini (örn. bildirimi kapatma) kendi içinde yönetir.
 
 ## Fonksiyon Grupları
-### Toast Bileşeni Tanımı ve Davranışı
-Bu grup, sepete ekleme bildiriminin tüm yaşam döngüsünü ve kullanıcı etkileşimlerini yöneten ana (ve tek) bileşeni barındırır. Bileşen, olaylarla tetiklenir, zamanlayıcı ile kapanır ve çeviri metinlerini kullanır.
+### Bildirim Bileşeni
+Modül, sepete ekleme sonrası bildirimini gösteren ve yöneten ana (ve tek) bileşeni içerir. Bu bileşen, olaylarla tetiklenir, belirli süre sonra otomatik kaybolur ve çeviri destekli metinler kullanır.
 - AddToCartToast
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametresiz bir React fonksiyonel bileşenidir. Fonksiyon imzasında herhangi bir parametre tanımlı değildir.
-
-[Aksiyom 1]: Eğer React Runtime (JSX/TSX çalışma ortamı) yoksa, bileşen render edilemez ve çalışma zamanı hatası oluşur.
-
-[Aksiyom 2]: Eğer bileşen bir React Component Tree içerisine yerleştirilmemişse, DOM'da herhangi bir toast bildirimi görüntülenemez.
-
-[Aksiyom 3]: Eğer bileşen bağımsız olarak çağrılacaksa (parametre almadığından), gerekli tüm durum (state) ve mantık (logic) kendi içinde veya React Context/hooks aracılığıyla sağlanmalıdır.
+Bu modül için, fonksiyon imzası (`AddToCartToast()`) ve modül sabitlerine dayanarak belirlenebilecek somut aksiyomlar sınırlıdır. Aşağıda sadece arayüz seviyesinde çıkarılabilen varsayımlar yer almaktadır.
 
 ---
 
-**Not:** Fonksiyon imzası `AddToCartToast()` olarak verilmiş olup herhangi bir parametre veya default değer içermemektedir. Bu nedenle, bileşenin iç mantığına (state yönetimi, event handling, timer mekanizması vb.) ilişkin varsayımlar fonksiyon gövdesi analiz edilmeden çıkarılamaz.
+**[Aksiyom 1]**: Eğer `AddToCartToast` bileşeni React bileşen ağacının dışında (React Provider hiyerarşisi dışında) render edilirse, bileşen düzgün çalışmaz veya hata fırlatır olur.
+
+> *Gerekçe*: Fonksiyon imzasında prop parametresi (`props`) tanımlı değildir; bileşen React Hook'ları veya Context API kullanarak dış kaynaklara erişebilir. Bu kaynakların sağlanması için bileşenin uygun bir React.Provider içnde bulunması zorunludur.
+
+**[Aksiyom 2]**: Eğer bileşenin bağımlı olduğu translation (i18n) sistemi mevcut değilse veya sağlanamıyorsa, bileşen gösterilen bildirim metinlerini doğru dille render edemez olur.
+
+> *Gerekçe*: Fonksiyon imzasında dışarıdan çeviri/lokalizasyon parametresi geçirilmez; bu nedenle çeviri kaynakları iç hook veya context aracılığıyla çözülmelidir.
+
+**[Aksiyom 3]**: Eğer bileşenin tetiklenmesini sağlayan üst bileşen (parent) bileşeni mount/unmount döngüsünü uygun şekilde yönetmezse, birden fazla toast bildirimi üst üste birikir veya beklenmeyen zamanlama davranışı gösterir olur.
+
+> *Gerekçe*: Fonksiyon `AddToCartToast()` adıyla çağrılmaktadır; bileşenin ne zaman挂載edileceği ve ne zaman kaldırılacağı üst bileşenin sorumluluğundadır. İç zamanlayıcı (timer) ve state yönetimi bileşen içindedir, ancak mount sıklığı dışarıdan kontrol edilir.
+
+---
+
+**Not**: Bu bileşenin fonksiyon gövdesi (implementation body) analiz edilemediğinden, iç state yönetimi, timer süreleri, animation parametreleri gibi detaylı aksiyomlar çıkarılamamıştır. Yukarıdaki aksiyomlar yalnızca fonksiyon imzası ve bileşen türü (React .tsx) bilgisine dayanmaktadır.
 
 ---
 
@@ -53,31 +61,8 @@ Bu modül, parametresiz bir React fonksiyonel bileşenidir. Fonksiyon imzasında
 ### [N1_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; bileşen içi metinleri çevirir
-  - `visible` — `React.useState<boolean>(false)` state'i; toast bildiriminin görünürlüğünü tutar
-  - `product` — `React.useState<Product | null>(null)` state'i; sepete eklenen ürün verisini tutar
-  - `hideTimer` — `React.useRef<number | null>(null)` ref'i; otomatik kapatma timeout ID'sini saklar
-  - `onAdded` — useEffect içinde tanımlı arrow callback; CustomEvent dinleyicisi, ürün verisini alıp state'leri günceller ve 5 sn sonra gizler
-  - `detail` — `(e as CustomEvent).detail as { product?: Product }` CustomEvent payload'u; sepete eklenen ürün bilgisini içerir
-- **Dönüş**: `React.FC` — JSX (toast bildirim UI'ı) veya `null` (görünür değilse)
-
-### [N2_NASIL] AST Pointer: src/components/AddToCartToast.tsx::useEffect callback (initializer)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `onAdded` — event handler callback; `detail.product` varsa `setProduct`, `setVisible(true)` çağırır, mevcut timeout'u temizler, 5000ms'lik yeni timeout ayarlar
-  - `detail` — `(e as CustomEvent).detail as { product?: Product }` CustomEvent payload'u
-- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener` ile `onAdded` kaldırır, `hideTimer.current` varsa timeout'u temizler
-
-### [N3_NASIL] AST Pointer: src/components/AddToCartToast.tsx::onAdded (inner callback)
-- **params**: `(e: Event)` — pencereden gelen custom event nesnesi
-- **ic_degiskenler**:
-  - `detail` — `(e as CustomEvent).detail as { product?: Product }` CustomEvent payload'u; `product` alanını opsiyonel olarak içerir
-- **Dönüş**: yok (void) — `setProduct`, `setVisible`, `window.setTimeout` ile yan etki olarak state ve zamanlayıcıları günceller
-
-### [N4_NASIL] AST Pointer: src/components/AddToCartToast.tsx::cleanup (inner arrow)
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (void) — `window.removeEventListener` ile `onAdded` kaldırır, `hideTimer.current` varsa `window.clearTimeout` ile zamanlayıcıyı temizler
+  - `onAdded` — Sepete ürün eklendiğinde tetiklenen event handler; CustomEvent'ten product bilgisini çıkarır ve Sonner toast'unu tetikler
+- **Dönüş**: `null` (Saf controller bileşeni, DOM render etmez; yan etki olarak toast gösterir)
 
 ---
 
@@ -102,7 +87,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-light-gray`, `border-primary-navy`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-industrial-gray`, `hover:text-white`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`
-- **Layout:** `bottom-3`, `fixed`, `flex`, `flex-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `items-start`, `justify-center`, `max-w-92vw`, `md:bottom-6`, `md:gap-3`
-- **Varyant/Responsive:** `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `animate-slide-up`, `border`, `font-medium`, `font-semibold`, `inset-x-3`, `md:inset-auto`, `md:pb-4`, `md:px-4`, `md:py-2`, `mt-2`, `pb-3`, `pt-0`, `px-3`, `py-3`, `ring-1`
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)

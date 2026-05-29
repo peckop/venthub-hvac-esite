@@ -7,8 +7,8 @@ skeleton_hash: b5ead15e45e8d41c
 entity_hashes:
   func:WhatsAppFloat: 594fe2409e378878
   overview: 27f525e3029fcecb
-  style_tokens: 74a4b829716b6fee
-generated_at: 2026-05-28T22:37:07Z
+  style_tokens: fb346cbde40036cb
+generated_at: 2026-05-29T19:59:05Z
 ---
 
 ## Genel Bakış
@@ -80,6 +80,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `text-sm`
-- **Layout:** `absolute`, `hidden`, `left-14`, `lg:block`, `whatsapp-float`
+- **Layout:** `absolute`, `hidden`, `left-14`, `lg:block`, `relative`, `whatsapp-float`
 - **Varyant/Responsive:** `group-hover:`, `lg:` önekleri
 - **Yardımcı Sınıflar:** `duration-300`, `font-bold`, `group`, `group-hover:opacity-100`, `opacity-0`, `pointer-events-none`, `shrink-0`, `transition-opacity`, `whitespace-nowrap`

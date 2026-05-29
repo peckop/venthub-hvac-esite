@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-29T19:23:49.548526+00:00
+compiled_at: 2026-05-29T19:55:45.335451+00:00
 total_compiled_files: 404
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-29T19:23:49.548526+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-29T19:55:45.335451+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -6106,100 +6106,84 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** (yok)
 
 ---
-# FILE: src\components\AddToCartToast.md
+# FILE: src\components\AddToCartToastContent.md
 
 ---
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx
-skeleton_hash: 38d8482f76de1dcf
+source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToastContent.tsx
+skeleton_hash: 3bb5e51857b7e687
 entity_hashes:
-  func:AddToCartToast: 581f14d900d31bb4
-  overview: 9eae019706928365
-  style_tokens: 7c669d9ccd4d6a62
-generated_at: 2026-05-28T22:35:29Z
+  func:AddToCartToastContent: da3886a1d2990a31
+  overview: d0439d8a27460edb
+  style_tokens: 5ac0b676517c4959
+generated_at: 2026-05-29T19:55:37Z
 ---
 
 ## Genel Bakış
-Bu modül, bir ürünün sepete eklenmesi sonrasında kullanıcıya kısa süreli bir bildirim (toast) göstermekle sorumlu olan tek bir React fonksiyonel bileşenini içerir. Bileşen, bildirimin görünür hale gelmesini, belirli bir süre sonra otomatik kaybolmasını ve kullanıcıya sepeti görüntüleme veya bildirimi kapatma gibi aksiyonlar sunmasını yönetir.
+Bu modül, bir ürün sepete eklendiğinde kullanıcıya gösterilen toast bildiriminin içeriğini render eden tek bir React fonksiyonel bileşenini içerir. Bileşen, ürün bilgilerini ve bildirimi kapatma işlevini prop olarak alarak minimal ve odaklı bir arayüz sunar.
 
 ## Fonksiyon Grupları
-### Toast Bileşeni Tanımı ve Davranışı
-Bu grup, sepete ekleme bildiriminin tüm yaşam döngüsünü ve kullanıcı etkileşimlerini yöneten ana (ve tek) bileşeni barındırır. Bileşen, olaylarla tetiklenir, zamanlayıcı ile kapanır ve çeviri metinlerini kullanır.
-- AddToCartToast
+### Toast İçeriği Bileşeni
+Sepete ekleme işleminin ardından gösterilen bildirim içeriğini ve etkileşimlerini yöneten ana UI bileşeni.
+- AddToCartToastContent
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametresiz bir React fonksiyonel bileşenidir. Fonksiyon imzasında herhangi bir parametre tanımlı değildir.
+Bu modül için aksiyon üretilemedi. Nedeni: Fonksiyon gövdesine erişim olmadığından, modülün doğru çalışması için **zorunlu olan koşullar** güvenilir biçimde çıkarılamamaktadır. Yalnızca fonksiyon imzasından (parametrelerin varlığı) şu zayıf aksiyom üretilebilir:
 
-[Aksiyom 1]: Eğer React Runtime (JSX/TSX çalışma ortamı) yoksa, bileşen render edilemez ve çalışma zamanı hatası oluşur.
+[Aksiyom 1]: Eğer `product` parametresi verilmezse (undefined/null), modülün render süreci hata ile karşılaşır veya beklenmeyen davranış gösterir.
+[Aksiyom 2]: Eğer `onClose` parametresi bir fonksiyon değilse, Toast kapatma işlemi (kullanıcı etkileşimi veya zamanlayıcı sonrası) çalışamaz; bileşen kapanmaz.
 
-[Aksiyom 2]: Eğer bileşen bir React Component Tree içerisine yerleştirilmemişse, DOM'da herhangi bir toast bildirimi görüntülenemez.
-
-[Aksiyom 3]: Eğer bileşen bağımsız olarak çağrılacaksa (parametre almadığından), gerekli tüm durum (state) ve mantık (logic) kendi içinde veya React Context/hooks aracılığıyla sağlanmalıdır.
-
----
-
-**Not:** Fonksiyon imzası `AddToCartToast()` olarak verilmiş olup herhangi bir parametre veya default değer içermemektedir. Bu nedenle, bileşenin iç mantığına (state yönetimi, event handling, timer mekanizması vb.) ilişkin varsayımlar fonksiyon gövdesi analiz edilmeden çıkarılamaz.
+**Not:** Daha güçlü aksiyomlar (örn. `product.name`, `product.price` gibi alanların varlığı zorunluluğu, bileşenin hangi durumlarda render edildiği, Toast gösterim süresi koşulları vb.) yalnızca fonksiyon gövdesi analiz edilerek üretilebilir. Mevcut bilgiyle uydurma yapılmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### AddToCartToast
-**Ne yapar**: Sepete ekleme işlemi sonrası kullanıcıya gösterilen bir bildirim (toast) bileşenini oluşturur. Bu bildirim, kullanıcının sepete bir ürün eklediğini görsel olarak onaylar.
-**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanmıştır ve muhtemelen bir UI kütüphanesinden (örneğin, Chakra UI, Material UI) toast mekanizmasını kullanarak bildirim mesajını ve stilini yönetir. İçerisinde sepete eklenen ürünle ilgili kısa bir bilgi veya başarılı ekleme mesajı barındırabilir.
+### AddToCartToastContent
+**Ne yapar**: Sepete ürün ekleme işleminin ardından kullanıcıya bilgilendirme olarak gösterilen bir toast bildirim bileşenini oluşturur. Ürünün temel bilgilerini ve bildirimi kapatma butonunu içerir.
+
+**Nasıl yapar**: `product` prop'undan alınan ürün adı, fiyatı ve resmi gibi verileri kullanarak bir JSX yapısı döndürür. Bildirim mesajını dinamik olarak oluşturur. `onClose` fonksiyonu, kullanıcı bildirimi kapatmak istediğinde çağrılır ve.toast'ın kaybolmasını tetikler.
+
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz.
-**Dönüş**: React.FC — Sepete ekleme bildirimini temsil eden bir React fonksiyonel bileşeni döndürür.
+- `product`: `Product` — Sepete eklenen ürünün tüm verilerini içeren nesne. Adı, fiyatı ve görsel URL'i gibi bilgileri barındırır.
+- `onClose`: `() => void` — Toast bildiriminin kapatılması istendiğinde çağrılacak fonksiyon. Bu fonksiyon, bileşenin üst düzeydeki durumunu (örn. `isVisible`) değiştirerek bildirimin kaybolmasını sağlar.
+
+**Dönüş**: `React.FC<AddToCartToastContentProps>` — Bu bileşen, `AddToCartToastContentProps` arayüzüne uygun prop'ları alan ve JSX (React Element) döndüren bir React fonksiyonel bileşenidir.
+
+---
+
+## INTERFACES
+
+### AddToCartToastContentProps
+- `product: Product`
+- `onClose: () => void`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/AddToCartToastContent.tsx::AddToCartToastContent
+- **params**: `{ product, onClose }` — product: Sepete eklenen ürün nesnesi, onClose: Toast kapatma fonksiyonu
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; bileşen içi metinleri çevirir
-  - `visible` — `React.useState<boolean>(false)` state'i; toast bildiriminin görünürlüğünü tutar
-  - `product` — `React.useState<Product | null>(null)` state'i; sepete eklenen ürün verisini tutar
-  - `hideTimer` — `React.useRef<number | null>(null)` ref'i; otomatik kapatma timeout ID'sini saklar
-  - `onAdded` — useEffect içinde tanımlı arrow callback; CustomEvent dinleyicisi, ürün verisini alıp state'leri günceller ve 5 sn sonra gizler
-  - `detail` — `(e as CustomEvent).detail as { product?: Product }` CustomEvent payload'u; sepete eklenen ürün bilgisini içerir
-- **Dönüş**: `React.FC` — JSX (toast bildirim UI'ı) veya `null` (görünür değilse)
-
-### [N2_NASIL] AST Pointer: src/components/AddToCartToast.tsx::useEffect callback (initializer)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `onAdded` — event handler callback; `detail.product` varsa `setProduct`, `setVisible(true)` çağırır, mevcut timeout'u temizler, 5000ms'lik yeni timeout ayarlar
-  - `detail` — `(e as CustomEvent).detail as { product?: Product }` CustomEvent payload'u
-- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener` ile `onAdded` kaldırır, `hideTimer.current` varsa timeout'u temizler
-
-### [N3_NASIL] AST Pointer: src/components/AddToCartToast.tsx::onAdded (inner callback)
-- **params**: `(e: Event)` — pencereden gelen custom event nesnesi
-- **ic_degiskenler**:
-  - `detail` — `(e as CustomEvent).detail as { product?: Product }` CustomEvent payload'u; `product` alanını opsiyonel olarak içerir
-- **Dönüş**: yok (void) — `setProduct`, `setVisible`, `window.setTimeout` ile yan etki olarak state ve zamanlayıcıları günceller
-
-### [N4_NASIL] AST Pointer: src/components/AddToCartToast.tsx::cleanup (inner arrow)
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (void) — `window.removeEventListener` ile `onAdded` kaldırır, `hideTimer.current` varsa `window.clearTimeout` ile zamanlayıcıyı temizler
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, `cartToast.added`, `common.close`, `cartToast.continue`, `cartToast.goToCart`, `cartToast.autoClose` gibi metinleri çevirir
+- **Dönüş**: JSX element (React bileşeni) — Sepete ekleme başarılı toast'unu gösteren React bileşeni. Product bilgisini ve onClose fonksiyonunu kullanarak toast içeriğini render eder. Çeviri metinlerini `t` fonksiyonu ile alır. `product.name` ürün adını gösterir. Kullanıcı "X" butonuna, "Alışverişe Devam Et" butonuna veya "Sepete Git" linkine tıklayarak toast'u kapatır.
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\AddToCartToast.tsx
-  function: src\components\AddToCartToast.tsx::AddToCartToast
+  file: src\components\AddToCartToastContent.tsx
+  function: src\components\AddToCartToastContent.tsx::AddToCartToastContent
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
-  export: AddToCartToast
+  export: AddToCartToastContent
 
 ---
 
@@ -6212,10 +6196,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-light-gray`, `border-primary-navy`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-industrial-gray`, `hover:text-white`, `text-center`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-success-green`
-- **Layout:** `bottom-3`, `fixed`, `flex`, `flex-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `items-start`, `justify-center`, `max-w-92vw`, `md:bottom-6`, `md:gap-3`
-- **Varyant/Responsive:** `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `animate-slide-up`, `border`, `font-medium`, `font-semibold`, `inset-x-3`, `md:inset-auto`, `md:pb-4`, `md:px-4`, `md:py-2`, `mt-2`, `pb-3`, `pt-0`, `px-3`, `py-3`, `ring-1`
+- **Renkler:** `bg-primary-navy`, `bg-success-green/10`, `bg-white`, `border-light-gray`, `border-primary-navy`, `hover:bg-primary-navy`, `hover:bg-secondary-blue`, `hover:text-industrial-gray`, `hover:text-white`, `text-base`, `text-center`, `text-industrial-gray`, `text-lg`, `text-primary-navy`, `text-sm`
+- **Layout:** `flex`, `flex-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-1`, `inline-flex`, `items-center`, `items-start`, `justify-center`, `max-w-92vw`, `md:gap-3`, `md:grid-cols-2`, `md:p-4`, `md:w-360px`
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `animate-slide-up`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-medium`, `font-semibold`, `leading-none`, `leading-snug`, `md:pb-4`, `md:px-4`, `md:py-2`, `mt-0.5`
 
 ---
 # FILE: src\components\BackToTopButton.md
