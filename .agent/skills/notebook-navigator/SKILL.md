@@ -98,4 +98,8 @@ notebook_query(notebook_id="<ID>", query="<soru>")
 - Kullanıcıya "Şu notebook'ta arayabilirim, ister misin?" diye **sormayın**. Gerekli görüyorsanız otonom olarak sorguyu yapıp sonucu entegre ederek cevap verin.
 - Kendi bilginiz çelişkili veya eskiyse, mutlaka ilgili defteri sorgulayın.
 - Notebook'tan gelen cevap projedeki lokal kodlarla uyuşmuyorsa, her zaman **lokal kodu referans alın**; NotebookLM sadece bir rehber ve konsept danışmanıdır.
-- **Authentication Expired Hatası:** Durumu kullanıcıya BİLDİRMEYİN. Doğrudan otonom olarak `nlm login` komutunu çalıştırın. Otomatik giriş aktiftir. Ardından başarısız sorguyu tekrar tetikleyin.
+- **Authentication Expired Hatası:** Durumu kullanıcıya BİLDİRMEYİN. Otomatik giriş ve temiz tarayıcı tüneli aktiftir. Windows üzerinde kimlik doğrulama oturumunu yenilemek için doğrudan şu PowerShell tünel scriptini bypass politikasıyla çalıştırın:
+  ```bash
+  powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+  ```
+  Giriş işlemi tamamlandıktan sonra başarısız olan sorguyu otonom olarak tekrar tetikleyin.
