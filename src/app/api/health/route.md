@@ -3,32 +3,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts
-skeleton_hash: f3a6c5de7a590bae
+skeleton_hash: 0f2343958cb843a8
 entity_hashes:
   func:GET: 3a9b2c312d190949
-  overview: 5afd8bfad676573c
-generated_at: 2026-05-29T11:34:00Z
+  overview: c73ec3ea3e37e6ac
+generated_at: 2026-05-29T12:17:34Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın sağlık durumunu kontrol eden bir API endpoint'i sunar. Tek bir GET isteği ile servisin aktif ve çalışır durumda olduğunu doğrular.
+Bu modül, VentHub HVAC uygulamasının sağlık durumunu kontrol eden bir API endpoint'i sunar. Servisin aktif ve çalışır durumda olduğunu doğrulamak için kullanılan standart bir izleme mekanizmasıdır. Genellikle load balancer'lar, monitoring servisleri ve DevOps araçları tarafından periyodik olarak sorgulanır.
 
 ## Fonksiyon Grupları
 ### Sağlık Kontrolü
-Sistemin çalışma durumunu doğrulayan temel bir health check endpoint'i sağlar.
+Sistemin çalışma durumunu doğrulayan temel bir health check endpoint'i sağlar. Durum bilgisi ve zaman damgası içeren JSON yanıt döndürerek servisin ayakta olduğunu teyit eder.
 - GET
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi paylaşılmadığından, yalnızca fonksiyon imzasına dayalı çıkarım yapılmıştır. Detaylı aksiyomlar için GET() fonksiyonunun iç implementasyonuna erişim gereklidir.
+Bu modül, Next.js App Router yapısında bir API sağlık kontrolü endpoint'idir. Fonksiyon imzası `GET()` şeklindedir ve parametre almaz.
 
-[Aksiyom 1]: Eğer HTTP istek methodu GET değilse, modül tanımsız davranış sergiler (varsayılan Next.js App Router davranışı geçerli olur).
+[Aksiyom 1]: Eğer bu dosya `app/api/health/` dizin yapısında değilse, Next.js App Router bu route'u tanımaz ve endpoint erişilemez olur.
+
+[Aksiyom 2]: Eğer `GET` fonksiyonu `export` ile dışa açılmamışsa, Next.js istekleri bu handler'a yönlendiremez ve 404 hatası döner.
+
+[Aksiyom 3]: Eğer `GET()` fonksiyonu geçerli bir `Response` (veya `NextResponse`) nesnesi döndürmeyi ihmal ederse, istemci tanımsız bir yanıt alır veya sunucu hatası oluşur.
+
+[Aksiyom 4]: Eğer `GET()` fonksiyonu çalışırken beklenmeyen bir istisna fırlatırsa ve bu istisna yakalanmazsa, Next.js varsayılan 500 Internal Server Error yanıtını üretir.
 
 ---
 
-**Not:** Mimari aksiyomların güvenilirliği için `GET()` fonksiyonunun **gövde kodu** (return blokları, hata yönetim mantığı, bağımlılık enjeksiyonları vb.) paylaşılmalıdır. Mevcut bilgiyle yalnızca imza tabanlı genel bir varsayım üretilebilmiştir.
+**Not:** Fonksiyon gövdesi (implementasyon) paylaşılmadığından, response body yapısı, durum kodu değerleri veya iç bağımlılıklar hakkında kesin aksiyom üretilememektedir. Bu aksiyomlar yalnızca `GET()` fonksiyon imzası ve Next.js App Router sözleşme gereksinimlerine dayanmaktadır.
 
 ---
 
@@ -51,10 +57,10 @@ Bu modül için fonksiyon gövdesi paylaşılmadığından, yalnızca fonksiyon 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/api/health/route.ts`::GET
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesinde bağımsız değişken tanımlanmamıştır — inline nesne doğrudan return edilir)
-- **Dönüş**: `NextResponse.json({ status: "ok", timestamp: new Date().toISOString() })` — HTTP 200 yanıtı döner; `status` alanı `"ok"` string'i, `timestamp` alanı o anki UTC zaman damgasının ISO format karşılığıdır.
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts::GET
+- **params**: (yok)
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde atanmış değişken bulunmamaktadır)
+- **Dönüş**: `NextResponse.json()` — Sağlık durumu bilgisini (status ve timestamp) JSON formatında döndürür
 
 ---
 
