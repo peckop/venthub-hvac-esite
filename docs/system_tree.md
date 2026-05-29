@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-29T09:34:50.858464+00:00
+compiled_at: 2026-05-29T11:48:52.452282+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-29T09:34:50.858464+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-29T11:48:52.452282+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -56,7 +56,7 @@ Bu belge, otonom derleyici tarafından 2026-05-29T09:34:50.858464+00:00 tarihind
 │   │   │   │   └── 📂 **[categorySlug]/**
 │   │   │   │       ├── 📂 **[subCategorySlug]/**
 │   │   │   │       │   └── ✅ `page.tsx`
-│   │   │   │       └── ✅ `page.tsx`
+│   │   │   │       └── ❌ `page.tsx`
 │   │   │   ├── 📂 **checkout/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **contact/**
@@ -146,12 +146,14 @@ Bu belge, otonom derleyici tarafından 2026-05-29T09:34:50.858464+00:00 tarihind
 │   │   │   └── 📂 **webhook-events/**
 │   │   │       └── ✅ `page.tsx`
 │   │   ├── 📂 **api/**
+│   │   │   ├── 📂 **health/**
+│   │   │   │   └── ✅ `route.ts`
 │   │   │   └── 📂 **webhook/**
 │   │   │       └── 📂 **supabase/**
 │   │   │           └── ❌ `route.ts`
 │   │   ├── ✅ `layout.tsx`
 │   │   ├── ✅ `robots.ts`
-│   │   └── ❌ `sitemap.ts`
+│   │   └── ✅ `sitemap.ts`
 │   ├── 📂 **assets/**
 │   │   └── 📂 **images/**
 │   ├── 📂 **components/**
@@ -287,7 +289,8 @@ Bu belge, otonom derleyici tarafından 2026-05-29T09:34:50.858464+00:00 tarihind
 │   │   │   ├── ✅ `StrategicBrands.tsx`
 │   │   │   └── ✅ `TrustProofSection.tsx`
 │   │   ├── 📂 **layout/**
-│   │   │   ├── ❌ `ClientLayout.tsx`
+│   │   │   ├── ✅ `ClientLayout.tsx`
+│   │   │   ├── ✅ `CookieConsent.tsx`
 │   │   │   ├── ✅ `MainLayout.tsx`
 │   │   │   └── ❌ `PageShell.tsx`
 │   │   ├── 📂 **navigation/**
@@ -567,6 +570,7 @@ Bu belge, otonom derleyici tarafından 2026-05-29T09:34:50.858464+00:00 tarihind
 └── 📂 **supabase/**
     └── 📂 **functions/**
         ├── 📂 **_shared/**
+        │   ├── ✅ `cors.ts`
         │   ├── ✅ `notify.ts`
         │   ├── ❌ `rate_limit.ts`
         │   └── ✅ `sentry.ts`
@@ -612,13 +616,12 @@ Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
 ## Geçersiz Şablon (Invalid Format)
 Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:
 - [❌] `src\app\[lang]\about\page.md`
+- [❌] `src\app\[lang]\category\[categorySlug]\page.md`
 - [❌] `src\app\admin\returns\page.md`
 - [❌] `src\app\api\webhook\supabase\route.md`
-- [❌] `src\app\sitemap.md`
 - [❌] `src\components\PaymentWatcher.md`
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\admin\dashboard\AbcPieChart.md`
-- [❌] `src\components\layout\ClientLayout.md`
 - [❌] `src\components\layout\PageShell.md`
 - [❌] `src\components\navigation\NavSecondaryRail.md`
 - [❌] `src\components\navigation\NavShell.md`

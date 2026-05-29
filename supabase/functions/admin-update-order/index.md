@@ -3,44 +3,40 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-update-order\index.ts
-skeleton_hash: f52d9153a17ad7ad
+skeleton_hash: 0340d9cc1fa5afae
 entity_hashes:
   func:admin-update-order_handler: 046f5c7fec17e235
-  overview: 105a307c9f13c203
-generated_at: 2026-05-28T22:42:25Z
+  overview: cc5b05e5e6c2045f
+generated_at: 2026-05-29T11:41:38Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase Edge Function olarak çalışan tek bir HTTP handler içermektedir. Amacı, admin yetkisine sahip kullanıcıların mevcut bir siparişi güncellemesi talebini alarak doğrulama ve yetkilendirme işlemlerini gerçekleştirmek, ardından sipariş kaydını veritabanında güncelleyip sonucu istemciye bildirmektir.
+Bu modül, Supabase Edge Function olarakploye edilmiş bir HTTP servisidir. Tek bir asenkron handler fonksiyonu içerir. Temel sorumluluğu, admin panelinden gelen sipariş güncelleme isteklerini alıp doğrulamak, yetkilendirmeyi gerçekleştirmek ve ardından veritabanındaki ilgili sipariş kaydını güncelleyerek istemciye uygun bir durum koduyla yanıt dönmektir.
 
 ## Fonksiyon Grupları
-### Admin Sipariş Güncelleme Handler
-Modülün tek ve ana bileşeni olarak, HTTP isteğinin tam yaşam döngüsünü yönetir: isteği alır, geçerliliğini ve admin yetkisini doğrular, güncelleme işlemini tetikler ve uygun HTTP yanıtını üretir.
+### Admin Sipariş Güncelleme İşleyicisi
+Modülün tek bileşeni olarak HTTP istek-yanıt döngüsünün tamamını yönetir. İsteğin gövdesinden sipariş verilerini ayrıştırır, admin yetkisini doğrular, Supabase veritabanı bağlantısı kurarak sipariş kaydını günceller ve operasyonun sonucuna göre başarı veya hata yanıtı üretir.
 - admin-update-order_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bir yöneticinin sipariş güncelleme isteğini işleyen bir HTTP handler fonksiyonudur. Aşağıdaki mimari varsayımlar modülün doğru çalışması için gereklidir:
+Bu modül, bir yöneticinin mevcut bir siparişi güncellemesi için HTTP tabanlı bir API sunar ve bu işlem için kimlik doğrulama ile yetkilendirme gerektirir.
 
----
+**[Aksiyom 1]:** Eğer geçerli bir HTTP Request nesnesi (`req`) sağlanmazsa, handler fonksiyonu düzgün çalışamaz ve hata yanıtı üretilir.
 
-**[Aksiyom 1]:** Eğer geçerli bir `Request` nesnesi (`req`) yoksa, handler fonksiyonu isteği işleyemez ve uygun bir hata yanıtı (400 Bad Request) döndürülmesi gerekir.
+**[Aksiyom 2]:** Eğer istekte bulunan kullanıcının admin yetkisi yoksa, sipariş güncelleme işlemi gerçekleştirilmez ve yetkilendirme hatası döner.
 
-**[Aksiyom 2]:** Eğer isteği gönderen kullanıcının admin yetkisi doğrulanamıyorsa, handler fonksiyonu isteği reddetmeli ve 401 Unauthorized veya 403 Forbidden yanıtı döndürmelidir.
+**[Aksiyom 3]:** Eğer güncellenecek sipariş ID'si istek içinde sağlanmazsa veya geçersiz bir sipariş ID'si iletilirse, güncelleme başarısız olur.
 
-**[Aksiyom 3]:** Eğer güncellenecek siparişin ID'si istek içerisinde sağlanamıyorsa, handler fonksiyonu işlemi tamamlayamaz ve 400 Bad Request yanıtı döndürülmesi gerekir.
+**[Aksiyom 4]:** Eğer Supabase veritabanı bağlantısı kesikse veya veritabanı erişilemez durumdaysa, sipariş güncelleme işlemi başarısız olur.
 
-**[Aksiyom 4]:** Eğer belirtilen sipariş ID'sine sahip bir sipariş veritabanında mevcut değilse, handler fonksiyonu güncelleme yapamaz ve 404 NotFound yanıtı döndürülmesi gerekir.
+**[Aksiyom 5]:** Eğer güncelleme için geçersiz veya eksik alanlar (örn: sipariş durumu, teslimat bilgileri vb.) sağlanırsa, doğrulama hatası üretilir.
 
-**[Aksiyom 5]:** Eğer veritabanı bağlantısı (Supabase client) sağlanamıyorsa, handler fonksiyonu sipariş verisini okuyamaz veya güncelleyemez ve 500 Internal Server Error yanıtı döndürülmesi gerekir.
+**[Aksiyom 6]:** Eğer güncelleme işlemi veritabanında başarılı bir şekilde gerçekleştirilirse, istemciye success durum kodu ile onay yanıtı döner.
 
-**[Aksiyom 6]:** Eğer istek gövdesindeki güncelleme verisi geçersiz veya bozuksa (örn: geçersiz JSON formatı), handler fonksiyonu veriyi işleyemez ve 400 Bad Request yanıtı döndürülmesi gerekir.
-
----
-
-> **Not:** Bu modülde `request.body` formatı, izin verilen güncelleme alanları ve doğrulama kuralları fonksiyon gövdesinde tanımlı olmakla birlikte, verilen bilgilerde bu detaylar açıkça belirtilmemiştir. Eşik değerleri ve kabul kriterleri hakkında kesin bilgi mevcut değildir.
+**[Aksiyom 7]:** Eğer güncelleme sırasında beklenmeyen bir sunucu hatası oluşursa, istemciye 500 seviyesinde bir hata yanıtı üretilir.
 
 ---
 
@@ -61,53 +57,50 @@ Bu modül, bir yöneticinin sipariş güncelleme isteğini işleyen bir HTTP han
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: admin-update-order/index.ts::admin-update-order_handler
-- **params**: `(req: Request)`
-- **ic_degiskenler**:
-  - `origin` — Request'ten gelen origin header'ı, CORS kontrolü için kullanılır
-  - `allowed` — Environment variable'dan split edilen izin verilen origin listesi
-  - `okOrigin` — Origin'in allowed listesinde olup olmadığını kontrol eden boolean flag
-  - `requestId` — Her istek için benzersiz UUID veya timestamp, response header'larında kullanılır
-  - `cors` — CORS header'larını içeren object
-  - `ct` — Content-Type header'ının lowercased hali, JSON kontrolü için kullanılır
-  - `max` — Environment variable'dan alınan max body boyutu byte cinsinden
-  - `cl` — Content-Length header'ı, byte cinsinden
-  - `supabaseUrl` — Environment variable'dan alınan Supabase URL'i
-  - `serviceRoleKey` — Environment variable'dan alınan service role key
-  - `anonKey` — Environment variable'dan alınan anon key
-  - `authHeader` — Authorization header'ı, kullanıcı doğrulama için kullanılır
-  - `authClient` — Anon key ile oluşturulan Supabase client, kullanıcı doğrulaması için
-  - `user` — authClient.auth.getUser() ile alınan kullanıcı objesi
-  - `authErr` — authClient.auth.getUser() hata sonucu
-  - `roleCheck` — Kullanıcı rolünü kontrol etmek için fetch sonucu Response
-  - `arr` — roleCheck response'unun JSON parse sonucu array
-  - `role` — Kullanıcının rolü, admin veya superadmin olmalı
-  - `body` — req.json() ile parse edilen request body
-  - `id` — Body'den alınan sipariş ID'si
-  - `conversation_id` — Body'den alınan conversation ID'si
-  - `status` — Body'den alınan yeni durum
-  - `display_code` — Body'den alınan display kodu (ID'nin son 8 hanesi)
-  - `newStatus` — status değerinin string representation'ı, varsayılan 'paid'
-  - `resp` — patch fonksiyonu sonucu Response nesnesi
-  - `ok` — resp'nin ok property'si, başarılı güncelleme kontrolü
-  - `text` — resp'nin text body'si, yanıt mesajı
-  - `_e` — catch bloğundaki hata nesnesi
-- **Dönüş**: `Response`
+### [N1_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::admin-update-order_handler
+- **params**: (req: Request)
+- **ic_degiskenler**: 
+  - `corsHeaders` — getCorsHeaders fonksiyonundan dönen CORS başlıkları nesnesi
+  - `origin` — HTTP isteğinin origin başlığı, CORS doğrulaması için kullanılır
+  - `allowed` — ALLOWED_ORIGINS env değişkeninden split ile elde edilen izin verilen origin listesi
+  - `okOrigin` — İsteğin origin'inin izin verilen originler listesinde olup olmadığını kontrol eden boolean
+  - `requestId` — Benzersiz istek ID'si, crypto.randomUUID ile üretilir veya Date.now() ile oluşturulur
+  - `ct` — Content-Type başlığının küçük harfli hali, JSON doğrulaması için kullanılır
+  - `max` — Maksimum gövde boyutu (byte cinsinden), MAX_BODY_KB env değişkeninden hesaplanır
+  - `cl` — Content-Length başlığının numeric değeri, payload boyut kontrolü için kullanılır
+  - `supabaseUrl` — SUPABASE_URL env değişkeni
+  - `serviceRoleKey` — SUPABASE_SERVICE_ROLE_KEY env değişkeni
+  - `anonKey` — SUPABASE_ANON_KEY env değişkeni
+  - `authHeader` — Authorization başlığının değeri
+  - `authClient` — Anon key ile oluşturulan ve auth header eklenen Supabase istemcisi
+  - `user` — authClient.auth.getUser() çağrısından dönen kullanıcı nesnesi
+  - `authErr` — auth.getUser() çağrısındaki hata nesnesi
+  - `roleCheck` — Kullanıcı rolünü kontrol etmek için yapılan fetch isteği
+  - `arr` — roleCheck yanıtının JSON parse edilmiş hali (user_profiles tablosu satırı)
+  - `role` — Kullanıcının rolü (arr[0]?.role)
+  - `body` — İstek gövdesinin JSON parse edilmiş hali
+  - `id` — body.id, sipariş ID'si
+  - `conversation_id` — body.conversation_id, konuşma ID'si
+  - `status` — body.status, yeni durum değeri
+  - `display_code` — body.display_code, UI'da görülen son 8 hanelik kod
+  - `newStatus` — status parametresinin string hali, varsayılan 'paid'
+  - `resp` — PATCH isteğinin Response nesnesi
+  - `ok` — resp.ok değerinden elde edilen boolean, işlemin başarılı olup olmadığını gösterir
+  - `text` — resp.text() çağrısından dönen yanıt metni
+- **Dönüş**: Response (JSON.stringify ile {ok, response} veya hata JSON'u)
 
-### [N2_NASIL] AST Pointer: admin-update-order/index.ts::patch
-- **params**: `(filter: string)`
-- **ic_degiskenler**:
-  - `filter` — VentHub orders tablosunda güncelleme yapılacak satırı filtreleyen WHERE clause parçası
-- **Dönüş**: `Response` (fetch sonucu) — venthub_orders tablosunda status güncelleme sonucu
+### [N1_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::patch
+- **params**: (filter: string)
+- **ic_degiskenler**: (yok - sadece fetch çağrısı yapıyor)
+- **Dönüş**: Promise<Response> (fetch çağrısının response'u)
 
-### [N3_NASIL] AST Pointer: admin-update-order/index.ts::listRecent
-- **params**: `(_limit = 100)`
-- **ic_degiskenler**:
-  - `_limit` — Çekilecek maksimum sipariş sayısı, varsayılan 100
-  - `res` — fetch sonucu Response nesnesi
-  - `txt` — Response body'sinin text hali
-  - `data` — txt'nin JSON parse sonucu array veya parse hatasında boş array
-- **Dönüş**: `Array<{id?: string, conversation_id?: string, created_at?: string}>` — Son eklenen siparişlerin listesi
+### [N1_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::listRecent
+- **params**: (_limit = 100)
+- **ic_degiskenler**: 
+  - `res` — VenthubOrders tablosundan son siparişleri çeken fetch isteğinin response'u
+  - `txt` — res.text() çağrısından dönen ham JSON metni
+  - `data` — txt'nin JSON parse edilmiş hali, dizi değilse boş diziye dönüşür
+- **Dönüş**: Array<{id?: string, conversation_id?: string, created_at?: string}> (venthub_orders tablosundaki son kayıtlar)
 
 ---
 

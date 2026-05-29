@@ -3,25 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-confirmation\index.ts
-skeleton_hash: d36ea4f635b936cd
+skeleton_hash: 43beb69b89bb8357
 entity_hashes:
   func:loadTemplate: 9bc4b1ff28af1df3
   func:order-confirmation_handler: 52ce43dfb5d8480d
   func:renderTemplate: 598e7353aec8e680
-  overview: 9331abe1828bd6b9
-generated_at: 2026-05-28T22:46:25Z
+  overview: af6e7804c17b14b9
+generated_at: 2026-05-29T11:45:59Z
 ---
 
 ## Genel Bakış
-Bu modül, bir sipariş onayı e-postası göndermekle sorumlu bir Supabase Edge Function'ıdır. Gelen HTTP isteğini işleyerek sipariş ve müşteri bilgilerini alır, ilgili HTML e-posta şablonunu diskten yükler, verilerle doldurur ve Resend API kullanarak e-postayı gönderir.
+Bu modül, sipariş onayı e-postası gönderimi için tasarlanmış bir Supabase Edge Function'dır. Gelen HTTP isteklerini alarak sipariş detaylarını işler, e-posta şablonunu dinamik verilerle doldurur ve harici bir e-posta servisi üzerinden göndererek HTTP yanıtı üretir.
 
 ## Fonksiyon Grupları
-### Şablon İşleme
-Bu grup, e-posta şablonunun yüklenmesini ve dinamik verilerle doldurulmasını sağlar. Şablon dosyası asenkron olarak okunur ve bir veri haritası kullanılarak kişiselleştirilmiş HTML içeriğine dönüştürülür.
+### Şablon Motoru
+Bu grup, HTML e-posta şablonlarının yüklenmesini ve veriyle doldurulmasını yönetir. Şablon dosyası diskten asenkron olarak okunarak işlenmeye hazır hale getirilir, ardından basit bir şablon motoru ile dinamik içeriğe dönüştürülür.
 - loadTemplate, renderTemplate
 
-### İstek Yönetimi ve E-posta Gönderimi
-Ana iş akışını kontrol eden bu grup, gelen isteği doğrular, gerekli verileri elde eder, şablon işleme adımlarını tetikler, e-postayı gönderir ve sonuç durumunu içeren HTTP yanıtını oluşturur.
+### Ana İş Akışı ve E-posta Gönderimi
+Bu grup, tüm iş akışını koordine eden merkezi işleyicidir. İsteği doğrulamadan şablon seçimine, veri hazırlamadan e-posta gönderimi ve yanıt üretimi dahil tüm adımları yönetir.
 - order-confirmation_handler
 
 ---
@@ -61,76 +61,70 @@ Ana iş akışını kontrol eden bu grup, gelen isteği doğrular, gerekli veril
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: supabase/functions/order-confirmation/index.ts::renderTemplate
-- **params**: (`tpl`: string, `_data`: Record<string, unknown>)
+- **params**: `tpl: string, _data: Record<string, unknown>`
 - **ic_degiskenler**:
-  - `_m` — regex eşleşme sonucu (ilk callback'te: {{#if}} kalıbının tüm eşleşmesi, ikinci callback'te: {{key}} kalıbının tüm eşleşmesi)
-  - `key` — regex tarafından yakalanan değişken adı (şablon içindeki `{{key}}` veya `{{#if key}}` ifadesinden gelir)
-  - `inner` — `{{#if key}}...{{/if}}` bloğunun içeriği (yalnızca birinci replace callback'inde)
-  - `v` — `_data[key]` ile şablon verisi sözlüğünden ilgili değerin okunması
-  - `truthy` — `v` değerinin truthy olup olmadığını belirleyen boolean (string ise !=='' kontrolü, diğer tipler için doğrudan)
-- **Dönüş**: string (değiştirilmiş/yer tutucuları doldurulmuş şablon)
+  - `tpl` — İşlenecek HTML şablonu metni
+  - `_data` — Şablondaki degiskenlerin degerlerini iceren dict
+  - `_m` — Regex eslesmesinin tam eslesen metni (callback parametresi)
+  - `key` — Şablondaki degisken/koşul adı (callback parametresi)
+  - `inner` — `{{#if}}` blogunun icerigi (callback parametresi)
+  - `v` — `_data[key]` ile elde edilen deger
+  - `truthy` — Degerin truthy olup olmadigini gosteren boolean
+- **Dönüş**: `string` — Islenmis şablon
 
 ### [N2_NASIL] AST Pointer: supabase/functions/order-confirmation/index.ts::loadTemplate
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `url` — `new URL('./templates/email/order_confirmation.html', import.meta.url)` ile hesaplanan dosya yolu referansı;模板 HTML dosyasının konumunu belirtir
-- **Dönüş**: `Promise<string | null>` — şablon içeriği başarıyla okunursa string, hata olursa null
+  - `url` — Şablon dosyasinin tam URL'si
+- **Dönüş**: `Promise<string | null>` — Şablon metni veya hata durumunda null
 
 ### [N3_NASIL] AST Pointer: supabase/functions/order-confirmation/index.ts::order-confirmation_handler
-- **params**: (`req`: Request)
+- **params**: `req`
 - **ic_degiskenler**:
-  - `requestOrigin` — HTTP isteğinin `Origin` header değerinin string karşılığı; CORS doğrulamasında kullanılır
-  - `allowedOrigins` — `ALLOWED_ORIGINS` env değişkeninin virgülle ayrılmış, trim edilmiş, boş olmayan string dizisi; izin veren köklerin listesi
-  - `originAllowed` — boolean; istek kökünün izin listesinde olup olmadığını veya listenin boş olup olmadığını belirler
-  - `corsHeaders` — `Record<string, string>`; tüm HTTP yanıtlarına eklenecek CORS başlıkları sözlüğü (`Access-Control-Allow-Origin`, `Vary`, `Access-Control-Allow-Headers`, `Access-Control-Allow-Methods`, `Access-Control-Max-Age` alanlarını içerir)
-  - `_text` — `await req._text()` ile okunan ham istek gövdesi (string); JSON.parse'a girdi olarak verilir
-  - `parsed` — `_text`'in `JSON.parse` ile çözümlemesi; `Record<string, unknown>` tipinde sözlük, istek parametrelerini tutar
-  - `order_id` — IIFE `((): string | null => {...})()` ile `parsed['order_id']`'den çıkarılan ve trim edilmiş sipariş ID'si; null olabilir
-  - `supabaseUrl` — `SUPABASE_URL` env değişkeninden okunan Supabase proje URL'i; tüm API çağrıları için temel URL
-  - `serviceKey` — `SUPABASE_SERVICE_ROLE_KEY` env değişkeninden okunan servis anahtarı; yetkili API istekleri için Bearer token olarak kullanılır
-  - `authHeader` — `req.headers.get('Authorization')` ile gelen Authorization header değeri; kimlik doğrulama için kullanılır
-  - `isAuthorized` — boolean; istek yapanın yetkili olup olmadığını tutar; başlangıçta false
-  - `anonKey` — `SUPABASE_ANON_KEY` env değişkeninden okunan anonim anahtar; fallback auth istemcisi oluşturulurken kullanılır
-  - `authClient` — `createClient(supabaseUrl, anonKey, {...})` ile oluşturulan Supabase istemcisi; anonim anahtarla ama gelen Authorization header'ı ile kimlik doğrulama yapılır
-  - `user` — `await authClient.auth.getUser()` sonucundan gelen kullanıcının bilgileri (`{ id, ... }`); null olabilir, yetkilendirme kontrolü için kullanılır
-  - `roleCheck` — `fetch(...)` ile `user_profiles` tablosundan rol sorgulama sonucu (Response); admin/superadmin rolü kontrol edilir
-  - `arr` — `roleCheck.json()` çözümlemesinden gelen dizi (hata durumunda boş dizi); kullanıcı profil satırlarını tutar
-  - `role` — `arr[0]?.role` ile erişilen kullanıcının rol string'i; `'admin'` veya `'superadmin'` ise yetkilendirme yapılır
-  - `resendApiKey` — `RESEND_API_KEY` env değişkeninden okunan Resend API anahtarı; e-posta gönderimi için Bearer token
-  - `emailFrom` — `EMAIL_FROM` env değişkeninden okunan gönderici e-posta adresi/bilgisi; `'VentHub Test <onboarding@resend.dev>'` varsayılır
-  - `testMode` — `EMAIL_TEST_MODE` env değişkeninin boolean karşılığı; küçük harfe çevirip `'true'` ise test modu aktif
-  - `testTo` — `EMAIL_TEST_TO` env değişkeninden okunan test alıcı e-postası; test modunda e-posta buraya gider
-  - `bccList` — `SHIP_EMAIL_BCC` env değişkeninin virgülle ayrılmış, trim edilmiş, boş olmayan string dizisi; BCC alıcı listesi
-  - `brandName` — `BRAND_NAME` env değişkeninden okunan marka adı; şablon ve konu satırında kullanılır
-  - `brandPrimary` — `BRAND_PRIMARY_COLOR` env değişkeninden okunan marka ana rengi (hex); şablon içindeki renk referansları için
-  - `brandLogoUrl` — `BRAND_LOGO_URL` env değişkeninden okunan marka logo URL'i; şablon değişkenlerine aktarılır
-  - `customer_email` — sipariş kaydından veya auth kullanıcısından elde edilen müşteri e-posta adresi; başlangıçta null, DB sorgusuyla doldurulur
-  - `customer_name` — sipariş kaydından veya auth kullanıcısından elde edilen müşteri tam adı; başlangıçta null, DB sorgusuyla doldurulur
-  - `order_number` — sipariş kaydından elde edilen sipariş numarası string'i; null olabilir
-  - `o` — `fetch(...)` ile `venthub_orders` tablosundan sipariş bilgisi sorgulama sonucu (Response)
-  - `arr` — `o.json()` çözümlemesinden gelen sipariş satırları dizisi; boş dizi olabilir (hata durumunda)
-  - `row` — `arr[0]` satır nesnesi; `user_id`, `customer_email`, `customer_name`, `order_number` alanlarını içerir; null olabilir
-  - `uid` — `row.user_id` değerinin string karşılığı; müşteri bilgileri eksikse auth API'den bilgi çekmek için kullanılır
-  - `u` — `fetch(...)` ile Supabase auth admin API'den kullanıcı bilgisi sorgulama sonucu (Response)
-  - `uj` — `u.json()` çözümlemesinden gelen kullanıcı nesnesi (`UserResponse`); `email`, `user_metadata.full_name`, `user_metadata.name` alanlarını içerebilir
-  - `metaName` — `uj.user_metadata.full_name` veya `uj.user_metadata.name` değerinden elde edilen isim; `customer_name` eksikse tamamlamak için kullanılır
-  - `toList` — `string[]` tipinde e-posta alıcıları dizisi; test modunda `testTo`, normalde `customer_email` eklenir; boşsa BCC'den ilk eleman alınır
-  - `bcc` — `bccList`'in kopyası (`[...bccList]`); alıcı listesi boşsa ilk elemanı `toList`'a taşınır, kalanı BCC olarak kalır
-  - `prettyOrderNo` — `order_number` varsa `#` prefix + tire sonrasındaki kısım, yoksa son 8 karakter büyük harf + `#` prefix olarak formatlanmış sipariş numarası; konu satırı ve şablon için kullanılır
-  - `subject` — e-posta konu satırı; `"${brandName} | Siparişiniz alındı - ${prettyOrderNo}"` formatında oluşturulur
-  - `tpl` — `await loadTemplate()` ile yüklenen ham HTML şablonu; null olabilir
-  - `html` — `renderTemplate(tpl, {...})` çağrısıyla doldurulmuş nihai HTML içerik; şablon yüklenemezse inline fallback HTML ile oluşturulur
-  - `send` — inner async fonksiyon; Resend API'ye POST isteği atarak e-posta gönderir, closure üzerinden `resendApiKey`, `emailFrom`, `toList`, `bcc`, `subject`, `html` değişkenlerini kullanır
-  - `resp` — `send()` çağrısından dönen Response nesnesi; `resp.ok` ile başarı kontrolü yapılır
-  - `txt` — `resp._text()` ile okunan hata yanıtı metni; `'domain'` ve `'verify'` içeriği kontrol edilerek auto-retry (fallback sender) mantığı çalıştırılır
-  - `result` — `resp.json()` çözümlemesinden gelen Resend API yanıt nesnesi; `result.id` veya `result._data.id` ile message ID alınır
-- **Dönüş**: `Response` — JSON gövdeli HTTP yanıtı; başarı: `{ success, subject, result }` (200), hata: çeşitli error nesneleri (400/401/403/405/500)
-
-### [N4_NASIL] AST Pointer: supabase/functions/order-confirmation/index.ts::send (inner function, handler içinde)
-- **params**: (yok)
-- **ic_degiskenler**:
-  — (inner fonksiyon olup closure üzerinden dış kapsamdaki `resendApiKey`, `emailFrom`, `toList`, `bcc`, `subject`, `html` değişkenlerine erişir; kendi içinde ek değişken tanımlamaz)
-- **Dönüş**: `Promise<Response>` — Resend API yanıt response nesnesi
+  - `requestOrigin` — HTTP isteginin Origin header'indaki deger
+  - `allowedOrigins` — İzin verilen domainlerin listesi (env'den ayrilmis)
+  - `originAllowed` — İstek origin'inin izin verilen listede olup olmadigi
+  - `corsHeaders` — CORS yanit headarlari objesi
+  - `_text` — Request body'nin ham metin olarak okunmasi
+  - `parsed` — JSON parse edilmis request body objesi
+  - `order_id` — parsed['order_id']'den alinan ve trim edilmis siparis ID'si
+  - `supabaseUrl` — Supabase projesi URL'si
+  - `serviceKey` — Supabase service role key
+  - `authHeader` — Authorization header degeri
+  - `isAuthorized` — Kullanicinin yetkili olup olmadigini gosteren boolean
+  - `anonKey` — Supabase anon key (auth fallback icin kullanilir)
+  - `authClient` — Supabase auth client (auth fallback icin kullanilir)
+  - `user` — Auth client'tan alinan kullanici objesi
+  - `roleCheck` — Kullanici rolunu kontrol icin fetch sonucu
+  - `arr` — roleCheck.json() sonucu array
+  - `role` — Kullanicinin rolu (arr[0]?.role)
+  - `resendApiKey` — Resend email API key
+  - `emailFrom` — Gonderen email adresi
+  - `testMode` — Test modu aktif mi (env'den okunur)
+  - `testTo` — Test modunda email alacagi adres
+  - `bccList` — BCC listesi (env'den ayrilmis)
+  - `brandName` — Marka adi
+  - `brandPrimary` — Marka ana renk kodu
+  - `brandLogoUrl` — Marka logo URL'si
+  - `o` — Siparis verisini cekmek icin fetch sonucu
+  - `arr` — Siparis verisi array (o.json() sonucu)
+  - `row` — Siparis verisi satiri (arr[0])
+  - `order_number` — Siparis numarasi (row'dan)
+  - `customer_email` — Musteri emaili (row'dan veya auth user'dan)
+  - `customer_name` — Musteri adi (row'dan veya auth user'dan)
+  - `uid` — Kullanici ID'si (row.user_id)
+  - `u` — Auth user verisini cekmek icin fetch sonucu
+  - `uj` — Auth user verisi (u.json() sonucu)
+  - `toList` — Email gonderilecek alici listesi
+  - `bcc` — BCC listesi (gonderilecek)
+  - `prettyOrderNo` — Gosterim icin formatlanmis siparis numarasi
+  - `subject` — Email konu basligi
+  - `tpl` — Yuklenen HTML sablonu
+  - `html` — Islenmis veya fallback HTML icerigi
+  - `resp` — Resend API'ye email gonderme sonucu
+  - `txt` — Basarisiz gonderimde hata mesaji
+  - `result` — Resend API yanit sonucu
+- **Dönüş**: `Response` — HTTP yanit (JSON icerikli)
 
 ---
 

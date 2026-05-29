@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\stock-alert\index.ts
-skeleton_hash: a4a0d80cc3de8a97
+skeleton_hash: 2d2461a51728c843
 entity_hashes:
   func:checkAllProducts: 84cfac7d1bdd2b56
   func:checkSpecificProduct: 5027f709f9a40c80
@@ -11,29 +11,43 @@ entity_hashes:
   func:processProductAlert: c58aae9b08876f88
   func:sendNotification: 9d45549bdcd4429b
   func:stock-alert_handler: 9f0ae49f1a00dd49
-  overview: 84f6600311f3bf60
-generated_at: 2026-05-28T22:50:56Z
+  overview: f1961f87b9e63cad
+generated_at: 2026-05-29T11:48:39Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformu için bir Supabase Edge Fonksiyonu olarak stok uyarıları yönetir. Stok seviyeleri belirli bir eşiğin altına düştüğünde, ilgili alıcılara bildirim göndermek suretiyle tedarik süreçlerinin zamanında başlatılmasını sağlar. Modül, HTTP istekleriyle tetiklenir ve ürün bazlı veya toplu stok kontrolü yapabilir.
+VentHub HVAC platformu için tasarlanmış bir Supabase Edge Fonksiyonudur. Temel amacı, ürün stok seviyelerinin önceden tanımlı kritik eşik değerlerin altına düştüğünde otomatik uyarılar üreterek tedarik zinciri süreçlerini başlatmaktır. Modül, hem tüm ürün envanterini tarayan toplu kontrol hem de belirli bir ürünü hedefleyen tetikleme modları ile esnek bir uyarı yönetimi sunar.
 
 ## Fonksiyon Grupları
 ### İstek Kabul ve Yönlendirme
-Gelen HTTP isteğini analiz ederek hangi stok kontrol methodunun çalıştırılacağına karar verir ve işlem sonucunu HTTP yanıtı olarak döndürür.
+Gelen HTTP isteğini dinler, istek parametrelerini analiz eder ve verilen komuta bağlı olarak stok kontrol işinin doğru metodunu başlatır.
 - stock-alert_handler
 
 ### Stok Kontrol ve Değerlendirme
-Veritabanındaki ürünlerin stok seviyelerini eşik değerleriyle karşılaştırır. Tüm ürünleri tarayabileceği gibi tek bir belirli ürünü de kontrol edebilir.
+Veritabanındaki ürün stoklarını çekerek definedik eşik değerleriyle karşılaştırır. İstenen kapsamda (tüm ürünler veya tek bir ürün) stok yetersizliği tespit eder.
 - checkAllProducts, checkSpecificProduct
 
 ### Uyarı İşleme ve Bildirim Tetikleme
-Stok uyarısı gereken ürünler için alıcı listesini çeker ve her bir alıcıya uygun bildirimleri gönderir.
+Stok uyarısı oluşturulan her bir ürün için ilgili alıcıların listesini çeker ve tanımlı bildirim kanalları üzerinden öncelik sırasına göre ulaşılabilir uyarılar gönderir.
 - processProductAlert, getAlertRecipients, sendNotification
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim göndererek tedarik süreçlerini tetikler. Fonksiyon imzaları ve modül yapısı dikkate alınarak aşağıdaki aksiyomlar türetilmiştir:
+
+[Aksiyom 1]: Eğer `stock-alert_handler` fonksiyonuna geçerli bir HTTP isteği (`Request`) ulaşmazsa, fonksiyon uygun bir hata yanıtı (örn. 400/405) döndürmeli veya işlenmemelidir; aksi halde beklenmeyen davranış veya çökme olur.
+
+[Aksiyom 2]: Eğer `supabase` istemcisi (`SupabaseClient`) `checkAllProducts` veya `checkSpecificProduct` fonksiyonlarına başarıyla bağlanamazsa (örn. kimlik doğrulama hatası, ağ kesintisi), stok kontrolü yapılamaz ve dolayısıyla hiçbir uyarı bildirimi gönderilemez; bu durumda ilgili hata loglanmalı veya çağrıya hata ile dönülmelidir.
+
+[Aksiyom 3]: Eğer `checkSpecificProduct` fonksiyonuna geçerli bir `_productId` parametresi verilmezse (boş string, null veya tanımsız), fonksiyon o ürünü işleyemez; bu durumda o ürüne ait uyarı kontrolü atlanır veya hata döndürülür.
+
+[Aksiyom 4]: Eğer `processProductAlert` fonksiyonunda `product` nesnesi içinde stok seviyesi veya eşik değeri bilgisi eksikse (bu değerlerin hangisi olduğu bilinmiyor), ürünün düşük stoklu olup olmadığı değerlendirilemez; bu durumda o ürün için uyarı işlemi yapılamaz.
+
+[Aksiyom 5]: Eğer `processProductAlert` fonksiyonuna verilen `recipients` listesi boşsa (`AlertRecipient[]` boş dizi), stok uyarısı için bildirim gönderilecek alıcı bulunmaz; bu durumda `sendNotification` çağrılmaz veya uyarı işlemi tamamlanmaz.
+
+[Aksiyom 6]: Eğer `sendNotification` fonksiyonuna `priority` parametresi geçerli bir değer değilse (örn. tanımsız string, boş string), bildirimin önceliği belirlenemez; bu durumda bildirim ya gönderilemez ya da varsayılan
 
 ---
 
@@ -118,77 +132,74 @@ Stok uyarısı gereken ürünler için alıcı listesini çeker ve her bir alıc
 ## SABİTLER
 - **corsHeaders** (object) — `{
 
-    'Access-Control-Allow-Origin': '*',
-
-    'Access-Control-Allow-Headers...`
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::stock-alert_handler
+### [N1_NASIL] AST Pointer: stock-alert/index.ts::stock-alert_handler
 - **params**: (req: Request)
 - **ic_degiskenler**:
-  - `supabaseUrl` — Supabase URL'sini ortam değişkeninden alır
-  - `serviceRoleKey` — Supabase service role key'ini ortam değişkeninden alır
-  - `authHeader` — İstek başlığındaki Authorization değerini alır
-  - `isAuthorized` — Kimlik doğrulama durumunu tutar (başlangıçta false)
-  - `authClient` — Anonymous key ile oluşturulan kimlik doğrulama istemcisi
-  - `user` — Kimlik doğrulanmış kullanıcı nesnesi
-  - `roleCheck` — Kullanıcı rolünü kontrol eden REST API isteği sonucu
-  - `arr` — roleCheck JSON yanıtını parse eder
-  - `role` — Kullanıcının rolü (arr[0]?.role)
-  - `supabase` — Service role key ile oluşturulan Supabase istemcisi
+  - `supabaseUrl` — Supabase proje URL'si, environment variable'dan alınır
+  - `serviceRoleKey` — Supabase service role anahtarı, environment variable'dan alınır
+  - `authHeader` — İsteğin Authorization header'ı
+  - `isAuthorized` — Yetkilendirme durumunu takip eden boolean
+  - `anonKey` — Supabase anon key, auth fallback için kullanılır
+  - `createClientAuth` — Dinamik import ile yüklenen Supabase client factory
+  - `authClient` — Kullanıcı doğrulama için oluşturulan Supabase client
+  - `user` — Doğrulanmış kullanıcı nesnesi
+  - `roleCheck` — Kullanıcı rolünü kontrol eden fetch isteği sonucu
+  - `arr` — Rol kontrolü sonucu JSON array
+  - `role` — Kullanıcının rolü (array[0].role)
+  - `supabase` — Service role ile oluşturulan ana Supabase client
   - `alertResults` — İşlenen uyarı sonuçları dizisi
   - `_productId` — POST isteğinden gelen ürün ID'si
-  - `error` — Try-catch bloğunda yakalanan hata
-  - `msg` — Hata mesajı stringi
-- **Dönüş**: Response (farklı durumlarda farklı Response nesneleri)
+  - `error` — Try-catch bloğundaki yakalanan hata
+- **Dönüş**: Response (JSON yanıt veya hata yanıtı)
 
-### [N2_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::checkAllProducts
+### [N2_NASIL] AST Pointer: stock-alert/index.ts::checkAllProducts
 - **params**: (supabase: SupabaseClient)
 - **ic_degiskenler**:
-  - `allLowStock` — products tablosundan çekilen düşük stoklu ürünler verisi
-  - `fetchErr` — Supabase sorgusu hata nesnesi
-  - `productsToAlert` — Eşik değerin altında kalan ürünler (JS tarafında filtrelenmiş)
-  - `recipients` — Uyarı alıcıları listesi (getAlertRecipients fonksiyonundan)
-  - `results` — İşlenen uyarı sonuçlarını toplayan dizi
-  - `product` — Döngüdeki her bir ürün nesnesi (Product tipinde)
-- **Dönüş**: results dizisi (ProductAlertResult[])
+  - `allLowStock` — Veritabanından çekilen düşük stoklu ürünler dizisi
+  - `fetchErr` — Ürünleri çekerken oluşabilecek hata
+  - `productsToAlert` — Eşik değerin altında kalan filtrelenmiş ürünler
+  - `recipients` — Uyarı alıcıları dizisi
+  - `results` — İşlenen ürünlerin sonuçlarını tutan dizi
+- **Dönüş**: Promise<any[]> (işlenen uyarı sonuçları)
 
-### [N3_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::checkSpecificProduct
+### [N3_NASIL] AST Pointer: stock-alert/index.ts::checkSpecificProduct
 - **params**: (supabase: SupabaseClient, _productId: string)
 - **ic_degiskenler**:
-  - `product` — Belirli bir ürünün verisi (Supabase'den çekilen)
-  - `error` — Supabase sorgusu hata nesnesi
-  - `recipients` — Uyarı alıcıları listesi (getAlertRecipients fonksiyonundan)
-- **Dönüş**: Dizi (ProductAlertResult[])
+  - `product` — Tek bir ürünün verileri
+  - `error` — Ürün çekerken oluşabilecek hata
+  - `recipients` — Uyarı alıcıları dizisi
+- **Dönüş**: Promise<any[]> (ürün işlenme sonucu)
 
-### [N4_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::processProductAlert
+### [N4_NASIL] AST Pointer: stock-alert/index.ts::processProductAlert
 - **params**: (supabase: SupabaseClient, product: Product, recipients: AlertRecipient[])
 - **ic_degiskenler**:
-  - `alertType` — Uyarı türü (out_of_stock veya low_stock)
-  - `priority` — Öncelik seviyesi (critical veya high)
-  - `alertData` — Uyarı verisi nesnesi (productName, _productId, currentStock, threshold, alertType içerir)
-  - `notifications` — Gönderilen bildirim sonuçlarını toplayan dizi
-  - `recipient` — Döngüdeki her bir alıcı (AlertRecipient tipinde)
-- **Dönüş**: { product, alertType, notifications, success }
+  - `alertType` — Uyarı türü ('out_of_stock' veya 'low_stock')
+  - `priority` — Bildirim önceliği ('critical' veya 'high')
+  - `alertData` — Uyarı verisi nesnesi
+  - `notifications` — Bildirim sonuçları dizisi
+- **Dönüş**: Promise<{product: string, alertType: string, notifications: number, success: boolean}>
 
-### [N5_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::sendNotification
+### [N5_NASIL] AST Pointer: stock-alert/index.ts::sendNotification
 - **params**: (type: string, to: string, data: AlertData, priority: string)
 - **ic_degiskenler**:
-  - `supabaseUrl` — Supabase URL'sini ortam değişkeninden alır
-  - `serviceRoleKey` — Supabase service role key'ini ortam değişkeninden alır
+  - `supabaseUrl` — Supabase URL'si
+  - `serviceRoleKey` — Service role anahtarı
   - `response` — notification-service fonksiyonuna yapılan fetch isteği sonucu
-  - `err` — Try-catch bloğunda yakalanan hata
-- **Dönüş**: { type, recipient, success }
+  - `err` — Bildirim gönderirken oluşabilecek hata
+- **Dönüş**: Promise<{type: string, recipient: string, success: boolean}>
 
-### [N6_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::getAlertRecipients
+### [N6_NASIL] AST Pointer: stock-alert/index.ts::getAlertRecipients
 - **params**: (supabase: SupabaseClient)
 - **ic_degiskenler**:
-  - `settings` — inventory_settings tablosundan çekilen ayarlar verisi
-  - `recipients` — Uyarı alıcıları dizisi (başlangıçta boş)
-- **Dönüş**: Promise<AlertRecipient[]>
+  - `settings` — inventory_settings tablosundan çekilen ayarlar
+  - `recipients` — Alıcılar dizisi (varsayılan değerlerle)
+- **Dönüş**: Promise<AlertRecipient[]> (alıcılar dizisi)
 
 ---
 
@@ -202,11 +213,11 @@ graph TD
     index_ts__processProductAlert["processProductAlert"]
     index_ts__sendNotification["sendNotification"]
     index_ts__stock-alert_handler["stock-alert_handler"]
-    index_ts__processProductAlert --> index_ts__sendNotification
+    index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
     index_ts__checkAllProducts --> index_ts__getAlertRecipients
+    index_ts__processProductAlert --> index_ts__sendNotification
     index_ts__checkSpecificProduct --> index_ts__processProductAlert
     index_ts__checkAllProducts --> index_ts__processProductAlert
-    index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
 ```
 
 ## NODE ID STANDARD

@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-29T09:34:51.124478+00:00
-total_compiled_files: 409
+compiled_at: 2026-05-29T11:48:52.721959+00:00
+total_compiled_files: 412
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-29T09:34:51.124478+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-29T11:48:52.721959+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -390,6 +390,84 @@ Bu fonksiyon herhangi bir parametre almamaktadır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: robots
+
+---
+# FILE: src\app\sitemap.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\sitemap.ts
+skeleton_hash: ebc623b3db63a7de
+entity_hashes:
+  func:sitemap: 07414dd0bcd23791
+  overview: 1f20e97deb68e19e
+generated_at: 2026-05-29T11:36:50Z
+---
+
+## Genel Bakış
+Bu modül, Next.js uygulaması için site haritasını (sitemap) dinamik olarak oluşturmaktan sorumludur. Asenkron bir fonksiyon kullanarak uygulamadaki kategoriler ve ürünler gibi farklı içerik türlerinin URL'lerini toplar ve arama motorları için gerekli olan son değişiklik tarihi, değişim sıklığı ve öncelik gibi meta verilerle zenginleştirerek standart bir site haritası yapısı üretir.
+
+## Fonksiyon Grupları
+### Site Haritası Oluşturma
+Bu grup, uygulamanın tüm rotalarının (hem statik hem de dinamik) taranarak arama motoru dostu bir site haritası verisi hazırlanmasını yönetir.
+- sitemap
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, parametresiz ve asenkron çalışan bir site haritası oluşturucusudur. Fonksiyon gövdesi verilmediği için sadece imzadan çıkarılabilecek minimum mimari varsayımlar aşağıdadır.
+
+**[Aksiyom 1]**: Eğer `sitemap()` fonksiyonu bir parametre ile çağrılırsa, fonksiyon beklenmeyen davranış gösterir veya hata oluşur.
+
+**[Aksiyom 2]**: Eğer fonksiyon asenkron (promise) olarak çağrılmazsa veya dönen değerin `await` edilmesi gerekirken edilmezse, site haritası verisi düzgün işlenemez.
+
+**[Aksiyom 3]**: Eğer fonksiyonun çalışması için gerekli veri kaynakları (örn: kategoriler, ürünler listesi) erişilebilir değilse, site haritası eksik veya boş döner.
+
+**[Aksiyom 4]**: Eğer Next.js site haritası API'sinin beklediği response formatı (Content-Type: application/xml vb.) sağlanmazsa, arama motorları site haritasını tanıyamaz.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### sitemap
+**Ne yapar**: Bu fonksiyon, web sitesinin tüm sayfalarını (statik sayfalar, kategoriler, markalar ve ürünler) arama motorları için yapılandırılmış bir site haritası formatında, çoklu dil desteğiyle (Türkçe ve İngilizce) oluşturur.
+**Nasıl yapar**: Fonksiyon, site URL'sini ve desteklenen dilleri temel alır. Asenkron olarak kategori ve ürün verilerini çeker. Ardından, tanımlanmış statik rotaları, çekilen kategori verilerine göre kategori rotalarını, önceden tanımlı `HVAC_BRANDS` dizisinden marka rotalarını ve geçerli bir `slug` değeri olan ürünler için ürün rotalarını, her biri için yerelleştirilmiş URL'ler, son güncellenme tarihi, değişim sıklığı ve öncelik gibi meta verilerle birleştirip döndürür.
+**Parametreler**:
+Bu fonksiyon parametre almaz.
+**Dönüş**: `Promise<MetadataRoute.Sitemap>` - Tüm sayfaları (statik, kategori, marka ve ürün) ve bunların dil alternatiflerini içeren, arama motoru optimizasyonu için hazırlanmış bir site haritası dizisi.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/sitemap.ts::sitemap
+- **params**: (parametre yok)
+- **ic_degiskenler**: 
+  `baseUrl` — SITE_URL sabitinden alınan site temel URL'si, tüm sitemap girdilerinin oluşturulmasında kullanılır
+  `locales` — Desteklenen dil kodlarını içeren dizi ('tr' ve 'en')
+  `categories` — Veritabanından getCategories() ile çekilen tüm kategorilerin dizisi, hata durumunda boş dizi döner
+  `products` — Veritabanından getAllProducts() ile çekilen tüm ürünlerin dizisi, hata durumunda boş dizi döner
+  `staticRoutesList` — Sitemap'e dahil edilecek sabit sayfa rotalarının (path'lerin) listesi
+  `staticRoutes` — Her dil için sabit rotaların sitemap girdilerini oluşturan dizi
+  `categoryRoutes` — Her dil ve kategori için kategori sayfalarının sitemap girdilerini oluşturan dizi
+  `brandRoutes` — Her dil ve marka için marka sayfalarının sitemap girdilerini oluşturan dizi
+  `productRoutes` — Her dil ve ürün (slug'ı olan) için ürün sayfalarının sitemap girdilerini oluşturan dizi
+- **Dönüş**: Promise<MetadataRoute.Sitemap> — Tüm statik, kategori, marka ve ürün rotalarının birleşimi olan sitemap dizisi
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\sitemap.ts
+  function: src\app\sitemap.ts::sitemap
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: sitemap
 
 ---
 # FILE: src\app\admin\layout.md
@@ -2094,6 +2172,79 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
+
+---
+# FILE: src\app\api\health\route.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts
+skeleton_hash: f3a6c5de7a590bae
+entity_hashes:
+  func:GET: 3a9b2c312d190949
+  overview: 5afd8bfad676573c
+generated_at: 2026-05-29T11:34:00Z
+---
+
+## Genel Bakış
+Bu modül, uygulamanın sağlık durumunu kontrol eden bir API endpoint'i sunar. Tek bir GET isteği ile servisin aktif ve çalışır durumda olduğunu doğrular.
+
+## Fonksiyon Grupları
+### Sağlık Kontrolü
+Sistemin çalışma durumunu doğrulayan temel bir health check endpoint'i sağlar.
+- GET
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için fonksiyon gövdesi paylaşılmadığından, yalnızca fonksiyon imzasına dayalı çıkarım yapılmıştır. Detaylı aksiyomlar için GET() fonksiyonunun iç implementasyonuna erişim gereklidir.
+
+[Aksiyom 1]: Eğer HTTP istek methodu GET değilse, modül tanımsız davranış sergiler (varsayılan Next.js App Router davranışı geçerli olur).
+
+---
+
+**Not:** Mimari aksiyomların güvenilirliği için `GET()` fonksiyonunun **gövde kodu** (return blokları, hata yönetim mantığı, bağımlılık enjeksiyonları vb.) paylaşılmalıdır. Mevcut bilgiyle yalnızca imza tabanlı genel bir varsayım üretilebilmiştir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### GET
+**Ne yapar**: Health check (sağlık kontrolü) endpoint'ini sunar ve API servisinin aktif olduğunu doğrulayan basit bir yanıt döndürür. Bu fonksiyon, sistemin çalışıp çalışmadığını kontrol etmek için kullanılan standart bir izleme mekanizmasıdır.
+
+**Nasıl yapar**: Fonksiyon, `NextResponse.json()` metodunu kullanarak HTTP 200 durum koduyla birlikte JSON formatında yanıt oluşturur. Yanıt içinde `status` alanına "ok" değeri, `timestamp` alanına ise o anki UTC zaman damgası ISO 8601 formatında eklenir. Fonksiyon asenkron (async) olarak tanımlanmıştır, ancak mevcut implementasyonda herhangi bir asenkron işlem gerçekleştirmemektedir.
+
+**Parametreler**:
+- Fonksiyon herhangi bir parametre almamaktadır.
+
+**Dönüş**:
+- `NextResponse` — JSON formatında yanıt içeren HTTP response nesnesi
+  - `status`: string — Servisin durumunu belirtir, her zaman "ok" değerini döndürür
+  - `timestamp`: string — ISO 8601 formatında UTC zaman damgası (örnek: "2024-01-15T10:30:00.000Z")
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: `src/app/api/health/route.ts`::GET
+- **params**: (parametre yok)
+- **ic_degiskenler**: (fonksiyon gövdesinde bağımsız değişken tanımlanmamıştır — inline nesne doğrudan return edilir)
+- **Dönüş**: `NextResponse.json({ status: "ok", timestamp: new Date().toISOString() })` — HTTP 200 yanıtı döner; `status` alanı `"ok"` string'i, `timestamp` alanı o anki UTC zaman damgasının ISO format karşılığıdır.
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\api\health\route.ts
+  function: src\app\api\health\route.ts::GET
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: GET
 
 ---
 # FILE: src\app\[lang]\layout.md
@@ -3874,131 +4025,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
-
----
-# FILE: src\app\[lang]\category\[categorySlug]\page.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\category\[categorySlug]\page.tsx
-skeleton_hash: eb88eb1b16c32048
-entity_hashes:
-  func:Page: 83982c2082601bcb
-  func:generateMetadata: bff06976b3e638cc
-  func:generateStaticParams: 5124c4ce610dd009
-  overview: a7ed6e67780b499e
-  style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-05-28T22:34:48Z
----
-
-## Genel Bakış
-Bu modül, Next.js App Router yapısında dinamik kategori sayfalarını sunar. URL'deki `categorySlug` parametresine göre sayfa içeriğini, SEO meta bilgilerini ve statik üretim parametrelerini yönetir.
-
-## Fonksiyon Grupları
-### Statik Üretim Yapılandırması
-Uygulama derleme sırasında hangi kategori slug'larının önceden üretileceğini belirler.
-- generateStaticParams
-
-### SEO Meta Bilgisi Oluşturma
-Dinamik kategori sayfasının tarayıcı ve arama motorları için başlık, açıklama gibi meta bilgilerini üretir.
-- generateMetadata
-
-### Sayfa Bileşeni
-Kategori sayfasının ana React bileşenini oluşturur ve kullanıcının gördüğü arayüzü render eder.
-- Page
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül, Next.js'in dinamik segmentler kullanılarak oluşturulan, bir kategorinin tüm detaylarını sunan ana sayfasıdır. Aşağıda, modülün doğru çalışması için gerekli olan mimari varsayımlar listelenmiştir.
-
-[Aksiyom 1]: Eğer `categorySlug` parametresi, geçerli bir kategorinin URL dostu temsili (slug) değilse veya bu slug'a karşılık gelen kategori verisi sunucuda (örn. `getCategoryData` fonksiyonunun çektiği kaynak) mevcut değilse, hem `generateMetadata` hem de `Page` bileşeni düzgün bir meta bilgi veya içerik üretemez ve kullanıcıya hata durumu veya boş/eksik bir sayfa sunulur.
-[Aksiyom 2]: Eğer `generateStaticParams` fonksiyonu, statik site oluşturma (build) aşamasında çağrıldığında, ilgili kategorilerin geçerli `categorySlug` değerlerini içeren bir dizi döndürmezse, o kategorilere ait sayfalar build sırasında oluşturulamaz ve 404 (bulunamadı) hatası ile karşılaşılır.
-[Aksiyom 3]: Eğer `generateMetadata` fonksiyonu, `params` nesnesi içinden `categorySlug` değerini alıp `getCategoryData` gibi bir veri çekme fonksiyonuna iletemezse (örn. params nesnesi beklenen yapıda değilse), SEO için gerekli olan dinamik sayfa başlığı, açıklaması ve diğer meta etiketleri boş veya varsayılan değerlerle oluşturulur, bu da arama motoru optimizasyonunu olumsuz etkiler.
-[Aksiyom 4]: Eğer `Page` bileşeni, `params` nesnesi içinden `categorySlug` değerini alıp veri çekme işlemi için kullanamazsa (örn. params bir Promise ise ve çözümlenemiyorsa), bileşen ilgili kategorinin ürünlerini veya içeriğini listeleyemez ve kullanıcıya boş veya hatalı bir arayüz sunulur.
-
----
-
-## FONKSİYON DETAYLARI
-
-### generateStaticParams
-**Ne yapar**: Bu fonksiyon, Next.js'in statik site oluşturma (SSG) süreci için dinamik rotaların önceden oluşturulacak tüm olası parametrelerinin listesini üretir. Temel amacı, derleme zamanında (build time) hangi dil ve kategori kombinasyonları için HTML dosyası oluşturulacağını belirlemektir.
-**Nasıl yapar**: Fonksiyon, Supabase veritabanından aktif (`is_active` alanı true olan) tüm kategorilerin `slug` alanını çeker. Gelen her bir kategori nesnesi için, varsayılan olarak Türkçe (`tr`) ve İngilizce (`en`) olmak üzere iki ayrı dil parametresi oluşturur. Bu sayede her kategori slug'ı için iki farklı URL yolu (örn: `/tr/category/xxx` ve `/en/category/xxx`) önceden derlenebilir hale gelir.
-**Parametreler**:
-- Fonksiyon parametre almaz.
-**Dönüş**: `{ lang: string, categorySlug: string }` nesnelerinden oluşan bir dizi. Her bir nesne, oluşturulacak bir sayfanın dinamik parametrelerini temsil eder.
-
-### generateMetadata
-**Ne yapar**: Bu fonksiyon, belirli bir kategori sayfası için SEO (Arama Motoru Optimizasyonu) ve sosyal paylaşım (Open Graph) amaçlı HTML `<head>` bölümündeki meta etiketlerinin dinamik içeriğini üretir. Sayfanın arama motorlarındaki görünürlüğünü ve sosyal medyada paylaşım appearance'ını belirler.
-**Nasıl yapar**: Fonksiyon, URL'den gelen `categorySlug` parametresini alır ve önbelleklenmiş bir veri çekme fonksiyonu olan `getCachedCategoryData` ile ilgili kategori verisini sunucu tarafında (SSR) getirir. Kategori bulunamazsa, varsayılan bir "Kategori Bulunamadı" başlığı döndürür. Kategori mevcutsa, kategori adını ve açıklamasını kullanarak dinamik bir `title`, `description`, `canonical` URL ve `openGraph` nesnesi (başlık, açıklama, URL, site adı, görsel, dil, tür bilgileri dahil) oluşturur. Görsel için öncelikle kategorinin kendi `image_url` alanını, eğer bu boşsa varsayılan bir görsel yolunu kullanır.
-**Parametreler**:
-- name: params — Sayfanın dinamik parametrelerini içeren bir nesne.
-- type: `Promise<{ categorySlug: string }>` — Parametreler asenkron olarak çözümlenir, bu yüzden bir Promise'tır.
-- description: URL yolundan gelen `categorySlug` bilgisini taşır. Bu değer, kategori verisini çekmek ve SEO etiketlerini buna göre oluşturmak için kullanılır.
-**Dönüş**: `Metadata` tipinde bir nesne. Bu nesne, Next.js tarafından otomatik olarak HTML `<head>` bölümüne meta etiketleri olarak enjekte edilir.
-
-### Page
-**Ne yapar**: Bu fonksiyon, bir kategori sayfasının ana React bileşenidir. Sunucu tarafında (SSR) tüm gerekli verileri çeker, yapılandırılmış veri (JSON-LD) oluşturur ve istemci tarafına (client) bir React bileşeni ile birlikte gönderilmek üzere sayfa içeriğini render eder.
-**Nasıl yapar**: Fonksiyon, `categorySlug` parametresini alır ve önbellek mekanizmasıyla kategori verisini çeker. Kategori mevcutsa, o kategorinin alt kategorilerini (`parent_id` eşleşmesi ile) ve ardından bu kategori ile tüm alt kategorilerine ait ürünleri `getProductsEnriched` fonksiyonu ile çeker. Verileri, Google'ın zengin sonuçlar için tanımladığı `CollectionPage` tipinde bir JSON-LD yapısına dönüştürerek sayfaya ekler. Son olarak, verileri `PageComponent` bileşenine başlangıç (initial) prop'ları olarak aktarır ve bir `React.Suspense` sınırı içinde render eder; böylece veri yüklenirken bir fallback UI gösterilir.
-**Parametreler**:
-- name: params — Sayfanın dinamik parametrelerini içeren bir nesne.
-- type: `Promise<{ categorySlug: string }>` — Parametreler asenkron olarak çözümlenir.
-- description: URL yolundan gelen `categorySlug` bilgisini taşır. Bu değer, kategori verisi, alt kategoriler ve ürünlerin çekilmesi için temel giriş parametresidir.
-**Dönüş**: JSX elemanı (React.ReactNode). Sayfanın render edilecek tam HTML yapısını temsil eder. İçeriğinde bir `<script>` etiketi (JSON-LD için) ve bir Suspense içinde sarmalanmış ana sayfa bileşeni (`PageComponent`) bulunur.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/app/[lang]/category/[categorySlug]/page.tsx::generateStaticParams
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `data` — `supabase.from('categories').select('slug').eq('is_active', true)` sorgusunun döndürdüğüham veri
-  - `categoriesList` — `data`'nın `{ slug: string | null }[]` tipine cast edilmiş hali; her biri bir kategori slug'ı tutar
-- **Dönüş**: `{ lang: string, categorySlug: string }[]` — her kategori için `tr` ve `en` dilleri için static param nesneleri dizisi
-
----
-
-
-## MERMAID CALL GRAPH
-```mermaid
-graph TD
-    page_tsx__Page["Page"]
-    page_tsx__generateMetadata["generateMetadata"]
-    page_tsx__generateStaticParams["generateStaticParams"]
-```
-
-## NODE ID STANDARD
-
-  file: src\app\[lang]\category\[categorySlug]\page.tsx
-  function: src\app\[lang]\category\[categorySlug]\page.tsx::generateStaticParams
-  function: src\app\[lang]\category\[categorySlug]\page.tsx::generateMetadata
-  function: src\app\[lang]\category\[categorySlug]\page.tsx::Page
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: Page
-  export: generateMetadata
-  export: generateStaticParams
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-500`
-- **Layout:** (yok)
-- **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `container`, `mx-auto`, `px-4`, `py-12`
 
 ---
 # FILE: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.md
@@ -21579,6 +21605,293 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `absolute`, `flex`, `flex-col`, `from-slate-900/60`, `gap-16`, `gap-3`, `gap-6`, `grid`, `grid-cols-2`, `h-12`, `h-2`, `h-full`, `hover:shadow-2xl`, `hover:shadow-primary-navy/5`, `hover:shadow-slate-200/50`
 - **Varyant/Responsive:** `data-[in-view=true]:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
 - **Yardımcı Sınıflar:** `${delayClass`, `-translate-x-4`, `aspect-video`, `border`, `data-[in-view=true]:opacity-100`, `data-[in-view=true]:translate-x-0`, `data-[in-view=true]:translate-y-0`, `delay-200`, `delay-300`, `duration-300`, `duration-500`, `duration-700`, `ease-out`, `font-bold`, `font-light`
+
+---
+# FILE: src\components\layout\ClientLayout.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\layout\ClientLayout.tsx
+skeleton_hash: d3b4d3734259a93f
+entity_hashes:
+  func:ClientLayout: 6950fd4597251d25
+  func:ClientLayoutInner: 51b8420900083527
+  func:NavigationTracker: 42dc03a7f1389152
+  func:Providers: 17b4bbfa6b876fcf
+  overview: 46b38c1acbe0e751
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-05-29T11:37:04Z
+---
+
+## Genel Bakış
+Bu modül, istemci tarafı uygulamanın temel yapı taşlarını bir araya getiren layout bileşenlerini tanımlar. Uygulama genelindeki bağlam sağlayıcılarını yapılandırır, gezinti olaylarını izler ve sayfa düzeninin katmanlı yapısını oluşturur.
+
+## Fonksiyon Grupları
+### Bağlam Sağlayıcıları
+Uygulama genelinde kullanılacak olan durum yönetimi ve servis sağlayıcılarını sıralı bir yapıda çocukların üzerine sararak, tüm alt bileşenlerin bu verilere erişmesini sağlar.
+- Providers
+
+### Gezinti İzleme
+URL değişimlerini ve sayfa geçişlerini izleyen bileşendir; böylece uygulama içindeki gezinti olayları takip edilebilir hale gelir.
+- NavigationTracker
+
+### Düzen Bileşenleri
+Sayfa yapısının dış ve iç katmanlarını oluşturur; dış bileşen genel çerçeveyi tanımlarken, iç bileşen içerik alanının yerleşimini ve stillendirilmesini yönetir.
+- ClientLayout, ClientLayoutInner
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için fonksiyon gövdeleri paylaşılmadığından, yalnızca fonksiyon imzalarından çıkarılabilecek minimal varsayımlar tanımlanmıştır.
+
+[Aksiyom 1]: Eğer `Providers` bileşeni çağrıldığında `children` prop'u sağlanmazsa, sağlayıcılar içinde render edilecek hiçbir içerik olmayacağından uygulama içeriği görünmez hale gelir.
+
+[Aksiyom 2]: Eğer `NavigationTracker` bileşeni `usePathname` veya benzeri bir Next.js navigasyon hook'u kullanıyorsa ve bu hook providers zincirinin dışında çağrılırsa, bileşen doğru gezinti bilgisini alamaz ve navigasyon izleme çalışmaz.
+
+[Aksiyom 3]: Eğer `ClientLayoutInner` bileşeni çağrıldığında `children` prop'u sağlanmazsa, layout içinde sayfa içeriği render edilmez ve boş bir sayfa görüntülenir.
+
+[Aksiyom 4]: Eğer `ClientLayout` bileşeni çağrıldığında `children` prop'u sağlanmazsa, tüm layout yapısı (sağlayıcılar, gezinti izleyici, düzen) boş içeriğe sahip olur.
+
+[Aksiyom 5]: Eğer `Providers` bileşeni, iç içe geçmiş birden fazla context sağlayıcısı kullanıyorsa ve sağlayıcı sırası yanlışatersa, bağımlı sağlayıcılar doğru bağlam değerlerini bulamaz ve hata oluşur.
+
+---
+
+**Not:** Bu modül için detaylı mimari varsayımların üretilebilmesi için fonksiyon gövdelerinin (function bodies) paylaşılması gerekmektedir. Mevcut aksiyonlar yalnızca fonksiyon imza imzalarından ve React bileşen kalıplarından (patterns) türetilmiştir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Providers
+**Ne yapar**: Uygulama genelinde kullanılacak olan bağlam (context) sağlayıcılarını çocuk bileşenlerin üzerine katmanlar halinde sararak, tüm alt bileşenlerin bu bağlam verilerine erişmesini sağlar.
+
+**Nasıl yapar**: Beş farklı sağlayıcıyı iç içe bir yapıda sıralar: I18nProvider → AuthProvider → CategoryProvider → CartProvider → ProjectProvider. Sıralama önemlidir çünkü dış katmandaki sağlayıcılar, iç katmanlardaki sağlayıcıların verilerine erişebilir. `{children}` en iç katmanda yer alarak tüm bağlam verilerini miras alır.
+
+**Parametreler**:
+- `children`: `React.ReactNode` — Bu sağlayıcıların sarmalayacağı tüm alt bileşenlerin düğüm yapısıdır. Tüm uygulama içeriği bu parameter aracılığıyla sağlayıcılara dahil edilir.
+
+**Dönüş**: JSX yapısı döndürür. Doğrudan `{children}` düğümünü, sağlanan bağlam katmanlarının içine yerleştirilmiş biçimde render eder.
+
+### NavigationTracker
+**Ne yapar**: `useSearchParams` hook'u üzerinden geçerli URL arama parametrelerini izleyerek navigasyon değişikliklerini takip eder.  
+**Nasıl yapar**: Bileşen içinde `useSearchParams` çağrısı yapar, parametrelerdeki değişikliklere yanıt vererek (örneğin bir efekt içinde) gerekli takip veya güncelleme mantığını çalıştırır. Ayrı bir bileşen olarak `Suspense` içinde render edilmesi önerilir, çünkü hook'un asenkron davranışı nedeniyle bekleme süresi olabilir.  
+**Parametreler**: *(yok)*  
+**Dönüş**: null – fonksiyon herhangi bir görsel çıktı üretmez, sadece yan etkiler (takip) sağlar.
+
+### ClientLayoutInner
+
+**Ne yapar**: Uygulamanın istemci tarafı (client-side) ana layout yapısını oluşturur. Sayfa içeriklerini (`children`) sarmalayan üst düzey layout bileşenidir ve sayfanın alt kısmına çerez onay bannerı ile sayfa navigasyon takipçisini ekler.
+
+**Nasıl yapar**: Fonksiyon, React bileşenleri olan `MainLayout`, `CookieConsent` ve `NavigationTracker`'ı bir araya getirir. `MainLayout` bileşeni içinde `children`'ı render ederek sayfa içeriğini yerleştirir. Ardından `CookieConsent` bileşenini doğrudan ekler. `NavigationTracker` bileşenini ise `Suspense` ile sararak yükleme durumunda (`fallback={null}`) herhangi bir UI göstermeden asenktron olarak yüklenmesini sağlar. Bu sayede navigasyon takibi arka planda çalışırken ana sayfa içeriği engellenmemiş olur.
+
+**Parametreler**:
+- `children`: `React.ReactNode` — Ana layout içinde render edilecek sayfa içeriği. Bu prop, geçerli rotaya ait tüm alt sayfa bileşenlerini barındırır.
+
+**Dönüş**: JSX elementi döndürür. `MainLayout` içine sarılmış, sayfa içeriği (`children`), çerez onay bileşeni (`CookieConsent`) ve sarmalanmış navigasyon takipçisi (`NavigationTracker`) içeren bir React bileşen yapısı döndürür.
+
+### ClientLayout
+**Ne yapar**: Uygulama istemci tarafı düzenini oluşturmak için `ClientLayoutInner` bileşenini kullanarak verilen `children` öğesini sarmalar.  
+**Nasıl yapar**: Fonksiyon, `ClientLayoutInner` bileşenini render eder ve içine `children` prop'ını yerleştirir; bu sayfa düzeninin temel yapısını sağlar.  
+**Parametreler**:  
+- children: React.ReactNode — Düzen içinde gösterilecek içerik  
+**Dönüş**: JSX elementi – `<ClientLayoutInner>{children}</ClientLayoutInner>` şeklinde bir ağaç döndürür.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::Providers
+- **params**: `{ children }: { children: React.ReactNode }` — React alt elemanları
+- **ic_degiskenler**: (yok — sadece JSX döner)
+- **Dönüş**: JSX — I18nProvider > AuthProvider > CategoryProvider > CartProvider > ProjectProvider ile sarmalanmış children
+
+---
+
+### [N2_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::NavigationTracker
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `pathname` — `usePathname()` hook'undan gelen mevcut URL yolu, navigasyon stack mantığında birincil belirleyici
+  - `searchParams` — `useSearchParams()` hook'undan gelen URL arama parametreleri, currentFullPath oluşturmada kullanılır
+  - `handlePopState` — popstate eventi tetiklendiğinde `sessionStorage`'a `'vh_is_pop'` flag'ini `'true'` olarak yazan callback, geri butonu tespiti için
+  - `handleInteraction` — mousedown ve keydown eventlerinde `sessionStorage`'a `'vh_is_pop'` flag'ini `'false'` olarak yazan callback, kullanıcı etkileşimi ile geri tuşu ayrımı için
+  - `updateStack` — navigasyon geçmişini `sessionStorage` anahtarı `'vh_nav_stack'` altında JSON array olarak yöneten ana mantık fonksiyonu
+  - `search` — `searchParams?.toString() || ''` ile elde edilen query string, currentFullPath birleştirmesinde kullanılır
+  - `hash` — `window.location.hash || ''` ile elde edilen URL fragment, currentFullPath birleştirmesinde kullanılır
+  - `currentFullPath` — pathname + search + hash birleşiminden oluşan tam URL yolu, stack karşılaştırmalarında kullanılır
+  - `stack` — `JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]')` ile okunan navigasyon geçmişi dizisi, maksimum 10 eleman tutulur
+  - `lastItem` — `stack[stack.length - 1]` ile alınan son navigasyon girişi, mevcut sayfa ile aynıysa stack değiştirilmez
+  - `secondLastItem` — `stack[stack.length - 2]` ile alınan sondan bir önceki navigasyon girişi, geri gidilen sayfa tespiti için kullanılır
+- **Dönüş**: `null` — bileşen JSX üretmez, yan etkisi olarak sessionStorage'da navigasyon geçmişini tutar
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::ClientLayoutInner
+- **params**: `{ children }: { children: React.ReactNode }` — React alt elemanları
+- **ic_degiskenler**: (yok — sadece JSX döner)
+- **Dönüş**: JSX — MainLayout içine children, CookieConsent ve Suspense ile sarılmış NavigationTracker döner
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::ClientLayout
+- **params**: `{ children }: { children: React.ReactNode }` — React alt elemanları
+- **ic_degiskenler**: (yok — sadece JSX döner)
+- **Dönüş**: JSX — ClientLayoutInner içine children sarmalanarak döner
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    ClientLayout_tsx__ClientLayout["ClientLayout"]
+    ClientLayout_tsx__ClientLayoutInner["ClientLayoutInner"]
+    ClientLayout_tsx__NavigationTracker["NavigationTracker"]
+    ClientLayout_tsx__Providers["Providers"]
+```
+
+## NODE ID STANDARD
+
+  file: src\components\layout\ClientLayout.tsx
+  function: src\components\layout\ClientLayout.tsx::Providers
+  function: src\components\layout\ClientLayout.tsx::NavigationTracker
+  function: src\components\layout\ClientLayout.tsx::ClientLayoutInner
+  function: src\components\layout\ClientLayout.tsx::ClientLayout
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: ClientLayout
+  export: ClientLayoutInner
+  export: NavigationTracker
+  export: Providers
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\components\layout\CookieConsent.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\layout\CookieConsent.tsx
+skeleton_hash: fffd063be9e63817
+entity_hashes:
+  func:CookieConsent: ab64b95154357198
+  overview: 02fd6c06c04c6c38
+  style_tokens: 20b5f371d2cf3ccf
+generated_at: 2026-05-29T11:37:31Z
+---
+
+## Genel Bakış
+Bu modül, web sitesinin çerez politikasına ilişkin kullanıcı rızasını yöneten ve gösteren bir React bileşenidir. Kullanıcının çerez tercihlerini kabul etmesini veya reddetmesini sağlayarak gizlilik düzenlemelerine uyumu kolaylaştırır.
+
+## Fonksiyon Grupları
+### Çerez Rıza Bileşeni
+Bileşen, kullanıcının çerez kullanımına ilişkin tercihlerini almak ve kaydetmek için bir arayüz sağlar.
+- CookieConsent
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül (CookieConsent) için, yalnızca sağlanan fonksiyon imzası (`CookieConsent()`) temelinde, modülün doğru çalışması için aşağıdaki mimari varsayımlar (aksiyomlar) tanımlanabilir. Fonksiyon gövdesi ve modül içeriği bilinmediğinden, bu varsayımlar minimal ve yalnızca imzadan çıkarılabilir niteliktedir:
+
+- **Bu modül için özel aksiyom tanımlanmamıştır.** (Fonksiyon gövdesi bilinmediğinden, yalnızca imzaya dayalı kesin aksiyom üretilemez.)
+
+---
+
+## FONKSİYON DETAYLARI
+
+### CookieConsent
+
+**Ne yapar**: Kullanıcının çerez politikasını kabul edip etmediğini kontrol eden ve gerektiğinde bir izin dialogu gösteren React bileşenidir. İlk etkileşimden sonra belirli bir gecikmeyleظهر olarak kullanıcının çerez tercihini kaydeder.
+
+**Nasıl yapar**: `useEffect` hook'u ile `localStorage`'da `vh_cookie_consent` anahtarını sorgular. Bu anahtar yoksa, LCP ve CLS performans metriklerini olumsuz etkilememek adına 1.5 saniyelik bir gecikme sonrası dialogu görünür hale getirir. `useI18n()` hook'undan alınan dile göre Türkçe veya İngilizce lokalize metinler kullanılır. Kullanıcı "Kabul Et" veya "Reddet" butonlarından birine tıklandığında tercihi `localStorage`'a yazılır ve dialog kapatılır. Tüm `localStorage` işlemleri `try-catch` blokları ile sarılmıştır; böylece gizlilik modu veya depolama engelleri durumunda bile bileşen hata vermeden çalışmaya devam eder.
+
+**Parametreler**:
+- Bu bileşen herhangi bir prop almamaktadır. Dil tercihi ve çerez durumu iç bileşen state'leri ve bağlam (context) üzerinden yönetilir.
+
+**Dönüş**: `JSX.Element` veya `null` — `isVisible` state'i `false` olduğunda bileşen `null` döner ve render edilmez; `true` olduğunda ise `role="dialog"` niteliğine sahip, erişilebilirlik (accessibility) destekli bir dialog JSX'i döner. Dialog, `aria-live="polite"` ve `aria-label` nitelikleri ile ekran okuyucu uyumluluğuna sahiptir.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::CookieConsent
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `lang` — mevcut dil tercihi, useI18n hook'undan alınır
+  - `isVisible` — cookie consent bannerının görünürlüğünü kontrol eden state değişkeni
+  - `text` — dile göre yerelleştirilmiş ana açıklama metni
+  - `policyText` — dile göre yerelleştirilmiş "Cookie Policy" linki metni
+  - `acceptText` — dile göre yerelleştirilmiş "Accept All" butonu metni
+  - `rejectText` — dile göre yerelleştirilmiş "Reject" butonu metni
+  - `handleAccept` — çerezleri kabul etme işleyicisi
+  - `handleReject` — çerezleri reddetme işleyicisi
+- **Dönüş**: JSX bileşeni (isVisible true ise cookie consent dialog'u, değilse null)
+
+### [N2_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::useEffectCallback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `consent` — localStorage'dan alınan cookie consent durumu ('accepted' veya 'rejected' string'i veya null)
+  - `timer` — 1.5 saniye sonra isVisible'ı true yapacak timeout ID'si
+- **Dönüş**: timeout'u temizleyen cleanup fonksiyonu
+
+### [N3_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleAccept
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: localStorage'a 'accepted' yazar ve isVisible'ı false yapar)
+
+### [N4_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleReject
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: localStorage'a 'rejected' yazar ve isVisible'ı false yapar)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\layout\CookieConsent.tsx
+  function: src\components\layout\CookieConsent.tsx::CookieConsent
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: CookieConsent
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500/10`, `bg-gradient-to-r`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-500`, `hover:bg-white/5`, `hover:from-cyan-400`, `hover:text-cyan-400`, `hover:text-white`, `hover:to-blue-500`, `text-cyan-400`, `text-slate-300`, `text-slate-400`, `text-sm`
+- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `h-5`, `hover:from-cyan-400`, `hover:shadow-lg`, `items-center`, `items-start`, `justify-between`
+- **Varyant/Responsive:** `active:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-95`, `animate-fadeInUp`, `border`, `cyan-glow`, `duration-200`, `duration-300`, `font-bold`, `font-medium`, `glass-strong`, `hover:scale-105`, `leading-relaxed`, `pt-2`, `px-3`, `px-4`, `py-1.5`
 
 ---
 # FILE: src\components\layout\MainLayout.md

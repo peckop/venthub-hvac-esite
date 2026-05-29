@@ -3,43 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\apply-coupon\index.ts
-skeleton_hash: 9b98a0b5fd98d396
+skeleton_hash: c8d35825cdb738d5
 entity_hashes:
   func:apply-coupon_handler: a399f5149250ae7f
-  func:buildCors: 9da93e5126db3247
-  overview: ffd2f02daad367fc
-generated_at: 2026-05-28T22:43:14Z
+  func:buildCors: 317be5b9cff201e9
+  overview: fb96f807c58d5b28
+generated_at: 2026-05-29T11:42:34Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesi için bir Supabase Edge Fonksiyonu olarak kupon kodlarının doğrulanması ve uygulanması işlemlerini yönetir. Cross-origin istekleri için gerekli güvenlik başlıklarını yapılandırarak tarayıcı politikalarına uyum sağlar ve kupon işlemlerinin tam akışını yürütür.
+Bu modül, VentHub HVAC projesi için bir Supabase Edge Fonksiyonu olup, HTTP istekleriyle gelen kupon kodlarının doğrulanması ve uygulanması süreçlerini merkezi olarak yönetir. Cross-origin (çapraz köken) erişim güvenliğini sağlamak için tarayıcı politikalarına uygun CORS başlıklarını otomatik olarak yapılandırır ve kupon işleminin tüm iş akışını (doğrulama, uygulama ve yanıt oluşturma) koordine eder.
 
 ## Fonksiyon Grupları
-### CORS Yapılandırma Yardımcıları
-HTTP istekleri arasındaki çapraz köken erişimlerini güvenli bir şekilde yönetmek için gerekli HTTP başlıklarını ve izin bayraklarını üretir.
+### CORS Yapılandırma
+HTTP istekleri arasındaki çapraz köken erişimlerini güvenli bir şekilde sağlamak için gerekli HTTP başlıklarını ve izin parametrelerini dinamik olarak üretir.
 - buildCors
 
-### Kupon Uygulama İş Akışı
-Gelen HTTP isteklerini alarak kupon doğrulama ve uygulama mantığını yürütür, CORS yapılandırmasını sağlar ve işlem sonucuna göre uygun HTTP yanıtını döndürür.
+### Kupon İşleme İş Akışı
+Gelen HTTP isteklerini analiz ederek kupon kodunu doğrular, ilgili iş mantığını yürütür, CORS yapılandırmasını entegre eder ve işlemin success veya hata durumuna göre uygun HTTP yanıtını oluşturup döndürür.
 - apply-coupon_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen bilgiler (fonksiyon imzaları) sınırlıdır. Aşağıdaki aksiyomlar yalnızca fonksiyon imzalarından çıkarılabilir niteliktedir.
+Bu modül, HTTP istekleri üzerinden kupon kodu doğrulama ve uygulama işlevselliği sağlayan bir Supabase Edge Fonksiyonudur. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
 
-[Aksiyom 1]: Eğer `buildCors` fonksiyonuna geçerli bir `Request` nesnesi verilmezse, CORS başlıkları düzgün oluşturulamaz ve cross-origin istekler tarayıcı güvenlik kurallarına uygun yanıt alamaz.
+[Aksiyom 1]: Eğer `buildCors` fonksiyonu çağrılmaz veya geçerli bir `Request` nesnesi sağlanmazsa, yanıtın HTTP başlıklarında `Access-Control-Allow-Origin` gibi Cross-OriginResource-Sharing (CORS) başlıkları oluşturulamaz ve tarayıcı politikalarına uygunluk sağlanamaz; bu durumda istek tarayıcı tarafından engellenir.
 
-[Aksiyom 2]: Eğer `apply-coupon_handler` fonksiyonuna geçerli bir `Request` nesnesi verilmezse, kupon uygulama iş akışı başlatılamaz.
+[Aksiyom 2]: Eğer `apply-coupon_handler` fonksiyonuna geçerli bir `Request` nesnesi (örneğin, `method`, `url`, `headers` ve geçerli bir `body` içeren) ulaşmazsa, kupon kodu doğrulama ve uygulama iş akışı başlatılamaz ve istek geçersiz yanıt (örn: 400/405) ile sonuçlanır.
 
-[Aksiyom 3]: Eğer `Request` nesnesi üzerinde CORS yapılandırması için gerekli header bilgileri (örn: `Origin`) mevcut değilse, `buildCors` fonksiyonu uygun CORS başlıkları üretemeyebilir.
-
-[Aksiyom 4]: Eğer `apply-coupon_handler` tarafından döndürülen yanıt, `buildCors` tarafından üretilen CORS başlıklarını içermiyorsa, tarayıcılar yanıtı engelleyebilir.
-
----
-
-**Not:** Kupon kodu geçerliliği, süre kontrolü, kullanım limiti gibi iş mantığına ait aksiyomlar fonksiyon gövdeleri görüntülenmeden belirlenememiştir. Mevcut veri yalnızca fonksiyon imzalarını içermektedir.
+[Aksiyom 3]: Eğer istek, kupon kodunu içeren bir `body` veya doğru query parametreleri (örn: `code`, `cartId`) içermiyorsa veya bu veriler hatalıysa, kupon
 
 ---
 
@@ -47,14 +41,20 @@ Bu modül için verilen bilgiler (fonksiyon imzaları) sınırlıdır. Aşağıd
 
 ### buildCors
 
-**Ne yapar**: HTTP isteğinin origin (kaynak) bilgisini kontrol ederek CORS (Cross-Origin Resource Sharing) başlıklarını oluşturur. İzin verilen kaynaklar listesindeki originlere göre erişim izni verip verilmeyeceğini belirler.
+**Ne yapar**: HTTP isteğinin origin (köken) adresini doğrular ve Cross-Origin Resource Sharing (CORS) politikasına uygun yanıt header'larını oluşturur. Fonksiyon, istek yapan kaynağın izin verilen origin listesinde yer alıp olmadığını kontrol ederek hem header'ları hem de doğrulama sonucunu birlikte döndürür.
 
-**Nasıl yapar**: Fonksiyon, istekten gelen `origin` başlığını okur ve `ALLOWED_ORIGINS` ortam değişkeninden izin verilen kaynakları virgülle ayrılmış liste olarak parse eder. Eğer izin verilen kaynak listesi boşsa tüm kaynaklara izin verir; doluysa istek gelen origin'in bu listede olup olmadığını kontrol eder. Uygun CORS başlıklarını döndürürken, izin yoksa `Access-Control-Allow-Origin` başlığını `'null'` olarak ayarlar.
+**Nasıl yapar**: Fonksiyon首先 istek nesnesinden `origin` header'ını okur. Ardından `ALLOWED_ORIGINS` ortam değişkenini virgülle ayırarak izin verilen origin listesini oluşturur. Eğer izin verilen origin listesi boşsa veya istek gelen origin bu listede yer alıyorsa `ok` değeri `true` olur. Son olarak CORS header'ları; izin durumuna göre `Access-Control-Allow-Origin` değerini origin olarak veya `'null'` olarak ayarlayarak oluşturur.
 
 **Parametreler**:
-- `req`: Request — CORS kontrolü yapılacak HTTP isteği nesnesi
+- `req`: Request — CORS kontrolü yapılacak olan HTTP isteği nesnesi. Bu nesneden `origin` header'ı çıkarılarak istemcinin kaynak adresi alınır.
 
-**Dönüş**: `{ headers: Record<string, string>, ok: boolean }` — `headers`, yanıt için gereken CORS başlıklarını içerir; `ok`, istek edilen origin'in izin verilenler listesinde olup olmadığını belirtir
+**Dönüş**: `{ headers: Record<string, string>, ok: boolean }` — `headers` alanı, yanıtta kullanılacak CORS header'larını içerir (`Access-Control-Allow-Origin`, `Access-Control-Allow-Headers`, `Access-Control-Allow-Methods`). `ok` alanı ise origin doğrulamasının başarılı olup olmadığını belirtir; `true` ise istek izin verilen kaynaktan geliyor demektir.
+
+**Notlar**:
+- `Access-Control-Allow-Origin` header'ı, izin verilmeyen kaynaklarda `'null'` değerini alır ve bu durumda tarayıcı isteği engelleyecektir.
+- `Access-Control-Allow-Headers` alanı `authorization`, `x-client-info`, `apikey` ve `content-type` header'larının istek içerisinde gönderilmesine izin verir.
+- `Access-Control-Allow-Methods` alanı sadece `POST` ve `OPTIONS` (preflight) HTTP metodlarına izin verir.
+- Eğer `ALLOWED_ORIGINS` ortam değişkeni tanımlı değilse veya boşsa, tüm origin'lere izin verilir (`allowed.length === 0` kontrolü).
 
 ### apply-coupon_handler
 **Ne yapar**: Bu fonksiyon, kupon kodu uygulama işlemini yöneten ana istek işleyicisidir ve gelen istekleri işleyerek ilgili mantığı uygular.
@@ -102,47 +102,48 @@ type ApplyCouponResp = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\apply-coupon\index.ts::buildCors
+### [N1_NASIL] AST Pointer: supabase/functions/apply-coupon/index.ts::buildCors
 - **params**: (req: Request)
 - **ic_degiskenler**:
-  - `origin` — Request header'ından alınan Origin değeri veya boş string
-  - `allowed` — ALLOWED_ORIGINS ortam değişkeninden split edilip trim edilen izin verilen originlerin dizisi
-  - `ok` — origin'in izin verilenler listesinde olup olmadığını kontrol eden boolean
-  - `headers` — CORS header'larını içeren nesne (Access-Control-Allow-Origin, Allow-Headers, Allow-Methods)
-- **Dönüş**: `{ headers: Record<string,string>, ok: boolean }`
+  - `origin` — HTTP isteğinin origin başlığını alır, boş ise boş string kullanılır
+  - `allowed` — Ortam değişkeninden ALLOWED_ORIGINS değerini alır, virgülle ayırıp temizlenmiş dizine dönüştürür
+  - `ok` — Origin'in izin verilen listesinde olup olmadığını kontrol eder (allowed boşsa true kabul eder)
+  - `headers` — CORS başlıklarını içeren nesne (Access-Control-Allow-Origin, Allow-Headers, Allow-Methods)
+- **Dönüş**: { headers: Record<string,string>, ok: boolean } nesnesi
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\apply-coupon\index.ts::apply-coupon_handler
+### [N2_NASIL] AST Pointer: supabase/functions/apply-coupon/index.ts::apply-coupon_handler
 - **params**: (req: Request)
 - **ic_degiskenler**:
-  - `requestId` — Her istek için benzersiz UUID veya timestamp tabanlı ID
-  - `cors` — buildCors fonksiyonundan dönen CORS header'ları ve durum nesnesi
-  - `ct` — Request'in Content-Type header'ının küçük harfe çevrilmiş hali
-  - `max` — Maksimum gövde boyutu (KB cinsinden MAX_BODY_KB ortam değişkeninden okunur, byte'a çevrilir)
-  - `cl` — Request'in Content-Length header'ı (sayıya çevrilmiş, 0 ise 0)
-  - `SUPABASE_URL` — Supabase URL'si (ortam değişkeninden)
-  - `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role anahtarı (ortam değişkeninden)
-  - `supabase` — createClient ile oluşturulan Supabase istemcisi
-  - `forwarded` — x-forwarded-for header'ı
-  - `ip` — İstemcinin IP adresi (birkaç header'dan denenerek belirlenir, yoksa 'unknown')
-  - `key` — Rate limiting için anahtar (format: `coupon:${ip}`)
-  - `result` — checkRateLimit fonksiyonundan dönen sonuç nesnesi (allowed, remaining, resetAt içerir)
-  - `rl` — rateLimitHeaders fonksiyonu ile oluşturulan rate limit header'ları nesnesi
-  - `body` — Request JSON gövdesi (ApplyCouponReq tipinde, parse edilemezse boş nesne)
-  - `code` — body.code string'inden trim edilmiş kupon kodu
-  - `subtotal` — body.subtotal sayısından parse edilen ara toplam
-  - `_data` — Supabase sorgusundan dönen kupon verisi (CouponRow tipinde veya null)
-  - `error` — Supabase sorgusu hata nesnesi
-  - `row` — _data'nın CouponRow olarak cast edilmiş hali veya null
-  - `now` — Mevcut zaman (Date.now())
-  - `startsOk` — Kuponun geçerlilik başlangıç tarihinin kontrolü
-  - `endsOk` — Kuponun geçerlilik bitiş tarihinin kontrolü
-  - `activeOk` — Kuponun aktif olup olmadığının kontrolü
-  - `limitOk` — Kupon kullanım limitinin dolup dolmadığının kontrolü
-  - `minOk` — Minimum sipariş tutarı kontrolü
-  - `discount` — Hesaplanan indirim miktarı
-  - `finalTotal` — İndirim sonrası toplam tutar
+  - `corsHeaders` — getCorsHeaders() çağrısından dönen CORS başlıkları nesnesi
+  - `cors` — corsHeaders ile aynı değer (yeniden atama)
+  - `requestId` — Benzersiz istek kimliği (crypto.randomUUID() veya Date.now())
+  - `ct` — İstek başlığındaki content-type değeri (lowercase)
+  - `max` — Maksimum gövde boyutu (byte cinsinden, MAX_BODY_KB ortam değişkeninden hesaplanır)
+  - `cl` — İstek başlığındaki content-length değeri
+  - `SUPABASE_URL` — Supabase servis URL'i ortam değişkeni
+  - `SUPABASE_SERVICE_ROLE_KEY` — Supabase servis rolü anahtarı ortam değişkeni
+  - `supabase` — createClient() ile oluşturulan Supabase istemcisi
+  - `forwarded` — x-forwarded-for başlığı değeri (proxy durumları için)
+  - `ip` — İstemci IP adresi (birden fazla başlıktan denenerek alınır)
+  - `key` — Rate limit anahtarı (coupon:ip formatında)
+  - `result` — checkRateLimit() sonucu (allowed, remaining, resetAt değerleri)
+  - `rl` — Rate limit başlık nesnesi
+  - `body` — JSON gövdesi (ApplyCouponReq tipinde)
+  - `code` — body.code değerinden alınan temizlenmiş kupon kodu
+  - `subtotal` — body.subtotal değerinden alınan ara toplam tutarı
+  - `_data` — Supabase sorgusundan dönen veri (CouponRow tipinde)
+  - `error` — Supabase sorgu hatası
+  - `row` — _data cast edilmiş CouponRow nesnesi veya null
+  - `now` — Şu anki zaman damgası (Date.now())
+  - `startsOk` — Kuponun başlangıç tarihi kontrolü
+  - `endsOk` — Kuponun bitiş tarihi kontrolü
+  - `activeOk` — Kuponun aktif olup olmadığı kontrolü
+  - `limitOk` — Kullanım limiti kontrolü (used_count < usage_limit)
+  - `minOk` — Minimum sipariş tutarı kontrolü (subtotal >= minimum_order_amount)
+  - `discount` — Hesaplanan indirim tutarı
+  - `finalTotal` — İndirim uygulanmış nihai toplam tutar
   - `resp` — Yanıt nesnesi (ApplyCouponResp tipinde)
-- **Dönüş**: Response nesnesi (JSON gövde ve HTTP status kodu ile)
+- **Dönüş**: Response (JSON içeriği ile HTTP yanıtı)
 
 ---
 

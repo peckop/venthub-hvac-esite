@@ -3,41 +3,35 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\category\[categorySlug]\page.tsx
-skeleton_hash: eb88eb1b16c32048
+skeleton_hash: cf914e160936bdb3
 entity_hashes:
   func:Page: 83982c2082601bcb
   func:generateMetadata: bff06976b3e638cc
   func:generateStaticParams: 5124c4ce610dd009
-  overview: a7ed6e67780b499e
+  overview: f42538946dac9021
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-05-28T22:34:48Z
+generated_at: 2026-05-29T11:36:31Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js App Router yapısında dinamik kategori sayfalarını sunar. URL'deki `categorySlug` parametresine göre sayfa içeriğini, SEO meta bilgilerini ve statik üretim parametrelerini yönetir.
+Bu modül, Next.js App Router yapısında dinamik kategori sayfalarını sunar. URL'deki `categorySlug` parametresine göre sayfa içeriğini, SEO meta bilgilerini ve statik üretim parametrelerini yönetir. Modül, hem sunucu taraflı veri çekme hem de istemci tarafı arayüz sunma sorumluluğunu taşır.
 
 ## Fonksiyon Grupları
 ### Statik Üretim Yapılandırması
-Uygulama derleme sırasında hangi kategori slug'larının önceden üretileceğini belirler.
-- generateStaticParams
+Uygulama derleme aşamasında hangi kategori slug'larının önceden üretileceğini belirleyerek statik site oluşturma sürecini yönetir.
+- `generateStaticParams`
 
 ### SEO Meta Bilgisi Oluşturma
 Dinamik kategori sayfasının tarayıcı ve arama motorları için başlık, açıklama gibi meta bilgilerini üretir.
-- generateMetadata
+- `generateMetadata`
 
 ### Sayfa Bileşeni
-Kategori sayfasının ana React bileşenini oluşturur ve kullanıcının gördüğü arayüzü render eder.
-- Page
+Kategori sayfasının ana React bileşenini oluşturarak kullanıcının gördüğü arayüzü render eder.
+- `Page`
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül, Next.js'in dinamik segmentler kullanılarak oluşturulan, bir kategorinin tüm detaylarını sunan ana sayfasıdır. Aşağıda, modülün doğru çalışması için gerekli olan mimari varsayımlar listelenmiştir.
 
-[Aksiyom 1]: Eğer `categorySlug` parametresi, geçerli bir kategorinin URL dostu temsili (slug) değilse veya bu slug'a karşılık gelen kategori verisi sunucuda (örn. `getCategoryData` fonksiyonunun çektiği kaynak) mevcut değilse, hem `generateMetadata` hem de `Page` bileşeni düzgün bir meta bilgi veya içerik üretemez ve kullanıcıya hata durumu veya boş/eksik bir sayfa sunulur.
-[Aksiyom 2]: Eğer `generateStaticParams` fonksiyonu, statik site oluşturma (build) aşamasında çağrıldığında, ilgili kategorilerin geçerli `categorySlug` değerlerini içeren bir dizi döndürmezse, o kategorilere ait sayfalar build sırasında oluşturulamaz ve 404 (bulunamadı) hatası ile karşılaşılır.
-[Aksiyom 3]: Eğer `generateMetadata` fonksiyonu, `params` nesnesi içinden `categorySlug` değerini alıp `getCategoryData` gibi bir veri çekme fonksiyonuna iletemezse (örn. params nesnesi beklenen yapıda değilse), SEO için gerekli olan dinamik sayfa başlığı, açıklaması ve diğer meta etiketleri boş veya varsayılan değerlerle oluşturulur, bu da arama motoru optimizasyonunu olumsuz etkiler.
-[Aksiyom 4]: Eğer `Page` bileşeni, `params` nesnesi içinden `categorySlug` değerini alıp veri çekme işlemi için kullanamazsa (örn. params bir Promise ise ve çözümlenemiyorsa), bileşen ilgili kategorinin ürünlerini veya içeriğini listeleyemez ve kullanıcıya boş veya hatalı bir arayüz sunulur.
 
 ---
 
@@ -70,14 +64,41 @@ Bu modül, Next.js'in dinamik segmentler kullanılarak oluşturulan, bir kategor
 
 ---
 
+## SABİTLER
+- **_getCachedSupabaseData** (call) — `cache((id: string) => {
+
+  return supabase.from('categories').select('*').eq(...`
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/[lang]/category/[categorySlug]/page.tsx::generateStaticParams
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — `supabase.from('categories').select('slug').eq('is_active', true)` sorgusunun döndürdüğüham veri
-  - `categoriesList` — `data`'nın `{ slug: string | null }[]` tipine cast edilmiş hali; her biri bir kategori slug'ı tutar
-- **Dönüş**: `{ lang: string, categorySlug: string }[]` — her kategori için `tr` ve `en` dilleri için static param nesneleri dizisi
+  - `data` — supabase'den aktif kategorilerin slug değerlerini çeken sorgunun sonucu
+  - `categoriesList` — data'nın null olma durumuna karşı korumalı olarak diziye dönüştürülmüş hali
+- **Dönüş**: `{ lang: string, categorySlug: string }[]` formatında, her kategori için 'tr' ve 'en' dillerinde iki nesne içeren dizi
+
+### [N2_NASIL] AST Pointer: src/app/[lang]/category/[categorySlug]/page.tsx::generateMetadata
+- **params**: `{ params: Promise<{ categorySlug: string }> }` — URL parametrelerini içeren promise
+- **ic_degiskenler**:
+  - `categorySlug` — params promise'ından çözümlenen kategori slug'ı
+  - `category` — categorySlug kullanılarak cached getCategoryData ile çekilen kategori verisi
+- **Dönüş**: `Metadata` formatında SEO verisi (title, description, alternates, openGraph)
+
+### [N3_NASIL] AST Pointer: src/app/[lang]/category/[categorySlug]/page.tsx::Page
+- **params**: `{ params: Promise<{ categorySlug: string }> }` — URL parametrelerini içeren promise
+- **ic_degiskenler**:
+  - `categorySlug` — params promise'ından çözümlenen kategori slug'ı
+  - `category` — categorySlug ile cached getCategoryData ile çekilen kategori verisi
+  - `products` — varsayılan boş dizi, kategori varsa getProductsEnriched ile zenginleştirilmiş ürünler dizisi
+  - `subCategories` — varsayılan boş dizi, kategori varsa supabase'den çekilen alt kategorilerin domain formatına dönüştürülmüş hali
+  - `subsData` — supabase'den çekilen alt kategori verilerinin raw hali
+  - `categoriesArray` — subsData'nın null olma durumuna karşı korumalı DbCategory dizisi
+  - `categoryIds` — ana kategori ID'si ve tüm alt kategori ID'lerinden oluşan dizi
+  - `jsonLd` — JSON-LD formatında yapılandırılmış veri nesnesi
+- **Dönüş**: `<React.Suspense>` ile sarmalanmış `<PageComponent>` ve JSON-LD script'i içeren JSX
 
 ---
 

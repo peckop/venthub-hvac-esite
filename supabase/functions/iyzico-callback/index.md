@@ -3,27 +3,27 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-callback\index.ts
-skeleton_hash: 828e661b626678aa
+skeleton_hash: 808310d169bd9ad2
 entity_hashes:
   func:iyzico-callback_handler: 14b42ca547fc6940
-  overview: bae576fb73387a70
-generated_at: 2026-05-28T22:44:12Z
+  overview: a4ecb35c6d2ec3a1
+generated_at: 2026-05-29T11:43:13Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin Supabase altyapısında barındırılan bir edge fonksiyonudur. Tek bir merkezi işleyici aracılığıyla İyzico ödeme sağlayıcısından gelen webhook callback isteklerini alır, doğrular ve sistemdeki ilgili kayıtları günceller.
+Bu modül, Supabase Edge Function olarak deployed edilmiş bir webhook handler'dır. İyzico ödeme sağlayıcısından gelen callback isteklerini merkezi olarak işler, imza doğrulama ile güvenliği sağlar ve ödeme durumuna göre veritabanı kayıtlarını günceller.
 
 ## Fonksiyon Grupları
 ### İyzico Callback İşleme
-Bu grup, modülün tüm sorumluluğunu kapsar: Gelen İyzico webhook isteklerinin güvenli bir şekilde doğrulanması, ödeme durumuna göre veritabanı güncellemelerinin yapılması ve uygun HTTP yanıtlarının üretilmesini yönetir.
+Gelen webhook isteklerinin imza doğrulaması, ödeme bilgilerinin ayrıştırılması ve ilgili sipariş/kayıt güncellemelerinin yapılması dahil tüm iş akışını yönetir.
 - iyzico-callback_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için temel aksiyomlar aşağıdadır:
+Bu modül, İyzico ödeme sağlayıcısından gelen webhook callback isteklerini işleyen bir Supabase Edge fonksiyonudur. Fonksiyonun doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir:
 
-[Aksiyom 1]: Eğer `req` parametresi sağlanmazsa veya geçerli bir HTTP istek nesnesi (Request
+[Aksiyom 1]: Eğer `req` parametresi sağlanmazsa, fonksiyon istek verilerine erişemez ve callback işleme gerçekleştirilemez.
 
 ---
 
@@ -57,36 +57,33 @@ type CheckoutRetrieveResponse = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: iyzico-callback/index.ts::Promise_executor
-- **params**: `resolve` — Promise resolve callback, `reject` — Promise reject callback
+### [N1_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::(resolve, reject) callback
+- **params**: `(resolve, reject)` — Promise'ın resolve ve reject fonksiyonları
 - **ic_degiskenler**:
-  - `sdk` — closure'dan gelen Iyzipay SDK nesnesi, `checkoutForm.retrieve` metodu çağrılır
-  - `retrieveReq` — closure'dan gelen checkout form retrieve istek parametreleri
-  - `err` — retrieve callback'inden gelen hata nesnesi (unknown), varsa `reject(err)` ile fırlatılır
-  - `res` — `CheckoutRetrieveResponse` tipinde başarılı yanıt, `resolve(res)` ile çözümlenir
-- **Dönüş**: Promise resolve/reject ile `CheckoutRetrieveResponse` veya hata
+  - `retrieveReq` — Iyzipay checkout form retrieve istek parametreleri (dışarıdan geliyor)
+  - `sdk` — Iyzipay SDK nesnesi (dışarıdan geliyor, `sdk.checkoutForm.retrieve` çağrılıyor)
+- **Dönüş**: Yok (Promise executor callback'i; `resolve(res)` veya `reject(err)` ile sonuç üretir)
 
-### [N2_NASIL] AST Pointer: iyzico-callback/index.ts::retrieve_callback
-- **params**: `err` — unknown tipinde hata nesnesi, `res` — `CheckoutRetrieveResponse` tipinde yanıt
+### [N2_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::(err, res) callback
+- **params**: `(err: unknown, res: CheckoutRetrieveResponse)` — Iyzipay retrieve sonucu; hata veya yanıt
 - **ic_degiskenler**:
-  - `reject` — closure'dan gelen Promise reject fonksiyonu, hata durumunda çağrılır
-  - `resolve` — closure'dan gelen Promise resolve fonksiyonu, başarı durumunda çağrılır
-- **Dönüş**: Yok (yan etki: `resolve(res)` veya `reject(err)` çağrılır)
+  - Fonksiyon gövdesinde ek değişken tanımlanmamıştır. Sadece parametreler kullanılır: `err` hata durumunda `reject(err)` ile reddeder, `res` başarı durumunda `resolve(res)` ile çözümlenir.
+- **Dönüş**: Yok (callback; bir üst scope'taki `resolve`/`reject` üzerinden sonuç üretir)
 
-### [N3_NASIL] AST Pointer: iyzico-callback/index.ts::patchStatus
-- **params**: `newStatus` — `'paid' | 'failed' | 'confirmed'` tipinde, siparişin güncellenecek durumu
+### [N3_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::patchStatus
+- **params**: `(newStatus: 'paid' | 'failed' | 'confirmed')` — Siparişe atanacak yeni durum değeri
 - **ic_degiskenler**:
-  - `orderId` — closure'dan gelen sipariş ID'si, varsa `id=eq.${orderId}` filtresi oluşturulur
-  - `result` — closure'dan gelenretrieve sonucu nesnesi, `result?.conversationId` erişimi yapılır
-  - `conversationId` — closure'dan gelen conversation ID'si, `orderId` yoksa alternatif filtre olarak kullanılır
-  - `filterById` — string, `orderId` varsa `id=eq.${orderId}` query string'i; boş string olabilir
-  - `filterByConv` — string, `orderId` yoksa ve conversation ID mevcutsa `conversation_id=eq.${...}` query string'i; boş string olabilir
-  - `filter` — string, `filterById || filterByConv` birleşimi; aktif filtre query parametresi
-  - `supabaseUrl` — closure'dan gelen Supabase proje URL'i, REST API endpoint地址i oluşturmak için kullanılır
-  - `serviceRoleKey` — closure'dan gelen Supabase service role anahtarı, `Authorization` ve `apikey` header'larında kullanılır
-  - `debugInfo` — closure'dan gelen hata/ayıklama bilgisi, PATCH body'sinde `payment_debug` alanına yazılır
-  - `resp` — `fetch` çağrısının döndürdüğü `Response` nesnesi, fonksiyon tarafından return edilir
-- **Dönüş**: `Response | null` — fetch yanıtı veya filtre oluşturulamazsa `null`
+  - `filterById` — `orderId` mevcutsa `id=eq.{orderId}` formatında Supabase filtre sorgusu oluşturur; değilse boş string
+  - `filterByConv` — `orderId` yoksa ve `result.conversationId` veya `conversationId` mevcutsa `conversation_id=eq.{id}` formatında filtre sorgusu oluşturur; değilse boş string
+  - `filter` — `filterById` veya `filterByConv`'dan ilk dolu olanı alır; her ikisi de boşsa `null` döner (fonksiyon erken çıkar)
+  - `resp` — Supabase REST API'ye PATCH isteği sonucu dönen `Response` nesnesi
+  - `orderId` — Dış scope'tan gelen sipariş ID'si (null olabilir)
+  - `result` — Iyzipay retrieve sonucu (`.conversationId` erişimi yapılır)
+  - `conversationId` — Dış scope'tan gelen conversation ID'si (fallback olarak kullanılır)
+  - `supabaseUrl` — Supabase proje URL'i, REST API endpoint'i için kullanılır
+  - `serviceRoleKey` — Supabase service role anahtarı, Authorization ve apikey header'larında kullanılır
+  - `debugInfo` — Ödeme debug bilgisi, `payment_debug` alanına JSON olarak kaydedilir
+- **Dönüş**: `Response | null` — Supabase PATCH yanıtını döner; filtre oluşturulamazsa `null` döner
 
 ---
 
