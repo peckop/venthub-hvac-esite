@@ -34,6 +34,7 @@ Thumbs.db
 # VentHub Registry Reports & Temp
 *.txt
 !requirements.txt
+!public/llms.txt
 !memory-engine/**/requirements.txt
 *.log
 /tmp/

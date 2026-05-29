@@ -1,0 +1,57 @@
+# VentHub HVAC — Project Blueprint & Context
+
+> This is a machine-readable project profile for AI assistants, agents, and search crawlers. It summarizes the architecture, core flows, constraints, and strict guidelines of the VentHub HVAC platform.
+
+## Core Identity & Vision
+- **Project Name:** VentHub HVAC
+- **Domain:** HVAC Engineering & E-Commerce (B2B/B2C hybrid sales platform)
+- **Key Features:**
+  - 3D Interactive Viewer (React Three Fiber GLB/GLTF models of Jet Fans, HRV units, Silencers)
+  - HVAC Engineering Calculators (ASHRAE/EN standards for Air Curtain, Duct Sizing, HRV, Jet Fan)
+  - Needs Wizard (Rule-based matchmaker for products based on engineering parameters)
+  - Knowledge Hub (HVAC technical articles and document tree)
+  - Premium ERP-like Admin Panel (Order, inventory, returns, tracking, real-time sync)
+
+---
+
+## Technical Stack
+- **Frontend:** Next.js 15 (App Router, SSR/SSG/ISR), React 19 (React Compiler active), TypeScript 5, Tailwind CSS 4, React Three Fiber, Framer Motion, @tailwindcss/typography.
+- **Backend:** Supabase (Edge Functions in Deno/TS, Auth, Realtime WebSockets, Storage).
+- **Database:** PostgreSQL (Supabase-hosted, 26 tables, 108 RLS policies, 51 RPCs, 26 indexes).
+- **Integrations:** Iyzico (3D Secure payments), Resend (Transactional emails), Twilio (WhatsApp/SMS alerts), Sentry (Error tracking), Vercel (Hosting & CI/CD).
+
+---
+
+## Directory Structure
+- `/src/app/` — Next.js App Router (Admin panel under `/admin`, Account under `/account`, Calculators under `/calculators`).
+- `/src/components/` — UI components (Reusable primitives under `/ui`, 3D scenes under `/products/3d`, domain components under `/checkout`, `/admin`, etc.).
+- `/src/hooks/` — Custom hooks (RBAC hooks like `useRole`, routing hooks like `useLocalizedRoutes`).
+- `/src/i18n/` — Sub-path i18n dictionaries and provider (`tr`/`en` dictionaries).
+- `/src/lib/` — Business logic and API gateway client services.
+- `/supabase/` — Supabase migrations and 28 isolated Deno Edge Functions (under `/functions`).
+- `/docs/` — Core documentation artifacts compiled via AST pipelines.
+
+---
+
+## Architectural Guardrails & Strict Rules
+
+1. **No-Plan-No-Code:** AI must generate a detailed implementation plan and secure approval before making any code modifications.
+2. **Strict Type Safety:** Absolute strict TypeScript; any usage of `any` is strictly prohibited.
+3. **RLS-First:** Every single PostgreSQL database table must be guarded by bulletproof Row-Level Security policies.
+4. **Monotonic State Transitions:** Order and return statuses can only transition forward (e.g., pending -> paid -> shipped -> delivered). Regressions are blocked at database/API level.
+5. **Webhook Security:** All incoming webhooks must verify HMAC signatures and implement a Replay Guard (timestamp verification or idempotency tokens).
+6. **Route SSOT & i18n Routing:** Sub-path `/[lang]/` localization. Href hardcoding is forbidden; all routing must go through `useLocalizedRoutes`.
+7. **Gateway Principle:** UI components must never call Supabase or fetch endpoints directly. Data operations must be abstracted into specialized Gateway hooks/services.
+8. **No Arbitrary Style Values:** Bracket styling (`w-[92vw]`, etc.) is disabled via ESLint. Use design system HSL tokens and tokens from `tokens.js`.
+9. **Below-The-Fold Render Optimization:** Viewing heavy tables or complex 3D scenes must use `.content-auto` (content-visibility: auto) to optimize LCP.
+10. **A11y (WCAG 2.1 AA):** Use `focus-visible:` state selectors instead of `focus:` to keep premium focus rings only for keyboard navigation.
+11. **PPR (Partial Pre-Rendering) & Suspense Bounds:** Components reading search parameters using `useSearchParams` must be wrapped in `<Suspense fallback={<Skeleton />}>` to avoid SSR poisoning.
+12. **unstable_cache Collision Guard:** The active locale (`lang`) must be passed as part of the cache keys array when caching Server-side data (e.g., `['home-data', lang]`).
+13. **React 19 Compiler Warning [GEÇİŞ AŞAMASINDA]:** Since the React Compiler automates hook dependencies, do not use manual `useMemo`/`useCallback` for simple UI components. However, keep them in complex data viewmodels and Context Providers where async operations run.
+14. **Supabase ORM Single-Query React Cache [GEÇİŞ AŞAMASINDA]:** Wrap all independent Supabase database queries in React Server Components with `React.cache()` to avoid waterfall and redundant queries.
+15. **Black-box isolation:** Next.js server context must never leak into isolated Supabase Edge Functions. Communicate only via standard API contracts, auth payloads, and db events.
+
+---
+
+*Last Synchronized: 2026-05-29*
+*Digital Twin ID: 2aa4fc16-acf6-47c6-90a8-c02fe5bb28f8*

@@ -154,6 +154,7 @@ Kod derlenebiliyor mu? Testler geçiyor mu?
 | README (200+ satır) | 🟡 WARNING |
 | CHANGELOG | 🟡 WARNING |
 | CONTRIBUTING.md | 🟡 WARNING |
+| llms.txt Standardı (kök dizin veya /public/llms.txt) | 🔴 STRICT [GEÇİŞ AŞAMASINDA] |
 
 ---
 
@@ -200,6 +201,7 @@ Kod derlenebiliyor mu? Testler geçiyor mu?
 | Route SSOT (hardcoded href yasak) | 🔴 STRICT |
 | i18n Leakage | 🟡 WARNING |
 | Framer Motion sızıntısı | 🟡 WARNING |
+| Supabase ORM Tekilleştirme (RSC içinde React.cache) | 🔴 STRICT [GEÇİŞ AŞAMASINDA] |
 
 ---
 
@@ -210,6 +212,7 @@ Kod derlenebiliyor mu? Testler geçiyor mu?
 | Dead Code (Knip) | `pnpm run knip --reporter compact` | 🟡 WARNING |
 | Bundle Analyzer | `pnpm run analyze` | 🟡 WARNING |
 | Unused Dependencies | `pnpm run knip --include unlisted,unresolved` | 🟡 WARNING |
+| React 19 Compiler Sınırı | Yeni basit bileşenlerde manuel useMemo/useCallback kısıtı | 🟡 WARNING [GEÇİŞ AŞAMASINDA] |
 
 > [!TIP]
 > Sadece teknik borç taraması yapmak için: `python run_enterprise_audit.py --layers L11`
