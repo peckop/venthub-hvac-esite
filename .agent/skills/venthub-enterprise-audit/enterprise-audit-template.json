@@ -583,6 +583,21 @@
           },
           "status": "PENDING",
           "evidence": ""
+        },
+        "L6_04_llms_txt": {
+          "target": "/llms.txt AI standardizasyon belgesi mevcut olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "public/llms.txt"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
         }
       }
     },
@@ -915,6 +930,23 @@
           },
           "status": "PENDING",
           "evidence": ""
+        },
+        "L10_05_supabase_cache": {
+          "target": "RSC içindeki bağımsız Supabase ORM sorguları React.cache() ile tekilleştirilmeli.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "cache\\s*\\(.*supabase",
+              "src/app/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": "",
+          "note": "Varlık kontrolü."
         }
       }
     },
@@ -968,6 +1000,22 @@
               "unlisted,unresolved",
               "--reporter",
               "compact"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PENDING",
+          "evidence": ""
+        },
+        "L11_04_react_compiler_hooks": {
+          "target": "React Compiler devrede olduğundan, basit bileşenlerde manuel useCallback/useMemo kullanımı azaltılmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "useCallback|useMemo",
+              "src/components/ui/"
             ],
             "expected_exit_codes": [
               0
