@@ -3,26 +3,27 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx
-skeleton_hash: 7805843109ba355b
+skeleton_hash: 9cc228dadd3a82f3
 entity_hashes:
   func:BackToTopButton: c8f2538093a58334
-  overview: bde72dfa4c09c889
-  style_tokens: 5e3169b1c89ec108
-generated_at: 2026-05-28T22:35:38Z
+  func:handleScrollToTop: 94e0754193bc122d
+  overview: cab9522d3717ffc4
+  style_tokens: b29c0a49231e465f
+generated_at: 2026-05-29T18:43:11Z
 ---
 
 ## Genel Bakış
-`BackToTopButton` bileşeni, sayfa kaydırma konumuna göre görünür hâle gelen ve tıklandığında kullanıcıyı sayfanın en üstüne taşıyan bir React fonksiyonel bileşenidir. UI içinde sabit bir konumda yer alır ve kullanıcı deneyimini iyileştirmek için basit bir geri dönüş işlevi sunar.
+BackToTopButton bileşeni, sayfa kaydırma konumuna göre görünürlüğü kontrol edilen ve kullanıcı tıklamasıyla sayfanın en üstüne yumuşak geçiş sağlayan bir React fonksiyonel bileşenidir. Kullanıcı deneyimini iyileştirmek için sabit konumda yer alan, minimal bir navigasyon yardımcısıdır.
 
 ## Fonksiyon Grupları
-### UI Render ve Etkileşim
-Bu grup, butonun görsel çıktısını üretir ve kullanıcı tıklamasını işleyerek sayfayı en üste kaydırır.  
-- BackToTopButton   (bileşenin kendisi, render ve click handler içerir)
+### Bileşen ve Etkileşim
+Butonun görünümünü, görünür olma durumunu ve kullanıcı tıklamasını yöneten ana React bileşenidir.
+- BackToTopButton, handleScrollToTop
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için verilen fonksiyon gövdesi bulunamadığından, mimari varsayımlar üretilememektedir.
 
 ---
 
@@ -38,23 +39,40 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 **Dönüş**: `React.FC` — Oluşturulan “Back to Top” butonunu temsil eden bir React functional component.
 
+### handleScrollToTop
+
+**Ne yapar**: Sayfanın en üstüne yumuşak bir şekilde kaydırma işlemi gerçekleştirir. Kullanıcı sayfayı aşağı kaydırdığında görünen "Back to Top" butonuna tıklandığında çağrılır ve pencereyi sayfanın başlangıç konumuna (0,0) geri taşır.
+
+**Nasıl yapar**: `window.scrollTo()` veya `window.scroll()` metodu ile `behavior: 'smooth'` seçeneği kullanarak animasyonlu bir kaydırma efekti oluşturur. Bu sayede kullanıcı deneyimi için ani bir geçiş yerine yumuşak bir geçiş sağlanır.
+
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: `void` — Fonksiyon herhangi bir değer döndürmez, sadece pencere konumunu değiştirir.
+
+---
+
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx::BackToTopButton
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: components/BackToTopButton.tsx::BackToTopButton
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `visible` — `useState` ile oluşturulan, butonun görünür olup olmadığını tutan boolean değer.
-  - `setVisible` — `visible` state'ini güncelleyen setter fonksiyonu.
-  - `pos` — `{ bottom: number; right: number }` tipinde, butonun ekrandaki konumunu tutan nesne.
-  - `setPos` — `pos` state'ini güncelleyen setter fonksiyonu.
-  - `t` — `useI18n` hookundan gelen çeviri fonksiyonu, `t('common.backToTop')` ile metin çevirisi yapılır.
-  - `onScroll` — kaydırma olayını dinleyen ve `visible` state'ini ayarlayan iç fonksiyon (aşağıda ayrı bir AST Pointer olarak listelenir).
-  - `computePos` — butonun konumunu hesaplayan ve `pos` state'ini güncelleyen iç fonksiyon (aşağıda ayrı bir AST Pointer olarak listelenir).
-  - `id` — `setInterval` tarafından döndürülen zamanlayıcı kimliği, temizleme sırasında `clearInterval` ile iptal edilir.
-  - `GAP` — layout boşluğu için kullanılan sabit (dosyada tanımlı değil, dışarıdan sağlanır).
-- **Dönüş**: React bileşeni (`React.FC`). Render edilen `<button>` elemanı, `visible` durumuna göre görünürlük ve konum stillerini ayarlar; tıklanınca sayfayı üstteki konuma yumuşak kaydırır.
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, UI metinlerini uluslararası dillere çevirir (örn. `t('common.backToTop')`)
+  - `visible` — `useScrollThrottle` hook'undan dönen boolean değer; scroll pozisyonuna göre butonun görünürlüğünü kontrol eder (400px'de göster, 300px altında gizle)
+  - `handleScrollToTop` — component içinde tanımlı nested arrow fonksiyon; butona tıklandığında sayfayı tepeye kaydırır ve odak yönetimini sağlar
+  - `isReduced` — `handleScrollToTop` içinde tanımlı boolean; kullanıcının `prefers-reduced-motion` tercihini kontrol eder, `true` ise `auto`, `false` ise `smooth` davranış seçer
+  - `mainContent` — `document.getElementById('main-content')` ile elde edilen `HTMLElement | null`; klavye navigasyonu odağını ana içeriğe taşımak için kullanılır
+- **Dönüş**: JSX — yukarı kaydırma butonu (`<button>`), görünürlüğü `visible` state'ine bağlı olarak opacity/scale class'larıyla kontrol edilir
+
+---
+
+### [N2_NASIL] AST Pointer: components/BackToTopButton.tsx::handleScrollToTop
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `isReduced` — `typeof window !== 'undefined'` kontrolü sonrası `window.matchMedia('(prefers-reduced-motion: reduce)').matches` ile alınan boolean; kullanıcı reduced motion istiyorsa `true` döner
+  - `mainContent` — `document.getElementById('main-content')` ile DOM'dan çekilen `HTMLElement | null` referansı; `tabindex` attribute'u ayarlanıp `focus()` ile erişilebilirlik odağı buraya taşınır
+- **Dönüş**: yok (void) — `window.scrollTo()` ile sayfayı tepeye kaydırır, ardından `mainContent` elementine `tabindex='-1'` ekleyip `preventScroll: true` ile focus yükler
 
 ---
 
@@ -62,6 +80,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
   file: src\components\BackToTopButton.tsx
   function: src\components\BackToTopButton.tsx::BackToTopButton
+  function: src\components\BackToTopButton.tsx::handleScrollToTop
 
 ---
 
@@ -80,6 +99,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-primary-navy`, `border-white/20`, `hover:bg-secondary-blue`, `text-white`
-- **Layout:** `fixed`, `p-3`, `shadow-lg`, `z-40`
+- **Layout:** `p-3`, `shadow-lg`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `${visible`, `:`, `border`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `invisible`, `opacity-0`, `opacity-100`, `pointer-events-none`, `rounded-full`, `transition-shadow`, `translate-y-0`
+- **Yardımcı Sınıflar:** `$`, `:`, `border`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `invisible`, `opacity-0`, `opacity-100`, `pointer-events-none`, `rounded-full`, `scale-100`, `scale-75`

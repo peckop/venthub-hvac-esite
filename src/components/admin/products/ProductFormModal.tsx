@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { supabase } from '../../../lib/supabase'
 import type { DbCategory, DbProductInsert, DbProductUpdate, DbJson } from '../../../types/db-rows'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // Form schema
 const productSchema = z.object({

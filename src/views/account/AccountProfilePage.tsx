@@ -2,7 +2,7 @@ import React from 'react'
 import { useI18n } from '@/i18n/I18nProvider'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { User, Phone, Check, Loader2 } from 'lucide-react'
 
 interface UserMetadata {

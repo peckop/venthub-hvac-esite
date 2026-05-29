@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 interface ApiCallState<T> {
     data: T | null

@@ -3,33 +3,43 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx
-skeleton_hash: d55e7e1f42ff8548
+skeleton_hash: 6664f8dcf5b2ab07
 entity_hashes:
   func:RegisterPage: 595595bc145e81ea
   func:handleChange: c35710484665a43c
   func:handleSubmit: 460293fdfa9263b6
   func:validateForm: 35d7413c1db3ab00
-  overview: f33301e20d1c64f6
+  overview: 471e8191bfc85309
   style_tokens: b4142733c6599819
-generated_at: 2026-05-28T22:40:10Z
+generated_at: 2026-05-29T18:51:05Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı kayıt arayüzünü sağlayan bir React bileşenidir. Form verilerini yönetir, kullanıcı girdilerinin geçerliliğini kontrol eder ve kayıt işlemini başlatır.
+RegisterPage.tsx modülü, kullanıcıların hesap oluşturabilmesi için gerekli olan kayıt sayfasını ve ilgili form yönetim mantığını içeren bir React bileşenidir. Modül, kullanıcının form alanlarına girdiği verileri yönetir, bu verilerin geçerliliğini doğrular ve son olarak kayıt işlemini tetikleyerek sunucuya gönderir.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-Kayıt sayfasının görsel yapısını oluşturur ve kullanıcı arayüzünü sunar.
+### Ana Sayfa Bileşeni
+Tüm kayıt arayüzünü ve form yapısını ekrana çizen, modülün dışa açılan kapısıdır.
 - RegisterPage
 
-### Form Yönetimi ve Doğrulama
-Kullanıcı girdilerini takip eder, verilerin kurallara uygunluğunu sınar ve form gönderme işlemini koordine eder.
+### Form Etkileşimi ve İş Akışı Yönetimi
+Kullanıcı girdilerini takip eden, bu girdilerin tanımlı kurallara göre doğruluğunu sınayan ve nihayetinde formun sunucuya gönderilmesi işlemini başlatan yardımcı fonksiyonlar kümesidir.
 - handleChange, validateForm, handleSubmit
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, kullanıcı kayıt formunu yöneten React bileşenidir.
+
+[Aksiyom 1]: Eğer handleChange, React.ChangeEvent<HTMLInputElement> tipinde parametre almıyorsa, form alanlarındaki input değişiklikleri doğru şekilde yakalanamaz.
+
+[Aksiyom 2]: Eğer validateForm, form geçerlilik durumunu boolean olarak döndürmüyorsa, handleSubmit geçerlilik kontrolüne güvenemez.
+
+[Aksiyom 3]: Eğer handleSubmit, React.FormEvent parametresi almıyorsa, form submit olayının varsayılan davranışı (sayfa yenileme) engellenemez.
+
+[Aksiyom 4]: Eğer RegisterPage, handleChange ve handleSubmit'ü aynı form bileşenine bağlamıyorsa, kullanıcı etkileşimleri form state'ine yansıtılmaz.
+
+[Aksiyom 5]: Eğer validateForm çağrılmadan önce form state'i güncellenmemişse, eski verilerle doğrulama yapılır ve hatalı sonuç üretilebilir.
 
 ---
 
@@ -62,41 +72,67 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::RegisterPage
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: React.FC (bileşen render eder, JSX döndürür)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::handleChange
-- **params**: e — `React.ChangeEvent<HTMLInputElement>` (giriş elemanının değişim olayı)
-- **ic_degiskenler**:
-  - `setFormData` — dışarıdan gelen state güncelleme fonksiyonu; form verisini yeni değerle birleştirerek günceller.
-  - `formData` — dışarıdan gelen mevcut form durumu; yeni alan değeriyle genişletilir.
-- **Dönüş**: yok (state günceller, UI yeniden render olur)
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::validateForm
+### [N1_NASIL] AST Pointer: src/views/RegisterPage.tsx::RegisterPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `formData` — form alanlarının mevcut değerleri; `name`, `email`, `password`, `confirmPassword` vb. içerir.
-  - `passedRules` — şifre güvenlik kurallarının kaç tanesinin sağlandığını gösteren sayı.
-  - `toast` — kullanıcıya hata mesajı göstermek için kullanılan bildirim fonksiyonu.
-  - `t` — i18n çeviri fonksiyonu; hata mesajlarını yerelleştirir.
-- **Dönüş**: `boolean` — form geçerli ise `true`, aksi takdirde `false` (hata toastları gösterilir)
+  - `formData` — form alanlarının değerlerini tutan state nesnesi (name, email, password, confirmPassword alanları içerir)
+  - `setFormData` — formData state'ini güncellemek için setter fonksiyonu
+  - `loading` — form gönderim sürecindeki yükleme durumunu tutan boolean state
+  - `setLoading` — loading state'ini güncellemek için setter fonksiyonu
+  - `passedRules` — kullanıcının şifresinin kaç güvenlik kuralını geçtiğini tutan sayısal state
+  - `strengthColor` — şifre gücü seviyesine karşılık gelen renk sınıfı string'i
+  - `setRegistrationComplete` — kayıt işleminin tamamlanma durumunu güncellemek için setter fonksiyonu
+  - `t` — useI18n hook'unun döndürdüğü çeviri fonksiyonu
+  - `signUp` — useAuth hook'unun sağladığı kayıt olma fonksiyonu
+  - `Routes` — uygulama rotalarını tutan sabit nesne
+  - `i` — strength bar için döngü indis sayacı (JSX map içinde)
+  - `rule` — passwordRules dizisindeki tek bir kural nesnesi (key, label, test alanları)
+- **Dönüş**: React.FC (JSX Element — formsayfası, strength bar, password kuralları listesi ve kayıt formu döndürür)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx::handleSubmit
-- **params**: e — `React.FormEvent` (form gönderim olayı)
+---
+
+### [N2_NASIL] AST Pointer: src/views/RegisterPage.tsx::handleChange
+- **params**: `e: React.ChangeEvent<HTMLInputElement>` — input değişim olayı nesnesi
 - **ic_degiskenler**:
-  - `e` — form gönderim olayını durdurmak için `preventDefault()` çağrılır.
-  - `validateForm` — form doğrulama fonksiyonu; `false` dönerse işlem durur.
-  - `setLoading` — yükleme durumunu `true/false` olarak ayarlayan state setter.
-  - `toast` — başarı ve hata bildirimleri için kullanılan fonksiyon.
-  - `t` — i18n çeviri fonksiyonu; mesajları yerelleştirir.
-  - `hibpPwnedCount` — şifreyi Have I Been Pwned API'siyle kontrol eden async fonksiyon; `pwned` sayısını döner.
-  - `formData` — gönderilecek kayıt bilgileri (`email`, `password`, `name`).
-  - `signUp` — kullanıcı kaydı yapan async fonksiyon; `{ error }` nesnesi döner.
-  - `setRegistrationComplete` — kayıt tamamlandığında UI durumunu güncelleyen state setter.
-  - `console.error` — beklenmeyen hataları konsola loglar.
-- **Dönüş**: yok (state günceller, toast gösterir, olası hataları yakalar)
+  - `formData` — mevcut form verisi, spread operator ile kopyalanıp güncellenir
+  - `setFormData` — formData state'ini güncellemek için setter
+  - `e.target.name` — değişen input alanının name attribute'u (hangi alanın değiştiğini belirler)
+  - `e.target.value` — değişen input alanının yeni değeri
+- **Dönüş**: yok (state setter ile yan etki: formData güncellenir)
+
+---
+
+### [N3_NASIL] AST Pointer: src/views/RegisterPage.tsx::validateForm
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `formData.name` — kullanıcının adı, trim edilip boş olup olmadığı kontrol edilir
+  - `formData.email` — kullanıcının e-posta adresi, boş ve `@` karakteri içermesi kontrol edilir
+  - `formData.password` — kullanıcının şifresi, passedRules eşiği ile kontrol edilir
+  - `formData.confirmPassword` — kullanıcının şifre tekrar alanı, password ile eşleşme kontrol edilir
+  - `passedRules` — kaç şifre kuralının geçildiği sayısal değer, 4'ten küçükse hata verir
+  - `t` — i18n çeviri fonksiyonu, hata mesajları için kullanılır
+  - `toast` — sonner toast bildirim fonksiyonu, hata mesajlarını gösterir
+- **Dönüş**: boolean (true = form geçerli, false = form geçersiz ve hata toast gösterildi)
+
+---
+
+### [N4_NASIL] AST Pointer: src/views/RegisterPage.tsx::handleSubmit
+- **params**: `e: React.FormEvent` — form submit olayı nesnesi
+- **ic_degiskenler**:
+  - `e` — form submit olayı, `e.preventDefault()` ile sayfa yenilenmesi engellenir
+  - `validateForm` — form validasyon fonksiyonu çağrısı, false dönerse işlem durur
+  - `setLoading` — yükleme durumunu true yapar (try bloğu başında) ve false yapar (finally bloğunda)
+  - `pwned` — hibpPwnedCount fonksiyonunun döndürdüğü sayı, şifrenin bilinen sızıntılarda kaç kez geçtiğini tutar; 0'dan büyükse kayıt engellenir
+  - `hibpPwnedCount` — HIBP API'sine k-anonymity ile sızıntı kontrolü yapan fonksiyon, formData.password argümanı ile çağrılır
+  - `formData.email` — signUp fonksiyonuna传递 edilen e-posta
+  - `formData.password` — signUp fonksiyonuna传递 edilen şifre
+  - `formData.name` — signUp fonksiyonuna传递 edilen kullanıcı adı
+  - `error` — signUp fonksiyonunun `{ error }` destructured sonucu; hata mesajı içerir (already registered / Password should be at least / diğer)
+  - `signUp` — useAuth hook'unun sağladığı asenkron kayıt fonksiyonu, (email, password, name) argümanlarıyla çağrılır
+  - `setRegistrationComplete` — başarılı kayıt sonrası true yapılarak onay ekranına geçişi tetikler
+  - `t` — i18n çeviri fonksiyonu, tüm hata/başarı mesajları için kullanılır
+  - `toast` — sonner toast bildirim fonksiyonu, hata ve başarı mesajlarını gösterir
+- **Dönüş**: yok (yan etkiler: hata/başarı toast gösterimi, state güncellemeleri, signUp API çağrısı)
 
 ---
 

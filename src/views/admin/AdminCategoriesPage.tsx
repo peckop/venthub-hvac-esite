@@ -24,7 +24,7 @@ import CategoryFormModal from '../../components/admin/categories/CategoryFormMod
 import { Tags, Plus, Layout } from 'lucide-react'
 import EditableCell from '../../components/admin/EditableCell'
 import InfoTooltip from '../../components/admin/InfoTooltip'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useRole } from '../../hooks/useRole'
 import { useDragScroll } from '../../hooks/useDragScroll'
 

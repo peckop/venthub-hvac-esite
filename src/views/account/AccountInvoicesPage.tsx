@@ -11,7 +11,7 @@ import {
 } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '../../i18n/I18nProvider'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { FileText, Plus, Trash2, Edit2, CheckCircle, User, Building2, Landmark, Loader2 } from 'lucide-react'
 
 type InvoiceProfileType = 'individual' | 'corporate'

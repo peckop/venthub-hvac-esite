@@ -3,41 +3,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx
-skeleton_hash: ffd02b4bb0002d84
+skeleton_hash: c62079cae2908af5
 entity_hashes:
   func:AuthCallbackPage: b8296e20d27a327c
-  overview: 4e4abcf032bc136f
+  overview: 0d7baa0d62a2803d
   style_tokens: 404ab1f16440192d
-generated_at: 2026-05-28T22:39:23Z
+generated_at: 2026-05-29T18:49:17Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin kimlik doğrulama akışında, harici kimlik sağlayıcısından geri dönüş yapılan özel React sayfa bileşenini barındırır. Kimlik doğrulama sonrası kullanıcının oturum süreçlerini yönetip ana uygulamaya yönlendirmek üzere tasarlanmış tek sorumluluklu bir görsel modüldür.
+Bu modül, VentHub HVAC uygulamasında kimlik doğrulama akışının son aşamasını yöneten tek bileşenli bir React sayfasıdır. Harici kimlik sağlayıcısından (OAuth, SSO vb.) geri dönüş sonrasında tarayıcı URL'indeki yetkilendirme verilerini işler, kullanıcı oturumunu başlatır ve ana uygulamaya güvenli bir geçiş sağlar. Tek sorumluluklu yapısı sayesinde kimlik doğrulama geri dönüş sürecini izole ve merkezi bir noktadan kontrol eder.
 
 ## Fonksiyon Grupları
-### Ana Giriş Noktası Bileşeni
-Modülün tek dışa aktarılan ana bileşeni olarak, kimlik doğrulama geri dönüş sürecinin tüm işleyişini yönetir, kullanıcıya yönlendirme ve bekleme durumu arayüzünü sunar.
+### Ana Bileşen ve Akış Yönetimi
+Modülün tek ve ana bileşeni olarak kimlik doğrulama geri dönüş sürecinin tüm yaşam döngüsünü yönetir; URL parametrelerinden token/code gibi verileri çıkarır, oturum oluşumu tetikler, kullanıcıya bekleme arayüzü sunar ve başarısızlık durumunda hata gösterimi yaparak yönlendirme sağlar.
 - AuthCallbackPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kimlik doğrulama geri dönüş sayfası olarak çalışır; fonksiyon gövdesi sağlanmadığı için aksiyomlar modülün amacına dayalı minimal varsayımlardır.
+Bu modül, kimlik doğrulama geri dönüş sayfası olarak çalışır; harici kimlik sağlayıcısından dönen oturum verilerini işleyerek kullanıcıyı uygulamaya yönlendirir.
 
-[Aksiyom 1]: Eğer kimlik sağlayıcı (OAuth/Identity Provider) yapılandırması yoksa, kimlik doğrulama geri dönüş parametreleri alınamaz ve kullanıcı oturumu başlatılamaz.
+**[Aksiyom 1]:** Eğer kimlik doğrulama bağlamı (auth context) sağlayıcısı mevcut değilse, kullanıcının oturum durumu güncellenemez ve sayfa geçerli kimlik bilgisiyle başlatılamaz.
 
-[Aksiyom 2]: Eğer uygulama rotaları arasında AuthCallbackPage'e yönlendirme tanımı yoksa, kimlik sağlayıcısı geri dönüş URL'i bu sayfaya ulaşamaz.
+**[Aksiyom 2]:** Eğer yönlendirme bağlamı (router context) mevcut değilse, kimlik doğrulama sonrası kullanıcı ana sayfaya veya hedef sayfaya yönlendirilemez ve sonsuz bekleme durumunda kalır.
 
-[Aksiyom 3]: Eğer tarayıcı URL parametrelerinde (token, code, state vb.) kimlik doğrulama verileri yoksa, oturum oluşumu başarısız olur ve kullanıcı ana uygulamaya yönlendirilemez.
+**[Aksiyom 3]:** Eğer URL sorgu parametreleri (callback query params) kimlik sağlayıcı tarafından sağlanmıyorsa, token/oturum bilgisi çıkarılamaz ve kimlik doğrulama başarısız olur.
 
-[Aksiyom 4]: Eğer kimlik doğrulama API'si (session/token exchange) erişilebilir değilse, kullanıcı bilgileri sunucu tarafında doğrulanamaz.
+**[Aksiyom 4]:** Eğer tarayıcı oturum depolama mekanizması (sessionStorage/localStorage) kullanılamıyorsa, geçici oturum verileri saklanamaz ve sayfa yeniden yüklendiğinde kimlik bilgisi kaybolur.
 
-[Aksiyom 5]: Eğer istemci tarafı oturum yönetimi mekanizması (localStorage, cookie, context) yoksa, kimlik bilgileri saklanamaz ve uygulama içindeki erişim kontrolü çalışamaz.
+**[Aksiyom 5]:** Eğer kimlik sağlayıcı yanıtında hata parametresi (error/denied) bulunuyorsa, bileşen hata durumu arayüzü göstermeli ve kullanıcıyı giriş sayfasına yönlendirmelidir.
 
----
-
-**Not:** Bu modül için fonksiyon gövdesi (implementasyon kodu) sağlanmamıştır. Bu nedenle aksiyomlar modülün kimlik doğrulama callback sayfası olmasından yola çıkılarak türetilmiştir. Detaylı ve kesin aksiyonlar için `AuthCallbackPage` fonksiyon gövdesinin incelenmesi gerekmektedir.
+**[Aksiyom 6]:** Eğer kimlik sağlayıcı yanıtında geçersiz veya süresi dolmuş token dönüyorsa, oturum başlatılamaz ve kullanıcı yeniden kimlik doğrulama akışına yönlendirilmelidir.
 
 ---
 
@@ -53,69 +51,62 @@ Bu modül, kimlik doğrulama geri dönüş sayfası olarak çalışır; fonksiyo
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::AuthCallbackPage
+### [N1_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::AuthCallbackPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `status` — loading, success, error durumlarını tutan state değişkeni, sayfa içeriğini durumuna göre koşullu renderlamak için kullanılır
-  - `setStatus` — status state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `message` — Kullanıcıya gösterilecek durum mesajını tutan state değişkeni, başarı/hata bildirimlerini ekranda göstermek için kullanılır
-  - `setMessage` — message state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `router` — Next.js `useRouter` hook'u ile alınan yönlendirme nesnesi, sayfalar arası geçiş işlemleri için kullanılır
-  - `useEffect` — Bileşen ilk mount edildiğinde auth callback işlemlerini tetiklemek için kullanılan React hook'u, bağımlılık dizisi `[router]`
-- **Dönüş**: JSX element (React.FC olarak auth callback sayfa arayüzü)
+  - `status` — useState hook; loading, success veya error durumunu tutar, UI'da hangi içeriğin gösterileceğini belirler
+  - `message` — useState hook; kullanıcıya gösterilecek bilgi/hata mesajını tutar
+  - `router` — `useRouter()` ile elde edilen Next.js router nesnesi; programlı sayfa yönlendirmeleri için kullanılır
+- **Dönüş**: JSX (React.FC) — loading, success veya error durumuna göre koşullu JSX blokları render eder
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::handleAuthCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `hashFragment` — URL'den alınan hash parçası, auth callback linkinin geçerliliğini kontrol etmek için kullanılır
-  - `window.location.hash` — Tarayıcının mevcut URL'sinin hash kısmı, `hashFragment` değişkenine atanır
-  - `data` — `supabase.auth.getSession()` çağrısından dönen oturum verisi, aktif oturumun varlığını kontrol etmek için kullanılır
-  - `error` — `supabase.auth.getSession()` çağrısından dönen hata nesnesi, oturum alma sırasında oluşan hataları işlemek için kullanılır
-  - `sessionError` — `supabase.auth.exchangeCodeForSession()` çağrısından dönen hata nesnesi, kod-oturum değişimi sırasında oluşan hataları konsola loglamak için kullanılır
-  - `newData` — Kod değişiminden sonra tekrar alınan oturum verisi, yeni oluşturulan oturumun varlığını kontrol etmek için kullanılır
-  - `newError` — İkinci `supabase.auth.getSession()` çağrısından dönen hata nesnesi, tekrar oturum alma sırasında oluşan hataları fırlatmak için kullanılır
-  - `supabase.auth.getSession` — Supabase'in aktif kullanıcı oturum bilgilerini alan API çağrısı
-  - `supabase.auth.exchangeCodeForSession` — URL'deki auth doğrulama kodunu oturuma dönüştüren Supabase API çağrısı
-  - `console.error` — Hata mesajlarını geliştirici konsoluna yazmak için kullanılan fonksiyon
-  - `toast.success` — Başarı bildirimi göstermek için kullanılan react-hot-toast fonksiyonu
-  - `setTimeout` — Kullanıcıya mesajı göstermek için yönlendirmeyi 2-3 saniye geciktirmek için kullanılan zamanlayıcı
-  - `router.push` — Kullanıcıyı hedef rotaya yönlendirmek için kullanılan Next.js router fonksiyonu
-  - `Routes.auth.login` — Giriş sayfası rotasını dinamik olarak oluşturan uygulama yardımcı fonksiyonu
-- **Dönüş**: void (sadece yan etki bırakır, değer döndürmez)
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
+### [N2_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::useEffect → handleAuthCallback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `router.push` — Başarılı doğrulama sonrası kullanıcıyı ana sayfa (/) rotasına yönlendirmek için kullanılan Next.js router fonksiyonu
-- **Dönüş**: void
+  - `hashFragment` — `window.location.hash` değerinden alınır; OAuth callback URL'sindeki hash fragment'ı temsil eder, token verilerini barındırır
+  - `data` — `supabase.auth.getSession()` sonucundan elde edilen session nesnesi; mevcut oturum bilgisini içerir
+  - `error` — `supabase.auth.getSession()` sonucundan elde edilen hata nesnesi; session alma işlemindeki hataları tutar
+  - `sessionError` — `supabase.auth.exchangeCodeForSession(window.location.href)` sonucundaki hata; URL'deki auth kodunun token'a dönüştürme hatası
+  - `newData` — Kod değişimi sonrası ikinci kez çağrılan `supabase.auth.getSession()` sonucundaki data; güncellenmiş session bilgisini tutar
+  - `newError` — İkinci `getSession()` çağrısındaki hata nesnesi
+  - `error` (catch bloğu) — `unknown` tipinde yakalanan beklenmedik hatalar
+- **Dönüş**: yok (side-effect: `setStatus`, `setMessage`, `router.push`, `toast.success` çağırır)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `router.push` — Doğrulama hatası sonrası kullanıcıyı giriş sayfasına yönlendirmek için kullanılan Next.js router fonksiyonu
-  - `Routes.auth.login` — Hata mesajı parametresi ile giriş sayfası rotasını oluşturan yardımcı fonksiyon
-  - `error.message` — Oturum alma sırasında oluşan hatanın kullanıcıya gösterilecek mesajı, rotaya parametre olarak geçirilir
-- **Dönüş**: void
+---
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
+### [N3_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (onClick → router.push login fallback)
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `router.push` — Başarılı oturum oluşturma sonrası kullanıcıyı ana sayfa (/) rotasına yönlendirmek için kullanılan Next.js router fonksiyonu
-- **Dönüş**: void
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — hata durumunda "Giriş Sayfasına Dön" butonuna tıklandığında `router.push(Routes.auth.login())` çalıştırır
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `router.push` — Geçersiz/ süresi dolmuş link durumunda kullanıcıyı giriş sayfasına yönlendirmek için kullanılan Next.js router fonksiyonu
-  - `Routes.auth.login` — "No session found" hata mesajı ile giriş sayfası rotasını oluşturan yardımcı fonksiyon
-- **Dönüş**: void
+---
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx::<anonymous>
+### [N4_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.home success redirect)
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `router.push` — Beklenmedik hata durumunda kullanıcıyı giriş sayfasına yönlendirmek için kullanılan Next.js router fonksiyonu
-  - `Routes.auth.login` — Ekstra parametresiz standart giriş sayfası rotasını oluşturan yardımcı fonksiyon
-- **Dönüş**: void
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — başarılı doğrulama sonrası 2 saniye bekleyip ana sayfaya yönlendirir
+
+---
+
+### [N5_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.auth.login with error redirect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — session alınamadığında 3 saniye bekleyip hata mesajıyla giriş sayfasına yönlendirir
+
+---
+
+### [N6_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.auth.login catch error redirect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — catch bloğunda yakalanan hatalar sonrası 3 saniye bekleyip giriş sayfasına yönlendirir
+
+---
+
+### [N7_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.auth.login No session redirect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — hash fragment mevcut olup session bulunamadığında 3 saniye bekleyip "No session found" mesajıyla giriş sayfasına yönlendirir
 
 ---
 

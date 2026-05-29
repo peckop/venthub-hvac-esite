@@ -16,7 +16,7 @@ import { Routes } from '../../utils/routes';
 
 
 // Lazy Overlays
-const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))
+const Toaster = lazy(() => import('sonner').then(m => ({ default: m.Toaster })))
 const AddToCartToast = lazy(() => import('../AddToCartToast'))
 const WhatsAppFloat = lazy(() => import('../WhatsAppFloat'))
 
@@ -83,35 +83,33 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 {children}
             </main>
 
-            <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
-                <BackToTopButton />
+            <div className="fixed bottom-6 right-6 z-toast flex flex-col items-end gap-3 pointer-events-none">
+                <div className="pointer-events-auto">
+                    <BackToTopButton />
+                </div>
                 
                 {enableWhatsApp && (
-                    <Suspense fallback={null}>
-                        <WhatsAppFloat />
-                    </Suspense>
+                    <div className="pointer-events-auto">
+                        <Suspense fallback={null}>
+                            <WhatsAppFloat />
+                        </Suspense>
+                    </div>
                 )}
+
+                <div className="pointer-events-auto">
+                    <LanguageSwitcher />
+                </div>
             </div>
 
             <PaymentWatcher />
-            <LanguageSwitcher />
             <Footer />
 
             {enableToaster && (
                 <Suspense fallback={null}>
                     <AddToCartToast />
                     <Toaster
+                        richColors
                         position="top-right"
-                        toastOptions={{
-                            duration: 3000,
-                            style: { 
-                                background: '#FFFFFF', 
-                                color: '#374151', 
-                                border: '1px solid #E5E7EB', 
-                                borderRadius: '0.75rem', 
-                                fontSize: '14px' 
-                            }
-                        }}
                     />
                 </Suspense>
             )}

@@ -17,7 +17,7 @@ import { AuthorityBuilder } from '@/components/admin/authority-builder/Authority
 import { AuthorityRenderer } from '@/components/authority/AuthorityRenderer';
 import { AuthorityBlock, SpecsBlock } from '@/types/authority';
 import { DbCategory, CategoryMetadata, DbJson } from '@/types/db-rows';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 interface CategoryBuilderViewProps {
   categoryId: string;

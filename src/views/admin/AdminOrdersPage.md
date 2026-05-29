@@ -24,77 +24,62 @@ entity_hashes:
   func:sortIndicator: 43ac755400ab07d3
   func:submitShip: 0b47468e1ba29f91
   func:toggleSort: 5416b105263f00aa
-  overview: f85949eb6d5dc985
+  overview: df69e61bb4e6b055
   style_tokens: 37fc37c91a33397d
-generated_at: 2026-05-28T22:39:02Z
+generated_at: 2026-05-29T18:59:08Z
 ---
 
 ## Genel Bakış
-`AdminOrdersPage.tsx`, yönetici paneli içinde sipariş listesini gösteren ve yönetimi sağlayan bir React bileşenidir. Sayfa, sipariş tablosunu sıralama, filtreleme ve dışa aktarma işlevlerini birleştiren çeşitli modal pencereler aracılığıyla gönderi, log ve not işlemlerini yönetir. Ayrıca, tarih, para birimi ve durum gibi verileri görsel olarak düzenleyen yardımcı fonksiyonlar içerir.
+`AdminOrdersPage.tsx`, yönetici panelinde siparişlerin listelendiği, sıralandığı ve yönetildiği ana sayfa bileşenidir. Bu modül, sipariş verilerini görsel bir tabloda sunarak gönderi takibi, not yönetimi ve toplu işlem gibi kritik işlevleri kontrol eden modal pencereleri ve yardımcı fonksiyonları barındırır.
 
 ## Fonksiyon Grupları
-### Bileşen ve Modal Kontrolleri
-Sayfanın ana render işlevi ve kullanıcı etkileşimlerini tetikleyen modal açma/kapama fonksiyonları yer alır.
+### Ana Bileşen ve Etkileşim Kontrolleri
+Sayfayı oluşturan ana React bileşeni ve kullanıcı etkileşimlerini tetikleyen modal açma/kapama mantığını yönetir.
 - AdminOrdersPage, openShipModal, closeShipModal, openLogsModal, closeLogsModal, openNotesModal, closeNotesModal
 
-### Sipariş İşlemleri ve Eylemler
-Sipariş üzerinden gerçekleştirilen veri değiştirme işlemleri (not ekleme/silme, gönderi onayı, toplu iptal, CSV dışa aktarma) bu grupta toplanmıştır.
+### Sipariş İşlemleri ve Veri Değişiklikleri
+Siparişler üzerinde gerçekleştirilen temel veri değiştirme ve dışa aktarma eylemlerini kapsar.
 - addNote, deleteNote, submitShip, bulkCancelShipping, exportCsv
 
-### Sıralama ve Görselleştirme
-Tablo başlıklarının sıralama durumunu yöneten ve sıralama göstergesi sağlayan fonksiyonlar bulunur.
-- toggleSort, sortIndicator
+### Sıralama ve Tablo Görünümü
+Sipariş tablosunun sıralama mantığını ve durum görselleştirmesi için yardımcı fonksiyonları içerir.
+- toggleSort, sortIndicator, badgeClass, prettyStatus
 
-### Biçimlendirme ve Yardımcı İşlevler
-Tutar, tarih, durum etiketi ve takip URL’si gibi verilerin kullanıcıya sunulması için biçimlendirmeyi ve sınıflandırma görevlerini üstlenen fonksiyonlar yer alır.
-- formatAmount, safeDate, prettyStatus, badgeClass, generateTrackingUrl
+### Veri Biçimlendirme ve Yardımcı Fonksiyonlar
+Ham veriyi (tarih, para birimi) kullanıcıya uygun formatlara dönüştüren ve dış bağlantılar oluşturan yardımcı araçları sunar.
+- formatAmount, safeDate, generateTrackingUrl
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `openShipModal` fonksiyonu çağrılırken `id` parametresi sağlanmazsa, modal hiç açılmaz ve kullanıcıya bir hata/uyarı gösterilir.  
+Bu modül sipariş yönetimi面板ıdır ve üç farklı modal (gönderim, loglar, notlar), sıralama, toplu işlem ve CSV dışa aktarma işlevlerini yönetir.
 
-**Aksiyom 2**: Eğer `closeShipModal` fonksiyonu çağrıldığında gönderim (ship) modalı zaten kapalıysa, hiçbir yan etki (state değişikliği, UI güncellemesi) gerçekleşmez.  
+**[Aksiyom 1]**: `SortKey` tipi (sütun sıralama anahtarları) modül dışında tanımlı olmalıdır. Eğer `SortKey` tipi yoksa, `toggleSort()` ve `sortIndicator()` fonksiyonları çalışamaz.
 
-**Aksiyom 3**: Eğer `openLogsModal` fonksiyonu çağrılırken `id` parametresi eksik ya da boş bir string ise, log modalı açılmaz ve ilgili kayıt bulunamadı mesajı gösterilir.  
+**[Aksiyom 2]**: `Lang` (dil) tipi modül dışında tanımlı olmalıdır. Eğer `Lang` tipi yoksa, `formatAmount()` ve `safeDate()` fonksiyonları doğru dilde formatlama yapamaz.
 
-**Aksiyom 4**: Eğer `closeLogsModal` fonksiyonu çağrıldığında log modalı zaten kapalıysa, sistem mevcut durumu korur ve ek bir işlem yapılmaz.  
+**[Aksiyom 3]**: `prettyStatus()` için `t` parametresi (çeviri fonksiyonu) her çağrımda sağlanmalıdır. Eğer `t` fonksiyonu sağlanmazsa, durum etiketleri ham anahtar olarak gösterilir ve kullanıcı diline çevrilmez.
 
-**Aksiyom 5**: Eğer `openNotesModal` fonksiyonu çağrılırken `id` parametresi geçerli bir sipariş/öğe kimliği değilse, notlar modalı açılmaz ve kullanıcıya “Geçersiz öğe” uyarısı verilir.  
+**[Aksiyom 4]**: `addNote()` çağrılmadan önce not içeriği (örn: state/input) modül içinde dolu olmalıdır. Eğer not içeriği boş/null ise, boş not kaydı oluşur veya ekleme başarısız olur.
 
-**Aksiyom 6**: Eğer `closeNotesModal` fonksiyonu çağrıldığında notlar modalı zaten kapalıysa, hiçbir UI güncellemesi gerçekleşmez.  
+**[Aksiyom 5]**: `openShipModal(id)`, `openLogsModal(id)` ve `openNotesModal(id)` çağrılırken `id` parametresi geçerli bir sipariş ID'si olmalıdır. Eğer geçersiz/boş bir ID verilirse, ilgili modal hatalı veri gösterir veya boş açılır.
 
-**Aksiyom 7**: Eğer `addNote` fonksiyonu çalıştırıldığında not içeriği (ör. bir form alanı) boş ya da geçersizse, not eklenmez ve kullanıcıya “Not boş olamaz” hatası gösterilir.  
+**[Aksiyom 6]**: `deleteNote(noteId)` çağrılacaksa, `noteId` daha önce var olan bir nota ait olmalıdır. Eğer geçersiz bir `noteId` verilirse, silme işlemi başarısız olur.
 
-**Aksiyom 8**: Eğer `deleteNote` fonksiyonu çağrılırken `noteId` parametresi mevcut bir not kimliğine karşılık gelmezse, silme işlemi gerçekleşmez ve “Not bulunamadı” mesajı döndürülür.  
+**[Aksiyom 7]**: `submitShip()` çağrılmadan önce gönderim bilgileri (kargo firması, takip no vb.) state içinde doldurulmuş olmalıdır. Eğer gönderim verileri eksikse, gönderim işlemi başarısız olur veya doğrulama hatası oluşur.
 
-**Aksiyom 9**: Eğer `submitShip` fonksiyonu çalıştırıldığında gönderim (shipping) için gerekli tüm zorunlu alanlar (ör. taşıyıcı, takip numarası) eksikse, gönderim isteği gönderilmez ve kullanıcıya eksik alan hatası bildirilir.  
+**[Aksiyom 8]**: `bulkCancelShipping()` çağrıldığında en az bir sipariş seçili (selected) olmalıdır. Eğer hiç sipariş seçilmediyse, toptan iptal işlemi uygulanacak hedef yoktur.
 
-**Aksiyom 10**: Eğer `toggleSort` fonksiyonu verilen `key` parametresi geçerli bir `SortKey` değilse, sıralama durumu değişmez ve mevcut sıralama korunur.  
+**[Aksiyom 9]**: `safeDate(iso, lang)` fonksiyonuna verilen `iso` parametresi geçerli bir ISO 8601 tarih dizgesi olmalıdır. Eğer geçersiz bir tarih verilirse, "bilinmeyen tarih" gibi güvenli bir dönüş yapılır (çökmez).
 
-**Aksiyom 11**: Eğer `sortIndicator` fonksiyonu verilen `key` parametresi geçerli bir `SortKey` değilse, sıralama göstergesi (ok, ikon vb.) döndürülmez.  
+**[Aksiyom 10]**: `generateTrackingUrl(carrier, tracking)` için hem `carrier` hem de `tracking` boş string olmamalıdır. Eğer herhangi biri boşsa, geçersiz veya boş bir takip URL'i üretilir.
 
-**Aksiyom 12**: Eğer `bulkCancelShipping` fonksiyonu çalıştırıldığında iptal edilecek gönderim kaydı bulunmazsa, toplu iptal işlemi hiçbir etkide bulunmaz ve kullanıcıya “İptal edilecek gönderim yok” mesajı gösterilir.  
+**[Aksiyom 11]**: `formatAmount(v, lang)` – `v` parametresi `undefined` veya `null` olabilir, bu durumda güvenli bir varsayılan gösterim yapılmalıdır. Eğer `v` negatif bir değer olarak verilirse, modülün bunu nasıl gösterdiği fonksiyon gövdesine bağlıdır (bilinmiyor).
 
-**Aksiyom 13**: Eğer `exportCsv` fonksiyonu çalıştırıldığında dışa aktarılacak veri seti boşsa, CSV dosyası oluşturulmaz ve kullanıcıya “Dışa aktarılacak veri yok” uyarısı verilir.  
+**[Aksiyom 12]**: `badgeClass(s)` için `s` parametresi geçerli bir sipariş durum stringi olmalıdır. Eğer bilinmeyen bir durum verilirse, varsayılan/güvenli bir CSS sınıfı döndürülmelidir.
 
-**Aksiyom 14**: Eğer `formatAmount` fonksiyonu `v` parametresi `null` veya `undefined` ise, fonksiyon `null`/`undefined` döndürür (veya varsayılan bir “‑” gösterimi) ve dil (`lang`) parametresi yine de kullanılmaz.  
-
-**Aksiyom 15**: Eğer `safeDate` fonksiyonu `iso` parametresi geçerli bir ISO‑8601 tarih stringi değilse, fonksiyon geçerli bir tarih döndürmez ve “Geçersiz tarih” değeri (ör. `null`) verir.  
-
-**Aksiyom 16**: Eğer `prettyStatus` fonksiyonu `s` parametresi tanımsız bir durum kodu içeriyorsa, çeviri fonksiyonu `t` çağrılmaz ve fonksiyon orijinal `s` değerini döndürür.  
-
-**Aksiyom 17**: Eğer `badgeClass` fonksiyonu `s` parametresi beklenen bir durum (ör. “pending”, “shipped”) ile eşleşmezse, fonksiyon varsayılan bir CSS sınıfı (ör. `badge-default`) döndürür.  
-
-**Aksiyom 18**: Eğer `generateTrackingUrl` fonksiyonu `carrier` parametresi tanımsız ya da desteklenmeyen bir taşıyıcı ise, fonksiyon `null` döndürür ve takip URL’si oluşturulmaz.  
-
-**Domain‑specific kurallar**:  
-- `toggleSort`, `sortIndicator` ve `badgeClass` fonksiyonları için geçerli `SortKey` ve durum değerleri proje içinde tanımlı sabitlerdir; bu sabitlerin dışındaki değerler “geçersiz” kabul edilir.  
-- `formatAmount` ve `safeDate` fonksiyonları, `lang` parametresiyle gelen dil kodunun desteklenip desteklenmediği kontrol edilmez; desteklenmeyen bir dil kodu için yerel ayar (locale) varsayılan sistem diline düşer.  
-
-Bu aksiyomlar, modülün fonksiyonlarının beklenen ön koşullarını ve eksik/yanlış veri durumunda sistemin nasıl davranması gerektiğini tanımlar.
+**[Aksiyom 13]**: `toggleSort(key)` fonksiyonu, mevcut bir sıralama sütunu `key` ile çağrılmalıdır. Eğer SortKey union'ına uym
 
 ---
 
@@ -267,161 +252,360 @@ type SortKey = 'id' | 'status' | 'conversation' | 'amount' | 'created'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::AdminOrdersPage
+### [N1_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::AdminOrdersPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `statusOptions` — sabit seçenek listesi, her biri `{value, label}` objesi
-  - `hasQuery` — URL’de `q` veya `preset` parametresi var mı kontrolü
-  - `debounceTimer` — `setTimeout` id, debounced query için
-  - `deepLinkAppliedRef` — `useRef` flag, deep‑link bir kez uygulanıp uygulanmadığını tutar
-  - `urlParams` — `URLSearchParams` nesnesi, pencere URL sorgu parametrelerini okur
-  - `preset` — `urlParams.get('preset')`, preset değeri
-  - `qParam` — `urlParams.get('q')`, arama sorgusu
-  - `searchParams` — `useSearchParams()` sonucu, Next.js arama parametreleri
-  - `isPending` — `preset === 'pendingShipments'` kontrolü
-  - `fetchId` — her fetch çağrısı için artan kimlik
-  - `qb` — Supabase query builder, `view_admin_orders` tablosundan veri çeker
-  - `q` — `debouncedQuery.trim()`, arama metni
-  - `offset` — sayfalama için `(page-1)*PAGE_SIZE`
-  - `data`, `count`, `fetchErr` — Supabase sorgusunun döndürdüğü veri, toplam satır ve hata
-  - `rows` — `setRows` ile güncellenen sipariş satırları (state)
-  - `total` — toplam kayıt sayısı (state)
-  - `shipId` — seçili gönderi sipariş id’si
-  - `carrier`, `tracking` — gönderi bilgileri (state)
-  - `sendEmail` — gönderi e‑posta gönderim onayı (state)
-  - `advRows` — toplu gönderi için gelişmiş satır listesi
-  - `advBulk` — gelişmiş toplu mod flag’i
-  - `targets` — işlem yapılacak sipariş id’leri dizisi
-  - `results` — toplu işlem sonuçları `{id, ok}`
-  - `invalid` — eksik alanları olan satır id’leri
-  - `turl` — `generateTrackingUrl` çıktısı, takip URL’si
-  - `mapById` — `advRows` üzerinden id → satır haritası
-  - `arr` — sıralanmış sipariş kopyası (return)
-- **Dönüş**: React bileşeni; UI render eder, yan etkileri (fetch, modal yönetimi) vardır.
+  - `statusFilterOptions` — durum filtreleme seçeneklerini döndüren memoized callback; value/label çiftleri içerir
+  - `hasActiveFilters` — URL'de `q` veya `preset` parametresi olup olmadığını kontrol eder
+  - `debouncedQueryEffect` — `query` değişiminde 300ms debounce ile `setDebouncedQuery` çağırır; cleanup ile timeout temizler
+  - `deepLinkWindowEffect` — ilk yüklemede `window.location.search`'ten `preset` ve `q` parametrelerini okur; `pendingShipments` preset'i ve arama sorgusunu state'e yazar
+  - `deepLinkSearchParamsEffect` — `searchParams` değişiminde URL parametrelerinden `preset` ve `q` değerlerini okur; `deepLinkAppliedRef` ile çift tetiklemeyi önler
+  - `fetchOrders` — Supabase'den `view_admin_orders` tablosunu sayfalı olarak çeker; durum, tarih aralığı ve arama filtresi uygular; `ensureSessionFresh()` çağırarak oturum tazeler
+  - `viewModeEffect` — `viewMode === 'list'` olduğunda `fetchOrders` çağırır
+  - `status` — seçili sipariş durumu filtresi
+  - `presetPendingShipments` — pending shipments presetinin aktif olup olmadığını belirtir
+  - `debouncedQuery` — debounce edilmiş arama sorgusu
+  - `dateRange` — tarih aralığı filtresi (from/to Date nesneleri)
+  - `page` — mevcut sayfa numarası
+  - `PAGE_SIZE` — sayfa başına satır sabiti
+  - `loading` — yükleme durumu flag'i
+  - `setLoading` — yükleme durumunu günceller
+  - `setRows` — tablo satırlarını günceller
+  - `setTotal` — toplam kayıt sayısını günceller
+  - `lastFetchId` — race condition önleme için incremented fetch ID ref'i
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi
+  - `rows` — mevcut tablo satırları dizisi
+  - `selectedIds` — çoklu seçimde işaretli sipariş ID'leri
+  - `visibleCols` — görünür sütun toggles nesnesi (id, status, conversation, amount, created)
+  - `hasWriteAccess` — yazma izni flag'i
+  - `lang` — mevcut dil kodu (Lang tipi)
+  - `sortKey` — sıralama sütun anahtarı (SortKey tipi)
+  - `sortDir` — sıralama yönü ('asc' veya 'desc')
+  - `sortedRows` — sıralanmış satırlar dizisi (memoized)
+  - `openShipModal` — kargo modalını açar; mevcut taşıyıcı/takip bilgilerini yükler
+  - `openLogsModal` — e-posta log modalını açar
+  - `openNotesModal` — not modalını açar
+  - `setSelectedIds` — seçim dizisini günceller
+  - `openShipModal` — tekli kargo güncelleme modalını açar
+  - `openLogsModal` — log listeleme modalını açar
+  - `openNotesModal` — not yönetimi modalını açar
+  - `submitShip` — tekli veya toplu kargo güncelleme/fişleme işlemini çalıştırır
+  - `bulkCancelShipping` — seçili shipped siparişlerin kargosunu toplu iptal eder
+  - `exportCsv` — siparişleri CSV olarak dışa aktarır
+  - `rowRenderer` — her satır için JSX render callback'ini döndüren fonksiyon
+  - `logRowRenderer` — e-posta log satırı render callback'i
+  - `noteRenderer` — not kartı render callback'i
+  - `formatAmount` — para birimi formatlama
+  - `safeDate` — hata güvenli tarih formatlama
+  - `prettyStatus` — durum kodunu çevrilmiş görünüme dönüştürür
+  - `badgeClass` — duruma göre Tailwind badge CSS class'ı döndürür
+  - `generateTrackingUrl` — kargo firmasına göre takip URL'i üretir
+- **Dönüş**: `React.FC` (JSX)
 
-### [N2_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::openShipModal
-- **params**: `id: string`
-- **ic_degiskenler**:
-  - `fetchId` — `++lastFetchId.current` ile artan kimlik
-  - `setBulkMode` — toplu mod kapatılır
-  - `setShipId` — seçilen sipariş id’si state’e konur
-  - `setCarrier`, `setTracking` — carrier ve tracking state sıfırlanır
-  - `setSendEmail` — e‑posta gönderim flag’i true yapılır
-  - `data` — Supabase `venthub_orders` tablosundan getirilen carrier/tracking
-  - `dto` — `data` tip dönüşümü `{carrier?, tracking_number?}`
-- **Dönüş**: yok (modal açma yan etkisi)
+---
 
-### [N3_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::closeShipModal
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (modal kapama yan etkisi)
-
-### [N4_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::openLogsModal
-- **params**: `id: string`
-- **ic_degiskenler**:
-  - `setLogsOpen`, `setLogsLoading` — modal ve loading state
-  - `data`, `error` — Supabase `shipping_email_events` sorgusundan gelen kayıtlar ve hata
-  - `setEmailLogs` — alınan logları state’e koyar
-- **Dönüş**: yok
-
-### [N5_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::closeLogsModal
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N6_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::openNotesModal
-- **params**: `id: string`
-- **ic_degiskenler**:
-  - `setNotesOrderId`, `setNotesOpen` — ilgili sipariş id ve modal state
-  - `data`, `error` — Supabase `order_notes` sorgusundan gelen notlar
-  - `setNotes` — notları state’e koyar
-- **Dönüş**: yok
-
-### [N7_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::closeNotesModal
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::addNote
+### [N2_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::statusFilterOptions (anonim callback)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `notesOrderId` — notun ekleneceği sipariş id
-  - `noteInput` — kullanıcı girişi
-  - `data`, `error` — Supabase `order_notes` insert sonucu
-  - `setNotes` — yeni notu mevcut listeye ekler
-  - `setNoteInput` — giriş alanını temizler
-- **Dönüş**: yok
+  - `t` — i18n çeviri fonksiyonu; `admin.orders.statusLabels.*` anahtarlarından çeviriler getirir
+- **Dönüş**: `{ value: string, label: string }[]` dizisi
 
-### [N9_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::deleteNote
-- **params**: `noteId: string`
-- **ic_degiskenler**:
-  - `error` — Supabase delete işlem hatası
-  - `setNotes` — silinen notu listeden çıkarır
-- **Dönüş**: yok
+---
 
-### [N10_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::submitShip
+### [N3_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::hasActiveFilters (anonim callback)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `bulkMode`, `shipId`, `carrier`, `tracking`, `sendEmail`, `rows`, `selectedIds`, `advRows`, `advBulk`
-  - `curRow` — `rows.find` ile seçili satır
-  - `isShipped` — mevcut durum kontrolü
-  - `turl` — `generateTrackingUrl` çıktısı
-  - `fnErr` — Supabase function invoke hatası
-  - `logAdminAction` — admin log kaydı
-  - `setRows` — satırların `status` alanını günceller
-  - `setShipOpen` — modal kapanışı
-  - `toast.success` / `toast.error` — kullanıcı bildirimi
-  - `targets` — toplu işlemde seçili ve gönderilmemiş sipariş id’leri
-  - `results`, `invalid` — toplu işlem sonuçları ve geçersiz satırlar
-  - `mapById` — gelişmiş toplu satır haritası
-- **Dönüş**: yok
+  - `qs` — `window.location.search`'ten oluşturulan `URLSearchParams` nesnesi; URL query string'ini parse eder
+- **Dönüş**: `boolean` — `q` veya `preset` parametresi varsa `true`
 
-### [N11_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::toggleSort
-- **params**: `key: SortKey`
-- **ic_degiskenler**:
-  - `sortKey`, `sortDir` — mevcut sıralama anahtarı ve yön state
-- **Dönüş**: yok
+---
 
-### [N12_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::sortIndicator
-- **params**: `key: SortKey`
-- **ic_degiskenler**:
-  - `sortKey`, `sortDir` — mevcut sıralama bilgisi
-- **Dönüş**: string (`''`, `'▲'` veya `'▼'`)
-
-### [N13_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::bulkCancelShipping
+### [N4_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::debouncedQueryEffect (anonim callback)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `targets` — `status === 'shipped'` ve seçili id’ler
-  - `results` — her id için Supabase function invoke sonucu
-  - `failed` — başarısız id listesi
-  - `setRows` — başarılı olanların `status`ını `confirmed` yapar
-  - `setSelectedIds` — seçim temizlenir
-- **Dönüş**: yok
+  - `t` — `setTimeout` dönüşü; cleanup fonksiyonunda `clearTimeout(t)` ile temizlenen timer ID'si
+  - `query` — mevcut arama sorgusu state'i; trim edilip 300ms gecikmeyle `setDebouncedQuery`'ye aktarılır
+  - `setDebouncedQuery` — debounce edilmiş sorgu state'ini günceller
+- **Dönüş**: cleanup fonksiyonu `() => void`
 
-### [N14_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::formatAmount
-- **params**: `v?: number | null, lang: Lang = 'tr'`
-- **ic_degiskenler**: yok
-- **Dönüş**: string (`formatCurrency` sonucu veya `'-'`)
+---
 
-### [N15_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::safeDate
-- **params**: `iso: string, lang: Lang = 'tr'`
-- **ic_degiskenler**: yok
-- **Dönüş**: string (`formatDateTime` sonucu veya orijinal iso)
+### [N5_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::deepLinkWindowEffect (anonim callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `deepLinkAppliedRef` — daha önce deep link uygulanıp uygulanmadığını takip eden ref; tekrar işlenmeyi önler
+  - `urlParams` — `window.location.search`'ten oluşturulan `URLSearchParams`; URL parametrelerini parse eder
+  - `preset` — URL'deki `preset` parametre değeri; `pendingShipments` ise filtre uygulanır
+  - `qParam` — URL'deki `q` parametre değeri; arama sorgusu olarak kullanılır
+  - `setPresetPendingShipments` — pending shipments preset durumunu günceller
+  - `setStatus` — durum filtresini günceller (genellikle sıfırlar)
+  - `setQuery` — arama sorgusu state'ini günceller
+  - `setDebouncedQuery` — debounce edilmiş sorguyu doğrudan set eder
+- **Dönüş**: `void`
 
-### [N16_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::prettyStatus
-- **params**: `s: string, t: (key: string, params?: Record<string, unknown>) => string`
-- **ic_degiskenler**: yok
-- **Dönüş**: string (lokalize edilmiş status etiketi)
+---
 
-### [N17_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::badgeClass
-- **params**: `s: string`
-- **ic_degiskenler**: yok
-- **Dönüş**: string (CSS sınıfı)
+### [N6_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::deepLinkSearchParamsEffect (anonim callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `searchParams` — Next.js `useSearchParams()` hook'undan gelen parametreler; URL parametrelerine erişim sağlar
+  - `deepLinkAppliedRef` — deep link'in daha önce uygulanıp uygulanmadığını kontrol eder; `true` ise fonksiyon erken döner
+  - `preset` — `searchParams.get('preset')` ile alınan preset parametre değeri
+  - `isPending` — `preset === 'pendingShipments'` kontrolü; pending shipments modunda olup olmadığını belirtir
+  - `qParam` — `searchParams.get('q')` ile alınan arama sorgusu parametresi
+  - `setPresetPendingShipments` — pending shipments preset state'ini günceller
+  - `setStatus` — durum filtresini günceller
+  - `setQuery` — arama sorgusu state'ini günceller
+  - `setDebouncedQuery` — debounce edilmiş sorguyu günceller
+- **Dönüş**: `void`
 
-### [N18_NASIL] AST Pointer: src\views\admin\AdminOrdersPage.tsx::generateTrackingUrl
-- **params**: `carrier: string, tracking: string`
-- **ic_degiskenler**: yok
-- **Dönüş**: string | null (carrier’a göre oluşturulan takip URL’si)
+---
+
+### [N7_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::fetchOrders (anonim async callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `fetchId` — race condition önleme için `++lastFetchId.current` ile artırılan benzersiz istek ID'si; eski isteklerin state'i bozmasını engeller
+  - `lastFetchId` — en son fetch isteğinin ID'sini tutan ref; birden fazla istek çakıştığında sadece en sonuncunun sonuçları uygulanır
+  - `qb` — Supabase sorgu builder zinciri; `view_admin_orders` tablosunu sütun/filtre/sıralama/pagination ile yapılandırır
+  - `presetPendingShipments` — pending shipments presetinin aktif olup olmadığı; `confirmed`/`processing` ve `shipped_at` null olan siparişleri filtreler
+  - `status` — seçili durum filtresi; `qb.eq('status', status)` ile uygulanır
+  - `debouncedQuery` — debounce edilmiş arama sorgusu; `search_text` sütununda `ilike` ile arama yapılır
+  - `dateRange` — tarih aralığı filtresi; `from` ve `to` değerleri `created_at` sütununda `gte`/`lte` ile filtreler
+  - `page` — mevcut sayfa numarası; offset hesaplamasında kullanılır
+  - `PAGE_SIZE` — sayfa başına satır sayısı sabiti; `range()` hesaplamasında kullanılır
+  - `offset` — `(page - 1) * PAGE_SIZE` ile hesaplanan satır başlangıç indeksi
+  - `data` — Supabase yanıtından dönen satır verisi; `AdminOrderRow[]` dizisine cast edilir
+  - `count` — Supabase yanıtından dönen toplam kayıt sayısı
+  - `fetchErr` — Supabase sorgu hatası; fırlatılır
+  - `setRows` — tablo satırlarını günceller
+  - `setTotal` — toplam kayıt sayısını günceller
+  - `setLoading` — yükleme durumunu false'a çeker (finally bloğunda)
+  - `ensureSessionFresh` — oturum token'ının taze olduğunu garanti altına alan fonksiyon
+  - `t` — i18n çeviri fonksiyonu; hata mesajları için kullanılır
+  - `toast` — bildirim toast nesnesi; hata durumunda `toast.error` çağırır
+- **Dönüş**: `void`
+
+---
+
+### [N8_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::openShipModal (async fonksiyon)
+- **params**: `(id: string)` — kargo modalının açılacağı sipariş ID'si
+- **ic_degiskenler**:
+  - `setBulkMode` — toplu modu kapatır (false)
+  - `setShipId` — modalda düzenlenecek sipariş ID'sini ayarlar
+  - `setCarrier` — taşıyıcı adı state'ini sıfırlar
+  - `setTracking` — takip numarası state'ini sıfırlar
+  - `setSendEmail` — e-posta gönderim flag'ini true yapar
+  - `data` — Supabase'den dönen `venthub_orders` satırı; `carrier` ve `tracking_number` alanlarını içerir
+  - `dto` — `data`'nın typed cast hali `{ carrier?: string | null; tracking_number?: string | null }`
+  - `setShipOpen` — modalın açık/kapalı durumunu `true` yapar
+  - `supabase` — Supabase istemci nesnesi; `venthub_orders` tablosundan `.select('carrier, tracking_number').eq('id', id).maybeSingle()` sorgusu yapar
+- **Dönüş**: `void`
+
+---
+
+### [N9_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::openLogsModal (async fonksiyon)
+- **params**: `(id: string)` — loglarının görüneceği sipariş ID'si
+- **ic_degiskenler**:
+  - `setLogsOpen` — log modalını açar
+  - `setLogsLoading` — log yükleme durumunu aktif eder
+  - `data` — Supabase'den dönen `shipping_email_events` satırları; `subject`, `email_to`, `provider_message_id`, `created_at`, `carrier`, `tracking_number` alanlarını içerir
+  - `error` — Supabase sorgu hatası
+  - `setEmailLogs` — `EmailLog[]` dizisini günceller; hata durumunda boş dizi atanır
+  - `setLogsLoading` — finally bloğunda yükleme durumunu kapatır
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi; hata durumunda `toast.error` çağırır
+  - `supabase` — Supabase istemci nesnesi; `shipping_email_events` tablosundan `order_id` filtreli, `created_at` azalan sıralı, `limit(20)` sorgusu yapar
+- **Dönüş**: `void`
+
+---
+
+### [N10_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::openNotesModal (async fonksiyon)
+- **params**: `(id: string` — notlarının görüneceği sipariş ID'si
+- **ic_degiskenler**:
+  - `setNotesOrderId` — not modalına ait sipariş ID'sini ayarlar
+  - `setNotesOpen` — not modalını açar
+  - `data` — Supabase'den dönen `order_notes` satırları; `id`, `note`, `created_at`, `user_id` alanlarını içerir
+  - `error` — Supabase sorgu hatası
+  - `setNotes` — `OrderNote[]` dizisini günceller; hata durumunda boş dizi atanır
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi
+  - `supabase` — Supabase istemci nesnesi; `order_notes` tablosundan `order_id` filtreli, `created_at` azalan sıralı, `limit(50)` sorgusu yapar
+- **Dönüş**: `void`
+
+---
+
+### [N11_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::addNote (async fonksiyon)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `notesOrderId` — mevcut not modalına ait sipariş ID'si; boşsa veya `noteInput` boş trim ise fonksiyon erken döner
+  - `noteInput` — kullanıcı tarafından girilen not metni; trim edilerek insert edilir
+  - `data` — Supabase insert sonrası dönen tek satır; `id`, `note`, `created_at`, `user_id` alanlarını içerir
+  - `error` — Supabase insert hatası
+  - `setNotes` — mevcut notların başına yeni notu ekler (prepend)
+  - `setNoteInput` — not giriş alanını sıfırlar
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi
+  - `supabase` — Supabase istemci nesnesi; `order_notes` tablosuna `.insert({ order_id: notesOrderId, note: noteInput.trim() }).select(...).single()` yapar
+- **Dönüş**: `void`
+
+---
+
+### [N12_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::deleteNote (async fonksiyon)
+- **params**: `(noteId: string)` — silinecek notun ID'si
+- **ic_degiskenler**:
+  - `error` — Supabase delete hatası
+  - `setNotes` — mevcut notlardan `noteId` eşleşen notu filtreleyerek kaldırır
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi; başarı veya hata durumunda toast gösterir
+  - `supabase` — Supabase istemci nesnesi; `order_notes` tablosundan `.delete().eq('id', noteId)` yapar
+- **Dönüş**: `void`
+
+---
+
+### [N13_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::submitShip (anonim async callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `bulkMode` — toplu kargo modu flag'i; `false` ise tekli, `true` ise toplu güncelleme yapılır
+  - `shipId` — tekli modda güncellenecek siparişin ID'si
+  - `rows` — mevcut tablo satırları dizisi
+  - `selectedIds` — çoklu seçimde işaretli sipariş ID'leri
+  - `curRow` — `shipId` ile eşleşen mevcut satır; `status` alanı kontrol edilir
+  - `isShipped` — siparişin zaten shipped olup olmadığı; `curRow?.status === 'shipped'` kontrolü
+  - `carrier` — taşıyıcı adı state'i
+  - `tracking` — takip numarası state'i
+  - `turl` — `generateTrackingUrl(carrier, tracking)` ile üretilen kargo takip URL'i; null olabilir
+  - `sendEmail` — kargo güncellemesi sonrası e-posta gönderim flag'i
+  - `fnErr` — `supabase.functions.invoke('admin-update-shipping')` çağrısından dönen hata
+  - `supabase.functions` — Supabase Edge Functions API'si; `admin-update-shipping` fonksiyonunu çağırır
+  - `setRows` — tekli modda satır durumunu günceller (shipped veya mevcut durum korunur)
+  - `setShipOpen` — modalı kapatır
+  - `t` — i18n çeviri fonksiyonu
+  - `toast` — bildirim toast nesnesi
+  - `targets` — toplu modda shipped olmayan seçili sipariş ID'leri dizisi
+  - `advBulk` — gelişmiş toplu mod flag'i; her sipariş için ayrı taşıyıcı/takip girilip girilmediğini belirtir
+  - `advRows` — gelişmiş toplu modda her sipariş için `{ id, carrier, tracking }` dizisi
+  - `mapById` — `advRows`'ı ID bazında Map'e dönüştüren nesne; hızlı erişim sağlar
+  - `invalid` — taşıyıcı veya takip numarası boş olan hedef ID'ler dizisi
+  - `results` — `Promise.all` ile çalıştırılan toplu güncelleme sonuçları; her biri `{ id, ok: boolean }` şeklindedir
+  - `logAdminAction` — admin aksiyonunu loglayan fonksiyon; tablo adı, satır PK, aksiyon tipi, before/after değerleri ve yorum alır
+- **Dönüş**: `void`
+
+---
+
+### [N14_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::toggleSort (fonksiyon)
+- **params**: `(key: SortKey)` — sıralanacak sütun anahtarı
+- **ic_degiskenler**:
+  - `sortKey` — mevcut sıralama sütunu; aynı sütun tekrar tıklanırsa yön tersine çevrilir
+  - `setSortDir` — sıralama yönünü `asc`/`desc` olarak toggler
+  - `setSortKey` — sıralama sütununu değiştirir
+- **Dönüş**: `void`
+
+---
+
+### [N15_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::sortIndicator (fonksiyon)
+- **params**: `(key: SortKey)` — sütun anahtarı
+- **ic_degiskenler**:
+  - `sortKey` — mevcut aktif sıralama sütunu; `key` ile eşleşmiyorsa boş dize döner
+  - `sortDir` — sıralama yönü; `'asc'` ise `▲`, `'desc'` ise `▼` gösterir
+- **Dönüş**: `string` — `'▲'`, `'▼'` veya boş dize
+
+---
+
+### [N16_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::bulkCancelShipping (async fonksiyon)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `rows` — mevcut tablo satırları dizisi
+  - `selectedIds` — çoklu seçimde işaretli sipariş ID'leri
+  - `targets` — shipped durumundaki seçili siparişlerin ID'leri dizisi; `status === 'shipped'` filtresi uygulanır
+  - `window.confirm` — onay dialogu; toplu iptal işlemi için kullanıcı onayı alır
+  - `results` — `Promise.all` ile çalıştırılan iptal sonuçları; her biri `{ id, ok: boolean }` şeklindedir
+  - `fnErr` — `supabase.functions.invoke('admin-update-shipping')` çağrısından dönen hata; `cancel: true` body gönderilir
+  - `failed` — başarısız olan sipariş ID'leri dizisi
+  - `setRows` — başarılı iptallerde satır durumunu `'confirmed'` olarak günceller; başarısız olanlarda mevcut durumu korur
+  - `setSelectedIds` — seçim dizisini sıfırlar
+  - `supabase.functions` — `admin-update-shipping` Edge Function'ını `{ cancel: true, send_email: false }` body ile çağırır
+- **Dönüş**: `void`
+
+---
+
+### [N17_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::exportCsv (fonksiyon)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `header` — CSV başlık satırı dizisi; `orderId`, `status`, `amount` başlıkları
+  - `rows` — dışa aktarılacak tablo satırları dizisi
+  - `lines` — her satırın `id`, `status`, `total_amount` değerlerini virgülle ayrılmış ve çift tırnakla escape edilmiş hali
+  - `blob` — CSV verisinden oluşturulan `Blob` nesnesi; BOM (`\ufeff`) ile UTF-8 charset eklenir
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici dosya URL'i
+  - `a` — programatik oluşturulan `<a>` DOM elementi; `download`属性 ile `orders.csv` olarak indirme tetiklenir
+  - `t` — i18n çeviri fonksiyonu; başlık metinleri için kullanılır
+- **Dönüş**: `void`
+
+---
+
+### [N18_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::rowRenderer (anonim callback)
+- **params**: `(r: AdminOrderRow)` — render edilecek sipariş satırı
+- **ic_degiskenler**:
+  - `selectedIds` — işaretli sipariş ID'leri dizisi; checkbox `checked` değerini belirler
+  - `setSelectedIds` — checkbox değişiminde sipariş ID'sini diziden ekler/çıkarır; `e.target.checked` ile toggle yapar
+  - `visibleCols` — sütun görünürlük nesnesi; `id`, `status`, `conversation`, `amount`, `created` alanları ile hangi `<td>`'lerin render edileceği kontrol edilir
+  - `badgeClass` — duruma göre Tailwind badge CSS class'ını döndüren fonksiyon
+  - `prettyStatus` — durum kodunu çevrilmiş metne dönüştüren fonksiyon
+  - `t` — i18n çeviri fonksiyonu; buton metinleri için kullanılır
+  - `formatAmount` — para birimi formatlama fonksiyonu; `r.total_amount` ve `lang` ile çağrılır
+  - `lang` — mevcut dil kodu (Lang tipi)
+  - `safeDate` — tarih formatlama fonksiyonu; `r.created_at` ile çağrılır
+  - `hasWriteAccess` — yazma izni flag'i; kargo butonunun gösterilip gösterilmeyeceğini belirler
+  - `openShipModal` — kargo modalını açan fonksiyon; `r.id` ile çağrılır
+  - `openLogsModal` — log modalını açan fonksiyon; `r.id` ile çağrılır
+  - `openNotesModal` — not modalını açan fonksiyon; `r.id` ile çağrılır
+  - `r.id` — siparişin tam ID'si
+  - `r.order_number` — sipariş numarası; yoksa `r.id.slice(0, 8)` kısaltması gösterilir
+  - `r.status` — sipariş durumu kodu
+  - `r.conversation_id` — konuşma ID'si; yoksa `'-'` gösterilir
+  - `r.total_amount` — sipariş toplam tutarı
+  - `r.created_at` — sipariş oluşturma tarihi (ISO string)
+- **Dönüş**: `JSX.Element` (`<tr>` satırı)
+
+---
+
+### [N19_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::logRowRenderer (anonim callback)
+- **params**: `(l: EmailLog, i: number)` — e-posta log satırı ve indeks
+- **ic_degiskenler**:
+  - `safeDate` — tarih formatlama fonksiyonu; `l.created_at` ile çağrılır
+  - `l.created_at` — e-posta gönderim tarihi (ISO string)
+  - `l.subject` — e-posta konu satırı
+- **Dönüş**: `JSX.Element` (`<tr>` satırı)
+
+---
+
+### [N20_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::noteRenderer (anonim callback)
+- **params**: `(n: OrderNote)` — render edilecek not nesnesi
+- **ic_degiskenler**:
+  - `n.id` — not ID'si; silme butonunda `deleteNote(n.id)` olarak kullanılır
+  - `n.note` — not metni içeriği
+  - `n.created_at` — not oluşturma tarihi (ISO string)
+  - `deleteNote` — notu silen fonksiyon; silme butonunun `onClick` handler'ı
+  - `safeDate` — tarih formatlama fonksiyonu; `n.created_at` ile çağrılır
+- **Dönüş**: `JSX.Element` (not kartı `<div>`'i)
+
+---
+
+### [N21_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::formatAmount (fonksiyon)
+- **params**: `(v?: number | null, lang: Lang = 'tr')` — formatlanacak tutar ve dil kodu
+- **ic_degiskenler**:
+  - `v` — formatlanacak sayısal tutar; `null` veya `undefined` ise `'-'` döner
+  - `lang` — para birimi formatında kullanılacak dil kodu; varsayılan `'tr'`
+- **Dönüş**: `string` — `formatCurrency(v, lang, { maximumFractionDigits: 0 })` sonucu veya `'-'`
+
+---
+
+### [N22_NASIL] AST Pointer: `src/views/admin/AdminOrdersPage.tsx`::safeDate (fonksiyon)
+- **params**: `(iso: string, lang: Lang = 'tr')` — ISO tarih string'i ve dil kodu
+- **ic_degiskenler**:
+  - `iso` — formatlanacak ISO tarih string'i
+  - `lang` — tarih formatında kullanılacak dil kodu; varsayılan `'tr'`
+- **Dönüş**: `string` — `formatDateTime(iso, lang)` sonucu; hata durumunda
 
 ---
 
@@ -448,17 +632,17 @@ graph TD
     AdminOrdersPage_tsx__sortIndicator["sortIndicator"]
     AdminOrdersPage_tsx__submitShip["submitShip"]
     AdminOrdersPage_tsx__toggleSort["toggleSort"]
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__badgeClass
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openLogsModal
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__deleteNote
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__toggleSort
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__prettyStatus
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__sortIndicator
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__formatAmount
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openNotesModal
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__safeDate
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openShipModal
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__sortIndicator
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__generateTrackingUrl
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__deleteNote
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__badgeClass
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__toggleSort
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__safeDate
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__formatAmount
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openLogsModal
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__prettyStatus
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openNotesModal
 ```
 
 ## NODE ID STANDARD

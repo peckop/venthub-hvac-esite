@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { FileUp, X, CheckCircle2, Search, Info } from 'lucide-react'
 import { generateId } from '../../utils/crypto'
 import { cn } from '@/lib/utils'
@@ -207,7 +207,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                 URL.revokeObjectURL(url)
             }
 
-            toast.custom((t) => (
+            toast.custom((id) => (
                 <div className="glass-strong rounded-2xl border border-white/10 shadow-2xl p-4 flex flex-col gap-4 animate-in slide-in-from-bottom-5 duration-300 pointer-events-auto">
                     <div className="flex items-center gap-3">
                         <CheckCircle2 className="text-emerald-400" size={20} />
@@ -221,7 +221,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                         {errors.length > 0 && (
                             <button
                                 className="px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-xl glass border border-white/10 text-white hover:bg-white/10"
-                                onClick={() => { downloadErrors(); toast.dismiss(t.id) }}
+                                onClick={() => { downloadErrors(); toast.dismiss(id) }}
                             >Hataları İndir</button>
                         )}
                         <button
@@ -240,13 +240,13 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                     toast.error('Geri alma başarısız')
                                 } finally {
                                     csvUndoingRef.current = false
-                                    toast.dismiss(t.id)
+                                    toast.dismiss(id)
                                 }
                             }}
                         >Tümünü Geri Al</button>
                     </div>
                 </div>
-            ), { duration: 15000, position: 'bottom-center' })
+            ), { duration: 15000 })
 
         } catch (err) {
             console.error('CSV processing error:', err)

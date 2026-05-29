@@ -11,44 +11,54 @@ entity_hashes:
   func:handleEdit: c5409fbf6f4f144a
   func:load: fc235a1ebf177283
   func:remove: 16990c02664975f8
-  overview: a35a906484de9e32
+  overview: 570df85b8e327283
   style_tokens: 0e730a4c2dea0604
-generated_at: 2026-05-28T22:39:02Z
+generated_at: 2026-05-29T18:56:09Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetim platformunun yönetici panelinde yer alan kategori yönetimi sayfasını oluşturur. Admin kullanıcıların sistemdeki tüm kategoriler üzerinde işlem yapabilmesini sağlayan ön yüz mantığını barındıran React bileşenidir, tüm kategoriyle ilgili işlevleri tek noktada toplar.
+Bu modül, VentHub HVAC yönetim platformunun yönetici panelinde yer alan kategori yönetim sayfasını oluşturan React bileşenidir. Sistemdeki kategorilerin yüklenmesi, oluşturulması, düzenlenmesi, tasarlanması ve silinmesi gibi tüm CRUD işlemlerini tek bir arayüz üzerinden yönetir. Admin kullanıcıların kategoriler üzerinde tam kontrole sahip olduğu merkezi bir yönetim noktasıdır.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Modülün ana giriş noktası olarak tüm kategori yönetim arayüzünü ve bağlı işlevleri bir araya getirerek yönetici sayfasını oluşturur.
+Modülün giriş noktası olarak tüm kategori yönetim arayüzünü ve bağlı işlevleri bir araya getirerek yönetici sayfasını oluşturur.
 - AdminCategoriesPage
 
 ### Veri İşleme Fonksiyonları
-Kategori verilerini sunucudan yüklemek ve istenildiğinde kayıt silmek gibi arka uçla entegre çalışan temel veri işlemlerini gerçekleştirir.
+Kategori verilerini sunucudan çekmek ve kalıcı olarak silmek gibi arka uçla entegre çalışan temel veri işlemlerini yürütür.
 - load, remove
 
-### Kullanıcı Eylemi İşleyicileri
-Yönetici kullanıcının arayüzde gerçekleştirdiği yeni kategori oluşturma, mevcut kategoriyi düzenleme ve tasarlama gibi tüm kullanıcı eylemlerini yönetir.
+### Kullanıcı Eylem İşleyicileri
+Yönetici kullanıcının arayüzdeki etkileşimlerine yanıt olarak yeni kategori oluşturma, mevcut kategoriyi düzenleme ve tasarım sayfasını açma gibi tüm kullanıcı odaklı eylemleri yönetir.
 - handleCreate, handleEdit, handleDesign
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, yönetici panelinde kategori yönetim arayüzü sağlayan bir React bileşenidir. Aşağıda yalnızca fonksiyon imzalarından ve modül sabitlerinden türetilebilen mimari varsayımlar listelenmektedir.
+Bu modül, admin panelinde kategori yönetim sayfasını temsil eden bir React bileşenidir. Aşağıda, bileşenin doğru çalışması için gereken mimari varsayımlar listelenmektedir.
 
-**[Aksiyom 1]:** Eğer `ColumnsMenu` modülü import edilmemiş veya çalıştırılabilir (callable) durumda değilse, kategori tablosunda sütun menüsü arayüzüsunu gösteren bileşen kullanılamaz.
+Bu modül için belirli bir eşik değeri veya kabul kriteri belirtilmemiştir. Varsayımlar, fonksiyon imzaları ve modülün genel yapısına dayanmaktadır.
 
-**[Aksiyom 2]:** Eğer `ExportMenu` modülü import edilmemiş veya çalıştırılabilir (callable) durumda değilse, kategori verilerinin dışa aktarım menüsü sunulamaz.
+[Aksiyom 1]: Eğer `DbCategory` tipi veya bu tipe karşılık gelen bir veri yapısı (örneğin, `id`, `name`, `description` gibi alanları içeren bir nesne) yoksa, `handleEdit` ve `handleDesign` fonksiyonları doğru çalışamaz.
 
-**[Aksiyom 3]:** Eğer `handleEdit(r: DbCategory)` fonksiyonu geçerli bir `DbCategory` nesnesi alamıyorsa (null veya undefined ise), düzenleme işlemi başlatılamaz.
+[Aksiyom 2]: Eğer `remove(id: string)` fonksiyonu çağrılmadan önce ilgili kategorinin `id` değerine sahip olduğu doğrulanmamışsa, beklenmeyen bir kategori silinmesine veya hata fırlatılmasına yol açabilir.
 
-**[Aksiyom 4]:** Eğer `handleDesign(r: DbCategory)` fonksiyonu geçerli bir `DbCategory` nesnesi alamıyorsa (null veya undefined ise), tasarım/ayar düzenleme işlemi başlatılamaz.
+[Aksiyom 3]: Eğer `ColumnsMenu` veya `ExportMenu` modül sabitleri (muhtemelen bileşenler) doğru bir şekilde içe aktarılmamışsa veya çağrılamıyorsa, sayfa düzgün render edilemez veya menü işlevleri çalışmaz.
 
-**[Aksiyom 5]:** Eğer `remove(id: string)` fonksiyonu geçerli bir string identifier alamıyorsa (boş string, null veya undefined ise), silme işlemi gerçekleştirilemez.
+[Aksiyom 4]: Eğer `load()` fonksiyonu bileşen mount edildiğinde veya veriye ihtiyaç duyulduğunda çağrılmazsa, kategoriler listesi boş veya güncel olmayabilir.
 
-**[Aksiyom 6]:** Eğer `load()` fonksiyonu tarafından erişilen veri kaynağı (API endpoint veya servis) erişilebilir durumda değilse, kategori listesi yüklenemez ve arayüz boş/hata durumunda kalır.
+[Aksiyom 5]: Eğer `handleCreate` fonksiyonu, yeni bir kategori oluşturmak için gerekli parametreleri (örneğin, kullanıcıdan alınan veri) alamıyorsa, yeni kategori eklenemez.
+
+[Aksiyom 6]: Eğer `AdminCategoriesPage` bileşeni, yönetici panelinde yetkilendirilmiş bir kullanıcı tarafından erişilemez bir rotada render edilirse, bileşen görünmeyebilir veya hata verebilir (bu, rotalama veya yetkilendirme katmanına bağlıdır).
+
+[Aksiyom 7]: Eğer `remove` fonksiyonu, silme işlemini sunucuya iletmeden önce bir onay mekanizması (örneğin, bir modal) içermiyorsa, yanlışlıkla silme riski vardır.
+
+[Aksiyom 8]: Eğer `handleEdit` ve `handleDesign` fonksiyonları, ilgili kategorinin mevcut verilerini (örneğin, `DbCategory` nesnesini) parametre olarak alamıyorsa, düzenleme veya tasarım sayfası doğru verilerle doldurulamaz.
+
+[Aksiyom 9]: Eğer `load` fonksiyonu, kategorileri yüklerken bir hata oluşursa (örneğin, ağ hatası), bileşen hata durumunu göstermeli veya kullanıcıyı bilgilendirmelidir; aksi takdirde kullanıcı veri eksikliğiyle karşılaşabilir.
+
+[Aksiyom 10]: Eğer `AdminCategoriesPage` bileşeni, alt bileşenlere (örneğin
 
 ---
 
@@ -103,142 +113,112 @@ Bu modül, yönetici panelinde kategori yönetim arayüzü sağlayan bir React b
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::readLocalStorageSettings
+### [N1_NASIL] AST Pointer: AdminCategoriesPage.tsx::AdminCategoriesPage
+- **params**: (parametre yok)
+- **ic_degiskenler**: Fonksiyon govdesi dogrudan saglanmamis; iceride tanimlanan state'ler (useState): `loading`, `error`, `rows`, `editingId`, `isModalOpen`, `visibleCols`, `density` — bileşen durum yonetimi icin kullanilir
+- **Dönüş**: React.FC (JSX render)
+
+---
+
+### [N2_NASIL] AST Pointer: AdminCategoriesPage.tsx::load
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `typeof window` — sunucu tarafı çalışma durumunu kontrol etmek için kullanılan global window nesnesi tür check'i
-  - `STORAGE_KEY` — localStorage anahtarlarını oluşturmak için kullanılan sabit temel anahtar
-  - `c` — localStorage'dan okunan görünür sütun ayarlarının ham string değeri
-  - `setVisibleCols` — görünür sütun listesini state'de güncellemek için kullanılan React state setter'ı
-  - `JSON.parse` — string formatındaki ayarları JS nesnesine dönüştürmek için kullanılan native fonksiyon
-  - `d` — localStorage'dan okunan tablo satır yoğunluğu ayarının ham string değeri
-  - `setDensity` — tablo satır yoğunluğunu state'de güncellemek için kullanılan React state setter'ı
-- **Dönüş**: void (tarayıcı dışı ortamda veya hata durumunda erken çıkış yapar)
+  - `fetchErr` — supabase `select()` sorgusundan donen hata nesnesi; varsa `throw` ile yakalanir
+  - `data` — supabase'den gelen kategori satirlarinin ham dizisi; `DbCategory[]` tipine cast edilerek `setRows` ile state'e yazilir
+  - `e` — try-catch yakalanan hata nesnesi; `.message` ozelligi `setError` ile hata mesaji olarak kaydedilir
+- **Dönüş**: yok (async); `setLoading`, `setError`, `setRows` ile state gunceller
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::saveVisibleColsToLocalStorage
+---
+
+### [N3_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleCreate
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok; `setEditingId(null)` ile duzenleme kimligini sifirlar, `setIsModalOpen(true)` ile olusturma modalini acar
+
+---
+
+### [N4_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleEdit
+- **params**: `r: DbCategory` — duzenlenecek kategori nesnesi; iceriden `r.id` erisilerek `editingId` state'i guncellenir
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok; `setEditingId(r.id)` ile secilen kategorinin ID'sini kaydeder, `setIsModalOpen(true)` ile duzenleme modalini acar
+
+---
+
+### [N5_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleDesign
+- **params**: `r: DbCategory` — tasarlanacak kategori nesnesi; `r.id` kullanilarak rota olusturulur
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok; `router.push()` ile `/admin/categories/${r.id}/builder` rotasina yonlendirme yapar
+
+---
+
+### [N6_NASIL] AST Pointer: AdminCategoriesPage.tsx::remove
+- **params**: `id: string` — silinecek kategorinin benzersiz kimligi
+- **ic_degiskenler**:
+  - `before` — silinmeden onceki kategori verisi; `rows.find(r => r.id === id)` ile mevcut satirlardan id eslesmesiyle bulunur, bulunamazsa `null` olur; audit log'a onceki deger olarak yazilir
+  - `delErr` — supabase `delete()` isleminden donen hata nesnesi; varsa `throw` ile yakalanir
+  - `e` — try-catch yakalanan hata nesnesi; `alert` ile kullaniciya hata mesaji gosterilir
+- **Dönüş**: yok (async); `confirm` ile onay alir, `supabase.from('categories').delete().eq('id', id)` ile silme islemi yapar, `logAdminAction` ile audit log kaydeder, `load()` ile listeyi yeniler
+
+---
+
+### [N7_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — localStorage sutun yukleyici useEffect)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `typeof window` — sunucu tarafı çalışma durumunu kontrol etmek için kullanılan global window nesnesi tür check'i
-  - `STORAGE_KEY` — localStorage anahtarını oluşturmak için kullanılan sabit temel anahtar
-  - `visibleCols` - state'deki güncel görünür sütun listesi, localStorage'a kaydedilecek değer
-  - `JSON.stringify` - JS nesnesini localStorage için string formatına dönüştürmek için kullanılan native fonksiyon
-- **Dönüş**: void (tarayıcı dışı ortamda veya hata durumunda erken çıkış yapar)
+  - `c` — `localStorage.getItem()` ile okunan sutun gorunurluk ayarlari JSON stringi; parse edilip `setVisibleCols` ile state'e birlestirilir
+  - `d` — `localStorage.getItem()` ile okunan yogunluk (density) ayari stringi; `"compact"` veya `"comfortable"` degeri ise `setDensity` ile state'e yazilir
+- **Dönüş**: yok; `window` kontrolu ile sunucu tarafinda calismayi engeller, try-catch ile localStorage hatalarini yutar
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::saveDensityToLocalStorage
+---
+
+### [N8_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — localStorage sutun kaydedici useEffect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — `visibleCols` state'i kapsamdan okunur)
+- **Dönüş**: yok; `visibleCols` degerini `JSON.stringify` ile serialized olarak `localStorage.setItem` ile kaydeder
+
+---
+
+### [N9_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — localStorage yogunluk kaydedici useEffect)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — `density` state'i kapsamdan okunur)
+- **Dönüş**: yok; `density` degerini dogrudan `localStorage.setItem` ile kaydeder
+
+---
+
+### [N10_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — CSV disa aktarim handler'i)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `typeof window` — sunucu tarafı çalışma durumunu kontrol etmek için kullanılan global window nesnesi tür check'i
-  - `STORAGE_KEY` — localStorage anahtarını oluşturmak için kullanılan sabit temel anahtar
-  - `density` - state'deki güncel tablo satır yoğunluğu değeri, localStorage'a kaydedilecek
-- **Dönüş**: void (tarayıcı dışı ortamda veya hata durumunda erken çıkış yapar)
+  - `cols` — disa aktarilacak sutun adlarinin dizisi: `['id', 'name', 'sort_order', 'slug', 'parent_id', 'description']`
+  - `header` — sutun adlarinin virgülle birlestirilmis CSV baslik satiri
+  - `lines` — `filtered` dizisi uzerinden `.map()` ile her kategori satirinin CSV formatina donusturulmus hali; `r.name.replace(/"/g, '""')` ile tirnak isaretleri escape edilir, `r.sort_order || 0` ile bos deger varsayilir
+  - `csv` — BOM karakteri (`\ufeff`) + baslik + satirlarin `\n` ile birlestirilmis tam CSV icerigi
+  - `blob` — CSV metninden olusturulan `Blob` nesnesi; MIME tipi `text/csv;charset=utf-8`
+  - `url` — `URL.createObjectURL(blob)` ile olusturulan gecici dosya URL'i
+  - `a` — `document.createElement('a')` ile olusturulan gecici anchor elementi; `href`, `download` ozellikleri ayarlanip `click()` ile indirme tetiklenir, sonra `URL.revokeObjectURL` ile URL serbest birakilir
+- **Dönüş**: yok (dosya indirme yan etkisi)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::load
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setLoading` - yükleme durumunu state'de güncellemek için kullanılan React state setter'ı
-  - `setError` - hata mesajını state'de güncellemek için kullanılan React state setter'ı
-  - `ensureSessionFresh` - kullanıcı oturumunun geçerliliğini kontrol eden yardımcı fonksiyon
-  - `supabase` - veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `data` - veritabanından çekilen kategori listesi ham değeri
-  - `fetchErr` - kategori çekme işlemi sırasında oluşan hata nesnesi
-  - `setRows` - kategori listesini state'de kaydetmek için kullanılan React state setter'ı
-  - `DbCategory` - kategori verilerinin tipini tanımlayan TypeScript tipi
-- **Dönüş**: void (tüm async işlemler sonrası state güncellemeleri yapar, değer döndürmez)
+---
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::handleCreate
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setEditingId` - düzenleme sırasında seçili kategori ID'sini sıfırlamak için kullanılan React state setter'ı
-  - `setIsModalOpen` - kategori oluşturma/düzenleme modalını açmak için kullanılan React state setter'ı
-- **Dönüş**: void
+### [N11_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — tablo satir renderer'i)
+- **params**: `r: DbCategory` — render edilecek kategori satiri verisi
+- **ic_degiskenler**: (yerel degisken yok; kapsamdan erisilenler: `visibleCols`, `adminTableCellClass`, `cellPad`, `process.env.NEXT_PUBLIC_SUPABASE_URL`, `hasWriteAccess`, `categoryMap`, `adminTableActionClass`, `adminTableActionDangerClass`, `t`, `supabase`, `setRows`, `toast`, `load`, `handleDesign`, `handleEdit`, `remove`)
+- **Dönüş**: JSX `<tr>` elementi; gorunurluk ayarlarina gore `visibleCols.image`, `visibleCols.name`, `visibleCols.sortOrder`, `visibleCols.slug`, `visibleCols.parent`, `visibleCols.description`, `visibleCols.actions` kosullariyla sutunlari sartli olarak render eder
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::handleEdit
-- **params**: r: DbCategory
-- **ic_degiskenler**:
-  - `r.id` - düzenlenecek kategorinin benzersiz kimliği
-  - `setEditingId` - düzenlenen kategori ID'sini state'e kaydeden React state setter'ı
-  - `setIsModalOpen` - kategori düzenleme modalını açan React state setter'ı
-- **Dönüş**: void
+---
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::handleDesign
-- **params**: r: DbCategory
+### [N12_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — kategori adi inline guncelleme handler'i)
+- **params**: `val` — duzeltilmis yeni kategori adi degeri (string)
 - **ic_degiskenler**:
-  - `r.id` - tasarlanacak kategorinin benzersiz kimliği
-  - `router` - Next.js yönlendirme istemcisi, sayfa yönlendirmesi için kullanılır
-- **Dönüş**: void
+  - `upErr` — `supabase.from('categories').update({ name: val }).eq('id', r.id)` sorgusundan donen hata nesnesi; varsa `throw` ile yakalanir
+- **Dönüş**: yok (async); `val` bos veya eski degerle ayni ise erken donus; aksi halde supabase update ile veritabanini gunceller, `setRows` ile yerel state'i gunceller, `toast.success` ile bildirim gosterir
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::remove
-- **params**: id: string
-- **ic_degiskenler**:
-  - `confirm` - kullanıcıdan silme onayı alan yerleşik browser fonksiyonu
-  - `rows` - state'deki mevcut kategori listesi, silinen kategorinin önceki değerini almak için kullanılır
-  - `before` - silinmeden önceki kategori nesnesinin kopyası, denetim kaydı için saklanır
-  - `supabase` - veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `delErr` - kategori silme işlemi sırasında oluşan hata nesnesi
-  - `logAdminAction` - denetim kaydı oluşturmak için içe aktarılan audit modülü fonksiyonu
-  - `load` - silme sonrası kategori listesini yenilemek için çağrılan yükleme fonksiyonu
-  - `alert` - hata durumunda kullanıcıya mesaj gösteren yerleşik browser fonksiyonu
-- **Dönüş**: void
+---
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::exportCategoriesToCsv
-- **params**: (parametre yok)
+### [N13_NASIL] AST Pointer: AdminCategoriesPage.tsx::(unnamed — siralama sirasi inline guncelleme handler'i)
+- **params**: `val` — girilen yeni siralama degeri (string olarak girilir, parseInt ile cevrilir)
 - **ic_degiskenler**:
-  - `cols` - CSV dosyasına yazılacak sütun isimleri listesi
-  - `header` - CSV dosyasının başlık satırı, sütun isimlerinden birleştirilir
-  - `filtered` - dışa aktarılacak filtrelenmiş kategori listesi
-  - `lines` - CSV dosyasının veri satırları, her kategori için bir satır oluşturulur
-  - `csv` - tam olarak birleştirilmiş CSV dosyası içeriği
-  - `blob` - CSV içeriğinden oluşturulan Blob nesnesi, indirme için kullanılır
-  - `url` - Blob nesnesinden oluşturulan geçici indirme URL'si
-  - `document.createElement` - indirme bağlantısı için <a> etiketi oluşturan native DOM fonksiyonu
-  - `URL.revokeObjectURL` - kullanım sonrası geçici URL'yi temizleyen native fonksiyon
-- **Dönüş**: void
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::renderCategoryTableRow
-- **params**: r: DbCategory
-- **ic_degiskenler**:
-  - `r.id` - tablo satırının benzersiz anahtarı olarak kullanılan kategori kimliği
-  - `visibleCols.image` - resim sütununun görünürlük durumu
-  - `VentImage` - resim göstermek için kullanılan özel React bileşeni
-  - `process.env.NEXT_PUBLIC_SUPABASE_URL` - Supabase proje URL'si, resim yolu oluşturmak için kullanılır
-  - `r.image_url` - kategoriye ait resmin depodaki yolu
-  - `hasWriteAccess` - kullanıcının yazma yetkisi olup olmadığını belirten bayrak
-  - `EditableCell` - satır içi düzenleme için kullanılan özel React bileşeni
-  - `supabase` - kategori güncelleme işlemleri için kullanılan Supabase istemcisi
-  - `setRows` - güncellenen kategori listesini state'e kaydeden React state setter'ı
-  - `toast.success` - işlem başarısı hakkında kullanıcıya bildirim gösteren fonksiyon
-  - `categoryMap` - üst kategori isimlerini ID'den almak için kullanılan Map nesnesi
-  - `handleDesign` - tasarım sayfasına yönlendiren fonksiyon
-  - `handleEdit` - kategori düzenleme modalını açan fonksiyon
-  - `remove` - kategori silme fonksiyonu
-  - `t` - çeviri fonksiyonu, arayüz metinlerini yerelleştirmek için kullanılır
-- **Dönüş**: JSX.Element (kategori tablosu için bir <tr> elementi döndürür)
-
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::saveCategoryNameUpdate
-- **params**: val: string
-- **ic_degiskenler**:
-  - `val` - EditableCell'den gelen yeni kategori adı değeri
-  - `r.name` - mevcut kategori adı, değişiklik kontrolü için kullanılır
-  - `r.id` - güncellenecek kategorinin benzersiz kimliği
-  - `supabase` - veritabanı güncellemesi için kullanılan Supabase istemcisi
-  - `upErr` - güncelleme işlemi sırasında oluşan hata nesnesi
-  - `setRows` - güncellenen kategori listesini state'e kaydeden React state setter'ı
-  - `toast.success` - işlem başarısı hakkında kullanıcıya bildirim gösteren fonksiyon
-- **Dönüş**: void
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx::saveCategorySortOrderUpdate
-- **params**: val: string
-- **ic_degiskenler**:
-  - `val` - EditableCell'den gelen yeni sıralama değeri string hali
-  - `num` - string'ten dönüştürülmüş sayısal sıralama değeri
-  - `r.sort_order` - mevcut sıralama değeri, değişiklik kontrolü için kullanılır
-  - `r.id` - güncellenecek kategorinin benzersiz kimliği
-  - `supabase` - veritabanı güncellemesi için kullanılan Supabase istemcisi
-  - `upErr` - güncelleme işlemi sırasında oluşan hata nesnesi
-  - `setRows` - güncellenen kategori listesini state'e kaydeden React state setter'ı
-  - `toast.success` - işlem başarısı hakkında kullanıcıya bildirim gösteren fonksiyon
-  - `load` - sıralama değişikliği sonrası kategori listesini yenilemek için çağrılan fonksiyon
-- **Dönüş**: void
+  - `num` — `parseInt(val || '0', 10)` ile string degerin donusturulmus sayisal hali; `isNaN` kontrolu ile gecersiz giris onlenir
+  - `upErr` — `supabase.from('categories').update({ sort_order: num }).eq('id', r.id)` sorgusundan donen hata nesnesi; varsa `throw` ile yakalanir
+- **Dönüş**: yok (async); `num` NaN veya eski degerle ayni ise erken donus; aksi halde supabase update ile veritabanini gunceller, `setRows` ile yerel state'i gunceller, `toast.success` ile bildirim gosterir, `load()` ile listeyi yeniler
 
 ---
 

@@ -3,37 +3,41 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx
-skeleton_hash: dbb4f3205dcd696a
+skeleton_hash: 7754993243b50714
 entity_hashes:
   func:AddressFormModal: 22dcfc4163aec036
   func:handleSave: 51987ec8847e1d2c
-  overview: 6d8dac3b90fdee5f
+  overview: cddc87ce3d0ec431
   style_tokens: 4fa16246087d5121
-generated_at: 2026-05-28T22:39:51Z
+generated_at: 2026-05-29T19:01:52Z
 ---
 
 ## Genel Bakış
-Bu modül, sipariş tamamlama (checkout) akışında kullanılan bir React modal bileşenidir. Kullanıcıların yeni adres eklemesi veya mevcut adreslerini düzenlemesi için açılan form penceresinin tüm temel işlevlerini yönetir. Dışarıdan alınan veriler ve geri çağırma fonksiyonları aracılığıyla ana uygulama akışıyla entegre çalışır.
+Bu modül, sipariş tamamlama (checkout) sürecinde kullanıcıların adres bilgilerini girmesini veya düzenlemesini sağlayan bir React modal bileşenidir. Temel olarak, bir form aracılığıyla adres verilerinin toplanmasını ve kaydedilmesini yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Modal Bileşeni
-Modülün ana giriş noktası olarak çalışır, dışarıdan gelen adres verisi, modal kapatma ve adres kaydedilmesi sonrası tetiklenecek geri çağırımları alarak modalın temel çalışma altyapısını kurar.
+Modülün dış arayüzünü ve temel yapısını oluşturur, gerekli prop'ları (mevcut adres verisi, kapatma ve kaydetme sonrası çağrılacak fonksiyonlar, çeviri nesnesi) alarak modal penceresinin ana iskeletini kurar.
 - AddressFormModal
 
-### Form İşlem Yöneticileri
-Formun gönderim ve kaydetme sürecini yönetir, form olayını yakalayarak adres verilerinin işlenmesini ve kaydedilmesini sağlar, işlem sonrası ilgili geri çağırımları tetikler.
+### Form Veri İşleme
+Formun gönderilmesi olayını ele alır, kullanıcı tarafından girilen adres verilerini işler ve modülün sunduğu geri çağırma fonksiyonları aracılığıyla verileri üst katmana iletir.
 - handleSave
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı adres formu modal bileşeni, dışarıdan alınan tüm prop'ların eksiksiz ve çalışır durumda olmasını, form işleyicisinin gerektirdiği event nesnesinin erişilebilir olmasını varsayar.
+Bu modül, sipariş tamamlama akışında adres formunu yöneten bir React modal bileşenidir. Aşağıda, bileşenin doğru çalışması için gerekli olan mimari varsayımlar listelenmektedir.
 
-[Aksiyom 1]: Eğer onClose prop'u yoksa, modal bileşeni kapatılamaz, kullanıcı işlemini sonlandırmak için gerekli kapatma aksiyonu tetiklenemez olur.
-[Aksiyom 2]: Eğer onSaved prop'u yoksa, adres başarılı bir şekilde kaydedildikten sonra üst katman bileşenlere kayıt durumu bildirilemez, adres yönetimiyle ilgili state'ler güncellenemez olur.
-[Aksiyom 3]: Eğer t (çeviri) prop'u yoksa, modal içindeki arayüz metinleri işlenemez, kullanıcıya bozuk veya eksik metinler gösterilir olur.
-[Aksiyom 4]: Eğer address prop'u yoksa, form üzerinde mevcut adresi düzenleme işlemi yapılamaz, kullanıcıya varsayılan olarak boş bir adres formu sunulur olur.
-[Aksiyom 5]: Eğer handleSave fonksiyonuna gönderilen React.FormEvent nesnesi eksik veya erişilemez olursa, formun varsayılan gönderim davranışı engellenemez, sayfa yenilenir ve adres kayıt işlemi başarısız olur.
+[Aksiyom 1]: Eğer `address` prop'u verilmezse, modal bileşeni varsayılan olarak yeni bir adres oluşturma modunda başlatılamaz.
+
+[Aksiyom 2]: Eğer `onClose` fonksiyonu verilmezse, modal kapatılamaz ve kullanıcı arayüzünde takılmalara neden olur.
+
+[Aksiyom 3]: Eğer `onSaved` fonksiyonu verilmezse, adres başarıyla kaydedildikten sonra ana uygulama güncellenemez.
+
+[Aksiyom 4]: Eğer `t` (çeviri) fonksiyonu verilmezse, modal içindeki metinler çevrilemez.
+
+[Aksiyom 5]: Eğer `handleSave` fonksiyonu geçerli bir `React.FormEvent` nesnesi alamazsa, form gönderimi sırasında hata oluşur ve adres kaydedilemez.
 
 ---
 
@@ -70,31 +74,42 @@ Bu React tabanlı adres formu modal bileşeni, dışarıdan alınan tüm prop'la
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx::AddressFormModal
-- **params**: address, onClose, onSaved, t
+### [N1_NASIL] AST Pointer: src/views/checkout/AddressFormModal.tsx::AddressFormModal
+- **params**: (address, onClose, onSaved, t)
 - **ic_degiskenler**:
-  - `saving` — Adres kaydetme işleminin devam edip etmediğini takip eden boolean state değişkeni
-  - `setSaving` — `saving` state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `form` — Formun tüm alan değerlerini tutan state nesnesi, mevcut adres verileriyle varsayılan olarak doldurulur
-  - `setForm` — `form` state nesnesini güncellemek için kullanılan React state setter fonksiyonu
-  - `handleSave` - Form gönderildiğinde adres güncelleme işlemini yöneten içeride tanımlanan async fonksiyon
-- **Dönüş**: Adres düzenleme modalı ve formunu içeren React JSX elementi
+  - `saving` — Boolean state değişkeni, kayıt işleminin devam edip etmediğini kontrol eder
+  - `form` — Adres formundaki tüm alanları tutan state nesnesi (label, full_name, phone, address_line, city, district, postal_code, is_default_shipping, is_default_billing)
+  - `address?.label` — Var olan adresin etiketi (form başlatılırken kullanılır)
+  - `address?.full_name` — Var olan adresin tam adı (form başlatılırken kullanılır)
+  - `address?.phone` — Var olan adresin telefonu (form başlatılırken kullanılır)
+  - `address?.address_line` — Var olan adresin açık adresi (form başlatılırken kullanılır)
+  - `address?.city` — Var olan adresin şehri (form başlatılırken kullanılır)
+  - `address?.district` — Var olan adresin ilçesi (form başlatılırken kullanılır)
+  - `address?.postal_code` — Var olan adresin posta kodu (form başlatılırken kullanılır)
+  - `address?.is_default_shipping` — Var olan adresin varsayılan kargo adresi olup olmadığı (form başlatılırken kullanılır)
+  - `address?.is_default_billing` — Var olan adresin varsayılan fatura adresi olup olmadığı (form başlatılırken kullanılır)
+  - `handleSave` — Form gönderildiğinde çağrılan asenkron fonksiyon
+- **Dönüş**: JSX element (modal form)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx::handleSave
-- **params**: e: React.FormEvent
+### [N2_NASIL] AST Pointer: src/views/checkout/AddressFormModal.tsx::handleSave
+- **params**: (e: React.FormEvent)
 - **ic_degiskenler**:
-  - `e.preventDefault` — Formun varsayılan sayfa yenileme davranışını engellemek için çağrılan olay metodu
-  - `address` — Bileşene dışarıdan aktarılan mevcut adres nesnesi, boşluk kontrolü yapılıp güncellemede adres kimliği olarak kullanılır
-  - `setSaving` — Kaydetme durumu state'ini güncellemek için kullanılan setter fonksiyonu
-  - `updateAddress` — Supabase entegrasyonu ile veritabanında adresi güncellemek için çağrılan API fonksiyonu
-  - `form.label, form.full_name, form.phone, form.address_line, form.city, form.district, form.postal_code, form.is_default_shipping, form.is_default_billing` — Formdaki güncel kullanıcı giriş değerleri, adres güncelleme verisi olarak gönderilir
-  - `toast.success` — İşlem başarısı durumunda kullanıcıya bildirim göstermek için kullanılan toast kütüphanesi metodu
-  - `t` — Çoklu dil çevirisi yapmak için kullanılan çeviri fonksiyonu, tüm metinleri çevirmek için kullanılır
-  - `onSaved` — Adres başarıyla güncellendikten sonra ana bileşene haber vermek için çağrılan callback fonksiyonu
-  - `onClose` — İşlem sonrası modal penceresini kapatmak için çağrılan callback fonksiyonu
-  - `console.error` - Hata durumunda konsola hata detaylarını loglamak için kullanılan metod
-  - `toast.error` — Hata durumunda kullanıcıya hata bildirimi göstermek için kullanılan toast kütüphanesi metodu
-- **Dönüş**: yok
+  - `saving` — State değişkeni, kayıt işlemini devre dışı bırakmak için true yapılır
+  - `address` — Prop'tan gelen adres nesnesi, var olup olmadığı kontrol edilir ve `id` özelliği kullanılır
+  - `form.label` — Form nesnesinden gelen etiket alanı
+  - `form.full_name` — Form nesnesinden gelen tam ad alanı
+  - `form.phone` — Form nesnesinden gelen telefon alanı
+  - `form.address_line` — Form nesnesinden gelen açık adres alanı
+  - `form.city` — Form nesnesinden gelen şehir alanı
+  - `form.district` — Form nesnesinden gelen ilçe alanı
+  - `form.postal_code` — Form nesnesinden gelen posta kodu alanı
+  - `form.is_default_shipping` — Form nesnesinden gelen varsayılan kargo adresi alanı
+  - `form.is_default_billing` — Form nesnesinden gelen varsayılan fatura adresi alanı
+  - `t('checkout.saved.updated')` — Başarılı kayıt sonrası gösterilen başarı mesajı
+  - `t('checkout.saved.updateError')` — Hata durumunda gösterilen hata mesajı
+  - `onSaved` — Başarılı kayıt sonrası çağrılan callback fonksiyonu
+  - `onClose` — Başarılı kayıt sonrası modalı kapatan fonksiyon
+- **Dönüş**: void (dönüş değeri yok, yan etkiler: state güncelleme, toast gösterme, modal kapatma)
 
 ---
 

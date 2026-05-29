@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, CheckCircle } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 

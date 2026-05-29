@@ -15,7 +15,7 @@ import {
   CheckoutInvoiceInfo, 
   CheckoutLegalConsents 
 } from '../types/db-rows'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 export const useCheckoutOrchestrator = () => {
   const { user } = useAuth()

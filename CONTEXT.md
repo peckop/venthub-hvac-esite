@@ -303,6 +303,7 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 - **Otonom Oturum Yönetimi:** Dokümantasyon eşitlemeleri sırasında oluşabilecek `Authentication expired` hataları, kullanıcı müdahalesi gerekmeksizin otonom olarak `nlm login` + `refresh_auth` mekanizması ile sessizce çözülür.
 - **Supabase Edge Functions Mühürü:** Güncel mimaride yer alan 26 adet Edge Function'ın (`cc doc batch`) dokümanlarının senkronizasyon sırasında NotebookLM'e tam ve eksiksiz aktarılması zorunludur. Bu durum tüm mikroservislerin otonom denetimini garanti eder.
 - **Orion CLI Granüler Dökümantasyon Standardı:** Dökümantasyon motoru, tüm modüller için `entity_hashes` tabanlı parça değişimi takibi yapar ve `AST POINTERS` standardına uygun olarak iç değişkenleri (`ic_degiskenler`, `params`, `dönüşler`) en ince kılcal damarına kadar detaylandırır.
+- **Xiaomi mimoV2 Premium Token Planı ve Paralel İşçi (Workers) Standardı:** Projemiz, **Xiaomi mimoV2 Premium Token** (mimo-v2.5) planına abonedir. Bu sayede dakikalık token ve istek hız sınırları (TPM/RPM limits) son derece yüksektir. Gelecek tüm oturumlarda ve dokümantasyon güncellemelerinde Orion CLI komutları (özellikle `orion doc all` veya `orion doc changed`) doğrudan **`--workers 20`** (20 paralel işçi) parametresi ile çalıştırılmalı, böylece bekleme süreleri en aza indirilmelidir.
 
 ---
 

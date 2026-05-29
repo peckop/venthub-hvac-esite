@@ -8,27 +8,46 @@ entity_hashes:
   func:CategoryFormModal: 45e70a4b9811a0d5
   func:handleImageUpload: 633c0036d64f1044
   func:onSubmit: c1bb6fdd37c1f2b9
-  overview: aa842adfcce629ec
+  overview: ea6088aded43e4e6
   style_tokens: 6073b78732e76f74
-generated_at: 2026-05-28T22:35:21Z
+generated_at: 2026-05-29T18:45:22Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelinde kategori ekleme ve düzenleme işlemlerini yöneten bir form modal bileşenidir. Kullanıcıdan kategori adı, açıklama ve görsel gibi bilgileri alır, geçerlilik kontrollerini yapar ve ilgili API çağrılarını tetikler. Modal açılıp kapanma durumu, mevcut kategori verisi ve başarı durumunda çağrılacak geri çağrı (callback) gibi dışarıdan aldığı özelliklerle (props) esnek bir kullanım sunar.
+Bu modül, yönetici panelinde kategorilerin eklenmesini ve düzenlenmesini sağlayan bir form modalı bileşenidir. Kullanıcıdan kategori adı, açıklama ve görsel bilgilerini toplar, doğrular ve ilgili API isteklerini başlatır. Bileşen, dışarıdan kontrol edilen açılıp kapanma durumu ve mevcut kategori verisi ile esnek bir yapı sunar.
 
 ## Fonksiyon Grupları
-### Form Gönderimi ve Veri İşleme
-Kullanıcının doldurduğu form verilerini alır, doğrular ve yeni bir kategori oluşturmak veya mevcut kategoriyi güncellemek için gerekli işlemleri başlatır.
-- handleImageUpload, onSubmit
-
-### Bileşenin Kendisi
-Form modalının tüm yapısını, görünümünü ve alt bileşenlerini düzenleyen ana fonksiyondur. Açılma/kapanma durumu, başlık, form alanları ve butonlar gibi kullanıcı arayüzü ögelerini içerir.
+### Bileşenin Ana Yapısı
+Tüm modal penceresinin yapısını, başlığını, form alanlarını ve butonlarını oluşturan ve yöneten ana React bileşenidir.
 - CategoryFormModal
+
+### Form İşlemleri ve Veri Yönetimi
+Kullanıcının form verilerini doğrulayan, görsel yükleyen ve form gönderiminde gerekli API çağrılarını tetikleyen iş mantığını barındırır.
+- handleImageUpload, onSubmit
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, kategori formu modal bileşeni olup, formun açılması, doğrulanması ve gönderilmesi için dış bağımlılıklara ve geçerli verilere ihtiyaç duyar.
+
+[Aksiyom 1]: Eğer `open` prop'u `false` olarak verilirse, modal görüntülenmez ve form içeriği sıfırlanmaz (sadece kapanır).
+
+[Aksiyom 2]: Eğer `onOpenChange` callback'i sağlanmazsa, modal'ın kapanma tetikleyicisi çalıştırılamaz ve kullanıcı modal'ı kapatamaz.
+
+[Aksiyom 3]: Eğer `onSuccess` callback'i sağlanmazsa, form başarılı şekilde gönderildiğinde üst bileşene bildirim yapılamaz ve veri yenileme tetiklenemez.
+
+[Aksiyom 4]: Eğer `category` prop'u verilmezse (undefined/null), modal "yeni kategori ekleme" modunda çalışır; verilirse "mevcut kategori düzenleme" moduna geçer.
+
+[Aksiyom 5]: Eğer `categorySchema` (Zod şeması) geçerli bir şema olarak çağrılamazsa (`.parse` veya `.safeParse` hata fırlatırsa), form gönderimi reddedilir ve API isteği gönderilmez.
+
+[Aksiyom 6]: Eğer `handleImageUpload` fonksiyonuna geçerli bir `React.ChangeEvent<HTMLInputElement>` verilmezse veya event içindeki dosya (`e.target.files`) boş/null ise, görsel yükleme işlemi gerçekleştirilmez.
+
+[Aksiyom 7]: Eğer `onSubmit` fonksiyonuna `CategoryFormValues` tipine uymayan bir değer verilirse, TypeScript derleme zamanı hatası oluşur veya runtime'da beklenmeyen davranış gözlemlenebilir.
+
+[Aksiyom 8]: Eğer `categorySchema` doğrulaması başarısız olursa, form hataları gösterilir ve `onSubmit` fonksiyonu çağrılmaz.
+
+[Aksiyom 9]: Eğer `categorySchema` içinde tanımlı alanlar (ad, açıklama, görsel vb.) zorunluysa, kullanıcı bu alanları doldurmadan form gönderimi başarısız olur.
 
 ---
 
@@ -101,65 +120,40 @@ type CategoryFormValues = z.infer<typeof categorySchema>
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::CategoryFormModal
-- **params**: `open`, `onOpenChange`, `category`, `onSuccess`
+- **params**: `open` — modal'ın açık olup olmadığını belirler (boolean), `onOpenChange` — modal durumunu değiştiren callback, `category` — düzenlenecek kategori objesi (null ise yeni kategori), `onSuccess` — başarılı işlem sonrası çağrılan callback
 - **ic_degiskenler**:
-  - `fetchParents` — component içinde tanımlı async fonksiyon, parent kategorileri getirir ve `setParentIdOptions` ile state günceller.
-  - `form` — `useForm` hookundan dönen nesne, form değerlerini yönetir (`reset`, `setValue` vb.).
-  - `setParentIdOptions` — parent seçeneklerini tutan state setter.
-  - `setPreviewImage` — seçilen/resim URL’sini tutan state setter.
-  - `setUploadingImage` — resim yükleme sırasında loading state’i yöneten setter.
-  - `setLoading` — form submit sırasında loading state’i yöneten setter.
-  - `handleImageUpload` — resim seçildiğinde çalıştırılan async fonksiyon (aşağıda ayrı pointer).
-  - `onSubmit` — form submit handler (aşağıda ayrı pointer).
-- **Dönüş**: React bileşeni JSX döndürür; yan etkileri (`useEffect`) içinde veri çekme ve form resetleme yapılır.
+  - `fetchParents` — supabase'den parent_id'si null olan kategorileri çekip `parentIdOptions` state'ini güncelleyen inner async fonksiyon; kendi kendine parent olmasını önler (`neq('id', category?.id || '00000000-...')`)
+  - `form` — `useForm` ile oluşturulan form instance, `zodResolver(categorySchema)` ile doğrulanır
+  - `parentIdOptions` — `setParentIdOptions` ile set edilen üst kategori listesi state'i
+  - `previewImage` — `setPreviewImage` ile set edilen önizleme görseli URL'i state'i
+  - `uploadingImage` — `setUploadingImage` ile set edilen yükleme durumu state'i (boolean)
+  - `loading` — `setLoading` ile set edilen form gönderim yüklenme durumu state'i (boolean)
+  - `category?.id` — mevcut kategorinin ID'si, fetchParents'ta self-parenting önlemede kullanılır
+  - `category?.name, .slug, .parent_id, .description, .seo_title, .seo_desc, .is_featured, .sort_order, .image_url` — form reset'te mevcut kategori değerlerinden doldurulan alanlar
+  - `category?.metadata?.metric1?.value, .label, .metadata?.metric2?.value, .label` — metadata içinden metric alanları, form reset'te kullanılır
+  - `p.id`, `p.name` — select option render'ında her üst kategori için id ve adı
+- **Dönüş**: `React.FC<CategoryFormModalProps>` — Dialog, Tabs, form alanları ve submit butonlarından oluşan JSX
 
-### [N2_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::fetchParents
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::handleImageUpload
+- **params**: `e: React.ChangeEvent<HTMLInputElement>` — input change eventi
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen kategori listesi (`id`, `name` alanları).
-- **Dönüş**: `setParentIdOptions(data)` ile state günceller; explicit return yoktur.
+  - `file` — `e.target.files?.[0]` ile elde edilen ilk seçilen dosya; yoksa fonksiyon erken return eder
+  - `compressedFile` — `compressImage(file)` ile sıkıştırılmış dosya, Supabase'e yüklenmeden önce optimize edilir
+  - `fileExt` — `file.name.split('.').pop()` ile elde edilen dosya uzantısı (ör: jpg, png)
+  - `fileName` — `crypto.randomUUID()` ile üretilen benzersiz dosya adı, uzantıyla birleştirilir
+  - `filePath` — `category-images/${fileName}` olarak tanımlı Supabase storage içi tam dosya yolu
+  - `uploadError` — `supabase.storage.from('products').upload()` sonucu dönen hata; varsa fırlatılır
+  - `publicUrl` — `supabase.storage.from('products').getPublicUrl(filePath)` ile elde edilen herkese açık görsel URL'i
+- **Dönüş**: yok (yan etkiler: `form.setValue('image_url', publicUrl)`, `setPreviewImage(publicUrl)`, toast bildirimleri)
 
-### [N3_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::useEffect‑open
-- **params**: (parametre yok) – `useEffect` callback
+### [N3_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::onSubmit
+- **params**: `values: CategoryFormValues` — react-hook-form'dan gelen doğrulanmış form değerleri
 - **ic_degiskenler**:
-  - `open` – component prop, modal açık olduğunda `fetchParents` çağrılır.
-- **Dönüş**: yok (effect içinde yan etki).
-
-### [N4_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::useEffect‑category
-- **params**: (parametre yok) – `useEffect` callback
-- **ic_degiskenler**:
-  - `category` – prop, var ise form `reset` edilir ve `setPreviewImage` çağrılır; yoksa boş değerlerle reset yapılır.
-  - `form` – `useForm` nesnesi, `reset` metodu ile form değerlerini ayarlar.
-  - `setPreviewImage` – resim önizleme state setter.
-- **Dönüş**: yok (effect içinde yan etki).
-
-### [N5_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::handleImageUpload
-- **params**: `e` — `React.ChangeEvent<HTMLInputElement>`
-- **ic_degiskenler**:
-  - `file` — seçilen dosya (`e.target.files?.[0]`).
-  - `compressedFile` — `compressImage(file)` sonucu elde edilen sıkıştırılmış dosya.
-  - `fileExt` — dosya uzantısı (`file.name.split('.').pop()`).
-  - `fileName` — UUID ve uzantıdan oluşan yeni dosya adı.
-  - `filePath` — Supabase storage içinde dosyanın yolu (`category-images/${fileName}`).
-  - `uploadError` — storage upload işlemi sırasında oluşabilecek hata.
-  - `publicUrl` — yüklenen dosyanın herkese açık URL’si (`supabase.storage.from('products').getPublicUrl(filePath)`).
-- **Dönüş**: yok (state güncellemeleri ve toast bildirimleriyle yan etki).
-
-### [N6_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::onSubmit
-- **params**: `values` — `CategoryFormValues`
-- **ic_degiskenler**:
-  - `metadata` — `CategoryMetadata` nesnesi, metric1 ve metric2 bilgilerini içerir.
-  - `updateData` — `CategoryUpdate` nesnesi, mevcut kategori güncellenirken kullanılan alanlar ve `metadata` (JSON’a dönüştürülmüş).
-  - `insertData` — `CategoryInsert` nesnesi, yeni kategori eklenirken kullanılan alanlar, `metadata` ve boş `authority_content` dizisi.
-  - `error` — Supabase `update` veya `insert` işlemi sırasında oluşan hata.
-- **Dönüş**: yok (state güncellemeleri, toast bildirimleri ve `onSuccess`, `onOpenChange` callback’leriyle yan etki).
-
-### [N7_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::optionRender
-- **params**: `p` — parent seçenek nesnesi (`{ id, name }`)
-- **ic_degiskenler**:
-  - `p.id` — option value attribute.
-  - `p.name` — option display text.
-- **Dönüş**: JSX `<option>` elementi; explicit return yoktur (inline render).
+  - `metadata` — `CategoryMetadata` nesnesi; `values.metric1_label`, `values.metric1_value`, `values.metric2_label`, `values.metric2_value` değerlerinden oluşur, Supabase'e JSON olarak kaydedilir
+  - `updateData` — `category` varsa (düzelleme modu) oluşturulan `CategoryUpdate` nesnesi; `values.name, .slug, .parent_id, .description, .seo_title, .seo_desc, .is_featured, .sort_order, .image_url` ve `toSupabaseJson(metadata)` içerir
+  - `insertData` — `category` yoksa (yeni ekleme modu) oluşturulan `CategoryInsert` nesnesi; updateData ile aynı alanlara ek olarak `authority_content: []` içerir
+  - `error` — `supabase.from('categories').update()` veya `.insert()` sonucu dönen hata; varsa fırlatılır
+- **Dönüş**: yok (yan etkiler: `supabase.from('categories').update/insert` ile veritabanı yazma, `onSuccess()` çağrısı, `onOpenChange(false)` ile modal'ı kapatma, toast bildirimleri)
 
 ---
 

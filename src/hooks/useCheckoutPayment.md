@@ -3,20 +3,20 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutPayment.ts
-skeleton_hash: 0f81e1692b39b882
+skeleton_hash: 68bcfa4f5c8e469e
 entity_hashes:
   func:useCheckoutPayment: a8bb41b15d097162
-  overview: 5e2bf25a48045329
-generated_at: 2026-05-28T22:37:44Z
+  overview: e0e6f5e6a2896df3
+generated_at: 2026-05-29T18:49:02Z
 ---
 
 ## Genel Bakış
-`useCheckoutPayment` modülü, VentHub HVAC uygulamasının ödeme adımını yöneten tek bir React hook'udur. Sepet içeriği, kullanıcı bilgileri ve sunucu tarafı fiyatlandırma gibi dış bağımlılıkları alarak, toplam tutarı hesaplar, fiyatları günceller ve ödeme tamamlandığında sepeti temizler. Böylece ödeme sürecinin bütünlüğü ve tutarlılığı tek bir noktadan kontrol edilir.  
+`useCheckoutPayment` modülü, VentHub HVAC uygulamasının ödeme sürecin yöneten tek bir React hook'udur. Sepet içeriği, kullanıcı bilgileri ve sunucu tarafı fiyatlandırma gibi dış bağımlılıkları alarak, toplam tutarı hesaplar, fiyatları günceller ve ödeme tamamlandığında sepeti temizler. Böylece ödeme sürecinin bütünlüğü ve tutarlılığı tek bir noktadan kontrol edilir.
 
 ## Fonksiyon Grupları
 ### Ödeme Akışı Orkestratörü  
 Bu grup, ödeme sürecinin tüm adımlarını bir araya getirir; gelen verileri doğrular, tutarı hesaplar, fiyatları günceller ve işlem sonunda sepeti temizler.  
-- useCheckoutPayment  
+- useCheckoutPayment
 
 ### Yardımcı Veri ve İşlem Sağlayıcıları  
 Ödeme orkestratörünün ihtiyaç duyduğu dış bağımlılıkları içerir; sepet öğeleri, kullanıcı bilgileri ve fiyatlandırma/temizleme fonksiyonları bu grup altında toplanır.  
@@ -25,16 +25,20 @@ Bu grup, ödeme sürecinin tüm adımlarını bir araya getirir; gelen verileri 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `items` parametresi sağlanmazsa, ödeme işlemi başlatılamaz ve hook hata verir.  
-**Aksiyom 2**: Eğer `getCartTotal` fonksiyonu tanımlı değilse, sepet tutarı hesaplanamaz, bu yüzden ödeme tutarı belirlenemez ve hook çalışmaz.  
-**Aksiyom 3**: Eğer `user` nesnesi eksik ya da geçersizse, kimlik doğrulama ve faturalama bilgileri alınamaz; bu durumda ödeme süreci durur.  
-**Aksiyom 4**: Eğer `clearCart` fonksiyonu sağlanmazsa, ödeme tamamlandıktan sonra sepet temizlenemez ve kullanıcı aynı sepeti tekrar görür.  
-**Aksiyom 5**: Eğer `applyServerPricing` fonksiyonu mevcut değilse, sunucu tarafı fiyatlandırma güncellemeleri uygulanamaz; bu da fiyat tutarsızlıklarına yol açar.  
-**Aksiyom 6**: Eğer `UseCheckoutPaymentProps` tipindeki bir nesne (`or` anahtarıyla) sağlanmazsa, hook’un beklediği tüm bağımlılıkların (items, getCartTotal, user, clearCart, applyServerPricing) ayrı ayrı geçirilmesi gerekir; aksi takdirde tip uyumsuzluğu hatası oluşur.  
+Bu hook, ödeme sürecinin yönetimini üstlenir ve dışarıdan sağlanan bağımlılıklar üzerinde çalışır. Doğru işleyiş için aşağıdaki koşulların karşılanması gerekmektedir.
 
-*Domain‑specific bir eşik değeri, kabul kriteri veya başka bir özel kural mevcut değildir; tüm gereksinimler fonksiyon imzasındaki parametrelerin varlığı ve doğru tipte olmasıyla sınırlıdır.*
+[Aksiyom 1]: Eğer `items` parametresi geçerli bir dizi (array) verisi değilse (null, undefined veya başka bir tipte ise), sepet öğeleri işlenemez ve ödeme süreci başlatılamaz.
+
+[Aksiyom 2]: Eğer `getCartTotal` parametresi çağrılabilir bir fonksiyon değilse, sepet toplam tutarı hesaplanamaz ve sipariş özeti oluşturulamaz.
+
+[Aksiyom 3]: Eğer `clearCart` parametresi çağrılabilir bir fonksiyon değilse, başarılı ödeme işleminden sonra sepetteki ürünler temizlenemez; bu durum sepetteki ürünlerin kullanıcının bir sonraki alışveriş seansına kadar korunmasına yol açar.
+
+[Aksiyom 4]: Eğer `applyServerPricing` parametresi çağrılabilir bir fonksiyon değilse, sunucu tarafı fiyatlandırma doğrulaması yapılamaz; bu durum yerel veya eski fiyatların kullanılmasına neden olabilir.
+
+[Aksiyom 5]: Eğer `user` parametresi null veya undefined ise, ödeme süreci başlatılamaz; çünkü siparişin kullanıcıya bağlanması ve ödeme işleminin yürütülmesi için kullanıcı kimliği zorunludur.
+
+[Aksiyom 6]: Eğer `items` dizisi boş ise (toplam öğe sayısı 0), sepet toplamı hesaplanamaz ve ödeme butonu devre dışı kalır.
 
 ---
 
@@ -74,29 +78,48 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useCheckoutPayment
-- **params**: `({ items, getCartTotal, user, clearCart, applyServerPricing, orchestrator, couponCode, t }: UseCheckoutPaymentProps)`
+- **params**: (`items`, `getCartTotal`, `user`, `clearCart`, `applyServerPricing`, `orchestrator`, `couponCode`, `t`)
 - **ic_degiskenler**:
-  - `router` — `useRouter()` ile oluşturulan Next.js yönlendirici, sayfa yönlendirmeleri için kullanılır.
-  - `loading` — ödeme işlemi sırasında gösterilen yükleme durumu (`useState(false)`).
-  - `setLoading` — `loading` değerini güncelleyen setter.
-  - `iyzToken` — İyzico’dan alınan ödeme token’ı (`useState('')`).
-  - `setIyzToken` — `iyzToken` değerini güncelleyen setter.
-  - `paymentUrl` — İyzico ödeme sayfasının URL’i (`useState('')`).
-  - `setPaymentUrl` — `paymentUrl` değerini güncelleyen setter.
-  - `orderId` — oluşturulan siparişin kimliği (`useState('')`).
-  - `setOrderId` — `orderId` değerini güncelleyen setter.
-  - `convId` — İyzico konuşma kimliği (`useState('')`).
-  - `setConvId` — `convId` değerini güncelleyen setter.
-  - `iyzScriptLoaded` — dış script’in yüklendiği durum (sabit `false`).
-  - `formReady` — ödeme formunun hazır olup olmadığını gösteren flag (`useState(false)`).
-  - `setFormReady` — `formReady` değerini güncelleyen setter.
-  - `progressPct` — ödeme sürecindeki ilerleme yüzdesi (`useState(20)`).
-  - `setProgressPct` — `progressPct` değerini güncelleyen setter.
-  - `paymentFrameContent` — iframe içeriği (sabit boş string).
-  - `isTest` — test ortamı kontrolü (`'vi' in globalThis`).
-- **Dönüş**: Hook’un döndürdüğü nesne  
-  `{ loading, iyzToken, paymentUrl, orderId, convId, iyzScriptLoaded, formReady, progressPct, paymentFrameContent, setFormReady, setProgressPct, initiatePayment }`  
-  (yan etkileri: state güncellemeleri, router yönlendirmesi, dış script yüklenmesi).
+  - `router` — useRouter hookundan dönen yönlendirme nesnesi, sayfa geçişleri için kullanılır
+  - `loading` — useState ile tanımlanan boolean, ödeme sürecinin yüklenme durumunu tutar
+  - `iyzToken` — useState ile tanımlanan string, iyzico ödeme token'ını tutar
+  - `paymentUrl` — useState ile tanımlanan string, iyzico ödeme sayfası URL'ini tutar
+  - `orderId` — useState ile tanımlanan string, sipariş numarasını tutar
+  - `convId` — useState ile tanımlanan string, iyzico konuşma ID'sini tutar
+  - `iyzScriptLoaded` — useState ile tanımlanan boolean, iyzico scriptinin yüklenip yüklenmediğini tutar (hiç set edilmez)
+  - `formReady` — useState ile tanımlanan boolean, formun hazır olup olmadığını tutar
+  - `progressPct` — useState ile tanımlanan number, ilerleme yüzdesini tutar (başlangıç: 20)
+  - `paymentFrameContent` — useState ile tanımlanan string, ödeme frame içeriğini tutar (hiç set edilmez)
+  - `isTest` — globalThis'de 'vi' olup olmadığını kontrol eden boolean, test ortamı tespiti yapar
+  - `initiatePayment` — async fonksiyon, ödeme sürecini başlatır
+- **Dönüş**: `{ loading, iyzToken, paymentUrl, orderId, convId, iyzScriptLoaded, formReady, progressPct, paymentFrameContent, setFormReady, setProgressPct, initiatePayment }` (object)
+
+### [N2_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::initiatePayment
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `authoritativeTotal` — getCartTotal() ile alınan sepet toplamı, sunucu doğrulamasından sonra güncellenebilir
+  - `validation` — validateServerCart() ile sunucu tarafı sepet doğrulama sonucu
+  - `localHash` — getPriceHashLocal(items) ile yerel sepet için fiyat hash'i
+  - `serverHash` — getPriceHashServer(validation?.items, items) ile sunucu tarafı fiyat hash'i
+  - `buildPaymentRequest` — Dinamik import ile yüklenen ödeme isteği oluşturma fonksiyonu
+  - `requestData` — buildPaymentRequest() ile oluşturulan iyzico ödeme isteği verisi
+  - `data` — supabase.functions.invoke() yanıtındaki veri nesnesi
+  - `error` — supabase.functions.invoke() yanıtındaki hata nesnesi
+  - `d` — data.data objesi, iyzico yanıtının içeriği
+  - `msg` — yakalanan hatanın mesajı
+- **Dönüş**: `true` (başarılı) veya `false` (hatalı) boolean
+
+### [N3_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useEffectCallback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `timer` — setInterval ile oluşturulan zamanlayıcı ID'si, periyodik sipariş durumu kontrolü için kullanılır
+- **Dönüş**: Cleanup fonksiyonu `() => clearInterval(timer)` veya `undefined` (orderId yoksa)
+
+### [N4_NASIL] AST Pointer: src/hooks/useCheckpointPayment.ts::setIntervalCallback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `data` — supabase.from('venthub_orders').select('status') sorgusundan dönen sipariş durumu verisi
+- **Dönüş**: `undefined` (yan etkiler: clearCart() çağırır, router.push() ile yönlendirme yapar)
 
 ---
 

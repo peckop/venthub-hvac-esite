@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { ShoppingBag, Box, Bell, X, Check, Activity, Clock } from 'lucide-react'
 import { formatDateTime } from '../../i18n/datetime'
 
@@ -127,22 +127,22 @@ const AdminRealtimeNotifications: React.FC = () => {
                     setUnreadCount(prev => prev + 1)
 
                     // Show Toast
-                    toast.custom((t) => (
+                    toast.custom((id) => (
                         <div
                             role="button"
                             tabIndex={0}
                             onClick={() => {
-                                toast.dismiss(t.id)
+                                toast.dismiss(id)
                                 if (notif.link) router.push(notif.link as import('next').Route)
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault()
-                                    toast.dismiss(t.id)
+                                    toast.dismiss(id)
                                     if (notif.link) router.push(notif.link as import('next').Route)
                                 }
                             }}
-                            className={`${t.visible ? 'animate-in fade-in slide-in-from-top-4' : 'animate-out fade-out slide-out-to-top-2'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-primary-navy cursor-pointer hover:bg-slate-50 transition-colors`}
+                            className="max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-primary-navy cursor-pointer hover:bg-slate-50 transition-colors animate-in fade-in slide-in-from-top-4 duration-300"
                         >
                             <div className="flex-shrink-0 pt-0.5">
                                 <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
@@ -154,7 +154,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                                 <p className="mt-1 text-sm text-slate-500">{notif.message}</p>
                             </div>
                         </div>
-                    ), { duration: 6000, position: 'top-right' })
+                    ), { duration: 6000 })
                 }
             )
             .subscribe()
@@ -184,22 +184,22 @@ const AdminRealtimeNotifications: React.FC = () => {
                     setNotifications(prev => [notif, ...prev].slice(0, 20))
                     setUnreadCount(prev => prev + 1)
 
-                    toast.custom((t) => (
+                    toast.custom((id) => (
                         <div
                             role="button"
                             tabIndex={0}
                             onClick={() => {
-                                toast.dismiss(t.id)
+                                toast.dismiss(id)
                                 if (notif.link) router.push(notif.link as import('next').Route)
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault()
-                                    toast.dismiss(t.id)
+                                    toast.dismiss(id)
                                     if (notif.link) router.push(notif.link as import('next').Route)
                                 }
                             }}
-                            className={`${t.visible ? 'animate-in fade-in slide-in-from-top-4' : 'animate-out fade-out slide-out-to-top-2'} max-w-md w-full bg-white shadow-lg rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-emerald-500 cursor-pointer hover:bg-slate-50 transition-colors`}
+                            className="max-w-md w-full bg-white shadow-lg rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-emerald-500 cursor-pointer hover:bg-slate-50 transition-colors animate-in fade-in slide-in-from-top-4 duration-300"
                         >
                             <div className="flex-shrink-0 pt-0.5">
                                 <div className="h-10 w-10 rounded-full bg-emerald-50 flex items-center justify-center">
@@ -211,7 +211,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                                 <p className="mt-1 text-sm text-slate-500">{notif.message}</p>
                             </div>
                         </div>
-                    ), { duration: 4000, position: 'top-right' })
+                    ), { duration: 4000 })
                 }
             )
             .subscribe()

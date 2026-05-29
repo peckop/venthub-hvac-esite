@@ -300,7 +300,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       window.dispatchEvent(new CustomEvent('vh_cart_item_added', { detail: { product } }))
     } catch {
       try {
-        import('react-hot-toast').then(({ default: toast }) => toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })).catch(() => { })
+        import('sonner').then(({ toast }) => toast.success(`${product.name} sepete eklendi!`, { duration: 2500 })).catch(() => { })
       } catch { }
     }
   }, [user, serverCartId, items])
@@ -309,7 +309,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems(currentItems => {
       const item = currentItems.find(item => item.product.id === _productId)
       if (item) {
-        import('react-hot-toast').then(({ default: toast }) => toast.success(`${item.product.name} sepetten çıkarıldı`, { duration: 2000, position: 'top-right' })).catch(() => { })
+        import('sonner').then(({ toast }) => toast.success(`${item.product.name} sepetten çıkarıldı`, { duration: 2000 })).catch(() => { })
       }
       return currentItems.filter(item => item.product.id !== _productId)
     })
@@ -374,7 +374,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     if (!opts?.silent) {
-      import('react-hot-toast').then(({ default: toast }) => toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })).catch(() => { })
+      import('sonner').then(({ toast }) => toast.success('Sepet temizlendi', { duration: 2000 })).catch(() => { })
     }
 
     if (CART_SERVER_SYNC && user && serverCartId) {

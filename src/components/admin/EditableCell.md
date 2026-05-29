@@ -3,42 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx
-skeleton_hash: 68ab2fd6998e4d6d
+skeleton_hash: df7dad40afd16a13
 entity_hashes:
   func:EditableCell: c69e143b78ab0750
-  overview: 4312d2a15431d150
+  overview: afceb79d7ede9415
   style_tokens: 2f2ada2707ada249
-generated_at: 2026-05-28T22:35:31Z
+generated_at: 2026-05-29T18:44:07Z
 ---
 
 ## Genel Bakış
-`EditableCell` bileşeni, yönetim panelindeki tablo hücrelerinin düzenlenebilir olmasını sağlayan bir React fonksiyonel bileşenidir. Gelen değer, tip ve yer tutucu gibi parametreleri alır, kullanıcı etkileşimi sonrası değişikliği `onSave` callback’i ile dışarı aktarır.
+`EditableCell`, yönetim paneli tablolarındaki hücrelerin tıklanarak düzenlenebilir hale getirilmesini sağlayan bir React bileşenidir. Değer, veri tipi ve yer tutucu gibi yapılandırma parametreleri alarak hücrenin görünümünü ve davranışını kontrol eder; düzenleme işlemi tamamlandığında kaydetme çağrısı ile değişiklikleri üst bileşene iletir.
 
 ## Fonksiyon Grupları
 ### Düzenlenebilir Hücre Bileşeni
-Bu grup, hücrenin görüntülenmesi, düzenleme moduna geçişi ve kaydedilmesi süreçlerini yönetir.  
-- EditableCell  
-
-(İçeride kullanılan yardımcı fonksiyonlar (ör. durum yönetimi, olay işleyicileri) bu bileşenin içinde tanımlanır ve dışarıdan ayrı bir fonksiyon olarak listelenmez.)
+Bu modül, tek bir kapsamlı bileşenden oluşur ve tablo hücrelerinin görüntülenmesi, düzenleme moduna geçişi ile değişikliklerin kaydedilmesi süreçlerini yönetir.
+- EditableCell
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `onSave` fonksiyonu sağlanmazsa, hücrede yapılan değişiklikler kalıcı olarak kaydedilemez ve kullanıcıya bir hata/uyarı gösterilir.  
+Bu modül için varsayımlar, EditableCell bileşeninin doğru çalışması için zorunlu koşulları belirtir.
 
-**Aksiyom 2**: Eğer `type` parametresi belirtilmezse, varsayılan olarak `'text'` tipi kullanılır; bu tip dışındaki bir değer verilirse, tip `'text'` olarak düşürülür.  
+[Axiom 1]: Eğer onSave callback fonksiyonu sağlanmamışsa veya çağrılamıyorsa, kullanıcı düzenlemeleri kaydedemez ve hata oluşur.
 
-**Aksiyom 3**: Eğer `placeholder` parametresi belirtilmezse, varsayılan değer `'-'` kullanılır; bu değer gösterim amaçlıdır ve gerçek veri kaybına yol açmaz.  
-
-**Aksiyom 4**: Eğer `value` parametresi `null` veya `undefined` ise, hücre içeriği `placeholder` değeriyle gösterilir; bu durumda `onSave` çağrısı yapılmadan önce kullanıcı bir giriş yapmalıdır.  
-
-**Aksiyom 5**: Eğer `type` değeri desteklenmeyen bir formatta (ör. `'binary'`, `'object'` vb.) ise, davranış **bilinmiyor**; bu durumda uygulama bir istisna fırlatabilir veya tip `'text'`e geri dönebilir (tasarım kararına bağlı).  
-
-**Domain‑specific kural**: `type` parametresi için kabul edilen değerler **bilinmiyor**; mevcut kod tabanında tanımlı olabilecek tipler (`'text'`, `'number'`, `'date'` vb.) proje dokümantasyonunda belirtilmelidir.  
-
-Bu aksiyomlar, `EditableCell` bileşeninin temel çalışma koşullarını ve eksik/girişik parametrelerin sistem üzerindeki etkilerini tanımlar.
+[Axiom 2]: Eğer type parametresi geçerli bir HTML input type değeri (örn: text
 
 ---
 
@@ -75,24 +64,75 @@ Bu aksiyomlar, `EditableCell` bileşeninin temel çalışma koşullarını ve ek
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx::EditableCell
-- **params**: (value, onSave, type = 'text', placeholder = '-', className = '', disabled = false, inputWidth = 'w-24')
+### [N1_NASIL] AST Pointer: EditableCell.tsx::EditableCell
+- **params**: `value` — hücre mevcut değeri; `onSave` — async callback, düzenlenmiş değeri kaydetmek için çağrılır; `type` — input türü (varsayılan `'text'`); `placeholder` — değer boşsa gösterilen yer tutucu (varsayılan `'-'`); `className` — dışarıdan ek CSS sınıfı (varsayılan `''`); `disabled` — düzenlemeyi devre dışı bırakıp bırakmayacağı (varsayılan `false`); `inputWidth` — input genişlik CSS sınıfı (varsayılan `'w-24'`)
 - **ic_degiskenler**:
-  - `editing` — hücrenin düzenleme modunda olup olmadığını tutan boolean state.
-  - `setEditing` — `editing` state'ini güncelleyen set fonksiyonu.
-  - `draft` — kullanıcı tarafından düzenlenen geçici değer; başlangıçta `value`'nun string temsili.
-  - `setDraft` — `draft` state'ini güncelleyen set fonksiyonu.
-  - `saving` — kaydetme işlemi devam ederken gösterilen boolean state.
-  - `setSaving` — `saving` state'ini güncelleyen set fonksiyonu.
-  - `inputRef` — `<input>` elementine referans tutan `useRef` nesnesi.
-  - `startEdit` — düzenleme moduna geçişi başlatan, `disabled` veya `saving` durumunda işlem yapmayan callback.
-  - `cancel` — düzenleme iptal edildiğinde `draft`'ı orijinal `value`'ya sıfırlayan ve `editing`i kapatan callback.
-  - `save` — `draft`'ı `trim()` edip `onSave` async fonksiyonuna gönderen, hata durumunda toast bildirimi gösteren ve ilgili state'leri yöneten async callback.
-    - `trimmed` — `draft`'ın baş ve sondaki boşlukları kaldırılmış hali.
-    - `original` — komponentin başlangıçtaki `value`'nun string temsili.
-  - `handleKeyDown` — klavye olaylarını dinleyen, `Enter` tuşunda `save`i, `Escape` tuşunda `cancel`ı tetikleyen callback.
-    - `e` — `React.KeyboardEvent` nesnesi, tuş bilgisi ve `preventDefault` metodunu içerir.
-- **Dönüş**: React element (JSX) – düzenleme modunda bir `<input>` ve kaydetme animasyonu, düzenleme modunda değilken bir `<button>` döndürür.
+  - `editing` — `useState<boolean>` — hücrenin düzenleme modunda olup olmadığını tutar
+  - `draft` — `useState<string>` — input'taki geçici düzenleme değeri; `value`'dan türetilir, kaydetmeye kadar yerel tutulur
+  - `saving` — `useState<boolean>` — `onSave` çağrısının devam edip etmediğini takip eder, bitene kadar input devre dışı kalır
+  - `inputRef` — `useRef<HTMLInputElement>` — input DOM elemanına erişim sağlar, düzenleme moduna girildiğinde odaklama ve seçim için kullanılır
+  - `useEffect` (draft senkron) — `value` değiştiğinde ve düzenleme modunda değilken `draft`'ı yeni `value` ile senkronize eder
+  - `useEffect` (focus) — `editing` `true` olduğunda input'a otomatik focus veselectAll yapar
+  - `startEdit` — `useCallback` — disabled veya saving değilse draft'ı value'dan doldurur ve editing modunu açar
+  - `cancel` — `useCallback` — draft'ı orijinal value'ya sıfırlar ve editing modunu kapatır
+  - `save` — `useCallback(async)` — draft trimlenmiş hali ile orijinal value karşılaştırır; değişiklik yoksa sadece modu kapatır, varsa `onSave(trimmed)` çağırır, hata olursa toast gösterir ve eski değere döner
+  - `handleKeyDown` — `useCallback` — Enter tuşunda `save()`, Escape tuşunda `cancel()` tetikler
+- **Dönüş**: `JSX.Element` — editing modunda `div` içinde `input` + optional spinner; normal modda `button` ile hücre değeri veya placeholder gösterilir
+
+### [N2_NASIL] AST Pointer: EditableCell.tsx::useEffect[draft-senkron]
+- **params**: yok (useEffect callback)
+- **ic_degiskenler**:
+  - `editing` — dış scope'tan; düzenleme modunda olup olmadığı kontrol edilir
+  - `value` — dış scope'tan; hücrenin güncel değeri, String'e çevrilerek draft'a yazılır
+  - `setDraft` — dış scope'tan; draft state setter'ı
+- **Dönüş**: yok (yan etki: `editing` false iken `draft`'ı `String(value ?? '')` ile günceller)
+
+### [N3_NASIL] AST Pointer: EditableCell.tsx::useEffect[focus]
+- **params**: yok (useEffect callback)
+- **ic_degiskenler**:
+  - `editing` — dış scope'tan; düzenleme modunda olup olmadığı kontrol edilir
+  - `inputRef` — dış scope'tan; input DOM elemanı referansı
+- **Dönüş**: yok (yan etki: editing true ve inputRef.current mevcutsa `focus()` ve `select()` çağırır)
+
+### [N4_NASIL] AST Pointer: EditableCell.tsx::startEdit
+- **params**: yok
+- **ic_degiskenler**:
+  - `disabled` — dış scope'tan; hücre devre dışıysa düzenleme başlatılmaz
+  - `saving` — dış scope'tan; kaydetme devam ediyorsa düzenleme başlatılmaz
+  - `value` — dış scope'tan; mevcut değer `String(value ?? '')` ile draft'a yazılır
+  - `setDraft` — dış scope'tan; draft state setter'ı
+  - `setEditing` — dış scope'tan; editing state setter'ı
+- **Dönüş**: yok (yan etki: disabled/saving değilse draft'ı value ile doldurup editing modunu açar)
+
+### [N5_NASIL] AST Pointer: EditableCell.tsx::cancel
+- **params**: yok
+- **ic_degiskenler**:
+  - `value` — dış scope'tan; mevcut değer `String(value ?? '')` ile draft'a geri yazılır
+  - `setDraft` — dış scope'tan; draft state setter'ı
+  - `setEditing` — dış scope'tan; editing state setter'ı
+- **Dönüş**: yok (yan etki: draft'ı orijinal value'ya sıfırlar ve editing modunu kapatır)
+
+### [N6_NASIL] AST Pointer: EditableCell.tsx::save
+- **params**: yok
+- **ic_degiskenler**:
+  - `draft` — dış scope'tan; input'taki mevcut düzenleme değeri, `.trim()` ile boşlukları temizlenir → `trimmed`
+  - `trimmed` — `draft.trim()` sonucu; karşılaştırma ve kaydetme için kullanılacak temizlenmiş değer
+  - `original` — `String(value ?? '')`; hücrenin orijinal değeri, karşılaştırma ve hata durumunda geri dönüş için kullanılır
+  - `value` — dış scope'tan; orijinal hücre değeri
+  - `onSave` — dış scope'tan; async kaydetme callback'i, `onSave(trimmed)` ile çağrılır
+  - `setEditing` — dış scope'tan; editing state setter'ı
+  - `setSaving` — dış scope'tan; saving state setter'ı
+  - `toast` — `sonner` import'undan; hata durumunda `toast.error('Güncelleme başarısız')` gösterir
+- **Dönüş**: yok (yan etki: değişiklik varsa `onSave(trimmed)` çağırır; hata olursa draft'ı orijinal değere sıfırlar ve hata toast'u gösterir; finally bloğunda saving'i false yapar)
+
+### [N7_NASIL] AST Pointer: EditableCell.tsx::handleKeyDown
+- **params**: `e` — `React.KeyboardEvent` — tuş olayı nesnesi
+- **ic_degiskenler**:
+  - `e.key` — basılan tuşun adı; `'Enter'` veya `'Escape'` kontrol edilir
+  - `e.preventDefault` — varsayılan tarayıcı davranışını engeller
+  - `save` — dış scope'tan; kaydetme fonksiyonu, Enter tuşunda tetiklenir (`void save()`)
+  - `cancel` — dış scope'tan; iptal fonksiyonu, Escape tuşunda tetiklenir
+- **Dönüş**: yok (yan etki: Enter → `save()`, Escape → `cancel()` çağırır; her iki durumda da `preventDefault()` ile varsayılan davranış engellenir)
 
 ---
 

@@ -3,26 +3,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountSecurityPage.tsx
-skeleton_hash: 714d41430b62d140
+skeleton_hash: 3ee88315eea607cf
 entity_hashes:
   func:AccountSecurityPage: c6bf7ae08fac23f0
-  overview: 4253e862f0a8090f
+  overview: 44f19fdf9e73a3e3
   style_tokens: ac89c7eeea9aa372
-generated_at: 2026-05-28T22:38:52Z
+generated_at: 2026-05-29T18:53:04Z
 ---
 
 ## Genel Bakış
-`AccountSecurityPage` bileşeni, kullanıcı hesabının güvenlik ayarlarını görüntülemek ve yönetmek için tasarlanmış bir React sayfasıdır. Sayfa, şifre değişikliği, iki faktörlü kimlik doğrulama ve oturum yönetimi gibi güvenlik ilgili işlemlerin UI mantığını barındırır.
+`AccountSecurityPage`, kullanıcının hesap güvenliğiyle ilgili tüm ayarları yönettiği ana React sayfasıdır. Şifre değiştirme, bağlı kimlik sağlayıcılarını (Google, e-posta vb.) görüntüleme/bağlama ve şifre gücü kontrolü gibi güvenlik işlevlerini tek bir bileşen içinde sunar.
 
 ## Fonksiyon Grupları
-### Güvenlik Ayarları UI
-Bu grup, güvenlik ayarlarını kullanıcıya sunan ve etkileşimlerini yöneten tek bir bileşeni içerir.  
-- AccountSecurityPage   (sayfanın ana render ve durum yönetimi)
+### Güvenlik Ayarları Arayüzü ve Etkileşim
+Sayfanın ana rendered durumunu, form alanlarını ve kullanıcı etkileşimlerini yöneten tek bir kapsamlı bileşeni içerir. Şifre formu alanlarını, durum yönetimini ve tüm UI mantığını barındırır.
+- `AccountSecurityPage` (sayfanın tüm render, durum ve etkileşim mantığını yöneten ana bileşen)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+**Not:** `AccountSecurityPage()` fonksiyon imzası parametresizdir ve modül sabitleri tanımlı değildir. Fonksiyon gövdesi analiz edilmediği için, veri bağımlılıkları, koşullar ve iş mantığı çıkarılamamıştır. Mimari varsayımlar belirlenememiştir.
 
 ---
 
@@ -42,58 +46,40 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountSecurityPage.tsx::AccountSecurityPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: `src/views/account/AccountSecurityPage.tsx`::AccountSecurityPage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `router` — `useRouter()` hook'undan gelen router nesnesi; sayfa yönlendirmeleri için kullanılır.
-  - `user` — `useAuth()` hook'undan gelen oturum bilgisi; mevcut kullanıcının e‑posta vb. alanlarına erişim sağlar.
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; UI metinlerini yerelleştirir.
-  - `current` — Mevcut şifre giriş alanının state'i; `setCurrent` ile güncellenir.
-  - `setCurrent` — `current` state'ini güncelleyen setter fonksiyonu.
-  - `password` — Yeni şifre giriş alanının state'i; `setPassword` ile güncellenir.
-  - `setPassword` — `password` state'ini güncelleyen setter fonksiyonu.
-  - `confirm` — Yeni şifre tekrar giriş alanının state'i; `setConfirm` ile güncellenir.
-  - `setConfirm` — `confirm` state'ini güncelleyen setter fonksiyonu.
-  - `saving` — Form gönderimi sırasında gösterilen yükleme durumu; `setSaving` ile güncellenir.
-  - `setSaving` — `saving` state'ini güncelleyen setter fonksiyonu.
-  - `identities` — Bağlı kimlik (google, email vb.) listesi; `setIdentities` ile güncellenir.
-  - `setIdentities` — `identities` state'ini güncelleyen setter fonksiyonu.
-  - `hasProvider` — Belirli bir sağlayıcı (`p`) mevcut mu diye kontrol eden yardımcı fonksiyon; `identities` üzerinden `some` ile arama yapar.
-  - `passwordRules` — Şifre kurallarını tanımlayan nesne dizisi; her kural bir `key`, `label` ve `test` fonksiyonu içerir.
-  - `passedRules` — `passwordRules` içinde `password` değerini geçen kural sayısı; şifre gücünü hesaplamak için kullanılır.
-  - `strengthColor` — `passedRules` değerine göre belirlenen arka plan rengi sınıfı; UI’da şifre gücünü gösterir.
-  - `strengthLabel` — `passedRules` değerine göre belirlenen metin etiketi (Zayıf, Orta, İyi, Güçlü); UI’da şifre gücünü gösterir.
-- **Dönüş**: yok (React bileşeni JSX döndürür; yan etkileri `useEffect` ve iç fonksiyonlarla yönetilir)
+  - `router` — `useRouter()` hookundan dönen Next.js yönlendirici nesnesi, sayfa yönlendirmeleri için kullanılır
+  - `user` — `useAuth()` hookundan destructure edilen mevcut oturum açmış kullanıcı nesnesi
+  - `t` — `useI18n()` hookundan destructure edilen çeviri fonksiyonu, UI metinleri için kullanılır
+  - `current` — `useState('')` state'i, mevcut/eski şifre input değerini tutar
+  - `password` — `useState('')` state'i, yeni şifre input değerini tutar
+  - `confirm` — `useState('')` state'i, şifre tekrar input değerini tutar
+  - `saving` — `useState(false)` state'i, form gönderim işleminin devam edip etmediğini belirtir
+  - `identities` — `useState<Array<{id?: string; provider?: string}>>()` state'i, kullanıcının bağlı kimlik/bağlantı listesini tutar (google, email vb.)
+  - `hasProvider` — arrow fonksiyon, verilen provider string'ine sahip identities elemanı olup olmadığını kontrol eder
+  - `passwordRules` — dizi, her biri `key`, `label`, `test` alanına sahip şifre kuralları nesneleri dizisi (uzunluk, büyük harf, rakam, özel karakter)
+  - `passedRules` — `passwordRules` dizisi üzerinden `password` state'inin test ettiği kural sayısı (0-4 arası)
+  - `strengthColor` — `passedRules` sayısına göre arka plan rengi CSS sınıfı (bg-red-500, bg-orange-400, bg-yellow-400, bg-green-500)
+  - `strengthLabel` — `passedRules` sayısına göre Türkçe güç etiketi string'i (Zayıf, Orta, İyi, Güçlü)
+- **Dönüş**: JSX (React bileşen render çıktısı)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountSecurityPage.tsx::refreshIdentities
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: `src/views/account/AccountSecurityPage.tsx`::refreshIdentities
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `data` — `supabase.auth.getUser()` çağrısının başarılı yanıtı; kullanıcı bilgilerini içerir.
-  - `error` — `supabase.auth.getUser()` çağrısının hata nesnesi; hata kontrolü için kullanılır.
-  - `ids` — `data.user.identities` alanından alınan kimlik listesi; yoksa boş dizi (`[]`) atanır.
-  - `setIdentities` — Üst bileşenden gelen state setter; kimlik listesini günceller.
-  - `supabase` — Supabase istemcisi; kimlik bilgilerini almak için `auth.getUser()` metodunu çağırır.
-- **Dönüş**: yok (state güncellenir, UI yeniden render olur)
+  - `data` — `supabase.auth.getUser()` çağrısından dönen data nesnesi, kullanıcı bilgilerini içerir
+  - `error` — `supabase.auth.getUser()` çağrısından dönen hata nesnesi, hata yoksa undefined
+  - `ids` — `data.user.identities` alanının tip cast edilmiş hali `Array<{id?: string; provider?: string}>`, boş dizi fallback ile `setIdentities(ids)` ile state'e yazılır
+- **Dönüş**: void (yan etki: `identities` state'ini günceller)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountSecurityPage.tsx::handleSubmit
-- **params**: `e` — `React.FormEvent` nesnesi; form gönderimini durdurmak için `preventDefault()` çağrılır.
+### [N3_NASIL] AST Pointer: `src/views/account/AccountSecurityPage.tsx`::handleSubmit
+- **params**: `e: React.FormEvent` — form submit event nesnesi, `e.preventDefault()` ile varsayılan engellenir
 - **ic_degiskenler**:
-  - `e` — Form submit olayı; `e.preventDefault()` ile varsayılan davranış engellenir.
-  - `current` — Mevcut şifre state'i; boş ise hata toast'ı gösterilir.
-  - `passedRules` — Şifre kurallarının kaç tanesinin sağlandığını gösteren sayı; 4’ten azsa hata toast'ı gösterilir.
-  - `password` — Yeni şifre state'i; kurallara uymuyorsa hata toast'ı gösterilir.
-  - `confirm` — Yeni şifre tekrar state'i; `password` ile eşleşmezse hata toast'ı gösterilir.
-  - `setSaving` — Form gönderimi sırasında yükleme durumunu (`saving`) kontrol eden setter; işlem başında `true`, bitişte `false` yapılır.
-  - `user` — `useAuth()` hook'undan gelen oturum bilgisi; `email` alanı `reauth` için kullanılır.
-  - `supabase` — Supabase istemcisi; kimlik doğrulama, şifre güncelleme ve kimlik bağlama işlemlerinde kullanılır.
-  - `toast` — `react-hot-toast` kütüphanesinden gelen toast fonksiyonu; hata ve başarı mesajları gösterir.
-  - `t` — Çeviri fonksiyonu; toast mesajlarını yerelleştirir.
-  - `hibpPwnedCount` — `password`'ün daha önce sızdırılıp sızdırılmadığını kontrol eden async fonksiyon; 0’dan büyükse hata toast'ı gösterilir.
-  - `setCurrent` — `current` state'ini temizleyen setter; işlem başarılı olduğunda boş string atanır.
-  - `setPassword` — `password` state'ini temizleyen setter; işlem başarılı olduğunda boş string atanır.
-  - `setConfirm` — `confirm` state'ini temizleyen setter; işlem başarılı olduğunda boş string atanır.
-  - `console` — Hata yakalama bloklarında hataları konsola loglamak için kullanılır.
-- **Dönüş**: yok (form gönderimi yan etkileriyle (toast, state güncellemeleri, yönlendirme) yönetilir)
+  - `email` — `user?.email || ''` ile elde edilen kullanıcı e-posta adresi, yeniden kimlik doğrulama için kullanılır
+  - `reauth` — `supabase.auth.signInWithPassword({ email, password: current })` çağrısının sonucu, mevcut şifre ile yeniden kimlik doğrulama yanıtı; `reauth.error` varsa yanlış şifre
+  - `pwned` — `hibpPwnedCount(password)` async çağrısının sonucu (sayı), yeni şifrenin Have I Been Pwned veritabanında kaç kez sızdırıldığını gösterir; 0'dan büyükse şifre reddedilir
+  - `error` — `supabase.auth.updateUser({ password })` çağrısından destructure edilen hata nesnesi, şifre güncelleme başarısızsa fırlatılır
+- **Dönüş**: void (yan etkiler: şifre günceller, form alanlarını sıfırlar, toast bildirimleri gösterir)
 
 ---
 

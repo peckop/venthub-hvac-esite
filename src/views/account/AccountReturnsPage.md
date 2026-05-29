@@ -3,26 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx
-skeleton_hash: 3a744f7714238bb9
+skeleton_hash: 109a1efcdb007f73
 entity_hashes:
   func:AccountReturnsPage: b01b740ffc8dc4da
-  overview: 094ef3e3bb6279cc
+  overview: edff17140391afac
   style_tokens: d5328287ff24abb4
-generated_at: 2026-05-28T22:38:52Z
+generated_at: 2026-05-29T18:52:47Z
 ---
 
 ## Genel Bakış
-`AccountReturnsPage` bileşeni, kullanıcıların iade işlemlerini görüntüleyebildiği ve yönetebildiği bir sayfa sunar. React/TypeScript ortamında, ilgili veri çekme, durum yönetimi ve UI render işlemlerini tek bir bileşende birleştirir.
+`AccountReturnsPage`, kullanıcıların iade işlemlerini görüntüleyebildiği, yeni iade talepleri oluşturabildiği ve iade sürecinin durumunu takip edebildiği bir hesap sayfası bileşenidir. Supabase üzerinden iade kayıtlarını ve sipariş bilgilerini çekerek, loading/error/empty durumlarını yöneten tek bileşenli bir yapı sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Render ve Veri Yönetimi
-Bu grup, iade listelerinin alınması, sayfa durumunun (loading, error, empty) yönetilmesi ve UI’nın oluşturulmasından sorumludur.  
-- AccountReturnsPage   (sayfanın ana bileşeni, veri çekme ve render akışını kontrol eder)
+### Veri Çekme ve Durum Yönetimi
+Bileşen içindeki asenkron veri yükleme işlemlerini, Supabase sorgularını ve sayfa durumlarının (yükleniyor, hata, boş liste) yönetimini kontrol eder.
+- AccountReturnsPage (useEffect içinde load ve loadOrders fonksiyonlarıyla veri çekme akışı)
+
+### Form ve Modal İşlemleri
+Yeni iade talebi oluşturma formunun durumunu, modal açma/kapama mantığını ve form doğrulama ile kayıt ekleme işlemlerini yönetir.
+- AccountReturnsPage (form state, openModal, handleCreate fonksiyonu)
+
+### Sayfa Render ve Görsel Sunum
+Sayfa düzenini, iade listesi tablosunu, durum göstergelerini ve iade süreci zaman çizelgesini oluşturan render mantığını içerir.
+- AccountReturnsPage (JSX yapısı, statusClass, getStatus yardımcıları)
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
 
 ---
 
@@ -70,89 +77,80 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::AccountReturnsPage
-- **params**: (none)
+### [N1_NASIL] AST Pointer: `AccountReturnsPage.tsx`::useEffect_load_returns
+- **params**: () (React useEffect callback, parametre yok)
 - **ic_degiskenler**:
-  - `mounted` — effect yaşam döngüsü boyunca bileşenin hâlâ monte edilmiş olup olmadığını izler; temizleme fonksiyonunda `false` yapılır.
-  - `load` — returns verisini Supabase’dan çeken ve `setRows`, `setLoading` durumlarını yöneten async iç fonksiyon.
-- **Dönüş**: yok (React bileşeni render eder, yan etkileri `useEffect` içinde yönetir)
+  - `mounted` — useEffect cleanup flag; component unmount olduğunda false yapılır, state güncellemelerini engeller
+- **Dönüş**: cleanup fonksiyonu döner (`() => { mounted = false }`)
 
-### [N2_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::load
-- **params**: (none)
+### [N2_NASIL] AST Pointer: `AccountReturnsPage.tsx`::load
+- **params**: () (parametre yok, closure içinde user, mounted, setRows, setLoading, t erişir)
 - **ic_degiskenler**:
-  - `list` — Supabase sorgusundan dönen returns listesi (`data` kısmı).
-  - `error` — Supabase sorgusundan dönen hata nesnesi.
-- **Dönüş**: yok (durum günceller, hata fırlatır)
+  - `list` — supabase'den dönen iade kayıtları dizisi (destructuring ile `{ data: list, error }`)
+  - `error` — supabase sorgusundan dönen hata nesnesi (destructuring ile `{ data: list, error }`)
+- **Dönüş**: yok (async void; setRows ile state günceller, toast.error ile hata gösterir)
 
-### [N3_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::loadOrders
-- **params**: (none)
+### [N3_NASIL] AST Pointer: `AccountReturnsPage.tsx`::useEffect_load_orders
+- **params**: () (React useEffect callback, parametre yok)
 - **ic_degiskenler**:
-  - `data` — Supabase’dan çekilen sipariş kayıtları.
-  - `error` — Supabase sorgusundan dönen hata nesnesi.
-  - `fb` — alternatif sorgu (sütun eksikliği/400 hatası durumunda) sonucu.
-- **Dönüş**: yok (`setOrders` ile durum günceller)
+  - `mounted` — useEffect cleanup flag; component unmount olduğunda false yapılır
+- **Dönüş**: cleanup fonksiyonu döner (`() => { mounted = false }`)
 
-### [N4_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::prefillEffect
-- **params**: (none)
+### [N4_NASIL] AST Pointer: `AccountReturnsPage.tsx`::loadOrders
+- **params**: () (parametre yok, closure içinde user, mounted, setOrders erişir)
 - **ic_degiskenler**:
-  - `prefillOrderId` — URL parametresi veya dışarıdan gelen ön‑doldurma değeri.
-- **Dönüş**: yok (modal açma yan etkisi)
+  - `data` — supabase'den dönen sipariş verileri (destructuring ile `let { data, error }`)
+  - `error` — supabase sorgusundan dönen hata nesnesi (destructuring ile `let { data, error }`)
+  - `fb` — fallback sorgu sonucu; `order_number` sütunu yoksa alternatif select sonucu (`const fb = await supabase...`)
+- **Dönüş**: yok (async void; setOrders ile state günceller)
 
-### [N5_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::reasonOptions
-- **params**: (none)
-- **ic_degiskenler**: (none, sadece sabit dizi döner)
-- **Dönüş**: `string[]` — iade nedenleri listesi
+### [N5_NASIL] AST Pointer: `AccountReturnsPage.tsx`::useEffect_prefill_modal
+- **params**: () (React useEffect callback, parametre yok)
+- **ic_degiskenler**: (yok — sadece prefillOrderId kontrolü yapıp setOpenModal çağırır)
+- **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::submitReturn
-- **params**: (none)
+### [N6_NASIL] AST Pointer: `AccountReturnsPage.tsx`::getReasons
+- **params**: () (parametre yok)
+- **ic_degiskenler**: (yok — doğrudan string dizisi literal döner)
+- **Dönüş**: `string[]` — iade sebepleri dizisi: `['Yanlış ürün/eksik parça', 'Hasarlı ürün', 'Uyumsuz/istenen özelliklerde değil', 'Fikrim değişti', 'Diğer']`
+
+### [N7_NASIL] AST Pointer: `AccountReturnsPage.tsx`::handleSubmitReturn
+- **params**: () (async arrow function, parametre yok; closure içinde form, user, supabase, toast, t, setOpenModal, setForm, setRows, router erişir)
 - **ic_degiskenler**:
-  - `form.order_id` — seçilen sipariş kimliği.
-  - `form.reason` — seçilen iade nedeni.
-  - `form.description` — isteğe bağlı açıklama.
-  - `payload` — Supabase `venthub_returns` tablosuna eklenecek veri nesnesi.
-  - `error` — insert işleminden dönen hata.
-  - `list` — yeni eklenen iade sonrası güncellenen returns listesi.
-- **Dönüş**: yok (toast gösterir, modal kapatır, form sıfırlar, yönlendirir)
+  - `payload` — supabase insert için hazırlanan nesne; `order_id`, `user_id`, `reason`, `description` alanlarını içerir
+  - `list` — insert sonrası yeniden sorgulanan iade kayıtları dizisi (`const { data: list } = await supabase...`)
+- **Dönüş**: yok (async void; toast.success/toast.error ile bildirim, setOpenModal ile modal kapatma, router.push ile navigasyon)
 
-### [N7_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::statusClass
-- **params**: `s: string`
+### [N8_NASIL] AST Pointer: `AccountReturnsPage.tsx`::statusClass
+- **params**: `(s: string)` — iade durumu stringi
 - **ic_degiskenler**:
-  - `v` — `s` değerinin küçük harfe çevrilmiş hali; sınıf seçimi için kullanılır.
-- **Dönüş**: `string` — CSS sınıfı
+  - `v` — parametrenin küçük harfe çevrilmiş hali, karşılaştırma için (`const v = (s || '').toLowerCase()`)
+- **Dönüş**: `string` — Tailwind CSS class name (ör: `'bg-yellow-100 text-yellow-800'`)
 
-### [N8_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::getStatusIcon
-- **params**: `status: string`
-- **ic_degiskenler**: (none, sadece `status` üzerinden switch)
-- **Dönüş**: `JSX.Element` — ilgili Lucide‑react ikonu
+### [N9_NASIL] AST Pointer: `AccountReturnsPage.tsx`::getStatusIcon
+- **params**: `(status: string)` — iade durumu stringi
+- **ic_degiskenler**: (yok — switch/if ile doğrudan JSX element döner)
+- **Dönüş**: `JSX.Element` — duruma göre icon bileşeni (Clock, CheckCircle, XCircle, Truck, Package, RefreshCw)
 
-### [N9_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::getStatusLabel
-- **params**: `status: string`
-- **ic_degiskenler**: (none, sadece `status` üzerinden i18n lookup)
-- **Dönüş**: `string` — yerelleştirilmiş durum etiketi
+### [N10_NASIL] AST Pointer: `AccountReturnsPage.tsx`::getStatusLabel
+- **params**: `(status: string)` — iade durumu stringi
+- **ic_degiskenler**: (yok — doğrudan t() çağrısının sonucu döner)
+- **Dönüş**: `string` — localized durum etiketi (`t(\`returns.statusLabels.${status}\`)`) veya status'un kendisi
 
-### [N10_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::getReturnTimeline
-- **params**: `currentStatus: string`
+### [N11_NASIL] AST Pointer: `AccountReturnsPage.tsx`::getReturnTimeline
+- **params**: `(currentStatus: string)` — mevcut iade durumu
 - **ic_degiskenler**:
-  - `allSteps` — normal akıştaki adımların sabit dizisi.
-  - `currentIndex` — `currentStatus`’ın `allSteps` içindeki konumu.
-- **Dönüş**: `TimelineStep[]` — her adımın tamamlanma ve mevcut olma bilgisiyle dönen dizi
+  - `allSteps` — tüm timeline adımlarının tanımlı dizisi; her biri `{ key, label }` yapısındadır (5 adım: requested, approved, in_transit, received, refunded)
+  - `currentIndex` — currentStatus'un allSteps dizisindeki indeksi; `-1` ise bulunamamıştır (`allSteps.findIndex(step => step.key === currentStatus)`)
+- **Dönüş**: `TimelineStep[]` — her adım için `{ key, label, completed?, isCurrent?, isTerminal? }` nesnelerinden oluşan dizi
 
-### [N11_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::renderOption
-- **params**: `o: OrderLite`
-- **ic_degiskenler**: (none, sadece `o` üzerinden değer okur)
-- **Dönüş**: `JSX.Element` — `<option>` öğesi
-
-### [N12_NASIL] AST Pointer: src\views\account\AccountReturnsPage.tsx::renderReturnRow
-- **params**: `r: ReturnRow`
+### [N12_NASIL] AST Pointer: `AccountReturnsPage.tsx`::renderReturnCard
+- **params**: `(r)` — ReturnRow tipinde bir iade kaydı nesnesi
 - **ic_degiskenler**:
-  - `o` — `orders` dizisinden `r.order_id` eşleşen sipariş.
-  - `code` — sipariş numarası ya da return id’den türetilen gösterim kodu.
-  - `timeline` — `getReturnTimeline(r.status)` sonucu.
-- **Dönüş**: `JSX.Element` — iade satırı kartı markup’u
-
---- 
-
-*Not: Fonksiyon isimleri, kod içinde açıkça tanımlı olan adlardan alınmıştır; anonim arrow fonksiyonlar (useEffect callbackleri vb.) için mantıksal bir adlandırma yapılmıştır.*
+  - `o` — orders dizisi içinde r.order_id eşleşen sipariş nesnesi (`orders.find(x => x.id === r.order_id)`)
+  - `code` — gösterim için sipariş kodu; order_number varsa `#${order_number.split('-')[1]}`, yoksa `#${r.order_id.slice(-8).toUpperCase()}`
+  - `timeline` — bu iade kaydının durumuna göre timeline adımları dizisi (`getReturnTimeline(r.status)`)
+- **Dönüş**: `JSX.Element` — iade kaydı kart JSX'i (header, details, progress timeline bölümleri)
 
 ---
 

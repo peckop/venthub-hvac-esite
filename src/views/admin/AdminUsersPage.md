@@ -3,28 +3,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx
-skeleton_hash: 348e12a8da4fe548
+skeleton_hash: aab27482c6f16b67
 entity_hashes:
   func:AdminUsersPage: ee013d03ee079db2
-  overview: 3fe4b4182e26dc08
+  overview: 0096771747f8ab6c
   style_tokens: 8daaaf9992883c4d
-generated_at: 2026-05-28T22:39:48Z
+generated_at: 2026-05-29T19:00:45Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC sisteminin yönetici panelinde yer alan kullanıcı yönetimi sayfasını oluşturan React bileşenini barındırır. Yöneticilerin platformdaki tüm kullanıcı hesaplarını görüntülemesi, düzenlemesi ve yönetmesi için gereken arayüzün temel yapısını sunar. Sayfa, yetkili yöneticilerin kullanıcı tablosunu filtrelemesi, detay görmesi ve gerekli işlemleri yapabilmesi için gerekli işlevselliği tek bir bileşen altında toplar.
+Bu modül, VentHub HVAC yönetici panelinde yer alan kullanıcı yönetimi sayfasını oluşturan ana React bileşenidir. Yetkili yöneticilerin platformdaki tüm kullanıcı hesaplarını görüntülemesi, filtrelemesi, detay bilgilerini incelemesi ve rol gibi temel bilgileri değiştirebilmesi için gereken arayüzün tamamını sunar. Sayfa, yönetici ve normal kullanıcı sekmeleri arasında geçiş yaparak verileri dinamik şekilde yükler ve yöneticilerin kullanıcıları etkin bir şekilde denetlemesini sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Yönetici kullanıcılar sayfasının tüm işlevselliğini tek bir bileşen altında toplayan, sayfanın renderlanmasından ve temel iş akışından sorumlu ana bileşendir. Kullanıcı listeleme arayüzünün yönetici paneli ortamında sorunsuz çalışmasını sağlar.
+Yönetici kullanıcılar sayfasının tüm arayüz ve işlevselliğini tek bir bileşen altında toplayan, sayfanın renderlanmasından ve temel veri akışından sorumlu ana bileşendir. Oturum kontrolü, veri çekme, filtreleme ve rol değiştirme gibi işlemleri yöneterek yönetici panelinde kullanıcı yönetimini mümkün kılar.
 - `AdminUsersPage`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Not:** Fonksiyon gövdesi verilmediği için mimari varsayımlar üretilememektedir. Aksiyom üretimi için AdminUsersPage bileşeninin implementasyon koduna ihtiyaç vardır.
+Bu modül için fonksiyon gövdesi detayları paylaşılmamıştır, bu nedenle yalnızca fonksiyon imzasından ve modül yapısından çıkarılabilecek minimal aksiyomlar tanımlanmıştır.
+
+---
+
+[Aksiyom 1]: Eğer bileşen bir React sayfa bileşeni olarak render ediliyorsa, bir React Router v6+ ortamında çalışması gerekir. Eğer geçerli bir React Router bağlamı (Router Context) yoksa, bileşen iç navigasyon ve route parametreleri doğru çalışmaz.
+
+[Aksiyom 2]: Eğer bileşen yönetici paneline ait bir sayfa ise, kullanıcı bilgileri ve rol kontrolü için üst seviye bir AuthProvider/Context bağlamı mevcut olmalıdır. Eğer Auth Context bağlantısı yoksa, yönetici yetkilendirme kontrolü yapılamaz ve yetkisiz erişim riski oluşur.
+
+[Aksiyom 3]: Eğer AdminUsersPage fonksiyonu paramet almıyorsa (signature: `AdminUsersPage()`), bileşen props yerine hook'lar (useContext, useNavigate, useQuery vb.) aracılığıyla bağımlılıklarını karşılar. Eğer gerekli hook'lar çalıştırılamıyorsa (örn: bir Provider içinde render edilmemişse), bileşen hata fırlatır.
+
+---
+
+**Not:** Fonksiyon gövdesi detayları paylaşılmadığı için, API çağrıları, state yönetimi, filtreleme eşik değerleri veya veri modeli bağımlılıkları gibi detaylı aksiyomlar türetilememiştir. Fonksiyon implementasyonu paylaşıldığında daha spesifik aksiyomlar eklenebilir.
 
 ---
 
@@ -63,174 +74,186 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminUsersPage::roleCheckEffect
-- **params**: () — effect callback, parametre yok
-- **ic_degiskenler**:
-  - `role` — useAuth'tan gelen kullanıcının mevcut rolü, super_admin/admin olup olmadığı kontrol edilir
-- **Dönüş**: yok (state setter çağrısı: `setAdminUsers`)
+### [N1_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::setIsAdminCallback
+- **params**: () — parametre yok
+- **ic_degiskenler**: (yok, doğrudan state setter çağrılır)
+- **Dönüş**: yok (yan etki: `isAdmin` state'ini `role` değerine göre günceller)
 
 ---
 
-### [N2_NASIL] AST Pointer: AdminUsersPage::authRedirectEffect
-- **params**: () — effect callback, parametre yok
-- **ic_degiskenler**:
-  - `loading` — useAuth'tan gelen oturum yükleme durumu
-  - `user` — useAuth'tan gelen mevcut kullanıcı nesnesi
-- **Dönüş**: yok (yan etki: `router.push` ile login sayfasına yönlendirme)
-
----
-
-### [N3_NASIL] AST Pointer: AdminUsersPage::loadAdminUsersEffect
-- **params**: () — effect callback, parametre yok
-- **ic_degiskenler**:
-  - `loadAdminUsers` — asenkron iç fonksiyon, admin kullanıcı listesini yükler ve çağrılır
-- **Dönüş**: yok (effect side-effect olarak veri çeker)
-
----
-
-### [N4_NASIL] AST Pointer: AdminUsersPage::loadAdminUsers
+### [N2_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::redirectIfUnauthenticated
 - **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `isAdmin` — kullanıcının admin olup olmadığını belirleyen boolean, true değilse fonksiyon erken döner
-  - `user` — mevcut oturum kullanıcısı, null ise fonksiyon erken döner
-  - `isLoading` — yükleme durumu flag'i, true yapılarak spinner tetiklenir (`setIsLoading(true)`)
-  - `data` — `listAdminUsers()` API çağrısından dönen admin kullanıcı dizisi
-  - `profiles` — `supabase.from('user_profiles').select(...)` sorgusundan dönen profil dizisi, manuel join için kullanılır
-  - `profiles?.find(p => p.id === u.id)?.full_name` — her admin user'ın id'sine karşılık gelen profil tam adı
-  - `u.full_name` — profil bulunamazsa fallback olarak kullanılır
-  - `enrichedAdmins` — `data.map(...)` ile genişletilmiş, full_name zenginleştirilmiş admin kullanıcı dizisi
-  - `_t('admin.users.toasts.adminsLoadFailed')` — hata toast mesajı için çeviri anahtarı
-- **Dönüş**: yok (yan etki: `setAdminUsers(enrichedAdmins)` ile state güncellenir)
+  - `loading` — useAuth hook'undan gelen yükleme durumu flag'i, true ise henüz oturum kontrolü devam ediyor demektir
+  - `user` — useAuth hook'undan gelen mevcut kullanıcı nesnesi, null ise giriş yapılmamıştır
+  - `router` — useRouter hook'undan gelen Next.js router instance'ı, sayfa yönlendirme için kullanılır
+- **Dönüş**: yok (yan etki: kullanıcı giriş yapmamışsa `/admin/users` login sayfasına yönlendirir)
 
 ---
 
-### [N5_NASIL] AST Pointer: AdminUsersPage::enrichAdminProfileMap
-- **params**: `u` — `AdminUser` tipinde tek bir admin kullanıcı nesnesi (map callback)
-- **ic_degiskenler**:
-  - `u` — genişletme yapılan orijinal admin user nesnesi, spread ile kopyalanır (`...u`)
-  - `profiles` — üst kapsamdan gelen supabase profil sorgusu sonucu
-  - `profiles?.find(p => p.id === u.id)?.full_name` — eşleşen profil tam adı
-  - `u.full_name` — profil eşleşmezse fallback tam ad
-- **Dönüş**: `{ ...u, full_name: ... }` — tam ad alanı zenginleştirilmiş admin user nesnesi
-
----
-
-### [N6_NASIL] AST Pointer: AdminUsersPage::loadAllUsersEffect
-- **params**: () — effect callback, parametre yok
-- **ic_degiskenler**:
-  - `loadAllUsers` — asenkron iç fonksiyon, tüm kullanıcıları yükler ve çağrılır
-- **Dönüş**: yok (effect side-effect olarak veri çeker)
-
----
-
-### [N7_NASIL] AST Pointer: AdminUsersPage::loadAllUsers
+### [N3_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectLoadAdminUsers
 - **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `isAdmin` — admin yetkisi kontrolü, false ise erken dönüş
-  - `user` — oturum kullanıcısı, null ise erken dönüş
-  - `activeTab` — mevcut aktif sekme, 'all' değilse erken dönüş
-  - `isLoading` — yükleme durumu flag'i (`setIsLoading(true)` ile tetiklenir)
-  - `profiles` — `supabase.from('user_profiles').select('id, role, created_at, full_name')` sorgusundan delen tüm kullanıcı profil dizisi
-  - `profileError` — supabase sorgusundan dönen hata nesnesi, varsa fırlatılır
-  - `_t('admin.users.toasts.allLoadFailed')` — hata toast mesajı için çeviri anahtarı
-- **Dönüş**: yok (yan etki: `setAllUsers(profiles)` ile state güncellenir, hata durumunda `setAllUsers([])` ile temizlenir)
+  - `isAdmin` — kullanıcının admin olup olmadığını belirten boolean state, inner function'ın guard kontrolünde kullanılır
+  - `user` — useAuth hook'undan gelen mevcut kullanıcı nesnesi, inner function'ın guard kontrolünde kullanılır
+- **ic_fonksiyonlar**:
+  - `loadAdminUsers` — async inner fonksiyon, admin kullanıcı listesini yükler
+- **Dönüş**: yok (yan etki: `isAdmin` true ve `user` mevcutsa `loadAdminUsers()` çağırır)
 
 ---
 
-### [N8_NASIL] AST Pointer: AdminUsersPage::handleRoleChange
-- **params**: `userId` (string) — rolü değiştirilecek kullanıcının benzersiz kimliği, `newRole` ('user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer') — hedef rol
+### [N4_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::loadAdminUsers
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `hasWriteAccess` — kullanıcının yazma yetkisi olup olmadığı boolean, false ise fonksiyon erken döner
-  - `userId` — hedef kullanıcının ID'si
-  - `newRole` — atanmak istenen yeni rol
-  - `success` — `setUserAdminRole(userId, newRole)` çağrısının başarı durumu boolean
-  - `logAdminAction` — dinamik import ile yüklenen audit log fonksiyonu (`../../lib/audit` modülünden)
-  - `supabase` — audit log çağrısında kullanılan supabase istemcisi
-  - `allUsers` — mevcut tüm kullanıcı dizisi, eski rolü bulmak için `allUsers.find(u => u.id === userId)?.role` kullanılır
-  - `data` — `listAdminUsers()` ile yeniden yüklenen admin kullanıcı listesi
-  - `_t('admin.users.permissionsError')` — yetki hatası toast mesajı
-  - `_t('admin.users.toasts.roleUpdated')` — başarı toast mesajı, `{ role: _t(...) }` parametre ile
-  - `_t('admin.users.toasts.roleNotUpdated')` — başarısızlık toast mesajı
-  - `_t('admin.users.toasts.roleUpdateError')` — genel hata toast mesajı
-- **Dönüş**: yok (yan etki: `setAllUsers(prev => prev.map(...))` ile local state güncellenir, `setAdminUsers(data)` ile admin listesi yenilenir)
+  - `isAdmin` — boolean state, guard kontrolünde kullanılır; false ise fonksiyon erken return eder
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, guard kontrolünde kullanılır; null ise erken return
+  - `data` — `listAdminUsers()` API çağrısının dönüş değeri; admin kullanıcıların dizisi (AdminUser[])
+  - `profiles` — `supabase.from('user_profiles').select(...)` sorgusunun `data` alanı; `{id, full_name}` alanlarını içeren profil nesneleri dizisi
+  - `enrichedAdmins` — `data.map(...)` ile oluşturulan genişletilmiş admin listesi; her user objesine `full_name` alanı profile'dan join edilerek eklenir
+- **API Cagrilari**:
+  - `listAdminUsers()` — admin kullanıcı listesini getiren servis fonksiyonu
+  - `supabase.from('user_profiles').select('id, full_name').in('id', data.map(u => u.id))` — user_profiles tablosundan admin kullanıcıların profil bilgilerini çeker
+- **Dönüş**: yok (yan etki: `setIsLoading(true)`, `setAdminUsers(enrichedAdmins)` state güncellemeleri yapar, hata durumunda `toast.error` gösterir)
 
 ---
 
-### [N9_NASIL] AST Pointer: AdminUsersPage::updateAllUsersState
-- **params**: `prev` — mevcut `AllUser[]` state dizisi (React state updater callback)
+### [N5_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::adminUsersMapCallback
+- **params**: `u` — AdminUser tipinde tek bir admin kullanıcısı nesnesi
 - **ic_degiskenler**:
-  - `prev` — önceki tüm kullanıcılar dizisi
-  - `u` — `prev.map` içindeki her bir kullanıcı nesnesi
-  - `userId` — hedef kullanıcı ID'si, eşleşme kontrolü yapılır (`u.id === userId`)
-  - `newRole` — atanacak yeni rol stringi
-- **Dönüş**: `{ ...u, role: newRole }` veya orijinal `u` — güncellenmiş `AllUser[]` dizisi
+  - `profiles` — outer scope'tan gelen supabase sorgusundan dönen profil dizisi; `.find(p => p.id === u.id)` ile eşleşme aranır
+- **Dönüş**: nesne — `...u` spread ile mevcut alanlar korunur, `full_name` alanı profiles'tan bulunamazsa `u.full_name` fallback kullanılır
 
 ---
 
-### [N10_NASIL] AST Pointer: AdminUsersPage::getRoleIcon
-- **params**: `roleCode` (string) — rol kodu ('super_admin', 'admin', 'warehouse', 'sales' veya diğer)
-- **ic_degiskenler**: yok (switch statement doğrudan parametreyi kullanır)
-- **Dönüş**: JSX.Element — ilgili role karşılık gelen Lucide icon bileşeni (Crown, Shield, ShieldCheck veya Users)
-
----
-
-### [N11_NASIL] AST Pointer: AdminUsersPage::loadPreferencesEffect
-- **params**: () — effect callback, parametre yok
+### [N6_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectLoadAllUsers
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `c` — `localStorage.getItem(...)` ile okunan sütun görünürlükleri JSON stringi, parse edilerek `visibleCols` state'ine merged
-  - `d` — `localStorage.getItem(...)` ile okunan yoğunluk tercihi stringi, 'compact' veya 'comfortable' ise `density` state'ine set edilir
-  - `STORAGE_KEY` — localStorage anahtar öneki, sütun tercihleri için kullanılır
-- **Dönüş**: yok (yan etki: `setVisibleCols`, `setDensity` state setter'ları çağrılır)
+  - `isAdmin` — boolean state, guard kontrolünde kullanılır
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, guard kontrolünde kullanılır
+  - `activeTab` — mevcut aktif sekme state'i; `'all'` değilse fonksiyon erken return eder
+- **ic_fonksiyonlar**:
+  - `loadAllUsers` — async inner fonksiyon, tüm kullanıcı listesini yükler
+- **Dönüş**: yok (yan etki: guard koşulları sağlandığında `loadAllUsers()` çağırır)
 
 ---
 
-### [N12_NASIL] AST Pointer: AdminUsersPage::saveColumnsEffect
-- **params**: () — effect callback, parametre yok
+### [N7_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::loadAllUsers
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `visibleCols` — mevcut sütun görünürlük nesnesi, JSON string olarak localStorage'a yazılır
-  - `STORAGE_KEY` — localStorage anahtar öneki
-- **Dönüş**: yok (yan etki: `localStorage.setItem(...)` ile sütun tercihleri kaydedilir)
+  - `isAdmin` — boolean state, guard kontrolünde kullanılır
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, guard kontrolünde kullanılır
+  - `activeTab` — mevcut sekme state'i; `'all'` değilse fonksiyon erken return
+  - `profiles` — `supabase.from('user_profiles').select(...)` sorgusunun `data` alanı; `{id, role, created_at, full_name}` alanlarını içeren tüm kullanıcı profil dizisi (AllUser[])
+  - `profileError` — supabase sorgusunun `error` alanı; sorgu hatası varsa fırlatılır
+- **API Cagrilari**:
+  - `ensureSessionFresh()` — proaktif oturum tazeleme kontrolü yapar
+  - `supabase.from('user_profiles').select('id, role, created_at, full_name')` — user_profiles tablosundan tüm kullanıcıların temel bilgilerini çeker
+- **Dönüş**: yok (yan etki: `setIsLoading(true/false)`, `setAllUsers(profiles)` state güncellemeleri yapar; hata durumunda `setAllUsers([])` ile listeyi temizler ve `toast.error` gösterir)
 
 ---
 
-### [N13_NASIL] AST Pointer: AdminUsersPage::saveDensityEffect
-- **params**: () — effect callback, parametre yok
+### [N8_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::handleRoleChange
+- **params**: `userId` — string, rolü değiştirilecek kullanıcının benzersiz kimliği; `newRole` — string union tipi (`'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer'`), hedef rol
 - **ic_degiskenler**:
-  - `density` — yoğunluk tercihi stringi ('compact' veya 'comfortable'), localStorage'a yazılır
-  - `STORAGE_KEY` — localStorage anahtar öneki
-- **Dönüş**: yok (yan etki: `localStorage.setItem(...)` ile yoğunluk tercihi kaydedilir)
+  - `hasWriteAccess` — boolean, kullanıcının yazma yetkisi olup olmadığını belirler; false ise toast gösterilip erken return
+  - `success` — `setUserAdminRole(userId, newRole)` çağrısının boolean dönüş değeri; true ise güncelleme başarılı demektir
+  - `logAdminAction` — dinamik import ile `../../lib/audit` modülünden yüklenen audit loglama fonksiyonu
+- **API Cagrilari**:
+  - `setUserAdminRole(userId, newRole)` — kullanıcının rolünü veritabanında günceller
+  - `import('../../lib/audit').logAdminAction(supabase, {...})` — dinamik import ile audit log kaydı oluşturur; `supabase` instance'ı, `table_name: 'user_profiles'`, `row_pk: userId`, `action: 'UPDATE'`, `before: { role: ... }`, `after: { role: newRole }`, `comment: 'role change'` parametreleri ile
+  - `listAdminUsers()` — güncelleme sonrası admin listesini yeniden çeker
+- **Dönüş**: yok (yan etki: `setUpdatingRole(userId/null)`, `setAllUsers(prev => ...)`, `setAdminUsers(data)` state güncellemeleri yapar; success'e göre `toast.success` veya `toast.error` gösterir)
 
 ---
 
-### [N14_NASIL] AST Pointer: AdminUsersPage::UserAvatar
-- **params**: `{ name, email }` — `name?` (string, opsiyonel — kullanıcının tam adı), `email?` (string, opsiyonel — kullanıcının e-posta adresi)
+### [N9_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::setAllUsersMapCallback
+- **params**: `prev` — AllUser[] tipinde mevcut tüm kullanıcılar dizisi (setState'in önceki değeri)
 - **ic_degiskenler**:
-  - `initial` — `(name || email || '?').charAt(0).toUpperCase()` ile hesaplanan avatar baş harfi, büyük harfe dönüştürülür
-- **Dönüş**: JSX.Element — gradient arka planlı, baş harf içeren dairesel avatar bileşeni
+  - `u` — `.map()` iterasyonundaki mevcut kullanıcı nesnesesi
+  - `userId` — outer scope'tan gelen hedef kullanıcı kimliği
+  - `newRole` — outer scope'tan gelen yeni rol değeri
+- **Dönüş**: AllUser[] — her kullanıcı için `u.id === userId` eşleşiyorsa `role` alanı `newRole` ile değiştirilmiş nesne, diğerleri aynen korunur
 
 ---
 
-### [N15_NASIL] AST Pointer: AdminUsersPage::renderUserRow
-- **params**: `userItem` — `AdminUser | AllUser` tipinde tek bir kullanıcı nesnesi
+### [N10_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::searchFilterCallback
+- **params**: `user` — AllUser tipinde tek bir kullanıcı nesnesi
 - **ic_degiskenler**:
-  - `userItem.id` — satır key'i ve rol değiştirme butonlarında kullanıcı tanımlayıcısı
-  - `userItem.email` — kullanıcının e-posta adresi, UserAvatar'a ve tablo hücresine yazdırılır
-  - `userItem.full_name` — kullanıcının tam adı, UserAvatar'a ve tablo hücresine yazdırılır
-  - `userItem.role` — kullanıcının mevcut rolü, rol ikonu ve aksiyon butonlarının koşullarında kullanılır
-  - `userItem.created_at` — kullanıcının hesap oluşturma tarihi, `formatDate(userItem.created_at, lang)` ile formatlanır
-  - `visibleCols.user` — email/sütununun görünürlük flag'i
-  - `visibleCols.role` — rol sütununun görünürlük flag'i
-  - `visibleCols.created` — tarih sütununun görünürlük flag'i
-  - `visibleCols.actions` — aksiyon butonları sütununun görünürlük flag'i
-  - `role` — mevcut oturum kullanıcısının rolü, super_admin/admin kontrollerinde kullanılır
-  - `hasWriteAccess` — yazma yetkisi boolean, butonların disabled durumunu belirler
-  - `updatingRole` — şu an rolü güncellenen kullanıcının ID'si, butonları devre dışı bırakmak için kullanılır
-  - `_t(...)` — çeviri fonksiyonu, rol etiketleri ve buton başlıkları için kullanılır
-  - `lang` — mevcut dil kodu, `formatDate` fonksiyonuna geçirilir
-  - `handleRoleChange` — rol değiştirme handler fonksiyonu, her butonun onClick'inde çağrılır
-  - `adminTableCellClass` — tablo hücreleri için ortak CSS sınıfı
-  - `cellPad` — tablo hücre iç;padding sınıfı
-- **Dönüş**: JSX.Element — `<tr>` tablo satırı, içinde email, rol, tarih ve aksiyon butonları hücreleri
+  - `searchQuery` — outer scope'tan gelen arama sorgusu string'i; küçük harfe dönüştürülerek eşleşme kontrolü yapılır
+- **Dönüş**: boolean — kullanıcının `email` alanı veya `full_name` alanı arama sorgusunu içeriyorsa true, aksi halde false
+
+---
+
+### [N11_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::searchFilterCallbackAll
+- **params**: `user` — AllUser tipinde tek bir kullanıcı nesnesi
+- **ic_degiskenler**:
+  - `searchQuery` — outer scope'tan gelen arama sorgusu string'i; küçük harfe dönüştürülerek eşleşme kontrolü yapılır
+- **Dönüş**: boolean — kullanıcının `email` alanı veya `full_name` alanı arama sorgusunu içeriyorsa true, aksi halde false
+
+---
+
+### [N12_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::getRoleIcon
+- **params**: `roleCode` — string, kullanıcının rol kodu
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element — rol koduna göre ilgili lucide-react icon bileşeni döner: `'super_admin'` → Crown (mor), `'admin'` → Shield (indigo), `'warehouse'`/`'sales'` → ShieldCheck (cyan), diğer tüm roller → Users (slate)
+
+---
+
+### [N13_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectLoadColPrefs
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - `STORAGE_KEY` — outer scope'tan gelen localStorage anahtarının kök değeri; `${STORAGE_KEY}:cols` formatında sütun tercihi okunur
+  - `c` — `localStorage.getItem(...)` çağrısının dönüş string'i; JSON parse edilerek sütun görünürlük nesnesine dönüştürülür
+  - `d` — `localStorage.getItem(...)` çağrısının dönüş string'i; yoğunluk tercihini temsil eder (`'compact'` veya `'comfortable'`)
+  - `prev` — `setVisibleCols` setter'ının callback'indeki mevcut visibleCols state değeri
+- **Dönüş**: yok (yan etki: `setVisibleCols` ile sütun görünürlük state'ini, `setDensity` ile yoğunluk state'ini localStorage'dan yükler)
+
+---
+
+### [N14_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectSaveColPrefs
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - `STORAGE_KEY` — outer scope'tan gelen localStorage anahtarının kök değeri; `${STORAGE_KEY}:cols` formatında sütun tercihi yazılır
+  - `visibleCols` — mevcut sütun görünürlük state nesnesi; JSON.stringify ile string'e dönüştürülüp localStorage'a kaydedilir
+- **Dönüş**: yok (yan etki: `visibleCols` state'ini localStorage'a kaydeder)
+
+---
+
+### [N15_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::useEffectSaveDensity
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - `STORAGE_KEY` — outer scope'tan gelen localStorage anahtarının kök değeri; `${STORAGE_KEY}:density` formatında yoğunluk tercihi yazılır
+  - `density` — mevcut yoğunluk state değeri (`'compact'` veya `'comfortable'`); doğrudan string olarak localStorage'a kaydedilir
+- **Dönüş**: yok (yan etki: `density` state'ini localStorage'a kaydeder)
+
+---
+
+### [N16_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::UserAvatar
+- **params**: `name` — string | undefined opsiyonel, kullanıcının tam adı; `email` — string | undefined opsiyonel, kullanıcının e-posta adresi
+- **ic_degiskenler**:
+  - `initial` — avatar içinde gösterilen başharf; `name` mevcutsa onun ilk karakteri, yoksa `email`'in ilk karakteri, o da yoksa `'?'` karakteri; `.toUpperCase()` ile büyük harfe dönüştürülür
+- **Dönüş**: JSX.Element — user'ın başharfini gösteren gradient arka planlı dairesel avatar bileşeni
+
+---
+
+### [N17_NASIL] AST Pointer: `src/views/admin/AdminUsersPage.tsx`::userTableRow
+- **params**: `userItem` — AllUser veya AdminUser tipinde tek bir kullanıcı nesnesi; tabloda satır olarak render edilecek
+- **ic_degiskenler**:
+  - `visibleCols` — outer scope'tan gelen sütun görünürlük nesnesi; `visibleCols.user`, `visibleCols.role`, `visibleCols.created`, `visibleCols.actions` boolean alanları ile hangi sütunların gösterileceği kontrol edilir
+  - `cellPad` — outer scope'tan gelen hücre padding CSS class string'i
+  - `adminTableCellClass` — outer scope'tan gelen ortak hücre CSS class string'i
+  - `lang` — outer scope'tan gelen dil code string'i, `formatDate` fonksiyonuna geçirilir
+  - `role` — outer scope'tan gelen mevcut giriş yapmış kullanıcının rolü; butonların koşullu gösteriminde kullanılır
+  - `hasWriteAccess` — outer scope'tan gelen boolean, kullanıcının yazma yetkisi varsa butonlar aktif olur
+  - `updatingRole` — outer scope'tan gelen string | null state, şu anda rolü güncellenen kullanıcının ID'si; ilgili butonlar `disabled` olur
+  - `user` — outer scope'tan gelen mevcut kullanıcı nesnesi; `userItem.id === user?.id` kontrolü ile kendi rolünü değiştirmesi engellenir
+- **Fonksiyon Cagrilari**:
+  - `UserAvatar({ name: userItem.full_name || undefined, email: userItem.email })` — avatar bileşeni
+  - `getRoleIcon(userItem.role || 'user')` — rol ikonu
+  - `_t(\`roles.${userItem.role || 'user'}\`)` — rol çevirisi
+  - `formatDate(userItem.created_at, lang)` — tarih formatlama
+  - `handleRoleChange(userItem.id, 'super_admin'|'admin'|'warehouse'|'sales'|'viewer'|'user')` — buton onClick handler'ları
+- **Dönüş**: JSX `<tr>` elementi — kullanıcının bilgilerini (avatar, email, isim, rol, kayıt tarihi, işlem butonları) içeren tablo satırı; sütun görünürlüğüne göre koşullu olarak render edilir
 
 ---
 

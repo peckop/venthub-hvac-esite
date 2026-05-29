@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 interface EditableCellProps {
     /** Gösterilecek mevcut değer */

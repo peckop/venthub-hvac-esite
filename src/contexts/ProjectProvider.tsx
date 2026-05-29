@@ -12,7 +12,7 @@ import {
   ProjectItem
 } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 interface ProjectContextType {
   projects: UserProject[]

@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react'
 import { UserAddress, updateAddress } from '../../lib/supabase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 interface AddressFormModalProps {
     address: UserAddress | null

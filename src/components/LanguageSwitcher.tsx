@@ -43,7 +43,7 @@ const LanguageSwitcher: React.FC = () => {
   return (
     <div
       id="language-switcher"
-      className="fixed bottom-4 right-4 z-50 bg-white/90 backdrop-blur border border-light-gray rounded-full shadow-sm p-1 flex items-center gap-1"
+      className="bg-white/90 backdrop-blur border border-light-gray rounded-full shadow-sm p-1 flex items-center gap-1"
       role="group"
       aria-label={t('common.languageSwitcher')}
     >

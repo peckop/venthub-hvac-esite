@@ -5,7 +5,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { updateOrderStatus } from '../../lib/orderStatusService'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'

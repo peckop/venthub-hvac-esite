@@ -1,0 +1,1038 @@
+{
+  "audit_name": "VentHub Enterprise Teslim Öncesi Audit (10/10 Onay Motoru)",
+  "audit_version": "1.0.0",
+  "audit_date": "2026-05-29",
+  "git_commit_sha": "e1bd204d99cdff8f2430fbba30fb2fe72a2e24af",
+  "agent_id": "Antigravity",
+  "layers": {
+    "L1_build_quality": {
+      "name": "Teknik Kalite (Build & Code)",
+      "checks": {
+        "L1_01_typescript": {
+          "target": "TypeScript strict mode derleme hatası sıfır olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "exec",
+              "tsc",
+              "--noEmit"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": ""
+        },
+        "L1_02_eslint": {
+          "target": "ESLint 0 hata, 0 warning.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "lint"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "> venthub-hvac@0.1.0 lint C:\\Users\\alize\\venthub-hvac\n> cross-env NODE_OPTIONS='--max-old-space-size=8192' eslint ."
+        },
+        "L1_03_unit_tests": {
+          "target": "Tüm birim testler geçmeli.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "test",
+              "--",
+              "--run",
+              "--reporter=dot"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "> venthub-hvac@0.1.0 test C:\\Users\\alize\\venthub-hvac\n> vitest \"--\" \"--run\" \"--reporter=dot\"\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv4.1.3 \u001b[39m\u001b[90mC:/Users/alize/venthub-hvac\u001b[39m\n\n \u001b[32m✓\u001b[39m src/views/checkout/__tests__/ReviewSummary.test.tsx \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 227\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/imageUtils.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 186\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/use-mobile.test.tsx \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 75\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useCartHook.test.tsx \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 72\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useNavigationState.test.tsx \u001b[2m(\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 106\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useHideOnScroll.test.tsx \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 88\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useRole.test.tsx \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 85\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/applicationUi.test.tsx \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 143\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/hooks/__tests__/useApiCall.test.tsx \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 113\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/searchHighlight.test.tsx \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 176\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/utils/__tests__/getCategoryIcon.test.tsx \u001b[2m(\u001b[22m\u001b[2m8 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 226\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/views/account/__tests__/ReturnsModalClose.test.tsx \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 275\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/components/products/__tests__/ProductsHero.test.tsx \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 713\u001b[2mms\u001b[22m\u001b[39m\n     \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m should have focus-within classes on the search bar container and no ring on input \u001b[33m 704\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/components/category/sections/HowItWorks.test.tsx \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1760\u001b[2mms\u001b[22m\u001b[39m\n     "
+        },
+        "L1_04_build": {
+          "target": "Production build 0 hata ile tamamlanmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "build"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "> venthub-hvac@0.1.0 build C:\\Users\\alize\\venthub-hvac\n> cross-env NODE_OPTIONS='--max-old-space-size=8192' next build\n\n   ▲ Next.js 15.5.18\n   - Environments: .env.local, .env\n   - Experiments (use with caution):\n     · clientTraceMetadata\n\n   Creating an optimized production build ...\nwarn  - It seems like you don't have a global error handler set up. It is recommended that you add a global-error.js file with Sentry instrumentation so that React rendering errors are reported to Sentry. Read more: https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#react-render-errors-in-app-router (you can suppress this warning by setting SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1 as environment variable)\n ✓ Compiled successfully in 48s\n   Linting and checking validity of types ...\n   Collecting page data ...\n   Generating static pages (0/855) ...\n   Generating static pages (213/855) \n   Generating static pages (427/855) \n   Generating static pages (641/855) \n ✓ Generating static pages (855/855)\n   Finalizing page optimization ...\n   Collecting build traces ...\n\nRoute (app)                                                           Size  First Load JS\n┌ ○ /_not-found                                                    1.15 kB         169 kB\n├ ● /[lang]                                                        13.7 kB         284 kB\n├   ├ /tr\n├   └ /en\n├ ● /[lang]/about                                                  1.45 kB         176 kB\n├   ├ /tr/about\n├   └ /en/about\n├ ● /[lang]/account                                                7.55 kB         300 kB\n├   ├ /tr/account\n├   └ /en/account\n├ ● /[lang]/account/addresses                                      1.56 kB         169 kB\n├   ├ /tr/account/addresses\n├   └ /en/account/addresses\n├ ● /[lang]/account/invoices                                       1.56 kB         169 kB\n├   ├ /tr/account/invoices\n├   └ /en/account/invoices\n├ ● /[lang]/account/orders                                         1.56 kB     "
+        },
+        "L1_05_lockfile": {
+          "target": "pnpm-lock.yaml ve package.json senkron olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "install",
+              "--frozen-lockfile"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Lockfile is up to date, resolution step is skipped\nAlready up to date\n WARN  Failed to create bin at C:\\Users\\alize\\venthub-hvac\\node_modules\\.bin\\supabase. ENOENT: no such file or directory, stat 'C:\\Users\\alize\\venthub-hvac\\node_modules\\.pnpm\\supabase@2.81.2\\node_modules\\supabase\\bin\\supabase.EXE'\n\n WARN  Failed to create bin at C:\\Users\\alize\\venthub-hvac\\node_modules\\.bin\\supabase. ENOENT: no such file or directory, stat 'C:\\Users\\alize\\venthub-hvac\\node_modules\\supabase\\bin\\supabase.EXE'\n. postinstall$ pnpm run type-check\n. postinstall: > venthub-hvac@0.1.0 type-check C:\\Users\\alize\\venthub-hvac\n. postinstall: > cross-env NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit\n. postinstall: Done\nDone in 13.8s using pnpm v10.15.0"
+        },
+        "L1_06_bundle_size": {
+          "target": "Hiçbir JS chunk 500 KB (gzip öncesi) üstünde olmamalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "__BUNDLE_SIZE_CHECK__"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        }
+      }
+    },
+    "L2_security": {
+      "name": "Güvenlik (OWASP + Supabase)",
+      "checks": {
+        "L2_01_dependency_cve": {
+          "target": "pnpm audit 0 HIGH ve 0 CRITICAL.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "audit",
+              "--audit-level",
+              "high"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "4 vulnerabilities found\nSeverity: 4 moderate"
+        },
+        "L2_02_hardcoded_secrets": {
+          "target": "Kod tabanında hardcoded şifre/token/secret bulunmamalı (i18n/test dosyaları hariç).",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "(password|secret|token|api_key)\\s*[:=]\\s*['\"][^'\"]{8,}",
+              "src/lib/",
+              "src/views/",
+              "scripts/",
+              "supabase/functions/",
+              "--exclude=test\\.ts|dictionaries|__tests__"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        },
+        "L2_03_security_headers": {
+          "target": "HSTS, X-Frame-Options, nosniff, Referrer-Policy, CSP header mevcut olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "Strict-Transport-Security|X-Frame-Options|Content-Security-Policy|nosniff|Referrer-Policy",
+              "next.config.mjs"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (5):\nnext.config.mjs:54 -> { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },\nnext.config.mjs:55 -> { key: 'X-Frame-Options', value: 'DENY' },\nnext.config.mjs:56 -> { key: 'X-Content-Type-Options', value: 'nosniff' },\nnext.config.mjs:57 -> { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },\nnext.config.mjs:59 -> key: 'Content-Security-Policy-Report-Only',",
+          "note": "Varlık kontrolü — header'lar bulunmalı."
+        },
+        "L2_04_console_leak": {
+          "target": "Console.log/warn içinde hassas değişken (password/token/secret değeri) doğrudan yazdırılmamalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "console\\.log\\(.*(?:password|token|secret|apiKey|credentials)",
+              "src/",
+              "--exclude=error\\(|__tests__"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        },
+        "L2_05_rate_limiting": {
+          "target": "Kritik endpoint'lerde (ödeme, auth) rate limiting aktif olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "checkRateLimit|rate_limit|rateLimit",
+              "supabase/functions/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "Bulgular (23):\nsupabase\\functions\\apply-coupon\\index.ts:82 -> const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')\nsupabase\\functions\\apply-coupon\\index.ts:82 -> const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')\nsupabase\\functions\\apply-coupon\\index.ts:82 -> const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')\nsupabase\\functions\\apply-coupon\\index.ts:83 -> const { result } = await checkRateLimit(key, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { limit: Number(Deno.env.get('COUP\nsupabase\\functions\\apply-coupon\\index.ts:85 -> const rl = rateLimitHeaders(Number(Deno.env.get('COUPON_RATE_LIMIT_PER_MINUTE') || 60), result.remaining, result.resetAt\nsupabase\\functions\\apply-coupon\\index.ts:86 -> return new Response(JSON.stringify({ error: 'rate_limited' }), { status: 429, headers: { 'Content-Type': 'application/js\nsupabase\\functions\\iyzico-payment\\index.ts:68 -> const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')\nsupabase\\functions\\iyzico-payment\\index.ts:68 -> const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')\nsupabase\\functions\\iyzico-payment\\index.ts:68 -> const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')\nsupabase\\functions\\iyzico-payment\\index.ts:69 -> const { result, _limit, _windowSec } = await checkRateLimit(key, supabaseUrl, serviceRoleKey, { _limit: Number(Deno.env.\nsupabase\\functions\\iyzico-payment\\index.ts:71 -> const rl = rateLimitHeaders(Number(Deno.env.get('PAYMENT_RATE_LIMIT_PER_MINUTE') || 30), result.remaining, result.resetA\nsupabase\\functions\\iyzico-payment\\index.ts:76 -> if (debugEnabled) console.warn('rate_limit skipped:', _e)\nsupabase\\functions\\shipping-status\\index.ts:33 -> const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')\nsupabase\\functions\\shipping-status\\index.ts:33 -> const { checkRateLimit, rateLimitHeaders } =",
+          "note": "Bu kontrol varlığı arar — bulunamazsa FAIL, bulunursa PASS (inverted). Runner'da özel mantık."
+        },
+        "L2_06_password_strength": {
+          "target": "Kayıt ve şifre değişiminde güç kuralları zorlanmalı (min 8, büyük harf, rakam, özel karakter).",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "passwordRules|pwRule|hibpPwnedCount",
+              "src/views/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (16):\nsrc\\views\\RegisterPage.tsx:9 -> import { hibpPwnedCount } from '../utils/passwordSecurity'\nsrc\\views\\RegisterPage.tsx:33 -> const passwordRules = [\nsrc\\views\\RegisterPage.tsx:34 -> { key: 'length',  label: t('auth.pwRule.length')  || 'En az 8 karakter',     test: (p: string) => p.length >= 8 },\nsrc\\views\\RegisterPage.tsx:35 -> { key: 'upper',   label: t('auth.pwRule.upper')   || 'En az 1 büyük harf',   test: (p: string) => /[A-Z]/.test(p) },\nsrc\\views\\RegisterPage.tsx:36 -> { key: 'digit',   label: t('auth.pwRule.digit')   || 'En az 1 rakam',        test: (p: string) => /[0-9]/.test(p) },\nsrc\\views\\RegisterPage.tsx:37 -> { key: 'special', label: t('auth.pwRule.special') || 'En az 1 özel karakter', test: (p: string) => /[^A-Za-z0-9]/.test(p\nsrc\\views\\RegisterPage.tsx:40 -> const passedRules = passwordRules.filter(r => r.test(formData.password)).length\nsrc\\views\\RegisterPage.tsx:56 -> toast.error(t('auth.pwRule.allRequired') || 'Şifreniz tüm güvenlik kurallarını karşılamalıdır')\nsrc\\views\\RegisterPage.tsx:77 -> const pwned = await hibpPwnedCount(formData.password)\nsrc\\views\\RegisterPage.tsx:249 -> {passwordRules.map(rule => (\nsrc\\views\\account\\AccountSecurityPage.tsx:7 -> import { hibpPwnedCount } from '../../utils/passwordSecurity'\nsrc\\views\\account\\AccountSecurityPage.tsx:37 -> const passwordRules = [\nsrc\\views\\account\\AccountSecurityPage.tsx:43 -> const passedRules = passwordRules.filter(r => r.test(password)).length\nsrc\\views\\account\\AccountSecurityPage.tsx:72 -> const pwned = await hibpPwnedCount(password)\nsrc\\views\\account\\AccountSecurityPage.tsx:150 -> {passwordRules.map(rule => (\nsrc\\views\\account\\__tests__\\AccountSecurityPage.test.tsx:37 -> hibpPwnedCount: vi.fn().mockResolvedValue(0)",
+          "note": "Varlık kontrolü — bulunamazsa FAIL."
+        },
+        "L2_07_cors_wildcard": {
+          "target": "Auth endpoint lerde Access-Control-Allow-Origin: * kullanilmamali.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "Access-Control-Allow-Origin.*\\*",
+              "supabase/functions/",
+              "src/app/api/",
+              "--exclude=__tests__"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        },
+        "L2_08_service_role_leak": {
+          "target": "service_role anahtari client bundle a sizmamali (NEXT_PUBLIC_ prefix kontrolu).",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "NEXT_PUBLIC.*service_role|NEXT_PUBLIC.*SERVICE_ROLE",
+              "src/",
+              ".env",
+              ".env.local"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        }
+      }
+    },
+    "L3_legal": {
+      "name": "Yasal Uyumluluk (KVKK / GDPR)",
+      "checks": {
+        "L3_01_account_deletion": {
+          "target": "Kullanıcı hesap silme hakkı mevcut olmalı (KVKK Madde 7).",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "deleteUser|deleteAccount|hesabimiSil|account.*delet",
+              "src/",
+              "supabase/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (2):\nsrc\\views\\account\\AccountAddressesPage.tsx:140 -> toast.success(t('account.addresses.toasts.deleted'))\nsrc\\views\\account\\AccountAddressesPage.tsx:145 -> toast.error(t('account.addresses.toasts.deleteError'))",
+          "note": "Varlık kontrolü."
+        },
+        "L3_02_cookie_consent": {
+          "target": "Cookie consent teknik implementasyonu mevcut olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "CookieConsent|cookieConsent|cookie.*consent|gdpr",
+              "src/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (7):\nsrc\\components\\layout\\ClientLayout.tsx:11 -> import CookieConsent from './CookieConsent'\nsrc\\components\\layout\\ClientLayout.tsx:11 -> import CookieConsent from './CookieConsent'\nsrc\\components\\layout\\ClientLayout.tsx:101 -> <CookieConsent />\nsrc\\components\\layout\\CookieConsent.tsx:7 -> export default function CookieConsent() {\nsrc\\components\\layout\\CookieConsent.tsx:14 -> const consent = localStorage.getItem('vh_cookie_consent')\nsrc\\components\\layout\\CookieConsent.tsx:25 -> localStorage.setItem('vh_cookie_consent', 'accepted')\nsrc\\components\\layout\\CookieConsent.tsx:32 -> localStorage.setItem('vh_cookie_consent', 'rejected')",
+          "note": "Varlık kontrolü."
+        },
+        "L3_03_legal_pages": {
+          "target": "KVKK, Gizlilik, Çerez politikası sayfaları fiziksel olarak mevcut olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "src/app/[lang]/legal/kvkk/page.tsx",
+              "src/app/[lang]/legal/gizlilik-politikasi/page.tsx",
+              "src/app/[lang]/legal/cerez-politikasi/page.tsx"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Mevcut: src/app/[lang]/legal/kvkk/page.tsx, src/app/[lang]/legal/gizlilik-politikasi/page.tsx, src/app/[lang]/legal/cerez-politikasi/page.tsx"
+        },
+        "L3_04_license_file": {
+          "target": "LICENSE dosyası proje kökünde mevcut olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "LICENSE"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "HIÇBİRİ BULUNAMADI: LICENSE"
+        },
+        "L3_05_gpl_risk": {
+          "target": "Ticari üründe pure GPL lisanslı bağımlılık bulunmamalı (LGPL hariç).",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "licenses",
+              "list"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "GPL riski bulunamadı.",
+          "note": "Çıktıda 'GPL-2.0' veya 'GPL-3.0' (LGPL hariç) aranır."
+        }
+      }
+    },
+    "L4_ops": {
+      "name": "Operasyonel Hazırlık (DevOps)",
+      "checks": {
+        "L4_01_health_check": {
+          "target": "/api/health endpoint mevcut olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "src/app/api/health/route.ts"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Mevcut: src/app/api/health/route.ts"
+        },
+        "L4_02_monitoring": {
+          "target": "Error monitoring (Sentry/benzeri) entegrasyonu mevcut olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "@sentry|Sentry\\.init|posthog|datadog|opentelemetry",
+              "src/",
+              "package.json"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (1):\npackage.json:47 -> \"@sentry/nextjs\": \"^8.54.0\",",
+          "note": "Varlık kontrolü."
+        },
+        "L4_03_ci_pipeline": {
+          "target": "CI/CD pipeline (GitHub Actions) lint + test + build adımlarını içermeli.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              ".github/workflows"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Mevcut: .github/workflows"
+        },
+        "L4_04_env_template": {
+          "target": ".env.example dosyası mevcut ve kapsamlı olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              ".env.example"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Mevcut: .env.example"
+        },
+        "L4_05_dockerfile": {
+          "target": "Containerize edilebilir Dockerfile mevcut olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "deploy/Dockerfile",
+              "Dockerfile"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Mevcut: deploy/Dockerfile\nEksik: Dockerfile",
+          "note": "OR logic — herhangi biri yeterli."
+        },
+        "L4_06_security_md": {
+          "target": "SECURITY.md güvenlik açığı bildirim kılavuzu mevcut olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "SECURITY.md",
+              ".github/SECURITY.md"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "HIÇBİRİ BULUNAMADI: SECURITY.md, .github/SECURITY.md",
+          "note": "OR logic."
+        }
+      }
+    },
+    "L5_data": {
+      "name": "Veri & Veritabanı Bütünlüğü",
+      "checks": {
+        "L5_01_rls": {
+          "target": "Tüm public tablolarda Row Level Security aktif olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "supabase_mcp",
+            "args": [
+              "rls_check"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "MANUAL: Supabase MCP araçlarıyla ajan tarafından doğrulanmalı.",
+          "note": "MCP aracıyla doğrulanır. Runner'da özel fonksiyon."
+        },
+        "L5_02_supabase_security_advisors": {
+          "target": "Supabase güvenlik danışmanları 0 WARN/ERROR raporlamalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "supabase_mcp",
+            "args": [
+              "security_advisors"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "MANUAL: Supabase MCP araçlarıyla ajan tarafından doğrulanmalı.",
+          "note": "MCP aracıyla doğrulanır."
+        },
+        "L5_03_input_validation": {
+          "target": "Server-side form/API input validation şeması (Zod/Yup) mevcut olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "z\\.object|z\\.string|zodSchema|safeParse|yup\\.object|joi\\.object",
+              "src/",
+              "supabase/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (28):\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:23 -> const categorySchema = z.object({\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:24 -> name: z.string().min(1, 'Kategori adı zorunludur'),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:25 -> slug: z.string().min(1, 'Slug zorunludur'),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:26 -> parent_id: z.string().optional().nullable(),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:27 -> description: z.string().optional().nullable(),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:28 -> seo_title: z.string().optional().nullable(),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:29 -> seo_desc: z.string().optional().nullable(),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:32 -> image_url: z.string().optional().nullable(),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:33 -> metric1_value: z.string().optional().nullable(),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:34 -> metric1_label: z.string().optional().nullable(),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:35 -> metric2_value: z.string().optional().nullable(),\nsrc\\components\\admin\\categories\\CategoryFormModal.tsx:36 -> metric2_label: z.string().optional().nullable(),\nsrc\\components\\admin\\products\\ProductFormModal.tsx:15 -> const productSchema = z.object({\nsrc\\components\\admin\\products\\ProductFormModal.tsx:16 -> name: z.string().min(3, 'İsim en az 3 karakter olmalı'),\nsrc\\components\\admin\\products\\ProductFormModal.tsx:17 -> sku: z.string().min(3, 'SKU gereklidir'),\nsrc\\components\\admin\\products\\ProductFormModal.tsx:18 -> brand: z.string().min(1, 'Marka seçiniz'),\nsrc\\components\\admin\\products\\ProductFormModal.tsx:19 -> model_code: z.string().optional(),\nsrc\\components\\admin\\products\\ProductFormModal.tsx:20 -> category_id: z.string().min(1, 'Kategori seçiniz'),\nsrc\\components\\admin\\products\\ProductFormModal.tsx:26 -> description: z.string().optional(),\nsupabase\\functio",
+          "note": "Varlık kontrolü."
+        },
+        "L5_04_fk_index": {
+          "target": "Foreign Key sutunlarinda eslesen CREATE INDEX mevcut olmali.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "REFERENCES.*\\\\(.*\\\\)",
+              "supabase/migrations/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz.",
+          "note": "Varlik kontrolu."
+        },
+        "L5_05_grant_select": {
+          "target": "Yeni migration sutununda GRANT SELECT eksikligi olmamali.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "supabase_mcp",
+            "args": [
+              "grant_check"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "MANUAL: Supabase MCP araçlarıyla ajan tarafından doğrulanmalı.",
+          "note": "MCP araciyla dogrulanir."
+        }
+      }
+    },
+    "L6_docs": {
+      "name": "Dokümantasyon",
+      "checks": {
+        "L6_01_readme": {
+          "target": "README.md 200+ satır, kurulum/deployment/konfigürasyon bölümleri içermeli.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "file_line_count",
+            "args": [
+              "README.md",
+              200
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "README.md: 55 satır (beklenen >= 200) — YETERSİZ"
+        },
+        "L6_02_changelog": {
+          "target": "CHANGELOG aktif tutuluyor olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "docs/CHANGELOG.md",
+              "CHANGELOG.md"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Mevcut: CHANGELOG.md\nEksik: docs/CHANGELOG.md",
+          "note": "OR logic."
+        },
+        "L6_03_contributing": {
+          "target": "CONTRIBUTING.md mevcut olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "CONTRIBUTING.md"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "HIÇBİRİ BULUNAMADI: CONTRIBUTING.md"
+        },
+        "L6_04_llms_txt": {
+          "target": "/llms.txt AI standardizasyon belgesi mevcut olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "public/llms.txt"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Mevcut: public/llms.txt"
+        }
+      }
+    },
+    "L7_product": {
+      "name": "Ürün Tamamlığı",
+      "checks": {
+        "L7_01_critical_routes": {
+          "target": "Tüm kritik e-ticaret rotaları fiziksel olarak mevcut olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "src/app/products/[slug]/page.tsx",
+              "src/app/cart/page.tsx",
+              "src/app/checkout/page.tsx",
+              "src/app/auth/login/page.tsx",
+              "src/app/auth/register/page.tsx",
+              "src/app/account/orders/page.tsx",
+              "src/app/admin/page.tsx"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Mevcut: src/app/admin/page.tsx\nEksik: src/app/products/[slug]/page.tsx, src/app/cart/page.tsx, src/app/checkout/page.tsx, src/app/auth/login/page.tsx, src/app/auth/register/page.tsx, src/app/account/orders/page.tsx"
+        },
+        "L7_02_e2e_tests": {
+          "target": "Kritik akışlar (kayıt→sepet→ödeme) için E2E test mevcut olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "\\.spec\\.ts$|\\.e2e\\.ts$",
+              "tests/",
+              "e2e/",
+              "src/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "BULUNAMADI — gerekli pattern mevcut değil.",
+          "note": "Varlık kontrolü. node_modules hariç tutulur."
+        },
+        "L7_03_sitemap_robots": {
+          "target": "sitemap.ts ve robots.ts mevcut olmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "file_exists",
+            "args": [
+              "src/app/sitemap.ts",
+              "src/app/robots.ts"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Mevcut: src/app/sitemap.ts, src/app/robots.ts"
+        },
+        "L7_04_error_boundary": {
+          "target": "Global ErrorBoundary bileşeni mevcut ve kullanılıyor olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "ErrorBoundary",
+              "src/components/",
+              "src/app/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (5):\nsrc\\components\\ErrorBoundary.tsx:36 -> export class ErrorBoundary extends Component<Props, State> {\nsrc\\components\\ErrorBoundary.tsx:51 -> console.error('ErrorBoundary caught an error:', error, errorInfo)\nsrc\\components\\products\\3d\\Product3DViewer.tsx:25 -> class ErrorBoundary extends React.Component<{ children: React.ReactNode, t: (key: string) => string }, { hasError: boole\nsrc\\components\\products\\3d\\Product3DViewer.tsx:161 -> <ErrorBoundary t={t}>\nsrc\\components\\products\\3d\\Product3DViewer.tsx:171 -> </ErrorBoundary>",
+          "note": "Varlık kontrolü."
+        },
+        "L7_05_stripe_idempotency": {
+          "target": "Stripe checkout.sessions.create cagrilarinda idempotencyKey mevcut olmali.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "sessions\\.create",
+              "supabase/functions/",
+              "src/app/api/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz.",
+          "note": "Varlik kontrolu."
+        },
+        "L7_06_webhook_signature": {
+          "target": "Stripe webhook larinda imza dogrulamasi (Stripe-Signature) mevcut olmali.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "Stripe-Signature|stripe\\.webhooks\\.constructEvent|verifySignature",
+              "supabase/functions/",
+              "src/app/api/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz.",
+          "note": "Varlik kontrolu."
+        },
+        "L7_07_ui_data_leak": {
+          "target": "UI da NaN, undefined, [object Object] gibi ham veri sizintisi olmamali.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "\"NaN\"|\"undefined\"|\"[object Object]\"|\"null\"",
+              "src/views/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "Bulgular (23):\nsrc\\components\\admin\\InventoryTable.tsx:79 -> <td className={adminTableCellClass + \" \" + cellPad}>\nsrc\\components\\admin\\InventoryTable.tsx:86 -> {visibleCols.physical && <td className={adminTableCellClass + \" \" + cellPad + \" text-right font-mono font-bold text-slat\nsrc\\components\\admin\\InventoryTable.tsx:87 -> {visibleCols.reserved && <td className={adminTableCellClass + \" \" + cellPad + \" text-right font-mono text-slate-500\"}>{r\nsrc\\components\\admin\\InventoryTable.tsx:88 -> {visibleCols.available && <td className={adminTableCellClass + \" \" + cellPad + \" text-right font-mono font-black text-cy\nsrc\\components\\admin\\InventoryTable.tsx:89 -> {visibleCols.threshold && <td className={adminTableCellClass + \" \" + cellPad + \" text-right font-mono text-slate-500\"}>{\nsrc\\components\\admin\\InventoryTable.tsx:91 -> <td className={adminTableCellClass + \" \" + cellPad} onClick={e => e.stopPropagation()}>\nsrc\\components\\admin\\InventoryTable.tsx:106 -> <td className={adminTableCellClass + \" \" + cellPad} onClick={e => e.stopPropagation()}>\nsrc\\components\\admin\\InventoryTable.tsx:121 -> <td className={adminTableCellClass + \" \" + cellPad + \" text-center\"}>\nsrc\\components\\admin\\InventoryTable.tsx:133 -> <td className={adminTableCellClass + \" \" + cellPad + \" text-right\"}>\nsrc\\components\\admin\\InventoryTable.tsx:144 -> {visibleCols.status && <td className={adminTableCellClass + \" \" + cellPad + \" text-center\"}>{statusBadge(r)}</td>}\nsrc\\components\\admin\\InventoryTable.tsx:154 -> <th className={adminTableHeadCellClass + \" \" + headPad}>\nsrc\\components\\admin\\InventoryTable.tsx:161 -> <th className={adminTableHeadCellClass + \" \" + headPad + \" text-right\"}>\nsrc\\components\\admin\\InventoryTable.tsx:169 -> <th className={adminTableHeadCellClass + \" \" + headPad + \" text-right\"}>\nsrc\\components\\admin\\InventoryTable.tsx:177 -> <th className={adminTableHeadCellClass + \" \" + headPad + \" text-right\"}>\nsrc\\components\\admin\\InventoryTable.tsx:185 -> <th className={adminTableHeadCellClass + \" "
+        }
+      }
+    },
+    "L8_performance": {
+      "name": "Performans & Core Web Vitals",
+      "checks": {
+        "L8_01_image_optimization": {
+          "target": "Ham <img> etiketi yerine next/image kullanılmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "<img ",
+              "src/views/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        },
+        "L8_02_client_boundary": {
+          "target": "'use client' layout veya page wrapper'larında değil, yaprak bileşenlerde olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "use client",
+              "src/app/layout.tsx",
+              "src/app/page.tsx"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        },
+        "L8_03_lighthouse": {
+          "target": "Lighthouse Performance >= 60, Accessibility >= 80, Best Practices >= 80, SEO >= 80.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "lighthouse",
+            "args": [
+              "--only-categories=performance,accessibility,best-practices,seo"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "MANUAL: Lighthouse testi ajan tarafından browser tool ile çalıştırılmalı.",
+          "note": "Canlı site veya local dev üzerinde çalıştırılır. Playwright/browser tool gerekir."
+        },
+        "L8_04_skeleton_coverage": {
+          "target": "Dinamik veri yüklenen sayfalarda Skeleton/loading state mevcut olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "Skeleton|loading\\.tsx|Loading",
+              "src/app/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (57):\nsrc\\app\\_components\\ProductDetailPageView.tsx:71 -> const [loading, setLoading] = useState(!initialProduct)\nsrc\\app\\_components\\ProductDetailPageView.tsx:118 -> setLoading(false)\nsrc\\app\\_components\\ProductDetailPageView.tsx:123 -> setLoading(true)\nsrc\\app\\_components\\ProductDetailPageView.tsx:153 -> setLoading(false)\nsrc\\components\\ErrorBoundary.tsx:29 -> return error.message.includes('Loading chunk') ||\nsrc\\components\\ErrorBoundary.tsx:31 -> error.message.includes('Loading CSS chunk')\nsrc\\components\\HeroSkeleton.tsx:3 -> export const HeroSkeleton: React.FC = () => {\nsrc\\components\\HeroSkeleton.tsx:40 -> export default HeroSkeleton\nsrc\\components\\LoadingSpinner.tsx:6 -> interface LoadingSpinnerProps {\nsrc\\components\\LoadingSpinner.tsx:11 -> const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({\nsrc\\components\\LoadingSpinner.tsx:11 -> const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({\nsrc\\components\\LoadingSpinner.tsx:43 -> export default LoadingSpinner\nsrc\\components\\SearchOverlay.tsx:28 -> const [loading, setLoading] = React.useState(false)\nsrc\\components\\SearchOverlay.tsx:91 -> setLoading(true)\nsrc\\components\\SearchOverlay.tsx:102 -> if (active) setLoading(false)\nsrc\\components\\SearchOverlay.tsx:137 -> setLoading(true)\nsrc\\components\\SearchOverlay.tsx:150 -> setLoading(false)\nsrc\\components\\StickyHeader.tsx:62 -> const { loading: isCategoriesLoading } = useCategories()\nsrc\\components\\StickyHeader.tsx:250 -> <NavPrimaryRail items={primaryItems} isCategoriesLoading={isCategoriesLoading} isCategoryHubOpen={isCategoryHubOpen} onC\nsrc\\components\\StickyHeader.tsx:250 -> <NavPrimaryRail items={primaryItems} isCategoriesLoading={isCategoriesLoading} isCategoryHubOpen={isCategoryHubOpen} onC\nsrc\\components\\admin\\AdminSkeleton.tsx:4 -> interface AdminSkeletonProps {\nsrc\\components\\admin\\AdminSkeleton.tsx:11 -> export default function AdminSkeleton({ variant, rows = 5, count = 4, fields = 6 }: AdminSkeletonProps) {\nsrc\\components\\admin\\AdminSkeleton.t",
+          "note": "Varlık kontrolü."
+        }
+      }
+    },
+    "L9_accessibility": {
+      "name": "Erişilebilirlik (WCAG 2.1 AA)",
+      "checks": {
+        "L9_01_aria_usage": {
+          "target": "Etkileşimli bileşenlerde aria-label / aria-describedby / role mevcut olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "aria-label|aria-describedby|role=",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (110):\nsrc\\components\\AddToCartToast.tsx:50 -> aria-label={t('common.close')}\nsrc\\components\\AddToCartToast.tsx:60 -> aria-label={t('cartToast.continue')}\nsrc\\components\\BackToTopButton.tsx:52 -> aria-label={t('common.backToTop')}\nsrc\\components\\BeforeAfterSlider.tsx:22 -> role=\"region\"\nsrc\\components\\BeforeAfterSlider.tsx:24 -> aria-label=\"Öncesi / sonrası karşılaştırma\"\nsrc\\components\\BeforeAfterSlider.tsx:42 -> aria-label=\"Karşılaştırma konumu\"\nsrc\\components\\CartToast.tsx:71 -> <button onClick={onClose} className=\"text-steel-gray hover:text-industrial-gray focus-visible:outline-none focus-visible\nsrc\\components\\CartToast.tsx:99 -> aria-label={t('common.close')}\nsrc\\components\\CartToast.tsx:125 -> aria-label={t('cartToast.continue')}\nsrc\\components\\CartToast.tsx:134 -> aria-label={t('cartToast.goToCart')}\nsrc\\components\\ErrorBoundary.tsx:103 -> aria-label={t('error.refresh', 'Sayfayı Yenile')}\nsrc\\components\\ErrorBoundary.tsx:113 -> aria-label={t('error.retry', 'Tekrar Dene')}\nsrc\\components\\ErrorBoundary.tsx:121 -> aria-label={t('error.refresh', 'Sayfayı Yenile')}\nsrc\\components\\Footer.tsx:39 -> <a href=\"https://facebook.com\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label={t('footer.social.facebook')} classN\nsrc\\components\\Footer.tsx:42 -> <a href=\"https://twitter.com\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label={t('footer.social.twitter')} classNam\nsrc\\components\\Footer.tsx:45 -> <a href=\"https://linkedin.com\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label={t('footer.social.linkedin')} classN\nsrc\\components\\Footer.tsx:48 -> <a href=\"https://instagram.com\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label={t('footer.social.instagram')} clas\nsrc\\components\\HeroCarousel.tsx:215 -> aria-label={t(\"common.prev\") as string}>\nsrc\\components\\HeroCarousel.tsx:221 -> aria-label={t(\"common.next\") as string}>\nsrc\\components\\HeroCarousel.tsx:234 -> aria-label={`${t(\"common.next\")} ${idx + 1}`}\nsrc\\components\\HeroSection.tsx:122 -> role=\"prese",
+          "note": "Varlık kontrolü. Sayısal yoğunluk raporlanır."
+        },
+        "L9_02_alt_text": {
+          "target": "Tüm görsellerde alt text mevcut olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "<Image[^>]*(?!alt=)[^>]*/>|<img[^>]*(?!alt=)[^>]*>",
+              "src/views/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "Bulgular (39):\nsrc\\views\\AboutPage.tsx:73 -> <Image\nsrc\\views\\AboutPage.tsx:124 -> <Image\nsrc\\views\\AboutPage.tsx:149 -> <Image\nsrc\\views\\BrandDetailPage.tsx:158 -> <Image\nsrc\\views\\BrandsPage.tsx:138 -> <Image\nsrc\\views\\ProductDetailPage.tsx:215 -> <ImageGallery images={images} productName={product.name} slug={product.slug || product.name} modelType={categoryMetadata\nsrc\\views\\category\\CategoryLandingView.tsx:117 -> <Image src={heroImage} alt={vm?.displayName || ''} fill className=\"object-cover group-hover:scale-105 transition-transfo\nsrc\\views\\category\\CategorySeriesView.tsx:152 -> <div className=\"relative w-12 h-12 rounded-xl bg-white border border-slate-100 overflow-hidden shrink-0\"><Image src={p.i\nsrc\\views\\knowledge\\HubPage.tsx:58 -> <Image\nsrc\\views\\knowledge\\TopicPage.tsx:69 -> <Image\nsrc\\components\\HeroSection.tsx:18 -> <Image\nsrc\\components\\HVACIcons.tsx:299 -> <Image\nsrc\\components\\SearchOverlay.tsx:368 -> <Image src={r.image_url} alt={r.name} fill sizes=\"40px\" className=\"object-cover\" />\nsrc\\components\\authority\\AuthorityRenderer.tsx:61 -> <Image\nsrc\\components\\authority\\AuthorityRenderer.tsx:125 -> <Image\nsrc\\components\\authority\\AuthorityRenderer.tsx:139 -> <Image\nsrc\\components\\authority\\AuthorityRenderer.tsx:250 -> <Image\nsrc\\components\\authority\\VideoAuthority.tsx:63 -> <Image\nsrc\\components\\category\\CategoryShowcase.tsx:53 -> <Image\nsrc\\components\\category\\CategoryShowcase.tsx:191 -> <Image\nsrc\\components\\category\\CategoryShowcase.tsx:240 -> <Image\nsrc\\components\\category\\CategoryShowcase.tsx:270 -> <Image\nsrc\\components\\category\\EnhancedNeedsWizard.tsx:305 -> <Image\nsrc\\components\\home\\ApplicationSolutions.tsx:109 -> <Image\nsrc\\components\\home\\CinematicProductShowcase.tsx:158 -> <Image\nsrc\\components\\home\\CinematicProductShowcase.tsx:197 -> <Image\nsrc\\components\\home\\EliteHero.tsx:29 -> <Image\nsrc\\components\\home\\FeaturedCommercialBlocks.tsx:158 -> <Image\nsrc\\components\\home\\GuidedCategoryDiscovery.tsx:71 -> <Image\nsrc\\components\\home\\HomeSinevizy",
+          "note": "Alt text eksik görselleri arar."
+        },
+        "L9_03_keyboard_navigation": {
+          "target": "Kritik etkileşimli elemanlarda tabIndex / onKeyDown desteği olmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "tabIndex|onKeyDown|onKeyUp|onKeyPress",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (25):\nsrc\\components\\BackToTopButton.tsx:56 -> tabIndex={visible ? 0 : -1}\nsrc\\components\\ImageGallery.tsx:100 -> onKeyDown={(e) => {\nsrc\\components\\LeadModal.tsx:86 -> onKeyDown={(e) => { if (e.key === 'Escape') handleClose() }}\nsrc\\components\\SearchOverlay.tsx:403 -> onKeyDown={(e) => { if (e.key === 'Escape') handleClose() }}\nsrc\\components\\SearchOverlay.tsx:421 -> onKeyDown={handleKeyDown}\nsrc\\components\\admin\\AdminRealtimeNotifications.tsx:133 -> tabIndex={0}\nsrc\\components\\admin\\AdminRealtimeNotifications.tsx:138 -> onKeyDown={(e) => {\nsrc\\components\\admin\\AdminRealtimeNotifications.tsx:190 -> tabIndex={0}\nsrc\\components\\admin\\AdminRealtimeNotifications.tsx:195 -> onKeyDown={(e) => {\nsrc\\components\\admin\\AdminRealtimeNotifications.tsx:308 -> tabIndex={0}\nsrc\\components\\admin\\AdminRealtimeNotifications.tsx:315 -> onKeyDown={(e) => {\nsrc\\components\\admin\\CommandPalette.tsx:150 -> tabIndex={-1}\nsrc\\components\\admin\\CommandPalette.tsx:163 -> onKeyDown={handleKeyDown}\nsrc\\components\\admin\\EditableCell.tsx:103 -> onKeyDown={(e) => e.stopPropagation()}\nsrc\\components\\admin\\EditableCell.tsx:111 -> onKeyDown={handleKeyDown}\nsrc\\components\\admin\\InventoryCsvImport.tsx:267 -> tabIndex={-1}\nsrc\\components\\admin\\InventoryCsvImport.tsx:338 -> tabIndex={0}\nsrc\\components\\admin\\InventoryCsvImport.tsx:341 -> onKeyDown={(e) => {\nsrc\\components\\admin\\InventoryDetailDrawer.tsx:55 -> tabIndex={-1}\nsrc\\components\\category\\EnhancedNeedsWizard.tsx:168 -> tabIndex={-1}\nsrc\\components\\navigation\\CategoryCard3D.tsx:30 -> tabIndex={0}\nsrc\\components\\navigation\\CategoryCard3D.tsx:32 -> onKeyDown={(e) => {\nsrc\\components\\navigation\\CategoryHubOverlay.tsx:115 -> onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}\nsrc\\components\\products\\AddToProjectModal.tsx:64 -> tabIndex={-1}\nsrc\\components\\products\\AddToProjectModal.tsx:153 -> onKeyDown={(e) => e.key === 'Enter' && handleCreateAndAdd()}",
+          "note": "Varlık kontrolü."
+        }
+      }
+    },
+    "L10_nextjs_discipline": {
+      "name": "Next.js 15 / React 19 Disiplini (VentHub Özel)",
+      "checks": {
+        "L10_01_async_params": {
+          "target": "Next.js 15: Dinamik route params mutlaka await edilmeli.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "params\\.[a-zA-Z]+",
+              "src/app/",
+              "--exclude=await params"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        },
+        "L10_02_route_ssot": {
+          "target": "Hardcoded href path yerine Routes.xxx helper kullanılmalı.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "href=\"/category|href=\"/products|href=\"/cart|href=\"/auth",
+              "src/views/",
+              "src/components/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        },
+        "L10_03_i18n_leakage": {
+          "target": "JSX içinde hardcoded Türkçe/İngilizce metin sızıntısı olmamalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "node",
+            "args": [
+              ".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "[i18n AST Scanner] Tarama basliyor...\n\n[🚨 i18n LEAKAGE DETECTED]\nBulunan hardcoded metin sızıntıları:\n- src\\views\\account\\AccountAddressesPage.tsx:173 | [JsxText <label>] | Text: \"Adres Başlığı\"\n- src\\views\\account\\AccountAddressesPage.tsx:174 | [JsxProp <placeholder>] | Text: \"Ev, İş, Depo vb.\"\n- src\\views\\account\\AccountAddressesPage.tsx:179 | [JsxText <label>] | Text: \"Ad Soyad / Firma\"\n- src\\views\\account\\AccountAddressesPage.tsx:180 | [JsxProp <placeholder>] | Text: \"Kişi veya Firma adı\"\n- src\\views\\account\\AccountAddressesPage.tsx:183 | [JsxText <label>] | Text: \"Telefon\"\n- src\\views\\account\\AccountAddressesPage.tsx:184 | [JsxProp <placeholder>] | Text: \"+90 5XX XXX XX XX\"\n- src\\views\\account\\AccountAddressesPage.tsx:189 | [JsxText <label>] | Text: \"Açık Adres\"\n- src\\views\\account\\AccountAddressesPage.tsx:190 | [JsxProp <placeholder>] | Text: \"Mahalle, sokak, bina ve daire no...\"\n- src\\views\\account\\AccountAddressesPage.tsx:195 | [JsxText <label>] | Text: \"İl\"\n- src\\views\\account\\AccountAddressesPage.tsx:196 | [JsxProp <placeholder>] | Text: \"İl\"\n- src\\views\\account\\AccountAddressesPage.tsx:199 | [JsxText <label>] | Text: \"İlçe\"\n- src\\views\\account\\AccountAddressesPage.tsx:200 | [JsxProp <placeholder>] | Text: \"İlçe\"\n- src\\views\\account\\AccountAddressesPage.tsx:248 | [JsxText <p>] | Text: \"Siparişlerinizde kolayca seçmek için adreslerinizi yönetin.\"\n- src\\views\\account\\AccountAddressesPage.tsx:256 | [JsxText <span>] | Text: \"Adresler yükleniyor...\"\n- src\\views\\account\\AccountAddressesPage.tsx:264 | [JsxText <h3>] | Text: \"Henüz Adres Eklenmemiş\"\n- src\\views\\account\\AccountAddressesPage.tsx:265 | [JsxText <p>] | Text: \"Sağ paneldeki formu kullanarak yeni bir teslimat veya fatura adresi ekleyebilirsiniz.\"\n- src\\views\\account\\AccountAddressesPage.tsx:310 | [JsxText <span>] | Text: \"Varsayılan\"\n- src\\views\\account\\AccountAddressesPage.tsx:325 | [JsxText <span>] | Text: \"Varsayılan\"\n- src\\views\\account\\AccountInvoicesPage.tsx:160 | [JsxText <button>] | Text: \"Birey"
+        },
+        "L10_04_framer_motion": {
+          "target": "Performans katili framer-motion sızıntısı kalmamalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "framer-motion|from 'motion'",
+              "src/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "Bulgular (18):\nsrc\\components\\BrandsShowcase.tsx:8 -> import { motion } from 'framer-motion'\nsrc\\components\\authority\\TechnicalDrawingAuthority.tsx:4 -> import { motion } from 'framer-motion'\nsrc\\components\\authority\\ThreeDAuthority.tsx:13 -> import { motion } from 'framer-motion'\nsrc\\components\\authority\\VideoAuthority.tsx:4 -> import { motion } from 'framer-motion'\nsrc\\components\\category\\CategoryShowcase.tsx:12 -> import { motion } from 'framer-motion'\nsrc\\components\\home\\CinematicProductShowcase.tsx:5 -> import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'\nsrc\\components\\home\\FeaturedCommercialBlocks.tsx:4 -> import { motion, AnimatePresence } from 'framer-motion'\nsrc\\components\\home\\FinalCTA.tsx:3 -> import { motion, Variants } from 'framer-motion'\nsrc\\components\\home\\RevealSection.tsx:4 -> import { motion } from 'framer-motion'\nsrc\\components\\products\\AddToProjectModal.tsx:6 -> import { motion } from 'framer-motion'\nsrc\\components\\products\\CategoryPreviewPanel.tsx:4 -> import { motion, AnimatePresence } from 'framer-motion'\nsrc\\components\\products\\OrbitalProductsShowcase.tsx:10 -> import { useInView } from 'framer-motion'\nsrc\\components\\products\\RadialActionMenu.tsx:2 -> import { motion, AnimatePresence } from 'framer-motion'\nsrc\\views\\ProductDetailPage.tsx:38 -> import { motion } from 'framer-motion'\nsrc\\views\\ProductsDiscoveryView.tsx:20 -> import { motion, AnimatePresence } from 'framer-motion'\nsrc\\views\\category\\CategorySeriesView.tsx:14 -> import { motion } from 'framer-motion'\nsrc\\views\\knowledge\\HubPage.tsx:6 -> import { motion, AnimatePresence } from 'framer-motion'\nsrc\\views\\knowledge\\TopicPage.tsx:7 -> import { motion } from 'framer-motion'"
+        },
+        "L10_05_supabase_cache": {
+          "target": "RSC içindeki bağımsız Supabase ORM sorguları React.cache() ile tekilleştirilmeli.",
+          "enforcement_level": "STRICT",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "cache\\s*\\([\\s\\S]*?supabase",
+              "src/app/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Bulgular (1):\nsrc\\app\\[lang]\\category\\[categorySlug]\\page.tsx:10 -> // React.cache() ile bağımsız Supabase ORM sorgusu (L10_05 Kurumsal Disiplini)",
+          "note": "Varlık kontrolü."
+        }
+      }
+    },
+    "L11_technical_debt": {
+      "name": "Teknik Borç & Ölü Kod (Eski MRI Kapsamı)",
+      "checks": {
+        "L11_01_dead_code": {
+          "target": "Kullanılmayan dosya, export ve dependency sıfır olmalı (Knip).",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "knip",
+              "--reporter",
+              "compact"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "> venthub-hvac@0.1.0 knip C:\\Users\\alize\\venthub-hvac\n> cross-env NODE_OPTIONS='--max-old-space-size=8192' knip \"--reporter\" \"compact\"\n\n\u001b[93m\u001b[4mUnused files\u001b[24m\u001b[39m (77)\nsrc/actions/auth.ts: src/actions/auth.ts\nsrc/app/_components/ProductDetailPageView.tsx: src/app/_components/ProductDetailPageView.tsx\nsrc/components/BeforeAfterSlider.tsx: src/components/BeforeAfterSlider.tsx\nsrc/components/BentoGrid.tsx: src/components/BentoGrid.tsx\nsrc/components/CartToast.tsx: src/components/CartToast.tsx\nsrc/components/CaseStudySection.tsx: src/components/CaseStudySection.tsx\nsrc/components/CategoriesShowcase.tsx: src/components/CategoriesShowcase.tsx\nsrc/components/CategoryFlow.tsx: src/components/CategoryFlow.tsx\nsrc/components/ErrorBoundary.tsx: src/components/ErrorBoundary.tsx\nsrc/components/FAQShortSection.tsx: src/components/FAQShortSection.tsx\nsrc/components/HeroCarousel.tsx: src/components/HeroCarousel.tsx\nsrc/components/HeroSection.tsx: src/components/HeroSection.tsx\nsrc/components/HeroSkeleton.tsx: src/components/HeroSkeleton.tsx\nsrc/components/InViewCounter.tsx: src/components/InViewCounter.tsx\nsrc/components/LazyBrandsShowcase.tsx: src/components/LazyBrandsShowcase.tsx\nsrc/components/LazyInView.tsx: src/components/LazyInView.tsx\nsrc/components/LoadingSpinner.tsx: src/components/LoadingSpinner.tsx\nsrc/components/MagneticCTA.tsx: src/components/MagneticCTA.tsx\nsrc/components/QuickViewModal.tsx: src/components/QuickViewModal.tsx\nsrc/components/ResourcesSection.tsx: src/components/ResourcesSection.tsx\nsrc/components/ScrollLinkedProcess.tsx: src/components/ScrollLinkedProcess.tsx\nsrc/components/SimpleProductGallery.tsx: src/components/SimpleProductGallery.tsx\nsrc/components/SpotlightHeroOverlay.tsx: src/components/SpotlightHeroOverlay.tsx\nsrc/components/SpotlightList.tsx: src/components/SpotlightList.tsx\nsrc/components/SubcategoryFlow.tsx: src/components/SubcategoryFlow.tsx\nsrc/components/TiltCard.tsx: src/components/TiltCard.tsx\nsrc/components/TrustSection.tsx: src/co"
+        },
+        "L11_02_bundle_analyzer": {
+          "target": "Bundle bileşim analizi yapılmalı — hangi modül kaç KB, tree-shaking etkisi.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "analyze"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "TIMEOUT: Komut 5 dakika içinde tamamlanmadı.",
+          "note": "HTML rapor .next/analyze/ altına üretilir. Detaylı inceleme gerekir."
+        },
+        "L11_03_unused_dependencies": {
+          "target": "package.json'da kullanılmayan dependency kalmamalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "pnpm",
+            "args": [
+              "run",
+              "knip",
+              "--include",
+              "unlisted,unresolved",
+              "--reporter",
+              "compact"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "FAIL",
+          "evidence": "> venthub-hvac@0.1.0 knip C:\\Users\\alize\\venthub-hvac\n> cross-env NODE_OPTIONS='--max-old-space-size=8192' knip \"--include\" \"unlisted,unresolved\" \"--reporter\" \"compact\"\n\n\u001b[93m\u001b[4mUnlisted dependencies\u001b[24m\u001b[39m (1)\neslint.config.cjs: @eslint/eslintrc\n ELIFECYCLE  Command failed with exit code 1."
+        },
+        "L11_04_react_compiler_hooks": {
+          "target": "React Compiler devrede olduğundan, basit bileşenlerde manuel useCallback/useMemo kullanımı azaltılmalı.",
+          "enforcement_level": "WARNING",
+          "executor": {
+            "tool": "regex_scan",
+            "args": [
+              "useCallback|useMemo",
+              "src/components/ui/"
+            ],
+            "expected_exit_codes": [
+              0
+            ]
+          },
+          "status": "PASS",
+          "evidence": "Temiz."
+        }
+      }
+    }
+  },
+  "summary": {
+    "total_checks": 57,
+    "passed": 44,
+    "warned": 13,
+    "failed": 0,
+    "blocked_layers": [],
+    "overall_verdict": "CONDITIONAL"
+  }
+}

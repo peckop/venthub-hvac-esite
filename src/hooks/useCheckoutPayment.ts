@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
 import { validateServerCart } from '../lib/order'
 import { getPriceHashLocal, getPriceHashServer } from '../utils/checkoutHelpers'

@@ -7,7 +7,7 @@ import { formatDate as formatOnlyDate } from '../../i18n/datetime'
 import { useRouter } from 'next/navigation'
 import { Routes } from '../../utils/routes'
 import { Truck, Package, Copy, ExternalLink, CheckCircle, Clock, MapPin } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 interface ShipmentRow {
   id: string

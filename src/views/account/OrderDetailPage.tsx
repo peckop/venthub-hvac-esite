@@ -11,7 +11,7 @@ import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import { Routes } from '../../utils/routes'
 import { Package, Calendar, CreditCard, ArrowLeft, Link as LinkIcon, Copy, RefreshCcw } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useCart } from '../../hooks/useCartHook'
 
 interface ShippingAddress {

@@ -6,9 +6,9 @@ source_path: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecu
 skeleton_hash: 85f4afbf3aec26ee
 entity_hashes:
   func:renderWithProviders: 836f0c3bce4ec02c
-  overview: 8400c9916e1ce4f6
+  overview: c381a7567f61eaba
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:38:52Z
+generated_at: 2026-05-29T18:55:12Z
 ---
 
 ## Genel Bakış
@@ -21,12 +21,7 @@ React arayüz elemanlarını testlerde kullanılan sistem sağlayıcılarıyla b
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu React test modülü, AccountSecurityPage hesap güvenliği sayfasının test ortamında doğru şekilde renderlanması, çalıştırılması ve test edilmesi için test altyapısının, tanımlı mock kullanıcı verisinin ve tüm gerekli uygulama provider yapılandırmalarının erişilebilir olmasını varsayar.
 
-[Aksiyom 1]: Eğer renderWithProviders fonksiyonunun çalışması için gereken tüm React uygulama providerları (yetkilendirme kontexti, state yönetimi vb.) ve test bağımlılıkları yoksa, AccountSecurityPage bileşeni testlerde hiçbir şekilde render edilemez ve tüm testler başarısız olur.
-[Aksiyom 2]: Eğer varsayılan test kullanıcısı email'i 'u@example.com' test ortamındaki mock servisler veya test veritabanında kayıtlı, yetkili bir hesaba ait değilse, hesap güvenliği verileri çekilemez ve güvenlik odaklı tüm testler başarısız olur.
-[Aksiyom 3]: Eğer projenin test çalıştırma altyapısı (Jest, TypeScript derleyicisi, React Testing Library vb.) .tsx uzantılı test dosyalarını işleyecek şekilde yapılandırılmamışsa, bu test modülü hiç çalıştırılamaz.
 
 ---
 
@@ -44,184 +39,167 @@ Bu React test modülü, AccountSecurityPage hesap güvenliği sayfasının test 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_0
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: AccountSecurityPage.test.tsx::mockU useRouter
+- **params**: () — parametresiz
 - **ic_degiskenler**:
-  - `useRouter().push` — Next.js router push metodu mock'u
-  - `useRouter().replace` — Next.js router replace metodu mock'u
-  - `useRouter().prefetch` — Next.js router prefetch metodu mock'u
-  - `useSearchParams()` — URLSearchParams nesnesi döndüren mock
-  - `usePathname()` — '/' pathini döndüren mock
-- **Dönüş**: useRouter, useSearchParams, usePathname metotlarını içeren Next.js router mock nesnesi
+  - yok
+- **Dönüş**: `{ useRouter: () => { push, replace, prefetch } }` — Next.js useRouter mock'unu döner, push/replace/prefetch vi.fn() ile stublanmış
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_1
-- **params**: (yok)
+---
+
+### [N2_NASIL] AST Pointer: AccountSecurityPage.test.tsx::mockU useSearchParams
+- **params**: () — parametresiz
 - **ic_degiskenler**:
-  - `push` — Router push metodu mock'u
-  - `replace` — Router replace metodu mock'u
-  - `prefetch` — Router prefetch metodu mock'u
-- **Dönüş**: router metotlarını içeren mock nesnesi
+  - yok
+- **Dönüş**: `() => new URLSearchParams()` — boş URLSearchParams instance'ı döner
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_2
-- **params**: (yok)
+---
+
+### [N3_NASIL] AST Pointer: AccountSecurityPage.test.tsx::mockU usePathname
+- **params**: () — parametresiz
 - **ic_degiskenler**:
-  - `toastFn` — Temel toast ana fonksiyonu olarak vi.fn() ile oluşturulmuş mock
-  - `toastFn.error` — Hata mesajı göstermek için mocklanmış toast error metodu
-  - `toastFn.success` — Başarı mesajı göstermek için mocklanmış toast success metodu
-- **Dönüş**: default olarak toast mock nesnesini içeren obje
+  - yok
+- **Dönüş**: `() => '/'` — kök path döner
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_3
-- **params**: (yok)
+---
+
+### [N4_NASIL] AST Pointer: AccountSecurityPage.test.tsx::mockToast
+- **params**: () — parametresiz
 - **ic_degiskenler**:
-  - `supabase.auth.signInWithPassword` — Supabase şifre ile giriş metodu mock'u
-  - `supabase.auth.updateUser` — Supabase kullanıcı bilgisi güncelleme metodu mock'u
-- **Dönüş**: mocklanmış supabase nesnesini içeren obje
+  - `toastFn` — vi.fn() ile oluşturulmuş mock fonksiyon; `Object.assign` ile `error` ve `success` yöntemleri eklenir, böylece hem `toast()` hem `toast.error()` hem `toast.success()` çağrılabilir
+- **Dönüş**: `{ default: toastFn }` — sonner toast modülünün default export'unu taklit eder
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_4
-- **params**: (yok)
+---
+
+### [N5_NASIL] AST Pointer: AccountSecurityPage.test.tsx::mockSupabase
+- **params**: () — parametresiz
 - **ic_degiskenler**:
-  - `hibpPwnedCount` — HIBP servisinin ihlal sayısını döndüren, 0 değerini resolve eden mock fonksiyon
-- **Dönüş**: hibpPwnedCount mock'unu içeren obje
+  - yok
+- **Dönüş**: `{ supabase: { auth: { signInWithPassword, updateUser } } }` — supabase auth modülünü taklit eder; signInWithPassword ve updateUser vi.fn() ile stublanmış
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::renderWithProviders
-- **params**: ui, userEmail
+---
+
+### [N6_NASIL] AST Pointer: AccountSecurityPage.test.tsx::mockHibp
+- **params**: () — parametresiz
 - **ic_degiskenler**:
-  - `authValue.user` — Mock kullanıcı nesnesi, email ve id değerleri atanmış
-  - `authValue.session` — Oturum nesnesi, null olarak ayarlanmış
-  - `authValue.role` — Kullanıcı rolü, null olarak ayarlanmış
-  - `authValue.loading` — Auth yükleme durumu, false olarak ayarlanmış
-  - `authValue.roleLoading` — Rol yükleme durumu, false olarak ayarlanmış
-  - `authValue.signIn` — Giriş metodu mock'u
-  - `authValue.signUp` — Kayıt metodu mock'u
-  - `authValue.signOut` — Çıkış metodu mock'u
-  - `authValue.resetPassword` — Şifre sıfırlama metodu mock'u
-  - `authValue.refreshSession` — Oturum yenileme metodu mock'u
-- **Dönüş**: @testing-library/react render fonksiyonunun sonucu, sarmalanmış providerlarla bileşen render edilir
+  - yok
+- **Dönüş**: `{ hibpPwnedCount: vi.fn().mockResolvedValue(0) }` — Have I Been Pwned kontrol fonksiyonunu taklit eder, 0 sızıntı ile resolve eder
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_5
-- **params**: (yok)
+---
+
+### [N7_NASIL] AST Pointer: AccountSecurityPage.test.tsx::renderWithProviders
+- **params**: `(ui: React.ReactElement, { userEmail = 'u@example.com' } = {})` — test edilecek bileşen ve opsiyonel kullanıcı e-postası
 - **ic_degiskenler**:
-  - `vi.clearAllMocks` — Tüm vitest mocklarını sıfırlayan fonksiyon
-- **Dönüş**: yok
+  - `authValue` — `AuthContext` tipinde nesne; `user`, `session`, `role`, `loading`, `roleLoading`, `signIn`, `signUp`, `signOut`, `resetPassword`, `refreshSession` alanlarını içerir; test ortamı için sahte auth bağlamı sağlar
+  - `authValue.user` — `Object.assign` ile `{}` üzerine `email: userEmail` ve `id: '123'` atanmış Supabase User nesnesi; `as import('@supabase/supabase-js').User` ile tip ataması yapılır
+  - `authValue.session` — `null` değerinde; oturum olmadığını belirtir
+  - `authValue.role` — `null` değerinde; rol bilgisi olmadığını belirtir
+  - `authValue.loading` — `false` değerinde; yükleme tamamlanmış durumda
+  - `authValue.roleLoading` — `false` değerinde; rol yüklemesi tamamlanmış durumda
+  - `authValue.signIn` — `vi.fn()` ile stublanmış giriş fonksiyonu
+  - `authValue.signUp` — `vi.fn()` ile stublanmış kayıt fonksiyonu
+  - `authValue.signOut` — `vi.fn()` ile stublanmış çıkış fonksiyonu
+  - `authValue.resetPassword` — `vi.fn()` ile stublanmış şifre sıfırlama fonksiyonu
+  - `authValue.refreshSession` — `vi.fn()` ile stublanmış oturum yenileme fonksiyonu
+- **Dönüş**: `render(...)` çağırısının dönüşü; `I18nProvider > AuthContext.Provider > ui` sarmalayıcılarıyla sarılmış React bileşenini render eder
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_6
-- **params**: (yok)
+---
+
+### [N8_NASIL] AST Pointer: AccountSecurityPage.test.tsx::beforeEachHandler
+- **params**: () — parametresiz
 - **ic_degiskenler**:
-  - `cleanup` - @testing-library/react temizleme fonksiyonu, test sonrası DOM'u temizler
-- **Dönüş**: yok
+  - yok
+- **Dönüş**: yok; `vi.clearAllMocks()` çağırarak tüm mock çağrı geçmişini temizler
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_7
-- **params**: (yok)
-- **ic_degiskenler**: Tüm test senaryolarını tanımlayan 6 adet `it` bloğu, her biri ayrı şifre güncelleme senaryosunu test eder
-- **Dönüş**: yok
+---
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_8
-- **params**: (yok)
+### [N9_NASIL] AST Pointer: AccountSecurityPage.test.tsx::afterEachHandler
+- **params**: () — parametresiz
 - **ic_degiskenler**:
-  - `getByPlaceholderText` — renderWithProviders'ten dönen placeholder ile element bulma metodu
-  - `getByRole` — renderWithProviders'ten dönen rol ile element bulma metodu
-  - `newInput` — "New password" placeholder'ına sahip şifre input elementi
-  - `confirmInput` — "New password (confirm)" placeholder'ına sahip şifre tekrar input elementi
-  - `saveBtn` — "Save" isimli buton elementi
-  - `userEvent.type` — Kullanıcı inputunu simüle eden testing-library metodu
-  - `userEvent.click` — Kullanıcı tıklamasını simüle eden testing-library metodu
-  - `expect` — Vitest assertion metodu
-- **Dönüş**: yok, boş current password senaryosunu test eder
+  - yok
+- **Dönüş**: yok; `cleanup()` çağırarak React testBED dom'unu temizler
 
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_9
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `getByPlaceholderText` — Element bulma metodu
-  - `getByRole` — Element bulma metodu
-  - `screen.getAllByPlaceholderText` — screen nesnesinden tüm eşleşen placeholder elementlerini bulma metodu
-  - `currentInput[0]` — İlk "Current password" input elementi, HTMLInputElement olarak cast edilmiş
-  - `newInput` — Yeni şifre input elementi
-  - `confirmInput` — Yeni şifre tekrar input elementi
-  - `saveBtn` — Kaydet butonu
-  - `userEvent` — Kullanıcı etkileşimi simülasyon metotları
-- **Dönüş**: yok, kısa yeni şifre senaryosunu test eder
+---
 
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_10
-- **params**: (yok)
+### [N10_NASIL] AST Pointer: AccountSecurityPage.test.tsx::itShowsValidationErrorsForEmptyCurrentPassword
+- **params**: () — parametresiz (async arrow callback)
 - **ic_degiskenler**:
-  - `currentInput[0]` — Mevcut şifre input elementi
-  - `newInput` — Yeni şifre input
-  - `confirmInput` — Yeni şifre tekrar input
-  - `saveBtn` — Kaydet butonu
-  - `userEvent` — Kullanıcı etkileşimi metotları
-  - `expect` — Assertion metodu
-- **Dönüş**: yok, eşleşmeyen şifreler senaryosunu test eder
+  - `getByPlaceholderText` — `renderWithProviders` destructuring dönüşünden alınan; placeholder text'e göre DOM elementi bulan fonksiyon
+  - `getByRole` — `renderWithProviders` destructuring dönüşünden alınan; ARIA rolüne göre DOM elementi bulan fonksiyon
+  - `newInput` — `getByPlaceholderText('New password')` ile bulunan yeni şifre input elementi
+  - `confirmInput` — `getByPlaceholderText('New password (confirm)')` ile bulunan şifre onay input elementi
+  - `saveBtn` — `getByRole('button', { name: 'Save' })` ile bulunan kaydet butonu
+- **Dönüş**: yok; mevcut şifre boşken validasyon hatası verildiğini doğrular: `toast.error` ile 'Please enter your current password' çağrılmalı, `supabase.auth.signInWithPassword` çağrılmamalı
 
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_11
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `vi.mocked` — Vitest mock sarmalama metodu
-  - `supabase.auth.signInWithPassword.mockImplementationOnce` — Giriş metodu için tek kullanımlık implementasyon atama
-  - `currentInput[0]` — Mevcut şifre input
-  - `newInput` — Yeni şifre input
-  - `confirmInput` — Yeni şifre tekrar input
-  - `saveBtn` — Kaydet butonu
-- **Dönüş**: yok, yanlış mevcut şifre senaryosunu test eder
+---
 
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_12
-- **params**: (yok)
+### [N11_NASIL] AST Pointer: AccountSecurityPage.test.tsx::itShowsValidationErrorForShortNewPassword
+- **params**: () — parametresiz (async arrow callback)
 - **ic_degiskenler**:
-  - `data.user` — Giriş başarısızlığında null kullanıcı nesnesi
-  - `data.session` — Giriş başarısızlığında null oturum nesnesi
-  - `error` — AuthError tipi hata nesnesi, geçersiz giriş bilgisi mesajı içerir
-- **Dönüş**: Hata içeren promise nesnesi, kimlik doğrulama hatasını simüle eder
+  - `getByPlaceholderText` — `renderWithProviders` destructuring dönüşünden alınan; placeholder text'e göre DOM elementi bulan fonksiyon
+  - `getByRole` — `renderWithProviders` destructuring dönüşünden alınan; ARIA rolüne göre DOM elementi bulan fonksiyon
+  - `currentInput` — `screen.getAllByPlaceholderText('Current password')[0]` ile bulunan mevcut şifre input elementi; `as HTMLInputElement` ile tip ataması yapılır
+  - `newInput` — `getByPlaceholderText('New password')` ile bulunan yeni şifre input elementi
+  - `confirmInput` — `getByPlaceholderText('New password (confirm)')` ile bulunan şifre onay input elementi
+  - `saveBtn` — `getByRole('button', { name: 'Save' })` ile bulunan kaydet butonu
+- **Dönüş**: yok; kısa şifre için validasyon hatası doğrulanır: `toast.error` ile 'account.security.rulesNotMet' çağrılmalı
 
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_13
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `vi.mocked(supabase.auth.signInWithPassword)` — Mocklanmış giriş metodu
-  - `vi.mocked(supabase.auth.updateUser)` — Mocklanmış kullanıcı güncelleme metodu
-  - `currentInput[0]` — Mevcut şifre input
-  - `newInput` — Yeni şifre input
-  - `confirmInput` — Yeni şifre tekrar input
-  - `saveBtn` — Kaydet butonu
-- **Dönüş**: yok, başarılı şifre güncelleme senaryosunu test eder
+---
 
-### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_14
-- **params**: (yok)
+### [N12_NASIL] AST Pointer: AccountSecurityPage.test.tsx::itShowsValidationErrorWhenPasswordsDoNotMatch
+- **params**: () — parametresiz (async arrow callback)
 - **ic_degiskenler**:
-  - `data.user` — Başarılı giriş sonrası dolu kullanıcı nesnesi
-  - `data.session` — Başarılı giriş sonrası dolu oturum nesnesi
-  - `error` — null hata değeri
-- **Dönüş**: Başarılı giriş verisini içeren resolved promise
+  - `getByPlaceholderText` — `renderWithProviders` destructuring dönüşünden alınan; placeholder text'e göre DOM elementi bulan fonksiyon
+  - `getByRole` — `renderWithProviders` destructuring dönüşünden alınan; ARIA rolüne göre DOM elementi bulan fonksiyon
+  - `currentInput` — `screen.getAllByPlaceholderText('Current password')[0]` ile bulunan mevcut şifre input elementi; `as HTMLInputElement` cast'li
+  - `newInput` — `getByPlaceholderText('New password')` ile bulunan yeni şifre input elementi
+  - `confirmInput` — `getByPlaceholderText('New password (confirm)')` ile bulunan şifre onay input elementi
+  - `saveBtn` — `getByRole('button', { name: 'Save' })` ile bulunan kaydet butonu
+- **Dönüş**: yok; eşleşmeyen şifreler için validasyon hatası doğrulanır: `toast.error` ile 'Passwords do not match' çağrılmalı, `supabase.auth.signInWithPassword` çağrılmamalı
 
-### [N17_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_15
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data.user` — Başarılı güncelleme sonrası dolu kullanıcı nesnesi
-  - `error` — null hata değeri
-- **Dönüş**: Başarılı güncelleme verisini içeren resolved promise
+---
 
-### [N18_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_16
-- **params**: (yok)
+### [N13_NASIL] AST Pointer: AccountSecurityPage.test.tsx::itHandlesWrongCurrentPassword
+- **params**: () — parametresiz (async arrow callback)
 - **ic_degiskenler**:
-  - `vi.mocked(supabase.auth.signInWithPassword)` — Mocklanmış giriş metodu
-  - `vi.mocked(supabase.auth.updateUser)` — Mocklanmış kullanıcı güncelleme metodu
-  - `currentInput[0]` — Mevcut şifre input
-  - `newInput` — Yeni şifre input
-  - `confirmInput` — Yeni şifre tekrar input
-  - `saveBtn` — Kaydet butonu
-- **Dönüş**: yok, güncelleme başarısızlığı senaryosunu test eder
+  - `getByPlaceholderText` — `renderWithProviders` destructuring dönüşünden alınan; placeholder text'e göre DOM elementi bulan fonksiyon
+  - `getByRole` — `renderWithProviders` destructuring dönüşünden alınan; ARIA rolüne göre DOM elementi bulan fonksiyon
+  - `currentInput` — `screen.getAllByPlaceholderText('Current password')[0]` ile bulunan mevcut şifre input elementi; `as HTMLInputElement` cast'li
+  - `newInput` — `getByPlaceholderText('New password')` ile bulunan yeni şifre input elementi
+  - `confirmInput` — `getByPlaceholderText('New password (confirm)')` ile bulunan şifre onay input elementi
+  - `saveBtn` — `getByRole('button', { name: 'Save' })` ile bulunan kaydet butonu
+  - `vi.mocked(supabase.auth.signInWithPassword).mockImplementationOnce(...)` — signInWithPassword'ın bir kez `{ data: { user: null, session: null }, error: { name: 'AuthError', status: 400, message: 'Invalid login credentials' } }` dönmesini sağlar
+- **Dönüş**: yok; yanlış mevcut şifre senaryosunu test eder: `supabase.auth.signInWithPassword` çağrılmış olmalı, `supabase.auth.updateUser` çağrılmamış olmalı, `toast.error` ile 'Current password is incorrect' çağrılmalı
 
-### [N19_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_17
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data.user` — Başarılı ön doğrulama sonrası dolu kullanıcı nesnesi
-  - `data.session` — Başarılı ön doğrulama sonrası dolu oturum nesnesi
-  - `error` — null hata değeri
-- **Dönüş**: Ön doğrulama başarılı verisini içeren resolved promise
+---
 
-### [N20_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx::anon_18
-- **params**: (yok)
+### [N14_NASIL] AST Pointer: AccountSecurityPage.test.tsx::itUpdatesPasswordSuccessfully
+- **params**: () — parametresiz (async arrow callback)
 - **ic_degiskenler**:
-  - `data.user` — Güncelleme başarısızlığında null kullanıcı nesnesi
-  - `error` — Güncelleme hatasını içeren AuthError nesnesi
-- **Dönüş**: Güncelleme hatası içeren resolved promise
+  - `getByPlaceholderText` — `renderWithProviders` destructuring dönüşünden alınan; placeholder text'e göre DOM elementi bulan fonksiyon
+  - `getByRole` — `renderWithProviders` destructuring dönüşünden alınan; ARIA rolüne göre DOM elementi bulan fonksiyon
+  - `currentInput` — `screen.getAllByPlaceholderText('Current password')[0]` ile bulunan mevcut şifre input elementi; `as HTMLInputElement` cast'li
+  - `newInput` — `getByPlaceholderText('New password')` ile bulunan yeni şifre input elementi
+  - `confirmInput` — `getByPlaceholderText('New password (confirm)')` ile bulunan şifre onay input elementi
+  - `saveBtn` — `getByRole('button', { name: 'Save' })` ile bulunan kaydet butonu
+  - `vi.mocked(supabase.auth.signInWithPassword).mockImplementationOnce(...)` — signInWithPassword başarılı response döner: `{ data: { user: {}, session: {} }, error: null }`
+  - `vi.mocked(supabase.auth.updateUser).mockImplementationOnce(...)` — updateUser başarılı response döner: `{ data: { user: {} }, error: null }`
+- **Dönüş**: yok; başarılı şifre güncelleme senaryosunu test eder: `supabase.auth.signInWithPassword` çağrılmış olmalı, `supabase.auth.updateUser` `{ password: '12345678aA!' }` argümanıyla çağrılmış olmalı, `toast.success` ile 'Your password has been updated' çağrılmalı
+
+---
+
+### [N15_NASIL] AST Pointer: AccountSecurityPage.test.tsx::itShowsErrorWhenUpdateFails
+- **params**: () — parametresiz (async arrow callback)
+- **ic_degiskenler**:
+  - `getByPlaceholderText` — `renderWithProviders` destructuring dönüşünden alınan; placeholder text'e göre DOM elementi bulan fonksiyon
+  - `getByRole` — `renderWithProviders` destructuring dönüşünden alınan; ARIA rolüne göre DOM elementi bulan fonksiyon
+  - `currentInput` — `screen.getAllByPlaceholderText('Current password')[0]` ile bulunan mevcut şifre input elementi; `as HTMLInputElement` cast'li
+  - `newInput` — `getByPlaceholderText('New password')` ile bulunan yeni şifre input elementi
+  - `confirmInput` — `getByPlaceholderText('New password (confirm)')` ile bulunan şifre onay input elementi
+  - `saveBtn` — `getByRole('button', { name: 'Save' })` ile bulunan kaydet butonu
+  - `vi.mocked(supabase.auth.signInWithPassword).mockImplementationOnce(...)` — signInWithPassword başarılı response döner: `{ data: { user: {}, session: {} }, error: null }`
+  - `vi.mocked(supabase.auth.updateUser).mockImplementationOnce(...)` — updateUser hata response döner: `{ data: { user: null }, error: { name: 'AuthError', status: 400, message: 'update failed' } }`
+- **Dönüş**: yok; şifre güncelleme başarısızlık senaryosunu test eder: `supabase.auth.signInWithPassword` çağrılmış olmalı, `supabase.auth.updateUser` çağrılmış olmalı, `toast.error` ile 'An error occurred while updating password' çağrılmalı
 
 ---
 

@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useRouter, usePathname } from 'next/navigation'
 import { Crown, Shield, ShieldCheck, Users, AlertCircle, Package, Tag, Eye, SearchX } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { listAdminUsers, setUserAdminRole } from '../../config/admin'
 import { 
   adminSectionTitleClass, 

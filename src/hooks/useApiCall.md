@@ -3,29 +3,48 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts
-skeleton_hash: 00770ccd49233591
+skeleton_hash: 5c125e59a0aecf21
 entity_hashes:
   func:useApiCall: ad3857eabf77c233
-  overview: 0635a829e467e31a
-generated_at: 2026-05-28T22:37:51Z
+  overview: 301e3e9f7e67faae
+generated_at: 2026-05-29T18:47:35Z
 ---
 
 ## Genel Bakış
-Bu modül, React uygulamalarında API çağrılarını merkezi ve standart bir şekilde yönetmek için tasarlanmış bir hook sunar. Tüm HTTP isteklerinin durumunu takip etmeyi, hata yönetimi sağlamayı ve istek yapılandırmalarını opsiyonel parametrelerle özelleştirmeyi amaçlar.
+Bu modül, React uygulamalarında API çağrılarını merkezi ve yeniden kullanılabilir bir şekilde yönetmek için özel bir hook sunar. Temel amacı, tüm HTTP istekleri için tutarlı bir durum yönetim döngüsü (yükleniyor, başarı, hata) sağlamak ve temel istek yapılandırmalarını merkezileştirmektir.
 
 ## Fonksiyon Grupları
-### Merkezi API Çağrı Orkestrasyonu
-Bu grup, uygulama genelindeki tüm API etkileşimlerini başlatan, izleyen ve sonlandıran temel işlevi barındırır. Hook, istek ömrü boyunca yüklenme, başarı ve hata durumlarını yöneterek bileşenlere tutarlı bir veri akışı sağlar.
+### API Çağrı Orkestrasyonu ve Durum Yönetimi
+Bu grup, tek bir hook ile asenkron API çağrılarının başlatılmasını, yürütülmesini ve sonuçlarının (başarı veya hata) izlenmesini sağlar. Hook, çağrı sürecinde otomatik olarak durum güncellemeleri yaparak bileşenlere stabilized bir veri akışı sunar.
 - useApiCall
 
 ### Özelleştirilebilir İstek Yapılandırması
-Bu grup, varsayılan API davranışını ve istek parametrelerini uygulama ihtiyaçlarına göre ayarlama imkanı sunar. Hook'a iletilen opsiyonel yapılandırma seçenekleri, kimlik doğrulama, zaman aşımları veya özel başlıklar gibi parametrelerin merkezi olarak belirlenmesine olanak tanır.
+Bu grup, varsayılan istek davranışlarının opsiyonel parametrelerle genişletilmesine ve özelleştirilmesine olanak tanır. Uygulama genelindeki ortak yapılandırma ihtiyaçlarını (örn. kimlik doğrulama, zaman aşımları) tek bir noktadan tanımlamayı kolaylaştırır.
 - useApiCall
+
+---
+*Bu hook, VentHub HVAC projesi içindeki tüm API çağrılarını standartlaştırmak ve merkezi olarak yönetmek temel mimari varsayımı üzerine kurulmuştur.*
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu hook, VentHub HVAC projesi içinde API çağrılarını merkezi olarak yönetmek ve stand
+
+Bu hook, API çağrılarını yönetmek için temel bir React hook yapısına ve opsiyonel bir yapılandırma nesnesine bağlıdır. Varsayımlar, fonksiyonun parametreleri ve React hook kuralları üzerine kuruludur.
+
+**[Aksiyom 1]: Eğer `useApiCall` hook'u React fonksiyonel bileşeninin veya başka bir hook'un içinde invok edilmemişse, "Invalid hook call" hatası oluşur.**
+Bu, React'ın hook kurallarına bağlılık varsayımıdır.
+
+**[Aksiyom 2]: Eğer `defaultOptions` parametresi sağlanmazsa veya `null`/`undefined` olarak geçilirse, hook bir varsayılan (muhtemelen boş) yapılandırma nesnesi ile çalışır.**
+Fonksiyon imzasındaki `?` işareti, parametrenin opsiyonel olduğunu belirtir.
+
+**[Aksiyom 3]: Eğer `defaultOptions` içinde bir `url` (API endpoint adresi) veya bunu sağlayan bir `fetchConfig` bileşeni belirtilmemişse, hook'un bir HTTP isteği başlatması mümkün değildir.**
+Hook, bir hedef olmadan API çağrısı yapamaz; bu durum isteği başlatamaz veya bir hata fırlatır.
+
+**[Aksiyom 4]: Eğer `defaultOptions` içindeki `method` parametresi (`GET`, `POST`, `PUT`, `DELETE` vb.) geçerli bir HTTP method değilse, istek başarısız olur veya sunucu tarafından reddedilir.**
+Geçersiz bir method ile yapılan istekler standart HTTP hataları (405 Method Not Allowed gibi) ile sonuçlanır.
+
+**[Aksiyom 5]: Eğer `defaultOptions` içindeki `headers`, `body` veya diğer yapılandırma parametreleri, gönderilen isteğin türü (örn: `GET` isteğinde `body` olması) ile uyumsuzsa, istek hata ile sonuçlanır.**
+İstek yapısının HTTP protokolü ile tutarlı olması bir zorunluluktur.
 
 ---
 
@@ -59,27 +78,27 @@ Bu hook, VentHub HVAC projesi içinde API çağrılarını merkezi olarak yönet
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::useApiCall
-- **params**: (defaultOptions?: UseApiCallOptions)
+### [N1_NASIL] AST Pointer: src/hooks/useApiCall.ts::useApiCall
+- **params**: `(defaultOptions?: UseApiCallOptions)` — Hook'a geçirilen varsayılan API çağrı seçenekleri
 - **ic_degiskenler**:
-  - `state` — useApiCall hook'unun state'i, ApiCallState<T> tipinde, data, loading ve error değerlerini tutar
-  - `setState` — state'i güncellemek için kullanılan setter fonksiyonu
-  - `execute` — useCallback ile sarılmış, API çağrısını yöneten async fonksiyon
-  - `reset` — useCallback ile sarılmış, state'i sıfırlayan fonksiyon
-- **Dönüş**: `{ ...state, execute, reset }` nesnesi
+  - `state` — useState ile yönetilen {data, loading, error} durum nesnesi, ApiCallState<T> tipinde
+  - `execute` — useCallback ile sarılmış async fonksiyon, API çağrısı yapar ve state'i günceller
+  - `reset` — useCallback ile sarılmış fonksiyon, state'i başlangıç değerine sıfırlar
+- **Dönüş**: `{ ...state, execute, reset }` — state alanlarını (data, loading, error) ve iki metodu içeren nesne
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::execute
-- **params**: (apiFunc: () => Promise<T>, options?: UseApiCallOptions)
+### [N2_NASIL] AST Pointer: src/hooks/useApiCall.ts::execute
+- **params**: `(apiFunc: () => Promise<T>, options?: UseApiCallOptions)` — Çalıştırılacak API fonksiyonu ve opsiyonel seçenekler
 - **ic_degiskenler**:
-  - `mergedOptions` — defaultOptions ve options'un birleşimi, spread operatörü ile oluşturulmuş
-  - `result` — apiFunc() çağrısının başarıyla döndürdüğü değer
-  - `error` — catch bloğunda yakalanan hata nesnesi, Error instancesi veya string'den oluşturulmuş
-- **Dönüş**: Promise<T | null>, başarıda result, hata durumunda null
+  - `mergedOptions` — `{ ...defaultOptions, ...options }` ile birleştirilmiş seçenekler nesnesi; showToast, successMessage, errorMessage alanlarını içerir
+  - `result` — `await apiFunc()` çağrısının başarılı sonucu, T tipinde
+  - `error` — catch bloğunda yakalanan hata; `err instanceof Error ? err : new Error(String(err))` ile Error nesnesine dönüştürülmüş
+- **Dönüş**: `Promise<T | null>` — Başarılıysa result, hatalıysa null döner
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts::reset
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (state'i sıfırlar, setState çağrısı yapar)
+### [N3_NASIL] AST Pointer: src/hooks/useApiCall.ts::reset
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - (yok)
+- **Dönüş**: yok — Yan etki olarak state'i `{ data: null, loading: false, error: null }` değerine sıfırlar
 
 ---
 

@@ -3,33 +3,26 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryQrLabel.tsx
-skeleton_hash: 1c3557ada2a9bd3b
+skeleton_hash: ebe773dcc2c30493
 entity_hashes:
   func:printQrLabel: 68158948d578d02a
-  overview: 59c570f5c42e413d
+  overview: ddf13ce18f5512aa
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:35:36Z
+generated_at: 2026-05-29T18:45:03Z
 ---
 
 ## Genel Bakış
-InventoryQrLabel bileşeni, envanter öğeleri için QR kod etiketlerinin oluşturulması ve yazdırılmasından sorumludur. Kullanıcı etkileşimiyle tetiklenen asenkron bir işlem yürütür, yazdırma sürecinin durumunu yönetir ve ilgili UI güncellemelerini sağlar.
+Bu modül, envanter kalemleri için QR kod etiketlerinin yazdırılmasını yöneten tek bir odaklı işlev sunar. Kullanıcının yazdırma tetiklemesiyle asenkron olarak çalışan fonksiyon, yazdırma sürecinin UI üzerindeki durumunu (yazdırılıyor/yazdırıldı) kontrol eder.
 
 ## Fonksiyon Grupları
 ### QR Etiket Yazdırma
-Bu grup, QR kod etiketinin hazırlanması, yazdırma komutunun gönderilmesi ve yazdırma işleminin ilerleyişinin UI’da yansıtılmasından sorumludur.
+Etiket yazdırma sürecinin tüm aşamalarını — hazırlık, basıcıya gönderim ve durum yönetimi — tek bir işlevde kümeler.
 - printQrLabel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması gerekir; koşullar sağlanmazsa fonksiyonun davranışı belirsiz veya hata verebilir.
-
-- **Eğer** `r` parametresi geçerli bir `QrLabelProps` nesnesi **olmazsa**, fonksiyon QR kod verisini hazırlayamayacağından işlem başarısız olur veya bir hata fırlatır.  
-- **Eğer** `setPrintingQr` parametresi bir fonksiyon **olmazsa**, yazdırma sürecinin durumunu UI’a yansıtmak için state güncellenemez; bu da kullanıcıya yazdırma ilerlemesinin gösterilmesini engeller.  
-- **Eğer** `QrLabelProps` içindeki QR kod üretimi için zorunlu veri alanları (örneğin kimlik, açıklama vb.) **eksikse veya geçersizse**, oluşturulan QR kod boş veya hatalı olur ve yazdırma işlemi beklenildiği gibi gerçekleşmez.  
-- **Eğer** fonksiyon asenkron bir işlem (örneğin basıcıyla iletişim) gerçekleştiriyorsa ve bu işlem sırasında bir hata oluşursa, `setPrintingQr(false)` çağrısı yapılarak yazdırma durumunun sıfırlanması beklenir; aksi takdirde UI sürekli “yazdırılıyor” durumunda kalabilir.  
-
-Bu varsayımlar, fonksiyon gövdesindeki dış bağımlılıklar ve veri akışı üzerinden türetilmiştir; docstring, yorum veya değişken isimlerinden çıkarılmamıştır.
+Bu modül, QR etiket yaz
 
 ---
 
@@ -57,25 +50,19 @@ Bu varsayımlar, fonksiyon gövdesindeki dış bağımlılıklar ve veri akış�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/InventoryQrLabel.tsx::printQrLabel
-- **params**: r: QrLabelProps, setPrintingQr: (v: boolean) => void
+### [N1_NASIL] AST Pointer: InventoryQrLabel.tsx::printQrLabel
+- **params**: `(r: QrLabelProps, setPrintingQr: (v: boolean) => void)`
+  - `r` — QR etiketi basılacak ürünün bilgilerini taşıyan nesne; `r.product_id`, `r.name`, `r.warehouse_location`, `r.physical_stock` alanları kullanılır
+  - `setPrintingQr` — yazdırma işleminin devam edip etmediğini belirten state setter; `true` ile başlar, `finally` bloğunda `false` yapılır
 - **ic_degiskenler**:
-  - `window` — global object used to check if running in browser (typeof window === 'undefined')
-  - `url` — string containing QR code API URL with encoded product_id
-  - `iframe` — HTMLIFrameElement created to host printable HTML content
-  - `safeName` — sanitized product name with HTML entities escaped
-  - `safeSku` — uppercase first 8 chars of product_id with HTML escaping
-  - `safeLoc` — warehouse location string with HTML escaping, default '-'
-  - `htmlContent` — full HTML string for the label page, includes interpolated variables
-  - `doc` — document object of the iframe's contentWindow, used to write HTML
-  - `toast` — imported react-hot-toast function for error notification
-- **Dönüş**: yok (function returns undefined; side effects: sets printing state, creates iframe, triggers print, shows toast on error)
-
-### [N2_NASIL] AST Pointer: src/components/admin/InventoryQrLabel.tsx::setTimeout callback
-- **params**: (none)
-- **ic_degiskenler**:
-  - `iframe` — reference to the iframe element captured from outer scope; used to check if still attached and remove it from DOM
-- **Dönüş**: yok (callback returns undefined; side effect: removes iframe after delay)
+  - `url` — qrserver.com API'si kullanılarak oluşturulan QR kod görselinin URL adresi; `r.product_id` Base64-URL-encode edilerek dataya eklenir
+  - `iframe` — yazdırma işlemini gerçekleştirmek için DOM'a eklenen gizli iframe elemanı; HTML içeriği içine yazılır ve `window.print()` tetiklenir
+  - `safeName` — `r.name` değerinin XSS-safe hali; `<` ve `>` karakterleri HTML entity'lerine dönüştürülür; HTML template'de ürün adı olarak gösterilir
+  - `safeSku` — `r.product_id`'den ilk 8 karakter alınıp büyük harfe çevrilmiş, XSS-safe SKU kodu; HTML template'de "SKU Kodu" olarak gösterilir
+  - `safeLoc` — `r.warehouse_location` değerinin XSS-safe hali; boşsa `'-'` değeri kullanılır; HTML template'de "Depo Rafı" olarak gösterilir
+  - `htmlContent` — iframe içine yazılacak tam HTML doküman stringi; CSS stilleri, QR görseli, ürün bilgileri ve yazdırma medya sorgularını içerir; `safeSku`, `safeName`, `safeLoc`, `url`, `r.physical_stock` template literal ile interpolatedir
+  - `doc` — `iframe.contentWindow?.document` ifadesinden elde edilen iframe'in Document nesnesi; `null` kontrolü yapılarak `doc.open()`, `doc.write(htmlContent)`, `doc.close()` ile HTML içeriği iframe'a yazılır
+- **Dönüş**: yok — fonksiyon asenkrondür, doğrudan bir değer dönmez; yan etki olarak iframe oluşturur, HTML yazar, 5 saniye sonra iframe'ı DOM'dan kaldırır; hata durumunda `toast.error('Etiket oluşturulamadı')` gösterir; her durumda `setPrintingQr(false)` çağırır
 
 ---
 

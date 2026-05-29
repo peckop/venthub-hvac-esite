@@ -3,26 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountProfilePage.tsx
-skeleton_hash: 8f54003fdfbd1d91
+skeleton_hash: 04eeead58cbf5946
 entity_hashes:
   func:AccountProfilePage: 754183d7e2ba9791
-  overview: 6f24907adef049a2
+  overview: dc99ac3fc9b4a582
   style_tokens: d7513d5d715e48fe
-generated_at: 2026-05-28T22:38:52Z
+generated_at: 2026-05-29T18:52:27Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı profil bilgilerini gösteren ve düzenleyen bir hesap profili sayfası bileşenini içerir. Sayfa, kullanıcı verilerini alarak arayüzde sunar ve gerekli etkileşimleri yönetir.
+Bu modül, kullanıcı profil sayfasını temsil eden bir React bileşenidir. Kullanıcının mevcut profil bilgilerini (ad soyad ve telefon) görüntülemesini, düzenlemesini ve Supabase üzerinden güncelleme yapmasını sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Kullanıcı profil sayfasının görsel yapısını oluşturur ve veri akışını koordin eder.
+Sayfanın tüm kullanıcı arayüzünü, durum yönetimini ve veriyle etkileşimi tek bir bileşen içinde yönetir.
 - AccountProfilePage
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
 
 ---
 
@@ -50,44 +49,30 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\account\AccountProfilePage.tsx::AccountProfilePage
-- **params**: (none)
+### [N1_NASIL] AST Pointer: AccountProfilePage.tsx::AccountProfilePage
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — translation function returned by `useI18n()`, used to localize UI strings.
-  - `user` — current authenticated user object returned by `useAuth()`, contains `user_metadata`.
-  - `fullName` — state variable holding the current value of the full name input field.
-  - `setFullName` — state updater function for `fullName`.
-  - `phone` — state variable holding the current value of the phone input field.
-  - `setPhone` — state updater function for `phone`.
-  - `saving` — state variable indicating whether a save operation is in progress.
-  - `setSaving` — state updater function for `saving`.
-  - `onSave` — event handler function defined within the component, invoked on form submission.
-- **Dönüş**: returns JSX markup for the account profile page.
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu; UI string'lerini dil bazlı render eder
+  - `user` — useAuth hook'undan dönen mevcut Supabase kullanıcı nesnesi; user_metadata alanı profili bilgilerini tutar
+  - `fullName` — React state (string), kullanıcının tam adını tutar; input value'sine bağlanır; başlangıç değeri boş string
+  - `setFullName` — fullName state'ini güncelleyen setter; input onChange handler'ında kullanılır
+  - `phone` — React state (string), kullanıcının telefon numarasını tutar; input value'sine bağlanır; başlangıç değeri boş string
+  - `setPhone` — phone state'ini güncelleyen setter; input onChange handler'ında kullanılır
+  - `saving` — React state (boolean), form kaydetme işleminin devam edip etmediğini kontrol eder; true iken buton disable edilir ve spinner gösterilir
+  - `setSaving` — saving state'ini güncelleyen setter; onSave fonksiyonunda try/finally bloklarında kullanılır
+- **Dönüş**: JSX — Kullanıcı profil düzenleme sayfasını render eder; isim ve telefon alanlarını içerir
 
-### [N2_NASIL] AST Pointer: src\views\account\AccountProfilePage.tsx::useEffect callback
-- **params**: (none)
+### [N1_NASIL] AST Pointer: AccountProfilePage.tsx::onSave
+- **params**: `e: React.FormEvent` — form submit olay nesnesi
 - **ic_degiskenler**:
-  - `user` — accessed from outer scope to read `user_metadata`.
-  - `meta` — local variable holding the user metadata cast to `UserMetadata`; defaults to an empty object if `user` or `user_metadata` is undefined.
-  - `fullName` — accessed from outer scope to set its state.
-  - `setFullName` — state updater function for `fullName`.
-  - `phone` — accessed from outer scope to set its state.
-  - `setPhone` — state updater function for `phone`.
-- **Dönüş**: no explicit return; side effect updates component state.
+  - `error` — supabase.auth.updateUser çağrısının destructure edilmiş error alanı; hata varsa hata nesnesi, yoksa undefined
+- **Dönüş**: void (async) — supabase.auth.updateUser ile full_name ve phone alanlarını günceller; başarılıysa toast.success, hatalıysa toast.error gösterir; her durumda saving'i false'a çeker
 
-### [N3_NASIL] AST Pointer: src\views\account\AccountProfilePage.tsx::onSave
-- **params**: `e` — `React.FormEvent` representing the form submission event.
+### [N1_NASIL] AST Pointer: AccountProfilePage.tsx::useEffect callback (anonim)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `e` — event object; `e.preventDefault()` stops default form submission.
-  - `setSaving` — state updater function for `saving`; called with `true` at start and `false` in `finally`.
-  - `saving` — accessed only in JSX button `disabled={saving}` (not within this function body).
-  - `supabase` — imported client used to call `supabase.auth.updateUser`.
-  - `fullName` — current value of the full name state, used in the update payload.
-  - `phone` — current value of the phone state, used in the update payload.
-  - `toast` — imported notification library; `toast.success` and `toast.error` are called based on operation outcome.
-  - `t` — translation function used to fetch localized toast messages.
-  - `error` — local variable capturing the `error` property from the Supabase response.
-- **Dönüş**: no explicit return; performs asynchronous update and side‑effects (state changes, notifications).
+  - `meta` — user?.user_metadata değerinin UserMetadata tipine cast edilmiş hali; user_metadata mevcut değilse boş obje `{}` kullanılır
+- **Dönüş**: yok — user değiştiğinde tetiklenerek fullName ve phone state'lerini meta.full_name ve meta.phone değerleriyle başlatır (yan etki)
 
 ---
 

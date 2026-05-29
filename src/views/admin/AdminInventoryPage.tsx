@@ -10,7 +10,7 @@ import {
   RefreshCw, 
   Plus
 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import InventoryTable from '../../components/admin/InventoryTable';
 import type { Database } from '../../types/database.types';
 import { LoadState, Density } from '../../types/admin-shared';

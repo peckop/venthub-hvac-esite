@@ -235,9 +235,7 @@ textarea:focus-visible {
 
 /* WhatsApp floating button - Modern & Responsive */
 .whatsapp-float {
-  @apply fixed z-toast bg-emerald-500 text-white rounded-full shadow-2xl transition-[width,background-color,border-radius] duration-500 ease-in-out flex items-center justify-center border-2 border-white;
-  bottom: 110px;
-  right: 20px;
+  @apply bg-emerald-500 text-white rounded-full shadow-2xl transition-[width,background-color,border-radius] duration-500 ease-in-out flex items-center justify-center border-2 border-white;
   width: 56px;
   height: 56px;
   overflow: hidden;

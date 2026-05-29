@@ -42,7 +42,7 @@ import { AuthContext } from '../../../contexts/AuthContextDefinition'
 import { I18nProvider } from '../../../i18n/I18nProvider'
 import AccountSecurityPage from '../AccountSecurityPage'
 import { supabase } from '../../../lib/supabase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 function renderWithProviders(ui: React.ReactElement, { userEmail = 'u@example.com' } = {}) {
   const authValue: React.ContextType<typeof AuthContext> = {

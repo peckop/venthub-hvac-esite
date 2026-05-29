@@ -7,21 +7,21 @@ skeleton_hash: b97e5d93501ef882
 entity_hashes:
   func:ProductFormModal: 6997b37c35b0ebef
   func:onSubmit: 56cec6a550e2cc75
-  overview: 12f9cde3f23a5605
+  overview: 2b203263d8652482
   style_tokens: 553a7b8fa0cd3c86
-generated_at: 2026-05-28T22:35:35Z
+generated_at: 2026-05-29T18:45:50Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici paneli ürün yönetimi için ürün ekleme ve düzenleme işlemlerini gerçekleştiren bir form modal bileşenidir. Modalın açık/kapalı durumunu, form verilerini ve işlem sonuçlarını dışarıdan gelen prop'lar aracılığıyla yönetir.
+Bu modül, yönetici panelinde ürün ekleme ve düzenleme işlevselliğini sunan bir React form modal bileşenidir. Modül, modalın görünürlüğünü, formun çalışma modunu (yeni kayıt veya mevcut kaydı düzenleme) ve form gönderim sonrasındaki akışı yöneterek kullanıcı arayüzündeki ürün Yönetim sürecini merkezileştirir.
 
 ## Fonksiyon Grupları
-### Modal Ana Bileşeni
-Modalın temel yapısını, görünürlük durumunu ve formun çalışma modunu (yeni ürün ekleme / mevcut ürünü düzenleme) yönetir. Dışarıdan gelen prop'ları işleyerek formun doğru şekilde çalışmasını sağlar.
+### Modal Bileşeni ve Yönetimi
+Bileşenin temel yapısını, dışarıdan kontrol edilen görünürlük durumunu ve formun başlangıç değerlerini (yeni ürün veya mevcut ürün verileriyle doldurma) yönetir. Prop'lar aracılığıyla modunun açılıp kapanmasını ve üst bileşenle olan etkileşim kurallarını belirler.
 - ProductFormModal
 
-### Form Gönderim İşleyicisi
-Formdan alınan verileri işleyerek ürün ekleme veya düzenleme işlemini gerçekleştirir. İşlem başarılı olduğunda ilgili geri çağırmaları tetikleyerek modalın kapanmasını ve ana bileşenin bilgilendirilmesini sağlar.
+### Form Gönderim ve Veri İşleme
+Kullanıcı formu doldurup gönderdiğinde tetiklenen asenkron işlemcidir. Doğrulanmış form verilerini alır, bir API isteği gönderir ve işlemin başarısına veya başarısızlığına göre ilgili geri çağırma fonksiyonlarını (onSuccess, onClose) tetikleyerek uygulamanın durumunu günceller.
 - onSubmit
 
 ---
@@ -37,11 +37,28 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 **Aksiyom 4**: Eğer `onSuccess` callback’i tanımlı değilse, form başarılı bir şekilde gönderildiğinde (doğrulama ve API çağrısı başarılı) uygulama başka bir yan etki (örn. bildirim, yönlendirme) gerçekleştirmez.  
 
-**Aksiyom 5**: Eğer `_productId` prop’u sağlanmazsa, modal “yeni ürün ekle” modunda çalışır; sağlanırsa “ürün düzenle” modunda çalışır ve `productSchema`/form başlangıç değerleri bu kimliğe göre doldurulur.  
+**Aksiyom 5**: Eğer `_productId` prop’u sağlanmazsa, modal “yeni ürün ekle” modunda çalışır; sağlanırsa “ürün düzenleme” modunda çalışır ve form alanı mevcut ürün bilgileriyle başlangıç değerleri olarak doldurulur.
 
-**Aksiyom 6**: Eğer `onSubmit` fonksiyonuna geçirilen `values` nesnesi `productSchema` ile uyumlu değilse, gönderim sırasında doğrulama hatası fırlatılır ve `onSuccess` çağrılmaz.  
+---
 
-**Aksiyom 7**: Eğer `ProductFormValues` tipindeki zorunlu alanlar eksik ya da `null`/`undefined` ise, `onSubmit` içinde bu eksiklikler tespit edilir ve form gönderimi reddedilir. (Bu alanların tam listesi **bilinmiyor**; tip tanımından çıkarılamamıştır.)
+## AXIOMS – Mimari Varsayımlar
+Bu modül, bir ürün ekleme/düzenleme formunu yöneten bir React modal bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer `open` prop'u truthy (true veya_truthy bir değer) değilse, modalın görünür olmaması ve formun render edilmemesi gerekir. Aksi takdirde form kullanıcıya hata vermeden gösterilebilir.
+
+[Aksiyom 2]: Eğer `_productId` prop'u sağlanmamışsa (undefined), modülün "yeni ürün ekleme" modunda çalışması ve submit işlemi sırasında bir oluşturma (create) isteği yapması gerekir.
+
+[Aksiyom 3]: Eğer `_productId` prop'u sağlanmışsa (undefined değil), modülün "ürün düzenleme" modunda çalışması, mevcut ürün verilerini form alanlarına doldurması ve submit işlemi sırasında bir güncelleme (update) isteği yapması gerekir.
+
+[Aksiyom 4]: Form alanları `productSchema` ile doğrulanmalıdır. Eğer girilen değerler şemaya uymuyorsa, form submit edilmeli ve kullanıcıya hata gösterilmelidir.
+
+[Aksiyom 5]: Form submit edildiğinde (submit işlemi başarılı olduğunda), `onSuccess` callback'inin çağrılması zorunludur. Çağrılmazsa, dış bileşenler (örn. ürün listesi) güncellenemez.
+
+[Aksiyom 6]: `onClose` callback'inin, modal kapatma isteği (başarılı bir işlem sonrası veya iptal durumunda) oluştuğunda çağrılması beklenir. Çağrılmazsa, modalın açık kalması dışarıdan yönetilemez.
+
+[Aksiyom 7]: Submit işlemi (form verilerinin işlenmesi) asenkron bir süreçtir. İşlem devam ederken formun tekrar tekrar submit edilmesi (çift tıklama vb.) engellenmelidir; aksi halde birden fazla istek gönderilebilir.
+
+[Aksiyom 8`: Modül, `open` prop'unun değişkenliğine (true/false geçişlerine) tepki vererek form durumunu (dolu/boş alanlar, hata durumları) resetlemelidir. Aksi halde önceki form verileri yeni bir açılışta kalabilir.
 
 ---
 
@@ -101,57 +118,53 @@ type ProductFormValues = z.infer<typeof productSchema>
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::ProductFormModal
-- **params**: `_productId, open, onClose, onSuccess`
+- **params**: `_productId` — düzenlenecek ürünün ID'si (yeni ürün ise undefined), `open` — modalın açık olup olmadığı boolean, `onClose` — modalı kapatma callback fonksiyonu, `onSuccess` — başarılı işlem sonrası çağrılan callback fonksiyonu
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook’den gelen çeviri fonksiyonu.
-  - `loading` — form ve veri işlemleri sırasında gösterilen yükleme durumu (boolean).
-  - `setLoading` — `loading` değerini güncelleyen state setter.
-  - `categories` — veritabanından çekilen kategori listesi (DbCategory[]).
-  - `setCategories` — `categories` değerini güncelleyen state setter.
-  - `register` — form alanlarını `react-hook-form` ile bağlamak için kullanılan fonksiyon.
-  - `handleSubmit` — form submit olayını `react-hook-form` ile sarmalayan fonksiyon.
-  - `reset` — form alanlarını varsayılan ya da çekilen değerlerle sıfırlayan fonksiyon.
-  - `errors` — form doğrulama hatalarını içeren nesne (`formState.errors`).
-  - `loadProduct` — ürün detaylarını id’ye göre çeken `useCallback` fonksiyonu (aşağıda ayrı olarak tanımlanmıştır).
-  - `onSubmit` — form gönderildiğinde çalıştırılan async fonksiyon (aşağıda ayrı olarak tanımlanmıştır).
-- **Dönüş**: JSX element (React component output). Fonksiyon yan etkileri: state güncellemeleri, veri çekme, toast bildirimleri.
+  - `t` — useI18n hookundan dönen çeviri fonksiyonu, UI metinlerini lokalize etmek için kullanılır
+  - `loading` — form gönderimi veya veri yükleme sırasında true olan boolean durum değişkeni
+  - `setLoading` — loading durumunu güncelleyen state setter
+  - `categories` — DbCategory dizisi, Supabase'den çekilen kategori listesi, formdaki kategori select dropdown'ını doldurur
+  - `setCategories` — categories durumunu güncelleyen state setter
+  - `register` — react-hook-form register fonksiyonu, form inputlarını form state'e bağlar
+  - `handleSubmit` — react-hook-form'un submit wrapper'ı, validasyon sonrası onSubmit callback'ini çağırır
+  - `reset` — form alanlarını sıfırlayan veya varsayılan/fetch edilen değerlerle dolduran react-hook-form fonksiyonu
+  - `errors` — formState içinden alınan validasyon hataları nesnesi, her alan için hata mesajı içerir
+  - `loadProduct` — useCallback ile sarılı async fonksiyon, verilen ID ile Supabase'den ürün çekip form alanlarını doldurur
+  - `onSubmit` — form gönderiminde çalışan async fonksiyon, ürün oluşturma veya güncelleme işlemini yürütür
+- **Dönüş**: JSX element (Dialog bileşeni) veya `null` (modal kapalıyken)
 
 ### [N2_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::loadProduct
-- **params**: `id`
+- **params**: `id` — string, yüklenecek ürünün benzersiz ID'si
 - **ic_degiskenler**:
-  - `setLoading` — dışarıdaki `loading` state’ini `true` yapar.
-  - `product` — `supabase.from('products').select(...).eq('id', id).single()` sorgusundan dönen ürün verisi.
-  - `error` — aynı sorgudan dönen olası hata nesnesi.
-  - `reset` — form alanlarını `product` verisiyle doldurur.
-- **Dönüş**: yok (void). Yan etkileri: `loading` state’i, form `reset`, hata durumunda toast gösterimi.
+  - `product` — Supabase'den dönen `data` alanının alias'ı, tüm ürün alanlarını (name, sku, brand, price, vb.) içeren DbProduct nesnesi; `reset` ile form alanlarına dağıtılır
+  - `error` — Supabase `.single()` sorgusundan dönen hata nesnesi, varsa `throw` edilir
+- **Dönüş**: yok (yan etki: `setLoading` ile loading durumunu değiştirir, `reset` ile formu doldurur, hata olursa `toast.error` gösterir)
 
-### [N3_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::fetchCategories (inner function of useEffect)
-- **params**: (yok)
+### [N3_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::fetchCategoriesEffect
+- **params**: yok
 - **ic_degiskenler**:
-  - `setCategories` — dışarıdaki `categories` state’ini günceller.
-  - `data` — `supabase.from('categories').select(...).order('name').returns<DbCategory[]>()` sorgusundan dönen kategori dizisi.
-- **Dönüş**: yok (void). Yan etkileri: `categories` state’ini doldurur.
+  - `fetchCategories` — useEffect içinde tanımlı async inner fonksiyon, Supabase'den tüm kategorileri çeker ve `setCategories` ile state'e yazar
+- **Dönüş**: yok (yan etki: bileşen mount edildiğinde kategorileri yükler)
 
-### [N4_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::openEffect (second useEffect)
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::fetchCategories
+- **params**: yok
 - **ic_degiskenler**:
-  - `open` — modalın açık/kapalı durumu.
-  - `_productId` — düzenleme modunda mevcut ürün id’si.
-  - `loadProduct` — `_productId` mevcutsa ürün detaylarını çeken fonksiyon.
-  - `reset` — yeni ürün ekleme modunda formu varsayılan değerlere sıfırlar.
-- **Dönüş**: yok (void). Yan etkileri: koşula bağlı olarak `loadProduct` çağrısı veya `reset`.
+  - `data` — Supabase categories tablosundan dönen DbCategory dizisi, `order('name')` ile alfabetik sıralanmış; `setCategories(data || [])` ile state'e atanır
+- **Dönüş**: yok (yan etki: `setCategories` çağrısı ile state güncellenir)
 
-### [N5_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::onSubmit
-- **params**: `values`
+### [N5_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::useEffectOpenHandler
+- **params**: yok
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: modal açıldığında `_productId` varsa `loadProduct(_productId)` çağırır, yoksa formu varsayılan değerlerle `reset` eder)
+
+### [N6_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::onSubmit
+- **params**: `values` — ProductFormValues, react-hook-form tarafından doğrulanmış form değerleri (name, sku, brand, category_id, status, price, vb.)
 - **ic_degiskenler**:
-  - `setLoading` — işlem başlangıcında `true`, sonunda `false` yapar.
-  - `payload` — gönderilecek veri nesnesi; `values` içeriğini yayar ve `technical_specs` alanını `DbJson` tipine dönüştürür. Tipi `_productId` var ise `DbProductUpdate`, yok ise `DbProductInsert`.
-  - `error` — `supabase` insert/update işlemlerinden dönen olası hata.
-  - `toast` — işlem sonucuna göre başarı veya hata mesajı gösterir.
-  - `onSuccess` — dışarıdan gelen, işlem başarılı olduğunda çalıştırılan callback.
-  - `onClose` — modalı kapatan dışarıdan gelen callback.
-  - `t` — hata mesajı çevirisi için kullanılan i18n fonksiyonu.
-- **Dönüş**: yok (void). Yan etkileri: veri tabanı güncellemesi/eklemesi, toast bildirimleri, `onSuccess` ve `onClose` callback’lerinin tetiklenmesi.
+  - `payload` (if dalı) — DbProductUpdate türünde güncelleme yükü, `values` spread edilir ve `technical_specs` DbJson'a cast edilir
+  - `error` (if dalı) — Supabase `.update()` sorgusundan dönen hata nesnesi, varsa `throw` edilir
+  - `payload` (else dalı) — DbProductInsert türünde oluşturma yükü, `values` spread edilir ve `technical_specs` DbJson'a cast edilir
+  - `error` (else dalı) — Supabase `.insert()` sorgusundan dönen hata nesnesi, varsa `throw` edilir
+- **Dönüş**: yok (yan etki: `setLoading` ile loading durumunu değiştirir, `toast.success` gösterir, `onSuccess()` ve `onClose()` callback'lerini çağırır, hata olursa `toast.error` gösterir)
 
 ---
 

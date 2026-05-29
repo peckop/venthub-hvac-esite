@@ -5,7 +5,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { useRouter, usePathname } from 'next/navigation'
 import { Routes } from '../../utils/routes'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { syncOrderFromReturn } from '../../lib/orderStatusService'
 import { 
   adminSectionTitleClass, 

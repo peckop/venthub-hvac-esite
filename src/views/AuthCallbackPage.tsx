@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { CheckCircle, AlertCircle } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Routes } from '../utils/routes'
 
 const AuthCallbackPage: React.FC = () => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import type { UserIdentity } from '@supabase/supabase-js'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '@/i18n/I18nProvider'
 import { hibpPwnedCount } from '../../utils/passwordSecurity'

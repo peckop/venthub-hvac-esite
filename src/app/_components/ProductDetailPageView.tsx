@@ -18,7 +18,7 @@ import Seo from '../../components/Seo'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import LeadModal from '../../components/LeadModal'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { 
   ArrowLeft,
   ShoppingCart,

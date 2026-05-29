@@ -8,8 +8,8 @@ entity_hashes:
   func:LanguageSwitcher: e20e68a6d834aa54
   func:switchLanguage: ceec0990f90068b4
   overview: 2f23c86896c74c04
-  style_tokens: 93059c02fd156e45
-generated_at: 2026-05-28T22:36:01Z
+  style_tokens: 819c78943fe15425
+generated_at: 2026-05-29T18:43:11Z
 ---
 
 ## Genel Bakış
@@ -110,6 +110,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-primary-navy`, `bg-white/90`, `border-light-gray`, `hover:bg-light-gray`, `text-industrial-gray`, `text-sm`, `text-white`
-- **Layout:** `backdrop-blur`, `bottom-4`, `fixed`, `flex`, `gap-1`, `items-center`, `p-1`, `right-4`, `shadow-sm`, `z-50`
+- **Layout:** `backdrop-blur`, `flex`, `gap-1`, `items-center`, `p-1`, `shadow-sm`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
 - **Yardımcı Sınıflar:** `${lang`, `:`, `===`, `border`, `en`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy`, `outline-none`, `px-3`, `py-1`, `rounded-full`, `tr`

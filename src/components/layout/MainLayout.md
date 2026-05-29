@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\layout\MainLayout.tsx
-skeleton_hash: 9565e774eeff6c35
+skeleton_hash: 4aa70162bd38d961
 entity_hashes:
-  func:MainLayout: 0453d85d148de011
+  func:MainLayout: 51353f0c7669626b
   overview: 7e72cc7b6a87bed6
-  style_tokens: bc0163b5a04f2512
-generated_at: 2026-05-28T22:36:12Z
+  style_tokens: c300b80e9d38560c
+generated_at: 2026-05-29T18:46:10Z
 ---
 
 ## Genel Bakış
@@ -37,20 +37,15 @@ Bu modül, ana sayfa düzenini sağlayan bir layout bileşenidir ve孩子.childr
 ## FONKSİYON DETAYLARI
 
 ### MainLayout
+**Ne yapar**: MainLayout, uygulamanın ana görünüm yapısını ve düzenini sağlayan üst düzey bir React bileşenidir. Sayfanın mevcut yoluna göre (yönetim paneli veya genel site) farklı düzenler sunar ve küresel arayüz elemanlarını (başlık, alt bilgi, bildirimler vb.) yönetir.
 
-**Ne yapar**: Uygulamanın ana layout yapısını oluşturur. Mevcut sayfanın rotasına (pathname) göre admin paneli veya normal site layout'unu render eder. Sticky header, footer, WhatsApp butonu, toast bildirimleri ve scroll-to-top gibi global bileşenleri yönetir.
-
-**Nasıl yapar**: 
-- `usePathname` hook'u ile mevcut sayfa rotasını alır ve `/admin` ile başlayıp başlamadığını kontrol eder
-- Admin sayfasındaysa minimal bir layout (siyah header + çocuk bileşenler) döner
-- Normal sayfalarda `useScrollThrottle` hook'u ile scroll pozisyonunu takip ederek sticky header'ın gösterilip gizlenmesini kontrol eder
-- Toast ve WhatsApp butonları için performans odaklı lazy loading uygular: Toast, kullanıcı ilk kez tıkladığında veya tuşa bastığında; WhatsApp butonu ise ilk scroll hareketinde etkinleşir
-- `Suspense` ile sarılmış bileşenlerle async loading yönetimi yapar
+**Nasıl yapar**: Fonksiyon, `usePathname` kancasıyla mevcut URL yolunu alır ve bunun `/admin` ile başlayıp başlamadığını kontrol ederek iki ana render dalına ayrılır. Yönetici rotası için minimal, koyu temalı bir düzen; genel site için `StickyHeader`, `Footer`, ve various floating buttons (WhatsApp, dil seçici, yukarı çık) içeren daha zengin bir düzen döndürür. Kullanıcı etkileşimine (pointer olayı, tuş basma veya kaydırma) bağlı olarak `Toaster` ve `WhatsAppFloat` bileşenleri etkinleştirilerek performans optimizasyonu yapılır. `ScrollToTop` ve `PaymentWatcher` gibi bileşenler sayfa geçişlerini ve arka plan işlemlerini yönetir.
 
 **Parametreler**:
-- `children` : `React.ReactNode` — Layout içinde render edilecek sayfa içeriği. MainLayout bileşeninin ana prop'u olup, tüm alt sayfa bileşenleri bu parametre aracılığıyla layout içine yerleştirilir
+- `props`: `MainLayoutProps` — Bileşenin alacağı özellikler objesi.
+  - `children`: `React.ReactNode` — Düzenin içine render edilecek olan alt bileşenler veya sayfa içeriği. Bu, layouts pattern kullanılarak sayfalar arasındaki ortak yapıyı sağlayan zorunlu bir özelliktir.
 
-**Dönüş**: `JSX.Element` — Admin sayfası için basit bir `<div>` yapısı, normal sayfalar için sticky header, ana içerik alanı, WhatsApp butonu, footer ve toast sistemi dahil tam bir sayfa layout'u döner
+**Dönüş**: `JSX.Element` — Seçilen düzene (yönetici veya genel site) göre yapılandırılmış React JSX elemanı.
 
 ---
 
@@ -62,7 +57,7 @@ Bu modül, ana sayfa düzenini sağlayan bir layout bileşenidir ve孩子.childr
 ---
 
 ## SABİTLER
-- **Toaster** (call) — `lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))`
+- **Toaster** (call) — `lazy(() => import('sonner').then(m => ({ default: m.Toaster })))`
 - **AddToCartToast** (call) — `lazy(() => import('../AddToCartToast'))`
 - **WhatsAppFloat** (call) — `lazy(() => import('../WhatsAppFloat'))`
 
@@ -70,17 +65,17 @@ Bu modül, ana sayfa düzenini sağlayan bir layout bileşenidir ve孩子.childr
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/components/layout/MainLayout.tsx::MainLayout`
-- **params**: `{ children }` — `MainLayoutProps` tipinde, sarmalanan sayfa içeriği
+### [N1_NASIL] AST Pointer: src/components/layout/MainLayout.tsx::MainLayout
+- **params**: `{ children }: MainLayoutProps`
 - **ic_degiskenler**:
-  - `pathname` — `usePathname()` hook'undan gelen mevcut URL yolu (string | null)
-  - `isAdmin` — `pathname?.startsWith('/admin')` ile hesaplanan boolean; admin sayfasında olup olmadığının kontrolü
-  - `isScrolled` — `useScrollThrottle({ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: pathname || '' })` ile dönen boolean; sayfanın belirli px kadar scroll edilip edilmediğini belirtir
-  - `enableToaster` — `useState(false)` ile oluşturulan state; Toaster ve AddToCartToast bileşenlerinin etkinleşip etkinleşmeyeceğini tutar
-  - `setEnableToaster` — `enableToaster` state'ini güncelleyen setter fonksiyonu; useEffect içinde ilk pointerdown veya keydown'da `true` yapılır
-  - `enableWhatsApp` — `useState(false)` ile oluşturulan state; WhatsAppFloat bileşeninin etkinleşip etkinleşmeyeceğini tutar
-  - `setEnableWhatsApp` — `enableWhatsApp` state'ini güncelleyen setter fonksiyonu; useEffect içinde ilk scroll'da `true` yapılır
-- **Dönüş**: JSX — `isAdmin` true ise admin paneli layout'u (minimal sarmalayıcı), false ise ana site layout'u (StickyHeader, main content, BackToTopButton, WhatsAppFloat, PaymentWatcher, LanguageSwitcher, Footer, Toaster, AddToCartToast dahil tam sayfa yapısı)
+  - `pathname` — `usePathname()` hook'undan alınan mevcut sayfa rotası, admin kontrolü ve `useScrollThrottle` parametresi olarak kullanılır
+  - `isAdmin` — `pathname`'in `/admin` ile başlayıp başlamadığını kontrol eden boolean, admin layout dalını tetikler
+  - `isScrolled` — `useScrollThrottle` hook'undan dönen boolean, sayfanın kaydırma durumunu belirtir, `StickyHeader`'a aktarılır
+  - `enableToaster` — `useState(false)` ile tanımlanan state, ilk etkileşim (`pointerdown`/`keydown`) sonrası `true` olur; `Toaster` ve `AddToCartToast`'ın render edilmesini kontrol eder
+  - `setEnableToaster` — `enableToaster` state'ini `true` yapan setter fonksiyonu, `useEffect` içindeki event listener callback'inde çağrılır
+  - `enableWhatsApp` — `useState(false)` ile tanımlanan state, ilk `scroll` olayı sonrası `true` olur; `WhatsAppFloat`'ın render edilmesini kontrol eder
+  - `setEnableWhatsApp` — `enableWhatsApp` state'ini `true` yapan setter fonksiyonu, `useEffect` içindeki `scroll` event listener callback'inde çağrılır
+- **Dönüş**: JSX element (`React.ReactNode`) — `isAdmin` true ise basit admin layout, değilse tam site layout'u (header, main, footer, overlay'ler dahil) döner
 
 ---
 
@@ -106,6 +101,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-gray-50`, `bg-slate-900`, `bg-white`, `bg-white/10`, `hover:bg-white/20`, `text-white`, `text-xs`
-- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-grow`, `gap-3`, `items-center`, `justify-between`, `min-h-screen`, `overflow-auto`, `relative`, `right-6`, `z-50`, `z-modal`
+- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-grow`, `gap-3`, `items-center`, `items-end`, `justify-between`, `min-h-screen`, `overflow-auto`, `relative`, `right-6`, `z-modal`, `z-toast`
 - **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `duration-300`, `font-bold`, `px-3`, `px-6`, `py-1`, `py-3`, `rounded-full`, `shrink-0`, `tracking-tighter`, `tracking-widest`, `transition-colors`, `uppercase`
+- **Yardımcı Sınıflar:** `duration-300`, `font-bold`, `pointer-events-auto`, `pointer-events-none`, `px-3`, `px-6`, `py-1`, `py-3`, `rounded-full`, `shrink-0`, `tracking-tighter`, `tracking-widest`, `transition-colors`, `uppercase`

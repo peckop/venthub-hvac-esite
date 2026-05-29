@@ -3,26 +3,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx
-skeleton_hash: 85bfbc2f18d6514d
+skeleton_hash: 394b402a26fb5307
 entity_hashes:
   func:AccountAddressesPage: 75c0fb5d7175a123
-  overview: b41befa640558dbe
+  overview: 4b1d634aa140bb3a
   style_tokens: 20e5949307a3284f
-generated_at: 2026-05-28T22:38:51Z
+generated_at: 2026-05-29T18:51:43Z
 ---
 
 ## Genel Bakış
-`AccountAddressesPage` bileşeni, kullanıcının kayıtlı adreslerini görüntüleyen ve yönetmesine olanak tanıyan bir sayfa sunar. React ve TypeScript kullanılarak oluşturulmuş bu modül, adres listesi, ekleme ve düzenleme formları gibi UI öğelerini bir araya getirir.
+Kullanıcının hesap adreslerini görüntülemesini ve yönetmesini sağlayan bir sayfa bileşeni. Adres ekleme, düzenleme, silme ve varsayılan belirleme gibi temel adres yönetim işlemlerini tek bir bileşen içerisinde sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Render ve UI Yönetimi
-Bu grup, sayfanın temel görünümünü oluşturur, adres verilerini alır ve UI bileşenlerini (liste, form, butonlar vb.) render eder.  
+### Adres Sayfası Yönetimi
+Tüm adres yönetim arayüzünü ve iş mantığını içeren ana bileşen. Veri çekme, form yönetimi ve kullanıcı etkileşimlerini merkezi olarak ele alır.
 - AccountAddressesPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, kullanıcının kayıtlı adreslerini görüntüleyip yönetmesini sağlayan bir sayfa bileşenidir.
+
+[Aksiyom 1]: Eğer `emptyForm` sabiti (boş form yapısı) tanımlı değilse, yeni adres eklenirken form alanları başlatılamaz ve kullanıcı form dolduramaz.
+[Aksiyom 2]: Eğer bileşen, kullanıcının adreslerini almak için dış bir API servisine veya veri kaynağına erişemiyorsa, adres listesi boş görüntülenir veya bileşen hata verir.
+[Aksiyom 3]: Eğer bileşen, kullanıcı oturum açmamış veya kimlik doğrulaması yapılmamış durumdaysa, kullanıcıya ait adresler yüklenemez ve sayfa hata durumuna geçer.
 
 ---
 
@@ -65,80 +69,91 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::\<anonymous_loadAddresses>
+### [N1_NASIL] AST Pointer: AccountAddressesPage.tsx::AccountAddressesPage
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `emptyForm` — Import edilen, formun başlangıç değerlerini tutan sabit nesne
+- **Dönüş**: yok (JSX return eder, fonksiyon imzası yok olarak belirtilmiş)
+
+### [N2_NASIL] AST Pointer: AccountAddressesPage.tsx::AnonymousFunction_0 (loadAddresses)
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — `listAddresses()` API çağrısından dönen adres listesi; `setItems` ile UI’ya aktarılır.
-  - `e` — `try…catch` bloğunda yakalanan hata nesnesi; konsola loglanır ve toast ile kullanıcıya bildirilir.
-- **Dönüş**: `Promise<void>` (asenkron, UI yan etkileri)
+  - `data` — listAddresses() API çağrısının dönüş değeri, kullanıcı adreslerinin listesi
+- **Dönüş**: yok
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::startEdit
-- **params**: `a: UserAddress`
+### [N3_NASIL] AST Pointer: AccountAddressesPage.tsx::startEdit
+- **params**: `(a: UserAddress)` — Düzenlenecek adres objesi
 - **ic_degiskenler**:
-  - `a` — Düzenlenmek istenen adres nesnesi; alanları `setForm` ile form durumuna kopyalanır.
-  - `setForm` — Form state’ini güncelleyen React setter fonksiyonu.
-  - `window.scrollTo` — Mobilde formun görünür olmasını sağlamak için sayfayı kaydırır.
-- **Dönüş**: `void`
+  - `a` — Parametre olarak gelen UserAddress objesi, tüm adres alanlarını içerir
+  - `a.id` — Adresin benzersiz kimliği
+  - `a.label` — Adres etiketi (ör: "Ev", "İş")
+  - `a.full_name` — Adres sahibinin tam adı
+  - `a.phone` — Telefon numarası
+  - `a.address_line` — Adres satırı
+  - `a.city` — Şehir
+  - `a.district` — İlçe
+  - `a.postal_code` — Posta kodu
+  - `a.country` — Ülke kodu
+  - `a.is_default_shipping` — Varsayılan teslimat adresi mi
+  - `a.is_default_billing` — Varsayılan fatura adresi mi
+- **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::resetForm
+### [N4_NASIL] AST Pointer: AccountAddressesPage.tsx::resetForm
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `emptyForm` — Boş form şablonu (sabit obje) ; `setForm` ile form state’i sıfırlanır.
-  - `setForm` — Form state’ini güncelleyen React setter fonksiyonu.
-- **Dönüş**: `void`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::handleSubmit
-- **params**: `e: React.FormEvent`
+### [N5_NASIL] AST Pointer: AccountAddressesPage.tsx::handleSubmit
+- **params**: `(e: React.FormEvent)` — Form submit olay nesnesi
 - **ic_degiskenler**:
-  - `e` — Form submit olayı; `preventDefault()` ile sayfa yenilenmesi engellenir.
-  - `form` — Form state nesnesi; alanları API çağrısına gönderilir.
-  - `user` — Oturum açmış kullanıcı bilgisi; yoksa hata fırlatılır.
-  - `isEditing` — Formun düzenleme modunda olup olmadığını gösteren boolean.
-  - `setSaving` — “Kaydetme” yükleme durumunu yöneten React setter fonksiyonu.
-  - `updateAddress` — Mevcut adresi güncelleyen API fonksiyonu.
-  - `createAddress` — Yeni adres oluşturmak için kullanılan API fonksiyonu.
-  - `toast` — Başarı / hata bildirimleri için `react-hot-toast` arayüzü.
-  - `t` — Çeviri fonksiyonu (`useI18n`); mesajları yerelleştirir.
-  - `resetForm` — İşlem sonrası formu temizler.
-  - `refresh` — Adres listesini yeniden yükleyen fonksiyon (muhtemelen `listAddresses` çağrısı).
-- **Dönüş**: `Promise<void>`
+  - `e` — Form submit olayı, preventDefault() ile varsayılan davranış engellenir
+  - `form` — Form state'inden gelen mevcut form verisi
+  - `form.address_line` — Adres satırı (zorunlu alan kontrolü yapılır)
+  - `form.city` — Şehir (zorunlu alan kontrolü yapılır)
+  - `form.district` — İlçe (zorunlu alan kontrolü yapılır)
+  - `form.id` — Düzenleme modunda ise mevcut adresin ID'si
+  - `isEditing` — Düzenleme modunda olup olmadığı (form.id varsa true)
+  - `user` — Kimlik doğrulanmış kullanıcı objesi
+  - `user.id` — Kullanıcının benzersiz kimliği
+  - `form.label` — Adres etiketi
+  - `form.full_name` — Tam ad
+  - `form.phone` — Telefon
+  - `form.postal_code` — Posta kodu
+  - `form.country` — Ülke
+  - `form.is_default_shipping` — Varsayılan teslimat adresi bayrağı
+  - `form.is_default_billing` — Varsayılan fatura adresi bayrağı
+- **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::handleDelete
-- **params**: `id: string`
+### [N6_NASIL] AST Pointer: AccountAddressesPage.tsx::handleDelete
+- **params**: `(id: string)` — Silinecek adresin ID'si
 - **ic_degiskenler**:
-  - `id` — Silinecek adresin benzersiz kimliği.
-  - `confirm` — Tarayıcı onay penceresi; kullanıcı onay vermezse işlem iptal olur.
-  - `t` — Çeviri fonksiyonu; onay mesajı ve toast metinleri için kullanılır.
-  - `deleteAddress` — Adresi veritabanından kaldıran API fonksiyonu.
-  - `toast` — Başarı / hata bildirimleri.
-  - `refresh` — Adres listesini güncellemek için tekrar veri çekme fonksiyonu.
-  - `form` — Mevcut form state’i; silinen adres formda ise form temizlenir.
-  - `resetForm` — Formu sıfırlar.
-  - `e` — `catch` bloğunda yakalanan hata nesnesi.
-- **Dönüş**: `Promise<void>`
+  - `id` — Silinecek adresin benzersiz kimliği
+  - `form` — Form state'inden gelen mevcut form verisi
+  - `form.id` — Mevcut formda düzenlenecek adresin ID'si (silinen adres ile aynı ise form sıfırlanır)
+- **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::makeDefault
-- **params**: `id: string`, `kind: 'shipping' | 'billing'`
+### [N7_NASIL] AST Pointer: AccountAddressesPage.tsx::makeDefault
+- **params**: `(id: string, kind: 'shipping' | 'billing')` — Adres ID'si ve adres türü
 - **ic_degiskenler**:
-  - `id` — Varsayılan olarak ayarlanacak adresin kimliği.
-  - `kind` — `'shipping'` veya `'billing'`; hangi adres tipinin varsayılan olacağını belirler.
-  - `setDefaultAddress` — Seçilen adresi varsayılan yapan API fonksiyonu.
-  - `toast` — İşlem sonucunu kullanıcıya bildiren toast.
-  - `t` — Çeviri fonksiyonu; toast mesajlarını yerelleştirir.
-  - `refresh` — Varsayılan değişikliği sonrası adres listesini yeniden yükler.
-  - `e` — `catch` bloğunda yakalanan hata nesnesi.
-- **Dönüş**: `Promise<void>`
+  - `id` — Varsayılan yapılacak adresin benzersiz kimliği
+  - `kind` — Adres türü ('shipping' veya 'billing')
+- **Dönüş**: yok
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx::renderAddressItem
-- **params**: `a: UserAddress`
+### [N8_NASIL] AST Pointer: AccountAddressesPage.tsx::AnonymousJSXFunction (addressCard)
+- **params**: `(a)` — UserAddress objesi (JSX içinde kullanılır)
 - **ic_degiskenler**:
-  - `a` — Listeden gelen tek bir adres nesnesi; tüm UI alanları (`a.id`, `a.label`, `a.full_name`, `a.address_line`, `a.city`, `a.district`, `a.postal_code`, `a.phone`, `a.is_default_shipping`, `a.is_default_billing`) render edilir.
-  - `startEdit` — Düzenleme butonuna tıklandığında `a` ile `startEdit` fonksiyonunu çağırır.
-  - `handleDelete` — Silme butonuna tıklandığında `a.id` ile `handleDelete` fonksiyonunu çağırır.
-  - `makeDefault` — Varsayılan butonlarına tıklandığında `a.id` ve ilgili `'shipping'`/`'billing'` türü ile `makeDefault` fonksiyonunu çağırır.
-  - `t` — Çeviri fonksiyonu; UI metinlerini yerelleştirir.
-  - `MapPin`, `Edit2`, `Trash2`, `Truck`, `CreditCard`, `CheckCircle` — İkon bileşenleri (görsel amaçlı, fonksiyonel etkisi yok).
-- **Dönüş**: `JSX.Element` (React bileşeni)
+  - `a` — Adres objesi, tüm alanları JSX içinde erişilir
+  - `a.id` — Adresin benzersiz kimliği (butonlarda key ve onClick için kullanılır)
+  - `a.label` — Adres etiketi (gösterilir)
+  - `a.full_name` — Tam ad (gösterilir)
+  - `a.address_line` — Adres satırı (gösterilir)
+  - `a.district` — İlçe (gösterilir)
+  - `a.city` — Şehir (gösterilir)
+  - `a.postal_code` — Posta kodu (gösterilir)
+  - `a.phone` — Telefon (gösterilir)
+  - `a.is_default_shipping` — Varsayılan teslimat adresi mi (badge gösterilir veya buton)
+  - `a.is_default_billing` — Varsayılan fatura adresi mi (badge gösterilir veya buton)
+- **Dönüş**: JSX (adres kartı)
 
 ---
 
