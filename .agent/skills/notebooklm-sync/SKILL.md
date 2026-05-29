@@ -127,13 +127,7 @@ Eğer bu mesajı alırsanız işlem başarılı demektir. Kullanıcıya "Noteboo
 ## Hata Durumları
 
 ### Authentication Expired Hatası
-**ÖNEMLİ KURAL:** Eğer komut "Authentication expired" hatası verirse otonom olarak şu adımları izleyin:
-
-1. `.agent/scripts/nlm-clean-login.ps1` scriptini PowerShell üzerinde bypass politikasıyla çalıştırarak tarayıcı entegrasyonuyla güvenli giriş yapmayı tetikleyin:
-   ```bash
-   powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
-   ```
-2. Login tamamlandıktan sonra senkronizasyon komutunu tekrar tetikleyin.
+**ÖNEMLİ KURAL:** Eğer komut "Authentication expired" hatası verirse, oturumu yenilemek için doğrudan `notebook-navigator` yeteneğindeki (Skill) kimlik doğrulama adımlarını izleyin. Giriş işlemi tamamlandıktan sonra senkronizasyon komutunu tekrar tetikleyin.
 
 ### cc doc tree Master MD 0 Dosya Hatası
 Eğer `cc doc tree` komutu "→ 0 MD NLM'e birlestirilecek" diyorsa:
@@ -152,5 +146,5 @@ Eğer `cc doc batch` rate limit'e takılırsa:
 - **A1:** Master MD'ye kök dosyalar (README vb.) dahil edilmez — standalone_files olarak ayrı yüklenir.
 - **A2:** NLM defterinde tam 3 master + standalone kaynak olmalıdır (frontend master + supabase master + db schema + README).
 - **A3:** Sync öncesi mutlaka migrator_lite + batch + schema çalıştırılmalıdır — aksi halde eski `.md` NLM'e gider.
-- **A4:** Auth hatası aldığında kullanıcıya sormadan `nlm login` çalıştır.
+- **A4:** Auth hatası aldığında `notebook-navigator` yeteneğindeki oturum yenileme adımlarını çalıştır.
 - **A5:** NLM CLI güncelleme kontrolü her sync öncesi yapılmalıdır.
