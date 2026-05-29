@@ -1,4 +1,4 @@
-// Orion Hook Verification
+// Orion Hook Verification Success Test
 import { NextResponse } from 'next/server'
 
 export async function GET() {
