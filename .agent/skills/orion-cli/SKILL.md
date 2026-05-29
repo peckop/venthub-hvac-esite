@@ -64,7 +64,7 @@ Tüm projeyi tarar, her kod dosyası için `.md` üretir.
 orion doc all                    # Sadece yeni/değişen dosyalar (hash kontrolü)
 orion doc all --changed-only     # Sadece son commit'ten beri değişenler
 orion doc all --force            # Tümünü sıfırdan üret (yavaş)
-orion doc all --workers 10       # Paralel worker sayısı (varsayılan: 10)
+orion doc all --workers 20       # Paralel worker sayısı (Xiaomi mimoV2 planı gereği varsayılan: 20)
 ```
 
 ### orion doc batch
@@ -124,10 +124,10 @@ Mimari değişiklik sonrası NotebookLM'i güncellemek için sırayla:
 pip install --upgrade notebooklm-mcp-cli
 
 # 2. Kaynak koddan MD üret
-orion doc all --changed-only
+orion doc all --changed-only --workers 20
 
 # 3. Extra master'lar varsa (supabase vb.)
-orion doc batch --batch-dir supabase/functions
+orion doc batch --batch-dir supabase/functions --workers 20
 
 # 4. DB şeması varsa
 orion doc schema

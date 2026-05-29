@@ -1,5 +1,16 @@
 # Changelog
 
+### [2026-05-29] VentHub Toast Migration to Sonner, Floating Widgets Flexbox Unification & 20-Workers Orion standard
+**Özet:** Uygulama genelinde eski bildirim kütüphaneleri temizlenerek `sonner` migrasyonu tamamlandı, main layout üzerindeki yüzen araçlar flexbox ile dikeyde hizalanıp layout thrashing engellendi ve Xiaomi mimoV2 Premium Token aboneliği doğrultusunda Orion CLI paralel işçi (workers) standardı kalıcı olarak 20 worker'a çıkarıldı.
+**Değişiklik Kapsamı:**
+- **Sonner Toast Migrasyonu:** Eski `react-hot-toast` ve kullanılmayan `react-error-boundary` kütüphaneleri kaldırıldı. Toplamda 38 adet dosya statik ve dinamik olarak `sonner` API'lerine geçirildi, geriye dönük uyumluluk için custom toast adaptörü yazıldı.
+- **Yüzen Araçlar Flexbox Unification:** `BackToTopButton`, `LanguageSwitcher` ve `WhatsAppFloat` widget'ları main layout altında tek bir dikey Flexbox sütununda birleştirildi. `getBoundingClientRect` ve `setInterval` tabanlı layout thrashing (CLS tetikleyicileri) yok edilerek, `useScrollThrottle` hook'u ve saf CSS'e geçildi. Clicktable alanları `pointer-events-none` ve `pointer-events-auto` overlay sistemiyle izole edildi.
+- **Orion CLI 20-Workers Standardı:** Xiaomi mimoV2 Premium Token planının sunduğu yüksek RPM/TPM limitlerini tam verimle kullanmak üzere, Orion CLI yetenek tanımı (`.agent/skills/orion-cli/SKILL.md`) güncellendi ve varsayılan işçi sayısı kalıcı olarak 20 paralel worker'a yükseltildi.
+- **Dokümantasyon Ağacı Rejenerasyonu:** Sonner geçişi sonrası `orion doc tree` komutuyla `docs/system_tree.md`, `venthub_hvac_master.md` ve `supabase_functions_master.md` dosyaları sıfırdan derlenerek Git deposuna işlendi.
+**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ (0 error, 0 warning) | `pnpm run build` ✅ | `orion doc tree` E2E Test ✅
+
+---
+
 ### [2026-05-28] VentHub Multilingual SSG/PPR, On-Demand ISR Webhooks & 10/10 SEO alternates
 **Özet:** Platformun statik sayfa hızı ve arama motoru görünürlüğü (SEO) için Next.js 15 sub-path routing, Kısmi Ön Oluşturma (PPR), HMAC doğrulamalı Supabase Webhook On-Demand ISR, Sitemap alternates (hreflang) metadata kurgusu tamamlandı ve yerel dökümantasyon ağacı ile NotebookLM hafızası %100 senkronize edildi.
 **Değişiklik Kapsamı:**
