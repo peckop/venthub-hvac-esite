@@ -149,6 +149,7 @@ Sisteme yalan söyleyemezsin. Gözle baktığın hiçbir şeye `PASS` verme, yal
 - README (200+ satır) (WARNING)
 - CHANGELOG (WARNING)
 - CONTRIBUTING.md (WARNING)
+- llms.txt Standardı (kök dizin veya /public/llms.txt) (STRICT) [GEÇİŞ AŞAMASINDA]
 
 #### L7 — Ürün Tamamlığı
 - Kritik Rotalar (/products, /cart, /checkout, /auth, /admin) (STRICT)
@@ -176,11 +177,13 @@ Sisteme yalan söyleyemezsin. Gözle baktığın hiçbir şeye `PASS` verme, yal
 - Route SSOT (hardcoded href yasak) (STRICT)
 - i18n Leakage (WARNING)
 - Framer Motion sızıntısı (WARNING)
+- Supabase ORM Tekilleştirme (RSC içinde React.cache) (STRICT) [GEÇİŞ AŞAMASINDA]
 
 #### L11 — Teknik Borç & Ölü Kod
 - Dead Code (Knip): `pnpm run knip --reporter compact` (WARNING)
 - Bundle Analyzer: `pnpm run analyze` (WARNING)
 - Unused Dependencies: `pnpm run knip --include unlisted,unresolved` (WARNING)
+- React 19 Compiler Sınırı (basit UI'larda manuel useMemo/useCallback kısıtı) (WARNING) [GEÇİŞ AŞAMASINDA]
 
 #### L12 — Cache ve Önbellek Hijyeni (Yeni Katman)
 - Edge-CDN seviyesinde önbelleklenen statik rotaların (`generateStaticParams`), webhook tetiklenmesiyle (`revalidatePath`/`revalidateTag`) eşzamanlı ve hatasız yıkıldığının (cache invalidation) denetlenmesi. (STRICT)
