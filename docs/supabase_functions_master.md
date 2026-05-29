@@ -2,7 +2,7 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-29T08:51:16.576320+00:00
+compiled_at: 2026-05-29T09:34:51.330264+00:00
 total_compiled_files: 28
 source: supabase/functions
 ---

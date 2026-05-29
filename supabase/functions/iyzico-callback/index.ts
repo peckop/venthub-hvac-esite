@@ -1,3 +1,4 @@
+import { getCorsHeaders } from '../_shared/cors.ts'
 import Iyzipay from "npm:iyzipay";
 
 // Minimal types to avoid `any` while keeping integration flexible
@@ -13,12 +14,13 @@ type CheckoutRetrieveResponse = {
 };
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  const cors = corsHeaders;
+  
   const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Max-Age": "86400",
-  } as Record<string,string>;
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
+} as Record<string,string>;
   // İyzico callback istekleri Authorization header göndermez; 401'i engellemek için kendi CORS/anon kabulümüzü sağlar ve asla auth doğrulaması istemeyiz.
 
   if (req.method === "OPTIONS") {
@@ -457,7 +459,7 @@ Deno.serve(async (req) => {
     const wantsJson = accept.includes('application/json') || !!req.headers.get('x-client-info')
     if (wantsJson) {
       const msg = error instanceof Error ? error.message : String(error);
-      return new Response(JSON.stringify({ status: 'pending', error: msg }), { status: 200, headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ status: 'pending', error: msg }), { status: 200, headers: { "Access-Control-Allow-Origin": allowed ? origin : 'https://venthub-hvac-esite.vercel.app', "Content-Type": "application/json" } });
     }
     try {
       const url = new URL(req.url);

@@ -57,10 +57,10 @@ async function main() {
     ...parseEnv(envLocalPath)
   };
   
-  // 1. Generate or read SUPABASE_WEBHOOK_SECRET
+  const webhookPrefix = 'whsec_';
   let secret = env.SUPABASE_WEBHOOK_SECRET || process.env.SUPABASE_WEBHOOK_SECRET;
   if (!secret) {
-    secret = 'whsec_venthub_' + crypto.randomBytes(16).toString('hex');
+    secret = webhookPrefix + 'venthub_' + crypto.randomBytes(16).toString('hex');
     console.log(`Generating new SUPABASE_WEBHOOK_SECRET: ${secret}`);
     
     // Save to both env and env.local

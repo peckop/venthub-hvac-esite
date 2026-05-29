@@ -8,6 +8,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import MainLayout from './MainLayout'
 import { I18nProvider } from '../../i18n/I18nProvider'
 import { ProjectProvider } from '../../contexts/ProjectProvider'
+import CookieConsent from './CookieConsent'
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
@@ -97,7 +98,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
     return (
         <MainLayout>
             {children}
-            
+            <CookieConsent />
             {/* MantÄ±ksal TakipÃ§iler */}
             <Suspense fallback={null}>
                 <NavigationTracker />

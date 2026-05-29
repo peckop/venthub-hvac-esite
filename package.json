@@ -43,7 +43,8 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.468.0",
-    "next": "15.5.7",
+    "next": "15.5.18",
+    "@sentry/nextjs": "^8.54.0",
     "postcss": "^8.4.49",
     "react": "19.0.0",
     "react-day-picker": "8.10.1",
@@ -83,6 +84,7 @@
     "eslint-plugin-tailwindcss": "^3.18.3",
     "globals": "^17.4.0",
     "jsdom": "^29.0.0",
+    "happy-dom": "^20.8.8",
     "knip": "^6.4.1",
     "lint-staged": "^16.4.0",
     "pg": "^8.21.0",
@@ -90,20 +92,29 @@
     "supabase": "^2.80.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.57.1",
-    "vite": "^6.4.1",
+    "vite": "^6.4.2",
     "vitest": "^4.1.3",
     "vitest-axe": "^0.1.0"
   },
   "pnpm": {
     "overrides": {
-      "minimatch": "9.0.5",
+      "minimatch": "9.0.7",
       "minimatch@3": ">=3.1.4",
-      "minimatch@9": "9.0.5",
+      "minimatch@9": "9.0.7",
       "basic-ftp": ">=5.2.0",
       "glob@10": ">=10.5.0",
       "@remix-run/router": ">=1.23.2",
       "rollup@4": ">=4.59.0",
-      "flatted": "3.4.1"
+      "rollup": ">=4.22.4",
+      "flatted": "3.4.2",
+      "happy-dom": ">=20.8.8",
+      "dompurify": ">=3.4.0",
+      "ws": ">=8.20.1",
+      "uuid": ">=11.1.1",
+      "picomatch": ">=2.3.2",
+      "anymatch>picomatch": ">=4.0.4",
+      "readdirp>picomatch": ">=4.0.4",
+      "lodash": ">=4.18.1"
     }
   }
 }

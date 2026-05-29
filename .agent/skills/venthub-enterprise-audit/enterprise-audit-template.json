@@ -222,7 +222,7 @@
           "executor": {
             "tool": "regex_scan",
             "args": [
-              "Access-Control-Allow-Origin.*\\\\*",
+              "Access-Control-Allow-Origin.*\\*",
               "supabase/functions/",
               "src/app/api/",
               "--exclude=__tests__"
@@ -298,9 +298,9 @@
           "executor": {
             "tool": "file_exists",
             "args": [
-              "src/app/legal/kvkk/page.tsx",
-              "src/app/legal/gizlilik-politikasi/page.tsx",
-              "src/app/legal/cerez-politikasi/page.tsx"
+              "src/app/[lang]/legal/kvkk/page.tsx",
+              "src/app/[lang]/legal/gizlilik-politikasi/page.tsx",
+              "src/app/[lang]/legal/cerez-politikasi/page.tsx"
             ],
             "expected_exit_codes": [
               0
@@ -937,7 +937,7 @@
           "executor": {
             "tool": "regex_scan",
             "args": [
-              "cache\\s*\\(.*supabase",
+              "cache\\s*\\([\\s\\S]*?supabase",
               "src/app/"
             ],
             "expected_exit_codes": [

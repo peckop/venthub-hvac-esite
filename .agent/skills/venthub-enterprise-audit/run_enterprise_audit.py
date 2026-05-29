@@ -133,12 +133,20 @@ def run_regex_scan(pattern, paths):
                 continue
             try:
                 with open(filepath, "r", encoding="utf-8", errors="replace") as f:
-                    for i, line in enumerate(f, 1):
-                        if regex.search(line):
-                            if ex_regex and ex_regex.search(line):
-                                continue
-                            rel = filepath.relative_to(PROJECT_ROOT)
-                            matches.append(f"{rel}:{i} -> {line.strip()[:120]}")
+                    content = f.read()
+                
+                for match in regex.finditer(content):
+                    start_pos = match.start()
+                    line_no = content[:start_pos].count("\n") + 1
+                    
+                    lines = content.splitlines()
+                    line_content = lines[line_no - 1] if line_no <= len(lines) else ""
+                    
+                    if ex_regex and ex_regex.search(line_content):
+                        continue
+                        
+                    rel = filepath.relative_to(PROJECT_ROOT)
+                    matches.append(f"{rel}:{line_no} -> {line_content.strip()[:120]}")
             except Exception:
                 continue
 
@@ -340,9 +348,9 @@ def main():
         layer_name = layer_data.get("name", layer_id)
         layer_has_strict_fail = False
 
-        print(f"\n{'─' * 50}")
+        print(f"\n{'-' * 50}")
         print(f"  KATMAN: {layer_name}")
-        print(f"{'─' * 50}")
+        print(f"{'-' * 50}")
 
         for check_id, check_data in layer_data.get("checks", {}).items():
             total += 1
@@ -356,16 +364,16 @@ def main():
 
             if status == "PASS":
                 passed += 1
-                print(f" ✅ PASS")
+                print(" [PASS]")
             elif status == "FAIL" and enforcement == "WARNING":
                 warned += 1
-                print(f" ⚠️ WARN")
+                print(" [WARN]")
             elif status == "FAIL" and enforcement == "STRICT":
                 failed += 1
                 layer_has_strict_fail = True
-                print(f" ❌ BLOCKED")
+                print(" [BLOCKED]")
             else:
-                print(f" ⏭️ {status}")
+                print(f" [{status}]")
 
         if layer_has_strict_fail:
             blocked_layers.append(layer_name)
@@ -396,19 +404,19 @@ def main():
     print(f"  SONUÇLAR")
     print(f"{'=' * 60}")
     print(f"  Toplam Kontrol : {total}")
-    print(f"  ✅ Geçen       : {passed}")
-    print(f"  ⚠️  Uyarı       : {warned}")
-    print(f"  ❌ Bloklayan   : {failed}")
-    print(f"{'─' * 60}")
+    print(f"  Gecen          : {passed}")
+    print(f"  Uyari          : {warned}")
+    print(f"  Bloklayan      : {failed}")
+    print(f"{'-' * 60}")
 
     verdict = data["summary"]["overall_verdict"]
     if verdict == "BLOCKED":
-        print(f"  🔴 GENEL KARAR: BLOKLANMIŞ — Teslime hazır değil")
+        print(f"  GENEL KARAR: BLOKLANMIS - Teslime hazir degil")
         print(f"  Bloklayan katmanlar: {', '.join(blocked_layers)}")
     elif verdict == "CONDITIONAL":
-        print(f"  🟡 GENEL KARAR: KOŞULLU — Uyarılar giderilmeli")
+        print(f"  GENEL KARAR: KOSULLU - Uyarilar giderilmeli")
     else:
-        print(f"  ✅ GENEL KARAR: TESLİME HAZIR")
+        print(f"  GENEL KARAR: TESLIME HAZIR")
 
     print(f"\n  JSON Rapor : {json_path}")
     print(f"  MD Rapor   : {md_path}")

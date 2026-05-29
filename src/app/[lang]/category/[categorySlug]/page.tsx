@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { cache } from 'react'
 import PageComponent from '../../../../views/CategoryPage'
 import { supabase, getProductsEnriched } from '../../../../lib/supabase'
 import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
@@ -6,6 +6,11 @@ import type { DomainCategory, DomainProduct } from '../../../../lib/type-convert
 import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../../../types/db-rows'
 import { SITE_URL } from '../../../../config/siteUrl'
 import { getCachedCategoryData, preloadCategory } from '../../../../lib/data/preload'
+
+// React.cache() ile bağımsız Supabase ORM sorgusu (L10_05 Kurumsal Disiplini)
+const _getCachedSupabaseData = cache((id: string) => {
+  return supabase.from('categories').select('*').eq('id', id).single()
+})
 
 
 export async function generateStaticParams() {

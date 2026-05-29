@@ -1,3 +1,4 @@
+import { getCorsHeaders } from '../_shared/cors.ts'
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
@@ -6,7 +7,7 @@ function buildCors(req: Request) {
   const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
   const ok = allowed.length === 0 || (origin && allowed.includes(origin))
   const headers = {
-    'Access-Control-Allow-Origin': ok ? (origin || '*') : 'null',
+    'Access-Control-Allow-Origin': ok ? (origin || 'https://venthub-hvac-esite.vercel.app') : 'null',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
   } as Record<string,string>
@@ -39,6 +40,9 @@ type ApplyCouponResp = {
 }
 
 Deno.serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
+  const cors = corsHeaders;
+  
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
   const cors = buildCors(req)
   if (req.method === 'OPTIONS') {

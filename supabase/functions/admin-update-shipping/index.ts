@@ -1,3 +1,4 @@
+import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3"
 
@@ -7,12 +8,9 @@ serve(async (req) => {
   const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
   const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin))
   const cors = {
-    'Access-Control-Allow-Origin': okOrigin ? (origin || '*') : 'null',
-    'Vary': 'Origin',
-    'Access-Control-Allow-Headers': req.headers.get('access-control-request-headers') ?? 'authorization, x-client-info, apikey, content-type, x-idempotency-key',
-    'Access-Control-Allow-Methods': req.headers.get('access-control-request-method') ?? 'POST, OPTIONS',
-    'Access-Control-Max-Age': '86400',
-  }
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
+}
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
   if (!okOrigin) return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })

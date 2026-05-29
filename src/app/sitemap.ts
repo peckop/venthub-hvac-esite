@@ -23,6 +23,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/about',
     '/destek/merkez',
     '/cart',
+    '/legal/kvkk',
+    '/legal/gizlilik-politikasi',
+    '/legal/cerez-politikasi',
   ]
 
   const staticRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>

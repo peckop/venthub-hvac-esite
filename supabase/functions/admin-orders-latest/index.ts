@@ -1,15 +1,18 @@
+import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  const cors = corsHeaders;
+  
   const origin = req.headers.get('origin') || ''
   const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean)
   const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin))
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
   const cors = {
-    'Access-Control-Allow-Origin': okOrigin ? (origin || '*') : 'null',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  } as Record<string, string>
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
+} as Record<string, string>
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
   if (!okOrigin) return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })

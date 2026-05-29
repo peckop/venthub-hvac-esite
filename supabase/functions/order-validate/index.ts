@@ -1,3 +1,4 @@
+import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
 interface CartItem { product_id: string; quantity: number | string; unit_price?: number | string; price_list_id?: string | null }
 interface Product {
@@ -14,12 +15,13 @@ interface MismatchItem { product_id: string; had: unknown; expected: number; pri
 interface StockIssue { product_id: string; requested: number; available: number }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  const cors = corsHeaders;
+  
   const cors = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Max-Age": "86400"
-  };
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
+};
 
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 200, headers: cors });

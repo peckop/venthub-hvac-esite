@@ -1,3 +1,4 @@
+import { getCorsHeaders } from '../_shared/cors.ts'
 // supabase/functions/iyzico-refund/index.ts
 // Refund/Cancel unified endpoint for IyziCo + DB stock restoration
 // Idempotent, requires admin or order owner
@@ -32,8 +33,11 @@ type IyziSdk = {
 type IyziCtor = new (args: { apiKey: string; secretKey: string; uri: string }) => IyziSdk;
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  const cors = corsHeaders;
+  
   const corsHeaders: Record<string, string> = {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": allowed ? origin : 'https://venthub-hvac-esite.vercel.app',
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Max-Age": "86400",
