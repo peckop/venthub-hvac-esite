@@ -355,6 +355,9 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 26. **JWT app_metadata Zorunluluğu (SaaS):** Güvenlik politikalarında ve Edge işlevlerinde JWT yetkilendirme kararları `raw_user_meta_data` üzerinden verilemez (kullanıcı tarafından düzenlenebilir). Rol ve tenant izolasyonu kesinlikle `app_metadata` üzerinden yapılmalıdır.
 27. **Feature Flags ve RSC Hibrit Mimarisi (SaaS):** Next.js 15 ve React 19 RSC mimarisinde Server Component'lar içinde `useTenant` gibi client hook'ları KULLANILAMAZ. Feature flag ve tenant verisi okumaları için Server Component'larda `getTenantConfig()` asenkron fonksiyonu, Client Component'larda `useTenant()` hook'u kullanılmalıdır.
 28. **Cache Key Tenant İzolasyonu (SaaS):** `unstable_cache` ve `revalidateTag` mekanizmalarında Data Bleeding'i önlemek adına anahtarlara kesinlikle `tenantId` dahil edilmelidir (Örn: `['key', lang, tenantId]`). ISR webhook'ları da tenant-aware olmalıdır.
+29. **Tenant-Aware İletişim (SaaS):** SaaS White-Label yapısı gereği; e-posta şablonlarına basılacak logo ve şirket unvanı global `.env` değişkenlerinden KULLANILAMAZ. Tüm iletişim işlemleri, işlemin yapıldığı `tenant_id` bağlamındaki `tenants.config` JSONB objesinden çekilen marka verileriyle (brandName, emailFrom) özelleştirilmelidir.
+30. **Storage Bucket İzolasyon Politikaları (SaaS):** `product_images` ve diğer tenant-specific storage bucket'larındaki erişimler, klasör veya yol tabanlı RLS politikaları ile kiracı özelinde sızdırmaz hale getirilmelidir (`storage.objects` üzerinde `tenant_id = jwt_tenant_id()` kontrolü).
+31. **Çapraz Kiracı super_admin Yetkilendirmesi (SaaS):** Çapraz kiracı erişimi (Cross-Tenant) gerektiren `super_admin` rolleri için 1-N FK yerine pivot tablo mimarisi (ör. `tenant_users`) tasarlanmalıdır.
 
 ---
 
