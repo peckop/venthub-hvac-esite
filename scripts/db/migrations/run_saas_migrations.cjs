@@ -2,8 +2,15 @@ const fs = require('fs');
 const path = require('path');
 const { Client } = require('pg');
 
+// Load environment variables from .env if available
+try {
+  require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
+} catch (e) {
+  // Ignore if dotenv is not present or failed to load
+}
+
 // Correct remote pooler connection URL on port 6543 (transaction pooler)
-const connectionString = "postgresql://postgres.tnofewwkwlyjsqgwjjga:***REMOVED***@aws-1-eu-central-1.pooler.supabase.com:6543/postgres";
+const connectionString = process.env.DATABASE_URL || "postgresql://postgres.tnofewwkwlyjsqgwjjga:[PASSWORD]@aws-1-eu-central-1.pooler.supabase.com:6543/postgres";
 
 const client = new Client({
   connectionString,

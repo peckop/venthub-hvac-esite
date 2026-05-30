@@ -132,8 +132,22 @@ async function main() {
   fs.writeFileSync(tempSqlFile, sqlContent, 'utf8');
   console.log('Created temporary SQL file scripts/temp_setup.sql');
   
-  // 3. Try possible database connections using Supabase CLI db query
-  const passwords = [env.SUPABASE_DB_PASSWORD, '***REMOVED***'].filter(Boolean);
+  const passwords = [env.SUPABASE_DB_PASSWORD].filter(Boolean);
+  
+  // Dynamically extract password from DATABASE_URL if available
+  const dbUrl = env.DATABASE_URL || process.env.DATABASE_URL;
+  if (dbUrl) {
+    try {
+      const match = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@/);
+      if (match && match[2] && !match[2].includes('[')) {
+        passwords.push(match[2]);
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
+  
+  // Remove duplicates
   const uniquePasswords = Array.from(new Set(passwords));
   
   const possibleConfigs = [];
