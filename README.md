@@ -21,6 +21,13 @@ VentHub sistemine ait tüm işletim, mimari ve otonom kurallar **5 Ciltlik Maste
 
 ---
 
+## 🏢 Multi-Tenant SaaS Architecture (Faz 1 — Foundation)
+Platform, tek kiracılı (single-tenant) yapısını bozmadan, dinamik ve Edge-safe çözücüler ile **Çoklu Kiracılı (Multi-Tenant) SaaS altyapısına** başarıyla yükseltilmiştir:
+*   🏢 **Kiracı İzolasyonu (Tenant Isolation):** Veritabanındaki 21 adet işlem tablosu `tenant_id` kolonu, foreign key indeksleri ve dynamic JWT `jwt_tenant_id()` RPC claim korumasıyla (108+ RLS politikası güncellenerek) %100 sızdırmaz hale getirilmiştir.
+*   ⚡ **Edge-Safe Çözümleme (Tenant Resolution):** Edge Runtime üzerinde çalışan ve Vercel Edge Config / Redis destekli dynamic domain ve subdomain çözücü (`tenantResolver.ts`) ile kiracı çözümlenmektedir.
+*   🔒 **Güvenli JWT Claims & Auth Sync:** Kullanıcı login/signup akışlarında Supabase Auth üzerinden otomatik kiracı claim enjeksiyonu ve profil eşleştirmesi trigger seviyesinde entegre edilmiştir.
+*   📦 **Önbellek ve Realtime İzolasyonu:** ISR/unstable_cache katmanlarında `[key, lang, tenantId]` bazlı veri sızıntı koruması ve WebSocket stok/sipariş kanallarında tam kiracı bazlı yalıtım sağlanmıştır.
+
 ## 🚀 Modern Enterprise Mimari Yapısı
 
 VentHub HVAC platformu, modern web standartlarını ve maksimum hızı hedefleyen en güncel Next.js 15+ ve React 19 mimarisi üzerine inşa edilmiştir:

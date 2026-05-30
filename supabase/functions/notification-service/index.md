@@ -11,7 +11,7 @@ entity_hashes:
   func:sendSMS: 569d0e2e89431898
   func:sendWhatsApp: 79c6e69b836b3ef4
   overview: 71e4dfd3d4c33151
-generated_at: 2026-05-30T21:16:11Z
+generated_at: 2026-05-30T21:36:25Z
 ---
 
 ## Genel Bakış

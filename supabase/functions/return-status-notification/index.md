@@ -7,7 +7,7 @@ skeleton_hash: 70775c6410a3ad58
 entity_hashes:
   func:return-status-notification_handler: 7d2592fd30deaf05
   overview: 2f67488397ccb15e
-generated_at: 2026-05-30T21:16:46Z
+generated_at: 2026-05-30T21:36:29Z
 ---
 
 ## Genel Bakış

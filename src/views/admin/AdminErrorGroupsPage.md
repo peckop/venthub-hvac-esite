@@ -15,7 +15,7 @@ entity_hashes:
   func:updateStatus: 6c7719de765f38dd
   overview: 2bc670ce94cd0c60
   style_tokens: 5e40817d604cd18b
-generated_at: 2026-05-30T20:26:00Z
+generated_at: 2026-05-30T21:36:07Z
 ---
 
 ## Genel Bakış
@@ -228,10 +228,10 @@ graph TD
     AdminErrorGroupsPage_tsx__updateNotes["updateNotes"]
     AdminErrorGroupsPage_tsx__updateStatus["updateStatus"]
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateNotes
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSelect
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateAssignedTo
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__loadLatestClientErrors
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSort
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__loadLatestClientErrors
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSelect
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateStatus
 ```
 

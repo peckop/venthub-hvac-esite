@@ -7,7 +7,7 @@ skeleton_hash: b33a5fa4ac98e4a4
 entity_hashes:
   func:admin-create-coupon_handler: 72913923d4da4715
   overview: e7791c38f1685aef
-generated_at: 2026-05-30T21:15:15Z
+generated_at: 2026-05-30T21:36:13Z
 ---
 
 ## Genel Bakış

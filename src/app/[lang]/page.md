@@ -11,7 +11,7 @@ entity_hashes:
   func:getCachedHomeData: 3cdedf9dace01d81
   overview: 2213b85befa55c27
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-30T20:23:14Z
+generated_at: 2026-05-30T21:35:06Z
 ---
 
 ## Genel Bakış
@@ -31,20 +31,6 @@ Bu grup, dil ve kiracı bazlı ana sayfa verilerini önbellekten alarak ana Reac
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, Next.js App Router'ın dinamik `[lang]` segmentli ana sayfa yapısına dayanır. Mimari varsayımlar, fonksiyon imzalarından çıkarılmıştır.
-
----
-
-**[Aksiyom 1]:** Eğer `Props` tipi `params.lang` alanı içermiyorsa, `RootPage` ve `generateMetadata` fonksiyonları doğru çalışamaz.
-
-**[Aksiyom 2]:** Eğer `lang` parametresi desteklenen diller listesinde yer almıyorsa, `generateStaticParams` tarafından geçerli statik parametreler üretilmez.
-
-**[Aksiyom 3]:** Eğer `getCachedHomeData` fonksiyonuna geçerli bir `tenantId` sağlanmıyorsa, veri çekme işlemi başarısız olur veya eksik çalışır.
-
-**[Aksiyom 4]:** Eğer `getCachedHomeData` fonksiyonuna geçerli bir `lang` sağlanmıyorsa, dil-bilinçli veri içeriği dönüştürülemez.
-
-**[Aksiyom 5]:** Eğer `generateStaticParams` tarafından döndürülen `lang` değerleri `generateMetadata` ve `RootPage` tarafından kabul edilmiyorsa, build zamanında hata oluşur.
-
-**[Aksiyom 6]:** Eğer `getCachedHomeData` için önbellekleme mekanizması çalışmıyorsa, her istekte ana sayfa verileri yeniden çekilir (performans düşer, fonksiyonel hata değil).
 
 ---
 

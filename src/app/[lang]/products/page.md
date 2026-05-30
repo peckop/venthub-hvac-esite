@@ -9,7 +9,7 @@ entity_hashes:
   func:getCachedProducts: 13bd3816d5356001
   overview: a4d00c564c02f39c
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-05-30T20:23:29Z
+generated_at: 2026-05-30T21:35:08Z
 ---
 
 ## Genel Bakış
@@ -70,17 +70,6 @@ Bu modülün doğru çalışması için aşağıdaki mimari varsayımlar geçerl
   - **Cache options**: `{ tags: ['products-discovery', \`products-discovery-${tenantId}\`], revalidate: false }` — tag tabanlı invalidation için tenantId'li tag eklenir, revalidation kapatılmıştır
   - `getProductsEnriched({ limit: 100 })` — cache içindeki async callable; Supabase'den en fazla 100 ürün getirir
 - **Dönüş**: `Promise<DomainProduct[]>` (getProductsEnriched'in dönüş değeri, cachelenmiş)
-
----
-
-### [N2_NASIL] AST Pointer: `[lang]/products/page.tsx`::Page
-- **params**: `{ params: Promise<{ lang: string }> }` — Next.js App Router params prop'u (Promise olarak resolve edilir)
-- **ic_degiskenler**:
-  - `lang` — `await params` ile çözümlenmiş dil kodu (ör. "en", "tr"); getCachedProducts çağrısına传递 edilir
-  - `tenantConfig` — `await getTenantConfig()` ile elde edilen tenant yapılandırma nesnesi; `.id` alanı tenantId olarak kullanılır, ayrıca `TenantProvider`'a value olarak verilir
-  - `tenantId` — `tenantConfig.id`'den türetilen tenant tanımlayıcısı; getCachedProducts çağrısına传递 edilir
-  - `products: DomainProduct[]` — `await getCachedProducts(lang, tenantId)` çağrısıyla elde edilen enriched ürün listesi; `CategoryMasterView`'a `initialProducts` prop'u olarak verilir
-- **Dönüş**: JSX (React.Suspense > TenantProvider > CategoryMasterView) — `initialCategory={null}` ve `initialProducts={products}` ile render edilen sayfa. `initialCategory` null olduğu için MasterView bunu Discovery modu olarak işleyecektir.
 
 ---
 

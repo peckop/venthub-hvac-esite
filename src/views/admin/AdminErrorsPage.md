@@ -9,7 +9,7 @@ entity_hashes:
   func:fmt: f911ea01809e8b2a
   overview: d57f965472ef04ba
   style_tokens: a98ae3ae7fce0104
-generated_at: 2026-05-30T20:26:36Z
+generated_at: 2026-05-30T21:36:09Z
 ---
 
 ## Genel Bakış
@@ -102,84 +102,6 @@ Bu modülün doğru çalışması için aşağıdaki mimari varsayımlar geçerl
   - `scheduleRefetch` — `React.useCallback`, 400ms gecikmeyle fetchErrors'u tetikleyen debounce fonksiyonu
   - `expandedId` — `React.useState<string | null>(null)`, genişletilmiş satırın ID'si, detay panelini açar/kapar
 - **Dönüş**: JSX (React element — admin paneli hata listesi tablosu)
-
----
-
-### [N2_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::fmt
-- **params**: `(d: Date)` — Formatlanacak tarih nesnesi
-- **ic_degiskenler**:
-  - `y` — `d.getFullYear()`, tam yıl numarası (örn. 2025)
-  - `m` — `String(d.getMonth() + 1).padStart(2, '0')`, sıfır dolgulu ay stringi (örn. "01"-"12")
-  - `day` — `String(d.getDate()).padStart(2, '0')`, sıfır dolgulu gün stringi (örn. "01"-"31")
-- **Dönüş**: `string` — "YYYY-MM-DD" formatında tarih (örn. "2025-01-15")
-
----
-
-### [N3_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::debounceEffect
-- **params**: (parametre yok — React.useEffect callback)
-- **ic_degiskenler**:
-  - `t` — `setTimeout(() => setDebouncedQ(q.trim()), 300)` dönüş değeri, 300ms debounce timer ID'si; temizleme fonksiyonunda `clearTimeout(t)` ile iptal edilir
-- **Dönüş**: cleanup fonksiyonu — timer'ı temizler
-
----
-
-### [N4_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::fetchErrors
-- **params**: (parametre yok — useCallback, bağımlılıklar: `[fromDate, toDate, level, env, debouncedQ, page, t]`)
-- **ic_degiskenler**:
-  - `query` — `supabase.from('client_errors').select(...)` ile başlayan Supabase query builder nesnesi; filtreler (`gte`, `lte`, `eq`, `or`) ve sıralama zincirlenerek eklenir
-  - `like` — `` `%${debouncedQ}%` `` formatında arama deseni, `query.or()` içinde `url.ilike` ve `message.ilike` için kullanılır
-  - `from` — `(page - 1) * PAGE_SIZE`, pagination için başlangıç indeksi
-  - `to` — `from + PAGE_SIZE - 1`, pagination için bitiş indeksi
-  - `data` — `await query.range(from, to)` sonucundan dönen `data` özelliği, hata satırları dizisi
-  - `error` — `await query.range(from, to)` sonucundan dönen `error` özelliği, Supabase hatası veya null
-  - `count` — `await query.range(from, to)` sonucundan dönen `count` özelliği, toplam kayıt sayısı
-- **Dönüş**: `Promise<void>` — state setter'ları ile `rows`, `total`, `error`, `loading` güncellenir
-
----
-
-### [N5_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::scheduleRefetch
-- **params**: (parametre yok — useCallback, bağımlılık: `[]`)
-- **ic_degiskenler**: (yok — sadece outer scope'taki `refetchTimer` ve `fetchRef` referanslarına erişir)
-- **Dönüş**: `void` — varsa önceki timer'ı temizler, ardından 400ms sonrası için `fetchRef.current()` çağrısı zamanlar
-
----
-
-### [N6_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::realtimeEffect
-- **params**: (parametre yok — React.useEffect callback, bağımlılıklar: `[scheduleRefetch, tenantId]`)
-- **ic_degiskenler**:
-  - `ch` — `` supabase.channel(`client-errors-${tenantId}`) `` ile oluşturulan Supabase real-time kanal aboneliği; `postgres_changes` event'i ile `client_errors` tablosundaki tüm değişiklikleri dinler
-- **Dönüş**: cleanup fonksiyonu — `supabase.removeChannel(ch)` ile kanalı kapatır, `refetchTimer.current` varsa timer'ı temizler
-
----
-
-### [N7_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::realtimeChangeHandler
-- **params**: (parametre yok — Supabase `postgres_changes` callback)
-- **ic_degiskenler**: (yok — sadece outer scope'taki `scheduleRefetch`'i çağırır)
-- **Dönüş**: `void` — tabloda değişiklik gerçekleştiğinde `scheduleRefetch()` ile yeniden veri çekilmesini tetikler
-
----
-
-### [N8_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::realtimeCleanup
-- **params**: (parametre yok — realtimeEffect cleanup fonksiyonu)
-- **ic_degiskenler**:
-  - `ch` — outer scope'tan kapanış yoluyla erişilen Supabase kanal nesnesi (realtimeEffect içinde tanımlı)
-- **Dönüş**: `void` — `supabase.removeChannel(ch)` ile real-time aboneliği kaldırır; `refetchTimer.current` varsa pending timer'ı iptal eder
-
----
-
-### [N9_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::mapRenderRow
-- **params**: `r: ErrorRow` — Tek bir hata kaydı nesnesi
-- **ic_degiskenler**: (yok — parametre `r`'nin özellikleri doğrudan JSX içinde erişilir)
-  - `r.id` — hata kaydının benzersiz tanımlayıcısı, `key` ve `expandedId` karşılaştırması için kullanılır
-  - `r.at` — hata oluşma zamanı, `formatDateTime(r.at, lang)` ile formatlanarak gösterilir
-  - `r.level` — hata seviyesi (`error`/`warn`/`info`), renkli badge ile gösterilir
-  - `r.message` — hata mesajı metni, tablo hücresinde doğrudan yazdırılır
-  - `r.url` — hata oluşan URL, yoksa `"-"` gösterilir
-  - `r.stack` — stack trace metni, `String(r.stack || '').slice(0, 8000)` ile 8000 karakterle kısaltılıp `<pre>` içinde gösterilir
-  - `r.user_agent` — tarayıcı kullanıcı ajanı stringi, detay panelinde gösterilir
-  - `r.release` — uygulama versiyon/release bilgisi, detay panelinde gösterilir
-  - `r.env` — ortam bilgisi (production/preview/development), detay panelinde gösterilir
-- **Dönüş**: `JSX.Element` — `<React.Fragment>` içinde satır + genişletme detayı (varsa)
 
 ---
 

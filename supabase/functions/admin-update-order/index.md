@@ -7,7 +7,7 @@ skeleton_hash: 2aae01d91a254e30
 entity_hashes:
   func:admin-update-order_handler: 046f5c7fec17e235
   overview: 236389b6147671e5
-generated_at: 2026-05-30T21:15:35Z
+generated_at: 2026-05-30T21:36:15Z
 ---
 
 ## Genel Bakış

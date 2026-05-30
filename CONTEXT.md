@@ -37,7 +37,7 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 
 | Faz | Amaç | Durum |
 |-----|------|-------|
-| **Faz 1: Foundation** | Mevcut VentHub "default tenant" olur, yeni tenant eklenebilir hale gelir | 🔄 Başlatılacak |
+| **Faz 1: Foundation** | Mevcut VentHub "default tenant" olur, yeni tenant eklenebilir hale gelir | 🏆 BİTTİ (Remote Deployed) |
 | **Faz 2: White-Label** | Her tenant kendi markasıyla görünür (CSS token override, logo, renk) | 📋 Planlandı |
 | **Faz 3: Tenant Admin + Billing** | Tenant kendi işini yönetsin, subscription/billing sistemi | 📋 Planlandı |
 | **Faz 4: Marketplace + Plugin** | Çoklu satıcı, komisyon, plugin mimarisi | 📋 Uzun vade |

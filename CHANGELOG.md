@@ -1,5 +1,26 @@
 # Changelog
 
+### [2026-05-30] VentHub SaaS Transformation Phase 1 — Foundation & Master Docs Compilation
+**Özet:** VentHub HVAC platformunun çoklu kiracılı (multi-tenant) SaaS mimarisine geçişinin 1. Fazı (Foundation) tamamen uygulanmış, test edilmiş, veritabanı şeması ve Edge fonksiyonları master belgeleri derlenerek NotebookLM kütüphaneleriyle eksiksiz olarak senkronize edilmiştir.
+**Değişiklik Kapsamı:**
+- **SaaS Altyapısı (Faz 1):**
+  - `tenants` veritabanı tablosu ve claims'leri JWT'den çözen `jwt_tenant_id()` RPC fonksiyonu PostgreSQL katmanına kuruldu.
+  - 21 adet kiracı-duyarlı (Tenant-Aware) veritabanı tablosuna `tenant_id uuid` kolonu, foreign key indeksleri ve kiracı RLS izolasyon koşulları (`tenant_id = jwt_tenant_id()`) eklendi.
+  - Edge Runtime'da doğrudan veritabanı sorgusu atmayan subdomain/custom domain çözücü (`src/lib/tenantResolver.ts`) ve Downstream'e kiracı kimliği ileten `src/middleware.ts` ara katman mantığı kuruldu.
+  - Supabase Auth signup ve login süreçleri, dynamic `app_metadata` tenant claim enjeksiyonu ve `user_profiles` veritabanı tablosu otomatik eşleme tetikleyicileri ile trigger seviyesinde entegre edildi.
+  - Next.js önbellek (`unstable_cache`/ISR) katmanında `[key, lang, tenantId]` bazlı veri sızıntı koruması ve WebSocket stok/sipariş kanallarında tam kiracı bazlı realtime kanal izolasyonu sağlandı.
+  - Deno Edge kargo ve ödeme webhook'ları; HMAC-SHA256 doğrulaması, 5 dakikalık clock-skew tekrar oynatma koruması ve kiracı izolasyonuna sahip olacak şekilde tamamen sızdırmaz yapıldı.
+- **SSOT Master Dokümantasyon Güncellemeleri:**
+  - `docs/supabase_functions_master.md` betik yardımıyla 30 adet Edge fonksiyonunun `.md` dökümanlarının birleştirilmesiyle yeniden derlendi.
+  - `docs/database_schema_master.md` veritabanındaki 28 aktif tablo, 132 RLS politikası, 55 fonksiyon, 47 indeks ve ER diyagramı güncellemelerini yansıtacak şekilde programatik olarak güncellendi.
+  - 24 adet değişen TS/TSX kaynak dosyası için `orion doc single --force` çalıştırılarak taze bireysel `.md` dokümanları üretildi, `docs/system_tree.md` güncellendi.
+- **NotebookLM Dijital İkiz Senkronizasyonu:**
+  - NLM MCP CLI kimlik doğrulama oturumu yenilendi.
+  - VentHub Proje Hafızası (`235043eb-970f-4a52-9f39-1d02b2621e9c`) notebook'undaki diğer özel dökümanlar korunarak, sadece güncellenen 3 adet Master MD (`venthub_hvac_master.md`, `supabase_functions_master.md`, `database_schema_master.md`) ile `README.md`, `CHANGELOG.md` ve `CONTEXT.md` dosyaları güvenli bir şekilde güncellendi / yüklendi.
+**Doğrulama:** `pnpm run test:e2e` ✅ (89/89 E2E test passed, 100% green status) | `pnpm run type-check` ✅ (0 error) | `pnpm run lint` ✅ (0 error, 0 warning) | `nlm source list` (Google NLM sync OK) ✅
+
+---
+
 ### [2026-05-29] VentHub Toast Migration to Sonner, Floating Widgets Flexbox Unification & 20-Workers Orion standard
 **Özet:** Uygulama genelinde eski bildirim kütüphaneleri temizlenerek `sonner` migrasyonu tamamlandı, main layout üzerindeki yüzen araçlar flexbox ile dikeyde hizalanıp layout thrashing engellendi ve Xiaomi mimoV2 Premium Token aboneliği doğrultusunda Orion CLI paralel işçi (workers) standardı kalıcı olarak 20 worker'a çıkarıldı.
 **Değişiklik Kapsamı:**
