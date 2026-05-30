@@ -398,7 +398,7 @@ DROP POLICY IF EXISTS "price_lists_service_role" ON public.price_lists;
 
 CREATE POLICY "price_lists_select" ON public.price_lists
   FOR SELECT TO anon, authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (active = true OR public.is_user_admin(auth.uid())));
+  USING (tenant_id = public.jwt_tenant_id() AND (is_active = true OR public.is_user_admin(auth.uid())));
 
 CREATE POLICY "price_lists_admin_all" ON public.price_lists
   FOR ALL TO authenticated
