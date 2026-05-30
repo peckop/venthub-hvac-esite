@@ -1,7 +1,5 @@
 # Teamwork Project Prompt — VentHub SaaS Foundation (Faz 1)
 
-> Status: Step 9 — Ready for launch, awaiting user approval
-> Goal: Craft prompt → get user approval → delegate to teamwork_preview
 
 VentHub, mevcut tek kiracılı (single-tenant) HVAC e-ticaret platformunu çoklu kiracılı (multi-tenant) SaaS altyapısına dönüştürme projesidir. Bu faz (Faz 1 — Foundation), mevcut uygulamayı bozmadan multi-tenancy temelini atar. Mevcut VentHub "default tenant" olarak çalışmaya devam edecek, yeni tenant'lar eklenebilir hale gelecektir.
 
