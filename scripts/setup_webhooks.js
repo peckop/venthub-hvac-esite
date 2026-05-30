@@ -81,7 +81,21 @@ async function main() {
   const host = 'aws-1-eu-central-1.pooler.supabase.com';
   const database = 'postgres';
   
-  const passwords = [env.SUPABASE_DB_PASSWORD, '***REMOVED***'].filter(Boolean);
+  const passwords = [env.SUPABASE_DB_PASSWORD].filter(Boolean);
+  
+  // Dynamically extract password from DATABASE_URL if available
+  const dbUrl = env.DATABASE_URL || process.env.DATABASE_URL;
+  if (dbUrl) {
+    try {
+      const match = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@/);
+      if (match && match[2] && !match[2].includes('[')) {
+        passwords.push(match[2]);
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
+  
   // Remove duplicates
   const uniquePasswords = Array.from(new Set(passwords));
   
