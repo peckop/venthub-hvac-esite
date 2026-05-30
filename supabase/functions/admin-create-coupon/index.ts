@@ -1,5 +1,6 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { resolveTenantId } from '../_shared/tenant_config.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -42,10 +43,15 @@ Deno.serve(async (req: Request) => {
 
     const userId = userRes.user.id
 
+    // We must resolve tenantId before profile check
+    const bodyCheck = await req.clone().json().catch(() => ({}))
+    const tenantId = resolveTenantId(req, bodyCheck)
+
     const { data: profile, error: profErr } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
       .eq('id', userId)
+      .eq('tenant_id', tenantId)
       .maybeSingle()
 
     if (profErr) {
@@ -100,6 +106,7 @@ Deno.serve(async (req: Request) => {
       usage_limit,
       used_count: 0,
       created_by: userId,
+      tenant_id: tenantId,
     }
 
     const { data, error: insErr } = await supabaseAdmin

@@ -1,12 +1,14 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
+import { resolveTenantId, getTenantBranding } from '../_shared/tenant_config.ts'
 
 interface DeliveryRequest {
   order_id: string
   customer_email?: string
   customer_name?: string
   order_number?: string
+  tenant_id?: string
 }
 
 function render(tpl: string, _data: Record<string, unknown>) {
@@ -36,6 +38,16 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 
+    const body = await req.json().catch(()=>({})) as DeliveryRequest
+    const order_id = body.order_id
+    let customer_email = body.customer_email
+    let customer_name = body.customer_name
+    let order_number = body.order_number
+
+    // Resolve Tenant ID and get Branding details dynamically
+    const tenantId = resolveTenantId(req, body)
+    const branding = await getTenantBranding(tenantId)
+
     const authHeader = req.headers.get('Authorization')
     let isAuthorized = false
     if (authHeader === `Bearer ${serviceKey}`) {
@@ -46,7 +58,7 @@ serve(async (req) => {
         const authClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
         const { data: { user } } = await authClient.auth.getUser()
         if (user) {
-          const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+          const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
             headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
           })
           if (roleCheck.ok) {
@@ -70,19 +82,13 @@ serve(async (req) => {
     }
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
-    const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
-
-    const body = await req.json().catch(()=>({})) as DeliveryRequest
-    const order_id = body.order_id
-    let customer_email = body.customer_email
-    let customer_name = body.customer_name
-    let order_number = body.order_number
+    let emailFrom = branding.emailFrom
 
     if (!order_id) return new Response(JSON.stringify({ error: 'missing_fields', missing: ['order_id'] }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
     // Derive info if missing
     if ((!customer_email || !customer_name || !order_number) && supabaseUrl && serviceKey) {
-      const o = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=order_number,customer_name,customer_email`, {
+      const o = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=order_number,customer_name,customer_email`, {
         headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
       })
       if (o.ok) {
@@ -100,22 +106,26 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'customer_info_missing' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
+    const brandName = branding.brandName
+    const brandPrimary = branding.brandPrimaryColor
+    const brandLogoUrl = branding.brandLogoUrl
+
     const prettyOrderNo = order_number ? `#${order_number.split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
-    const subject = `Siparişiniz teslim edildi - ${prettyOrderNo}`
+    const subject = `${brandName} | Siparişiniz teslim edildi - ${prettyOrderNo}`
 
     let html = (await loadTemplate()) || ''
     if (!html) {
       html = [
         '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">',
-        '<h2 style="color: #2563eb;">Teslimat Tamamlandı</h2>',
+        `<h2 style="color: ${brandPrimary};">${brandName} — Teslimat Tamamlandı</h2>`,
         `<p>Merhaba <strong>${customer_name}</strong>,</p>`,
         `<p><strong>${prettyOrderNo}</strong> numaralı siparişiniz başarıyla teslim edilmiştir.</p>`,
         '<p>Herhangi bir sorunuz olursa bizimle iletişime geçebilirsiniz.</p>',
-        '<p>Teşekkürler,<br><strong>VentHub Ekibi</strong></p>',
+        `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
         '</div>'
       ].join('')
     } else {
-      html = render(html, { customer_name, order_number: prettyOrderNo })
+      html = render(html, { customer_name, order_number: prettyOrderNo, brand_name: brandName, brand_primary_color: brandPrimary, brand_logo_url: brandLogoUrl })
     }
 
     if (!resendApiKey) {
@@ -139,7 +149,7 @@ serve(async (req) => {
         await fetch(`${supabaseUrl}/rest/v1/shipping_email_events`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, Prefer: 'return=minimal' },
-          body: JSON.stringify({ order_id, email_to: customer_email, subject, provider: 'resend', provider_message_id: result?.id || null })
+          body: JSON.stringify({ order_id, email_to: customer_email, subject, provider: 'resend', provider_message_id: result?.id || null, tenant_id: tenantId })
         })
       }
     } catch {}

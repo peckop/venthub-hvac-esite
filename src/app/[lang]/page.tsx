@@ -66,8 +66,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 import { unstable_cache } from 'next/cache'
+import { getTenantConfig } from '../../utils/tenantServer'
+import { TenantProvider } from '../../hooks/useTenant'
 
-const getCachedHomeData = (lang: string) => unstable_cache(
+const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
   async () => {
     const [catData, prodData] = await Promise.all([
       getCategories(),
@@ -75,19 +77,22 @@ const getCachedHomeData = (lang: string) => unstable_cache(
     ])
     return { catData, prodData }
   },
-  ['home-page-data', lang],
-  { tags: ['home-data', `home-data-${lang}`], revalidate: false }
+  ['home-page-data', lang, tenantId],
+  { tags: ['home-data', `home-data-${tenantId}`], revalidate: false }
 )()
 
 export default async function RootPage({ params }: Props) {
   const { lang } = await params
   const dict = lang === 'en' ? en : tr
 
+  const tenantConfig = await getTenantConfig()
+  const tenantId = tenantConfig.id
+
   let categories: DomainCategory[] = []
   let products: Product[] = []
 
   try {
-    const { catData, prodData } = await getCachedHomeData(lang)
+    const { catData, prodData } = await getCachedHomeData(lang, tenantId)
     categories = toUICategoryList(catData)
     products = (prodData as Product[]) || []
   } catch (error) {
@@ -145,7 +150,7 @@ export default async function RootPage({ params }: Props) {
   ]
 
   return (
-    <>
+    <TenantProvider value={tenantConfig}>
       {jsonLds.map((ld, i) => (
         <script
           key={i}
@@ -159,6 +164,6 @@ export default async function RootPage({ params }: Props) {
         initialProducts={products} 
         dictionary={dict.home}
       />
-    </>
+    </TenantProvider>
   )
 }

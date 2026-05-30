@@ -1,9 +1,12 @@
+'use client';
+
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
 import { ShoppingBag, Box, Bell, X, Check, Activity, Clock } from 'lucide-react'
 import { formatDateTime } from '../../i18n/datetime'
+import { useTenant } from '../../hooks/useTenant'
 
 interface AppNotification {
     id: string
@@ -16,6 +19,7 @@ interface AppNotification {
 }
 
 const AdminRealtimeNotifications: React.FC = () => {
+    const { id: tenantId } = useTenant()
     const [notifications, setNotifications] = useState<AppNotification[]>([])
     const [isOpen, setIsOpen] = useState(false)
     const [unreadCount, setUnreadCount] = useState(0)
@@ -100,7 +104,7 @@ const AdminRealtimeNotifications: React.FC = () => {
     useEffect(() => {
         // 1. Sipariş Kanalı
         const ordersChannel = supabase
-            .channel('admin-orders-realtime')
+            .channel(`admin-orders-realtime-${tenantId}`)
             .on(
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'venthub_orders' },
@@ -161,7 +165,7 @@ const AdminRealtimeNotifications: React.FC = () => {
 
         // 2. Stok Hareketi Kanalı
         const stockChannel = supabase
-            .channel('admin-stock-realtime')
+            .channel(`admin-stock-realtime-${tenantId}`)
             .on(
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'inventory_movements' },
@@ -220,7 +224,7 @@ const AdminRealtimeNotifications: React.FC = () => {
             supabase.removeChannel(ordersChannel)
             supabase.removeChannel(stockChannel)
         }
-    }, [router])
+    }, [router, tenantId])
 
     // Close dropdown
     useEffect(() => {

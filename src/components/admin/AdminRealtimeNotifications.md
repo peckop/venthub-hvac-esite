@@ -3,46 +3,46 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminRealtimeNotifications.tsx
-skeleton_hash: eabfe432a624460e
+skeleton_hash: b67d5d43d0f37d2f
 entity_hashes:
   func:AdminRealtimeNotifications: 1b67a246f8f15ea8
   func:IconForType: b8eaefdda2e3fd3b
   func:clearAll: 256b77623e27b78c
   func:toggleDropdown: 97a60ca3e9e42667
-  overview: 9e1475e57b239be9
+  overview: ca181570c6a1fe40
   style_tokens: 58e7fc7febbe30f9
-generated_at: 2026-05-29T18:43:38Z
+generated_at: 2026-05-30T20:24:15Z
 ---
 
 ## Genel Bakış
-`AdminRealtimeNotifications` bileşeni, yönetim panelinde gerçek zamanlı bildirimleri görsel olarak sunan ve bunlarla etkileşime girilmesini sağlayan bir React UI modülüdür. Bildirimleri listeleme, bildirim menüsünü açma/kapama, tüm bildirimleri temizleme ve bildirim türlerine göre ikon atama gibi temel sorumlulukları barındırır. Bileşen, bildirimlerin durumunu ve kullanıcının bu bildirimler üzerindeki aksiyonlarını yönetir.
+`AdminRealtimeNotifications` bileşeni, yönetim panelinde gerçek zamanlı bildirimlerin görüntülenmesini ve yönetilmesini sağlayan bir React modülüdür. Bildirim panelinin açılıp kapatılması, bildirimlerin temizlenmesi ve türlerine göre ikon eşleştirme gibi işlevsellikleri sunar. Modül, bildirimlerin görsel sunumunu ve kullanıcı etkileşimlerini tek bir bileşen altında merkezileştirir.
 
 ## Fonksiyon Grupları
-### Ana Bileşen ve Render
-Modülün ana giriş noktasıdır; bildirim verisini alır, durumunu yönetir ve bileşenin nihai görünümünü (JSX) render eder.
+### Ana Bileşen
+Bildirim verisini alarak bileşenin genel yapısını ve render mantığını yöneten ana giriş noktasıdır.
 - `AdminRealtimeNotifications`
 
-### Bildirim Etkileşimleri
-Kullanıcının bildirimler üzerindeki temel eylemlerini işler; bildirim panelinin açılıp kapatılması ve tüm bildirilerin temizlenmesi gibi durum değişikliklerini tetikler.
+### Etkileşim İşleyicileri
+Kullanıcı eylemlerine yanıt veren; bildirim menüsünün durumunu değiştiren ve toplu temizleme işlemini gerçekleştiren yardımcı işlevlerdir.
 - `toggleDropdown`, `clearAll`
 
-### Görsel Yardımcılar
-Bildirim türlerine (örneğin, uyarı, başarı, bilgi) göre uygun ikonları eşleştirerek arayüzde görsel tutarlılık ve tanımlanabilirlik sağlar.
+### Görsel Eşleştirme
+Bildirim türlerine göre uygun ikonları dinamik olarak belirleyerek arayüzde tutarlılık sağlayan bileşen içi yardımcı fonksiyondur.
 - `IconForType`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-[Modül, fonksiyon gövdeleri paylaşılmadığı için yalnızca imza analizine dayalı minimal varsayımlar içermektedir.]
+Bu modül için fonksiyon gövdeleri paylaşılmadığı için, yalnızca fonksiyon imzalarından ve modül amacından çıkarılabilecek minimum aksiyomlar tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `IconForType` fonksiyonuna `type` parametresi olarak geçerli bir `string` değeri sağlanmazsa (undefined veya boş string), bileşen için uygun ikon belirlenemez ve render davranışı belirsiz olur.
+**[Aksiyom 1]:** Eğer `AdminRealtimeNotifications` bileşeni herhangi bir prop almıyorsa, bildirim verilerinin bileşen dışından (Context, global state vb.) erişilebilir olması gerekir; aksi halde bildirim listesi boş rendered olur.
 
-[Aksiyom 2]: Eğer `AdminRealtimeNotifications` ana bileşeni hiç parametre almıyorsa (props yoksa), bildirim verisi fonksiyon gövdesinde erişilen bir dış bağımlılık (React Context, global state vb.) aracılığıyla temin edilmelidir; aksi halde gösterilecek bildirim listesi boş veya tanımsız kalır.
+**[Aksiyom 2]:** Eğer `type` parametresi `IconForType` fonksiyonuna geçilmemişse veya geçersiz bir değerse, varsayılan/bilinmeyen bir ikon gösterimi yapılması beklenir; aksi halde render hatası oluşur.
 
-[Aksiyom 3]: Eğer `toggleDropdown` ve `clearAll` fonksiyonları hiç parametre almıyorsa, bu fonksiyonların etkilediği durum (dropdown açık/kapalı durumu, bildirim listesi) modül içindeki bir state (useState/useRef) veya dış bir state yönetimi ile tutulmalıdır; aksi halde eylemlerin etkisi hiçbir veri üzerinde gerçekleşmez.
+**[Aksiyom 3]:** Eğer `clearAll` çağrıldığında bildirim listesi zaten boşsa, fonksiyon herhangi bir hata vermeden sessizce çalışmalıdır; aksi halde kullanıcı tarafında beklenmeyen davranış oluşur.
 
-[Aksiyom 4]: Eğer `IconForType` fonksiyonu tarafından desteklenmeyen bir `type` string'i geçilirse (örneğin bilinmeyen bir bildirim türü), varsayılan/fallback bir ikon gösterilmeli ya da bileşen kırılmalı; bu davranış fonksiyon gövdesinde tanımlı değilse uygulama hata verebilir.
+**[Aksiyom 4]:** Eğer `toggleDropdown` çağrıldığında dropdown durumu (açık/kapalı) terslenmeli; bu durum bileşenin dahili state'inde tutulmalıdır, aksi halde menü açılıp kapanamaz.
 
 ---
 
@@ -84,82 +84,41 @@ Bildirim türlerine (örneğin, uyarı, başarı, bilgi) göre uygun ikonları e
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::useEffect_InitialFetch
-- **params**: () — useCallback/arrow fonksiyonu, parametre yok
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\AdminRealtimeNotifications.tsx::AdminRealtimeNotifications
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `active` — asenkron işlemlerin hâlâ geçerli olup olmadığını kontrol eden bayrak; temizleme fonksiyonunda `false` yapılır
-  - `fetchRecentActivity` — inner async fonksiyon; siparişleri ve stok hareketlerini Supabase'den çeker, birleştirir
-  - `oData` — `supabase.from('venthub_orders').select(...)` sonucundan dönen sipariş veri dizisi
-  - `sData` — `supabase.from('inventory_movements').select(...)` sonucundan dönen stok hareketi veri dizisi
-  - `combined` — `AppNotification[]` tipinde; sipariş ve stok bildirimlerinin birleştirildiği dizi
-  - `o` — `oData.forEach` iterasyonunda her bir sipariş satırı; `o.id`, `o.total_amount`, `o.created_at`, `o.order_number` erişimleri yapılır
-  - `s` — `sData.forEach` iterasyonunda her bir stok hareketi satırı (`Record<string, unknown>`)
-  - `products` — `s.products` cast edilmiş nesne; `products?.name` ve `products?.sku` erişimleri yapılır
-  - `pName` — `products?.name` değeri veya fallback `'Bilinmeyen Ürün'`
-  - `pSku` — `products?.sku` değeri veya boş string
-  - `delta` — `s.delta` sayısına dönüştürülmüş stok değişim miktarı
-  - `movementType` — `delta > 0` ise `'Giriş'`, değilse `'Çıkış'`
-  - `absQty` — `Math.abs(delta)` ile mutlak değer
-  - `err` — catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: cleanup fonksiyonu `() => { active = false }` döner
+  - `active` — Effect cleanup flag'ı, effect temizlendiğinde false yapılarak state güncellemelerini engeller
+  - `fetchRecentActivity` — Son siparişleri ve stok hareketlerini Supabase'den çekip birleştiren async fonksiyon
+  - `combined` — AppNotification[] tipinde, sipariş ve stok hareketlerinin birleştirildiği dizi
+  - `oData` — Supabase'den çekilen son 5 siparişin verisi
+  - `sData` — Supabase'den çekilen son 5 stok hareketinin verisi (products join ile)
+  - `o` — forEach döngüsünde her bir sipariş nesnesi
+  - `s` — forEach döngüsünde her bir stok hareketi nesnesi (Record<string, unknown> cast)
+  - `products` — s.products'ın Record<string, unknown> olarak cast edilmesi, null olabilir
+  - `pName` — products?.name veya 'Bilinmeyen Ürün' fallback'i ile ürün adı
+  - `pSku` — products?.sku veya boş string fallback'i ile ürün SKU'su
+  - `delta` — stok değişim miktarı (s.delta || 0'dan number'a çevirme)
+  - `movementType` — delta > 0 ise 'Giriş', değilse 'Çıkış' string değeri
+  - `absQty` — Math.abs(delta) ile mutlak stok miktarı
+- **Dönüş**: React.FC (Component)
 
-### [N2_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::fetchRecentActivity
-- **params**: () — inner async fonksiyon, parametre yok
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\AdminRealtimeNotifications.tsx::toggleDropdown
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `oData` — `supabase.from('venthub_orders').select('id, total_amount, created_at, order_number').order('created_at', { ascending: false }).limit(5)` sonucu; `oData.forEach` ile `o.id`, `o.total_amount`, `o.created_at`, `o.order_number` alanları okunur
-  - `sData` — `supabase.from('inventory_movements').select('id, delta, reason, created_at, products!product_id(name, sku)').order(...).limit(5)` sonucu
-  - `combined` — `AppNotification[]` tipinde boş dizi; bildirimler buraya push edilir
-  - `o` — `oData.forEach` callback parametresi; her sipariş kaydı
-  - `s` — `sData.forEach` callback parametresi; `Record<string, unknown>` tipinde stok hareketi kaydı
-  - `products` — `s.products` alanının `Record<string, unknown> | null` cast'i
-  - `pName` — `products?.name || 'Bilinmeyen Ürün'` — ürün adı
-  - `pSku` — `products?.sku || ''` — ürün SKU kodu
-  - `delta` — `Number(s.delta || 0)` — stok değişim miktarı
-  - `movementType` — `delta > 0 ? 'Giriş' : 'Çıkış'` hareket yönü etiketi
-  - `absQty` — `Math.abs(delta)` — mutlak stok miktarı
-  - `a`, `b` — `combined.sort` callback parametreleri; sıralama için bildirim nesneleri
-  - `err` — catch bloğundaki hata nesnesi
-- **Dönüş**: yok; `setNotifications(combined.slice(0, 10))` ile yan etki
+  - (fonksiyon gövdesinde yeni değişken tanımlanmamış, sadece state setter'ları kullanılıyor)
+- **Dönüş**: yok (void)
 
-### [N3_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::useEffect_RealtimeSubscriptions
-- **params**: () — useCallback/arrow fonksiyonu, parametre yok
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\AdminRealtimeNotifications.tsx::clearAll
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `ordersChannel` — `supabase.channel('admin-orders-realtime')` ile oluşturulan sipariş gerçek zamanlı kanalı; `.on('postgres_changes', ...)` ve `.subscribe()` zincirlenir
-  - `stockChannel` — `supabase.channel('admin-stock-realtime')` ile oluşturulan stok gerçek zamanlı kanalı; `.on('postgres_changes', ...)` ve `.subscribe()` zincirlenir
-  - `newOrder` — sipariş INSERT callback'inde `payload.new as Record<string, unknown>` cast edilmiş yeni sipariş nesnesi; `newOrder.id`, `newOrder.total_amount`, `newOrder.order_number`, `newOrder.created_at` alanları okunur
-  - `totalAmt` — `Number(newOrder.total_amount || 0)` — sipariş tutarı
-  - `amt` — `Intl.NumberFormat('tr-TR', ...).format(totalAmt)` ile formatlanmış para birimi stringi
-  - `orderId` — `String(newOrder.id || '')` — sipariş ID'si string karşılığı
-  - `orderNumber` — `newOrder.order_number` varsa String, yoksa `orderId.slice(0, 8)` — sipariş numarası
-  - `notif` — `AppNotification` tipinde; realtime sipariş bildirim nesnesi (`id`, `type`, `title`, `message`, `timestamp`, `isRead`, `link`)
-  - `m` — stok INSERT callback'inde `payload.new as Record<string, unknown>` cast edilmiş stok hareketi nesnesi; `m.id`, `m.delta`, `m.reason`, `m.created_at` alanları okunur
-  - `delta` — `Number(m.delta || 0)` — stok değişim miktarı
-  - `movementType` — `delta > 0 ? 'Giriş' : 'Çıkış'`
-  - `absQty` — `Math.abs(delta)` — mutlak stok miktarı
-  - `id` — `toast.custom` callback parametresi; toast ID'si
-- **Dönüş**: cleanup fonksiyonu `supabase.removeChannel(ordersChannel)` ve `supabase.removeChannel(stockChannel)` çalıştırır
+  - (fonksiyon gövdesinde yeni değişken tanımlanmamış, sadece state setter'ları kullanılıyor)
+- **Dönüş**: yok (void)
 
-### [N4_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::useEffect_ClickOutside
-- **params**: () — useCallback/arrow fonksiyonu, parametre yok
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\AdminRealtimeNotifications.tsx::IconForType
+- **params**: { type: string }
 - **ic_degiskenler**:
-  - `handleClickOutside` — `(event: MouseEvent) => void` tipinde inner fonksiyon; `event.target`'in `dropdownRef.current` içinde olup olmadığını kontrol eder
-  - `event` — `handleClickOutside` callback parametresi; `MouseEvent` tipinde; `event.target as Node` cast edilir
-- **Dönüş**: cleanup fonksiyonu `document.removeEventListener('mousedown', handleClickOutside)` döner
-
-### [N5_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::toggleDropdown
-- **params**: () — parametre yok
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok; `setOpen(!isOpen)`, `setNotifications(prev => prev.map(...))`, `setUnreadCount(0)` ile yan etki
-
-### [N6_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::clearAll
-- **params**: () — parametre yok
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok; `setNotifications([])` ve `setUnreadCount(0)` ile yan etki
-
-### [N7_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::IconForType
-- **params**: `{ type }` — `type: string` — bildirim türü (`'order'`, `'stock'` veya diğer)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX — `type === 'order'` ise `ShoppingBag` ikonlu mavi daire, `type === 'stock'` ise `Box` ikonlu yeşil daire, aksi halde `Activity` ikonlu gri daire
+  - `type` — Bildirim türü (order, stock veya diğer), hangi ikonun gösterileceğini belirler
+- **Dönüş**: JSX.Element (React icon component)
 
 ---
 

@@ -81,7 +81,7 @@ async function main() {
   const host = 'aws-1-eu-central-1.pooler.supabase.com';
   const database = 'postgres';
   
-  const passwords = [env.SUPABASE_DB_PASSWORD, 'SgxnZcG8Y79evUfd', 'buSgxnZcG8Y79evUfd'].filter(Boolean);
+  const passwords = [env.SUPABASE_DB_PASSWORD, '***REMOVED***'].filter(Boolean);
   // Remove duplicates
   const uniquePasswords = Array.from(new Set(passwords));
   
