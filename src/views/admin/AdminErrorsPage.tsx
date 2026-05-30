@@ -1,6 +1,7 @@
  
 import React from 'react'
 import { usePathname } from 'next/navigation'
+import { useTenant } from '../../hooks/useTenant'
 import { supabase } from '../../lib/supabase'
 import { 
   adminSectionTitleClass, 
@@ -35,6 +36,7 @@ interface ErrorRow {
 const PAGE_SIZE = 50
 
 const AdminErrorsPage: React.FC = () => {
+  const { id: tenantId } = useTenant()
   const { t, lang } = useI18n()
   const dragScrollRef = useDragScroll<HTMLDivElement>()
   // Default date range: last 7 days (including today)
@@ -113,7 +115,7 @@ const AdminErrorsPage: React.FC = () => {
 
   React.useEffect(() => {
     const ch = supabase
-      .channel('client-errors')
+      .channel(`client-errors-${tenantId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'client_errors' }, () => {
         scheduleRefetch()
       })
@@ -122,7 +124,7 @@ const AdminErrorsPage: React.FC = () => {
       supabase.removeChannel(ch)
       if (refetchTimer.current) clearTimeout(refetchTimer.current)
     }
-  }, [scheduleRefetch])
+  }, [scheduleRefetch, tenantId])
 
   const [expandedId, setExpandedId] = React.useState<string | null>(null)
 

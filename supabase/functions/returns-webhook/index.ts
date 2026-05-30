@@ -5,6 +5,7 @@
 // Env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RETURNS_WEBHOOK_SECRET (HMAC) or RETURNS_WEBHOOK_TOKEN
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { resolveTenantId } from '../_shared/tenant_config.ts'
 
 function json(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), { status: init.status || 200, headers: { 'content-type': 'application/json; charset=utf-8', ...(init.headers||{}) } })
@@ -60,6 +61,9 @@ Deno.serve(async (req: Request) => {
     let body: unknown = {}
     try { body = JSON.parse(raw) } catch {}
 
+    // Resolve Tenant ID dynamically
+    const tenantId = resolveTenantId(req, body)
+
     const secret = Deno.env.get('RETURNS_WEBHOOK_SECRET') || ''
     const token = Deno.env.get('RETURNS_WEBHOOK_TOKEN') || ''
     const sign = req.headers.get('x-signature') || ''
@@ -99,7 +103,7 @@ Deno.serve(async (req: Request) => {
     // Optional dedup
     const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     if (eventId) {
-      const { data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId).limit(1)
+      const { data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId).eq('tenant_id', tenantId).limit(1)
       if (Array.isArray(exist) && exist.length > 0) return json({ ok: true, event_id: eventId, duplicate: true })
     }
 
@@ -107,14 +111,14 @@ Deno.serve(async (req: Request) => {
     let returnId = (p._return_id || '').trim()
     if (!returnId && p.order_id) {
       try {
-        const { data } = await supabase.from('venthub_returns').select('id').eq('order_id', p.order_id).order('created_at',{ ascending:false }).limit(1)
+        const { data } = await supabase.from('venthub_returns').select('id').eq('order_id', p.order_id).eq('tenant_id', tenantId).order('created_at',{ ascending:false }).limit(1)
         if (Array.isArray(data) && data[0]) returnId = data[0].id
       } catch {}
     }
     if (!returnId) return json({ error: 'Missing _return_id' }, { status: 400 })
 
     // Fetch current status
-    const { data: cur, error: curErr } = await supabase.from('venthub_returns').select('id,status').eq('id', returnId).single()
+    const { data: cur, error: curErr } = await supabase.from('venthub_returns').select('id,status').eq('id', returnId).eq('tenant_id', tenantId).single()
     if (curErr || !cur) return json({ error: 'Return not found' }, { status: 404 })
 
     const mapped = mapReturnStatus(p.status)
@@ -132,7 +136,7 @@ Deno.serve(async (req: Request) => {
     // Update returns row
     let updated = false
     if (Object.keys(patch).length > 0) {
-      const { error: updErr } = await supabase.from('venthub_returns').update(patch).eq('id', returnId)
+      const { error: updErr } = await supabase.from('venthub_returns').update(patch).eq('id', returnId).eq('tenant_id', tenantId)
       if (updErr) return json({ error: updErr.message || 'DB update failed' }, { status: 500 })
       updated = true
     }
@@ -152,6 +156,7 @@ Deno.serve(async (req: Request) => {
           body_hash: bodyHash,
           received_at: new Date().toISOString(),
           processed_at: new Date().toISOString(),
+          tenant_id: tenantId,
         })
       }
     } catch {}
@@ -169,7 +174,7 @@ Deno.serve(async (req: Request) => {
           let reason = ''
           let description = ''
           try {
-            const r = await fetch(`${SUPABASE_URL}/rest/v1/venthub_returns?id=eq.${encodeURIComponent(returnId)}&select=order_id,reason,description,status`, {
+            const r = await fetch(`${SUPABASE_URL}/rest/v1/venthub_returns?id=eq.${encodeURIComponent(returnId)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=order_id,reason,description,status`, {
               headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
             })
             if (r.ok) {
@@ -187,7 +192,7 @@ Deno.serve(async (req: Request) => {
           let userId = ''
           if (rOrderId) {
             try {
-              const o = await fetch(`${SUPABASE_URL}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(rOrderId)}&select=order_number,user_id`, {
+              const o = await fetch(`${SUPABASE_URL}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(rOrderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=order_number,user_id`, {
                 headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
               })
               if (o.ok) {
@@ -235,7 +240,8 @@ Deno.serve(async (req: Request) => {
                   old_status: String(cur.status || ''),
                   new_status: nextStatus,
                   reason,
-                  description
+                  description,
+                  tenant_id: tenantId
                 })
               })
             } catch {}

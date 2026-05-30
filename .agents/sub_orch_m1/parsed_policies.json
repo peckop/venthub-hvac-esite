@@ -1,0 +1,804 @@
+{
+  "admin_audit_log": [
+    {
+      "table": "admin_audit_log",
+      "policyName": "INSERT",
+      "action": "authenticated",
+      "role": "`-`",
+      "condition": "",
+      "lineNum": 891
+    },
+    {
+      "table": "admin_audit_log",
+      "policyName": "admin_audit_log_select_v2",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`public.is_admin_user(`",
+      "lineNum": 892
+    },
+    {
+      "table": "admin_audit_log",
+      "policyName": "admin_audit_log_insert_v2",
+      "action": "INSERT",
+      "role": "authenticated",
+      "condition": "`-`",
+      "lineNum": 893
+    }
+  ],
+  "cart_items": [
+    {
+      "table": "cart_items",
+      "policyName": "cart_items_select_own",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`exists (",
+      "lineNum": 1523
+    },
+    {
+      "table": "cart_items",
+      "policyName": "cart_items_modify_own",
+      "action": "ALL",
+      "role": "public",
+      "condition": "`exists (",
+      "lineNum": 1526
+    },
+    {
+      "table": "cart_items",
+      "policyName": "cart_items_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`cart_id IN (",
+      "lineNum": 1529
+    },
+    {
+      "table": "cart_items",
+      "policyName": "cart_items_user_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`cart_id IN (",
+      "lineNum": 1532
+    },
+    {
+      "table": "cart_items",
+      "policyName": "cart_items_user_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`cart_id IN (",
+      "lineNum": 1535
+    },
+    {
+      "table": "cart_items",
+      "policyName": "ci_auth_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`cart_id IN (SELECT id FROM public.shopping_carts WHERE user_id = (SELECT auth.ui`",
+      "lineNum": 1538
+    },
+    {
+      "table": "cart_items",
+      "policyName": "cart_items_select_own",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 1539
+    }
+  ],
+  "categories": [
+    {
+      "table": "categories",
+      "policyName": "categories_admin_modify",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 1547
+    },
+    {
+      "table": "categories",
+      "policyName": "categories_public_select",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`true`",
+      "lineNum": 1550
+    },
+    {
+      "table": "categories",
+      "policyName": "cat_public_read_opt",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`true`",
+      "lineNum": 1551
+    },
+    {
+      "table": "categories",
+      "policyName": "cat_admin_all_opt",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 1552
+    },
+    {
+      "table": "categories",
+      "policyName": "cat_admin_insert_opt",
+      "action": "INSERT",
+      "role": "authenticated",
+      "condition": "`-`",
+      "lineNum": 1553
+    },
+    {
+      "table": "categories",
+      "policyName": "cat_admin_update_opt",
+      "action": "UPDATE",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 1554
+    },
+    {
+      "table": "categories",
+      "policyName": "cat_admin_delete_opt",
+      "action": "DELETE",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 1555
+    }
+  ],
+  "client_error_groups": [
+    {
+      "table": "client_error_groups",
+      "policyName": "admins_read_error_groups",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`public.is_admin_user(`",
+      "lineNum": 1561
+    }
+  ],
+  "contact_messages": [
+    {
+      "table": "contact_messages",
+      "policyName": "Public can insert contact messages",
+      "action": "INSERT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 1567
+    },
+    {
+      "table": "contact_messages",
+      "policyName": "Admins can view messages",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 1568
+    },
+    {
+      "table": "contact_messages",
+      "policyName": "contact_messages_public_insert",
+      "action": "INSERT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 1571
+    },
+    {
+      "table": "contact_messages",
+      "policyName": "contact_messages_admin_select",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 1572
+    },
+    {
+      "table": "contact_messages",
+      "policyName": "contact_messages_admin_update",
+      "action": "UPDATE",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 1575
+    },
+    {
+      "table": "contact_messages",
+      "policyName": "contact_messages_public_insert",
+      "action": "INSERT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 1578
+    },
+    {
+      "table": "contact_messages",
+      "policyName": "admin_view_messages",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 1579
+    },
+    {
+      "table": "contact_messages",
+      "policyName": "cm_auth_select_opt",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`(user_id = (SELECT auth.uid(`",
+      "lineNum": 1582
+    },
+    {
+      "table": "contact_messages",
+      "policyName": "Admins can view messages",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 1583
+    }
+  ],
+  "coupons": [
+    {
+      "table": "coupons",
+      "policyName": "Admin users can manage coupons",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`is_admin_user(auth.uid(`",
+      "lineNum": 1829
+    },
+    {
+      "table": "coupons",
+      "policyName": "Public can view active coupons",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 1830
+    }
+  ],
+  "error_groups": [
+    {
+      "table": "error_groups",
+      "policyName": "admins_read_error_groups",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`public.is_admin_user(`",
+      "lineNum": 2013
+    }
+  ],
+  "order_attachments": [
+    {
+      "table": "order_attachments",
+      "policyName": "Admin users can manage order attachments",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`is_admin_user(auth.uid(`",
+      "lineNum": 2019
+    },
+    {
+      "table": "order_attachments",
+      "policyName": "Order owners can view non-internal attachments",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`NOT is_internal AND order_id IN (SELECT id FROM public.venthub_orders WHERE user`",
+      "lineNum": 2020
+    }
+  ],
+  "order_notes": [
+    {
+      "table": "order_notes",
+      "policyName": "Admin users can manage order notes",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`is_admin_user(auth.uid(`",
+      "lineNum": 2026
+    },
+    {
+      "table": "order_notes",
+      "policyName": "Order owners can view non-internal notes",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`NOT is_internal AND order_id IN (SELECT id FROM public.venthub_orders WHERE user`",
+      "lineNum": 2027
+    }
+  ],
+  "product_images": [
+    {
+      "table": "product_images",
+      "policyName": "product_images_update_consolidated",
+      "action": "UPDATE",
+      "role": "authenticated",
+      "condition": "`true`",
+      "lineNum": 2574
+    },
+    {
+      "table": "product_images",
+      "policyName": "product_images_update_admin",
+      "action": "UPDATE",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 2575
+    },
+    {
+      "table": "product_images",
+      "policyName": "product_images_update_admin",
+      "action": "UPDATE",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 2578
+    },
+    {
+      "table": "product_images",
+      "policyName": "product_images_update_admin",
+      "action": "UPDATE",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = auth.uid(`",
+      "lineNum": 2581
+    },
+    {
+      "table": "product_images",
+      "policyName": "pi_admin_all_opt",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2582
+    }
+  ],
+  "products": [
+    {
+      "table": "products",
+      "policyName": "products_update_admin_stock",
+      "action": "UPDATE",
+      "role": "public",
+      "condition": "`(SELECT coalesce(nullif(current_setting('request.jwt.claims', true`",
+      "lineNum": 2588
+    },
+    {
+      "table": "products",
+      "policyName": "products_update_stock_authenticated",
+      "action": "UPDATE",
+      "role": "public",
+      "condition": "`auth.uid(`",
+      "lineNum": 2589
+    },
+    {
+      "table": "products",
+      "policyName": "products_read",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 2590
+    },
+    {
+      "table": "products",
+      "policyName": "products_admin_write",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 2591
+    },
+    {
+      "table": "products",
+      "policyName": "prod_read",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 2594
+    },
+    {
+      "table": "products",
+      "policyName": "prod_admin",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2595
+    },
+    {
+      "table": "products",
+      "policyName": "products_public_read",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 2596
+    },
+    {
+      "table": "products",
+      "policyName": "p_public_read",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 2597
+    },
+    {
+      "table": "products",
+      "policyName": "p_admin_write",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2598
+    },
+    {
+      "table": "products",
+      "policyName": "p_public_read",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 2599
+    },
+    {
+      "table": "products",
+      "policyName": "prod_admin_insert",
+      "action": "INSERT",
+      "role": "authenticated",
+      "condition": "`-`",
+      "lineNum": 2600
+    },
+    {
+      "table": "products",
+      "policyName": "prod_admin_update",
+      "action": "UPDATE",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2601
+    },
+    {
+      "table": "products",
+      "policyName": "prod_admin_delete",
+      "action": "DELETE",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2602
+    },
+    {
+      "table": "products",
+      "policyName": "p_public_read",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 2603
+    },
+    {
+      "table": "products",
+      "policyName": "prod_admin",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = auth.uid(`",
+      "lineNum": 2604
+    },
+    {
+      "table": "products",
+      "policyName": "prod_public_read_opt",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`true`",
+      "lineNum": 2605
+    },
+    {
+      "table": "products",
+      "policyName": "prod_public_read_opt",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`true`",
+      "lineNum": 2606
+    },
+    {
+      "table": "products",
+      "policyName": "prod_admin_all_opt",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2607
+    },
+    {
+      "table": "products",
+      "policyName": "prod_admin_insert_opt",
+      "action": "INSERT",
+      "role": "authenticated",
+      "condition": "`-`",
+      "lineNum": 2608
+    },
+    {
+      "table": "products",
+      "policyName": "prod_admin_update_opt",
+      "action": "UPDATE",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2609
+    },
+    {
+      "table": "products",
+      "policyName": "prod_admin_delete_opt",
+      "action": "DELETE",
+      "role": "authenticated",
+      "condition": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2610
+    }
+  ],
+  "returns_webhook_events": [
+    {
+      "table": "returns_webhook_events",
+      "policyName": "admins_read_returns_webhooks",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`public.is_admin_user(`",
+      "lineNum": 3211
+    }
+  ],
+  "shipping_email_events": [
+    {
+      "table": "shipping_email_events",
+      "policyName": "admins_read_shipping_emails",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`public.is_admin_user(`",
+      "lineNum": 3217
+    }
+  ],
+  "shipping_webhook_events": [
+    {
+      "table": "shipping_webhook_events",
+      "policyName": "admins_read_shipping_webhooks",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`public.is_admin_user(`",
+      "lineNum": 3223
+    }
+  ],
+  "shopping_carts": [
+    {
+      "table": "shopping_carts",
+      "policyName": "shopping_carts_select_own",
+      "action": "SELECT",
+      "role": "public",
+      "condition": "`user_id = auth.uid(`",
+      "lineNum": 3229
+    },
+    {
+      "table": "shopping_carts",
+      "policyName": "shopping_carts_modify_own",
+      "action": "ALL",
+      "role": "public",
+      "condition": "`user_id = auth.uid(`",
+      "lineNum": 3230
+    },
+    {
+      "table": "shopping_carts",
+      "policyName": "shopping_carts_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3231
+    },
+    {
+      "table": "shopping_carts",
+      "policyName": "shopping_carts_user_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3232
+    },
+    {
+      "table": "shopping_carts",
+      "policyName": "shopping_carts_user_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3233
+    },
+    {
+      "table": "shopping_carts",
+      "policyName": "sc_auth_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3234
+    },
+    {
+      "table": "shopping_carts",
+      "policyName": "shopping_carts_select_own",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3235
+    }
+  ],
+  "user_invoice_profiles": [
+    {
+      "table": "user_invoice_profiles",
+      "policyName": "user_invoice_profiles_own",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3241
+    },
+    {
+      "table": "user_invoice_profiles",
+      "policyName": "uip_own",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3242
+    }
+  ],
+  "venthub_order_items": [
+    {
+      "table": "venthub_order_items",
+      "policyName": "venthub_order_items_select_consolidated",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`order_id IN (",
+      "lineNum": 3714
+    },
+    {
+      "table": "venthub_order_items",
+      "policyName": "venthub_order_items_insert_optimized",
+      "action": "INSERT",
+      "role": "authenticated",
+      "condition": "`-`",
+      "lineNum": 3716
+    },
+    {
+      "table": "venthub_order_items",
+      "policyName": "venthub_order_items_insert_optimized",
+      "action": "INSERT",
+      "role": "authenticated",
+      "condition": "`-`",
+      "lineNum": 3717
+    },
+    {
+      "table": "venthub_order_items",
+      "policyName": "venthub_order_items_select_consolidated",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`order_id IN (",
+      "lineNum": 3718
+    }
+  ],
+  "venthub_orders": [
+    {
+      "table": "venthub_orders",
+      "policyName": "orders_select_policy",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3725
+    }
+  ],
+  "venthub_returns": [
+    {
+      "table": "venthub_returns",
+      "policyName": "venthub_returns_select_consolidated",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4148
+    },
+    {
+      "table": "venthub_returns",
+      "policyName": "venthub_returns_select_consolidated",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4149
+    }
+  ],
+  "webhook_events": [
+    {
+      "table": "webhook_events",
+      "policyName": "admins_read_webhook_events",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`public.is_admin_user(`",
+      "lineNum": 4155
+    }
+  ],
+  "wizard_selections": [
+    {
+      "table": "wizard_selections",
+      "policyName": "Users can view own selections",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4161
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "Anyone can insert selections",
+      "action": "INSERT",
+      "role": "public",
+      "condition": "`-`",
+      "lineNum": 4162
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "Admin can view all selections",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 4163
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "Admin can update selections",
+      "action": "UPDATE",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 4166
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "wizard_selections_anon_insert",
+      "action": "INSERT",
+      "role": "anon",
+      "condition": "`-`",
+      "lineNum": 4169
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "wizard_selections_auth_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4170
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "wizard_selections_user_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4171
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "wizard_selections_admin_select",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 4172
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "wizard_selections_user_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4175
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "wizard_selections_admin_read",
+      "action": "SELECT",
+      "role": "authenticated",
+      "condition": "`EXISTS (",
+      "lineNum": 4176
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "ws_anon_insert",
+      "action": "INSERT",
+      "role": "anon",
+      "condition": "`-`",
+      "lineNum": 4179
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "ws_auth_all",
+      "action": "ALL",
+      "role": "authenticated",
+      "condition": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4180
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "ws_anon_insert",
+      "action": "INSERT",
+      "role": "anon",
+      "condition": "`-`",
+      "lineNum": 4181
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "ws_anon_insert",
+      "action": "INSERT",
+      "role": "anon",
+      "condition": "`-`",
+      "lineNum": 4182
+    },
+    {
+      "table": "wizard_selections",
+      "policyName": "ws_anon_insert",
+      "action": "INSERT",
+      "role": "anon",
+      "condition": "`-`",
+      "lineNum": 4183
+    }
+  ]
+}

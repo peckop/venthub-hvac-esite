@@ -1,6 +1,7 @@
  
 import React from 'react'
 import { usePathname } from 'next/navigation'
+import { useTenant } from '../../hooks/useTenant'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -56,6 +57,7 @@ interface ClientErrorRow {
 const PAGE_SIZE = 50
 
 const AdminErrorGroupsPage: React.FC = () => {
+  const { id: tenantId } = useTenant()
   const { t, lang } = useI18n()
   const { canWrite } = useRole()
   const dragScrollRef = useDragScroll<HTMLDivElement>()
@@ -199,7 +201,7 @@ const AdminErrorGroupsPage: React.FC = () => {
   // Realtime: refresh list on any change in error_groups
   React.useEffect(() => {
     const ch = supabase
-      .channel('error-groups')
+      .channel(`error-groups-${tenantId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'error_groups' }, () => {
         scheduleRefetch()
       })
@@ -208,7 +210,7 @@ const AdminErrorGroupsPage: React.FC = () => {
       supabase.removeChannel(ch)
       if (refetchTimer.current) clearTimeout(refetchTimer.current)
     }
-  }, [scheduleRefetch])
+  }, [scheduleRefetch, tenantId])
 
   const updateStatus = async (id: string, newStatus: 'open' | 'resolved' | 'ignored') => {
     const prev = rows

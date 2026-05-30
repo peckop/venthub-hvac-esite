@@ -13,6 +13,7 @@
     "test": "vitest",
     "test:watch": "vitest dev",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "vitest run --config vitest.config.ts --dir tests/e2e",
     "type-check": "cross-env NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit",
     "analyze": "cross-env ANALYZE=true NODE_OPTIONS='--max-old-space-size=8192' next build",
     "knip": "cross-env NODE_OPTIONS='--max-old-space-size=8192' knip",

@@ -11,6 +11,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "https://esm.sh/@supabase/supabase-js@2.45.4": "@supabase/supabase-js",
+      "https://esm.sh/@supabase/supabase-js@2.39.3": "@supabase/supabase-js",
+      "https://esm.sh/@supabase/supabase-js@2": "@supabase/supabase-js",
+      "https://esm.sh/zod@3.23.8": "zod",
     },
   },
   test: {
@@ -18,6 +22,11 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ['vitest.setup.ts', 'vitest-setup.tsx'],
     css: true,
+    server: {
+      deps: {
+        inline: [/supabase\/functions/],
+      },
+    },
     // Use threads pool (default) for better stability on Windows/CI
     pool: 'threads',
     testTimeout: 20000,

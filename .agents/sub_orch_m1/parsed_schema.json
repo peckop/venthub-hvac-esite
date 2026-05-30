@@ -1,0 +1,178 @@
+{
+  "tables": [
+    "admin_audit_log",
+    "ai_chat_messages",
+    "ai_chat_sessions",
+    "ai_recommendations",
+    "brands",
+    "cart_items",
+    "categories",
+    "client_errors",
+    "coupons",
+    "create",
+    "customer_profiles",
+    "error_groups",
+    "hvac_calculations",
+    "if",
+    "inventory_items",
+    "inventory_movements",
+    "inventory_settings",
+    "order_attachments",
+    "order_notes",
+    "order_refund_events",
+    "payment_transactions",
+    "price_lists",
+    "product_analytics",
+    "product_comparisons",
+    "product_documents",
+    "product_images",
+    "product_reviews",
+    "product_variations",
+    "products",
+    "profiles",
+    "rate_limits",
+    "recently_viewed_products",
+    "returns_webhook_events",
+    "search_analytics",
+    "search_filters",
+    "shipping_email_events",
+    "shipping_idempotency",
+    "shipping_webhook_events",
+    "stripe_payment_intents",
+    "support_messages",
+    "support_tickets",
+    "system_settings",
+    "technical_spec_templates",
+    "technical_specifications",
+    "turkey_cities",
+    "user_addresses",
+    "user_invoice_profiles",
+    "user_profiles",
+    "venthub_returns",
+    "warehouses",
+    "wishlist_items",
+    "wishlists",
+    "wizard_selections"
+  ],
+  "policies": {
+    "admin_audit_log": [
+      "admin_audit_log_insert_v2",
+      "admin_audit_log_select_v2"
+    ],
+    "brands": [
+      "p_anon_read_brands"
+    ],
+    "cart_items": [
+      "ci_auth_all",
+      "p_user_read_own_cart"
+    ],
+    "categories": [
+      "cat_admin_delete_opt",
+      "cat_admin_insert_opt",
+      "cat_admin_update_opt",
+      "cat_public_read_opt",
+      "categories_delete_admin",
+      "categories_insert_admin",
+      "categories_public_read",
+      "categories_update_admin",
+      "p_anon_read_categories"
+    ],
+    "client_errors": [
+      "admin can read client errors",
+      "client_errors_select_admin_jwt",
+      "client_errors_select_owner_email"
+    ],
+    "coupons": [
+      "coupons_admin_all"
+    ],
+    "error_groups": [
+      "error_groups_select_admin",
+      "error_groups_select_admin_db",
+      "error_groups_update_admin",
+      "error_groups_update_admin_db"
+    ],
+    "inventory_movements": [
+      "inventory_movements_select_admin",
+      "p_admin_read_inventory"
+    ],
+    "inventory_settings": [
+      "inventory_settings_select_all",
+      "inventory_settings_update_admin"
+    ],
+    "order_attachments": [
+      "order_attachments_admin_all"
+    ],
+    "order_notes": [
+      "order_notes_admin_all"
+    ],
+    "order_refund_events": [
+      "order_refund_events_admin_select",
+      "order_refund_events_service_insert"
+    ],
+    "payment_transactions": [
+      "p_user_read_own_transactions"
+    ],
+    "price_lists": [
+      "p_anon_read_active_price_lists"
+    ],
+    "product_documents": [
+      "p_anon_read_product_documents"
+    ],
+    "product_images": [
+      "p_anon_read_product_images",
+      "pi_admin_all_opt",
+      "product_images_delete_admin",
+      "product_images_insert_admin",
+      "product_images_select_all"
+    ],
+    "products": [
+      "p_anon_read_active_products",
+      "prod_admin_delete_opt",
+      "prod_admin_insert_opt",
+      "prod_admin_update_opt",
+      "prod_public_read_opt",
+      "products_update_admin_only"
+    ],
+    "returns_webhook_events": [
+      "returns_webhook_events_admin_select",
+      "returns_webhook_events_service_insert"
+    ],
+    "shipping_email_events": [
+      "shipping_email_events_admin_select",
+      "shipping_email_events_service_insert"
+    ],
+    "technical_specifications": [
+      "p_anon_read_technical_specs"
+    ],
+    "turkey_cities": [
+      "p_anon_read_turkey_cities"
+    ],
+    "user_invoice_profiles": [
+      "uip_own"
+    ],
+    "user_profiles": [
+      "merged_user_profiles_authenticated_insert",
+      "merged_user_profiles_authenticated_update",
+      "user_profiles_delete_policy",
+      "user_profiles_insert_merged",
+      "user_profiles_insert_policy",
+      "user_profiles_select_admin_list",
+      "user_profiles_select_policy",
+      "user_profiles_service_insert",
+      "user_profiles_update_merged",
+      "user_profiles_update_policy"
+    ],
+    "venthub_returns": [
+      "returns_delete_policy",
+      "returns_insert_policy",
+      "returns_select_policy",
+      "returns_update_policy",
+      "venthub_returns_update_merged"
+    ],
+    "wizard_selections": [
+      "Admin can update selections",
+      "Admin can view all selections",
+      "ws_auth_all"
+    ]
+  }
+}

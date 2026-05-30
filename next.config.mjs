@@ -78,6 +78,8 @@ export default withSentryConfig(
     hideSourceMaps: true,
     disableLogger: true,
     automaticVercelMonitors: true,
+    disableServerWebpackPlugin: true,
+    disableClientWebpackPlugin: true,
   }
 );
 

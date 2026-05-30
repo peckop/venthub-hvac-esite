@@ -1,6 +1,7 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3"
+import { resolveTenantId } from '../_shared/tenant_config.ts'
 
 serve(async (req) => {
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
@@ -88,7 +89,10 @@ serve(async (req) => {
     }
 
     // Verify caller role (Must be admin or superadmin)
-    const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+    // We must resolve tenantId before profile check
+    const tenantId = resolveTenantId(req, parsed || {})
+
+    const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
       headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
     })
     
@@ -106,7 +110,7 @@ serve(async (req) => {
     let isCurrentlyShipped = false
     if (order_id) {
       try {
-        const cur = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=status,shipped_at`, {
+        const cur = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=status,shipped_at`, {
           headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
         })
         if (cur.ok) {
@@ -126,7 +130,7 @@ serve(async (req) => {
       if (!order_id) {
         return new Response(JSON.stringify({ error: 'missing_fields', missing: ['order_id'] }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
       }
-      const updCancel = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}`, {
+      const updCancel = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
         body: JSON.stringify({ carrier: null, tracking_number: null, tracking_url: null, shipped_at: null, status: 'confirmed' })
@@ -146,7 +150,7 @@ serve(async (req) => {
     // Fetch current order to decide first-time vs update (preserve shipped_at if already set)
     let isFirstShip = true
     try {
-      const cur = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=status,shipped_at`, {
+      const cur = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=status,shipped_at`, {
         headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
       })
       if (cur.ok) {
@@ -176,7 +180,7 @@ serve(async (req) => {
       patchBody['shipped_at'] = new Date().toISOString()
       patchBody['status'] = 'shipped'
     }
-    const upd = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}`, {
+    const upd = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify(patchBody)
@@ -205,7 +209,7 @@ serve(async (req) => {
     let customer_email: string | null = null
     let customer_name: string | null = null
     try {
-      const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=user_id,order_number`, {
+      const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=user_id,order_number`, {
         headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
       })
       if (ordResp.ok) {
@@ -234,7 +238,7 @@ serve(async (req) => {
         const resp = await fetch(`${supabaseUrl}/functions/v1/shipping-notification`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey },
-          body: JSON.stringify({ order_id, carrier, tracking_number, tracking_url, customer_email, customer_name })
+          body: JSON.stringify({ order_id, carrier, tracking_number, tracking_url, customer_email, customer_name, tenant_id: tenantId })
         })
         interface ShippingNotifyResponse { disabled?: boolean; subject?: string; result?: { id?: string } }
         let j: ShippingNotifyResponse | null = null
@@ -250,7 +254,8 @@ serve(async (req) => {
               provider: 'resend',
               provider_message_id: (j && j.result && j.result.id) || null,
               carrier,
-              tracking_number
+              tracking_number,
+              tenant_id: tenantId
             })
             await fetch(`${supabaseUrl}/rest/v1/shipping_email_events`, {
               method: 'POST',
