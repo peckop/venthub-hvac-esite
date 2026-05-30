@@ -16,7 +16,7 @@
 | **Proje Adı** | VentHub HVAC |
 | **Domain** | İklimlendirme & Havalandırma (HVAC) E-Ticaret |
 | **İş Modeli** | HVAC sektörüne özel Multi-Tenant SaaS E-Ticaret Platformu (Shopify modeli) |
-| **Mevcut Durum** | Tek kiracılı (single-tenant) → Çoklu kiracılı (multi-tenant) dönüşümde |
+| **Mevcut Durum** | Faz 1 (SaaS Foundation) tamamlandı ve uzak veritabanına uygulandı. Faz 2 (White-Label) aşamasına hazır. |
 | **Hedef Kitle** | Makine mühendisleri, mimarlar, müteahhitler, tesisat firmaları, son kullanıcılar |
 | **Diller** | Türkçe (birincil), İngilizce |
 | **Canlı Ortam** | Vercel (frontend), Supabase (backend + DB) |
@@ -72,10 +72,10 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | Özellik | Detay |
 |---------|-------|
 | Motor | PostgreSQL (Supabase hosted) |
-| Tablolar | 26 |
-| RLS Politikaları | 108 |
-| RPC Fonksiyonları | 52 |
-| İndeksler | 26 |
+| Tablolar | 28 (Tenants ve Order Refund Events dahil) |
+| RLS Politikaları | 132 (Çoklu kiracı sızdırmazlığı aktif) |
+| RPC Fonksiyonları | 55 (jwt_tenant_id, metadata ve profile sync dahil) |
+| İndeksler | 47 (Kiracı kolon indeksleri dahil) |
 
 ### Dış Entegrasyonlar
 | Servis | Kullanım |
@@ -166,6 +166,8 @@ venthub-hvac/
 | `addresses` | Kullanıcı adresleri |
 | `invoice_profiles` | Fatura profilleri (bireysel/kurumsal) |
 | `coupons` | İndirim kuponları |
+| `tenants` | Kiracı kayıtları, subdomain, özel alan adı, tema/stil, özellik bayrakları (feature flags) ve marka ayarları |
+| `order_refund_events` | Sipariş iade/refund hareketleri ve tutar denetim kaydı |
 
 ---
 
