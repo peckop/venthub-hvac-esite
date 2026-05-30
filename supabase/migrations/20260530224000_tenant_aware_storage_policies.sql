@@ -10,8 +10,8 @@ DROP POLICY IF EXISTS product_images_insert_admin ON storage.objects;
 DROP POLICY IF EXISTS product_images_update_admin ON storage.objects;
 DROP POLICY IF EXISTS product_images_delete_admin ON storage.objects;
 
--- Ensure RLS is active on storage.objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- Ensure RLS is active on storage.objects (storage.objects has RLS active by default)
+-- ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 -- 2. CREATE TENANT-AWARE AND ROLE-VERIFIED POLICIES
 

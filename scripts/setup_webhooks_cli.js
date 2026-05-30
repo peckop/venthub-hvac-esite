@@ -133,7 +133,7 @@ async function main() {
   console.log('Created temporary SQL file scripts/temp_setup.sql');
   
   // 3. Try possible database connections using Supabase CLI db query
-  const passwords = [env.SUPABASE_DB_PASSWORD, 'SgxnZcG8Y79evUfd', 'buSgxnZcG8Y79evUfd'].filter(Boolean);
+  const passwords = [env.SUPABASE_DB_PASSWORD, '***REMOVED***'].filter(Boolean);
   const uniquePasswords = Array.from(new Set(passwords));
   
   const possibleConfigs = [];
