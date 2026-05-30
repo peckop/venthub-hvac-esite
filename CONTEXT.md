@@ -15,7 +15,8 @@
 |------|-------|
 | **Proje Adı** | VentHub HVAC |
 | **Domain** | İklimlendirme & Havalandırma (HVAC) E-Ticaret |
-| **İş Modeli** | B2B/B2C karma satış platformu |
+| **İş Modeli** | HVAC sektörüne özel Multi-Tenant SaaS E-Ticaret Platformu (Shopify modeli) |
+| **Mevcut Durum** | Tek kiracılı (single-tenant) → Çoklu kiracılı (multi-tenant) dönüşümde |
 | **Hedef Kitle** | Makine mühendisleri, mimarlar, müteahhitler, tesisat firmaları, son kullanıcılar |
 | **Diller** | Türkçe (birincil), İngilizce |
 | **Canlı Ortam** | Vercel (frontend), Supabase (backend + DB) |
@@ -24,13 +25,24 @@
 
 ## 2. Vizyon ve Fark
 
-VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Mühendislik & Satış Platformu"** olarak kurgulanmıştır:
+VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Mühendislik & Satış Platformu"** olarak kurgulanmış ve **multi-tenant SaaS platformuna** dönüştürülmektedir:
 
 - **3D Ürün Görselleştirme:** React Three Fiber ile GLB/GLTF modeller (Jet Fan, HRV, Kanal Tipi Fan, Susturucu)
 - **Mühendislik Hesaplayıcıları:** ASHRAE/EN standartlarında hava perdesi, kanal basıncı, HRV ve jet fan hesaplama
 - **İhtiyaç Sihirbazı (Needs Wizard):** Kapı ölçüsü, rüzgar, trafik yoğunluğu girerek uygun ürün eşleştirme
 - **Bilgi Merkezi (Knowledge Hub):** HVAC konularında teknik makaleler ve rehberler
 - **Premium Admin Paneli:** ERP benzeri sipariş/stok/iade/kargo/denetim yönetimi
+
+### SaaS Dönüşüm Yol Haritası (4 Faz)
+
+| Faz | Amaç | Durum |
+|-----|------|-------|
+| **Faz 1: Foundation** | Mevcut VentHub "default tenant" olur, yeni tenant eklenebilir hale gelir | 🔄 Başlatılacak |
+| **Faz 2: White-Label** | Her tenant kendi markasıyla görünür (CSS token override, logo, renk) | 📋 Planlandı |
+| **Faz 3: Tenant Admin + Billing** | Tenant kendi işini yönetsin, subscription/billing sistemi | 📋 Planlandı |
+| **Faz 4: Marketplace + Plugin** | Çoklu satıcı, komisyon, plugin mimarisi | 📋 Uzun vade |
+
+> Detaylı plan: `docs/venthub_saas_master_roadmap.md` · Faz 1 prompt: `docs/venthub_saas_faz1_prompt.md`
 
 ---
 
@@ -62,7 +74,7 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | Motor | PostgreSQL (Supabase hosted) |
 | Tablolar | 26 |
 | RLS Politikaları | 108 |
-| RPC Fonksiyonları | 51 |
+| RPC Fonksiyonları | 52 |
 | İndeksler | 26 |
 
 ### Dış Entegrasyonlar
@@ -201,9 +213,13 @@ Düşük stok → stock-alert → WhatsApp/SMS bildirim (Twilio)
 
 | Rol | Yetki |
 |-----|-------|
-| `customer` | Ürün görüntüleme, sepet, sipariş, hesap yönetimi |
+| `super_admin` | Tüm sistem yönetimi, tüm tenant'lara erişim |
 | `admin` | Sipariş yönetimi, stok, kargo, iade işlemleri |
-| `superadmin` | Tüm admin + kullanıcı yönetimi, ayarlar, kupon, audit log |
+| `moderator` | İçerik yönetimi, ürün düzenleme |
+| `editor` | Bilgi merkezi içerik düzenleme |
+| `support` | Müşteri destek işlemleri |
+| `customer` | Ürün görüntüleme, sepet, sipariş, hesap yönetimi |
+| `user` | Temel kullanıcı (varsayılan) |
 
 RBAC `user_profiles.role` alanı + `useRole()` hook + Edge Function auth middleware ile uygulanır. 108 RLS politikası veritabanı seviyesinde güvenliği sağlar.
 
@@ -299,7 +315,7 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 | `cc doc schema` | DB şema → MD üretimi |
 | `cc doc tree --nlm-sync --force-sync` | Master birleştirme + NLM upload |
 
-**NotebookLM Digital Twin:** Tüm master MD'ler NLM'e yüklenerek proje hafızası oluşturulur. Notebook ID: `2aa4fc16-acf6-47c6-90a8-c02fe5bb28f8`
+**NotebookLM Digital Twin:** Tüm master MD'ler NLM'e yüklenerek proje hafızası oluşturulur. Notebook ID: `235043eb-970f-4a52-9f39-1d02b2621e9c`
 - **Otonom Oturum Yönetimi:** Dokümantasyon eşitlemeleri sırasında oluşabilecek `Authentication expired` hataları, kullanıcı müdahalesi gerekmeksizin otonom olarak `nlm login` + `refresh_auth` mekanizması ile sessizce çözülür.
 - **Supabase Edge Functions Mühürü:** Güncel mimaride yer alan 26 adet Edge Function'ın (`cc doc batch`) dokümanlarının senkronizasyon sırasında NotebookLM'e tam ve eksiksiz aktarılması zorunludur. Bu durum tüm mikroservislerin otonom denetimini garanti eder.
 - **Orion CLI Granüler Dökümantasyon Standardı:** Dökümantasyon motoru, tüm modüller için `entity_hashes` tabanlı parça değişimi takibi yapar ve `AST POINTERS` standardına uygun olarak iç değişkenleri (`ic_degiskenler`, `params`, `dönüşler`) en ince kılcal damarına kadar detaylandırır.
@@ -332,6 +348,11 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 21. **React 19 Compiler ve useMemo/useCallback Sınırlandırması [GEÇİŞ AŞAMASINDA - WARNING]:** React 19 Compiler performansı arka planda otomatik optimize ettiği için, yeni yazılacak basit arayüz bileşenlerinde manuel `useMemo` ve `useCallback` kullanımı kısıtlanmalıdır (Gereksiz teknik borç oluşumunu önlemek için). Ancak veri işleme/yönetim merkezleri (Gateway viewmodel'ları ve Context Provider'lar) asenkron veri karmaşalarından ötürü bu kuraldan muaf tutulmalıdır.
 22. **Supabase ORM Tekilleştirme (React cache) [GEÇİŞ AŞAMASINDA - STRICT]:** Server Components (RSC) ağacında render döngüsü esnasında birden fazla kez çağrılma ihtimali olan tüm bağımsız Supabase ORM sorguları, mükerrer veritabanı sorgusu maliyetlerini (Waterfall) önlemek amacıyla kesinlikle ve istisnasız `React.cache()` fonksiyonu ile tekilleştirilmelidir.
 23. **AI Botları ve Ajanlar için llms.txt Standardı [GEÇİŞ AŞAMASINDA - STRICT]:** Projenin tüm mimari yapısını, geliştirme standartlarını ve kurallarını tek bir bağlamda (single-context) özetleyen standartlaştırılmış `/llms.txt` dosyası kök dizinde (veya public klasöründe) sunulmalıdır. Bu sayede projeye dahil olan yeni AI ajanlarının onboarding süresi sıfıra indirilir ve bağlam sızıntıları önlenir.
+24. **Tenant Data İzolasyonu (SaaS):** Çoklu kiracı (multi-tenant) yapısında veritabanı okuma/yazma, Edge Function API işlemleri ve Supabase Realtime WebSocket kanalları (örn: `admin-orders-realtime-${tenantId}`) kesinlikle tenant-scoped (kiracıya izole) olmak zorundadır. Data Bleeding kabul edilemez bir güvenlik felaketidir.
+25. **Middleware Strict Edge Kısıtı (SaaS):** `src/middleware.ts` Edge Runtime'da çalıştığı için Supabase Client ile doğrudan veritabanı sorgusu atılması KESİNLİKLE YASAKTIR. Tenant resolution için Vercel Edge Config, statik map veya `x-tenant-id` request header kullanılmalıdır. URL rewrite yapılmamalı — `detectLocale` offset koruması bozulur.
+26. **JWT app_metadata Zorunluluğu (SaaS):** Güvenlik politikalarında ve Edge işlevlerinde JWT yetkilendirme kararları `raw_user_meta_data` üzerinden verilemez (kullanıcı tarafından düzenlenebilir). Rol ve tenant izolasyonu kesinlikle `app_metadata` üzerinden yapılmalıdır.
+27. **Feature Flags ve RSC Hibrit Mimarisi (SaaS):** Next.js 15 ve React 19 RSC mimarisinde Server Component'lar içinde `useTenant` gibi client hook'ları KULLANILAMAZ. Feature flag ve tenant verisi okumaları için Server Component'larda `getTenantConfig()` asenkron fonksiyonu, Client Component'larda `useTenant()` hook'u kullanılmalıdır.
+28. **Cache Key Tenant İzolasyonu (SaaS):** `unstable_cache` ve `revalidateTag` mekanizmalarında Data Bleeding'i önlemek adına anahtarlara kesinlikle `tenantId` dahil edilmelidir (Örn: `['key', lang, tenantId]`). ISR webhook'ları da tenant-aware olmalıdır.
 
 ---
 
@@ -347,6 +368,6 @@ Bu projede kullanılan Antigravity CLI (`agy.exe`) konuşmalarını isimlendirme
 
 ---
 
-*Son güncelleme: 2026-05-29*
+*Son güncelleme: 2026-05-30*
 
 

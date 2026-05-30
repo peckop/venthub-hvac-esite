@@ -28,12 +28,13 @@ Bu bilgiler projenin NotebookLM dijital ikizinden doğrulanmıştır:
 
 Supabase veritabanında multi-tenancy temeli oluştur:
 
-1. `tenants` tablosu oluştur. Her tenant'ın bir slug'ı, opsiyonel custom domain'i, tema konfigürasyonu (CSS token override'ları için JSONB), feature flags (JSONB), ve genel config (JSONB — varsayılan dil, para birimi, ödeme geçidi ayarları) olmalı.
-2. Mevcut 26 tablonun tenant-aware olanlarına `tenant_id UUID REFERENCES tenants(id)` kolonu ekle. Tenant-agnostik tablolar (örn: saf lookup/enum tabloları) varsa onlara ekleme.
-3. `jwt_tenant_id()` adında bir RPC/helper fonksiyon oluştur — JWT'deki `tenant_id` claim'ini döndürsün.
-4. Mevcut 108 RLS politikasını güncelle — tenant izolasyonu ekle. Her politikaya `tenant_id = jwt_tenant_id()` koşulu eklenmeli. Public READ politikaları (products, categories gibi) tenant-scoped olmalı.
-5. Bir "default" tenant kaydı oluştur — mevcut VentHub bu tenant'a atansın.
-6. Migration atomik olmalı — ya hepsi başarılı ya hiçbiri.
+1. `tenants` tablosu oluştur. Her tenant'ın bir slug'ı, opsiyonel custom domain'i, tema konfigürasyonu (CSS token override'ları için JSONB), feature flags (JSONB), ve genel config (JSONB — varsayılan dil, para birimi, ödeme geçidi ayarları, email_from, brand_name, brand_logo_url) olmalı.
+2. `tenants` tablosu oluşturulurken **Golden Triad** (GRANT → ENABLE RLS → POLICY) katı bir şekilde uygulanmalıdır.
+3. Mevcut 26 tablonun tenant-aware olanlarına `tenant_id UUID REFERENCES tenants(id)` kolonu ekle. Tenant-agnostik tablolar (örn: saf lookup/enum tabloları) varsa onlara ekleme. **Özellikle `admin_audit_log` tablosuna `tenant_id` ekle** — super_admin hangi tenant'ta hangi işlemin yapıldığını izleyebilmeli.
+4. `jwt_tenant_id()` adında bir RPC/helper fonksiyon oluştur — JWT'deki `tenant_id` claim'ini döndürsün. **ÖNEMLİ:** Bu fonksiyon R2'deki JWT claim entegrasyonuyla birlikte çalışır — RLS güncellemeleri (madde 5) bu fonksiyonun hazır olmasına bağlıdır.
+5. Mevcut 108 RLS politikasını güncelle — tenant izolasyonu ekle. Her politikaya `tenant_id = jwt_tenant_id()` koşulu eklenmeli. Public READ politikaları (products, categories gibi) tenant-scoped olmalı.
+6. Bir "default" tenant kaydı oluştur — mevcut VentHub bu tenant'a atansın.
+7. Migration atomik olmalı — ya hepsi başarılı ya hiçbiri.
 
 ### R2. JWT Tenant Claim & Auth Integration
 
@@ -110,11 +111,34 @@ Kargo ve ödeme webhook'larında tenant çakışmasını önle:
 3. Veya sipariş arama sorgusuna `eq('tenant_id', ...)` eklenmeli.
 4. `iyzico-callback` handler'ı da aynı şekilde tenant-aware yapılmalı.
 
-## Acceptance Criteria
+### R10. Storage Bucket İzolasyonu (NLM Denetim Bulgusu — KRİTİK)
+
+Supabase Storage politikalarına tenant izolasyonu ekle:
+
+1. `product_images` ve diğer tenant-specific bucket'lardaki Storage politikalarına `tenant_id` kontrolü ekle.
+2. Mevcut `product_images_select_all` (USING true) politikası tenant-scoped olmalı — Tenant B, Tenant A'ın ürün fotoğraflarını silememeli veya kendi ürünlerine bağlayamamalı.
+3. Storage bucket yapısını tenant-aware hale getir (bucket per tenant veya path-based izolasyon).
+
+### R11. Edge Function Email Hijyeni (NLM Denetim Bulgusu — KRİTİK)
+
+Email gönderen Edge Function'lar tenant bazlı branding kullanmalı:
+
+1. `order-confirmation`, `delivery-notification` ve diğer email gönderen Edge Function'lar, `brandName`, `EMAIL_FROM` ve `brandLogoUrl` değerlerini global `.env`'den değil, R7'de iletilen `tenant_id` üzerinden `tenants.config` JSONB objesinden çekmeli.
+2. Faz 1'de yeni bir tenant sipariş aldığında, e-posta default VentHub markasıyla değil, tenant'ın kendi markasıyla gitmeli.
+3. Fallback: Tenant config'de email ayarları yoksa default VentHub değerlerine düşülmeli.
+
+---
+
+## Verification Checklist
+
+> Faz 1 tamamlandığında aşağıdaki tüm maddeler kontrol edilmelidir:
 
 ### Database
-- [ ] `tenants` tablosu oluşturulmuş ve en az 1 default tenant kaydı var
-- [ ] Tenant-aware tabloların hepsinde `tenant_id` kolonu mevcut ve NOT NULL (default tenant ID ile doldurulmuş)
+- [ ] `tenants` tablosu Golden Triad (GRANT → ENABLE RLS → POLICY) ile oluşturulmuş
+- [ ] Default tenant kaydı mevcut
+- [ ] Tüm tenant-aware tablolarda `tenant_id` kolonu var ve NOT NULL
+- [ ] `admin_audit_log` tablosunda `tenant_id` mevcut
+- [ ] 108 RLS politikası `jwt_tenant_id()` ile güncellenmiş)
 - [ ] `jwt_tenant_id()` fonksiyonu çalışıyor ve JWT'den tenant_id döndürüyor
 - [ ] Tüm güncellenmiş RLS politikaları tenant izolasyonu sağlıyor
 
@@ -155,10 +179,20 @@ Kargo ve ödeme webhook'larında tenant çakışmasını önle:
 - [ ] `pnpm run build` → başarılı production build
 - [ ] Mevcut VentHub (default tenant) aynen çalışıyor — hiçbir mevcut işlevsellik kırılmamış
 
+### Storage Isolation
+- [ ] Test tenant'ı, default tenant'ın storage bucket'ındaki dosyaları okuyamamalı/modifiye edememeli
+- [ ] Ürün görselleri tenant-scoped erişim politikalarıyla korunuyor
+
+### Email Branding
+- [ ] Test tenant siparişinde gönderilen email, test tenant'ın brandName/logo bilgisini taşıyor
+- [ ] Default tenant siparişinde email hâlâ VentHub markasıyla gidiyor
+
 ### Data Isolation Verification
 - [ ] İkinci bir test tenant oluşturulduğunda, bu tenant'ın verileri default tenant'tan izole
 - [ ] Default tenant'ın ürünleri test tenant'ta görünmüyor
 - [ ] Test tenant'ın siparişleri default tenant admin'inde görünmüyor
+- [ ] Middleware tenant resolution 50ms altında çalışıyor (Edge Runtime performans testi)
+- [ ] Client tarafından sahte `raw_user_meta_data` ile tenant atlaması (tenant-hopping) yapılamıyor
 
 ## Constraints
 
