@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useTenant.tsx
-skeleton_hash: 3dd2073efcae03d8
+skeleton_hash: 3d8ee542900cffd2
 entity_hashes:
-  func:TenantProvider: 16227bbe335256af
-  func:useTenant: 29a7443f19ec9980
+  func:TenantProvider: 55e323a184679af4
+  func:useTenant: 1b557639af7ddf07
   overview: ea8d03008ab03037
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-30T20:24:39Z
+generated_at: 2026-05-30T21:25:57Z
 ---
 
 ## Genel Bakış
@@ -45,15 +45,16 @@ Bu modül, React Context API kullanarak tenant (kiracı) bilgisini alt bileşenl
 ## FONKSİYON DETAYLARI
 
 ### TenantProvider
-**Ne yapar**: Tenant bilgilerini (kiracı yapılandırmasını) tüm alt bileşenlere erişilebilir hale getirmek için React Context Provider olarak görev yapar. Uygulama genelinde tenant verisinin prop drilling olmadan paylaşılmasını sağlar.
 
-**Nasıl yapar**: `TenantContext.Provider` bileşenini sarmalayarak, `value` prop'u olarak aldığı tenant yapılandırmasını React'ın context mekanizması aracılığıyla tüm alt bileşen zincirine aktarır. Sadece sarmalama (wrapping) işlemi yapar, herhangi bir veri dönüşümü veya mantık içermez.
+**Ne yapar**: Tenant (kiracı) yapılandırma bilgilerini alt bileşenlere sağlamak için React Context Provider olarak görev yapar. Uygulama içindeki tüm bileşenlerin kiracıya özel ayarlara erişebilmesini mümkün kılar.
+
+**Nasıl yapar**: `TenantContext.Provider` bileşenini sarmalayarak, `value` propundan gelen `TenantConfig` nesnesini tüm alt bileşen hiyerarşisine aktarır. Bu sayede derinlerdeki herhangi bir bileşen, prop drilling yapmaksızın kiracı bilgilerine ulaşabilir. Bileşen saf bir sarmalayıcıdır ve herhangi bir mantık içermez.
 
 **Parametreler**:
-- `value`: `TenantConfig` — Alt bileşenlere dağıtılacak olan tenant yapılandırma nesnesi. ID, subdomain, özellik bayrakları gibi tüm tenant bilgilerini barındırır.
-- `children`: `React.ReactNode` — Provider içerisine yerleştirilecek alt bileşenler. Bu bileşenler Provider'ın çocuğu olarak context değerine erişebilir.
+- `value`: `TenantConfig` — Alt bileşenlere aktarılacak kiracı yapılandırma nesnesi. Kiracının kimliği, alt alanı, özellik bayrakları gibi tüm bilgileri içerir.
+- `children`: `React.ReactNode` — Provider içinde sarılacak alt bileşenler. Bu prop, provider'ın içeriğinde rendered her şeyi kapsar.
 
-**Dönüş**: `JSX.Element` — `TenantContext.Provider` ile sarmalanmış children bileşenlerini döndürür.
+**Dönüş**: `JSX.Element` — `TenantContext.Provider` ile sarılmış children bileşenlerini döndürür.
 
 ### useTenant
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -76,20 +77,19 @@ Bu modül, React Context API kullanarak tenant (kiracı) bilgisini alt bileşenl
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useTenant.tsx::TenantProvider
-- **params**: `{ value, children }` — `value` context olarak sağlanan tenant yapılandırması, `children` olarak render edilecek React elemanları
-- **ic_degiskenler**:
-  - Yok — parametreler doğrudan JSX içinde kullanılıyor
-- **Dönüş**: JSX elemanı (`<TenantContext.Provider>` ile sarmalanmış children)
+- **params**: `value` — Provider'a geçirilen TenantConfig değeri, alt bileşenlere context olarak sağlanır; `children` — Provider içinde sarılan React çocuk bileşenleri
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `<TenantContext.Provider>` ile sarılmış children bileşenleri döner
 
 ### [N2_NASIL] AST Pointer: src/hooks/useTenant.tsx::useTenant
-- **params**: Yok
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `context` — `useContext(TenantContext)` ile alınan mevcut tenant context değeri
-  - `isDefaultTenant` — tenant'ın varsayılan tenant olup olmadığını kontrol eden boolean bayrak
-  - `viewer3d` — 3D görüntüleyici özelliğinin aktif olup olmadığını belirleyen boolean
-  - `engineeringCalculators` — mühendislik hesaplayıcılarının aktif olup olmadığını belirleyen boolean
-  - `pdfExports` — PDF dışa aktarma özelliğinin aktif olup olmadığını belirleyen boolean
-- **Dönüş**: `TenantConfig` — orijinal context'i genişletilmiş ve özellik bayrakları hesaplanmış yapılandırma nesnesi
+  - `context` — `useContext(TenantContext)` çağrısıyla elde edilen TenantConfig değeri; mevcut tenant bilgilerini tutar
+  - `isDefaultTenant` — Boolean; tenant'ın varsayılan tenant olup olmadığını kontrol eder (`context.id === 'd3b07384-d113-495f-a558-8c38634e0000'` veya `context.subdomain === 'default'`)
+  - `viewer3d` — Boolean; 3D görüntüleyici özelliğinin aktif olup olmadığını belirler — varsayılan tenant ise veya `context.features?.viewer3d` undefined ise `true`, aksi halde `!!context.features.viewer3d` değeri alınır
+  - `engineeringCalculators` — Boolean; mühendislik hesaplayıcı özelliğini belirler — aynı mantıkla hesaplanır
+  - `pdfExports` — Boolean; PDF dışa aktarma özelliğini belirler — aynı mantıkla hesaplanır
+- **Dönüş**: `TenantConfig` — `context` objesinin spread edilip `features` alanının `viewer3d`, `engineeringCalculators`, `pdfExports` değerleriyle genişletilmiş hali; context undefined ise `Error` fırlatılır
 
 ---
 
