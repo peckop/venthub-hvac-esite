@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-29T19:55:45.063707+00:00
+compiled_at: 2026-05-29T19:58:36.275271+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-29T19:55:45.063707+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-29T19:58:36.275271+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -164,7 +164,6 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:55:45.063707+00:00 tarihind
 │   │   ├── ✅ `BentoGrid.tsx`
 │   │   ├── ✅ `BrandsShowcase.tsx`
 │   │   ├── ✅ `BuildTag.tsx`
-│   │   ├── ⚠️ `CartToast.md`
 │   │   ├── ✅ `CaseStudySection.tsx`
 │   │   ├── ✅ `CategoriesShowcase.tsx`
 │   │   ├── ✅ `CategoryFlow.tsx`
@@ -612,8 +611,7 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:55:45.063707+00:00 tarihind
 Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
 
 ## Sahipsiz (Orphan) MD Dosyaları
-Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
-- [⚠️] `src\components\CartToast.md`
+Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
 
 ## Geçersiz Şablon (Invalid Format)
 Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:

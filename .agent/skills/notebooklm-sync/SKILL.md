@@ -89,7 +89,7 @@ Bu komutları çalıştırdığınızda arka planda şunlar gerçekleşir:
 ```yaml
 source_dirs: [src]
 master_md: "docs/venthub_hvac_master.md"
-notebook_id: "2aa4fc16-acf6-47c6-90a8-c02fe5bb28f8"
+notebook_id: "235043eb-970f-4a52-9f39-1d02b2621e9c"
 standalone_files: [README.md, docs/database_schema_master.md]
 skip_dirs: [__pycache__, .git, .agent, .venv, venv, mcp-env, node_modules, ...]
 skip_files: [venthub_hvac_master.md, system_tree.md, supabase_functions_master.md, ...]
