@@ -3,44 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-payment\index.ts
-skeleton_hash: 8761b392fd3c1940
+skeleton_hash: 728e831857b032c6
 entity_hashes:
   func:iyzico-payment_handler: de31c29702dafb3c
-  overview: e63f8c36df209855
-generated_at: 2026-05-29T11:43:41Z
+  overview: 10ad7fb56d2cc8ae
+generated_at: 2026-05-30T20:29:25Z
 ---
 
 ## Genel Bakış
 
-Bu modül, İyzico ödeme altyapısıyla entegre çalışan bir Supabase Edge Function'dır. HTTP istekleri üzerinden ödeme başlatma, iptal etme ve durum sorgulama gibi temel ödeme operasyonlarını yönetir. Güvenlik kapsamında hassas ödeme verilerini (e-posta, adres bilgileri) maskeleyerek işler.
+Bu modül, İyzico ödeme altyapısıyla entegre çalışan bir Supabase Edge Function'dır. HTTP istekleri üzerinden ödeme başlatma, iptal etme ve durum sorgulama gibi temel ödeme operasyonlarını merkezi olarak yönetir. Hassas müşteri verilerini (e-posta, adres bilgileri) maskeleyerek güvenli ödeme süreçleri sunar.
 
 ## Fonksiyon Grupları
 
-### Ödeme İsteği Yönetimi
-Bu grup, gelen HTTP isteklerini alır, istek metodunu ve içeriğini analiz ederek İyzico API'sine uygun ödeme akışını başlatır.
-- iyzico_payment_handler
+### Ödeme İşlemi Yönetimi
+Gelen HTTP isteklerini alarak İyzico API'sine uygun ödeme akışlarını yönlendirir. İstek metoduna göre (ödeme başlatma, iptal, durum sorgulama) uygun işlemi başlatır ve sonucu istemciye iletir.
 
-### Veri Hijyeni
-Bu grup, İyzico'ya gönderilecek ödeme nesnelerindeki hassas alanları (e-posta, adres) maskeleyerek veri sızıntısını önler.
-- sanitize_payment_obj
+- iyzico_payment_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için minimal ve doğrulanabilir aksiyomlar tanımlanmıştır.
-
----
-
-**[Aksiyom 1]**: Eğer `req` parametresi (`Request` tipinde) sağlanmazsa veya geçersiz bir HTTP isteği gelirse, `iyzico_payment_handler` fonksiyonu çalıştırılamaz ve istemciye hata yanıtı döner.
-
-**[Aksiyom 2]**: Eğer fonksiyon bir Supabase Edge Function ortamında çalıştırılmazsa (Edge Runtime mevcut değilse), iyzico API çağrıları ve HTTP response oluşturma işlemleri başarısız olur.
-
-**[Aksiyom 3]**: Eğer iyzico API entegrasyonu için gerekli ortam değişkenleri (API key, secret vb.) tanımlı değilse, ödeme işlemleri başlatılamaz. *(Not: Bu değerler fonksiyon imzasında görünmeyen dış bağımlılıklardır; fonksiyon gövdesinde erişilip erişilmediği bilinmemektedir.)*
-
----
-
-> **Not**: Fonksiyon gövdesi kodu paylaşılmadığı için, modül içi detaylı akış kuralları, hata yönetimi varsayımları veya domain-specific eşik değerleri çıkarılamamıştır. Mevcut aksiyonlar yalnızca fonksiyon imzası ve modülün yapısal bilgisine dayanmaktadır.
+Bu modül için özel aksiyom tanımlanmamıştır. Mevcut bilgiler (fonksiyon imzası ve modül sabitleri), modülün doğru çalışması için zorunlu olan koşulları belirlemek için yeterli değildir. Aksiyomlar, fonksiyon gövdesinin analiz edilmesiyle üretilebilir.
 
 ---
 
@@ -61,81 +45,77 @@ Bu modül için minimal ve doğrulanabilir aksiyomlar tanımlanmıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::mask_object
-- **params**: `(obj: PaymentMin)` — маскировка yapılacak ödeme/kişisel veri nesnesi
-- **ic_degiskenler**:
-  - (dahili değişken yok — tüm işlem inline spread ile yapılır)
-- **Dönüş**: Kişisel verileri maskelenmiş (`email`, `gsmNumber`, `registrationAddress`, `ip`, `address`) PaymentMin nesnesi; `buyer`, `shippingAddress`, `billingAddress` alanları varsa maskelenir, yoksa `undefined` döner
+### [N1_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::maskPaymentMin
+- **params**: `obj` — `PaymentMin` tipinde, ödeme verisi içeren nesne; hassas alanlar maskelenir
+- **ic_degiskenler**: (yok — parametre üzerinde spread + koşullu eşleme yapılır)
+- **Dönüş**: Hassas alanları (`email`, `gsmNumber`, `registrationAddress`, `ip`, `address`) maskelenmiş `PaymentMin` nesnesi; `buyer`, `shippingAddress`, `billingAddress` koşullu olarak eklenir
+- **Closure değişkenleri**: `mask` — metin maskeleyici yardımcı fonksiyon
 
 ---
 
 ### [N2_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::mask
-- **params**: `(k?: string | null)` — maskelenecek anahtar/metin değeri
+- **params**: `k` — `string | null | undefined`, maskelenecek anahtar/metin
 - **ic_degiskenler**:
-  - `s` — `k` değerinin `String()` ile garanti altına alınmış hal; uzunluk kontrolü ve dilimleme bu üzerinde yapılır
-- **Dönüş**: `string` — değer yoksa `'(missing)'`, 10 karakter ve altıysa aynen, daha uzunsa ilk 6 + `…` + son 4 karakter formatında
+  - `s` — `String(k)` dönüşümü ile elde edilen güvenli string; uzunluk kontrolü ve dilimleme için kullanılır
+- **Dönüş**: `string` — Uzunluk ≤10 ise aynen döner; >10 ise ilk 6 karakter + `…` + son 4 karakter formatında kısaltılmış metin; `k` falsy ise `'(missing)'` döner
 
 ---
 
-### [N3_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::raw_to_order_item
-- **params**: `(raw)` — ham sipariş satır verisi (veritabanından gelen ham kayıt)
+### [N3_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::mapRawToOrderItem
+- **params**: `raw` — Ham ürün satır verisi (DB satırı)
 - **ic_degiskenler**:
-  - `_productId` — `raw.product_id` değerinin referansı; ürün kimliğini tutar
-  - `unitPrice` — `raw.unit_price` değerinin `Number()` ile sayıya çevrilmiş hali; birim fiyatı temsil eder
-  - `qty` — `raw.quantity` değerinin `Number()` ile çevrilip en az 1'e sabitlenmiş (Math.max) miktarı; sipariş adedini tutar
-  - `safeUnit` — `unitPrice` sonsuz sayı değilse kendisi, değilse 0 olarak garanti altına alınmış birim fiyat
-  - `p` — `prodMap` lookup haritasından `_productId` ile çekilen ürün nesnesi; ürün adı ve görseli fallback olarak kullanılır
-  - `fid` — `_productId` değerinin `String()` ile garantiye alınmış hali; `nameMap` ve `imageMap` haritalarında lookup için kullanılır
-  - `fallbackName` — ürün adı: önce `p.name`, sonra `nameMap.get(fid)`, son çare olarak `'Ürün'`
-  - `fallbackImage` — ürün görseli: önce `p.image_url`, sonra `imageMap.get(fid)`, son çare olarak `null`
-- **Dış değişken erişimleri**: `prodMap` (Map — ürün lookup haritası), `nameMap` (Map — ürün adı fallback haritası), `imageMap` (Map — ürün görseli fallback haritası), `dbOrderId` (sipariş veritabanı kimliği)
-- **Dönüş**: `{ order_id, product_id, product_name, unit_price, quantity, total_price, price_at_time, product_image_url }` yapısında sipariş kalemi nesnesi
+  - `_productId` — `raw.product_id` değerinden elde edilen ürün ID'si; ürün haritasında arama ve dönüş objesinde `product_id` alanı için kullanılır
+  - `unitPrice` — `Number(raw.unit_price)` ile elde edilen birim fiyat; hesaplamalarda kullanılır
+  - `qty` — `Math.max(1, Number(raw.quantity ?? 1))` ile elde edilen miktar; minimum 1 garanti edilir
+  - `safeUnit` — `Number.isFinite(unitPrice)` kontrolü ile finite olmayan değerlerde 0'a düşürülen güvenli birim fiyat
+  - `p` — `_productId` varsa `prodMap.get(_productId)` ile elde edilen ürün kaydı (`Record<string, unknown>`); `name` ve `image_url` alanları kullanılır, bulunamazsa boş nesne `{}`
+  - `fid` — `String(_productId || '')` — string karşılığı; `nameMap` ve `imageMap` aramalarında kullanılır
+  - `fallbackName` — `p.name` → `nameMap.get(fid)` → `'Ürün'` sıralamasıyla belirlenen ürün adı fallback zinciri
+  - `fallbackImage` — `p.image_url` → `imageMap.get(fid)` → `null` sıralamasıyla belirlenen ürün görsel URL fallback zinciri
+- **Closure değişkenleri**: `prodMap` — ürün bilgileri Map'i; `nameMap` — ürün ad fallback Map'i; `imageMap` — ürün görsel fallback Map'i; `dbOrderId` — veritabanı sipariş ID'si; `tenantId` — kiracı/mağaza tanımlayıcısı
+- **Dönüş**: `{ order_id, product_id, product_name, unit_price, quantity, total_price, price_at_time, product_image_url, tenant_id }` — sipariş kalemi nesnesi; `total_price = safeUnit * qty` olarak hesaplanır
 
 ---
 
-### [N4_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::item_to_basket_item
-- **params**: `(item)` — sipariş kalemi nesnesi (order item)
-- **ic_degiskenler**:
-  - (dahili değişken yok — tüm değerler inline hesaplanır)
-- **Dış değişken erişimleri**: `prodMap` (Map — ürün lookup haritası, `get` metodu ile ürün bilgisi çekilir), `to2` (sayıyı iki ondalık basamağa yuvarlayan yardımcı fonksiyon)
-- **Dönüş**: `{ id, name, category1: 'HVAC', category2: 'Products', itemType: 'PHYSICAL', price }` yapısında iyzicoya gönderilecek sepet kalemi nesnesi
+### [N4_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::mapItemToBasketItem
+- **params**: `item` — Sipariş kalemi nesnesi (`product_id`, `unit_price`, `quantity` alanları beklenir)
+- **ic_degiskenler**: (yok — doğrudan parametre ve closure'dan değerler kullanılır)
+- **Closure değişkenleri**: `prodMap` — ürün adı çözümlemek için kullanılır; `to2` — fiyat yuvarlama yardımcısı
+- **Dönüş**: `{ id, name, category1: 'HVAC', category2: 'Products', itemType: 'PHYSICAL', price }` — Iyzipay sepet kalemi formatında nesne; `price` alanı `to2(Number(item.unit_price) * Number(item.quantity)).toFixed(2)` ile hesaplanır; `name` alanı `prodMap.get(item.product_id)?.name` veya `'Ürün'` fallback'i
 
 ---
 
-### [N5_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::build_callback_url
-- **params**: yok
+### [N5_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::buildCallbackUrl
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `su` — `SUPABASE_URL` ortam değişkeninin değeri; boş string fallback'li olarak alınır
-  - `host` — `su` URL'sinden çıkarılan hostname (ör. `tnofewwkwlyjsqgwjjga.supabase.co`)
-  - `projectRef` — `host` stringinin ilk `.`'den önceki kısmı; Supabase proje referansı
-- **Dönüş**: `string` — iyzico callback URL'i (`https://{projectRef}.functions.supabase.co/iyzico-callback`); `catch` bloğunda boş string `''` döner
+  - `su` — `Deno.env.get('SUPABASE_URL') || ''` ile elde edilen Supabase URL'si; ortam değişkeninden okunur
+  - `host` — `new URL(su).host` ile ayrıştırılan hostname; örn. `tnofewwkwlyjsqgwjjga.supabase.co`
+  - `projectRef` — `host.split('.')[0]` ile elde edilen Supabase proje referans ID'si
+- **Dönüş**: `string` — Tam callback URL'si (`https://{projectRef}.functions.supabase.co/iyzico-callback`); URL ayrıştırma başarısız olursa boş string `''` döner
 
 ---
 
-### [N6_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::format_basket_item
-- **params**: `(it)` — daha önce formatlanmış basket item nesnesi
-- **ic_degiskenler**:
-  - (dahili değişken yok — tüm alanlar inline atanır)
-- **Dış değişken erişimleri**: `IYZI` (iyzico SDK sabitler objesi; `IYZI.BASKET_ITEM_TYPE?.PHYSICAL` erişimi yapılır, yoksa `'PHYSICAL'` fallback)
-- **Dönüş**: `{ id, name, category1, category2, itemType, price }` yapısında iyzico SDK'nın beklediği formata göre düzenlenmiş sepet kalemi
+### [N6_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::mapToIyziBasketItem
+- **params**: `it` — Daha önce dönüştürülmüş sepet kalemi nesnesi (`id`, `name`, `category1`, `category2`, `itemType`, `price` alanları beklenir)
+- **ic_degiskenler**: (yok — doğrudan spread + alan eşleme yapılır)
+- **Closure değişkenleri**: `IYZI` — Iyzipay sabitleri nesnesi; `IYZI.BASKET_ITEM_TYPE?.PHYSICAL` kullanılır
+- **Dönüş**: `{ id, name, category1, category2, itemType, price }` — Iyzipay SDK sepet kalemi formatında nesne; `itemType` alanı `IYZI.BASKET_ITEM_TYPE?.PHYSICAL ?? 'PHYSICAL'` olarak çözümlenir
 
 ---
 
-### [N7_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::checkout_form_initialize
-- **params**: `(resolve, reject)` — Promise executor callback'leri
-- **ic_degiskenler**:
-  - (dahili değişken yok)
-- **Dış değişken erişimleri**: `sdk` (iyzico SDK nesnesi — `sdk.checkoutFormInitialize.create` metodu çağrılır), `sdkRequest` (iyzico'ya gönderilen istek parametreleri objesi)
-- **Dönüş**: `void` — `sdk.checkoutFormInitialize.create` çağrısının sonucu `resolve(res)` ile çözülür; hata varsa `reject(err)` ile reddedilir
+### [N7_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::initCheckoutForm
+- **params**: `resolve` — Promise resolve callback'i; `reject` — Promise reject callback'i
+- **ic_degiskenler**: (yok)
+- **Closure değişkenleri**: `sdk` — Iyzipay SDK instance'ı; `sdk.checkoutFormInitialize.create()` çağrılır; `sdkRequest` — Checkout form başlatma istek parametreleri
+- **Dönüş**: void — Promise executor fonksiyonu; `sdk.checkoutFormInitialize.create(sdkRequest, callback)` çağrısı ile asenkron ödeme sayfası başlatılır; `err` varsa `reject(err)`, başarı durumunda `resolve(res)` çağrılır
 
 ---
 
-### [N8_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::checkout_form_callback
-- **params**: `(err: unknown, res: { status?: string; token?: string; paymentPageUrl?: string; checkoutFormContent?: string; errorMessage?: string })` — iyzico SDK'nın asenkron callback parametreleri
-- **ic_degiskenler**:
-  - (dahili değişken yok)
-- **Closure erişimleri**: `resolve` ve `reject` — üst fonksiyonun ([N7]) Promise executor kapsamından gelir
-- **Dönüş**: `void` — hata varsa `reject(err)`, başarılıysa `resolve(res)` çağrılır
+### [N8_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::checkoutFormCallback
+- **params**: `err` — `unknown` tipinde hata nesnesi (SDK hata durumu); `res` — `{ status?: string; token?: string; paymentPageUrl?: string; checkoutFormContent?: string; errorMessage?: string }` — SDK yanıt nesnesi
+- **ic_degiskenler**: (yok)
+- **Closure değişkenleri**: `resolve` — dış scope'dan gelen Promise resolve; `reject` — dış scope'dan gelen Promise reject
+- **Dönüş**: void — N7'deki `create` methodunun callback'i; `err` varsa `reject(err)`, başarı durumunda `resolve(res)`
 
 ---
 

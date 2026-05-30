@@ -1,0 +1,29 @@
+{
+  "id": "edb4ac2f-0c4c-453f-a84a-6dfe33b8683f",
+  "name": "venthub-hvac",
+  "projectResources": {
+    "resources": [
+      {
+        "gitFolder": {
+          "folderUri": "file:///c%3A/Users/alize/venthub-hvac",
+          "defaultBranch": "master",
+          "allowWrite": true
+        }
+      },
+      {
+        "gitFolder": {
+          "folderUri": "file:///c:/Users/alize/venthub-hvac",
+          "defaultBranch": "master",
+          "allowWrite": true
+        }
+      },
+      {
+        "gitFolder": {
+          "folderUri": "file:///C:/Users/alize/venthub-hvac",
+          "defaultBranch": "master",
+          "allowWrite": true
+        }
+      }
+    ]
+  }
+}

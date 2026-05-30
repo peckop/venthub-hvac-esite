@@ -3,44 +3,46 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-notification\index.ts
-skeleton_hash: bb666753dc1e660f
+skeleton_hash: 36e242b42237e9f8
 entity_hashes:
   func:loadShippingTemplate: 4b4a832183734352
   func:renderTemplate: 26cc0a301db3fae9
   func:shipping-notification_handler: 06ce613108984be4
-  overview: 4c65afdf5b25052f
-generated_at: 2026-05-29T11:48:14Z
+  overview: 9cf32250487e69ff
+generated_at: 2026-05-30T20:32:25Z
 ---
 
 ## Genel Bakış
-Bu modül, kargo bildirimlerinin dinamik olarak oluşturulmasını ve sunulmasını sağlayan bir HTTP fonksiyonudur. Depolama alanından yüklendiği şablon dosyalarını, gelen istek verileriyle birleştirerek kişiselleştirilmiş bildirim metinleri üretir ve bunları istemciye bir HTTP yanıtı olarak döndürür.
+Bu modül, kargo bildirimleri için bir HTTP uç noktasıdır. Gelen isteklere yanıt olarak, depolama alanındaki şablonları yükler, istek verileriyle birleştirerek bildirim metni oluşturur ve bunu istemciye iletir.
 
 ## Fonksiyon Grupları
 ### Şablon İşleme
-Gerekli kargo bildirim şablonunu depolama alanından getirir ve bu şablonu, verilen veri setiyle birleştirerek nihai bildirim metnini üretir.
+Gerekli şablonu depolama alanından yükler ve şablon içindeki yer tutucuları verilen verilerle değiştirerek nihai bildirim metnini üretir.
 - loadShippingTemplate, renderTemplate
 
-### Ana İşleyici ve Koordinasyon
-Gelen HTTP isteklerini karşılar, şablon yükleme ve işleme adımlarını yöneterek tüm sürecin sonucunda istemciye uygun bir yanıt paketi oluşturur.
+### İstek Koordinasyonu
+Gelen HTTP isteklerini yönetir, şablon yükleme ve işleme adımlarını koordine ederek istemciye uygun bir yanıt döndürür.
 - shipping-notification_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon imzalarından çıkarılabilecek mimari varsayımlar sınırlıdır.
+Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküman bilgisi temelinde aşağıdakilerdir.
 
-**[Aksiyom 1]**: Eğer `renderTemplate` fonksiyonuna geçilen `tpl` parametresi geçerli bir string değilse, şablon işleme başarısız olur.
+[Aksiyom 1]: Eğer `loadShippingTemplate` fonksiyonu çağrıldığında depolama alanındaki şablon dosyası erişilebilir değilse veya mevcut değilse, fonksiyon hata fırlatır (örneğin, bir istisna) veya uygun bir hata yönetimi mekanizması devreye girer.
 
-**[Aksiyom 2]**: Eğer `renderTemplate` fonksiyonuna geçilen `_data` parametresi `Record<string, unknown>` yapısına uygun değilse, yer tutucu değişkenlerin değerleri yanlış veya eksik olarak yerine konur.
+[Aksiyom 2]: Eğer `renderTemplate` fonksiyonu çağrıldığında `tpl` parametresi geçerli bir şablon dizesi değilse (örneğin, boş string veya `null`/`undefined`), fonksiyonun davranışı belirsizdir veya hata oluşur. Fonksiyon, şablonu `_data` parametresiyle birleştirebilir.
 
-**[Aksiyom 3]**: Eğer `loadShippingTemplate` fonksiyonunun çağrıldığı ortamda şablon kaynağı erişilebilir değilse, fonksiyon geçerli bir şablon döndüremez.
+[Aksiyom 3]: Eğer `shipping-notification_handler` fonksiyonu bir HTTP isteği (`req`) ile çağrıldığında, istek içinde gerekli veriler (örneğin, şablonu dolduracak veri alanları) eksikse, şablon işleme kısmen tamamlanır veya eksik veriler için boş/varsayılan değerler kullanılır.
 
-**[Aksiyom 4]**: Eğer `shipping-notification_handler` fonksiyonuna geçilen `req` parametresi geçerli bir HTTP istek nesnesi değilse, istek işlenemez.
+[Aksiyom 4]: Eğer `shipping-notification_handler` fonksiyonu bir HTTP isteği (`req`) ile çağrıldığında, istek yöntemi (HTTP method) modülün beklediği yöntem (örneğin, POST) değilse, fonksiyon uygun bir HTTP hata kodu (örneğin, 405 Method Not Allowed) ile yanıt verir.
 
-**[Aksiyom 5]**: Eğer `shipping-notification_handler` isteği başarıyla işlerse, bir HTTP yanıt döndürmesi beklenir.
+[Aksiyom 5]: Eğer `loadShippingTemplate` fonksiyonu başarıyla bir şablon yüklerse, bu şablon `renderTemplate` fonksiyonuna geçerli bir string olarak传递 edilmelidir. Aksi halde, `renderTemplate` işlevi düzgün çalışamaz.
 
-> **Not**: Fonksiyon imzalarında default değer tanımlanmamıştır ve modül sabitleri belirtilmemiştir; bu nedenle eşik değerleri veya spesifik kabul kriterleri belirlenememiştir.
+[Aksiyom 6]: Eğer `renderTemplate` fonksiyonu, `_data` parametresinde şablonda referans alan ancak veri setinde bulunmayan bir anahtar (key) içeriyorsa, bu anahtar için şablonda boş bir alan veya belirli bir hata işleme davranışı gösterilir.
+
+[Aksiyom 7]: Eğer `shipping-notification_handler` fonksiyonu bir HTTP yanıtı oluştururken, yanıtın içeriği (content type) metin tabanlı olmalıdır (örneğin, `text/plain` veya `text/html`), çünkü modül bildirim metni üretir.
 
 ---
 
@@ -88,68 +90,81 @@ Bu modül için fonksiyon imzalarından çıkarılabilecek mimari varsayımlar s
 - `carrier: string`
 - `tracking_number: string`
 - `tracking_url?: string | null`
+- `tenant_id?: string`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::renderTemplate
+### [N1_NASIL] AST Pointer: shipping-notification/index.ts::renderTemplate
 - **params**: `tpl: string`, `_data: Record<string, unknown>`
 - **ic_degiskenler**:
-  - `v` (if-block callback içinde) — `_data[key]` değerini okur, if-block'un truthy olup olmadığını belirler
-  - `truthy` — `v` değerinin truthy olup olmadığını boolean'a çevirir, if-block içeriğinin korunup korunmayacağını belirler
-  - `v` (variable callback içinde) — `_data[key]` değerini okur, template değişkeninin yerine konacak değeri sağlar
-- **Dönüş**: `string` — if-block'ları ve değişken placeholder'ları işlenmiş nihai şablon metni
+  - **1. if-blocks replace callback içinde:**
+    - `_m` — regex eşleşme nesnesi, replace callback parametresi, doğrudan kullanılmaz
+    - `key` — `{{#if ...}}` içindeki değişken adı, `_data` içinde lookup anahtarı
+    - `inner` — `{{#if}}...{{/if}}` arasındaki HTML içeriği, truthy ise döndürülür
+    - `v` — `_data[key]` ile elde edilen değerin truthy olup olmadığı kontrol edilir
+    - `truthy` — `v`'nin truthy/Falsy durumu, inner içeriğinin korunup korunmayacağına karar verir
+  - **2. variable replace callback içinde:**
+    - `_m` — regex eşleşme nesnesi, replace callback parametresi, doğrudan kullanılmaz
+    - `key` — `{{...}}` içindeki değişken adı, `_data` içinde lookup anahtarı
+    - `v` — `_data[key]` ile elde edilen değer, null ise boş string, değilse String(v) olarak döndürülür
+- **Dönüş**: `string` — if-block ve değişken replacement'ları uygulanmış şablon metni
 
-### [N2_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::loadShippingTemplate
+---
+
+### [N2_NASIL] AST Pointer: shipping-notification/index.ts::loadShippingTemplate
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `url` — `import.meta.url` referansıyla `'./templates/email/shipping.html'` dosyasının mutlak URL nesnesini oluşturur
-- **Dönüş**: `Promise<string | null>` — şablon dosyasının içeriği; dosya bulunamazsa `null`
+  - `url` — `new URL('./templates/email/shipping.html', import.meta.url)` ile oluşturulan URL nesnesi, `Deno.readTextFile` ile okunacak dosya yolunu temsil eder
+- **Dönüş**: `Promise<string | null>` — şablon dosyasının içeriği veya hata durumunda null
 
-### [N3_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::shipping-notification_handler
-- **params**: `req` (Request nesnesi)
+---
+
+### [N3_NASIL] AST Pointer: shipping-notification/index.ts::shipping-notification_handler
+- **params**: `req` (Request)
 - **ic_degiskenler**:
-  - `requestOrigin` — isteğin `origin` header'ından gelen kaynak URL, CORS izin kontrolü için kullanılır
-  - `requestHeaders` — isteğin `access-control-request-headers` header'ı, CORS ön isteği bilgisi
-  - `requestMethod` — isteğin `access-control-request-method` header'ı, CORS ön isteği yöntemi
-  - `allowedOrigins` — `ALLOWED_ORIGINS` env değişkeninden virgülle ayrılmış izinli origin listesi, boşluklar temizlenmiş ve boş elemanlar filtrelenmiş
-  - `originAllowed` — `requestOrigin`'in `allowedOrigins` listesinde olup olmadığını belirten boolean, CORS kaynak doğrulaması
-  - `corsHeaders` — CORS response header'ları nesnesi, tüm response'lara eklenir
-  - `body` — `req.json()` ile parse edilmiş request gövdesi, `ShippingNotificationRequest` tipinde
-  - `order_id` — `body`'den destructure edilen sipariş ID'si, zorunlu alan
-  - `customer_email` — `body`'den destructure edilen müşteri e-posta adresi, zorunlu alan
-  - `customer_name` — `body`'den destructure edilen müşteri adı, zorunlu alan
-  - `carrier` — `body`'den destructure edilen kargo firması adı, zorunlu alan
-  - `tracking_number` — `body`'den destructure edilen kargo takip numarası, zorunlu alan
-  - `tracking_url` — `body`'den destructure edilen kargo takip URL'i, opsiyonel alan
-  - `order_number` — `body`'den destructure edilen sipariş numarası (let ile tanımlı, eksikse DB'den çözülür)
-  - `missing` — zorunlu alanların hangilerinin eksik olduğunu belirten string dizisi, 400 hatasında döndürülür
-  - `SUPABASE_URL` — `SUPABASE_URL` env değişkeninden okunan Supabase proje URL'i
-  - `SERVICE_KEY` — `SUPABASE_SERVICE_ROLE_KEY` env değişkeninden okunan service role anahtarı
-  - `authHeader` — isteğin `Authorization` header'ından okunan bearer token
-  - `isAuthorized` — kullanıcının yetkilendirilip yetkilendirilmediğini tutan boolean bayrak
-  - `anonKey` — `SUPABASE_ANON_KEY` env değişkeninden okunan anonim anahtar, auth client oluşturulmasında kullanılır
-  - `createClient` — dinamik import ile yüklenen `@supabase/supabase-js` modülünden Supabase istemci oluşturucu fonksiyon
-  - `authClient` — kullanıcı token'ı ile oluşturulan Supabase auth istemcisi, kullanıcı bilgisi almak için kullanılır
-  - `user` — `authClient.auth.getUser()` sonucundan extract edilen kullanıcı nesnesi
-  - `roleCheck` — `user_profiles` tablosundan kullanıcının rolünü sorgulayan fetch response'u
-  - `arr` (roleCheck içinde) — `roleCheck.json()` sonucu, rol bilgisi dizisi
-  - `arr[0]?.role` — kullanıcının rolü, `admin` veya `superadmin` ise yetkilendirme başarılı sayılır
-  - `err` — auth fallback bloğundaki yakalanan hata, konsola loglanır
-  - `RESEND_API_KEY` — `RESEND_API_KEY` env değişkeninden okunan Resend API anahtarı, e-posta gönderimi için gerekli
-  - `EMAIL_FROM` — `EMAIL_FROM` env değişkeninden okunan gönderen e-posta adresi, varsayılan olarak `'VentHub <onboarding@resend.dev>'`
-  - `o` — eksik `order_number`'i çözmek için `venthub_orders` tablosuna yapılan fetch sonucu
-  - `arr` (order_number çözümleme içinde) — `venthub_orders` sorgu sonucu dizi, `arr[0].order_number` ile sipariş numarası alınır
-  - `prettyOrderNo` — sipariş numarasının display formatı; `order_number` varsa `#XX` formatında, yoksa `order_id`'nin son 8 karakteri
-  - `subject` — e-posta konu satırı, `prettyOrderNo` ile birlikte oluşturulur
-  - `html` — e-posta HTML içeriği; şablon dosyası yüklenemezse inline fallback HTML ile, yüklenirse `renderTemplate` ile oluşturulur
-  - `resp` — Resend API'ye gönderilen e-posta isteği sonucu response
-  - `t` — Resend API hata durumunda okunan hata metin response'u
-  - `result` — başarılı Resend API yanıtının JSON body'si, e-posta gönderim detaylarını içerir
-  - `error` — try-catch yakalanan genel hata nesnesi
-  - `msg` — hatanın message string'i veya string'e çevrilmiş hata değeri, error response body'de döndürülür
-- **Dönüş**: `Response` — OPTIONS isteklerinde 200, yetkilendirme başarısızsa 401, alan eksikse 400, method izinsizse 405, Resend disabled ise 200+disabled, başarıyla e-posta gönderildiyse 200+success, hata durumunda 500
+  - `requestOrigin` — `req.headers.get('origin')` ile alınan istek kaynağı
+  - `requestHeaders` — `req.headers.get('access-control-request-headers')` ile alınan CORS istek başlıkları
+  - `requestMethod` — `req.headers.get('access-control-request-method')` ile alınan HTTP yöntemi
+  - `allowedOrigins` — `Deno.env.get('ALLOWED_ORIGINS')` string'inin virgülle bölünüp trim edilmiş izin verilen origin dizisi
+  - `originAllowed` — `requestOrigin`'in `allowedOrigins` listesinde olup olmadığının boolean kontrolü
+  - `corsHeaders` — `Access-Control-Allow-Headers` ve `Access-Control-Allow-Methods` içeren CORS başlık nesnesi
+  - `body` — `req.json()` ile parse edilmiş request gövdesi (`ShippingNotificationRequest`)
+  - `order_id` — `body`'den destructure edilmiş sipariş ID'si, eksik alan kontrolünde ve yanıt/payload'ta kullanılır
+  - `customer_email` — `body`'den destructure edilmiş müşteri e-postası, Resend API `to` alanında kullanılır
+  - `customer_name` — `body`'den destructure edilmiş müşteri adı, eksik alan kontrolünde ve HTML içinde selamlama kısmında kullanılır
+  - `carrier` — `body`'den destructure edilmiş kargo firması adı, HTML içinde kargo firması bilgisinde kullanılır
+  - `tracking_number` — `body`'den destructure edilmiş takip numarası, eksik alan kontrolünde ve HTML/şablonda kullanılır
+  - `tracking_url` — `body`'den destructure edilmiş takip URL'i, şablonda ve fallback HTML'de takip butonu linki olarak kullanılır
+  - `order_number` — `body`'den destructure edilmiş sipariş numarası (`let`, değiştirilebilir), eksikse Supabase'den resolve edilir, `prettyOrderNo` ve şablon değişkeni olarak kullanılır
+  - `tenantId` — `resolveTenantId(req, body)` ile çözümlenen kiracı ID'si, Supabase ve branding çağrılarında kullanılır
+  - `branding` — `getTenantBranding(tenantId)` ile alınan kiracı marka bilgileri nesnesi (emailFrom, brandName, brandPrimaryColor, brandLogoUrl)
+  - `missing` — eksik alanların boolean filtresinden oluşan string dizisi, 400 hata yanıtının `missing` alanına eklenir
+  - `SUPABASE_URL` — `Deno.env.get('SUPABASE_URL')` ile alınan Supabase URL'i, auth client oluşturma, rol kontrolü ve sipariş numarası çözümleme çağrılarında kullanılır
+  - `SERVICE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile alınan servis anahtarı, Bearer token karşılaştırmasında, auth header'da ve Supabase REST çağrılarının `Authorization`/`apikey` başlıklarında kullanılır
+  - `authHeader` — `req.headers.get('Authorization')` ile alınan yetkilendirme başlığı, Bearer token karşılaştırmasında ve auth client oluşturmada kullanılır
+  - `isAuthorized` — kullanıcının yetkili olup olmadığını tutan boolean bayrak, authorization flow'unun sonucuna göre ayarlanır
+  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile alınan anonim Supabase anahtarı, authClient oluşturmada kullanılır
+  - `authClient` — `createClient` ile oluşturulan Supabase istemcisi, `auth.getUser()` çağrısıyla kullanıcının kimliğini doğrular
+  - `roleCheck` — Supabase REST API ile kullanıcının rolünü sorgulayan `fetch` yanıt nesnesi, `roleCheck.ok` ile durumu kontrol edilir
+  - `arr` — `roleCheck.json()`'dan elde edilen JSON dizisi, `[0].role` ile rol alınır; ayrıca `order_number` çözümlemesinde `o.json()` sonucundan elde edilen JSON dizisi olarak da kullanılır
+  - `role` — `arr[0]?.role` ile elde edilen kullanıcı rolü, `'admin'` veya `'superadmin'` ise yetkilendirme başarılı olur
+  - `RESEND_API_KEY` — `Deno.env.get('RESEND_API_KEY')` ile alınan Resend API anahtarı, email gönderilip gönderilmeyeceğine karar verilir (yoksa `disabled: true` yanıt döner) ve Resend API çağrısının `Authorization` başlığında kullanılır
+  - `EMAIL_FROM` — `branding.emailFrom` değerinden atanan gönderen e-posta adresi, Resend API çağrısının `from` alanında kullanılır
+  - `o` — `order_number` eksikse Supabase REST API ile sipariş numarasını sorgulayan `fetch` yanıt nesnesi, `o.ok` ile durumu kontrol edilir
+  - `brandName` — `branding.brandName` değerinden atanan marka adı, email konu satırı, fallback HTML başlığı ve selamlama/imza kısmında kullanılır
+  - `brandPrimary` — `branding.brandPrimaryColor` değerinden atanan ana renk kodu, fallback HTML'de başlık rengi ve buton arka plan rengi olarak kullanılır
+  - `brandLogoUrl` — `branding.brandLogoUrl` değerinden atanan logo URL'i, `renderTemplate` çağrısında şablon verisi olarak iletilir
+  - `prettyOrderNo` — sipariş numarasının formatlanmış hali (`#XXX`), email konu satırı, fallback HTML ve şablon değişkeni olarak kullanılır
+  - `subject` — `brandName` ve `prettyOrderNo` ile oluşturulan email konu satırı, Resend API çağrısında kullanılır
+  - `html` — email HTML içeriği; önce `loadShippingTemplate()` yüklenir, başarısız olursa fallback HTML string oluşturulur, başarılıysa `renderTemplate` ile render edilir, Resend API çağrısının `html` alanına gönderilir
+  - `resp` — Resend API (`https://api.resend.com/emails`) POST isteği sonucu, `resp.ok` ile durumu kontrol edilir, hata varsa exception fırlatılır
+  - `t` — başarısız Resend yanıtının `resp.text()` ile alınan hata metni, Error mesajında kullanılır
+  - `result` — başarılı Resend yanıtının `resp.json()` ile parse edilmiş sonucu, başarı yanıtının `result` alanına eklenir
+  - `error` — catch bloğu tarafından yakalanan hata nesnesi, `sentryCaptureException` ile Sentry'ye gönderilir ve `msg`'ye dönüştürülür
+  - `msg` — `error.message` veya `String(error)` ile elde edilen hata mesajı string'i, 500 hata yanıtının `error` alanına eklenir
+- **Dönüş**: `Response` — 200 (başarılı/disabled), 400 (eksik alan), 405 (yanlış method), 401 (yetkisiz) veya 500 (hata) HTTP yanıtı
 
 ---
 

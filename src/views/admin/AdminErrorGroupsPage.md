@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx
-skeleton_hash: 9638f08d7e7c62f9
+skeleton_hash: 6a2cf5ad7fb8cfd4
 entity_hashes:
   func:AdminErrorGroupsPage: 2df4b29ac83c8598
   func:bulkApplyStatus: 2e737880df202268
@@ -13,47 +13,46 @@ entity_hashes:
   func:updateAssignedTo: 115d7b001b19d674
   func:updateNotes: 57b7793991d9e6a2
   func:updateStatus: 6c7719de765f38dd
-  overview: d1130a512219291d
+  overview: 2bc670ce94cd0c60
   style_tokens: 5e40817d604cd18b
-generated_at: 2026-05-28T22:39:07Z
+generated_at: 2026-05-30T20:26:00Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC yönetici panelindeki hata grupları yönetim sayfasıdır. Sistemde kaydedilen istemci hatalarının gruplar halinde görüntülenmesini, sıralanmasını, durumlarının değiştirilmesini, sorumlu atanmasını ve toplu işlemler uygulanmasını sağlar.
+Bu modül, Venthub HVAC yönetici panelindeki hata grupları yönetim sayfasıdır. Yöneticilerin sistemde kaydedilen istemci hatalarını gruplar halinde görüntülemesine, grupları farklı kriterlere göre sıralamasına, tek tek veya toplu olarak durumlarını değiştirmesine, sorumlu kullanıcı ataması yapmasına ve notlar eklemesine olanak tanır. Modül, hem genel listeleme ve filtreleme hem de detaylı hata yönetimi için gerekli arayüz ve işlevsellikleri tek bir bileşen altında toplar.
 
 ## Fonksiyon Grupları
-
-### Ana Bileşen ve Görünüm Kontrolleri
-Sayfanın temel yapısını oluşturan ana React bileşeni ile yöneticinin hata gruplarını filtreleme ve seçim yapma gibi arayüz etkileşimlerini yöneten fonksiyonları içerir.
+### Ana Sayfa Yapısı ve Görünüm Kontrolleri
+Modülün temelini oluşturan ana React bileşeni ile yöneticinin hata grupları listesini sıralamasını ve gruplar üzerinde toplu seçim yapmasını sağlayan arayüz etkileşim fonksiyonlarını kapsar.
 - AdminErrorGroupsPage, toggleSort, toggleSelect
 
-### Hata Grubu Detay Yönetimi
-Tek bir hata grubu üzerinde gerçekleştirilen durum güncelleme, kullanıcı atama, not ekleme ve gruba ait güncel hataları getirme gibi bireysel yönetim işlemlerini yöneten asenkron fonksiyonlardır.
+### Bireysel Hata Grubu Yönetim İşlemleri
+Belirli bir hata grubu üzerinde tek tek gerçekleştirilen durum güncelleme, sorumlu atama, not ekleme ve o gruba ait en son hata kayıtlarını getirme gibi detaylı yönetim operasyonlarını yöneten asenkron fonksiyonlardır.
 - updateStatus, updateAssignedTo, updateNotes, loadLatestClientErrors
 
-### Toplu İşlem Fonksiyonları
-Birden fazla seçili hata grubuna aynı anda durum değişikliği uygulamak için kullanılan toplu işleme fonksiyonudur.
+### Toplu İşlem Yönetimi
+Seçili olan birden fazla hata grubuna aynı anda belirli bir durum değişikliğini uygulamak için kullanılan, verimliliği artıran toplu işleme fonksiyonudur.
 - bulkApplyStatus
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, hata gruplarının yönetimi için bir yönetici arayüzü sunan React bileşenidir ve aşağıdaki mimari varsayımlara dayanır:
+Bu modül, hata grupları yönetim sayfası olarak API tabanlı CRUD işlemleri ve toplu seçim mekanizması üzerine kurulmuştur.
 
-**[Aksiyom 1]:** Eğer backend API'si hata grupları için `open`, `resolved` veya `ignored` durum değerlerini desteklemiyorsa, `updateStatus` fonksiyonu geçersiz durum hatası ile karşılaşır.
+**[Aksiyom 1]**: Eğer `updateStatus` fonksiyonuna geçilen `id` değerine karşılık gelen hata grubu sunucuda mevcut değilse, durum güncelleme isteği başarısız olur.
 
-**[Aksiyom 2]:** Eğer sıralama alanı olarak `last_seen` veya `count` dışında bir değer gönderilirse, `toggleSort` fonksiyonu beklenmeyen davranış gösterir (TypeScript seviyede engellenir).
+**[Aksiyom 2]**: Eğer `toggleSort` fonksiyonuna geçilen `by` parametresi `'last_seen'` veya `'count'` değerlerinden biri değilse, sıralama yanlısı çalışır veya çalışma zamanı hatası oluşur (TypeScript enum contract).
 
-**[Aksiyom 3]:** Eğer `bulkApplyStatus` çağrıldığında en az bir hata grubu seçilmediyse (`toggleSelect` ile `on=true` olarak işaretlenen grup yoksa), toplu durum güncellemesi uygulanacak hedef bulunamaz.
+**[Aksiyom 3]**: Eğer `loadLatestClientErrors` fonksiyonuna geçilen `groupId` değerine ait hata grubu sunucuda mevcut değilse, istemci hata listesi boş döner veya 404 hatası oluşur.
 
-**[Aksiyom 4]:** Eğer `loadLatestClientErrors` fonksiyonuna geçersiz veya var olmayan bir `groupId` verilirse, sunucu tarafında ilgili hatalar bulunamaz ve boş sonuç döner.
+**[Aksiyom 4]**: Eğer `updateAssignedTo` fonksiyonuna geçilen `userId` değeri boş string (`''`) değilse, bu userId'nin geçerli bir kullanıcı kimliğine karşılık gelmesi gerekir; aksi takdirde atama işlemi başarısız olur.
 
-**[Aksiyom 5]:** Eğer `updateAssignedTo` fonksiyonuna geçerli bir `userId` yerine boş string (`''`) verilirse, hata grubunun sorumluluğu kaldırılır (atanmamış duruma geçer).
+**[Aksiyom 5]**: Eğer `bulkApplyStatus` fonksiyonu çağrıldığında hiçbir hata grubu seçilmemiş (`toggleSelect` ile `on: true` olarak işaretlenmemiş) ise, toplu durum güncelleme hiçbir kayıt üzerinde etkili olmaz.
 
-**[Aksiyom 6]:** Eğer `updateNotes` fonksiyonuna boş string verilirse, hata grubunun not alanı temizlenir.
+**[Aksiyom 6]**: Eğer `updateNotes` fonksiyonuna geçilen `id` değerine karşılık gelen hata grubu mevcut değilse, not güncelleme isteği başarısız olur.
 
-**[Aksiyom 7]:** Eğer `toggleSelect` fonksiyonu ile bir grup seçildiyse (`on=true`), `bulkApplyStatus` bu grubu hedeflemelidir; grup seçimi kaldırıldıysa (`on=false`) o grup toplu işlem kapsamı dışına çıkar.
+**[Aksiyom 7]**: Eğer `updateStatus` fonksiyonuna geçilen `newStatus` değeri `'open'`, `'resolved'` veya `'ignored'` değerlerinden biri değilse, durum geçersiz kabul edilir ve güncelleme yapılmaz (sabit üç durum döngüsü: open↔resolved↔ignored).
 
 ---
 
@@ -156,203 +155,63 @@ Bu modül, hata gruplarının yönetimi için bir yönetici arayüzü sunan Reac
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::mount_init_localstorage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::toggleSort
+- **params**: `by: 'last_seen' | 'count'` — sıralanacak sütun
 - **ic_degiskenler**:
-  - `c` — localStorage'dan okunan görünür sütun ayarlarının JSON string değeri
-  - `d` — localStorage'dan okunan tablo yoğunluk ayarının string değeri
-  - `setVisibleCols` — görünür sütunları güncelleyen state setter fonksiyonu
-  - `setDensity` — tablo yoğunluğunu güncelleyen state setter fonksiyonu
-  - `STORAGE_KEY` — localStorage anahtarları için kullanılan sabit önek
-- **Dönüş**: void (sunucu tarafında erken dönüş yapar)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::save_visible_cols_to_localstorage
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `visibleCols` — güncel görünür sütun state değeri
-  - `STORAGE_KEY` — localStorage anahtarları için kullanılan sabit önek
-- **Dönüş**: void
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::save_density_to_localstorage
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `density` — güncel tablo yoğunluk state değeri
-  - `STORAGE_KEY` — localStorage anahtarları için kullanılan sabit önek
-- **Dönüş**: void
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::toggleSort
-- **params**: by: 'last_seen' | 'count'
-- **ic_degiskenler**:
-  - `setSortBy` — sıralama sütununu güncelleyen state setter
-  - `setSortDir` — sıralama yönünü güncelleyen state setter
-  - `prev` — setSortBy callback'inde gelen önceki sortBy değeri
-  - `d` — setSortDir callback'inde gelen önceki sortDir değeri
+  - `prev` — mevcut sıralama sütununun önceki değeri
+  - `d` — mevcut sıralama yönü (asc/desc)
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::setSortBy_internal_callback
-- **params**: prev (önceki sortBy değeri)
+### [N2_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::updateStatus
+- **params**: `id: string` — güncellenecek satır ID'si, `newStatus: 'open' | 'resolved' | 'ignored'` — yeni durum
 - **ic_degiskenler**:
-  - `by` — üst kapsamdaki toggleSort fonksiyonundan gelen sıralama sütunu
-  - `setSortDir` — sıralama yönünü güncelleyen state setter
-- **Dönüş**: önceki veya yeni sortBy değeri
+  - `prev` — güncelleme öncesi satır listesi (hata durumunda geri almak için)
+  - `rs` — satır listesi (map callback içinde)
+  - `r` — dönüştürülen her bir satır
+  - `error` — supabase update sonucu hata
+- **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::debounce_search_cleanup
+### [N3_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::updateAssignedTo
+- **params**: `id: string` — güncellenecek satır ID'si, `userId: string | ''` — atanacak kullanıcı ID'si (boş string = kaldır)
+- **ic_degiskenler**:
+  - `val` — userId boşsa null, değilse userId
+  - `prev` — güncelleme öncesi satır listesi
+  - `rs` — satır listesi (map callback içinde)
+  - `r` — dönüştürülen her bir satır
+  - `error` — supabase update sonucu hata
+- **Dönüş**: yok
+
+### [N4_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::updateNotes
+- **params**: `id: string` — güncellenecek satır ID'si, `notes: string` — yeni not içeriği
+- **ic_degiskenler**:
+  - `prev` — güncelleme öncesi satır listesi
+  - `rs` — satır listesi (map callback içinde)
+  - `r` — dönüştürülen her bir satır
+  - `error` — supabase update sonucu hata
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::loadLatestClientErrors
+- **params**: `groupId: string` — hata grubu ID'si
+- **ic_degiskenler**:
+  - `queryResult` — supabase sorgu sonucu (data ve error içeren obje)
+  - `data` — queryResult'dan çıkarılan client_errors satırları
+  - `error` — queryResult'dan çıkarılan hata
+- **Dönüş**: yok (state güncelleme侧 etkisi: setLatestClientErrors)
+
+### [N6_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::toggleSelect
+- **params**: `id: string` — satır ID'si, `on: boolean` — seçili mi
+- **ic_degiskenler**:
+  - `prev` — önceki seçili ID listesi
+- **Dönüş**: yok
+
+### [N7_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::bulkApplyStatus
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` - kurulan setTimeout ID'si
-  - `setDebouncedQ` - arama sorgusunu 300ms gecikmeyle güncelleyen state setter
-  - `q` - girilen güncel ham arama sorgusu
-- **Dönüş**: clearTimeout'u çağıran temizleme fonksiyonu, void
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::load_admin_users
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `supabase.rpc('admin_list_users')` - admin yetkisiyle kullanıcı listesi çeken secure RPC çağrısı
-  - `data` - RPC'den dönen kullanıcı listesi ham verisi
-  - `error` - RPC çağrısı sırasında oluşan hata
-  - `list` - formatlanmış AdminUserOpt tipinde kullanıcı listesi
-  - `u` - map fonksiyonunda işlenen tek kullanıcı nesnesi
-  - `setUsers` - kullanıcı listesini state'e kaydeden setter
-- **Dönüş**: void
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::map_raw_user_to_adminopt
-- **params**: u (ham kullanıcı nesnesi)
-- **ic_degiskenler**:
-  - `u.id` - kullanının benzersiz ID'si
-  - `u.email` - kullanının email adresi
-  - `u.full_name` - kullanının tam adı (null olabilir)
-- **Dönüş**: formatlanmış AdminUserOpt tipinde kullanıcı nesnesi
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::fetch_error_groups
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setLoading` - yükleme durumunu ayarlayan state setter
-  - `setError` - hata durumunu ayarlayan state setter
-  - `supabase.from('error_groups')` - error_groups tablosundan sorgu oluşturan Supabase client
-  - `sortBy` - güncel sıralama sütunu
-  - `sortDir` - güncel sıralama yönü
-  - `fromDate` - filtre için başlangıç tarihi
-  - `toDate` - filtre için bitiş tarihi
-  - `level` - filtre için hata seviyesi
-  - `status` - filtre için grup durumu
-  - `assigned` - filtre için atanan kullanıcı ID'si
-  - `debouncedQ` - gecikmeli arama sorgusu
-  - `like` - SQL ILIKE operatörü için wildcard'lı arama deseni
-  - `from` - sayfalama için başlangıç indeksi
-  - `to` - sayfalama için bitiş indeksi
-  - `PAGE_SIZE` - tek sayfada gösterilecek kayıt sayısı sabiti
-  - `data` - sorgudan dönen error grubu listesi
-  - `error` - sorgu hatası
-  - `count` - toplam kayıt sayısı
-  - `setRows` - error grubu satırlarını state'e kaydeden setter
-  - `setTotal` - toplam kayıt sayısını state'e kaydeden setter
-  - `e` - yakalanan hata nesnesi
-- **Dönüş**: Promise<void>
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::schedule_refetch
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `refetchTimer.current` - mevcut bekleyen zamanlayıcı ID'si
-  - `fetchRef.current` - verileri tekrar yükleyen ana fetch fonksiyonu referansı
-- **Dönüş**: void
-
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::setup_realtime_channel
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `ch` - oluşturulan Supabase realtime kanal nesnesi
-  - `supabase.channel` - realtime kanal oluşturan Supabase metodu
-  - `scheduleRefetch` - veri yeniden yüklemeyi zamanlayan fonksiyon
-  - `supabase.removeChannel` - kanalı temizleyen Supabase metodu
-- **Dönüş**: kanalı temizleyen useEffect temizleme fonksiyonu, void
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::updateStatus
-- **params**: id: string, newStatus: 'open' | 'resolved' | 'ignored'
-- **ic_degiskenler**:
-  - `prev` - güncelleme öncesi mevcut satır listesi yedeği
-  - `setRows` - satır listesini güncelleyen state setter
-  - `r` - map fonksiyonunda işlenen tek error grubu satırı
-  - `supabase.from('error_groups').update` - durum güncellemesi yapan Supabase sorgusu
-  - `error` - sorgu sırasında oluşan hata
-- **Dönüş**: Promise<void>
-
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::updateAssignedTo
-- **params**: id: string, userId: string | ''
-- **ic_degiskenler**:
-  - `val` - boş string gelmesi halinde null'a çevrilen atanacak kullanıcı ID'si
-  - `prev` - güncelleme öncesi satır listesi yedeği
-  - `setRows` - satır listesini güncelleyen state setter
-  - `r` - map'te işlenen tek satır
-  - `supabase.from('error_groups').update` - atanan kullanıcıyı güncelleyen Supabase sorgusu
-  - `error` - sorgu hatası
-- **Dönüş**: Promise<void>
-
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::updateNotes
-- **params**: id: string, notes: string
-- **ic_degiskenler**:
-  - `prev` - güncelleme öncesi satır listesi yedeği
-  - `setRows` - satır listesini güncelleyen state setter
-  - `r` - map'te işlenen tek satır
-  - `supabase.from('error_groups').update` - notları güncelleyen Supabase sorgusu
-  - `error` - sorgu hatası
-- **Dönüş**: Promise<void>
-
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::loadLatestClientErrors
-- **params**: groupId: string
-- **ic_degiskenler**:
-  - `queryResult` - client_errors tablosundan dönen sorgu sonucu
-  - `supabase.from('client_errors').select` - hata kayıtlarını çeken Supabase sorgusu
-  - `data` - sorgudan dönen client hatası listesi
-  - `error` - sorgu hatası
-  - `setLatestClientErrors` - yüklenen son hataları state'e kaydeden setter
-- **Dönüş**: Promise<void>
-
-### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::export_all_error_groups
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `CHUNK` - toplu veri çekerken kullanılacak parça boyutu sabiti (1000)
-  - `offset` - sorgu için mevcut başlangıç ofseti
-  - `all` - birleştirilmiş tüm error grubu listesi
-  - `makeQuery` - filtreleri ve sıralamayı uygulayan sorgu üretici fonksiyon
-  - `data` - parça sorgusundan dönen veri
-  - `error` - parça sorgusu hatası
-  - `chunk` - çeken mevcut veri parçası
-  - `header` - CSV dosyasının başlık satırı
-  - `escape` - CSV değerlerini özel karakterler için formatlayan fonksiyon
-  - `rowsCsv` - tüm satırların CSV formatına çevrilmiş listesi
-  - `csv` - birleştirilmiş tam CSV string'i
-  - `blob` - CSV'den oluşturulan Blob nesnesi
-  - `url` - Blob için oluşturulan geçici URL
-  - `a` - indirme işlemi için oluşturulan <a> DOM elementi
-  - `e` - yakalanan hata nesnesi
-- **Dönüş**: Promise<void>
-
-### [N17_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::csv_escape_value
-- **params**: v: unknown
-- **ic_degiskenler**:
-  - `s` - değeri string'e çevrilip temizlenmiş hali
-- **Dönüş**: CSV uyumlu formatlanmış string
-
-### [N18_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::toggleSelect
-- **params**: id: string, on: boolean
-- **ic_degiskenler**:
-  - `setSelectedIds` - seçili satır ID'lerini güncelleyen state setter
-  - `prev` - önceki seçili ID listesi
-  - `x` - filter fonksiyonunda işlenen ID
-- **Dönüş**: void
-
-### [N19_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx::bulkApplyStatus
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `selectedIds` - seçili olan tüm satır ID'leri
-  - `setSavingBulk` - toplu güncelleme yükleme durumunu ayarlayan setter
-  - `bulkStatus` - uygulanacak toplu durum değeri
-  - `supabase.from('error_groups').update` - birden fazla satırın durumunu güncelleyen Supabase sorgusu
-  - `error` - sorgu hatası
-  - `setRows` - satır listesini güncelleyen state setter
-  - `r` - map'te işlenen tek satır
-  - `setSelectedIds` - seçili ID'leri sıfırlayan setter
-  - `e` - yakalanan hata nesnesi
-- **Dönüş**: Promise<void>
+  - `error` — supabase update sonucu hata
+  - `prev` — bulk güncelleme öncesi satır listesi (callback içinde)
+  - `r` — dönüştürülen her bir satır (callback içinde)
+  - `e` — catch bloğunda yakalanan hata
+- **Dönüş**: yok
 
 ---
 
@@ -368,12 +227,12 @@ graph TD
     AdminErrorGroupsPage_tsx__updateAssignedTo["updateAssignedTo"]
     AdminErrorGroupsPage_tsx__updateNotes["updateNotes"]
     AdminErrorGroupsPage_tsx__updateStatus["updateStatus"]
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateStatus
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateAssignedTo
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSort
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateNotes
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__loadLatestClientErrors
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSelect
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateAssignedTo
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__loadLatestClientErrors
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSort
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateStatus
 ```
 
 ## NODE ID STANDARD

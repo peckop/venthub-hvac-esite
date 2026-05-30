@@ -33,8 +33,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ revalidated: false, message: 'No record found in payload' })
     }
 
+    const tenantId = activeRecord.tenant_id as string | undefined
+
     const revalidatedPaths: string[] = []
     const revalidatedTags: string[] = []
+
+    if (tenantId) {
+      revalidateTag(`home-data-${tenantId}`)
+      revalidateTag(`products-discovery-${tenantId}`)
+      revalidatedTags.push(`home-data-${tenantId}`, `products-discovery-${tenantId}`)
+    }
 
     // 1. Table: products
     if (table === 'products') {

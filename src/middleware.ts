@@ -2,6 +2,7 @@ import { Routes } from './utils/routes'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { resolveTenant } from './lib/tenantResolver'
 
 /**
  * Edge Middleware — Sorumluluklar:
@@ -36,6 +37,19 @@ function detectLocale(request: NextRequest): string {
 
 // ── Ana Middleware ───────────────────────────────────────────────────────────
 export async function middleware(request: NextRequest) {
+  const host = request.headers.get('host') || ''
+  const { tenantId } = resolveTenant(host)
+  request.headers.set('x-tenant-id', tenantId)
+
+  const setTenantCookie = (res: NextResponse) => {
+    res.cookies.set('tenant_id', tenantId, {
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+    return res;
+  };
+
   const { pathname } = request.nextUrl
   const segments = pathname.split('/').filter(Boolean)
   const firstSegment = segments[0]
@@ -60,7 +74,7 @@ export async function middleware(request: NextRequest) {
     if (effectiveSegments[0] === 'admin') {
       const url = request.nextUrl.clone()
       url.pathname = `/admin${pathname.substring(3 + firstSegment.length)}`
-      return NextResponse.redirect(url, 307)
+      return setTenantCookie(NextResponse.redirect(url, 307))
     }
   } else {
     // Rota locale barındırmıyor
@@ -72,7 +86,7 @@ export async function middleware(request: NextRequest) {
       const detectedLocale = detectLocale(request)
       const url = request.nextUrl.clone()
       url.pathname = `/${detectedLocale}${pathname === '/' ? '' : pathname}`
-      return NextResponse.redirect(url, 307)
+      return setTenantCookie(NextResponse.redirect(url, 307))
     }
   }
 
@@ -81,7 +95,7 @@ export async function middleware(request: NextRequest) {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
   if (!supabaseUrl || !anonKey) {
-    return response
+    return setTenantCookie(response)
   }
 
   // ── Kol 1: UUID → Slug SEO Yönlendirmesi (effectiveSegments ile) ────────────────
@@ -106,14 +120,14 @@ export async function middleware(request: NextRequest) {
         if (data?.slug) {
           const url = request.nextUrl.clone()
           url.pathname = `/${locale}${Routes.product(data.slug)}`
-          return NextResponse.redirect(url, 308)
+          return setTenantCookie(NextResponse.redirect(url, 308))
         }
       } catch (error) {
         console.error('[Middleware] UUID Slug Lookup Hatası:', error)
       }
     }
 
-    return response
+    return setTenantCookie(response)
   }
 
   // ── Kol 2: Admin RBAC Guard (effectiveSegments ile) ────────────────────────────────
@@ -124,7 +138,7 @@ export async function middleware(request: NextRequest) {
     const isLocalhost = host.startsWith('localhost') || host.startsWith('127.0.0.1')
 
     if (isDev && isLocalhost) {
-      return response
+      return setTenantCookie(response)
     }
 
     // Auth ve Rol doğrulaması: Çerezleri senkronize eden tam Supabase Client
@@ -153,7 +167,7 @@ export async function middleware(request: NextRequest) {
       loginUrl.pathname = '/auth/login'
       loginUrl.searchParams.set('from', pathname)
       if (error) loginUrl.searchParams.set('reason', 'expired')
-      return NextResponse.redirect(loginUrl, 302)
+      return setTenantCookie(NextResponse.redirect(loginUrl, 302))
     }
 
     const jwtRole = user.user_metadata?.role
@@ -162,11 +176,11 @@ export async function middleware(request: NextRequest) {
       const homeUrl = request.nextUrl.clone()
       homeUrl.pathname = '/'
       homeUrl.searchParams.set('auth_error', 'unauthorized')
-      return NextResponse.redirect(homeUrl, 302)
+      return setTenantCookie(NextResponse.redirect(homeUrl, 302))
     }
 
-    return response
+    return setTenantCookie(response)
   }
 
-  return response
+  return setTenantCookie(response)
 }

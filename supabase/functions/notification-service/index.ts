@@ -1,6 +1,7 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3"
+import { resolveTenantId, getTenantBranding } from '../_shared/tenant_config.ts'
 
 type TemplateData = Record<string, string | number | boolean>;
 
@@ -11,6 +12,7 @@ interface NotificationRequest {
   priority: 'low' | 'medium' | 'high' | 'critical'
   template?: string
   _data?: TemplateData
+  tenant_id?: string
 }
 
 interface _StockAlertData {
@@ -42,6 +44,13 @@ serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
 
+    const body = await req.json().catch(()=>({})) as NotificationRequest
+    const { type, to, message, priority, template, _data } = body
+
+    // Resolve Tenant ID and get Branding details dynamically
+    const tenantId = resolveTenantId(req, body)
+    const branding = await getTenantBranding(tenantId)
+
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'unauthorized', message: 'Missing Authorization header' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -56,7 +65,7 @@ serve(async (req) => {
       if (authErr || !user) {
         return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
       }
-      const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+      const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
         headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey }
       })
       if (roleCheck.ok) {
@@ -70,16 +79,13 @@ serve(async (req) => {
       }
     }
 
-    const body = await req.json() as NotificationRequest
-    const { type, to, message, priority, template, _data } = body
-
     // Environment variables
     const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID')
     const twilioAuthToken = Deno.env.get('TWILIO_AUTH_TOKEN')
     const twilioWhatsAppNumber = Deno.env.get('TWILIO_WHATSAPP_NUMBER') // _e.g., 'whatsapp:+14155238886'
     const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER')
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
-    const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <noreply@venthub.com>'
+    let emailFrom = branding.emailFrom
     const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
     
     let result: unknown = { success: false, note: undefined as unknown }
@@ -122,7 +128,7 @@ serve(async (req) => {
           result = { success: true, disabled: true, channel: 'email' }
           break
         }
-        result = await sendEmail(to, message, template, { ...(_data||{}), emailFrom }, {
+        result = await sendEmail(to, message, template, { ...(_data||{}), emailFrom, brandName: branding.brandName, brandPrimaryColor: branding.brandPrimaryColor }, {
           apiKey: resendApiKey!,
           from: emailFrom,
         })
