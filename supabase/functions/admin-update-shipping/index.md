@@ -7,7 +7,7 @@ skeleton_hash: a534cbeace1d001e
 entity_hashes:
   func:admin-update-shipping_handler: fab3b88ab551f027
   overview: 4717843338e56bb2
-generated_at: 2026-05-30T20:28:16Z
+generated_at: 2026-05-30T21:15:46Z
 ---
 
 ## Genel Bakış
@@ -25,7 +25,10 @@ Veritabanı güncelleme işleminin sonucuna göre istemciye uygun HTTP durum kod
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
 
+**Not:** Fonksiyon gövdesi (kod) paylaşılmadığı için, sadece fonksiyon imzasından veya genel bakıştan mimari varsayımlar çıkarılamaz. Aksiyomlar sadece fonksiyon gövdesindeki kontrollere, koşullara ve süreçlere dayanılarak tanımlanabilir.
 
 ---
 

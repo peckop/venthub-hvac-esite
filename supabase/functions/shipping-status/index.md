@@ -8,7 +8,7 @@ entity_hashes:
   func:jsonResponse: 60e54d50747b3229
   func:shipping-status_handler: d099b53accac2970
   overview: 695bc1e855ae9226
-generated_at: 2026-05-28T22:50:01Z
+generated_at: 2026-05-30T21:17:01Z
 ---
 
 ## Genel Bakış

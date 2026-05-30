@@ -12,7 +12,7 @@ entity_hashes:
   func:returns-webhook_handler: b4558e805d0a933f
   func:sha256Base64: 0784b35c5d8e45cb
   overview: 165beda8727317f0
-generated_at: 2026-05-30T20:31:33Z
+generated_at: 2026-05-30T21:17:00Z
 ---
 
 ## Genel Bakış
@@ -39,7 +39,23 @@ HTTP isteğini alarak tüm iş akışını yönetir; imza doğrulaması, payload
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, kargo firmalarından gelen webhook isteklerini HMAC-SHA256 ile doğrulayıp iade durumunu eşleyen bir Supabase Edge Function'dır.
+
+---
+
+**[Aksiyom 1]:** `hmacValid` fonksiyonu `secret`, `raw` ve `signatureHeader` parametrelerinin üçünü de alır. Eğer HMAC doğrulama secret'ı ortam değişkenlerinde yapılandırılmamışsa veya boş string olarak verilmişse, hiçbir webhook isteği geçerli kabul edilmez ve tüm istekler reddedilir.
+
+**[Aksiyom 2]:** `SKEW_MS` sabiti, HMAC-SHA256 zaman damgası doğrulamasında saat sapması toleransını belirler. Eğer istek zaman damgası ile sunucu zamanı arasındaki fark `SKEW_MS` değerini aşarsa, HMAC imza doğrulaması başarısız olur (replay saldırısı koruması devreye girer).
+
+**[Aksiyom 3]:** `mapReturnStatus` fonksiyonunun `input` parametresi opsiyoneldir (`?`). Eğer bilinmeyen veya eşlenemeyen bir iade durum değeri gelirse, fonksiyon bir varsayılan/benchmark durum döndürmelidir; undefined durumunda modülün durumu belirsizleşir.
+
+**[Aksiyom 4]:** `normalizePayload` fonksiyonu `unknown` tipinde bir obje alır — bu, kargo firmalarının farklı JSON yapıları gönderebileceği anlamına gelir. Eğer payload tamamen `null` veya `undefined` olarak gelirse, normalize edilecek geçerli bir yapı olmadığından fonksiyon hata fırlatır veya boş/geçersiz bir sonuç döner.
+
+**[Aksiyom 5]:** `returns-webhook_handler` fonksiyonu standart `Request` alıp `json` fonksiyonu aracılığıyla `Response` döner. Eğer handler içinde beklenmeyen bir exception fırlatılırsa ve yakalanmazsa, Supabase Edge Function varsayılan 500 hatasıyla yanıt verir.
+
+**[Aksiyom 6]:** `hmacValid` için `raw` parametresi, HTTP request body'sinin birebir (ham) string karşılığıdır. Eğer body parsing sırasında orijinal ham content değiştirilmişse veya encoding farklılaşmışsa (örn: Unicode normalizasyonu), HMAC doğrulaması başarısız olur çünkü imza ile doğrulanacak ham veri uyuşmaz.
 
 ---
 
@@ -104,93 +120,6 @@ HTTP isteğini alarak tüm iş akışını yönetir; imza doğrulaması, payload
 - **ic_degiskenler**:
   - (yok — parametreler doğrudan kullanılır)
 - **Dönüş**: `Response` — JSON serialize edilmiş body ile oluşturulmuş Response nesnesi
-
----
-
-### [N2_NASIL] AST Pointer: supabase/functions/returns-webhook/index.ts::hmacValid
-- **params**: `secret: string, raw: string, signatureHeader: string`
-- **ic_degiskenler**:
-  - `key` — crypto.subtle.importKey ile üretilen HMAC-SHA256 anahtarı; raw secret'tan import edilir
-  - `sigBytes` — crypto.subtle.sign ile raw string üzerinde HMAC-SHA256 imzası hesaplanarak elde edilen byte dizisi
-  - `computed` — sigBytes'ın Base64'e çevrilmiş hali; hesaplanan imza stringi
-  - `given` — signatureHeader içinden `sha256=` prefix'i kaldırılmış ve trim edilmiş ham imza stringi
-- **Dönüş**: `Promise<boolean>` — hesaplanan imza ile verilen imza eşleşiyorsa `true`, aksi halde veya hata durumunda `false`
-
----
-
-### [N3_NASIL] AST Pointer: supabase/functions/returns-webhook/index.ts::mapReturnStatus
-- **params**: `input?: string`
-- **ic_degiskenler**:
-  - `s` — input'un küçük harfe çevrilmiş hali; durum eşleştirmesi için kullanılır
-- **Dönüş**: `{ status?: string; setReceived?: boolean }` — input'a göre normalize edilmiş durum nesnesi; boş input gelirse `{}` döner
-
----
-
-### [N4_NASIL] AST Pointer: supabase/functions/returns-webhook/index.ts::normalizePayload
-- **params**: `obj: unknown`
-- **ic_degiskenler**:
-  - `rec` — obj'nin Record<string,unknown> olarak cast edilmiş hali; obje değilse boş obje kullanılır
-  - `pick` — rest parametreli inner fonksiyon; verilen anahtar listesinde ilk null-olmayan değeri döndürür
-- **Dönüş**: `{ _return_id, order_id, carrier, tracking_number, status, delivered_at }` — normalize edilmiş webhook payload nesnesi, her alan pick() ile çoklu anahtar alternatiflerinden çözümlenir
-
----
-
-### [N5_NASIL] AST Pointer: supabase/functions/returns-webhook/index.ts::sha256Base64
-- **params**: `input: string`
-- **ic_degiskenler**:
-  - `bytes` — input stringinin TextEncoder ile byte dizisine çevrilmiş hali
-  - `hash` — crypto.subtle.digest ile SHA-256 hash'inin raw byte dizisi
-- **Dönüş**: `Promise<string>` — SHA-256 hash'inin Base64编码字符串i
-
----
-
-### [N6_NASIL] AST Pointer: supabase/functions/returns-webhook/index.ts::returns-webhook_handler
-- **params**: `req: Request`
-- **ic_degiskenler**:
-  - `raw` — req.text() ile okunan ham request body stringi; HMAC imza hesaplaması ve dedup body_hash için kullanılır
-  - `body` — raw string'in JSON.parse ile parse edilmiş hali; parse hatası olursa boş obje `{}` kalır
-  - `tenantId` — resolveTenantId(req, body) çağrısı ile elde edilen kiracı ID'si; tüm DB sorgularında filtre olarak kullanılır
-  - `secret` — Deno.env.get('RETURNS_WEBHOOK_SECRET') ile okunan HMAC secret key'i; imza doğrulama için kullanılır
-  - `token` — Deno.env.get('RETURNS_WEBHOOK_TOKEN') ile okunan token değeri; alternatif token tabanlı auth için kullanılır
-  - `sign` — req.headers.get('x-signature') ile okunan HMAC imza header'ı
-  - `tok` — req.headers.get('x-webhook-token') ile okunan token header'ı
-  - `ok` — boolean; auth durumunu belirtir, HMAC veya token doğrulamasıyla `true` olur
-  - `tsHeader` — req.headers.get('x-timestamp') veya req.headers.get('x-event-time') ile okunan timestamp header'ı; replay guard kontrolü için kullanılır
-  - `t` — tsHeader'dan parse edilmiş epoch milisaniye timestamp'i; epoch veya ISO formatı desteklenir
-  - `SUPABASE_URL` — Deno.env.get('SUPABASE_URL') ile okunan Supabase proje URL'i; client oluşturma ve REST API çağrıları için kullanılır
-  - `SERVICE_KEY` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan service role anahtarı; Supabase client ve API çağrıları için kullanılır
-  - `supabase` — createClient(SUPABASE_URL, SERVICE_KEY) ile oluşturulmuş Supabase client nesnesi
-  - `p` — normalizePayload(body) çağrısı ile normalize edilmiş webhook payload nesnesi; tipi `_return_id, order_id, carrier, tracking_number, status, delivered_at` alanlarını içerir
-  - `eventId` — req.headers.get('x-id') veya req.headers.get('x-event-id') ile okunan ve trim edilmiş event ID'si; dedup kontrolü için kullanılır
-  - `exist` — returns_webhook_events tablosundan sorgulanan mevcut event kaydı; duplicate kontrolü yapılır
-  - `returnId` — p._return_id'ten çözümlenmiş veya p.order_id ile venthub_returns tablosundan bulunmuş return ID'si; tüm DB işlemlerinde anahtar olarak kullanılır
-  - `cur` — venthub_returns tablosundan mevcut return kaydının `{ id, status }` değerleri; durum ilerleme kontrolü için kullanılır
-  - `curErr` — venthub_returns sorgusundaki olası hata nesnesi; return bulunamazsa 404 döner
-  - `mapped` — mapReturnStatus(p.status) çağrısı ile elde edilen normalize edilmiş durum nesnesi
-  - `patch` — Record<string, unknown> tipinde DB güncelleme nesnesi; mapped.status varsa `status` anahtarını içerir
-  - `rank` — durum sıralama sözlüğü; `requested:0, approved:1, rejected:1, in_transit:2, received:3, refunded:4, cancelled:4`
-  - `curRank` — mevcut durumun rank sözlüğündeki sırası; bulunamazsa 0
-  - `nextRank` — patch.status'ün rank sözlüğündeki sırası; bulunamazsa curRank kullanılır
-  - `updated` — boolean; venthub_returns tablosunda güncelleme yapılıp yapılmadığını belirtir
-  - `updErr` — venthub_returns update sorgusundaki olası hata nesnesi
-  - `bodyHash` — sha256Base64(raw) çağrısı ile elde edilen body hash'i; audit kaydı için kullanılır
-  - `nextStatus` — patch['status'] veya cur.status'ten elde edilen bir sonraki durum stringi; email gönderimi kontrolünde kullanılır
-  - `rOrderId` — p.order_id veya DB'den sorgulanarak elde edilen order ID'si; email payload'ı için kullanılır
-  - `reason` — venthub_returns tablosundan sorgulanan iade nedeni
-  - `description` — venthub_returns tablosundan sorgulanan iade açıklaması
-  - `r` — venthub_returns REST API üzerinden yapılan fetch isteği sonucu; return detaylarını içerir
-  - `arr` — r.json().catch() ile elde edilen response body'si dizi olarak
-  - `row` — arr[0] olarak elde edilen tek satırlık return detay kaydı
-  - `orderNumber` — venthub_orders tablosundan sorgulanan sipariş numarası; email payload'ı için kullanılır
-  - `userId` — venthub_orders tablosundan sorgulanan kullanıcı ID'si; email alıcısını bulmak için kullanılır
-  - `o` — venthub_orders REST API üzerinden yapılan fetch isteği sonucu; order detaylarını içerir
-  - `customerEmail` — Auth Admin API ile sorgulanan müşteri e-posta adresi; bildirim email'i gönderimi için kullanılır
-  - `customerName` — Auth Admin API ile sorgulanan müşteri tam adı; bildirim email'i gönderimi için kullanılır
-  - `u` — Auth Admin API (auth/v1/admin/users/{userId}) üzerinden yapılan fetch isteği sonucu
-  - `ju` — u.json() ile parse edilmiş kullanıcı nesnesi; email ve user_metadata alanlarını içerir
-  - `meta` — ju.user_metadata'nın UserMetadata olarak cast edilmiş hali; full_name veya name alanını içerir
-  - `_e` — try-catch bloğu içinde yakalanmış genel hata nesnesi; log ve error response için kullanılır
-- **Dönüş**: `Response` — webhook işleme sonucuna göre JSON response (başarı, hata, duplicate veya unchanged)
 
 ---
 

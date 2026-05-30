@@ -8,7 +8,7 @@ entity_hashes:
   func:checkRateLimit: eb2ddca9002ea24b
   func:rateLimitHeaders: 8e57db019805fbe0
   overview: 2d23853bbec3dccf
-generated_at: 2026-05-28T22:51:38Z
+generated_at: 2026-05-30T21:17:11Z
 ---
 
 ## Genel Bakış
@@ -25,7 +25,9 @@ Kota kontrolü sonrasında elde edilen limit, kalan hak ve sıfırlanma zamanı 
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için özel aksiyom tanımlanmamıştır. Modülün doğru çalışması için zorunlu olan tek conditions, fonksiyon imzasında belirtilen parametrelerin geçerli değerler (örn: geçerli bir URL, geçerli bir anahtar, pozitif sayısal değerler) olmasıdır; bu durum genel programlama kuralıdır ve modüle özgü bir aksiyom olarak tanımlanmaz.
 
 ---
 
@@ -80,13 +82,6 @@ type RateLimitResult = { allowed: boolean; remaining: number; resetAt: string }
   - `row` — data[0] mevcutsa ilk satır, aksi halde varsayılan {allowed: true, remaining: limit-1, reset_at: ...} nesnesi
   - `result` — RateLimitResult nesnesi; allowed boolean, remaining number, resetAt string değerlerini tutar
 - **Dönüş**: `{ result: RateLimitResult, limit: number, windowSec: number }`
-
----
-
-### [N2_NASIL] AST Pointer: _shared/rate_limit.ts::rateLimitHeaders
-- **params**: (limit: number, remaining: number, resetAt: string)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `Record<string,string>` — RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset HTTP header'larını içeren nesne
 
 ---
 

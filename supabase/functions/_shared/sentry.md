@@ -10,7 +10,7 @@ entity_hashes:
   func:sentryCaptureException: d3efed22b661b471
   func:sentryCaptureMessage: f1e4a7cbdea35542
   overview: a0aac1a163270d41
-generated_at: 2026-05-28T22:51:56Z
+generated_at: 2026-05-30T21:17:11Z
 ---
 
 ## Genel Bakış
@@ -151,8 +151,8 @@ graph TD
     sentry_ts__sentryCaptureException["sentryCaptureException"]
     sentry_ts__sentryCaptureMessage["sentryCaptureMessage"]
     sentry_ts__sentryCaptureException --> sentry_ts__postStore
-    sentry_ts__postStore --> sentry_ts__parseDsn
     sentry_ts__sentryCaptureMessage --> sentry_ts__postStore
+    sentry_ts__postStore --> sentry_ts__parseDsn
 ```
 
 ## NODE ID STANDARD

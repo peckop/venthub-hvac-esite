@@ -7,7 +7,7 @@ skeleton_hash: 5a9d607e9b6cdc1b
 entity_hashes:
   func:iyzico-callback_handler: 14b42ca547fc6940
   overview: 9f60711f4ba6c146
-generated_at: 2026-05-30T20:28:58Z
+generated_at: 2026-05-30T21:16:10Z
 ---
 
 ## Genel Bakış
@@ -20,7 +20,21 @@ Gelen webhook isteklerinin imza doğrulaması, ödeme bilgilerinin ayrıştırı
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel varsayımlar tanımlanabilmektedir. Fonksiyon gövdesi paylaşılmadığından, detaylı akış ve iş mantığına ilişkin aksiyomlar belirlenememiştir.
+
+---
+
+**[Aksiyom 1]**: `iyzico-callback_handler` fonksiyonu, bir `req` parametresi ile çağrılmalıdır.
+**Eğer** `req` parametresi sağlanmadan fonksiyon çağrılırsa, **sonuç** olarak fonksiyon çalışma zamanı hatası (TypeError) verir ve callback işlenemez.
+
+**[Aksiyom 2]**: `req` parametresi, HTTP istek nesnesi (Supabase Edge Function standardında `Request` tipinde) olmalıdır.
+**Eğer** `req` geçerli bir HTTP istek nesnesi değilse (örneğin `null`, `undefined` veya yanlış tipte bir değer ise), **sonuç** olarak fonksiyon isteği işleyemez ve hata fırlatır.
+
+---
+
+> **Not**: Fonksiyon gövdesi, modül sabitleri ve varsayılan değerler paylaşılmadığı için; imza doğrulama eşiği, beklenen header alanları, veritabanı tablo/bičim tanımları, callback URL yapısı ve ödeme durumu eşik değerleri gibi detaylı domain-specific aksiyomlar **bilinmiyor** durumdadır. Bu aksiyomların belirlenebilmesi için fonksiyon gövdesinin (implementation) incelenmesi gerekmektedir.
 
 ---
 

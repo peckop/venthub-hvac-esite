@@ -7,7 +7,7 @@ skeleton_hash: 1151b66ec188024e
 entity_hashes:
   func:getCorsHeaders: 1360a70a0a4d6694
   overview: 8eaad34e6f15ad7c
-generated_at: 2026-05-29T11:39:05Z
+generated_at: 2026-05-30T21:17:01Z
 ---
 
 ## Genel Bakış

@@ -9,7 +9,7 @@ entity_hashes:
   func:loadTemplate: 4c5f3a8524c0bb12
   func:render: b6f065ff28ae59f4
   overview: d34e01c15bff1856
-generated_at: 2026-05-30T20:28:40Z
+generated_at: 2026-05-30T21:15:46Z
 ---
 
 ## Genel Bakış

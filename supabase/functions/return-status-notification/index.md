@@ -7,7 +7,7 @@ skeleton_hash: 70775c6410a3ad58
 entity_hashes:
   func:return-status-notification_handler: 7d2592fd30deaf05
   overview: 2f67488397ccb15e
-generated_at: 2026-05-30T20:30:48Z
+generated_at: 2026-05-30T21:16:46Z
 ---
 
 ## Genel Bakış
@@ -35,10 +35,6 @@ Bu modül, Supabase Edge Function runtime ortamında HTTP istekleriyle iade duru
 **[Aksiyom 5]**: Eğer CORS origin başlıkları doğrulanamazsa, tarayıcı tabanlı istekler engellenebilir (CORS policy violation).
 
 **[Aksiyom 6]**: Eğer modül Supabase Edge Function runtime ortamında (Deno) çalıştırılmazsa, runtime-specific API'ler (Deno.fetch, Edge Function context) kullanılamaz ve fonksiyon başarısız olur.
-
----
-
-*Not: Fonksiyon imzasında sadece `req` parametresi bulunduğundan, detaylı iş mantığı (iade durum tipleri, bildirim kanalları, veritabanı etkileşimleri vb.) mimari varsayımlara dahil edilmemiştir.*
 
 ---
 

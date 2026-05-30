@@ -7,7 +7,7 @@ skeleton_hash: 51c5353a83b2d85b
 entity_hashes:
   func:order-validate_handler: 5404fb6b36c963fe
   overview: 583f7cd99c081500
-generated_at: 2026-05-29T11:46:48Z
+generated_at: 2026-05-30T21:16:25Z
 ---
 
 ## Genel Bakış

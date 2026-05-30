@@ -12,7 +12,7 @@ entity_hashes:
   func:sha256Base64: 0784b35c5d8e45cb
   func:shipping-webhook_handler: b6676fdc25219168
   overview: 408836261e4028d5
-generated_at: 2026-05-30T20:32:58Z
+generated_at: 2026-05-30T21:17:01Z
 ---
 
 ## Genel Bakış
@@ -31,22 +31,6 @@ Birbirinden farklı kargo firmalarının durum kodlarını VentHub'ın kendi iç
 ### Ana Webhook İşleyici
 Modülün giriş noktasıdır; gelen HTTP isteklerini alarak güvenlik doğrulaması, payload normalizasyonu ve durum güncelleme adımlarını sırasıyla yönetir. İş akışının tüm aşamalarını koordine eder.
 - shipping-webhook_handler
-
----
-
-## Aksiyomlar – Mimari Varsayımlar
-
-Bu modül, kargo firması webhook'larının güvenli şekilde alınıp normalize edilmesini sağlayan bir Edge Function'dur. Aşağıda modülün doğru çalışması için zorunlu olan mimari varsayımlar listelenmektedir.
-
-**[Aksiyom 1]**: Eğer `hmacValid` fonksiyonuna geçirilen `secret` parametresi (webhook secret) geçersiz veya boşsa, imza doğrulama başarısız olmalı ve istek reddedilmelidir.
-
-**[Aksiyom 2]**: Her bir kargo firması için `normalizePayload` fonksiyonuna özel bir `carrierHint` parametresi传递edilmelidir; bu, payload'ın doğru şablona göre ayrıştırılmasını sağlar.
-
-**[Aksiyom 3]**: `mapCarrierStatus` fonksiyonunun döndürdüğü nesne, `setShipped` veya `setDelivered` alanlarından en az birini içermelidir; aksi halde sipariş durumu güncellenmez.
-
-**[Aksiyom 4]**: Ana işleyici (`shipping-webhook_handler`), HMAC doğrulaması başarısız olduğunda 401/403 yanıtı döndürmeli ve işlemi sonlandırmalıdır.
-
-**[Aksiyom 5]**: `jsonResponse` fonksiyonu, tüm HTTP yanıtları için tutarlı bir format sağlamak üzere kullanılmalıdır; modül içinden doğrudan `Response` nesnesi oluşturulmamalıdır.
 
 ---
 

@@ -7,7 +7,7 @@ skeleton_hash: 2aae01d91a254e30
 entity_hashes:
   func:admin-update-order_handler: 046f5c7fec17e235
   overview: 236389b6147671e5
-generated_at: 2026-05-30T20:27:23Z
+generated_at: 2026-05-30T21:15:35Z
 ---
 
 ## Genel Bakış
@@ -35,10 +35,6 @@ Bu modül, Supabase Edge Function ortamında çalışan bir HTTP handler'ıdır.
 **[Aksiyom 5]:** Eğer güncellenmeye çalışılan sipariş kaydı veritabanında mevcut değilse, güncelleme işlemi başarısız olur veya ilgili durum koduyla yanıt döner.
 
 **[Aksiyom 6]:** Fonksiyon, istek-yanıt döngüsünü tamamen asenkron olarak yönetir; tüm HTTP yanıtları `Response` nesnesi olarak döndürülür.
-
----
-
-*Not: Fonksiyon imzasında (`req: Request`) hiçbir default değer tanımlı değildir; dolayısıyla eşik değerleri, limitler veya varsayılan parametrelerle ilgili bir varsayım üretilememiştir.*
 
 ---
 
@@ -95,23 +91,6 @@ Bu modül, Supabase Edge Function ortamında çalışan bir HTTP handler'ıdır.
   - `recent` — `listRecent(200)` ile son 200 siparişin getirildiği array (display_code araması için)
   - `target` — `recent` array'inde `display_code` ile eşleşen sipariş nesnesi, `id` alanının son 8 hanesi ile karşılaştırılır
 - **Dönüş**: `Response` — JSON { ok, response } veya hata Response'u
-
----
-
-### [N2_NASIL] AST Pointer: admin-update-order/index.ts::patch
-- **params**: `filter: string`
-- **ic_degiskenler**: (yok — doğrudan fetch çağrısı yapılır)
-- **Dönüş**: `Promise<Response>` — Supabase REST API PATCH yanıtını döner; `status` alanını `newStatus` değerine günceller, `Prefer: return=representation` ile temsilci veri döner; outer scope'tan `supabaseUrl`, `serviceRoleKey`, `tenantId`, `newStatus` değişkenlerini kapanım yoluyla kullanır
-
----
-
-### [N3_NASIL] AST Pointer: admin-update-order/index.ts::listRecent
-- **params**: `_limit: number` (varsayılan 100)
-- **ic_degiskenler**:
-  - `res` — `venthub_orders` tablosundan son `_limit` adet siparişi `created_at` azalan sırada çeken fetch response'u; `id,conversation_id,created_at` alanlarını seçer
-  - `txt` — `res` gövdesinin ham metin olarak okunmuş hali
-  - `data` — IIFE ile `JSON.parse(txt)` yapılmaya çalışılan dizi; parse hatasında boş döner
-- **Dönüş**: `Promise<Array>` — `id`, `conversation_id`, `created_at` alanlarını içeren sipariş nesneleri dizisi; outer scope'tan `supabaseUrl`, `serviceRoleKey`, `tenantId` değişkenlerini kapanım yoluyla kullanır
 
 ---
 

@@ -7,7 +7,7 @@ skeleton_hash: 55d9342253dad488
 entity_hashes:
   func:iyzico-refund_handler: b3edad3bb6b5ef11
   overview: 86377044cea6469b
-generated_at: 2026-05-29T11:44:16Z
+generated_at: 2026-05-30T21:16:11Z
 ---
 
 ## Genel Bakış

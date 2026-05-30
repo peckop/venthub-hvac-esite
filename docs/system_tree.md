@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-29T19:58:36.275271+00:00
+compiled_at: 2026-05-30T21:17:42.734948+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-29T19:58:36.275271+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-05-30T21:17:42.734948+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -150,14 +150,14 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:58:36.275271+00:00 tarihind
 │   │   │   │   └── ✅ `route.ts`
 │   │   │   └── 📂 **webhook/**
 │   │   │       └── 📂 **supabase/**
-│   │   │           └── ❌ `route.ts`
+│   │   │           └── ✅ `route.ts`
 │   │   ├── ✅ `layout.tsx`
 │   │   ├── ✅ `robots.ts`
 │   │   └── ✅ `sitemap.ts`
 │   ├── 📂 **assets/**
 │   │   └── 📂 **images/**
 │   ├── 📂 **components/**
-│   │   ├── ❌ `AddToCartToast.tsx`
+│   │   ├── ✅ `AddToCartToast.tsx`
 │   │   ├── ✅ `AddToCartToastContent.tsx`
 │   │   ├── ✅ `BackToTopButton.tsx`
 │   │   ├── ✅ `BeforeAfterSlider.tsx`
@@ -381,7 +381,7 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:58:36.275271+00:00 tarihind
 │   │   ├── ❌ `orbitalCarouselConfig.ts`
 │   │   └── ✅ `siteUrl.ts`
 │   ├── 📂 **contexts/**
-│   │   ├── ❌ `AuthContext.tsx`
+│   │   ├── ✅ `AuthContext.tsx`
 │   │   ├── ✅ `AuthContextDefinition.ts`
 │   │   ├── ✅ `CartContext.tsx`
 │   │   ├── ✅ `CartProvider.tsx`
@@ -410,7 +410,8 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:58:36.275271+00:00 tarihind
 │   │   ├── ✅ `useRole.ts`
 │   │   ├── ✅ `useScrollAnimation.ts`
 │   │   ├── ✅ `useScrollThrottle.tsx`
-│   │   └── ✅ `useSettings.ts`
+│   │   ├── ✅ `useSettings.ts`
+│   │   └── ✅ `useTenant.tsx`
 │   ├── 📂 **i18n/**
 │   │   ├── ✅ `I18nContext.ts`
 │   │   ├── ✅ `I18nProvider.tsx`
@@ -442,9 +443,10 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:58:36.275271+00:00 tarihind
 │   │   │   ├── ✅ `product.service.ts`
 │   │   │   └── ❌ `project.service.ts`
 │   │   ├── ✅ `supabase.ts`
+│   │   ├── ✅ `tenantResolver.ts`
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `utils.ts`
-│   ├── ✅ `middleware.ts`
+│   ├── ❌ `middleware.ts`
 │   ├── 📂 **test/**
 │   ├── 📂 **types/**
 │   │   ├── ✅ `admin-shared.ts`
@@ -474,6 +476,7 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:58:36.275271+00:00 tarihind
 │   │   ├── ✅ `productHelpers.ts`
 │   │   ├── ✅ `routes.ts`
 │   │   ├── ✅ `searchHighlight.tsx`
+│   │   ├── ✅ `tenantServer.ts`
 │   │   ├── ✅ `testA11y.tsx`
 │   │   ├── ✅ `three-utils.ts`
 │   │   ├── ✅ `type-converters.ts`
@@ -572,8 +575,9 @@ Bu belge, otonom derleyici tarafından 2026-05-29T19:58:36.275271+00:00 tarihind
         ├── 📂 **_shared/**
         │   ├── ✅ `cors.ts`
         │   ├── ✅ `notify.ts`
-        │   ├── ❌ `rate_limit.ts`
-        │   └── ✅ `sentry.ts`
+        │   ├── ✅ `rate_limit.ts`
+        │   ├── ✅ `sentry.ts`
+        │   └── ✅ `tenant_config.ts`
         ├── 📂 **admin-create-coupon/**
         ├── 📂 **admin-iyzico-reconcile/**
         ├── 📂 **admin-order-inspect/**
@@ -619,8 +623,6 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\app\[lang]\category\[categorySlug]\page.md`
 - [❌] `src\app\_components\ProductDetailPageView.md`
 - [❌] `src\app\admin\returns\page.md`
-- [❌] `src\app\api\webhook\supabase\route.md`
-- [❌] `src\components\AddToCartToast.md`
 - [❌] `src\components\PaymentWatcher.md`
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\admin\dashboard\AbcPieChart.md`
@@ -632,12 +634,12 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\components\products\CategoryPreviewPanel.md`
 - [❌] `src\components\products\SeriesCard.md`
 - [❌] `src\config\orbitalCarouselConfig.md`
-- [❌] `src\contexts\AuthContext.md`
 - [❌] `src\design-system\tokens.md`
 - [❌] `src\lib\pdfAssets.md`
 - [❌] `src\lib\services\category.service.md`
 - [❌] `src\lib\services\pricing.service.md`
 - [❌] `src\lib\services\project.service.md`
+- [❌] `src\middleware.md`
 - [❌] `src\types\database.md`
 - [❌] `src\utils\analytics.md`
 - [❌] `src\utils\applicationUi.md`
@@ -652,4 +654,3 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\views\admin\AdminOrdersBoard.md`
 - [❌] `src\views\calculators\AirCurtainCalcPage.md`
 - [❌] `src\views\checkout\buildPaymentRequest.md`
-- [❌] `supabase\functions\_shared\rate_limit.md`

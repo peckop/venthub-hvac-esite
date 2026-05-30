@@ -12,7 +12,7 @@ entity_hashes:
   func:sendEmail: 2a2dc768ec5451fa
   func:sendSlack: cd61229d7922325b
   overview: be8ec04b8995d7cb
-generated_at: 2026-05-28T22:51:19Z
+generated_at: 2026-05-30T21:17:01Z
 ---
 
 ## Genel Bakış
@@ -126,56 +126,6 @@ type NotifyField = { title: string; value: string; short?: boolean }
 
 ---
 
-### [N2_NASIL] AST Pointer: `supabase/functions/_shared/notify.ts`::getSlackWebhook
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `url` — `getEnv('SLACK_WEBHOOK_URL')` cagrisindan donen webhook URL degeri; `https://` ile baslayip baslamadigi kontrol edilir
-- **Dönüş**: `string | null` — gecerli bir Slack webhook URL varsa onu, degilse `null` dondurur
-
----
-
-### [N3_NASIL] AST Pointer: `supabase/functions/_shared/notify.ts`::getEmailConfig
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `to` — `getEnv('NOTIFY_EMAIL')` cagrisindan donen hedef e-posta adresi
-  - `supabaseUrl` — `getEnv('SUPABASE_URL')` cagrisindan donen Supabase proje URL'i
-  - `serviceKey` — `getEnv('SUPABASE_SERVICE_ROLE_KEY')` cagrisindan donen service role anahtari
-- **Dönüş**: `{ to: string, supabaseUrl: string, serviceKey: string }` — e-posta konfigurasyon nesnesi dondurur
-
----
-
-### [N4_NASIL] AST Pointer: `supabase/functions/_shared/notify.ts`::sendSlack
-- **params**: `text: string`, `fields?: NotifyField[]`
-- **ic_degiskenler**:
-  - `url` — `getSlackWebhook()` cagrisindan donen webhook URL; `null` ise fonksiyon erken doner (`false`)
-  - `payload` — `Record<string, unknown>` turunde Slack API gonderim govdesi; `text` alanini ve opsiyonel `attachments` (field basliklari, degerleri, short bayragi) icerir
-- **Dönüş**: `boolean` — Slack'e basariyla gonderildiyse `true`, hata alindiysa veya URL yoksa `false`
-
----
-
-### [N5_NASIL] AST Pointer: `supabase/functions/_shared/notify.ts`::sendEmail
-- **params**: `subject: string`, `text: string`, `fields?: NotifyField[]`
-- **ic_degiskenler**:
-  - `to` — `getEmailConfig()` cagrisindan destructure edilen hedef e-posta adresi
-  - `supabaseUrl` — `getEmailConfig()` cagrisindan destructure edilen Supabase URL
-  - `serviceKey` — `getEmailConfig()` cagrisindan destructure edilen service role anahtari
-  - `message` — `text` parametresinin kopyasi; fields mevcutsa `\n` ile birlestirilmis baslik:deger ciftleri eklenir
-  - `payload` — e-posta gonderim govdesi; `type: 'email'`, `to`, `message`, `priority: 'high'`, `template: undefined`, `data.subject` alanlarini icerir
-  - `resp` — `fetch()` sonucu `Response` nesnesi; `resp.ok` degeri ile basari kontrolu yapilir
-- **Dönüş**: `boolean` — e-posta basariyla gonderildiyse (`resp.ok === true`) `true`, eksik konfigurasyon veya hata durumunda `false`
-
----
-
-### [N6_NASIL] AST Pointer: `supabase/functions/_shared/notify.ts`::notify
-- **params**: `text: string`, `fields?: NotifyField[]`
-- **ic_degiskenler**:
-  - `debug` — `getEnv('NOTIFY_DEBUG')` degerinin kucuk harfe cevirilmis hali `"true"` esitliginden donen `boolean`; debug loglarini aktif eder
-  - `subject` — `text` parametresinin ilk 50 karakteri; e-posta konu basligi olarak kullanilir
-  - `sent` — `boolean` tipinde basari bayragi; herhangi bir kanaldan (Slack veya Email) gonderim basarili olursa `true` olur
-- **Dönüş**: `yok` (`void`) — fonksiyon dogrudan deger dondurmez; yan etki olarak Slack ve/veya e-posta gonderir, debug modunda `console.warn` ile log basar
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -186,13 +136,13 @@ graph TD
     notify_ts__notify["notify"]
     notify_ts__sendEmail["sendEmail"]
     notify_ts__sendSlack["sendSlack"]
-    notify_ts__notify --> notify_ts__sendSlack
-    notify_ts__notify --> notify_ts__getEnv
-    notify_ts__getEmailConfig --> notify_ts__getEnv
-    notify_ts__sendEmail --> notify_ts__getEmailConfig
-    notify_ts__notify --> notify_ts__sendEmail
-    notify_ts__sendSlack --> notify_ts__getSlackWebhook
     notify_ts__getSlackWebhook --> notify_ts__getEnv
+    notify_ts__notify --> notify_ts__sendEmail
+    notify_ts__getEmailConfig --> notify_ts__getEnv
+    notify_ts__notify --> notify_ts__getEnv
+    notify_ts__notify --> notify_ts__sendSlack
+    notify_ts__sendSlack --> notify_ts__getSlackWebhook
+    notify_ts__sendEmail --> notify_ts__getEmailConfig
 ```
 
 ## NODE ID STANDARD
