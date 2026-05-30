@@ -7,7 +7,7 @@ skeleton_hash: b33a5fa4ac98e4a4
 entity_hashes:
   func:admin-create-coupon_handler: 72913923d4da4715
   overview: e7791c38f1685aef
-generated_at: 2026-05-30T20:27:08Z
+generated_at: 2026-05-30T21:15:15Z
 ---
 
 ## Genel Bakış
@@ -23,18 +23,6 @@ Tek bir işleyici fonksiyon, gelen tüm HTTP isteklerini alır, işler ve kupon 
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül için fonksiyon gövdesi (implementation body) paylaşılmadığından, yalnızca fonksiyon imzası ve sabit yapısından türetilen minimum varsayımlar tanımlanabilmektedir.
-
----
-
-**[Aksiyom 1 - Request Zorunluluğu]:** Eğer `req` parametresi `Request` tipinde değilse veya `null/undefined` değerinde ise, modül HTTP isteğini işleyemez ve çağrı başarısız olur.
-
-**[Aksiyom 2 - CORS Bağımlılığı]:** Eğer `corsHeaders` sabiti tanımlı değilse veya geçerli bir HTTP header nesnesi içermiyorsa, cross-origin isteklere yanıt verilirken tarayıcı tarafında CORS hataları oluşur.
-
-**[Aksiyom 3 - Edge Function Ortamı]:** Eğer modül, Supabase Edge Function ortamında (Deno runtime) çalışmıyorsa, `Request` nesnesi ve global runtime bağımlılıkları tanımsız olacağından fonksiyon başlatılamaz.
-
----
-
-> **Not:** Fonksiyon gövdesi (implementation) paylaşılmadığı için; yetki kontrolü mekanizması, veritabanı bağlantısı, kupon doğrulama kuralları, eşik değerleri ve yanıt formatı gibi detaylı domain-specific aksiyomlar **bilinmiyor** olarak işaretlenmiştir. Detaylı mimari varsayımlar için fonksiyon gövdesinin paylaşılması gerekmektedir.
 
 ---
 

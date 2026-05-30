@@ -12,7 +12,7 @@ entity_hashes:
   func:sendNotification: 9d45549bdcd4429b
   func:stock-alert_handler: 9f0ae49f1a00dd49
   overview: f1961f87b9e63cad
-generated_at: 2026-05-29T11:48:39Z
+generated_at: 2026-05-30T21:17:01Z
 ---
 
 ## Genel Bakış
@@ -213,10 +213,10 @@ graph TD
     index_ts__processProductAlert["processProductAlert"]
     index_ts__sendNotification["sendNotification"]
     index_ts__stock-alert_handler["stock-alert_handler"]
-    index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
-    index_ts__checkAllProducts --> index_ts__getAlertRecipients
     index_ts__processProductAlert --> index_ts__sendNotification
     index_ts__checkSpecificProduct --> index_ts__processProductAlert
+    index_ts__checkAllProducts --> index_ts__getAlertRecipients
+    index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
     index_ts__checkAllProducts --> index_ts__processProductAlert
 ```
 

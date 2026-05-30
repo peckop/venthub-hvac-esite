@@ -7,7 +7,7 @@ skeleton_hash: 6a020ed8c0cfc54c
 entity_hashes:
   func:admin-orders-latest_handler: 9cf0e6c826d5f20e
   overview: 3bb02a7476b8fc62
-generated_at: 2026-05-29T11:41:07Z
+generated_at: 2026-05-30T21:15:35Z
 ---
 
 ## Genel Bakış
@@ -30,10 +30,6 @@ Bu modül, admin-orders-latest_handler fonksiyonunun doğru çalışması için 
 [Aksiyom 3]: Eğer veritabanı bağlantısı kesik veya erişilemez ise, fonksiyonun siparişleri getirme işlemi başarısız olur.
 
 [Aksiyom 4]: Eğer veritabanında siparişlerle ilgili tablo veya view mevcut değilse, sorgu sonucu boş döner veya hata oluşur.
-
----
-
-**Not:** Fonksiyon gövdesi (implementation) sağlanmadığı için, bu aksiyomlar yalnızca fonksiyon imzası ve modülün genel amacına dayanarak türetilmiştir. Detaylı mimari varsayımlar için fonksiyon gövdesinin analizi gereklidir.
 
 ---
 
@@ -90,20 +86,6 @@ Bu modül, admin-orders-latest_handler fonksiyonunun doğru çalışması için 
   - `normalizeDateStart(d)` — YYYY-MM-DD formatındaki tarih string'ini ISO gün başlangıcı formatına dönüştürür
   - `normalizeDateEnd(d)` — YYYY-MM-DD formatındaki tarih string'ini ISO gün sonu formatına dönüştürür
 - **Dönüş**: `Response` — JSON { total, page, _limit, rows } ile 200; hata durumunda JSON { error } ile 401/403/500
-
----
-
-### [N2_NASIL] AST Pointer: `supabase/functions/admin-orders-latest/index.ts::normalizeDateStart`
-- **params**: `(d)` — string, tarih değeri (YYYY-MM-DD veya ISO formatı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `string` — girilen tarih `YYYY-MM-DD` formatındaysa `YYYY-MM-DDT00:00:00Z` formatında döner; aksi halde girdinin kendisi aynen döner
-
----
-
-### [N3_NASIL] AST Pointer: `supabase/functions/admin-orders-latest/index.ts::normalizeDateEnd`
-- **params**: `(d)` — string, tarih değeri (YYYY-MM-DD veya ISO formatı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `string` — girilen tarih `YYYY-MM-DD` formatındaysa `YYYY-MM-DDT23:59:59Z` formatında döner; aksi halde girdinin kendisi aynen döner
 
 ---
 

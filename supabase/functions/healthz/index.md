@@ -7,7 +7,7 @@ skeleton_hash: 2f2f8d8c33239d20
 entity_hashes:
   func:healthz_handler: 680c3be8d7d51d07
   overview: 7d9308860fa3cc5c
-generated_at: 2026-05-28T22:43:56Z
+generated_at: 2026-05-30T21:16:00Z
 ---
 
 ## Genel Bakış
@@ -20,7 +20,21 @@ Bu grup, servisin çalışır durumda olup olmadığını doğrulayan tek işlev
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, bir Supabase Edge Function health-check endpoint'ini temsil eder. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer gelen HTTP isteği (`req`) geçerli bir `Request` nesnesi değilse (örn: null, undefined veya yanlış tipte), fonksiyon beklenmeyen bir hata fırlatır veya işlenemeyen bir istek ile karşılaşır.
+
+[Aksiyom 2]: Eğer healthz_handler tarafından erişilmesi beklenen veritabanı bağlantısı (veya ilgili servis) mevcut değilse veya bağlantı kesilmişse, fonksiyon istemciye **503 Service Unavailable** HTTP durum koduyla yanıt verir.
+
+[Aksiyom 3]: Eğer fonksiyon, isteği başarıyla işleyip veritabanı erişilebilirliğini doğrulayamazsa (örn: timeout, bağlantı hatası), servis durumu "sağlıksız" olarak sınıflandırılır ve **503** döner; başarılı olursa **200 OK** döner.
+
+[Aksiyom 4]: Fonksiyonun çalışması için, ortam değişkenleri (environment variables) aracılığıyla veritabanı bağlantısı yapılandırması (örn: `SUPABASE_URL`, `SUPABASE_KEY` veya benzeri) sunucu tarafında tanımlı olmalıdır; aksi takdirde veritabanı sorgusu çalıştırılamaz ve fonksiyon hata verir.
+
+[Aksiyom 5]: Fonksiyon her çağrıda bağımsız (stateless) çalışır; önceki isteklerin durumu veya oturum bilgisi saklanmaz. Her health-check isteği tek başına değerlendirilir.
+
+**Not:** Fonksiyon gövdesi (gövde kodu)paylaşılmadığı için, somut uygulama detayları (örn: veritabanı sorgusunun türü, zaman aşımları, ek header'lar) hakkında kesin bilgi bulunmamaktadır. Yukarıdaki varsayımlar, fonksiyon imzası ve genel sağlık kontrolü tasarımından çıkarılmıştır.
 
 ---
 

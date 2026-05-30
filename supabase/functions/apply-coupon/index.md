@@ -8,7 +8,7 @@ entity_hashes:
   func:apply-coupon_handler: a399f5149250ae7f
   func:buildCors: 317be5b9cff201e9
   overview: fb96f807c58d5b28
-generated_at: 2026-05-29T11:42:34Z
+generated_at: 2026-05-30T21:15:46Z
 ---
 
 ## Genel Bakış

@@ -5,10 +5,10 @@ namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\tenant_config.ts
 skeleton_hash: 9da745ddb0a89b81
 entity_hashes:
-  func:getTenantBranding: 6ae9f5f873d6872c
-  func:resolveTenantId: 0e5af2f2539b0210
+  func:getTenantBranding: bde2d3819c7904af
+  func:resolveTenantId: 70b9699dc1e36828
   overview: 0aa8d7ed1d1b17a6
-generated_at: 2026-05-30T20:26:53Z
+generated_at: 2026-05-30T21:17:28Z
 ---
 
 ## Genel Bakış
@@ -44,25 +44,29 @@ Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve
 ## FONKSİYON DETAYLARI
 
 ### resolveTenantId
-**Ne yapar**: Bu fonksiyon, bir HTTP isteğinden (`Request` nesnesi) `tenant_id` değerini çıkarmak için kullanılan merkezi bir çözümleyicidir. İşlevi, çoklu kaynaklardan (URL parametresi, JWT claim'i, istek gövdesi) tenant belirleyicisini bulmak ve tutarlı bir şekilde sunmaktır.
+**Ne yapar**: Bir HTTP isteğinden kiracı kimliğini (tenant_id) çıkarmaya çalışır. Bu işlem, istek URL'si, Yetkilendirme başlığındaki JWT veya istek gövdesindeki veriler kullanılarak sırasıyla kontrol edilir. Eğer hiçbir kaynakta geçerli bir kiracı kimliği bulunamazsa, tanımlı bir varsayılan değer döndürür.
 
-**Nasıl yapar**: Fonksiyon, tanımlanmış bir hiyerarşiye göre arama yapar. İlk olarak URL'nin arama parametrelerinde `tenant_id` anahtarını kontrol eder. Bulamazsa, `Authorization` başlığındaki Bearer JWT'yi ayrıştırarak `app_metadata.tenant_id` claim'ini arar. Üçüncü olarak, zaten ayrıştırılmış olan istek gövdesinde `tenant_id` veya `tenantId` alanını inceler. Bu denemelerin hiçbiri başarılı olmazsa veya herhangi bir ayrıştırma hatası oluşursa, önceden tanımlanmış sabit bir `DEFAULT_TENANT_ID` değerini döndürür. Bu sayede sistem, eksik veya hatalı bir tenant belirleyicisi durumunda bile çalışmaya devam edebilir.
+**Nasıl yapar**: Fonksiyon, kiracı kimliğini belirlemek için üç aşamalı bir arama stratejisi uygular. Öncelikle URL sorgu parametrelerinde `tenant_id` arar. Bulamazsa, `Authorization` başlığındaki Bearer token'ı ayrıştırarak JWT payload'ındaki `app_metadata.tenant_id` claim'ini kontrol eder. Hâlâ bulamazsa, opsiyonel olarak verilen `parsedBody` nesnesinde `tenant_id` veya `tenantId` alanlarını inceler. Tüm denemeler başarısız olursa, module seviyesinde tanımlı olan `DEFAULT_TENANT_ID` sabitini döndürür. Herhangi bir ayrıştırma hatası oluşursa hatayı konsola kaydeder.
 
 **Parametreler**:
-- `req`: Request — İşlenmemiş HTTP istek nesnesi. URL, başlıklar ve gövde gibi verileri içerir.
-- `parsedBody?`: any — Opsiyonel. Daha önce ayrıştırılmış olan istek gövdesi nesnesi. Eğer sağlandığında, fonksiyon bunu üçüncü bir kaynak olarak kullanır.
+- `req`: Request — Kiracı kimliğini çıkarmak için analiz edilecek HTTP istek nesnesi. URL, başlıklar ve gövde erişimi için kullanılır.
+- `parsedBody`: any (opsiyonel) — Önceden ayrıştırılmış bir istek gövdesi nesnesi. `tenant_id` alanı için kontrol edilir.
 
-**Dönüş**: string — Çıkarılmış veya belirlenmiş olan `tenant_id` değerini döndürür.
+**Dönüş**: string — Bulunan veya varsayılan kiracı kimliği. Geçerli bir kiracı kimliği bulunamazsa module sabiti olan `DEFAULT_TENANT_ID` döndürülür.
 
 ### getTenantBranding
-**Ne yapar**: Bu fonksiyon, belirli bir `tenant_id` için marka kimliği ve iletişim ayarları gibi yapılandırma detaylarını dinamik olarak getirir. Çeşitli kaynaklardan gelen verileri birleştirerek tutarlı bir `TenantBranding` nesnesi oluşturur.
+**Ne yapar**: Belirli bir kiracı için marka yapılandırma bilgilerini (logo, ad, renk, e-posta adresi gibi) dinamik olarak getirir. Veri kaynağı olarak sırasıyla kiracının veritabanı kaydını, ortam değişkenlerini ve son olarak kod içi varsayılan değerleri kullanarak bir fallback mekanizması uygular.
 
-**Nasıl yapar**: Fonksiyon, bir hata toleransı ve fallback (yedekleme) mantığıyla çalışır. İlk olarak, Supabase servis anahtarını ve URL'sini kullanarak veritabanındaki `tenants` tablosundan ilgili tenant'ın `config` alanını çeker. Veritabanından gelen config nesnesi, yerel bir `dbConfig` değişkenine atanır. Ardından, her bir marka alanı (ad, logo, renk, e-posta göndereni) için çok katmanlı bir arama ve birleştirme işlemi uygulanır: Önce veritabanından gelen config'de snake_case ve camelCase anahtarlarını kontrol eder, bulamazsa ortam değişkenlerine (Deno.env) bakar, son olarak systemVars`daki hardcoded (kodda sabitlenmiş) varsayılan değerleri kullanır. Bu hiyerarşi, her alan için sırasıyla veritabanı > ortam değişkeni > sistem varsayılanı şeklinde çalışır.
+**Nasıl yapar**: Fonksiyon, istenen kiracının marka ayarlarını bulmak için hiyerarşik bir çözümleme yapar. İlk adım olarak, Supabase istemcisi oluşturarak `tenants` tablosundaki `config` alanını sorgular. Veritabanından başarılı bir veri alınırsa, bu yapılandırma nesnesi temel alınır; alınmazsa veya hata oluşursa konsola bir uyarı yazılır. Daha sonra, her bir marka özelliği (`brandName`, `brandLogoUrl`, vb.) için, veritabanı yapılandırmasındaki anahtar isimleri (hem snake_case hem camelCase varyantları) kontrol eder. Bu anahtarlar bulunamazsa, ilgili ortam değişkenine (ör. `BRAND_NAME`) bakar. Ortam değişkeni de yoksa, fonksiyon içi tanımlı nihai hardcoded varsayılan değeri kullanır. Bu süreç, dört ana marka özelliğinin her biri için tekrarlanarak nihai `TenantBranding` nesnesi oluşturulur.
 
 **Parametreler**:
-- `tenantId`: string — Branding yapılandırması getirilmek istenen kiracının (tenant) benzersiz tanımlayıcısı.
+- `tenantId`: string — Marka yapılandırması getirilecek olan kiracının benzersiz tanımlayıcısı. Veritabanı sorgusu için kullanılır.
 
-**Dönüş**: Promise<TenantBranding> — Asenkron olarak, `brandName`, `brandLogoUrl`, `brandPrimaryColor` ve `emailFrom` alanlarını içeren bir `TenantBranding` nesnesi ile çözülen bir Promise döndürür.
+**Dönüş**: Promise<TenantBranding> — Aşağıdaki alanları içeren bir marka yapılandırma nesnesi:
+- `brandName`: string — Markanın Görünen Adı (Ör: "VentHub")
+- `brandLogoUrl`: string — Markanın Logo Görselinin Tam URL'i
+- `brandPrimaryColor`: string — Markanın Ana Renk Kodu (HEX formatında, Ör: "#2563eb")
+- `emailFrom`: string — Sistem e-postalarında kullanılacak "Gönderen" adresi (Ör: "VentHub <onboarding@resend.dev>")
 
 ---
 
@@ -80,31 +84,32 @@ Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve
 
 ### [N1_NASIL] AST Pointer: _shared/tenant_config.ts::resolveTenantId
 - **params**: (req: Request, parsedBody?: any)
-- **ic_degiskenler**: 
-  - `url` — req.url'den oluşturulan URL nesnesi, query parametrelerine erişim sağlar
-  - `queryTenantId` — URL search params'dan alınan tenant_id değeri, birincil kaynaktır
-  - `authHeader` — Authorization header'ı, Bearer token içeriğini taşır
-  - `token` — Bearer prefix'inden sonra gelen JWT token string'i
-  - `jwtParts` — JWT token'ın noktalarla ayrılmış üç parçalı array'i (header, payload, signature)
-  - `payload` — JWT payload JSON nesnesi, app_metadata içeriğini barındırır
-  - `tenantId` — payload.app_metadata.tenant_id değerinden alınan tenant identifier
-  - `bodyTenantId` — parsedBody parametresinden tenant_id veya tenantId alanından alınan değer
-- **Dönüş**: string (tenant_id değeri veya DEFAULT_TENANT_ID)
+- **ic_degiskenler**:
+  - `url` — İstek URL'sini temsil eden URL nesnesi, sorgu parametrelerini okumak için kullanılır
+  - `queryTenantId` — URL'deki `tenant_id` sorgu parametresinden gelen string değer
+  - `authHeader` — Authorization veya authorization header'ından gelen token string'i
+  - `token` — Bearer prefix'i去除ılmış JWT token string'i
+  - `jwtParts` — JWT token'ının '.' karakteriyle ayrılmış parçalarını içeren array
+  - `payload` — JWT payload'unun Base64 decode edilmiş JSON objesi
+  - `tenantId` — JWT payload'unun `app_metadata.tenant_id` alanından gelen tenant ID string'i
+  - `bodyTenantId` — parsedBody objesinden gelen `tenant_id` veya `tenantId` alanı
+  - `err` — try-catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: string — Çözümlenmiş tenant ID'si veya DEFAULT_TENANT_ID
 
 ### [N2_NASIL] AST Pointer: _shared/tenant_config.ts::getTenantBranding
 - **params**: (tenantId: string)
-- **ic_degiskenler**: 
-  - `supabaseUrl` — Deno.env'den SUPABASE_URL değişkeninin değeri, Supabase bağlantısı için kullanılır
-  - `serviceKey` — Deno.env'den SUPABASE_SERVICE_ROLE_KEY değişkeninin değeri, service role yetkisi sağlar
-  - `dbConfig` — Veritabanından çekilen veya boş dizi olarak başlayan tenant konfigürasyon nesnesi
-  - `supabase` — createClient ile oluşturulan Supabase istemcisi, veritabanı sorguları yapar
-  - `data` — tenants tablosundan select('config') ile dönen satır verisi
-  - `error` — Supabase sorgusu sırasında oluşan hata nesnesi
-  - `brandName` — Marka adı için hiyerarşik çözümleme: dbConfig.brand_name -> dbConfig.brandName -> Deno.env.BRAND_NAME -> 'VentHub'
-  - `brandLogoUrl` — Marka logosu URL'i için hiyerarşik çözümleme: dbConfig.brand_logo_url -> dbConfig.brandLogoUrl -> Deno.env.BRAND_LOGO_URL -> varsayılan Vercel URL
-  - `brandPrimaryColor` — Marka ana rengi için hiyerarşik çözümleme: dbConfig.brand_primary_color -> dbConfig.brandPrimaryColor -> Deno.env.BRAND_PRIMARY_COLOR -> '#2563eb'
-  - `emailFrom` — E-posta gönderim adresi için hiyerarşik çözümleme: dbConfig.email_from -> dbConfig.EMAIL_FROM -> Deno.env.EMAIL_FROM -> 'VentHub <onboarding@resend.dev>'
-- **Dönüş**: Promise<TenantBranding> (brandName, brandLogoUrl, brandPrimaryColor, emailFrom alanlarını içeren nesne)
+- **ic_degiskenler**:
+  - `supabaseUrl` — SUPABASE_URL ortam değişkeninden gelen Supabase URL string'i
+  - `serviceKey` — SUPABASE_SERVICE_ROLE_KEY ortam değişkeninden gelen service role key string'i
+  - `dbConfig` — Veritabanından çekilen tenant konfigürasyon objesi (Record<string, string>)
+  - `supabase` — createClient ile oluşturulan Supabase istemcisi nesnesi
+  - `data` — Veritabanı sorgusundan dönen tenant verisi (config alanını içerir)
+  - `error` — Veritabanı sorgusundan dönen hata nesnesi
+  - `brandName` — Hiyerarşik resolved marka adı (DB config, alternatif key, ortam değişkeni veya varsayılan)
+  - `brandLogoUrl` — Hiyerarşik resolved marka logosu URL'i
+  - `brandPrimaryColor` — Hiyerarşik resolved marka ana rengi
+  - `emailFrom` — Hiyerarşik resolved e-posta gönderici adresi
+- **Dönüş**: Promise<TenantBranding> — {brandName, brandLogoUrl, brandPrimaryColor, emailFrom} objesi
 
 ---
 

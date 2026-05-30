@@ -9,7 +9,7 @@ entity_hashes:
   func:renderTemplate: 26cc0a301db3fae9
   func:shipping-notification_handler: 06ce613108984be4
   overview: 9cf32250487e69ff
-generated_at: 2026-05-30T20:32:25Z
+generated_at: 2026-05-30T21:17:00Z
 ---
 
 ## Genel Bakış
@@ -110,61 +110,6 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküma
     - `key` — `{{...}}` içindeki değişken adı, `_data` içinde lookup anahtarı
     - `v` — `_data[key]` ile elde edilen değer, null ise boş string, değilse String(v) olarak döndürülür
 - **Dönüş**: `string` — if-block ve değişken replacement'ları uygulanmış şablon metni
-
----
-
-### [N2_NASIL] AST Pointer: shipping-notification/index.ts::loadShippingTemplate
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `url` — `new URL('./templates/email/shipping.html', import.meta.url)` ile oluşturulan URL nesnesi, `Deno.readTextFile` ile okunacak dosya yolunu temsil eder
-- **Dönüş**: `Promise<string | null>` — şablon dosyasının içeriği veya hata durumunda null
-
----
-
-### [N3_NASIL] AST Pointer: shipping-notification/index.ts::shipping-notification_handler
-- **params**: `req` (Request)
-- **ic_degiskenler**:
-  - `requestOrigin` — `req.headers.get('origin')` ile alınan istek kaynağı
-  - `requestHeaders` — `req.headers.get('access-control-request-headers')` ile alınan CORS istek başlıkları
-  - `requestMethod` — `req.headers.get('access-control-request-method')` ile alınan HTTP yöntemi
-  - `allowedOrigins` — `Deno.env.get('ALLOWED_ORIGINS')` string'inin virgülle bölünüp trim edilmiş izin verilen origin dizisi
-  - `originAllowed` — `requestOrigin`'in `allowedOrigins` listesinde olup olmadığının boolean kontrolü
-  - `corsHeaders` — `Access-Control-Allow-Headers` ve `Access-Control-Allow-Methods` içeren CORS başlık nesnesi
-  - `body` — `req.json()` ile parse edilmiş request gövdesi (`ShippingNotificationRequest`)
-  - `order_id` — `body`'den destructure edilmiş sipariş ID'si, eksik alan kontrolünde ve yanıt/payload'ta kullanılır
-  - `customer_email` — `body`'den destructure edilmiş müşteri e-postası, Resend API `to` alanında kullanılır
-  - `customer_name` — `body`'den destructure edilmiş müşteri adı, eksik alan kontrolünde ve HTML içinde selamlama kısmında kullanılır
-  - `carrier` — `body`'den destructure edilmiş kargo firması adı, HTML içinde kargo firması bilgisinde kullanılır
-  - `tracking_number` — `body`'den destructure edilmiş takip numarası, eksik alan kontrolünde ve HTML/şablonda kullanılır
-  - `tracking_url` — `body`'den destructure edilmiş takip URL'i, şablonda ve fallback HTML'de takip butonu linki olarak kullanılır
-  - `order_number` — `body`'den destructure edilmiş sipariş numarası (`let`, değiştirilebilir), eksikse Supabase'den resolve edilir, `prettyOrderNo` ve şablon değişkeni olarak kullanılır
-  - `tenantId` — `resolveTenantId(req, body)` ile çözümlenen kiracı ID'si, Supabase ve branding çağrılarında kullanılır
-  - `branding` — `getTenantBranding(tenantId)` ile alınan kiracı marka bilgileri nesnesi (emailFrom, brandName, brandPrimaryColor, brandLogoUrl)
-  - `missing` — eksik alanların boolean filtresinden oluşan string dizisi, 400 hata yanıtının `missing` alanına eklenir
-  - `SUPABASE_URL` — `Deno.env.get('SUPABASE_URL')` ile alınan Supabase URL'i, auth client oluşturma, rol kontrolü ve sipariş numarası çözümleme çağrılarında kullanılır
-  - `SERVICE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile alınan servis anahtarı, Bearer token karşılaştırmasında, auth header'da ve Supabase REST çağrılarının `Authorization`/`apikey` başlıklarında kullanılır
-  - `authHeader` — `req.headers.get('Authorization')` ile alınan yetkilendirme başlığı, Bearer token karşılaştırmasında ve auth client oluşturmada kullanılır
-  - `isAuthorized` — kullanıcının yetkili olup olmadığını tutan boolean bayrak, authorization flow'unun sonucuna göre ayarlanır
-  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile alınan anonim Supabase anahtarı, authClient oluşturmada kullanılır
-  - `authClient` — `createClient` ile oluşturulan Supabase istemcisi, `auth.getUser()` çağrısıyla kullanıcının kimliğini doğrular
-  - `roleCheck` — Supabase REST API ile kullanıcının rolünü sorgulayan `fetch` yanıt nesnesi, `roleCheck.ok` ile durumu kontrol edilir
-  - `arr` — `roleCheck.json()`'dan elde edilen JSON dizisi, `[0].role` ile rol alınır; ayrıca `order_number` çözümlemesinde `o.json()` sonucundan elde edilen JSON dizisi olarak da kullanılır
-  - `role` — `arr[0]?.role` ile elde edilen kullanıcı rolü, `'admin'` veya `'superadmin'` ise yetkilendirme başarılı olur
-  - `RESEND_API_KEY` — `Deno.env.get('RESEND_API_KEY')` ile alınan Resend API anahtarı, email gönderilip gönderilmeyeceğine karar verilir (yoksa `disabled: true` yanıt döner) ve Resend API çağrısının `Authorization` başlığında kullanılır
-  - `EMAIL_FROM` — `branding.emailFrom` değerinden atanan gönderen e-posta adresi, Resend API çağrısının `from` alanında kullanılır
-  - `o` — `order_number` eksikse Supabase REST API ile sipariş numarasını sorgulayan `fetch` yanıt nesnesi, `o.ok` ile durumu kontrol edilir
-  - `brandName` — `branding.brandName` değerinden atanan marka adı, email konu satırı, fallback HTML başlığı ve selamlama/imza kısmında kullanılır
-  - `brandPrimary` — `branding.brandPrimaryColor` değerinden atanan ana renk kodu, fallback HTML'de başlık rengi ve buton arka plan rengi olarak kullanılır
-  - `brandLogoUrl` — `branding.brandLogoUrl` değerinden atanan logo URL'i, `renderTemplate` çağrısında şablon verisi olarak iletilir
-  - `prettyOrderNo` — sipariş numarasının formatlanmış hali (`#XXX`), email konu satırı, fallback HTML ve şablon değişkeni olarak kullanılır
-  - `subject` — `brandName` ve `prettyOrderNo` ile oluşturulan email konu satırı, Resend API çağrısında kullanılır
-  - `html` — email HTML içeriği; önce `loadShippingTemplate()` yüklenir, başarısız olursa fallback HTML string oluşturulur, başarılıysa `renderTemplate` ile render edilir, Resend API çağrısının `html` alanına gönderilir
-  - `resp` — Resend API (`https://api.resend.com/emails`) POST isteği sonucu, `resp.ok` ile durumu kontrol edilir, hata varsa exception fırlatılır
-  - `t` — başarısız Resend yanıtının `resp.text()` ile alınan hata metni, Error mesajında kullanılır
-  - `result` — başarılı Resend yanıtının `resp.json()` ile parse edilmiş sonucu, başarı yanıtının `result` alanına eklenir
-  - `error` — catch bloğu tarafından yakalanan hata nesnesi, `sentryCaptureException` ile Sentry'ye gönderilir ve `msg`'ye dönüştürülür
-  - `msg` — `error.message` veya `String(error)` ile elde edilen hata mesajı string'i, 500 hata yanıtının `error` alanına eklenir
-- **Dönüş**: `Response` — 200 (başarılı/disabled), 400 (eksik alan), 405 (yanlış method), 401 (yetkisiz) veya 500 (hata) HTTP yanıtı
 
 ---
 

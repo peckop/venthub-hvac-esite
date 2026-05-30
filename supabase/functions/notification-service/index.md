@@ -11,7 +11,7 @@ entity_hashes:
   func:sendSMS: 569d0e2e89431898
   func:sendWhatsApp: 79c6e69b836b3ef4
   overview: 71e4dfd3d4c33151
-generated_at: 2026-05-30T20:29:54Z
+generated_at: 2026-05-30T21:16:11Z
 ---
 
 ## Genel Bakış
@@ -190,50 +190,6 @@ type TemplateData = Record<string, string | number | boolean>
 
 ---
 
-### [N2_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendWhatsApp
-- **params**: `(to: string, message: string, template?: string, _data?: TemplateData, config?: TwilioConfig)`
-- **ic_degiskenler**:
-  - `finalMessage` — `template` mevcutsa `formatTemplate(template, _data)` ile biçimlendirilmiş mesaj, yoksa ham `message`
-  - `formattedTo` — `to` numarası `whatsapp:` prefix'i içermiyorsa önüne eklenerek formatlanan alıcı numarası
-  - `twilioUrl` — Twilio Messages API uç nokta URL'i, `config.accountSid` ile dinamik oluşturulur
-  - `credentials` — `btoa(`${config.accountSid}:${config.authToken}`)` ile Base64 kodlanan HTTP Basic Auth bilgisi
-  - `response` — Twilio API'ye POST isteği ile dönen fetch yanıtı
-  - `error` — `response.ok` false ise `response._text()` ile alınan hata metni
-- **Dönüş**: Twilio API yanıtının JSON parse edilmiş hali (Twilio mesaj nesnesi)
-
----
-
-### [N3_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendSMS
-- **params**: `(to: string, message: string, config: TwilioConfig)`
-- **ic_degiskenler**:
-  - `twilioUrl` — Twilio Messages API uç nokta URL'i, `config.accountSid` ile dinamik oluşturulur
-  - `credentials` — `btoa(`${config.accountSid}:${config.authToken}`)` ile Base64 kodlanan HTTP Basic Auth bilgisi
-  - `response` — Twilio API'ye POST isteği ile dönen fetch yanıtı
-  - `error` — `response.ok` false ise `response._text()` ile alınan hata metni
-- **Dönüş**: Twilio API yanıtının JSON parse edilmiş hali (Twilio mesaj nesnesi)
-
----
-
-### [N4_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendEmail
-- **params**: `(to: string, message: string, template?: string, _data?: TemplateData, config?: { apiKey: string; from?: string })`
-- **ic_degiskenler**:
-  - `subject` — `_data?.subject` mevcutsa onu alan, yoksa `'VentHub Bildirim'` varsayılanını kullanan e-posta konu satırı
-  - `finalMessage` — `template` mevcutsa `formatTemplate(template, _data)` ile biçimlendirilmiş mesaj, yoksa ham `message`
-  - `from` — `config?.from` veya `_data?.emailFrom` veya `'VentHub <noreply@venthub.com>'` sırasıyla denenerek belirlenen gönderici adresi
-  - `response` — Resend API'ye POST isteği ile dönen fetch yanıtı
-  - `error` — `response.ok` false ise `response._text()` ile alınan hata metni
-- **Dönüş**: Resend API yanıtının JSON parse edilmiş hali (Resend mesaj nesnesi)
-
----
-
-### [N5_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::formatTemplate
-- **params**: `(template: string, _data: TemplateData)`
-- **ic_degiskenler**:
-  - `formatted` — `template` değerinden başlatılıp her `{{key}}` placeholder'ının `_data[key]` değeri ile değiştirildiği sonuç string
-- **Dönüş**: `string` — yer tutucuları değerlerle değiştirilmiş şablon metni
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -243,8 +199,8 @@ graph TD
     index_ts__sendEmail["sendEmail"]
     index_ts__sendSMS["sendSMS"]
     index_ts__sendWhatsApp["sendWhatsApp"]
-    index_ts__sendWhatsApp --> index_ts__formatTemplate
     index_ts__sendEmail --> index_ts__formatTemplate
+    index_ts__sendWhatsApp --> index_ts__formatTemplate
 ```
 
 ## NODE ID STANDARD

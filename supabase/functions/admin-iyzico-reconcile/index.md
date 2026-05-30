@@ -7,7 +7,7 @@ skeleton_hash: 2cafc6e476e015f8
 entity_hashes:
   func:admin-iyzico-reconcile_handler: e8970eccf3f1fb90
   overview: b0badc73158954b7
-generated_at: 2026-05-29T11:40:05Z
+generated_at: 2026-05-30T21:15:15Z
 ---
 
 ## Genel Bakış
@@ -39,10 +39,6 @@ Bu modül, Supabase Edge Function olarak çalışan bir HTTP handler'idır. Mima
 **[Aksiyom 7]:** Eğer Supabase veritabanı bağlantısı kesikse veya tablolar (ödeme kayıtları) erişilebilir durumda değilse, yerel tarafın doğrulanması yapılamaz ve tutarsızlık raporlanamaz.
 
 **[Aksiyom 8]:** Fonksiyon imzasında `req` dışında parametre tanımlanmamıştır; bu nedenle işlevsellik tamamen `req` nesnesinin içeriğine (header, body, query params) bağımlıdır.
-
----
-
-> **Not:** Fonksiyon gövdesi (kod) paylaşılmadığı için, iç iş mantığına (örn: hangi API endpoint'lerinin çağrıldığı, hangi tabloların sorgulandığı, detaylı hata yönetimi) ilişkin aksiyomlar **bilinmiyor** olarak işaretlenmiştir.
 
 ---
 
