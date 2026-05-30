@@ -1,5 +1,6 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import Iyzipay from "npm:iyzipay";
+import { resolveTenantId } from '../_shared/tenant_config.ts'
 
 
 /**
@@ -128,6 +129,9 @@ Deno.serve(async (req: Request) => {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
             });
         }
+
+        // Resolve Tenant ID dynamically
+        const tenantId = resolveTenantId(req, requestData || {})
 
         const amount = requestData?.amount
         const cartItems = requestData?.cartItems
@@ -295,7 +299,8 @@ Deno.serve(async (req: Request) => {
             legal_consents: legalConsents || null,
             shipping_method: (typeof shippingMethod === 'string' && shippingMethod) ? shippingMethod : 'standard',
             coupon_code: (requestData?.couponCode && typeof requestData.couponCode === 'string') ? requestData.couponCode : null,
-            coupon_discount: 0
+            coupon_discount: 0,
+            tenant_id: tenantId
         };
 
         // Try creating order; if schema drift (shipping_method column missing), retry without it
@@ -410,6 +415,7 @@ Deno.serve(async (req: Request) => {
                 total_price: safeUnit * qty,
                 price_at_time: safeUnit,
                 product_image_url: fallbackImage,
+                tenant_id: tenantId
             }
         });
 
@@ -561,7 +567,7 @@ Deno.serve(async (req: Request) => {
             // Minimal token saklama: reconcile için yeterli.
             try {
                 if (iyzicoResult.token) {
-                    await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(dbOrderId)}`, {
+                    await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(dbOrderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
                         method: 'PATCH',
                         headers: {
                             'Authorization': `Bearer ${serviceRoleKey}`,

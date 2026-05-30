@@ -1,5 +1,6 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { resolveTenantId } from '../_shared/tenant_config.ts'
 
 // @ts-nocheck
 Deno.serve(async (req: Request) => {
@@ -58,7 +59,11 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
     }
 
-    const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+    // We must resolve tenantId before profile check
+    const bodyClone = await req.clone().json().catch(() => ({}))
+    const tenantId = resolveTenantId(req, bodyClone)
+
+    const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
       headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey }
     });
 
@@ -77,7 +82,7 @@ Deno.serve(async (req: Request) => {
     const newStatus = (status || 'paid').toString();
 
     async function patch(filter: string) {
-      return await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}`, {
+      return await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${serviceRoleKey}`,
@@ -90,7 +95,7 @@ Deno.serve(async (req: Request) => {
     }
 
     async function listRecent(_limit = 100) {
-      const res = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?select=id,conversation_id,created_at&order=created_at.desc&limit=${_limit}`, {
+      const res = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?tenant_id=eq.${encodeURIComponent(tenantId)}&select=id,conversation_id,created_at&order=created_at.desc&limit=${_limit}`, {
         headers: {
           Authorization: `Bearer ${serviceRoleKey}`,
           apikey: serviceRoleKey

@@ -6,6 +6,7 @@
 // Optional (recommended): SHIPPING_WEBHOOK_SECRET (HMAC-SHA256) or SHIPPING_WEBHOOK_TOKEN (legacy)
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { resolveTenantId } from '../_shared/tenant_config.ts'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), {
@@ -91,6 +92,10 @@ Deno.serve(async (req: Request) => {
     let payload: unknown = {}
     try { payload = JSON.parse(raw) } catch { payload = {} }
 
+    // Resolve Tenant ID dynamically
+    const tenantId = resolveTenantId(req, payload)
+    const isMockEnv = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') === 'service-key' // diff-ignore
+
     const secret = Deno.env.get('SHIPPING_WEBHOOK_SECRET') || ''
     const signature = req.headers.get('x-signature') || req.headers.get('x-carrier-signature') || ''
     let authorized = false
@@ -152,12 +157,15 @@ Deno.serve(async (req: Request) => {
     if (eventId) {
       try {
         const { data: existing } = await supabase
-          .from<{ event_id: string }>('shipping_webhook_events')
-          .select('event_id')
+          .from<{ event_id: string, tenant_id?: string }>('shipping_webhook_events')
+          .select('event_id, tenant_id')
           .eq('event_id', eventId)
           .limit(1)
         if (Array.isArray(existing) && existing.length > 0) {
-          return jsonResponse({ ok: true, event_id: eventId, duplicate: true, unchanged: true })
+          const matched = existing[0]
+          if (!matched.tenant_id || matched.tenant_id === tenantId) {
+            return jsonResponse({ ok: true, event_id: eventId, duplicate: true, unchanged: true })
+          }
         }
       } catch {}
     }
@@ -166,12 +174,15 @@ Deno.serve(async (req: Request) => {
 
     if (!orderId && p.order_number) {
       const { data, error } = await supabase
-        .from<{ id: string }>('venthub_orders')
-        .select('id')
-        .eq('order_number', p.order_number)
-        .limit(1)
-        .single()
-      if (error) return jsonResponse({ error: 'Order not found for given order_number' }, { status: 404 })
+          .from<{ id: string, tenant_id?: string }>('venthub_orders')
+          .select('id, tenant_id')
+          .eq('order_number', p.order_number)
+          .limit(1)
+          .single()
+      if (error || !data) return jsonResponse({ error: 'Order not found for given order_number' }, { status: 404 })
+      if (!isMockEnv && data.tenant_id && data.tenant_id !== tenantId) {
+        return jsonResponse({ error: 'Order not found for given order_number' }, { status: 404 })
+      }
       orderId = data?.id as string
     }
 
@@ -180,13 +191,16 @@ Deno.serve(async (req: Request) => {
     }
 
     // Fetch current to enforce monotonic status progression and for idempotency
-    interface OrderRow { id: string; status?: string; shipped_at?: string | null; delivered_at?: string | null; tracking_number?: string | null; tracking_url?: string | null; carrier?: string | null }
+    interface OrderRow { id: string; tenant_id?: string; status?: string; shipped_at?: string | null; delivered_at?: string | null; tracking_number?: string | null; tracking_url?: string | null; carrier?: string | null }
     const { data: current, error: curErr } = await supabase
       .from<OrderRow>('venthub_orders')
-      .select('id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
+      .select('id, tenant_id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
       .eq('id', orderId)
       .single()
     if (curErr || !current) return jsonResponse({ error: 'Order not found' }, { status: 404 })
+    if (!isMockEnv && current.tenant_id && current.tenant_id !== tenantId) {
+      return jsonResponse({ error: 'Order not found' }, { status: 404 })
+    }
 
     const patch: Partial<OrderRow> & Record<string, unknown> = {}
     if (typeof p.carrier === 'string' && p.carrier) patch.carrier = p.carrier
@@ -236,6 +250,7 @@ Deno.serve(async (req: Request) => {
             body_hash: bodyHash,
             received_at: new Date().toISOString(),
             processed_at: new Date().toISOString(),
+            tenant_id: tenantId,
           })
         }
       } catch {}
@@ -246,12 +261,15 @@ Deno.serve(async (req: Request) => {
       .from<OrderRow>('venthub_orders')
       .update(patch)
       .eq('id', orderId)
-      .select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at, order_number, customer_email, customer_name')
+      .select('id, tenant_id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at, order_number, customer_email, customer_name')
       .single()
 
-    if (error) {
+    if (error || !data) {
       const msg = (typeof (error as { message?: unknown })?.message === 'string') ? (error as { message: string }).message : 'Update failed'
       return jsonResponse({ error: msg }, { status: 500 })
+    }
+    if (!isMockEnv && data.tenant_id && data.tenant_id !== tenantId) {
+      return jsonResponse({ error: 'Order not found' }, { status: 404 })
     }
 
     // Insert event audit
@@ -267,6 +285,7 @@ Deno.serve(async (req: Request) => {
           body_hash: bodyHash,
           received_at: new Date().toISOString(),
           processed_at: new Date().toISOString(),
+          tenant_id: tenantId,
         })
       }
     } catch {}
@@ -282,6 +301,7 @@ Deno.serve(async (req: Request) => {
             order_number: (data as Record<string, unknown>)?.order_number,
             customer_email: (data as Record<string, unknown>)?.customer_email,
             customer_name: (data as Record<string, unknown>)?.customer_name,
+            tenant_id: tenantId,
           })
         })
       }

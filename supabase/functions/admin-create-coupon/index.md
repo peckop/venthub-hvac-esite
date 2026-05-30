@@ -3,36 +3,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-create-coupon\index.ts
-skeleton_hash: d670578debdc12bc
+skeleton_hash: b33a5fa4ac98e4a4
 entity_hashes:
   func:admin-create-coupon_handler: 72913923d4da4715
-  overview: 5cba6bb90779bd31
-generated_at: 2026-05-29T11:39:37Z
+  overview: e7791c38f1685aef
+generated_at: 2026-05-30T20:27:08Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase Edge Function olarak çalışan HTTP endpoint'idir. Yönetici paneli üzerinden yeni indirim kuponları oluşturulmasını sağlar. Gelen istekleri işleyerek kupon verilerini doğrular, veritabanına kaydeder ve uygun HTTP yanıtları döndürür.
+Bu modül, bir Supabase Edge Function olarak çalışan tek bir HTTP endpoint'idir. Yönetici arayüzünden gelen istekleri alarak yeni indirim kuponu oluşturma işlemini yönetir. İstek gövdesindeki verileri doğrular, veritabanına kaydeder ve işlem sonucuna göre uygun HTTP yanıtını döndürür.
 
 ## Fonksiyon Grupları
-### Kupon Oluşturma İşlemleri
-Tüm HTTP isteklerini yöneterek kupon oluşturma sürecini tek bir işleyici içinde yürütür. İstek doğrulama, yetki kontrolü, veri kaydı ve yanıt üretimini içerir.
-- admin_create_coupon_handler
+### İstek İşleme ve Kupon Oluşturma
+Tek bir işleyici fonksiyon, gelen tüm HTTP isteklerini alır, işler ve kupon oluşturma mantığını yürütür. Yetkilendirme, veri doğrulama, veritabanı işlemi ve yanıt üretimini kapsayan tüm adımları tek bir akışta yönetir.
+- admin-create-coupon_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Supabase Edge Function平台上 çalışan bir HTTP endpoint'idir. Yalnızca yapısal unsurlardan (fonksiyon imzası ve sabitler) türetilen aksiyomlar aşağıdadır.
+Bu modül için fonksiyon gövdesi (implementation body) paylaşılmadığından, yalnızca fonksiyon imzası ve sabit yapısından türetilen minimum varsayımlar tanımlanabilmektedir.
 
 ---
 
-**[Aksiyom 1]:** Eğer `corsHeaders` sabiti tanımlı değilse veya boşsa, cross-origin istekler yanıt başlıklarında CORS kurallarına uygun şekilde işlenemez ve istemciler tarayıcı güvenlik politikası nedeniyle yanıta erişemez.
+**[Aksiyom 1 - Request Zorunluluğu]:** Eğer `req` parametresi `Request` tipinde değilse veya `null/undefined` değerinde ise, modül HTTP isteğini işleyemez ve çağrı başarısız olur.
 
-**[Aksiyom 2]:** Eğer `req` parametresi `Request` tipinde değilse (örn: `null`, `undefined` veya farklı bir tip), fonksiyon HTTP method, header veya body bilgisine erişemeden çalışma zamanı hatası verir.
+**[Aksiyom 2 - CORS Bağımlılığı]:** Eğer `corsHeaders` sabiti tanımlı değilse veya geçerli bir HTTP header nesnesi içermiyorsa, cross-origin isteklere yanıt verilirken tarayıcı tarafında CORS hataları oluşur.
 
-**[Aksiyom 3]:** Eğer istek gövdesi (request body) geçerli bir JSON içermiyorsa veya `Content-Type` header'ı `application/json` olarak ayarlanmamışsa, kupon oluşturma verileri parse edilemez ve işlenemez.
+**[Aksiyom 3 - Edge Function Ortamı]:** Eğer modül, Supabase Edge Function ortamında (Deno runtime) çalışmıyorsa, `Request` nesnesi ve global runtime bağımlılıkları tanımsız olacağından fonksiyon başlatılamaz.
 
-**[Aksiyom 4]:** Eğer Supabase Edge Function runtime ortamı (Deno) müsait değilse veya fonksiyon deploy edilmemişse, HTTP istekleri bu endpoint'e yönlendirilemez ve bağlantı hatası oluşur.
+---
+
+> **Not:** Fonksiyon gövdesi (implementation) paylaşılmadığı için; yetki kontrolü mekanizması, veritabanı bağlantısı, kupon doğrulama kuralları, eşik değerleri ve yanıt formatı gibi detaylı domain-specific aksiyomlar **bilinmiyor** olarak işaretlenmiştir. Detaylı mimari varsayımlar için fonksiyon gövdesinin paylaşılması gerekmektedir.
 
 ---
 
@@ -62,38 +64,39 @@ Bu modül, Supabase Edge Function平台上 çalışan bir HTTP endpoint'idir. Ya
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: supabase/functions/admin-create-coupon/index.ts::admin-create-coupon_handler
-- **params**: `(req: Request)` — gelen HTTP isteği
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `corsHeaders` — `getCorsHeaders(req)` ile elde edilen CORS başlık nesnesi, tüm yanıtlara eklenir
-  - `cors` — `corsHeaders`'ın alias'ı olarak atanmış, fonksiyon gövdesinde tekrar kullanılmaz
+  - `corsHeaders` — `getCorsHeaders(req)` çağrısından elde edilen CORS header nesnesi, tüm HTTP yanıtlarına eklenir
+  - `cors` — `corsHeaders`'in alternatif alias'ı, aynı nesneye referans
   - `SUPABASE_URL` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase proje URL'i, istemci oluşturmada kullanılır
-  - `SUPABASE_ANON_KEY` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan anonim anahtar, kullanıcı bazlı Supabase istemcisi oluşturulurken kullanılır
-  - `SUPABASE_SERVICE_ROLE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan servis rolü anahtarı, admin Supabase istemcisi oluşturulurken kullanılır
-  - `authHeader` — `req.headers.get('Authorization')` ile alınan Yetkilendirme başlığı, kullanıcı kimlik doğrulaması için kullanılır
-  - `supabaseUser` — `createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { global: { headers: { Authorization: authHeader } } })` ile oluşturulan kullanıcı Supabase istemcisi, `auth.getUser()` çağrısıyla kullanılır
-  - `supabaseAdmin` — `createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)` ile oluşturulan servis rolü Supabase istemcisi, profil sorgulama ve kupon ekleme işlemlerinde kullanılır
-  - `userRes` — `supabaseUser.auth.getUser()` çağrısının `data` sonucu, kullanıcı bilgilerini içerir
-  - `userErr` — `supabaseUser.auth.getUser()` çağrısının `error` sonucu, kimlik doğrulama hatası varsa doludur
-  - `userId` — `userRes.user.id` değerinden alınan kimlik doğrulanmış kullanıcının UUID'si, profil sorgusu ve `created_by` alanına yazılır
-  - `profile` — `supabaseAdmin.from('user_profiles').select('role').eq('id', userId).maybeSingle()` sorgusunun sonucu, kullanıcının rol bilgisini içerir
-  - `profErr` — profil sorgusunun `error` sonucu, veritabanı hatası varsa doludur
-  - `userRole` — `profile?.role` değerinden alınan kullanıcı rolü, `'user'` varsayılanı ile `'admin'`/`'superadmin'` kontrolü yapılır
-  - `body` — `await req.json().catch(() => ({}))` ile parse edilen istek gövdesi, `CouponBody` arayüzü ile tiplendirilmiş (code, type, value, starts_at, ends_at, active, usage_limit alanları)
-  - `code` — `String(body.code || '').trim()` ile temizlenmiş kupon kodu, 3-50 karakter arası olmalı
-  - `type` — `String(body.type || '')` ile alınan indirim türü, `'percent'` veya `'fixed'` olmalı
-  - `value` — `Number(body.value)` ile sayıya dönüştürülen indirim değeri, sıfırdan büyük olmalı
-  - `starts_at` — `body.starts_at` varsa `String(body.starts_at)`, yoksa `null`; kupon geçerlilik başlangıç tarihi
-  - `ends_at` — `body.ends_at` varsa `String(body.ends_at)`, yoksa `null`; kupon geçerlilik bitiş tarihi
-  - `is_active` — `Boolean(body.active ?? true)` ile belirlenen aktiflik durumu, varsayılan `true`
-  - `usage_limit` — `body.usage_limit`'ten parse edilen kullanım limiti, `null` olabilir (sınırsız), geçersiz değerlerde `null` atanır
-  - `ul` — `Number(body.usage_limit)` ile parse edilen geçici kullanım limiti sayısı, `!Number.isFinite(ul) || ul < 1` kontrolü ile `null` veya geçerli sayıya dönüştürülür
-  - `errs` — validasyon hatalarını toplayan `string[]` dizisi, geçersiz alan isimleri eklenir (`'code'`, `'type'`, `'value'`)
-  - `payload` — `supabaseAdmin.from('coupons').insert(payload)` ile veritabanına yazılacak kupon nesnesi; alanları: `code`, `discount_type` (`'percentage'`/`'fixed_amount'`), `discount_value`, `valid_from` (ISO tarih), `valid_until` (ISO tarih), `is_active`, `usage_limit`, `used_count` (0), `created_by` (userId)
-  - `data` — `supabaseAdmin.from('coupons').insert(payload).select('id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at').single()` çağrısının `data` sonucu, eklenen kuponun tam bilgilerini içerir
-  - `insErr` — insert işleminin `error` sonucu, veritabanı ekleme hatası varsa doludur
-  - `_e` — `catch` bloğu yakalama değişkeni, `unknown` tipinde, hata nesnesi veya string olabilir
-  - `msg` — `_e instanceof Error ? _e.message : String(_e)` ile elde edilen hata mesajı, internal hata yanıtında `details` alanına yazılır
-- **Dönüş**: `Response` — OPTIONS istekleri için 204, method hatası için 405, kimlik doğrulama hataları için 401, yetki hatası için 403, validasyon hataları için 400, başarılı kupon oluşturma için 200 (JSON ile kupon verisi), genel catch bloğu için 500
+  - `SUPABASE_ANON_KEY` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan anonim anahtar, normal kullanıcı yetkilendirmeli Supabase istemcisi oluşturulurken kullanılır
+  - `SUPABASE_SERVICE_ROLE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan servis rolü anahtarı, yetki bypass yapan admin Supabase istemcisi oluşturulurken kullanılır
+  - `authHeader` — `req.headers.get('Authorization')` ile gelen JWT token, kullanıcı kimlik doğrulaması için kullanılır
+  - `supabaseUser` — `createClient` ile oluşturulan Supabase istemcisi, anonim key + Authorization header ile; kullanıcının kendi token'ıyla auth istekleri yapılır
+  - `supabaseAdmin` — `createClient` ile oluşturulan Supabase istemcisi, service role key ile; veritabanı üzerinde tam yetkili operations yapılır
+  - `userRes` — `supabaseUser.auth.getUser()` sonucundaki `data`, kullanıcı bilgilerini içerir
+  - `userErr` — `supabaseUser.auth.getUser()` sonucundaki `error`, auth hatası varsa doludur
+  - `userId` — `userRes.user.id`, doğrulanmış kullanıcının UUID'si, profil sorgusu ve coupon oluşturma payload'ında kullanılır
+  - `bodyCheck` — `req.clone().json()` ile okunan talep gövdesi (hata olursa boş obje), `resolveTenantId`'ye parametre olarak verilir
+  - `tenantId` — `resolveTenantId(req, bodyCheck)` ile çözümlenen kiracı ID'si, profil sorgusu ve coupon payload'ında kullanılır
+  - `profile` — `user_profiles` tablosundan `role` alanını seçen sorgu sonucu `data`, kullanıcının rol bilgisini içerir
+  - `profErr` — profil sorgusundaki `error`, sorgu hatası varsa doludur
+  - `userRole` — `profile?.role` değerinden türetilen rol string'i, varsayılan olarak `'user'`; admin/superadmin kontrolü yapılır
+  - `body` — `req.json()` ile okunan CouponBody tipindeki talep gövdesi, kupon oluşturma parametrelerini içerir
+  - `code` — `body.code`'un string'e çevrilip trim edilmiş hali, kupon kodu doğrulama ve payload'da kullanılır
+  - `type` — `body.type`'un string'e çevrilmiş hali, indirim türü (`percent` veya `fixed`)
+  - `value` — `body.value`'un `Number()` ile sayıya çevrilmiş hali, indirim miktarı/tutarı
+  - `starts_at` — `body.starts_at` varsa string'e çevrilmiş, yoksa `null`; kupon geçerlilik başlangıç tarihi
+  - `ends_at` — `body.end_at` varsa string'e çevrilmiş, yoksa `null`; kupon geçerlilik bitiş tarihi
+  - `is_active` — `body.active` boolean değeri, `undefined`/`null` ise `true` varsayılır; kuponun aktiflik durumu
+  - `usage_limit` — `body.usage_limit`'ten türetilen `number | null`; geçerli bir pozitif finite sayı değilse `null` olur, kuponun maximum kullanım sayısını belirler
+  - `errs` — validasyon hatalarını toplayan string dizisi; `code`, `type`, `value` hataları buraya eklenir, boş değilse 400 döner
+  - `payload` — `coupons` tablosuna insert edilecek nesne; `code`, `discount_type`, `discount_value`, `valid_from`, `valid_until`, `is_active`, `usage_limit`, `used_count`, `created_by`, `tenant_id` alanlarını içerir; `type` alanını `discount_type` formatına dönüştürür (`'percent'` → `'percentage'`, `'fixed'` → `'fixed_amount'`)
+  - `data` — `coupons` tablosuna insert sonrası `select` ile dönen tek satır (`id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at` alanları); başarı durumunda istemciye JSON olarak döner
+  - `insErr` — insert sorgusundaki `error`, insert hatası varsa doludur
+  - `_e` — `catch` bloğunda yakalanan hata nesnesi, `Error` instance ise `.message` okunur, değilse `String(_e)` ile string'e çevrilir
+  - `msg` — `_e`'den türetilen hata mesajı string'i, internal error yanıtı detayında kullanılır
+- **Dönüş**: `Response` — Başarılı kupon oluşturma: `200` + kupon JSON'u; validasyon/hata durumlarında uygun HTTP status kodları (204, 405, 500, 401, 403, 400) ile hata JSON'u döner; `finally` dönüşü yoktur
 
 ---
 

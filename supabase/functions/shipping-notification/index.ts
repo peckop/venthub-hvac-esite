@@ -1,6 +1,7 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { sentryCaptureException } from "../_shared/sentry.ts"
+import { resolveTenantId, getTenantBranding } from '../_shared/tenant_config.ts'
 
 // Tiny template renderer for {{var}} and {{#if var}} ... {{/if}}
 function renderTemplate(tpl: string, _data: Record<string, unknown>): string {
@@ -35,6 +36,7 @@ interface ShippingNotificationRequest {
   carrier: string
   tracking_number: string
   tracking_url?: string | null
+  tenant_id?: string
 }
 
 serve(async (req) => {
@@ -56,6 +58,10 @@ serve(async (req) => {
     const { order_id, customer_email, customer_name, carrier, tracking_number, tracking_url } = body
     let { order_number } = body
 
+    // Resolve Tenant ID and get Branding details dynamically
+    const tenantId = resolveTenantId(req, body)
+    const branding = await getTenantBranding(tenantId)
+
     if (!order_id || !customer_email || !customer_name || !carrier || !tracking_number) {
       const missing = [!order_id && 'order_id', !customer_email && 'customer_email', !customer_name && 'customer_name', !carrier && 'carrier', !tracking_number && 'tracking_number'].filter(Boolean)
       return new Response(JSON.stringify({ error: 'missing_fields', missing }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -75,7 +81,7 @@ serve(async (req) => {
         const authClient = createClient(SUPABASE_URL, anonKey, { global: { headers: { Authorization: authHeader } } })
         const { data: { user } } = await authClient.auth.getUser()
         if (user) {
-          const roleCheck = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+          const roleCheck = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
             headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
           })
           if (roleCheck.ok) {
@@ -99,12 +105,12 @@ serve(async (req) => {
     }
 
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
-    const EMAIL_FROM = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
+    let EMAIL_FROM = branding.emailFrom
 
     // Resolve order_number if missing
     if (!order_number && SUPABASE_URL && SERVICE_KEY) {
       try {
-        const o = await fetch(`${SUPABASE_URL}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=order_number`, {
+        const o = await fetch(`${SUPABASE_URL}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=order_number`, {
           headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
         })
         if (o.ok) {
@@ -114,24 +120,28 @@ serve(async (req) => {
       } catch {}
     }
 
+    const brandName = branding.brandName
+    const brandPrimary = branding.brandPrimaryColor
+    const brandLogoUrl = branding.brandLogoUrl
+
     const prettyOrderNo = order_number ? `#${order_number.split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
-    const subject = `Siparişiniz kargoya verildi - ${prettyOrderNo}`
+    const subject = `${brandName} | Siparişiniz kargoya verildi - ${prettyOrderNo}`
 
     let html = (await loadShippingTemplate()) || ''
     if (!html) {
       html = [
         '<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">',
-        '<h2>Siparişiniz Kargoya Verildi</h2>',
+        `<h2 style="color: ${brandPrimary};">${brandName} — Siparişiniz Kargoya Verildi</h2>`,
         `<p>Merhaba ${customer_name},</p>`,
         `<p><strong>${prettyOrderNo}</strong> numaralı siparişiniz kargoya verilmiştir.</p>`,
         `<p><strong>Kargo Firması:</strong> ${carrier}</p>`,
         `<p><strong>Takip Numarası:</strong> ${tracking_number}</p>`,
-        tracking_url ? `<p><a href="${tracking_url}" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Kargomu Takip Et</a></p>` : '',
-        '<p>Teşekkürler,<br>VentHub Ekibi</p>',
+        tracking_url ? `<p><a href="${tracking_url}" style="background: ${brandPrimary}; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Kargomu Takip Et</a></p>` : '',
+        `<p>Teşekkürler,<br>${brandName} Ekibi</p>`,
         '</div>'
       ].join('')
     } else {
-      html = renderTemplate(html, { customer_name, order_number: prettyOrderNo, carrier, tracking_number, tracking_url: tracking_url || '#' })
+      html = renderTemplate(html, { customer_name, order_number: prettyOrderNo, carrier, tracking_number, tracking_url: tracking_url || '#', brand_name: brandName, brand_primary_color: brandPrimary, brand_logo_url: brandLogoUrl })
     }
 
     if (!RESEND_API_KEY) {

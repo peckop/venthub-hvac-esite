@@ -3,36 +3,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx
-skeleton_hash: 2f5b4133310167a3
+skeleton_hash: 2762eb4f250e5d06
 entity_hashes:
   func:AdminErrorsPage: a54e992b31a4d175
   func:fmt: f911ea01809e8b2a
-  overview: d3ea8e7075148ca6
+  overview: d57f965472ef04ba
   style_tokens: a98ae3ae7fce0104
-generated_at: 2026-05-28T22:38:59Z
+generated_at: 2026-05-30T20:26:36Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC sisteminin yönetici paneli için geliştirilmiş sistem hatalarını görüntüleyen React tabanlı bir sayfa bileşenidir. Yöneticilerin platformda oluşan tüm hataları tek bir arayüzde incelemesini sağlarken, hata kayıtlarındaki tarih bilgilerini okunabilir formata dönüştürmek için yerleşik bir yardımcı fonksiyon barındırır.
+Bu modül, VentHub HVAC yönetici paneli için geliştirilmiş bir hata görüntüleme sayfasıdır. Sistemde oluşan hataların listelenmesini ve incelenmesini sağlarken, tarih bilgilerini okunabilir formata dönüştüren yardımcı bir fonksiyon barındırır.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Yönetici arayüzünün hata listeleme sayfasını oluşturan ana React bileşenidir, tüm sayfa mantığını ve arayüz yapısını yöneterek adminlerin hata kayıtlarına erişimini sağlar.
+### Sayfa Bileşeni
+Tüm sayfa düzenini ve veri akışını yöneterek hata kayıtlarını admin kullanıcılarına sunan ana React bileşenidir.
 - AdminErrorsPage
 
 ### Tarih Formatlama Yardımcıları
-Hata kayıtlarındaki ham tarih nesnelerini kullanıcı dostu, okunabilir string formatına dönüştürmekten sorumludur, zaman damgalarının kullanıcı arayüzünde düzgün gösterilmesini sağlar.
+Hata kayıtlarındaki ham tarih nesnelerini kullanıcı arayüzünde gösterilebilir string formatına dönüştürmekten sorumludur.
 - fmt
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React TypeScript tabanlı admin paneli hata görüntüleme sayfası modülünün sağlıklı çalışması için yerine getirilmesi gereken zorunlu mimari koşullar aşağıda listelenmiştir.
+Bu modülün doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
 
-[Aksiyom 1]: Eğer bu sayfaya erişen kullanıcının admin yetkisine sahip olup olmadığını doğrulayan entegre yetkilendirme mekanizması yoksa, yetkisiz kullanıcılar sistemin hassas hata verilerine erişebilir, veri güvenliği ve gizliliği ihlali yaşanır.
-[Aksiyom 2]: Eğer AdminErrorsPage componenti, sistemdeki tüm hata kayıtlarını çekeceği bir backend API'sine ya da component içine hata verisini iletecek bir state/prop aktarım altyapısına sahip değilse, sayfada hiçbir hata kaydı görüntülenemez, admin kullanıcıları hataları teşhis edemez.
-[Aksiyom 3]: Eğer dahili tarih formatlama fonksiyonu fmt(), aldığı geçerli Date nesnesini okunabilir bir metne dönüştüremiyorsa, hata kayıtlarının zaman damgaları hatalı/okunamaz görünür, kronolojik hata takibi imkansız hale gelir.
-[Aksiyom 4]: Eğer uygulamanın çalıştığı ortam, React fonksiyonel componentlerin ve TypeScript sözdiziminin çalışmasını desteklemiyorsa, AdminErrorsPage hiçbir şekilde render edilemez, admin paneli hata görüntüleme özelliği tamamen devre dışı kalır.
+[Aksiyom 1]: Eğer `AdminErrorsPage` bileşeni için dışarıdan (örn. API, context, prop) hata kayıtları listesi sağlanmazsa, sayfa boş veya yükleniyor durumunda kalır ve hata kayıtları gösterilmez.
+
+[Aksiyom 2]: Eğer `fmt` fonksiyonuna `Date` nesnesi dışındaki bir veri tipi (örn. string, null, undefined) verilirse, fonksiyon hata verir veya beklenmeyen bir çıktı üretir.
+
+[Aksiyom 3]: Eğer `fmt` fonksiyonu için gerekli olan tarih formatı (örn. "DD.MM.YYYY HH:mm") modül içinde sabitlenmemişse, format bilinmiyor olur.
+
+[Aksiyom 4]: Eğer `AdminErrorsPage` bileşeninin render edeceği ana yapının (header, tablo/liste bölümü, vb.) en az bir `div` veya benzeri bir container içermesi zorunluysa, bu yapı yoksa sayfa düzgün render edilemez.
 
 ---
 
@@ -70,136 +73,113 @@ Bu React TypeScript tabanlı admin paneli hata görüntüleme sayfası modülün
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx::AdminErrorsPage
+### [N1_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::AdminErrorsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, UI metinlerini çevirmek için kullanılır
-  - `lang` — useI18n hook'undan alınan mevcut dil kodu, tarih formatlamasında kullanılır
-  - `dragScrollRef` — useDragScroll hook'undan dönen referans, sürükleyerek kaydırma işlevi için tablo kapsayıcısına atanır
-  - `fmt` — Date nesnelerini YYYY-MM-DD formatına çeviren iç yardımcı fonksiyon
-  - `now` — Mevcut tarihi tutan Date nesnesi, varsayılan tarih aralığını hesaplamak için kullanılır
-  - `defaultToDate` - fmt ile formatlanmış bugünün tarihi, bitiş tarihi varsayılan değeri
-  - `defaultFromDate` - fmt ile formatlanmış 7 gün önceki tarih, başlangıç tarihi varsayılan değeri
-  - `rows` - Hata kayıtlarını tutan state dizisi, ErrorRow tipinde
-  - `setRows` - rows state'ini güncelleyen setter fonksiyonu
-  - `loading` - Veri çekme işleminin durumunu tutan state, boolean
-  - `setLoading` - loading state'ini güncelleyen setter fonksiyonu
-  - `error` - Oluşan hataları tutan state, string veya null
-  - `setError` - error state'ini güncelleyen setter fonksiyonu
-  - `total` - Toplam hata kayıt sayısını tutan state, number
-  - `setTotal` - total state'ini güncelleyen setter fonksiyonu
-  - `page` - Mevcut sayfa numarasını tutan state, number
-  - `setPage` - page state'ini güncelleyen setter fonksiyonu
-  - `q` - Arama sorgusunu tutan state, string
-  - `setQ` - q state'ini güncelleyen setter fonksiyonu
-  - `debouncedQ` - Gecikmeli arama sorgusunu tutan state, string
-  - `setDebouncedQ` - debouncedQ state'ini güncelleyen setter fonksiyonu
-  - `fromDate` - Filtre için başlangıç tarihini tutan state, string
-  - `setFromDate` - fromDate state'ini güncelleyen setter fonksiyonu
-  - `toDate` - Filtre için bitiş tarihini tutan state, string
-  - `setToDate` - toDate state'ini güncelleyen setter fonksiyonu
-  - `level` - Hata seviyesi filtresini tutan state, string
-  - `setLevel` - level state'ini güncelleyen setter fonksiyonu
-  - `env` - Ortam filtresini tutan state, string, varsayılan 'production'
-  - `setEnv` - env state'ini güncelleyen setter fonksiyonu
-  - `fetchErrors` - Hata kayıtlarını Supabase'den çeken async callback fonksiyonu
-  - `pathname` - usePathname hook'undan alınan mevcut rota, sayfa değişimlerinde veriyi yeniden çekmek için kullanılır
-  - `fetchRef` - fetchErrors fonksiyonunu tutan ref, gerçek zamanlı güncellemelerde en güncel fonksiyonu erişmek için kullanılır
-  - `refetchTimer` - Yeniden çekme işlemini geciktirmek için setTimeout ID'sini tutan ref
-  - `scheduleRefetch` - Veriyi 400ms gecikmeyle yeniden çekmeyi planlayan callback fonksiyonu
-  - `expandedId` - Açık olan hata kaydının ID'sini tutan state, string veya null
-  - `setExpandedId` - expandedId state'ini güncelleyen setter fonksiyonu
-- **Dönüş**: React.FC, admin hata yönetimi sayfası JSX elementi döndürür
+  - `tenantId` — `useTenant()` hook'undan destructured `id` değeri, Supabase real-time kanal ismi ve tenant bağlamsı için kullanılır
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, tüm UI metinleri ve hata mesajları için kullanılır
+  - `lang` — `useI18n()` hook'undan gelen mevcut dil kodu, `formatDateTime` çağrısına geçirilir
+  - `dragScrollRef` — `useDragScroll<HTMLDivElement>()` hook'undan dönen ref, tablonun yatay sürüklenebilir alanı için DOM referansı
+  - `fmt` — inner fonksiyon, Date nesnesini "YYYY-MM-DD" formatına çevirir
+  - `now` — `new Date()`, şu anki tarih/saat
+  - `defaultToDate` — `fmt(now)` çağrısıyla elde edilen bugünkü tarih stringi
+  - `defaultFromDate` — `now`'dan 6 gün öncesinin formatlanmış tarih stringi
+  - `rows` — `React.useState<ErrorRow[]>([])`, Supabase'den çekilen hata kayıtları dizisi
+  - `loading` — `React.useState<boolean>(false)`, veri yükleme durumu
+  - `error` — `React.useState<string | null>(null)`, hata mesajı veya null
+  - `total` — `React.useState(0)`, sunucudaki toplam kayıt sayısı (pagination için)
+  - `page` — `React.useState(1)`, mevcut sayfa numarası
+  - `q` — `React.useState('')`, arama kutusuna yazılan ham sorgu metni
+  - `debouncedQ` — `React.useState('')`, 300ms gecikmeli arama sorgusu, API istekleri için kullanılır
+  - `fromDate` — `React.useState(defaultFromDate)`, başlangıç tarihi filtresi
+  - `toDate` — `React.useState(defaultToDate)`, bitiş tarihi filtresi
+  - `level` — `React.useState('')`, hata seviyesi filtresi (error/warn/info/)
+  - `env` — `React.useState('production')`, ortam filtresi (production/preview/development/)
+  - `fetchErrors` — `React.useCallback`, Supabase'den hata kayıtlarını çeken asenkron fonksiyon, filtre/sayfalama parametrelerine göre query oluşturur
+  - `pathname` — `usePathname()` hook'undan gelen mevcut URL yolu, sayfa değişikliğinde veriyi yeniden çeker
+  - `fetchRef` — `React.useRef(fetchErrors)`, fetchErrors fonksiyonunun güncel referansını tutar, real-time callback'lerde güncel versiyonuna erişmek için kullanılır
+  - `refetchTimer` — `React.useRef<ReturnType<typeof setTimeout> | null>(null)`, debounce amaçlı setTimeout ID'si
+  - `scheduleRefetch` — `React.useCallback`, 400ms gecikmeyle fetchErrors'u tetikleyen debounce fonksiyonu
+  - `expandedId` — `React.useState<string | null>(null)`, genişletilmiş satırın ID'si, detay panelini açar/kapar
+- **Dönüş**: JSX (React element — admin paneli hata listesi tablosu)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx::fmt
-- **params**: (d: Date)
-- **ic_degiskenler**:
-  - `y` - Gelen tarih nesnesinin yıl değerini tutan değişken
-  - `m` - Gelen tarih nesnesinin ay değerini 2 haneli string olarak formatlayan değişken
-  - `day` - Gelen tarih nesnesinin gün değerini 2 haneli string olarak formatlayan değişken
-- **Dönüş**: string, YYYY-MM-DD formatında tarih stringi döndürür
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx::debounceQEffectCallback
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::fmt
+- **params**: `(d: Date)` — Formatlanacak tarih nesnesi
 - **ic_degiskenler**:
-  - `t` - 300ms gecikme için oluşturulan setTimeout ID'si
-  - `setDebouncedQ` - Arama sorgusunun boşluklarını kırparak debounced state'e atayan setter fonksiyonu
-  - `q` - Trimlenen orijinal arama sorgusu
-- **Dönüş**: cleanup fonksiyonu, bileşen unmount olduğunda zamanlayıcıyı temizler
+  - `y` — `d.getFullYear()`, tam yıl numarası (örn. 2025)
+  - `m` — `String(d.getMonth() + 1).padStart(2, '0')`, sıfır dolgulu ay stringi (örn. "01"-"12")
+  - `day` — `String(d.getDate()).padStart(2, '0')`, sıfır dolgulu gün stringi (örn. "01"-"31")
+- **Dönüş**: `string` — "YYYY-MM-DD" formatında tarih (örn. "2025-01-15")
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx::fetchErrors
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setLoading` - Veri çekme başladığında loading state'ini true yapan setter
-  - `setError` - Hata durumunu sıfırlayan setter
-  - `supabase` - Supabase istemcisi, veritabanı sorguları için kullanılır
-  - `query` - Supabase sorgu nesnesi, filtreler ve sıralama eklenerek geliştirilir
-  - `fromDate` - Sorguda kullanılan başlangıç tarihi filtresi
-  - `toDate` - Sorguda kullanılan bitiş tarihi filtresi
-  - `level` - Sorguda kullanılan hata seviyesi filtresi
-  - `env` - Sorguda kullanılan ortam filtresi
-  - `debouncedQ` - Sorguda kullanılan arama terimi
-  - `like` - SQL ILIKE operatörü için formatlanmış jokerli arama stringi
-  - `page` - Mevcut sayfa numarası, sayfalama hesaplamasında kullanılır
-  - `from` - Sayfalama için sorgunun başlangıç indeksi
-  - `to` - Sayfalama için sorgunun bitiş indeksi
-  - `PAGE_SIZE` - Sayfa başına kayıt sayısı, sabit
-  - `data` - Supabase'den dönen hata kayıtları dizisi
-  - `error` - Sorgu sırasında oluşan hata nesnesi
-  - `count` - Toplam eşleşen kayıt sayısı
-  - `setRows` - Çekilen verileri rows state'ine atayan setter
-  - `setTotal` - Toplam kayıt sayısını total state'ine atayan setter
-  - `setError` - Hata durumunda hata mesajını ayarlayan setter
-  - `t` - Çeviri fonksiyonu, genel hata mesajı için kullanılır
-- **Dönüş**: Promise<void>, async işlem sonrası değer döndürmez
+---
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx::scheduleRefetch
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::debounceEffect
+- **params**: (parametre yok — React.useEffect callback)
 - **ic_degiskenler**:
-  - `refetchTimer.current` - Önceki zamanlayıcının ID'si, varsa temizlenir
-  - `fetchRef.current` - En güncel fetchErrors fonksiyonu, 400ms sonra çalıştırılır
-- **Dönüş**: yok
+  - `t` — `setTimeout(() => setDebouncedQ(q.trim()), 300)` dönüş değeri, 300ms debounce timer ID'si; temizleme fonksiyonunda `clearTimeout(t)` ile iptal edilir
+- **Dönüş**: cleanup fonksiyonu — timer'ı temizler
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx::realtimeChannelEffectCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `supabase` - Supabase istemcisi, gerçek zamanlı kanal oluşturmak için kullanılır
-  - `ch` - Oluşturulan gerçek zamanlı kanal nesnesi
-  - `scheduleRefetch` - Veritabanı değişikliği tetiklendiğinde veriyi yeniden çekmeyi planlayan fonksiyon
-- **Dönüş**: cleanup fonksiyonu, kanal aboneliğini ve zamanlayıcıyı temizler
+---
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx::postgresChangeHandler
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::fetchErrors
+- **params**: (parametre yok — useCallback, bağımlılıklar: `[fromDate, toDate, level, env, debouncedQ, page, t]`)
 - **ic_degiskenler**:
-  - `scheduleRefetch` - Veritabanı değişikliği sonrası veriyi yeniden çekmeyi tetikleyen fonksiyon
-- **Dönüş**: yok
+  - `query` — `supabase.from('client_errors').select(...)` ile başlayan Supabase query builder nesnesi; filtreler (`gte`, `lte`, `eq`, `or`) ve sıralama zincirlenerek eklenir
+  - `like` — `` `%${debouncedQ}%` `` formatında arama deseni, `query.or()` içinde `url.ilike` ve `message.ilike` için kullanılır
+  - `from` — `(page - 1) * PAGE_SIZE`, pagination için başlangıç indeksi
+  - `to` — `from + PAGE_SIZE - 1`, pagination için bitiş indeksi
+  - `data` — `await query.range(from, to)` sonucundan dönen `data` özelliği, hata satırları dizisi
+  - `error` — `await query.range(from, to)` sonucundan dönen `error` özelliği, Supabase hatası veya null
+  - `count` — `await query.range(from, to)` sonucundan dönen `count` özelliği, toplam kayıt sayısı
+- **Dönüş**: `Promise<void>` — state setter'ları ile `rows`, `total`, `error`, `loading` güncellenir
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx::realtimeCleanupCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `supabase` - Supabase istemcisi, kanalı kaldırmak için kullanılır
-  - `ch` - Kapatılacak gerçek zamanlı kanal nesnesi
-  - `refetchTimer.current` - Devam eden varsa zamanlayıcı, temizlenir
-- **Dönüş**: yok
+---
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx::rowsMapCallback
-- **params**: (r: ErrorRow)
+### [N5_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::scheduleRefetch
+- **params**: (parametre yok — useCallback, bağımlılık: `[]`)
+- **ic_degiskenler**: (yok — sadece outer scope'taki `refetchTimer` ve `fetchRef` referanslarına erişir)
+- **Dönüş**: `void` — varsa önceki timer'ı temizler, ardından 400ms sonrası için `fetchRef.current()` çağrısı zamanlar
+
+---
+
+### [N6_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::realtimeEffect
+- **params**: (parametre yok — React.useEffect callback, bağımlılıklar: `[scheduleRefetch, tenantId]`)
 - **ic_degiskenler**:
-  - `r.id` - Hata kaydının benzersiz ID'si, React anahtarı ve genişletme kontrolü için kullanılır
-  - `r.at` - Hata oluşum tarihi, formatlanarak tabloda gösterilir
-  - `formatDateTime` - Tarih formatlama fonksiyonu, r.at değerini kullanıcıya uygun formatta gösterir
-  - `lang` - Mevcut dil kodu, tarih formatlamasında kullanılır
-  - `r.level` - Hata seviyesi, renklendirme ve gösterim için kullanılır
-  - `r.message` - Hata mesajı, tabloda gösterilir
-  - `r.url` - Hatanın oluştuğu URL, tabloda gösterilir
-  - `setExpandedId` - Tıklama sonrası hata detayını açmak/kapatmak için ID'yi ayarlayan setter
-  - `expandedId` - Mevcut açık olan hata ID'si, detayın gösterilip gösterilmeyeceğini kontrol eder
-  - `t` - Çeviri fonksiyonu, "Detayları Göster/Gizle" metinleri için kullanılır
-  - `r.stack` - Hata yığını, detay açıldığında gösterilir
-  - `r.user_agent` - Kullanıcının tarayıcı bilgisi, detaylarda gösterilir
-  - `r.release` - Uygulama sürümü, detaylarda gösterilir
-  - `r.env` - Hatanın oluştuğu ortam, detaylarda gösterilir
-- **Dönüş**: React.ReactFragment, her hata kaydı için tablo satırı ve opsiyonel detay satırı içeren fragment döndürür
+  - `ch` — `` supabase.channel(`client-errors-${tenantId}`) `` ile oluşturulan Supabase real-time kanal aboneliği; `postgres_changes` event'i ile `client_errors` tablosundaki tüm değişiklikleri dinler
+- **Dönüş**: cleanup fonksiyonu — `supabase.removeChannel(ch)` ile kanalı kapatır, `refetchTimer.current` varsa timer'ı temizler
+
+---
+
+### [N7_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::realtimeChangeHandler
+- **params**: (parametre yok — Supabase `postgres_changes` callback)
+- **ic_degiskenler**: (yok — sadece outer scope'taki `scheduleRefetch`'i çağırır)
+- **Dönüş**: `void` — tabloda değişiklik gerçekleştiğinde `scheduleRefetch()` ile yeniden veri çekilmesini tetikler
+
+---
+
+### [N8_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::realtimeCleanup
+- **params**: (parametre yok — realtimeEffect cleanup fonksiyonu)
+- **ic_degiskenler**:
+  - `ch` — outer scope'tan kapanış yoluyla erişilen Supabase kanal nesnesi (realtimeEffect içinde tanımlı)
+- **Dönüş**: `void` — `supabase.removeChannel(ch)` ile real-time aboneliği kaldırır; `refetchTimer.current` varsa pending timer'ı iptal eder
+
+---
+
+### [N9_NASIL] AST Pointer: `src/views/admin/AdminErrorsPage.tsx`::mapRenderRow
+- **params**: `r: ErrorRow` — Tek bir hata kaydı nesnesi
+- **ic_degiskenler**: (yok — parametre `r`'nin özellikleri doğrudan JSX içinde erişilir)
+  - `r.id` — hata kaydının benzersiz tanımlayıcısı, `key` ve `expandedId` karşılaştırması için kullanılır
+  - `r.at` — hata oluşma zamanı, `formatDateTime(r.at, lang)` ile formatlanarak gösterilir
+  - `r.level` — hata seviyesi (`error`/`warn`/`info`), renkli badge ile gösterilir
+  - `r.message` — hata mesajı metni, tablo hücresinde doğrudan yazdırılır
+  - `r.url` — hata oluşan URL, yoksa `"-"` gösterilir
+  - `r.stack` — stack trace metni, `String(r.stack || '').slice(0, 8000)` ile 8000 karakterle kısaltılıp `<pre>` içinde gösterilir
+  - `r.user_agent` — tarayıcı kullanıcı ajanı stringi, detay panelinde gösterilir
+  - `r.release` — uygulama versiyon/release bilgisi, detay panelinde gösterilir
+  - `r.env` — ortam bilgisi (production/preview/development), detay panelinde gösterilir
+- **Dönüş**: `JSX.Element` — `<React.Fragment>` içinde satır + genişletme detayı (varsa)
 
 ---
 

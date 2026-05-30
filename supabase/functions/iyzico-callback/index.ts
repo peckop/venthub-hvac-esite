@@ -1,5 +1,6 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import Iyzipay from "npm:iyzipay";
+import { resolveTenantId } from '../_shared/tenant_config.ts'
 
 // Minimal types to avoid `any` while keeping integration flexible
 type CheckoutRetrieveResponse = {
@@ -45,18 +46,24 @@ Deno.serve(async (req) => {
     let conversationId: string | undefined;
     let orderId: string | undefined;
 
+    let formJson: Record<string, unknown> = {}
     if (contentType.includes("application/x-www-form-urlencoded")) {
       const form = await req.formData();
       token = String(form.get("token") || "");
       conversationId = form.get("conversationId")?.toString();
       orderId = form.get("orderId")?.toString();
+      formJson = { token, conversationId, orderId }
     } else {
       const bodyJson = await req.json().catch(() => ({} as Record<string, unknown>));
       const body = bodyJson as { token?: string; conversationId?: string; orderId?: string };
       token = body?.token;
       conversationId = body?.conversationId;
       orderId = body?.orderId;
+      formJson = bodyJson;
     }
+
+    // Resolve Tenant ID dynamically
+    const tenantId = resolveTenantId(req, formJson)
     // URL query'den de parametre al (callbackUrl'_e eklendi)
     let successUrl: string | null = null;
     try {
@@ -83,7 +90,7 @@ Deno.serve(async (req) => {
       // Fallback: orderId üzerinden payment_token'ı getir ve devam et
       if (orderId) {
         try {
-          const got = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=payment_token`, {
+          const got = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=payment_token`, {
             headers: { Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`, apikey: `${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` }
           })
           const arr = await got.json().catch(()=>[])
@@ -147,7 +154,7 @@ Deno.serve(async (req) => {
     // Token geldiyse hemen DB'ye yaz (denetim ve reconcile için)
     try {
       if (token && orderId) {
-        await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}`, {
+        await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
           body: JSON.stringify({ payment_token: token })
@@ -193,7 +200,7 @@ Deno.serve(async (req) => {
       const filterByConv = (!orderId && (result?.conversationId || conversationId)) ? `conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}` : '';
       const filter = filterById || filterByConv;
       if (!filter) return null;
-      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}`, {
+      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${serviceRoleKey}`,
@@ -220,7 +227,7 @@ Deno.serve(async (req) => {
       try {
         let finalOrderId: string | null = orderId || null
         if (!finalOrderId && (result?.conversationId || conversationId)) {
-          const oResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!) }&select=id`, {
+          const oResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!) }&tenant_id=eq.${encodeURIComponent(tenantId)}&select=id`, {
             headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey }
           })
           if (oResp.ok) {
@@ -237,7 +244,7 @@ Deno.serve(async (req) => {
               'apikey': serviceRoleKey,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ order_id: finalOrderId })
+            body: JSON.stringify({ order_id: finalOrderId, tenant_id: tenantId })
           })
         }
       } catch { /* ignore */ }
@@ -248,7 +255,7 @@ Deno.serve(async (req) => {
           const su = Deno.env.get('SUPABASE_URL') || ''
           const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
           if (su && sk) {
-            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=id,total_amount,coupon_code,coupon_discount`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=id,total_amount,coupon_code,coupon_discount`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
             if (oResp.ok) {
               const arr = await oResp.json().catch(()=>[])
               const row = Array.isArray(arr) ? arr[0] as { id?: string; total_amount?: number; coupon_code?: string|null; coupon_discount?: number|null } : null
@@ -256,7 +263,7 @@ Deno.serve(async (req) => {
               const total = Number(row?.total_amount || 0)
               if (code && total > 0) {
                 // Get coupon details
-                const cRes = await fetch(`${su}/rest/v1/coupons?code=eq.${encodeURIComponent(code)}&select=discount_type,discount_value,minimum_order_amount,is_active,valid_from,valid_until,usage_limit,used_count`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
+                const cRes = await fetch(`${su}/rest/v1/coupons?code=eq.${encodeURIComponent(code)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=discount_type,discount_value,minimum_order_amount,is_active,valid_from,valid_until,usage_limit,used_count`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
                 if (cRes.ok) {
                   const carr = await cRes.json().catch(()=>[])
                   const c = Array.isArray(carr) ? carr[0] as { discount_type?: string; discount_value?: number; minimum_order_amount?: number|null; is_active?: boolean; valid_from?: string|null; valid_until?: string|null; usage_limit?: number|null; used_count?: number|null } : null
@@ -273,7 +280,7 @@ Deno.serve(async (req) => {
                       if (disc > total) disc = total
                       const disc2 = Number(Number(disc).toFixed(2))
                       // Patch order with computed discount
-                      await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}`, {
+                      await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
                         method: 'PATCH',
                         headers: { Authorization: `Bearer ${sk}`, apikey: sk, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
                         body: JSON.stringify({ coupon_discount: disc2 })
@@ -313,7 +320,7 @@ Deno.serve(async (req) => {
             // Mark stock processed flag and attach RPC summary to payment_debug
             try {
               const updatedDebugInfo = { ...debugInfo, stock_processed: true, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
-              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${orderId}`, {
+              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${orderId}&tenant_id=eq.${tenantId}`, {
                 method: 'PATCH',
                 headers: {
                   'Authorization': `Bearer ${serviceRoleKey}`,
@@ -327,7 +334,7 @@ Deno.serve(async (req) => {
 
             // Optional: trigger low stock alerts after RPC (best-effort, non-blocking)
             try {
-              const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${orderId}&select=product_id,quantity`, {
+              const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${orderId}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=product_id,quantity`, {
                 headers: {
                   'Authorization': `Bearer ${serviceRoleKey}`,
                   'apikey': serviceRoleKey
@@ -379,14 +386,14 @@ Deno.serve(async (req) => {
           // Fetch order row to get user_id
           const _u_id: string | null = null
           if (orderId) {
-            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=user_id`, {
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=user_id`, {
               headers: { Authorization: `Bearer ${sk}`, apikey: sk }
             })
             const arr = await oResp.json().catch(()=>[])
             const row = Array.isArray(arr) ? arr[0] : null
             uid = row?.user_id || null
           } else if (result?.conversationId || conversationId) {
-            const oResp = await fetch(`${su}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}&select=user_id`, {
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=user_id`, {
               headers: { Authorization: `Bearer ${sk}`, apikey: sk }
             })
             const arr = await oResp.json().catch(()=>[])
@@ -395,7 +402,7 @@ Deno.serve(async (req) => {
           }
           if (uid) {
             // Look up ALL shopping carts for the user and clear their items
-            const cResp = await fetch(`${su}/rest/v1/shopping_carts?user_id=eq.${encodeURIComponent(uid)}&select=id`, {
+            const cResp = await fetch(`${su}/rest/v1/shopping_carts?user_id=eq.${encodeURIComponent(uid)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=id`, {
               headers: { Authorization: `Bearer ${sk}`, apikey: sk }
             })
       const carts = await cResp.json().catch(()=>[])
@@ -403,7 +410,7 @@ Deno.serve(async (req) => {
         ? (carts as Array<{ id?: string }>).map((c) => c?.id).filter((v): v is string => Boolean(v))
         : []
             for (const cid of cartIds) {
-              await fetch(`${su}/rest/v1/cart_items?cart_id=eq.${encodeURIComponent(cid)}`, {
+              await fetch(`${su}/rest/v1/cart_items?cart_id=eq.${encodeURIComponent(cid)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${sk}`, apikey: sk, Prefer: 'return=minimal' }
               }).catch(()=>{})

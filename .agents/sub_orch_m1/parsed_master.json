@@ -1,0 +1,698 @@
+{
+  "tables": [
+    "admin_audit_log",
+    "client_errors",
+    "contact_messages",
+    "coupons",
+    "error_groups",
+    "inventory_movements",
+    "inventory_settings",
+    "order_attachments",
+    "order_notes",
+    "order_refund_events",
+    "product_images",
+    "rate_limits",
+    "returns_webhook_events",
+    "shipping_email_events",
+    "shipping_idempotency",
+    "shipping_webhook_events",
+    "user_addresses",
+    "user_invoice_profiles",
+    "user_profiles",
+    "venthub_returns",
+    "wizard_selections"
+  ],
+  "policies": [
+    {
+      "policyName": "INSERT",
+      "islem": "authenticated",
+      "rol": "`-`",
+      "kosul": "",
+      "lineNum": 891
+    },
+    {
+      "policyName": "admin_audit_log_select_v2",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`public.is_admin_user(`",
+      "lineNum": 892
+    },
+    {
+      "policyName": "admin_audit_log_insert_v2",
+      "islem": "INSERT",
+      "rol": "authenticated",
+      "kosul": "`-`",
+      "lineNum": 893
+    },
+    {
+      "policyName": "cart_items_select_own",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`exists (",
+      "lineNum": 1523
+    },
+    {
+      "policyName": "cart_items_modify_own",
+      "islem": "ALL",
+      "rol": "public",
+      "kosul": "`exists (",
+      "lineNum": 1526
+    },
+    {
+      "policyName": "cart_items_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`cart_id IN (",
+      "lineNum": 1529
+    },
+    {
+      "policyName": "cart_items_user_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`cart_id IN (",
+      "lineNum": 1532
+    },
+    {
+      "policyName": "cart_items_user_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`cart_id IN (",
+      "lineNum": 1535
+    },
+    {
+      "policyName": "ci_auth_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`cart_id IN (SELECT id FROM public.shopping_carts WHERE user_id = (SELECT auth.ui`",
+      "lineNum": 1538
+    },
+    {
+      "policyName": "cart_items_select_own",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 1539
+    },
+    {
+      "policyName": "categories_admin_modify",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 1547
+    },
+    {
+      "policyName": "categories_public_select",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`true`",
+      "lineNum": 1550
+    },
+    {
+      "policyName": "cat_public_read_opt",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`true`",
+      "lineNum": 1551
+    },
+    {
+      "policyName": "cat_admin_all_opt",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 1552
+    },
+    {
+      "policyName": "cat_admin_insert_opt",
+      "islem": "INSERT",
+      "rol": "authenticated",
+      "kosul": "`-`",
+      "lineNum": 1553
+    },
+    {
+      "policyName": "cat_admin_update_opt",
+      "islem": "UPDATE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 1554
+    },
+    {
+      "policyName": "cat_admin_delete_opt",
+      "islem": "DELETE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 1555
+    },
+    {
+      "policyName": "admins_read_error_groups",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`public.is_admin_user(`",
+      "lineNum": 1561
+    },
+    {
+      "policyName": "Public can insert contact messages",
+      "islem": "INSERT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 1567
+    },
+    {
+      "policyName": "Admins can view messages",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 1568
+    },
+    {
+      "policyName": "contact_messages_public_insert",
+      "islem": "INSERT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 1571
+    },
+    {
+      "policyName": "contact_messages_admin_select",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 1572
+    },
+    {
+      "policyName": "contact_messages_admin_update",
+      "islem": "UPDATE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 1575
+    },
+    {
+      "policyName": "contact_messages_public_insert",
+      "islem": "INSERT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 1578
+    },
+    {
+      "policyName": "admin_view_messages",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 1579
+    },
+    {
+      "policyName": "cm_auth_select_opt",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`(user_id = (SELECT auth.uid(`",
+      "lineNum": 1582
+    },
+    {
+      "policyName": "Admins can view messages",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 1583
+    },
+    {
+      "policyName": "Admin users can manage coupons",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`is_admin_user(auth.uid(`",
+      "lineNum": 1829
+    },
+    {
+      "policyName": "Public can view active coupons",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 1830
+    },
+    {
+      "policyName": "UPDATE",
+      "islem": "authenticated",
+      "rol": "`EXISTS (",
+      "lineNum": 2010
+    },
+    {
+      "policyName": "admins_read_error_groups",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`public.is_admin_user(`",
+      "lineNum": 2013
+    },
+    {
+      "policyName": "Admin users can manage order attachments",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`is_admin_user(auth.uid(`",
+      "lineNum": 2019
+    },
+    {
+      "policyName": "Order owners can view non-internal attachments",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`NOT is_internal AND order_id IN (SELECT id FROM public.venthub_orders WHERE user`",
+      "lineNum": 2020
+    },
+    {
+      "policyName": "Admin users can manage order notes",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`is_admin_user(auth.uid(`",
+      "lineNum": 2026
+    },
+    {
+      "policyName": "Order owners can view non-internal notes",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`NOT is_internal AND order_id IN (SELECT id FROM public.venthub_orders WHERE user`",
+      "lineNum": 2027
+    },
+    {
+      "policyName": "product_images_update_consolidated",
+      "islem": "UPDATE",
+      "rol": "authenticated",
+      "kosul": "`true`",
+      "lineNum": 2574
+    },
+    {
+      "policyName": "product_images_update_admin",
+      "islem": "UPDATE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 2575
+    },
+    {
+      "policyName": "product_images_update_admin",
+      "islem": "UPDATE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 2578
+    },
+    {
+      "policyName": "product_images_update_admin",
+      "islem": "UPDATE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = auth.uid(`",
+      "lineNum": 2581
+    },
+    {
+      "policyName": "pi_admin_all_opt",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2582
+    },
+    {
+      "policyName": "products_update_admin_stock",
+      "islem": "UPDATE",
+      "rol": "public",
+      "kosul": "`(SELECT coalesce(nullif(current_setting('request.jwt.claims', true`",
+      "lineNum": 2588
+    },
+    {
+      "policyName": "products_update_stock_authenticated",
+      "islem": "UPDATE",
+      "rol": "public",
+      "kosul": "`auth.uid(`",
+      "lineNum": 2589
+    },
+    {
+      "policyName": "products_read",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 2590
+    },
+    {
+      "policyName": "products_admin_write",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 2591
+    },
+    {
+      "policyName": "prod_read",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 2594
+    },
+    {
+      "policyName": "prod_admin",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2595
+    },
+    {
+      "policyName": "products_public_read",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 2596
+    },
+    {
+      "policyName": "p_public_read",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 2597
+    },
+    {
+      "policyName": "p_admin_write",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2598
+    },
+    {
+      "policyName": "p_public_read",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 2599
+    },
+    {
+      "policyName": "prod_admin_insert",
+      "islem": "INSERT",
+      "rol": "authenticated",
+      "kosul": "`-`",
+      "lineNum": 2600
+    },
+    {
+      "policyName": "prod_admin_update",
+      "islem": "UPDATE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2601
+    },
+    {
+      "policyName": "prod_admin_delete",
+      "islem": "DELETE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2602
+    },
+    {
+      "policyName": "p_public_read",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 2603
+    },
+    {
+      "policyName": "prod_admin",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = auth.uid(`",
+      "lineNum": 2604
+    },
+    {
+      "policyName": "prod_public_read_opt",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`true`",
+      "lineNum": 2605
+    },
+    {
+      "policyName": "prod_public_read_opt",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`true`",
+      "lineNum": 2606
+    },
+    {
+      "policyName": "prod_admin_all_opt",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2607
+    },
+    {
+      "policyName": "prod_admin_insert_opt",
+      "islem": "INSERT",
+      "rol": "authenticated",
+      "kosul": "`-`",
+      "lineNum": 2608
+    },
+    {
+      "policyName": "prod_admin_update_opt",
+      "islem": "UPDATE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2609
+    },
+    {
+      "policyName": "prod_admin_delete_opt",
+      "islem": "DELETE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(`",
+      "lineNum": 2610
+    },
+    {
+      "policyName": "admins_read_returns_webhooks",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`public.is_admin_user(`",
+      "lineNum": 3211
+    },
+    {
+      "policyName": "admins_read_shipping_emails",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`public.is_admin_user(`",
+      "lineNum": 3217
+    },
+    {
+      "policyName": "admins_read_shipping_webhooks",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`public.is_admin_user(`",
+      "lineNum": 3223
+    },
+    {
+      "policyName": "shopping_carts_select_own",
+      "islem": "SELECT",
+      "rol": "public",
+      "kosul": "`user_id = auth.uid(`",
+      "lineNum": 3229
+    },
+    {
+      "policyName": "shopping_carts_modify_own",
+      "islem": "ALL",
+      "rol": "public",
+      "kosul": "`user_id = auth.uid(`",
+      "lineNum": 3230
+    },
+    {
+      "policyName": "shopping_carts_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3231
+    },
+    {
+      "policyName": "shopping_carts_user_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3232
+    },
+    {
+      "policyName": "shopping_carts_user_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3233
+    },
+    {
+      "policyName": "sc_auth_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3234
+    },
+    {
+      "policyName": "shopping_carts_select_own",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3235
+    },
+    {
+      "policyName": "user_invoice_profiles_own",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3241
+    },
+    {
+      "policyName": "uip_own",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3242
+    },
+    {
+      "policyName": "venthub_order_items_select_consolidated",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`order_id IN (",
+      "lineNum": 3714
+    },
+    {
+      "policyName": "venthub_order_items_insert_optimized",
+      "islem": "INSERT",
+      "rol": "authenticated",
+      "kosul": "`-`",
+      "lineNum": 3716
+    },
+    {
+      "policyName": "venthub_order_items_insert_optimized",
+      "islem": "INSERT",
+      "rol": "authenticated",
+      "kosul": "`-`",
+      "lineNum": 3717
+    },
+    {
+      "policyName": "venthub_order_items_select_consolidated",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`order_id IN (",
+      "lineNum": 3718
+    },
+    {
+      "policyName": "orders_select_policy",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 3725
+    },
+    {
+      "policyName": "venthub_returns_select_consolidated",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4148
+    },
+    {
+      "policyName": "venthub_returns_select_consolidated",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4149
+    },
+    {
+      "policyName": "admins_read_webhook_events",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`public.is_admin_user(`",
+      "lineNum": 4155
+    },
+    {
+      "policyName": "Users can view own selections",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4161
+    },
+    {
+      "policyName": "Anyone can insert selections",
+      "islem": "INSERT",
+      "rol": "public",
+      "kosul": "`-`",
+      "lineNum": 4162
+    },
+    {
+      "policyName": "Admin can view all selections",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 4163
+    },
+    {
+      "policyName": "Admin can update selections",
+      "islem": "UPDATE",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 4166
+    },
+    {
+      "policyName": "wizard_selections_anon_insert",
+      "islem": "INSERT",
+      "rol": "anon",
+      "kosul": "`-`",
+      "lineNum": 4169
+    },
+    {
+      "policyName": "wizard_selections_auth_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4170
+    },
+    {
+      "policyName": "wizard_selections_user_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4171
+    },
+    {
+      "policyName": "wizard_selections_admin_select",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 4172
+    },
+    {
+      "policyName": "wizard_selections_user_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4175
+    },
+    {
+      "policyName": "wizard_selections_admin_read",
+      "islem": "SELECT",
+      "rol": "authenticated",
+      "kosul": "`EXISTS (",
+      "lineNum": 4176
+    },
+    {
+      "policyName": "ws_anon_insert",
+      "islem": "INSERT",
+      "rol": "anon",
+      "kosul": "`-`",
+      "lineNum": 4179
+    },
+    {
+      "policyName": "ws_auth_all",
+      "islem": "ALL",
+      "rol": "authenticated",
+      "kosul": "`user_id = (SELECT auth.uid(`",
+      "lineNum": 4180
+    },
+    {
+      "policyName": "ws_anon_insert",
+      "islem": "INSERT",
+      "rol": "anon",
+      "kosul": "`-`",
+      "lineNum": 4181
+    },
+    {
+      "policyName": "ws_anon_insert",
+      "islem": "INSERT",
+      "rol": "anon",
+      "kosul": "`-`",
+      "lineNum": 4182
+    },
+    {
+      "policyName": "ws_anon_insert",
+      "islem": "INSERT",
+      "rol": "anon",
+      "kosul": "`-`",
+      "lineNum": 4183
+    }
+  ]
+}

@@ -91,10 +91,19 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }, [fetchRole]);
 
   const signUp = useCallback(async (email: string, password: string, name: string) => {
+    const tenantId = typeof document !== 'undefined'
+      ? document.cookie.split('; ').find(row => row.startsWith('tenant_id='))?.split('=')[1]
+      : undefined;
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name } }
+      options: { 
+        data: { 
+          full_name: name,
+          tenant_id: tenantId || 'd3b07384-d113-495f-a558-8c38634e0000'
+        } 
+      }
     });
     if (error) return { error: { message: error.message } as AuthError };
     return {};

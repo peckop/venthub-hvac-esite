@@ -1,6 +1,7 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { sentryCaptureException } from "../_shared/sentry.ts"
+import { resolveTenantId, getTenantBranding } from '../_shared/tenant_config.ts'
 
 function renderTemplate(tpl: string, _data: Record<string, unknown>): string {
   tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
@@ -43,6 +44,10 @@ serve(async (req) => {
     let parsed: Record<string, unknown> = {}
     try { parsed = _text ? JSON.parse(_text) : {} } catch {}
 
+    // Resolve Tenant ID and get Branding details dynamically
+    const tenantId = resolveTenantId(req, parsed)
+    const branding = await getTenantBranding(tenantId)
+
     // inputs
     const order_id = ((): string | null => {
       const v = parsed['order_id']
@@ -64,7 +69,7 @@ serve(async (req) => {
         const authClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
         const { data: { user } } = await authClient.auth.getUser()
         if (user) {
-          const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
+          const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
             headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
           })
           if (roleCheck.ok) {
@@ -88,14 +93,14 @@ serve(async (req) => {
     }
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
-    const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub Test <onboarding@resend.dev>'
+    let emailFrom = branding.emailFrom
     const testMode = (Deno.env.get('EMAIL_TEST_MODE') || '').toLowerCase() === 'true'
     const testTo = Deno.env.get('EMAIL_TEST_TO') || 'delivered@resend.dev'
     const bccList = (Deno.env.get('SHIP_EMAIL_BCC') || '').split(',').map(s=>s.trim()).filter(Boolean)
 
-    const brandName = Deno.env.get('BRAND_NAME') || 'VentHub'
-    const brandPrimary = Deno.env.get('BRAND_PRIMARY_COLOR') || '#2563eb'
-    const brandLogoUrl = Deno.env.get('BRAND_LOGO_URL') || ''
+    const brandName = branding.brandName
+    const brandPrimary = branding.brandPrimaryColor
+    const brandLogoUrl = branding.brandLogoUrl
 
     if (!supabaseUrl || !serviceKey || !resendApiKey) {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -110,7 +115,7 @@ serve(async (req) => {
     let customer_name: string | null = null
     let order_number: string | null = null
     try {
-      const o = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=user_id,customer_email,customer_name,order_number`, {
+      const o = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=user_id,customer_email,customer_name,order_number`, {
         headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
       })
       if (o.ok) {
