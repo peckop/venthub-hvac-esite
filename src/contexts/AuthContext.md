@@ -8,7 +8,7 @@ entity_hashes:
   func:AuthProvider: 8a171b0bec808d24
   overview: 60c35673d50b49a8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-30T20:24:26Z
+generated_at: 2026-05-30T21:35:29Z
 ---
 
 ## Genel Bakış
@@ -32,10 +32,6 @@ Bu modül için mimari varsayımlar, yalnızca `AuthProvider({ children })` fonk
 **[Aksiyom 3]:** Eğer `AuthProvider` içinde消費edildiği (`useContext` ile erişildiği) alt bileşenler bu sağlayıcının alt ağacında konumlandırılmamışsa, context değeri `undefined` veya varsayılan başlangıç değeri olarak döner.
 
 **[Aksiyom 4]:** Eğer `AuthProvider` bileşeninin iç durumu (state) başlatılamazsa (örn: useEffect içindeki asenkron işlemler başarısız olursa), kimlik doğrulama durumu tutarsız olur ve bileşenler geçersiz oturum verisi ile çalışır.
-
----
-
-> **Not:** Fonksiyon gövdesi (implementation body) paylaşılmadığından, modülün iç kimlik doğrulama mantığı, token yönetimi veya API çağrıları hakkında aksiyom üretilmemiştir. Belirtilen aksiyomlar yalnızca fonksiyon imzasının yapısal gerekliliklerinden türetilmiştir.
 
 ---
 

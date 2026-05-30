@@ -7,7 +7,7 @@ skeleton_hash: aa5b1627dbd47e55
 entity_hashes:
   func:getTenantConfig: 1921adc85b5a5888
   overview: 66487cd4d320af10
-generated_at: 2026-05-30T21:25:59Z
+generated_at: 2026-05-30T21:36:05Z
 ---
 
 ## Genel Bakış

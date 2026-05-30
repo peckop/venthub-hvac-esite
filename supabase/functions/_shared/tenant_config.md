@@ -8,7 +8,7 @@ entity_hashes:
   func:getTenantBranding: bde2d3819c7904af
   func:resolveTenantId: 70b9699dc1e36828
   overview: 0aa8d7ed1d1b17a6
-generated_at: 2026-05-30T21:17:28Z
+generated_at: 2026-05-30T21:36:11Z
 ---
 
 ## Genel Bakış

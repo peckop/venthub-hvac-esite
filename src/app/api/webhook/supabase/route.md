@@ -5,9 +5,9 @@ namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\api\webhook\supabase\route.ts
 skeleton_hash: 3fb60d8dc42d092a
 entity_hashes:
-  func:POST: 419057af1299b48a
+  func:POST: b4117100eb99acd2
   overview: f1a5a31fe18cb8c0
-generated_at: 2026-05-30T20:23:41Z
+generated_at: 2026-05-30T21:35:25Z
 ---
 
 ## Genel Bakış
@@ -41,14 +41,18 @@ Bu modül, Supabase webhook olaylarını HMAC ile doğrulayıp önbellek yenilem
 ## FONKSİYON DETAYLARI
 
 ### POST
-**Ne yapar**: Supabase veritabanında gerçekleşen değişiklikleri (INSERT, UPDATE, DELETE) bir webhook aracılığıyla alır ve Next.js uygulamasında ilgili sayfaların ve veri önbelleklerinin yeniden doğrulanmasını (revalidation) sağlar. Bu sayede, veritabanındaki güncellemeler kullanıcıya en kısa sürede yansır.
 
-**Nasıl yapar**: Fonksiyon, istek gövdesinden gelen webhook payload'ını analiz eder. Önce `x-webhook-secret` header'ı ile bir HMAC gizli anahtar doğrulaması yaparak isteğin yetkili kaynaktan geldiğinden emin olur. Ardından payload içindeki `table` ve `record` bilgilerine göre belirlenen mantıkla, `products`, `categories` veya `inventory_movements` tablolarındaki değişikliklere karşılık gelen sayfa yollarını (`revalidatePath`) ve veri etiketlerini (`revalidateTag`) yeniden doğrular. İşlem başarılıysa yeniden doğrulanan yolların ve etiketlerin listesini içeren bir JSON yanıtı döner; bir hata oluşursa hata mesajı ile birlikte 500 durum kodu döner.
+**Ne yapar**: Supabase veritabanından gelen webhook olaylarını alır ve Next.js'in_isr önbelleğini ilgili sayfa yollarına ve etiketlere göre yeniden doğrular (revalidate). Ürün, kategori veya stok hareketi değişikliklerinde ilgili sayfaların güncel veriyi göstermesini sağlar.
+
+**Nasıl yapar**: Önce `x-webhook-secret` başlığını `SUPABASE_WEBHOOK_SECRET` ortam değişkeniyle karşılaştırarak HMAC/token doğrulaması yapar. Yetkili isteklerde, payload içindeki `table`, `type`, `record` ve `old_record` alanlarını çıkarır. `record` veya `old_record` içinden `tenant_id` varsa kiracıya özel (`home-data-{tenantId}`, `products-discovery-{tenantId}`) etiketleri yeniden doğrular. Ardından tablo adına göre (`products`, `categories`, `inventory_movements`) dalgalı (cascading) bir yeniden doğrulama stratejisi uygular: ürün slug'ına göre detay sayfalarını, kategori slug'ına göre kategori sayfalarını ve ilgili listeleme etiketlerini (`home-data`, `products-discovery`) yeniden doğrular. `inventory_movements` durumunda ürün ve kategori ilişkileri supabase üzerinden sorgulanarak dolaylı etkilenen sayfalar da dahil edilir. Son olarak tüm yeniden doğrulanan yolları ve etiketleri JSON yanıtıyla birlikte döner.
 
 **Parametreler**:
-- `request`: NextRequest — Supabase webhook'undan gelen HTTP isteği. Gövdesinde `table`, `type`, `record`, `old_record` alanlarını içeren JSON verisi ve `x-webhook-secret` başlığı barındırır.
+- `request`: NextRequest — Gelen HTTP istek nesnesi. Supabase webhook tarafından gönderilir ve JSON payload ile `x-webhook-secret` header'ını içerir. Payload `SupabaseWebhookPayload` tipine assert edilerek `table`, `type`, `record`, `old_record` alanları çıkarılır.
 
-**Dönüş**: `NextResponse` — Başarılıysa `{ revalidated: boolean, event: { table: string, type: string }, revalidatedPaths: string[], revalidatedTags: string[], timestamp: string }` yapısında bir JSON yanıtı ve 200 durum kodu döner. HMAC doğrulaması başarısız olursa `{ error: string }` ile 401,(payload'da aktif kayıt yoksa `{ revalidated: boolean, message: string }` ile 200, başka bir hata oluşursa `{ error: string }` ile 500 durum kodu döner.
+**Dönüş**: `NextResponse` — Üç farklı durum döner:
+- **Başarılı (200)**: `{ revalidated: true, event: { table, type }, revalidatedPaths: string[], revalidatedTags: string[], timestamp: string }` formatında yanıt döner. Yeniden doğrulanan tüm sayfa yolları ve etiket listeleri dahil edilir.
+- **Kayıt bulunamadı (200)**: Payload içinde `record` ve `old_record` alanlarının her ikisi de yoksa `{ revalidated: false, message: 'No record found in payload' }` döner.
+- **Hata (401 veya 500)**: Geçersiz webhook secret için `{ error: 'Unauthorized' }` (401), yakalanan beklenmedik istisnalar için `{ error: string }` (500) formatında hata yanıtı döner.
 
 ---
 
@@ -60,36 +64,6 @@ Bu modül, Supabase webhook olaylarını HMAC ile doğrulayıp önbellek yenilem
 - `schema: string`
 - `record: Record<string, unknown> | null`
 - `old_record: Record<string, unknown> | null`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/app/api/webhook/supabase/route.ts::POST
-- **params**: `request: NextRequest` — Next.js tarafından otomatik oluşturulan HTTP istek nesnesi
-- **ic_degiskenler**:
-  - `payload` — request.json() ile parse edilen Supabase webhook payload'u; `type`, `table`, `record`, `old_record` alanlarını içerir (SupabaseWebhookPayload tipinde)
-  - `webhookSecret` — request header'ından okunan `x-webhook-secret` değeri, HMAC/Token doğrulaması için kullanılır
-  - `expectedSecret` — `process.env.SUPABASE_WEBHOOK_SECRET` ortam değişkeninden okunan beklenen secret değeri, webhook'un güvenliğini doğrulamak için kullanılır
-  - `table` — payload'dan destructure edilen tablo adı (örn: "products", "categories", "inventory_movements")
-  - `type` — payload'dan destructure edilen event türü (INSERT, UPDATE, DELETE vb.)
-  - `record` — payload'dan destructure edilen yeni kayıt verisi (INSERT/UPDATE durumunda mevcut)
-  - `old_record` — payload'dan destructure edilen önceki kayıt verisi (UPDATE/DELETE durumunda mevcut)
-  - `activeRecord` — record veya old_record'dan hangisi mevcutsa onu tutan değişken; payload'tan alınan geçerli kaydı temsil eder
-  - `tenantId` — activeRecord.tenant_id alanından türetilen kiracı ID'si; kiracıya özel cache tag'lerini revalidate etmek için kullanılır
-  - `revalidatedPaths` — string dizisi; fonksiyon süresince revalidate edilen tüm path'lerin toplandığı dizi, yanıt olarak döndürülür
-  - `revalidatedTags` — string dizisi; fonksiyon süresince revalidate edilen tüm tag'lerin toplandığı dizi, yanıt olarak döndürülür
-  - `productSlug` (products bloğu içinde) — activeRecord.slug alanından türetilen ürün slug'ı; ürün detay sayfalarının path revalidation'ı için kullanılır
-  - `categoryId` — activeRecord.category_id alanından türetilen kategori ID'si; ürünün bağlı olduğu kategoriyi bulmak ve o kategorinin sayfalarını revalidate etmek için kullanılır
-  - `category` — `supabase.from('categories').select('slug').eq('id', categoryId).single()` sorgusundan dönen kategori nesnesi; sadece `category?.slug` alanı kullanılır
-  - `categorySlug` (categories bloğu içinde) — activeRecord.slug alanından türetilen kategori slug'ı; kategori sayfalarının path revalidation'ı için kullanılır
-  - `productId` — activeRecord.product_id alanından türetilen ürün ID'si; stok hareketinin hangi ürüne ait olduğunu belirtir
-  - `product` — `supabase.from('products').select('slug, category_id').eq('id', productId).single()` sorgusundan dönen ürün nesnesi; `product.slug` ve `product.category_id` alanları kullanılır
-  - `productSlug` (inventory_movements bloğu içinde) — product.slug alanından türetilen ürün slug'ı; stok değişikliğinde ürün detay sayfalarının revalidation'ı için kullanılır
-  - `category` (inventory_movements bloğu içinde, iç) — `supabase.from('categories').select('slug').eq('id', product.category_id).single()` sorgusundan dönen kategori nesnesi; ürünün bağlı olduğu kategorinin slug'ını almak için kullanılır
-  - `errorMsg` — catch bloğunda error nesnesinden çıkarılan hata mesajı string'i; Error ise `error.message`, değilse `String(error)` kullanılır
-- **Dönüş**: `NextResponse` —成功 durumunda `{ revalidated: true, event: { table, type }, revalidatedPaths, revalidatedTags, timestamp }` JSON'u (200); auth başarısızlığında `{ error: 'Unauthorized' }` (401); payload'ta kayıt yoksa `{ revalidated: false, message: 'No record found in payload' }` (200); hata yakalandığında `{ error: errorMsg }` (500)
-- **Yan Etkiler**: `revalidatePath()` ve `revalidateTag()` çağrıları ile Next.js cache'ini invalidates eder; `console.warn` ve `console.error` ile loglama yapar; Supabase'den kategori/ürün sorgulaması yapar
 
 ---
 

@@ -11,7 +11,7 @@ entity_hashes:
   func:toggleDropdown: 97a60ca3e9e42667
   overview: ca181570c6a1fe40
   style_tokens: 58e7fc7febbe30f9
-generated_at: 2026-05-30T20:24:15Z
+generated_at: 2026-05-30T21:35:27Z
 ---
 
 ## Genel Bakış

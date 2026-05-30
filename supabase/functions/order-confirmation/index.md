@@ -9,7 +9,7 @@ entity_hashes:
   func:order-confirmation_handler: 52ce43dfb5d8480d
   func:renderTemplate: 598e7353aec8e680
   overview: 826d5cbc0f75e005
-generated_at: 2026-05-30T21:16:11Z
+generated_at: 2026-05-30T21:36:27Z
 ---
 
 ## Genel Bakış

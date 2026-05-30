@@ -9,7 +9,7 @@ entity_hashes:
   func:renderTemplate: 26cc0a301db3fae9
   func:shipping-notification_handler: 06ce613108984be4
   overview: 9cf32250487e69ff
-generated_at: 2026-05-30T21:17:00Z
+generated_at: 2026-05-30T21:36:32Z
 ---
 
 ## Genel Bakış

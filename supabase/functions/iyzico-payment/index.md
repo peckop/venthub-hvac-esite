@@ -7,7 +7,7 @@ skeleton_hash: 728e831857b032c6
 entity_hashes:
   func:iyzico-payment_handler: de31c29702dafb3c
   overview: 10ad7fb56d2cc8ae
-generated_at: 2026-05-30T21:16:10Z
+generated_at: 2026-05-30T21:36:23Z
 ---
 
 ## Genel Bakış
