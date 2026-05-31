@@ -1,10 +1,13 @@
 
 import { createClient } from '@supabase/supabase-js'
 
-// Hardcoded credentials from .env to bypass dotenv issues
-const supabaseUrl = 'https://tnofewwkwlyjsqgwjjga.supabase.co'
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+// Load credentials dynamically from environment
+const supabaseUrl = process.env.SUPABASE_URL || 'https://tnofewwkwlyjsqgwjjga.supabase.co';
 // Using SERVICE_ROLE_KEY to bypass RLS policies
-const supabaseKey = '[SERVICE_ROLE_KEY]'
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '[SERVICE_ROLE_KEY]';
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
