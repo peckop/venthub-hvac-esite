@@ -6278,6 +6278,9 @@ DROP POLICY IF EXISTS "merged_coupons_anon_select" ON public.coupons;
 DROP POLICY IF EXISTS "merged_coupons_authenticated_select" ON public.coupons;
 DROP POLICY IF EXISTS "merged_coupons_dashboard_user_select" ON public.coupons;
 DROP POLICY IF EXISTS "merged_coupons_service_role_select" ON public.coupons;
+DROP POLICY IF EXISTS "merged_coupons_authenticated_insert" ON public.coupons;
+DROP POLICY IF EXISTS "merged_coupons_authenticated_update" ON public.coupons;
+DROP POLICY IF EXISTS "merged_coupons_authenticated_delete" ON public.coupons;
 
 -- inventory_movements duplicate merged policies
 DROP POLICY IF EXISTS "merged_inventory_movements_authenticated_select" ON public.inventory_movements;
@@ -6292,12 +6295,16 @@ DROP POLICY IF EXISTS "merged_inventory_settings_service_role_select" ON public.
 -- order_attachments duplicate merged policies
 DROP POLICY IF EXISTS "merged_order_attachments_authenticated_select" ON public.order_attachments;
 DROP POLICY IF EXISTS "merged_order_attachments_service_role_select" ON public.order_attachments;
+DROP POLICY IF EXISTS "merged_order_attachments_authenticated_insert" ON public.order_attachments;
+DROP POLICY IF EXISTS "merged_order_attachments_authenticated_update" ON public.order_attachments;
+DROP POLICY IF EXISTS "merged_order_attachments_authenticated_delete" ON public.order_attachments;
 
 -- order_notes duplicate merged policies
 DROP POLICY IF EXISTS "merged_order_notes_authenticated_delete" ON public.order_notes;
 DROP POLICY IF EXISTS "merged_order_notes_authenticated_insert" ON public.order_notes;
 DROP POLICY IF EXISTS "merged_order_notes_authenticated_select" ON public.order_notes;
 DROP POLICY IF EXISTS "merged_order_notes_service_role_select" ON public.order_notes;
+DROP POLICY IF EXISTS "merged_order_notes_authenticated_update" ON public.order_notes;
 
 -- order_refund_events duplicate merged policies
 DROP POLICY IF EXISTS "merged_order_refund_events_authenticated_select" ON public.order_refund_events;
@@ -6307,6 +6314,9 @@ DROP POLICY IF EXISTS "merged_order_refund_events_service_role_select" ON public
 DROP POLICY IF EXISTS "merged_price_lists_anon_select" ON public.price_lists;
 DROP POLICY IF EXISTS "merged_price_lists_authenticated_select" ON public.price_lists;
 DROP POLICY IF EXISTS "merged_price_lists_service_role_select" ON public.price_lists;
+DROP POLICY IF EXISTS "merged_price_lists_authenticated_insert" ON public.price_lists;
+DROP POLICY IF EXISTS "merged_price_lists_authenticated_update" ON public.price_lists;
+DROP POLICY IF EXISTS "merged_price_lists_authenticated_delete" ON public.price_lists;
 
 -- product_prices duplicate merged policies
 DROP POLICY IF EXISTS "merged_product_prices_anon_select" ON public.product_prices;
@@ -6507,7 +6517,6 @@ CREATE POLICY "price_lists_admin_delete" ON public.price_lists FOR DELETE TO aut
   USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
 
 COMMIT;
-
 
 
 ## 3. FONKSIYONLAR (PL/pgSQL)
