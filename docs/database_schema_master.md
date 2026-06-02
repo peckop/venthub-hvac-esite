@@ -1,7 +1,7 @@
 # Veritabani Semasi — venthub-hvac
 
 ---
-compiled_at: 2026-05-30T21:20:51.922146+00:00
+compiled_at: 2026-06-02T11:19:41.384715+00:00
 tables: 28
 policies: 132
 functions: 55
@@ -5184,6 +5184,1015 @@ CREATE POLICY product_images_delete_tenant ON storage.objects
 
 -- Refresh PostgREST schema cache
 NOTIFY pgrst, 'reload schema';
+
+COMMIT;
+
+
+
+
+-- FILE: 20260602070000_security_hardening.sql
+BEGIN;
+
+-- ============================================================================
+-- R1: User Profiles RLS Recursion Fix
+-- ============================================================================
+-- Redefine is_admin_user() to safely read role from JWT claims first (recursion-free)
+CREATE OR REPLACE FUNCTION public.is_admin_user()
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  claims jsonb;
+  user_role text;
+BEGIN
+  -- If service_role, bypass checks and return true
+  IF auth.role() = 'service_role' THEN
+    RETURN TRUE;
+  END IF;
+
+  -- Retrieve JWT claims from request context
+  claims := nullif(current_setting('request.jwt.claims', true), '')::jsonb;
+  
+  IF claims IS NOT NULL THEN
+    user_role := COALESCE(
+      claims ->> 'user_role',
+      claims -> 'app_metadata' ->> 'user_role',
+      claims -> 'user_metadata' ->> 'role'
+    );
+    IF user_role IS NOT NULL THEN
+      RETURN user_role IN ('admin', 'superadmin');
+    END IF;
+  END IF;
+
+  -- Fallback to database lookup if claims are empty (e.g. backend script, triggers)
+  RETURN EXISTS (
+    SELECT 1 FROM public.user_profiles 
+    WHERE id = auth.uid() AND role IN ('admin','superadmin')
+  );
+END;
+$$;
+
+-- Drop and recreate the user_profiles SELECT policy to use the non-recursive is_admin_user()
+DROP POLICY IF EXISTS user_profiles_select_policy ON public.user_profiles;
+CREATE POLICY user_profiles_select_policy ON public.user_profiles FOR SELECT
+  USING ( id = auth.uid() OR public.is_admin_user() );
+
+
+-- ============================================================================
+-- R2: GraphQL Schema Exposure Prevention
+-- ============================================================================
+-- 1. Tables with existing comments (Preserve and Append)
+COMMENT ON TABLE public.user_profiles IS 'Kullanıcı profilleri ve rolleri | @graphql({"disabled": true})';
+COMMENT ON TABLE public.wizard_selections IS 'Hava perdesi seçim wizard kaydları - hukuki koruma amaçlı | @graphql({"disabled": true})';
+COMMENT ON TABLE public.venthub_orders IS 'Payment system fixed on 2025-09-03 - all required columns added | @graphql({"disabled": true})';
+COMMENT ON TABLE public.venthub_order_items IS 'Order items schema fixed on 2025-09-03 - optional fields made nullable | @graphql({"disabled": true})';
+COMMENT ON VIEW public.admin_users IS 'Admin ve moderatör kullanıcıları listesi | @graphql({"disabled": true})';
+
+-- 2. Tables without existing comments (Directly Disable)
+COMMENT ON TABLE public.admin_audit_log IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.cart_items IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.category_mapping_rules IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.client_errors IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.contact_messages IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.coupons IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.error_groups IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.inventory_movements IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.inventory_settings IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.order_attachments IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.order_email_events IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.order_notes IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.order_refund_events IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.organizations IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.payment_transactions IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.product_authorities IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.project_items IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.rate_limits IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.returns_webhook_events IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.shipping_email_events IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.shipping_idempotency IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.shipping_webhook_events IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.shopping_carts IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.site_settings IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.user_addresses IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.user_invoice_profiles IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.user_projects IS '@graphql({"disabled": true})';
+COMMENT ON TABLE public.venthub_returns IS '@graphql({"disabled": true})';
+
+
+-- ============================================================================
+-- R3 & R4: Storage Policy Hardening & Obsolete Policy Drop
+-- ============================================================================
+-- Drop permissive public/authenticated read/upload policies on product-images bucket
+DROP POLICY IF EXISTS product_images_read_public ON storage.objects;
+DROP POLICY IF EXISTS product_images_select_tenant ON storage.objects;
+DROP POLICY IF EXISTS product_images_insert_authenticated ON storage.objects;
+
+-- Recreate the SELECT policy to target authenticated roles only, fix the name shadowing bug,
+-- and enforce user membership validation against the active tenant.
+CREATE POLICY product_images_select_tenant ON storage.objects
+  FOR SELECT TO authenticated
+  USING (
+    bucket_id = 'product-images'
+    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
+    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
+    AND EXISTS (
+      SELECT 1 FROM public.user_profiles up
+      WHERE up.id = auth.uid()
+      AND up.tenant_id = public.jwt_tenant_id()
+    )
+  );
+
+
+-- ============================================================================
+-- R5a: Search Path Lock for Webhook Trigger Function
+-- ============================================================================
+ALTER FUNCTION public.handle_supabase_webhook() SET search_path = pg_catalog, public, net;
+
+
+-- ============================================================================
+-- R6: Custom Auth JWT Hook
+-- ============================================================================
+-- Update handle_new_user_metadata() to populate user_role and tenant_id claims
+CREATE OR REPLACE FUNCTION public.handle_new_user_metadata()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_catalog
+AS $$
+DECLARE
+  tenant_id_raw text;
+  resolved_tenant_id uuid;
+  role_val text;
+BEGIN
+  -- Extract tenant_id from raw_user_meta_data
+  tenant_id_raw := new.raw_user_meta_data ->> 'tenant_id';
+  
+  -- Safe block to parse and check tenant_id validity in the tenants table
+  BEGIN
+    IF tenant_id_raw IS NOT NULL THEN
+      SELECT id INTO resolved_tenant_id FROM public.tenants WHERE id = tenant_id_raw::uuid AND is_active = true;
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    resolved_tenant_id := NULL;
+  END;
+
+  -- Default to 'd3b07384-d113-495f-a558-8c38634e0000' if not found or invalid
+  IF resolved_tenant_id IS NULL THEN
+    resolved_tenant_id := 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
+  END IF;
+
+  -- Extract role from metadata, default to 'user'
+  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
+
+  -- Inject tenant_id and user_role into raw_app_meta_data so they are included in JWT claims
+  new.raw_app_meta_data := jsonb_set(
+    COALESCE(new.raw_app_meta_data, '{}'::jsonb),
+    '{tenant_id}',
+    to_jsonb(resolved_tenant_id::text)
+  );
+  new.raw_app_meta_data := jsonb_set(
+    new.raw_app_meta_data,
+    '{user_role}',
+    to_jsonb(role_val)
+  );
+
+  -- Also set tenant_id and user_role in raw_user_meta_data
+  new.raw_user_meta_data := jsonb_set(
+    COALESCE(new.raw_user_meta_data, '{}'::jsonb),
+    '{tenant_id}',
+    to_jsonb(resolved_tenant_id::text)
+  );
+  new.raw_user_meta_data := jsonb_set(
+    new.raw_user_meta_data,
+    '{role}',
+    to_jsonb(role_val)
+  );
+
+  RETURN new;
+END;
+$$;
+
+
+-- ============================================================================
+-- R7: Function Execution Revocation
+-- ============================================================================
+-- Revoke execution from public for all 30 security definer functions
+REVOKE EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text, uuid) FROM public;
+REVOKE EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text) FROM public;
+REVOKE EXECUTE ON FUNCTION public.adjust_stock_v2(uuid, integer) FROM public;
+REVOKE EXECUTE ON FUNCTION public.admin_list_all_users() FROM public;
+REVOKE EXECUTE ON FUNCTION public.admin_list_users() FROM public;
+REVOKE EXECUTE ON FUNCTION public.enforce_role_change() FROM public;
+REVOKE EXECUTE ON FUNCTION public.fn_admin_get_orders(text, text, text, integer) FROM public;
+REVOKE EXECUTE ON FUNCTION public.fn_admin_update_order_status(text, text, text) FROM public;
+REVOKE EXECUTE ON FUNCTION public.get_admin_users() FROM public;
+REVOKE EXECUTE ON FUNCTION public.get_products_enriched(uuid[], integer, integer, text, text, text, numeric, numeric) FROM public;
+REVOKE EXECUTE ON FUNCTION public.get_user_role(uuid) FROM public;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user_metadata() FROM public;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user_profile() FROM public;
+REVOKE EXECUTE ON FUNCTION public.handle_supabase_webhook() FROM public;
+REVOKE EXECUTE ON FUNCTION public.increment_coupon_usage(text) FROM public;
+REVOKE EXECUTE ON FUNCTION public.is_admin() FROM public;
+REVOKE EXECUTE ON FUNCTION public.is_admin_user() FROM public;
+REVOKE EXECUTE ON FUNCTION public.is_staff_user() FROM public;
+REVOKE EXECUTE ON FUNCTION public.is_user_admin(uuid) FROM public;
+REVOKE EXECUTE ON FUNCTION public.jwt_tenant_id() FROM public;
+REVOKE EXECUTE ON FUNCTION public.process_order_stock_reduction(text) FROM public;
+REVOKE EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid, integer) FROM public;
+REVOKE EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid) FROM public;
+REVOKE EXECUTE ON FUNCTION public.set_stock(uuid, integer, text, uuid) FROM public;
+REVOKE EXECUTE ON FUNCTION public.set_stock(uuid, integer, text) FROM public;
+REVOKE EXECUTE ON FUNCTION public.set_user_admin_role(uuid, text) FROM public;
+REVOKE EXECUTE ON FUNCTION public.set_user_role(uuid, text) FROM public;
+REVOKE EXECUTE ON FUNCTION public.update_inventory_settings(integer) FROM public;
+REVOKE EXECUTE ON FUNCTION public.update_inventory_thresholds(integer, boolean) FROM public;
+REVOKE EXECUTE ON FUNCTION public.user_invoice_profiles_ensure_single_default() FROM public;
+
+-- Grant EXECUTE back to authenticated and anon for the functions used in RLS policies or context resolution
+GRANT EXECUTE ON FUNCTION public.is_admin_user() TO authenticated, anon;
+GRANT EXECUTE ON FUNCTION public.jwt_tenant_id() TO authenticated, anon;
+GRANT EXECUTE ON FUNCTION public.is_user_admin(uuid) TO authenticated, anon;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, anon;
+GRANT EXECUTE ON FUNCTION public.is_staff_user() TO authenticated, anon;
+
+
+-- ============================================================================
+-- R9: Drop Obsolete Debug Functions
+-- ============================================================================
+DROP FUNCTION IF EXISTS public.debug_context();
+DROP FUNCTION IF EXISTS public.debug_policies_product_images();
+
+
+-- ============================================================================
+-- R10: Restrict Anon SELECT Privileges
+-- ============================================================================
+-- Revoke SELECT privilege from anon on the 36 sensitive tables and views
+REVOKE SELECT ON TABLE public.admin_audit_log FROM anon;
+REVOKE SELECT ON TABLE public.admin_users FROM anon;
+REVOKE SELECT ON TABLE public.cart_items FROM anon;
+REVOKE SELECT ON TABLE public.category_mapping_rules FROM anon;
+REVOKE SELECT ON TABLE public.client_errors FROM anon;
+REVOKE SELECT ON TABLE public.contact_messages FROM anon;
+REVOKE SELECT ON TABLE public.coupons FROM anon;
+REVOKE SELECT ON TABLE public.error_groups FROM anon;
+REVOKE SELECT ON TABLE public.inventory_movements FROM anon;
+REVOKE SELECT ON TABLE public.inventory_settings FROM anon;
+REVOKE SELECT ON TABLE public.inventory_summary FROM anon;
+REVOKE SELECT ON TABLE public.inventory_velocity FROM anon;
+REVOKE SELECT ON TABLE public.order_attachments FROM anon;
+REVOKE SELECT ON TABLE public.order_email_events FROM anon;
+REVOKE SELECT ON TABLE public.order_notes FROM anon;
+REVOKE SELECT ON TABLE public.order_refund_events FROM anon;
+REVOKE SELECT ON TABLE public.organizations FROM anon;
+REVOKE SELECT ON TABLE public.payment_transactions FROM anon;
+REVOKE SELECT ON TABLE public.product_authorities FROM anon;
+REVOKE SELECT ON TABLE public.project_items FROM anon;
+REVOKE SELECT ON TABLE public.rate_limits FROM anon;
+REVOKE SELECT ON TABLE public.returns_webhook_events FROM anon;
+REVOKE SELECT ON TABLE public.shipping_email_events FROM anon;
+REVOKE SELECT ON TABLE public.shipping_idempotency FROM anon;
+REVOKE SELECT ON TABLE public.shipping_webhook_events FROM anon;
+REVOKE SELECT ON TABLE public.shopping_carts FROM anon;
+REVOKE SELECT ON TABLE public.site_settings FROM anon;
+REVOKE SELECT ON TABLE public.user_addresses FROM anon;
+REVOKE SELECT ON TABLE public.user_invoice_profiles FROM anon;
+REVOKE SELECT ON TABLE public.user_profiles FROM anon;
+REVOKE SELECT ON TABLE public.user_projects FROM anon;
+REVOKE SELECT ON TABLE public.venthub_order_items FROM anon;
+REVOKE SELECT ON TABLE public.venthub_orders FROM anon;
+REVOKE SELECT ON TABLE public.venthub_returns FROM anon;
+REVOKE SELECT ON TABLE public.view_admin_orders FROM anon;
+REVOKE SELECT ON TABLE public.wizard_selections FROM anon;
+
+COMMIT;
+
+
+
+-- FILE: 20260602080000_security_hardening_fixes.sql
+-- Migration: Security Hardening Fixes
+-- Target: public.user_profiles, custom JWT auth hook, prevent self-elevation, internal auth checks, explicit function revocations
+-- Created: 2026-06-02
+
+BEGIN;
+
+-- ==========================================
+-- 1. R1 Fix (Cross-Tenant Leak)
+-- ==========================================
+DROP POLICY IF EXISTS user_profiles_select_policy ON public.user_profiles;
+CREATE POLICY user_profiles_select_policy ON public.user_profiles FOR SELECT TO authenticated
+  USING ( tenant_id = public.jwt_tenant_id() AND (id = auth.uid() OR public.is_admin_user()) );
+
+
+-- ==========================================
+-- 2. R6 (Custom Access Token Auth Hook)
+-- ==========================================
+CREATE OR REPLACE FUNCTION public.custom_access_token_hook(event jsonb)
+RETURNS jsonb
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  claims jsonb;
+  user_role text;
+  tenant_id_val text;
+BEGIN
+  -- Retrieve the user's role and tenant_id from the database user_profiles table
+  SELECT role, tenant_id::text INTO user_role, tenant_id_val
+  FROM public.user_profiles
+  WHERE id = (event->>'user_id')::uuid;
+
+  claims := event->'claims';
+
+  -- Ensure app_metadata is not null
+  IF (claims->'app_metadata') IS NULL THEN
+    claims := jsonb_set(claims, '{app_metadata}', '{}'::jsonb);
+  END IF;
+
+  -- Inject the role into JWT claims as user_role
+  IF user_role IS NOT NULL THEN
+    claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
+    claims := jsonb_set(claims, '{app_metadata, user_role}', to_jsonb(user_role));
+  ELSE
+    claims := jsonb_set(claims, '{user_role}', '"user"'::jsonb);
+    claims := jsonb_set(claims, '{app_metadata, user_role}', '"user"'::jsonb);
+  END IF;
+
+  -- Inject tenant_id into JWT claims as tenant_id (both root and app_metadata)
+  IF tenant_id_val IS NOT NULL THEN
+    claims := jsonb_set(claims, '{tenant_id}', to_jsonb(tenant_id_val));
+    claims := jsonb_set(claims, '{app_metadata, tenant_id}', to_jsonb(tenant_id_val));
+  ELSE
+    claims := jsonb_set(claims, '{tenant_id}', '"d3b07384-d113-495f-a558-8c38634e0000"'::jsonb);
+    claims := jsonb_set(claims, '{app_metadata, tenant_id}', '"d3b07384-d113-495f-a558-8c38634e0000"'::jsonb);
+  END IF;
+
+  -- Put the modified claims back in the event
+  event := jsonb_set(event, '{claims}', claims);
+  RETURN event;
+END;
+$$;
+
+-- Configure permissions for the Auth Hook
+GRANT USAGE ON SCHEMA public TO supabase_auth_admin;
+GRANT SELECT ON TABLE public.user_profiles TO supabase_auth_admin;
+GRANT EXECUTE ON FUNCTION public.custom_access_token_hook(jsonb) TO supabase_auth_admin;
+REVOKE EXECUTE ON FUNCTION public.custom_access_token_hook(jsonb) FROM anon, authenticated, public;
+
+
+-- ==========================================
+-- 3. Prevent Role Self-Elevation Triggers
+-- ==========================================
+CREATE OR REPLACE FUNCTION public.handle_new_user_metadata()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_catalog
+AS $$
+DECLARE
+  tenant_id_raw text;
+  resolved_tenant_id uuid;
+  role_val text;
+BEGIN
+  -- Extract tenant_id from raw_user_meta_data
+  tenant_id_raw := new.raw_user_meta_data ->> 'tenant_id';
+  
+  -- Safe block to parse and check tenant_id validity in the tenants table
+  BEGIN
+    IF tenant_id_raw IS NOT NULL THEN
+      SELECT id INTO resolved_tenant_id FROM public.tenants WHERE id = tenant_id_raw::uuid AND is_active = true;
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    resolved_tenant_id := NULL;
+  END;
+
+  -- Default to 'd3b07384-d113-495f-a558-8c38634e0000' if not found or invalid
+  IF resolved_tenant_id IS NULL THEN
+    resolved_tenant_id := 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
+  END IF;
+
+  -- Extract role from metadata, default to 'user'
+  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
+
+  -- Prevent role self-elevation
+  IF NOT (auth.role() = 'service_role' OR public.is_admin_user()) THEN
+    role_val := 'user';
+  END IF;
+
+  -- Inject tenant_id and user_role into raw_app_meta_data so they are included in JWT claims
+  new.raw_app_meta_data := jsonb_set(
+    COALESCE(new.raw_app_meta_data, '{}'::jsonb),
+    '{tenant_id}',
+    to_jsonb(resolved_tenant_id::text)
+  );
+  new.raw_app_meta_data := jsonb_set(
+    new.raw_app_meta_data,
+    '{user_role}',
+    to_jsonb(role_val)
+  );
+
+  -- Also set tenant_id and user_role in raw_user_meta_data
+  new.raw_user_meta_data := jsonb_set(
+    COALESCE(new.raw_user_meta_data, '{}'::jsonb),
+    '{tenant_id}',
+    to_jsonb(resolved_tenant_id::text)
+  );
+  new.raw_user_meta_data := jsonb_set(
+    new.raw_user_meta_data,
+    '{role}',
+    to_jsonb(role_val)
+  );
+
+  RETURN new;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.handle_new_user_profile()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_catalog
+AS $$
+DECLARE
+  resolved_tenant_id uuid;
+  full_name_val text;
+  role_val text;
+BEGIN
+  -- Extract resolved tenant_id from new.raw_app_meta_data
+  resolved_tenant_id := (new.raw_app_meta_data ->> 'tenant_id')::uuid;
+  
+  -- Extract other metadata values
+  full_name_val := new.raw_user_meta_data ->> 'full_name';
+  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
+
+  -- Prevent role self-elevation
+  IF NOT (auth.role() = 'service_role' OR public.is_admin_user()) THEN
+    role_val := 'user';
+  END IF;
+
+  -- Insert or update public.user_profiles mapping
+  INSERT INTO public.user_profiles (id, tenant_id, full_name, role, created_at, updated_at)
+  VALUES (
+    new.id,
+    resolved_tenant_id,
+    full_name_val,
+    role_val,
+    now(),
+    now()
+  )
+  ON CONFLICT (id) DO UPDATE
+  SET
+    tenant_id = EXCLUDED.tenant_id,
+    full_name = EXCLUDED.full_name,
+    role = EXCLUDED.role,
+    updated_at = now();
+
+  RETURN new;
+END;
+$$;
+
+
+-- ==========================================
+-- 4. Internal Authorization Checks (Defense-in-depth)
+-- ==========================================
+
+-- Drop functions before recreating to avoid parameter default / signature collision errors
+DROP FUNCTION IF EXISTS public.set_user_admin_role(uuid, text);
+DROP FUNCTION IF EXISTS public.adjust_stock(uuid, integer, text, uuid);
+DROP FUNCTION IF EXISTS public.adjust_stock(uuid, integer, text);
+DROP FUNCTION IF EXISTS public.set_stock(uuid, integer, text, uuid);
+DROP FUNCTION IF EXISTS public.set_stock(uuid, integer, text);
+
+-- set_user_admin_role
+CREATE OR REPLACE FUNCTION public.set_user_admin_role(user_id UUID, new_role TEXT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF NOT (auth.role() = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  IF new_role NOT IN ('user','admin','moderator','superadmin', 'super_admin', 'warehouse', 'sales', 'viewer') THEN
+    RAISE EXCEPTION 'Invalid role: %', new_role;
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE id = user_id) THEN
+    INSERT INTO public.user_profiles (id, role) VALUES (user_id, new_role)
+    ON CONFLICT (id) DO UPDATE SET role=new_role, updated_at=NOW();
+  ELSE
+    UPDATE public.user_profiles SET role=new_role, updated_at=NOW() WHERE id = user_id;
+  END IF;
+
+  RETURN TRUE;
+END;
+$$;
+
+-- adjust_stock(p_product_id, p_delta, p_reason, p_batch_id)
+CREATE OR REPLACE FUNCTION public.adjust_stock(
+  p_product_id uuid,
+  p_delta int,
+  p_reason text,
+  p_batch_id uuid
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'pg_catalog, public'
+AS $$
+BEGIN
+  IF NOT (auth.role() = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  UPDATE public.products 
+  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
+  WHERE id = p_product_id;
+
+  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id)
+  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'), p_batch_id);
+END;
+$$;
+
+-- adjust_stock(p_product_id, p_delta, p_reason)
+CREATE OR REPLACE FUNCTION public.adjust_stock(
+  p_product_id uuid,
+  p_delta int,
+  p_reason text
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'pg_catalog, public'
+AS $$
+BEGIN
+  IF NOT (auth.role() = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  UPDATE public.products 
+  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
+  WHERE id = p_product_id;
+  
+  INSERT INTO public.inventory_movements (product_id, delta, reason) 
+  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'));
+END;
+$$;
+
+-- set_stock(p_product_id, p_new_qty, p_reason, p_batch_id)
+CREATE OR REPLACE FUNCTION public.set_stock(
+  p_product_id uuid,
+  p_new_qty int,
+  p_reason text,
+  p_batch_id uuid
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'pg_catalog, public'
+AS $$
+DECLARE
+  v_current int;
+  v_delta int;
+BEGIN
+  IF NOT (auth.role() = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  SELECT COALESCE(stock_qty, 0) INTO v_current 
+  FROM public.products 
+  WHERE id = p_product_id;
+
+  v_delta := p_new_qty - v_current;
+  IF v_delta = 0 THEN
+    RETURN;
+  END IF;
+
+  UPDATE public.products 
+  SET stock_qty = GREATEST(0, p_new_qty)
+  WHERE id = p_product_id;
+
+  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id) 
+  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'), p_batch_id);
+END;
+$$;
+
+-- set_stock(p_product_id, p_new_qty, p_reason)
+CREATE OR REPLACE FUNCTION public.set_stock(
+  p_product_id uuid,
+  p_new_qty int,
+  p_reason text
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'pg_catalog, public'
+AS $$
+DECLARE
+  v_current int;
+  v_delta int;
+BEGIN
+  IF NOT (auth.role() = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  SELECT COALESCE(stock_qty, 0) INTO v_current 
+  FROM public.products 
+  WHERE id = p_product_id;
+  
+  v_delta := p_new_qty - v_current;
+  
+  IF v_delta = 0 THEN
+    RETURN;
+  END IF;
+  
+  UPDATE public.products 
+  SET stock_qty = GREATEST(0, p_new_qty)
+  WHERE id = p_product_id;
+  
+  INSERT INTO public.inventory_movements (product_id, delta, reason) 
+  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'));
+END;
+$$;
+
+
+-- ==========================================
+-- 5. R7 Fix (Explicit Function Execution Revocation)
+-- ==========================================
+
+-- Revoke execution from public, anon, and authenticated explicitly for all 30 functions
+REVOKE EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text, uuid) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.adjust_stock_v2(uuid, integer) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.admin_list_all_users() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.admin_list_users() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.enforce_role_change() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.fn_admin_get_orders(text, text, text, integer) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.fn_admin_update_order_status(text, text, text) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.get_admin_users() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.get_products_enriched(uuid[], integer, integer, text, text, text, numeric, numeric) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.get_user_role(uuid) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user_metadata() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user_profile() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.handle_supabase_webhook() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.increment_coupon_usage(text) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.is_admin() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.is_admin_user() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.is_staff_user() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.is_user_admin(uuid) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.jwt_tenant_id() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.process_order_stock_reduction(text) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid, integer) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.set_stock(uuid, integer, text, uuid) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.set_stock(uuid, integer, text) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.set_user_admin_role(uuid, text) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.set_user_role(uuid, text) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.update_inventory_settings(integer) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.update_inventory_thresholds(integer, boolean) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.user_invoice_profiles_ensure_single_default() FROM anon, authenticated, public;
+
+-- Grant execution back to authenticated and anon ONLY for RLS helper functions
+GRANT EXECUTE ON FUNCTION public.is_admin_user() TO authenticated, anon;
+GRANT EXECUTE ON FUNCTION public.jwt_tenant_id() TO authenticated, anon;
+GRANT EXECUTE ON FUNCTION public.is_user_admin(uuid) TO authenticated, anon;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, anon;
+GRANT EXECUTE ON FUNCTION public.is_staff_user() TO authenticated, anon;
+
+-- Grant execute to authenticated/service_role on other RPC functions as needed by application or admin actions
+GRANT EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text, uuid) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.admin_list_users() TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.set_stock(uuid, integer, text, uuid) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.set_stock(uuid, integer, text) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.set_user_admin_role(uuid, text) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.get_products_enriched(uuid[], integer, integer, text, text, text, numeric, numeric) TO authenticated, anon, service_role;
+
+COMMIT;
+
+
+
+-- FILE: 20260602090000_security_hardening_null_fix.sql
+-- Migration: Security Hardening Null-Safe Fixes
+-- Target: Redefine 7 database functions to use COALESCE(auth.role(), '') = 'service_role'
+-- Created: 2026-06-02
+
+BEGIN;
+
+-- 1. handle_new_user_metadata()
+CREATE OR REPLACE FUNCTION public.handle_new_user_metadata()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_catalog
+AS $$
+DECLARE
+  tenant_id_raw text;
+  resolved_tenant_id uuid;
+  role_val text;
+BEGIN
+  -- Extract tenant_id from raw_user_meta_data
+  tenant_id_raw := new.raw_user_meta_data ->> 'tenant_id';
+  
+  -- Safe block to parse and check tenant_id validity in the tenants table
+  BEGIN
+    IF tenant_id_raw IS NOT NULL THEN
+      SELECT id INTO resolved_tenant_id FROM public.tenants WHERE id = tenant_id_raw::uuid AND is_active = true;
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    resolved_tenant_id := NULL;
+  END;
+
+  -- Default to 'd3b07384-d113-495f-a558-8c38634e0000' if not found or invalid
+  IF resolved_tenant_id IS NULL THEN
+    resolved_tenant_id := 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
+  END IF;
+
+  -- Extract role from metadata, default to 'user'
+  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
+
+  -- Prevent role self-elevation using COALESCE for null-safety
+  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR public.is_admin_user()) THEN
+    role_val := 'user';
+  END IF;
+
+  -- Inject tenant_id and user_role into raw_app_meta_data so they are included in JWT claims
+  new.raw_app_meta_data := jsonb_set(
+    COALESCE(new.raw_app_meta_data, '{}'::jsonb),
+    '{tenant_id}',
+    to_jsonb(resolved_tenant_id::text)
+  );
+  new.raw_app_meta_data := jsonb_set(
+    new.raw_app_meta_data,
+    '{user_role}',
+    to_jsonb(role_val)
+  );
+
+  -- Also set tenant_id and user_role in raw_user_meta_data
+  new.raw_user_meta_data := jsonb_set(
+    COALESCE(new.raw_user_meta_data, '{}'::jsonb),
+    '{tenant_id}',
+    to_jsonb(resolved_tenant_id::text)
+  );
+  new.raw_user_meta_data := jsonb_set(
+    new.raw_user_meta_data,
+    '{role}',
+    to_jsonb(role_val)
+  );
+
+  RETURN new;
+END;
+$$;
+
+
+-- 2. handle_new_user_profile()
+CREATE OR REPLACE FUNCTION public.handle_new_user_profile()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_catalog
+AS $$
+DECLARE
+  resolved_tenant_id uuid;
+  full_name_val text;
+  role_val text;
+BEGIN
+  -- Extract resolved tenant_id from new.raw_app_meta_data
+  resolved_tenant_id := (new.raw_app_meta_data ->> 'tenant_id')::uuid;
+  
+  -- Extract other metadata values
+  full_name_val := new.raw_user_meta_data ->> 'full_name';
+  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
+
+  -- Prevent role self-elevation using COALESCE for null-safety
+  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR public.is_admin_user()) THEN
+    role_val := 'user';
+  END IF;
+
+  -- Insert or update public.user_profiles mapping
+  INSERT INTO public.user_profiles (id, tenant_id, full_name, role, created_at, updated_at)
+  VALUES (
+    new.id,
+    resolved_tenant_id,
+    full_name_val,
+    role_val,
+    now(),
+    now()
+  )
+  ON CONFLICT (id) DO UPDATE
+  SET
+    tenant_id = EXCLUDED.tenant_id,
+    full_name = EXCLUDED.full_name,
+    role = EXCLUDED.role,
+    updated_at = now();
+
+  RETURN new;
+END;
+$$;
+
+
+-- 3. set_user_admin_role(user_id UUID, new_role TEXT)
+CREATE OR REPLACE FUNCTION public.set_user_admin_role(user_id UUID, new_role TEXT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  IF new_role NOT IN ('user','admin','moderator','superadmin', 'super_admin', 'warehouse', 'sales', 'viewer') THEN
+    RAISE EXCEPTION 'Invalid role: %', new_role;
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE id = user_id) THEN
+    INSERT INTO public.user_profiles (id, role) VALUES (user_id, new_role)
+    ON CONFLICT (id) DO UPDATE SET role=new_role, updated_at=NOW();
+  ELSE
+    UPDATE public.user_profiles SET role=new_role, updated_at=NOW() WHERE id = user_id;
+  END IF;
+
+  RETURN TRUE;
+END;
+$$;
+
+
+-- 4. adjust_stock(p_product_id, p_delta, p_reason, p_batch_id)
+CREATE OR REPLACE FUNCTION public.adjust_stock(
+  p_product_id uuid,
+  p_delta int,
+  p_reason text,
+  p_batch_id uuid
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'pg_catalog, public'
+AS $$
+BEGIN
+  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  UPDATE public.products 
+  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
+  WHERE id = p_product_id;
+
+  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id)
+  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'), p_batch_id);
+END;
+$$;
+
+
+-- 5. adjust_stock(p_product_id, p_delta, p_reason)
+CREATE OR REPLACE FUNCTION public.adjust_stock(
+  p_product_id uuid,
+  p_delta int,
+  p_reason text
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'pg_catalog, public'
+AS $$
+BEGIN
+  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  UPDATE public.products 
+  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
+  WHERE id = p_product_id;
+  
+  INSERT INTO public.inventory_movements (product_id, delta, reason) 
+  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'));
+END;
+$$;
+
+
+-- 6. set_stock(p_product_id, p_new_qty, p_reason, p_batch_id)
+CREATE OR REPLACE FUNCTION public.set_stock(
+  p_product_id uuid,
+  p_new_qty int,
+  p_reason text,
+  p_batch_id uuid
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'pg_catalog, public'
+AS $$
+DECLARE
+  v_current int;
+  v_delta int;
+BEGIN
+  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  SELECT COALESCE(stock_qty, 0) INTO v_current 
+  FROM public.products 
+  WHERE id = p_product_id;
+
+  v_delta := p_new_qty - v_current;
+  IF v_delta = 0 THEN
+    RETURN;
+  END IF;
+
+  UPDATE public.products 
+  SET stock_qty = GREATEST(0, p_new_qty)
+  WHERE id = p_product_id;
+
+  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id) 
+  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'), p_batch_id);
+END;
+$$;
+
+
+-- 7. set_stock(p_product_id, p_new_qty, p_reason)
+CREATE OR REPLACE FUNCTION public.set_stock(
+  p_product_id uuid,
+  p_new_qty int,
+  p_reason text
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'pg_catalog, public'
+AS $$
+DECLARE
+  v_current int;
+  v_delta int;
+BEGIN
+  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
+    SELECT 1 FROM public.user_profiles up
+    WHERE up.id = auth.uid() 
+      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
+  )) THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+
+  SELECT COALESCE(stock_qty, 0) INTO v_current 
+  FROM public.products 
+  WHERE id = p_product_id;
+  
+  v_delta := p_new_qty - v_current;
+  
+  IF v_delta = 0 THEN
+    RETURN;
+  END IF;
+  
+  UPDATE public.products 
+  SET stock_qty = GREATEST(0, p_new_qty)
+  WHERE id = p_product_id;
+  
+  INSERT INTO public.inventory_movements (product_id, delta, reason) 
+  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'));
+END;
+$$;
 
 COMMIT;
 
