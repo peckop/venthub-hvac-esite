@@ -93,7 +93,27 @@ notebook_query(notebook_id="<ID>", query="<soru>")
 
 **Ürün sorusu:** "Vortice Vort HRI 350 teknik özellikleri?" → Önce `00 - Full Catalog`, bulamazsa ilgili kategori defteri.
 
-## 3. Katı Kurallar
+## 3. NotebookLM'i İkinci Beyin Olarak Kullanma Kılavuzu (LLM Cognitive Extension)
+
+NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarinin tamamını saniyeler içinde analiz edebilen dinamik bir **Baş Danışmandır**. Yapay zeka ajanları (LLM) geliştirme yaparken ve kararlar alırken aşağıdaki bilişsel yönergeleri izlemelidir:
+
+### A. Etki Analizi (Impact Analysis)
+*   **Kural:** Kod tabanında veya veritabanı şemasında (özellikle RLS politikaları, middleware veya kritik SaaS bileşenlerinde) değişiklik yapmadan önce NotebookLM'e danışın.
+*   **Sorgu Kalıbı:** *"X dosyasında/tablosunda yapacağım [değişiklik detayı] değişikliği sistem genelinde hangi bileşenleri, API'leri, ödeme geçitlerini (İyzico vb.) veya Edge Function'ları etkileyebilir? Risk analizini çıkar."*
+
+### B. Proje İlerlemesinin Ölçülmesi (Progress & Complete Evaluation)
+*   **Kural:** SaaS Faz 1 (veya aktif faz) hedeflerinin ne kadarının tamamlandığını, geride kalan güvenlik ve mimari açıkları ölçmek için NotebookLM'i bir denetçi olarak kullanın.
+*   **Sorgu Kalıbı:** *"CONTEXT.md, README.md ve güncel master dokümanlarına göre SaaS Faz 1 Foundation hedeflerinden hangileri tamamlandı? Eksik kalan veya risk teşkil eden entegrasyonlar nelerdir?"*
+
+### C. Geliştirme Danışmanlığı ve Mimari Arama (Architectural Consulting)
+*   **Kural:** Yeni bir kod yazmaya başlamadan önce, projenin geçmişte alınmış kararlarını (Enterprise Design Decisions), i18n kurallarını veya Supabase güvenlik aksiyomlarını NotebookLM'den sorgulayın.
+*   **Sorgu Kalıbı:** *"Bu projede RLS politikaları yazılırken veya JWT claims entegrasyonu yapılırken uyulması gereken zorunlu aksiyomlar ve tasarım desenleri nelerdir?"*
+
+### D. Hızlı Kod ve Mantık Keşfi (Dynamic Code Search)
+*   **Kural:** Kod tabanı büyüdükçe yüzlerce dosyayı yerel grep/read araçlarıyla tek tek taramak yerine, hedeflenen mantıksal yapıyı ve dosya isimlerini bulmak için önce NotebookLM'i sorgulayın. Bu hem bağlam penceresini (context window) korur hem de aramayı nokta atışı hale getirir.
+*   **Sorgu Kalıbı:** *"HVAC fiziksel hesaplamalarını yapan veya tenant context'ini yöneten ana kod blokları ve bunların bağlı olduğu yardımcı sınıflar hangi dosyalarda yer alıyor?"*
+
+## 4. Katı Kurallar
 
 - Kullanıcıya "Şu notebook'ta arayabilirim, ister misin?" diye **sormayın**. Gerekli görüyorsanız otonom olarak sorguyu yapıp sonucu entegre ederek cevap verin.
 - Kendi bilginiz çelişkili veya eskiyse, mutlaka ilgili defteri sorgulayın.

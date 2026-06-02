@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-05-30T21:37:28.358000+00:00
+compiled_at: 2026-06-02T09:30:19.934011+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-05-30T21:37:28.358000+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-02T09:30:19.934011+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -446,7 +446,7 @@ Bu belge, otonom derleyici tarafından 2026-05-30T21:37:28.358000+00:00 tarihind
 │   │   ├── ✅ `tenantResolver.ts`
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `utils.ts`
-│   ├── ❌ `middleware.ts`
+│   ├── ✅ `middleware.ts`
 │   ├── 📂 **test/**
 │   ├── 📂 **types/**
 │   │   ├── ✅ `admin-shared.ts`
@@ -639,7 +639,6 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\lib\services\category.service.md`
 - [❌] `src\lib\services\pricing.service.md`
 - [❌] `src\lib\services\project.service.md`
-- [❌] `src\middleware.md`
 - [❌] `src\types\database.md`
 - [❌] `src\utils\analytics.md`
 - [❌] `src\utils\applicationUi.md`
