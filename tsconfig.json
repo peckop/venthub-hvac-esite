@@ -21,6 +21,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "types": ["node"],
     "plugins": [
       {
         "name": "next"
@@ -39,6 +40,7 @@
     ".agent",
     "supabase",
     "threejs-skill-workspace",
-    "threejs-component-builder-workspace"
+    "threejs-component-builder-workspace",
+    "tests/e2e/empirical_*.test.ts"
   ]
 }

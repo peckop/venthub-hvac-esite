@@ -1,3 +1,5 @@
+-- Webhook Setup Script
+-- Note: Replace the placeholder 'REPLACE_WITH_ENV_SECRET' with the actual environment secret before deploying.
 -- 1. Enable pg_net extension
 CREATE EXTENSION IF NOT EXISTS pg_net;
 
@@ -7,7 +9,7 @@ RETURNS TRIGGER AS $$
 DECLARE
   payload jsonb;
   webhook_url text := 'https://venthub-hvac-esite.vercel.app/api/webhook/supabase';
-  webhook_secret text := 'whsec_venthub_a61f54b2bcff63f221259b315256d006';
+  webhook_secret text := 'REPLACE_WITH_ENV_SECRET';
   req_id bigint;
 BEGIN
   -- Construct the payload matching Route Handler expectations

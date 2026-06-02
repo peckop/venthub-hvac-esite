@@ -35,6 +35,7 @@ When working on any Supabase task that touches auth, RLS, views, storage, or use
 
 - **Auth and session security**
   - **Never use `user_metadata` claims in JWT-based authorization decisions.** In Supabase, `raw_user_meta_data` is user-editable and can appear in `auth.jwt()`, so it is unsafe for RLS policies or any other authorization logic. Store authorization data in `raw_app_meta_data` / `app_metadata` instead.
+  - **RBAC için resmi önerilen yol: Custom Access Token Auth Hook.** Rol bilgisini JWT'ye enjekte etmek için trigger ile `raw_app_meta_data` yazmak yerine, Supabase'in resmi Auth Hook mekanizmasını kullanın. Bu hook her token yenilemede otomatik çalışır ve her zaman güncel rol bilgisi sağlar. Detay: https://supabase.com/docs/guides/api/custom-claims-and-role-based-access-control-rbac
   - **Deleting a user does not invalidate existing access tokens.** Sign out or revoke sessions first, keep JWT expiry short for sensitive apps, and for strict guarantees validate `session_id` against `auth.sessions` on sensitive operations.
   - **If you use `app_metadata` or `auth.jwt()` for authorization, remember JWT claims are not always fresh until the user's token is refreshed.**
 
@@ -89,6 +90,15 @@ supabase <group> <command> --help  # Flags for a specific command
 
 **Version check and upgrade:** Run `supabase --version` to check. For CLI changelogs and version-specific features, consult the [CLI documentation](https://supabase.com/docs/reference/cli/introduction) or [GitHub releases](https://github.com/supabase/cli/releases).
 
+### MCP vs CLI: Advisor Kapsamı Farkı
+- **CLI** (`supabase db advisors`): Sadece temel lint kurallarını çalıştırır (unused_index, extension_in_public, multiple_permissive, auth_rls_initplan, function_search_path_mutable)
+- **MCP** (`get_advisors`): Supabase Management API üzerinden TAM güvenlik taraması yapar. CLI'da görünmeyen şu kategorileri de kapsar:
+  - `pg_graphql_anon_table_exposed` / `pg_graphql_authenticated_table_exposed`
+  - `anon_security_definer_function_executable` / `authenticated_security_definer_function_executable`
+  - `public_bucket_allows_listing`
+  - `auth_leaked_password_protection`
+- **Kural:** Güvenlik denetimlerinde her zaman MCP `get_advisors` kullanın. CLI sonuçları eksik kalabilir.
+
 ## Supabase MCP Server
 
 For setup instructions, server URL, and configuration, see the [MCP setup guide](https://supabase.com/docs/guides/getting-started/mcp).
@@ -107,11 +117,11 @@ For setup instructions, server URL, and configuration, see the [MCP setup guide]
 
 ## Supabase Documentation
 
-Before implementing any Supabase feature, find the relevant documentation. Use these methods in priority order:
-
-1. **MCP `search_docs` tool** (preferred — returns relevant snippets directly)
-2. **Fetch docs pages as markdown** — any docs page can be fetched by appending `.md` to the URL path.
-3. **Web search** for Supabase-specific topics when you don't know which page to look at.
+**CRITICAL:** Skills dosyaları güncel olmayabilir. Supabase hızla değişir. Her güvenlik kararından ÖNCE resmi kaynağı doğrulayın:
+1. **MCP `search_docs` tool** (preferred)
+2. **Docs pages as markdown** — URL'e `.md` ekleyin
+3. **MCP `get_advisors`** — Her DDL değişikliğinden sonra çalıştırın
+4. **Web search** for Supabase-specific topics when you don't know which page to look at.
 
 ## Making and Committing Schema Changes
 
