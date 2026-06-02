@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\layout.tsx
-skeleton_hash: 70190c87d7cf97c3
+skeleton_hash: cb39796d757f09ec
 entity_hashes:
-  func:Layout: f1cd59870391c992
-  overview: 91f2d39d391ae877
+  func:Layout: 835aeffc7f64a977
+  overview: e7251b7df76c3216
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:35:10Z
+generated_at: 2026-06-02T09:12:51Z
 ---
 
 ## Genel Bakış
@@ -16,7 +16,7 @@ Bu modül, yönetim paneli (admin) bölümleri için üst düzey düzen bileşen
 
 ## Fonksiyon Grupları
 ### Düzen Bileşeni
-Tüm admin sayfalarını sarmalayan ana layout bileşenini içerir. Sayfalar arasında paylaşılan arayüz yapısını (sidebar, header vb.) tanımlayarak alt içeriklerin doğru konumda görüntülenmesini sağlar.
+Yönetim paneli sayfalarını sarmalayan ana layout bileşenini içerir. Sayfalar arasında paylaşılan arayüz yapısını (sidebar, header vb.) tanımlayarak alt içeriklerin doğru konumda görüntülenmesini sağlar.
 - Layout
 
 ---
@@ -24,28 +24,22 @@ Tüm admin sayfalarını sarmalayan ana layout bileşenini içerir. Sayfalar ara
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
+[NOT: Bu modül bir React layout bileşeni olup, fonksiyon gövdesinde (sadece `return` ifadesi) herhangi bir mantıksal koşul veya varsayım içermemektedir. Bileşen, sadece `children` prop'unu alıp JSX yapısı içinde yerleştiren saf bir sunum bileşenidir. Dolayısıyla, fonksiyon gövdesinden türetilebilecek mimari varsayım bulunmamaktadır.]
+
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Layout
-**Ne yapar**: Bu fonksiyon, uygulamanın admin bölümündeki ana sayfa düzenini (layout) oluşturur. Temel amacı, tüm sayfa içeriklerini (`children`) ortak bir taşıyıcı bileşen (`LayoutComponent`) ile sarmalayarak tutarlı bir görünüm ve yapı sağlamaktır.
 
-**Nasıl yapar**: Fonksiyon, React fonksiyonel bir bileşenidir ve doğrudan `LayoutComponent` bileşenini döndürür. `children` olarak adlandırılan prop, bu bileşenin içine yerleştirilerek, tüm alt sayfa içeriklerinin ortak bir dış çerçeve içinde render edilmesini sağlar. Bu, genellikle menü, başlık veya kenar çubuğu gibi ortak UI elemanlarını yönetmek için kullanılan bir yapısal kalıptır.
+**Ne yapar**: Admin panelinin üst seviye layout bileşenidir. Tenant (kiracı) yapılandırmasını sunucu tarafında asenkron olarak yükler ve tüm admin sayfalarını bu yapılandırma ile sararak çocuk bileşenleri render eder.
+
+**Nasıl yapar**: Fonksiyon asenkron çalışır ve önce `getTenantConfig()` çağrısı ile geçerli tenant yapılandırmasını sunucu tarafında alır. Ardından bu yapılandırma değerini `TenantProvider` bileşenine prop olarak geçer ve `LayoutComponent` içinde孩子.children bileşenlerini sarmalayarak render eder. Bu sayede tüm alt sayfalar tenant bilgisine erişebilir.
 
 **Parametreler**:
-- children: `React.ReactNode` — Bu layout bileşeninin içinde render edilecek olan tüm alt sayfa içeriklerini, bileşenlerini veya JSX elementlerini temsil eder. `LayoutComponent`'in içine yerleştirilir.
+- children: React.ReactNode — Admin panelinde render edilecek sayfa içeriği ve alt bileşenler. Bu parametre, layout içinde görüntülenecek tüm çocuk React elemanlarını temsil eder.
 
-**Dönüş**: `JSX.Element` — `LayoutComponent` bileşenini ve onun içine yerleştirilmiş `children`'ı döndürür. Bu, React tarafından render edilebilir geçerli bir JSX yapısıdır.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/app/admin/layout.tsx::Layout
-- **params**: `{ children }: { children: React.ReactNode }` — children prop'u, alt sayfa bileşenlerini temsil eder
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde herhangi bir değişken tanımlanmıyor veya atanmıyor)
-- **Dönüş**: JSX — `<LayoutComponent>{children}</LayoutComponent>` ifadesini döndürür; `LayoutComponent` içine `children` prop'unu yerleştirerek admin sayfasının dış sarmalayıcı yerleşimini (layout) render eder
+**Dönüş**: JSX.Element — TenantProvider ile sarılmış LayoutComponent içinde child'ları barındıran React bileşeni döndürür. Tenant yapılandırması tüm alt bileşenlere context aracılığıyla dağıtılır.
 
 ---
 
