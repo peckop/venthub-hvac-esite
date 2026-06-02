@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '../index.css'
+import '@/lib/three-setup'
 import { Providers, ClientLayout } from '../components/layout/ClientLayout'
 import { SITE_URL } from '@/config/siteUrl'
 

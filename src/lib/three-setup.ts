@@ -14,12 +14,16 @@ if (typeof window !== 'undefined') {
     console.warn = (...args: unknown[]) => {
         const msg = typeof args[0] === 'string' ? args[0] : '';
         
-        // Filter out known harmless deprecations and clutter
+        // Filter out known harmless deprecations, WebGL shader warnings, and clutter
         if (msg.includes('THREE.Clock: This module has been deprecated') ||
+            msg.includes('THREE.THREE.Clock') ||
             msg.includes('use THREE.Timer instead') ||
             msg.includes('PCFSoftShadowMap has been deprecated') ||
             msg.includes('Detected scroll-behavior: smooth') ||
-            msg.includes('Next.js will no longer automatically disable smooth scrolling')) {
+            msg.includes('Next.js will no longer automatically disable smooth scrolling') ||
+            msg.includes('THREE.WebGLProgram: Program Info Log') ||
+            msg.includes('warning X4122') ||
+            msg.includes('cannot be represented accurately in double precision')) {
             return;
         }
         

@@ -3,30 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\layout.tsx
-skeleton_hash: cea0240c16858674
+skeleton_hash: 427402ca19687e8b
 entity_hashes:
   func:RootLayout: 81f35cb6d72f3218
-  overview: 21a28938937a2d25
+  overview: b75fce6203810ddf
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:35:18Z
+generated_at: 2026-06-02T21:30:18Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın tüm sayfalarını saran kök layout bileşenini tanımlar. Next.js'in varsayılan düzen mekanizmasını kullanarak her sayfaya ortak HTML yapısı, font ayarları ve stil referanslarını sağlar. Sayfa içerikleri `children` prop'u aracılığıyla bu düzenin içine yerleştirilerek tutarlı bir görünüm elde edilir.
+Bu modül, VentHub web uygulamasının temel yapı taşını oluşturur. Tüm sayfaları saran kök layout bileşenini tanımlayarak tutarlı bir HTML yapısı, font ayarları ve ortak stil referanslarını sağlar. Sayfa içerikleri bu düzenin içine yerleştirilerek uygulamanın genel görünümünü ve düzenini belirler.
 
 ## Fonksiyon Grupları
 ### Layout Rendering
-Uygulamanın en dış çerçevesini oluşturur; tüm sayfaların bu düzen bileşeni üzerinden geçerek tarayıcıya sunulmasını sağlar.
+Uygulamanın en dış çerçevesini ve temel HTML yapısını oluşturarak tüm sayfaların bu düzen bileşeni üzerinden tarayıcıya sunulmasını sağlar.
 - RootLayout
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül, bir React fonksiyonel bileşeni olan bir layout bileşenidir. Temel mimari varsayımlar, children parametresinin varlığı ve tipine dayanır.
 
-[Aksiyom 1]: Eğer `children` parametresi sağlanmazsa (null, undefined veya hiç geçilmezse), TypeScript derleme hatası oluşur ve bileşen render edilemez.
-
-[Aksiyom 2]: Eğer `children` parametresi sağlanan bir React.ReactNode değeri değilse (örn: geçersiz bir nesne veya React tarafından işlenemeyen bir veri tipi), bileşen render sırasında bir hata fırlatır ve uygulama kırılabilir.
 
 ---
 
@@ -55,9 +50,9 @@ Bu modül, bir React fonksiyonel bileşeni olan bir layout bileşenidir. Temel m
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/layout.tsx::RootLayout
-- **params**: `children` — React.ReactNode, alt sayfa bileşenlerini temsil eder, JSX içinde {children} olarak render edilir
-- **ic_degiskenler**: (yok — fonksiyonda herhangi bir yerel değişken tanımlanmamıştır; tüm değerler parametre veya modül seviyesindeki sabitlerden (inter, SITE_URL) gelir)
-- **Dönüş**: yok (JSX döndürür — `<html>` elementi ile sarılmış tam sayfa yapısı; yan etkiler: Providers ve ClientLayout sarmalayıcıları ile sayfa düzenini oluşturur, JSON-LD yapılandırılmış veri script'i enjekte eder)
+- **params**: `{ children }` — React bileşenlerinin içeriği (React.ReactNode tipinde)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX (React layout yapısı) — `<html>` ve `<body>` etiketlerini, Providers, ClientLayout, JSON-LD scripti ve children içeren tam sayfa layout'unu döndürür. Yan etki: `inter.className` ile font stillendirir, `SITE_URL` ile SEO URL'si ekler.
 
 ---
 
