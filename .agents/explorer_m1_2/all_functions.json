@@ -1,0 +1,190 @@
+[
+  {
+    "schema_name": "public",
+    "function_name": "_normalize_rls_expr"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "adjust_stock"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "adjust_stock"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "adjust_stock_v2"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "admin_list_all_users"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "admin_list_users"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "admin_search_products"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "bump_rate_limit"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "enforce_role_change"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "fn_admin_get_orders"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "fn_admin_update_order_status"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "fn_auto_categorize_products"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "fn_enrich_product_specs"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "fts_search_products"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "generate_order_number"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "get_admin_users"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "get_products_enriched"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "get_search_suggestions"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "get_user_role"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "handle_new_user_metadata"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "handle_new_user_profile"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "handle_supabase_webhook"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "increment_coupon_usage"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "increment_error_group_count"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "is_admin"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "is_admin_user"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "is_staff_user"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "is_user_admin"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "jwt_role"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "jwt_tenant_id"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "normalize_product_threshold_overrides"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "process_order_stock_reduction"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "reverse_inventory_batch"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "reverse_inventory_batch"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_order_number"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_stock"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_stock"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_updated_at"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_user_admin_role"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_user_role"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "sync_payment_status_with_status"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "tr_auto_categorize_trigger"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "update_inventory_settings"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "update_inventory_thresholds"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "update_updated_at_column"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "update_user_profiles_updated_at"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "user_invoice_profiles_ensure_single_default"
+  }
+]

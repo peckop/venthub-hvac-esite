@@ -15,7 +15,7 @@ entity_hashes:
   func:secureResolveInvoicePath: 8bd792a72ccb68e5
   func:secureResolveTenant: a7c0a6c7bd053522
   overview: 88ca2352585634a1
-generated_at: 2026-05-30T20:33:32Z
+generated_at: 2026-06-02T07:51:17Z
 ---
 
 ## Genel Bakış
@@ -37,7 +37,49 @@ Bu grup, test senaryolarında verilerin temizlenmesini ve önbellekleme anahtar�
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, HVAC sistemi için adversarial (saldırgan) test senaryolarında kullanılan yardımcı fonksiyonları ve güvenli önbellek motorunu kapsar. Güvenlik mekanizmalarının doğru çalışmasını test etmek için kritik varsayımlar taşır.
+
+---
+
+**[Aksiyom 1 - Tenant Izolasyonu]:** `SecureCacheEngine` tarafından depolanan değerler, `tenantId` parameteresine göre kesinlikle izole olmalıdır.
+*Eğer farklı `tenantId` değerleri ile aynı `key` ve `lang` kullanılarak `set` ve `get` işlemleri yapılırsa, farklı tenantlar için farklı değerler dönmelidir. Aksi halde, tenant veri sızıntısı (tenant data leakage) oluşur.*
+
+---
+
+**[Aksiyom 2 - Host Çözümleme Sınırları]:** `secureResolveTenant` fonksiyonu `host` parametresi `null` veya `undefined` olduğunda bile çalışabilir durumda olmalıdır.
+*Eğer `host` parametresi `null` veya `undefined` geldiğinde fonksiyon hata fırlatırsa, beklenmeyen host değerleri için sistem çöker. Güvenli bir varsayılan tenant veya hata yönetimi ile sonuç döndürmelidir.*
+
+---
+
+**[Aksiyom 3 - İmza Hesaplama Bileşenleri]:** `computeSignature(secret, body)` fonksiyonu için hem `secret` hem de `body` non-empty string olmalıdır.
+*Eğer `secret` boş string olarak verilirse, hesaplanan imza güvenliksiz ve tahmin edilebilir hale gelir. Eğer `body` boş string olursa, imza tutarsız ve reprodukible olmayan sonuçlar doğurur.*
+
+---
+
+**[Aksiyom 4 - Güvenli vs. Naif Anahtar Üretimi]:** `naiveBuildKey` ve `SecureCacheEngine.buildKey` fonksiyonları farklı güvenlik seviyelerine sahip olmalıdır.
+*Eğer `naiveBuildKey` ile `SecureCacheEngine.buildKey` aynı inputlar için aynı çıktıyı üretirse, naif implementasyonun güvenli implementasyondan farkı kalmaz ve adversary testleri anlamını yitirir. `naiveBuildKey` kasıtlı olarak zayıf bir anahtar üretim stratejisi izlemelidir.*
+
+---
+
+**[Aksiyom 5 - Marka Konfigürasyonu Alan Zorunluluğu]:** `sanitizeBrandConfig` tarafından işlenen config objesinin `brandName`, `brandPrimaryColor` ve `brandLogoUrl` alanlarının tümü var olmalıdır.
+*Eğer bu alanlardan herhangi biri eksik veya farklı bir tipte gelirse, sanitizasyon süreci tanımsız davranış (undefined behavior) sergileyebilir. Eksik alan durumunda varsayılan değer mi yoksa hata mı döndürüleceği modülün test senaryoları ile tutarlı olmalıdır.*
+
+---
+
+**[Aksiyom 6 - Fatura Yolu Deterministikliği]:** `secureResolveInvoicePath(tenantId, invoiceId)` aynı `tenantId` ve `invoiceId` değerleri için her zaman aynı yolu döndürmelidir.
+*Eğer aynı inputlar için farklı path'ler döndürülürse, fatura dosyalarına erişim tutarsız hale gelir ve dosya sistemi tabanlı testler başarısız olur.*
+
+---
+
+**[Aksiyom 7 - Cache Anahtar Formatı]:** `SecureCacheEngine.buildKey` fonksiyonu, `key`, `lang` ve `tenantId` bileşenlerinden deterministik ve benzersiz bir anahtar üretmelidir.
+*Eğer farklı `(key, lang, tenantId)` üçlülerinden aynı cache anahtarı üretilirse, cache çakışmaları (collision) oluşur ve yanlış veriler okunur.*
+
+---
+
+**[Aksiyom 8 - Mock User Resolver Çıktı Yapısı]:** `mockUserResolver()` fonksiyonu, bir kullanıcı objesi döndürmelidir ve bu obje至少 `id` alanı içermelidir.
+*Eğer mock user objesi geçerli bir yapıya sahip değilse, user-referanslı fonksiyonların test
 
 ---
 
@@ -90,93 +132,22 @@ Bu grup, test senaryolarında verilerin temizlenmesini ve önbellekleme anahtar�
 **Dönüş**: `{ brandName: string; brandPrimaryColor: string; brandLogoUrl: string }` — Her alaninin guvenli ve gecerli formata temizlenmis hali.
 
 ### buildKey
-**Ne yapar**: `SecureCacheEngine` sinifinin bir yontemi olarak, prototype pollution saldirilarini onleyen guvenli bir onbellek anahtari uretir.
-**Nasil yapar**: Gelen `key`, `lang` ve `tenantId` parametrelerinden herhangi birinin `"__proto__"` veya `"constructor"` gibi prototype zincirini manipule edebilecek degerler olup olmadigini kontrol eder. Boyle bir deger tespit ederse hata firlatir. Aksi takdirde, parametreleri bir dizi icine koyup `JSON.stringify` ile serialize ederek, token manipulasyonu cakismalarini onleyen yapısal olarak guvenli bir anahtar字符串i返回 eder.
+**Ne yapar**: Güvenli bir cache anahtarı oluşturur. Verilen key, dil ve tenant bilgilerini birleştirerek prototip manipülasyonu saldırılarına karşı korumalı bir string üretir.
+
+**Nasıl yapar**: İlk olarak prototype pollution guard uygulayarak `__proto__` veya `constructor` değerlerini engeller. Ardından parametreleri bir array içinde JSON.stringify ile serialize ederek yapısal olarak güvenli bir anahtar oluşturur.
+
 **Parametreler**:
-- key: string — Anahtar olusturmak icin kullanilan temel anahtar.
-- lang: string — Dil kodu.
-- tenantId: string — Tenant benzersiz kimligi.
-**Dönüş**: `string` — JSON.stringify ile uretilmis guvenli,唯一 anahtar字符串i.
+- key: string — Cache'de depolanacak verinin tanımlayıcısı
+- lang: string — Dil kodu bilgisi
+- tenantId: string — Kiracı (tenant) tanımlayıcısı
+
+**Dönüş**: string — JSON formatında serialize edilmiş güvenli cache anahtarı
 
 ### get
-**Ne yapar**: `SecureCacheEngine` sinifinin bir yontemi olarak, guvenli sekilde olusturulmus bir anahtarla onbellek deposundan deger okur.
-**Nasil yapar**: `this.buildKey` yontemini cagirarak, verilen parametrelerden guvenli bir anahtar uretir. Bu anahtari kullanarak `this.store` (bir Map veya benzeri depo) uzerinde `get` islemi yapar ve degeri返回 eder.
-**Parametreler**:
-- key: string — Onbellek anahtari icin temel deger.
-- lang: string — Dil kodu.
-- tenantId: string — Tenant benzersiz kimligi.
-**Dönüş**: `any` — Onbellekte bulunan deger; anahtar yoksa `undefined`.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### set
-**Ne yapar**: `SecureCacheEngine` sinifinin bir yontemi olarak, guvenli sekilde olusturulmus bir anahtarla bir degeri onbellek deposuna yazar.
-**Nasil yapar**: `this.buildKey` yontemini cagirarak, verilen parametrelerden guvenli bir anahtar uretir. Bu anahtari kullanarak `this.store` uzerinde `set` islemi yaparak verilen degeri kaydeder.
-**Parametreler**:
-- key: string — Onbellek anahtari icin temel deger.
-- lang: string — Dil kodu.
-- tenantId: string — Tenant benzersiz kimligi.
-- value: any — Onbellekte saklanacak deger.
-**Dönüş**: Fonksiyonun belirgin bir返回 degeri yoktur (muhtemelen `void`). Yalnizca yan etki olarak depoyu gunceller.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: tests\e2e\adversarial.test.ts::mockUserResolver
-- **params**: (parametre yok)
-- **ic_degiskenler**: (değişken yok, doğrudan literal nesne döndürür)
-- **Dönüş**: { user: any; error: any }
-
-### [N2_NASIL] AST Pointer: tests\e2e\adversarial.test.ts::computeSignature
-- **params**: `secret: string`, `body: string`
-- **ic_degiskenler**:
-  - `encoder` — Metinleri ikili (binary) forma dönüştüren TextEncoder örneği
-  - `key` — HMAC-SHA-256 imzası için imp ortlanmış (imported) kripto anahtarı
-  - `signature` — HMAC ile hesaplanmış ham imza bytes dizisi
-- **Dönüş**: string (base64 kodlanmış imza)
-
-### [N3_NASIL] AST Pointer: tests\e2e\adversarial.test.ts::secureResolveTenant
-- **params**: `host: string | null | undefined`
-- **ic_degiskenler**:
-  - `base` — resolveTenant() çağrısından dönen ham tenant çözümleme sonucu
-- **Dönüş**: `{ slug, tenantId, ... }` nesnesi (slug'ı potentially 'invalid' olarak değiştirilmiş)
-
-### [N4_NASIL] AST Pointer: tests\e2e\adversarial.test.ts::naiveBuildKey
-- **params**: `key: string`, `lang: string`, `tenantId: string`
-- **ic_degiskenler**: (değişken yok, doğrudan template literal döndürür)
-- **Dönüş**: string (`key-lang-tenantId` formatında birleşik dize)
-
-### [N5_NASIL] AST Pointer: tests\e2e\adversarial.test.ts::secureResolveInvoicePath
-- **params**: `tenantId: string`, `invoiceId: string`
-- **ic_degiskenler**:
-  - `normalizedInvoiceId` — decodeURIComponent() ile URL-kodlanmış traversal karakterleri çözümlenmiş fatura ID'si
-- **Dönüş**: string (`tenants/{tenantId}/invoices/{normalizedInvoiceId}.pdf` formatında depolama yolu)
-
-### [N6_NASIL] AST Pointer: tests\e2e\adversarial.test.ts::sanitizeBrandConfig
-- **params**: `config: { brandName: string; brandPrimaryColor: string; brandLogoUrl: string }`
-- **ic_degiskenler**:
-  - `brandName` — config.brandName değerinden DOMPurify ile HTML etiketleri temizlenmiş ve trim edilmiş güvenli marka adı
-  - `colorRegex` — Geçerli renk formatlarını (hex, rgb, rgba) doğrulayan regular expression deseni
-  - `brandPrimaryColor` — Regex eşleşmesi ile doğrulanmış veya '#2563eb' güvenli varsayılana düşürülmüş ana renk
-  - `brandLogoUrl` — config.brandLogoUrl'den gelen URL, protocol doğrulamasıyla güvenli hale getirilmiş veya varsayılana düşürülmüş
-  - `parsed` — config.brandLogoUrl değerini parsed URL nesnesi (try bloğu içinde)
-- **Dönüş**: `{ brandName: string; brandPrimaryColor: string; brandLogoUrl: string }`
-
-### [N7_NASIL] AST Pointer: tests\e2e\adversarial.test.ts::SecureCacheEngine.buildKey
-- **params**: `key: string`, `lang: string`, `tenantId: string`
-- **ic_degiskenler**: (değişken yok, doğrudan JSON.stringify ile döndürür)
-- **Dönüş**: string (JSON.stringify([key, lang, tenantId]) formatında korumalı anahtar)
-
-### [N8_NASIL] AST Pointer: tests\e2e\adversarial.test.ts::SecureCacheEngine.get
-- **params**: `key: string`, `lang: string`, `tenantId: string`
-- **ic_degiskenler**:
-  - `safeKey` — buildKey() çağrısı ile üretilmiş güvenli anahtar
-- **Dönüş**: any (this.store.get(safeKey) sonucu)
-
-### [N9_NASIL] AST Pointer: tests\e2e\adversarial.test.ts::SecureCacheEngine.set
-- **params**: `key: string`, `lang: string`, `tenantId: string`, `value: any`
-- **ic_degiskenler**:
-  - `safeKey` — buildKey() çağrısı ile üretilmiş güvenli anahtar
-- **Dönüş**: yok (this.store.set() ile yan etki: store haritasına değer ekler)
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 

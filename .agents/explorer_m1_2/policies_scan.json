@@ -1,0 +1,1199 @@
+[
+  {
+    "schemaname": "public",
+    "tablename": "admin_audit_log",
+    "policyname": "admin_audit_log_insert_v2",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((tenant_id = jwt_tenant_id()) AND is_admin_user())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_audit_log",
+    "policyname": "admin_audit_log_select_v2",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) AND is_admin_user())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_audit_log",
+    "policyname": "admin_audit_log_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_audit_log",
+    "policyname": "merged_admin_audit_log_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR (true OR (true OR true)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "cart_items",
+    "policyname": "cart_items_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "cart_items",
+    "policyname": "ci_auth_all",
+    "roles": "{authenticated}",
+    "cmd": "ALL",
+    "qual": "((tenant_id = jwt_tenant_id()) AND (cart_id IN ( SELECT shopping_carts.id\n   FROM shopping_carts\n  WHERE ((shopping_carts.user_id = ( SELECT auth.uid() AS uid)) AND (shopping_carts.tenant_id = jwt_tenant_id())))))",
+    "with_check": "((tenant_id = jwt_tenant_id()) AND (cart_id IN ( SELECT shopping_carts.id\n   FROM shopping_carts\n  WHERE ((shopping_carts.user_id = ( SELECT auth.uid() AS uid)) AND (shopping_carts.tenant_id = jwt_tenant_id())))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "cart_items",
+    "policyname": "merged_cart_items_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR (true OR (true OR true)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "cat_admin_delete_opt",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "cat_admin_insert_opt",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "cat_admin_update_opt",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))",
+    "with_check": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "cat_public_read_opt",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "category_mapping_rules",
+    "policyname": "merged_category_mapping_rules_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(((( SELECT user_profiles.role\n   FROM user_profiles\n  WHERE (user_profiles.id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))::text = ANY (ARRAY[('admin'::character varying)::text, ('superadmin'::character varying)::text])) OR ((( SELECT user_profiles.role\n   FROM user_profiles\n  WHERE (user_profiles.id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))::text = ANY (ARRAY[('admin'::character varying)::text, ('superadmin'::character varying)::text])))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "client_errors",
+    "policyname": "merged_client_errors_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text) OR ((jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text))) OR (jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text])) OR (((( SELECT current_setting('request.jwt.claims'::text) AS current_setting))::jsonb ->> 'email'::text) = 'recep.varlik@gmail.com'::text)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "contact_messages",
+    "policyname": "admin_view_messages",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying])::text[])))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "coupons",
+    "policyname": "coupons_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "coupons",
+    "policyname": "merged_coupons_anon_select",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))) OR (((tenant_id = jwt_tenant_id()) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))) OR (((tenant_id = jwt_tenant_id()) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))) OR ((tenant_id = jwt_tenant_id()) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "coupons",
+    "policyname": "merged_coupons_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid))) OR (((tenant_id = jwt_tenant_id()) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))) OR (((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR (((tenant_id = jwt_tenant_id()) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))) OR (((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR (((tenant_id = jwt_tenant_id()) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))) OR (((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))))))))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "coupons",
+    "policyname": "merged_coupons_dashboard_user_select",
+    "roles": "{dashboard_user}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "coupons",
+    "policyname": "merged_coupons_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR (true OR (true OR true)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "error_groups",
+    "policyname": "admins_read_error_groups",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "is_admin_user()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "inventory_movements",
+    "policyname": "inventory_movements_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "inventory_movements",
+    "policyname": "merged_inventory_movements_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid))) OR (((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR (((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "inventory_movements",
+    "policyname": "merged_inventory_movements_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR (true OR (true OR true)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "inventory_settings",
+    "policyname": "inventory_settings_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "inventory_settings",
+    "policyname": "merged_inventory_settings_anon_select",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) OR ((tenant_id = jwt_tenant_id()) OR ((tenant_id = jwt_tenant_id()) OR (tenant_id = jwt_tenant_id()))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "inventory_settings",
+    "policyname": "merged_inventory_settings_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) OR ((tenant_id = jwt_tenant_id()) OR ((tenant_id = jwt_tenant_id()) OR (tenant_id = jwt_tenant_id()))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "inventory_settings",
+    "policyname": "merged_inventory_settings_authenticated_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid))) OR (((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR (((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))))",
+    "with_check": "(((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid))) OR (((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR (((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "inventory_settings",
+    "policyname": "merged_inventory_settings_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR (true OR (true OR true)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_attachments",
+    "policyname": "merged_order_attachments_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND (NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE ((venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id()))))) OR ((NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE (venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE ((venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id()))))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE ((venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id()))))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE ((venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id()))))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_attachments",
+    "policyname": "merged_order_attachments_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_attachments",
+    "policyname": "order_attachments_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_email_events",
+    "policyname": "merged_order_email_events_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles up\n  WHERE ((up.id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) AND ((up.role)::text = ANY (ARRAY[('admin'::character varying)::text, ('superadmin'::character varying)::text])))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_email_events",
+    "policyname": "merged_order_email_events_service_role_insert",
+    "roles": "{service_role}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "true"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_notes",
+    "policyname": "merged_order_notes_authenticated_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_notes",
+    "policyname": "merged_order_notes_authenticated_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE (venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_notes",
+    "policyname": "merged_order_notes_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND (NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE ((venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id()))))) OR ((NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE (venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE ((venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id()))))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE ((venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id()))))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE ((venthub_orders.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id()))))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_notes",
+    "policyname": "merged_order_notes_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_notes",
+    "policyname": "order_notes_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_refund_events",
+    "policyname": "merged_order_refund_events_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND is_admin_user()) OR ((tenant_id = jwt_tenant_id()) AND is_admin_user()) OR ((tenant_id = jwt_tenant_id()) AND is_admin_user()) OR ((tenant_id = jwt_tenant_id()) AND is_admin_user()))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_refund_events",
+    "policyname": "merged_order_refund_events_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_refund_events",
+    "policyname": "order_refund_events_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "organizations",
+    "policyname": "Anyone can view organizations",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "organizations",
+    "policyname": "merged_organizations_authenticated_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "organizations",
+    "policyname": "merged_organizations_authenticated_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "organizations",
+    "policyname": "merged_organizations_authenticated_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))",
+    "with_check": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "payment_transactions",
+    "policyname": "merged_payment_transactions_authenticated_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text, 'service_role'::text]))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "payment_transactions",
+    "policyname": "merged_payment_transactions_authenticated_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text, 'service_role'::text]))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "payment_transactions",
+    "policyname": "merged_payment_transactions_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR (jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text, 'service_role'::text])))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "payment_transactions",
+    "policyname": "merged_payment_transactions_authenticated_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text, 'service_role'::text]))",
+    "with_check": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text, 'service_role'::text]))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "price_lists",
+    "policyname": "merged_price_lists_anon_select",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND ((is_active = true) OR is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))) OR ((tenant_id = jwt_tenant_id()) AND ((is_active = true) OR is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))) OR ((tenant_id = jwt_tenant_id()) AND ((is_active = true) OR is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))) OR ((tenant_id = jwt_tenant_id()) AND ((is_active = true) OR is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid)))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "price_lists",
+    "policyname": "merged_price_lists_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND ((is_active = true) OR is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))) OR ((tenant_id = jwt_tenant_id()) AND ((is_active = true) OR is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND ((is_active = true) OR is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND ((is_active = true) OR is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid)))) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "price_lists",
+    "policyname": "merged_price_lists_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "price_lists",
+    "policyname": "price_lists_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_authorities",
+    "policyname": "Product authorities are manageable by admins.",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) AND ((user_profiles.role)::text = ANY (ARRAY[('admin'::character varying)::text, ('superadmin'::character varying)::text])))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "merged_product_images_authenticated_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles up\n  WHERE ((up.id = ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid)) AND ((up.role)::text = ANY (ARRAY[('admin'::character varying)::text, ('moderator'::character varying)::text])))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "merged_product_images_authenticated_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(EXISTS ( SELECT 1\n   FROM user_profiles up\n  WHERE ((up.id = ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid)) AND ((up.role)::text = ANY (ARRAY[('admin'::character varying)::text, ('moderator'::character varying)::text])))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "product_images_select_all",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "product_images_update_admin",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying])::text[])))))",
+    "with_check": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying])::text[])))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_prices",
+    "policyname": "merged_product_prices_anon_select",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) OR (tenant_id = jwt_tenant_id()) OR (tenant_id = jwt_tenant_id()) OR (tenant_id = jwt_tenant_id()))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_prices",
+    "policyname": "merged_product_prices_authenticated_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_prices",
+    "policyname": "merged_product_prices_authenticated_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_prices",
+    "policyname": "merged_product_prices_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR (tenant_id = jwt_tenant_id()) OR (tenant_id = jwt_tenant_id()) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR (tenant_id = jwt_tenant_id()) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR (tenant_id = jwt_tenant_id()) OR ((tenant_id = jwt_tenant_id()) AND is_user_admin(( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_prices",
+    "policyname": "merged_product_prices_authenticated_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))",
+    "with_check": "(jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_prices",
+    "policyname": "merged_product_prices_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_prices",
+    "policyname": "product_prices_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "prod_admin_delete_opt",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "prod_admin_insert_opt",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "prod_admin_update_opt",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))",
+    "with_check": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "prod_public_read_opt",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "project_items",
+    "policyname": "Users can delete items from their projects",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_projects\n  WHERE ((user_projects.id = project_items.project_id) AND (user_projects.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "project_items",
+    "policyname": "Users can insert items in their projects",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(EXISTS ( SELECT 1\n   FROM user_projects\n  WHERE ((user_projects.id = project_items.project_id) AND (user_projects.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "project_items",
+    "policyname": "Users can update items in their projects",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_projects\n  WHERE ((user_projects.id = project_items.project_id) AND (user_projects.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "project_items",
+    "policyname": "Users can view items in their projects",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_projects\n  WHERE ((user_projects.id = project_items.project_id) AND (user_projects.user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "rate_limits",
+    "policyname": "merged_rate_limits_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "returns_webhook_events",
+    "policyname": "merged_returns_webhook_events_service_role_insert",
+    "roles": "{service_role}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "true"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "returns_webhook_events",
+    "policyname": "merged_returns_webhook_events_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "returns_webhook_events",
+    "policyname": "returns_webhook_events_admin_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) AND is_admin_user())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "returns_webhook_events",
+    "policyname": "returns_webhook_events_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipping_email_events",
+    "policyname": "merged_shipping_email_events_service_role_insert",
+    "roles": "{service_role}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "true"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipping_email_events",
+    "policyname": "merged_shipping_email_events_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipping_email_events",
+    "policyname": "shipping_email_events_admin_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) AND is_admin_user())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipping_email_events",
+    "policyname": "shipping_email_events_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipping_idempotency",
+    "policyname": "merged_shipping_idempotency_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipping_webhook_events",
+    "policyname": "merged_shipping_webhook_events_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipping_webhook_events",
+    "policyname": "shipping_webhook_events_admin_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) AND is_admin_user())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipping_webhook_events",
+    "policyname": "shipping_webhook_events_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shopping_carts",
+    "policyname": "merged_shopping_carts_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shopping_carts",
+    "policyname": "sc_auth_all",
+    "roles": "{authenticated}",
+    "cmd": "ALL",
+    "qual": "((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))",
+    "with_check": "((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shopping_carts",
+    "policyname": "shopping_carts_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "site_settings",
+    "policyname": "merged_site_settings_anon_select",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "site_settings",
+    "policyname": "merged_site_settings_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "site_settings",
+    "policyname": "merged_site_settings_authenticated_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM user_profiles\n  WHERE ((user_profiles.id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) AND ((user_profiles.role)::text = ANY (ARRAY[('super_admin'::character varying)::text, ('admin'::character varying)::text])))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "tenants",
+    "policyname": "merged_tenants_anon_select",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "tenants",
+    "policyname": "merged_tenants_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "tenants",
+    "policyname": "merged_tenants_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "tenants",
+    "policyname": "tenants_all_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_addresses",
+    "policyname": "merged_user_addresses_authenticated_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR (jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_addresses",
+    "policyname": "merged_user_addresses_authenticated_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR (jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_addresses",
+    "policyname": "merged_user_addresses_authenticated_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR (jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_addresses",
+    "policyname": "merged_user_addresses_authenticated_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR (jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))",
+    "with_check": "(((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR (jwt_role() = ANY (ARRAY['admin'::text, 'moderator'::text]))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))) OR ((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_addresses",
+    "policyname": "merged_user_addresses_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_addresses",
+    "policyname": "user_addresses_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_invoice_profiles",
+    "policyname": "merged_user_invoice_profiles_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_invoice_profiles",
+    "policyname": "uip_own",
+    "roles": "{authenticated}",
+    "cmd": "ALL",
+    "qual": "((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))",
+    "with_check": "((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_invoice_profiles",
+    "policyname": "user_invoice_profiles_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_profiles",
+    "policyname": "merged_user_profiles_authenticated_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())) OR ((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())) OR ((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())) OR ((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_profiles",
+    "policyname": "merged_user_profiles_authenticated_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())) OR ((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())) OR ((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())) OR ((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())))",
+    "with_check": "(((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())) OR ((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())) OR ((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())) OR ((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR is_admin_user())))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_profiles",
+    "policyname": "merged_user_profiles_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_profiles",
+    "policyname": "user_profiles_delete_policy",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "((tenant_id = jwt_tenant_id()) AND is_admin_user())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_profiles",
+    "policyname": "user_profiles_select_policy",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) AND ((id = ( SELECT auth.uid() AS uid)) OR is_admin_user()))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_profiles",
+    "policyname": "user_profiles_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_projects",
+    "policyname": "Users can delete their own projects",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_projects",
+    "policyname": "Users can insert their own projects",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_projects",
+    "policyname": "Users can update their own projects",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_projects",
+    "policyname": "Users can view their own projects",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_order_items",
+    "policyname": "venthub_order_items_insert_optimized",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((tenant_id = jwt_tenant_id()) AND (EXISTS ( SELECT 1\n   FROM venthub_orders\n  WHERE ((venthub_orders.id = venthub_order_items.order_id) AND (venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id())))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_order_items",
+    "policyname": "venthub_order_items_select_consolidated",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) AND ((order_id IN ( SELECT venthub_orders.id\n   FROM venthub_orders\n  WHERE ((venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = jwt_tenant_id())))) OR ( SELECT is_admin_user() AS is_admin_user)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_order_items",
+    "policyname": "venthub_order_items_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_orders",
+    "policyname": "merged_venthub_orders_authenticated_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)) OR ((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)) OR ((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)) OR ((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_orders",
+    "policyname": "merged_venthub_orders_authenticated_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))) OR ((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))) OR ((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))) OR ((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_orders",
+    "policyname": "merged_venthub_orders_authenticated_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))) OR ((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))) OR ((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))) OR ((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))))",
+    "with_check": "(((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))) OR ((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))) OR ((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))) OR ((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT auth.uid() AS uid) AS uid) AS uid) AS uid) AS uid) AS uid)) OR ( SELECT is_admin_user() AS is_admin_user))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_orders",
+    "policyname": "merged_venthub_orders_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_orders",
+    "policyname": "orders_select_policy",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT is_admin_user() AS is_admin_user)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_orders",
+    "policyname": "orders_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_returns",
+    "policyname": "merged_venthub_returns_authenticated_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)) OR ((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)) OR ((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)) OR ((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)))",
+    "with_check": "(((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)) OR ((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)) OR ((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)) OR ((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user)))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_returns",
+    "policyname": "returns_delete_policy",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "((tenant_id = jwt_tenant_id()) AND ( SELECT is_admin_user() AS is_admin_user))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_returns",
+    "policyname": "returns_insert_policy",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT is_admin_user() AS is_admin_user)))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_returns",
+    "policyname": "returns_select_policy",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((tenant_id = jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT is_admin_user() AS is_admin_user)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "venthub_returns",
+    "policyname": "returns_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "wizard_selections",
+    "policyname": "merged_wizard_selections_service_role_select",
+    "roles": "{service_role}",
+    "cmd": "SELECT",
+    "qual": "(true OR true OR true OR true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "wizard_selections",
+    "policyname": "wizard_selections_service_role",
+    "roles": "{service_role}",
+    "cmd": "ALL",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "wizard_selections",
+    "policyname": "ws_anon_insert",
+    "roles": "{anon}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(tenant_id = jwt_tenant_id())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "wizard_selections",
+    "policyname": "ws_auth_all",
+    "roles": "{authenticated}",
+    "cmd": "ALL",
+    "qual": "((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))",
+    "with_check": "((tenant_id = jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))"
+  }
+]

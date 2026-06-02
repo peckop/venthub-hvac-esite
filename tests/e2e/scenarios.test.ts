@@ -114,6 +114,22 @@ vi.mock('@supabase/ssr', () => {
           const res = mockUserResolver()
           if (res.error) return { data: { user: null }, error: res.error }
           return { data: { user: res.user }, error: null }
+        },
+        getSession: async () => {
+          const res = mockUserResolver()
+          if (res.error) return { data: { session: null }, error: res.error }
+          if (!res.user) return { data: { session: null }, error: null }
+          const payload = {
+            user_role: res.user.user_metadata?.role,
+            app_metadata: res.user.app_metadata,
+            user_metadata: res.user.user_metadata
+          }
+          const base64 = Buffer.from(JSON.stringify(payload)).toString('base64')
+            .replace(/=/g, '')
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+          const token = `header.${base64}.signature`
+          return { data: { session: { access_token: token, user: res.user } }, error: null }
         }
       }
     })

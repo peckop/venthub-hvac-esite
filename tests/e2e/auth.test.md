@@ -7,7 +7,7 @@ skeleton_hash: 1e2441e18601709c
 entity_hashes:
   func:mockUserResolver: 8f21d196d928fe6d
   overview: 14a9be75ba3e74c1
-generated_at: 2026-05-30T20:34:11Z
+generated_at: 2026-06-02T07:51:17Z
 ---
 
 ## Genel Bakış
@@ -23,31 +23,6 @@ Test senaryoları sırasında gerçek kimlik doğrulama bağımlılıklarını (
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül için tanımlanmış fonksiyon gövdesi mevcut değildir; dolayısıyla mimari varsayımlar çıkarılamamıştır.
-
----
-
-**Neden:**
-
-Verilen kaynak (`auth.test.ts`) bir test dosyası olup, `mockUserResolver()` fonksiyonunun **gövdesi** paylaşılmamıştır. Sadece fonksiyon imzası (`mockUserResolver()`) mevcuttur ve bu imza:
-
-| Bilgi | Durum |
-|-------|-------|
-| Parametre | Yok (boş imza) |
-| Return tipi | Bilinmiyor |
-| İç bağımlılıklar | Bilinmiyor |
-| Atılan istisnalar | Bilinmiyor |
-| Eşik değerleri | Bilinmiyor |
-
-**Sonuç:** `mockUserResolver()` fonksiyonunun gövdesi sağlandığında, şu alanlarda aksiyom üretilebilir:
-
-1. **Giriş koşulları** – Hangi parametreler/veriler zorunlu
-2. **Çıkış garantisi** – Ne döndürüyor (mock user objesi, Promise mi, vs.)
-3. **Bağımlılıklar** – Hangi servisleri/mockları tüketiyor
-4. **Hata koşulları** – Hangi durumlarda hata/failure üretiyor
-
----
-
-> ⚠️ **Not:** Fonksiyon gövdesi paylaşıldığında aksiyomlar üretilebilir. Mevcut bilgiyle **uydurma yapılmamıştır**.
 
 ---
 

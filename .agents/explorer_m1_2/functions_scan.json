@@ -1,0 +1,272 @@
+[
+  {
+    "schema_name": "public",
+    "function_name": "adjust_stock",
+    "identity_arguments": "p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid",
+    "arguments": "p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid DEFAULT NULL::uuid",
+    "result_type": "void",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "adjust_stock",
+    "identity_arguments": "p_product_id uuid, p_delta integer, p_reason text",
+    "arguments": "p_product_id uuid, p_delta integer, p_reason text",
+    "result_type": "void",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "adjust_stock_v2",
+    "identity_arguments": "p_product_id uuid, p_delta integer",
+    "arguments": "p_product_id uuid, p_delta integer",
+    "result_type": "void",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "admin_list_all_users",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "TABLE(id uuid, email text, full_name text, phone text, role text, created_at timestamp with time zone, updated_at timestamp with time zone)",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "admin_list_users",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "TABLE(id uuid, email text, full_name text, phone text, role text, created_at timestamp with time zone, updated_at timestamp with time zone)",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "enforce_role_change",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "trigger",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "fn_admin_get_orders",
+    "identity_arguments": "p_id text, p_conv text, p_status text, p_limit integer",
+    "arguments": "p_id text DEFAULT NULL::text, p_conv text DEFAULT NULL::text, p_status text DEFAULT NULL::text, p_limit integer DEFAULT 10",
+    "result_type": "SETOF venthub_orders",
+    "is_security_definer": true,
+    "access_privileges": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "fn_admin_update_order_status",
+    "identity_arguments": "p_id text, p_status text, p_conv text",
+    "arguments": "p_id text DEFAULT NULL::text, p_status text DEFAULT NULL::text, p_conv text DEFAULT NULL::text",
+    "result_type": "venthub_orders",
+    "is_security_definer": true,
+    "access_privileges": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "get_admin_users",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "TABLE(id uuid, email character varying, created_at timestamp with time zone, role text, full_name text)",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "get_products_enriched",
+    "identity_arguments": "p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric",
+    "arguments": "p_category_ids uuid[] DEFAULT NULL::uuid[], p_limit integer DEFAULT 50, p_offset integer DEFAULT 0, p_search_query text DEFAULT NULL::text, p_sort_by text DEFAULT 'name'::text, p_brand text DEFAULT NULL::text, p_min_price numeric DEFAULT NULL::numeric, p_max_price numeric DEFAULT NULL::numeric",
+    "result_type": "TABLE(id uuid, name text, brand text, price numeric, sku text, slug text, model_code text, category_id uuid, subcategory_id uuid, status text, is_featured boolean, description text, image_url text, image_alt text, stock_qty integer, low_stock_threshold integer, low_stock_override boolean, technical_specs jsonb, airflow_capacity numeric, noise_level numeric, pressure_rating numeric, created_at timestamp with time zone, updated_at timestamp with time zone, warehouse_location text, supplier_name text)",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "get_user_role",
+    "identity_arguments": "user_id uuid",
+    "arguments": "user_id uuid",
+    "result_type": "text",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "handle_new_user_metadata",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "trigger",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "handle_new_user_profile",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "trigger",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "handle_supabase_webhook",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "trigger",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "increment_coupon_usage",
+    "identity_arguments": "p_code text",
+    "arguments": "p_code text",
+    "result_type": "void",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "is_admin",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "boolean",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "is_admin_user",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "boolean",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "is_staff_user",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "boolean",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "is_user_admin",
+    "identity_arguments": "user_id uuid",
+    "arguments": "user_id uuid",
+    "result_type": "boolean",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "jwt_tenant_id",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "uuid",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "process_order_stock_reduction",
+    "identity_arguments": "p_order_id text",
+    "arguments": "p_order_id text",
+    "result_type": "jsonb",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "reverse_inventory_batch",
+    "identity_arguments": "p_batch_id uuid, p_max_minutes integer",
+    "arguments": "p_batch_id uuid, p_max_minutes integer DEFAULT 30",
+    "result_type": "integer",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "reverse_inventory_batch",
+    "identity_arguments": "p_batch_id uuid",
+    "arguments": "p_batch_id uuid",
+    "result_type": "void",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_stock",
+    "identity_arguments": "p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid",
+    "arguments": "p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid DEFAULT NULL::uuid",
+    "result_type": "void",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_stock",
+    "identity_arguments": "p_product_id uuid, p_new_qty integer, p_reason text",
+    "arguments": "p_product_id uuid, p_new_qty integer, p_reason text",
+    "result_type": "void",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_user_admin_role",
+    "identity_arguments": "user_id uuid, new_role text",
+    "arguments": "user_id uuid, new_role text",
+    "result_type": "boolean",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "set_user_role",
+    "identity_arguments": "user_id uuid, new_role text",
+    "arguments": "user_id uuid, new_role text",
+    "result_type": "boolean",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "update_inventory_settings",
+    "identity_arguments": "p_default_low_stock_threshold integer",
+    "arguments": "p_default_low_stock_threshold integer",
+    "result_type": "void",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "update_inventory_thresholds",
+    "identity_arguments": "p_default integer, p_reset_overrides boolean",
+    "arguments": "p_default integer, p_reset_overrides boolean DEFAULT false",
+    "result_type": "void",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  },
+  {
+    "schema_name": "public",
+    "function_name": "user_invoice_profiles_ensure_single_default",
+    "identity_arguments": "",
+    "arguments": "",
+    "result_type": "trigger",
+    "is_security_definer": true,
+    "access_privileges": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}"
+  }
+]

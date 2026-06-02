@@ -64,6 +64,21 @@ USING (
 - Aynı tablo/rol/aksiyon için birden fazla PERMISSIVE policy yazma (birleştir)
 - `SECURITY DEFINER` fonksiyonlarda `search_path = pg_catalog, public` sabitle
 
+### 🚨 SECURITY DEFINER Fonksiyon Erişim Kontrolü
+Postgres'te `public` şemasında oluşturulan tüm fonksiyonlara varsayılan olarak `EXECUTE` yetkisi `PUBLIC` rolüne verilir. Bu, `anon` ve `authenticated` rollerinin SECURITY DEFINER fonksiyonları çağırabilmesi demektir.
+
+**Kural:** Her SECURITY DEFINER fonksiyon oluşturulduktan sonra:
+```sql
+-- anon ve public erişimini kaldır
+REVOKE EXECUTE ON FUNCTION public.my_function() FROM anon, public;
+-- Sadece gerekli rollere ver
+GRANT EXECUTE ON FUNCTION public.my_function() TO authenticated;
+-- Veya sadece service_role'e ver (admin fonksiyonları için)
+GRANT EXECUTE ON FUNCTION public.my_function() TO service_role;
+```
+
+**MCP ile doğrulama:** `get_advisors({type: 'security'})` çalıştırarak `anon_security_definer_function_executable` uyarısı olmadığını kontrol edin.
+
 ## 🔑 Supabase 2026 Data API Güncellemesi: Altın Üçlü (Golden Triad) Kuralı
 
 Supabase'in 2026 yılındaki Data API (PostgREST / GraphQL) güvenlik güncellemesi uyarınca, `public` şemasında oluşturulan yeni tablolar artık otomatik olarak API rollerine (`anon`, `authenticated`, `service_role`) açık değildir.
@@ -128,6 +143,14 @@ DROP POLICY IF EXISTS "policy_name" ON table_name;
 CREATE POLICY "policy_name" ON table_name ...;
 ```
 
+### Doğrulama Adımı (Migration Sonrası)
+```bash
+# MCP ile TAM güvenlik taraması (CLI'dan daha kapsamlı)
+get_advisors({type: 'security'})
+get_advisors({type: 'performance'})
+```
+CLI `supabase db advisors` yetersiz kalabilir — pg_graphql exposure ve SECURITY DEFINER function grants gibi kritik uyarıları SADECE MCP gösterir.
+
 ## Rol Hiyerarşisi
 
 | Rol | Yetki |
@@ -142,6 +165,7 @@ CREATE POLICY "policy_name" ON table_name ...;
 
 ### JWT & Metadata
 - **`user_metadata` YASAK** — JWT yetkilendirme kararlarında `raw_user_meta_data` kullanılamaz (kullanıcı tarafından düzenlenebilir). Her zaman `app_metadata` kullan.
+- **RBAC için Auth Hook kullan** — Rol bilgisini JWT'ye enjekte etmek için trigger yerine Custom Access Token Auth Hook tercih edin (resmi yol). Bkz: https://supabase.com/docs/guides/api/custom-claims-and-role-based-access-control-rbac
 - **Token ömrü** — Kullanıcı silmek aktif token'ı geçersiz kılmaz → önce `auth.signOut()` çağır
 
 ### RLS İleri Kuralları

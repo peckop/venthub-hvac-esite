@@ -35,6 +35,23 @@ function detectLocale(request: NextRequest): string {
   return 'tr'
 }
 
+function decodeJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Failed to decode JWT:', error);
+    return null;
+  }
+}
+
 // ── Ana Middleware ───────────────────────────────────────────────────────────
 export async function middleware(request: NextRequest) {
   const host = request.headers.get('host') || ''
@@ -160,9 +177,9 @@ export async function middleware(request: NextRequest) {
     })
 
     // Güvenli Auth Kontrolü
-    const { data: { user }, error } = await supabase.auth.getUser()
+    const { data: { session }, error } = await supabase.auth.getSession()
 
-    if (error || !user) {
+    if (error || !session) {
       const loginUrl = request.nextUrl.clone()
       loginUrl.pathname = '/auth/login'
       loginUrl.searchParams.set('from', pathname)
@@ -170,7 +187,8 @@ export async function middleware(request: NextRequest) {
       return setTenantCookie(NextResponse.redirect(loginUrl, 302))
     }
 
-    const jwtRole = user.user_metadata?.role
+    const decoded = decodeJwt(session.access_token)
+    const jwtRole = decoded?.user_role
 
     if (!jwtRole || !ADMIN_ROLES.has(jwtRole.toLowerCase())) {
       const homeUrl = request.nextUrl.clone()
