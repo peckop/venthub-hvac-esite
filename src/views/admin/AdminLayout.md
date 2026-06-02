@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminLayout: f3d3a8a9833ef080
   overview: d411381d25a05687
   style_tokens: dab87eff3332d515
-generated_at: 2026-05-28T22:39:01Z
+generated_at: 2026-06-02T09:12:51Z
 ---
 
 ## Genel Bakış
