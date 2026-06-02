@@ -1,77 +1,59 @@
-# Uygulama Planı - Supabase Güvenlik Sertifikasyonu ve Admin Giriş Düzeltmesi
+# Implementation Plan - Resolve RLS Performance Warnings & Clean Up Duplicate Policies
 
-Bu plan, VentHub platformunun veritabanı güvenlik açıklarını kapatmak, pg_graphql sızıntılarını sıfırlamak, depolama (storage) ve fonksiyon yetkilerini sıkılaştırmak ve sonsuz döngü RLS hatasından kaynaklanan admin panel giriş sorununu gidermek amacıyla hazırlanmıştır.
+This plan addresses the 42 Row Level Security (RLS) performance warnings reported by the database linter. These warnings consist of:
+1. **31 Multiple Permissive Policies warnings** (caused by duplicate legacy `merged_` policies and overlapping policies).
+2. **11 Auth RLS Initialization Plan warnings** (caused by calling `auth.uid()`, `public.jwt_tenant_id()`, or role-check functions directly instead of wrapping them in a caching subquery `(SELECT ...)`).
 
 ---
 
-## Kullanıcı İncelemesi Gereken Hususlar
+## User Review Required
 
 > [!IMPORTANT]
-> - **Resmi Auth Hook Aktivasyonu:** `custom_access_token_hook` fonksiyonunun veritabanına yüklenmesinden sonra, JWT token claims enjeksiyonunun çalışması için Supabase Dashboard (`Authentication -> Hooks`) üzerinden bu fonksiyonun "Customize Access Token (JWT) Claims" kancasına bağlanması zorunludur.
-> - **Anon SELECT Revocation (Sızdırmazlık):** `products` ve `categories` dışındaki tüm hassas tablolardan `anon` SELECT izinleri kaldırılacaktır. Bu durum, frontend tarafında anonim kullanıcıların bu tabloları okumasını engelleyecektir (sipariş, iade, fatura profilleri vb.).
-> - **Eski Politikaların Temizlenmesi:** SaaS Faz 1 öncesinden kalan mükerrer permissive RLS politikaları tamamen silinecek, sadece `merged_*` kiracı-bazlı politikalar korunacaktır.
+> - **Duplicate Policy Drop:** Dropping the legacy `merged_` policies on the 13 affected tables is safe since they are duplicate policies, and the standard, tenant-aware policies (e.g. `coupons_admin_all`, `coupons_public_select`, etc.) are fully configured and in place.
+> - **Query Optimizer Caching:** Wrapping all function calls in RLS expressions with `(SELECT ...)` triggers PostgreSQL's `initPlan` caching. This prevents PostgreSQL from re-evaluating session/JWT functions for every row in a table scan, providing significant database performance improvements.
 
 ---
 
-## Açık Sorular (Open Questions)
+## Open Questions
 
-> [!WARNING]
-> - Veritabanındaki değişikliklerin uzak Supabase sunucusuna uygulanması için kullanılacak veritabanı bağlantısı (`DATABASE_URL`) ortam değişkenlerinde tanımlı mıdır?
-> - `pg_graphql` kısıtlamaları sonrası, müşteri tarafında GraphQL üzerinden sorgulanan başka bir özel tablo (örn: `site_settings`) bulunmakta mıdır? Yoksa varsayılan olarak sadece `products`, `categories`, `price_lists`, `product_prices` ve `tenants` (slug/domain) tablolarının açık kalması yeterli midir?
+None. The issues have been trace-verified directly using the database catalogs via the `supabase` MCP server.
 
 ---
 
-## Önerilen Değişiklikler (Proposed Changes)
+## Proposed Changes
 
-### 1. Veritabanı ve Şema Sıkılaştırma (Database Schema & Security)
+### Database Migrations
 
-#### [MODIFY] [20260602070000_security_hardening.sql](file:///c:/Users/alize/venthub-hvac/supabase/migrations/20260602070000_security_hardening.sql)
-#### [MODIFY] [20260602080000_security_hardening_fixes.sql](file:///c:/Users/alize/venthub-hvac/supabase/migrations/20260602080000_security_hardening_fixes.sql)
-#### [MODIFY] [20260602090000_security_hardening_null_fix.sql](file:///c:/Users/alize/venthub-hvac/supabase/migrations/20260602090000_security_hardening_null_fix.sql)
+#### [NEW] [20260602120000_resolve_performance_and_duplicate_rls.sql](file:///c:/Users/alize/venthub-hvac/supabase/migrations/20260602120000_resolve_performance_and_duplicate_rls.sql)
+A new migration file will be created to perform the following:
 
-Bu SQL migration dosyaları veritabanına uygulanarak şu düzenlemeler yapılacaktır:
-*   **User Profiles SELECT RLS Fix:** `is_admin_user()` fonksiyonu JWT claimlerinden rol okuyacak şekilde yeniden tanımlanır. `user_profiles` select politikası bu recursion-free fonksiyonu kullanacak şekilde güncellenir.
-*   **GraphQL Gizleme:** Hassas tablolara `@graphql({"disabled": true})` direktifleri comment olarak eklenir.
-*   **Storage Listing Block:** `product-images` bucket'ı için listelemeyi (`list()`) engelleyen, sadece tekil erişime izin veren UUID/Tenant doğrulama politikası uygulanır.
-*   **Function Revocation:** 30 adet `SECURITY DEFINER` fonksiyonun `PUBLIC` execute yetkisi geri alınır. Sadece RLS helper fonksiyonlarına gerekli izinler verilir.
-*   **Triggers & Self-Elevation Guard:** `handle_new_user_metadata` ve `handle_new_user_profile` trigger fonksiyonlarında `COALESCE(auth.role(), '') = 'service_role'` null-safe kontrolü kullanılarak rol yükseltme (self-elevation) engellenir.
-*   **Anon SELECT Revocation:** 36 hassas tablo ve view'dan `anon` SELECT yetkisi kaldırılır.
+1. **Cleanup of duplicate RLS policies** (`multiple_permissive_policies` warning):
+   - Drop the `admin_view_messages` policy on `public.contact_messages` (keeping the correct `Admins can view messages`).
+   - Drop all legacy `merged_` policies on the 13 tables: `coupons`, `inventory_movements`, `inventory_settings`, `order_attachments`, `order_notes`, `order_refund_events`, `price_lists`, `product_prices`, `tenants`, `user_addresses`, `user_profiles`, `venthub_orders`, `venthub_returns`.
 
----
-
-### 2. Uygulama ve Middleware Entegrasyonu (Application Middleware)
-
-#### [MODIFY] [middleware.ts](file:///c:/Users/alize/venthub-hvac/src/middleware.ts)
-*   Admin yetkilendirmesi yapan kontrol `user.user_metadata?.role` yerine, resmi Auth Hook tarafından JWT token claims içerisine enjekte edilen `user_role` değerini decode edip doğrulayacaktır:
-    ```typescript
-    const decoded = decodeJwt(session.access_token);
-    const jwtRole = decoded?.user_role;
-    ```
+2. **Wrap functions in caching subqueries** (`auth_rls_initplan` warning):
+   Redefine the 11 original policies by wrapping `auth.uid()`, `public.jwt_tenant_id()`, and `public.is_user_admin()` in `(SELECT ...)` subqueries:
+   - `inventory_settings` -> `inventory_settings_update_admin`
+   - `coupons` -> `coupons_admin_all`
+   - `order_notes` -> `order_notes_admin_all` and `order_notes_view_policy`
+   - `user_profiles` -> `user_profiles_select_policy`
+   - `inventory_movements` -> `inventory_movements_select_admin`
+   - `order_attachments` -> `order_attachments_admin_all` and `order_attachments_view_policy`
+   - `product_prices` -> `product_prices_admin_all`
+   - `price_lists` -> `price_lists_admin_all` and `price_lists_select`
 
 ---
 
-## Doğrulama Planı (Verification Plan)
+## Verification Plan
 
-### Otomatik Testler
-*   Veritabanı üzerinde security advisor denetimi yapmak:
-    ```bash
-    supabase db advisors --db-url "$DATABASE_URL"
-    ```
-    Kritik güvenlik uyarılarının sıfıra yakınsadığı doğrulanmalıdır.
-*   TypeScript ve Linter denetimi:
-    ```bash
-    pnpm run type-check
-    pnpm run lint
-    ```
-*   Tüm E2E entegrasyon testlerinin regresyonsuz geçmesi:
-    ```bash
-    pnpm run test:e2e
-    ```
+### Automated Tests
+- Run `get_advisors` with `type = 'performance'` and verify that the 42 warnings (`auth_rls_initplan` and `multiple_permissive_policies`) are resolved.
+- Run local lint, type check, and build checks to ensure no regressions:
+  ```powershell
+  pnpm run lint
+  pnpm run type-check
+  pnpm run build
+  ```
 
-### Manuel Doğrulama
-*   Bir admin kullanıcısı ile `/admin` paneline başarıyla giriş yapılabildiği, RLS recursion döngüsünün kırıldığı doğrulanacaktır.
-*   GraphQL API istemcisi üzerinden hassas tabloların şema listesinde görünmediği doğrulanacaktır.
-*   Uzak veritabanına uygulanan local migration geçmişi listelenecektir:
-    ```bash
-    supabase migration list --local
-    ```
+### Manual Verification
+- Verify that admin panel features (inventory list, coupons, and orders) function correctly without any database permission issues.
