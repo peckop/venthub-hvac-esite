@@ -1,7 +1,7 @@
 # Veritabani Semasi — venthub-hvac
 
 ---
-compiled_at: 2026-06-02T11:19:41.384715+00:00
+compiled_at: 2026-06-02T20:17:11.974157+00:00
 tables: 28
 policies: 132
 functions: 55
@@ -6193,6 +6193,63 @@ BEGIN
   VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'));
 END;
 $$;
+
+COMMIT;
+
+
+
+
+-- FILE: 20260602100000_resolve_linter_warnings.sql
+-- Migration: Resolve database linter warnings (GraphQL exposure, extension schema, public exec checks)
+-- Target: pg_graphql, pg_net, is_admin/is_admin_user/is_staff_user/is_user_admin
+-- Created: 2026-06-02
+
+BEGIN;
+
+-- ==========================================
+-- 1. GraphQL Schema Exposure Cleanup
+-- ==========================================
+-- The project uses Supabase REST/PostgREST API exclusively (no Apollo client or graphql dependencies).
+-- Dropping pg_graphql resolves all 48 lint warnings regarding schema exposure to anon/authenticated.
+DROP EXTENSION IF EXISTS pg_graphql CASCADE;
+
+
+-- ==========================================
+-- 2. Extension Schema Hardening
+-- ==========================================
+-- Move pg_net extension out of public schema to clean extensions schema as recommended by lint 0014.
+CREATE SCHEMA IF NOT EXISTS extensions;
+DROP EXTENSION IF EXISTS pg_net CASCADE;
+CREATE EXTENSION pg_net WITH SCHEMA extensions;
+
+
+-- ==========================================
+-- 3. Revoke Execute Permissions from Anon
+-- ==========================================
+-- Revoke execution rights from anon/public for administrative query check functions.
+-- They remain accessible to authenticated and service_role as required for RLS policy evaluation.
+REVOKE EXECUTE ON FUNCTION public.is_admin() FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.is_admin_user() FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.is_staff_user() FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.is_user_admin(uuid) FROM anon, public;
+
+COMMIT;
+
+
+
+-- FILE: 20260602110000_hardened_invoker_functions.sql
+-- Migration: Convert RLS helpers and public search to SECURITY INVOKER
+-- Target: jwt_tenant_id, is_admin_user, is_admin, is_staff_user, is_user_admin, get_products_enriched
+-- Created: 2026-06-02
+
+BEGIN;
+
+ALTER FUNCTION public.jwt_tenant_id() SECURITY INVOKER;
+ALTER FUNCTION public.is_admin_user() SECURITY INVOKER;
+ALTER FUNCTION public.is_admin() SECURITY INVOKER;
+ALTER FUNCTION public.is_staff_user() SECURITY INVOKER;
+ALTER FUNCTION public.is_user_admin(uuid) SECURITY INVOKER;
+ALTER FUNCTION public.get_products_enriched(uuid[], integer, integer, text, text, text, numeric, numeric) SECURITY INVOKER;
 
 COMMIT;
 
