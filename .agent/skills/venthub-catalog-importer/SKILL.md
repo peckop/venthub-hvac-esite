@@ -1,5 +1,5 @@
 ---
-name: venthub-pdf-ingestor
+name: venthub-catalog-importer
 description: Ingests and validates HVAC catalog PDFs using an autonomous Visual Multi-Agent Team.
 when_to_use: >
   Kullan: 'ingest a PDF catalog', 'process Vortice catalogs', 'run visual multi-agent team', 'extract specifications from PDF'.
