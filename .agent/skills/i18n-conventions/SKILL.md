@@ -159,3 +159,26 @@ UI'da aşağıdaki hatalar asla görünmemelidir:
 - [ ] Dil değiştirince tüm görünen metin güncelleniyor
 - [ ] `"NaN"`, `"undefined"`, `"null"` gibi ham değerler UI'da yok
 - [ ] Boş çeviri anahtarı yok (anahtar var ama değer boş string)
+
+## Strict TypeScript Güvenliği & Otomasyon Standartları
+
+VentHub projesi enterprise seviyesinde dil güvenliğini sağlamak için şu iki mekanizmayı zorunlu tutar:
+
+### 1. Sözlük Mühürleme (Type-Locking)
+* **İngilizce Sözlük (`en.ts`)** mutlaka Türkçe sözlüğün (`tr.ts`) tipini implemente etmelidir:
+  ```typescript
+  import { tr } from './tr'
+  export const en: typeof tr = { ... }
+  ```
+  Bu sayede herhangi bir dilde eksik veya fazla anahtar bırakılması durumunda TypeScript derleyicisi (`pnpm run type-check`) doğrudan derlemeyi durduracaktır.
+
+### 2. Autocomplete & nested key desteği
+* `src/i18n/I18nContext.ts` içerisindeki `TranslationKeys` recursive tipi sayesinde `t()` fonksiyonuna yazılan anahtarlar kod editöründe otomatik tamamlanmalıdır.
+* Geçici dönüşümler için `TranslationKeyInput` tipi kullanılır.
+
+### 3. Otomatik Parite Testleri
+* Dil dosyaları arasındaki uyumu denetlemek için yazılmış olan `src/i18n/__tests__/i18n.test.ts` testi her zaman çalışabilir olmalıdır.
+* Geliştirme sürecinde pariteyi bozacak bir değişiklik yapıldığında:
+  - Git Commit atılırken (`lint-staged` sayesinde otomatik tetiklenir) commit engellenir.
+  - Proje derlenirken (`package.json`'daki `prebuild` hook'u sayesinde otomatik tetiklenir) build engellenir.
+* Manuel çalıştırmak için: `pnpm run test:i18n` kullanılabilir.
