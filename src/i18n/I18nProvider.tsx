@@ -4,7 +4,7 @@ import React, { useContext, useMemo, useState, useEffect } from 'react'
 import { en } from './dictionaries/en'
 import { tr } from './dictionaries/tr'
 
-import { I18nContext, type Lang, type AppDictionary } from './I18nContext'
+import { I18nContext, type Lang, type AppDictionary, type TranslationKeyInput } from './I18nContext'
 
 export type { Lang }
 
@@ -88,7 +88,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
   const setLang = React.useCallback((l: Lang) => setLangState(l), [])
 
   const t = useMemo(() => {
-    return (key: string, paramsOrAlt?: Record<string, unknown> | string) => {
+    return (key: TranslationKeyInput, paramsOrAlt?: Record<string, unknown> | string) => {
       const currentDict = dictionary || (DICTS[lang] as AppDictionary)
       const translation = get(currentDict as unknown as Dict, key)
       const hasTranslation = translation !== key
@@ -113,7 +113,7 @@ export function useI18n() {
     return {
       lang: 'tr' as Lang,
       setLang: () => { },
-      t: (key: string, paramsOrAlt?: Record<string, unknown> | string) => {
+      t: (key: TranslationKeyInput, paramsOrAlt?: Record<string, unknown> | string) => {
         return typeof paramsOrAlt === 'string' ? paramsOrAlt : key
       },
       dict: tr as AppDictionary

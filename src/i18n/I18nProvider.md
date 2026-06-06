@@ -3,44 +3,49 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx
-skeleton_hash: 329481657406985a
+skeleton_hash: 524d487b2f107334
 entity_hashes:
   func:I18nProvider: e23d74154d179265
   func:get: f83a743aef414d1c
   func:interpolate: 02cc51f0bd59e8d6
-  func:useI18n: f453a53ec7b45d5a
-  overview: 94f7fbb5ed9d8128
+  func:useI18n: 7f95c6a8fb408f61
+  overview: cf17f12ee8097019
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:37:50Z
+generated_at: 2026-06-06T08:45:18Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC platformunda React tabanlı çok dilli (uluslararasılaştırma / i18n) desteğini yöneten temel sağlayıcı modülüdür. Uygulama genelinde tüm bileşenlerin çeviri metinlerine erişmesini, dil değişikliklerini takip etmesini ve dinamik içerikli çevirileri kullanmasını sağlar. React context mimarisi üzerinden i18n işlevlerini tüm uygulamaya yayarak merkezi bir dil yönetimi sunar.
+Bu modül, React uygulamalarında çok dilli (uluslararasılaştırma) desteğini yönetmek için kullanılan temel i18n altyapısını sunar. Çeviri sözlüklerinden güvenli erişim, dinamik parametrelerle metin interpolasyonu ve React context aracılığıyla bileşenlere dil desteği dağıtma gibi temel işlemleri merkezi olarak yönetir.
 
 ## Fonksiyon Grupları
+
 ### Çekirdek I18n Altyapısı
-Uygulama genelinde çok dilli desteğin temelini oluşturan, tüm alt bileşenlerin i18n özelliklerine erişmesini sağlayan temel yapı taşlarını içerir.
+Uygulama genelinde çeviri bağlamının (context) oluşturulmasını ve bileşenlerin bu bağlama erişmesini sağlayan React tabanlı yapı taşlarını içerir.
 - I18nProvider, useI18n
 
-### Çeviri Metni İşleme Yardımcıları
-Çeviri kaynaklarındaki metinlere güvenli erişim sağlamak ve dinamik parametreler içeren çeviri metinlerini işlemek için kullanılan yardımcı fonksiyonları barındırır.
+### Çeviri Metni Yardımcıları
+Çeviri sözlüklerinden iç içe anahtarlarla değer almayı ve dinamik parametrelerle metin kalıplarını doldurmayı sağlayan yardımcı işlevleri kapsar.
 - get, interpolate
-
-### Dil Değişikliği İzleyici Bileşeni
-URL üzerinden gelen dil kodundaki değişiklikleri takip ederek, uygulama genelinde dil güncelleme sürecini tetikleyen izleyici bileşenidir.
-- LanguageUrlWatcher
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-React tabanlı uluslararasılaştırma (i18n) modülüdür, uygulama genelinde çoklu dil desteği sağlamak için tasarlanmıştır; doğru çalışması için React runtime ortamı, geçerli çeviri veri seti ve tüm prop/bağımlılıkların eksiksiz sağlanması zorunludur.
 
-[Aksiyom 1]: Eğer React runtime ortamı sağlanmazsa, I18nProvider, useI18n gibi React bileşen ve hook'ları çalışmaz, uygulama başlatılamaz.
-[Aksiyom 2]: Eğer get fonksiyonuna iletilecek geçerli çeviri sözlüğü (Dict tipindeki obj parametresi) sağlanmazsa, istenen path'teki çeviri metni getirilemez, arayüzde boş veya hatalı metinler görüntülenir.
-[Aksiyom 3]: Eğer interpolate fonksiyonuna geçerli şablon string'i veya yer tutucuları doldurmak için gerekli parametre nesnesi sağlanmazsa, dinamik içerikli çeviriler doğru oluşturulamaz, arayüzde hatalı metinler görünür.
-[Aksiyom 4]: Eğer LanguageUrlWatcher bileşenine iletilen onLangChange geçerli bir callback fonksiyonu değilse, dil değişikliği tetiklendiğinde bu değişiklik uygulama genelinde yayınlanamaz, seçilen dil tüm arayüze uygulanamaz.
-[Aksiyom 5]: Eğer I18nProvider componentine geçerli alt ağacı temsil eden children prop'u sağlanmazsa, provider sarmaladığı uygulama içeriğini oluşturtamaz, uygulama arayüzü yüklenemez.
-[Aksiyom 6]: Eğer useI18n hook'u I18nProvider ile sarmalanmamış bir React bileşeninde kullanılırsa, hook i18n bağlamına erişemez, çalışma zamanında hatası fırlatır.
+Bu modül, React context tabanlı bir i18n (uluslararasılaştırma) sağlayıcısıdır. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir.
+
+**[Aksiyom 1]**: Eğer `useI18n()` bir `I18nProvider` üst bileşeninin dışında (ancestor zincirinde yer almıyorsa) çağrılırsa, React context'ten değer okunamaz ve hook hata/fail verir.
+
+**[Aksiyom 2]**: Eğer `I18nProvider`'a verilen `dictionary`, `get(obj, path)` fonksiyonunun beklediği hiyerarşik yapıya (üst seviye anahtar dil kodları, iç içe çeviri anahtarları) sahip değilse, çeviri aramaları başarısız olur ve `undefined` döner.
+
+**[Aksiyom 3]**: Eğer `I18nProvider`'a geçirilen `lang` (initialLang) değeri, `dictionary` objesinde tanımlı bir dil anahtarı değilse, geçerli bir çeviri bulunamaz ve boş/hata çıktısı üretilir.
+
+**[Axiom 4]**: Eğer `interpolate(str, params)` çağrısındaki `params` içindeki anahtarlar, `str` içindeki yer tutucu desenleriyle (örn. `{{key}}`) eşleşmiyorsa, yer tutucuların hiçbiri değiştirilmez ve ham string geri döner.
+
+**[Axiom 5]**: Eğer `get(obj, path)` çağrısındaki `path` (dot-notation), `obj` içinde geçerli bir yolu temsil etmiyorsa, fonksiyon `undefined` döner; modül bu durumda bir fırlatma (throw) yapmaz.
+
+---
+
+*Not: Bu modülde tanımlı sabit (constant) bulunmamaktadır. Eşik değer, domain-specific kural veya varsayılan parametre değeri fonksiyon imzalarında belirtilmemiştir; bu nedenle uydurulmamıştır.*
 
 ---
 
@@ -70,10 +75,23 @@ React tabanlı uluslararasılaştırma (i18n) modülüdür, uygulama genelinde �
 **Dönüş**: React.FC<{ children: React.ReactNode }> — İçindeki tüm çocukları sarmalayan, i18n bağlamını paylaştıran React fonksiyonel bileşeni olarak döner.
 
 ### useI18n
-**Ne yapar**: I18nProvider tarafından sunulan i18n bağlamına erişmek için kullanılan özel React hookudur. Herhangi bir alt bileşen içinden çağrılarak aktif dil bilgisi, çeviri metinleri çekme, dil değiştirme gibi tüm i18n özelliklerine erişim sağlar. Yalnızca I18nProvider ile sarmalanmış ağacın içindeki bileşenlerde kullanılabilir, aksi takdirde erişim hatası fırlatır.
-**Nasıl yapar**: React'in yerel useContext hookunu kullanarak I18nProvider tarafından oluşturulan i18n bağlam nesnesini çeker ve kullanıcıya sunar. Geliştiricilerin bileşenlerinde i18n özelliklerini kullanmasını kolaylaştıran basit bir arayüz sunar, tüm bağlamdaki verileri ve metotları tek bir nesne altında toplar.
-**Parametreler**: Herhangi bir parametre almaz.
-**Dönüş**: ctx — İçinde aktif dil bilgisi, çeviri alma, dil değiştirme gibi tüm i18n ile ilgili metotları ve verileri barındıran bağlam nesnesi.
+
+**Ne yapar**: React bileşenleri içinde internationalization (uluslararasılaşma) bağlamına erişmek için özel bir hook sağlar. Uygulama genelinde dil tercihini okumak ve çeviri fonksiyonuna erişmek amacıyla kullanılır.
+
+**Nasıl yapar**: `useContext` hook'u ile `I18nContext` değerini alır. Eğer bu hook bir sağlayıcı (Provider) dışında çağrılıyorsa veya bağlam henüz hazırlanmamışsa, uygulamanın çökmemesi için varsayılan Türkçe değerler döner. Bu sayede bileşenler her durumda güvenli bir şekilde çeviri fonksiyonlarını ve dil bilgisini kullanabilir.
+
+**Parametreler**:
+
+Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**:
+
+`{ lang: Lang, setLang: () => void, t: (key: TranslationKeyInput, paramsOrAlt?: Record<string, unknown> | string) => string, dict: AppDictionary }` — Dil bilgisini, dil değiştirme fonksiyonunu, çeviri fonksiyonunu ve sözlük nesnesini içeren bir nesne döner. Context mevcut değilse varsayılan değerler şunlardır:
+
+- `lang`: `'tr'` olarak ayarlanmıştır, yani Türkçe
+- `setLang`: Boş bir ok-fonksiyonudur, hiçbir işlem yapmaz
+- `t`: Verilen çeviri anahtarını döndürür; eğer ikinci parametre bir string ise alternatif metni döndürür, bir nesne ise anahtarın kendisini döndürür
+- `dict`: Türkçe (`tr`) sözlük nesnesi olarak ayarlanmıştır
 
 ---
 
@@ -97,57 +115,40 @@ type Dict = Record<string, unknown>
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx::get
-- **params**: (obj: Dict, path: string)
+### [N1_NASIL] AST Pointer: i18n/I18nProvider.tsx::get
+- **params**: `(obj: Dict, path: string)`
 - **ic_degiskenler**:
-  - `keys` — path string'ini noktalara göre bölerek oluşturulan nesne erişim anahtarları dizisi
-  - `current` — nesne üzerinde anahtarlarla gezinirken her adımda güncel durumu tutan değişken
-  - `k` — keys dizisi üzerinden döngüde işlenen sıradaki erişim anahtarı
-- **Dönüş**: string
+  - `keys` — path.split('.') ile elde edilen noktayla ayrılmış anahtarlar dizisi
+  - `current` — döngü içinde mevcut seviyedeki değeri tutan değişken, başlangıçta `obj`'ye eşit
+  - `k` — for döngüsünde her bir anahtarı temsil eden döngü değişkeni
+- **Dönüş**: `string`
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx::interpolate
-- **params**: (str: string, params?: Record<string, unknown>)
-- **ic_degiskenler**:
-  - `_m` — String.replace regex eşleşmesinin tam metni, kullanılmayan yer tutucu
-  - `p1` — regex ile yakalanan şablon içindeki değişken adı
-  - `v` — params nesnesinden p1 anahtarı ile alınan şablon değişkeninin değeri
-- **Dönüş**: string
+### [N2_NASIL] AST Pointer: i18n/I18nProvider.tsx::interpolate
+- **params**: `(str: string, params?: Record<string, unknown>)`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string`
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx::LanguageUrlWatcher
-- **params**: ({ onLangChange }: { onLangChange: (l: Lang) => void })
+### [N3_NASIL] AST Pointer: i18n/I18nProvider.tsx::I18nProvider
+- **params**: `({ children, lang: initialLang, dictionary })`
 - **ic_degiskenler**:
-  - `searchParams` — Next.js useSearchParams hook'u ile alınan URL arama parametreleri nesnesi
-  - `fromUrl` — searchParams'tan alınan lang sorgu parametresinin değeri
-- **Dönüş**: null (yok)
+  - `lang` — useState ile tanımlanan mevcut dil durumu, başlangıçta `initialLang || 'tr'`
+  - `setLangState` — useState'ten dönen dil durumunu güncellemek için fonksiyon
+  - `saved` — localStorage'dan okunan kayıtlı dil tercihi
+  - `nav` — `navigator.language` değerinin küçük harfli versiyonu
+  - `setLang` — React.useCallback ile tanımlanan, dil durumunu güncellemek için kararlı fonksiyon
+  - `currentDict` — `dictionary` prop'u veya `DICTS[lang]` sözlüğü
+  - `translation` — `get()` ile anahtar karşılığı alınan çeviri metni
+  - `hasTranslation` — çevirinin anahtarla aynı olup olmadığını kontrol eden mantıksal değişken
+  - `v` — replace fonksiyonundaki geri çağırma ile elde edilen parametre değeri
+  - `dict` — useMemo ile hesaplanan mevcut sözlük
+  - `value` — useMemo ile hesaplanan context değeri
+- **Dönüş**: `React.FC<I18nProviderProps>` (JSX Element)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx::I18nProvider
-- **params**: ({ children }: { children: React.ReactNode })
+### [N4_NASIL] AST Pointer: i18n/I18nProvider.tsx::useI18n
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `lang` — useState ile yönetilen aktif dil kodu, varsayılan 'tr'
-  - `setLangState` — Aktif dili güncellemek için kullanılan useState setter fonksiyonu
-  - `saved` — localStorage'dan okunan önceki kullanıcı dil ayarının değeri
-  - `nav` — Tarayıcının varsayılan dilini tutan, küçük harfe dönüştürülmüş navigator.language değeri
-  - `setLang` — useCallback ile sarmalanmış, dışarıya sunulan dil değiştirme fonksiyonu
-  - `t` — useMemo ile oluşturulmuş, çeviri almak için kullanılan fonksiyon
-  - `key` — t fonksiyonunun aldığı, sözlükten erişilecek çeviri anahtarı
-  - `paramsOrAlt` — t fonksiyonunun aldığı, şablon değişkenleri veya yedek çeviri metni olan opsiyonel parametre
-  - `translation` — get fonksiyonu ile aktif dil sözlüğünden alınan ham çeviri metni
-  - `hasTranslation` — Çeviri anahtarının sözlükte var olup olmadığını gösteren boolean değer
-  - `dict` — useMemo ile oluşturulan, aktif dile ait AppDictionary tipinde tam sözlük nesnesi
-  - `value` — I18nContext.Provider'a aktarılacak tüm bağlam değerlerini içeren nesne
-- **Dönüş**: React.JSX.Element (Context sağlayıcısı ve alt bileşenler)
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx::useI18n
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `ctx` — useContext hook'u ile erişilen I18nContext nesnesi
-  - `lang` — Context yoksa varsayılan olarak atanan 'tr' dil kodu
-  - `setLang` — Context yoksa boş olarak tanımlanan dil değiştirme fonksiyonu
-  - `t` — Context yoksa tanımlanan yedek çeviri fonksiyonu
-  - `key` — Yedek t fonksiyonunun aldığı çeviri anahtarı
-  - `paramsOrAlt` — Yedek t fonksiyonunun aldığı yedek metin veya parametre olan opsiyonel değer
-  - `dict` — Context yoksa varsayılan olarak atanan Türkçe sözlük nesnesi
-- **Dönüş**: I18nContext değeri veya context yoksa varsayılan yedek nesne
+  - `ctx` — I18nContext'ten alınan context değeri
+- **Dönüş**: `{ lang: Lang, setLang: (l: Lang) => void, t: (key: TranslationKeyInput, paramsOrAlt?: Record<string, unknown> | string) => string, dict: AppDictionary }`
 
 ---
 

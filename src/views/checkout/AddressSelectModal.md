@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressSelectModal.tsx
-skeleton_hash: 7ffe6fa0c3a11b7d
+skeleton_hash: a92619f9be2e9c05
 entity_hashes:
   func:AddressSelectModal: adfcf435f03c2db9
   overview: cd2d8adfb0ea97a4
-  style_tokens: bb1c826648f8a0de
-generated_at: 2026-05-28T22:40:06Z
+  style_tokens: 0a79973eb6842aa3
+generated_at: 2026-06-06T08:46:37Z
 ---
 
 ## Genel Bakış
@@ -75,6 +75,7 @@ Kullanıcının mevcut adreslerine erişmesini, birini seçmesini, düzenlemesin
 - `onEdit: (a: UserAddress) => void`
 - `onDelete: (id: string) => void`
 - `t: (key: string) => string`
+- `onAddNew?: () => void`
 
 ---
 
@@ -93,21 +94,6 @@ Kullanıcının mevcut adreslerine erişmesini, birini seçmesini, düzenlemesin
   - `onDelete` — Silme callback'i; `() => onDelete(a.id)` arrow ile address ID gönderilerek bağlanır
   - `t` — i18n çeviri fonksiyonu; `t('checkout.saved.close')`, `t('checkout.saved.address')`, `t('checkout.saved.default')`, `t('checkout.saved.edit')`, `t('checkout.saved.delete')`, `t('checkout.saved.use')` çağrılır
 - **Dönüş**: `JSX.Element` — modal overlay + dialog JSX yapısı
-
----
-
-### [N2_NASIL] AST Pointer: `AddressSelectModal.tsx`::`(a) => (...)` *(inline `.map()` callback)*
-- **params**: (`a`)
-- **ic_degiskenler**:
-  - Fonksiyon gövdesi saf JSX render callback'idir; iç değişken tanımlanmamıştır.
-- **Parametre Kullanımları**:
-  - `a` — `UserAddress` nesnesi; aşağıdaki özellikleri erişilir:
-    - `a.id` — `key={a.id}` olarak React key ve `onDelete(a.id)` olarak silme handler'ına argument olarak gönderilir
-    - `a.label` — Adres etiketi; `a.label || t('checkout.saved.address')` ile fallback'li render edilir
-    - `a.is_default_shipping` — Varsayılan kargo adresi flag'i; `{a.is_default_shipping && <span>...` ile koşullu render
-    - `a.full_address` — Tam adres metni; `{a.full_address}` olarak `whitespace-pre-line` ile render edilir
-  - Kapsam dışından: `onEdit`, `onDelete`, `onPick`, `t` — kapanış tarafından yakalanır
-- **Dönüş**: `JSX.Element` — tek bir adres kartı (`<div>`) JSX'i
 
 ---
 
@@ -133,6 +119,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-black/40`, `bg-white`, `border-b`, `hover:bg-gray-50`, `text-industrial-gray`, `text-primary-navy`, `text-red-600`, `text-sm`, `text-steel-gray`, `text-xs`
-- **Layout:** `fixed`, `flex`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `hover:shadow-sm`, `items-center`, `justify-between`, `justify-center`, `max-h-80vh`, `max-w-2xl`, `overflow-hidden`, `overflow-y-auto`, `p-3`
+- **Layout:** `fixed`, `flex`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `hover:shadow-sm`, `items-center`, `justify-between`, `justify-center`, `max-h-80vh`, `max-w-2xl`, `overflow-hidden`, `overflow-y-auto`
 - **Varyant/Responsive:** `hover:`, `sm:` önekleri
 - **Yardımcı Sınıflar:** `border`, `font-medium`, `font-semibold`, `hover:underline`, `inset-0`, `ml-1`, `mt-1`, `mt-3`, `px-3`, `px-5`, `py-1.5`, `py-4`, `rounded-2xl`, `rounded-full`, `rounded-lg`

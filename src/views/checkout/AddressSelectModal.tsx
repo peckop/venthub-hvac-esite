@@ -11,6 +11,7 @@ interface AddressSelectModalProps {
     onEdit: (a: UserAddress) => void
     onDelete: (id: string) => void
     t: (key: string) => string
+    onAddNew?: () => void
 }
 
 const AddressSelectModal: React.FC<AddressSelectModalProps> = ({
@@ -20,13 +21,21 @@ const AddressSelectModal: React.FC<AddressSelectModalProps> = ({
     onPick,
     onEdit,
     onDelete,
-    t
+    t,
+    onAddNew
 }) => (
     <div className="fixed inset-0 z-dropdown bg-black/40 flex items-center justify-center">
         <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-11/12 max-w-2xl max-h-80vh overflow-hidden">
             <div className="px-5 py-4 border-b flex items-center justify-between">
                 <div className="text-industrial-gray font-semibold">{title}</div>
-                <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
+                <div className="flex items-center gap-3">
+                    {onAddNew && (
+                        <button type="button" onClick={onAddNew} className="text-xs text-primary-navy hover:underline font-semibold">
+                            + {t('account.addresses.formTitleNew')}
+                        </button>
+                    )}
+                    <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
+                </div>
             </div>
             <div className="p-5 overflow-y-auto">
                 {addresses.length === 0 ? (

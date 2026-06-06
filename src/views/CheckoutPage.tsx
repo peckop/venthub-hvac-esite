@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
 import Link from 'next/link'
@@ -17,17 +17,23 @@ import OrderSummarySidebar from './checkout/OrderSummarySidebar'
 import PaymentIframeContainer from './checkout/PaymentIframeContainer'
 import SecurePaymentOverlay from './checkout/SecurePaymentOverlay'
 import AddressSelectModal from './checkout/AddressSelectModal'
+import AddressFormModal from './checkout/AddressFormModal'
 import { getTranslationWithFallback } from '../utils/checkoutHelpers'
 import { useCheckoutCoupon } from '../hooks/useCheckoutCoupon'
 import { useCheckoutPayment } from '../hooks/useCheckoutPayment'
 import { useCheckoutOrchestrator } from '../hooks/useCheckoutOrchestrator'
 import { CheckoutAddressInfo } from '../types/db-rows'
+import { UserAddress, listAddresses, deleteAddress } from '../lib/supabase'
+import { toast } from 'sonner'
 
 const CheckoutPage: React.FC = () => {
   const { items, getCartTotal, clearCart, applyServerPricing } = useCart()
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const { t, lang } = useI18n()
+
+  const [editingAddress, setEditingAddress] = useState<UserAddress | null>(null)
+  const [showAddressFormModal, setShowAddressFormModal] = useState<boolean>(false)
 
   // Central Orchestrator
   const orchestrator = useCheckoutOrchestrator()
@@ -63,6 +69,28 @@ const CheckoutPage: React.FC = () => {
     handleSelectInvoiceProfile,
     handleNextStep
   } = orchestrator
+
+  const handleAddressSaved = async () => {
+    try {
+      const refreshed = await listAddresses()
+      orchestrator.setSavedAddresses(refreshed)
+    } catch (err) {
+      console.error('Failed to refresh addresses:', err)
+    }
+  }
+
+  const handleAddressDelete = async (id: string) => {
+    if (!window.confirm(t('checkout.saved.confirmDelete') || 'Are you sure you want to delete this address?')) return
+    try {
+      await deleteAddress(id)
+      toast.success(t('checkout.saved.deleted') || 'Address deleted')
+      const refreshed = await listAddresses()
+      orchestrator.setSavedAddresses(refreshed)
+    } catch (err) {
+      console.error(err)
+      toast.error(t('checkout.saved.deleteError') || 'Error during delete')
+    }
+  }
 
   // Coupon hook
   const { couponCode, setCouponCode, couponApplied, applyCoupon, removeCoupon } = useCheckoutCoupon(getCartTotal())
@@ -132,8 +160,17 @@ const CheckoutPage: React.FC = () => {
             else setBillingAddress(addr)
             setShowAddressModal(false)
           }}
-          onEdit={() => setShowAddressModal(false)}
-          onDelete={() => {}}
+          onEdit={(a) => {
+            setEditingAddress(a)
+            setShowAddressFormModal(true)
+            setShowAddressModal(false)
+          }}
+          onDelete={handleAddressDelete}
+          onAddNew={() => {
+            setEditingAddress(null)
+            setShowAddressFormModal(true)
+            setShowAddressModal(false)
+          }}
           t={t}
         />
       )}
@@ -222,6 +259,15 @@ const CheckoutPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {showAddressFormModal && (
+        <AddressFormModal
+          address={editingAddress}
+          onClose={() => setShowAddressFormModal(false)}
+          onSaved={handleAddressSaved}
+          t={t}
+        />
+      )}
     </div>
   )
 }

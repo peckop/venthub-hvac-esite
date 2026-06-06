@@ -1542,11 +1542,18 @@ export const en = {
     relatedProducts: 'Related Products',
     officialDistributor: 'OFFICIAL DISTRIBUTOR',
     priceAvailability: 'Price & Availability',
-
+    shareCopied: 'Link copied!',
+    variantDetails: 'Variant Details',
+    messages: {
+      pdfStarted: 'Generating PDF...',
+    },
+    errors: {
+      pdfFailed: 'Failed to generate PDF.',
+    },
     labels: {
       productFeatures: 'Product Features',
       productDescription: 'Product Description',
-      technicalSpecs: 'Technical _specifications',
+      technicalSpecs: 'Technical Specifications',
       category: 'Category',
       price: 'Price',
       physicalDimensions: 'Physical Dimensions',
@@ -1559,8 +1566,9 @@ export const en = {
       pressure: 'Pressure',
       power: 'Power',
       noise: 'Noise Level',
-      noSpecsAvailable: 'No technical _specifications available for this product.',
-      technicalDatasheet: 'TECHNICAL DATASHEET'
+      noSpecsAvailable: 'No technical specifications available for this product.',
+      technicalDatasheet: 'TECHNICAL DATASHEET',
+      engineeringAnalysis: 'Engineering Analysis'
     },
     features: {
       materialQuality: 'Premium material and manufacturing quality',
@@ -1577,7 +1585,8 @@ export const en = {
       view3DModel: '3D Model View',
       interactiveModel: 'Interactive Model',
       dimensionedDrawing: 'Dimensioned Drawing',
-      cadDwg: 'CAD - DWG Format'
+      cadDwg: 'CAD - DWG Format',
+      cadDwgAvailable: 'CAD - DWG Available'
     },
     docs: {
       installationGuide: 'Installation Guide',
@@ -1585,7 +1594,7 @@ export const en = {
       maintenanceManual: 'Maintenance Manual',
       safetyInfo: 'Safety Information',
       warrantyTerms: 'Warranty Terms',
-      technicalSpecsDoc: 'Technical _specifications',
+      technicalSpecsDoc: 'Technical Specifications',
       productCatalog: 'Product Catalog',
       technicalBrochure: 'Technical Brochure',
       productReleaseNotes: 'Product Release Notes',
@@ -1598,7 +1607,11 @@ export const en = {
       downloadBrochure: 'Download Brochure',
       liveDataNotice: "ℹ️ Data is updated in real-time",
       interactive3D: "3D VIEW",
-      addToProject: "Add to Project"
+      addToProject: "Add to Project",
+      removeFromWishlist: 'Remove from Favorites',
+      addToWishlist: 'Add to Favorites',
+      favorite: 'Favorite',
+      share: 'Share'
     },
     cert: {
       ceCertificate: 'CE Certificate',
@@ -1626,7 +1639,66 @@ export const en = {
       documents: 'Documents',
       brochure: 'Brochure/Catalog',
       certificates: 'Certificates',
-      specs: 'Technical _specifications'
+      specs: 'Technical Specifications'
+    },
+    trust: {
+      freeShipping: 'Free Shipping',
+      securePayment: 'Secure Payment',
+      warranty: 'Warranty'
+    },
+    engineering: {
+      noise: {
+        ultraQuiet: {
+          label: 'Ultra Quiet Operation',
+          desc: 'Whisper-quiet performance designed for acoustics-sensitive living and working environments.'
+        },
+        officeComfort: {
+          label: 'Office Comfort Level',
+          desc: 'Low noise level suitable for offices, libraries, and study rooms.'
+        },
+        standard: {
+          label: 'Standard Noise Level',
+          desc: 'Acceptable sound level for standard comfort zones and commercial spaces.'
+        },
+        industrial: {
+          label: 'Industrial Noise Level',
+          desc: 'Noise level designed for high-capacity ventilation in industrial plants.'
+        }
+      },
+      efficiency: {
+        diamond: {
+          label: 'Diamond Energy Efficiency',
+          desc: 'Maximum thermal efficiency minimizing energy consumption.'
+        },
+        platinum: {
+          label: 'Platinum Energy Efficiency',
+          desc: 'High thermal recovery rate providing significant energy savings.'
+        },
+        gold: {
+          label: 'Gold Energy Efficiency',
+          desc: 'Standard-compliant energy recovery efficiency for modern HVAC designs.'
+        }
+      },
+      motor: {
+        ec: {
+          label: 'EC Motor Technology',
+          desc: 'Brushless motor design with low energy consumption and precise speed control.'
+        },
+        ac: {
+          label: 'AC Motor Technology',
+          desc: 'Durable and reliable classic AC motor technology.'
+        }
+      },
+      capacity: {
+        highFlow: {
+          label: 'High Airflow Capacity',
+          desc: 'Ideal performance for medium to large residential and commercial spaces.'
+        },
+        industrialFlow: {
+          label: 'Industrial Airflow Capacity',
+          desc: 'High-capacity airflow designed for large industrial plants and warehouses.'
+        }
+      }
     }
   },
   cart: {

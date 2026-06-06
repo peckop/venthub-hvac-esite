@@ -1521,6 +1521,191 @@ export const tr = {
     inspectSeries: 'Seriyi İncele',
     whyCategory: 'Neden {{category}}?'
   },
+
+  pdp: {
+    loading: 'Ürün yükleniyor...',
+    productNotFound: 'Ürün Bulunamadı',
+    backHome: 'Ana Sayfaya Dön',
+    back: 'Geri Dön',
+    featured: 'Öne Çıkan',
+    brand: 'Marka',
+    model: 'Model',
+    inStock: 'Stokta Var',
+    outOfStock: 'Stokta Yok',
+    vatIncluded: '(KDV Dahil)',
+    qty: 'Adet:',
+    addToCart: 'Sepete Ekle',
+    askStock: 'Stok Sor',
+    techQuote: 'Teknik Teklif İste',
+    askPriceButton: 'Teklif İste',
+    freeShipping: 'Ücretsiz Kargo',
+    warranty2y: '2 Yıl Garanti',
+    support247: '7/24 Destek',
+    descFallback: 'Bu ürün için detaylı açıklama yakında eklenecektir.',
+    relatedGuide: 'İlgili Kılavuz',
+    statusLabel: 'Durum',
+    relatedProducts: 'İlgili Ürünler',
+    officialDistributor: 'RESMİ DİSTRİBÜTÖR',
+    priceAvailability: 'Fiyat & Stok',
+    shareCopied: 'Link kopyalandı!',
+    variantDetails: 'Varyant Detayları',
+    messages: {
+      pdfStarted: 'PDF üretiliyor...',
+    },
+    errors: {
+      pdfFailed: 'PDF üretilemedi.',
+    },
+    labels: {
+      productFeatures: 'Ürün Özellikleri',
+      productDescription: 'Ürün Açıklaması',
+      technicalSpecs: 'Teknik Özellikler',
+      category: 'Kategori',
+      price: 'Fiyat',
+      physicalDimensions: 'Fiziksel Boyutlar',
+      performanceMetrics: 'Performans Metrikleri',
+      width: 'Genişlik',
+      height: 'Yükseklik',
+      depth: 'Derinlik',
+      weight: 'Ağırlık',
+      airflow: 'Hava Debisi',
+      pressure: 'Basınç',
+      power: 'Güç',
+      noise: 'Ses Seviyesi',
+      noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
+      technicalDatasheet: 'TEKNİK VERİ SAYFASI',
+      engineeringAnalysis: 'Mühendislik Analizi'
+    },
+    features: {
+      materialQuality: 'Birinci sınıf malzeme ve üretim kalitesi',
+      energyEfficient: 'Enerji tasarruflu tasarım ve düşük tüketim',
+      quietOperation: 'Sessiz çalışma ve minimum titreşim',
+      easyMaintenance: 'Kolay kurulum ve bakım',
+      durable: 'Uzun ömürlü ve dayanıklı'
+    },
+    diagramsExtra: {
+      technicalDiagrams: 'Teknik Şemalar',
+      mounting: 'Montaj Şeması',
+      electrical: 'Elektrik Şeması',
+      threeDViews: '3D Görünümler',
+      view3DModel: '3D Modeli Görüntüle',
+      interactiveModel: 'İnteraktif Model',
+      dimensionedDrawing: 'Ölçülü Çizim',
+      cadDwg: 'CAD - DWG Formatı',
+      cadDwgAvailable: 'CAD - DWG Mevcut'
+    },
+    docs: {
+      installationGuide: 'Kurulum Kılavuzu',
+      userManual: 'Kullanım Kılavuzu',
+      maintenanceManual: 'Bakım Kılavuzu',
+      safetyInfo: 'Güvenlik Bilgileri',
+      warrantyTerms: 'Garanti Koşulları',
+      technicalSpecsDoc: 'Teknik Özellikler',
+      productCatalog: 'Ürün Kataloğu',
+      technicalBrochure: 'Teknik Broşür',
+      productReleaseNotes: 'Ürün Sürüm Notları',
+      troubleshootingGuide: 'Sorun Giderme Kılavuzu',
+      sparePartsList: 'Yedek Parça Listesi'
+    },
+    actions: {
+      download: 'İndir',
+      downloadCatalog: 'Kataloğu İndir',
+      downloadBrochure: 'Broşürü İndir',
+      liveDataNotice: "ℹ️ Veriler gerçek zamanlı güncellenmektedir",
+      interactive3D: "3D GÖRÜNÜM",
+      addToProject: "Projeye Ekle",
+      removeFromWishlist: 'Favorilerden Kaldır',
+      addToWishlist: 'Favorilere Ekle',
+      favorite: 'Favori',
+      share: 'Paylaş'
+    },
+    cert: {
+      ceCertificate: 'CE Sertifikası',
+      iso9001: 'ISO 9001',
+      tseCertificate: 'TSE Sertifikası',
+      energyStar: 'Energy Star',
+      ulCertificate: 'UL Sertifikası',
+      ecoFriendly: 'Çevre Dostu',
+      rohsCompliant: 'RoHS Uyumlu',
+      downloadCenter: 'Sertifika İndirme Merkezi',
+      downloadAllZip: 'Tüm Sertifikaları İndir (ZIP)',
+      verify: 'Sertifika Doğrulama'
+    },
+    certLabels: {
+      certificateNo: 'Sertifika No',
+      validity: 'Geçerlilik',
+      standard: 'Standart',
+      efficiency: 'Verimlilik'
+    },
+    sections: {
+      general: 'Genel Bilgiler',
+      models: 'Modeller',
+      dimensions: 'Boyutlar',
+      diagrams: 'Şemalar',
+      documents: 'Belgeler',
+      brochure: 'Broşür/Katalog',
+      certificates: 'Sertifikalar',
+      specs: 'Teknik Özellikler'
+    },
+    trust: {
+      freeShipping: 'Ücretsiz Kargo',
+      securePayment: 'Güvenli Ödeme',
+      warranty: 'Garanti'
+    },
+    engineering: {
+      noise: {
+        ultraQuiet: {
+          label: 'Ultra Sessiz Çalışma',
+          desc: 'Akustik hassasiyeti yüksek yaşam ve çalışma alanları için tasarlanmış fısıltı sessizliğinde performans.'
+        },
+        officeComfort: {
+          label: 'Ofis Konfor Seviyesi',
+          desc: 'Ofis, kütüphane ve çalışma odaları için uygun düşük ses seviyesi.'
+        },
+        standard: {
+          label: 'Standart Ses Seviyesi',
+          desc: 'Standart konfor alanları ve ticari mekanlar için kabul edilebilir ses seviyesi.'
+        },
+        industrial: {
+          label: 'Endüstriyel Ses Seviyesi',
+          desc: 'Endüstriyel tesislerde yüksek kapasiteli havalandırma için tasarlanmış ses seviyesi.'
+        }
+      },
+      efficiency: {
+        diamond: {
+          label: 'Elmas Enerji Verimliliği',
+          desc: 'Enerji tüketimini minimuma indiren maksimum ısıl verimlilik.'
+        },
+        platinum: {
+          label: 'Platin Enerji Verimliliği',
+          desc: 'Önemli ölçüde enerji tasarrufu sağlayan yüksek ısıl geri kazanım oranı.'
+        },
+        gold: {
+          label: 'Altın Enerji Verimliliği',
+          desc: 'Modern HVAC tasarımları için standartlara uygun enerji geri kazanım verimliliği.'
+        }
+      },
+      motor: {
+        ec: {
+          label: 'EC Motor Teknolojisi',
+          desc: 'Düşük enerji tüketimi ve hassas hız kontrolü sağlayan fırçasız motor tasarımı.'
+        },
+        ac: {
+          label: 'AC Motor Teknolojisi',
+          desc: 'Dayanıklı ve güvenilir klasik AC motor teknolojisi.'
+        }
+      },
+      capacity: {
+        highFlow: {
+          label: 'Yüksek Hava Debisi',
+          desc: 'Orta ve büyük ölçekli konut ve ticari alanlar için ideal performans.'
+        },
+        industrialFlow: {
+          label: 'Endüstriyel Hava Debisi',
+          desc: 'Büyük endüstriyel tesisler ve depolar için tasarlanmış yüksek kapasiteli hava akışı.'
+        }
+      }
+    }
+  },
   categories: {
     title: 'Ürün Kategorileri',
     subtitle: 'Tüm HVAC alanlarını kapsayan geniş yelpazemizle profesyonel havalandırma çözümlerini bulun.',
