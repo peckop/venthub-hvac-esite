@@ -1,110 +1,128 @@
-export const en = {
+import { tr } from './tr'
+
+export const en: typeof tr = {
   common: {
     loadingApp: 'Loading VentHub... ',
     loading: 'Loading...',
-    // Navigation & generic
-    categories: "Categories",
-    products: "Products",
-    brands: "Brands",
-    about: "About",
-    contact: "Contact",
-    supportCenter: "Support Center",
-    knowledgeHub: "Knowledge Hub",
-    myOrders: "My Orders",
-    signOut: "Sign Out",
-    signIn: "Sign In",
-    signUp: "Sign Up",
-    skipToContent: "Skip to main content",
-    searchHeaderPlaceholder: "Search product, brand or model...",
-    search: "Search",
-    quickSearch: "Quick search...",
-    allCategories: "All Categories",
-    priceRange: "Price Range",
-    languageSwitcher: "Language Selection",
-    turkish: "Turkish",
-    english: "English",
-
-    // Existing
-    discover: "Discover",
-    allProducts: "All Products",
-    exploreProducts: "Explore Products",
-    getQuote: "Get a Quote",
+    categories: 'Categories',
+    products: 'Products',
+    brands: 'Brands',
+    about: 'About',
+    contact: 'Contact',
+    supportCenter: 'Support Center',
+    knowledgeHub: 'Knowledge Hub',
+    myOrders: 'My Orders',
+    signOut: 'Sign Out',
+    signIn: 'Sign In',
+    signUp: 'Sign Up',
+    skipToContent: 'Skip to main content',
+    searchHeaderPlaceholder: 'Search product, brand or model...',
+    search: 'Search',
+    quickSearch: 'Quick search...',
+    allCategories: 'All Categories',
+    priceRange: 'Price Range',
+    languageSwitcher: 'Language Selection',
+    turkish: 'Turkish',
+    english: 'English',
+    discover: 'Discover',
+    allProducts: 'All Products',
+    exploreProducts: 'Explore Products',
+    getQuote: 'Get a Quote',
     addToCart: 'Add to Cart',
     categoryList: {
-      // MAIN FAMILIES
-      'residential': 'Residential Ventilation',
-      'commercial': 'Commercial Ventilation',
-      'industrial': 'Industrial Ventilation',
-      'hrv': 'VMC & Heat Recovery',
+      residential: 'Residential Ventilation',
+      commercial: 'Commercial Ventilation',
+      industrial: 'Industrial Ventilation',
+      hrv: 'VMC & Heat Recovery',
       'air-treatment': 'Air Treatment',
-      'hygiene': 'Hygiene and Sanitizer',
-      'summer': 'Summer Ventilation',
-      'ac': 'Air Conditioning',
-      'heating': 'Electric Heating',
-      'hvls': 'Industrial Ceiling Fans',
-      'accessories': 'Accessories and Components',
+      hygiene: 'Hygiene and Sanitizer',
+      summer: 'Summer Ventilation',
+      ac: 'Air Conditioning',
+      heating: 'Electric Heating',
+      hvls: 'Industrial Ceiling Fans',
+      accessories: 'Accessories and Components',
       'smart-home': 'Smart Home',
-
-      // SUB-CATEGORIES
-      'sub': {
-        'bathroom': 'Bathroom and Toilet Fans',
-        'window': 'Window and Wall Fans',
-        'ghost': 'In-line / Duct Fans',
-        'smoke': 'Smoke Exhaust Fans',
-        'jet': 'Car Park Jet Fans',
-        'radial': 'Radial Fans',
-        'roof': 'Roof Fans',
-        'axial-ind': 'Industrial Axial Fans'
+      sub: {
+        bathroom: 'Bathroom and Toilet Fans',
+        window: 'Window and Wall Fans',
+        ghost: 'In-line / Duct Fans',
+        smoke: 'Smoke Exhaust Fans',
+        jet: 'Car Park Jet Fans',
+        radial: 'Radial Fans',
+        roof: 'Roof Fans',
+        'axial-ind': 'Industrial Axial Fans',
+        'air-curtain': 'Air Curtains',
+        conditioning: 'Air Conditioning Solutions'
       }
     },
-    byApplication: "Solutions by Application",
-    viewAll: "View all",
-    featured: "Featured Products",
-    newProducts: "New Products",
-    whyUs: "Why VentHub?",
-    homeLabel: "Home",
-    discoverPage: "Discover",
-    notFound: "No results found",
-    clearSearch: "Clear search",
-    searchPlaceholder: "Product name, brand...",
-    searchPlaceholderLong: "Product name, brand, model...",
-    selectByNeed: "Choose by need",
-    seeAllProducts: "See all products",
-    back: "Back",
-    backToTop: "Back to top",
-    gotoCategory: "Go to category",
-    cancel: "Cancel",
-    close: "Close",
-    noVisuals: "No Visual Available",
-    noImage: "No Image",
-    viewFullscreen: "View fullscreen",
-    view3D: "View 3D",
-    prev: "Previous",
-    next: "Next",
-    remove: "Remove",
-    more: "More",
-    whatsappAriaLabel: "Message on WhatsApp",
-    whatsappTitle: "Message on WhatsApp",
-    whatsappTooltip: "Engineering Line",
-    whatsappSupportMessage: "Quick support from website",
+    byApplication: 'Solutions by Application',
+    viewAll: 'View all',
+    featured: 'Featured Products',
+    newProducts: 'New Products',
+    whyUs: 'Why VentHub?',
+    homeLabel: 'Home',
+    discoverPage: 'Discover',
+    notFound: 'No results found',
+    clearSearch: 'Clear search',
+    searchPlaceholder: 'Product name, brand...',
+    searchPlaceholderLong: 'Product name, brand, model...',
+    selectByNeed: 'Choose by need',
+    seeAllProducts: 'See all products',
+    back: 'Back',
+    backToTop: 'Back to top',
+    gotoCategory: 'Go to category',
+    cancel: 'Cancel',
+    close: 'Close',
+    noVisuals: 'No Visual Available',
+    noImage: 'No Image',
+    viewFullscreen: 'View fullscreen',
+    view3D: 'View 3D',
+    prev: 'Previous',
+    next: 'Next',
+    remove: 'Remove',
+    more: 'More',
+    whatsappAriaLabel: 'Message on WhatsApp',
+    whatsappTitle: 'Message on WhatsApp',
+    whatsappTooltip: 'Engineering Line',
+    whatsappSupportMessage: 'Quick support from website',
     whatsapp: {
       faqSupportMessage: 'I could not find the answer I was looking for on the FAQ page...',
       supportMessageDefault: 'Hello, I would like to contact the VentHub HVAC support team.',
       technicalQuoteMessage: 'I request a technical quote and project design for {{productName}}. Project details: {{projectInfo}}'
-    }
+    },
+    actions: 'Actions',
+    addToProject: 'Add to Project List',
+    adminPanel: 'Admin Panel',
+    all: 'All',
+    amount: 'Amount',
+    backToSite: 'Back to Site',
+    date: 'Date',
+    delete: 'Delete',
+    edit: 'Edit',
+    goToStore: 'Go to Store',
+    id: 'ID',
+    no: 'No',
+    none: 'None',
+    save: 'Save',
+    saving: 'Saving...',
+    status: 'Status',
+    systemPreparing: 'System Preparing...',
+    yes: 'Yes'
   },
   search: {
-    recentSearches: "Recent Searches",
-    clearRecent: "Clear",
-    popularCategories: "Popular Categories",
-    noResults: "No results found",
-    detailedSearch: "detailed search for",
-    allResults: "See all results",
-    keyboardHint: "Navigate with arrow keys",
-    enterHint: "For all results",
-    placeholder: "Search products, categories, brands...",
-    noResultsAdvice: "Try different keywords",
-    detailedSearchCta: "Click for detailed search",
+    recentSearches: 'Recent Searches',
+    clearRecent: 'Clear',
+    popularCategories: 'Popular Categories',
+    noResults: 'No results found',
+    detailedSearch: 'detailed search for',
+    allResults: 'See all results',
+    keyboardHint: 'Navigate with arrow keys',
+    enterHint: 'For all results',
+    placeholder: 'Search products, categories, brands...',
+    noResultsAdvice: 'Try different keywords',
+    detailedSearchCta: 'Click for detailed search',
+    brandPrefix: 'Brand: ',
+    fuzzyMatchNotice: 'No exact match found, showing similar results.'
   },
   resources: {
     title: 'Resources & Guides',
@@ -158,38 +176,35 @@ export const en = {
       'hava-perdesi': {
         title: 'Air Curtain',
         summary: 'Installed above entrances to preserve comfort and reduce energy loss; device should fully cover door width.',
-        steps: [
-          'Door width = device width (unbroken barrier).',
-          'Nozzle velocity 7–9 m/s; at floor 2–3 m/s target.',
-          'Nozzle tilted 10–15° inwards; auto speed via door contact.'
-        ],
+        steps: ['Door width = device width (unbroken barrier).', 'Nozzle velocity 7–9 m/s; at floor 2–3 m/s target.', 'Nozzle tilted 10–15° inwards; auto speed via door contact.'],
         pitfalls: ['Device too short', 'Too low velocity', 'Tilting nozzle outward']
       },
       'jet-fan': {
         title: 'Jet Fan (Parking)',
         summary: 'Ceiling fans that direct flow to exhaust for CO/NOx and smoke scenarios; layout must avoid dead zones.',
-        steps: [
-          'Flow: Volume × ACH (e.g. 7,200 m³ × 8 ACH ≈ 57,600 m³/h).',
-          'Thrust 50–100 N typical; pick by distance and plan.',
-          'Layout: axis spacing 25–35 m; drive to exhaust; cover sensor zones.'
-        ],
-        pitfalls: ['Leaving dead zones', 'Missing sensor coverage']
+        steps: ['Flow: Volume × ACH (e.g. 7,200 m³ × 8 ACH ≈ 57,600 m³/h).', 'Thrust 50–100 N typical; pick by distance and plan.', 'Layout: axis spacing 25–35 m; drive to exhaust; cover sensor zones.'],
+        pitfalls: ['Leaving dead zones', 'Missing sensor coverage'],
+        image: '/images/hvac_installation_close_up_premium_3.png'
       },
       hrv: {
         title: 'Heat Recovery (HRV/ERV)',
         summary: 'Provides fresh air with heat recovery; key criteria are airflow, efficiency/SFP and external static pressure.',
-        steps: [
-          'Airflow by occupancy/space (EN 16798-1 / ASHRAE 62.1 ranges).',
-          'Efficiency/SFP: 70–85% efficiency, low SFP.',
-          'Pressure: external static matching filter/duct losses.'
-        ],
-        pitfalls: ['Focusing on efficiency while ignoring external static']
+        steps: ['Airflow by occupancy/space (EN 16798-1 / ASHRAE 62.1 ranges).', 'Efficiency/SFP: 70–85% efficiency, low SFP.', 'Pressure: external static matching filter/duct losses.'],
+        pitfalls: ['Focusing on efficiency while ignoring external static'],
+        image: '/images/hvac_installation_close_up_premium_4.png'
+      },
+      'air-curtain': {
+        image: '/images/hvac_installation_close_up_premium_3.png',
+        pitfalls: ['Device too short', 'Too low velocity', 'Tilting nozzle outward'],
+        steps: ['Door width = device width (unbroken barrier).', 'Nozzle velocity 7–9 m/s; at floor 2–3 m/s target.', 'Nozzle tilted 10–15° inwards; auto speed via door contact.'],
+        summary: 'For correct air curtain selection, door height, width and usage purpose (comfort/industrial) are decisive.',
+        title: 'Air Curtain Selection'
       }
     }
   },
   home: {
-    seoTitle: "VentHub - Premium HVAC Solutions | Fans, Speed Control, Heating & Cooling",
-    seoDesc: "Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.",
+    seoTitle: 'VentHub - Premium HVAC Solutions | Fans, Speed Control, Heating & Cooling',
+    seoDesc: 'Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.',
     hero: {
       eyebrow: 'Engineering-Guided HVAC Commerce',
       title: 'Enter the right HVAC path from the first screen.',
@@ -240,8 +255,14 @@ export const en = {
             title: 'Industrial Ventilation Layers',
             subtitle: 'Statically balanced and acoustically optimized solution axes in high-flow systems.',
             products: [
-              { label: 'Vortice Lineo', subLabel: 'Mixed Flow Duct Fan' },
-              { label: 'Lineo Quiet', subLabel: 'Ultra Quiet Performance' }
+              {
+                label: 'Vortice Lineo',
+                subLabel: 'Mixed Flow Duct Fan'
+              },
+              {
+                label: 'Lineo Quiet',
+                subLabel: 'Ultra Quiet Performance'
+              }
             ]
           },
           {
@@ -249,8 +270,14 @@ export const en = {
             title: 'Vortice Lineo Quiet: The Future of Silence',
             subtitle: 'The perfect balance of minimum energy consumption, maximum air transfer efficiency, and premium silent comfort.',
             products: [
-              { label: 'Air Flow Technology', subLabel: 'Laminar Flow Control' },
-              { label: 'EC Motor Efficiency', subLabel: 'Low Energy Consumption' }
+              {
+                label: 'Air Flow Technology',
+                subLabel: 'Laminar Flow Control'
+              },
+              {
+                label: 'EC Motor Efficiency',
+                subLabel: 'Low Energy Consumption'
+              }
             ]
           },
           {
@@ -258,8 +285,14 @@ export const en = {
             title: 'Technical Excellence and Smart Flow',
             subtitle: 'End-to-end deterministic ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
             products: [
-              { label: 'Industrial Solutions', subLabel: 'High Capacity' },
-              { label: 'Smart Control', subLabel: 'Automation Integration' }
+              {
+                label: 'Industrial Solutions',
+                subLabel: 'High Capacity'
+              },
+              {
+                label: 'Smart Control',
+                subLabel: 'Automation Integration'
+              }
             ]
           }
         ]
@@ -490,49 +523,58 @@ export const en = {
       tertiaryCta: 'Explore Products'
     },
     features: {
-      euQuality: "European quality standards",
-      fastDelivery: "Fast delivery",
-      warranty: "2-year warranty",
-      support: "24/7 technical support",
+      euQuality: 'European quality standards',
+      fastDelivery: 'Fast delivery',
+      warranty: '2-year warranty',
+      support: '24/7 technical support'
     },
-    heroTitle: "Clean Air, Clean Future",
-    heroSubtitle: "Turkey's most trusted HVAC distributor. 6 premium brands, 50+ product types for professional ventilation solutions.",
-    bottomCtaTitle: "Let us help you choose the right product.",
-    bottomCtaSubtitle: "Share your project details, our engineering team will guide you quickly.",
-    whyParagraph: "With 15+ years of experience and world-class products, we are your trusted partner in the HVAC industry.",
+    heroTitle: 'Clean Air, Clean Future',
+    heroSubtitle: 'Turkey\'s most trusted HVAC distributor. 6 premium brands, 50+ product types for professional ventilation solutions.',
+    bottomCtaTitle: 'Let us help you choose the right product.',
+    bottomCtaSubtitle: 'Share your project details, our engineering team will guide you quickly.',
+    whyParagraph: 'With 15+ years of experience and world-class products, we are your trusted partner in the HVAC industry.',
     why: {
-      premiumTitle: "Premium Quality",
-      premiumText: "We select only the highest-quality products from globally recognized brands.",
-      expertTitle: "Expert Support",
-      expertText: "Our HVAC experts provide 24/7 technical support to find the best solution.",
-      fastTitle: "Fast Delivery",
-      fastText: "Rapid and reliable delivery across Turkey.",
+      premiumTitle: 'Premium Quality',
+      premiumText: 'We select only the highest-quality products from globally recognized brands.',
+      expertTitle: 'Expert Support',
+      expertText: 'Our HVAC experts provide 24/7 technical support to find the best solution.',
+      fastTitle: 'Fast Delivery',
+      fastText: 'Rapid and reliable delivery across Turkey.'
     },
     whyVentHub: {
-      title: "Why",
-      subtitle: "Turkey's trusted HVAC e-commerce platform",
+      title: 'Why',
+      subtitle: 'Turkey\'s trusted HVAC e-commerce platform',
       features: {
-        brands: { title: "Premium Brands", description: "Vortice, Casals and industry leading brands products" },
-        support: { title: "Expert Support", description: "Professional technical consultancy service" },
-        delivery: { title: "Fast Delivery", description: "Delivered to your door in 2-5 business days across Turkey" }
+        brands: {
+          title: 'Premium Brands',
+          description: 'Vortice, Casals and industry leading brands products'
+        },
+        support: {
+          title: 'Expert Support',
+          description: 'Professional technical consultancy service'
+        },
+        delivery: {
+          title: 'Fast Delivery',
+          description: 'Delivered to your door in 2-5 business days across Turkey'
+        }
       },
       badges: {
-        premium: "Premium Brands",
-        ce: "CE Certified",
-        warranty: "2 Years Warranty",
-        shipping: "Same Day Shipping"
+        premium: 'Premium Brands',
+        ce: 'CE Certified',
+        warranty: '2 Years Warranty',
+        shipping: 'Same Day Shipping'
       },
       authorizedDealer: {
-        prefix: "VentHub is the authorized dealer of",
-        brand: "Vortice",
-        suffix: "products in Turkey."
+        prefix: 'VentHub is the authorized dealer of',
+        brand: 'Vortice',
+        suffix: 'products in Turkey.'
       }
     },
     stats: {
-      premiumBrands: "Premium Brands",
-      productTypes: "Product Types",
-      yearsExperience: "Years Experience",
-      happyCustomers: "Happy Customers",
+      premiumBrands: 'Premium Brands',
+      productTypes: 'Product Types',
+      yearsExperience: 'Years Experience',
+      happyCustomers: 'Happy Customers'
     },
     galleryTitle: 'Product Gallery',
     gallerySubtitle: 'Browse featured products',
@@ -570,19 +612,43 @@ export const en = {
     subtitle: 'A transparent and predictable process from kickoff to delivery',
     stepPrefix: 'Step',
     steps: {
-      need: { title: 'Understanding Your Needs', desc: 'We clarify the use case via a short call or form.' },
-      analysis: { title: 'Analysis & Calculation', desc: 'We review airflow, pressure, acoustics, energy efficiency and regulations.' },
-      proposal: { title: 'Solution / Proposal', desc: 'We propose suitable product families, alternatives and lead times.' },
-      implementation: { title: 'Implementation Support', desc: 'We streamline with install guides, commissioning and technical support.' },
-      support: { title: 'Support', desc: 'After-sales training, spare parts and service network for sustainability.' }
+      need: {
+        title: 'Understanding Your Needs',
+        desc: 'We clarify the use case via a short call or form.'
+      },
+      analysis: {
+        title: 'Analysis & Calculation',
+        desc: 'We review airflow, pressure, acoustics, energy efficiency and regulations.'
+      },
+      proposal: {
+        title: 'Solution / Proposal',
+        desc: 'We propose suitable product families, alternatives and lead times.'
+      },
+      implementation: {
+        title: 'Implementation Support',
+        desc: 'We streamline with install guides, commissioning and technical support.'
+      },
+      support: {
+        title: 'Support',
+        desc: 'After-sales training, spare parts and service network for sustainability.'
+      }
     }
   },
   homeTrust: {
     title: 'Trust & Compliance',
     subtitle: 'Our infrastructure, security and processes are transparent and standards-compliant.',
-    kvkk: { title: 'KVKK Compliant', desc: 'Personal data is stored securely and used only where necessary.' },
-    payment: { title: 'Secure Payment (iyzico)', desc: '3D Secure and advanced anti-fraud checks.' },
-    returns: { title: 'Easy Returns/Exchanges', desc: 'Transparent procedures and fast, result-focused support.' }
+    kvkk: {
+      title: 'KVKK Compliant',
+      desc: 'Personal data is stored securely and used only where necessary.'
+    },
+    payment: {
+      title: 'Secure Payment (iyzico)',
+      desc: '3D Secure and advanced anti-fraud checks.'
+    },
+    returns: {
+      title: 'Easy Returns/Exchanges',
+      desc: 'Transparent procedures and fast, result-focused support.'
+    }
   },
   homeFaq: {
     title: 'FAQs (Short)',
@@ -607,10 +673,22 @@ export const en = {
     title: 'Featured Applications',
     subtitle: 'Move the pointer to spotlight content',
     items: {
-      parkingJetFan: { title: 'Parking Jet Fan', desc: 'CO sensor control and energy saving' },
-      airCurtain: { title: 'Air Curtain', desc: 'Entrance comfort and reduced heat loss' },
-      hrv: { title: 'Heat Recovery (HRV)', desc: 'Indoor air quality and efficiency' },
-      smokeExhaust: { title: 'Smoke Exhaust', desc: 'Emergency management' }
+      parkingJetFan: {
+        title: 'Parking Jet Fan',
+        desc: 'CO sensor control and energy saving'
+      },
+      airCurtain: {
+        title: 'Air Curtain',
+        desc: 'Entrance comfort and reduced heat loss'
+      },
+      hrv: {
+        title: 'Heat Recovery (HRV)',
+        desc: 'Indoor air quality and efficiency'
+      },
+      smokeExhaust: {
+        title: 'Smoke Exhaust',
+        desc: 'Emergency management'
+      }
     }
   },
   homeGallery: {
@@ -619,70 +697,102 @@ export const en = {
     productsCta: 'View Products',
     guideCta: 'Open Guide',
     items: {
-      parking: { title: 'Parking Ventilation', subtitle: 'Jet fan / CO control' },
-      airCurtain: { title: 'Air Curtain', subtitle: 'Entrance comfort' },
-      heatRecovery: { title: 'Heat Recovery', subtitle: 'Energy efficiency' },
-      industrialKitchen: { title: 'Industrial Kitchen', subtitle: 'Hood and duct' },
-      smokeExhaust: { title: 'Smoke Exhaust', subtitle: 'Emergency' },
-      hvac: { title: 'Heating/Cooling', subtitle: 'Comfort HVAC' }
+      parking: {
+        title: 'Parking Ventilation',
+        subtitle: 'Jet fan / CO control'
+      },
+      airCurtain: {
+        title: 'Air Curtain',
+        subtitle: 'Entrance comfort'
+      },
+      heatRecovery: {
+        title: 'Heat Recovery',
+        subtitle: 'Energy efficiency'
+      },
+      industrialKitchen: {
+        title: 'Industrial Kitchen',
+        subtitle: 'Hood and duct'
+      },
+      smokeExhaust: {
+        title: 'Smoke Exhaust',
+        subtitle: 'Emergency'
+      },
+      hvac: {
+        title: 'Heating/Cooling',
+        subtitle: 'Comfort HVAC'
+      }
     }
   },
   homeShowcase: {
-    slide1: { title: 'Expertise in Industrial Ventilation', subtitle: 'Solutions tailored to your project and the right product selection' },
-    slide2: { title: 'Energy Efficiency & Comfort', subtitle: 'Better performance at lower cost with proper engineering' },
-    slide3: { title: 'Guided by Your Needs', subtitle: 'Explore by application and quickly reach the right category' },
+    slide1: {
+      title: 'Expertise in Industrial Ventilation',
+      subtitle: 'Solutions tailored to your project and the right product selection'
+    },
+    slide2: {
+      title: 'Energy Efficiency & Comfort',
+      subtitle: 'Better performance at lower cost with proper engineering'
+    },
+    slide3: {
+      title: 'Guided by Your Needs',
+      subtitle: 'Explore by application and quickly reach the right category'
+    },
     prevAria: 'Previous',
     playAria: 'Play',
     pauseAria: 'Pause',
     nextAria: 'Next'
   },
   products: {
-    breadcrumbDiscover: "Discover",
-    heroTitle: "Discover HVAC products: engineering-led selection, fast quotes",
-    heroSubtitle: "Find the right product quickly with application-guided areas, popular categories and featured products.",
-    itemsListed: "items listed",
-    resultsFound: "results found",
-    heroValue1: "Certified, reliable products",
-    heroValue2: "Engineering support and right selection",
-    heroValue3: "Fast quote / guidance",
-    helpCtaTitle: "Not sure? Let's choose the right product by application.",
-    helpCtaSubtitle: "Share your project details; our engineering team will respond quickly.",
-    applicationTitle: "Solutions by Application",
-    popularCategories: "Popular Categories",
+    breadcrumbDiscover: 'Discover',
+    heroTitle: 'Discover HVAC products: engineering-led selection, fast quotes',
+    heroSubtitle: 'Find the right product quickly with application-guided areas, popular categories and featured products.',
+    itemsListed: 'items listed',
+    resultsFound: 'results found',
+    heroValue1: 'Certified, reliable products',
+    heroValue2: 'Engineering support and right selection',
+    heroValue3: 'Fast quote / guidance',
+    helpCtaTitle: 'Not sure? Let\'s choose the right product by application.',
+    helpCtaSubtitle: 'Share your project details; our engineering team will respond quickly.',
+    applicationTitle: 'Solutions by Application',
+    popularCategories: 'Popular Categories',
     discoverVisual: 'Discover visual area',
     searchResultsTitle: 'Search Results',
     searchSeoTitle: 'Search: {{q}}',
     searchSeoDesc: 'Search results for "{{q}}"',
     discoverSeoDesc: 'Discover products, featured items and popular categories on VentHub.',
-    // Hub Section
-    hubBadge: "Turkey's HVAC Expert",
-    hubTitle: "Professional HVAC Solutions",
-    hubSubtitle: "Air curtain, industrial fan and heat recovery systems. Let's find the right product for your needs together.",
-    searchPlaceholder: "Search product or model...",
+    hubBadge: 'Turkey\'s HVAC Expert',
+    hubTitle: 'Professional HVAC Solutions',
+    hubSubtitle: 'Air curtain, industrial fan and heat recovery systems. Let\'s find the right product for your needs together.',
+    searchPlaceholder: 'Search product or model...',
     noResults: 'No Results Found',
     noResultsDesc: 'Please clear filters or try a different term.',
     clearFilters: 'Clear Filters',
+    allProductsTitle: 'All Our Products',
+    emptyDesc: 'Select one of the categories to see more products.',
+    emptyTitle: 'No Products Found',
+    systemTotalPrefix: 'All in system',
+    viewGrid: 'Grid',
+    viewList: 'List'
   },
   applications: {
     parking: {
-      title: "Parking Ventilation",
-      subtitle: "Solutions requiring high airflow and pressure",
+      title: 'Parking Ventilation',
+      subtitle: 'Solutions requiring high airflow and pressure'
     },
     airCurtain: {
-      title: "Mall / Entrance Air Curtain",
-      subtitle: "Entrance solutions that reduce energy loss",
+      title: 'Mall / Entrance Air Curtain',
+      subtitle: 'Entrance solutions that reduce energy loss'
     },
     heatRecovery: {
-      title: "Heat Recovery",
-      subtitle: "Efficient HVAC and energy saving",
+      title: 'Heat Recovery',
+      subtitle: 'Efficient HVAC and energy saving'
     },
-    "air-curtain": {
-      title: "Mall / Entrance Air Curtain",
-      subtitle: "Entrance solutions that reduce energy loss",
+    'air-curtain': {
+      title: 'Mall / Entrance Air Curtain',
+      subtitle: 'Entrance solutions that reduce energy loss'
     },
-    "heat-recovery": {
-      title: "Heat Recovery",
-      subtitle: "Efficient HVAC and energy saving",
+    'heat-recovery': {
+      title: 'Heat Recovery',
+      subtitle: 'Efficient HVAC and energy saving'
     }
   },
   megamenu: {
@@ -693,7 +803,7 @@ export const en = {
     productCategories: 'Product Categories',
     pickCategory: 'Choose a category for premium HVAC solutions',
     subcategories: 'subcategories',
-    more: 'more',
+    more: 'more'
   },
   header: {
     syncing: 'Syncing',
@@ -730,22 +840,29 @@ export const en = {
   },
   admin: {
     common: {
-      saveChanges: "Save Changes",
-      cancel: "Cancel",
-      delete: "Delete",
-      edit: "Edit",
-      search: "Search...",
-      filter: "Filter",
-      noResults: "No results found",
-      loading: "Loading...",
-      success: "Operation successful",
-      error: "An error occurred",
-      ready: "Ready",
-      actions: "Actions",
-      status: "Status",
-      active: "Active",
-      passive: "Passive",
-      all: "All"
+      saveChanges: 'Save Changes',
+      cancel: 'Cancel',
+      delete: 'Delete',
+      edit: 'Edit',
+      search: 'Search...',
+      filter: 'Filter',
+      noResults: 'No results found',
+      loading: 'Loading...',
+      success: 'Operation successful',
+      error: 'An error occurred',
+      ready: 'Ready',
+      actions: 'Actions',
+      status: 'Status',
+      active: 'Active',
+      passive: 'Passive',
+      all: 'All',
+      addCard: 'Add Card',
+      addLine: 'Add Line',
+      addNewProduct: 'Add New Product',
+      imageUrl: 'Image URL',
+      imageUrlWithManual: 'Image URL (or Manual Entry)',
+      no: 'No',
+      yes: 'Yes'
     },
     dashboard: {
       subtitle: 'Quick glance and latest activity',
@@ -770,21 +887,38 @@ export const en = {
         returnStatus: 'Return Status Breakdown',
         pendingShipmentAge: 'Pending Shipment (Age)',
         weeklyReturns: 'Returns - Weekly Trend',
-        systemHealth: "System Health",
-        recentOrders: "Recent Orders",
-        orderFlow: "Order Flow",
-        salesTrend: "Sales Trend"
+        systemHealth: 'System Health',
+        recentOrders: 'Recent Orders',
+        orderFlow: 'Order Flow',
+        salesTrend: 'Sales Trend'
       },
       trend: 'Order trend for last {{days}} days',
-      recent: { title: 'Recent Orders' },
-      table: { order: 'Order', date: 'Date', amount: 'Amount', status: 'Status' }
+      recent: {
+        title: 'Recent Orders'
+      },
+      table: {
+        order: 'Order',
+        date: 'Date',
+        amount: 'Amount',
+        status: 'Status'
+      }
     },
     errors: {
       levelTitle: 'Level',
       envTitle: 'Environment',
       detailsTitle: 'Details',
-      labels: { stack: 'Stack', ua: 'UA', release: 'Release', env: 'Env' },
-      table: { date: 'Date', level: 'Level', message: 'Message', url: 'URL' }
+      labels: {
+        stack: 'Stack',
+        ua: 'UA',
+        release: 'Release',
+        env: 'Env'
+      },
+      table: {
+        date: 'Date',
+        level: 'Level',
+        message: 'Message',
+        url: 'URL'
+      }
     },
     toolbar: {
       searchPlaceholder: 'Search',
@@ -879,7 +1013,15 @@ export const en = {
         locationUpdated: 'Location updated',
         supplierUpdated: 'Supplier updated',
         stockAdjusted: 'Stock adjusted'
-      }
+      },
+      adjustStock: 'Adjust Stock',
+      criticalLevel: 'Critical Level',
+      editStock: 'Edit Stock',
+      movements: 'Movement History',
+      stockAlarms: 'Stock Alarms',
+      summary: 'Stock Summary',
+      supplier: 'Supplier',
+      warehouseLocation: 'Warehouse Location'
     },
     settings: {
       siteName: 'Site Name',
@@ -917,10 +1059,27 @@ export const en = {
         categoryTitle: 'Category',
         allCategories: 'All Categories'
       },
-      toggles: { featuredOnly: 'Only: Featured' },
-      statusLabels: { active: 'Active', inactive: 'Inactive', out_of_stock: 'Out of Stock' },
-      table: { image: 'Image', name: 'Name', sku: 'SKU', category: 'Category', status: 'Status', price: 'Price', stock: 'Stock', actions: 'Actions' },
-      export: { csvLabel: 'CSV (UTF-8 BOM)' },
+      toggles: {
+        featuredOnly: 'Only: Featured'
+      },
+      statusLabels: {
+        active: 'Active',
+        inactive: 'Inactive',
+        out_of_stock: 'Out of Stock'
+      },
+      table: {
+        image: 'Image',
+        name: 'Name',
+        sku: 'SKU',
+        category: 'Category',
+        status: 'Status',
+        price: 'Price',
+        stock: 'Stock',
+        actions: 'Actions'
+      },
+      export: {
+        csvLabel: 'CSV (UTF-8 BOM)'
+      },
       import: {
         button: 'Import (beta)',
         previewTitle: 'CSV Preview (first 10 rows) — Total: {{total}}',
@@ -939,8 +1098,18 @@ export const en = {
       edit: {
         editing: 'Editing',
         new: 'New Product',
-        tabs: { info: 'Info', pricing: 'Pricing', stock: 'Stock', images: 'Images', seo: 'SEO' },
-        actions: { new: 'New', save: 'Save', delete: 'Delete' },
+        tabs: {
+          info: 'Info',
+          pricing: 'Pricing',
+          stock: 'Stock',
+          images: 'Images',
+          seo: 'SEO'
+        },
+        actions: {
+          new: 'New',
+          save: 'Save',
+          delete: 'Delete'
+        },
         info: {
           name: 'Name',
           sku: 'SKU',
@@ -1001,6 +1170,13 @@ export const en = {
       confirm: {
         deleteImage: 'Do you want to delete the image?',
         deleteProduct: 'Do you want to delete this product?'
+      },
+      form: {
+        category: 'Category',
+        name: 'Product Name',
+        outOfStock: 'Out of Stock',
+        price: 'Price',
+        select: 'Select'
       }
     },
     ui: {
@@ -1050,7 +1226,14 @@ export const en = {
       },
       export: {
         csvLabel: 'CSV (with visible filters)',
-        headers: { date: 'Date', product: 'Product', sku: 'SKU', delta: 'Delta', reason: 'Reason', ref: 'Reference' }
+        headers: {
+          date: 'Date',
+          product: 'Product',
+          sku: 'SKU',
+          delta: 'Delta',
+          reason: 'Reason',
+          ref: 'Reference'
+        }
       },
       batchFilterPrefix: 'Filter: Batch',
       pageLabel: 'Page {{page}}',
@@ -1113,7 +1296,8 @@ export const en = {
           status: 'Status',
           conversationId: 'Conversation ID',
           amount: 'Amount',
-          products: 'See featured solutions'
+          products: 'See featured solutions',
+          created: 'Date'
         }
       },
       columns: {
@@ -1214,42 +1398,87 @@ export const en = {
       },
       board: {
         columns: {
-          new: "New / Pending",
-          prep: "Processing",
-          shipped: "Shipped",
-          done: "Delivered",
-          cancel: "Cancelled",
-          refund: "Refunded"
+          new: 'New / Pending',
+          prep: 'Processing',
+          shipped: 'Shipped',
+          done: 'Delivered',
+          cancel: 'Cancelled',
+          refund: 'Refunded'
         },
         stepper: {
-          received: "Received",
-          pa_id: "Paid",
-          prep: "Preparing",
-          shipped: "Shipped",
-          delivered: "Delivered"
+          received: 'Received',
+          pa_id: 'Paid',
+          prep: 'Preparing',
+          shipped: 'Shipped',
+          delivered: 'Delivered'
         },
         messages: {
-          cancelledOrRefunded: "Order is cancelled or refunded.",
-          updateSuccess: "Order status updated successfully.",
-          updateError: "Error occurred while updating status."
+          cancelledOrRefunded: 'Order is cancelled or refunded.',
+          updateSuccess: 'Order status updated successfully.',
+          updateError: 'Error occurred while updating status.'
         }
       }
     },
     webhooks: {
       title: 'Webhook Events',
-      tabs: { returns: 'Returns', shipping: 'Shipping Emails' },
-      search: { returns: 'event_id, order_id, _return_id, carrier, status_mapped', shipping: 'order_id, email, subject, provider' },
-      tip: { rowAction: 'Click a row to open details and reprocess menu.' },
-      returnsTable: { eventId: 'Event ID', order: 'Order', carrier: 'Carrier', statusMapped: 'Status (mapped)', received: 'Received' },
-      emailsTable: { order: 'Order', to: 'To', subject: 'Subject', provider: 'Provider', date: 'Date' }
+      tabs: {
+        returns: 'Returns',
+        shipping: 'Shipping Emails'
+      },
+      search: {
+        returns: 'event_id, order_id, _return_id, carrier, status_mapped',
+        shipping: 'order_id, email, subject, provider'
+      },
+      tip: {
+        rowAction: 'Click a row to open details and reprocess menu.'
+      },
+      returnsTable: {
+        eventId: 'Event ID',
+        order: 'Order',
+        carrier: 'Carrier',
+        statusMapped: 'Status (mapped)',
+        received: 'Received'
+      },
+      emailsTable: {
+        order: 'Order',
+        to: 'To',
+        subject: 'Subject',
+        provider: 'Provider',
+        date: 'Date'
+      },
+      noEmails: 'No Email Activity Found',
+      noEmailsDesc: 'There is currently no recorded shipping/cargo email activity.',
+      noReturns: 'No Return Activity Found',
+      noReturnsDesc: 'There is currently no recorded return webhook activity.',
+      subtitle: 'Monitor data flow between systems and automatic notifications.'
     },
     errorGroups: {
       searchPlaceholder: 'search signature/message',
-      filter: { statusAll: 'Status: All', assignedAll: 'Assigned: All', unassigned: '(unassigned)' },
-      export: { csvLabel: 'CSV (UTF-8 BOM)' },
-      table: { lastSeen: 'Last Seen', level: 'Level', signature: 'Signature', lastMsg: 'Last Message', count: 'Count', status: 'Status', assigned: 'Assigned', actions: 'Actions' },
-      bulk: { selected: 'Selected groups: {{count}}', statusTitle: 'Status:' },
-      assigned: { none: '(none)' },
+      filter: {
+        statusAll: 'Status: All',
+        assignedAll: 'Assigned: All',
+        unassigned: '(unassigned)'
+      },
+      export: {
+        csvLabel: 'CSV (UTF-8 BOM)'
+      },
+      table: {
+        lastSeen: 'Last Seen',
+        level: 'Level',
+        signature: 'Signature',
+        lastMsg: 'Last Message',
+        count: 'Count',
+        status: 'Status',
+        assigned: 'Assigned',
+        actions: 'Actions'
+      },
+      bulk: {
+        selected: 'Selected groups: {{count}}',
+        statusTitle: 'Status:'
+      },
+      assigned: {
+        none: '(none)'
+      },
       details: {
         latest: 'Latest Records',
         notes: 'Notes',
@@ -1269,11 +1498,31 @@ export const en = {
       export: {
         csvLabel: 'CSV (with visible filters)',
         xlsLabel: 'Excel (.xls — HTML table)',
-        headers: { order: 'Order', customer: 'Customer', email: 'Email', reason: 'Reason', status: 'Status', date: 'Date', amount: 'Amount' }
+        headers: {
+          order: 'Order',
+          customer: 'Customer',
+          email: 'Email',
+          reason: 'Reason',
+          status: 'Status',
+          date: 'Date',
+          amount: 'Amount'
+        }
       },
-      table: { order: 'Order', customer: 'Customer', reason: 'Reason', status: 'Status', date: 'Date', actions: 'Actions' },
-      empty: { filtered: 'No return requests match the filters.', none: 'No return requests yet.' },
-      actions: { markAs: 'Mark as {{status}}' },
+      table: {
+        order: 'Order',
+        customer: 'Customer',
+        reason: 'Reason',
+        status: 'Status',
+        date: 'Date',
+        actions: 'Actions'
+      },
+      empty: {
+        filtered: 'No return requests match the filters.',
+        none: 'No return requests yet.'
+      },
+      actions: {
+        markAs: 'Mark as {{status}}'
+      },
       toasts: {
         returnsLoadFailed: 'Could not load return requests',
         statusUpdated: 'Return status updated to "{{status}}"',
@@ -1293,12 +1542,36 @@ export const en = {
     },
     users: {
       subtitle: 'Manage system users and their roles.',
-      tabs: { admins: 'Admin Users ({{count}})', all: 'All Users ({{count}})' },
+      tabs: {
+        admins: 'Admin Users ({{count}})',
+        all: 'All Users ({{count}})'
+      },
       searchPlaceholder: 'Search by email or name',
-      table: { user: 'User', company: 'Company & B2B', role: 'Role', created: 'Created', actions: 'Actions' },
-      empty: { filtered: 'No users match your search.', admins: 'No admin users yet.', all: 'User list is empty.' },
-      actions: { superadmin: 'Superadmin', admin: 'Admin', moderator: 'Mod', user: 'User' },
-      actionTitles: { superadmin: 'Make superadmin', admin: 'Make admin', moderator: 'Make moderator', user: 'Make user', cannotDemoteSelf: "You can't demote yourself" },
+      table: {
+        user: 'User',
+        company: 'Company & B2B',
+        role: 'Role',
+        created: 'Created',
+        actions: 'Actions'
+      },
+      empty: {
+        filtered: 'No users match your search.',
+        admins: 'No admin users yet.',
+        all: 'User list is empty.'
+      },
+      actions: {
+        superadmin: 'Superadmin',
+        admin: 'Admin',
+        moderator: 'Mod',
+        user: 'User'
+      },
+      actionTitles: {
+        superadmin: 'Make superadmin',
+        admin: 'Make admin',
+        moderator: 'Make moderator',
+        user: 'Make user',
+        cannotDemoteSelf: 'You can\'t demote yourself'
+      },
       toasts: {
         adminsLoadFailed: 'Failed to load admin users',
         allLoadFailed: 'Failed to load users',
@@ -1313,33 +1586,86 @@ export const en = {
           admin: 'Admin: Access to operations panel (inventory, returns, shipping, users)',
           moderator: 'Moderator: Limited admin privilege (inventory and returns)',
           user: 'User: Regular user (only manages own account)'
-        }
+        },
+        subtitle: 'Control the privilege levels of roles for system security.'
+      },
+      permissionsError: 'You do not have permission to change user roles.',
+      roles: {
+        admin: 'Privilege for product, order and content management.',
+        sales: 'Privilege for order, shipping, return and coupon management.',
+        superadmin: 'Full access to all system settings and role management.',
+        viewer: 'Privilege to view all modules read-only (view-only).',
+        warehouse: 'Privilege for stock management and inventory movements.'
       }
     },
     logistics: {
-      title: "Bulk Shipping Board",
-      subtitle: "Quickly enter tracking numbers for orders in 'confirmed' or 'processing' status.",
-      searchPlaceholder: "Search order no or customer...",
-      applyToAll: "Apply to All",
-      shipOrders: "Ship Selected",
-      updating: "Updating...",
-      noCarrierSelected: "Please select a carrier.",
+      title: 'Bulk Shipping Board',
+      subtitle: 'Quickly enter tracking numbers for orders in \'confirmed\' or \'processing\' status.',
+      searchPlaceholder: 'Search order no or customer...',
+      applyToAll: 'Apply to All',
+      shipOrders: 'Ship Selected',
+      updating: 'Updating...',
+      noCarrierSelected: 'Please select a carrier.',
       table: {
-        order: "Order",
-        customer: "Customer",
-        date: "Date",
-        carrier: "Carrier",
-        tracking: "Tracking Number",
-        status: "Status"
+        order: 'Order',
+        customer: 'Customer',
+        date: 'Date',
+        carrier: 'Carrier',
+        tracking: 'Tracking Number',
+        status: 'Status'
       },
       toasts: {
-        loadFailed: "Pending orders could not be loaded",
-        appliedToAll: "Selected carrier applied to all visible rows.",
-        noNewTracking: "No new shipping info found to save.",
-        bulkUpdateFailed: "Shipping update failed for {{count}} orders.",
-        bulkUpdateSuccess: "{{count}} orders successfully marked as Shipped!",
-        criticalError: "A critical error occurred during bulk update."
+        loadFailed: 'Pending orders could not be loaded',
+        appliedToAll: 'Selected carrier applied to all visible rows.',
+        noNewTracking: 'No new shipping info found to save.',
+        bulkUpdateFailed: 'Shipping update failed for {{count}} orders.',
+        bulkUpdateSuccess: '{{count}} orders successfully marked as Shipped!',
+        criticalError: 'A critical error occurred during bulk update.'
       }
+    },
+    a11y: {
+      close: 'Close',
+      collapse: 'Collapse',
+      copy: 'Copy',
+      delete: 'Delete',
+      download: 'Download',
+      edit: 'Edit',
+      expand: 'Expand',
+      export: 'Export',
+      filter: 'Filter',
+      import: 'Import',
+      menu: 'Menu',
+      next: 'Next',
+      prev: 'Previous',
+      refresh: 'Refresh',
+      save: 'Save',
+      search: 'Search',
+      settings: 'Settings',
+      upload: 'Upload File'
+    },
+    authority: {
+      labelTraditional: 'Label (e.g. Traditional)',
+      labelVenthub: 'Label (e.g. VentHub Difference)',
+      leftSideEski: 'Left Side (Old)',
+      rightSideYeni: 'Right Side (New)'
+    },
+    categories: {
+      clickToUpload: 'Click to upload',
+      imageDesc: 'Category images are used in homepage and category lists.',
+      imageLabel: 'Category Image',
+      metric1Label: 'Metric 1 Label',
+      metric1LabelPlaceholder: 'e.g. Capacity',
+      metric1Value: 'Metric 1 Value',
+      metric1ValuePlaceholder: 'e.g. 20,000 m³/h',
+      metric2Label: 'Metric 2 Label',
+      metric2LabelPlaceholder: 'e.g. Power',
+      metric2Value: 'Metric 2 Value',
+      metric2ValuePlaceholder: 'e.g. 1.5 kW',
+      quickMetrics: 'Quick Metrics',
+      quickMetricsDesc: 'These fields are displayed as short technical info on category cards.',
+      resolutionLabel: 'Recommended resolution:',
+      supportedFormatsLabel: 'Supported formats:',
+      uploading: 'Uploading...'
     }
   },
   footer: {
@@ -1349,7 +1675,16 @@ export const en = {
     workingHours: 'Working Hours',
     weekdays: 'Monday - Friday',
     saturday: 'Saturday',
-    rights: 'All rights reserved.'
+    rights: 'All rights reserved.',
+    address: 'Teknokent Mah. Teknopark Blv.\nNo: 1/4A 34906 Pendik/Istanbul',
+    email: 'info@venthub.com.tr',
+    phone: '+90 (216) 123-45-67',
+    social: {
+      facebook: 'Facebook',
+      instagram: 'Instagram',
+      linkedin: 'LinkedIn',
+      twitter: 'Twitter'
+    }
   },
   contactPage: {
     title: 'Contact',
@@ -1367,7 +1702,19 @@ export const en = {
     emailPh: 'Email',
     subjectPh: 'Subject',
     messagePh: 'Your message / Project details',
-    submit: 'Send'
+    submit: 'Send',
+    address: 'Address',
+    businessInquiry: 'Business Partnership & Project Proposals',
+    email: 'Your Email Address',
+    error: 'An error occurred while sending the message. Please try again.',
+    message: 'Your Message',
+    name: 'Your Full Name',
+    officialDistributor: 'Official Distributor & Engineering Partner',
+    phone: 'Your Phone Number',
+    subject: 'Subject',
+    submitting: 'Submitting...',
+    success: 'Your message has been successfully delivered. We will contact you as soon as possible.',
+    workingHours: 'Working Hours'
   },
   aboutPage: {
     title: 'About VentHub',
@@ -1380,7 +1727,11 @@ export const en = {
       premiumBrands: 'Premium Brands',
       productTypes: 'Product Types',
       deliveryTarget: 'Delivery Target',
-      yearsExperience: 'Years experience'
+      yearsExperience: 'Years experience',
+      brands: 'Global Brands',
+      clients: 'Happy Customers',
+      projects: 'Completed Projects',
+      years: 'Years of Experience'
     },
     values: {
       itemsTitle: 'Values That Define Us',
@@ -1401,10 +1752,22 @@ export const en = {
     whyTitle: 'Why VentHub?',
     whySubtitle: 'We work to be worthy of your trust',
     trustBadges: {
-      premium: { label: 'Premium Brands', sublabel: 'Global Manufacturers' },
-      ce: { label: 'CE Certified Products', sublabel: 'European Standards' },
-      original: { label: 'Original Products', sublabel: 'Quality Guarantee' },
-      reliable: { label: 'Reliable Platform', sublabel: 'Professional Service' }
+      premium: {
+        label: 'Premium Brands',
+        sublabel: 'Global Manufacturers'
+      },
+      ce: {
+        label: 'CE Certified Products',
+        sublabel: 'European Standards'
+      },
+      original: {
+        label: 'Original Products',
+        sublabel: 'Quality Guarantee'
+      },
+      reliable: {
+        label: 'Reliable Platform',
+        sublabel: 'Professional Service'
+      }
     },
     bullets: {
       bullet1: 'Engineering-focused selection support and proper product guidance',
@@ -1443,7 +1806,11 @@ export const en = {
     ctaTitleItalic: 'Your Engineering Partner?',
     ctaContact: 'Contact Us',
     ctaExplore: 'Explore Products',
-    seoDescription: 'VentHub: Premium HVAC distributor of Turkey. 15 years of experience and engineering-oriented ventilation solutions.'
+    seoDescription: 'VentHub: Premium HVAC distributor of Turkey. 15 years of experience and engineering-oriented ventilation solutions.',
+    history: 'Our History',
+    mission: 'Our Mission',
+    team: 'Our Team',
+    vision: 'Our Vision'
   },
   category: {
     loading: 'Loading category... ',
@@ -1545,10 +1912,10 @@ export const en = {
     shareCopied: 'Link copied!',
     variantDetails: 'Variant Details',
     messages: {
-      pdfStarted: 'Generating PDF...',
+      pdfStarted: 'Generating PDF...'
     },
     errors: {
-      pdfFailed: 'Failed to generate PDF.',
+      pdfFailed: 'Failed to generate PDF.'
     },
     labels: {
       productFeatures: 'Product Features',
@@ -1605,9 +1972,9 @@ export const en = {
       download: 'Download',
       downloadCatalog: 'Download Catalog',
       downloadBrochure: 'Download Brochure',
-      liveDataNotice: "ℹ️ Data is updated in real-time",
-      interactive3D: "3D VIEW",
-      addToProject: "Add to Project",
+      liveDataNotice: 'ℹ️ Data is updated in real-time',
+      interactive3D: '3D VIEW',
+      addToProject: 'Add to Project',
       removeFromWishlist: 'Remove from Favorites',
       addToWishlist: 'Add to Favorites',
       favorite: 'Favorite',
@@ -1788,7 +2155,11 @@ export const en = {
     shippedAt: 'Shipped At',
     deliveredAt: 'Delivered At',
     noShippingInfo: 'No shipping info available.',
-    invoicePdf: 'Proforma (PDF)'
+    invoicePdf: 'Proforma (PDF)',
+    empty: 'You have no orders yet.',
+    orderDate: 'Order Date',
+    orderNo: 'Order No',
+    orderTotal: 'Total Amount'
   },
   auth: {
     back: 'Back',
@@ -1803,7 +2174,7 @@ export const en = {
     submitting: 'Submitting...',
     login: 'Sign In',
     rememberMe: 'Remember me',
-    noAccount: "Don't have an account?",
+    noAccount: 'Don\'t have an account?',
     register: 'Sign Up',
     validEmailPassRequired: 'Email and password are required',
     required: 'is required',
@@ -1889,7 +2260,12 @@ export const en = {
     formPreparing: 'Preparing form...',
     paymentSuccess: '🎉 Payment completed successfully!',
     paymentError: 'An error occurred during payment',
-    steps: { step1: 'Personal Info', step2: 'Address Info', step3: 'Review', step4: 'Payment' },
+    steps: {
+      step1: 'Personal Info',
+      step2: 'Address Info',
+      step3: 'Review',
+      step4: 'Payment'
+    },
     overlay: {
       dialogLabel: 'Starting secure payment',
       header: 'Starting secure payment…',
@@ -1902,7 +2278,7 @@ export const en = {
       dontClose: 'Do not close this page or go back during this process. It may take a few seconds.'
     },
     help: {
-      smsTitle: "Didn't receive the code?",
+      smsTitle: 'Didn\'t receive the code?',
       tip1: 'Wait 30–60s and try again (your bank may send SMS with delay).',
       tip2: 'If no signal/airplane mode issues, try a different card/device.',
       tip3: 'Verify your phone number and contact your bank.'
@@ -2002,7 +2378,8 @@ export const en = {
       orderConfirmRequired: 'Please confirm the order',
       paymentInit: 'An error occurred while starting payment',
       validation: 'Some form fields are missing or invalid. Please check.',
-      database: 'Database error. Please try again.'
+      database: 'Database error. Please try again.',
+      paymentError: 'An error occurred during payment'
     }
   },
   payment: {
@@ -2017,7 +2394,6 @@ export const en = {
     itemsCountLabel: 'Items',
     securedBy3d: 'Secured by 3D',
     viewOrderDetails: 'View Order Details',
-
     failedGeneric: 'Payment could not be completed',
     failedToast: 'Payment failed: {{msg}}',
     verifyError: 'Verification error',
@@ -2079,7 +2455,12 @@ export const en = {
     descFallback: 'Product description will be added soon.'
   },
   support: {
-    links: { faq: 'FAQ', returns: 'Returns & Exchanges', shipping: 'Shipping & Delivery', warranty: 'Warranty & Service' },
+    links: {
+      faq: 'FAQ',
+      returns: 'Returns & Exchanges',
+      shipping: 'Shipping & Delivery',
+      warranty: 'Warranty & Service'
+    },
     home: {
       subtitle: 'Quickly find the information you need.',
       faqDesc: 'Orders, payment, installation and more',
@@ -2127,7 +2508,12 @@ export const en = {
       billingAddress: 'Billing Address',
       notSetShipping: 'Default shipping address is not set.',
       notSetBilling: 'Default billing address is not set.',
-      manageAddresses: 'Manage addresses'
+      manageAddresses: 'Manage addresses',
+      activeOrders: 'Active Orders',
+      completedOrders: 'Completed',
+      greeting: 'Hello,',
+      totalVolume: 'Total Volume',
+      welcomeMessage: 'Welcome to your B2B portal. You can manage your operations here.'
     },
     addresses: {
       title: 'My Addresses',
@@ -2155,7 +2541,6 @@ export const en = {
       makeDefault: 'Make Default',
       unregistered: 'Unregistered Title',
       cancel: 'Cancel',
-
       submit: {
         update: 'Update',
         add: 'Add'
@@ -2210,7 +2595,6 @@ export const en = {
       toastSuccess: 'Profile updated',
       toastError: 'Error during update'
     },
-
     security: {
       title: 'Change Password',
       currentLabel: 'Current password',
@@ -2223,7 +2607,32 @@ export const en = {
       pwned: 'This password has appeared in data breaches. Please choose a different, stronger password.',
       wrongCurrent: 'Current password is incorrect',
       updated: 'Your password has been updated',
-      updateError: 'An error occurred while updating password'
+      updateError: 'An error occurred while updating password',
+      connect: 'Connect',
+      connected: 'Connected',
+      disconnect: 'Disconnect',
+      disconnected: 'Disconnected',
+      emailPassword: 'Email & Password',
+      linkedAccountsNote: 'Different login methods with the same email may create separate accounts. You can link your Google account to your current account here to manage your accounts in a single center.',
+      linkedAccountsSubtitle: 'You can link your social accounts for one-click login.',
+      linkedAccountsTitle: 'Linked Login Methods',
+      oneClickLogin: 'One-click login',
+      rulesNotMet: 'Your password must meet all security rules',
+      saving: 'Updating...',
+      standardMethod: 'Standard login method',
+      toasts: {
+        cannotRemoveLast: 'You cannot remove the last login method',
+        googleIdNotFound: 'Google ID not found',
+        googleLinkFailed: 'Google linking failed',
+        googleLinkStarted: 'Google account linking process started',
+        googleUnlinkFailed: 'Failed to unlink Google account',
+        googleUnlinked: 'Google account unlinked',
+        unlinkUnsupported: 'unlinkIdentity API is not supported'
+      }
+    },
+    shipments: {
+      goToOrders: 'Go to My Orders',
+      preparingLabel: 'Prepared'
     }
   },
   returns: {
@@ -2254,7 +2663,6 @@ export const en = {
       cancelled: 'Cancelled'
     }
   },
-
   lead: {
     message: 'Message',
     title: 'Technical Offer Request',
@@ -2352,225 +2760,333 @@ export const en = {
       title: 'Engineering and Trust-Driven Approach',
       subtitle: 'We add value to your projects with industry-leading brands and our expert engineering team.',
       items: {
-        brands: { eyebrow: 'Competence', title: 'Global Brands', description: 'Official partner of the world\'s most reliable HVAC manufacturers.' },
-        guidance: { eyebrow: 'Expertise', title: 'Project Support', description: 'Supporting you at every step from specification to commissioning.' },
-        delivery: { eyebrow: 'Speed', title: 'Fast Delivery', description: 'On-time delivery across Turkey with our extensive stock network.' },
-        support: { eyebrow: 'Continuity', title: 'After-Sales', description: 'Uninterrupted operation with technical support and spare parts warranty.' }
-      }
-      },
-
-      calculators: {
-      airCurtain: {
-        title: 'Air Curtain Calculator',
-        description: 'Ideal air curtain selection based on door dimensions and usage conditions',
-        infoText: 'This tool performs pre-sizing in accordance with engineering standards (ISO 27327-1). It calculates required airflow, nozzle velocity, and motor power.',
-        steps: {
-          dimensions: 'Door Dimensions',
-          dimensionsDesc: 'Width and height',
-          application: 'Application',
-          applicationDesc: 'Purpose of use',
-          conditions: 'Conditions',
-          conditionsDesc: 'Wind and traffic',
-          results: 'Results',
-          resultsDesc: 'Calculation results'
+        brands: {
+          eyebrow: 'Competence',
+          title: 'Global Brands',
+          description: 'Official partner of the world\'s most reliable HVAC manufacturers.'
         },
-        form: {
-          doorWidth: 'Door Width',
-          doorHeight: 'Door Height',
-          doorWidthTooltip: 'Internal opening width of the door (0.5 - 10 m)',
-          doorHeightTooltip: 'Internal opening height of the door (1.5 - 6 m)',
-          applicationLabel: 'Select Application',
-          applicationPurpose: 'Select the purpose of the air curtain',
-          environmentalConditions: 'Environmental Conditions',
-          windStatus: 'Wind Status',
-          windTooltip: 'Expected wind intensity outside the door',
-          trafficIntensity: 'Traffic Intensity',
-          trafficTooltip: 'Estimated hourly passage count',
-          inputSummary: 'Input Summary'
+        guidance: {
+          eyebrow: 'Expertise',
+          title: 'Project Support',
+          description: 'Supporting you at every step from specification to commissioning.'
         },
-        applications: {
-          comfort: { label: 'Comfort / Energy', desc: 'General commercial areas, shops', info: 'Provides energy savings for general commercial areas. Nozzle speed: 8-12 m/s' },
-          insect: { label: 'Insect Control', desc: 'Food businesses, restaurants', info: 'Prevents insect entry for food businesses and restaurants. Nozzle speed: 12-15 m/s' },
-          coldRoom: { label: 'Cold Room', desc: 'Cold storage, refrigerated', info: 'Minimizes temperature loss in cold storage rooms. Nozzle speed: 15-18 m/s' }
+        delivery: {
+          eyebrow: 'Speed',
+          title: 'Fast Delivery',
+          description: 'On-time delivery across Turkey with our extensive stock network.'
         },
-        conditions: {
-          wind: { none: 'None', light: 'Light', moderate: 'Moderate', strong: 'Strong' },
-          traffic: { low: 'Low', medium: 'Medium', high: 'High' }
-        },
-        results: {
-          title: 'Calculation Results',
-          subtitle: 'Recommended air curtain _specifications',
-          gridTitle: 'Calculated Values',
-          airflow: 'Required Airflow',
-          airflowDesc: 'Total flow required for an effective air barrier',
-          velocity: 'Nozzle Velocity',
-          velocityDesc: 'Air speed at the air curtain outlet',
-          floorVelocity: 'Floor Velocity (Estimated)',
-          floorVelocityDesc: 'Expected air speed at floor level',
-          power: 'Recommended Motor Power',
-          powerDesc: 'Minimum motor power requirement',
-          nozzleWidth: 'Nozzle Width',
-          nozzleHeight: 'Nozzle Height',
-          efficiency: 'Efficiency',
-          efficiencyOptimal: 'Optimal',
-          efficiencyAcceptable: 'Acceptable',
-          efficiencyWarning: 'Borderline',
-          efficiencyOptimalDesc: 'Calculated parameters will provide ideal performance',
-          efficiencyAcceptableDesc: 'Performance is acceptable, improvement can be considered if needed',
-          efficiencyWarningDesc: 'A more powerful model or additional measures may be required'
-        },
-        diagram: {
-          unit: 'Air Curtain'
+        support: {
+          eyebrow: 'Continuity',
+          title: 'After-Sales',
+          description: 'Uninterrupted operation with technical support and spare parts warranty.'
         }
-        },
-        duct: {
-        title: 'Duct Pressure Loss Calculator',
-        description: 'Air duct velocity calculation and pressure drop estimation',
-        infoText: 'Calculates air velocity and estimated pressure loss based on flow rate and duct dimensions.',
-        form: {
-          shape: 'Duct Type',
-          round: 'Circular',
-          roundDesc: 'Spiral or welded pipe',
-          rectangular: 'Rectangular',
-          rectangularDesc: 'Angled duct',
-          material: 'Material',
-          steel: 'Galvanized Steel',
-          pvc: 'PVC',
-          flex: 'Flex Duct',
-          airflow: 'Airflow',
-          airflowTooltip: 'Amount of air that needs to pass through the duct',
-          diameter: 'Duct Diameter',
-          diameterTooltip: 'Inner diameter (50-2000 mm)',
-          width: 'Width (a)',
-          height: 'Height (b)',
-          length: 'Duct Length',
-          lengthTooltip: 'Total duct length'
-        },
-        results: {
-          velocity: 'Air Velocity',
-          specificLoss: 'Pressure Loss (Specific)',
-          totalLoss: 'Total Pressure Loss',
-          equivDiameter: 'Equivalent Diameter',
-          equivDiameterDesc: 'Circular duct equivalent'
-        }
-        },
-        hrv: {
-        title: 'HRV Energy Saving Calculator',
-        description: 'Heat recovery unit efficiency and energy saving calculation',
-        infoText: 'Calculates annual energy saving potential of heat recovery units (HRV) or enthalpic recovery units (ERV).',
-        form: {
-          type: 'Device Type',
-          hrv: 'HRV (Heat Recovery)',
-          hrvDesc: 'Heat recovery only',
-          erv: 'ERV (Energy Recovery)',
-          ervDesc: 'Heat + Moisture recovery',
-          climate: 'Climate Zone',
-          cold: 'Cold',
-          temperate: 'Temperate',
-          hot: 'Hot',
-          usage: 'Space Type',
-          office: 'Office',
-          commercial: 'Commercial',
-          occupancy: 'Number of People',
-          workingHours: 'Daily Operation',
-          electricityPrice: 'Electricity Unit Price'
-        },
-        results: {
-          heatingGain: 'Heating Gain',
-          coolingGain: 'Cooling Gain',
-          co2Reduction: 'CO₂ Reduction',
-          co2Desc: 'Annual carbon emission reduction',
-          payback: 'Payback Period',
-          paybackDesc: 'Estimated return on investment'
-        }
-        },
-        jetFan: {
-        title: 'Jet Fan Calculator',
-        description: 'Parking and tunnel jet fan thrust and ventilation calculation',
-        infoText: 'Calculates the required number of jet fans, thrust force, and air exchange amount in enclosed parking lots or tunnels.',
-        form: {
-          appType: 'Application Area',
-          parking: 'Parking',
-          parkingDesc: 'Enclosed parking ventilation',
-          tunnel: 'Tunnel',
-          tunnelDesc: 'Road or subway tunnel',
-          mode: 'Ventilation Mode',
-          normal: 'Normal',
-          normalDesc: 'Daily ventilation',
-          smoke: 'Smoke Exhaust',
-          smokeDesc: 'Fire scenario',
-          capacity: 'Vehicle Capacity',
-          width: 'Width',
-          height: 'Height'
-        },
-        results: {
-          ach: 'Air Change Rate',
-          totalThrust: 'Total Thrust Force',
-          count: 'Number of Jet Fans'
-        }
-        }
-        },
-
-        categorySilentFan: {
-      problem: {
-        eyebrow: 'SOUND AND COMFORT',
-        title: 'End Noise That Disrupts Your Peace',
-        subtitle: 'Standard duct fans don\'t just move air; they move noise into your living spaces. Discover the new standard of silence with Vortice Lineo Quiet.',
-        painPoints: [
-          { title: 'Acoustic Pollution', description: 'The hum created by conventional fans makes it difficult to focus and reduces comfort.' },
-          { title: 'Low Efficiency', description: 'Noisy fans are often aerodynamically inefficient and consume more energy.' },
-          { title: 'Vibration Issues', description: 'Poorly isolated devices cause vibration and secondary noise on mounting surfaces.' },
-          { title: 'Disrupted Focus', description: 'Constant noise can reduce productivity in libraries and offices by 20%.' }
-        ],
-        visual: {
-          without: 'With Standard Fan',
-          with: 'With Lineo Quiet',
-          withoutPoints: ['High decibel levels', 'Mechanical vibration', 'Turbulent airflow', 'Energy loss'],
-          withPoints: ['Whisper quiet', '60% energy saving', 'Laminar airflow', 'Vibration-free operation']
-        }
-      },
-      howItWorks: {
-        eyebrow: 'TECHNOLOGY',
-        title: 'Engineering Behind Silent Power',
-        subtitle: 'Vortice Lineo Quiet offers whisper-level performance with its aerodynamically optimized housing and sound-absorbing layers.',
-        steps: [
-          { title: 'Sound-Absorbing Housing', description: 'Special composite outer body traps motor noise inside.' },
-          { title: 'Laminar Flow', description: 'Air guiding vanes reduce turbulence and cut noise at the source.' },
-          { title: 'Dynamic Balance', description: 'High-precision fan impeller ensures vibration-free and silent circulation.' }
-        ]
-      },
-      comparison: {
-        title: 'Why Lineo Quiet?',
-        standard: 'Standard Fans',
-        quiet: 'Vortice Lineo Quiet',
-        features: [
-          { label: 'Noise Level', standard: '55-65 dB(A)', quiet: '25-30 dB(A)' },
-          { label: 'Energy Consumption', standard: 'High (AC Motor)', quiet: '60% Saving (ES/EC Motor)' },
-          { label: 'Air Quality', standard: 'Turbulent Flow', quiet: 'Laminar and Continuous' },
-          { label: 'Mounting', standard: 'Complex and Rigid', quiet: 'Fast and Vibration Isolated' }
-        ]
-      },
-      faq: {
-        title: 'Frequently Asked Questions',
-        items: [
-          { q: 'How quiet is it really?', a: 'Lineo Quiet is close to whisper sound (approx. 25 dB) at low speed. This is less than half of a normal conversation.' },
-          { q: 'Is it hard to install?', a: 'No, thanks to quick-mount clamps, you don\'t need to disconnect the device from the duct for maintenance or installation.' },
-          { q: 'Which areas is it suitable for?', a: 'Ideal for anywhere silence is critical, such as libraries, offices, bedrooms, and hotel rooms.' }
-        ]
-      },
-      brand: {
-        eyebrow: 'ENGINEERING HERITAGE',
-        title: 'Italian Silence: The Vortice Legend',
-        description: 'Directing the ventilation world since 1954, Vortice represents the pinnacle in the silent duct fan category with the Lineo Quiet series.',
-        badges: ['Authorized Distributor', '2 Year Warranty'],
-        stats: [
-          { label: 'Years Experience', value: '70+' },
-          { label: 'Countries', value: '90+' },
-          { label: "Compasso d'Oro", value: '3x' },
-          { label: 'Europe', value: '#1' }
-        ]
       }
     }
+  },
+  calculators: {
+    airCurtain: {
+      title: 'Air Curtain Calculator',
+      description: 'Ideal air curtain selection based on door dimensions and usage conditions',
+      infoText: 'This tool performs pre-sizing in accordance with engineering standards (ISO 27327-1). It calculates required airflow, nozzle velocity, and motor power.',
+      steps: {
+        dimensions: 'Door Dimensions',
+        dimensionsDesc: 'Width and height',
+        application: 'Application',
+        applicationDesc: 'Purpose of use',
+        conditions: 'Conditions',
+        conditionsDesc: 'Wind and traffic',
+        results: 'Results',
+        resultsDesc: 'Calculation results'
+      },
+      form: {
+        doorWidth: 'Door Width',
+        doorHeight: 'Door Height',
+        doorWidthTooltip: 'Internal opening width of the door (0.5 - 10 m)',
+        doorHeightTooltip: 'Internal opening height of the door (1.5 - 6 m)',
+        applicationLabel: 'Select Application',
+        applicationPurpose: 'Select the purpose of the air curtain',
+        environmentalConditions: 'Environmental Conditions',
+        windStatus: 'Wind Status',
+        windTooltip: 'Expected wind intensity outside the door',
+        trafficIntensity: 'Traffic Intensity',
+        trafficTooltip: 'Estimated hourly passage count',
+        inputSummary: 'Input Summary'
+      },
+      applications: {
+        comfort: {
+          label: 'Comfort / Energy',
+          desc: 'General commercial areas, shops',
+          info: 'Provides energy savings for general commercial areas. Nozzle speed: 8-12 m/s'
+        },
+        insect: {
+          label: 'Insect Control',
+          desc: 'Food businesses, restaurants',
+          info: 'Prevents insect entry for food businesses and restaurants. Nozzle speed: 12-15 m/s'
+        },
+        coldRoom: {
+          label: 'Cold Room',
+          desc: 'Cold storage, refrigerated',
+          info: 'Minimizes temperature loss in cold storage rooms. Nozzle speed: 15-18 m/s'
+        }
+      },
+      conditions: {
+        wind: {
+          none: 'None',
+          light: 'Light',
+          moderate: 'Moderate',
+          strong: 'Strong'
+        },
+        traffic: {
+          low: 'Low',
+          medium: 'Medium',
+          high: 'High'
+        }
+      },
+      results: {
+        title: 'Calculation Results',
+        subtitle: 'Recommended air curtain _specifications',
+        gridTitle: 'Calculated Values',
+        airflow: 'Required Airflow',
+        airflowDesc: 'Total flow required for an effective air barrier',
+        velocity: 'Nozzle Velocity',
+        velocityDesc: 'Air speed at the air curtain outlet',
+        floorVelocity: 'Floor Velocity (Estimated)',
+        floorVelocityDesc: 'Expected air speed at floor level',
+        power: 'Recommended Motor Power',
+        powerDesc: 'Minimum motor power requirement',
+        nozzleWidth: 'Nozzle Width',
+        nozzleHeight: 'Nozzle Height',
+        efficiency: 'Efficiency',
+        efficiencyOptimal: 'Optimal',
+        efficiencyAcceptable: 'Acceptable',
+        efficiencyWarning: 'Borderline',
+        efficiencyOptimalDesc: 'Calculated parameters will provide ideal performance',
+        efficiencyAcceptableDesc: 'Performance is acceptable, improvement can be considered if needed',
+        efficiencyWarningDesc: 'A more powerful model or additional measures may be required'
+      },
+      diagram: {
+        unit: 'Air Curtain'
+      }
+    },
+    duct: {
+      title: 'Duct Pressure Loss Calculator',
+      description: 'Air duct velocity calculation and pressure drop estimation',
+      infoText: 'Calculates air velocity and estimated pressure loss based on flow rate and duct dimensions.',
+      form: {
+        shape: 'Duct Type',
+        round: 'Circular',
+        roundDesc: 'Spiral or welded pipe',
+        rectangular: 'Rectangular',
+        rectangularDesc: 'Angled duct',
+        material: 'Material',
+        steel: 'Galvanized Steel',
+        pvc: 'PVC',
+        flex: 'Flex Duct',
+        airflow: 'Airflow',
+        airflowTooltip: 'Amount of air that needs to pass through the duct',
+        diameter: 'Duct Diameter',
+        diameterTooltip: 'Inner diameter (50-2000 mm)',
+        width: 'Width (a)',
+        height: 'Height (b)',
+        length: 'Duct Length',
+        lengthTooltip: 'Total duct length'
+      },
+      results: {
+        velocity: 'Air Velocity',
+        specificLoss: 'Pressure Loss (Specific)',
+        totalLoss: 'Total Pressure Loss',
+        equivDiameter: 'Equivalent Diameter',
+        equivDiameterDesc: 'Circular duct equivalent'
+      }
+    },
+    hrv: {
+      title: 'HRV Energy Saving Calculator',
+      description: 'Heat recovery unit efficiency and energy saving calculation',
+      infoText: 'Calculates annual energy saving potential of heat recovery units (HRV) or enthalpic recovery units (ERV).',
+      form: {
+        type: 'Device Type',
+        hrv: 'HRV (Heat Recovery)',
+        hrvDesc: 'Heat recovery only',
+        erv: 'ERV (Energy Recovery)',
+        ervDesc: 'Heat + Moisture recovery',
+        climate: 'Climate Zone',
+        cold: 'Cold',
+        temperate: 'Temperate',
+        hot: 'Hot',
+        usage: 'Space Type',
+        office: 'Office',
+        commercial: 'Commercial',
+        occupancy: 'Number of People',
+        workingHours: 'Daily Operation',
+        electricityPrice: 'Electricity Unit Price'
+      },
+      results: {
+        heatingGain: 'Heating Gain',
+        coolingGain: 'Cooling Gain',
+        co2Reduction: 'CO₂ Reduction',
+        co2Desc: 'Annual carbon emission reduction',
+        payback: 'Payback Period',
+        paybackDesc: 'Estimated return on investment'
+      }
+    },
+    jetFan: {
+      title: 'Jet Fan Calculator',
+      description: 'Parking and tunnel jet fan thrust and ventilation calculation',
+      infoText: 'Calculates the required number of jet fans, thrust force, and air exchange amount in enclosed parking lots or tunnels.',
+      form: {
+        appType: 'Application Area',
+        parking: 'Parking',
+        parkingDesc: 'Enclosed parking ventilation',
+        tunnel: 'Tunnel',
+        tunnelDesc: 'Road or subway tunnel',
+        mode: 'Ventilation Mode',
+        normal: 'Normal',
+        normalDesc: 'Daily ventilation',
+        smoke: 'Smoke Exhaust',
+        smokeDesc: 'Fire scenario',
+        capacity: 'Vehicle Capacity',
+        width: 'Width',
+        height: 'Height'
+      },
+      results: {
+        ach: 'Air Change Rate',
+        totalThrust: 'Total Thrust Force',
+        count: 'Number of Jet Fans'
+      }
+    }
+  },
+  categorySilentFan: {
+    problem: {
+      eyebrow: 'SOUND AND COMFORT',
+      title: 'End Noise That Disrupts Your Peace',
+      subtitle: 'Standard duct fans don\'t just move air; they move noise into your living spaces. Discover the new standard of silence with Vortice Lineo Quiet.',
+      painPoints: [
+        {
+          title: 'Acoustic Pollution',
+          description: 'The hum created by conventional fans makes it difficult to focus and reduces comfort.'
+        },
+        {
+          title: 'Low Efficiency',
+          description: 'Noisy fans are often aerodynamically inefficient and consume more energy.'
+        },
+        {
+          title: 'Vibration Issues',
+          description: 'Poorly isolated devices cause vibration and secondary noise on mounting surfaces.'
+        },
+        {
+          title: 'Disrupted Focus',
+          description: 'Constant noise can reduce productivity in libraries and offices by 20%.'
+        }
+      ],
+      visual: {
+        without: 'With Standard Fan',
+        with: 'With Lineo Quiet',
+        withoutPoints: ['High decibel levels', 'Mechanical vibration', 'Turbulent airflow', 'Energy loss'],
+        withPoints: ['Whisper quiet', '60% energy saving', 'Laminar airflow', 'Vibration-free operation']
+      }
+    },
+    howItWorks: {
+      eyebrow: 'TECHNOLOGY',
+      title: 'Engineering Behind Silent Power',
+      subtitle: 'Vortice Lineo Quiet offers whisper-level performance with its aerodynamically optimized housing and sound-absorbing layers.',
+      steps: [
+        {
+          title: 'Sound-Absorbing Housing',
+          description: 'Special composite outer body traps motor noise inside.'
+        },
+        {
+          title: 'Laminar Flow',
+          description: 'Air guiding vanes reduce turbulence and cut noise at the source.'
+        },
+        {
+          title: 'Dynamic Balance',
+          description: 'High-precision fan impeller ensures vibration-free and silent circulation.'
+        }
+      ]
+    },
+    comparison: {
+      title: 'Why Lineo Quiet?',
+      standard: 'Standard Fans',
+      quiet: 'Vortice Lineo Quiet',
+      features: [
+        {
+          label: 'Noise Level',
+          standard: '55-65 dB(A)',
+          quiet: '25-30 dB(A)'
+        },
+        {
+          label: 'Energy Consumption',
+          standard: 'High (AC Motor)',
+          quiet: '60% Saving (ES/EC Motor)'
+        },
+        {
+          label: 'Air Quality',
+          standard: 'Turbulent Flow',
+          quiet: 'Laminar and Continuous'
+        },
+        {
+          label: 'Mounting',
+          standard: 'Complex and Rigid',
+          quiet: 'Fast and Vibration Isolated'
+        }
+      ]
+    },
+    faq: {
+      title: 'Frequently Asked Questions',
+      items: [
+        {
+          q: 'How quiet is it really?',
+          a: 'Lineo Quiet is close to whisper sound (approx. 25 dB) at low speed. This is less than half of a normal conversation.'
+        },
+        {
+          q: 'Is it hard to install?',
+          a: 'No, thanks to quick-mount clamps, you don\'t need to disconnect the device from the duct for maintenance or installation.'
+        },
+        {
+          q: 'Which areas is it suitable for?',
+          a: 'Ideal for anywhere silence is critical, such as libraries, offices, bedrooms, and hotel rooms.'
+        }
+      ]
+    },
+    brand: {
+      eyebrow: 'ENGINEERING HERITAGE',
+      title: 'Italian Silence: The Vortice Legend',
+      description: 'Directing the ventilation world since 1954, Vortice represents the pinnacle in the silent duct fan category with the Lineo Quiet series.',
+      badges: ['Authorized Distributor', '2 Year Warranty'],
+      stats: [
+        {
+          label: 'Years Experience',
+          value: '70+'
+        },
+        {
+          label: 'Countries',
+          value: '90+'
+        },
+        {
+          label: 'Compasso d\'Oro',
+          value: '3x'
+        },
+        {
+          label: 'Europe',
+          value: '#1'
+        }
+      ]
+    }
+  },
+  product3d: {
+    loadError: 'Failed to load 3D model',
+    back: 'BACK',
+    view: 'VIEW',
+    reset: 'RESET',
+    orbit: 'ORBIT',
+    free: 'FREE',
+    auto: 'AUTO',
+    front: 'Front',
+    backLabel: 'Back',
+    left: 'Left',
+    right: 'Right',
+    top: 'Top',
+    bottom: 'Bottom'
   },
   error: {
     chunkTitle: 'Page Update Required',
@@ -2579,11 +3095,57 @@ export const en = {
     errorDesc: 'An error occurred while loading this page. Please try again.',
     refresh: 'Refresh Page',
     retry: 'Try Again',
-    devDetails: 'Error Details (Development)',
+    devDetails: 'Error Details (Development)'
+  },
+  needsWizard: {
+    ambient: 'Ambient (Unheated)',
+    analyzing: 'Analyzing Models...',
+    centralSystem: 'If central system is available',
+    close: 'Close',
+    coldStorage: 'Cold Storage',
+    coldStorageDesc: 'Cold chain protection',
+    coldStorageTip: 'Provides food safety and energy savings',
+    consultUs: 'Consult us',
+    customOffer: 'Request Custom Offer',
+    doorHeight: 'What is Your Door Height?',
+    electricHeater: 'Electric Heater',
+    entranceDesc: 'Shop, restaurant, hotel entrance',
+    entranceDoor: 'Entrance Door',
+    entranceTip: 'Increases customer comfort, prevents energy loss',
+    findSuitable: 'Find the Suitable One for Me',
+    goBack: 'Go Back',
+    heatingNeed: 'Is Heating Needed?',
+    heatingNoDesc: 'Air barrier only',
+    heatingYesDesc: 'For winter comfort',
+    heightMeter: 'Height (Meter)',
+    industrial: 'Industrial Facility',
+    industrialDesc: 'Factory, warehouse, logistics',
+    industrialTip: 'Power suitable for industrial requirements',
+    insulation: 'For insulation and savings',
+    matchScore: '{{score}}% Match',
+    meter: 'Meter',
+    mountType: 'How Should the Mounting Type Be?',
+    next: 'Continue',
+    notSure: 'Not Sure',
+    recessedMount: 'Recessed (In-Ceiling)',
+    restart: 'Restart',
+    retail: 'Market / Supermarket',
+    retailDesc: 'Refrigerated aisles',
+    retailTip: 'Keeps hot air away from refrigerated aisles',
+    standardMount: 'Standard (Wall/Ceiling Suspended)',
+    start: 'Start',
+    step: 'Step',
+    step1Desc: 'To determine the most suitable technical specifications, select the application area first.',
+    step1Title: 'Where is the area of use?',
+    step2Desc: 'It is critical that the air curtain covers the entire opening.',
+    step2Title: 'Enter door dimensions',
+    step3Title: 'Is heating needed?',
+    step6Desc: 'Recommendations filtered by engineering criteria.',
+    step6Title: 'Most Suitable Models for You',
+    threeSteps: 'Custom product recommendation in 3 steps',
+    waterHeater: 'Water Heated (LPHW)',
+    widthMeter: 'Width (Meter)',
+    winterComfort: 'For winter comfort',
+    wizardTitle: 'Needs Analysis Wizard'
   }
 };
-
-
-
-
-

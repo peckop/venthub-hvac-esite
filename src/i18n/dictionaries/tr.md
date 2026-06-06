@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: c5a49638b63a093f
+skeleton_hash: da03b3384eb114b2
 entity_hashes:
   overview: 3b73d1e6813a6921
-generated_at: 2026-06-06T08:45:37Z
+generated_at: 2026-06-06T09:07:34Z
 ---
 
 ## Genel Bakış
@@ -34,7 +34,7 @@ Bu modül, VentHub HVAC projesinin uluslararasılaştırma (i18n) altyapısı i�
 - **tr** (object) — `{
   common: {
     addToProject: 'Proje Listesine Ekle',
-    loadingApp: 'V...`
+    loadingApp: 'Vent...`
 
 ---
 

@@ -3,19 +3,24 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts
-skeleton_hash: 23fa7932e26be8a3
+skeleton_hash: 1301a265d976dd04
 entity_hashes:
-  overview: 5447197e2aa46545
-generated_at: 2026-06-06T08:45:37Z
+  overview: 9303b0df67433683
+generated_at: 2026-06-06T09:07:34Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin uluslararasılaştırma (i18n) sisteminin İngilizce dil paketini temsil eden sabit bir sözlük dosyasıdır; proje arayüzünde görünecek tüm İngilizce metinler, `en` adlı tek bir nesne içinde anahtar‑değer çiftleri olarak tanımlanmıştır. Modül içinde çalıştırılabilir fonksiyon, harici bağımlılık, ortam değişkeni kullanımı veya API çağrısı bulunmaz; yalnızca i18n çekirdek modülü tarafından içe aktarılan ve uygulama genelinde çeviri kaynağı olarak kullanılan statik veri yapısını içerir. Bu sayede İngilizce arayüz metinleri tek bir merkezden yönetilebilir ve diğer dil sözlükleriyle tutarlı bir yapı sağlanır.
+Bu modül, VentHub HVAC projesinin uluslararasılaştırma sistemindeki İngilizce dil sözlüğünü tanımlayan statik bir veri dosyasıdır. `en` adlı nesne, uygulamanın arayüzünde kullanılacak tüm İngilizce metinleri (buton etiketleri, hata mesajları, menü başlıkları vb.) merkezi olarak organize eder. Modül, yalnızca i18n çekirdek modülü tarafından içe aktarılan ve çeviri kaynağı olarak kullanılan saf bir sabitler kümesidir; herhangi bir işlevsel mantık, API çağrısı veya ortam değişkeni kullanımını içermez.
+
+## Fonksiyon Grupları
+Bu dosyada herhangi bir fonksiyon veya metod bulunmamaktadır. Modül, yalnızca dışa aktarılan (`en`) statik bir sözlük nesnesi içerir. Dolayısıyla, fonksiyon gruplaması yapılamaz.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Açıklama:** Bu modül yalnızca statik bir `en` nesnesi (key-value sözlüğü) içeren bir veri dosyasıdır. Fonksiyon imzası, sabit tanımı veya çalıştırılabilir kod bloğu bulunmadığı için, fonksiyon gövdesinden çıkarılabilecek bir mimari varsayım üretmek mümkün değildir.
 
 ---
 
@@ -27,11 +32,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - **en** (object) — `{
   common: {
     loadingApp: 'Loading VentHub... ',
-    loading: 'Loading...`
+    loading: 'Loading......`
 
 ---
 
 ## AST POINTERS
+
+Bu dosyada fonksiyon bulunmamaktadır.
+
+> **Not:** `C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts` dosyası yalnızca bir import statement (`import { tr } from './tr'`) ve bir sabit nesne tanımı (`en object`) içermektedir. Fonksiyon imzası veya gövdesi yer almamaktadır; dolayısıyla AST Pointer üretilemez.
 
 ---
 

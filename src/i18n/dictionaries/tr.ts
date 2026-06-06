@@ -3,110 +3,104 @@ export const tr = {
     addToProject: 'Proje Listesine Ekle',
     loadingApp: 'VentHub yükleniyor... ',
     loading: 'Yükleniyor...',
-    // Navigation & generic
-    categories: "Kategoriler",
-    products: "Ürünler",
-    brands: "Markalar",
-    about: "Hakkımızda",
-    contact: "İletişim",
-    supportCenter: "Destek Merkezi",
-    knowledgeHub: "Bilgi Merkezi",
-    myOrders: "Siparişlerim",
-    signOut: "Çıkış Yap",
-    signIn: "Giriş Yap",
-    signUp: "Kayıt Ol",
-    skipToContent: "Ana içeriğe geç",
-    searchHeaderPlaceholder: "Ürün, marka veya model ara...",
-    search: "Ara",
-    quickSearch: "Hızlı ara...",
-    allCategories: "Tüm Kategoriler",
-    priceRange: "Fiyat Aralığı",
-    systemPreparing: "Sistem Hazırlanıyor...",
-    adminPanel: "Yönetim Paneli",
-    goToStore: "Mağazaya Git",
-    backToSite: "Siteye Dön",
-    languageSwitcher: "Dil Seçimi",
-    turkish: "Türkçe",
-    english: "İngilizce",
-
-    // Existing
-    discover: "Keşfet",
-    allProducts: "Tüm Ürünler",
+    categories: 'Kategoriler',
+    products: 'Ürünler',
+    brands: 'Markalar',
+    about: 'Hakkımızda',
+    contact: 'İletişim',
+    supportCenter: 'Destek Merkezi',
+    knowledgeHub: 'Bilgi Merkezi',
+    myOrders: 'Siparişlerim',
+    signOut: 'Çıkış Yap',
+    signIn: 'Giriş Yap',
+    signUp: 'Kayıt Ol',
+    skipToContent: 'Ana içeriğe geç',
+    searchHeaderPlaceholder: 'Ürün, marka veya model ara...',
+    search: 'Ara',
+    quickSearch: 'Hızlı ara...',
+    allCategories: 'Tüm Kategoriler',
+    priceRange: 'Fiyat Aralığı',
+    systemPreparing: 'Sistem Hazırlanıyor...',
+    adminPanel: 'Yönetim Paneli',
+    goToStore: 'Mağazaya Git',
+    backToSite: 'Siteye Dön',
+    languageSwitcher: 'Dil Seçimi',
+    turkish: 'Türkçe',
+    english: 'İngilizce',
+    discover: 'Keşfet',
+    allProducts: 'Tüm Ürünler',
     exploreProducts: 'Ürünleri Keşfet',
     getQuote: 'Teklif Al',
     addToCart: 'Sepete Ekle',
     categoryList: {
-      // ANA AİLELER
-      'residential': 'Konut Tipi Havalandırma',
-      'commercial': 'Ticari Havalandırma',
-      'industrial': 'Endüstriyel Havalandırma',
-      'hrv': 'Isı Geri Kazanım Üniteleri (VMC)',
+      residential: 'Konut Tipi Havalandırma',
+      commercial: 'Ticari Havalandırma',
+      industrial: 'Endüstriyel Havalandırma',
+      hrv: 'Isı Geri Kazanım Üniteleri (VMC)',
       'air-treatment': 'Hava Şartlandırma',
-      'hygiene': 'Hijyen ve Sanitasyon',
-      'summer': 'Yaz Havalandırması (Vantilatörler)',
-      'ac': 'İklimlendirme (Klima)',
-      'heating': 'Elektrikli Isıtma',
-      'hvls': 'Endüstriyel Tavan Vantilatörleri',
-      'accessories': 'Aksesuarlar ve Bileşenler',
+      hygiene: 'Hijyen ve Sanitasyon',
+      summer: 'Yaz Havalandırması (Vantilatörler)',
+      ac: 'İklimlendirme (Klima)',
+      heating: 'Elektrikli Isıtma',
+      hvls: 'Endüstriyel Tavan Vantilatörleri',
+      accessories: 'Aksesuarlar ve Bileşenler',
       'smart-home': 'Akıllı Ev Sistemleri',
-
-      // ALT KATEGORİLER
-      'sub': {
-        'bathroom': 'Banyo ve Tuvalet Fanları',
-        'window': 'Cam ve Pencere Tipi Fanlar',
-        'ghost': 'Kanal İçi Hayalet Fanlar',
-        'smoke': 'Duman Egzoz Fanları',
-        'jet': 'Otopark Jet Fanları',
-        'radial': 'Radyal Fanlar',
-        'roof': 'Çatı Tipi Fanlar',
+      sub: {
+        bathroom: 'Banyo ve Tuvalet Fanları',
+        window: 'Cam ve Pencere Tipi Fanlar',
+        ghost: 'Kanal İçi Hayalet Fanlar',
+        smoke: 'Duman Egzoz Fanları',
+        jet: 'Otopark Jet Fanları',
+        radial: 'Radyal Fanlar',
+        roof: 'Çatı Tipi Fanlar',
         'axial-ind': 'Aksiyel Sanayi Fanları',
         'air-curtain': 'Hava Perdeleri',
-        'conditioning': 'İklimlendirme Çözümleri'
+        conditioning: 'İklimlendirme Çözümleri'
       }
     },
-    byApplication: "Uygulamaya Göre Çözümler",
-    viewAll: "Tümü",
-    featured: "Öne Çıkan Ürünler",
-    newProducts: "Yeni Ürünler",
-    whyUs: "Neden VentHub?",
-    homeLabel: "Ana Sayfa",
-    discoverPage: "Keşfet",
-    notFound: "Sonuç bulunamadı",
-    clearSearch: "Aramayı Temizle",
-    searchPlaceholder: "Ürün adı, marka...",
-    searchPlaceholderLong: "Ürün adı, marka, model...",
-    selectByNeed: "İhtiyacına Göre Seç",
-    seeAllProducts: "Tüm Ürünleri Gör",
-    back: "Geri",
-    backToTop: "Başa dön",
-    gotoCategory: "Kategoriye git",
-    cancel: "İptal",
-    close: "Kapat",
-    noVisuals: "Görsel Mevcut Değil",
-    noImage: "Görsel Yok",
-    viewFullscreen: "Tam ekran görüntüle",
-    view3D: "3D görüntüle",
-    prev: "Önceki",
-    next: "Sonraki",
-    remove: "Kaldır",
-    more: "Daha Fazla",
-    save: "Kaydet",
-    saving: "Kaydediliyor...",
-    edit: "Düzenle",
-    delete: "Sil",
-    actions: "İşlemler",
-    status: "Durum",
-    date: "Tarih",
-    amount: "Tutar",
-    id: "ID",
-    all: "Tümü",
-    none: "Yok",
-    yes: "Evet",
-    no: "Hayır",
-    whatsappAriaLabel: "WhatsApp ile yaz",
-    whatsappTitle: "WhatsApp ile yaz",
-    whatsappTooltip: "Mühendislik Hattı",
-    whatsappSupportMessage: "Web sitesinden hızlı destek",
+    byApplication: 'Uygulamaya Göre Çözümler',
+    viewAll: 'Tümü',
+    featured: 'Öne Çıkan Ürünler',
+    newProducts: 'Yeni Ürünler',
+    whyUs: 'Neden VentHub?',
+    homeLabel: 'Ana Sayfa',
+    discoverPage: 'Keşfet',
+    notFound: 'Sonuç bulunamadı',
+    clearSearch: 'Aramayı Temizle',
+    searchPlaceholder: 'Ürün adı, marka...',
+    searchPlaceholderLong: 'Ürün adı, marka, model...',
+    selectByNeed: 'İhtiyacına Göre Seç',
+    seeAllProducts: 'Tüm Ürünleri Gör',
+    back: 'Geri',
+    backToTop: 'Başa dön',
+    gotoCategory: 'Kategoriye git',
+    cancel: 'İptal',
+    close: 'Kapat',
+    noVisuals: 'Görsel Mevcut Değil',
+    noImage: 'Görsel Yok',
+    viewFullscreen: 'Tam ekran görüntüle',
+    view3D: '3D görüntüle',
+    prev: 'Önceki',
+    next: 'Sonraki',
+    remove: 'Kaldır',
+    more: 'Daha Fazla',
+    save: 'Kaydet',
+    saving: 'Kaydediliyor...',
+    edit: 'Düzenle',
+    delete: 'Sil',
+    actions: 'İşlemler',
+    status: 'Durum',
+    date: 'Tarih',
+    amount: 'Tutar',
+    id: 'ID',
+    all: 'Tümü',
+    none: 'Yok',
+    yes: 'Evet',
+    no: 'Hayır',
+    whatsappAriaLabel: 'WhatsApp ile yaz',
+    whatsappTitle: 'WhatsApp ile yaz',
+    whatsappTooltip: 'Mühendislik Hattı',
+    whatsappSupportMessage: 'Web sitesinden hızlı destek',
     whatsapp: {
       faqSupportMessage: 'Sıkça Sorulan Sorular sayfasında aradığım cevabı bulamadım...',
       supportMessageDefault: 'Merhaba, VentHub HVAC destek ekibiyle iletişime geçmek istiyorum.',
@@ -119,69 +113,96 @@ export const tr = {
     productsCta: 'Ürünleri Gör',
     guideCta: 'Kılavuzu Aç',
     items: {
-      parking: { title: 'Otopark Havalandırması', subtitle: 'Jet fan / CO kontrolü' },
-      airCurtain: { title: 'Hava Perdesi', subtitle: 'Giriş konforu' },
-      heatRecovery: { title: 'Isı Geri Kazanım', subtitle: 'Enerji verimliliği' },
-      industrialKitchen: { title: 'Endüstriyel Mutfak', subtitle: 'Davlumbaz ve kanal' },
-      smokeExhaust: { title: 'Duman Tahliye', subtitle: 'Acil durum' },
-      hvac: { title: 'Isıtma/Soğutma', subtitle: 'Konfor HVAC' }
+      parking: {
+        title: 'Otopark Havalandırması',
+        subtitle: 'Jet fan / CO kontrolü'
+      },
+      airCurtain: {
+        title: 'Hava Perdesi',
+        subtitle: 'Giriş konforu'
+      },
+      heatRecovery: {
+        title: 'Isı Geri Kazanım',
+        subtitle: 'Enerji verimliliği'
+      },
+      industrialKitchen: {
+        title: 'Endüstriyel Mutfak',
+        subtitle: 'Davlumbaz ve kanal'
+      },
+      smokeExhaust: {
+        title: 'Duman Tahliye',
+        subtitle: 'Acil durum'
+      },
+      hvac: {
+        title: 'Isıtma/Soğutma',
+        subtitle: 'Konfor HVAC'
+      }
     }
   },
   homeShowcase: {
-    slide1: { title: 'Endüstriyel Havalandırmada Uzmanlık', subtitle: 'Projenize özel çözümler ve doğru ürün seçimi' },
-    slide2: { title: 'Enerji Verimliliği & Konfor', subtitle: 'Doğru mühendislik ile daha düşük maliyetle daha iyi performans' },
-    slide3: { title: 'İhtiyaçlarınıza Göre Yönlendirme', subtitle: 'Uygulama alanına göre keşfedin ve doğru kategoriye hızla ulaşın' },
+    slide1: {
+      title: 'Endüstriyel Havalandırmada Uzmanlık',
+      subtitle: 'Projenize özel çözümler ve doğru ürün seçimi'
+    },
+    slide2: {
+      title: 'Enerji Verimliliği & Konfor',
+      subtitle: 'Doğru mühendislik ile daha düşük maliyetle daha iyi performans'
+    },
+    slide3: {
+      title: 'İhtiyaçlarınıza Göre Yönlendirme',
+      subtitle: 'Uygulama alanına göre keşfedin ve doğru kategoriye hızla ulaşın'
+    },
     prevAria: 'Önceki',
     playAria: 'Oynat',
     pauseAria: 'Duraklat',
     nextAria: 'Sonraki'
   },
   products: {
-    allProductsTitle: "Tüm Ürünlerimiz",
-    systemTotalPrefix: "Sistemdeki tüm",
-    viewGrid: "Izgara",
-    viewList: "Liste",
-    emptyTitle: "Ürün Bulunamadı",
-    emptyDesc: "Daha fazla ürün görmek için kategorilerden birini seçin.",
-    breadcrumbDiscover: "Keşfet",
-    heroTitle: "HVAC ürünlerini keşfedin: mühendislik odaklı seçim, hızlı teklif",
-    heroSubtitle: "Uygulama yönlendirmeli alanlar, popüler kategoriler ve öne çıkan ürünlerle aradığınızı hızla bulun.",
-    itemsListed: "ürün listeleniyor",
-    resultsFound: "sonuç bulundu",
-    heroValue1: "Sertifikalı, güvenilir ürünler",
-    heroValue2: "Mühendislik desteği ve doğru seçim",
-    heroValue3: "Hızlı teklif / yönlendirme",
-    helpCtaTitle: "Emin değil misiniz? Uygulamaya göre doğru ürünü seçelim.",
-    helpCtaSubtitle: "Proje detayınızı paylaşın; mühendislik ekibimiz hızla dönüş yapsın.",
-    applicationTitle: "Uygulamaya Göre Çözümler",
-    popularCategories: "Popüler Kategoriler",
+    allProductsTitle: 'Tüm Ürünlerimiz',
+    systemTotalPrefix: 'Sistemdeki tüm',
+    viewGrid: 'Izgara',
+    viewList: 'Liste',
+    emptyTitle: 'Ürün Bulunamadı',
+    emptyDesc: 'Daha fazla ürün görmek için kategorilerden birini seçin.',
+    breadcrumbDiscover: 'Keşfet',
+    heroTitle: 'HVAC ürünlerini keşfedin: mühendislik odaklı seçim, hızlı teklif',
+    heroSubtitle: 'Uygulama yönlendirmeli alanlar, popüler kategoriler ve öne çıkan ürünlerle aradığınızı hızla bulun.',
+    itemsListed: 'ürün listeleniyor',
+    resultsFound: 'sonuç bulundu',
+    heroValue1: 'Sertifikalı, güvenilir ürünler',
+    heroValue2: 'Mühendislik desteği ve doğru seçim',
+    heroValue3: 'Hızlı teklif / yönlendirme',
+    helpCtaTitle: 'Emin değil misiniz? Uygulamaya göre doğru ürünü seçelim.',
+    helpCtaSubtitle: 'Proje detayınızı paylaşın; mühendislik ekibimiz hızla dönüş yapsın.',
+    applicationTitle: 'Uygulamaya Göre Çözümler',
+    popularCategories: 'Popüler Kategoriler',
     discoverVisual: 'Keşfet görsel alanı',
     searchResultsTitle: 'Arama Sonuçları',
     searchSeoTitle: 'Arama: {{q}}',
     searchSeoDesc: '"{{q}}" için arama sonuçları',
     discoverSeoDesc: 'VentHub üzerindeki ürünleri, öne çıkanları ve popüler kategorileri keşfedin.',
-    hubBadge: "Türkiye'nin HVAC Uzmanı",
-    hubTitle: "Profesyonel HVAC Çözümleri",
-    hubSubtitle: "Hava perdesi, endüstriyel fan ve ısı geri kazanım sistemleri. İhtiyacınız olanı beraber bulalım.",
-    searchPlaceholder: "Ürün veya model ara...",
+    hubBadge: 'Türkiye\'nin HVAC Uzmanı',
+    hubTitle: 'Profesyonel HVAC Çözümleri',
+    hubSubtitle: 'Hava perdesi, endüstriyel fan ve ısı geri kazanım sistemleri. İhtiyacınız olanı beraber bulalım.',
+    searchPlaceholder: 'Ürün veya model ara...',
     noResults: 'Sonuç Bulunamadı',
     noResultsDesc: 'Lütfen filtreleri temizleyin veya farklı bir terim deneyin.',
-    clearFilters: 'Filtreleri Temizle',
+    clearFilters: 'Filtreleri Temizle'
   },
   search: {
-    recentSearches: "Son Aramalar",
-    clearRecent: "Temizle",
-    popularCategories: "Popüler Kategoriler",
-    noResults: "Sonuç bulunamadı",
-    detailedSearch: "için detaylı ara",
-    allResults: "Tüm sonuçları gör",
-    keyboardHint: "Ok tuşları ile gezinebilirsiniz",
-    enterHint: "Tüm sonuçlar için",
-    placeholder: "Ürün, kategori veya marka ara...",
-    noResultsAdvice: "Farklı anahtar kelimeler deneyin",
-    detailedSearchCta: "Detaylı arama için tıklayın",
-    brandPrefix: "Marka: ",
-    fuzzyMatchNotice: "Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor."
+    recentSearches: 'Son Aramalar',
+    clearRecent: 'Temizle',
+    popularCategories: 'Popüler Kategoriler',
+    noResults: 'Sonuç bulunamadı',
+    detailedSearch: 'için detaylı ara',
+    allResults: 'Tüm sonuçları gör',
+    keyboardHint: 'Ok tuşları ile gezinebilirsiniz',
+    enterHint: 'Tüm sonuçlar için',
+    placeholder: 'Ürün, kategori veya marka ara...',
+    noResultsAdvice: 'Farklı anahtar kelimeler deneyin',
+    detailedSearchCta: 'Detaylı arama için tıklayın',
+    brandPrefix: 'Marka: ',
+    fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.'
   },
   resources: {
     title: 'Kaynaklar ve Kılavuzlar',
@@ -236,40 +257,34 @@ export const tr = {
         title: 'Hava Perdesi Seçimi',
         image: '/images/hvac_installation_close_up_premium_3.png',
         summary: 'Doğru hava perdesi seçimi için kapı yüksekliği, genişliği ve kullanım amacı (konfor/endüstriyel) belirleyicidir.',
-        steps: [
-          'Kapı genişliği = cihaz genişliği (bariyer kesintisiz olmalı).',
-          'Çıkış hızı 7–9 m/s; zeminde 2–3 m/s hedef.',
-          'Nozül 10–15° iç mekâna eğimli; kapı kontağı ile otomatik hız.'
-        ],
+        steps: ['Kapı genişliği = cihaz genişliği (bariyer kesintisiz olmalı).', 'Çıkış hızı 7–9 m/s; zeminde 2–3 m/s hedef.', 'Nozül 10–15° iç mekâna eğimli; kapı kontağı ile otomatik hız.'],
         pitfalls: ['Kısa cihaz kullanımı', 'Çok düşük hız', 'Nozülü dışa doğru eğmek']
       },
       'jet-fan': {
         title: 'Jet Fan (Otopark)',
         image: '/images/hvac_installation_close_up_premium_3.png',
         summary: 'CO/NOx ve duman senaryosu için akışı egzoza yönlendiren tavan fanları; kör nokta bırakmadan yerleşim gerekir.',
-        steps: [
-          'Debi: Hacim × ACH (ör. 7.200 m³ × 8 ACH ≈ 57.600 m³/h).',
-          'İtme kuvveti 50–100 N tipik; mesafe ve plana göre belirlenir.',
-          'Yerleşim: eksen aralığı 25–35 m; egzoza sürükleme; sensör zonları kapsansın.'
-        ],
+        steps: ['Debi: Hacim × ACH (ör. 7.200 m³ × 8 ACH ≈ 57.600 m³/h).', 'İtme kuvveti 50–100 N tipik; mesafe ve plana göre belirlenir.', 'Yerleşim: eksen aralığı 25–35 m; egzoza sürükleme; sensör zonları kapsansın.'],
         pitfalls: ['Kör hacim bırakmak', 'Sensör kapsamasını atlamak']
       },
       hrv: {
         title: 'Isı Geri Kazanım (HRV/ERV)',
         image: '/images/hvac_installation_close_up_premium_4.png',
         summary: 'Taze havayı ısı geri kazanımı ile sağlayan cihazlar; seçimde debi, verim/SFP ve harici statik basınç kritik.',
-        steps: [
-          'Debi: kişi/mahale göre toplam m³/h (EN 16798-1/ASHRAE 62.1 aralıkları).',
-          'Verim/SFP: %70–85 verim, düşük SFP (işletme maliyeti).',
-          'Basınç: filtre/kanal kayıplarına uygun harici statik basınç.'
-        ],
+        steps: ['Debi: kişi/mahale göre toplam m³/h (EN 16798-1/ASHRAE 62.1 aralıkları).', 'Verim/SFP: %70–85 verim, düşük SFP (işletme maliyeti).', 'Basınç: filtre/kanal kayıplarına uygun harici statik basınç.'],
         pitfalls: ['Yüksek verime bakıp harici statik basıncı atlamak']
+      },
+      'hava-perdesi': {
+        pitfalls: ['Kısa cihaz kullanımı', 'Çok düşük hız', 'Nozülü dışa doğru eğmek'],
+        steps: ['Kapı genişliği = cihaz genişliği (bariyer kesintisiz olmalı).', 'Çıkış hızı 7–9 m/s; zeminde 2–3 m/s hedef.', 'Nozül 10–15° iç mekâna eğimli; kapı kontağı ile otomatik hız.'],
+        summary: 'Konforu korumak ve enerji kaybını azaltmak için girişlerin üzerine kurulur; cihaz kapı genişliğini tamamen kapatmalıdır.',
+        title: 'Hava Perdesi'
       }
     }
   },
   home: {
-    seoTitle: "VentHub - Premium HVAC Çözümleri | Fan, Hız Kontrol, Isıtma & Soğutma",
-    seoDesc: "VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.",
+    seoTitle: 'VentHub - Premium HVAC Çözümleri | Fan, Hız Kontrol, Isıtma & Soğutma',
+    seoDesc: 'VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.',
     hero: {
       eyebrow: 'Mühendislik Odaklı HVAC Ticareti',
       title: 'Doğru HVAC seçimine ilk ekranda girin.',
@@ -320,8 +335,14 @@ export const tr = {
             title: 'Endüstriyel Havalandırma Katmanları',
             subtitle: 'Yüksek debili sistemlerde statik balanslı ve akustik optimize edilmiş çözüm eksenleri.',
             products: [
-              { label: 'Vortice Lineo', subLabel: 'Kanal Tipi Karma Akışlı Fan' },
-              { label: 'Lineo Quiet', subLabel: 'Ultra Sessiz Performans' }
+              {
+                label: 'Vortice Lineo',
+                subLabel: 'Kanal Tipi Karma Akışlı Fan'
+              },
+              {
+                label: 'Lineo Quiet',
+                subLabel: 'Ultra Sessiz Performans'
+              }
             ]
           },
           {
@@ -329,8 +350,14 @@ export const tr = {
             title: 'Vortice Lineo Quiet: Sessizliğin Geleceği',
             subtitle: 'Minimum enerji tüketimi, maksimum hava transfer verimliliği ve premium sessiz konforun kusursuz dengesi.',
             products: [
-              { label: 'Hava Akış Teknolojisi', subLabel: 'Laminer Akış Kontrolü' },
-              { label: 'EC Motor Verimi', subLabel: 'Düşük Enerji Tüketimi' }
+              {
+                label: 'Hava Akış Teknolojisi',
+                subLabel: 'Laminer Akış Kontrolü'
+              },
+              {
+                label: 'EC Motor Verimi',
+                subLabel: 'Düşük Enerji Tüketimi'
+              }
             ]
           },
           {
@@ -338,8 +365,14 @@ export const tr = {
             title: 'Teknik Mükemmeliyet ve Akıllı Akış',
             subtitle: 'Endüstriyel mutfak, otopark ve konfor alanları için uçtan uca determisitik havalandırma mühendisliği.',
             products: [
-              { label: 'Endüstriyel Çözümler', subLabel: 'Yüksek Kapasite' },
-              { label: 'Akıllı Kontrol', subLabel: 'Otomasyon Entegrasyonu' }
+              {
+                label: 'Endüstriyel Çözümler',
+                subLabel: 'Yüksek Kapasite'
+              },
+              {
+                label: 'Akıllı Kontrol',
+                subLabel: 'Otomasyon Entegrasyonu'
+              }
             ]
           }
         ]
@@ -570,49 +603,58 @@ export const tr = {
       tertiaryCta: 'Ürünleri Keşfet'
     },
     features: {
-      euQuality: "Avrupa kalite standartları",
-      fastDelivery: "Hızlı teslimat",
-      warranty: "2 yıl garanti",
-      support: "7/24 teknik destek",
+      euQuality: 'Avrupa kalite standartları',
+      fastDelivery: 'Hızlı teslimat',
+      warranty: '2 yıl garanti',
+      support: '7/24 teknik destek'
     },
-    heroTitle: "Temiz Hava, Temiz Gelecek",
-    heroSubtitle: "Türkiye'nin en güvenilir HVAC distribütörü. 6 premium marka, 50+ ürün çeşidi ile profesyonel havalandırma çözümleri.",
-    bottomCtaTitle: "Doğru ürünü seçmenize yardımcı olalım.",
-    bottomCtaSubtitle: "Proje detayınızı paylaşın, mühendislik ekibimiz hızlıca yönlendirsin.",
-    whyParagraph: "15+ yıllık deneyimimiz ve dünya standartlarındaki ürünlerimizle HVAC sektöründe güvenilir partneriniziz.",
+    heroTitle: 'Temiz Hava, Temiz Gelecek',
+    heroSubtitle: 'Türkiye\'nin en güvenilir HVAC distribütörü. 6 premium marka, 50+ ürün çeşidi ile profesyonel havalandırma çözümleri.',
+    bottomCtaTitle: 'Doğru ürünü seçmenize yardımcı olalım.',
+    bottomCtaSubtitle: 'Proje detayınızı paylaşın, mühendislik ekibimiz hızlıca yönlendirsin.',
+    whyParagraph: '15+ yıllık deneyimimiz ve dünya standartlarındaki ürünlerimizle HVAC sektöründe güvenilir partneriniziz.',
     why: {
-      premiumTitle: "Premium Kalite",
-      premiumText: "Avrupa standartlarında, dünya çapında tanınan markalardan sadece en kaliteli ürünleri seçiyoruz.",
-      expertTitle: "Uzman Destek",
-      expertText: "HVAC uzmanlarımız size en uygun çözümü bulmak için 7/24 teknik destek sağlar.",
-      fastTitle: "Hızlı Teslimat",
-      fastText: "Türkiye genelinde hızlı ve güvenli teslimat.",
+      premiumTitle: 'Premium Kalite',
+      premiumText: 'Avrupa standartlarında, dünya çapında tanınan markalardan sadece en kaliteli ürünleri seçiyoruz.',
+      expertTitle: 'Uzman Destek',
+      expertText: 'HVAC uzmanlarımız size en uygun çözümü bulmak için 7/24 teknik destek sağlar.',
+      fastTitle: 'Hızlı Teslimat',
+      fastText: 'Türkiye genelinde hızlı ve güvenli teslimat.'
     },
     whyVentHub: {
-      title: "Neden",
-      subtitle: "Türkiye'nin güvenilir HVAC e-ticaret platformu",
+      title: 'Neden',
+      subtitle: 'Türkiye\'nin güvenilir HVAC e-ticaret platformu',
       features: {
-        brands: { title: "Premium Markalar", description: "Vortice, Casals ve sektörün lider markalarının ürünleri" },
-        support: { title: "Uzman Desteği", description: "Profesyonel teknik danışmanlık hizmeti" },
-        delivery: { title: "Hızlı Teslimat", description: "Türkiye geneli 2-5 iş günü içinde kapınızda" }
+        brands: {
+          title: 'Premium Markalar',
+          description: 'Vortice, Casals ve sektörün lider markalarının ürünleri'
+        },
+        support: {
+          title: 'Uzman Desteği',
+          description: 'Profesyonel teknik danışmanlık hizmeti'
+        },
+        delivery: {
+          title: 'Hızlı Teslimat',
+          description: 'Türkiye geneli 2-5 iş günü içinde kapınızda'
+        }
       },
       badges: {
-        premium: "Premium Markalar",
-        ce: "CE Sertifikalı",
-        warranty: "2 Yıl Garanti",
-        shipping: "Aynı Gün Kargo"
+        premium: 'Premium Markalar',
+        ce: 'CE Sertifikalı',
+        warranty: '2 Yıl Garanti',
+        shipping: 'Aynı Gün Kargo'
       },
       authorizedDealer: {
-        prefix: "VentHub,",
-        brand: "Vortice",
-        suffix: "ürünlerinin Türkiye yetkili satıcısıdır."
+        prefix: 'VentHub,',
+        brand: 'Vortice',
+        suffix: 'ürünlerinin Türkiye yetkili satıcısıdır.'
       }
     },
     stats: {
-      premiumBrands: "Premium Marka",
-      productTypes: "Ürün Çeşidi",
-      yearsExperience: "Yıl Deneyim",
-      happyCustomers: "Mutlu Müşteri",
+      premiumBrands: 'Premium Marka',
+      productTypes: 'Ürün Çeşidi',
+      yearsExperience: 'Yıl Deneyim',
+      happyCustomers: 'Mutlu Müşteri'
     },
     galleryTitle: 'Ürün Galerisi',
     gallerySubtitle: 'Öne çıkan ürünlere göz atın',
@@ -648,7 +690,7 @@ export const tr = {
     productCategories: 'Ürün Kategorileri',
     pickCategory: 'Premium HVAC çözümleri için kategori seçiminizi yapın',
     subcategories: 'alt kategori',
-    more: 'daha fazla',
+    more: 'daha fazla'
   },
   header: {
     syncing: 'Senkronize ediliyor',
@@ -703,62 +745,178 @@ export const tr = {
   },
   admin: {
     authority: {
-      leftSideEski: "Sol Taraf (Eski)",
-      labelTraditional: "Etiket (Örn: Geleneksel)",
-      rightSideYeni: "Sağ Taraf (Yeni)",
-      labelVenthub: "Etiket (Örn: VentHub Farkı)"
+      leftSideEski: 'Sol Taraf (Eski)',
+      labelTraditional: 'Etiket (Örn: Geleneksel)',
+      rightSideYeni: 'Sağ Taraf (Yeni)',
+      labelVenthub: 'Etiket (Örn: VentHub Farkı)'
     },
     categories: {
-      imageDesc: "Kategori görselleri ana sayfa ve kategori listelerinde kullanılır.",
-      resolutionLabel: "Önerilen çözünürlük:",
-      supportedFormatsLabel: "Desteklenen formatlar:",
-      quickMetrics: "Hızlı Metrikler",
-      quickMetricsDesc: "Bu alanlar kategori kartlarında kısa teknik bilgi olarak gösterilir.",
-      metric1Label: "Metrik 1 Etiketi",
-      metric1Value: "Metrik 1 Değeri",
-      metric1LabelPlaceholder: "Örn: Kapasite",
-      metric1ValuePlaceholder: "Örn: 20.000 m³/h",
-      metric2Label: "Metrik 2 Etiketi",
-      metric2Value: "Metrik 2 Değeri",
-      metric2LabelPlaceholder: "Örn: Güç",
-      metric2ValuePlaceholder: "Örn: 1.5 kW",
-      imageLabel: "Kategori Görseli",
-      clickToUpload: "Yüklemek için tıklayın",
-      uploading: "Yükleniyor..."
+      imageDesc: 'Kategori görselleri ana sayfa ve kategori listelerinde kullanılır.',
+      resolutionLabel: 'Önerilen çözünürlük:',
+      supportedFormatsLabel: 'Desteklenen formatlar:',
+      quickMetrics: 'Hızlı Metrikler',
+      quickMetricsDesc: 'Bu alanlar kategori kartlarında kısa teknik bilgi olarak gösterilir.',
+      metric1Label: 'Metrik 1 Etiketi',
+      metric1Value: 'Metrik 1 Değeri',
+      metric1LabelPlaceholder: 'Örn: Kapasite',
+      metric1ValuePlaceholder: 'Örn: 20.000 m³/h',
+      metric2Label: 'Metrik 2 Etiketi',
+      metric2Value: 'Metrik 2 Değeri',
+      metric2LabelPlaceholder: 'Örn: Güç',
+      metric2ValuePlaceholder: 'Örn: 1.5 kW',
+      imageLabel: 'Kategori Görseli',
+      clickToUpload: 'Yüklemek için tıklayın',
+      uploading: 'Yükleniyor...'
     },
     products: {
       form: {
-        name: "Ürün Adı",
-        category: "Kategori",
-        select: "Seçiniz",
-        outOfStock: "Stok Yok",
-        price: "Fiyat"
+        name: 'Ürün Adı',
+        category: 'Kategori',
+        select: 'Seçiniz',
+        outOfStock: 'Stok Yok',
+        price: 'Fiyat'
+      },
+      confirm: {
+        deleteImage: 'Görseli silmek istiyor musunuz?',
+        deleteProduct: 'Bu ürünü silmek istiyor musunuz?'
+      },
+      edit: {
+        actions: {
+          delete: 'Sil',
+          new: 'Yeni',
+          save: 'Kaydet'
+        },
+        editing: 'Düzenleniyor',
+        images: {
+          altPlaceholder: 'Alt metin',
+          delete: 'Sil',
+          down: 'Aşağı',
+          makeCover: 'Kapak Resmi Yap',
+          none: 'Henüz görsel yok. Yüklemek için dosyaları seçin.',
+          saveFirst: 'Önce ürünü kaydedin.',
+          up: 'Yukarı'
+        },
+        info: {
+          brand: 'Marka',
+          category: 'Kategori',
+          categoryUnset: '(Seçilmedi)',
+          featured: 'Öne Çıkan',
+          modelCode: 'Model Kodu (MPN)',
+          modelPlaceholder: 'Örn: AD-H-900-T',
+          name: 'Ad',
+          sku: 'SKU',
+          status: 'Durum'
+        },
+        new: 'Yeni Ürün',
+        pricing: {
+          purchasePlaceholder: 'Örn: 1499.50',
+          purchasePrice: 'Alış Maliyeti',
+          salePlaceholder: 'Örn: 1999.90',
+          salePrice: 'Satış Fiyatı'
+        },
+        seo: {
+          chars: '{{count}} karakter',
+          metaDesc: 'Meta Açıklaması',
+          metaTitle: 'Meta Başlığı',
+          slug: 'Kalıcı Bağlantı (Slug)',
+          slugInUse: 'Bu URL adı zaten kullanılıyor',
+          slugPlaceholder: 'ornek-urun',
+          slugRequired: 'URL adı boş olamaz'
+        },
+        stock: {
+          defaultSuffix: ' (Varsayılan: {{default}})',
+          hintBase: 'Boş bırakılırsa, Ayarlar\'daki varsayılan eşik kullanılır',
+          lowPlaceholder: 'Örn: 5',
+          lowThreshold: 'Düşük Stok Eşiği',
+          stock: 'Stok',
+          stockPlaceholder: 'Örn: 50'
+        },
+        tabs: {
+          images: 'Görseller',
+          info: 'Bilgi',
+          pricing: 'Fiyatlandırma',
+          seo: 'SEO',
+          stock: 'Stok'
+        }
+      },
+      export: {
+        csvLabel: 'CSV (UTF-8 BOM)'
+      },
+      import: {
+        button: 'İçe Aktar (beta)',
+        close: 'Kapat',
+        done: 'İçe aktarma tamamlandı: {{ok}} satır işlendi, {{fail}} satır başarısız oldu',
+        dryRun: 'Önizleme (Dry-run)',
+        dryRunResult: 'Önizleme: zorunlu alanlar {{status}}. Geçerli satırlar: {{ok}}/{{total}}',
+        error: 'İçe aktarma hatası: {{msg}}',
+        minColumns: 'En az sku ve name sütunları gereklidir',
+        needCsv: 'Önce bir CSV seçin',
+        noneFound: 'Geçerli satır bulunamadı',
+        previewTitle: 'CSV Önizlemesi (ilk 10 satır) — Toplam: {{total}}',
+        statusComplete: 'tamamlandı',
+        statusMissing: 'eksik',
+        writeButton: 'Yaz (SKU\'ya göre güncelle)'
+      },
+      statusLabels: {
+        active: 'Aktif',
+        inactive: 'Pasif',
+        out_of_stock: 'Stokta Yok'
+      },
+      table: {
+        actions: 'İşlemler',
+        category: 'Kategori',
+        image: 'Görsel',
+        name: 'Ad',
+        price: 'Fiyat',
+        sku: 'SKU',
+        status: 'Durum',
+        stock: 'Stok'
+      },
+      toasts: {
+        altSaveFailed: 'Alt metin kaydedilemedi: {{msg}}',
+        deleteFailed: 'Silinemedi: {{msg}}',
+        imagesSaveFailed: 'Görseller kaydedilemedi: {{msg}}',
+        imagesSaved: 'Görseller kaydedildi',
+        loadFailed: 'Yüklenemedi',
+        orderNotChanged: 'Sıralama değiştirilmedi',
+        priceSaveFailed: 'Fiyat kaydedilemedi: {{msg}}',
+        productLoadFailed: 'Ürün yüklenemedi: {{msg}}',
+        saveFailed: 'Kaydedilemedi: {{msg}}',
+        seoSaveFailed: 'SEO kaydedilemedi: {{msg}}',
+        stockSaveFailed: 'Stok kaydedilemedi: {{msg}}'
+      },
+      toggles: {
+        featuredOnly: 'Yalnızca: Öne Çıkanlar'
+      },
+      toolbar: {
+        allCategories: 'Tüm Kategoriler',
+        categoryTitle: 'Kategori'
       }
     },
     common: {
-      yes: "Evet",
-      no: "Hayır",
-      saveChanges: "Değişiklikleri Kaydet",
-      addLine: "Satır Ekle",
-      addCard: "Kart Ekle",
-      imageUrl: "Görsel URL",
-      imageUrlWithManual: "Görsel URL (veya Manuel Giriş)",
-      addNewProduct: "Yeni Ürün Ekle",
-      cancel: "İptal",
-      delete: "Sil",
-      edit: "Düzenle",
-      search: "Ara...",
-      filter: "Filtrele",
-      noResults: "Sonuç bulunamadı",
-      loading: "Yükleniyor...",
-      success: "İşlem başarılı",
-      error: "Bir hata oluştu",
-      ready: "Hazır",
-      actions: "İşlemler",
-      status: "Durum",
-      active: "Aktif",
-      passive: "Pasif",
-      all: "Tümü"
+      yes: 'Evet',
+      no: 'Hayır',
+      saveChanges: 'Değişiklikleri Kaydet',
+      addLine: 'Satır Ekle',
+      addCard: 'Kart Ekle',
+      imageUrl: 'Görsel URL',
+      imageUrlWithManual: 'Görsel URL (veya Manuel Giriş)',
+      addNewProduct: 'Yeni Ürün Ekle',
+      cancel: 'İptal',
+      delete: 'Sil',
+      edit: 'Düzenle',
+      search: 'Ara...',
+      filter: 'Filtrele',
+      noResults: 'Sonuç bulunamadı',
+      loading: 'Yükleniyor...',
+      success: 'İşlem başarılı',
+      error: 'Bir hata oluştu',
+      ready: 'Hazır',
+      actions: 'İşlemler',
+      status: 'Durum',
+      active: 'Aktif',
+      passive: 'Pasif',
+      all: 'Tümü'
     },
     users: {
       subtitle: 'Sistem kullanıcılarını ve rollerini yönetin.',
@@ -766,10 +924,19 @@ export const tr = {
       table: {
         user: 'Kullanıcı',
         created: 'Kayıt',
-        actions: 'İşlem'
+        actions: 'İşlem',
+        company: 'Şirket & B2B',
+        role: 'Rol'
       },
       info: {
-        subtitle: 'Sistem güvenliği için rollerin yetki seviyelerini kontrol edin.'
+        subtitle: 'Sistem güvenliği için rollerin yetki seviyelerini kontrol edin.',
+        items: {
+          admin: 'Yönetici: Operasyon paneline erişim (envanter, iadeler, sevkiyat, kullanıcılar)',
+          moderator: 'Moderatör: Sınırlı yönetici yetkisi (envanter ve iadeler)',
+          superadmin: 'Süper Yönetici: Tüm yetkiler + rol atamaları (güvenlik için sınırlı görünürlük)',
+          user: 'Kullanıcı: Standart kullanıcı (yalnızca kendi hesabını yönetir)'
+        },
+        title: 'Kullanıcı Rol Sistemi'
       },
       roles: {
         superadmin: 'Tüm sistem ayarlarına ve rol yönetimine tam erişim.',
@@ -778,7 +945,36 @@ export const tr = {
         sales: 'Sipariş, kargo, iade ve kupon yönetimi yetkisi.',
         viewer: 'Tüm modülleri salt-okunur (view-only) yetkisi.'
       },
-      permissionsError: 'Kullanıcı rolleri değiştirme yetkiniz yok.'
+      permissionsError: 'Kullanıcı rolleri değiştirme yetkiniz yok.',
+      actionTitles: {
+        admin: 'Yönetici yap',
+        cannotDemoteSelf: 'Kendi yetkinizi düşüremezsiniz',
+        moderator: 'Moderatör yap',
+        superadmin: 'Süper yönetici yap',
+        user: 'Kullanıcı yap'
+      },
+      actions: {
+        admin: 'Yönetici',
+        moderator: 'Moderatör',
+        superadmin: 'Süper Yönetici',
+        user: 'Kullanıcı'
+      },
+      empty: {
+        admins: 'Henüz yönetici kullanıcı yok.',
+        all: 'Kullanıcı listesi boş.',
+        filtered: 'Aramanızla eşleşen kullanıcı bulunamadı.'
+      },
+      tabs: {
+        admins: 'Yönetici Kullanıcılar ({{count}})',
+        all: 'Tüm Kullanıcılar ({{count}})'
+      },
+      toasts: {
+        adminsLoadFailed: 'Yönetici kullanıcılar yüklenemedi',
+        allLoadFailed: 'Kullanıcılar yüklenemedi',
+        roleNotUpdated: 'Rol güncellenemedi',
+        roleUpdateError: 'Rol güncelleme hatası',
+        roleUpdated: 'Kullanıcı rolü "{{role}}" olarak güncellendi'
+      }
     },
     inventory: {
       subtitle: 'Ürün stok seviyelerini ve depo hareketlerini izleyin.',
@@ -789,7 +985,42 @@ export const tr = {
       warehouseLocation: 'Depo Konumu',
       supplier: 'Tedarikçi',
       editStock: 'Stok Düzenle',
-      adjustStock: 'Stok Ayarla'
+      adjustStock: 'Stok Ayarla',
+      allCategories: 'TÜM KATEGORİLER',
+      csvLoad: 'CSV Yükle',
+      export: {
+        csv: 'Sayfa Verilerini İndir (.csv)',
+        template: 'Örnek CSV Şablonu (sku, miktar)'
+      },
+      groupByCategory: 'Kategoriye Göre Grupla',
+      status: {
+        criticalLevel: 'Kritik Seviye',
+        normal: 'Normal Durum',
+        outOfStock: 'Stokta Yok',
+        reserved: 'Rezerve'
+      },
+      table: {
+        abc: 'ABC Analizi',
+        available: 'Kullanılabilir Stok',
+        daysUntilEmpty: 'Tükenene Kadar Gün Sayısı',
+        location: 'Depo Konumu',
+        physical: 'Fiziki Stok',
+        productInfo: 'Ürün Bilgisi',
+        reserved: 'Rezerve Stok',
+        statusIndicator: 'Durum Göstergesi',
+        supplier: 'Tedarikçi',
+        threshold: 'Uyarı Eşiği'
+      },
+      toasts: {
+        loadFailed: 'Yükleme hatası',
+        locationUpdated: 'Konum güncellendi',
+        stockAdjusted: 'Stok ayarlandı',
+        supplierUpdated: 'Tedarikçi güncellendi',
+        undoFailed: 'Geri alma başarısız',
+        undoNotAllowed: 'Geri alma işlemi tersine çevrilemez',
+        undoSuccess: 'Hareket geri alındı',
+        undoTimePassed: 'Geri alma süresi doldu (10 dk)'
+      }
     },
     orders: {
       view_list: 'Liste Görünümü',
@@ -838,7 +1069,8 @@ export const tr = {
           status: 'Durum',
           conversationId: 'İşlem ID',
           amount: 'Tutar',
-          created: 'Tarih'
+          created: 'Tarih',
+          products: 'Öne çıkan çözümleri görün'
         }
       },
       columns: {
@@ -932,25 +1164,32 @@ export const tr = {
       },
       board: {
         columns: {
-          new: "Yeni / Bekliyor",
-          prep: "Hazırlanıyor",
-          shipped: "Kargoda",
-          done: "Teslim Edildi",
-          cancel: "İptal",
-          refund: "İade"
+          new: 'Yeni / Bekliyor',
+          prep: 'Hazırlanıyor',
+          shipped: 'Kargoda',
+          done: 'Teslim Edildi',
+          cancel: 'İptal',
+          refund: 'İade'
         },
         stepper: {
-          received: "Alındı",
-          pa_id: "Ödendi",
-          prep: "Hazırlanıyor",
-          shipped: "Kargoda",
-          delivered: "Teslim"
+          received: 'Alındı',
+          pa_id: 'Ödendi',
+          prep: 'Hazırlanıyor',
+          shipped: 'Kargoda',
+          delivered: 'Teslim'
         },
         messages: {
-          cancelledOrRefunded: "Sipariş iptal veya iade edilmiş.",
-          updateSuccess: "Sipariş durumu başarıyla güncellendi.",
-          updateError: "Durum güncellenirken hata oluştu."
+          cancelledOrRefunded: 'Sipariş iptal veya iade edilmiş.',
+          updateSuccess: 'Sipariş durumu başarıyla güncellendi.',
+          updateError: 'Durum güncellenirken hata oluştu.'
         }
+      },
+      tooltips: {
+        cancelBulkShipping: 'Seçilenlerin sevkiyatını iptal et (yalnızca sevk edilenler)',
+        cancelShipping: 'Sevkiyatı iptal et',
+        logs: 'E-posta günlüklerini görüntüle',
+        notes: 'Sipariş notlarını görüntüle/ekle',
+        shipping: 'Kargo bilgisi ekle / düzenle'
       }
     },
     dashboard: {
@@ -976,21 +1215,38 @@ export const tr = {
         returnStatus: 'İade Durum Kırılımı',
         pendingShipmentAge: 'Bekleyen Kargo (Yaş)',
         weeklyReturns: 'İadeler - Haftalık Trend',
-        systemHealth: "Sistem Sağlığı",
-        recentOrders: "Son Siparişler",
-        orderFlow: "Sipariş Akışı",
-        salesTrend: "Satış Trendi"
+        systemHealth: 'Sistem Sağlığı',
+        recentOrders: 'Son Siparişler',
+        orderFlow: 'Sipariş Akışı',
+        salesTrend: 'Satış Trendi'
       },
       trend: 'Son {{days}} gün sipariş trendi',
-      recent: { title: 'Son Siparişler' },
-      table: { order: 'Sipariş', date: 'Tarih', amount: 'Tutar', status: 'Durum' }
+      recent: {
+        title: 'Son Siparişler'
+      },
+      table: {
+        order: 'Sipariş',
+        date: 'Tarih',
+        amount: 'Tutar',
+        status: 'Durum'
+      }
     },
     errors: {
       levelTitle: 'Seviye',
       envTitle: 'Ortam',
       detailsTitle: 'Detaylar',
-      labels: { stack: 'Stack', ua: 'UA', release: 'Sürüm', env: 'Ortam' },
-      table: { date: 'Tarih', level: 'Seviye', message: 'Mesaj', url: 'URL' }
+      labels: {
+        stack: 'Stack',
+        ua: 'UA',
+        release: 'Sürüm',
+        env: 'Ortam'
+      },
+      table: {
+        date: 'Tarih',
+        level: 'Seviye',
+        message: 'Mesaj',
+        url: 'URL'
+      }
     },
     toolbar: {
       searchPlaceholder: 'Ara',
@@ -1041,27 +1297,53 @@ export const tr = {
       noReturns: 'İade Etkinliği Bulunamadı',
       noReturnsDesc: 'Şu an için kaydedilmiş herhangi bir iade webhook etkinliği bulunmuyor.',
       noEmails: 'E-Posta Etkinliği Bulunamadı',
-      noEmailsDesc: 'Şu an için kaydedilmiş herhangi bir sevkiyat/kargo e-posta etkinliği bulunmuyor.'
+      noEmailsDesc: 'Şu an için kaydedilmiş herhangi bir sevkiyat/kargo e-posta etkinliği bulunmuyor.',
+      emailsTable: {
+        date: 'Tarih',
+        order: 'Sipariş',
+        provider: 'Sağlayıcı',
+        subject: 'Konu',
+        to: 'Alıcı'
+      },
+      returnsTable: {
+        carrier: 'Kargo Firması',
+        eventId: 'Etkinlik ID',
+        order: 'Sipariş',
+        received: 'Alındı',
+        statusMapped: 'Durum (eşleşen)'
+      },
+      search: {
+        returns: 'event_id, order_id, _return_id, kargo, durum',
+        shipping: 'order_id, e-posta, konu, sağlayıcı'
+      },
+      tabs: {
+        returns: 'İadeler',
+        shipping: 'Sevkiyat E-postaları'
+      },
+      tip: {
+        rowAction: 'Detayları ve yeniden işlem menüsünü açmak için bir satıra tıklayın.'
+      },
+      title: 'Webhook Etkinlikleri'
     },
     a11y: {
-      close: "Kapat",
-      delete: "Sil",
-      edit: "Düzenle",
-      save: "Kaydet",
-      search: "Ara",
-      filter: "Filtrele",
-      menu: "Menü",
-      settings: "Ayarlar",
-      refresh: "Yenile",
-      export: "Dışa Aktar",
-      import: "İçe Aktar",
-      expand: "Genişlet",
-      collapse: "Daralt",
-      next: "Sonraki",
-      prev: "Önceki",
-      copy: "Kopyala",
-      upload: "Dosya Yükle",
-      download: "İndir"
+      close: 'Kapat',
+      delete: 'Sil',
+      edit: 'Düzenle',
+      save: 'Kaydet',
+      search: 'Ara',
+      filter: 'Filtrele',
+      menu: 'Menü',
+      settings: 'Ayarlar',
+      refresh: 'Yenile',
+      export: 'Dışa Aktar',
+      import: 'İçe Aktar',
+      expand: 'Genişlet',
+      collapse: 'Daralt',
+      next: 'Sonraki',
+      prev: 'Önceki',
+      copy: 'Kopyala',
+      upload: 'Dosya Yükle',
+      download: 'İndir'
     },
     returns: {
       total: 'Toplam: {{count}} iade talebi yönetiliyor.',
@@ -1069,11 +1351,31 @@ export const tr = {
       export: {
         csvLabel: 'CSV (Görünen filtrelerle)',
         xlsLabel: 'Excel (.xls — HTML tablo)',
-        headers: { order: 'Sipariş', customer: 'Müşteri', email: 'E-posta', reason: 'Sebep', status: 'Durum', date: 'Tarih', amount: 'Tutar' }
+        headers: {
+          order: 'Sipariş',
+          customer: 'Müşteri',
+          email: 'E-posta',
+          reason: 'Sebep',
+          status: 'Durum',
+          date: 'Tarih',
+          amount: 'Tutar'
+        }
       },
-      table: { order: 'Sipariş', customer: 'Müşteri', reason: 'Sebep', status: 'Durum', date: 'Tarih', actions: 'İşlemler' },
-      empty: { filtered: 'Filtrelerle eşleşen iade talebi bulunamadı.', none: 'Henüz iade talebi bulunmuyor.' },
-      actions: { markAs: '{{status}} olarak işaretle' },
+      table: {
+        order: 'Sipariş',
+        customer: 'Müşteri',
+        reason: 'Sebep',
+        status: 'Durum',
+        date: 'Tarih',
+        actions: 'İşlemler'
+      },
+      empty: {
+        filtered: 'Filtrelerle eşleşen iade talebi bulunamadı.',
+        none: 'Henüz iade talebi bulunmuyor.'
+      },
+      actions: {
+        markAs: '{{status}} olarak işaretle'
+      },
       toasts: {
         returnsLoadFailed: 'İade talepleri yüklenemedi',
         statusUpdated: 'İade durumu "{{status}}" olarak güncellendi',
@@ -1092,29 +1394,183 @@ export const tr = {
       }
     },
     logistics: {
-      title: "Toplu Kargo Panosu",
-      subtitle: "Hazırlanıyor durumundaki siparişlere hızlıca kargo takip no girin.",
-      searchPlaceholder: "Sipariş no veya müşteri ara...",
-      applyToAll: "Tümüne Uygula",
-      shipOrders: "Kargoya Ver",
-      updating: "Güncelleniyor...",
-      noCarrierSelected: "Lütfen bir kargo firması seçin.",
+      title: 'Toplu Kargo Panosu',
+      subtitle: 'Hazırlanıyor durumundaki siparişlere hızlıca kargo takip no girin.',
+      searchPlaceholder: 'Sipariş no veya müşteri ara...',
+      applyToAll: 'Tümüne Uygula',
+      shipOrders: 'Kargoya Ver',
+      updating: 'Güncelleniyor...',
+      noCarrierSelected: 'Lütfen bir kargo firması seçin.',
       table: {
-        order: "Sipariş",
-        customer: "Müşteri",
-        date: "Tarih",
-        carrier: "Kargo Firması",
-        tracking: "Takip Numarası",
-        status: "Durum"
+        order: 'Sipariş',
+        customer: 'Müşteri',
+        date: 'Tarih',
+        carrier: 'Kargo Firması',
+        tracking: 'Takip Numarası',
+        status: 'Durum'
       },
       toasts: {
-        loadFailed: "Bekleyen siparişler yüklenemedi",
-        appliedToAll: "Seçili kargo firması tüm satırlara uygulandı.",
-        noNewTracking: "Kaydedilecek yeni kargo bilgisi bulunamadı.",
-        bulkUpdateFailed: "{{count}} siparişte kargo güncellemesi başarısız oldu.",
-        bulkUpdateSuccess: "{{count}} sipariş başarıyla Kargoda durumuna alındı!",
-        criticalError: "Toplu güncelleme sırasında kritik bir hata oluştu."
+        loadFailed: 'Bekleyen siparişler yüklenemedi',
+        appliedToAll: 'Seçili kargo firması tüm satırlara uygulandı.',
+        noNewTracking: 'Kaydedilecek yeni kargo bilgisi bulunamadı.',
+        bulkUpdateFailed: '{{count}} siparişte kargo güncellemesi başarısız oldu.',
+        bulkUpdateSuccess: '{{count}} sipariş başarıyla Kargoda durumuna alındı!',
+        criticalError: 'Toplu güncelleme sırasında kritik bir hata oluştu.'
       }
+    },
+    audit: {
+      actionTitle: 'İşlem',
+      clear: 'Temizle',
+      details: 'İşlem Detayları',
+      errorLoad: 'Günlükler yüklenemedi',
+      filterBatch: 'Filtre: Toplu İşlem',
+      history: 'Denetim Geçmişi',
+      noRecords: 'Kayıt Bulunamadı',
+      noRecordsDesc: 'Filtreleriniz veya arama kriterlerinizle eşleşen denetim günlüğü bulunamadı.',
+      searchPlaceholder: 'Tablo, birincil anahtar veya not ara',
+      subtitle: 'Tüm sistem değişikliklerini ve kullanıcı aktivitelerini izleyin.',
+      viewMovements: 'Hareketleri Görüntüle'
+    },
+    errorGroups: {
+      assigned: {
+        none: '(hiçbiri)'
+      },
+      bulk: {
+        selected: 'Seçilen gruplar: {{count}}',
+        statusTitle: 'Durum:'
+      },
+      details: {
+        envTitle: 'Ortam',
+        latest: 'Son Kayıtlar',
+        notes: 'Notlar',
+        notesPlaceholder: 'Bu grup hakkında bir not bırakın...',
+        releaseTitle: 'Sürüm',
+        sampleUrl: 'Örnek URL',
+        stackSummary: 'yığın',
+        top5: 'En Sık 5 Dağılım',
+        urlTitle: 'URL',
+        userAgentTitle: 'Kullanıcı Aracısı'
+      },
+      export: {
+        csvLabel: 'CSV (UTF-8 BOM)'
+      },
+      filter: {
+        assignedAll: 'Atanan: Tümü',
+        statusAll: 'Durum: Tümü',
+        unassigned: '(atanmamış)'
+      },
+      searchPlaceholder: 'imza veya mesaj ara',
+      table: {
+        actions: 'İşlemler',
+        assigned: 'Atanan',
+        count: 'Sayı',
+        lastMsg: 'Son Mesaj',
+        lastSeen: 'Son Görülme',
+        level: 'Seviye',
+        signature: 'İmza',
+        status: 'Durum'
+      }
+    },
+    movements: {
+      batchFilterPrefix: 'Filtre: Toplu İşlem',
+      export: {
+        csvLabel: 'CSV (görünür filtrelerle)',
+        headers: {
+          date: 'Tarih',
+          delta: 'Değişim',
+          product: 'Ürün',
+          reason: 'Neden',
+          ref: 'Referans',
+          sku: 'SKU'
+        }
+      },
+      pageLabel: 'Sayfa {{page}}',
+      reasons: {
+        adjust: 'Ayarlama',
+        manual_in: 'Manuel Giriş',
+        manual_out: 'Manuel Çıkış',
+        po_receipt: 'Satın Alma Makbuzu',
+        return_in: 'İade Girişi',
+        sale: 'Satış',
+        transfer_in: 'Transfer Girişi',
+        transfer_out: 'Transfer Çıkışı',
+        undo: 'Geri Al'
+      },
+      table: {
+        date: 'Tarih',
+        delta: 'Değişim',
+        product: 'Ürün',
+        reason: 'Neden',
+        ref: 'Referans'
+      },
+      toolbar: {
+        allCategories: 'Tüm Kategoriler',
+        categoryTitle: 'Kategori'
+      }
+    },
+    search: {
+      audit: 'Tablo, birincil anahtar veya nota göre ara',
+      coupons: 'Kod veya tipe göre ara',
+      errors: 'URL veya mesaja göre ara',
+      movements: 'Ürün adı/SKU\'ya göre ara',
+      orders: 'Sipariş ID veya Görüşme ID\'ye göre ara',
+      products: 'Ürün adı/SKU/marka/URL adına göre ara'
+    },
+    settings: {
+      addAdmin: 'Yeni Yönetici Ekle',
+      adminsDesc: 'Platform yöneticilerini buradan yönetebilirsiniz.',
+      adminsTab: 'Yönetici Yönetimi',
+      adminsTitle: 'Yönetici Listesi',
+      apiLatency: 'API Gecikmesi',
+      contactEmail: 'İletişim E-postası',
+      dbStatus: 'Veritabanı Durumu',
+      dropLogo: 'Logoyu buraya sürükleyin',
+      generalTab: 'Genel Ayarlar',
+      headquarters: 'Merkez Ofis Adresi',
+      iyzicoApiKey: 'iyzico API Anahtarı',
+      iyzicoMode: 'iyzico Modu',
+      iyzicoSecretKey: 'iyzico Gizli Anahtarı',
+      lastUpdate: 'Son Güncelleme',
+      logo: 'Logo',
+      paymentTab: 'Ödeme Ayarları',
+      paymentTitle: 'Ödeme Yapılandırması',
+      platformIdentity: 'Platform Kimliği',
+      platformIdentityDesc: 'Mağaza adınızı, logonuzu ve iletişim bilgilerinizi yönetin.',
+      saveError: 'Ayarlar kaydedilirken bir hata oluştu',
+      saveSuccess: 'Ayarlar başarıyla kaydedildi',
+      siteName: 'Site Adı',
+      supportPhone: 'Destek Telefonu',
+      systemDesc: 'Sunucu ve altyapı durumunu gerçek zamanlı izleyin.',
+      systemLogs: 'Sistem Günlükleri',
+      systemTab: 'Sunucu ve altyapı durumunu izleyin',
+      systemTitle: 'Sistem Durumu',
+      tagline: 'Slogan',
+      versionInfo: 'Sürüm Bilgisi'
+    },
+    ui: {
+      accessDeniedDesc: 'Bu sayfaya erişmek için yönetici yetkileri gereklidir.',
+      accessDeniedTitle: 'Erişim Engellendi',
+      add: 'Ekle',
+      all: 'Tümü',
+      apply: 'Uygula',
+      clear: 'Temizle',
+      close: 'Kapat',
+      delete: 'Sil',
+      details: 'Detaylar',
+      edit: 'Düzenle',
+      endDate: 'Bitiş Tarihi',
+      failed: 'İşlem başarısız',
+      hide: 'Gizle',
+      loading: 'Yükleniyor…',
+      loadingShort: 'Yükleniyor…',
+      next: 'Sonraki',
+      noRecords: 'Kayıt yok',
+      pageLabel: 'Sayfa {{page}} / {{pages}}',
+      prev: 'Önceki',
+      refresh: 'Yenile',
+      save: 'Kaydet',
+      startDate: 'Başlangıç Tarihi',
+      total: 'Toplam'
     }
   },
   auth: {
@@ -1214,7 +1670,6 @@ export const tr = {
       estPrefix: 'Kuruluş'
     }
   },
-
   contactPage: {
     title: 'İletişim',
     subtitle: 'Size her konuda yardımcı olmaktan mutluluk duyarız.',
@@ -1233,9 +1688,18 @@ export const tr = {
     phoneLabel: 'Telefon',
     emailLabel: 'E-posta',
     workingHours: 'Çalışma Saatleri',
-    businessInquiry: 'İş Ortaklığı & Proje Teklifleri'
+    businessInquiry: 'İş Ortaklığı & Proje Teklifleri',
+    addressLabel: 'Adres',
+    addressLine1: 'Teknokent Mah. Teknopark Bulvarı',
+    addressLine2: 'No: 1/4A 34906 Pendik/İstanbul',
+    emailPh: 'E-posta',
+    messagePh: 'Mesajınız / Proje detayları',
+    namePh: 'Adınız Soyadınız',
+    quickButton: 'WhatsApp\'tan Yazın',
+    quickDesc: 'Acil konular ve hızlı yanıtlar için bize doğrudan WhatsApp üzerinden ulaşın.',
+    quickTitle: 'Hızlı İletişim',
+    subjectPh: 'Konu'
   },
-
   aboutPage: {
     title: 'Hakkımızda',
     subtitle: 'Havalandırma teknolojilerinde mühendislik ve inovasyonun birleştiği nokta.',
@@ -1247,7 +1711,12 @@ export const tr = {
       projects: 'Tamamlanan Projeler',
       clients: 'Mutlu Müşteriler',
       years: 'Yıllık Tecrübe',
-      brands: 'Global Markalar'
+      brands: 'Global Markalar',
+      deliveryTarget: 'Teslimat Hedefi',
+      launchYear: 'Kuruluş Yılı',
+      premiumBrands: 'Premium Markalar',
+      productTypes: 'Ürün Tipleri',
+      yearsExperience: 'Yıllık Tecrübe'
     },
     experience: 'Yıllık Tecrübe',
     distributorship: 'Global Distribütörlük',
@@ -1275,9 +1744,58 @@ export const tr = {
     ctaTitleItalic: 'Tanışmaya Hazır mısınız?',
     ctaContact: 'İletişime Geçin',
     ctaExplore: 'Ürünleri Keşfedin',
-    seoDescription: 'VentHub: Türkiye\'nin premium HVAC distribütörü. 15 yıllık tecrübe ve mühendislik odaklı havalandırma çözümleri.'
+    seoDescription: 'VentHub: Türkiye\'nin premium HVAC distribütörü. 15 yıllık tecrübe ve mühendislik odaklı havalandırma çözümleri.',
+    bullets: {
+      bullet1: 'Mühendislik odaklı seçim desteği ve doğru ürün yönlendirmesi',
+      bullet2: 'Stok, teslimat ve satış sonrasında şeffaf iletişim',
+      bullet3: 'KVKK/iyzico uyumlu, güvenli ödeme ve veri koruma'
+    },
+    cta: {
+      primary: 'Ürünleri Keşfet',
+      secondary: 'Bizimle İletişime Geçin',
+      subtitle: 'Projeniz için en uygun HVAC çözümünü birlikte bulalım. Uzman ekibimiz size yardımcı olmaya hazır.',
+      title: 'Birlikte Çalışalım'
+    },
+    experienceLabel: '2009\'dan Beri',
+    heroSubtitle: 'Profesyonel havalandırma çözümlerinde 15 yılı aşkın deneyimimizle, dünya standartlarında ürünleri Türkiye\'ye getiriyoruz.',
+    heroTitleText: 'Yeniden Tanımlıyoruz',
+    trustBadges: {
+      ce: {
+        label: 'CE Sertifikalı Ürünler',
+        sublabel: 'Avrupa Standartları'
+      },
+      original: {
+        label: 'Orijinal Ürünler',
+        sublabel: 'Kalite Garantisi'
+      },
+      premium: {
+        label: 'Premium Markalar',
+        sublabel: 'Global Üreticiler'
+      },
+      reliable: {
+        label: 'Güvenilir Platform',
+        sublabel: 'Profesyonel Servis'
+      }
+    },
+    values: {
+      itemsSubtitle: 'Aldığımız her kararda müşterilerimizin ihtiyaçlarını önceliklendiriyoruz',
+      itemsTitle: 'Bizi Tanımlayan Değerler',
+      mission: {
+        description: 'Türkiye\'de profesyonel HVAC çözümlerini erişilebilir kılmak, B2B müşterilerimize dünya standartlarında ürünler sunmak.',
+        title: 'Misyonumuz'
+      },
+      values: {
+        description: 'Kalite, güvenilirlik, müşteri memnuniyeti ve sürdürülebilirlik ilkelerimizin temelini oluşturur.',
+        title: 'Değerlerimiz'
+      },
+      vision: {
+        description: 'Global markaların güvenilir temsilcisi olarak büyüyerek havalandırma sektöründe Türkiye\'nin referans e-ticaret platformu olmak.',
+        title: 'Vizyonumuz'
+      }
+    },
+    whySubtitle: 'Güveninize layık olmak için çalışıyoruz',
+    whyTitle: 'Neden VentHub?'
   },
-
   cartToast: {
     added: 'Ürün sepete eklendi!',
     whatNext: 'Ne yapmak istersiniz?',
@@ -1285,7 +1803,6 @@ export const tr = {
     goToCart: 'Sepete Git',
     autoClose: 'Bu pencere 5 saniye içinde otomatik olarak kapanacak'
   },
-
   cart: {
     emptyTitle: 'Sepetiniz boş',
     emptyDesc: 'Henüz bir ürün eklemediniz. Alışverişe başlamak için ürünlerimizi keşfedin.',
@@ -1305,7 +1822,6 @@ export const tr = {
     securePayment: 'Güvenli ödeme sistemi ile korunmaktadır',
     itemTotal: 'Toplam'
   },
-
   checkout: {
     saved: {
       title: 'Kayıtlı Adresler',
@@ -1340,7 +1856,12 @@ export const tr = {
     formPreparing: 'Form hazırlanıyor...',
     paymentSuccess: '🎉 Ödeme başarıyla tamamlandı!',
     paymentError: 'Ödeme sırasında bir hata oluştu',
-    steps: { step1: 'Kişisel Bilgiler', step2: 'Adres Bilgileri', step3: 'Özet', step4: 'Ödeme' },
+    steps: {
+      step1: 'Kişisel Bilgiler',
+      step2: 'Adres Bilgileri',
+      step3: 'Özet',
+      step4: 'Ödeme'
+    },
     overlay: {
       dialogLabel: 'Güvenli ödeme başlatılıyor',
       header: 'Güvenli ödeme başlatılıyor…',
@@ -1353,7 +1874,7 @@ export const tr = {
       dontClose: 'İşlem sırasında bu sayfayı kapatmayın veya geri gitmeyin. Birkaç saniye sürebilir.'
     },
     help: {
-      smsTitle: "Kod gelmedi mi?",
+      smsTitle: 'Kod gelmedi mi?',
       tip1: '30–60 saniye bekleyin ve tekrar deneyin (bankanız SMS\'i gecikmeli gönderebilir).',
       tip2: 'Sinyal yoksa veya uçuş modu gibi sorunlar varsa, farklı bir cihaz deneyin.',
       tip3: 'Telefon numaranızı kontrol edin ve bankanızla iletişime geçin.'
@@ -1457,7 +1978,6 @@ export const tr = {
       database: 'Veritabanı hatası. Lütfen tekrar deneyin.'
     }
   },
-
   payment: {
     verifyingTitle: 'Ödeme doğrulanıyor...',
     verifyingDesc: 'İşlemi bankanızla teyit ediyoruz. Lütfen bekleyin.',
@@ -1477,7 +1997,6 @@ export const tr = {
     unverified: 'Ödeme doğrulanamadı',
     unexpected: 'Beklenmedik bir hata oluştu'
   },
-
   category: {
     loading: 'Kategoriler hazırlanıyor...',
     notFound: 'Kategori bulunamadı',
@@ -1519,9 +2038,37 @@ export const tr = {
     allSeries: 'Tüm Seriler',
     chooseSeriesDesc: 'İhtiyacınıza uygun seriyi seçin',
     inspectSeries: 'Seriyi İncele',
-    whyCategory: 'Neden {{category}}?'
+    whyCategory: 'Neden {{category}}?',
+    airflow: 'Hava Debisi (m³/h)',
+    brands: 'Markalar',
+    clean: 'Temizle',
+    clearFilters: 'Filtreleri Temizle',
+    close: 'Kapat',
+    compareBar: 'Karşılaştır',
+    compareTitle: 'Karşılaştırma',
+    feature: 'Özellik',
+    filters: 'Filtreler',
+    gridViewAria: 'Izgara görünümü',
+    labelBrand: 'Marka',
+    labelModel: 'Model',
+    labelPrice: 'Fiyat',
+    listViewAria: 'Liste görünümü',
+    localSearchPlaceholder: 'Bu kategori içinde ara (ad/marka/model/SKU)',
+    ltePlaceholder: '≤',
+    maxPlaceholder: 'Maks',
+    minPlaceholder: 'Min',
+    noProducts: 'Ürün Bulunamadı',
+    noProductsDesc: 'Filtrelerinizle eşleşen ürün bulunamadı.',
+    noise: 'Ses Seviyesi [dB(A)] (Maks)',
+    open: 'Aç',
+    pressure: 'Basınç (Pa)',
+    priceRange: 'Fiyat Aralığı',
+    sortByName: 'Ada Göre Sırala',
+    sortByPriceHigh: 'Fiyat: Yüksekten Düşüğe',
+    sortByPriceLow: 'Fiyat: Düşükten Yükseğe',
+    subcategories: 'Alt Kategoriler',
+    techFilters: 'Teknik Filtreler'
   },
-
   pdp: {
     loading: 'Ürün yükleniyor...',
     productNotFound: 'Ürün Bulunamadı',
@@ -1550,10 +2097,10 @@ export const tr = {
     shareCopied: 'Link kopyalandı!',
     variantDetails: 'Varyant Detayları',
     messages: {
-      pdfStarted: 'PDF üretiliyor...',
+      pdfStarted: 'PDF üretiliyor...'
     },
     errors: {
-      pdfFailed: 'PDF üretilemedi.',
+      pdfFailed: 'PDF üretilemedi.'
     },
     labels: {
       productFeatures: 'Ürün Özellikleri',
@@ -1610,9 +2157,9 @@ export const tr = {
       download: 'İndir',
       downloadCatalog: 'Kataloğu İndir',
       downloadBrochure: 'Broşürü İndir',
-      liveDataNotice: "ℹ️ Veriler gerçek zamanlı güncellenmektedir",
-      interactive3D: "3D GÖRÜNÜM",
-      addToProject: "Projeye Ekle",
+      liveDataNotice: 'ℹ️ Veriler gerçek zamanlı güncellenmektedir',
+      interactive3D: '3D GÖRÜNÜM',
+      addToProject: 'Projeye Ekle',
       removeFromWishlist: 'Favorilerden Kaldır',
       addToWishlist: 'Favorilere Ekle',
       favorite: 'Favori',
@@ -1713,7 +2260,6 @@ export const tr = {
     allTitle: 'Tüm Kategoriler',
     variantCount: '{{count}} çeşit'
   },
-
   quickView: {
     title: 'Hızlı Bakış',
     close: 'Kapat',
@@ -1721,9 +2267,13 @@ export const tr = {
     viewProduct: 'Ürünü Gör',
     descFallback: 'Ürün açıklaması yakında eklenecektir.'
   },
-
   support: {
-    links: { faq: 'SSS', returns: 'İade ve Değişim', shipping: 'Kargo ve Teslimat', warranty: 'Garanti ve Servis' },
+    links: {
+      faq: 'SSS',
+      returns: 'İade ve Değişim',
+      shipping: 'Kargo ve Teslimat',
+      warranty: 'Garanti ve Servis'
+    },
     home: {
       subtitle: 'İhtiyacınız olan bilgilere hızlıca ulaşın.',
       faqDesc: 'Siparişler, ödeme, kurulum ve daha fazlası',
@@ -1754,7 +2304,6 @@ export const tr = {
       a3: 'Ürüne göre değişiklik gösterebilir. Lütfen destek ekibimizle görüşün.'
     }
   },
-
   account: {
     tabs: {
       overview: 'Genel Bakış',
@@ -1809,7 +2358,6 @@ export const tr = {
       makeDefault: 'Varsayılan Yap',
       unregistered: 'Kayıtsız Başlık',
       cancel: 'İptal',
-
       submit: {
         update: 'Güncelle',
         add: 'Ekle'
@@ -1864,7 +2412,6 @@ export const tr = {
       toastSuccess: 'Profil güncellendi',
       toastError: 'Güncelleme sırasında hata'
     },
-
     security: {
       title: 'Şifre Değiştir',
       currentLabel: 'Mevcut şifre',
@@ -1898,10 +2445,9 @@ export const tr = {
         googleUnlinkFailed: 'Google bağlantısı kaldırılamadı',
         googleLinkStarted: 'Google hesabı bağlama işlemi başlatıldı',
         googleLinkFailed: 'Google bağlama başarısız'
-      },
+      }
     }
   },
-
   orders: {
     title: 'Siparişlerim',
     empty: 'Henüz siparişiniz bulunmuyor.',
@@ -1953,9 +2499,29 @@ export const tr = {
     shippedAt: 'Kargoya Veriliş',
     deliveredAt: 'Teslim Tarihi',
     noShippingInfo: 'Kargo bilgisi henüz girilmemiş.',
-    invoicePdf: 'Proforma (PDF)'
+    invoicePdf: 'Proforma (PDF)',
+    all: 'Tümü',
+    cancelled: 'İptal Edildi',
+    delivered: 'Teslim Edildi',
+    endDate: 'Bitiş Tarihi',
+    failed: 'Başarısız',
+    filters: 'Filtreler',
+    orderNumber: 'Sipariş No',
+    pa_id: 'Ödendi',
+    partialRefunded: 'Kısmi İade Edildi',
+    pending: 'Beklemede',
+    refunded: 'İade Edildi',
+    shipped: 'Sevk Edildi',
+    startDate: 'Başlangıç Tarihi',
+    subtitle: 'Geçmiş siparişlerinizi görüntüleyin ve takip edin',
+    tabs: {
+      invoice: 'Fatura',
+      items: 'Ürünler',
+      overview: 'Genel Bakış',
+      shipping: 'Sevkiyat'
+    },
+    viewAll: 'Tümünü görüntüle'
   },
-
   returns: {
     title: 'İade Taleplerim',
     new: 'Yeni İade Talebi',
@@ -1984,7 +2550,6 @@ export const tr = {
       cancelled: 'İptal Edildi'
     }
   },
-
   lead: {
     message: 'Mesaj',
     title: 'Teknik Teklif İsteği',
@@ -2024,7 +2589,7 @@ export const tr = {
       description: 'Endüstriyel havalandırma ihtiyaçlarınız için doğrudan üretici/distribütör fiyatlarıyla özel teklif alın. Mühendislik destek ekibimiz hızlıca size dönecektir.',
       feature1: 'Ücretsiz Projelendirme Desteği',
       feature2: 'Hızlı Fiyatlandırma ve Stok Bilgisi',
-      feature3: "B2B'ye Özel Avantajlı Koşullar"
+      feature3: 'B2B\'ye Özel Avantajlı Koşullar'
     },
     success: {
       title: 'Talebiniz Alındı!',
@@ -2082,14 +2647,29 @@ export const tr = {
       title: 'Mühendislik ve Güven Odaklı Yaklaşım',
       subtitle: 'Sektörün lider markaları ve uzman mühendis kadromuzla projelerinize değer katıyoruz.',
       items: {
-        brands: { eyebrow: 'Yetkinlik', title: 'Global Markalar', description: 'Dünyanın en güvenilir HVAC üreticilerinin yetkili ortağı.' },
-        guidance: { eyebrow: 'Uzmanlık', title: 'Proje Desteği', description: 'Şartnameden devreye almaya kadar her adımda yanınızdayız.' },
-        delivery: { eyebrow: 'Hız', title: 'Hızlı Teslimat', description: 'Geniş stok ağımızla Türkiye genelinde zamanında teslimat.' },
-        support: { eyebrow: 'Süreklilik', title: 'Satış Sonrası', description: 'Teknik destek ve yedek parça garantisi ile kesintisiz işletme.' }
+        brands: {
+          eyebrow: 'Yetkinlik',
+          title: 'Global Markalar',
+          description: 'Dünyanın en güvenilir HVAC üreticilerinin yetkili ortağı.'
+        },
+        guidance: {
+          eyebrow: 'Uzmanlık',
+          title: 'Proje Desteği',
+          description: 'Şartnameden devreye almaya kadar her adımda yanınızdayız.'
+        },
+        delivery: {
+          eyebrow: 'Hız',
+          title: 'Hızlı Teslimat',
+          description: 'Geniş stok ağımızla Türkiye genelinde zamanında teslimat.'
+        },
+        support: {
+          eyebrow: 'Süreklilik',
+          title: 'Satış Sonrası',
+          description: 'Teknik destek ve yedek parça garantisi ile kesintisiz işletme.'
+        }
       }
     }
   },
-
   calculators: {
     airCurtain: {
       title: 'Hava Perdesi Hesaplayıcı',
@@ -2120,13 +2700,34 @@ export const tr = {
         inputSummary: 'Giriş Özeti'
       },
       applications: {
-        comfort: { label: 'Konfor / Enerji', desc: 'Genel ticari alanlar, mağazalar', info: 'Genel ticari alanlar için enerji tasarrufu sağlar. Nozul hızı: 8-12 m/s' },
-        insect: { label: 'Sinek Kontrolü', desc: 'Gıda işletmeleri, restoranlar', info: 'Gıda işletmeleri ve restoranlar için sinek girişini engeller. Nozul hızı: 12-15 m/s' },
-        coldRoom: { label: 'Soğuk Oda', desc: 'Soğuk depolar, buzhane', info: 'Soğuk hava depolarında ısı kaybını minimize eder. Nozul hızı: 15-18 m/s' }
+        comfort: {
+          label: 'Konfor / Enerji',
+          desc: 'Genel ticari alanlar, mağazalar',
+          info: 'Genel ticari alanlar için enerji tasarrufu sağlar. Nozul hızı: 8-12 m/s'
+        },
+        insect: {
+          label: 'Sinek Kontrolü',
+          desc: 'Gıda işletmeleri, restoranlar',
+          info: 'Gıda işletmeleri ve restoranlar için sinek girişini engeller. Nozul hızı: 12-15 m/s'
+        },
+        coldRoom: {
+          label: 'Soğuk Oda',
+          desc: 'Soğuk depolar, buzhane',
+          info: 'Soğuk hava depolarında ısı kaybını minimize eder. Nozul hızı: 15-18 m/s'
+        }
       },
       conditions: {
-        wind: { none: 'Yok', light: 'Hafif', moderate: 'Orta', strong: 'Şiddetli' },
-        traffic: { low: 'Düşük', medium: 'Orta', high: 'Yoğun' }
+        wind: {
+          none: 'Yok',
+          light: 'Hafif',
+          moderate: 'Orta',
+          strong: 'Şiddetli'
+        },
+        traffic: {
+          low: 'Düşük',
+          medium: 'Orta',
+          high: 'Yoğun'
+        }
       },
       results: {
         title: 'Hesaplama Sonuçları',
@@ -2241,17 +2842,28 @@ export const tr = {
       }
     }
   },
-
   categorySilentFan: {
     problem: {
       eyebrow: 'SES VE KONFOR',
       title: 'Huzurunuzu Bozan Seslere Son Verin',
       subtitle: 'Standart kanal fanları sadece havayı değil, gürültüyü de yaşam alanlarınıza taşır. Vortice Lineo Quiet ile sessizliğin yeni standardını keşfedin.',
       painPoints: [
-        { title: 'Akustik Kirlilik', description: 'Konvansiyonel fanların yarattığı uğultu, odaklanmayı zorlaştırır ve konforu düşürür.' },
-        { title: 'Düşük Verimlilik', description: 'Gürültülü fanlar genellikle aerodinamik olarak verimsizdir ve daha fazla enerji harcar.' },
-        { title: 'Titreşim Sorunları', description: 'İzole edilmemiş cihazlar montaj yüzeylerinde titreşim ve ikincil gürültüye sebep olur.' },
-        { title: 'Bölünen Odak', description: 'Sürekli gürültü, kütüphane ve ofislerde verimliliği %20 oranında düşürebilir.' }
+        {
+          title: 'Akustik Kirlilik',
+          description: 'Konvansiyonel fanların yarattığı uğultu, odaklanmayı zorlaştırır ve konforu düşürür.'
+        },
+        {
+          title: 'Düşük Verimlilik',
+          description: 'Gürültülü fanlar genellikle aerodinamik olarak verimsizdir ve daha fazla enerji harcar.'
+        },
+        {
+          title: 'Titreşim Sorunları',
+          description: 'İzole edilmemiş cihazlar montaj yüzeylerinde titreşim ve ikincil gürültüye sebep olur.'
+        },
+        {
+          title: 'Bölünen Odak',
+          description: 'Sürekli gürültü, kütüphane ve ofislerde verimliliği %20 oranında düşürebilir.'
+        }
       ],
       visual: {
         without: 'Standart Fan İle',
@@ -2265,9 +2877,18 @@ export const tr = {
       title: 'Sessiz Gücün Arkasındaki Mühendislik',
       subtitle: 'Vortice Lineo Quiet, aerodinamik olarak optimize edilmiş gövdesi ve ses emici katmanları ile fısıltı seviyesinde performans sunar.',
       steps: [
-        { title: 'Ses Emici Gövde', description: 'Özel kompozit dış gövde, motor sesini içeride hapseder.' },
-        { title: 'Laminar Akış', description: 'Hava yönlendirici kanatlar türbülansı azaltır ve sesi kaynağında keser.' },
-        { title: 'Dinamik Balans', description: 'Yüksek hassasiyetli fan pervanesi, titreşimsiz ve sessiz bir sirkülasyon sağlar.' }
+        {
+          title: 'Ses Emici Gövde',
+          description: 'Özel kompozit dış gövde, motor sesini içeride hapseder.'
+        },
+        {
+          title: 'Laminar Akış',
+          description: 'Hava yönlendirici kanatlar türbülansı azaltır ve sesi kaynağında keser.'
+        },
+        {
+          title: 'Dinamik Balans',
+          description: 'Yüksek hassasiyetli fan pervanesi, titreşimsiz ve sessiz bir sirkülasyon sağlar.'
+        }
       ]
     },
     comparison: {
@@ -2275,18 +2896,43 @@ export const tr = {
       standard: 'Standart Fanlar',
       quiet: 'Vortice Lineo Quiet',
       features: [
-        { label: 'Ses Seviyesi', standard: '55-65 dB(A)', quiet: '25-30 dB(A)' },
-        { label: 'Enerji Tüketimi', standard: 'Yüksek (AC Motor)', quiet: '%60 Tasarruf (ES/EC Motor)' },
-        { label: 'Hava Kalitesi', standard: 'Türbülanslı Akış', quiet: 'Laminar ve Sürekli' },
-        { label: 'Montaj', standard: 'Karmaşık ve Sert', quiet: 'Hızlı ve Titreşim İzole' }
+        {
+          label: 'Ses Seviyesi',
+          standard: '55-65 dB(A)',
+          quiet: '25-30 dB(A)'
+        },
+        {
+          label: 'Enerji Tüketimi',
+          standard: 'Yüksek (AC Motor)',
+          quiet: '%60 Tasarruf (ES/EC Motor)'
+        },
+        {
+          label: 'Hava Kalitesi',
+          standard: 'Türbülanslı Akış',
+          quiet: 'Laminar ve Sürekli'
+        },
+        {
+          label: 'Montaj',
+          standard: 'Karmaşık ve Sert',
+          quiet: 'Hızlı ve Titreşim İzole'
+        }
       ]
     },
     faq: {
       title: 'Sıkça Sorulan Sorular',
       items: [
-        { q: 'Gerçekten ne kadar sessiz?', a: 'Lineo Quiet, düşük hızda fısıltı sesine (yaklaşık 25 dB) yakındır. Bu, normal bir konuşmanın yarısından daha azdır.' },
-        { q: 'Montajı zor mu?', a: 'Hayır, hızlı montaj kelepçeleri sayesinde bakım veya kurulum için cihazı kanaldan ayırmanız gerekmez.' },
-        { q: 'Hangi alanlar için uygundur?', a: 'Kütüphaneler, ofisler, yatak odaları ve otel odaları gibi sessizliğin kritik olduğu her yer için idealdir.' }
+        {
+          q: 'Gerçekten ne kadar sessiz?',
+          a: 'Lineo Quiet, düşük hızda fısıltı sesine (yaklaşık 25 dB) yakındır. Bu, normal bir konuşmanın yarısından daha azdır.'
+        },
+        {
+          q: 'Montajı zor mu?',
+          a: 'Hayır, hızlı montaj kelepçeleri sayesinde bakım veya kurulum için cihazı kanaldan ayırmanız gerekmez.'
+        },
+        {
+          q: 'Hangi alanlar için uygundur?',
+          a: 'Kütüphaneler, ofisler, yatak odaları ve otel odaları gibi sessizliğin kritik olduğu her yer için idealdir.'
+        }
       ]
     },
     brand: {
@@ -2295,40 +2941,52 @@ export const tr = {
       description: '1954\'ten beri havalandırma dünyasına yön veren Vortice, Lineo Quiet serisi ile sessiz kanal fanı kategorisinde zirveyi temsil ediyor.',
       badges: ['Yetkili Distribütör', '2 Yıl Garanti'],
       stats: [
-        { label: 'Yıllık Deneyim', value: '70+' },
-        { label: 'Ülke', value: '90+' },
-        { label: "Compasso d'Oro", value: '3x' },
-        { label: 'Avrupa', value: '#1' }
+        {
+          label: 'Yıllık Deneyim',
+          value: '70+'
+        },
+        {
+          label: 'Ülke',
+          value: '90+'
+        },
+        {
+          label: 'Compasso d\'Oro',
+          value: '3x'
+        },
+        {
+          label: 'Avrupa',
+          value: '#1'
+        }
       ]
     }
   },
   needsWizard: {
-    coldStorage: "Soğuk Hava Deposu",
-    coldStorageDesc: "Soğuk zincir koruması",
-    coldStorageTip: "Gıda güvenliği ve enerji tasarrufu sağlar",
-    industrial: "Endüstriyel Tesis",
-    industrialDesc: "Fabrika, depo, lojistik",
-    industrialTip: "Endüstriyel gereksinimlere uygun güç",
-    retail: "Market / Süpermarket",
-    retailDesc: "Soğutucu reyonlar",
-    retailTip: "Soğutucu reyonlardan sıcak havayı uzak tutar",
-    step1Title: "Kullanım alanı neresi?",
-    step1Desc: "Size en uygun teknik özellikleri belirlemek için önce uygulama alanını seçin.",
-    step2Title: "Kapı ölçülerini girin",
-    step2Desc: "Hava perdesinin tüm açıklığı kapatması kritik önemdedir.",
-    widthMeter: "Genişlik (Metre)",
-    heightMeter: "Yükseklik (Metre)",
-    step3Title: "Isıtıcı ihtiyacı var mı?",
-    heatingYesDesc: "Kışın konfor için",
-    heatingNoDesc: "Sadece hava bariyeri",
-    notSure: "Emin Değilim",
-    consultUs: "Bize danışın",
-    step6Title: "Size En Uygun Modeller",
-    step6Desc: "Mühendislik kriterlerine göre filtrelenmiş öneriler.",
-    analyzing: "Modeller Analiz Ediliyor...",
-    matchScore: "% {{score}} Uyum",
-    restart: "Yeniden Başla",
-    customOffer: "Özel Teklif İste",
+    coldStorage: 'Soğuk Hava Deposu',
+    coldStorageDesc: 'Soğuk zincir koruması',
+    coldStorageTip: 'Gıda güvenliği ve enerji tasarrufu sağlar',
+    industrial: 'Endüstriyel Tesis',
+    industrialDesc: 'Fabrika, depo, lojistik',
+    industrialTip: 'Endüstriyel gereksinimlere uygun güç',
+    retail: 'Market / Süpermarket',
+    retailDesc: 'Soğutucu reyonlar',
+    retailTip: 'Soğutucu reyonlardan sıcak havayı uzak tutar',
+    step1Title: 'Kullanım alanı neresi?',
+    step1Desc: 'Size en uygun teknik özellikleri belirlemek için önce uygulama alanını seçin.',
+    step2Title: 'Kapı ölçülerini girin',
+    step2Desc: 'Hava perdesinin tüm açıklığı kapatması kritik önemdedir.',
+    widthMeter: 'Genişlik (Metre)',
+    heightMeter: 'Yükseklik (Metre)',
+    step3Title: 'Isıtıcı ihtiyacı var mı?',
+    heatingYesDesc: 'Kışın konfor için',
+    heatingNoDesc: 'Sadece hava bariyeri',
+    notSure: 'Emin Değilim',
+    consultUs: 'Bize danışın',
+    step6Title: 'Size En Uygun Modeller',
+    step6Desc: 'Mühendislik kriterlerine göre filtrelenmiş öneriler.',
+    analyzing: 'Modeller Analiz Ediliyor...',
+    matchScore: '% {{score}} Uyum',
+    restart: 'Yeniden Başla',
+    customOffer: 'Özel Teklif İste',
     entranceDoor: 'Giriş Kapısı',
     next: 'Devam Et',
     entranceDesc: 'Mağaza, restoran, otel girişi',
@@ -2368,7 +3026,6 @@ export const tr = {
     top: 'Üst',
     bottom: 'Alt'
   },
-
   error: {
     chunkTitle: 'Sayfa Güncellemesi Gerekli',
     chunkDesc: 'Uygulama güncellenmiş görünüyor. Sayfayı yenileyip tekrar deneyin.',
@@ -2376,6 +3033,117 @@ export const tr = {
     errorDesc: 'Bu sayfa yüklenirken bir hata oluştu. Lütfen tekrar deneyin.',
     refresh: 'Sayfayı Yenile',
     retry: 'Tekrar Dene',
-    devDetails: 'Hata Detayları (Geliştirme)',
+    devDetails: 'Hata Detayları (Geliştirme)'
+  },
+  applications: {
+    'air-curtain': {
+      subtitle: 'Enerji kaybını azaltan giriş çözümleri',
+      title: 'AVM / Giriş Tipi Hava Perdesi'
+    },
+    airCurtain: {
+      subtitle: 'Enerji kaybını azaltan giriş çözümleri',
+      title: 'AVM / Giriş Tipi Hava Perdesi'
+    },
+    'heat-recovery': {
+      subtitle: 'Verimli havalandırma ve enerji tasarrufu',
+      title: 'Isı Geri Kazanım'
+    },
+    heatRecovery: {
+      subtitle: 'Verimli havalandırma ve enerji tasarrufu',
+      title: 'Isı Geri Kazanım'
+    },
+    parking: {
+      subtitle: 'Yüksek hava debisi ve basınç gerektiren çözümler',
+      title: 'Otopark Havalandırması'
+    }
+  },
+  homeCta: {
+    button: 'Teklif Al / Uzman Desteği',
+    subtitle: 'Bize kısa bilgi verin, doğru çözümü birlikte şekillendirelim.',
+    title: 'Projeniz Hakkında Konuşalım'
+  },
+  homeFaq: {
+    items: {
+      airCurtain: {
+        a: 'Konforu artırmak ve enerji kaybını azaltmak için girişlerde kullanılır; açıklıkta bir hava bariyeri oluşturur.',
+        q: 'Hava perdesini ne zaman kullanmalıyım?'
+      },
+      hrv: {
+        a: 'Hava debisi, ısı geri kazanım verimliliği, basınç kaybı ve ses seviyeleri belirleyicidir.',
+        q: 'Isı Geri Kazanım Cihazı (VMC) seçerken nelere dikkat etmeliyim?'
+      },
+      jetFan: {
+        a: 'Otopark hacmi, CO/NOx sensörleri, hava değişim oranı ve yerleşim planına göre hesaplanır.',
+        q: 'Jet fan seçimi nasıl yapılır?'
+      }
+    },
+    readMore: 'Daha fazlasını oku →',
+    subtitle: 'Temel konulara hızlı yanıtlar — daha fazlası için destek sayfamızı inceleyin.',
+    title: 'Sıkça Sorulan Sorular'
+  },
+  homeProcess: {
+    stepPrefix: 'Adım',
+    steps: {
+      analysis: {
+        desc: 'Hava debisi, basınç, akustik, enerji verimliliği ve yönetmelikleri inceliyoruz.',
+        title: 'Analiz & Hesaplama'
+      },
+      implementation: {
+        desc: 'Kurulum kılavuzları, devreye alma ve teknik destek ile süreci kolaylaştırıyoruz.',
+        title: 'Uygulama Desteği'
+      },
+      need: {
+        desc: 'Kısa bir telefon görüşmesi veya form aracılığıyla kullanım amacını netleştiriyoruz.',
+        title: 'İhtiyaçlarınızı Anlamak'
+      },
+      proposal: {
+        desc: 'Uygun ürün ailelerini, alternatifleri ve temin sürelerini öneriyoruz.',
+        title: 'Çözüm / Teklif'
+      },
+      support: {
+        desc: 'Sürdürülebilirlik için satış sonrası eğitim, yedek parça ve servis ağı sunuyoruz.',
+        title: 'Satış Sonrası Destek'
+      }
+    },
+    subtitle: 'Başlangıçtan teslimata kadar şeffaf ve öngörülebilir bir süreç',
+    title: 'Nasıl Çalışıyoruz'
+  },
+  homeSpotlight: {
+    items: {
+      airCurtain: {
+        desc: 'Giriş konforu ve azaltılmış ısı kaybı',
+        title: 'Hava Perdesi'
+      },
+      hrv: {
+        desc: 'İç ortam hava kalitesi ve verimlilik',
+        title: 'Isı Geri Kazanım Cihazı (VMC)'
+      },
+      parkingJetFan: {
+        desc: 'CO sensör kontrolü ve energy tasarrufu',
+        title: 'Otopark Jet Fanı'
+      },
+      smokeExhaust: {
+        desc: 'Acil durum yönetimi',
+        title: 'Duman Tahliye'
+      }
+    },
+    subtitle: 'İçeriği vurgulamak için imleci hareket ettirin',
+    title: 'Öne Çıkan Uygulamalar'
+  },
+  homeTrust: {
+    kvkk: {
+      desc: 'Kişisel veriler güvenli bir şekilde saklanır ve yalnızca gerekli olduğunda kullanılır.',
+      title: 'KVKK Uyumlu'
+    },
+    payment: {
+      desc: '3D Secure ve gelişmiş dolandırıcılık önleme kontrolleri.',
+      title: 'Güvenli Ödeme (iyzico)'
+    },
+    returns: {
+      desc: 'Şeffaf prosedürler ve hızlı, sonuç odaklı destek.',
+      title: 'Kolay İade/Değişim'
+    },
+    subtitle: 'Altyapımız, güvenliğimiz ve süreçlerimiz şeffaf ve standartlara uygundur.',
+    title: 'Güven & Uyum'
   }
 };
