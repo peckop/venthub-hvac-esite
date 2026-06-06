@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-02T20:51:30.378377+00:00
+compiled_at: 2026-06-06T09:36:14.854983+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -103,7 +103,7 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   └── 📂 **products/**
 │   │   │       ├── 📂 **[slug]/**
-│   │   │       │   └── ✅ `page.tsx`
+│   │   │       │   └── ❌ `page.tsx`
 │   │   │       └── ✅ `page.tsx`
 │   │   ├── 📂 **_components/**
 │   │   │   └── ❌ `ProductDetailPageView.tsx`
@@ -151,7 +151,7 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │   │   │   └── 📂 **webhook/**
 │   │   │       └── 📂 **supabase/**
 │   │   │           └── ✅ `route.ts`
-│   │   ├── ✅ `layout.tsx`
+│   │   ├── ❌ `layout.tsx`
 │   │   ├── ✅ `robots.ts`
 │   │   └── ✅ `sitemap.ts`
 │   ├── 📂 **assets/**
@@ -161,23 +161,16 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │   │   ├── ✅ `AddToCartToastContent.tsx`
 │   │   ├── ✅ `BackToTopButton.tsx`
 │   │   ├── ✅ `BeforeAfterSlider.tsx`
-│   │   ├── ✅ `BentoGrid.tsx`
 │   │   ├── ✅ `BrandsShowcase.tsx`
 │   │   ├── ✅ `BuildTag.tsx`
 │   │   ├── ✅ `CaseStudySection.tsx`
-│   │   ├── ✅ `CategoriesShowcase.tsx`
 │   │   ├── ✅ `CategoryFlow.tsx`
 │   │   ├── ✅ `ErrorBoundary.tsx`
-│   │   ├── ✅ `FAQShortSection.tsx`
 │   │   ├── ✅ `Footer.tsx`
 │   │   ├── ✅ `HVACIcons.tsx`
-│   │   ├── ✅ `HeroCarousel.tsx`
-│   │   ├── ✅ `HeroSection.tsx`
-│   │   ├── ✅ `HeroSkeleton.tsx`
 │   │   ├── ✅ `ImageGallery.tsx`
 │   │   ├── ✅ `InViewCounter.tsx`
 │   │   ├── ✅ `LanguageSwitcher.tsx`
-│   │   ├── ✅ `LazyBrandsShowcase.tsx`
 │   │   ├── ✅ `LazyInView.tsx`
 │   │   ├── ✅ `LeadModal.tsx`
 │   │   ├── ✅ `LoadingSpinner.tsx`
@@ -186,24 +179,19 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │   │   ├── ❌ `PaymentWatcher.tsx`
 │   │   ├── ✅ `ProductCard.tsx`
 │   │   ├── ✅ `QuickViewModal.tsx`
-│   │   ├── ✅ `ResourcesSection.tsx`
 │   │   ├── ✅ `ScrollLinkedProcess.tsx`
 │   │   ├── ✅ `ScrollReveal.tsx`
 │   │   ├── ✅ `ScrollToTop.tsx`
 │   │   ├── ✅ `SearchOverlay.tsx`
 │   │   ├── ✅ `SecurityRibbon.tsx`
 │   │   ├── ✅ `Seo.tsx`
-│   │   ├── ✅ `SimpleProductGallery.tsx`
 │   │   ├── ✅ `SpotlightHeroOverlay.tsx`
-│   │   ├── ✅ `SpotlightList.tsx`
 │   │   ├── ✅ `StickyHeader.tsx`
 │   │   ├── ✅ `SubcategoryFlow.tsx`
 │   │   ├── ❌ `TiltCard.tsx`
-│   │   ├── ✅ `TrustSection.tsx`
 │   │   ├── ✅ `UndecidedUserCTA.tsx`
 │   │   ├── ✅ `VisualShowcase.tsx`
 │   │   ├── ✅ `WhatsAppFloat.tsx`
-│   │   ├── ✅ `WhyVentHubEnhanced.tsx`
 │   │   ├── 📂 **admin/**
 │   │   │   ├── ✅ `AccessDenied.tsx`
 │   │   │   ├── ✅ `AdminEmptyState.tsx`
@@ -277,14 +265,11 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │   │   │   ├── ✅ `ApplicationSolutions.tsx`
 │   │   │   ├── ✅ `CinematicProductShowcase.tsx`
 │   │   │   ├── ✅ `ClientLeadButton.tsx`
-│   │   │   ├── ✅ `EliteHero.tsx`
 │   │   │   ├── ✅ `FeaturedCommercialBlocks.tsx`
-│   │   │   ├── ✅ `FinalCTA.tsx`
 │   │   │   ├── ✅ `GuidedCategoryDiscovery.tsx`
 │   │   │   ├── ✅ `HomePageClientWrapper.tsx`
 │   │   │   ├── ✅ `HomeSinevizyon.tsx`
 │   │   │   ├── ✅ `KnowledgeBlock.tsx`
-│   │   │   ├── ✅ `QuickEntryRail.tsx`
 │   │   │   ├── ✅ `RevealSection.tsx`
 │   │   │   ├── ✅ `StrategicBrands.tsx`
 │   │   │   └── ✅ `TrustProofSection.tsx`
@@ -354,16 +339,12 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │   │   │   │       ├── ✅ `SpeedControlModel.tsx`
 │   │   │   │       └── ✅ `WallMountedCompactFanModel.tsx`
 │   │   │   ├── ✅ `AddToProjectModal.tsx`
-│   │   │   ├── ✅ `ApplicationCards.tsx`
 │   │   │   ├── ✅ `BentPlaneGeometry.tsx`
 │   │   │   ├── ✅ `BlueprintCanvas.tsx`
 │   │   │   ├── ✅ `Category3DIcon.tsx`
 │   │   │   ├── ✅ `CategoryOrbitCarousel.tsx`
-│   │   │   ├── ❌ `CategoryPreviewPanel.tsx`
-│   │   │   ├── ✅ `CategoryShowcaseCards.tsx`
 │   │   │   ├── ✅ `InfiniteProductsShowcase.tsx`
 │   │   │   ├── ✅ `OrbitalProductsShowcase.tsx`
-│   │   │   ├── ✅ `ProductsGrid.tsx`
 │   │   │   ├── ✅ `ProductsHero.tsx`
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
@@ -413,7 +394,7 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │   │   ├── ✅ `useSettings.ts`
 │   │   └── ✅ `useTenant.tsx`
 │   ├── 📂 **i18n/**
-│   │   ├── ✅ `I18nContext.ts`
+│   │   ├── ❌ `I18nContext.ts`
 │   │   ├── ✅ `I18nProvider.tsx`
 │   │   ├── ✅ `datetime.ts`
 │   │   ├── 📂 **dictionaries/**
@@ -496,7 +477,6 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │       ├── ✅ `LoginPage.tsx`
 │       ├── ✅ `OrdersPage.tsx`
 │       ├── ❌ `PaymentSuccessPage.tsx`
-│       ├── ✅ `ProductDetailPage.tsx`
 │       ├── ❌ `ProductsDiscoveryView.tsx`
 │       ├── ❌ `ProductsPage.tsx`
 │       ├── ✅ `RegisterPage.tsx`
@@ -509,7 +489,6 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │       │   ├── ❌ `AccountReturnsPage.tsx`
 │       │   ├── ✅ `AccountSecurityPage.tsx`
 │       │   ├── ✅ `AccountShipmentsPage.tsx`
-│       │   ├── ✅ `AdminStockPage.tsx`
 │       │   └── ❌ `OrderDetailPage.tsx`
 │       ├── 📂 **admin/**
 │       │   ├── ✅ `AdminAuditLogPage.tsx`
@@ -543,7 +522,7 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │       │   ├── ✅ `CategorySeriesView.tsx`
 │       │   └── ✅ `CategoryShowcaseView.tsx`
 │       ├── 📂 **checkout/**
-│       │   ├── ✅ `AddressFormModal.tsx`
+│       │   ├── ❌ `AddressFormModal.tsx`
 │       │   ├── ✅ `AddressSelectModal.tsx`
 │       │   ├── ✅ `CheckoutProgress.tsx`
 │       │   ├── ✅ `InvoiceProfileModal.tsx`
@@ -568,7 +547,6 @@ Bu belge, otonom derleyici tarafından 2026-06-02T20:51:30.378377+00:00 tarihind
 │           ├── ✅ `FAQPage.tsx`
 │           ├── ✅ `ReturnsPage.tsx`
 │           ├── ✅ `ShippingPage.tsx`
-│           ├── ✅ `SupportHomePage.tsx`
 │           └── ✅ `WarrantyPage.tsx`
 └── 📂 **supabase/**
     └── 📂 **functions/**
@@ -621,8 +599,10 @@ Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
 Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:
 - [❌] `src\app\[lang]\about\page.md`
 - [❌] `src\app\[lang]\category\[categorySlug]\page.md`
+- [❌] `src\app\[lang]\products\[slug]\page.md`
 - [❌] `src\app\_components\ProductDetailPageView.md`
 - [❌] `src\app\admin\returns\page.md`
+- [❌] `src\app\layout.md`
 - [❌] `src\components\PaymentWatcher.md`
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\admin\dashboard\AbcPieChart.md`
@@ -631,10 +611,10 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\components\navigation\NavShell.md`
 - [❌] `src\components\product\ProductSmartInference.md`
 - [❌] `src\components\products\3d\factory\Assembler.md`
-- [❌] `src\components\products\CategoryPreviewPanel.md`
 - [❌] `src\components\products\SeriesCard.md`
 - [❌] `src\config\orbitalCarouselConfig.md`
 - [❌] `src\design-system\tokens.md`
+- [❌] `src\i18n\I18nContext.md`
 - [❌] `src\lib\pdfAssets.md`
 - [❌] `src\lib\services\category.service.md`
 - [❌] `src\lib\services\pricing.service.md`
@@ -652,4 +632,5 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\views\account\OrderDetailPage.md`
 - [❌] `src\views\admin\AdminOrdersBoard.md`
 - [❌] `src\views\calculators\AirCurtainCalcPage.md`
+- [❌] `src\views\checkout\AddressFormModal.md`
 - [❌] `src\views\checkout\buildPaymentRequest.md`
