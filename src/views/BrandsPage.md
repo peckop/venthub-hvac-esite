@@ -3,25 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx
-skeleton_hash: 43e21e1befc50fa8
+skeleton_hash: e9428ec466777b04
 entity_hashes:
   func:BrandsPage: 7fe8abffb7e6dbf9
-  overview: c25537bcc3b6bee2
+  overview: f92b067f7968b22a
   style_tokens: 583cff7322941abd
-generated_at: 2026-05-28T22:39:40Z
+generated_at: 2026-06-06T21:58:26Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC projesindeki markaları listeleyen tek sayfa bileşenini içermektedir. Kullanıcılara platformda bulunan tüm HVAC markalarını sunan bu görünüm, temel bir gezinme rotası olarak işlev görür. Bileşenin doğru çalışması için yönlendirme, veri sağlama ve ortak UI altyapısına bağımlıdır.
+Bu modül, Venthub HVAC platformundaki tüm markaları listeleyen ve kullanıcıya sunan tek bir React sayfası bileşenini içermektedir. Temel bir gezinme noktası olarak işlev görerek, markaları görsel ve interaktif bir arayüzle sergiler. Bileşen, i18n, erişilebilirlik ve performans optimizasyonları ile donatılmıştır.
 
 ## Fonksiyon Grupları
-### Marka Listesi Görünümü
-Modülün tek ve temel sorumluluğu, tüm markaların listelendiği ana sayfa bileşenini oluşturmaktır.
+### Marka Sayfası Görünümü
+Modülün tek ve temel sorumluluğu, ana sayfa bileşenini oluşturarak markaların listelendiği arayüzü sunmaktır.
 - BrandsPage
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül, bir React sayfa bileşeni olup, doğru çalışması için belirli harici bağımlılıklara ve veri koşullarına ihtiyaç duyar.
 
+[Aksiyom 1]: Eğer React uygulama ortamı (DOM ve React kütüphanesi) yoksa, bileşen render edilemez olur.
+[Aksiyom 2]: Eğer yönlendirme (routing) altyapısı (React Router veya benzeri) yapılandırılmamışsa, bu bileşen harici bir rotaya (örn: `/brands`) atanamaz ve URL üzerinden erişilemez olur.
+[Aksiyom 3]: Eğer marka verilerini sağlayan bir veri kaynağı (API, statik veri, vb.) veya bu verileri işleyen bir üst bileşen/context (örn: `BrandsProvider`) mevcut değilse, bileşen içinde marka listesi görüntülenemez olur.
+[Aksiyom 4]: Eğer bileşenin bağımlı olduğu ortak UI bileşenleri (örn: `Card`, `Layout`, `LoadingSpinner`) veya stil tanımları (CSS/SCSS) içe aktarılmamışsa, arayüz bozuk veya eksik render olur.
 
 ---
 
@@ -41,32 +47,30 @@ Modülün tek ve temel sorumluluğu, tüm markaların listelendiği ana sayfa bi
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/BrandsPage.tsx`::BrandsPage
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx::BrandsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, sayfadaki tüm metinlerin çevirisini sağlamak için kullanılır (örn. `t('brands.pageTitle')`, `t('brands.seoDesc')`, `t('brands.sectionTitle')`, `t('brands.eyebrow')`, `t('brands.pageSubtitle')`, `t('brands.aboutBrand')`, `t('brands.exploreBrand')`, `t('brands.trust.eyebrow')`, `t('brands.trust.title')`, `t('brands.trust.description')`, `t('brands.trust.original')`, `t('brands.trust.standard')`)
-  - `brands` — `HVAC_BRANDS` sabitinin bir kopyası, tüm HVAC markalarının dizisi; `.map()` ile dönülerek her marka kartı oluşturulur
-  - `heroBadgeRef` — `useScrollAnimation<HTMLDivElement>` hook'undan dönen React ref, hero bölümü rozetinin DOM referansını tutar, `{ threshold: 0.2 }` ile scroll tetikleme eşiği ayarlanmıştır
-  - `heroBadgeVisible` — `useScrollAnimation` hook'undan dönen boolean, hero rozetinin scroll animasyonunun tetiklenip tetiklenmediğini belirtir; `scrollAnimationClasses.fadeUp(heroBadgeVisible)` içinde CSS sınıfı olarak kullanılır
-  - `brandsGridRef` — `useScrollAnimation<HTMLDivElement>` hook'undan dönen React ref, markalar gridinin DOM referansını tutar, `{ threshold: 0.05 }` ile scroll tetikleme eşiği ayarlanmıştır
-  - `brandsGridVisible` — `useScrollAnimation` hook'undan dönen boolean, marka gridinin scroll animasyonunun tetiklenip tetiklenmediğini belirtir; `scrollAnimationClasses.fadeUp(brandsGridVisible)` ve `scrollAnimationClasses.staggerChild(index)` içinde kullanılır
-- **Dönüş**: JSX — sayfa genelinde 4 ana section'dan oluşan React bileşeni: Seo bileşeni, Hero bölümü, Brands Grid bölümü (marka kartları ile), Trust & Network bölümü
+  - `t` — useI18n hookundan alınan çeviri fonksiyonu, sayfa içindeki tüm metinleri çevirir
+  - `brands` — HVAC_BRANDS sabitinin referansı, marka listesini tutar
+  - `heroBadgeRef` — useScrollAnimation hookundan dönen ref, hero badge bölümü için scroll animasyonu reference'ı
+  - `heroBadgeVisible` — useScrollAnimation hookundan dönen boolean, hero badge bölümünün görünür olup olmadığını tutar
+  - `brandsGridRef` — useScrollAnimation hookundan dönen ref, markalar grid bölümü için scroll animasyonu reference'ı
+  - `brandsGridVisible` — useScrollAnimation hookundan dönen boolean, markalar grid bölümünün görünür olup olmadığını tutar
+- **Dönüş**: JSX elementi (React.FC) - tüm sayfa yapısını içeren React componenti
 
-### [N2_NASIL] AST Pointer: `src/views/BrandsPage.tsx`::(word, i)
-- **params**: `(word, i)`
-  - `word` — `t('brands.eyebrow').split(' ')` dizisinden gelen tek bir kelime string'i
-  - `i` — kelimenin dizi içindeki indeksi
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx::splitMapCallback
+- **params**: (word, i) — split() ile bölünmüş her kelime ve index
 - **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: `React.Fragment` — `i === 2` ise kelime `<span className="font-medium text-slate-950 italic">` ile sarılır; diğer kelimeler olduğu gibi döner (sonuna boşluk eklenerek)
+  - `word` — t('brands.eyebrow') metninin split() ile bölünmüş her bir kelimesi
+  - `i` — kelimenin index numarası, 2. kelimeyi special styling için kontrol eder
+- **Dönüş**: React.Fragment elementi, kelimeyi conditional olarak stillendirir
 
-### [N3_NASIL] AST Pointer: `src/views/BrandsPage.tsx`::(brand, index)
-- **params**: `(brand, index)`
-  - `brand` — `HVAC_BRANDS` dizisindeki tek bir marka nesnesi; erişilen özellikleri: `brand.slug` (URL slug'ı, link href ve key için), `brand.name` (marka adı, BrandIcon prop'u ve aria-label için), `brand.country` (ülke bilgisi), `brand.specialty` (uzmanlık alanı), `brand.description` (açıklama metni)
-  - `index` — markanın dizi içindeki indeksi, `scrollAnimationClasses.staggerChild(index)` ile kademeli animasyon gecikmesi hesaplanır
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx::brandsMapCallback
+- **params**: (brand, index) — brands.map() içindeki her marka objesi ve index
 - **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: JSX `<div>` — `key={brand.slug}`, animasyon class'ları ile sarılmış bir `<Link>` kartı; içinde `BrandIcon` (logo), marka adı, ülke, uzmanlık alanı, açıklama ve keşfetme oku bulunur; `Routes.brand(brand.slug)` href'ine bağlanır
+  - `brand` — brands array'inden gelen tek bir marka objesi (slug, name, country, specialty, description properties)
+  - `index` — markanın index numarası, staggerChild animasyonu için kullanılır
+- **Dönüş**: JSX div elementi - marka kartını oluşturan React componenti
 
 ---
 

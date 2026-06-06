@@ -3,36 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminReturnsPage.tsx
-skeleton_hash: 665af8b2e6937d88
+skeleton_hash: a60542cfa74c3cf9
 entity_hashes:
   func:AdminReturnsPage: 5655af1a631450c5
-  overview: 3de87dcfabc35e1e
+  overview: 7cb8623e788cd775
   style_tokens: 91f3132d3b13a047
-generated_at: 2026-05-29T18:59:59Z
+generated_at: 2026-06-06T21:58:03Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun yönetici panelinde yer alan iade yönetim sayfasıdır. Kimlik doğrulaması ve admin rolü kontrolü yapıldıktan sonra, platform üzerindeki tüm iade işlemlerinin listelenmesi, duruma göre filtrelenmesi ve iade onaylama/reddetme/bilgi isteme gibi yönetimsel işlemlerin gerçekleştirilmesini sağlar.
+VentHub HVAC admin panelindeki iade yönetim sayfasıdır. Kullanıcı kimlik doğrulaması ve admin rol kontrolü yapıldıktan sonra, tüm iade işlemlerinin listelenmesi, duruma göre filtrelenmesi ve iade onaylama/reddetme/bilgi isteme gibi yönetimsel işlemlerin tetiklenmesini sağlar.
 
 ## Fonksiyon Grupları
 ### Admin İade Sayfası Bileşeni
-Tek bileşen yapısında, iade yönetimi ile ilgili tüm arayüzü ve iş mantığını barındırır. Kullanıcı kimlik ve rol kontrolü, iade listesinin gösterimi, durum bazlı filtreleme ile iade sobrelemelerinin (onaylama, reddetme, bilgi isteme) tetiklenmesini yönetir.
+Tek bileşen yapısında iade yönetimi ile ilgili tüm arayüz ve iş mantığını barındırır. Kullanıcı erişim kontrolü, iade verilerinin getirilmesi ve manipülasyonu ile arayüz durum yönetimi bu bileşen içinde koordine edilir.
 - AdminReturnsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC admin panelindeki iade yönetim sayfası için temel mimari varsayımlar.
 
-[Aksiyom 1]: Eğer kullanıcı admin yetkisine sahip değilse veya kimlik doğrulaması geçerli değilse, iade yönetimi sayfasına erişim sağlanamaz.
+Bu modül için fonksiyon gövdesi verilmemiş olup, yalnızca imza bilgisine dayalı mimari varsayımlar tanımlanmıştır.
 
-[Aksiyom 2]: Eğer iade verileri (returns) API'den başarıyla retrieve edilemezse, sayfa düzgün görüntülenemez.
+**[Aksiyom 1]**: `AdminReturnsPage()` bileşeni parametresiz olarak tanımlanmıştır. Eğer bileşenin ihtiyaç duyduğu veriler (iade listesi, kullanıcı bilgisi vb.) props olarak sağlanmıyorsa, bu verilerin React Context, global state yönetimi veya içsel veri çekme (fetch/hook) mekanizması ile elde edilmesi gerekir.
 
-[Aksiyom 3]: Eğer React bileşen hiyerarşisinde geçerli bir router context mevcut değilse, sayfa yönlendirmeleri çalışmaz.
+**[Aksiyom 2]**: Bileşen React bileşen mimarisi üzerine kuruludur. Eğer React çalışma zamanı (runtime) veya JSX derleyici ortamu yoksa, bileşen doğru şekilde render edilemez.
 
----
-
-**Not:** Fonksiyon gövdesi (implementation body) paylaşılmadığı için, detaylı akış varsayımları üretilememiştir. Yukarıdaki aksiyomlar, modülün dosya yapısından (.tsx) ve eski doküman bağlamından türetilen genel yapısal gereksinimlerdir. Detaylı aksiyon bazlı aksiyomlar için fonksiyon gövdesi gereklidir.
+**[Aksiyom 3]**: Bileşen admin paneli kapsamında çalıştığından, kimlik doğrulama ve yetkilendirme bilgilerinin bileşen dışında (örn: rota koruyucu, higher-order component, veya context) sağlanması gerekir. Eğer bu kontroller bileşen içine yerleşik değilse ve dış mekanizma da sağlanmıyorsa, yetkisiz erişim riski oluşur.
 
 ---
 
@@ -76,208 +73,203 @@ type SortKey = 'order' | 'customer' | 'reason' | 'status' | 'date' | 'amount'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::AuthGuard
-- **params**: () — parametre yok
-- **ic_degiskenler**: (yok — sadece hook'lardan gelen `loading`, `user` ve `router` kullanılır)
-- **Dönüş**: yok (yan etki: `router.replace()` ile login sayfasına yönlendirme)
+### [N1_NASIL] AST Pointer: AdminReturnsPage.tsx::useAuthRedirectEffect
+- **params**: () — anonim arrow fonksiyon, parametre yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — erken return ile `router.replace` çağrısı yapar; kullanıcı yoksa login sayfasına yönlendirir
 
 ---
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ParseUrlStatusParam
-- **params**: () — parametre yok
+### [N2_NASIL] AST Pointer: AdminReturnsPage.tsx::useStatusFromUrlEffect
+- **params**: () — anonim arrow fonksiyon, parametre yok
 - **ic_degiskenler**:
-  - `params` — `URLSearchParams` nesnesi, `window.location.search`'ten oluşturulur, URL sorgu parametrelerini okumak için
-  - `stParam` — URL'deki `status` parametresinin string değeri (virgülle ayrılmış durum listesi), `null` olabilir
-  - `next` — `statusFilter`'in shallow copy'si, tüm değerleri önce `false`'a set edilip ardından URL'deki durumlar `true` olarak işaretlenir
-  - `k` — `Object.keys(next).forEach` döngüsünün iterasyon değişkeni, her bir durum anahtarını temsil eder
-  - `s` — `stParam.split(',')` döngüsünün iterasyon değişkeni, her bir durum stringini temsil eder
-  - `key` — `s.trim()` ile elde edilen, boşlukları temizlenmiş durum anahtarı
-- **Dönüş**: yok (yan etki: `setStatusFilter(next)` ile state güncellenir)
+  - `params` — `URLSearchParams` nesnesi, `window.location.search`'den oluşturulur, URL query string parametrelerini okumak için kullanılır
+  - `stParam` — `params.get('status')` ile elde edilen string, URL'deki `status` parametresinin değerini tutar (virgülle ayrılmış durum listesi)
+  - `next` — `statusFilter` nesnesinin shallow kopyası; tüm değerleri false'a set edildikten sonra URL'deki durumlar true yapılır
+  - `k` — `Object.keys(next)` iterasyonundaki mevcut anahtar
+  - `s` — `stParam.split(',')` iterasyonundaki tek bir durum string'i
+  - `key` — `s.trim()` ile elde edilmiş, temizlenmiş durum anahtarı
+- **Dönüş**: yok — `setStatusFilter(next)` ile state güncellenir (yan etki)
 
 ---
 
-### [N3_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::LoadReturns
-- **params**: () — parametre yok
+### [N3_NASIL] AST Pointer: AdminReturnsPage.tsx::loadReturns
+- **params**: () — anonim async arrow fonksiyon, parametre yok
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen raw satır dizisi (ilişkisel `venthub_orders` join'li)
-  - `error` — Supabase sorgu sonucu hata nesnesi, `null` olabilir
-  - `returnRows` — `ReturnRow[]` tipinde normalize edilmiş iade kayıtları dizisi, `data || []` fallback'li
-  - `mapped` — `ReturnWithOrder[]` tipinde, `returnRows.map()` ile dönüştürülmüş nesne dizisi; her eleman `item.id`, `item.order_id`, `item.user_id`, `item.reason`, `item.description`, `item.status`, `item.created_at`, `item.updated_at`, `item.venthub_orders?.order_number`, `item.venthub_orders?.customer_name`, `item.venthub_orders?.customer_email`, `item.venthub_orders?.total_amount` alanlarını içerir
-- **Dönüş**: yok (yan etki: `setReturns(mapped)`, `setIsLoading()`, `toast.error()`, `console.error()`)
+  - `data` — `supabase.from('venthub_returns').select(...)` çağrısının başarı durumunda dönen satır dizisi
+  - `error` — Supabase select çağrısının hata nesnesi;truthy ise throw edilir
+  - `returnRows` — `data || []` ifadesinden türeyen `ReturnRow[]` tipinde dizi; ham Supabase satırlarını tutar
+  - `mapped` — `returnRows.map(item => ...)` ile elde edilen `ReturnWithOrder[]` tipinde dizi; ham veriyi düzleştirilmiş forma dönüştürür, `venthub_orders` nested nesnesinin alanlarını üst seviyeye taşır
+- **Dönüş**: yok — `setReturns(mapped)` ile state güncellenir (yan etki)
 
 ---
 
-### [N4_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::MapReturnItem
-- **params**: `item` — tek bir `ReturnRow` nesnesi, Supabase'den gelen iade satırı
-- **ic_degiskenler**: (yok — doğrudan `item` özelliklerinden harita oluşturulur)
-- **Dönüş**: `{ id, order_id, user_id, reason, description, status, created_at, updated_at, order_number, customer_name, customer_email, total_amount }` — `ReturnWithOrder` tipinde nesne
+### [N4_NASIL] AST Pointer: AdminReturnsPage.tsx::returnMapFn
+- **params**: `item` — `ReturnRow` tipinde tek bir iade satırı nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: `ReturnWithOrder` tipinde nesne — `item`'in tüm alanlarını ve `item.venthub_orders?.order_number`, `item.venthub_orders?.customer_name`, `item.venthub_orders?.customer_email`, `item.venthub_orders?.total_amount` alanlarını düzleştirilmiş şekilde döndürür
 
 ---
 
-### [N5_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::EffectLoadReturns
-- **params**: () — parametre yok
-- **ic_degiskenler**: (yok — sadece `loadReturns()` çağrısı)
-- **Dönüş**: yok (yan etki: `loadReturns()` fonksiyonunu çağırır)
+### [N5_NASIL] AST Pointer: AdminReturnsPage.tsx::handleRefresh
+- **params**: () — anonim arrow fonksiyon, parametre yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `loadReturns()` çağrısı ile verileri yeniler
 
 ---
 
-### [N6_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ApplyFilters
-- **params**: () — parametre yok
+### [N6_NASIL] AST Pointer: AdminReturnsPage.tsx::applyFilters
+- **params**: () — anonim arrow fonksiyon, parametre yok
 - **ic_degiskenler**:
-  - `filtered` — filtreleme sürecinde kullanılan geçici dizi, başlangıçta `returns` dizisinin referansı, ardından filtrelenmiş hali
-  - `anyStatus` — `Object.values(statusFilter).some(Boolean)` sonucu, herhangi bir durum filtresinin aktif olup olmadığını belirten boolean
+  - `filtered` — `returns` state'inin kopyası; filtreleme操作ları bu dizi üzerinde yapılır
+  - `anyStatus` — `Object.values(statusFilter).some(Boolean)` sonucu; herhangi bir durum filtresi aktif mi kontrolü
   - `query` — `searchQuery.toLowerCase()` ile oluşturulmuş küçük harfli arama metni
-- **Dönüş**: yok (yan etki: `setFilteredReturns(filtered)` ile state güncellenir)
+- **Dönüş**: yok — `setFilteredReturns(filtered)` ile state güncellenir (yan etki)
 
 ---
 
-### [N7_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::SearchFilterPredicate
-- **params**: `r` — tek bir `ReturnWithOrder` nesnesi, filtrelenecek iade kaydı
-- **ic_degiskenler**: (yok — doğrudan `r.order_number`, `r.customer_name`, `r.customer_email`, `r.reason` ve outer scope `query` kullanılır)
-- **Dönüş**: `boolean` — kayıt arama sorgusuyla eşleşiyor mu
+### [N7_NASIL] AST Pointer: AdminReturnsPage.tsx::searchFilterPredicate
+- **params**: `r` — `ReturnWithOrder` tipinde iade nesnesi
+- **ic_degiskenler**:
+  - `query` — üst kapsamdan gelen küçük harfli arama string'i
+- **Dönüş**: `boolean` — `r.order_number`, `r.customer_name`, `r.customer_email`, `r.reason` alanlarından herhangi birinin `query`'yi içerip içermediğini döndürür
 
 ---
 
-### [N8_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::SortReturns
+### [N8_NASIL] AST Pointer: AdminReturnsPage.tsx::sortedReturns
+- **params**: () — anonim arrow fonksiyon, parametre yok
+- **ic_degiskenler**:
+  - `arr` — `filteredReturns` dizisinin shallow kopyası (`[...filteredReturns]`); sıralama bu kopya üzerinde yapılır
+  - `dir` — sıralama yönü; `sortDir === 'asc'` ise `1`, değilse `-1` (carpan)
+  - `ao` — sıralama anahtarı `order` durumunda, `a.order_number` varsa onu, yoksa `a.order_id`'yi tutar
+  - `bo` — sıralama anahtarı `order` durumunda, `b.order_number` varsa onu, yoksa `b.order_id`'yi tutar
+- **Dönüş**: `ReturnWithOrder[]` — sıralanmış iade dizisi
+
+---
+
+### [N9_NASIL] AST Pointer: AdminReturnsPage.tsx::sortComparator
+- **params**: `a`, `b` — her ikisi de `ReturnWithOrder` tipinde iade nesneleri
+- **ic_degiskenler**:
+  - `dir` — sıralama yönü carpanı (`asc` ise `1`, `desc` ise `-1`)
+  - `ao` — `order` sıralamasında `a` için kullanılan sipariş numarası/ID'si (order_number tercih edilir)
+  - `bo` — `order` sıralamasında `b` için kullanılan sipariş numarası/ID'si (order_number tercih edilir)
+- **Dönüş**: `number` — `localeCompare` veya aritmetik fark ile sıralama skoru
+
+---
+
+### [N10_NASIL] AST Pointer: AdminReturnsPage.tsx::toggleSort
+- **params**: `key: SortKey` — sıralanacak sütun anahtarı
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `setSortDir` ve/veya `setSortKey` ile state güncellenir; aynı tuşa tekrar basılırsa yön terslenir, farklı tuşa basılırsa yeni sütun seçilir
+
+---
+
+### [N11_NASIL] AST Pointer: AdminReturnsPage.tsx::sortIndicator
+- **params**: `key: SortKey` — göstergesi istenen sütun anahtarı
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — aktif sıralama sütunu ise `'▲'` veya `'▼'`, değilse boş string `''`
+
+---
+
+### [N12_NASIL] AST Pointer: AdminReturnsPage.tsx::handleStatusUpdate
+- **params**: `returnId: string` — güncellenecek iadenin ID'si, `newStatus: string` — hedef durum
+- **ic_degiskenler**:
+  - `returnItem` — `returns.find(r => r.id === returnId)` ile bulunan `ReturnWithOrder` nesnesi; güncellenen kaydın mevcut verilerini tutar
+  - `oldStatus` — `returnItem.status`, güncelleme öncesi mevcut durum string'i; audit log ve bildirim için kullanılır
+  - `error` — Supabase update çağrısının hata nesnesi
+- **Dönüş**: yok — Supabase'de durum güncellenir, audit log yazılır, local state güncellenir, sipariş senkronizasyonu yapılır, mock refund çağrılır, müşteriye e-posta bildirimi gönderilir (yan etkiler)
+
+---
+
+### [N13_NASIL] AST Pointer: AdminReturnsPage.tsx::statusUpdateStateMapper
+- **params**: `prev` — `ReturnWithOrder[]` tipinde mevcut returns state dizisi
+- **ic_degiskenler**: yok
+- **Dönüş**: `ReturnWithOrder[]` — `returnId` eşleşen elemanın `status` ve `updated_at` alanları güncellenmiş yeni dizi; `updated_at` `new Date().toISOString()` ile set edilir
+
+---
+
+### [N14_NASIL] AST Pointer: AdminReturnsPage.tsx::getStatusLabel
+- **params**: `status: string` — durum anahtarı
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — `_t(\`admin.returns.statusLabels.${status}\`)` ile uluslararasılaştırılmış durum etiketi; çeviri bulunamazsa ham `status` string'ini döndürür
+
+---
+
+### [N15_NASIL] AST Pointer: AdminReturnsPage.tsx::getStatusIcon
+- **params**: `status: string` — durum anahtarı
+- **ic_degiskenler**: yok
+- **Dönüş**: `JSX.Element` — duruma karşılık gelen lucide-react ikon bileşeni (`Clock`, `CheckCircle`, `XCircle`, `Truck`, `Package`, `RefreshCw`) ve uygun renk class'ı
+
+---
+
+### [N16_NASIL] AST Pointer: AdminReturnsPage.tsx::getStatusColor
+- **params**: `status: string` — durum anahtarı
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — Tailwind CSS renk class string'i (bg, text, border); duruma göre amber, emerald, rose, cyan, violet, slate tonları
+
+---
+
+### [N17_NASIL] AST Pointer: AdminReturnsPage.tsx::exportCsv
 - **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `arr` — `filteredReturns` dizisinin shallow copy'si (`[...filteredReturns]`), sıralama işlemi orijinal diziyi bozmaması için kopya üzerinde yapılır
-  - `dir` — sıralama yönü çarpanı, `sortDir === 'asc'` ise `1`, aksi halde `-1`
-  - `ao` — `a` elemanının sıralama değeri, `a.order_number` varsa onu aksi halde `a.order_id`'yi kullanır
-  - `bo` — `b` elemanının sıralama değeri, `b.order_number` varsa onu aksi halde `b.order_id`'yi kullanır
-- **Dönüş**: `ReturnWithOrder[]` — sıralanmış dizi
+  - `header` — `string[]` tipinde CSV sütun başlıkları dizisi; `_t()` ile uluslararasılaştırılmış
+  - `lines` — `filteredReturns.map(r => [...])` ile üretilen CSV satır stringleri dizisi
+  - `bom` — `'\ufeff'` UTF-8 BOM karakteri; Excel uyumluluğu için
+  - `csv` — tüm satırları `\n` ile birleştirilmiş tam CSV string'i
+  - `blob` — CSV verisinden oluşturulmuş `Blob` nesnesi; `text/csv;charset=utf-8` MIME tipi
+  - `url` — `URL.createObjectURL(blob)` ile elde edilen geçici dosya URL'i
+  - `a` — `document.createElement('a')` ile oluşturulmuş DOM `<a>` elementi; indirme tetikleyicisi
+- **Dönüş**: yok — tarayıcıda CSV dosyası indirme tetiklenir (yan etki)
 
 ---
 
-### [N9_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::CompareFn
-- **params**: `a` — sıralanacak birinci `ReturnWithOrder` nesnesi, `b` — sıralanacak ikinci `ReturnWithOrder` nesnesi
-- **ic_degiskenler**:
-  - `dir` — sıralama yönü çarpanı, `sortDir === 'asc'` ise `1`, aksi halde `-1`
-  - `ao` — `a` elemanının sıralama değeri (sadece `case 'order'` bloğunda), `a.order_number` varsa onu aksi halde `a.order_id` kullanır
-  - `bo` — `b` elemanının sıralama değeri (sadece `case 'order'` bloğunda), `b.order_number` varsa onu aksi halde `b.order_id` kullanır
-- **Dönüş**: `number` — negatif, sıfır veya pozitif karşılaştırma sonucu
+### [N18_NASIL] AST Pointer: AdminReturnsPage.tsx::csvRowMapper
+- **params**: `r` — `ReturnWithOrder` tipinde iade nesnesi
+- **ic_degiskenler**: yok (dahili `orderNo` hesaplaması: `r.order_number` varsa `r.order_number.split('-')[1]`, yoksa `r.order_id.slice(-8).toUpperCase()`)
+- **Dönüş**: `string` — tek bir CSV satırı; virgülle ayrılmış, çift tırnak ile escape edilmiş alanlar
 
 ---
 
-### [N10_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ToggleSort
-- **params**: `key: SortKey` — sıralanacak sütunun anahtarı
-- **ic_degiskenler**: (yok — doğrudan `sortKey`, `sortDir`, `setSortKey`, `setSortDir` kullanılır)
-- **Dönüş**: yok (yan etki: `setSortDir()` ve/veya `setSortKey()` ile state güncellenir)
-
----
-
-### [N11_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::SortIndicator
-- **params**: `key: SortKey` — sıralama göstergesi istenen sütunun anahtarı
-- **ic_degiskenler**: (yok — doğrudan `sortKey` ve `sortDir` kullanılır)
-- **Dönüş**: `string` — sıralama yönüne göre `'▲'`, `'▼'` veya boş string `''`
-
----
-
-### [N12_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::HandleStatusUpdate
-- **params**: `returnId: string` — güncellenecek iadenin UUID'si, `newStatus: string` — hedef durum stringi
-- **ic_degiskenler**:
-  - `returnItem` — `returns.find(r => r.id === returnId)` ile bulunan iade kaydı nesnesi, bulunamazsa `undefined`
-  - `oldStatus` — `returnItem.status`'ten alınan güncelleme öncesi eski durum stringi
-  - `error` — Supabase `.update()` sorgusundan dönen hata nesnesi
-  - `logAdminAction` — `await import('../../lib/audit')` ile dinamik import edilen audit loglama fonksiyonu
-  - `refundErr` — `supabase.functions.invoke('refund-order-mock')` sonucu hata nesnesi
-  - `invokeError` — `supabase.functions.invoke('return-status-notification')` sonucu hata nesnesi
-  - `emailError` — e-posta bildirim try-catch bloğundaki yakalanan hata nesnesi
-- **Dönüş**: yok (yan etki: `supabase.from().update()`, `setReturns()` state güncellemesi, `syncOrderFromReturn()` orders tablosu senkronizasyonu, `toast.success()`/`toast.error()` bildirimleri, `supabase.functions.invoke()` ile mock refund ve e-posta bildirimi)
-
----
-
-### [N13_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::SetReturnsMapFn
-- **params**: `prev` — mevcut `returns` state dizisi (callback'in parametresi)
-- **ic_degiskenler**: (yok — doğrudan `prev.map()`, `r.id`, `returnId`, `newStatus` kullanılır)
-- **Dönüş**: `ReturnWithOrder[]` — güncellenmiş iade kayıtları dizisi
-
----
-
-### [N14_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::GetStatusLabel
-- **params**: `status: string` — durum anahtarı
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `string` — `_t()` ile çevrilmiş durum etiketi, çeviri bulunamazsa orijinal `status` stringi
-
----
-
-### [N15_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::GetStatusIcon
-- **params**: `status: string` — durum anahtarı
-- **ic_degiskenler**: (yok — doğrudan `Clock`, `CheckCircle`, `XCircle`, `Truck`, `Package`, `RefreshCw` icon bileşenleri kullanılır)
-- **Dönüş**: `JSX.Element` — duruma karşılık gelen lucide-react icon bileşeni
-
----
-
-### [N16_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::GetStatusColor
-- **params**: `status: string` — durum anahtarı
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `string` — Tailwind CSS renk class'ları (bg, text, border) birleştirilmiş string
-
----
-
-### [N17_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ExportCsv
+### [N19_NASIL] AST Pointer: AdminReturnsPage.tsx::exportXls
 - **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `header` — `string[]` tipinde CSV sütun başlıkları dizisi, `_t()` ile çevrilmiş 7 başlık
-  - `lines` — `filteredReturns.map()` ile oluşturulmuş CSV satır stringleri dizisi, her satır virgülle ayrılmış ve tırnak işaretleri escape edilmiş
-  - `bom` — UTF-8 BOM karakteri (`'\ufeff'`), Excel'in doğru kodlamayı tanıması için
-  - `csv` — tüm satırları newline ile birleştirilmiş tam CSV stringi
-  - `blob` — `Blob` nesnesi, CSV içeriğini `text/csv;charset=utf-8;` MIME tipiyle paketler
-  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici dosya URL'i
-  - `a` — `document.createElement('a')` ile oluşturulan DOM anchor elementi, indirme tetikleyicisi
-- **Dönüş**: yok (yan etki: dosya indirme tetiklenir, geçici URL `revokeObjectURL` ile serbest bırakılır)
+  - `rowsHtml` — `filteredReturns.map(r => {...})` ile üretilen HTML `<tr>` satırlarının birleştirilmiş string'i
+  - `table` — tam HTML doküman string'i; UTF-8 charset, tablo başlıkları `_t()` ile uluslararasılaştırılmış
+  - `blob` — HTML tablosundan oluşturulmuş `Blob` nesnesi; `application/vnd.ms-excel` MIME tipi
+  - `url` — `URL.createObjectURL(blob)` ile elde edilen geçici dosya URL'i
+  - `a` — `document.createElement('a')` ile oluşturulmuş DOM `<a>` elementi; indirme tetikleyicisi
+- **Dönüş**: yok — tarayıcıda XLS dosyası indirme tetiklenir (yan etki)
 
 ---
 
-### [N18_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ExportCsvMapFn
-- **params**: `r` — tek bir `ReturnWithOrder` nesnesi
-- **ic_degiskenler**: (yok — doğrudan `r.order_number`, `r.order_id`, `r.customer_name`, `r.customer_email`, `r.reason`, `r.status`, `r.created_at`, `r.total_amount` kullanılır)
-- **Dönüş**: `string` — virgülle ayrılmış ve escape edilmiş CSV satır stringi
-
----
-
-### [N19_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ExportXls
-- **params**: () — parametre yok
+### [N20_NASIL] AST Pointer: AdminReturnsPage.tsx::xlsRowMapper
+- **params**: `r` — `ReturnWithOrder` tipinde iade nesnesi
 - **ic_degiskenler**:
-  - `rowsHtml` — `filteredReturns.map()` ile oluşturulmuş HTML `<tr>` satırlarının birleştirilmiş stringi
-  - `orderNo` — formate edilmiş sipariş numarası, `r.order_number` varsa `#` + ilk tire sonrası kısım, yoksa `#` + `order_id` son 8 karakteri
-  - `amount` — `formatCurrency()` ile formatlanmış para birimi stringi veya boş string
-  - `table` — tam HTML döküman stringi, `<table>` yapısı ve tüm satırları içerir
-  - `blob` — `Blob` nesnesi, HTML tablosunu `application/vnd.ms-excel` MIME tipiyle paketler
-  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici dosya URL'i
-  - `a` — `document.createElement('a')` ile oluşturulan DOM anchor elementi
-- **Dönüş**: yok (yan etki: dosya indirme tetiklenir, geçici URL `revokeObjectURL` ile serbest bırakılır)
+  - `orderNo` — formatlanmış sipariş numarası string'i; `r.order_number` varsa `#${r.order_number.split('-')[1]}`, yoksa `#${r.order_id.slice(-8).toUpperCase()}`
+  - `amount` — formatlanmış tutar string'i; `r.total_amount` number ise `formatCurrency(...)` çağrısı, değilse boş string
+- **Dönüş**: `string` — tek bir HTML `<tr>` satırı; `<td>` içinde sırasıyla orderNo, customer_name, customer_email, reason, status label, created_at, amount
 
 ---
 
-### [N20_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::ExportXlsMapFn
-- **params**: `r` — tek bir `ReturnWithOrder` nesnesi
+### [N21_NASIL] AST Pointer: AdminReturnsPage.tsx::statusFilterToggleMapper
+- **params**: `o` — `{ value: string; label: string }` tipinde durum seçeneği nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ key: string; label: string; active: boolean; onToggle: () => void }` nesnesi — `active`, `statusFilter[o.value]` boolean'ını; `onToggle`, ilgili durum filtresini tersleyen callback'i barındırır
+
+---
+
+### [N22_NASIL] AST Pointer: AdminReturnsPage.tsx::renderTableRow
+- **params**: `returnItem` — `ReturnWithOrder` tipinde iade nesnesi, `index` — `number` tipinde sıralama indeksi (animasyon gecikmesi için)
 - **ic_degiskenler**:
-  - `orderNo` — formate edilmiş sipariş numarası, `r.order_number` varsa `#` + split ile alınan kısım, yoksa `#` + `r.order_id.slice(-8).toUpperCase()`
-  - `amount` — `typeof r.total_amount === 'number'` kontrolü sonrası `formatCurrency()` ile formatlanmış string veya boş string
-- **Dönüş**: `string` — HTML `<tr>` satır stringi
+  - `orderNo` — formatlanmış sipariş numarası string'i; `returnItem.order_number` varsa `#${returnItem.order_number.split('-')[1]}`, yoksa `#${returnItem.order_id.slice(-8).toUpperCase()}`
+- **Dönüş**: `JSX.Element` — tablonun tek bir `<tr>` satırı; visibleCols kontrolü ile sütun görünürlüğü, formatCurrency/formatDate/formatTime ile hücre değerleri, handleStatusUpdate ile durum değiştirme butonları, hasWriteAccess ile yazma izni kontrolü, updatingStatus ile spinner gösterimi
 
 ---
 
-### [N21_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::StatusFilterToggleFn
-- **params**: `o` — `{ value: string, label: string }` tipinde durum filtre seçeneği nesnesi
-- **ic_degiskenler**: (yok — doğrudan `statusFilter` ve `setStatusFilter` kullanılır)
-- **Dönüş**: `{ key: string, label: string, active: boolean, onToggle: () => void }` — filtre butonu için yapılandırılmış nesne
-
----
-
-### [N22_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::RenderReturnRow
-- **params**: `returnItem` — `ReturnWithOrder` tipinde tek bir iade kaydı, `index` — `number` tipinde dizin sırası
-- **ic_degiskenler**:
-  - `orderNo` — formate edilmiş sipariş numarası, `returnItem.order_number` varsa `#` + ilk tire sonrası kısım, yoksa `#` + `returnItem.order_id.slice(-8).toUpperCase()`
-- **Dönüş**: `JSX.Element` — `<tr>` HTML tablo satırı bileşeni
-
----
-
-### [N23_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::StatusActionButton
+### [N23_NASIL] AST Pointer: AdminReturnsPage.tsx::renderStatusActionButtons
 - **params**: `status` — `string` tipinde hedef durum anahtarı
-- **ic_degiskenler**: (yok — outer scope `returnItem`, `handleStatusUpdate`, `updatingStatus`, `getStatusLabel` kullanılır)
-- **Dönüş**: `JSX.Element` — durum güncelleme butonu bileşeni
+- **ic_degiskenler**: yok
+- **Dönüş**: `JSX.Element` — durum değiştirme butonu; `handleStatusUpdate(returnItem.id, status)` onClick handler'ı, `updatingStatus === returnItem.id` ile yükleme durumu kontrolü, `getStatusLabel(status)` ile buton metni, `ChevronRight` ikonu
 
 ---
 

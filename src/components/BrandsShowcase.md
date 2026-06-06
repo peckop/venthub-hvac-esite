@@ -3,35 +3,44 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BrandsShowcase.tsx
-skeleton_hash: 91024db7e88f6112
+skeleton_hash: 2bdb96d68efadb02
 entity_hashes:
   func:BrandsShowcase: 396bbfa4a2991af7
   func:Lane: 607c875efec6621a
-  overview: 2292d0c89c7cdbbb
+  overview: a64c9ee274fd0d0f
   style_tokens: 90e49e0ab0d8115d
-generated_at: 2026-05-28T22:35:42Z
+generated_at: 2026-06-06T21:54:43Z
 ---
 
 ## Genel Bakış
-`BrandsShowcase` modülü, HVAC markalarını bir kayan şerit içinde göstererek kullanıcıya dinamik bir marka vitrini sunar. `Lane` yardımcı bileşeni, marka listesini belirli bir süre boyunca yatay olarak kaydırarak sürekli bir görüntü akışı oluşturur; `BrandsShowcase` ise bu şeriti bir araya getirerek tamamlayıcı bir görsel deneyim sağlar.
+
+`BrandsShowcase` modülü, HVAC markalarını sürekli kayan bir şerit (marquee) formatında sunan bir vitrin bileşenidir. Modül, marka logolarının kesintisiz döngü halinde akmasını sağlayarak dinamik ve görsel çekici bir marka tanıtımı oluşturur.
 
 ## Fonksiyon Grupları
-### Kaydırma Şeridi Mantığı
-Bu grup, marka öğelerinin yatay bir şeritte görüntülenmesi ve belirli aralıklarla otomatik olarak kaydırılması işlevini üstlenir.  
-- Lane  
 
-### Ana Gösterim Bileşeni
-Bu grup, kaydırma şeridini bir araya getirerek sayfada tam bir marka vitrini oluşturur; `Lane` bileşenini kullanarak markaların sürekli döngüsünü başlatır ve görsel bir sunum sağlar.  
-- BrandsShowcase (Lane’i içerir)
+### Kaydırma Şeridi Bileşeni
+Tek bir şerit (lane) üzerindeki marka öğelerini belirli bir sürede otomatik olarak kaydıran yardımcı bileşeni tanımlar. Varsayılan 50 saniyelik döngü süresi ile sürekli bir animasyon akışı sağlar.
+- Lane
+
+### Ana Vitrin Bileşeni
+Sayfada tam bir marka vitrini oluşturarak kaydırma şeridini yapılandırır ve kullanıma sunar. İçerisinde `Lane` bileşenini çağırarak HVAC markalarının gösterimini başlatır.
+- BrandsShowcase
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 
-[Aksiyom 1]: Eğer Lane fonksiyonuna **items** argümanı geçilmezse, bileşen doğru bir şekilde render edilemez (ör. hata fırlatır veya boş çıktı üretir).  
-[Aksiyom 2]: Eğer Lane fonksiyonuna **durationSec** argümanı geçilirse ve bu değer sıfır veya negatif bir sayıysa, animasyon süresi geçersiz olur ve beklenen kaydırma davranışı oluşmayabilir.  
-[Aksiyom 3]: Eğer Lane fonksiyonuna **durationSec** argümanı geçilmezse, varsayılan değer **50 saniye** kullanılır ve bu değerin pozitif olduğu varsayılır.
+Bu modül, HVAC markalarını kaydırılabilir bir şerit içinde gösteren bir vitrin bileşenidir. `Lane` yardımcı bileşeni listedeki öğeleri belirtilen sürede yatay olarak kaydırarak sürekli bir akış oluşturur; `BrandsShowcase` ise bu şeriti sayfada sunan ana bileşendir.
+
+[Aksiyom 1]: Eğer `Lane` bileşenine `items` argümanı sağlanmazsa, kaydırılacak marka içeriği bulunmayacağından şerit boş veya hatalı görüntülenir.
+
+[Aksiyom 2]: Eğer `Lane` bileşenine sağlanan `items` boş bir dizi ise (`[]`), şerit içeriği olmadan çalışır ve kaydırma animasyonu anlamsız hale gelir.
+
+[Aksiyom 3]: Eğer `durationSec` olarak `0` veya negatif bir değer verilirse, kaydırma animasyon süresi geçersiz olacağından animasyon düzgün çalışmaz veya çok hızlı/hatalı akar.
+
+[Aksiyom 4]: Eğer `BrandsShowcase` bileşeni içinde `Lane` bileşenine geçirilen `items` dizisi `Lane` bileşeninin beklediği formata (örn: img src, alt text içeren nesneler) uymuyorsa, öğeler düzgün render edilmez.
+
+[Aksiyom 5]: Eğer `durationSec` çok küçük bir değer olarak (örn: `1`) ayarlanırsa, marka logoları okunamayacak kadar hızlı kayar; çok büyük bir değer olarak ayarlanırsa ise kaydırma neredeyse görünmez hale gelir.
 
 ---
 
@@ -55,23 +64,24 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BrandsShowcase.tsx::Lane
-- **params**: items, durationSec
+### [N1_NASIL] AST Pointer: BrandsShowcase.tsx::Lane
+- **params**: `{ items, durationSec = 50 }`
 - **ic_degiskenler**:
-  - `repeated` — tripled array of items to create seamless marquee effect
-- **Dönüş**: JSX element (React.ReactElement)
+  - `repeated` — `items` dizisini üç kez tekrarlayarak oluşturulan dizi, sonsuz kaydırma animasyonu için kullanılır.
+- **Dönüş**: JSX elementi (React bileşeni)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BrandsShowcase.tsx::Lane_map_callback
-- **params**: brand, idx
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX element (Link wrapping brand item)
+### [N2_NASIL] AST Pointer: BrandsShowcase.tsx::(brand, idx) => (...)
+- **params**: `(brand, idx)`
+- **ic_degiskenler**:
+  - Yok
+- **Dönüş**: JSX elementi (Link bileşeni)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\BrandsShowcase.tsx::BrandsShowcase
+### [N3_NASIL] AST Pointer: BrandsShowcase.tsx::BrandsShowcase
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — translation function from useI18n for accessing localized strings
-  - `brands` — constant array of HVAC brand objects imported from ../lib/brands
-- **Dönüş**: JSX element (React.ReactElement)
+  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
+  - `brands` — HVAC_BRANDS sabitinden alınan marka dizisi
+- **Dönüş**: JSX elementi (React bileşeni)
 
 ---
 

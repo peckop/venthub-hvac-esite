@@ -3,30 +3,35 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx
-skeleton_hash: 394b402a26fb5307
+skeleton_hash: 4c2211bf85ba07b7
 entity_hashes:
   func:AccountAddressesPage: 75c0fb5d7175a123
-  overview: 4b1d634aa140bb3a
+  overview: 1f8e4efb1355258a
   style_tokens: 20e5949307a3284f
-generated_at: 2026-05-29T18:51:43Z
+generated_at: 2026-06-06T21:56:44Z
 ---
 
 ## Genel Bakış
-Kullanıcının hesap adreslerini görüntülemesini ve yönetmesini sağlayan bir sayfa bileşeni. Adres ekleme, düzenleme, silme ve varsayılan belirleme gibi temel adres yönetim işlemlerini tek bir bileşen içerisinde sunar.
+Kullanıcının hesap adreslerini görüntülemesini ve yönetmesini sağlayan bir React bileşeni sayfasıdır. Adres ekleme, düzenleme, silme ve varsayılan belirleme gibi temel adres yönetim işlemlerini tek bir bileşen içinde sunar.
 
 ## Fonksiyon Grupları
 ### Adres Sayfası Yönetimi
-Tüm adres yönetim arayüzünü ve iş mantığını içeren ana bileşen. Veri çekme, form yönetimi ve kullanıcı etkileşimlerini merkezi olarak ele alır.
+Kullanıcının tüm adreslerini listeleme, yeni adres oluşturma, mevcut adresleri düzenleme ve silme, ayrıca bir adresi varsayılan olarak belirleme gibi temel CRUD işlemlerini ve ilgili UI durumlarını yöneten ana bileşen.
 - AccountAddressesPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, kullanıcının kayıtlı adreslerini görüntüleyip yönetmesini sağlayan bir sayfa bileşenidir.
 
-[Aksiyom 1]: Eğer `emptyForm` sabiti (boş form yapısı) tanımlı değilse, yeni adres eklenirken form alanları başlatılamaz ve kullanıcı form dolduramaz.
-[Aksiyom 2]: Eğer bileşen, kullanıcının adreslerini almak için dış bir API servisine veya veri kaynağına erişemiyorsa, adres listesi boş görüntülenir veya bileşen hata verir.
-[Aksiyom 3]: Eğer bileşen, kullanıcı oturum açmamış veya kimlik doğrulaması yapılmamış durumdaysa, kullanıcıya ait adresler yüklenemez ve sayfa hata durumuna geçer.
+Bu modül, kullanıcının hesap adreslerini görüntülemesini ve yönetmesini sağlayan React sayfa bileşenidir.
+
+[Aksiyom 1]: Eğer `emptyForm` sabiti (boş form yapısı) tanımlı değilse veya geçerli bir nesne yapısına sahip değilse, adres ekleme/düzenleme formu başlatılamaz.
+
+[Aksiyom 2]: Eğer kullanıcı oturum açmamışsa veya yetkilendirme bilgisi yoksa, hesap adresleri sayfasına erişim sağlanamaz.
+
+[Aksiyom 3]: Eğer adres verileri API'den başarıyla çekilemezse, kullanıcıya boş liste veya hata durumu gösterilir.
+
+[Aksiyom 4]: Eğer form gönderilirken zorunlu alanlar boş bırakılırsa, form gönderimi engellenir.
 
 ---
 
@@ -69,25 +74,26 @@ Bu modül, kullanıcının kayıtlı adreslerini görüntüleyip yönetmesini sa
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AccountAddressesPage.tsx::AccountAddressesPage
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `emptyForm` — Import edilen, formun başlangıç değerlerini tutan sabit nesne
-- **Dönüş**: yok (JSX return eder, fonksiyon imzası yok olarak belirtilmiş)
-
-### [N2_NASIL] AST Pointer: AccountAddressesPage.tsx::AnonymousFunction_0 (loadAddresses)
+### [N1_NASIL] AST Pointer: AccountAddressesPage.tsx::loadAddresses
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — listAddresses() API çağrısının dönüş değeri, kullanıcı adreslerinin listesi
-- **Dönüş**: yok
+  - `setLoading` — State setter, yükleme durumunu true yapar
+  - `listAddresses` — API çağrısı, tüm adresleri getirir
+  - `setItems` — State setter, gelen adres verisini items state'ine atar
+  - `toast` — Toast notification nesnesi
+  - `t` — Çeviri fonksiyonu
+  - `e` — Catch bloğunda yakalanan hata nesnesi
+  - `data` — listAddresses() dönüş değeri, adres listesi
+- **Dönüş**: Promise<void> (async fonksiyon)
 
-### [N3_NASIL] AST Pointer: AccountAddressesPage.tsx::startEdit
-- **params**: `(a: UserAddress)` — Düzenlenecek adres objesi
+### [N2_NASIL] AST Pointer: AccountAddressesPage.tsx::startEdit
+- **params**: (a: UserAddress)
 - **ic_degiskenler**:
-  - `a` — Parametre olarak gelen UserAddress objesi, tüm adres alanlarını içerir
+  - `setForm` — State setter, form verilerini günceller
+  - `a` — Parametre, düzenlenecek UserAddress nesnesi
   - `a.id` — Adresin benzersiz kimliği
-  - `a.label` — Adres etiketi (ör: "Ev", "İş")
-  - `a.full_name` — Adres sahibinin tam adı
+  - `a.label` — Adres etiketi
+  - `a.full_name` — Tam ad bilgisi
   - `a.phone` — Telefon numarası
   - `a.address_line` — Adres satırı
   - `a.city` — Şehir
@@ -96,64 +102,87 @@ Bu modül, kullanıcının kayıtlı adreslerini görüntüleyip yönetmesini sa
   - `a.country` — Ülke kodu
   - `a.is_default_shipping` — Varsayılan teslimat adresi mi
   - `a.is_default_billing` — Varsayılan fatura adresi mi
+  - `window` — Pencere nesnesi (scrollTo için)
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: AccountAddressesPage.tsx::resetForm
+### [N3_NASIL] AST Pointer: AccountAddressesPage.tsx::resetForm
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
+- **ic_degiskenler**:
+  - `setForm` — State setter, formu sıfırlar
+  - `emptyForm` — Boş form nesnesi sabiti
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: AccountAddressesPage.tsx::handleSubmit
-- **params**: `(e: React.FormEvent)` — Form submit olay nesnesi
+### [N4_NASIL] AST Pointer: AccountAddressesPage.tsx::handleSubmit
+- **params**: (e: React.FormEvent)
 - **ic_degiskenler**:
-  - `e` — Form submit olayı, preventDefault() ile varsayılan davranış engellenir
-  - `form` — Form state'inden gelen mevcut form verisi
-  - `form.address_line` — Adres satırı (zorunlu alan kontrolü yapılır)
-  - `form.city` — Şehir (zorunlu alan kontrolü yapılır)
-  - `form.district` — İlçe (zorunlu alan kontrolü yapılır)
-  - `form.id` — Düzenleme modunda ise mevcut adresin ID'si
-  - `isEditing` — Düzenleme modunda olup olmadığı (form.id varsa true)
-  - `user` — Kimlik doğrulanmış kullanıcı objesi
-  - `user.id` — Kullanıcının benzersiz kimliği
-  - `form.label` — Adres etiketi
-  - `form.full_name` — Tam ad
-  - `form.phone` — Telefon
-  - `form.postal_code` — Posta kodu
-  - `form.country` — Ülke
-  - `form.is_default_shipping` — Varsayılan teslimat adresi bayrağı
-  - `form.is_default_billing` — Varsayılan fatura adresi bayrağı
-- **Dönüş**: yok
+  - `e` — Form submit event nesnesi
+  - `form` — Form state'i, adres verilerini içerir
+  - `form.address_line` — Adres satırı (doğrulama için kontrol)
+  - `form.city` — Şehir (doğrulama için kontrol)
+  - `form.district` — İlçe (doğrulama için kontrol)
+  - `form.id` — Düzenleme modunda adres kimliği
+  - `t` — Çeviri fonksiyonu
+  - `toast` — Toast notification nesnesi
+  - `user` — Auth context'ten kullanıcı nesnesi
+  - `user.id` — Kullanıcı kimliği
+  - `isEditing` — Düzenleme modu state'i
+  - `updateAddress` — API çağrısı, adresi günceller
+  - `createAddress` — API çağrısı, yeni adres oluşturur
+  - `resetForm` — Form sıfırlama fonksiyonu
+  - `refresh` — Verileri yenileme fonksiyonu
+  - `setSaving` — State setter, kaydetme durumunu yönetir
+- **Dönüş**: Promise<void> (async fonksiyon)
 
-### [N6_NASIL] AST Pointer: AccountAddressesPage.tsx::handleDelete
-- **params**: `(id: string)` — Silinecek adresin ID'si
+### [N5_NASIL] AST Pointer: AccountAddressesPage.tsx::handleDelete
+- **params**: (id: string)
 - **ic_degiskenler**:
-  - `id` — Silinecek adresin benzersiz kimliği
-  - `form` — Form state'inden gelen mevcut form verisi
-  - `form.id` — Mevcut formda düzenlenecek adresin ID'si (silinen adres ile aynı ise form sıfırlanır)
-- **Dönüş**: yok
+  - `id` — Parametre, silinecek adres kimliği
+  - `t` — Çeviri fonksiyonu
+  - `confirm` — Kullanıcı onay dialog fonksiyonu
+  - `deleteAddress` — API çağrısı, adresi siler
+  - `toast` — Toast notification nesnesi
+  - `refresh` — Verileri yenileme fonksiyonu
+  - `form` — Form state'i
+  - `form.id` — Mevcut formdaki adres kimliği
+  - `resetForm` — Form sıfırlama fonksiyonu
+- **Dönüş**: Promise<void> (async fonksiyon)
 
-### [N7_NASIL] AST Pointer: AccountAddressesPage.tsx::makeDefault
-- **params**: `(id: string, kind: 'shipping' | 'billing')` — Adres ID'si ve adres türü
+### [N6_NASIL] AST Pointer: AccountAddressesPage.tsx::makeDefault
+- **params**: (id: string, kind: 'shipping' | 'billing')
 - **ic_degiskenler**:
-  - `id` — Varsayılan yapılacak adresin benzersiz kimliği
-  - `kind` — Adres türü ('shipping' veya 'billing')
-- **Dönüş**: yok
+  - `id` — Parametre, varsayılan yapılacak adres kimliği
+  - `kind` — Parametre, adres türü (shipping veya billing)
+  - `setDefaultAddress` — API çağrısı, varsayılan adresi ayarlar
+  - `t` — Çeviri fonksiyonu
+  - `toast` — Toast notification nesnesi
+  - `refresh` — Verileri yenileme fonksiyonu
+- **Dönüş**: Promise<void> (async fonksiyon)
 
-### [N8_NASIL] AST Pointer: AccountAddressesPage.tsx::AnonymousJSXFunction (addressCard)
-- **params**: `(a)` — UserAddress objesi (JSX içinde kullanılır)
+### [N7_NASIL] AST Pointer: AccountAddressesPage.tsx::renderAddressCard
+- **params**: (a: UserAddress)
 - **ic_degiskenler**:
-  - `a` — Adres objesi, tüm alanları JSX içinde erişilir
-  - `a.id` — Adresin benzersiz kimliği (butonlarda key ve onClick için kullanılır)
-  - `a.label` — Adres etiketi (gösterilir)
-  - `a.full_name` — Tam ad (gösterilir)
-  - `a.address_line` — Adres satırı (gösterilir)
-  - `a.district` — İlçe (gösterilir)
-  - `a.city` — Şehir (gösterilir)
-  - `a.postal_code` — Posta kodu (gösterilir)
-  - `a.phone` — Telefon (gösterilir)
-  - `a.is_default_shipping` — Varsayılan teslimat adresi mi (badge gösterilir veya buton)
-  - `a.is_default_billing` — Varsayılan fatura adresi mi (badge gösterilir veya buton)
-- **Dönüş**: JSX (adres kartı)
+  - `a` — Parametre, render edilecek UserAddress nesnesi
+  - `a.id` — Adres kimliği (key ve butonlar için)
+  - `a.label` — Adres etiketi (görünen ad)
+  - `a.full_name` — Tam ad
+  - `a.address_line` — Adres satırı
+  - `a.district` — İlçe
+  - `a.city` — Şehir
+  - `a.postal_code` — Posta kodu
+  - `a.phone` — Telefon
+  - `a.is_default_shipping` — Varsayılan teslimat adresi durumu
+  - `a.is_default_billing` — Varsayılan fatura adresi durumu
+  - `t` — Çeviri fonksiyonu
+  - `startEdit` — Düzenleme başlatma fonksiyonu
+  - `handleDelete` — Silme işlemini tetikler
+  - `makeDefault` — Varsayılan yapma fonksiyonu
+  - `MapPin` — Lucide ikonu
+  - `Edit2` — Lucide ikonu
+  - `Trash2` — Lucide ikonu
+  - `Truck` — Lucide ikonu
+  - `CheckCircle` — Lucide ikonu
+  - `CreditCard` — Lucide ikonu
+- **Dönüş**: JSX Element (React component)
 
 ---
 

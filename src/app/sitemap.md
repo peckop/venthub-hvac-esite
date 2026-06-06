@@ -3,34 +3,24 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\sitemap.ts
-skeleton_hash: ebc623b3db63a7de
+skeleton_hash: fa7c2b0046492944
 entity_hashes:
   func:sitemap: 07414dd0bcd23791
-  overview: 1f20e97deb68e19e
-generated_at: 2026-05-29T11:36:50Z
+  overview: fbb6fde2da42ac38
+generated_at: 2026-06-06T21:54:28Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js uygulaması için site haritasını (sitemap) dinamik olarak oluşturmaktan sorumludur. Asenkron bir fonksiyon kullanarak uygulamadaki kategoriler ve ürünler gibi farklı içerik türlerinin URL'lerini toplar ve arama motorları için gerekli olan son değişiklik tarihi, değişim sıklığı ve öncelik gibi meta verilerle zenginleştirerek standart bir site haritası yapısı üretir.
+Bu modül, Next.js uygulaması için site haritasını (sitemap) dinamik olarak oluşturmaktan sorumludur. Statik sayfalar, kategoriler, markalar ve ürünler gibi tüm içerik türlerinin URL'lerini toplayarak arama motorları için yapılandırılmış bir site haritası üretir. Türkçe ve İngilizce çoklu dil desteğiyle, her URL için son değişiklik tarihi, değişim sıklığı ve öncelik gibi meta verileri içerir.
 
 ## Fonksiyon Grupları
 ### Site Haritası Oluşturma
-Bu grup, uygulamanın tüm rotalarının (hem statik hem de dinamik) taranarak arama motoru dostu bir site haritası verisi hazırlanmasını yönetir.
+Uygulamanın tüm rotalarını tarayarak arama motoru dostu site haritası verisini hazırlar.
 - sitemap
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametresiz ve asenkron çalışan bir site haritası oluşturucusudur. Fonksiyon gövdesi verilmediği için sadece imzadan çıkarılabilecek minimum mimari varsayımlar aşağıdadır.
-
-**[Aksiyom 1]**: Eğer `sitemap()` fonksiyonu bir parametre ile çağrılırsa, fonksiyon beklenmeyen davranış gösterir veya hata oluşur.
-
-**[Aksiyom 2]**: Eğer fonksiyon asenkron (promise) olarak çağrılmazsa veya dönen değerin `await` edilmesi gerekirken edilmezse, site haritası verisi düzgün işlenemez.
-
-**[Aksiyom 3]**: Eğer fonksiyonun çalışması için gerekli veri kaynakları (örn: kategoriler, ürünler listesi) erişilebilir değilse, site haritası eksik veya boş döner.
-
-**[Aksiyom 4]**: Eğer Next.js site haritası API'sinin beklediği response formatı (Content-Type: application/xml vb.) sağlanmazsa, arama motorları site haritasını tanıyamaz.
 
 ---
 
@@ -47,19 +37,89 @@ Bu fonksiyon parametre almaz.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/sitemap.ts::sitemap
+### [N1_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap`
 - **params**: (parametre yok)
-- **ic_degiskenler**: 
-  `baseUrl` — SITE_URL sabitinden alınan site temel URL'si, tüm sitemap girdilerinin oluşturulmasında kullanılır
-  `locales` — Desteklenen dil kodlarını içeren dizi ('tr' ve 'en')
-  `categories` — Veritabanından getCategories() ile çekilen tüm kategorilerin dizisi, hata durumunda boş dizi döner
-  `products` — Veritabanından getAllProducts() ile çekilen tüm ürünlerin dizisi, hata durumunda boş dizi döner
-  `staticRoutesList` — Sitemap'e dahil edilecek sabit sayfa rotalarının (path'lerin) listesi
-  `staticRoutes` — Her dil için sabit rotaların sitemap girdilerini oluşturan dizi
-  `categoryRoutes` — Her dil ve kategori için kategori sayfalarının sitemap girdilerini oluşturan dizi
-  `brandRoutes` — Her dil ve marka için marka sayfalarının sitemap girdilerini oluşturan dizi
-  `productRoutes` — Her dil ve ürün (slug'ı olan) için ürün sayfalarının sitemap girdilerini oluşturan dizi
-- **Dönüş**: Promise<MetadataRoute.Sitemap> — Tüm statik, kategori, marka ve ürün rotalarının birleşimi olan sitemap dizisi
+- **ic_degiskenler**:
+  - `baseUrl` — SITE_URL sabitinden alınan site kök URL'si, tüm sitemap URL'lerinin başına eklenir
+  - `locales` — Desteklenen dil kodlarının dizisi `['tr', 'en']`, her sayfanın çok dilli versiyonunu oluşturmak için kullanılır
+  - `categories` — `getCategories()` API çağrısının sonucu; kategori listesi, categoryRoutes oluşturmak için kullanılır; hata durumunda boş diziye düşer
+  - `products` — `getAllProducts()` API çağrısının sonucu; ürün listesi, productRoutes oluşturmak için kullanılır; hata durumunda boş diziye düşer
+  - `staticRoutesList` — Statik sayfa yollarının dizisi (örn. `/products`, `/brands`), her dil için sitemap girdileri üretmek kullanılır
+  - `staticRoutes` — `locales.flatMap` ile üretilen statik sayfaların sitemap objeleri dizisi; her route için dil bazlı URL, lastModified, changefreq, priority ve alternates içerir
+  - `categoryRoutes` — `locales.flatMap` ile üretilen kategori sayfalarının sitemap objeleri dizisi; `cat.slug` ve `cat.updated_at` değerlerinden URL ve meta bilgileri türetilir
+  - `brandRoutes` — `locales.flatMap` ile üretilen marka sayfalarının sitemap objeleri dizisi; `HVAC_BRANDS` dizisindeki her markanın `slug` değeri kullanılarak üretilir
+  - `productRoutes` — `locales.flatMap` ile üretilen ürün sayfalarının sitemap objeleri dizisi; sadece `slug` değeri olan ürünler (`!!prod.slug` filtresi) dahil edilir, `prod.slug!` ile non-null assertion kullanılır
+- **Dönüş**: `Promise<MetadataRoute.Sitemap>` — statik, kategori, marka ve ürün rotalarının birleşik dizisi
+
+---
+
+### [N2_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) =>` (static routes flatMap callback)
+- **params**: `lang` — şu anki dil kodu (`'tr'` veya `'en'`)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `staticRoutesList` dizisi üzerinde `map` ile üretilen sitemap objeleri dizisi; her biri `${baseUrl}/${lang}${route}` formatında URL, `new Date()` lastModified, `daily` changefreq, priority (ana sayfa `1.0`, diğerleri `0.8`) ve `alternates.languages` alanlarını içerir
+
+---
+
+### [N3_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) => → (route) =>` (static route map callback)
+- **params**: `route` — `staticRoutesList` dizisindeki tek bir statik yol stringi (örn. `''`, `'/products'`, `'/brands'`)
+- **ic_degiskenler**:
+  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
+  - `lang` — kapama yoluyla erişilen üst kapsamdaki dil kodu
+- **Dönüş**: `{ url, lastModified, changefreq, priority, alternates }` objesi; `url` `${baseUrl}/${lang}${route}`, `priority` `route === '' ? 1.0 : 0.8` koşuluyla belirlenir, `alternates.languages` her iki dil için de sabit URL üretir
+
+---
+
+### [N4_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) =>` (category routes flatMap callback)
+- **params**: `lang` — şu anki dil kodu (`'tr'` veya `'en'`)
+- **ic_degiskenler**:
+  - `categories` — kapama yoluyla erişilen üst kapsamdaki kategori dizisi
+  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
+- **Dönüş**: `categories` dizisi üzerinde `map` ile üretilen sitemap objeleri dizisi; her biri `${baseUrl}/${lang}${Routes.category(cat.slug)}` formatında URL, `cat.updated_at` veya fallback `new Date()` ile `lastModified`, `weekly` changefreq, `0.7` priority ve `alternates.languages` içerir
+
+---
+
+### [N5_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) => → (cat) =>` (category map callback)
+- **params**: `cat` — tek bir kategori objesi; `.slug` ve `.updated_at` özellikleri kullanılır
+- **ic_degiskenler**:
+  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
+  - `lang` — kapama yoluyla erişilen üst kapsamdaki dil kodu
+- **Dönüş**: `{ url, lastModified, changefreq, priority, alternates }` objesi; `url` `Routes.category(cat.slug)` kullanılarak, `lastModified` `new Date(cat.updated_at || new Date())` ile, `alternates.languages` her iki dil için `Routes.category(cat.slug)` kullanılarak üretilir
+
+---
+
+### [N6_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) =>` (brand routes flatMap callback)
+- **params**: `lang` — şu anki dil kodu (`'tr'` veya `'en'`)
+- **ic_degiskenler**:
+  - `HVAC_BRANDS` — kapama yoluyla erişilen üst kapsamdaki marka sabit dizisi
+  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
+- **Dönüş**: `HVAC_BRANDS` dizisi üzerinde `map` ile üretilen sitemap objeleri dizisi; her biri `${baseUrl}/${lang}${Routes.brand(brand.slug)}` formatında URL, `new Date()` lastModified, `weekly` changefreq, `0.6` priority ve `alternates.languages` içerir
+
+---
+
+### [N7_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) => → (brand) =>` (brand map callback)
+- **params**: `brand` — tek bir marka objesi; `.slug` özelliği kullanılır
+- **ic_degiskenler**:
+  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
+  - `lang` — kapama yoluyla erişilen üst kapsamdaki dil kodu
+- **Dönüş**: `{ url, lastModified, changefreq, priority, alternates }` objesi; `url` `Routes.brand(brand.slug)` kullanılarak, `lastModified` `new Date()`, `alternates.languages` her iki dil için `Routes.brand(brand.slug)` kullanılarak üretilir
+
+---
+
+### [N8_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) =>` (product routes flatMap callback)
+- **params**: `lang` — şu anki dil kodu (`'tr'` veya `'en'`)
+- **ic_degiskenler**:
+  - `products` — kapama yoluyla erişilen üst kapsamdaki ürün dizisi; önce `.filter((prod) => !!prod.slug)` ile slug değeri olanlar filtrelenir
+  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
+- **Dönüş**: Filtrelenmiş `products` dizisi üzerinde `map` ile üretilen sitemap objeleri dizisi; her biri `${baseUrl}/${lang}${Routes.product(prod.slug!)}` formatında URL, `prod.updated_at` veya fallback `new Date()` ile `lastModified`, `daily` changefreq, `0.9` priority ve `alternates.languages` içerir
+
+---
+
+### [N9_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) => → (prod) =>` (product map callback)
+- **params**: `prod` — tek bir ürün objesi; `.slug` (non-null assertion ile `!`) ve `.updated_at` özellikleri kullanılır; filtre tarafından `slug`'ı tanımlı olanlar ile sınırlıdır
+- **ic_degiskenler**:
+  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
+  - `lang` — kapama yoluyla erişilen üst kapsamdaki dil kodu
+- **Dönüş**: `{ url, lastModified, changefreq, priority, alternates }` objesi; `url` `Routes.product(prod.slug!)` kullanılarak, `lastModified` `new Date(prod.updated_at || new Date())` ile, `alternates.languages` her iki dil için `Routes.product(prod.slug!)` kullanılarak üretilir
 
 ---
 

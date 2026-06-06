@@ -3,46 +3,54 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\CategoryBuilderView.tsx
-skeleton_hash: d0d925c567f6b49d
+skeleton_hash: 51e67bc6da0fd1e7
 entity_hashes:
   func:CategoryBuilderView: c538d4ad7085f51d
   func:handleSave: f8b5a865424c16c7
-  overview: 248cf966562364e2
+  overview: 228c38d7ec836061
   style_tokens: 745d0461670ee6bd
-generated_at: 2026-05-29T19:01:11Z
+generated_at: 2026-06-06T21:58:02Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC admin panelinde kategori yapısı oluşturma ve düzenleme işlemlerini yöneten bir React görünüm bileşenidir. Mevcut bir kategoriyi yeniden yapılandırma veya yeni bir kategori hiyerarşisi tasarlama yeteneği sağlar ve kaydetme işlemini merkezi olarak kontrol eder.
+Bu modül, VentHub HVAC admin panelinde kategori yapısının görsel olarak oluşturulması ve düzenlenmesini sağlayan bir React görünüm bileşenidir. Mevcut bir kategoriyi yeniden yapılandırma veya sıfırdan yeni bir kategori hiyerarşisi tasarlama süreçlerini tek bir bileşen üzerinden yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Görünüm Bileşeni
-Kullanıcıya kategori verilerini görsel olarak düzenleyebileceği bir arayüz sunar. Modunu (yeni oluşturma veya mevcut kategoriyi düzenleme) belirleyen temel bileşendir.
+Kullanıcıya kategori verilerini düzenleyebileceği bir arayüz sunar. `categoryId` prop değerine bağlı olarak yeni kategori oluşturma veya mevcut kategoriyi düzenleme modunda çalışır.
 - CategoryBuilderView
 
 ### Veri Kaydetme İşleyicisi
-Formda düzenlenen kategori yapısının veya verisinin sunucuya gönderilmesini ve kaydedilmesini koordine eder. Başarılı veya başarısız sonuçlara göre kullanıcı bildirimleri yönetir.
+Formda düzenlenen kategori yapısının sunucuya gönderilmesini ve kalıcı hale getirilmesini koordine eder. Kayıt işleminin sonucuna göre kullanıcıya geri bildirim sağlar.
 - handleSave
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bir kategori oluşturma/düzenleme formu sunan React görünüm bileşenidir ve temel kaydetme işlevini içerir. Aşağıdaki mimari varsayımlar fonksiyon imzalarına dayanarak çıkarılmıştır.
+Bu modül için verilen bilgiler yalnızca fonksiyon imzası düzeyindedir; fonksiyon gövdeleri paylaşılmadığından çıkarım kapsamı oldukça dar tutulmuştur.
 
 ---
 
-**[Aksiyom 1]:** `CategoryBuilderView` bileşeni bir `categoryId` prop'u ile çağrılır. Eğer `categoryId` değer olarak `undefined` veya `null` gelirse, bileşen "yeni kategori oluşturma" modunda çalışır (varsa mevcut kategori verisi yüklenmez). Eğer geçerli bir `categoryId` değer gelirse, bileşen ilgili kategoriyi düzenleme modunda çalışır.
+[Aksiyom 1]: Eğer `categoryId` prop'u `CategoryBuilderView` bileşenine sağlanmazsa, bileşenin çalışma modu (yeni oluşturma mu yoksa düzenleme mi olduğu) belirsiz olur.
 
-**[Aksiyom 2]:** `handleSave()` fonksiyonu çağrıldığında, kaydedilecek kategori verisinin (form durumu veya bileşen state'i) önceden doldurulmuş ve geçerli bir durumda olması gerekir. Eğer kaydedilecek geçerli veri yoksa, `handleSave()` işlevinin anlamlı bir kayıt işlemi gerçekleştirmesi beklenemez.
-
-**[Aksiyom 3]:** `CategoryBuilderView` bileşeni, varsa kategori listesini veya kategoriye ait hiyerarşik yapı bilgisini (üst kategori referansları vb.) dışarıdan bir kaynaktan (API, context veya prop) almalıdır. Eğer bu veri kaynağı mevcut değilse, kategori formu ilgili alanları (örn. üst kategori seçimi) eksik veya boş olarak render eder.
-
-**[Aksiyom 4]:** `handleSave()` sonucunda bir API isteği发起lması bekleniyorsa, ilgili API endpoint'inin (kategori oluşturma/güncelleme) erişilebilir veYetkili olması gerekir. Eğer API erişilemezse veya yetkinlik yoksa, kaydetme işlemi başarısız olur.
+**Neden:** Fonksiyon imzasında `categoryId` için bir default değer tanımlanmamıştır. Prop'un varlığı/yokluğu bileşenin hangi modda çalışacağını belirleyen tek belirleyici olarak görünmektedir; bu ayrımın olmadığında bileşenin hangi davranışı göstereceği imza düzeyinde bilinmemektedir.
 
 ---
 
-> **Not:** Bu modülde herhangi bir sabit (constant) tanımlı değildir. Fonksiyon gövdelerine ilişkin detaylı bilgi sağlanmadığından, axioms yalnızca fonksiyon imzaları ve modülün amacına ilişkin üst düzey mimari varsayımları içermektedir.
+[Aksiyom 2]: Eğer `handleSave()` fonksiyonu çağrıldığında bileşenin iç state'inde kaydedilecek geçerli bir kategori verisi (yapı/hiyerarşisi) mevcut değilse, kaydetme işlemi hatalı bir istekle sonuçlanır veya veri kaybı oluşur.
+
+**Neden:** `handleSave()` parametsiz olarak tanımlıdır; bu durum, fonksiyonun kendi iç state'inden veri okuduğunu gösterir. Fonksiyon gövdesinde state doğrulaması olup olmadığı bilinmediğinden, geçerli veri olmaması durumunda davranış bilinmemektedir.
+
+---
+
+[Aksiyom 3]: Eğer `CategoryBuilderView` bileşeni bir React ortamı (parent bileşen, state management, API servisleri) dışında çalıştırılmaya çalışılırsa, fonksiyonların hiçbiri beklenen çıktıyı üretemez.
+
+**Neden:** Her iki fonksiyon da React bileşen imzası (destructure edilmiş props) ve olay işleyici kalıbındadır; React yaşam döngüsüne ve component tree'ye bağımlıdır. Ancak bu bağımlılıkların somut listesi fonksiyon gövdelerinde görülmediğinden, tam olarak hangi servislerin zorunlu olduğu bilinmemektedir.
+
+---
+
+> **Not:** Fonksiyon gövdeleri paylaşılmadığı için modül içi veri doğrulama eşikleri, API endpoint bağımlılıkları veya state yapısı hakkında somut aksiyom türetilmemiştir. Yukarıdaki varsayımlar yalnızca fonksiyon imzalarından çıkarılabilen minimum düzeydeki mimari gereklilikleri yansıtmaktadır.
 
 ---
 
@@ -73,36 +81,35 @@ Bu modül, bir kategori oluşturma/düzenleme formu sunan React görünüm bile�
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CategoryBuilderView.tsx::CategoryBuilderView
-- **params**: ({ categoryId })
+- **params**: `categoryId` — Kategoriyi yüklemek ve güncellemek için kullanılan benzersiz kimlik
 - **ic_degiskenler**:
-  - `router` — Next.js useRouter hook'undan gelen router nesnesi, sayfa yönlendirmeleri için kullanılır
-  - `category` — useState ile tutulan kategori verisi (DbCategory tipinde veya null), yüklenen kategorinin tüm bilgilerini barındırır
-  - `blocks` — useState ile tutulan yetkilendirme blokları dizisi (AuthorityBlock[] tipinde veya null), sayfa içeriğini oluşturur
-  - `loading` — useState ile tutulan yükleme durumu (boolean), verilerin yüklenip yüklenmediğini takip eder
-  - `saving` — useState ile tutulan kaydetme durumu (boolean), kaydetme işlemi sırasında buton durumunu kontrol eder
-  - `previewMode` — useState ile tutulan önizleme modu ('desktop' veya 'mobile'), sağ paneldeki cihaz görünümünü belirler
-  - `showPreview` — useState ile tutulan önizleme paneli görünürlüğü (boolean), sağ panelin açılıp kapanmasını kontrol eder
-  - `load` — useCallback ile sarılmış asenkron fonksiyon, kategori verilerini ve blokları yükler
-  - `handleSave` — asenkron fonksiyon, güncellenmiş blokları veritabanına kaydeder
-- **Dönüş**: React.FC<CategoryBuilderViewProps> (JSX)
+  - `router` — Next.js router, geri butonu ile `router.back()` çağrısıyla kullanılır
+  - `category` — `useState<DbCategory | null>`: Supabase'den yüklenen kategori verisi; header'da `category?.name` olarak gösterilir
+  - `blocks` — `useState<AuthorityBlock[] | null>`: Otorite blokları dizisi; AuthorityBuilder'a value, AuthorityRenderer'a content olarak verilir
+  - `loading` — `useState<boolean>`: Yüklenme durumu; true iken loading ekranı, false iken ana editör render edilir
+  - `saving` — `useState<boolean>`: Kaydetme durumu; handleSave tetiklendiğinde true olur, kaydetme butonunu disabled yapar
+  - `previewMode` — `useState<'desktop' | 'mobile'>`: Önizleme panelinin cihaz modu, desktop/mobile butonlarıyla değiştirilir
+  - `showPreview` — `useState<boolean>`: Sağ taraftaki canlı önizleme panelinin açık/kapalı durumunu kontrol eder
+  - `load` — `useCallback(async () => {...}, [categoryId])`: Kategoriyi Supabase'den yükleyen, legacy verileri migrate eden memoized fonksiyon; useEffect içinde çağrılır
+- **Dönüş**: JSX — Loading ekranı veya tam editör sayfası (header + AuthorityBuilder + canlı önizleme sidebar)
 
 ### [N2_NASIL] AST Pointer: CategoryBuilderView.tsx::load
-- **params**: (parametre yok - useCallback closure'unda categoryId kullanılır)
+- **params**: yok
 - **ic_degiskenler**:
-  - `data` — supabase.from('categories').select() sorgusundan dönen veri (DbCategory veya null)
-  - `error` — supabase sorgusu sırasında oluşabilecek hata nesnesi
-  - `cat` — data'nın DbCategory tipine cast edilmiş hali
-  - `initialBlocks` — cat.authority_content alanından elde edilen AuthorityBlock dizisi veya boş dizi
-  - `legacyBlocks` — eski veri yapısını yeni blok formatına dönüştürmek için oluşturulan AuthorityBlock dizisi
-  - `meta` — cat.metadata alanının CategoryMetadata tipine cast edilmiş hali veya null
-  - `rows` — SpecsBlock['content']['rows'] tipinde dizi, teknik özet satırlarını tutar
-- **Dönüş**: yok (async fonksiyon, verileri state'lere kaydeder)
+  - `data` — Supabase `select().single()` sorgusundan dönenham veri; `cat` değişkenine cast edilir
+  - `error` — Supabase sorgu sonucundaki hata nesnesi; varsa fırlatılıp catch bloğunda yakalanır
+  - `cat` — `data`'nın `DbCategory` tipine cast edilmiş hali; `description`, `metadata`, `authority_content` alanları okunur
+  - `initialBlocks` — `cat.authority_content`'ün `AuthorityBlock[]` tipine cast edilmiş hali; boşsa legacy migration çalıştırılır
+  - `legacyBlocks` — `AuthorityBlock[]`: Eski statik verilerden oluşturulan blok dizisi; rich-text ve specs blokları push edilir
+  - `meta` — `cat.metadata`'nın `CategoryMetadata | null` tipine cast edilmiş hali; `metric1` ve `metric2` alanları kontrol edilir
+  - `rows` — `SpecsBlock['content']['rows']`: Spec bloğunun satırları; `meta.metric1` ve `meta.metric2`'den label/value çiftleri eklenir
+- **Dönüş**: yok — Yan etki olarak `category` ve `blocks` state'lerini günceller; hata durumunda `toast.error`, başarılı legacy dönüşümde `toast.success` gösterir
 
 ### [N3_NASIL] AST Pointer: CategoryBuilderView.tsx::handleSave
-- **params**: (parametre yok - closure'unda blocks ve categoryId kullanılır)
+- **params**: yok
 - **ic_degiskenler**:
-  - `error` — supabase.from('categories').update() sorgusu sırasında oluşabilecek hata nesnesi
-- **Dönüş**: yok (async fonksiyon, veritabanına kayıt yapar ve toast bildirimleri gösterir)
+  - `error` — Supabase `update()` çağrısından dönen hata nesnesi; fırlatılıp catch bloğunda yakalanır
+- **Dönüş**: yok — Yan etki olarak `blocks` dizisini `DbJson` tipine cast edip Supabase'deki `categories` tablosunun `authority_content` alanına yazar; `saving` state'ini yönetir; başarı/hata toast mesajı gösterir
 
 ---
 

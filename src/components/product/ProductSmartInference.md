@@ -3,28 +3,24 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\product\ProductSmartInference.tsx
-skeleton_hash: 943b3141203d5b8c
+skeleton_hash: 6efc9c860eedde1a
 entity_hashes:
-  overview: a5c2eaa395a8b75d
+  overview: 1cbfc71df668bd9f
   style_tokens: 14ff5ff1bd6a1a02
-generated_at: 2026-05-28T22:36:46Z
+generated_at: 2026-06-06T21:54:56Z
 ---
 
 ## Genel Bakış
-Bu modül, bir ürünün mühendislik analizini ve teknik çıkarımlarını görsel olarak sunan React bileşenidir. Bir `Product` nesnesi alarak `generateEngineeringSummary` yardımcısı aracılığıyla mühendislik odaklı çıkarımlar üretir ve bu çıkarımları ikonlarla, renklerle ve çevirilerle zenginleştirilmiş bir kart olarak sunar.
+Bu modül, bir ürünün mühendislik analizini ve teknik çıkarımlarını görsel olarak sunan bir React bileşenidir. Bir `Product` nesnesi alarak `generateEngineeringSummary` yardımcısı aracılığıyla mühendislik odaklı verileri işler ve bu verileri ikonlar, renkler ve çevirilerle zenginleştirilmiş bir arayüz kartı olarak sunar.
 
-## Fonksiyon Grupları
-### Ana Bileşen Mantığı
-Bileşen, girdi olarak bir `Product` alır, uluslararasılaştırma (`useI18n`) kullanarak metinleri çözer ve `generateEngineeringSummary` ile mühendislik özetlerini oluşturur. Boş özet durumunda `null` döner, aksi halde ikonlar ve tema renkleriyle süslenmiş bir arayüz kartı render eder.
-- ProductSmartInference (React.memo)
-
-### Yardımcı Görsel Fonksiyonlar
-Bileşen içinde tanımlanmış yerel yardımcılar, her bir mühendislik çıkarımı türü (`type`) için uygun Lucide ikonunu ve CSS gradyan renk temasını döndürerek arayüzün dinamik ve anlamlı görünmesini sağlar.
-- getIcon, getThemeColor
+## Modülün Amacı ve Kullanım Bağlamı
+`ProductSmartInference` bileşeni, bir ürün sayfasında teknik ve mühendisliksel bilgileri kullanıcıya estetik bir kart içinde sunmak için kullanılır. Modül, bir `Product` veri modeli alır ve bu model üzerinde `generateEngineeringSummary` fonksiyonunu çağırarak bir mühendislik özetleri dizisi üretir. Oluşan her bir özet (örn: verimlilik, ses, dayanıklılık) için uygun Lucide ikonunu ve CSS gradyan renk temasını belirleyen iç yardımcı fonksiyonlar kullanır. Uluslararasılaştırma (`useI18n`) hook'u ile tüm metinleri çevrilmiş şekilde render eder; eğer mühendislik özeti üretilemezse bileşen `null` döner ve nothing render etmez.
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için güvenilir mimari varsayımlar üretilememektedir. Gerekçe: Fonksiyon gövdesi, parametre tanımı veya modül sabiti detayı verilmemiştir; yalnızca dosya yolu ve genel bir React bileşeni olduğu bilgisi mevcuttur. Aksiyom üretimi için fonksiyon imzası veya gövde kodu gereklidir.
 
 ---
 
@@ -48,29 +44,45 @@ Bileşen içinde tanımlanmış yerel yardımcılar, her bir mühendislik çıka
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/product/ProductSmartInference.tsx::ProductSmartInference
-- **params**: `product` — Ürün nesnesi, engineering summary oluşturmak için kullanılır
+### [N1_NASIL] AST Pointer: ProductSmartInference.tsx::mainComponent
+- **params**: `({ product })` — React component props, `product` Product tipinde ürün nesnesi
 - **ic_degiskenler**:
-  - `t` — Çeviri fonksiyonu, useI18n hook'undan alınır
-  - `summaries` — generateEngineeringSummary(product) ile oluşturulan mühendislik analizleri dizisi
-  - `getIcon` — Mühendislik analiz tipine göre ikon seçen iç fonksiyon
-  - `getThemeColor` — Mühendislik analiz tipine göre renk teması seçen iç fonksiyon
-- **Dönüş**: JSX element veya null (summaries.length === 0 ise null, aksi takdirde mühendislik analizleri kartları)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, `t('pdp.labels.engineeringAnalysis')`, `t(item.labelKey)`, `t(item.descriptionKey)` şeklinde JSX içinde kullanılır
+  - `summaries` — `generateEngineeringSummary(product)` çağrısının dönüşü, `EngineeringInference[]` dizisi; mühendislik analizi özetlerini tutar, boşsa `null` döner
+  - `getIcon` — inner fonksiyon, `EngineeringInference['type']` alır ve ilgili `lucide-react` ikon JSX elemanını döner
+  - `getThemeColor` — inner fonksiyon, `EngineeringInference['type']` alır ve Tailwind gradient/border/metin renk CSS sınıf dizgesini döner
+- **Erisilen Ozellikler**:
+  - `summaries.length` — dizi uzunluğu kontrol edilir, 0 ise `null` return
+  - `summaries.map((item, idx) => ...)` — her item için kart JSX'i üretilir
+  - `item.type` — `getIcon` ve `getThemeColor` fonksiyonlarına argüman olarak geçirilir
+  - `item.isI18n` — boolean, `true` ise `t(item.labelKey)` / `t(item.descriptionKey)` ile çevrilir, `false` ise ham değer gösterilir
+  - `item.labelKey` — başlık metni veya çeviri anahtarı
+  - `item.value` — mühendislik analizi sonucu değeri (ör: "35 dB")
+  - `item.descriptionKey` — açıklama metni veya çeviri anahtarı
+  - `t('pdp.labels.engineeringAnalysis')` — bölüm başlığı etiketi
+- **Dönüş**: JSX Element (React bileşeni) veya `summaries.length === 0` durumunda `null`
 
-### [N2_NASIL] AST Pointer: src/components/product/ProductSmartInference.tsx::getIcon
-- **params**: `type` — EngineeringInference['type'] (noise, efficiency, power, quality veya diğerleri)
+### [N2_NASIL] AST Pointer: ProductSmartInference.tsx::getIcon
+- **params**: `type: EngineeringInference['type']` — analiz türü (noise, efficiency, power, quality)
 - **ic_degiskenler**: yok
-- **Dönüş**: JSX element — Lucide React ikonu (Volume2, ShieldCheck, Zap, Cpu veya Activity)
+- **Dönüş**: JSX Element — `type` değerine göre `Volume2`, `ShieldCheck`, `Zap`, `Cpu` veya `Activity` lucide-react ikon bileşeni; her biri `size={20}` ve `className` ile stillendirilmiş
 
-### [N3_NASIL] AST Pointer: src/components/product/ProductSmartInference.tsx::getThemeColor
-- **params**: `type` — EngineeringInference['type'] (noise, efficiency, power, quality veya diğerleri)
+### [N3_NASIL] AST Pointer: ProductSmartInference.tsx::getThemeColor
+- **params**: `type: EngineeringInference['type']` — analiz türü (noise, efficiency, power, quality)
 - **ic_degiskenler**: yok
-- **Dönüş**: string — Tailwind CSS sınıfları ile tema rengi (gradient, border ve text renkleri)
+- **Dönüş**: `string` — Tailwind CSS gradient, border ve metin renk sınıf dizgesi; `type` değerine göre `from-*-500/10 to-transparent border-*-200/50 text-*-700` formatında renk teması döner
 
-### [N4_NASIL] AST Pointer: src/components/product/ProductSmartInference.tsx::mapCallback
-- **params**: `item` — EngineeringInference nesnesi (summaries dizisindeki her bir analiz), `idx` — Dizin indeksi
+### [N4_NASIL] AST Pointer: ProductSmartInference.tsx::mapCallback
+- **params**: `item: EngineeringInference`, `idx: number` — `summaries.map()` iterasyonundaki bireysel analiz özeti ve dizi indeksi
 - **ic_degiskenler**: yok
-- **Dönüş**: JSX element — Tek bir mühendislik analiz kartı (div içinde ikon, başlık, değer ve açıklama)
+- **Erisilen Ozellikler**:
+  - `item.type` — `getIcon(item.type)` ve `getThemeColor(item.type)` çağrılarına argüman
+  - `item.isI18n` — label ve description'ın çevrilip çevrilmeyeceğini belirler
+  - `item.labelKey` — `item.isI18n` true ise `t()` ile sarılır, değilse doğrudan gösterilir
+  - `item.value` — analiz sonucu değeri, `<span>` içinde render edilir
+  - `item.descriptionKey` — `item.isI18n` true ise `t()` ile sarılır, değilse doğrudan gösterilir
+  - `idx` — `key={idx}` olarak React key olarak kullanılır
+- **Dönüş**: JSX Element — her analiz özeti için kart bileşeni (`<div>`); ikon, başlık, değer ve açıklama içeren gradient arka planlı kart
 
 ---
 

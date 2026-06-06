@@ -3,30 +3,44 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx
-skeleton_hash: 68b343d716579a22
+skeleton_hash: 36cea506afbf6d87
 entity_hashes:
   func:AddressFormModal: 22dcfc4163aec036
   func:handleSave: 51987ec8847e1d2c
-  overview: 6dca8320898d8077
+  overview: e2728fdf3d977a4e
   style_tokens: 4fa16246087d5121
-generated_at: 2026-06-06T08:46:37Z
+generated_at: 2026-06-06T21:58:14Z
 ---
 
 ## Genel Bakış
-Bu modül, sipariş tamamlama sürecinde kullanıcıların adres bilgilerini girmesini veya düzenlemesini sağlayan bir React modal bileşenidir. Kullanıcıdan alınan form verilerini işleyerek üst katmana iletir ve modal penceresinin kapatılmasını yönetir.
+Bu modül, VentHub HVAC uygulamasının ödeme adımında sipariş sürecini tamamlamak için kullanılan bir React modal bileşenidir. Kullanıcıların mevcut adres bilgilerini düzenlemesine veya yeni adres eklemesine olanak tanır. Formdan gelen verileri işleyerek üst bileşene iletir ve modal penceresinin akışını yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen Yapısı
-Modal penceresinin dış arayüzünü ve temel iskeletini oluşturur. Adres düzenleme veya yeni adres oluşturma durumuna göre form alanlarını render eder.
+Modal penceresinin temel iskeletini ve form alanlarını oluşturarak kullanıcı arayüzünü sunar. Adres düzenleme veya oluşturma durumuna göre formu dinamik olarak render eder.
 - AddressFormModal
 
 ### Form Gönderim Yönetimi
-Formun gönderilmesi sırasında tetiklenir, kullanıcı girişlerini doğrular ve gerekli geri çağırma fonksiyonları aracılığıyla verileri üst bileşene aktarır.
+Kullanıcının formu göndermesiyle tetiklenen asenkron süreçten sorumludur. Giriş doğrulamasını yapar, verileri hazırlar ve üst bileşene geri çağırma fonksiyonları aracılığıyla aktarır.
 - handleSave
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için mimari varsayımlar, verilen fonksiyon imzalarına dayalı olarak çıkarılmıştır.
+
+**[Aksiyom 1]:** Eğer `onClose` callback'i sağlanmazsa, modal penceresinin kullanıcı tarafından kapatılması mümkün olmaz ve kullanıcı arayüzünde takılma durumu oluşur.
+
+**[Aksiyom 2]:** Eğer `onSaved` callback'i sağlanmazsa, adres başarıyla kaydedildikten sonra üst katman (örn: sipariş formu) güncel adres bilgisini alamaz ve veri tutarsızlığı oluşur.
+
+**[Aksiyom 3]:** Eğer `t` fonksiyonu sağlanmazsa, modal içindeki metinler ve hata mesajları çevrilmemiş olarak gösterilir veya çeviri hatası oluşur.
+
+**[Aksiyom 4]:** Eğer `address` parametresi `null` veya `undefined` olarak geçilirse, bileşen "yeni adres oluşturma" modunda çalışmalıdır; aksi takdirde düzenlenecek veri olmadığından form boş veya hatalı başlangıç değerleriyle render edilir.
+
+**[Aksiyom 5]:** Eğer `handleSave` fonksiyonu `React.FormEvent` yerine farklı bir event tipi ile çağrılırsa, form gönderimi sırasında beklenmeyen davranışlar oluşur (preventDefault çağrılamayabilir).
+
+**[Aksiyom 6]:** Eğer `handleSave` çağrıldığında form alanlarında zorunlu alanlar boş bırakılmışsa, kaydetme işlemi gerçekleşmemeli ve kullanıcıya hata bildirilmelidir; aksi takdirde eksik veri ile adres kaydı oluşur.
 
 ---
 
@@ -63,25 +77,29 @@ Formun gönderilmesi sırasında tetiklenir, kullanıcı girişlerini doğrular 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\checkout\AddressFormModal.tsx::AddressFormModal
-- **params**: `(address, onClose, onSaved, t)` — Bileşenin props'ları. `address` mevcut adres nesnesi (yeni ise null), `onClose` modal kapatma fonksiyonu, `onSaved` kayıt sonrası tetiklenecek fonksiyon, `t` çeviri fonksiyonu.
+### [N1_NASIL] AST Pointer: src/views/checkout/AddressFormModal.tsx::AddressFormModal (Component Body)
+- **params**: `address` — düzenlenecek mevcut adres nesnesi (UserAddress | undefined), `onClose` — modal kapatma callback fonksiyonu, `onSaved` — adres kaydedildikten sonra çağrılan callback fonksiyonu, `t` — i18n çeviri fonksiyonu
 - **ic_degiskenler**:
-  - `saving` — `useState<boolean>`: Formun kaydetme işlemi yapıldığını belirten yükleme durumu (loading) flag'i. Başlangıç değeri `false`.
-  - `form` — `useState<DbUserAddressInsert>`: Form alanlarının tüm değerlerini tutan state nesnesi. Alanlar: `label`, `full_name`, `phone`, `address_line`, `city`, `district`, `postal_code`, `is_default_shipping`, `is_default_billing`. Başlangıç değerleri `address` prop'undan gelir, yoksa boş string/false.
-- **Dönüş**: `JSX.Element` — Adres formu içeren modal JSX'ini döndürür.
+  - `saving` — form kaydetme işleminin devam edip etmediğini tutan boolean state, true iken buton disabled olur ve "..." gösterir
+  - `setSaving` — saving state'ini güncelleyen setter fonksiyonu
+  - `form` — form alanlarının tüm değerlerini tutan state nesnesi (label, full_name, phone, address_line, city, district, postal_code, is_default_shipping, is_default_billing), address prop'u varsa mevcut değerlerle, yoksa boş/varsayılan değerlerle doldurulur
+  - `setForm` — form state'ini güncelleyen setter fonksiyonu, her input change olayında spread ile güncellenir
+  - `handleSave` — form submit handler'ı, nested async fonksiyon olarak tanımlanır (N2 olarak ayrıca incelenir)
+- **Dönüş**: JSX — fixed overlay üzerinde modal form (adres oluşturma/düzenleme formu)
 
-### [N2_NASIL] AST Pointer: src\views\checkout\AddressFormModal.tsx::handleSave
-- **params**: `(e: React.FormEvent)` — Formun submit olayı.
+### [N2_NASIL] AST Pointer: src/views/checkout/AddressFormModal.tsx::handleSave (iç fonksiyon)
+- **params**: `e` — React.FormEvent, form submit olay nesnesi
 - **ic_degiskenler**:
-  - `setSaving` — `saving` state'ini güncelleyen fonksiyon. Kaydetme işlemi başlarken `true`, bittiğinde (`finally`) `false` yapılır.
-  - `form` — Üst kapsamda tanımlı form state nesnesi, tüm adres alanlarını içerir.
-  - `address` — Üst kapsamdan gelen mevcut adres prop'u, varsa `true` (güncelleme), yoksa `false` (oluşturma) dalı çalışır.
-  - `newAddressPayload` — `DbUserAddressInsert` tipinde nesne: Yeni adres oluşturulurken `createAddress` servisine gönderilen veri paketi. `user_id` boş string olarak atanır (servis tarafından üzerine yazılır), `address_type` `is_default_shipping` değerine göre `'shipping'` veya `'billing'` olur, diğer alanlar `form` state'inden kopyalanır.
-  - `updateAddress` — `../../lib/services/address.service` modülünden import edilen asenkron fonksiyon. `address.id` ve güncellenen alanları alır, adresi veritabanında günceller.
-  - `createAddress` — `../../lib/services/address.service` modülünden import edilen asenkron fonksiyon. `newAddressPayload` nesnesini alır, yeni adres oluşturur.
-  - `toast` — `sonner` kütüphanesinden import edilen bildirim fonksiyonu. Başarı/hata durumlarında kullanıcıya bildirim gösterir.
-  - `e.preventDefault()` — Formun varsayılan submit (sayfa yenileme) davranışını engeller.
-- **Dönüş**: `Promise<void>` — Asenkron bir form gönderimi; belirgin dönüş değeri yoktur. Yan etkileri: `updateAddress`/`createAddress` servis çağrıları, `toast` bildirimleri, `onSaved()` ve `onClose()` fonksiyon çağrısı.
+  - `e` parametresi — `e.preventDefault()` ile varsayılan form submit davranışı engellenir
+  - `address` — üst scope'tan gelen prop, varsa güncelleme (updateAddress), yoksa oluşturma (createAddress) yapılır
+  - `form` — üst scope'tan gelen form state'i, tüm alanları (label, full_name, phone, address_line, city, district, postal_code, is_default_shipping, is_default_billing) API çağrılarına parametre olarak geçilir
+  - `address.id` — address mevcutsa, updateAddress çağrısında adresin benzersiz tanımlayıcısı olarak kullanılır
+  - `newAddressPayload: DbUserAddressInsert` — yeni adres oluşturma için API'ye gönderilecek veri nesnesi, user_id boş string olarak atanır (servis tarafında override edilir), address_type ise is_default_shipping'e göre 'shipping' veya 'billing' olarak belirlenir, form alanlarının tamamı bu nesneye kopyalanır
+  - `t` — üst scope'tan gelen çeviri fonksiyonu, success ve error toast mesajları için kullanılır
+  - `onSaved` — üst scope'tan gelen callback, başarılı kayıt sonrası çağrılır
+  - `onClose` — üst scope'tan gelen callback, başarılı kayıt sonrası modal'ı kapatır
+  - `setSaving` — üst scope'tan gelen state setter, try bloğunun başında true, finally bloğunda false olarak ayarlanır
+- **Dönüş**: yok (void) — yan etkiler: updateAddress veya createAddress API çağrısı, toast.success/toast.error bildirim gösterimi, onSaved() ve onClose() callback çağrısı, setSaving ile loading durumu yönetimi
 
 ---
 

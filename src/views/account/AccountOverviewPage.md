@@ -3,30 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx
-skeleton_hash: bd8655db740d4e93
+skeleton_hash: c6b06ca12f994aa7
 entity_hashes:
   func:AccountOverviewPage: 5d6b23de15a52581
-  overview: 9631e42766ab0678
+  overview: 666ec0a2df1ce43b
   style_tokens: 98f0536966ac7e31
-generated_at: 2026-05-28T22:39:29Z
+generated_at: 2026-06-06T21:56:45Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasındaki kullanıcı hesap özet sayfasını oluşturan temel React bileşenidir. Kullanıcının hesap bilgilerini görüntülediği ana arayüz sayfası olarak görev yapar ve hesap yönetimi işlevlerinin giriş noktasıdır.
+AccountOverviewPage modülü, VentHub HVAC uygulamasında kullanıcıların kendi hesap özetlerine eriştiği ana dashboard sayfasıdır. Bu bileşen, kullanıcının profil bilgilerini, sipariş geçmişini, kargo durumlarını ve adreslerini tek bir merkezi arayüzde birleştirerek sunar. Hesap yönetimine dair temel bilgileri görselleştiren bu sayfa, kullanıcı deneyiminin odak noktalarından biridir.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Hesap özet sayfasının tamamını oluşturan ve kullanıcıya sunan ana React bileşenidir. Sayfa düzenini, içeriğini ve hesap verilerinin gösterimini yönetir.
+Kullanıcının tüm hesap özetini oluşturup render eden ana React bileşenidir. Verileri (siparişler, adresler, istatistikler) sunucudan çeker, işler ve düzenli bir dashboard aracılığıyla kullanıcıya sunar.
 - AccountOverviewPage
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için fonksiyon gövdesi verilmemiştir; dolayısıyla güvenilir mimari varsayımlar üretilemez.
 
----
-
-**Not:** Verilen `AccountOverviewPage()` fonksiyonu için sadece imza (parametresiz) mevcut olup, fonksiyon gövdesi paylaşılmamıştır. AXIOMS'lar yalnızca fonksiyon gövdesinden üretilen kabul edildiğinden, bu durumda çıkarım yapılamamaktadır.
 
 ---
 
@@ -64,52 +59,69 @@ Bu modül için fonksiyon gövdesi verilmemiştir; dolayısıyla güvenilir mima
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AccountOverviewPage::useEffect
-- **params**: ()
+### [N1_NASIL] AST Pointer: AccountOverviewPage.tsx::useEffectCallback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `mounted` — Boolean bayrak, bileşenin monte edilip edilmediğini takip eder, async işlemler için güvenlik kontrolü sağlar
-- **Dönüş**: Cleanup fonksiyonu döndürür (mounted=false yapar)
+  - `mounted` — boolean flag, fonksiyon bileşenin mounted olup olmadığını takip eder, async işlemler için cleanup’ta kullanılır
+  - `load` — async fonksiyon, verileri yüklemek için tanımlanır
+- **Dönüş**: Cleanup fonksiyonu döner → `() => { mounted = false }`
 
-### [N2_NASIL] AST Pointer: AccountOverviewPage::load
-- **params**: ()
+### [N2_NASIL] AST Pointer: AccountOverviewPage.tsx::load
+- **params**: (parametre yok, dış kapsamdan `user` değişkenini kullanır)
 - **ic_degiskenler**:
-  - `orderData` — ShipmentRecord[] tipinde boş dizi, tüm sipariş verilerini tutar, fallback senaryosunda yeniden doldurulur
-  - `addrData` — `listAddresses()` çağrısından dönen adres verisi, kullanıcı adreslerini temsil eder
-  - `data` — Supabase'den dönen sipariş verisi (başarılı senaryo)
-  - `error` — Supabase hata nesnesi, PGRST100 kodu kontrol edilir
-  - `fallback` — Ana sorgu hata verdiğinde alternatif sorgu sonucu
-  - `d` — Record<string, unknown> tipinde her bir fallback satırı, map işleminde kullanılır
-- **Dönüş**: yok (async void)
+  - `addrData` — `listAddresses()` çağrısından dönen adres verisi
+  - `orderData` — `ShipmentRecord[]` tipinde sipariş verisi dizisi, başlangıçta boş dizi
+  - `data` — supabase sorgusundan dönen ilk veri seti
+  - `error` — supabase sorgusundan dönen hata nesnesi
+  - `fallback` — hata durumunda alternatif supabase sorgusunun sonucu
+- **Dönüş**: yok (state’leri günceller: `setLoading`, `setAddresses`, `setOrders`)
 
-### [N3_NASIL] AST Pointer: AccountOverviewPage::renderOrderItem
-- **params**: `(o: ShipmentRecord)`
+### [N3_NASIL] AST Pointer: AccountOverviewPage.tsx::mapFallbackOrder
+- **params**: `d` — `Record<string, unknown>` tipinde tek bir sipariş satırı
 - **ic_degiskenler**:
-  - `isDelivered` — Boolean, siparişin teslim edilip edilmediğini status alanına bakarak kontrol eder
-  - `code` — String, sipariş numarasını formatlar: order_number varsa `#${order_number.split('-')[1]}`, yoksa `#${id.slice(-8).toUpperCase()}`
-  - `activeShipStatusBadge` — JSX elementi döndüren fonksiyon çağrısı, sipariş durumuna göre badge gösterir
-- **Dönüş**: JSX elementi (React.ReactNode)
+  - `...d` — spread operator ile tüm mevcut alanlar kopyalanır
+  - `carrier` — null olarak atanır (fallback veri setinde yok)
+  - `tracking_number` — null olarak atanır (fallback veri setinde yok)
+  - `shipped_at` — null olarak atanır (fallback veri setinde yok)
+  - `delivered_at` — null olarak atanır (fallback veri setinde yok)
+- **Dönüş**: `ShipmentRecord` objesi
 
-### [N4_NASIL] AST Pointer: AccountOverviewPage::getShipStatus
-- **params**: `(row?: ShipmentRecord)`
-- **ic_degiskenler**: yok
-- **Dönüş**: `'delivered' | 'shipped' | 'preparing'` (siparişin kargo durumunu belirten string)
-
-### [N5_NASIL] AST Pointer: AccountOverviewPage::getStatusBadge
-- **params**: `(status: 'delivered' | 'shipped' | 'preparing')`
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (React.ReactNode - duruma göre renkli badge)
-
-### [N6_NASIL] AST Pointer: AccountOverviewPage::getStepIndex
-- **params**: `(status: 'delivered' | 'shipped' | 'preparing')`
-- **ic_degiskenler**: yok
-- **Dönüş**: number (0, 1 veya 2 - duruma göre adım indeksi)
-
-### [N7_NASIL] AST Pointer: AccountOverviewPage::renderStepItem
-- **params**: `(step: {key: string, icon: React.ComponentType, label: string}, idx: number)`
+### [N4_NASIL] AST Pointer: AccountOverviewPage.tsx::getShipStatus
+- **params**: `row` — `ShipmentRecord` tipinde (opsiyonel, undefined olabilir)
 - **ic_degiskenler**:
-  - `active` — Boolean, idx'in activeStepIdx'den küçük olup olmadığını kontrol eder, adımın aktif/pasif durumunu belirler
-  - `StepIcon` — React bileşeni, step.icon'dan alınan ikon bileşeni, JSX içinde render edilir
-- **Dönüş**: JSX elementi (React.ReactNode - adım gösterge bileşeni)
+  - `row.delivered_at` — teslim tarihi alanı, truthy ise `delivered` döner
+  - `row.status` — sipariş durumu stringi, küçük harfe çevrilip karşılaştırılır
+  - `row.shipped_at` — kargoya verilme tarihi, truthy ise `shipped` döner
+  - `row.tracking_number` — kargo takip numarası, truthy ise `shipped` döner
+- **Dönüş**: `'delivered' | 'shipped' | 'preparing'` string’i
+
+### [N5_NASIL] AST Pointer: AccountOverviewPage.tsx::activeShipStatusBadge
+- **params**: `status` — `'delivered' | 'shipped' | 'preparing'` union tipi
+- **ic_degiskenler**:
+  - `status` parametresi switch-case ile kontrol edilir
+- **Dönüş**: JSX elementi (duruma göre renkli badge)
+
+### [N6_NASIL] AST Pointer: AccountOverviewPage.tsx::stepToIdx
+- **params**: `status` — `'delivered' | 'shipped' | 'preparing'` union tipi
+- **ic_degiskenler**:
+  - yok (sadece parametre kullanılır)
+- **Dönüş**: `number` (0, 1 veya 2)
+
+### [N7_NASIL] AST Pointer: AccountOverviewPage.tsx::renderShipStep
+- **params**: `step` — tek bir adım objesi (icon, label, key alanları var), `idx` — adımın indeksi (number)
+- **ic_degiskenler**:
+  - `active` — `idx <= activeStepIdx` karşılaştırması ile hesaplanan boolean, adımın aktif olup olmadığını belirler
+  - `StepIcon` — `step.icon` JSX bileşeni, adım ikonu
+- **Dönüş**: JSX fragment’i (adım ikonu, etiketi ve bağlantı çizgisi)
+
+### [N8_NASIL] AST Pointer: AccountOverviewPage.tsx::renderOrderItem
+- **params**: `o` — tek bir sipariş objesi (`ShipmentRecord`)
+- **ic_degiskenler**:
+  - `isDelivered` — `o.status.toLowerCase() === 'delivered'` karşılaştırması ile hesaplanan boolean
+  - `code` — sipariş kodu, `o.order_number` varsa `#${o.order_number.split('-')[1]}` formatında, yoksa `#${o.id.slice(-8).toUpperCase()}` formatında oluşturulur
+  - `o.total_amount` — sipariş toplam tutarı, `Number()` ile number tipine dönüştürülür
+  - `o.created_at` — sipariş oluşturma tarihi, `formatDate()` ile formatlanır
+- **Dönüş**: JSX elementi (sipariş kartı)
 
 ---
 

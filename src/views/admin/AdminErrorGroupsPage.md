@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx
-skeleton_hash: 6a2cf5ad7fb8cfd4
+skeleton_hash: 6ad894e4ce1fe0c0
 entity_hashes:
   func:AdminErrorGroupsPage: 2df4b29ac83c8598
   func:bulkApplyStatus: 2e737880df202268
@@ -13,46 +13,48 @@ entity_hashes:
   func:updateAssignedTo: 115d7b001b19d674
   func:updateNotes: 57b7793991d9e6a2
   func:updateStatus: 6c7719de765f38dd
-  overview: 2bc670ce94cd0c60
+  overview: e52d0620d9f9a09b
   style_tokens: 5e40817d604cd18b
-generated_at: 2026-05-30T21:36:07Z
+generated_at: 2026-06-06T21:57:26Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC yönetici panelindeki hata grupları yönetim sayfasıdır. Yöneticilerin sistemde kaydedilen istemci hatalarını gruplar halinde görüntülemesine, grupları farklı kriterlere göre sıralamasına, tek tek veya toplu olarak durumlarını değiştirmesine, sorumlu kullanıcı ataması yapmasına ve notlar eklemesine olanak tanır. Modül, hem genel listeleme ve filtreleme hem de detaylı hata yönetimi için gerekli arayüz ve işlevsellikleri tek bir bileşen altında toplar.
+Bu modül, yönetici panelindeki hata gruplarını yönetmek için kullanılan bir React sayfasıdır. Sistemde kaydedilen istemci hatalarını gruplar halinde sunar ve yöneticilerin bu grupları sıralamasına, durumlarını değiştirmesine, sorumlu ataması yapmasına ve notlar eklemesine olanak tanır. Modül, hem toplu işlemleri hem de bireysel grup detaylarını tek bir arayüz altında birleştirerek hata yönetimi süreçlerini merkezileştirir.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Yapısı ve Görünüm Kontrolleri
-Modülün temelini oluşturan ana React bileşeni ile yöneticinin hata grupları listesini sıralamasını ve gruplar üzerinde toplu seçim yapmasını sağlayan arayüz etkileşim fonksiyonlarını kapsar.
+### Ana Sayfa Yapısı ve Arayüz Etkileşimleri
+Modülün temelini oluşturan ana bileşeni ve sayfa üzerindeki genel sıralama ile seçim kontrollerini yönetir.
 - AdminErrorGroupsPage, toggleSort, toggleSelect
 
 ### Bireysel Hata Grubu Yönetim İşlemleri
-Belirli bir hata grubu üzerinde tek tek gerçekleştirilen durum güncelleme, sorumlu atama, not ekleme ve o gruba ait en son hata kayıtlarını getirme gibi detaylı yönetim operasyonlarını yöneten asenkron fonksiyonlardır.
+Belirli bir hata grubu üzerinde gerçekleştirilerek durum güncelleme, sorumlu atama, not ekleme ve o gruba ait en son hata kayıtlarını getirme gibi detaylı operasyonları kapsar.
 - updateStatus, updateAssignedTo, updateNotes, loadLatestClientErrors
 
 ### Toplu İşlem Yönetimi
-Seçili olan birden fazla hata grubuna aynı anda belirli bir durum değişikliğini uygulamak için kullanılan, verimliliği artıran toplu işleme fonksiyonudur.
+Seçili olan birden fazla hata grubuna aynı anda belirli bir durum değişikliğini uygulamak için kullanılan verimli toplu işleme fonksiyonudur.
 - bulkApplyStatus
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, hata grupları yönetim sayfası olarak API tabanlı CRUD işlemleri ve toplu seçim mekanizması üzerine kurulmuştur.
+Bu modül, hata grupları listesini yöneten bir yönetici sayfasıdır ve seçim/durum durumlarını bileşen içi state'te tutar.
 
-**[Aksiyom 1]**: Eğer `updateStatus` fonksiyonuna geçilen `id` değerine karşılık gelen hata grubu sunucuda mevcut değilse, durum güncelleme isteği başarısız olur.
+[Aksiyom 1]: Eğer `toggleSort` fonksiyonuna `'last_seen'` veya `'count'` dışında bir değer verilirse, sıralama davranışı tanımsızdır.
 
-**[Aksiyom 2]**: Eğer `toggleSort` fonksiyonuna geçilen `by` parametresi `'last_seen'` veya `'count'` değerlerinden biri değilse, sıralama yanlısı çalışır veya çalışma zamanı hatası oluşur (TypeScript enum contract).
+[Aksiyom 2]: Eğer `updateStatus` fonksiyonuna `'open'`, `'resolved'` veya `'ignored'` dışında bir durum değeri verilirse, güncelleme davranışı tanımsızdır.
 
-**[Aksiyom 3]**: Eğer `loadLatestClientErrors` fonksiyonuna geçilen `groupId` değerine ait hata grubu sunucuda mevcut değilse, istemci hata listesi boş döner veya 404 hatası oluşur.
+[Aksiyom 3]: Eğer `updateAssignedTo` fonksiyonuna boş string (`''`) verilirse, ilgili hata grubunun sorumlusu kaldırılır (atama temizlenir).
 
-**[Aksiyom 4]**: Eğer `updateAssignedTo` fonksiyonuna geçilen `userId` değeri boş string (`''`) değilse, bu userId'nin geçerli bir kullanıcı kimliğine karşılık gelmesi gerekir; aksi takdirde atama işlemi başarısız olur.
+[Aksiyom 4]: Eğer `bulkApplyStatus` çağrıldığında hiçbir hata grubu seçili (`toggleSelect` ile `on: true` yapılmamış) değilse, toplu güncelleme işlemi hiçbir kayıt üzerinde etkili olmaz.
 
-**[Aksiyom 5]**: Eğer `bulkApplyStatus` fonksiyonu çağrıldığında hiçbir hata grubu seçilmemiş (`toggleSelect` ile `on: true` olarak işaretlenmemiş) ise, toplu durum güncelleme hiçbir kayıt üzerinde etkili olmaz.
+[Aksiyom 5]: Eğer `bulkApplyStatus` çağrıldığında uygulanacak geçerli bir durum değeri (`'open'`, `'resolved'` veya `'ignored'`) bileşen state'inde mevcut değilse, toplu güncelleme davranışı tanımsızdır.
 
-**[Aksiyom 6]**: Eğer `updateNotes` fonksiyonuna geçilen `id` değerine karşılık gelen hata grubu mevcut değilse, not güncelleme isteği başarısız olur.
+[Aksiyom 6]: Eğer `loadLatestClientErrors` fonksiyonuna geçerli bir `groupId` verilmezse (boş string veya olmayan bir ID), istemci hata kayıtları yüklenmez.
 
-**[Aksiyom 7]**: Eğer `updateStatus` fonksiyonuna geçilen `newStatus` değeri `'open'`, `'resolved'` veya `'ignored'` değerlerinden biri değilse, durum geçersiz kabul edilir ve güncelleme yapılmaz (sabit üç durum döngüsü: open↔resolved↔ignored).
+[Aksiyom 7]: Eğer `updateNotes` fonksiyonuna geçersiz bir `id` verilse bile, fonksiyon varolan kayıtlar üzerinde dış etki (side effect) oluşturmaz; yalnızca eşleşen kayıt varsa güncellenir.
+
+[Aksiyom 8]: `bulkApplyStatus` fonksiyonu parametre almaz; bu durum, uygulanacak durum değerinin fonksiyon çağrılmadan önce bileşen içi state'inde önceden ayarlanması gerektiğini varsayar.
 
 ---
 
@@ -155,63 +157,52 @@ Bu modül, hata grupları yönetim sayfası olarak API tabanlı CRUD işlemleri 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::toggleSort
-- **params**: `by: 'last_seen' | 'count'` — sıralanacak sütun
+### [N1_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::AdminErrorGroupsPage
+- **params**: ()
 - **ic_degiskenler**:
-  - `prev` — mevcut sıralama sütununun önceki değeri
-  - `d` — mevcut sıralama yönü (asc/desc)
+- **Dönüş**: React.FC bileşeni; hata gruplarını yöneten, filtreleyen ve gösteren React bileşeni
+
+### [N2_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::toggleSort
+- **params**: (by: 'last_seen' | 'count')
+- **ic_degiskenler**:
 - **Dönüş**: yok
 
-### [N2_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::updateStatus
-- **params**: `id: string` — güncellenecek satır ID'si, `newStatus: 'open' | 'resolved' | 'ignored'` — yeni durum
+### [N3_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::updateStatus
+- **params**: (id: string, newStatus: 'open' | 'resolved' | 'ignored')
 - **ic_degiskenler**:
-  - `prev` — güncelleme öncesi satır listesi (hata durumunda geri almak için)
-  - `rs` — satır listesi (map callback içinde)
-  - `r` — dönüştürülen her bir satır
-  - `error` — supabase update sonucu hata
+  - `prev` — güncelleme öncesi mevcut satır listesinin kopyası, hata durumunda geri almak için
+- **Dönüş**: yok (async)
+
+### [N4_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::updateAssignedTo
+- **params**: (id: string, userId: string | '')
+- **ic_degiskenler**:
+  - `val` — boş string ise null, değilse userId değeri, atama işleminde kullanılır
+  - `prev` — güncelleme öncesi mevcut satır listesinin kopyası, hata durumunda geri almak için
+- **Dönüş**: yok (async)
+
+### [N5_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::updateNotes
+- **params**: (id: string, notes: string)
+- **ic_degiskenler**:
+  - `prev` — güncelleme öncesi mevcut satır listesinin kopyası, hata durumunda geri almak için
+- **Dönüş**: yok (async)
+
+### [N6_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::loadLatestClientErrors
+- **params**: (groupId: string)
+- **ic_degiskenler**:
+  - `queryResult` — Supabase sorgusunun sonucu (data ve error içeren obje)
+  - `data` — queryResult'dan gelen hata satırları dizisi
+  - `error` — queryResult'dan gelen hata nesnesi
+- **Dönüş**: yok (async)
+
+### [N7_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::toggleSelect
+- **params**: (id: string, on: boolean)
+- **ic_degiskenler**:
 - **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::updateAssignedTo
-- **params**: `id: string` — güncellenecek satır ID'si, `userId: string | ''` — atanacak kullanıcı ID'si (boş string = kaldır)
-- **ic_degiskenler**:
-  - `val` — userId boşsa null, değilse userId
-  - `prev` — güncelleme öncesi satır listesi
-  - `rs` — satır listesi (map callback içinde)
-  - `r` — dönüştürülen her bir satır
-  - `error` — supabase update sonucu hata
-- **Dönüş**: yok
-
-### [N4_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::updateNotes
-- **params**: `id: string` — güncellenecek satır ID'si, `notes: string` — yeni not içeriği
-- **ic_degiskenler**:
-  - `prev` — güncelleme öncesi satır listesi
-  - `rs` — satır listesi (map callback içinde)
-  - `r` — dönüştürülen her bir satır
-  - `error` — supabase update sonucu hata
-- **Dönüş**: yok
-
-### [N5_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::loadLatestClientErrors
-- **params**: `groupId: string` — hata grubu ID'si
-- **ic_degiskenler**:
-  - `queryResult` — supabase sorgu sonucu (data ve error içeren obje)
-  - `data` — queryResult'dan çıkarılan client_errors satırları
-  - `error` — queryResult'dan çıkarılan hata
-- **Dönüş**: yok (state güncelleme侧 etkisi: setLatestClientErrors)
-
-### [N6_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::toggleSelect
-- **params**: `id: string` — satır ID'si, `on: boolean` — seçili mi
-- **ic_degiskenler**:
-  - `prev` — önceki seçili ID listesi
-- **Dönüş**: yok
-
-### [N7_NASIL] AST Pointer: AdminErrorGroupsPage.tsx::bulkApplyStatus
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `error` — supabase update sonucu hata
-  - `prev` — bulk güncelleme öncesi satır listesi (callback içinde)
-  - `r` — dönüştürülen her bir satır (callback içinde)
-  - `e` — catch bloğunda yakalanan hata
-- **Dönüş**: yok
+### [N8_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::bulkApplyStatus
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (async)
 
 ---
 
@@ -227,11 +218,11 @@ graph TD
     AdminErrorGroupsPage_tsx__updateAssignedTo["updateAssignedTo"]
     AdminErrorGroupsPage_tsx__updateNotes["updateNotes"]
     AdminErrorGroupsPage_tsx__updateStatus["updateStatus"]
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSelect
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__loadLatestClientErrors
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSort
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateNotes
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateAssignedTo
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSort
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__loadLatestClientErrors
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSelect
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateStatus
 ```
 

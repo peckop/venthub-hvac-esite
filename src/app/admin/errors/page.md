@@ -3,26 +3,32 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\errors\page.tsx
-skeleton_hash: d928d1f83ba0523b
+skeleton_hash: 483b5ba841baa079
 entity_hashes:
   func:Page: dbe2af9383c2f93d
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:34:54Z
+generated_at: 2026-06-06T21:53:51Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC uygulamasının yönetim paneli içindeki hatalar sayfası için Next.js routing katmanının giriş noktasıdır. Tek bir bileşen üzerinden ilgili görünümü dinamik olarak yükleyip render eder; bu yapı sayesinde kod bölünmesi sağlanarak sayfanın ilk yüklenme performansı artırılır.
+Bu modül, Venthub HVAC uygulamasının yönetim panelindeki `/admin/errors` rotasına karşılık gelen sayfa giriş noktasıdır. Tek bileşen yapısı ile dinamik bir yükleme stratejisi kullanarak hata yönetimi arayüzünü sunar ve sayfa performansını artırır.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni ve Dinamik Yükleme
-Yönetim paneli hatalar sayfasının `/admin/errors` rotasına bağlanmasını sağlar; dinamik yükleme ile görünüm bileşenini çağırarak modüler yapı ve performans kazancı sunar.
+Yönetim paneli hata sayfasının rota yapısına bağlanmasını sağlar ve ana bileşeni dinamik olarak yükleyerek modüler bir görünüm sunar.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, Next.js App Router yapısında `/admin/errors` rotasına karşılık gelen bir sayfa giriş noktasıdır. Aşağıdaki mimari varsayımlar, fonksiyon imzası ve modül sabitlerinden türetilmiştir.
+
+[Aksiyom 1]: Eğer `AdminErrorsPage` modülü export edilmez veya kaldırılırsa, `Page()` bileşeni render edilemez ve `/admin/errors` rotasına erişimde hata sayfası boş kalır.
+
+[Aksiyom 2]: Eğer `Page()` bileşeni props olarak hiç parametre almıyorsa (imzada tanımsızsa), bu sayfanın dinamik route parametrelerine (`params`, `searchParams`) doğrudan bağımlı olmadığı anlamına gelir; bağımlılık varsa modülün yeniden düzenlenmesi gerekir.
+
+[Aksiyom 3]: Eğer Next.js App Router yapılandırması `/admin/errors` rotasını bu dosyadan başlatmıyorsa (dosya adı veya konumu değiştirilirse), bileşen hiç çağrılmaz ve sayfa 404 döner.
 
 ---
 
@@ -38,20 +44,18 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## SABİTLER
-- **AdminErrorsPage** (call) — `dynamic(
+- **AdminErrorsPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminErrorsPage'),
-  { ssr: f...`
+  { ss...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\errors\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - Kullanılan hiçbir yerel değişken yoktur
-- **Dönüş**: yok
-  - Fonksiyon, AdminErrorsPage bileşenini doğrudan döndürerek yönetici hata sayfasını render eder, herhangi bir yan etkisi bulunmaz.
+### [N1_NASIL] AST Pointer: src/app/admin/errors/page.tsx::Page
+- **params**: (yok)
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde değişken tanımlanmamıştır, doğrudan bileşen render edilmektedir)
+- **Dönüş**: `AdminErrorsPage` bileşenini JSX olarak render eder
 
 ---
 

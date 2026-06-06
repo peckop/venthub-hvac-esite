@@ -3,34 +3,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CartContext.tsx
-skeleton_hash: 72b86346b922fcd4
+skeleton_hash: bcf8fdf88a2f5de4
 entity_hashes:
-  overview: ac63949f1a90f53c
+  overview: 5c2e2a3fcb9d0dde
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:37:26Z
+generated_at: 2026-06-06T21:55:00Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının alışveriş sepeti durumunu yönetmek ve tüm bileşenler arasında paylaşmak için oluşturulmuş bir React Context yapısıdır. Modül, React'in standart `createContext` fonksiyonunu kullanarak `CartContext` nesnesini tanımlar ve sepet verilerinin tip güvenliğini sağlamak için Supabase projesinden içe aktarılan `Product` tipini kullanır. Bu dosya yalnızca bir context tanımı içerir; herhangi bir API sorgulaması, ortam değişkeni veya özel fonksiyon barındırmaz.
+Bu modül, VentHub HVAC uygulamasının alışveriş sepeti durumunu uygulama genelinde yönetmek ve paylaşmak için tasarlanmış bir React Context yapısını tanımlar. Modül, temel olarak React'in `createContext` fonksiyonunu kullanarak `CartContext` adlı bir context nesnesi oluşturur. Sepet verilerinin tip güvenliğini sağlamak için uygulamanın tipler dosyasından içe aktarılan `Product` ve `CartItem` tiplerini referans alır.
 
 ## Fonksiyon Grupları
-Bu dosyada tanımlanmış herhangi bir fonksiyon bulunmamaktadır. Modül yalnızca bir React Context nesnesi ve ilgili arayüzlerden oluşmaktadır.
+Bu dosyada tanımlanmış herhangi bir fonksiyon, metod veya özel hook bulunmamaktadır. Modülün içeriği yalnızca bir React Context tanımı ve ilgili tiplerin import edilmesinden ibarettir. Kod yapısı itibarıyla modül, bir durum yönetimi (`state`) veya mantık (`logic`) katmanı içermeyip, doğrudan bir paylaşımlı bağlam (`shared context`) sağlama amacına yöneliktir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, React context yapısı kullanarak alışveriş sepeti durumunu uygulama genelinde paylaşılabilir hale getiren bir modüldür.
+Bu modül, yalnızca bir React Context tanımı içererek alışveriş sepeti durumunu paylaşıma açar. Fonksiyon gövdesi içermediğinden, çıkarılacak mimari varsayımlar modülün yapısal bağımlılıklarıyla sınırlıdır.
 
-**[Aksiyom 1]:** Eğer `CartContext` modül sabiti çağrılmazsa (export edilmezse), uygulama bileşenleri sepet durumuna erişemez olur.
+[Aksiyom 1]: Eğer `Product` tipi Supabase yapılandırmasından içe aktarılamıyorsa, `CartContext` tipi tanımsız olur ve TypeScript derleme hatası oluşur.
 
-**[Aksiyom 2]:** Eğer `CartContext` bir React Provider ile sarmalanmazsa, alt bileşenlerde sepet verisi `undefined` veya varsayılan başlangıç değeri olarak döner.
+[Aksiyom 2]: Eğer `createContext` çağrılmadan önce bir sağlayıcı (Provider) bileşeni tanımlanmamışsa, `CartContext`'i tüketen tüm bileşenler varsayılan değer (`undefined`) alır ve runtime hataları meydana gelir.
 
-**[Aksiyom 3]:** Eğer `Product` tipi (Supabase kaynağından) modül tarafından import edilmezse, sepet öğelerinin tip güvenliği sağlanamaz ve derleme hatası oluşur.
-
----
-
-**Not:** Bu modülde tanımlı herhangi bir fonksiyon gövdesi (implementasyon) bulunmadığından, daha detaylı aksiyom üretimi için modülün içindeki `createContext` çağrı parametrelerinin ve Provider bileşeninin kod yapısının incelenmesi gerekir. Mevcut bilgiler sadece modül sabiti (`CartContext call`) seviyesindedir.
+[Aksiyom 3]: Eğer bu modül bir `Provider` sarmalayıcısı (wrapper) içermiyorsa, sepet durumunun yönetimi ve paylaşımı bu dosya dışında, farklı bir modülde sağlanmalıdır; aksi halde sepet verisi tüm uygulama arasında paylaşılamaz.
 
 ---
 
@@ -39,12 +35,6 @@ Bu modül, React context yapısı kullanarak alışveriş sepeti durumunu uygula
 ---
 
 ## INTERFACES
-
-### CartItem
-- `id: string`
-- `product: Product`
-- `quantity: number`
-- `unitPrice?: number`
 
 ### CartContextType
 - `items: CartItem[]`
@@ -66,19 +56,22 @@ Bu modül, React context yapısı kullanarak alışveriş sepeti durumunu uygula
 
 ## AST POINTERS
 
-Bu dosyada fonksiyon gövdesi bulunmamaktadır. Dosya yalnızca bir React Context sabiti tanımı içermektedir.
-
-### [N1_NASIL] AST Pointer: `CartContext.tsx`::CartContext
-- **Tür**: `createContext()` çağrısı ile oluşturulan React Context nesnesi (sabit tanımı)
-- **Params**: Yok — bir fonksiyon değil, `createContext` çağrısı sonucu oluşan sabit
-- **ic_degiskenler**:
-  - `CartContext` — `createContext()` ile oluşturulan React Context nesnesi; `Product` tipinde bir alışveriş sepeti bağlamı sağlamak üzere tanımlanmıştır; bileşen ağacı içinde `CartProvider` ve `useCart` hook'u aracılığıyla sepet verisi paylaşılmak için kullanılır
-- **Dönüş**: Yok — bu bir fonksiyon değil, modül seviyesinde Evaluate edilen bir sabittir
-- **Yan Etkiler**: Dosya import edildiğinde `CartContext` modül scope'una yerleştirilir; `Product` tipi `'../lib/supabase'` modülünden import edilerek context'in generic tipi olarak kullanılır
+Dosya içinde herhangi bir **fonksiyon gövdesi** bulunmamaktadır. Dosya yalnızca bir React Context tanımı ve tip importlarından oluşmaktadır.
 
 ---
 
-> **Not**: Bu dosyada analiz edilecek herhangi bir fonksiyon gövdesi (`useCart`, `CartProvider`, vb.) bulunmamaktadır. Fonksiyon gövdeleri muhtemelen farklı bir dosyada (ör. `CartContext.tsx` içinde ayrı bir dosya veya aynı dosyanın farklı bir versiyonunda) yer almaktadır.
+Dosya yapısı:
+
+| Öğe | Açıklama |
+|-----|----------|
+| `import { createContext } from 'react'` | React Context oluşturucu import edilmiş |
+| `import type { Product }` | Ürün tipi import edilmiş (kullanım alanı belirsiz — muhtemelen Context interface'inde kullanılıyor) |
+| `import type { CartItem }` | Sepet öğesi tipi import edilmiş (kullanım alanı belirsiz — muhtemelen Context interface'inde kullanılıyor) |
+| `CartContext (call)` | `createContext(...)` çağrısı ile bir Context nesnesi oluşturulmuş — **bu bir fonksiyon gövdesi değil, üst seviye bir ifadedir** |
+
+---
+
+> **Not:** Bu dosyada analiz edilecek bir fonksiyon gövdesi mevcut değildir. `CartContext (call)` ifadesi, `createContext` fonksiyonunun **çağrısı** olup, kendi içinde bir gövde içermez. Bu nedenleParams, iç değişken ve dönüş analizi yapılamamaktadır.
 
 ---
 
@@ -91,7 +84,6 @@ Bu dosyada fonksiyon gövdesi bulunmamaktadır. Dosya yalnızca bir React Contex
 ## DISA AKTARILANLAR (EXPORTS)
   export: CartContext
   export: CartContextType
-  export: CartItem
 
 ---
 

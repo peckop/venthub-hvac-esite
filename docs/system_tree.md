@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-06T09:36:14.854983+00:00
+compiled_at: 2026-06-06T22:00:17.132326+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-06T22:00:17.132326+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -20,9 +20,9 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── 📂 **account/**
 │   │   │   │   ├── 📂 **addresses/**
-│   │   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   │   └── ❌ `page.tsx`
 │   │   │   │   ├── 📂 **invoices/**
-│   │   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   │   └── ❌ `page.tsx`
 │   │   │   │   ├── ✅ `layout.tsx`
 │   │   │   │   ├── 📂 **orders/**
 │   │   │   │   │   ├── 📂 **detail/**
@@ -98,7 +98,7 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── 📂 **on-bilgilendirme-formu/**
 │   │   │   │       └── ✅ `page.tsx`
-│   │   │   ├── ✅ `page.tsx`
+│   │   │   ├── ❌ `page.tsx`
 │   │   │   ├── 📂 **payment-success/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   └── 📂 **products/**
@@ -109,14 +109,14 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   │   └── ❌ `ProductDetailPageView.tsx`
 │   │   ├── 📂 **admin/**
 │   │   │   ├── 📂 **audit-logs/**
-│   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── 📂 **categories/**
 │   │   │   │   ├── 📂 **[id]/**
 │   │   │   │   │   └── 📂 **builder/**
 │   │   │   │   │       └── ✅ `page.tsx`
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **coupons/**
-│   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── 📂 **error-groups/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **errors/**
@@ -124,7 +124,7 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   │   ├── 📂 **inventory/**
 │   │   │   │   ├── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **report/**
-│   │   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   │   └── ❌ `page.tsx`
 │   │   │   │   └── 📂 **settings/**
 │   │   │   │       └── ✅ `page.tsx`
 │   │   │   ├── ✅ `layout.tsx`
@@ -138,26 +138,29 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   │   ├── 📂 **products/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **returns/**
-│   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **settings/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **users/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   └── 📂 **webhook-events/**
-│   │   │       └── ✅ `page.tsx`
+│   │   │       └── ❌ `page.tsx`
 │   │   ├── 📂 **api/**
 │   │   │   ├── 📂 **health/**
 │   │   │   │   └── ✅ `route.ts`
 │   │   │   └── 📂 **webhook/**
 │   │   │       └── 📂 **supabase/**
 │   │   │           └── ✅ `route.ts`
+│   │   ├── 📂 **auth/**
+│   │   │   └── 📂 **signout/**
+│   │   │       └── ✅ `route.ts`
 │   │   ├── ❌ `layout.tsx`
 │   │   ├── ✅ `robots.ts`
-│   │   └── ✅ `sitemap.ts`
+│   │   └── ❌ `sitemap.ts`
 │   ├── 📂 **assets/**
 │   │   └── 📂 **images/**
 │   ├── 📂 **components/**
-│   │   ├── ✅ `AddToCartToast.tsx`
+│   │   ├── ❌ `AddToCartToast.tsx`
 │   │   ├── ✅ `AddToCartToastContent.tsx`
 │   │   ├── ✅ `BackToTopButton.tsx`
 │   │   ├── ✅ `BeforeAfterSlider.tsx`
@@ -180,7 +183,7 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   ├── ✅ `ProductCard.tsx`
 │   │   ├── ✅ `QuickViewModal.tsx`
 │   │   ├── ✅ `ScrollLinkedProcess.tsx`
-│   │   ├── ✅ `ScrollReveal.tsx`
+│   │   ├── ❌ `ScrollReveal.tsx`
 │   │   ├── ✅ `ScrollToTop.tsx`
 │   │   ├── ✅ `SearchOverlay.tsx`
 │   │   ├── ✅ `SecurityRibbon.tsx`
@@ -293,7 +296,7 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   │   ├── ❌ `NavShell.tsx`
 │   │   │   └── ✅ `NavUtilityRail.tsx`
 │   │   ├── 📂 **product/**
-│   │   │   └── ❌ `ProductSmartInference.tsx`
+│   │   │   └── ✅ `ProductSmartInference.tsx`
 │   │   ├── 📂 **products/**
 │   │   │   ├── 📂 **3d/**
 │   │   │   │   ├── ✅ `AutoCenter.tsx`
@@ -369,6 +372,8 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   ├── ✅ `CategoryContext.tsx`
 │   │   ├── ✅ `ProjectContext.tsx`
 │   │   └── ✅ `ProjectProvider.tsx`
+│   ├── 📂 **data/**
+│   │   └── ❌ `brands.ts`
 │   ├── 📂 **design-system/**
 │   │   └── ❌ `tokens.js`
 │   ├── 📂 **hooks/**
@@ -376,7 +381,7 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   ├── ✅ `useApiCall.ts`
 │   │   ├── ✅ `useAuth.ts`
 │   │   ├── ✅ `useCartHook.ts`
-│   │   ├── ✅ `useCategoryGateway.ts`
+│   │   ├── ❌ `useCategoryGateway.ts`
 │   │   ├── ✅ `useCategoryViewModel.ts`
 │   │   ├── ✅ `useCheckoutCoupon.ts`
 │   │   ├── ✅ `useCheckoutOrchestrator.ts`
@@ -391,7 +396,7 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   ├── ✅ `useRole.ts`
 │   │   ├── ✅ `useScrollAnimation.ts`
 │   │   ├── ✅ `useScrollThrottle.tsx`
-│   │   ├── ✅ `useSettings.ts`
+│   │   ├── ❌ `useSettings.ts`
 │   │   └── ✅ `useTenant.tsx`
 │   ├── 📂 **i18n/**
 │   │   ├── ❌ `I18nContext.ts`
@@ -403,9 +408,8 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   └── ✅ `format.ts`
 │   ├── 📂 **lib/**
 │   │   ├── ✅ `audit.ts`
-│   │   ├── ✅ `brands.ts`
 │   │   ├── 📂 **data/**
-│   │   │   └── ✅ `preload.ts`
+│   │   │   └── ❌ `preload.ts`
 │   │   ├── ✅ `ensureSessionFresh.ts`
 │   │   ├── ✅ `errorReporter.ts`
 │   │   ├── ✅ `hvacCalculations.ts`
@@ -418,20 +422,25 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   ├── 📂 **services/**
 │   │   │   ├── ✅ `address.service.ts`
 │   │   │   ├── ✅ `cart.service.ts`
-│   │   │   ├── ❌ `category.service.ts`
+│   │   │   ├── ✅ `category.service.ts`
 │   │   │   ├── ✅ `invoice.service.ts`
-│   │   │   ├── ❌ `pricing.service.ts`
+│   │   │   ├── ✅ `pricing.service.ts`
 │   │   │   ├── ✅ `product.service.ts`
-│   │   │   └── ❌ `project.service.ts`
+│   │   │   └── ✅ `project.service.ts`
+│   │   ├── 📂 **supabase/**
+│   │   │   ├── ✅ `client.ts`
+│   │   │   ├── ✅ `server.ts`
+│   │   │   └── ❌ `static.ts`
 │   │   ├── ✅ `supabase.ts`
 │   │   ├── ✅ `tenantResolver.ts`
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `utils.ts`
-│   ├── ✅ `middleware.ts`
+│   ├── ❌ `middleware.ts`
 │   ├── 📂 **test/**
 │   ├── 📂 **types/**
 │   │   ├── ✅ `admin-shared.ts`
 │   │   ├── ✅ `authority.ts`
+│   │   ├── ✅ `cart.ts`
 │   │   ├── ❌ `database.ts`
 │   │   ├── ✅ `database.types.ts`
 │   │   ├── ✅ `db-rows.ts`
@@ -463,10 +472,10 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `whatsapp.ts`
 │   └── 📂 **views/**
-│       ├── ✅ `AboutPage.tsx`
+│       ├── ❌ `AboutPage.tsx`
 │       ├── ✅ `AuthCallbackPage.tsx`
-│       ├── ✅ `BrandDetailPage.tsx`
-│       ├── ❌ `BrandsPage.tsx`
+│       ├── ❌ `BrandDetailPage.tsx`
+│       ├── ✅ `BrandsPage.tsx`
 │       ├── ✅ `CartPage.tsx`
 │       ├── ✅ `CategoryMasterView.tsx`
 │       ├── ✅ `CategoryPage.tsx`
@@ -476,36 +485,36 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │       ├── ✅ `HomePage.tsx`
 │       ├── ✅ `LoginPage.tsx`
 │       ├── ✅ `OrdersPage.tsx`
-│       ├── ❌ `PaymentSuccessPage.tsx`
-│       ├── ❌ `ProductsDiscoveryView.tsx`
+│       ├── ✅ `PaymentSuccessPage.tsx`
+│       ├── ✅ `ProductsDiscoveryView.tsx`
 │       ├── ❌ `ProductsPage.tsx`
 │       ├── ✅ `RegisterPage.tsx`
 │       ├── 📂 **account/**
 │       │   ├── ✅ `AccountAddressesPage.tsx`
-│       │   ├── ✅ `AccountInvoicesPage.tsx`
+│       │   ├── ❌ `AccountInvoicesPage.tsx`
 │       │   ├── ✅ `AccountLayout.tsx`
-│       │   ├── ✅ `AccountOverviewPage.tsx`
+│       │   ├── ❌ `AccountOverviewPage.tsx`
 │       │   ├── ❌ `AccountProfilePage.tsx`
-│       │   ├── ❌ `AccountReturnsPage.tsx`
+│       │   ├── ✅ `AccountReturnsPage.tsx`
 │       │   ├── ✅ `AccountSecurityPage.tsx`
 │       │   ├── ✅ `AccountShipmentsPage.tsx`
-│       │   └── ❌ `OrderDetailPage.tsx`
+│       │   └── ✅ `OrderDetailPage.tsx`
 │       ├── 📂 **admin/**
-│       │   ├── ✅ `AdminAuditLogPage.tsx`
+│       │   ├── ❌ `AdminAuditLogPage.tsx`
 │       │   ├── ✅ `AdminCategoriesPage.tsx`
 │       │   ├── ✅ `AdminCouponsPage.tsx`
-│       │   ├── ✅ `AdminDashboardPage.tsx`
+│       │   ├── ❌ `AdminDashboardPage.tsx`
 │       │   ├── ✅ `AdminErrorGroupsPage.tsx`
 │       │   ├── ✅ `AdminErrorsPage.tsx`
 │       │   ├── ✅ `AdminInventoryPage.tsx`
-│       │   ├── ✅ `AdminInventoryReportPage.tsx`
+│       │   ├── ❌ `AdminInventoryReportPage.tsx`
 │       │   ├── ✅ `AdminInventorySettingsPage.tsx`
 │       │   ├── ✅ `AdminLayout.tsx`
 │       │   ├── ✅ `AdminLogisticsPage.tsx`
 │       │   ├── ✅ `AdminMovementsPage.tsx`
-│       │   ├── ❌ `AdminOrdersBoard.tsx`
-│       │   ├── ✅ `AdminOrdersPage.tsx`
-│       │   ├── ✅ `AdminProductsPage.tsx`
+│       │   ├── ✅ `AdminOrdersBoard.tsx`
+│       │   ├── ❌ `AdminOrdersPage.tsx`
+│       │   ├── ❌ `AdminProductsPage.tsx`
 │       │   ├── ✅ `AdminReturnsPage.tsx`
 │       │   ├── ✅ `AdminSettingsPage.tsx`
 │       │   ├── ✅ `AdminUsersPage.tsx`
@@ -522,7 +531,7 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │       │   ├── ✅ `CategorySeriesView.tsx`
 │       │   └── ✅ `CategoryShowcaseView.tsx`
 │       ├── 📂 **checkout/**
-│       │   ├── ❌ `AddressFormModal.tsx`
+│       │   ├── ✅ `AddressFormModal.tsx`
 │       │   ├── ✅ `AddressSelectModal.tsx`
 │       │   ├── ✅ `CheckoutProgress.tsx`
 │       │   ├── ✅ `InvoiceProfileModal.tsx`
@@ -530,9 +539,9 @@ Bu belge, otonom derleyici tarafından 2026-06-06T09:36:14.854983+00:00 tarihind
 │       │   ├── ✅ `PaymentIframeContainer.tsx`
 │       │   ├── ✅ `ReviewSummary.tsx`
 │       │   ├── ✅ `SecurePaymentOverlay.tsx`
-│       │   ├── ✅ `StepAddressInfo.tsx`
+│       │   ├── ❌ `StepAddressInfo.tsx`
 │       │   ├── ✅ `StepCustomerInfo.tsx`
-│       │   └── ❌ `buildPaymentRequest.ts`
+│       │   └── ✅ `buildPaymentRequest.ts`
 │       ├── 📂 **knowledge/**
 │       │   ├── ✅ `HubPage.tsx`
 │       │   └── ✅ `TopicPage.tsx`
@@ -598,39 +607,52 @@ Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
 ## Geçersiz Şablon (Invalid Format)
 Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:
 - [❌] `src\app\[lang]\about\page.md`
+- [❌] `src\app\[lang]\account\addresses\page.md`
+- [❌] `src\app\[lang]\account\invoices\page.md`
 - [❌] `src\app\[lang]\category\[categorySlug]\page.md`
+- [❌] `src\app\[lang]\page.md`
 - [❌] `src\app\[lang]\products\[slug]\page.md`
 - [❌] `src\app\_components\ProductDetailPageView.md`
-- [❌] `src\app\admin\returns\page.md`
+- [❌] `src\app\admin\audit-logs\page.md`
+- [❌] `src\app\admin\coupons\page.md`
+- [❌] `src\app\admin\inventory\report\page.md`
+- [❌] `src\app\admin\webhook-events\page.md`
 - [❌] `src\app\layout.md`
+- [❌] `src\app\sitemap.md`
+- [❌] `src\components\AddToCartToast.md`
 - [❌] `src\components\PaymentWatcher.md`
+- [❌] `src\components\ScrollReveal.md`
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\admin\dashboard\AbcPieChart.md`
 - [❌] `src\components\layout\PageShell.md`
 - [❌] `src\components\navigation\NavSecondaryRail.md`
 - [❌] `src\components\navigation\NavShell.md`
-- [❌] `src\components\product\ProductSmartInference.md`
 - [❌] `src\components\products\3d\factory\Assembler.md`
 - [❌] `src\components\products\SeriesCard.md`
 - [❌] `src\config\orbitalCarouselConfig.md`
+- [❌] `src\data\brands.md`
 - [❌] `src\design-system\tokens.md`
+- [❌] `src\hooks\useCategoryGateway.md`
+- [❌] `src\hooks\useSettings.md`
 - [❌] `src\i18n\I18nContext.md`
+- [❌] `src\lib\data\preload.md`
 - [❌] `src\lib\pdfAssets.md`
-- [❌] `src\lib\services\category.service.md`
-- [❌] `src\lib\services\pricing.service.md`
-- [❌] `src\lib\services\project.service.md`
+- [❌] `src\lib\supabase\static.md`
+- [❌] `src\middleware.md`
 - [❌] `src\types\database.md`
 - [❌] `src\utils\analytics.md`
 - [❌] `src\utils\applicationUi.md`
-- [❌] `src\views\BrandsPage.md`
+- [❌] `src\views\AboutPage.md`
+- [❌] `src\views\BrandDetailPage.md`
 - [❌] `src\views\ForgotPasswordPage.md`
-- [❌] `src\views\PaymentSuccessPage.md`
-- [❌] `src\views\ProductsDiscoveryView.md`
 - [❌] `src\views\ProductsPage.md`
+- [❌] `src\views\account\AccountInvoicesPage.md`
+- [❌] `src\views\account\AccountOverviewPage.md`
 - [❌] `src\views\account\AccountProfilePage.md`
-- [❌] `src\views\account\AccountReturnsPage.md`
-- [❌] `src\views\account\OrderDetailPage.md`
-- [❌] `src\views\admin\AdminOrdersBoard.md`
+- [❌] `src\views\admin\AdminAuditLogPage.md`
+- [❌] `src\views\admin\AdminDashboardPage.md`
+- [❌] `src\views\admin\AdminInventoryReportPage.md`
+- [❌] `src\views\admin\AdminOrdersPage.md`
+- [❌] `src\views\admin\AdminProductsPage.md`
 - [❌] `src\views\calculators\AirCurtainCalcPage.md`
-- [❌] `src\views\checkout\AddressFormModal.md`
-- [❌] `src\views\checkout\buildPaymentRequest.md`
+- [❌] `src\views\checkout\StepAddressInfo.md`

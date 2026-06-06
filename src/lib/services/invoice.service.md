@@ -3,155 +3,173 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\invoice.service.ts
-skeleton_hash: 7c49e10c92ebc240
+skeleton_hash: e7d849d2911ccd3a
 entity_hashes:
-  func:createInvoiceProfile: f92c262499835920
-  func:deleteInvoiceProfile: 3a57f0436c08a151
-  func:fetchDefaultInvoiceProfile: a2ee326679328cb7
-  func:listInvoiceProfiles: 6371218f2a71c64a
-  func:setDefaultInvoiceProfile: c7e86c4c92702d78
-  func:updateInvoiceProfile: cee09476b26f89da
-  overview: e67bb84253f40f2b
-generated_at: 2026-05-28T22:38:21Z
+  func:createInvoiceProfile: bbfc2792f70cde7f
+  func:deleteInvoiceProfile: a31acbab50c2cb14
+  func:fetchDefaultInvoiceProfile: 2b6f3aa4e7dfedee
+  func:listInvoiceProfiles: 7e2d7a20cb0a80ff
+  func:setDefaultInvoiceProfile: 08cb21fce90e9002
+  func:updateInvoiceProfile: 0c0fc9242f3d814f
+  overview: 780776ec4e1fccc7
+generated_at: 2026-06-06T21:55:54Z
 ---
 
 ## Genel Bakış
-Bu modül, fatura profillerinin lifecycle yönetimini sağlayan servis katmanıdır. Platform genelinde kullanılacak fatura profillerinin CRUD işlemleri ve varsayılan profil belirleme mantığını merkezi olarak sunar.
+Bu modül, platformdaki fatura profillerinin yaşam döngüsünü yöneten bir servis katmanıdır. Temel olarak profil oluşturma, listeleme, güncelleme ve silme işlemlerinin (CRUD) merkezi bir noktasını sunar. Ayrıca, sürekli kullanılacak olan "varsayılan" profilin belirlenmesi ve sorgulanması gibi önemli bir işlevi yönetir.
 
 ## Fonksiyon Grupları
-### Temel Fatura Profili CRUD İşlemleri
-Fatura profillerinin veritabanında oluşturulması, listelenmesi, güncellenmesi ve silinmesi işlemlerini yönetir.
+### Fatura Profili Temel CRUD İşlemleri
+Bu grup, bir fatura profilinin veritabanındaki temel varlık yönetimi (oluştur, oku, güncelle, sil) işlemlerini kapsar.
 - listInvoiceProfiles, createInvoiceProfile, updateInvoiceProfile, deleteInvoiceProfile
 
 ### Varsayılan Fatura Profili Yönetimi
-İşletmenin sürekli kullanacağı varsayılan fatura profilinin ayarlanması ve sorgulanması işlemlerini gerçekleştirir.
+Bu grup, işletmenin sürekli kullanacağı tek bir "varsayılan" profilin belirlenmesi ve bu profilin zaman içinde sorgulanması gibi iş akışlarını yönetir.
 - setDefaultInvoiceProfile, fetchDefaultInvoiceProfile
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, fatura profili yönetimi için CRUD ve varsayılan profil yönetim işlemlerini içeren bir servis katmanıdır.
+Bu modül, fatura profillerinin lifecycle yönetimini sağlayan servis katmanıdır. Aşağıda, modülün doğru ve beklenen şekilde çalışması için zorunlu olan mimari varsayımlar (aksiyomlar) listelenmektedir.
 
-**[Aksiyom 1]:** Eğer `updateInvoiceProfile` fonksiyonuna geçersiz veya mevcut olmayan bir `id` parametresi verilirse, güncelleme işlemi başarısız olur.
+### Temel Varsayımlar
 
-**[Aksiyom 2]:** Eğer `deleteInvoiceProfile` fonksiyonuna geçersiz veya mevcut olmayan bir `id` parametresi verilirse, silme işlemi başarısız olur.
+**[Aksiyom 1]:** Eğer `id` parametresi, veritabanında var olmayan veya geçersiz bir UUID ise, `deleteInvoiceProfile`, `updateInvoiceProfile` ve `setDefaultInvoiceProfile` fonksiyonları başarısız olur ve ilgili hata fırlatır.
 
-**[Aksiyom 3]:** Eğer `createInvoiceProfile` fonksiyonuna `DbInvoiceProfileInsert` tipinde geçersiz bir `payload` verilirse, profil oluşturma işlemi başarısız olur.
+**[Aksiyom 2]:** Eğer `supabase` parametresi, geçerli bir Supabase istemcisi (client) instance'ı değilse, modüldeki hiçbir fonksiyon veritabanı bağlantısı kuramaz ve tüm CRUD işlemleri başarısız olur.
 
-**[Aksiyom 4]:** Eğer `setDefaultInvoiceProfile` fonksiyonuna geçersiz veya mevcut olmayan bir `id` parametresi verilirse, varsayılan profil atama işlemi başarısız olur.
+**[Aksiyom 3]:** Eğer `payload` (DbInvoiceProfileInsert veya DbInvoiceProfileUpdate) parametresi, veritabanı şemasının zorunlu alanlarını içermiyorsa (örn: `profile_name`, `company_name` gibi alanların eksik olması), `createInvoiceProfile` ve `updateInvoiceProfile` fonksiyonları veritabanı kısıtlaması nedeniyle başarısız olur.
 
-**[Aksiyom 5]:** Eğer `updateInvoiceProfile` fonksiyonuna `DbInvoiceProfileUpdate` tipinde geçersiz bir `payload` verilirse, güncelleme işlemi başarısız olur.
+### Durum Yönetimi ve İş Mantığı Varsayımları
 
-**[Aksiyom 6]:** `fetchDefaultInvoiceProfile` fonksiyonu çağrıldığında, sistemde tanımlanmış bir varsayılan fatura profili yoksa, sonuç olarak boş veya null bir değer döner.
+**[Aksiyom 4]:** Eğer `setDefaultInvoiceProfile` ile bir profil `is_default` olarak ayarlanıyorsa, aynı anda sadece bir profilin `is_default` alanı `true` olabilir. Bu durum veritabanı seviyesinde veya uygulama mantığında zorunlu olarak garanti altına alınmalıdır. Aksi takdirde birden fazla varsayılan profil oluşur ve `fetchDefaultInvoiceProfile` hangisini döndüreceği konusunda belirsizlik yaratır.
+
+**[Aksiyom 5]:** Eğer `is_default` alanı `true` olan bir profil silinirse (`deleteInvoiceProfile`), sistemde hiç varsayılan profil kalmayabilir. Bu durum, `fetchDefaultInvoiceProfile` fonksiyonunun `null` dönmesine veya işlevsel bir hata oluşturmasına neden olur.
+
+**[Aksiyom 6]:** Eğer `fetchDefaultInvoiceProfile` çağrıldığında, `is_default` alanı `true` olan bir profil bulunamıyorsa, fonksiyon `null` değeri döner. Bu durum, sistemde henüz varsayılan profil belirlenmemiş olmasına karşılık gelir.
+
+**[Aksiyom 7]:** Eğer `listInvoiceProfiles` fonksiyonu çağrıldığında kullanıcıya ait fatura profili kaydı yoksa, boş bir dizi döner. Bu durum bir hata durumu değil, geçerli bir iş durumudur.
+
+### Fonksiyonlar Arası Bağımlılık Varsayımları
+
+**[Aksiyom 8]:** Eğer `create
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### listInvoiceProfiles
-**Ne yapar**: Kullanıcıya ait tüm fatura profillerini listeler. Varsayılan profil en üstte olacak şekilde sıralanmış olarak döner.
-**Nasıl yapar**: Supabase istemcisi ile `user_invoice_profiles` tablosuna `select('*')` sorgusu gönderir. Sonuçları önce `is_default` alanına göre azalan, sonra `created_at` alanına göre azalan sırada düzenler. Veritabanı tablosu mevcut değilse boş bir dizi döner, diğer hatalarda fırlatır.
+**Ne yapar**: Kullanıcıya ait tüm fatura profillerini listeler. Varsayılan olarak önce `is_default` alanına göre azalan, ardından `created_at` alanına göre azalan sırada sıralanmış şekilde döndürür.
+**Nasıl yapar**: Supabase istemcisi kullanarak `user_invoice_profiles` tablosundaki tüm kayıtları (`*`) seçer. Sıralama, önce `is_default` alanının azalan sırasıyla (yani varsayılan olanlar üstte) ve ardından `created_at` alanının azalan sırasıyla (en yeniler üstte) gerçekleştirilir. Sorgu bir hata ile sonuçlanırsa, hata kodunun `PGRST205` olup olmadığı veya hata mesajının tablonun bulunamadığını belirtip belirtmediği kontrol edilir; eğer tablo mevcut değilse boş bir dizi döndürülür, aksi takdirde hata yukarıya fırlatılır.
 **Parametreler**:
-- Yok
-**Dönüş**: `Promise<DbInvoiceProfile[]>` — Kullanıcının tüm fatura profillerini içeren bir dizi. Tablo mevcut değilse boş dizi döner.
+- supabase: any — Supabase istemcisi nesnesi. Opsiyoneldir, belirtilmezse `defaultClient` kullanılır.
+**Dönüş**: `Promise<DbInvoiceProfile[]>` — Fatura profillerinin bir dizisi. Tablo bulunamazsa boş bir dizi döner.
 
 ### createInvoiceProfile
-**Ne yapar**: Yeni bir fatura profili oluşturur ve oluşturan kullanıcının kimliğini otomatik olarak ekler.
-**Nasıl yapar**: Önce `supabase.auth.getUser()` ile kimlik doğrulaması yapar. Kullanıcı kimliğini `payload` nesnesine `user_id` alanı olarak ekler. Ardından `user_invoice_profiles` tablosuna bu veriyi ekler (`insert`) ve eklenen kaydı (`select('*').single()`) geri döner. Kimlik doğrulama başarısız olursa hata fırlatır.
+**Ne yapar**: Yeni bir fatura profili oluşturur. Oluşturulan profile, oturum açmış kullanıcının kimliğini (`user_id`) otomatik olarak ekler.
+**Nasıl yapar**: Önce Supabase kimlik doğrulama servisi (`supabase.auth.getUser()`) kullanılarak mevcut kullanıcının bilgileri alınır. Kullanıcı kimliği doğrulanamazsa bir hata fırlatılır. Ardından, gelen `payload` verisi kullanıcı kimliği ile genişletilerek `user_invoice_profiles` tablosuna eklenir (`insert`). Ekleme işlemi başarılı olduktan sonra, eklenen kaydın tüm alanları (`*`) tek bir nesne (`single()`) olarak seçilip döndürülür.
 **Parametreler**:
-- `payload`: `DbInvoiceProfileInsert` — Oluşturulacak fatura profilinin verileri. `user_id` alanı otomatik olarak üzerine yazılır.
-**Dönüş**: `Promise<DbInvoiceProfile>` — Yeni oluşturulmuş fatura profilini temsil eden nesne.
+- payload: DbInvoiceProfileInsert — Oluşturulacak fatura profilinin verilerini içeren nesne. `user_id` alanı bu fonksiyon içinde otomatik olarak ayarlanacağı için gönderilmesi gerekmez.
+- supabase: any — Supabase istemcisi nesnesi. Opsiyoneldir, belirtilmezse `defaultClient` kullanılır.
+**Dönüş**: `Promise<DbInvoiceProfile>` — Yeni oluşturulmuş fatura profilinin tam verisi.
 
 ### updateInvoiceProfile
-**Ne yapar**: Belirli bir ID'ye sahip mevcut fatura profilini günceller.
-**Nasıl yapar**: Verilen `id` ile eşleşen kaydı bulur (`eq('id', id)`) ve `payload` içindeki alanlarıyla günceller (`update(payload)`). Güncellenen kaydı `select('*').single()` ile sorgular ve döner. Kayıt bulunamazsa veya başka bir veritabanı hatası oluşursa hata fırlatır.
+**Ne yapar**: Belirtilen `id` değerine sahip fatura profilini günceller.
+**Nasıl yapar**: Supabase istemcisi kullanarak `user_invoice_profiles` tablosunda `id` alanısı eşleşen kaydı bulur ve `payload` içindeki yeni değerlerle günceller (`update`). Güncelleme işleminden sonra, güncellenen kaydın tüm alanları (`*`) tek bir nesne (`single()`) olarak seçilip döndürülür. Eşleşen kayıt bulunamazsa Supabase bir hata döndürür ve bu hata yukarıya fırlatılır.
 **Parametreler**:
-- `id`: `string` — Güncellenecek fatura profilinin benzersiz tanımlayıcısı (UUID).
-- `payload`: `DbInvoiceProfileUpdate` — Güncellenecek alanları içeren nesne.
-**Dönüş**: `Promise<DbInvoiceProfile>` — Güncelleme sonrası fatura profilinin güncel hali.
+- id: string — Güncellenecek fatura profilinin benzersiz tanımlayıcısı.
+- payload: DbInvoiceProfileUpdate — Güncellenecek alanları ve yeni değerleri içeren nesne.
+- supabase: any — Supabase istemcisi nesnesi. Opsiyoneldir, belirtilmezse `defaultClient` kullanılır.
+**Dönüş**: `Promise<DbInvoiceProfile>` — Güncellenmiş fatura profilinin tam verisi.
 
 ### deleteInvoiceProfile
-**Ne yapar**: Belirli bir ID'ye sahip fatura profilini kalıcı olarak siler.
-**Nasıl yapar**: `user_invoice_profiles` tablosunda verilen `id` ile eşleşen kaydı bulur (`eq('id', id)`) ve `delete()` metodu ile siler. İşlem başarılıysa `true` döner, herhangi bir veritabanı hatası oluşursa hata fırlatır.
+**Ne yapar**: Belirtilen `id` değerine sahip fatura profilini kalıcı olarak siler.
+**Nasıl yapar**: Supabase istemcisi kullanarak `user_invoice_profiles` tablosunda `id` alanısı eşleşen kaydı bulur ve siler (`delete`). İşlem başarılı olursa `true` değeri döndürülür; aksi takdirde Supabase tarafından döndürülen hata yukarıya fırlatılır.
 **Parametreler**:
-- `id`: `string` — Silinecek fatura profilinin benzersiz tanımlayıcısı (UUID).
-**Dönüş**: `Promise<boolean>` — Silme işlemi başarılı olursa `true`.
+- id: string — Silinecek fatura profilinin benzersiz tanımlayıcısı.
+- supabase: any — Supabase istemcisi nesnesi. Opsiyoneldir, belirtilmezse `defaultClient` kullanılır.
+**Dönüş**: `Promise<boolean>` — Silme işlemi başarılıysa `true` değerini döndürür.
 
 ### setDefaultInvoiceProfile
-**Ne yapar**: Belirli bir fatura profilini kullanıcının varsayılan profili olarak ayarlar.
-**Nasıl yapar**: İlk olarak kimlik doğrulaması yapar. Ardından, kullanıcının *tüm* mevcut fatura profillerindeki `is_default` alanını `false` olarak günceller, böylece sadece bir profilin `is_default` değeri `true` olabilir. Bu temizleme işleminden sonra, belirtilen `id`ye sahip profili `is_default: true` olarak günceller ve güncel halini döner. Her iki veritabanı işlemi de hata fırlatabilir.
+**Ne yapar**: Belirtilen fatura profilini, kullanıcının varsayılan fatura profili olarak ayarlar. Bu işlem, kullanıcının diğer tüm fatura profillerindeki `is_default` alanını önce `false` yapar, ardından belirtilen profili `true` olarak günceller.
+**Nasıl yapar**: İlk olarak kimlik doğrulaması yapılarak mevcut kullanıcının `id`'si alınır. Kullanıcı kimliği doğrulanamazsa hata fırlatılır. Ardından, o kullanıcının `is_default` alanı zaten `true` olan tüm fatura profillerinin `is_default` alanı `false` olarak güncellenerek temizlenir. Son olarak, `id` parametresi ile belirtilen profilin `is_default` alanı `true` olarak güncellenir ve güncellenen profil tüm alanlarıyla (`*`) tek bir nesne (`single()`) olarak döndürülür.
 **Parametreler**:
-- `id`: `string` — Varsayılan olarak ayarlanacak fatura profilinin benzersiz tanımlayıcısı (UUID).
-**Dönüş**: `Promise<DbInvoiceProfile>` — Varsayılan olarak ayarlanmış fatura profilinin güncel hali.
+- id: string — Varsayılan olarak ayarlanacak fatura profilinin benzersiz tanımlayıcısı.
+- supabase: any — Supabase istemcisi nesnesi. Opsiyoneldir, belirtilmezse `defaultClient` kullanılır.
+**Dönüş**: `Promise<DbInvoiceProfile>` — Varsayılan olarak ayarlanmış fatura profilinin tam verisi.
 
 ### fetchDefaultInvoiceProfile
-**Ne yapar**: Kimliği doğrulanmış kullanıcının mevcut varsayılan fatura profilini getirir.
-**Nasıl yapar**: Kimlik doğrulaması yapar. Sonra `user_invoice_profiles` tablosunda, kullanıcının (`user_id`) ve `is_default` alanı `true` olan kaydı sorgular. Sonuçları `updated_at` alanına göre azalan sırada sıralar ve en fazla bir kayıt (`limit(1)`) getirir. Sorgulama başarısız olursa ve hata tablonun mevcut olmadığını belirtiyorsa (`PGRST205` kodu veya belirli bir mesaj), `null` döner. Diğer hatalarda异常 fırlatır. Sorgu sonucu boşsa yine `null` döner.
+**Ne yapar**: Oturum açmış kullanıcının mevcut varsayılan fatura profilini getirir. Varsayılan profil yoksa veya tablo mevcut değilse `null` döndürür.
+**Nasıl yapar**: Kimlik doğrulaması yapılarak mevcut kullanıcının `id`'si alınır. Kullanıcı kimliği doğrulanamazsa hata fırlatılır. Ardından, `user_invoice_profiles` tablosunda `user_id` alanısı mevcut kullanıcıya eşleşen ve `is_default` alanı `true` olan kayıtlar `updated_at` alanına göre azalan sırada sıralanarak en fazla bir tane (`limit(1)`) alınır. Sorgu bir hata ile sonuçlanırsa, hata kodunun `PGRST205` olup olmadığı veya hata mesajının tablonun bulunamadığını belirtip belirtmediği kontrol edilir; eğer tablo mevcut değilse `null` döndürülür, aksi takdirde hata yukarıya fırlatılır. Sorgu başarılıysa ve sonuç dizisi doluysa ilk eleman `DbInvoiceProfile` tipine dönüştürülerek döndürülür, aksi takdirde `null` döndürülür.
 **Parametreler**:
-- Yok
-**Dönüş**: `Promise<DbInvoiceProfile | null>` — Kullanıcının varsayılan fatura profili veya böyle bir profil yoksa/oluşan bir hata tablo mevcut değilse `null`.
+- supabase: any — Supabase istemcisi nesnesi. Opsiyoneldir, belirtilmezse `defaultClient` kullanılır.
+**Dönüş**: `Promise<DbInvoiceProfile | null>` — Kullanıcının varsayılan fatura profili varsa o profilin verisi, yoksa `null` döndürülür.
+
+---
+
+## SABİTLER
+- **defaultClient** (ternary_expression) — `typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\lib\services\invoice.service.ts::listInvoiceProfiles
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/lib/services/invoice.service.ts::listInvoiceProfiles
+- **params**: `supabase` (varsayılan değer: `defaultClient`)
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen kullanıcı fatura profili ham verileri
-  - `error` — Supabase sorgusu sırasında oluşan hata nesnesi
-  - `PostgrestErrorExtended` — Hata nesnesinin kod ve mesaj özelliklerini tiplendirmek için tanımlanan genişletilmiş hata arayüzü
-  - `e` — error nesnesinin PostgrestErrorExtended tipine dönüştürülmüş hali, özel hata kontrollerinde kullanılır
-- **Dönüş**: Promise<DbInvoiceProfile[]>
+  - `data` — Supabase'den dönen fatura profil listesi (başarılı sorgu sonucu)
+  - `error` — Supabase sorgusundan dönen hata nesnesi (varsa)
+  - `e` — PostgREST hata nesnesinin genişletilmiş versiyonu (hata kodu ve mesaj kontrolü için)
+  - `PostgrestErrorExtended` — PostgREST hata arayüz tanımı (hata tipini genişletmek için)
+- **Dönüş**: `Promise<DbInvoiceProfile[]>` — Fatura profil listesi veya boş dizi
 
-### [N2_NASIL] AST Pointer: src\lib\services\invoice.service.ts::createInvoiceProfile
-- **params**: payload: DbInvoiceProfileInsert
+### [N2_NASIL] AST Pointer: src/lib/services/invoice.service.ts::createInvoiceProfile
+- **params**: `payload: DbInvoiceProfileInsert`, `supabase` (varsayılan değer: `defaultClient`)
 - **ic_degiskenler**:
   - `authData` — Supabase auth.getUser() çağrısından dönen kimlik doğrulama verisi
-  - `userError` — Kullanıcı bilgilerini alma işlemi sırasında oluşan hata nesnesi
-  - `user` — Doğrulanmış mevcut oturum açmış kullanıcı nesnesi
-  - `dbPayload` - Kullanıcının benzersiz kimliği eklenmiş, veritabanına gönderilecek tam fatura profili ekleme yükü
-  - `data` — Supabase insert sorgusundan dönen kaydedilmiş fatura profili verisi
-  - `error` — Insert işlemi sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<DbInvoiceProfile>
+  - `userError` — Kimlik doğrulama hata nesnesi (varsa)
+  - `user` — Mevcut oturum açmış kullanıcı nesnesi (authData.user'dan alınır)
+  - `dbPayload` — Veritabanına eklenecek fatura profil verisi (payload + user_id eklenmiş hali)
+  - `data` — Supabase insert işleminin sonucu (eklenen fatura profili)
+  - `error` — Supabase insert işleminden dönen hata nesnesi (varsa)
+- **Dönüş**: `Promise<DbInvoiceProfile>` — Yeni oluşturulan fatura profili
 
-### [N3_NASIL] AST Pointer: src\lib\services\invoice.service.ts::updateInvoiceProfile
-- **params**: id: string, payload: DbInvoiceProfileUpdate
+### [N3_NASIL] AST Pointer: src/lib/services/invoice.service.ts::updateInvoiceProfile
+- **params**: `id: string`, `payload: DbInvoiceProfileUpdate`, `supabase` (varsayılan değer: `defaultClient`)
 - **ic_degiskenler**:
-  - `data` — Supabase update sorgusundan dönen güncellenmiş fatura profili verisi
-  - `error` — Güncelleme işlemi sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<DbInvoiceProfile>
+  - `data` — Supabase update işleminin sonucu (güncellenmiş fatura profili)
+  - `error` — Supabase update işleminden dönen hata nesnesi (varsa)
+- **Dönüş**: `Promise<DbInvoiceProfile>` — Güncellenmiş fatura profili
 
-### [N4_NASIL] AST Pointer: src\lib\services\invoice.service.ts::deleteInvoiceProfile
-- **params**: id: string
+### [N4_NASIL] AST Pointer: src/lib/services/invoice.service.ts::deleteInvoiceProfile
+- **params**: `id: string`, `supabase` (varsayılan değer: `defaultClient`)
 - **ic_degiskenler**:
-  - `error` — Supabase delete sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<boolean>
+  - `error` — Supabase delete işleminden dönen hata nesnesi (varsa)
+- **Dönüş**: `Promise<boolean>` — Silme işlemi başarılıysa true döner
 
-### [N5_NASIL] AST Pointer: src\lib\services\invoice.service.ts::setDefaultInvoiceProfile
-- **params**: id: string
-- **ic_degiskenler**:
-  - `authData` — Supabase auth.getUser() çağrısından dönen kimlik doğrulama verisi
-  - `userError` — Kullanıcı bilgilerini alma işlemi sırasında oluşan hata nesnesi
-  - `user` — Doğrulanmış mevcut oturum açmış kullanıcı nesnesi
-  - `clear` — Kullanıcının mevcut tüm varsayılan fatura profillerinin is_default değerini false yapan update sorgusunun dönüş yanıtı
-  - `data` — Yeni varsayılan olarak ayarlanan fatura profilinin Supabase sorgusundan dönen verisi
-  - `error` — Son update sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<DbInvoiceProfile>
-
-### [N6_NASIL] AST Pointer: src\lib\services\invoice.service.ts::fetchDefaultInvoiceProfile
-- **params**: (parametre yok)
+### [N5_NASIL] AST Pointer: src/lib/services/invoice.service.ts::setDefaultInvoiceProfile
+- **params**: `id: string`, `supabase` (varsayılan değer: `defaultClient`)
 - **ic_degiskenler**:
   - `authData` — Supabase auth.getUser() çağrısından dönen kimlik doğrulama verisi
-  - `userError` — Kullanıcı bilgilerini alma işlemi sırasında oluşan hata nesnesi
-  - `user` — Doğrulanmış mevcut oturum açmış kullanıcı nesnesi
-  - `data` — Supabase select sorgusundan dönen varsayılan fatura profili ham verileri dizisi
-  - `error` — Sorgu sırasında oluşan hata nesnesi
-  - `PostgrestErrorExtended` — Hata nesnesinin kod ve mesaj özelliklerini tiplendirmek için tanımlanan genişletilmiş hata arayüzü
-  - `e` — error nesnesinin PostgrestErrorExtended tipine dönüştürülmüş hali, özel hata kontrollerinde kullanılır
-  - `data[0]` — Sorgudan dönen ilk (tek) geçerli varsayılan fatura profili verisi
-- **Dönüş**: Promise<DbInvoiceProfile | null>
+  - `userError` — Kimlik doğrulama hata nesnesi (varsa)
+  - `user` — Mevcut oturum açmış kullanıcı nesnesi (authData.user'dan alınır)
+  - `clear` — Diğer varsayılan profilin kaldırılma işlemi sonucu (is_default:false yapılan güncelleme)
+  - `data` — Supabase update işleminin sonucu (varsayılan olarak ayarlanmış fatura profili)
+  - `error` — Supabase update işleminden dönen hata nesnesi (varsa)
+- **Dönüş**: `Promise<DbInvoiceProfile>` — Varsayılan olarak ayarlanmış fatura profili
+
+### [N6_NASIL] AST Pointer: src/lib/services/invoice.service.ts::fetchDefaultInvoiceProfile
+- **params**: `supabase` (varsayılan değer: `defaultClient`)
+- **ic_degiskenler**:
+  - `authData` — Supabase auth.getUser() çağrısından dönen kimlik doğrulama verisi
+  - `userError` — Kimlik doğrulama hata nesnesi (varsa)
+  - `user` — Mevcut oturum açmış kullanıcı nesnesi (authData.user'dan alınır)
+  - `data` — Supabase select sorgusundan dönen fatura profilleri dizisi
+  - `error` — Supabase select sorgusundan dönen hata nesnesi (varsa)
+  - `e` — PostgREST hata nesnesinin genişletilmiş versiyonu (hata kodu ve mesaj kontrolü için)
+  - `PostgrestErrorExtended` — PostgREST hata arayüz tanımı (hata tipini genişletmek için)
+- **Dönüş**: `Promise<DbInvoiceProfile | null>` — Varsayılan fatura profili veya null (bulunamazsa)
 
 ---
 

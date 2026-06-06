@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\products\page.tsx
-skeleton_hash: e541aa272b442b08
+skeleton_hash: 10116529f29d415c
 entity_hashes:
   func:Page: c96e4d8c93f660fc
   func:getCachedProducts: 13bd3816d5356001
-  overview: a4d00c564c02f39c
+  overview: 14adfddc5d7160bf
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-05-30T21:35:08Z
+generated_at: 2026-06-06T21:54:02Z
 ---
 
 ## Genel Bakış
@@ -28,15 +28,15 @@ Bu grup, isteği işleyerek dil parametresini çıkarır, gerekli verileri getir
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modülün doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir:
+Bu modül, bir Next.js dil bazlı dinamik ürün listesi sayfasıdır. Aşağıdaki varsayımlar fonksiyon imzalarından türetilmiştir.
 
-[Aksiyom 1]: Eğer `getCachedProducts` fonksiyonuna geçerli bir `tenantId` parametresi sağlanmazsa, ilgili kiracıya ait ürün verisi alınamaz ve sayfa hatalı veya eksik veri ile render edilir.
+**[Aksiyom 1]:** Eğer `getCachedProducts` çağrısında geçerli bir `tenantId` değeri yoksa, ürün verileri doğru tenant bağlamında alınamaz ve yanlış veya boş sonuç döner.
 
-[Aksiyom 2]: Eğer `getCachedProducts` fonksiyonu çağrıldığında `lang` parametresi geçerli bir dil kodu içermiyorsa, önbellek anahtarı tutarsız olur ve yanlış dilde ürün verisi döndürülebilir veya önbellek_isi bozulur.
+**[Aksiyom 2]:** Eğer `lang` parametresi (hem `getCachedProducts` hem `Page` için) sağlanmamışsa veya geçerli bir dil kodu içermiyorsa, dil-bazlı ürün verisi Retrieved edilemez ve sayfa varsayılan/boş dil içerikli render edilir.
 
-[Aksiyom 3]: Eğer `Page` bileşeninde `params.lang` Promise'i çözülmezse veya geçersiz bir değer içerirse, sayfa doğru dilde oluşturulamaz ve istemci tarafı bir hata oluşur.
+**[Aksiyom 3]:** Eğer `params` Promise'i `Page` bileşeni içinde `await` edilmeden kullanılırsa, `lang` parametresi erişilemez olur ve sayfa oluşturulamaz (Next.js 15+ async params davranışı).
 
-[Aksiyom 4]: Eğer `getCachedProducts` fonksiyonunda kullanılan önbellek mekanizması (örn: `unstable_cache`) doğru yapılandırılmamışsa veya erişilebilir değilse, her istek veri kaynağına doğrudan gider ve performans önemli ölçüde düşer.
+**[Aksiyom 4]:** Eğer `getCachedProducts` fonksiyonu için önbellek (cache) mekanizması çalışmıyorsa veya önbellek anahtarı geçersizse, her istekte kaynak veri kaynağına doğrudan istek atılır ve performans düşer.
 
 ---
 
@@ -63,13 +63,34 @@ Bu modülün doğru çalışması için aşağıdaki mimari varsayımlar geçerl
 
 ### [N1_NASIL] AST Pointer: `[lang]/products/page.tsx`::getCachedProducts
 - **params**: `lang: string`, `tenantId: string`
+- **ic_degiskenler**: (yok — parametreler doğrudan kullanılır)
+- **Parametre Kullanımları**:
+  - `lang` — önbellek anahtar listesine (`['products-discovery', lang, tenantId]`) ve tag追加ına (`products-discovery-${tenantId}`) dahil edilir
+  - `tenantId` — önbellek anahtar listesine ve tag追加ına dahil edilir; tag olarak `` `products-discovery-${tenantId}` `` oluşturulur
+- **Çağrılar**:
+  - `unstable_cache(async () => getProductsEnriched({ limit: 100 }), [...], {...})` — Next.js unstable_cache ile 100 ürünlü sorguyu önbelleğe alır
+  - `getProductsEnriched({ limit: 100 })` — servis katmanından zenginleştirilmiş ürün listesini çeker
+  - `unstable_cache(...)( ... )()` — dönen cache fonksiyonu hemen invok edilir
+- **Dönüş**: `DomainProduct[]` (getProductsEnriched sonucu)
+
+---
+
+### [N2_NASIL] AST Pointer: `[lang]/products/page.tsx`::Page
+- **params**: `{ params: Promise<{ lang: string }> }` — Next.js 15+ async params
 - **ic_degiskenler**:
-  - Fonksiyon gövdesi tek bir zincirli çağrıdır, ayrı iç değişken yoktur
-  - `unstable_cache(...)` — Next.js'in cache mekanizmasını oluşturur; bir cache factory döner ve hemen çağrılır `()`
-  - **Cache key**: `['products-discovery', lang, tenantId]` — lang ve tenantId parametreleri cache key bileşeni olarak kullanılır
-  - **Cache options**: `{ tags: ['products-discovery', \`products-discovery-${tenantId}\`], revalidate: false }` — tag tabanlı invalidation için tenantId'li tag eklenir, revalidation kapatılmıştır
-  - `getProductsEnriched({ limit: 100 })` — cache içindeki async callable; Supabase'den en fazla 100 ürün getirir
-- **Dönüş**: `Promise<DomainProduct[]>` (getProductsEnriched'in dönüş değeri, cachelenmiş)
+  - `lang` — `await params` destructuring'inden elde edilen dil kodu; `getCachedProducts` çağrısına argüman olarak verilir
+  - `tenantConfig` — `await getTenantConfig()` ile alınan kiracı yapılandırma nesnesi; `id` alanı ve `TenantProvider`'a value olarak kullanılır
+  - `tenantId` — `tenantConfig.id` erişiminden elde edilen kiracı tanımlayıcısı; `getCachedProducts` çağrısına argüman olarak verilir
+  - `products` — `DomainProduct[]` türünde, `getCachedProducts(lang, tenantId)` çağrısının sonucu; `CategoryMasterView` bileşenine `initialProducts` prop'u olarak iletilir
+- **Çağrılar**:
+  - `await params` — async parametre çözümleme
+  - `getTenantConfig()` — sunucu tarafında kiracı yapılandırmasını getirir
+  - `getCachedProducts(lang, tenantId)` — önbellekli ürün listesini çeker
+- **JSX Yapısı**:
+  - `React.Suspense` — fallback olarak "Yükleniyor..." spinner'ı sunar
+  - `TenantProvider` — `tenantConfig` değerini `value` prop'u ile alt bileşenlere sağlar
+  - `CategoryMasterView` — `initialCategory={null}` (Discovery modu), `initialProducts={products}` prop'ları ile render edilir
+- **Dönüş**: JSX (React bileşen ağacı) — sayfa HTML çıktısı
 
 ---
 

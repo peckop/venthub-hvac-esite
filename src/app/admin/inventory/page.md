@@ -3,37 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\page.tsx
-skeleton_hash: 463a1aa5b93b7376
+skeleton_hash: 0609cf90231b1356
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-28T22:35:04Z
+generated_at: 2026-06-06T21:53:51Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim paneli envanter sayfasının rotasını ve giriş noktasını tanımlar. `Page` fonksiyonu aracılığıyla asıl envanter arayüzünü dinamik olarak yükleyerek performansı optimize eder ve sayfanın kullanıcıya sunulmasını sağlar.
+Bu modül, yönetim paneli envanter sayfasının giriş noktasıdır. Ana sayfa bileşenini dinamik olarak yükleyerek sayfanın tarayıcıda gösterilmesini sağlar ve yükleme sürecini yönetir.
 
 ## Fonksiyon Grupları
-### Sayfa Yönlendirme ve Render
-Bu grup, envanter sayfasının ana bileşenini dinamik olarak içe aktarır ve sayfa yapısını oluşturarak tarayıcıda görüntülenmesini sorunsuz bir şekilde yönetir.
+### Sayfa Giriş Noktası
+Bu grup, envanter sayfasının ana bileşenini asenkron olarak içe aktarır ve sayfanın kullanıcıya sunulmasını kontrol eder.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için, verilen fonksiyon imzası ve modül sabitleri temelinde aşağıdaki mimari varsayımlar tanımlanmıştır:
+Bu modül için, yalnızca fonksiyon imzası ve modül sabitleri temelinde sınırlı sayıda aksiyom belirlenebilir. Fonksiyon gövdesi erişilebilir olmadığı için kapsamlı mimari varsayımlar üretilememektedir.
 
-[Aksiyom 1]: Eğer `PageComponent` sabiti (çağrılabilir fonksiyon/bileşen) yoksa veya geçerli bir React bileşeni değilse, `Page` fonksiyonu sayfayı doğru şekilde render edemez ve uygulama hata verir.
+[Aksiyom 1]: Eğer `PageComponent` sabiti modülde tanımlı veya import edilmemişse, `Page` fonksiyonunun JSX render ederken hata vermesi olur.
 
-[Aksiyom 2]: Eğer `PageComponent`'i dinamik olarak yükleyen `import()` promise'i başarısız olursa (örn: modül dosyası mevcut değilse, ağ hatası oluşursa), `Page` fonksiyonu hata durumunu işlemezse kullanıcıya boş veya bozuk bir sayfa gösterilir.
+---
 
-[Aksiyom 3]: Eğer `Page` fonksiyonu çağrılmazsa, envanter sayfası hiçbir zaman tarayıcıda oluşturulmaz ve kullanıcı erişemez.
-
-[Aksiyom 4]: Eğer `PageComponent` asenkron olarak yükleniyorsa, yüklenme tamamlanana kadar sayfada bir yükleme göstergisi (skeleton/spinner) gösterilmesi beklenir; aksi halde kullanıcı boş bir sayfa ile karşılaşır.
-
-> **Not:** Bu aksiyomlar, yalnızca `Page()` fonksiyon imzası ve `PageComponent` sabitinin varlığı referans alınarak çıkarılmıştır. Fonksiyon gövdesindeki uygulama detayları bilinmediğinden, spesifik hata işleme mekanizmaları veya yükleme durumu hakkında kesin bir aksiyom tanımlanamamaktadır.
+**Not:** Bu modül için yalnızca fonksiyon imzası (`Page()`) ve bir adet callable modül sabiti (`PageComponent`) bilgisi mevcuttur. Fonksiyon gövdesine erişilmediği için ek aksiyom üretilememektedir. Tam aksiyon listesi için fonksiyon gövdesinin analiz edilmesi gerekmektedir.
 
 ---
 
@@ -51,22 +47,26 @@ Bu modül için, verilen fonksiyon imzası ve modül sabitleri temelinde aşağ�
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../views/admin/AdminInventoryPage'), {
-  ssr: fa...`
+- **PageComponent** (call) — `nextDynamic(() => import('../../../views/admin/AdminInventoryPage'), {
+  ssr...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\inventory\page.tsx::LoadingFallback
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: React JSX element (loading spinner)
+### [N1_NASIL] AST Pointer: admin/inventory/page.tsx::loading (anonim fonksiyon)
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - (yok — JSX içinde harici class isimleri dışında değişken kullanılmamış)
+- **Dönüş**: JSX — `min-h-screen` container içinde spin animasyonlu loading spinner döndürür. `next/dynamic` ile sayfa yüklenirken gösterilen fallback bileşendir.
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\inventory\page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: React JSX element (renders PageComponent)
+---
+
+### [N2_NASIL] AST Pointer: admin/inventory/page.tsx::Page
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - (yok — `PageComponent` harici sabit olarak kullanılmış, yerel değişken değildir)
+- **Dönüş**: JSX — `<PageComponent />` bileşenini doğrudan döndürür. Sayfa yüklemesi için `next/dynamic` ile sarılmıştır.
 
 ---
 

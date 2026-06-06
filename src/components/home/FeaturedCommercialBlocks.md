@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx
-skeleton_hash: cc1ee378f0ab56e9
+skeleton_hash: 4c35b083d08a3617
 entity_hashes:
   func:FeaturedCommercialBlocks: 1889811721e866db
   func:normalizeImageUrl: e7ff2d52e57ce97b
-  overview: 053f00b1dc0bcc57
+  overview: e2b71b884b394ef9
   style_tokens: 0fba0ab3cddfc2f6
-generated_at: 2026-05-28T22:35:59Z
+generated_at: 2026-06-06T21:54:49Z
 ---
 
 ## Genel Bakış
@@ -28,13 +28,17 @@ Görsel adreslerinin boş veya geçersiz olma durumlarını temizleyerek, kullan
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için doğrulanabilir mimari aksiyomlar, yalnızca fonksiyon imzalarından çıkarılmıştır.
+Bu modül için, yalnızca fonksiyon imzasından türetilebilen mimari varsayımlar aşağıdadır.
 
-**[Aksiyom 1]**: Eğer `initialProducts` parametresi çağrıda sağlanmazsa, varsayılan olarak boş dizi (`[]`) kullanılır.
+**[Aksiyom 1]**: Eğer `normalizeImageUrl` fonksiyonuna `null` veya `undefined` değeri verilirse, fonksiyon geçerli bir görsel URL'si döndüremeyebilir — bu durumda çağrının bir fallback mekanizması (örn: varsayılan bir görsel) kullanması beklenir.
 
-**[Aksiyom 2]**: Eğer `normalizeImageUrl` fonksiyonuna `null` veya `undefined` değerinde bir `url` verilirse, fonksiyon bu geçersiz girişi işleyebilmelidir (fonksiyon imzası bu türleri kabul edecek şekilde tanımlıdır).
+**[Aksiyom 2]**: Eğer `FeaturedCommercialBlocks` bileşeni `initialProducts` parametresi olmadan çağrılırsa, bileşen boş bir dizi (`[]`) ile çalışacak şekilde varsayılan değer kullanır.
 
-**[Aksiyom 3]**: Eğer `FeaturedCommercialBlocks` bileşeni hiç argüman olmadan (`FeaturedCommercialBlocks()`) çağrılırsa, `initialProducts` otomatik olarak `[]` olur ve bileşen bu değerle çalışır.
+**[Aksiyom 3]**: Eğer `FeaturedCommercialBlocks` bileşenine geçersiz veya bozuk bir `initialProducts` verisi (örn: `null`, `undefined`, veya dizi olmayan bir değer) aktarılırsa, bileşen hata verebilir veya beklenmeyen davranış gösterebilir.
+
+---
+
+**Not:** Modül sabitleri kısmında herhangi bir sabit tanımlı değildir. Eski dokümandaki domain-specific bilgiler (eşik değerleri, kabul kriterleri vb.) bu aksiyomlara dahil edilmemiştir, çünkü bu bilgiler fonksiyon gövdesinden türetilememektedir.
 
 ---
 
@@ -79,39 +83,38 @@ type CommercialTab = 'featured' | 'newArrivals' | 'bestSellers'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/home/FeaturedCommercialBlocks.tsx::normalizeImageUrl
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::normalizeImageUrl
 - **params**: (url: string | null | undefined)
-- **ic_degiskenler**: 
-  - `trimmedUrl` — trimmed version of url after removing whitespace
-- **Dönüş**: string
+- **ic_degiskenler**:
+  - `trimmedUrl` — URL parametresinin boşlukları temizlenmiş hali;startsWith kontrolleri için kullanılır
+- **Dönüş**: string — normalize edilmiş URL (başına '/' eklenmiş veya doğrudan kullanılmış)
 
-### [N2_NASIL] AST Pointer: src/components/home/FeaturedCommercialBlocks.tsx::FeaturedCommercialBlocks
-- **params**: ({ initialProducts = [] })
-- **ic_degiskenler**: 
-  - `t` — translation function from useI18n
-  - `activeTab` — currently selected tab key ('featured', 'newArrivals', 'bestSellers')
-  - `setActiveTab` — setter function to change activeTab state
-  - `productsByTab` — object mapping tab keys to product arrays (featured, newArrivals, bestSellers)
-  - `activeProducts` — array of products for the currently active tab
-- **Dönüş**: JSX.Element (React component)
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::FeaturedCommercialBlocks
+- **params**: ({ initialProducts = [] }) — başlangıç ürünleri listesi, varsayılan boş dizi
+- **ic_degiskenler**:
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, Tüm metinler için kullanılır
+  - `activeTab` — useState hook'u ile oluşturulan aktif sekme durumu (commercial tab tipinde)
+  - `productsByTab` — useMemo hook'u ile hesaplanan sekelere göre gruplandırılmış ürünler nesnesi
+  - `activeProducts` — productsByTab nesnesinden activeTab anahtarına erişilerek elde edilen aktif ürün listesi
+- **Dönüş**: React.FC bileşeni (JSX)
 
-### [N3_NASIL] AST Pointer: src/components/home/FeaturedCommercialBlocks.tsx::useMemoCallback
-- **params**: ()
-- **ic_degiskenler**: 
-  - `featured` — array of up to 4 featured products, fallback to first 4 if none flagged
-  - `newArrivals` — array of up to 4 products sorted by creation date descending
-  - `bestSellers` — array of up to 4 products, fallback to first 4 if slice empty
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::productsByTab useMemo callback
+- **params**: () — parametre yok (useMemo callback'i)
+- **ic_degiskenler**:
+  - `featured` — is_featured flag'i olan veya ilk 4 üründen fallback yapılan öne çıkan ürünler dizisi
+  - `newArrivals` — created_at tarihine göre sıralanmış yeni gelen ürünler dizisi (en fazla 4)
+  - `bestSellers` — en çok satanlar için fallback ürün listesi (dizinin 4-8 arası veya ilk 4'ü)
 - **Dönüş**: { featured: Product[], newArrivals: Product[], bestSellers: Product[] }
 
-### [N4_NASIL] AST Pointer: src/components/home/FeaturedCommercialBlocks.tsx::TabButton
-- **params**: (tab)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element (button element)
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::tabButton render callback
+- **params**: (tab) — sekmeyi temsil eden string
+- **ic_degiskenler**: yok — sadece parametre ve dış scope değişkenleri kullanılır
+- **Dönüş**: JSX — tekil tab butonu elementi
 
-### [N5_NASIL] AST Pointer: src/components/home/FeaturedCommercialBlocks.tsx::ProductItem
-- **params**: (product, idx)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element (motion.wrapped ProductCard)
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::productCard render callback
+- **params**: (product: Product, idx: number) — ürün nesnesi ve indeks
+- **ic_degiskenler**: yok — sadece parametreler ve dış scope bileşenleri kullanılır
+- **Dönüş**: JSX — animasyonlu ürün kartı wrapper elementi
 
 ---
 

@@ -3,35 +3,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\users\page.tsx
-skeleton_hash: a1d1d34ac76683eb
+skeleton_hash: c5a526e3700ed168
 entity_hashes:
   func:Page: c68e4a7cc2b89422
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:35:15Z
+generated_at: 2026-06-06T21:54:10Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki kullanıcı yönetimi sayfasının Next.js App Router üzerindeki giriş noktasıdır. Tek bir React bileşeni olan Page fonksiyonu, istemci tarafında dinamik olarak yüklediği AdminUsersPage görünümünü render ederek kullanıcı listeleme ve yönetim arayüzünü sunar.
+Yönetim panelindeki kullanıcı yönetimi sayfasının Next.js App Router üzerindeki giriş noktasıdır. Tek bir React bileşeni olan Page fonksiyonu, istemci tarafında dinamik olarak yüklediği AdminUsersPage görünümünü render ederek kullanıcı listeleme ve yönetim arayüzünü sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Giriş Noktası (Route Entry Point)
-Bu grup, ilgili rotanın yükleyicisi olarak görev yapar. Modülün tek dışa aktarımı olan Page fonksiyonu, kullanıcı yönetimi arayüzünü tarayıcıya taşımak için ilgili UI bileşenini yükleyip render eder.
+### Sayfa Giriş Noktası
+Rota karşılama sorumluluğunu üstlenen minimal giriş bileşenidir. Dış bağımlılığı olan AdminUsersPage modülünü dinamik olarak yükleyip tarayıcıya taşıyarak kullanıcı yönetim arayüzünün görünür hale gelmesini sağlar.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için belirgin fonksiyon gövdesi kodu sağlanmadığından, yalnızca mevcut fonksiyon imzası ve modül sabitleri referansıyla desteklenebilen minimal varsayımlar aşağıdadır.
+Bu modül, Next.js App Router yapısı içinde tanımlanmış bir sayfa giriş noktasıdır. Fonksiyon gövdesi kodu sağlanmadığı için aksiyomlar, modülün yapısından ve Next.js App Router varsayımlarından türetilmiştir.
 
-[Aksiyom 1]: Eğer `AdminUsersPage` modülü import edilemez veya yüklenemez (örn. dosya yolu kırık, bağımlılık eksik) ise, `Page` bileşeni render hata verir veya boş sayfa döner.
+[Aksiyom 1]: Eğer `AdminUsersPage` bileşeni import edilemez veya mevcut değilse, `Page` fonksiyonu çalışırken derleme/runtime hatası oluşur.
 
-[Aksiyom 2]: Eğer Next.js App Router yapısı veya `src/app/admin/users/page.tsx` dosya yolu değiştirilirse, bu sayfa route üzerinden erişilemez hale gelir.
+[Aksiyom 2]: Eğer Next.js App Router yapısı bu dosyayı `/admin/users` rotasının giriş noktası olarak tanımıyorsa, bu sayfa tarayıcıda hiçbir zaman yüklenemez.
 
-[Aksiyom 3]: Eğer `AdminUsersPage` bileşeni `{ ssr: false }` seçeneğiyle dinamik import yapılıyorsa, client-side rendering zorunludur ve tarayıcı olmadan bileşen içeriği render edilemez.
+[Aksiyom 3]: Eğer istemci tarafı (client-side) bileşen yükleme mekanizması (örn: `dynamic()` import) çalışır durumda değilse, `AdminUsersPage` render edilmez ve sayfa boş kalır.
 
-[Aksiyom 4]: Eğer `Page` fonksiyonu parametre almıyorsa (mevcut imza: `Page()`), route parametreleri veya search params bu bileşen düzeyinde doğrudan erişilebilir değildir; gerekirse ilgili veriler `AdminUsersPage` içinde veya higher-order bileşen aracılığıyla sağlanmalıdır.
+[Aksiyom 4]: Eğer `Page` fonksiyonu varsayılan olarak `export default` ile dışa aktarılmıyorsa, Next.js bu dosyayı geçerli bir sayfa bileşeni olarak algılamaz.
+
+---
+
+**Not:** Fonksiyon gövdesi kodu doğrudan sağlanmadığı için, bu aksiyomlar yalnızca Next.js App Router sayfa bileşenlerinin zorunlu yapısal gereksinimlerine dayanmaktadır. Modülün kendi iç mantığına (state yönetimi, veri çekme, hata işleme vb.) dair aksiyomlar, fonksiyon gövdesi olmadan üretilemez.
 
 ---
 
@@ -51,9 +55,9 @@ Bu modül için belirgin fonksiyon gövdesi kodu sağlanmadığından, yalnızca
 ---
 
 ## SABİTLER
-- **AdminUsersPage** (call) — `dynamic(
+- **AdminUsersPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminUsersPage'),
-  { ssr: fa...`
+  { ssr...`
 
 ---
 
@@ -61,8 +65,8 @@ Bu modül için belirgin fonksiyon gövdesi kodu sağlanmadığından, yalnızca
 
 ### [N1_NASIL] AST Pointer: src/app/admin/users/page.tsx::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `AdminUsersPage` bileşeninin JSX'i
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde hiçbir değişken tanımlanmamıştır)
+- **Dönüş**: JSX — `AdminUsersPage` bileşeninin dinamik olarak yüklenmiş halini render eder. `nextDynamic` ile import edilen `AdminUsersPage` çağrısı sonucu elde edilen React bileşeni doğrudan return ile döndürülür.
 
 ---
 

@@ -3,43 +3,84 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts
-skeleton_hash: 6c450008f0499c83
+skeleton_hash: 1295cdbdebcee598
 entity_hashes:
-  func:addProductToProject: 8bfc690cdaa7e8d6
-  func:createProject: 76dd09d8df26fd26
-  func:deleteProject: 7aed632c205d7700
-  func:listProjectItems: 528a3d2806e287b2
-  func:listUserProjects: 33fe12e5edabd8d0
-  func:removeProductFromProject: de6b4aa428a3db2d
-  overview: d3d6cc5a6efc3fd8
-generated_at: 2026-05-28T22:38:29Z
+  func:addProductToProject: 1594b3164eacd4b8
+  func:createProject: d26dd214d1190fe7
+  func:deleteProject: 8954b4b6fc99d6f8
+  func:listProjectItems: 24cba4ef469359cd
+  func:listUserProjects: ecb590d6a7ea8030
+  func:removeProductFromProject: f7c9369ca9c14979
+  overview: 7ff4279173d96528
+generated_at: 2026-06-06T21:55:58Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunda kullanıcıların projelerini oluşturmalarını, yönetmelerini ve projelerine ürün ekleyip çıkarmalarını sağlayan merkezi bir proje yönetim servisidir. Bu modül, ön yüz bileşenlerinden gelen talepleri işleyerek kullanıcı bazlı proje erişimi ve proje içeriği yönetimini veritabanında güvenli ve tutarlı bir şekilde yürütür.
+VentHub HVAC platformunda kullanıcıların projelerini oluşturmasını, listelemesini ve silmesini sağlayan temel bir proje yönetim servisidir. Ayrıca her bir projeye ürün eklenmesi, çıkarılması ve proje içeriğinin sorgulanması gibi ürün bazlı yönetim işlemlerini destekler. Tüm fonksiyonlar Supabase istemcisi üzerinden veritabanıyla iletişim kurar ve kullanıcı oturumuna bağlı çalışır.
 
 ## Fonksiyon Grupları
-### Temel Proje Yaşam Döngüsü İşlemleri
-Kullanıcının kendi projeleriyle ilgili temel işlemleri yönetir; projelerin listelenmesinden oluşturulmasına ve silinmesine kadar tüm yaşam döngüsü adımlarını kontrol eder.
+### Proje Yaşam Döngüsü
+Kullanıcının kendi projeleri üzerindeki temel CRUD işlemlerini yönetir; projenin varoluşundan silinmesine kadar olan tüm adımları kapsar.
 - listUserProjects, createProject, deleteProject
 
-### Proje İçerik Yönetimi
-Mevcut bir projeye bağlı ürünlerin yönetimini üstlenir; projeye ürün ekleme, projeden ürün çıkarma ve projeye ait tüm ürünleri listeleme işlemlerini gerçekleştirir.
+### Proje Ürün Yönetimi
+Oluşturulmuş bir projeye bağlı ürünlerin eklenmesi, çıkarılması ve listelenmesi gibi proje içeriğiyle ilgili işlemleri yürütür.
 - addProductToProject, removeProductFromProject, listProjectItems
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, kullanıcıların proje oluşturmasını, yönetmesini ve projelere ürün eklemesini/çıkarmasını sağlayan bir servis katmanıdır. Aşağıdaki mimari varsayımlar, fonksiyon imzaları ve modül sabitlerinden türetilmiştir.
+
+---
+
+**[Aksiyom 1 – Supabase İstemci Bağımlılığı]:**
+Tüm fonksiyonlar (`listUserProjects`, `createProject`, `deleteProject`, `addProductToProject`, `removeProductFromProject`, `listProjectItems`) zorunlu bir `supabase` parametresi alır. Eğer işlevsel bir Supabase istemcisi (veya geçerli bir bağlantı) sağlanmazsa, hiçbir veritabanı okuma/yazma işlemi gerçekleştirilemez ve fonksiyonlar başarısız olur.
+
+---
+
+**[Aksiyom 2 – `user_projects` Tablosu Varlığı]:**
+`createProject` fonksiyonu `TablesInsert<'user_projects'>` tipinde bir parametre alır. Eğer Supabase veritabanında `user_projects` adında bir tablo (ilgili kolon tanımlarıyla birlikte) yoksa, proje oluşturma işlemleri veritabanı düzeyinde hata verir.
+
+---
+
+**[Aksiyom 3 – Proje Tanımlayıcı Zorunluluğu]:**
+`deleteProject`, `addProductToProject`, `removeProductFromProject` ve `listProjectItems` fonksiyonlarının tümü bir `projectId: string` (veya `id: string`) parametresi alır. Eğer geçerli (mevcut ve doğru formatta) bir proje UUID'si sağlanmazsa, ilgili proje üzerindeki silme, ürün ekleme/çıkarma veya listelege Operations başarısız olur veya tutarsız veriye yol açar.
+
+---
+
+**[Aksiyom 4 – Ürün Tanımlayıcı Zorunluluğu]:**
+`addProductToProject` ve `removeProductFromProject` fonksiyonları `productId: string` parametresi alır. Eğer geçerli (mevcut) bir ürün tanımlayıcısı sağlanmazsa, proje-ürün ilişkisi oluşturulamaz veya kaldırılamaz.
+
+---
+
+**[Aksiyom 5 – Miktar Sayısal Olmalı]:**
+`addProductToProject` fonksiyonu `quantity: number` parametresi alır. Fonksiyon imzasında sıfır, negatif veya sıfırdan büyük olduğuna dair bir kısıt belirtilmemiştir; ancak miktarın `number` tipinde olması zorunludur. Eğer `quantity` sayısal bir değer olarak sağlanmazsa, fonksiyon imzası ihlal edilmiş olur.
+
+---
+
+**[Aksiyom 6 – Kullanıcı Bağlamı (Dolaylı):**
+Fonksiyon isimleri (`listUserProjects`) ve tablo adı (`user_projects`) bir kullanıcı-proje ilişkisi olduğunu gösterir. Bu ilişkili operations'ların doğru çalışması için, sağlanan `supabase` istemcisinin geçerli bir kullanıcı oturumu/kimlik bağlamına sahip olması beklenir. Eğer böyle bir bağlam yoksa, kullanıcıya ait projelerin listelenmesi veya kullanıcıya ait projeye yazı yapılması anlam tutarsızlığına veya erişim hatasına yol açar.
+
+---
+
+**[Aksiyom 7 – `defaultClient` Ternary Mantığı]:**
+Modül sabitleri arasında `defaultClient` adında bir ternary ifade (koşullu değer ataması) bulunmaktadır. Bu sabit, bir koşula bağlı olarak farklı bir Supabase istem
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### listUserProjects
-**Ne yapar**: Kimliği doğrulanmış kullanıcının tüm projelerini getirir.
-**Nasıl yapar**: Supabase istemcisi üzerinden `user_projects` tablosuna sorgu gönderir. Tüm projeleri (`*`) seçer ve `updated_at` alanına göre azalan sırada (`ascending: false`) sıralar. Veritabanı sorgusu başarılıysa elde edilen veriyi `DbUserProject[]` dizisine dönüştürerek döndürür; herhangi bir hata oluşursa hatayı fırlatır. Sorgu sonucunda veri yoksa boş bir dizi döner.
-**Parametreler**: Bu fonksiyonun herhangi bir parametresi yoktur.
-**Dönüş**: `Promise<DbUserProject[]>` — Kullanıcının projelerini temsil eden bir dizi döner. Kullanıcının projesi yoksa boş bir dizi döner.
+**Ne yapar**: Oturum açmış kullanıcıya ait tüm projeleri getirir. Proje listesi son güncelleme tarihine göre azalan sırada sıralanır.
+
+**Nasıl yapar**: `user_projects` tablosundaki tüm kayıtları `updated_at` alanına göre azalan (en yeni en üstte) sırayla sorgular. Sorgu sonucunda hata oluşursa fırlatır, aksi halde veri dizisini döner.
+
+**Parametreler**:
+- `supabase` : `SupabaseClient` — Kullanılacak Supabase istemcisi. Belirtilmezse varsayılan istemci (`defaultClient`) kullanılır.
+
+**Dönüş**: `Promise<DbUserProject[]>` — Kullanıcının projelerinin bir dizisi. Kullanıcının hiç projesi yoksa boş bir dizi döner.
 
 ### createProject
 **Ne yapar**: Kimliği doğrulanmış kullanıcı için yeni bir proje oluşturur.
@@ -81,51 +122,66 @@ Mevcut bir projeye bağlı ürünlerin yönetimini üstlenir; projeye ürün ekl
 
 ---
 
+## SABİTLER
+- **defaultClient** (ternary_expression) — `typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient`
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts::listUserProjects
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: project.service.ts::listUserProjects
+- **params**: `supabase` — Supabase istemcisi (varsayılan: defaultClient)
 - **ic_degiskenler**:
-  - `data` — supabase.user_projects sorgusundan dönen tüm proje satırları verisi
-  - `error` — supabase sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<DbUserProject[]>
+  - `data` — user_projects tablosundan gelen satır verileri (DbUserProject[])
+  - `error` — Supabase sorgu hatası (yoksa null)
+- **Dönüş**: `Promise<DbUserProject[]>` — kullanıcı projeleri listesi
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts::createProject
-- **params**: [project: TablesInsert<'user_projects'>]
+### [N2_NASIL] AST Pointer: project.service.ts::createProject
+- **params**: 
+  - `project` — Oluşturulacak proje verisi (TablesInsert<'user_projects'> tipinde)
+  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
 - **ic_degiskenler**:
-  - `data` — supabase.user_projects ekleme işlemi sonrası oluşturulan proje satırı verisi
-  - `error` — supabase sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<DbUserProject>
+  - `data` — Yeni oluşturulmuş proje satırı (DbUserProject)
+  - `error` — Supabase insert hatası (yoksa null)
+- **Dönüş**: `Promise<DbUserProject>` — yeni oluşturulan proje
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts::deleteProject
-- **params**: [id: string]
+### [N3_NASIL] AST Pointer: project.service.ts::deleteProject
+- **params**: 
+  - `id` — Silinecek projenin ID'si (string)
+  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
 - **ic_degiskenler**:
-  - `error` — supabase proje silme sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<boolean>
+  - `error` — Supabase delete hatası (yoksa null)
+- **Dönüş**: `Promise<boolean>` — silme başarılı ise true
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts::addProductToProject
-- **params**: [projectId: string, productId: string, quantity: number]
+### [N4_NASIL] AST Pointer: project.service.ts::addProductToProject
+- **params**: 
+  - `projectId` — Ürün eklenecek projenin ID'si (string)
+  - `productId` — Eklenecek ürünün ID'si (string)
+  - `quantity` — Eklenecek ürün miktarı (number, varsayılan: 1)
+  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
 - **ic_degiskenler**:
-  - `data` — supabase.project_items ekleme işlemi sonrası oluşturulan proje öğesi satırı verisi
-  - `error` — supabase sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<DbProjectItem>
+  - `data` — Yeni eklenmiş proje öğesi satırı (DbProjectItem)
+  - `error` — Supabase insert hatası (yoksa null)
+- **Dönüş**: `Promise<DbProjectItem>` — eklenen proje öğesi
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts::removeProductFromProject
-- **params**: [projectId: string, productId: string]
+### [N5_NASIL] AST Pointer: project.service.ts::removeProductFromProject
+- **params**: 
+  - `projectId` — Ürün silinecek projenin ID'si (string)
+  - `productId` — Silinecek ürünün ID'si (string)
+  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
 - **ic_degiskenler**:
-  - `error` — supabase proje öğesi silme sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: Promise<boolean>
+  - `error` — Supabase delete hatası (yoksa null)
+- **Dönüş**: `Promise<boolean>` — silme başarılı ise true
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts::listProjectItems
-- **params**: [projectId: string]
+### [N6_NASIL] AST Pointer: project.service.ts::listProjectItems
+- **params**: 
+  - `projectId` — Öğeleri listelenecek projenin ID'si (string)
+  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
 - **ic_degiskenler**:
-  - `data` — supabase.project_items ve ilişkili products tablosu verilerini içeren sorgu sonucu
-  - `error` — supabase sorgusu sırasında oluşan hata nesnesi
-  - `items` — ham veritabanı verilerini tip dönüşümü için saklayan işlenmemiş proje öğeleri listesi
-  - `item` — map fonksiyonu içinde işlenen her bir proje öğesi nesnesi
-  - `item.product` — her proje öğesine ait ilişkili ürün verisi
-  - `mapDatabaseProductToDomain` — ürün verisini veritabanı formatından domain formatına dönüştüren yardımcı fonksiyon çağrısı
-- **Dönüş**: Promise<ProjectItem[]>
+  - `data` — Proje öğeleri ve ilişkili ürün verileri (DbProjectItem & { product: DbProduct | null }[])
+  - `error` — Supabase select hatası (yoksa null)
+  - `items` — Ham verinin tip güvenli versiyonu ve boş dizi fallback'i
+- **Dönüş**: `Promise<ProjectItem[]>` — dönüştürülmüş proje öğeleri listesi (ürün verisi mapDatabaseProductToDomain ile alanı dönüştürülmüş)
 
 ---
 

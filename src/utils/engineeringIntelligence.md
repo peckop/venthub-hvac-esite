@@ -3,38 +3,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\engineeringIntelligence.ts
-skeleton_hash: 39367cd3f19a2c7e
+skeleton_hash: bca291779aac5534
 entity_hashes:
   func:generateEngineeringSummary: e027e9800497ecbe
   func:getEfficiencyInference: 05c710f909e9d6a9
   func:getMotorInference: ef91c03ee063a82d
   func:getNoiseInference: 9266c31de55779b5
-  overview: 4c2f93faa4920bde
-generated_at: 2026-05-28T22:38:46Z
+  overview: 9ce3d52a464cda5e
+generated_at: 2026-06-06T21:56:28Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC (ısıtma, havalandırma ve iklimlendirme) sistemleri ürünleri için standartlaştırılmış mühendisliksel analiz ve çıkarımlar üreten bir yardımcı modüldür. Ürünlerin teknik spesifikasyonlarından yola çıkarak uzman değerlendirmeleri formatlar ve tüm analizleri bir araya getirerek kapsamlı bir ürün değerlendirmesi sunar.
+Bu modül, HVAC ürünleri için mühendislik analizlerini otomatikleştiren bir zeka katmanıdır. Ürünlerin teknik özelliklerinden (gürültü, verimlilik, motor tipi gibi) yola çıkarak standartlaştırılmış çıkarımlar üretir ve bu çıkarımları birleştirerek kapsamlı bir mühendislik özeti sunar.
 
 ## Fonksiyon Grupları
 ### Tekil Parametre Tabanlı Çıkarım Fonksiyonları
-Bir ürünün tek bir teknik özelliğinden (gürültü seviyesi, enerji verimliliği, motor tipi) yola çıkarak standart formatta mühendisliksel çıkarım nesneleri oluşturur.
+Bu grup, bir ürünün yalnızca bir teknik parametresini analiz ederek, o özellik için standart bir mühendislik değerlendirmesi ve çıkarımı üretir.
 - getNoiseInference, getEfficiencyInference, getMotorInference
 
 ### Kapsamlı Mühendislik Özeti Üretim Fonksiyonu
-Bir ürün nesnesi üzerinden tüm tekil parametre çıkarımlarını toplu halde çalıştırır, ürüne ait tüm mühendisliksel analizleri tek bir dizi halinde sunar.
+Bu ana fonksiyon, bir ürün nesnini alır ve yukarıdaki tüm tekil çıkarım fonksiyonlarını çalıştırarak, ürüne ait tüm mühendisliksel çıkarımları tek bir listeye dönüştürür.
 - generateEngineeringSummary
+
+## Axioms – Mimari Varsayımlar
+Bu mühendislik zekâsı modülü, ürünlere ait temel mühendislik metriklerinden yola çıkarak tahmin ve özet raporu üretmek için tüm girdi parametrelerinin geçerli, tanımlı ve modülün iç hesaplama mantığının erişilebilir olmasını varsayar.
+
+**[Aksiyom 1]:** Eğer `getNoiseInference` fonksiyonuna gönderilen `db` parametresi geçerli bir sayısal gürültü değeri değilse, üretilen gürültü tahmini tamamen güvenilmez olur.
+**[Aksiyom 2]:** Eğer `getEfficiencyInference` fonksiyonuna gönderilen opsiyonel `efficiency` parametresi geçerli bir sayısal verimlilik değeri değilse, üretilecek verimlilik tahmini hatalı olur veya hiç üretilemez.
+**[Aksiyom 3]:** Eğer `getMotorInference` fonksiyonuna gönderilen `motorType` parametresi, modülün bildiği geçerli bir motor tipi dizesi değilse, üretilecek motor tahmini hatalı olur veya hiç üretilemez.
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu mühendislik zekâsı modülü, ürünlere ait temel mühendislik metriklerinden yola çıkarak tahmin ve özet raporu üretmek için tüm girdi parametrelerinin geçerli, tanımlı ve modülün iç hesaplama mantığının erişilebilir olmasını varsayar.
 
-[Aksiyom 1]: Eğer getNoiseInference fonksiyonuna gönderilen db parametresi geçerli bir sayısal gürültü değeri değilse, üretilen gürültü tahmini tamamen güvenilmez olur.
-[Aksiyom 2]: Eğer getEfficiencyInference fonksiyonuna gönderilen opsiyonel efficiency parametresi geçerli bir sayısal verimlilik değeri değilse, üretilecek verimlilik tahmini hatalı olur veya hiç üretilemez.
-[Aksiyom 3]: Eğer getMotorInference fonksiyonuna gönderilen opsiyonel motorType parametresi modülün tanıdığı geçerli motor tipleri listesinde yer almıyorsa, motora özel mühendislik tahmini hiç üretilemez.
-[Aksiyom 4]: Eğer generateEngineeringSummary fonksiyonuna gönderilen Product nesnesi, tüm tahmin fonksiyonlarını çalıştırmak için gereken temel mühendislik alanlarını içermiyorsa, tam ve doğru mühendislik özeti üretilemez.
-[Aksiyom 5]: Eğer modülün içindeki tüm tahmin ve özetleme fonksiyonlarının çalışması için gereken hesaplama mantığı modül içinde erişilebilir değilse, hiçbir mühendislik çıktısı üretilmez.
 
 ---
 
@@ -84,9 +84,34 @@ Bu mühendislik zekâsı modülü, ürünlere ait temel mühendislik metriklerin
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/utils/engineeringIntelligence.ts::getNoiseInference
-- **params**: [db: number]
-- **ic_degiskenler**: yok
-- **Dönüş**: EngineeringInference | null
+- **params**: `db: number` — desibel seviyesi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `EngineeringInference | null` — db değerine göre sessizlik/kalite etiketleme nesnesi veya geçersiz/girdi yoksa null
+
+### [N2_NASIL] AST Pointer: src/utils/engineeringIntelligence.ts::getEfficiencyInference
+- **params**: `efficiency?: number` — verimlilik yüzdesi (isteğe bağlı)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `EngineeringInference | null` — diamond/platinum/gold etiketleme nesnesi veya eşiklerin altında/kararsız ise null
+
+### [N3_NASIL] AST Pointer: src/utils/engineeringIntelligence.ts::getMotorInference
+- **params**: `motorType?: string` — motor tipi adı (isteğe bağlı)
+- **ic_degiskenler**:
+  - `mt` — motorType'ın küçük harf karşılığı; EC/AC içeriğini kontrol etmek için kullanılır
+- **Dönüş**: `EngineeringInference | null` — EC veya AC motor kalite etiketleme nesnesi veya tanımlanamaz motor tipi için null
+
+### [N4_NASIL] AST Pointer: src/utils/engineeringIntelligence.ts::generateEngineeringSummary
+- **params**: `product: Product` — mühendislik özetinin üretileceği ürün nesnesi
+- **ic_degiskenler**:
+  - `inferences` — toplanan mühendislik çıkarımlarının (EngineeringInference[]) tutulduğu başlangıçta boş dizi
+  - `specs` — `product.technical_specs` kaydı ise `Record<string, unknown>`'a dönüştürülmüş hali, değilse boş `{}` nesnesi
+  - `noise` — `getNoiseInference()` çağrısının döndürdüğü ses analizi sonucu
+  - `efficiencyValue` — `specs` içinden `efficiency`, `verilik` veya `isi_gerikazanım_verimi` alanlarından birinden gelen verimlilik değeri
+  - `numericEff` — `efficiencyValue`'ın sayısal karşılığı; string ise `[^0-9.]` regex ile temizlenip `parseFloat` ile dönüştürülür, değilse `Number()` ile dönüştürülür
+  - `eff` — `getEfficiencyInference(numericEff)` çağrısının döndürdüğü verimlilik analizi sonucu
+  - `motorType` — `specs` içinden `motor_tipi`, `motor_type` veya `elektrik_motoru` alanlarından birinden gelen motor tipi değeri
+  - `motor` — `getMotorInference(String(motorType))` çağrısının döndürdüğü motor analizi sonucu
+  - `isIndustrial` — `product.airflow_capacity > 2000` kontrolü ile endüstriyel kapasite olup olmadığını belirleyen boolean
+- **Dönüş**: `EngineeringInference[]` — ürünün ses, verimlilik, motor ve kapasite özelliklerine ait tüm geçerli mühendislik çıkarımlarını içeren dizi
 
 ---
 
@@ -98,9 +123,9 @@ graph TD
     engineeringIntelligence_ts__getEfficiencyInference["getEfficiencyInference"]
     engineeringIntelligence_ts__getMotorInference["getMotorInference"]
     engineeringIntelligence_ts__getNoiseInference["getNoiseInference"]
-    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getNoiseInference
-    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getEfficiencyInference
     engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getMotorInference
+    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getEfficiencyInference
+    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getNoiseInference
 ```
 
 ## NODE ID STANDARD

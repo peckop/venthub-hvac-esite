@@ -3,32 +3,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToastContent.tsx
-skeleton_hash: 3bb5e51857b7e687
+skeleton_hash: 1092697f9ffe5af8
 entity_hashes:
   func:AddToCartToastContent: da3886a1d2990a31
-  overview: d0439d8a27460edb
+  overview: e02dd238d7a8dbce
   style_tokens: 5ac0b676517c4959
-generated_at: 2026-05-29T19:59:05Z
+generated_at: 2026-06-06T21:54:15Z
 ---
 
 ## Genel Bakış
-Bu modül, bir ürün sepete eklendiğinde kullanıcıya gösterilen toast bildiriminin içeriğini render eden tek bir React fonksiyonel bileşenini içerir. Bileşen, ürün bilgilerini ve bildirimi kapatma işlevini prop olarak alarak minimal ve odaklı bir arayüz sunar.
+Bu modül, bir ürün sepete eklendiğinde kullanıcıya kısa süreli bir bildirim (toast) gösteren tek bir React bileşenini tanımlar. Bileşen,_sepetteki ürünün temel bilgilerini sunar ve bildirimi kapatma olanağı sağlayarak kullanıcı deneyimini tamamlar.
 
 ## Fonksiyon Grupları
-### Toast İçeriği Bileşeni
-Sepete ekleme işleminin ardından gösterilen bildirim içeriğini ve etkileşimlerini yöneten ana UI bileşeni.
+### Toast Bildirim İçeriği
+Sepete ekleme işlemi sonrasında kullanıcılara bilgilendirme amaçlı gösterilen geçici bildirim penceresinin içeriğini ve etkileşimlerini yöneten UI bileşeni.
 - AddToCartToastContent
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için aksiyon üretilemedi. Nedeni: Fonksiyon gövdesine erişim olmadığından, modülün doğru çalışması için **zorunlu olan koşullar** güvenilir biçimde çıkarılamamaktadır. Yalnızca fonksiyon imzasından (parametrelerin varlığı) şu zayıf aksiyom üretilebilir:
+Bu modül, sepete ekleme bildiriminin içeriğini render eden React fonksiyonel bileşenidir. Aşağıdaki varsayımlar **fonksiyon imzasından** çıkarılmıştır; fonksiyon gövdesine erişim olmadığından gövde bazlı aksiyomlar üretilememiştir.
 
-[Aksiyom 1]: Eğer `product` parametresi verilmezse (undefined/null), modülün render süreci hata ile karşılaşır veya beklenmeyen davranış gösterir.
-[Aksiyom 2]: Eğer `onClose` parametresi bir fonksiyon değilse, Toast kapatma işlemi (kullanıcı etkileşimi veya zamanlayıcı sonrası) çalışamaz; bileşen kapanmaz.
+---
 
-**Not:** Daha güçlü aksiyomlar (örn. `product.name`, `product.price` gibi alanların varlığı zorunluluğu, bileşenin hangi durumlarda render edildiği, Toast gösterim süresi koşulları vb.) yalnızca fonksiyon gövdesi analiz edilerek üretilebilir. Mevcut bilgiyle uydurma yapılmamıştır.
+**[Aksiyom 1]**: Eğer `product` prop'u sağlanmazsa, bileşen sepetteki ürün bilgisini gösteremez ve render ettiği toast içeriği eksik veya hatalı olur.
+
+**[Aksiyom 2]**: Eğer `onClose` callback fonksiyonu sağlanmazsa, bileşen bildirimi kapatma eylemini tetikleyemez ve kullanıcı toast'ı manüel olarak kapatamaz.
+
+**[Aksiyom 3]**: Eğer `product` nesnesi beklenen alanları (örn: ürün adı, fiyatı, görseli — bilinmiyor) içermiyorsa, bileşen bu alanları render ederken hata veya boş alan oluşur.
+
+---
+
+> **Not:** Fonksiyon gövdesine erişim olmadığından, bileşenin hangi UI kütüphanesini kullandığı, hangi alt bileşenleri render ettiği veya hangi stillendirme mantığını uyguladığı bilinmemektedir. Daha kapsamlı aksiyomlar için fonksiyon gövdesine ihtiyaç vardır.
 
 ---
 
@@ -57,11 +64,11 @@ Bu modül için aksiyon üretilemedi. Nedeni: Fonksiyon gövdesine erişim olmad
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/AddToCartToastContent.tsx::AddToCartToastContent
-- **params**: `{ product, onClose }` — product: Sepete eklenen ürün nesnesi, onClose: Toast kapatma fonksiyonu
+### [N1_NASIL] AST Pointer: components/AddToCartToastContent.tsx::AddToCartToastContent
+- **params**: `product`, `onClose`
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, `cartToast.added`, `common.close`, `cartToast.continue`, `cartToast.goToCart`, `cartToast.autoClose` gibi metinleri çevirir
-- **Dönüş**: JSX element (React bileşeni) — Sepete ekleme başarılı toast'unu gösteren React bileşeni. Product bilgisini ve onClose fonksiyonunu kullanarak toast içeriğini render eder. Çeviri metinlerini `t` fonksiyonu ile alır. `product.name` ürün adını gösterir. Kullanıcı "X" butonuna, "Alışverişe Devam Et" butonuna veya "Sepete Git" linkine tıklayarak toast'u kapatır.
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, bileşen içindeki metinleri uluslararasılaştırmak için kullanılır
+- **Dönüş**: React.FC<AddToCartToastContentProps> (JSX ile toast içeriği döndürür)
 
 ---
 

@@ -3,28 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\coupons\page.tsx
-skeleton_hash: b5364a7dcacd7105
+skeleton_hash: f0cb795416035c48
 entity_hashes:
   func:Page: 556d56b0dab8a0be
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:35:00Z
+generated_at: 2026-06-06T21:53:57Z
 ---
 
 ## Genel Bakış
-Bu modül, admin panelindeki kupon yönetimi sayfasını sunan bir Next.js sayfa yönlendiricisidir. Tek bir `Page` bileşeni içermektedir ve bu bileşen, asıl kupon yönetim arayüzünü (`AdminCouponsPage`) dinamik olarak yükleyerek render eder.
+Bu modül, admin panelinin kupon yönetim sayfasını sunan basit bir Next.js sayfa yönlendiricisidir. Tek bir `Page` bileşeni içermekte olup, asıl kupon yönetim arayüzünü dinamik olarak yükleyerek render eder.
 
 ## Fonksiyon Grupları
-
 ### Sayfa Yönlendirici
-Modülün tek sorumluluğu, admin kupon sayfasının tarayıcıda görüntülenmesini sağlamaktır. Dinamik import ile `AdminCouponsPage` bileşeni yüklenerek sayfa içerik olarak sunulur.
+Modülün tek sorumluluğu, admin kupon sayfasının tarayıcıda görüntülenmesini sağlamaktır. Dinamik import ile asıl bileşeni yükleyerek sayfayı sunar.
 - `Page`
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
 
-Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -42,18 +39,20 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## SABİTLER
-- **AdminCouponsPage** (call) — `dynamic(
+- **AdminCouponsPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminCouponsPage'),
-  { ssr: ...`
+  { s...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\coupons\page.tsx::Page
+### [N1_NASIL] AST Pointer: src/app/admin/coupons/page.tsx::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<AdminCouponsPage />`) – React bileşeni olarak render edilen bir eleman.
+- **ic_degiskenler**: (iç değişken yok)
+- **Kullanilan Bilesenler**:
+  - `AdminCouponsPage` — import edilmiş React bileşeni, JSX içinde `<AdminCouponsPage />` olarak render edilir
+- **Dönüş**: JSX element — `<AdminCouponsPage />` bileşeninin render ettiği React node'u döner
 
 ---
 

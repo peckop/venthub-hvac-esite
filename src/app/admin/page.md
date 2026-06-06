@@ -3,39 +3,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\page.tsx
-skeleton_hash: abafacd2feb2ac3d
+skeleton_hash: 7f5ef772188d041e
 entity_hashes:
   func:Page: e310741650765783
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:35:01Z
+generated_at: 2026-06-06T21:54:06Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelinin ana sayfasını oluşturan React bileşenini tanımlar. Sayfanın temel düzenini sağlar ve ilgili alt bileşenleri bir araya getirerek kullanıcılara yönetim işlevlerine erişim imkanı sunar.
+Bu modül, yönetim panelinin ana sayfasını oluşturan bir React bileşenini tanımlar. Next.js App Router yapısı içinde yer alarak `/admin` rotasına karşılık gelir ve sayfanın temel düzenini sağlar. Bileşen, ilgili alt bileşenleri bir araya getirerek yönetim arayüzünü kullanıcıya sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Render Grubu
-Bu grup, admin panosunun ana sayfasını render ederek kullanıcı arayüzünü sunmaktan sorumludur.
+### Sayfa Bileşeni
+Bu grup, admin panelinin ana sayfasını render ederek kullanıcı arayüzünü sunmaktan sorumludur.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, Next.js App Router içinde bir sayfa bileşeni olarak çalıştığı için aşağıdaki koşulların sağlanması gerekir.
+Bu modül, parametresiz bir React sayfa bileşeni olup `AdminDashboardPage` modülünü çağırmaktadır. Doğru çalışması için aşağıdaki koşulların sağlanması gerekir.
 
-**Aksiyom 1**: Eğer `AdminDashboardPage` bileşeni tanımlı ya da içe aktarılmış değilse, `Page` fonksiyonu çalıştırıldığında **render hatası** oluşur.  
-**Aksiyom 2**: Eğer Next.js’in **App Router** (yani `app/` dizini ve `page.tsx` konumu) kullanılmazsa, `Page` fonksiyonu **yönlendirme/rota** mekanizması tarafından tanınmaz ve `/admin` yolu erişilemez.  
-**Aksiyom 3**: Eğer React ortamı (React 18+ ve JSX desteği) sağlanmazsa, `Page` fonksiyonu **JSX’i yorumlayamaz** ve **runtime hatası** verir.  
-**Aksiyom 4**: Eğer `Page` fonksiyonu dışarıdan **props** bekler ya da alırsa, ancak tanımda parametre yoksa, **props kaybı** meydana gelir ve bileşen beklenen veri akışını sağlayamaz. (Bu durumda fonksiyon imzası parametresiz olduğundan, props kullanılmaz.)  
-**Aksiyom 5**: Eğer `AdminDashboardPage` bileşeni **server‑side** (ör. `export const dynamic = 'force-dynamic'`) ya da **client‑side** (ör. `use client`) olarak yanlış şekilde işaretlenmişse, `Page` bileşeni **uyumsuz render** davranışı sergileyebilir (ör. hydration hatası).  
+[Aksiyom 1]: Eğer `AdminDashboardPage` modülü içe aktarılmamış ya da tanımlı değilse, `Page` fonksiyonu çalıştırıldığında **`ReferenceError`** oluşur.
 
-### Domain‑specific kurallar
-- **Next.js sürümü**: Bu sayfanın doğru çalışması için proje **Next.js 13+** (App Router destekli) olmalıdır.  
-- **React sürümü**: React 18 veya daha yeni bir sürüm gereklidir; aksi takdirde JSX dönüşümü başarısız olur.  
-- **Dosya konumu**: `page.tsx` dosyasının `src/app/admin/` altında bulunması zorunludur; farklı bir konumda ise `/admin` rotası otomatik olarak oluşturulmaz.  
-
-Bu koşullar sağlanmadığında belirtilen sonuçlar ortaya çıkar; aksi takdirde `Page` fonksiyonu sorunsuz bir şekilde `<AdminDashboardPage />` bileşenini render eder.
+[Aksiyom 2]: Eğer `AdminDashboardPage` bileşeni React elementi döndürmek yerine `undefined` ya da geçersiz bir değer döndürürse, `Page` fonksiyonu çalıştırıldığında **React render hatası** oluşur.
 
 ---
 
@@ -54,18 +45,19 @@ Bu koşullar sağlanmadığında belirtilen sonuçlar ortaya çıkar; aksi takdi
 ---
 
 ## SABİTLER
-- **AdminDashboardPage** (call) — `dynamic(
+- **AdminDashboardPage** (call) — `nextDynamic(
   () => import('../../views/admin/AdminDashboardPage'),
-  { ssr: f...`
+  { ss...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element (React bileşeni olarak `<AdminDashboardPage />` döndürür)
+### [N1_NASIL] AST Pointer: src/app/admin/page.tsx::Page
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `AdminDashboardPage` bileşenini render eder; dinamik olarak `next/dynamic` ile import edilmiş `AdminDashboardPage` çağrısı
+- **Yan Etkiler**: Yok — saf render fonksiyonu
 
 ---
 

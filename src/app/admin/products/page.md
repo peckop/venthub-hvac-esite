@@ -3,26 +3,32 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx
-skeleton_hash: 1d95369f5f63b92b
+skeleton_hash: d7e83efae0e32ebe
 entity_hashes:
   func:Page: b78386183e5eac2e
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:35:01Z
+generated_at: 2026-06-06T21:54:04Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js App Router içinde `admin/products` yoluna karşılık gelen sayfanın giriş noktasıdır. Tek bir bileşen fonksiyonu aracılığıyla `AdminProductsPage` bileşenini dinamik olarak yükler ve render eder; böylece ürün yönetimi UI’sinin oluşturulması ve gösterilmesi sorumluluğu bu dosyaya taşınır.
+Bu modül, Next.js yönetim paneli (admin) altındaki ürünler sayfasının giriş noktasıdır. Tek bir `Page` bileşeni ile sayfanın temel yapısını oluşturarak, ürün yönetimi arayüzünün render edilmesi işlemini ilgili alt bileşene devreder.
 
 ## Fonksiyon Grupları
 ### Sayfa Girişi ve Render
-Bu grup, yönetim panelindeki ürün listesi sayfasının temel render sürecini başlatır. `Page` fonksiyonu, başka bir fonksiyonu çağırmaz; sadece dinamik olarak içe aktarılan `AdminProductsPage` bileşenini JSX olarak döndürerek tüm UI ve iş mantığını alt bileşene devreder.
+Bu grup, yönetim panelindeki ürünler sayfasının yüklenme ve görünür kılınma sürecini yönetir. Modülün tek fonksiyonu olan `Page`, herhangi bir iş mantığı veya durum yönetimi içermeksizin, dinamik olarak içe aktarılmış olan `AdminProductsPage` arayüz bileşenini doğrudan döndürerek sayfayı oluşturur.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, parametresiz bir Next.js sayfa giriş noktasıdır ve dinamik import ile `AdminProductsPage` bileşenini render eder.
+
+[Aksiyom 1]: Eğer `AdminProductsPage` modülü (yolu bilinmiyor) import edilemez veya var olmazsa, sayfa render sırasında hata fırlatır ve yönetim paneli ürün sayfası gösterilemez.
+
+[Aksiyom 2]: Eğer `AdminProductsPage` bileşeni geçerli bir React/Next.js bileşeni olarak export edilmezse (örn: `default` export eksik veya non-JSX değeri döndürüyor), JSX render hatası oluşur.
+
+[Aksiyom 3]: Eğer dinamik import (`next/dynamic` veya benzeri mekanizma) başarısız olursa (ağ hatası, dosya bulunamaması), istemci tarafında yükleme durumu veya hata UI'ı gösterilmelidir; aksi takdirde boş/bozuk sayfa görüntülenir.
 
 ---
 
@@ -38,18 +44,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## SABİTLER
-- **AdminProductsPage** (call) — `dynamic(
+- **AdminProductsPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminProductsPage'),
-  { ssr:...`
+  { ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx::Page
+### [N1_NASIL] AST Pointer: src/app/admin/products/page.tsx::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<AdminProductsPage />`) – React bileşeni olarak `AdminProductsPage` bileşenini render eder.
+- **ic_degiskenler**: (değişken yok)
+  - Fonksiyon gövdesinde herhangi bir değişken tanımlanmamış veya kullanılmamıştır
+- **Dönüş**: JSX — `AdminProductsPage` dinamik olarak import edilmiş React bileşenini döndürür
 
 ---
 

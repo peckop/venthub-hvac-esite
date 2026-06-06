@@ -3,41 +3,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\__tests__\checkoutHelpers.test.ts
-skeleton_hash: 41dc231c161734eb
+skeleton_hash: 6c3b64045b137716
 entity_hashes:
   func:createMockItem: 80170451f6e8a295
-  overview: df2e6b4fcfd906bb
-generated_at: 2026-05-28T22:38:50Z
+  overview: f0343d3cad55c313
+generated_at: 2026-06-06T21:56:19Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin ödeme (checkout) süreçlerine ait birim testlerinde kullanılmak üzere, testlerin tutarlı ve tekrarlanabilir çalışmasını sağlamak için gerekli olan yapay test verilerini (mock sepet öğeleri) oluşturma sorumluluğuna sahiptir. Modül, yalnızca test ortamına yönelik, test senaryolarını besleyen standart veri üretici bir yardımcı fonksiyon barındırır.
+VentHub HVAC projesinin ödeme (checkout) süreçleri için kullanılan test yardımcı modülüdür. Modül, birim testlerde tutarlı ve tekrarlanabilir test senaryoları oluşturmak amacıyla yapay sepet öğesi (CartItem) verileri üretmekle sorumludur.
 
 ## Fonksiyon Grupları
-### Mock Test Verisi Üreticileri
-Test senaryolarında gereken, gerçek sepet verisi yapısına (CartItem) birebir uygun, kontrol edilebilir yapay test nesneleri üretmekten sorumludur. Bu sayede testler, dış bağımlılık olmaksızın ve beklenen formatta verilerle çalışabilir.
+### Mock Veri Üreticileri
+Test ortamında kullanılacak yapay sepet öğesi nesnelerini, tanımlı parametrelerle (id, miktar, fiyat) birebir üretmekten sorumludur.
 - createMockItem
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, test senaryolarında kullanılacak mock sepet öğesi verisi üretmek için tasarlanmış bir test yardımcı modülüdür.
 
-[Aksiyom 1]: Eğer `id` parametresi sağlanmazsa, fonksiyon çağrısı hata verir veya geçersiz mock veri üretilir.
+Bu modül test ortamına yönelik yapay test nesneleri üreten bir yardımcı fonksiyon modülüdür.
 
-[Aksiyom 2]: Eğer `quantity` parametresi sağlanmazsa, fonksiyon çağrısı hata verir veya geçersiz mock veri üretilir.
+[Aksiyom 1]: Eğer `id` parametresi olarak boş bir string (`""`) geçilirse, fonksiyon hata fırlatmaz ve `id` alanı boş string olarak ayarlanmış bir mock nesne döndürür.
 
-[Aksiyom 3]: Eğer `productPrice` parametresi sağlanmazsa, fonksiyon çağrısı hata verir veya geçersiz mock veri üretilir.
+[Aksiyom 2]: Eğer `quantity` parametresi olarak negatif bir sayı geçilirse, fonksiyon bunu doğrudan mock nesnesine yazar; negatif değer kontrolü veya doğrulaması yapılmaz.
 
-[Aksiyom 4]: Eğer `unitPrice` parametresi sağlanmazsa, üretilen mock öğede birim fiyatı için bilinmeyen bir varsayılan değer kullanılır.
+[Aksiyom 3]: Eğer `productPrice` parametresi olarak negatif bir sayı geçilirse, fonksiyon bunu doğrudan mock nesnesine yazar; fiyat doğrulaması yapılmaz.
 
-[Aksiyom 5]: Fonksiyon sadece test ortamında kullanılmalıdır; üretim (production) kodunda doğrudan çağrılmamalıdır.
+[Aksiyom 4]: Eğer `unitPrice` parametresi geçirilmezse, oluşturulan mock nesnenin `unitPrice` alanı `undefined` olarak ayarlanır.
 
-[Aksiyom 6]: Fonksiyonun döndürdüğü mock öğe nesnesinin yapısı, gerçek sepet öğesi formatıyla uyumlu olmalıdır (testlerin geçerliliği için).
+[Aksiyom 5]: Fonksiyon her çağrısında, verilen parametrelerle tutarlı ve deterministik (rastgelelik içermeyen, zaman bağımsız) bir `CartItem` yapısı döndürür.
 
-[Aksiyom 7]: Eğer `quantity` negatif bir değer olarak sağlanırsa, davranış bilinmiyor (fonksiyon imzasında doğrulama belirtilmemiştir).
-
-[Aksiyom 8]: Eğer `productPrice` negatif veya sıfır değer olarak sağlanırsa, davranış bilinmiyor (fonksiyon imzasında doğrulama belirtilmemiştir).
+[Aksiyom 6]: Fonksiyonun döndürdüğü nesne, `id`, `quantity`, `productPrice` ve opsiyonel `unitPrice` alanlarını içerir; bu alanlardan farklı bir alan barındırmaz veya eksik alan bırakmaz (opsiyonel `unitPrice` hariç).
 
 ---
 
@@ -61,69 +58,70 @@ Bu modül, test senaryolarında kullanılacak mock sepet öğesi verisi üretmek
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `checkoutHelpers.test.ts::createMockItem`
-- **params**:
-  - `id: string` — mock ürünün kimliği
-  - `quantity: number` — ürün miktarı
-  - `productPrice: number` — ürün fiyatı (unitPrice yoksa fallback olarak kullanılır)
-  - `unitPrice?: number` — birim fiyat (opsiyonel, sağlanmazsa product.price kullanılır)
-- **ic_degiskenler**: yok
-- **Dönüş**: `CartItem` — id, quantity, product: { price: productPrice }, unitPrice alanlarını içeren mock nesne
+### [N1_NASIL] AST Pointer: src/utils/__tests__/checkoutHelpers.test.ts::createMockItem
+- **params**: `(id: string, quantity: number, productPrice: number, unitPrice?: number)`
+- **ic_degiskenler**:
+  - (yerel değişken yok — parametreler direkt nesne oluşturmak için kullanılır)
+- **Dönüş**: `CartItem` — Verilen parametrelerden oluşan mock bir CartItem nesnesi döner; `product.price` alanını `productPrice`'dan, `unitPrice`'ı opsiyonel parametreden alır
 
 ---
 
-### [N2_NASIL] AST Pointer: `checkoutHelpers.test.ts::describe callback`
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — testleri gruplandıran describe bloğu, yan etkisi olarak 5 adet test case'i Vitest runner'a kaydeder
-
----
-
-### [N3_NASIL] AST Pointer: `checkoutHelpers.test.ts::it callback (empty array)`
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — getPriceHashLocal([]) çağrısının '[]' döndüğünü doğrular
-
----
-
-### [N4_NASIL] AST Pointer: `checkoutHelpers.test.ts::it callback (unitPrice fallback)`
+### [N2_NASIL] AST Pointer: src/utils/__tests__/checkoutHelpers.test.ts::describe_callback_(anonim)
 - **params**: yok
 - **ic_degiskenler**:
-  - `items` — createMockItem ile oluşturulmuş iki elemanlı mock CartItem dizisi; biri unitPrice ile (90), diğeri sadece productPrice ile (50)
-  - `result` — getPriceHashLocal(items) çağrısının döndürdüğü JSON string sonucu
-  - `parsed` — result'ın JSON.parse ile çözümlenmiş hali; [{id, qty, unit}] yapısında dizi
-- **Dönüş**: yok — parsed sonucununtoEqual ile beklenen [{id:'item-1',qty:2,unit:90},{id:'item-2',qty:1,unit:50}] dizisine eşitliğini doğrular
+  - (bu callback içinde doğrudan değişken tanımlanmaz — sadece `it()` çağrılır)
+- **Dönüş**: yok — `getPriceHashLocal` fonksiyonunu test eden 5 adet test senaryosunu çalıştırır
 
 ---
 
-### [N5_NASIL] AST Pointer: `checkoutHelpers.test.ts::it callback (decimal rounding)`
+### [N3_NASIL] AST Pointer: src/utils/__tests__/checkoutHelpers.test.ts::it_callback_"should return an empty array string for an empty list"
 - **params**: yok
 - **ic_degiskenler**:
-  - `items` — createMockItem ile oluşturulmuş iki elemanlı mock CartItem dizisi; ondalık fiyatlarla (10.121 ve 15.559)
-  - `result` — getPriceHashLocal(items) çağrısının döndürdüğü JSON string sonucu
-  - `parsed` — result'ın JSON.parse ile çözümlenmiş hali; yuvarlanmış unit değerleri içerir
-- **Dönüş**: yok — parsed sonucunun ondalık fiyatların doğru yuvarlandığını doğrular (10.12 ve 15.56)
+  - (hiçbir değişken tanımlanmaz — doğrudan expect çağrılır)
+- **Dönüş**: yok — `getPriceHashLocal([])` çağrısının `'[]'` döndüğünü doğrular
 
 ---
 
-### [N6_NASIL] AST Pointer: `checkoutHelpers.test.ts::it callback (sort by id)`
+### [N4_NASIL] AST Pointer: src/utils/__tests__/checkoutHelpers.test.ts::it_callback_"should use unitPrice if provided, otherwise fallback to product.price"
 - **params**: yok
 - **ic_degiskenler**:
-  - `items` — createMockItem ile oluşturulmuş üç elemanlı mock CartItem dizisi; ids'leri sırasız (z-item, a-item, m-item)
-  - `result` — getPriceHashLocal(items) çağrısının döndürdüğü JSON string sonucu
-  - `parsed` — result'ın JSON.parse ile çözümlenmiş hali; id'ye göre alfabetik sıralanmış dizi
-- **Dönüş**: yok — parsed sonucunun id'ye göre alfabetik sıralı (a-item, m-item, z-item) olduğunu doğrular
+  - `items` — `createMockItem` ile oluşturulmuş iki elemanlı mock CartItem dizisi; birinde `unitPrice` 90 olarak verilmiş, diğerinde verilmemiş (fallback davranışı test edilir)
+  - `result` — `getPriceHashLocal(items)` çağrısının döndüğü JSON string; hash karşılaştırması yapılır
+  - `parsed` — `JSON.parse(result)` ile elde edilmiş parsed nesne dizisi; `{ id, qty, unit }` formatında beklenen değerlerle `toEqual` ile karşılaştırılır
+- **Dönüş**: yok — unitPrice mevcutsa onu, yoksa product.price'ı kullanma davranışını doğrular
 
 ---
 
-### [N7_NASIL] AST Pointer: `checkoutHelpers.test.ts::it callback (duplicate ids)`
+### [N5_NASIL] AST Pointer: src/utils/__tests__/checkoutHelpers.test.ts::it_callback_"should handle decimal prices and apply rounding correctly"
 - **params**: yok
 - **ic_degiskenler**:
-  - `items` — createMockItem ile oluşturulmuş iki elemanlı mock CartItem dizisi; her ikisi de 'dup-item' idsine sahip (farklı unitPrice değerleri: 100 ve 90)
-  - `result` — getPriceHashLocal(items) çağrısının döndürdüğü JSON string sonucu
-  - `parsed` — result'ın JSON.parse ile çözümlenmiş hali; iki elemanlı dizi, her ikisinin de id'si 'dup-item'
-  - `units` — parsed dizisi üzerinde `.map((p) => p.unit)` ile oluşturulmuş, sadece unit değerlerinden oluşan dizi [100, 90]
-- **Dönüş**: yok — parsed[0].id ve parsed[1].id'nin 'dup-item' olduğunu, units dizisinin 100 ve 90 değerlerini içerdiğini doğrular
+  - `items` — `createMockItem` ile oluşturulmuş iki elemanlı mock CartItem dizisi; birinde ondalık fiyat 10.121 (aşağı yuvarlama beklenir), diğerinde hem productPrice 20.999 hem unitPrice 15.559 (yukarı yuvarlama beklenir)
+  - `result` — `getPriceHashLocal(items)` çağrısının döndüğü JSON string
+  - `parsed` — `JSON.parse(result)` ile elde edilmiş parsed nesne dizisi; yuvarlanmış fiyatlarla (`10.12`, `15.56`) `toEqual` karşılaştırması yapılır
+- **Dönüş**: yok — ondalıklı fiyatların doğru yuvarlanıp yuvarlanmadığını doğrular
+
+---
+
+### [N6_NASIL] AST Pointer: src/utils/__tests__/checkoutHelpers.test.ts::it_callback_"should sort items by id"
+- **params**: yok
+- **ic_degiskenler**:
+  - `items` — `createMockItem` ile oluşturulmuş üç elemanlı mock CartItem dizisi; id'ler sırasıyla `z-item`, `a-item`, `m-item` (sıralanma davranışı test edilir)
+  - `result` — `getPriceHashLocal(items)` çağrısının döndüğü JSON string
+  - `parsed` — `JSON.parse(result)` ile elde edilmiş parsed nesne dizisi; alfabetik sırayla (`a-item`, `m-item`, `z-item`) `toEqual` karşılaştırması yapılır
+- **Dönüş**: yok — sonuçların id'ye göre alfabetik sıralı olup olmadığını doğrular
+
+---
+
+### [N7_NASIL] AST Pointer: src/utils/__tests__/checkoutHelpers.test.ts::it_callback_"should handle two items with the same ID"
+- **params**: yok
+- **ic_degiskenler**:
+  - `items` — `createMockItem` ile oluşturulmuş iki elemanlı mock CartItem dizisi; her ikisi de aynı id'ye (`dup-item`) sahip ama farklı unitPrice'lara (100 ve 90) sahip
+  - `result` — `getPriceHashLocal(items)` çağrısının döndüğü JSON string
+  - `parsed` — `JSON.parse(result)` ile elde edilmiş parsed nesne dizisi; uzunluk ve id eşitliği kontrolleri yapılır
+  - `parsed[0]` — sıralanmış dizideki ilk eleman; `.id` alanı `dup-item` olmalı
+  - `parsed[1]` — sıralanmış dizideki ikinci eleman; `.id` alanı `dup-item` olmalı
+  - `units` — `parsed.map((p: { unit: number }) => p.unit)` ile elde edilmiş birim fiyat dizisi; 100 ve 90 değerlerini içermeli
+- **Dönüş**: yok — aynı id'ye sahip iki ürünün dizide korunup korunmadığını ve her iki unitPrice'ın da sonuçta yer alıp almadığını doğrular
 
 ---
 

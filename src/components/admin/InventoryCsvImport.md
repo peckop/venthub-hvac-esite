@@ -3,39 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryCsvImport.tsx
-skeleton_hash: 761e75d04491351f
+skeleton_hash: 07494bb5cb231527
 entity_hashes:
   func:InventoryCsvImport: 312fdc52cc14a1c7
-  overview: e2963426468ad6fc
+  overview: cb53e1e441eee9fe
   style_tokens: 3e4e1345adb17abc
-generated_at: 2026-05-29T18:44:43Z
+generated_at: 2026-06-06T21:54:43Z
 ---
 
 ## Genel Bakış
-Bu modül, CSV dosyaları aracılığıyla envanter (stok) verilerinin toplu olarak içe aktarılmasını sağlayan bir React bileşenidir. Kullanıcıya dosya yükleme, verileri önizleme ve onaylama, ardından seçilen eşik değerine göre stok ayarlama işlemi sunar.
+Bu modül, CSV dosyaları aracılığıyla envanter verilerinin toplu olarak içe aktarılmasını sağlayan tek bir React bileşeninden oluşur. Modal yapısında çalışan bileşen, dosya yükleme, veri doğrulama, önizleme ve eşik değerine göre stok güncelleme süreçlerini yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Envanter CSV içe aktarma sürecinin tüm kullanıcı arayüzü ve iş mantığını yönetir; dosya seçimi, doğrulama, önizleme ve nihai işleme adımlarını tek bir yerde toplar.
+Tüm CSV içe aktarma iş akışını (dosya seçimi, doğrulama, önizleme ve nihai işleme) tek bir yerde yönetir ve üst bileşenle iletişim için callback fonksiyonları kullanır.
 - InventoryCsvImport
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bir modal/dialog yapısı olarak tasarlanmıştır ve dış bağımlılıkların sağlanması gerekmektedir.
+Bu modül, CSV tabanlı envanter içe aktarma işlevi sağlayan bir React bileşenidir. Fonksiyon gövdesi erişilebilir olmadığından, yalnızca fonksiyon imzası ve modül bağlamından çıkarılabilen yapısal aksiyomlar tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `onClose` callback'i sağlanmazsa, kullanıcı modalı kapatamaz ve bileşen çıkışsız kalır.
+[Aksiyom 1]: Eğer `onClose` callback fonksiyonu sağlanmazsa, modal bileşenin kullanıcı tarafından kapatılması sonrasında üst bileşen durumu güncellenemez ve bileşen kalıcı olarak açık kalabilir.
 
-[Aksiyom 2]: Eğer `onSuccess` callback'i sağlanmazsa, başarılı CSV içe aktarma işlemi sonrasında üst bileşene bildirim yapılamaz.
+[Aksiyom 2]: Eğer `onSuccess` callback fonksiyonu sağlanmazsa, CSV içe aktarma işlemi başarılı bir şekilde tamamlansa bile üst bileşen başarı durumundan haberdar olamaz; ilgili veri yenileme veya bildirim tetiklenemez.
 
-[Aksiyom 3]: Eğer `effectiveThreshold` değeri sağlanmazsa, envanter verilerinin eşik bazlı işlenmesinde tanımsız davranış oluşur.
+[Aksiyom 3]: Eğer `isOpen` prop'u `true` olarak ayarlanmazsa, modal bileşen render edilmez veya görünür hale gelmez; bu durumda içe aktarma işlevi kullanıcıya sunulmaz.
 
-[Aksiyom 4]: Eğer `isOpen` false veya tanımsız ise, modal görünür olmaz (bileşen rendered olmayabilir).
+[Aksiyom 4]: Eğer `effectiveThreshold` parametresi geçerli bir sayısal değer olarak sağlanmazsa (örn: `undefined`, `null`, veya negatif değer), envanter eşik kontrolü sırasında beklenmeyen davranışlar oluşabilir; eşik değerinin pozitif bir sayı olması beklenir.
 
-[Aksiyom 5]: Eğer bileşen bir üst bileşen tarafından DOM'a yerleştirilmemişse (örn: bir Modal portal içinde değilse), dosya seçme ve doğrulama akışı görünür şekilde çalışmaz.
-
-[Aksiyom 6]: Eğer `effectiveThreshold` geçerli bir sayısal değer değilse (null, undefined veya string), eşik bazlı filtreleme/kabul kriteri uygulanamaz.
+[Aksiyom 5]: Eğer modal açıkken (`isOpen: true`) kullanıcı dosya yükleme sürecini başlatmazsa veya geçerli bir CSV dosyası seçmezse, içe aktarma işlemi ilerleyemez ve önizleme adımı gösterilemez.
 
 ---
 
@@ -76,139 +74,125 @@ Bu modül, bir modal/dialog yapısı olarak tasarlanmıştır ve dış bağıml�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleCsvImport
-- **params**: `file` (File) — CSV dosyası nesnesi
+### [N1_NASIL] AST Pointer: `InventoryCsvImport.tsx`::handleCsvImport (anonim async arrow — file parse)
+- **params**: `(file: File)` — yüklenen CSV dosyası
 - **ic_degiskenler**:
-  - `csvPreview` — CSV önizleme satırlarını tutan state (başlangıçta temizlenir)
-  - `textRaw` — Dosyadan okunan ham metin içeriği
-  - `text` — BOM karakteri temizlenmiş metin
-  - `lines` — Boş satırları filtrelenmiş CSV satırları dizisi
-  - `split` — CSV satırlarını virgülle ayıran ve tırnak işaretlerini işleyen yardımcı fonksiyon
-  - `headerRaw` — İlk satırın küçük harfe çevrilmiş ve boşlukları temizlenmiş hali
-  - `skuIdx` — SKU sütununun indeksi
-  - `qtyIdx` — Miktar sütununun indeksi (qty/quantity/stock/new_stock alternatifleriyle)
-  - `parsedRows` — Geçerli CSV satırlarının (line, sku, newQty) dizisi
-  - `errors` — Hatalı satırların (line, sku, message) dizisi
-  - `i` — For döngüsü sayaç değişkeni (satır numarası)
-  - `cells` — Mevcut satırın hücre değerleri dizisi
-  - `sku` — Mevcut satırın SKU değeri (trimmed)
-  - `qtyStr` — Mevcut satırın miktar değeri string olarak
-  - `newQty` — Sayıya çevrilmiş miktar (geçersiz ise NaN)
-  - `skus` — Benzersiz SKU değerlerinin dizisi
-  - `products` — Veritabanından getirilen ürün verileri (id, sku, name, stock_qty)
-  - `skuToProduct` — SKU'dan ürüne eşleme Map'i
-  - `preview` — Oluşturulan CsvPreviewRow dizisi
-  - `row` — parsedRows dizisinin her bir elemanı
-  - `product` — Mevcut satırın SKU'suna karşılık gelen ürün
-  - `th` — Ürün için eşik değeri (effectiveThreshold ile hesaplanan)
-  - `status` — Ürünün stok durumu ('out', 'critical' veya null)
-- **Dönüş**: yok (state günceller ve toast gösterir)
+  - `textRaw` — dosyanın ham string içeriği (`file.text()` sonucu)
+  - `text` — BOM karakteri (`\ufeff`) temizlenmiş CSV metni
+  - `lines` — boş satırları filtrelenmiş CSV satır dizisi
+  - `split` — virgülle splitting yapan inner fonksiyon, tırnak içi virgülleri korur
+  - `headerRaw` — küçük harfe normalize edilmiş başlık sütun adları dizisi
+  - `skuIdx` — başlık satırında `sku` sütununun indexi (-1 ise yok)
+  - `qtyIdx` — başlık satırında qty/quantity/stock/new_stock sütununun indexi
+  - `parsedRows` — `{ line: number; sku: string; newQty: number }` geçerli satırlar dizisi
+  - `errors` — `{ line: number; sku: string; message: string }` hata satırlar dizisi
+  - `cells` — mevcut satırın split edilmiş hücreleri
+  - `sku` — mevcut satırın SKU değeri (trimmed)
+  - `qtyStr` — mevcut satırın miktar ham string'i
+  - `newQty` — parse edilmiş miktar sayısı (NaN olabilir)
+  - `skus` — parsedRows'dan tekrarsız SKU listesi (`Set` → array)
+  - `products` — Supabase'den gelen eşleşen ürün kayıtları (`id, sku, name, stock_qty`)
+  - `skuToProduct` — SKU → `{ id, name, stock }` Map'i
+  - `preview` — `CsvPreviewRow[]` önizleme satırları dizisi
+  - `product` — mevcut satır için SKU'dan bulunan ürün bilgisi
+  - `th` — `effectiveThreshold(product.id)` çağrısıyla dönen eşik değeri
+  - `status` — `'out' | 'critical' | null` ürün stok durumu flag'i
+- **Dönüş**: yok (state setter'ları `setCsvPreview` ve `toast` ile yan etki)
 
-### [N2_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleCsvProcess
+---
+
+### [N2_NASIL] AST Pointer: `InventoryCsvImport.tsx`::handleProcessCsv (anonim async arrow — CSV işleme)
 - **params**: yok
 - **ic_degiskenler**:
-  - `csvPreview` — İşlenecek CSV önizleme verisi
-  - `csvProcessing` — İşlem durumunu takip eden state
-  - `csvProgress` — İlerleme yüzdesi state'i
-  - `skus` — csvPreview'deki tüm SKU'ların dizisi
-  - `products` — Veritabanından getirilen ürün verileri (id, sku)
-  - `skuToId` — SKU'dan product_id'ye eşleme Map'i
-  - `dryRun` — Kuru çalıştırma modu (true ise gerçek işlem yapılmaz)
-  - `successCount` — Başarılı güncelleme sayısı sayaacı
-  - `errors` — Hatalı işlemlerin (sku, message) dizisi
-  - `batchId` — İşlem batch ID'si (generateId ile oluşturulan)
-  - `BATCH_SIZE` — Toplu işlem boyutu (20)
-  - `i` — For döngüsü sayaç değişkeni
-  - `chunk` — Mevcut toplu iş parçası (csvPreview.slice ile)
-  - `item` — chunk içindeki her bir eleman
-  - `_productId` — Mevcut SKU'nun product_id karşılığı
-  - `reason` — Stok hareketi açıklaması
-  - `error` — supabase.rpc hatası
-  - `logAdminAction` — Dinamik import edilen audit log fonksiyonu
-  - `err` — Try-catch'te yakalanan hata
-  - `downloadErrors` — Hataları CSV olarak indiren yerel fonksiyon
-  - `header` — Hata CSV başlık satırı
-  - `lines` — Hata satırları
-  - `csv` — Oluşturulan hata CSV içeriği
-  - `blob` — CSV verisi için Blob nesnesi
-  - `url` — Blob için oluşturulan URL
-  - `a` — İndirme bağlantısı için HTML anchor elementi
-  - `id` — toast.custom tarafından verilen toast ID'si
-- **Dönüş**: yok (onSuccess() ve onClose() çağırır)
+  - `skus` — `csvPreview` dizisinden çıkarılmış SKU listesi
+  - `products` — Supabase'den gelen `{ sku, id }` eşleşen ürün kayıtları
+  - `skuToId` — SKU → ürün ID Map'i
+  - `successCount` — başarılı stok güncelleme sayacı
+  - `errors` — `{ sku: string; message: string }` hata listesi
+  - `batchId` — `generateId()` ile üretilen benzersiz batch kimliği
+  - `BATCH_SIZE` — toplu işlem boyutu (sabit: 20)
+  - `chunk` — mevcut batch'in `csvPreview` alt dizisi
+  - `_productId` — SKU'dan bulunan ürün ID'si
+  - `reason` — hareket açıklaması (`CSV import: add/remove ...`)
+  - `downloadErrors` — inner fonksiyon; hataları CSV olarak indirir
+  - `header` — hata CSV başlık satırı (`['sku', 'message']`)
+  - `lines` — hata satırlarının CSV formatlanmış hali
+  - `csv` — BOM eklenmiş tam hata CSV stringi
+  - `blob` — CSV içeriğinden oluşturulan Blob nesnesi
+  - `url` — Blob için oluşturulan object URL
+  - `a` — indirme için geçici `<a>` DOM elementi
+  - `id` — `toast.custom` callback parametresi, toast instance ID'si
+  - `undone` — `reverse_inventory_batch` RPC sonucu geri alınan hareket sayısı
+- **Dönüş**: yok (toast, state setter'ları, `onClose()`, `onSuccess()` yan etkileri)
 
-### [N3_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::processItem
-- **params**: `item` (CsvPreviewRow) — İşlenecek CSV satır verisi
+---
+
+### [N3_NASIL] AST Pointer: `InventoryCsvImport.tsx`::processItem (anonim async arrow — tekil ürün işleme, batch içinde)
+- **params**: `(item)` — `csvPreview` satır nesnesi (`{ sku, delta, ... }`)
 - **ic_degiskenler**:
-  - `skuToId` — SKU'dan product_id'ye eşleme Map'i (dış kapsamdan)
-  - `_productId` — Mevcut SKU'nun product_id karşılığı
-  - `reason` — Stok hareketi açıklaması
-  - `error` — supabase.rpc hatası
-  - `logAdminAction` — Dinamik import edilen audit log fonksiyonu
-  - `batchId` — İşlem batch ID'si (dış kapsamdan)
-  - `err` — Try-catch'te yakalanan hata
-  - `successCount` — Başarılı güncelleme sayacı (dış kapsamdan, güncellenir)
-  - `errors` — Hatalar dizisi (dış kapsamdan, güncellenir)
-- **Dönüş**: yok (successCount artırır veya errors'a ekler)
+  - `_productId` — `skuToId.get(item.sku)` ile elde edilen ürün UUID'si
+  - `reason` — dinamik hareket sebebi stringi (add/remove ve mutlak delta)
+  - `error` — `supabase.rpc('adjust_stock', ...)` destructured hata nesnesi
+  - `logAdminAction` — dinamik import ile yüklenen audit log fonksiyonu
+- **Dönüş**: yok (rpc çağrısı, audit log, `successCount++` yan etkisi; catch'te `errors.push`)
 
-### [N4_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::downloadErrors
+---
+
+### [N4_NASIL] AST Pointer: `InventoryCsvImport.tsx`::downloadErrors (anonim arrow — hata CSV indirme)
 - **params**: yok
 - **ic_degiskenler**:
-  - `errors` — Hatalı işlemlerin dizisi (dış kapsamdan)
-  - `header` — CSV başlık satırı ['sku', 'message']
-  - `lines` — Her hata için CSV formatında satır
-  - `csv` — BOM ile başlayan tam CSV içeriği
-  - `blob` — CSV verisi için Blob nesnesi
-  - `url` — Blob için oluşturulan URL
-  - `a` — İndirme bağlantısı için HTML anchor elementi
-- **Dönüş**: yok (dosya indirme tetikler)
+  - `header` — CSV başlık dizisi `['sku', 'message']`
+  - `lines` — her hatanın CSV escape edilmiş satır dizisi
+  - `csv` — BOM (`\ufeff`) ile birleştirilmiş tam CSV metni
+  - `blob` — CSV metninden oluşan `Blob` nesnesi (`type: text/csv`)
+  - `url` — `URL.createObjectURL` ile üretilen geçici dosya URL'i
+  - `a` — programatik oluşturulmuş `<a>` elementi (click ile indirme tetiklenir)
+- **Dönüş**: yok (DOM elementi click ve `URL.revokeObjectURL` ile temizlik)
 
-### [N5_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::renderToastContent
-- **params**: `id` (string) — toast.custom tarafından verilen toast ID'si
+---
+
+### [N5_NASIL] AST Pointer: `InventoryCsvImport.tsx`::toastContentRenderer (anonim arrow — toast JSX renderer)
+- **params**: `(id)` — toast instance ID'si (string)
 - **ic_degiskenler**:
-  - `successCount` — Başarılı güncelleme sayısı (dış kapsamdan)
-  - `batchId` — İşlem batch ID'si (dış kapsamdan)
-  - `errors` — Hatalı işlemlerin dizisi (dış kapsamdan)
-  - `downloadErrors` — Hataları indiren fonksiyon (dış kapsamdan)
-  - `csvUndoingRef` — Geri alma işlemini takip eden ref
-  - `onSuccess` — Başarı callback'i (dış kapsamdan)
-- **Dönüş**: JSX elementi (toast içeriği)
+  - `batchId` — üst scope'tan gelen batch ID (JSX içinde link URL'inde kullanılır: `/admin/movements?batch=${batchId}`)
+  - `successCount` — üst scope'tan gelen başarılı güncelleme sayısı (JSX içinde gösterilir)
+  - `errors` — üst scope'tan gelen hata dizisi (length > 0 ise hata butonu render edilir)
+  - `downloadErrors` — üst scope'tan gelen hata indirme fonksiyonu reference'i
+- **Dönüş**: JSX (`<div>` — glass-strong styled toast bileşeni, içinde link ve butonlar)
 
-### [N6_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleUndo
+---
+
+### [N6_NASIL] AST Pointer: `InventoryCsvImport.tsx`::handleUndo (anonim async arrow — geri alma handler'ı, toast içinde)
 - **params**: yok
 - **ic_degiskenler**:
-  - `csvUndoingRef` — Geri alma işlemini takip eden ref
-  - `batchId` — İşlem batch ID'si (dış kapsamdan)
-  - `data` — reverse_inventory_batch RPC sonucu
-  - `error` — RPC hatası
-  - `undone` — Geri alınan hareket sayısı
-  - `e` — Try-catch'te yakalanan hata
-- **Dönüş**: yok (toast gösterir ve onSuccess() çağırır)
+  - `csvUndoingRef` — `useRef<boolean>` flag'ı, çifte tıklama engeli (current erişimi)
+  - `data` — `supabase.rpc('reverse_inventory_batch', ...)` sonucu geri alınan satır sayısı
+  - `error` — RPC sonucu destructured hata nesnesi
+  - `undone` — `Number(data || 0)` ile parse edilmiş geri alınan hareket sayısı
+  - `e` — catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: yok (`onSuccess()`, `toast.success`/`toast.error`, `toast.dismiss(id)` yan etkileri)
 
-### [N7_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleFileChange
-- **params**: `e` (ChangeEvent<HTMLInputElement>) — Dosya input değişiklik olayı
-- **ic_degiskenler**:
-  - `file` — Seçilen dosya (e.target.files[0])
-  - `handleCsvImport` — CSV import fonksiyonu (dış kapsamdan)
-- **Dönüş**: yok (handleCsvImport çağırır)
+---
 
-### [N8_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::handleKeyDown
-- **params**: `e` (KeyboardEvent) — Klavye olayı
+### [N7_NASIL] AST Pointer: `InventoryCsvImport.tsx`::handleFileChange (anonim arrow — dosya input onChange)
+- **params**: `(e)` — React `ChangeEvent<HTMLInputElement>` olay nesnesi
 - **ic_degiskenler**:
-  - `dryRun` — Kuru çalıştırma modu state'i
-  - `setDryRun` — dryRun state setter'ı
-- **Dönüş**: yok (dryRun toggle eder)
+  - `file` — `e.target.files?.[0]` ile alınan ilk dosya reference'ı
+- **Dönüş**: yok (`handleCsvImport(file)` çağrısı ile yan etki)
 
-### [N9_NASIL] AST Pointer: src/components/admin/InventoryCsvImport.tsx::renderPreviewRow
-- **params**: 
-  - `item` (CsvPreviewRow) — Önizleme satır verisi
-  - `idx` (number) — Satır indeksi
-- **ic_degiskenler**:
-  - `item.name` — Ürün adı
-  - `item.sku` — Ürün SKU'su
-  - `item.current` — Mevcut stok miktarı
-  - `item.new` — Yeni stok miktarı
-  - `item.delta` — Stok değişim miktarı
-- **Dönüş**: JSX table row elementi
+---
+
+### [N8_NASIL] AST Pointer: `InventoryCsvImport.tsx`::handleDryRunToggle (anonim arrow — keyboard handler)
+- **params**: `(e)` — `KeyboardEvent` olay nesnesi
+- **ic_degiskenler**: (yok — sadece parametre kullanılır)
+- **Dönüş**: yok (`setDryRun(!dryRun)` state setter ile yan etki)
+
+---
+
+### [N9_NASIL] AST Pointer: `InventoryCsvImport.tsx`::renderRow (anonim arrow — tablo satır renderer)
+- **params**: `(item, idx)` — `item: CsvPreviewRow` önizleme satırı, `idx: number` satır indexi
+- **ic_degiskenler**: (yok — sadece parametre ve JSX template kullanımı)
+- **Dönüş**: JSX (`<tr>` — hover efektli, SKU/name/current/new/delta sütunlu tablo satırı; `item.delta` rengine göre `text-emerald-400` veya `text-rose-400`conditional class)
 
 ---
 

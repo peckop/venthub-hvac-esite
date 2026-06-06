@@ -3,36 +3,40 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\QuickViewModal.tsx
-skeleton_hash: dede96518b31d438
+skeleton_hash: 00d87e64807a05c6
 entity_hashes:
   func:QuickViewModal: debc62013d59b5ee
   func:handleAdd: 552a96581034d630
-  overview: 3c7154223e99d479
+  overview: 8af2669fbee6ab56
   style_tokens: a0d16d1087294b08
-generated_at: 2026-05-28T22:36:55Z
+generated_at: 2026-06-06T21:54:53Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinde ürünlerin hızlı önizlemesini sağlamak için kullanılan bir React modal bileşenidir. Bileşen, ürün verilerini alır, modal'ın açık/kapalı durumunu yönetir ve ürün ile ilgili kullanıcı eylemlerini işler.
+QuickViewModal, ürünlerin hızlı önizlemesini sunan bir modal bileşenidir. Ürün detaylarını görüntüler ve kullanıcıların ürünleri sepete eklemesine olanak tanır. Bileşen, modal durumunu ve kullanıcı etkileşimlerini merkezi olarak yönetir.
 
 ## Fonksiyon Grupları
-### Modal Bileşeni
-Ana UI bileşeni olup, ürün detaylarını modal olarak görüntülemekten ve görünürlük durumunu yönetmekten sorumludur. Kullanıcıya hızlı ürün önizleme deneyimi sunar.
+### Ana Modal Bileşeni
+Ürün bilgilerini modal penceresi içinde gösteren ve görünürlük durumunu kontrol eden ana UI bileşenidir.
 - QuickViewModal
 
-### Kullanıcı Etkileşim Yöneticileri
-Kullanıcı etkileşimlerini yakalayan ve ilgili işlemleri tetikleyen yardımcı fonksiyonlardır. Ürün ekleme gibi eylemleri yönetir.
+### Ürün Eylem Yönetimi
+Kullanıcı tarafından tetiklenen ürün ekleme işlemi gibi etkileşimleri işleyen yardımcı fonksiyonlardır.
 - handleAdd
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün çalışması için aşağıdaki varsayımlar gerekli.
 
-[Aksiyom 1]: Eğer `product` prop'u tanımlı değilse, `QuickViewModal` component'i render ederken product özelliklerine erişim hatası olur.  
-[Aksiyom 2]: Eğer `open` prop'u boolean değilse, modalın görünürlüğü kontrolü beklenen şekilde çalışmayabilir.  
-[Aksiyom 3]: Eğer `onClose` prop'u bir fonksiyon değilse, `onClose` çağrıldığında çalışma zamanı hatası olur.  
-[Aksiyom 4]: Eğer `handleAdd` fonksiyonu çağrılırken `product` prop'u tanımlı değilse, ürün ekleme işlemi beklenen şekilde gerçekleşmeyebilir.
+Bu modül, props tabanlı çalışan bir React modal bileşenidir; temel varsayımları fonksiyon imzalarından türetilmiştir.
+
+[Aksiyom 1]: Eğer `product` prop'u verilmezse veya geçerli bir ürün nesnesi içermiyorsa, modal bileşeni ürün bilgisi gösteremez ve render edilen içerik eksik veya hatalı olur.
+
+[Aksiyom 2]: Eğer `open` prop'u verilmezse veya `false` değerindeyse, modal.visible durumu kapalıdır ve kullanıcıya modal penceresi gösterilmez.
+
+[Aksiyom 3]: Eğer `onClose` prop'u verilmezse, kullanıcı modal'ı kapatmaya çalıştığında回调 fonksiyon tetiklenemez ve hata oluşur.
+
+[Aksiyom 4]: `handleAdd()` fonksiyonu çağrıldığında, modal bileşeninin iç bağlamında geçerli bir `product` prop'unun mevcut olması gerekir; aksi takdirde eklenecek ürün bilinmediğinden işlem başarısız olur.
 
 ---
 
@@ -67,23 +71,19 @@ Bu modülün çalışması için aşağıdaki varsayımlar gerekli.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\QuickViewModal.tsx::QuickViewModal
-- **params**: product, open, onClose
+### [N1_NASIL] AST Pointer: QuickViewModal.tsx::QuickViewModal
+- **params**: `{ product, open, onClose }` — product: Product tipinde ürün nesnesi, open: boolean modalın açık olup olmadığını belirler, onClose: callback modalı kapatmak için çağrılır
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, tüm UI metinlerini yerel dile çevirmek için kullanılır
-  - `lang` — useI18n hook'undan alınan aktif dil kodu, ürün fiyatını formatlamak için kullanılır
-  - `addToCart` — useCart hook'undan alınan sepete ürün ekleme fonksiyonu, handleAdd işlevinde çağrılır
-  - `price` — product.price değerinden number tipine dönüştürülmüş ürün fiyatı, para formatlama işleminde kullanılır
-  - `handleAdd` — modal içindeki sepete ekleme butonunun tıklama olayını yöneten iç fonksiyon
-- **Dönüş**: null (open veya product değerleri geçersizse) veya React JSX elementi (hızlı görünüm modal arayüzü)
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu, UI metinlerini uluslararası dil anahtarlarıyla çevirir (t('quickView.title'), t('quickView.addToCart') vb.)
+  - `lang` — useI18n hook'undan dönen aktif dil kodu, formatCurrency'e aktarılarak para birimi formatlamada kullanılır
+  - `addToCart` — useCart hook'undan dönen fonksiyon, verilen Product nesnesini sepete ekler
+  - `price` — Number(product.price) ile product.price'ın number tipine dönüştürülmüş hali, formatCurrency fonksiyonuna argüman olarak geçilir
+- **Dönüş**: `JSX.Element | null` — open veya product falsy ise null döner; aksi halde modal JSX yapısını (dialog, ürün bilgileri, Sepete Ekle ve Ürünü Gör butonları) döner
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\QuickViewModal.tsx::handleAdd
+### [N2_NASIL] AST Pointer: QuickViewModal.tsx::handleAdd
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `addToCart` — üst kapsamdan erişilen sepete ekleme fonksiyonu, modalda gösterilen ürünü sepete eklemek için çağrılır
-  - `product` — üst kapsamdan erişilen modalda görüntülenen ürün nesnesi, addToCart fonksiyonuna parametre olarak iletilir
-  - `onClose` — üst kapsamdan erişilen modalı kapatma callback fonksiyonu, sepete ekleme işlemi sonrası modalı kapatmak için çağrılır
-- **Dönüş**: yok
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — addToCart(product) ile ürünü sepete ekler, ardından onClose() ile modalı kapatır
 
 ---
 

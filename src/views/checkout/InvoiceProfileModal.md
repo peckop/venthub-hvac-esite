@@ -3,38 +3,34 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\InvoiceProfileModal.tsx
-skeleton_hash: d8ff7f27fe67b7db
+skeleton_hash: 439cb76d859bcc9d
 entity_hashes:
   func:InvoiceProfileModal: de25b37c1a2260e8
-  overview: 720b77fe25ff7933
+  overview: d09efa61e0a59dfc
   style_tokens: 7ba01f3f33eb1def
-generated_at: 2026-05-28T22:40:10Z
+generated_at: 2026-06-06T21:58:29Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun ödeme sürecinin fatura adımında kullanılan bir React modal bileşenidir. Kullanıcıların kayıtlı fatura profillerini görüntülemesi ve birini seçerek ödeme akışına devam etmesini sağlar.
+Bu modül, ödeme sürecinin fatura bilgileri adımında kullanılan bir React modal bileşenidir. Kullanıcının kayıtlı fatura profillerini listeden görüntülemesini ve tercih ettiği profili seçerek ödeme akışına devam etmesini sağlar.
 
 ## Fonksiyon Grupları
-### Ana Modal Yönetim Bileşeni
-Modalın tüm temel işlevlerini yerine getiren, dışarıdan alınan girdilerle çalışan tek bileşendir. Görünürlük durumunu kontrol eder, profil listesini sunar ve kullanıcının seçimini veya kapatma işlemini üst bileşene iletir.
+### Modal Bileşeni
+Ödeme sayfasında fatura profili seçimini yöneten modal penceresini sunar. Görünürlük kontrolü, profil listesinin sunulması, profil seçilmesi ve pencerenin kapatılması gibi tüm işlemleri tek bir bileşen içinde üstlenir.
 - InvoiceProfileModal
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React modal bileşeni, fatura profillerinin görüntülenmesi ve seçilmesi için prop'lara bağımlı olarak çalışır. Bağımsız durum yönetimi yoktur.
+Bu React modal bileşeni, fatura profillerinin görüntülenmesi ve seçilmesi için prop'lara bağımlı çalışır. Aşağıda, bileşenin doğru çalışması için gereken mimari varsayımlar listelenmektedir.
 
-[Aksiyom 1]: Eğer `open` prop'u `true` değilse, modal bileşeni kullanıcıya görünür şekilde render edilmez (veya DOM'da yer almaz).
-
-[Aksiyom 2]: Eğer `onClose` prop'u bir fonksiyon değilse (veya verilmemişse), modal kapatma işlemi (X butonu, backdrop tıklama, Escape tuşu) üst bileşene iletilemez ve hata oluşur.
-
-[Aksiyom 3]: Eğer `profiles` prop'u bir dizi (Array) olarak verilmemişse, bileşen fatura profillerini listeleme işlemini yürütemez ve hata oluşur.
-
-[Aksiyom 4]: Eğer `onSelect` prop'u bir fonksiyon değilse (veya verilmemişse), kullanıcının bir fatura profili seçmesi durumunda seçim sonucu üst bileşene iletilemez ve hata oluşur.
-
-[Aksiyom 5]: Eğer `open` prop'u `true` iken `onClose` prop'u çağrılmadan bileşenin unmount edilmesi isteniyorsa, üst bileşenin `open` prop'unu `false` yaparak bileşeni kontrollü şekilde kapatması gerekir, aksi takdirde modal durumu üst bileşenle senkronize kalmaz.
-
-[Aksiyom 6]: Eğer `profiles` prop'u boş bir dizi (`[]`) olarak verilmişse, bileşen "kayıtlı profil bulunmamaktadır" veya benzeri durumu göstermelidir; profilsiz durum için ayrık bir UI dalı gereklidir (bu durumda `onSelect` tetiklenemez).
+[Aksiyom 1]: Eğer `open` prop'u boolean (true/false) olarak sağlanmazsa, modal'ın görünürlük durumu belirsiz olur ve bileşen açılıp kapatılamaz.
+[Aksiyom 2]: Eğer `profiles` prop'u (fatura profilleri listesi) boş bir dizi veya tanımsız değilse, bileşen içeriği doğru şekilde gösterilir; aksi halde "profil bulunamadı" durumu oluşur.
+[Aksiyom 3]: Eğer `onClose` callback fonksiyonu sağlanmazsa, modal'ın kapatılması (X butonu veya dışarı tıklama ile) parent bileşene bildirilemez ve akış kilitlenebilir.
+[Aksiyom 4]: Eğer `onSelect` callback fonksiyonu sağlanmazsa, kullanıcı bir profil seçtiğinde bu seçim parent bileşene iletilemez ve ödeme akışı devam ettirilemez.
+[Aksiyom 5]: Eğer `profiles` içindeki her bir profil nesnesi `id` ve display için gereken alanları (ör. name, tax_id vb.) içermiyorsa, bileşen bu profilleri doğru şekilde listeleyemez veya seçemez.
+[Aksiyom 6]: Eğer `open` prop'u `true` iken modal render edilmezse, bileşen görünmez durumda olsa bile React tarafından mount edilmez ve kapanma mantığı bozulabilir.
+[Aksiyom 7]: Eğer bileşen, fatura profili seçim akışı dışında (ör. farklı bir modal) kullanılırsa, `onSelect` beklenen veri yapısını sağlamayabilir ve downstream hatalar oluşur.
 
 ---
 
@@ -68,16 +64,15 @@ Bu React modal bileşeni, fatura profillerinin görüntülenmesi ve seçilmesi i
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\InvoiceProfileModal.tsx::({ open, onClose, profiles, onSelect })
-- **params**: open, onClose, profiles, onSelect
-- **ic_degiskenler**:
-  - `t` — useI18n() hook'undan alınan çeviri fonksiyonu
-- **Dönüş**: null veya React elementi (JSX)
+### [N1_NASIL] AST Pointer: InvoiceProfileModal.tsx::InvoiceProfileModal
+- **params**: `open, onClose, profiles, onSelect`
+- **ic_degiskenler**: `t` — useI18n hook'undan alınan çeviri fonksiyonu
+- **Dönüş**: React JSX elementi veya null
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\InvoiceProfileModal.tsx::(p) => (...)
-- **params**: p
+### [N2_NASIL] AST Pointer: InvoiceProfileModal.tsx::(p => ...)
+- **params**: `p` — profiles dizisindeki bir fatura profil nesnesi
 - **ic_degiskenler**: (yok)
-- **Dönüş**: React elementi (JSX)
+- **Dönüş**: React JSX button elementi
 
 ---
 

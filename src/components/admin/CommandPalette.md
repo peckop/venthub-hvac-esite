@@ -3,18 +3,18 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\CommandPalette.tsx
-skeleton_hash: 0e3d7cc4dedcdfe7
+skeleton_hash: 738d408fb3f2d88d
 entity_hashes:
   func:CommandPalette: d6aeed4e7453fe44
   func:handleKeyDown: 1487e8d647499b5f
   func:selectItem: 2c4ba43ca43f0c65
-  overview: fc406b88dcf8da4f
+  overview: 6e2ec88e5bcb2e73
   style_tokens: 7dfe1be44eebd77e
-generated_at: 2026-05-28T22:35:38Z
+generated_at: 2026-06-06T21:55:09Z
 ---
 
 ## Genel Bakış
-CommandPalette, yönetim panelinde klavye kısayollarıyla hızlı komut arama ve seçimini sağlayan bir arayüz bileşenidir. Klavye etkileşimlerini yöneterek kullanıcıların komutlar arasında gezinmesini ve seçim yapmasını mümkün kılar.
+CommandPalette, yönetim panelinde klavye kısayollarıyla hızlı komut arama ve seçimini sağlayan bir arayüz bileşenidir. Kullanıcının klavye girdilerini yakalayarak palet içindeki komutlar arasında gezinmesini ve istediğini seçmesini mümkün kılar. Temel olarak, verimli bir navigasyon deneyimi sunmak için klavye etkileşimleri ve seçim mantığını yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
@@ -28,15 +28,14 @@ Kullanıcı klavye girdilerini işleyerek palet içindeki öğeler arasında gez
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, klavye etkileşimleriyle çalışan bir komut paleti arayüzüdür. Fonksiyon gövdesi içeriği paylaşılmadığı için, yalnızca fonksiyon imzalarından türetilen minimum aksiyomlar aşağıdadır.
 
-**[Aksiyom 1]:** Eğer `selectItem` fonksiyonuna geçilen `index` değeri, mevcut öğe listesinin geçerli bir indeks aralığı dışındaysa, öğe seçimi başarısız olur veya tanımsız davranış meydana gelir.
+Bu modül için, verilen fonksiyon imzası bilgilerine dayanarak, fonksiyon gövdeleri bilinmediğinden çıkarılabilecek somut mimari aksiyom bulunmamaktadır.
 
-**[Aksiyom 2]:** Eğer `handleKeyDown` fonksiyonuna geçilen `e` parametresi geçerli bir `React.KeyboardEvent` nesnesi değilse (null/undefined), klavye etkileşimi işlenemez ve fonksiyon hata verir.
+[Aksiyom 1]: Eğer `selectItem` fonksiyonuna geçerli bir `index` parametresi verilmezse (örn: listede olmayan bir indeks), ilgili komut düzgün bir şekilde seçilemez veya uygulama beklenmedik bir duruma düşebilir.
 
-**[Aksiyom 3]:** Eğer `CommandPalette` bileşeni, dışarıdan erişilebilir bir öğe listesi (komut listesi) içermiyorsa veya bu liste boşsa, `selectItem` fonksiyonu anlam ifade etmez ve hiçbir seçim gerçekleşemez.
+[Aksiyom 2]: Eğer `handleKeyDown` fonksiyonuna geçerli bir `React.KeyboardEvent` nesnesi sağlanmazsa, klavye etkileşimleri (örn: yukarı/aşağı ok tuşlarıyla gezinme, Enter ile seçim) işlenemez.
 
-**[Aksiyom 4]:** Eğer bileşenin bağımlı olduğu external state/context (örn: aktif öğe indeksi, öğe listesi) yanlış başlatılmışsa veya sağlanmamışsa, klavye navigasyonu ve seçim mantığı düzgün çalışamaz.
+[Aksiyom 3]: Eğer `CommandPalette` bileşeni, klavye olaylarını dinleyecek bir `onKeyDown` prop'u ile çağrılmazsa, klavye kısayolları çalışmaz.
 
 ---
 
@@ -76,94 +75,140 @@ Bu modül, klavye etkileşimleriyle çalışan bir komut paleti arayüzüdür. F
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::CommandPalette
+### [N1_NASIL] AST Pointer: CommandPalette.tsx::CommandPalette
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `open` — Paletin açık/kapalı durumunu tutar (boolean state)
-  - `search` — Kullanıcının arama kutusuna yazdığı sorgu metni
-  - `products` — Supabase'den getirilen ürün arama sonuçları (SearchResult[])
-  - `loading` — Ürün araması sırasında yükleme durumunu gösterir (boolean state)
-  - `activeIndex` — Klavye ile gezinirde hangi öğenin seçili olduğunu tutar (sayısal index)
-  - `router` — Next.js router örneği, sayfa yönlendirmeleri için kullanılır
-  - `inputRef` — Arama input DOM elemanına erişim için useRef
-  - `navItems` — useMemo ile memoize edilmiş statik navigasyon öğeleri dizisi (label, icon, href)
-  - `totalItems` — useMemo ile hesaplanan toplam seçilebilir öğe sayısı (filteredNav + products)
-  - `filteredNav` — search değerine göre filtrelenmiş navigasyon öğeleri
-  - `down` — useEffect içindeki keydown event handler fonksiyonu (CTRL+K toggle)
-  - `searchProducts` — useEffect içindeki async fonksiyon, supabase products tablosundan ürün arar
-  - `timer` — debounce için setTimeout return değeri
-- **Dönüş**: open false ise `null`, değilse JSX (React komut paleti dialog JSX'i)
+- **ic_degiskenler**: 
+  - `open` — Komut paletinin açık/kapalı durumunu tutan state (React.useState ile oluşturuldu)
+  - `setOpen` — open state'ini güncellemek için kullanılan setter fonksiyonu
+  - `search` — Arama kutusundaki yazıyı tutan state (React.useState ile oluşturuldu)
+  - `setSearch` — search state'ini güncellemek için kullanılan setter fonksiyonu
+  - `products` — Supabase'den getirilen ürün sonuçlarını tutan state array (SearchResult[] tipinde)
+  - `setProducts` — products state'ini güncellemek için kullanılan setter fonksiyonu
+  - `loading` — Arama yükleniyor durumunu tutan boolean state
+  - `setLoading` — loading state'ini güncellemek için kullanılan setter fonksiyonu
+  - `activeIndex` — Klavye navigasyonunda seçili olan öğenin indeksini tutan state
+  - `setActiveIndex` — activeIndex state'ini güncellemek için kullanılan setter fonksiyonu
+  - `router` — Next.js router hook'u ile oluşturulan yönlendirme nesnesi (useRouter())
+  - `inputRef` — Arama input DOM elemanına referans tutan React ref nesnesi
+  - `navItems` — Statik navigasyon öğeleri array'i (React.useMemo ile optimize edildi, 6 öğe: label, icon, href)
+  - `totalItems` — Toplam seçilebilir öğe sayısını hesaplayan değişken (React.useMemo ile optimize edildi, filteredNav.length + products.length)
+  - `filteredNav` — Arama terimine göre filtrelenmiş navigasyon öğeleri array'i (search.length > 0 ise navItems.filter(), değilse navItems)
+  - `e` — handleKeyDown fonksiyonunun parametresi (React.KeyboardEvent), tuş olayı nesnesi
+  - `index` — selectItem fonksiyonunun parametresi (number), seçilecek öğenin indeks değeri
+  - `prodIndex` — Ürün listesindeki göreli indeks hesaplaması (index - filteredNav.length)
+- **Dönüş**: JSX element (komut paleti arayüzü, !open ise null döner)
 
-### [N2_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::navItemsMemo
+### [N2_NASIL] AST Pointer: CommandPalette.tsx::useMemoNavItems
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok — inline array döner)
-- **Dönüş**: Static navigasyon öğeleri dizisi (label, icon, href alanları)
+- **ic_degiskenler**: yok (sadece array literal return eder)
+- **Dönüş**: Array<{ label: string, icon: Component, href: string }> — 6 statik navigasyon öğesi (Panel, Sipariş Yönetimi, Ürün Kataloğu, Stok Durumu, Kullanıcı Yönetimi, Ayarlar)
 
-### [N3_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::totalItemsMemo
+### [N3_NASIL] AST Pointer: CommandPalette.tsx::useMemoTotalItems
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `filteredNav` — search uzunluğu sıfırdan büyükse navItems'ı küçük harfe çevirerek filtreler, değilse tüm navItems'ı döner
-- **Dönüş**: `filteredNav.length + products.length` (toplam seçilebilir öğe sayısı)
+- **ic_degiskenler**: 
+  - `filteredNav` — Arama terimine göre filtrelenmiş navigasyon öğeleri array'i (search.length > 0 ise navItems.filter(), değilse navItems)
+  - `search` — Arama kutusundaki yazıyı tutan değişken (üst scope'tan erişim)
+  - `navItems` — Statik navigasyon öğeleri array'i (üst scope'tan erişim)
+  - `products` — Ürün sonuçları array'i (üst scope'tan erişim)
+- **Dönüş**: number — Toplam seçilebilir öğe sayısı (filteredNav.length + products.length)
 
-### [N4_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::useEffectToggleOpen
+### [N4_NASIL] AST Pointer: CommandPalette.tsx::useEffectCtrlK
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `down` — KeyboardEvent handler; `e.key === 'k'` ve metaKey/ctrlKey basılıysa open durumunu toggling yapar
-- **Dönüş**: Temizlik fonksiyonu (keydown listener kaldırma)
+- **ic_degiskenler**: 
+  - `down` — Klavye olay handler fonksiyonu (KeyboardEvent parametreli, CTRL+K tuş basımını yakalar)
+  - `e` — down fonksiyonunun parametresi (KeyboardEvent), tuş olayı nesnesi
+- **Dönüş**: Cleanup fonksiyonu (document.removeEventListener ile event listener'ı kaldırır)
 
-### [N5_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::handleKeyDownInner
-- **params**: `e: KeyboardEvent`
-- **ic_degiskenler**: (yok — doğrudan e parametresini kullanır)
-- **Dönüş**: yok
+### [N5_NASIL] AST Pointer: CommandPalette.tsx::useEffectCtrlKHandler
+- **params**: (e: KeyboardEvent)
+- **ic_degiskenler**: 
+  - `e` — Parametre olarak gelen KeyboardEvent nesnesi
+- **Dönüş**: yok (sadece setOpen state'ini toggles)
 
-### [N6_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::useEffectResetState
+### [N6_NASIL] AST Pointer: CommandPalette.tsx::useEffectResetOnOpen
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok — open true ise state'leri resetler)
-- **Dönüş**: yok (side effect: search '', products [], activeIndex 0, input focus)
+- **ic_degiskenler**: 
+  - `open` — Komut paletinin açık/kapalı durumunu tutan değişken (üst scope'tan erişim)
+  - `setTimeout` — 50ms gecikmeli fonksiyon çağırma (inputRef.current?.focus())
+- **Dönüş**: yok (yan etki: search, products, activeIndex state'lerini sıfırlar, input'a odaklanır)
 
-### [N7_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::useEffectProductSearch
+### [N7_NASIL] AST Pointer: CommandPalette.tsx::useEffectProductSearch
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `searchProducts` — Async fonksiyon; setLoading(true) ile başlar, `supabase.from('products').select('id, name, sku').ilike('name', %${search}%).limit(5)` sorgusu yapar, sonuçları products state'ine set eder, setLoading(false) ile bitirir
-  - `timer` — `searchProducts` fonksiyonunu 300ms gecikmeyle çalıştıran setTimeout
-- **Dönüş**: Temizlik fonksiyonu (timer'ı temizleme)
+- **ic_degiskenler**: 
+  - `searchProducts` — Async fonksiyon, Supabase'den ürün araması yapar
+  - `timer` — setTimeout return değeri, debounce için kullanılır
+  - `search` — Arama terimini tutan değişken (üst scope'tan erişim)
+  - `setLoading` — Loading state'ini güncelleyen setter (üst scope'tan erişim)
+  - `setProducts` — Ürün sonuçlarını güncelleyen setter (üst scope'tan erişim)
+  - `supabase` — Supabase istemcisi (import edilmiş)
+  - `data` — Supabase yanıtından dönen data alanı
+- **Dönüş**: Cleanup fonksiyonu (clearTimeout ile timer'ı iptal eder)
 
-### [N8_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::searchProductsAsync
-- **params**: (parametre yok — async inner fonksiyon)
-- **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen ürün verisi (destructure: `{ data }`)
-- **Dönüş**: yok (side effect: loading ve products state'lerini günceller)
-
-### [N9_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::useEffectResetIndex
+### [N8_NASIL] AST Pointer: CommandPalette.tsx::searchProductsAsync
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (side effect: activeIndex'i 0'a resetler)
+- **ic_degiskenler**: 
+  - `setLoading` — Loading state'ini true yapan setter (üst scope'tan erişim)
+  - `supabase` — Supabase istemcisi (üst scope'tan erişim)
+  - `data` — Supabase yanıtından dönen data alanı (products tablosundan id, name, sku alanlarını getirir)
+  - `setProducts` — Ürün sonuçlarını güncelleyen setter (üst scope'tan erişim)
+- **Dönüş**: Promise<void> (async fonksiyon, await ile Supabase çağrısı yapar)
 
-### [N10_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::handleKeyDown
-- **params**: `e: React.KeyboardEvent`
-- **ic_degiskenler**: (yok — doğrudan e parametresi ve component state'lerini kullanır)
-- **Dönüş**: yok (side effect: activeIndex, setOpen güncellemeleri)
+### [N9_NASIL] AST Pointer: CommandPalette.tsx::useEffectResetActiveIndex
+- **params**: (parametre yok)
+- **ic_degiskenler**: 
+  - `setActiveIndex` — ActiveIndex state'ini 0 yapan setter (üst scope'tan erişim)
+  - `search` — Arama terimini tutan değişken (üst scope'tan erişim)
+  - `products` — Ürün sonuçları array'i (üst scope'tan erişim)
+- **Dönüş**: yok (yan etki: activeIndex'i 0'a sıfırlar)
 
-### [N11_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::selectItem
-- **params**: `index: number`
-- **ic_degiskenler**:
-  - `filteredNav` — search length sıfırdan büyükse navItems küçük harf filtresi ile, değilse tüm navItems
-  - `prodIndex` — Seçilen öğenin products dizisindeki indeksi (`index - filteredNav.length`)
-- **Dönüş**: yok (side effect: setOpen(false) ve router.push ile sayfa yönlendirme)
+### [N10_NASIL] AST Pointer: CommandPalette.tsx::handleKeyDown
+- **params**: (e: React.KeyboardEvent)
+- **ic_degiskenler**: 
+  - `e` — Parametre olarak gelen React.KeyboardEvent nesnesi
+  - `totalItems` — Toplam seçilebilir öğe sayısı (üst scope'tan erişim)
+  - `activeIndex` — Mevcut aktif indeks (üst scope'tan erişim)
+  - `setActiveIndex` — ActiveIndex state'ini güncelleyen setter (üst scope'tan erişim)
+  - `setOpen` — Open state'ini false yapan setter (üst scope'tan erişim)
+  - `selectItem` — Öğe seçme fonksiyonu (üst scope'tan erişim)
+- **Dönüş**: yok (yan etki: klavye olaylarına göre state güncellemesi, yönlendirme)
 
-### [N12_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::renderNavItem
-- **params**: `item` (navItem nesnesi), `idx` (dizi indeksi)
-- **ic_degiskenler**:
-  - `Icon` — item.icon değerinden türetilen React bileşeni
-  - `isActive` — `activeIndex === idx` karşılaştırması ile hesaplanan boolean, öğenin seçili olup olmadığını belirler
-- **Dönüş**: JSX (nav öğesi button bileşeni)
+### [N11_NASIL] AST Pointer: CommandPalette.tsx::selectItem
+- **params**: (index: number)
+- **ic_degiskenler**: 
+  - `index` — Parametre olarak gelen sayısal indeks değeri
+  - `filteredNav` — Arama terimine göre filtrelenmiş navigasyon öğeleri array'i (search.length > 0 ise navItems.filter(), değilse navItems)
+  - `search` — Arama terimini tutan değişken (üst scope'tan erişim)
+  - `navItems` — Statik navigasyon öğeleri array'i (üst scope'tan erişim)
+  - `setOpen` — Open state'ini false yapan setter (üst scope'tan erişim)
+  - `router` — Next.js router nesnesi (üst scope'tan erişim)
+  - `prodIndex` — Ürün listesindeki göreli indeks hesaplaması (index - filteredNav.length)
+  - `products` — Ürün sonuçları array'i (üst scope'tan erişim)
+- **Dönüş**: yok (yan etki: komut paletini kapatır, belirli URL'ye yönlendirir)
 
-### [N13_NASIL] AST Pointer: src/components/admin/CommandPalette.tsx::renderProductItem
-- **params**: `p` (product nesnesi), `idx` (dizi indeksi)
-- **ic_degiskenler**:
-  - `globalIdx` — `filteredNav.length + idx` ile hesaplanan global liste indeksi
-  - `isActive` — `activeIndex === globalIdx` karşılaştırması ile hesaplanan boolean
-- **Dönüş**: JSX (ürün öğesi button bileşeni)
+### [N12_NASIL] AST Pointer: CommandPalette.tsx::renderNavItem
+- **params**: (item: { label: string, icon: Component, href: string }, idx: number)
+- **ic_degiskenler**: 
+  - `item` — Parametre olarak gelen navigasyon öğesi nesnesi (label, icon, href)
+  - `idx` — Parametre olarak gelen array indeksi
+  - `Icon` — item.icon değerini atayan değişken (React bileşeni)
+  - `isActive` — Bu öğenin seçili olup olmadığını belirleyen boolean (activeIndex === idx)
+  - `activeIndex` — Seçili olan indeks (üst scope'tan erişim)
+  - `setOpen` — Open state'ini false yapan setter (üst scope'tan erişim)
+  - `router` — Next.js router nesnesi (üst scope'tan erişim)
+- **Dönüş**: JSX element (navigasyon öğesi butonu)
+
+### [N13_NASIL] AST Pointer: CommandPalette.tsx::renderProductItem
+- **params**: (p: { id: string, name: string, sku: string }, idx: number)
+- **ic_degiskenler**: 
+  - `p` — Parametre olarak gelen ürün nesnesi (id, name, sku)
+  - `idx` — Parametre olarak gelen array indeksi
+  - `globalIdx` — Tüm öğeler arasındaki global indeks hesaplaması (filteredNav.length + idx)
+  - `isActive` — Bu ürünün seçili olup olmadığını belirleyen boolean (activeIndex === globalIdx)
+  - `activeIndex` — Seçili olan indeks (üst scope'tan erişim)
+  - `filteredNav` — Filtrelenmiş navigasyon array'i (üst scope'tan erişim)
+  - `setOpen` — Open state'ini false yapan setter (üst scope'tan erişim)
+  - `router` — Next.js router nesnesi (üst scope'tan erişim)
+- **Dönüş**: JSX element (ürün öğesi butonu)
 
 ---
 

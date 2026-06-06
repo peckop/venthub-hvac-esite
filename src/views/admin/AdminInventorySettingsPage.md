@@ -3,40 +3,49 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventorySettingsPage.tsx
-skeleton_hash: 46f3ae0b5676adff
+skeleton_hash: e987897f7e8ea53d
 entity_hashes:
   func:AdminInventorySettingsPage: 19119fa4d0915cd3
   func:save: 0164a79f2bf21d0f
   func:saveGeneralSettings: e292d3d4a2e6fa04
-  overview: 59445d0b8972e8c9
+  overview: c6b768cf9235a671
   style_tokens: 114083f4641bd38f
-generated_at: 2026-05-28T22:38:59Z
+generated_at: 2026-06-06T21:57:52Z
 ---
 
 ## Genel Bakış
-AdminInventorySettingsPage modülü, yönetici panelinde envanter ayarlarını görüntülemek ve güncellemek için kullanılan sayfanın bileşenini ve kaydetme iş mantığını tanımlar. Kaydetme işlemleri, genel ayarların ayrı ayrı ele alınmasını sağlayacak şekilde yapılandırılmıştır.
+Bu modül, yönetici panelindeki stok ayarları sayfasının kullanıcı arayüzünü oluşturur ve ayarların kaydedilmesi için gerekli iş mantığını içerir. Sayfa, ayarların görüntülenmesini ve yöneticinin bu ayarları güncelleme eylemlerini tetikleyen bir merkez olarak işlev görür; kaydetme işlemleri ise verilerin asenkron olarak kalıcı depoya aktarılmasını sağlar.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni
-Envanter ayarları sayfasının React bileşenini oluşturur, kullanıcı arayüzünü sunar ve kaydetme eylemlerini tetikler.
+### Sayfa Bileşeni ve Arayüz
+Envanter ayarları sayfasının ana React bileşenini tanımlar. Bu bileşen, kullanıcı arayüzünü sunar ve yöneticinin ayarları görüntülemesini, değiştirmesini ve kaydetme eylemlerini tetiklemesini sağlar.
 - AdminInventorySettingsPage
 
 ### Kaydetme İşlemleri
-Envanter ayarlarının ve genel ayarların güncellenmesi için asenkron kaydetme fonksiyonlarını içerir. Daha kapsamlı olan save muhtemelen diğer alt kaydetme işlemlerini de yönetir.
+Stok ayarlarının güncellenmesi ve kaydedilmesi için kullanılan asenkron fonksiyonları kapsar. Bu grup, genel ve spesifik kaydetme senaryolarını ele alarak verilerin arka planda güvenli bir şekilde depolanmasını yönetir.
 - save, saveGeneralSettings
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `AdminInventorySettingsPage()` bileşeni oluşturulmazsa, yönetim paneli envanter ayarları kullanıcı arayüzü gösterilemez.
+Bu modül için aksiyomlar, verilen fonksiyon imzalarından üretilmiştir.
 
-**Aksiyom 2**: Eğer `save()` fonksiyonu çağrıldığında gerekli form verileri (ör. ayar değerleri) mevcut değilse, ayarların kalıcı depoya kaydedilmesi gerçekleşmez ve bir hata/uyarı durumu ortaya çıkar.
+---
 
-**Aksiyom 3**: Eğer `saveGeneralSettings()` fonksiyonu çalıştırıldığında genel ayarların geçerli bir yapılandırma nesnesi sağlanmazsa, genel ayarlar güncellenmez ve sistem mevcut ayarları korur.
+**[Aksiyom 1]:** Eğer `save()` veya `saveGeneralSettings()` işlevleri çağrıldığında persistans katmanı (API endpoint veya veritabanı bağlantısı) mevcut değilse, ayarlar kaydedilmez.
 
-**Domain‑specific kural**: Bu fonksiyonların hiçbiri parametre almadığından, gerekli veri kaynağı (örn. bileşen durumu, context, veya global store) önceden hazırlanmış olmalıdır; aksi takdirde fonksiyonların iç mantığı çalışamaz ve beklenen yan etki (ayarların kaydedilmesi) gerçekleşmez.
+**[Aksiyom 2]:** Eğer `AdminInventorySettingsPage` bileşeni render edildiğinde geçerli bir oturum (session) veya yetkilendirme token'ı yoksa, yönetici ayarlarına erişim sağlanamaz.
+
+**[Aksiyom 3]:** Eğer `saveGeneralSettings()` işlevi, `save()` işlevinden bağımsız olarak çalışıyorsa (imzalar ayrı ve parametresiz), iki işlevin farklı veri setlerini hedeflediği varsayılır; birbirlerinin durumunu doğrudan etkilemezler.
+
+**[Aksiyom 4]:** Eğer `save()` veya `saveGeneralSettings()` işlevleri asenkron çalışıyorsa (önceki dokümanda "asenkron kaydetme" belirtilmiş), işlevlerin Promise/async-await dönüş türüne sahip olduğu ve hata yönetimi mekanizması gerektirdiği varsayılır.
+
+**[Aksiyom 5]:** Eğer `AdminInventorySettingsPage()` parametresiz olarak tanımlıysa, bileşenin gerekli tüm state ve props'u iç referanslarla (Context, hooks vb.) sağladığı veya modül-içi bağımlılıklarla beslendiği varsayılır.
+
+---
+
+> **Not:** Fonksiyon gövdelerine erişim olmadan, API endpoint'leri, form alanlarının yapısı veya veri modelleri hakkında kesin aksiyom üretilememektedir.
 
 ---
 
@@ -82,59 +91,76 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\admin\AdminInventorySettingsPage.tsx::AdminInventorySettingsPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::AdminInventorySettingsPage
+- **params**: ()
 - **ic_degiskenler**:
-  - `pathname` — `usePathname()` hook ile mevcut URL yolunu alır, `React.useEffect` bağımlılığı olarak kullanılır.
-  - `defaultThreshold` — Stok düşük eşik değeri; sayı ya da boş string tutar, `<input>` değerine bağlanır.
-  - `setDefaultThreshold` — `defaultThreshold` state’ini güncelleyen setter fonksiyonu.
-  - `resetAll` — “Tüm Ürünlere Uygula” checkbox’ının boolean durumu.
-  - `setResetAll` — `resetAll` state’ini güncelleyen setter.
-  - `loading` — veri yükleme durumu (`LoadState` enum); UI’da loading spinner gösterimi için kullanılır.
-  - `setLoading` — `loading` state’ini güncelleyen setter.
-  - `saving` — eşik güncelleme işlemi sırasında gösterilen loading flag’i.
-  - `setSaving` — `saving` state’ini güncelleyen setter.
-  - `savingGeneral` — genel ayarların kaydedilmesi sırasında gösterilen loading flag’i.
-  - `setSavingGeneral` — `savingGeneral` state’ini güncelleyen setter.
-  - `error` — hata mesajı string’i; UI’da hata bildirimi için gösterilir.
-  - `setError` — `error` state’ini güncelleyen setter.
-  - `success` — başarı mesajı string’i; UI’da başarı bildirimi için gösterilir.
-  - `setSuccess` — `success` state’ini güncelleyen setter.
-  - `alertEmail` — e‑posta bildirim adresi; form input değeri.
-  - `setAlertEmail` — `alertEmail` state’ini güncelleyen setter.
-  - `alertWebhook` — webhook URL; form input değeri.
-  - `setAlertWebhook` — `alertWebhook` state’ini güncelleyen setter.
-  - `resTimeout` — rezervasyon iptal süresi (saat); form input değeri.
-  - `setResTimeout` — `resTimeout` state’ini güncelleyen setter.
-  - `canWrite` — `useRole()` hook’tan gelen yetki kontrol fonksiyonu.
-  - `hasWriteAccess` — `canWrite('inventory_settings')` sonucunu tutar; UI’da erişim kontrolü.
-  - `load` — `React.useCallback` içinde tanımlı async fonksiyon; ayarları Supabase’den çeker ve state’leri doldurur.
-- **Dönüş**: React bileşeni JSX döndürür; yan etkileri: `useEffect` ile `load` fonksiyonunu sayfa yüklendiğinde ve `pathname` değiştiğinde çalıştırır, Supabase API çağrıları yapar, state güncellemeleriyle UI’yı yönetir.
+  - `pathname` — usePathname() hookundan alınan mevcut URL yolu
+  - `defaultThreshold` — numeric input state, varsayılan düşük stok eşiğini tutar
+  - `resetAll` — boolean checkbox state, tüm ürünlere uygulama durumunu kontrol eder
+  - `loading` — LoadState enum loading durumunu tutar
+  - `saving` — boolean, eşik güncelleme kaydetme işleminin durumunu tutar
+  - `savingGeneral` — boolean, genel ayarları kaydetme işleminin durumunu tutar
+  - `error` — string hata mesajını tutar
+  - `success` — string başarı mesajını tutar
+  - `alertEmail` — string alarm e-posta adresini tutar
+  - `alertWebhook` — string webhook URL'ini tutar
+  - `resTimeout` — number rezervasyon timeout süresini tutar (saat)
+  - `canWrite` — useRole() hookundan gelen write izni kontrol fonksiyonu
+  - `hasWriteAccess` — canWrite('inventory_settings') çağrısının boolean sonucu
+  - `load` — useCallback ile sarılmış asenkron veri yükleme fonksiyonu
+  - `save` — asenkron eşik güncelleme kaydetme fonksiyonu
+  - `saveGeneralSettings` — asenkron genel ayarları kaydetme fonksiyonu
+- **Dönüş**: JSX (React.FC)
 
-### [N2_NASIL] AST Pointer: src\views\admin\AdminInventorySettingsPage.tsx::save
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::AdminInventorySettingsPage::load
+- **params**: ()
 - **ic_degiskenler**:
-  - `value` — `defaultThreshold` boş ise `null`, değilse sayısal eşik değeri; RPC’ye gönderilir.
-  - `error` — `supabase.rpc` çağrısının döndürdüğü hata nesnesi (varsa).
-  - `e` — `catch` bloğunda yakalanan bilinmeyen hata; mesajı `msg` değişkenine dönüştürülür.
-  - `msg` — hata mesajı string’i; `setError` ile UI’da gösterilir.
-- **Dönüş**: `void` (yan etkileri: `saving` flag’i, `success`/`error` state’leri güncellenir, `load()` çağrısı ile veriler yeniden çekilir).
+  - `setLoading` — loading state setter'ı, LoadState.Loading ile başlatır
+  - `supabase` — import edilen Supabase browser client'ı
+  - `data` — inventory_settings tablosundan select('*').maybeSingle() sonucu gelen satır objesi
+  - `error` — Supabase sorgu hatası
+  - `val` — data?.default_low_stock_threshold değeri (null veya number)
+  - `setDefaultThreshold` — defaultThreshold state setter'ı
+  - `setAlertEmail` — alertEmail state setter'ı
+  - `setAlertWebhook` — alertWebhook state setter'ı
+  - `setResTimeout` — resTimeout state setter'ı
+  - `setError` — error state setter'ı
+  - `setLoading` — loading state setter'ı (LoadState.Idle ile)
+- **Dönüş**: yok (undefined)
 
-### [N3_NASIL] AST Pointer: src\views\admin\AdminInventorySettingsPage.tsx::saveGeneralSettings
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::AdminInventorySettingsPage::save
+- **params**: ()
 - **ic_degiskenler**:
-  - `error` — `supabase.from(...).update(...).eq(... )` çağrısının döndürdüğü hata nesnesi (varsa).
-  - `e` — `catch` bloğunda yakalanan bilinmeyen hata; mesajı `msg` değişkenine dönüştürülür.
-  - `msg` — hata mesajı string’i; `setError` ile UI’da gösterilir.
-- **Dönüş**: `void` (yan etkileri: `savingGeneral` flag’i, `success`/`error` state’leri güncellenir, `load()` ile ayarlar yeniden yüklenir).
+  - `setSaving` — saving state setter'ı (true)
+  - `setSuccess` — success state setter'ı (boş string)
+  - `setError` — error state setter'ı (boş string)
+  - `defaultThreshold` — numeric input state, eşik değerini tutar
+  - `resetAll` — boolean checkbox state, tüm ürünlere uygulama durumunu tutar
+  - `value` — defaultThreshold'un null veya number dönüşümü (=== '' ise null, değilse Number)
+  - `supabase` — import edilen Supabase browser client'ı
+  - `error` — update_inventory_thresholds RPC çağrısının hatası
+  - `setSuccess` — success state setter'ı (mesaj ile)
+  - `load` — useCallback ile sarılmış asenkron veri yükleme fonksiyonu
+  - `e` — catch bloğu için Error nesnesi
+  - `msg` — e'nin message özelliği veya varsayılan hata mesajı
+- **Dönüş**: yok (undefined)
 
-### [N4_NASIL] AST Pointer: src\views\admin\AdminInventorySettingsPage.tsx::load
-- **params**: (parametre yok) – `React.useCallback` içinde tanımlı.
+### [N4_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::AdminInventorySettingsPage::saveGeneralSettings
+- **params**: ()
 - **ic_degiskenler**:
-  - `data` — Supabase `select('*').maybeSingle()` sonucunda gelen kayıt objesi.
-  - `error` — API çağrısında oluşan hata nesnesi (varsa).
-  - `val` — `data?.default_low_stock_threshold` değerinin number | null tipinde tutulduğu ara değişken.
-- **Dönüş**: `void` (yan etkileri: `defaultThreshold`, `alertEmail`, `alertWebhook`, `resTimeout`, `error`, `loading` state’lerini günceller).
+  - `setSavingGeneral` — savingGeneral state setter'ı (true)
+  - `setSuccess` — success state setter'ı (boş string)
+  - `setError` — error state setter'ı (boş string)
+  - `alertEmail` — string alarm e-posta adresi state'i
+  - `alertWebhook` — string webhook URL'i state'i
+  - `resTimeout` — number rezervasyon timeout süresi state'i
+  - `supabase` — import edilen Supabase browser client'ı
+  - `error` — update sorgusunun hatası
+  - `setSuccess` — success state setter'ı ("Genel ayarlar kaydedildi")
+  - `load` — useCallback ile sarılmış asenkron veri yükleme fonksiyonu
+  - `e` — catch bloğu için Error nesnesi
+  - `msg` — e'nin message özelliği veya varsayılan hata mesajı
+- **Dönüş**: yok (undefined)
 
 ---
 

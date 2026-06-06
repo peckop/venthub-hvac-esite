@@ -3,39 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx
-skeleton_hash: c62079cae2908af5
+skeleton_hash: 7c8d9ccf38721fe4
 entity_hashes:
   func:AuthCallbackPage: b8296e20d27a327c
-  overview: 0d7baa0d62a2803d
+  overview: b34c2160d04ee913
   style_tokens: 404ab1f16440192d
-generated_at: 2026-05-29T18:49:17Z
+generated_at: 2026-06-06T21:58:25Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasında kimlik doğrulama akışının son aşamasını yöneten tek bileşenli bir React sayfasıdır. Harici kimlik sağlayıcısından (OAuth, SSO vb.) geri dönüş sonrasında tarayıcı URL'indeki yetkilendirme verilerini işler, kullanıcı oturumunu başlatır ve ana uygulamaya güvenli bir geçiş sağlar. Tek sorumluluklu yapısı sayesinde kimlik doğrulama geri dönüş sürecini izole ve merkezi bir noktadan kontrol eder.
+Bu modül, kimlik doğrulama akışının tamamlandığı geri dönüş (callback) sayfasıdır. Harici kimlik sağlayıcılarından (OAuth, SSO vb.) gelen yetkilendirme verilerini (token, code vb.) tarayıcı URL'sinden alarak kullanıcı oturumunu başlatır ve ana uygulamaya yönlendirme yapar. Tek bileşenli yapısı, tüm geri dönüş mantığını izole bir noktada toplayarak uygulama giriş sürecinin son adımı olarak görev yapar.
 
 ## Fonksiyon Grupları
-### Ana Bileşen ve Akış Yönetimi
-Modülün tek ve ana bileşeni olarak kimlik doğrulama geri dönüş sürecinin tüm yaşam döngüsünü yönetir; URL parametrelerinden token/code gibi verileri çıkarır, oturum oluşumu tetikler, kullanıcıya bekleme arayüzü sunar ve başarısızlık durumunda hata gösterimi yaparak yönlendirme sağlar.
+### Ana Kimlik Doğrulama Bileşeni
+Kimlik doğrulama geri dönüş sürecinin tüm yaşam döngüsünü yöneten bileşendir. URL parametrelerini analiz eder, oturum verilerini işler, kullanıcıya bekleme arayüzü gösterir ve oluşabilecek hataları yakalayarak anlamlı bir geri bildirim verir.
 - AuthCallbackPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kimlik doğrulama geri dönüş sayfası olarak çalışır; harici kimlik sağlayıcısından dönen oturum verilerini işleyerek kullanıcıyı uygulamaya yönlendirir.
+Bu modül için fonksiyon gövdesi paylaşılmadığından, kod analizinden türetilebilecek mimari varsayımlar belirlenememiştir.
 
-**[Aksiyom 1]:** Eğer kimlik doğrulama bağlamı (auth context) sağlayıcısı mevcut değilse, kullanıcının oturum durumu güncellenemez ve sayfa geçerli kimlik bilgisiyle başlatılamaz.
+**Not:** `AuthCallbackPage()` fonksiyon imzası仅有olup parametre almamaktadır. Fonksiyon gövdesi mevcut olmadığı için modülün çalışma zamanı bağımlılıkları, veri akışı gereksinimleri veya hata senaryoları hakkında kesin aksiyomlar üretilemez.
 
-**[Aksiyom 2]:** Eğer yönlendirme bağlamı (router context) mevcut değilse, kimlik doğrulama sonrası kullanıcı ana sayfaya veya hedef sayfaya yönlendirilemez ve sonsuz bekleme durumunda kalır.
-
-**[Aksiyom 3]:** Eğer URL sorgu parametreleri (callback query params) kimlik sağlayıcı tarafından sağlanmıyorsa, token/oturum bilgisi çıkarılamaz ve kimlik doğrulama başarısız olur.
-
-**[Aksiyom 4]:** Eğer tarayıcı oturum depolama mekanizması (sessionStorage/localStorage) kullanılamıyorsa, geçici oturum verileri saklanamaz ve sayfa yeniden yüklendiğinde kimlik bilgisi kaybolur.
-
-**[Aksiyom 5]:** Eğer kimlik sağlayıcı yanıtında hata parametresi (error/denied) bulunuyorsa, bileşen hata durumu arayüzü göstermeli ve kullanıcıyı giriş sayfasına yönlendirmelidir.
-
-**[Aksiyom 6]:** Eğer kimlik sağlayıcı yanıtında geçersiz veya süresi dolmuş token dönüyorsa, oturum başlatılamaz ve kullanıcı yeniden kimlik doğrulama akışına yönlendirilmelidir.
+---
 
 ---
 
@@ -51,62 +43,59 @@ Bu modül, kimlik doğrulama geri dönüş sayfası olarak çalışır; harici k
 
 ## AST POINTERS
 
-### [N1_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::AuthCallbackPage
+### [N1_NASIL] AuthCallbackPage.tsx::AuthCallbackPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `status` — useState hook; loading, success veya error durumunu tutar, UI'da hangi içeriğin gösterileceğini belirler
-  - `message` — useState hook; kullanıcıya gösterilecek bilgi/hata mesajını tutar
-  - `router` — `useRouter()` ile elde edilen Next.js router nesnesi; programlı sayfa yönlendirmeleri için kullanılır
-- **Dönüş**: JSX (React.FC) — loading, success veya error durumuna göre koşullu JSX blokları render eder
+  - `status` — useState hook'u ile tanımlanan state değişkeni, sayfanın mevcut durumunu (loading/success/error) tutar
+  - `message` — useState hook'u ile tanımlanan state değişkeni, kullanıcıya gösterilecek mesajı tutar
+  - `router` — useRouter() hook'u ile elde edilen Next.js router nesnesi, sayfa yönlendirmeleri için kullanılır
+- **Dönüş**: JSX element (React bileşeni)
 
----
-
-### [N2_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::useEffect → handleAuthCallback
+### [N2_NASIL] AuthCallbackPage.tsx::handleAuthCallback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `hashFragment` — `window.location.hash` değerinden alınır; OAuth callback URL'sindeki hash fragment'ı temsil eder, token verilerini barındırır
-  - `data` — `supabase.auth.getSession()` sonucundan elde edilen session nesnesi; mevcut oturum bilgisini içerir
-  - `error` — `supabase.auth.getSession()` sonucundan elde edilen hata nesnesi; session alma işlemindeki hataları tutar
-  - `sessionError` — `supabase.auth.exchangeCodeForSession(window.location.href)` sonucundaki hata; URL'deki auth kodunun token'a dönüştürme hatası
-  - `newData` — Kod değişimi sonrası ikinci kez çağrılan `supabase.auth.getSession()` sonucundaki data; güncellenmiş session bilgisini tutar
-  - `newError` — İkinci `getSession()` çağrısındaki hata nesnesi
-  - `error` (catch bloğu) — `unknown` tipinde yakalanan beklenmedik hatalar
-- **Dönüş**: yok (side-effect: `setStatus`, `setMessage`, `router.push`, `toast.success` çağırır)
+  - `hashFragment` — window.location.hash değerini tutar, URL'deki hash fragment bilgisini içerir
+  - `data` — supabase.auth.getSession() çağrısının response data değeri, mevcut oturum bilgisini içerir
+  - `error` — supabase.auth.getSession() çağrısının response error değeri, hata bilgisini içerir
+  - `sessionError` — supabase.auth.exchangeCodeForSession() çağrısının error değeri, token alışverişi hatalarını tutar
+  - `newData` — ikinci supabase.auth.getSession() çağrısının response data değeri, güncellenmiş oturum bilgisini içerir
+  - `newError` — ikinci supabase.auth.getSession() çağrısının response error değeri, güncelleme hatalarını tutar
+- **Dönüş**: void (return ile erken çıkış)
 
----
-
-### [N3_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (onClick → router.push login fallback)
+### [N3_NASIL] AuthCallbackPage.tsx::useEffectCallback
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — hata durumunda "Giriş Sayfasına Dön" butonuna tıklandığında `router.push(Routes.auth.login())` çalıştırır
+- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımlaması yok)
+- **Dönüş**: void
 
----
-
-### [N4_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.home success redirect)
+### [N4_NASIL] AuthCallbackPage.tsx::successRedirectHome
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — başarılı doğrulama sonrası 2 saniye bekleyip ana sayfaya yönlendirir
+- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
+- **Dönüş**: void
 
----
-
-### [N5_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.auth.login with error redirect)
+### [N5_NASIL] AuthCallbackPage.tsx::errorRedirectLogin
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — session alınamadığında 3 saniye bekleyip hata mesajıyla giriş sayfasına yönlendirir
+- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
+- **Dönüş**: void
 
----
-
-### [N6_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.auth.login catch error redirect)
+### [N6_NASIL] AuthCallbackPage.tsx::successRedirectHomeSecond
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — catch bloğunda yakalanan hatalar sonrası 3 saniye bekleyip giriş sayfasına yönlendirir
+- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
+- **Dönüş**: void
 
----
-
-### [N7_NASIL] AuthCallbackPage AST Pointer: src\views\AuthCallbackPage.tsx::arrow (setTimeout callback → Routes.auth.login No session redirect)
+### [N7_NASIL] AuthCallbackPage.tsx::invalidLinkRedirect
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — hash fragment mevcut olup session bulunamadığında 3 saniye bekleyip "No session found" mesajıyla giriş sayfasına yönlendirir
+- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
+- **Dönüş**: void
+
+### [N8_NASIL] AuthCallbackPage.tsx::catchRedirectLogin
+- **params**: (parametre yok)
+- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
+- **Dönüş**: void
+
+### [N9_NASIL] AuthCallbackPage.tsx::buttonOnClickRedirect
+- **params**: (parametre yok)
+- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
+- **Dönüş**: void
 
 ---
 

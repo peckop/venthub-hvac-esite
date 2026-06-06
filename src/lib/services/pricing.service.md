@@ -3,64 +3,74 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\pricing.service.ts
-skeleton_hash: f8f645d877537df2
+skeleton_hash: 2751cbf69babaac1
 entity_hashes:
-  func:getEffectivePriceInfo: c038397ed8e4de09
-  func:getEffectiveUnitPrice: 6cb5e1c0ee8d92ef
-  func:nowIso: e827ab618f0e3f23
-  overview: 9bc35ad97c12b69d
-generated_at: 2026-05-28T22:38:30Z
+  func:getEffectivePriceInfo: c48d7f76659a9994
+  func:getEffectiveUnitPrice: 17cb692a61b59d7e
+  func:nowIso: 7121138d8247572d
+  overview: 9306e1f92b6718ee
+generated_at: 2026-06-06T21:56:07Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunda ürünlerin geçerli fiyatlandırılmasını sağlayan merkezi fiyat servisidir. Ürün nesnelerinden birim fiyat ve fiyat listesi gibi temel fiyatlandırma metaverilerini asenkron olarak hesaplar ve sunar. Ayrıca tüm fiyat işlemlerinde tutarlılık sağlamak amacıyla ISO formatında zaman damgası üreten bir yardımcı fonksiyon içerir.
+VentHub HVAC platformunda merkezi fiyatlandırma hizmetini sunan bir modüldür. Ürünler için geçerli birim fiyat ve fiyat listesi bilgisini hesaplarken, fiyat geçerliliği ve zaman damgası gibi yardımcı işlemleri de yönetir. Modül, satış ve teklif süreçlerinde tutarlı fiyat bilgisi sağlamayı amaçlar.
 
 ## Fonksiyon Grupları
-
 ### Yardımcı Fonksiyon
-Modül genelinde ihtiyaç duyulan standart tarih-saat bilgisini üretir; fiyat geçerlilik kontrolleri ve zaman damgası gerektiren tüm işlemlerde kullanılır.
+Fiyatlandırma süreçlerinde ve loglama gibi işlemlerde kullanılan standart zaman bilgisini üretir.
 - nowIso
 
 ### Fiyat Hesaplama Fonksiyonları
-Ürün nesnesinden geçerli birim fiyatı ve ilişkili fiyat listesi kimliğini asenkron olarak hesaplar; platformdaki tüm satış ve teklif süreçlerinin fiyatlandirma kaynağıdır.
+Ürün nesnesi ve sistem verilerinden güncel birim fiyatı ve fiyat listesi kimliğini asenkron olarak hesaplayarak satış akışlarına temel fiyat bilgisini sağlar.
 - getEffectiveUnitPrice, getEffectivePriceInfo
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, fiyat hesaplama için harici bir veritabanı bağlantısına ve geçerli ürün verisine bağımlıdır.
+
+**[Aksiyom 1]:** Eğer `supabase` istemcisi (`getEffectiveUnitPrice` veya `getEffectivePriceInfo` çağrısında) sağlanmamışsa, fiyat hesaplama fonksiyonları çalışamaz.
+
+**[Aksiyom 2]:** Eğer `product` parametresi geçerli bir `Product` nesnesi içermiyorsa (`getEffectiveUnitPrice` veya `getEffectivePriceInfo` çağrısında), fiyat bilgisi üretilemez.
+
+**[Aksiyom 3]:** Eğer `defaultClient` sabiti tanımlı veya erişilebilir değilse, modül içindeki varsayılan veritabanı bağlantısı mekanizması bozulur.
+
+**[Aksiyom 4]:** Eğer `nowIso()` fonksiyonu çağrılamıyorsa (sistem saatine erişim engellenmişse), fiyat geçerlilik zaman damgaları tutarsız veya eksik olur.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### nowIso
-**Ne yapar**: Geerli UTC zaman diliminde ISO 8601 formatında bir zaman damgası döndürür.
-**Nasıl yapar**: `new Date().toISOString()` kullanarak mevcut tarihi ve saati tarayıcı/node ortamının yerel saatine göre değil, her zaman UTC'ye göre ISO formatında dizgiye çevirir. Bu, zaman damgalarında tutarlılık sağlamak için ideal bir yöntemdir.
+**Ne yapar**: Geçerli tarih ve saati ISO 8601 formatında bir字符串 olarak döndürür.
+**Nasıl yapar**: `new Date()` nesnesi oluşturarak `toISOString()` metodunu çağırır ve mevcut zamanı standart bir string formatında döndürür. Bu, Supabase sorgularında tarih bazlı filtreleme için zaman damgası olarak kullanılır.
 **Parametreler**:
-- Parametre almaz.
-**Dönüş**: `string` — "2024-01-15T09:30:00.000Z" gibi bir ISO 8601 zaman damgası.
+- Bu fonksiyon herhangi bir parametre almaz.
+**Dönüş**: `string` — Geçerli tarih ve saatin ISO 8601 formatında temsili.
 
 ### getEffectiveUnitPrice
-**Ne yapar**: Verilen bir ürün için, geçerli kullanıcı rolleri, aktif fiyat listeleri ve olası indirimler değerlendirilerek nihai birim fiyatı hesaplar.
-**Nasıl yapar**: `getEffectivePriceInfo` asenkron fonksiyonunu çağırarak fiyatlandırma bilgisini alır ve yalnızca `unitPrice` değerini döndürür. Bu, birim fiyatı tek bir sayısal değer olarak almak isteyen çağrılar için bir sarmalayıcı (wrapper) fonksiyondur.
+**Ne yapar**: Belirli bir ürün için geçerli birim fiyatı belirler. Kullanıcı rolleri, aktif fiyat listeleri ve geçerli indirimleri değerlendirerek nihai birim fiyatı döndürür.
+**Nasıl yapar**: `getEffectivePriceInfo` fonksiyonunu çağırarak fiyat bilgisini alır ve sadece `unitPrice` değerini döndürür. Bu, fiyat hesaplama mantığını soyutlayarak daha basit bir arayüz sunar.
 **Parametreler**:
-- product: `Product` — Taban fiyat bilgisini içeren ürün nesnesi.
-**Dönüş**: `Promise<number>` — Ürün için hesaplanmış nihai birim fiyatı.
+- product: `Product` — Fiyatı belirlenecek ürün nesnesi. Taban fiyat bilgisini içerir.
+- supabase: `any` (isteğe bağlı) — Varsayılan olarak `defaultClient` kullanılır. Veritabanı bağlantısı için Supabase istemcisi.
+**Dönüş**: `Promise<number>` — Hesaplanmış birim fiyatı sayısal değer olarak.
 
 ### getEffectivePriceInfo
-**Ne yapar**: Mevcut kullanıcının rolüne göre bir ürün için en uygun fiyatlandırma bilgisini (birim fiyat ve uygulanan fiyat listesi ID'si) belirler.
-**Nasıl yapar**: Bir dizi adımla çalışır:
-1. Ürünün taban fiyatını (`product.price`) bir fallback (yedek) değer olarak hesaplar.
-2. Supabase üzerinden kimlik doğrulaması yaparak mevcut kullanıcıyı ve profilini (rol ve organizasyon ID'si) çeker.
-3. Kullanıcı oturumu açmamışsa veya hata oluşursa fallback değeri döndürür.
-4. Aktif, tarih aralığı uygun (`effective_from` <= şu an ve `effective_to` >= şu an veya null) fiyat listelerini sorgular.
-5. Bulunan listeleri, kullanıcının rolüyle eşleşenleri önce gelecek şekilde sıralar (spesifik rol eşleşmesi, genel `null` user_type eşleşmesinden önce tercih edilir).
-6. En uygun fiyat listesinde (veya fallback olarak fiyat listesi ID'si `null` olan) ürünün `product_prices` tablosundaki satırlarını sorgular.
-7. Her satır için geçerlilik tarihlerini kontrol eder, ardından satış fiyatı (`sale_price`), taban fiyat (`base_price`) ve indirim yüzdesi (`discount_percentage`) sırasıyla değerlendirerek en uygun fiyatı hesaplar ve döndürür.
-8. Hiçbir eşleşme bulunamazsa veya hata oluşursa fallback fiyatı ve ilgili fiyat listesi ID'sini döndürür.
+**Ne yapar**: Mevcut kullanıcının rolüne göre bir ürün için en uygun fiyat bilgisini belirler. Aktif fiyat listelerini sorgular, en geçerli fiyatı veya indirimi uygular ve hem fiyatı hem de kullanılan fiyat listesinin kimliğini döndürür.
+**Nasıl yapar**: 
+1. Önce ürünün taban fiyatını (`product.price`) bir fallback değer olarak hesaplar.
+2. Supabase'den mevcut kullanıcının kimliğini ve profilini (rol, organizasyon ID) çeker.
+3. Geçerli tarihte aktif olan fiyat listelerini (`price_lists` tablosundan) sorgular.
+4. Kullanıcının rolüne uygun fiyat listelerini filtreler ve öncelik sırasına göre (özel kullanıcı tipi eşleşmesi > genel) sıralar.
+5. Seçilen fiyat listesinde (veya hiçbir fiyat listesi yoksa genel havuzda) ürünün fiyat kaydını (`product_prices`) arar.
+6. Kaydın `sale_price`, `base_price` ve `discount_percentage` alanlarını değerlendirerek birim fiyatı hesaplar. Öncelik sırası: satış fiyatı > indirimli taban fiyat > taban fiyat.
+7. Herhangi bir hata veya uygun fiyat bulunamazsa, ürünün kendi taban fiyatına geri döner.
 **Parametreler**:
 - product: `Product` — Fiyatı belirlenecek ürün nesnesi.
-**Dönüş**: `Promise<{ unitPrice: number, priceListId: string | null }>` — Hesaplanmış birim fiyatı ve uygulanan fiyat listesinin ID'si (hiçbir fiyat listesi uygulanmadıysa `null`).
+- supabase: `any` (isteğe bağlı) — Varsayılan olarak `defaultClient` kullanılır. Veritabanı bağlantısı için Supabase istemcisi.
+**Dönüş**: `Promise<{ unitPrice: number, priceListId: string | null }>` — Hesaplanmış birim fiyatı ve kullanılan fiyat listesinin kimliği (eğer bir fiyat listesi uygulandıysa). Fiyat listesi kullanılmadığında `priceListId` `null` olur.
 
 ---
 
@@ -86,48 +96,80 @@ type UserRole = 'individual' | 'dealer' | 'corporate' | 'admin'
 
 ---
 
+## SABİTLER
+- **defaultClient** (ternary_expression) — `typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient`
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/lib/services/pricing.service.ts::nowIso
+### [N1_NASIL] AST Pointer: pricing.service.ts::nowIso
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - (iç değişken yok)
-- **Dönüş**: string — geçerli ISO tarih stringini döndürür
+  - (yok)
+- **Dönüş**: string — Mevcut UTC zamanını ISO formatında döndürür.
 
-### [N2_NASIL] AST Pointer: src/lib/services/pricing.service.ts::getEffectiveUnitPrice
-- **params**: (product: Product) — fiyat bilgisi alınacak ürün nesnesi
+### [N2_NASIL] AST Pointer: pricing.service.ts::getEffectiveUnitPrice
+- **params**: (product: Product, supabase = defaultClient)
 - **ic_degiskenler**:
-  - `info` — getEffectivePriceInfo fonksiyonunun sonucunu tutar, unitPrice ve priceListId içerir
-- **Dönüş**: Promise<number> — ürünün etkin birim fiyatını döndürür
+  - `info` — getEffectivePriceInfo fonksiyonundan dönen unitPrice ve priceListId değerlerini tutar.
+- **Dönüş**: number — product için geçerli birim fiyatı döndürür.
 
-### [N3_NASIL] AST Pointer: src/lib/services/pricing.service.ts::getEffectivePriceInfo
-- **params**: (product: Product) — fiyat bilgisi hesaplanacak ürün nesnesi
+### [N3_NASIL] AST Pointer: pricing.service.ts::getEffectivePriceInfo
+- **params**: (product: Product, supabase = defaultClient)
 - **ic_degiskenler**:
-  - `fallback` — product.price değerinden hesaplanan yedek fiyat (IIFE ile)
-  - `authData` — supabase.auth.getUser() sonucu, kullanıcı verisi içerir
-  - `userErr` — auth isteği hata nesnesi
-  - `user` — kimlik doğrulanmış kullanıcı nesnesi veya hata durumunda null
-  - `prof` — user_profiles tablosundan gelen profil verisi (id, role, organization_id)
-  - `profErr` — profil sorgusu hata nesnesi
-  - `profile` — prof değişkeninin UserProfileLight olarak tipi dönüştürülmüş hali
-  - `role` — kullanıcının rolü (profile.role veya 'individual' varsayılanı)
-  - `now` — şu anki ISO tarih stringi (nowIso fonksiyonu ile)
-  - `lists` — aktif ve geçerli fiyat listeleri dizisi
-  - `listErr` — fiyat listeleri sorgusu hata nesnesi
-  - `typedLists` — lists dizisinin PriceListRow[] olarak tipi dönüştürülmüş hali
-  - `matchedLists` — kullanıcının rolüyle eşleşen veya genel (user_type=null) fiyat listeleri
-  - `sorted` — eşleşen listelerin öncelik sırasına göre sıralanmış hali
-  - `chosen` — sıralanmış listeden birinci (en uygun) fiyat listesi veya null
-  - `priceListIds` — denenecek fiyat listesi ID'leri dizisi (chosen.id ve null veya sadece null)
-  - `plId` — döngüdeki mevcut fiyat listesi ID'si
-  - `query` — product_prices tablosu için Supabase sorgu nesnesi
-  - `rows` — product_prices tablosundan gelen satırlar
-  - `prErr` — ürün fiyatları sorgusu hata nesnesi
-  - `pick` — geçerli tarih aralığındaki ilk ürün fiyatı satırı veya ilk satır
-  - `base` — pick.base_price sayısına dönüştürülmüş hali
-  - `sale` — pick.sale_price sayıya dönüştürülmüş hali veya null
-  - `disc` — pick.discount_percentage sayısına dönüştürülmüş hali
-- **Dönüş**: Promise<{ unitPrice: number, priceListId: string | null }> — hesaplanan birim fiyat ve kullanılan fiyat listesi ID'si
+  - `fallback` — product.price'dan hesaplanan ve geçerli fiyat bulunamadığında kullanılacak yedek fiyat.
+  - `authData` — supabase.auth.getUser() sonucundan gelen kullanıcı verisi.
+  - `userErr` — supabase.auth.getUser() sonucunda oluşabilecek hata.
+  - `user` — authData.user, userErr varsa null.
+  - `prof` — user_profiles tablosundan çekilen profil verisi.
+  - `profErr` — user_profiles sorgusundaki hata.
+  - `profile` — prof veya boş nesne.
+  - `role` — profile.role veya 'individual'.
+  - `now` — şu anki ISO tarih stringi.
+  - `lists` — price_lists tablosundan çekilen aktif ve tarih aralığına uyan fiyat listeleri.
+  - `listErr` — price_lists sorgusundaki hata.
+  - `typedLists` — lists'in PriceListRow[] türüne dönüştürülmüş hali.
+  - `matchedLists` — user_type'ı role ile eşleşen veya user_type'ı olmayan listeler.
+  - `sorted` — matchedLists'in sıralanmış hali.
+  - `chosen` — sorted[0] veya null.
+  - `priceListIds` — chosen varsa [chosen.id, null], yoksa [null].
+  - `plId` — priceListIds içindeki her bir id için döngüde kullanılır.
+  - `query` — product_prices tablosu için sorgu.
+  - `rows` — query sonucu veriler.
+  - `prErr` — query hatası.
+  - `pick` — rows içinden tarih aralığına uyan ilk satır veya rows[0].
+  - `base` — pick.base_price, sayıya çevrilmiş.
+  - `sale` — pick.sale_price, null olabilir.
+  - `disc` — pick.discount_percentage, sayıya çevrilmiş.
+  - `val` — base ve disc kullanılarak hesaplanan değer.
+- **Dönüş**: { unitPrice: number, priceListId: string | null } — product için geçerli fiyat ve fiyat listesi ID'si.
+
+### [N4_NASIL] AST Pointer: pricing.service.ts::(fallback_arrow)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `v` — product.price'ın sayısal karşılığı, parseFloat ile çevrilmiş.
+- **Dönüş**: number — fallback fiyatı döndürür.
+
+### [N5_NASIL] AST Pointer: pricing.service.ts::(filter_arrow)
+- **params**: (list)
+- **ic_degiskenler**:
+  - `match` — list.user_type ile role eşleşip eşleşmediğini tutan boolean.
+- **Dönüş**: boolean — listenin eşleşip eşleşmediğini döndürür.
+
+### [N6_NASIL] AST Pointer: pricing.service.ts::(sort_arrow)
+- **params**: (a, b)
+- **ic_degiskenler**:
+  - `aTime` — a.effective_from tarihini milisaniyeye çevirip tutan değişken.
+  - `bTime` — b.effective_from tarihini milisaniyeye çevirip tutan değişken.
+- **Dönüş**: number — sıralama için karşılaştırma sonucu.
+
+### [N7_NASIL] AST Pointer: pricing.service.ts::(find_arrow)
+- **params**: (r)
+- **ic_degiskenler**:
+  - `fromOk` — r.valid_from tarihinin geçerli olup olmadığını tutan boolean.
+  - `toOk` — r.valid_until tarihinin geçerli olup olmadığını tutan boolean.
+- **Dönüş**: boolean — satırın tarih aralığına uyup uymadığını döndürür.
 
 ---
 
@@ -138,8 +180,8 @@ graph TD
     pricing_service_ts__getEffectivePriceInfo["getEffectivePriceInfo"]
     pricing_service_ts__getEffectiveUnitPrice["getEffectiveUnitPrice"]
     pricing_service_ts__nowIso["nowIso"]
-    pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__nowIso
     pricing_service_ts__getEffectiveUnitPrice --> pricing_service_ts__getEffectivePriceInfo
+    pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__nowIso
 ```
 
 ## NODE ID STANDARD

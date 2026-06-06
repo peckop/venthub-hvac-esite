@@ -3,19 +3,19 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\api\webhook\supabase\route.ts
-skeleton_hash: 3fb60d8dc42d092a
+skeleton_hash: fd9bb44065467f64
 entity_hashes:
   func:POST: b4117100eb99acd2
-  overview: f1a5a31fe18cb8c0
-generated_at: 2026-05-30T21:35:25Z
+  overview: f01f3fd680e913b2
+generated_at: 2026-06-06T21:54:12Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase veritabanından gelen webhook olaylarını (INSERT, UPDATE, DELETE) HMAC ile doğrulayarak, Next.js uygulamasının önbelleğini (cache) ilgili sayfalar ve veriler için anlık olarak tetikler ve yeniler. Temel amacı, veritabanındaki değişikliklerin kullanıcı arayüzünde hemen görünür olmasını sağlamaktır.
+Bu modül, Supabase veritabanında gerçekleşen değişiklikleri (INSERT, UPDATE, DELETE) izleyerek Next.js uygulamasının önbelleğini gerçek zamanlı olarak yeniler. Temel işlevi, veritabanı olaylarını HMAC ile güvenli bir şekilde doğrulamak ve ilgili sayfaların önbelleğini tetikleyerek kullanıcı arayüzünün güncel kalmasını sağlamaktır.
 
 ## Fonksiyon Grupları
-### HTTP Metodları ve Olay İşleme
-Gelen webhook isteklerini karşılayan ve doğrulama, veri analizi ile önbellek yenileme adımlarını sırasıyla gerçekleştiren ana işleyici.
+### HTTP Webhook İşleyici
+Gelen webhook isteklerini doğrulayan ve işleyen ana modül giriş noktası. HMAC imza kontrolü, payload ayrıştırma ve önbellek yenileme tetikleme süreçlerini yönetir.
 - POST
 
 ---
@@ -24,17 +24,17 @@ Gelen webhook isteklerini karşılayan ve doğrulama, veri analizi ile önbellek
 
 Bu modül, Supabase webhook olaylarını HMAC ile doğrulayıp önbellek yenileme tetikleyen bir API route handler'dır.
 
-**[Aksiyom 1 - HMAC Secret Yapılandırması]:** Eğer `SUPABASE_WEBHOOK_SECRET` (veya HMAC doğrulama için kullanılan gizli anahtar) ortam değişkeni (env) olarak tanımlı yoksa, webhook imza doğrulaması başarısız olur ve tüm istekler reddedilir.
+**[Aksiyom 1 - HMAC Secret Zorunluluğu]:** Eğer `SUPABASE_WEBHOOK_SECRET` ortam değişkeni yoksa veya boşsa, webhook istekleri HMAC ile doğrulanamaz ve güvenlik açığı oluşur.
 
-**[Aksiyom 2 - İstek Başlıkları]:** Eğer gelen POST isteğinin header'larında Supabase tarafından eklenen imza başlığı (örn: `x-webhook-signature`, `authorization` veya benzeri HMAC imza başlığı) yoksa, istek yetkisiz kabul edilerek 401/403 döner ve işlenmez.
+**[Aksiyom 2 - Request Body Zorunluluğu]:** Eğer POST request'in body içeriği yoksa veya geçerli bir JSON değilse, webhook olayı işlenemez ve istek başarısız olur.
 
-**[Aksiyom 3 - İstek Body Yapısı]:** Eğer gelen POST isteğinin body'si geçerli bir JSON değilse veya Supabase webhook payload yapısına (tablo adı, operasyon türü, kayıt verisi) uygun structure içermiyorsa, payload ayrıştırma hatası oluşur ve istek işlenemez.
+**[Aksiyom 3 - Desteklenen Olay Türleri]:** Eğer webhook payload'ındaki `type` alanı `INSERT`, `UPDATE` veya `DELETE` değerlerinden biri değilse, olay işlenmez ve önbellek yenileme tetiklenmez.
 
-**[Aksiyom 4 - HMAC Doğrulama]:** Eğer isteğin imzası, beklenen HMAC algoritması ile doğrulanamıyorsa (secret eşleşmiyor veya imza geçersizse), istek reddedilir ve 401/403 yanıtı döner; hiçbir önbellek yenileme tetiklenmez.
+**[Aksiyom 4 - Tablo Bazlı Önbellek Yenileme]:** Eğer webhook payload'ındaki tablo adı (`table` alanı) uygulama tarafından izlenen tablolardan biri değilse, önbellek yenileme işlemi gerçekleşmez.
 
-**[Aksiyom 5 - Revalidation Mekanizması]:** Eğer Next.js revalidation endpoint'i (`/api/revalidate` veya karşılık gelen mekanizma) aktif ve erişilebilir değilse, webhook isteği doğrulanmış olsa bile etkilenen sayfaların önbelleği yenilenemez ve kullanıcı arayüzünde veri tutarsızlığı oluşur.
+**[Aksiyom 5 - HMAC İmza Doğrulama]:** Eğer gelen isteğin `x-supabase-signature` header'ı yoksa veya HMAC-SHA256 imzası SECRET ile eşleşmiyorsa, istek reddedilir (401 Unauthorized döner).
 
-**[Aksiyom 6 - Tablo-URL Eşleme Tanımları]:** Eğer webhook'tan gelen tablo adı ile yenilenecek sayfa/etiket yolları (revalidation path'leri) arasında bir eşleme (mapping) tanımlı değilse, hangi sayfaların yenileneceği bilinemez ve ilgili önbellekler eski verilerle kalır.
+**[Aksiyom 6 -revalidationPath Haritası]:** Eğer webhook payload'ındaki tablo adı `revalidationPath` haritasında eşleşen bir anahtar içermiyorsa, hangi sayfaların yenileneceği bilinmez ve önbellek güncellenemez.
 
 ---
 

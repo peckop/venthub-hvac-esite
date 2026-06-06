@@ -3,31 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\logistics\page.tsx
-skeleton_hash: 517c236f99fadd9e
+skeleton_hash: ae8daa961131c5fc
 entity_hashes:
   func:LogisticsPage: 70696f052bf11390
-  overview: ab1d59ecc97d7bb1
+  overview: 08b82d6ebca3f7e4
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:35:10Z
+generated_at: 2026-06-06T21:53:51Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yöneticilerinin lojistik operasyonlarını izlemek ve yönetmek için kullandığı web sayfasının giriş noktasıdır. Tek bileşenli bir yapısı olup, asıl lojistik arayüzünü ve işlevselliğini içeren bir alt bileşeni (`AdminLogisticsPage`) yükleyerek sayfayı sunar.
+Bu modül, VentHub HVAC yöneticilerinin lojistik operasyonlarını izlemek ve yönetmek için kullandığı web sayfasının giriş noktasıdır. Tek bileşenli bir yapıya sahip olup, asıl lojistik arayüzünü ve işlevselliğini barındıran `AdminLogisticsPage` alt bileşenini doğrudan sunarak sayfayı render eder. Sayfa, Next.js App Router yapısında çalışır ve yönetici panelindeki lojistik bölümüne erişim sağlar.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-- Yönetici panelindeki lojistik sayfasının üst düzey bileşenini oluşturur ve render eder.
-  - LogisticsPage
+Yönetim panelindeki lojistik sayfasının üst düzey yapısını oluşturur ve kullanıcıya sunar.
+- LogisticsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
 Bu modül için yalnızca fonksiyon imzası ve modül sabitleri temelinde çıkarılabilen sınırlı aksiyomlar tanımlanmıştır. Fonksiyon gövdesi sağlandığında aksiyomlar güncellenebilir.
 
-**[Aksiyom 1]**: Eğer `AdminLogisticsPage` bileşeni modül kapsaminda tanımlı veya import edilmiş değilse, `LogisticsPage` bileşeni çağrıldığında `ReferenceError` veya `undefined` hata durumu oluşur ve sayfa render edilemez.
-
-**[Aksiyom 2]**: Eğer `LogisticsPage` fonksiyonu parametresiz (`()`) olarak tanımlıysa ve bir React bileşeniyse, çağrıldığı bağlamda (`page.tsx` – Next.js App Router) bir React JSX/Element döndürmesi gerekir; aksi halde React render hatası oluşur.
+**[Aksiyom 1]**: Eğer `AdminLogisticsPage` modülü veya bileşeni yoksa veya import edilemezse, `LogisticsPage` bileşeni düzgün render edilemez.
 
 ---
 
@@ -46,18 +43,9 @@ Bu modül için yalnızca fonksiyon imzası ve modül sabitleri temelinde çıka
 ---
 
 ## SABİTLER
-- **AdminLogisticsPage** (call) — `dynamic(
+- **AdminLogisticsPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminLogisticsPage'),
-  { ssr...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\logistics\page.tsx::LogisticsPage
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX element (`<AdminLogisticsPage />`) – React bileşeni olarak `AdminLogisticsPage` bileşenini render eder.
+  {...`
 
 ---
 

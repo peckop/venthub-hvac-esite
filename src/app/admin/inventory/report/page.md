@@ -3,35 +3,27 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\report\page.tsx
-skeleton_hash: a90c7fedc66c4a2a
+skeleton_hash: e3b6dcb6f41911c2
 entity_hashes:
   func:InventoryReportPage: bfcc8ccf4dbc326a
-  overview: 186bde0cd4ca9cee
+  overview: 4a0a3d3311d8e694
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:35:10Z
+generated_at: 2026-06-06T21:53:59Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki envanter rapor sayfasının ana giriş noktasıdır. Tek bir fonksiyon, sayfanın üst düzey bileşenini dinamik olarak yükleyip render eder, böylece raporların listesi, grafikleri ve filtreleme seçenekleri tek bir sayfada birleşir.
+
+Yönetim panelindeki envanter rapor sayfasının üst düzey giriş noktasıdır. Tek bir React sayfa bileşeni olarak, rapor arayüzünün yüklenmesini ve render edilmesini sağlar.
 
 ## Fonksiyon Grupları
-### Sayfa Render ve Bileşen Yönlendirme
-Bu grup, rapor sayfasının kök bileşenini tanımlar ve asıl görünüm katmanına (view) yönlendirme yaparak sayfa içeriğini kullanıcıya sunar.  
+
+### Sayfa Bileşeni
+Envanter rapor sayfasının kök bileşenini tanımlar ve yönetir. Yönetim paneli düzeni içinde rapor görünümünü kullanıcıya sunar.
 - InventoryReportPage
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesine erişim olmadığından, sadece imza bilgisinden yola çıkarak güvenilir bir aksiyom üretilememektedir.
-
-**[Aksiyom 1]**: Eğer `InventoryReportPage` çağrıldığında bileşen ağacı (component tree) düzgün render edilecek bir React ortamı (provider'lar, layout) yoksa, sayfa render hatası ile karşılaşır.
-
-**[Aksiyom 2]**: Eğer sayfa dinamik içeriğini yüklemek için bağımlı olduğu modüller/bileşenler erişilebilir konumda değilse (örn. lazy load edilen alt sayfa bileşenleri), rapor içeriği kullanıcıya gösterilmez.
-
----
-
-> **Not**: Fonksiyon imzası `InventoryReportPage()` — parametresiz, default değer içermeyen, saf bir React sayfa bileşenidir. Fonksiyon gövdesine ait kod olmadığı için (kod kesik/eksik), domain-specific eşik değerleri, veri bağımlılıkları veya iş kuralı aksiyomları **bilinmiyor** durumdadır. Aksiyomların genişletilmesi için fonksiyon gövdesinin tamamının sağlanması gereklidir.
 
 ---
 
@@ -51,17 +43,17 @@ Bu modül için fonksiyon gövdesine erişim olmadığından, sadece imza bilgis
 ---
 
 ## SABİTLER
-- **AdminInventoryReportPage** (call) — `dynamic(
-  () => import('../../../../views/admin/AdminInventoryReportPage'),...`
+- **AdminInventoryReportPage** (call) — `nextDynamic(
+  () => import('../../../../views/admin/AdminInventoryReportPag...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\inventory\report\page.tsx::InventoryReportPage
+### [N1_NASIL] AST Pointer: src/app/admin/inventory/report/page.tsx::InventoryReportPage
 - **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element (React bileşeni `<AdminInventoryReportPage />` döndürür)
+- **ic_degiskenler**: (değişken tanımlanmamıştır)
+- **Dönüş**: `<AdminInventoryReportPage />` JSX bileşeni döndürür
 
 ---
 

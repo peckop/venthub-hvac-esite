@@ -3,26 +3,45 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\orders\page.tsx
-skeleton_hash: 0eb01de0ed96f5e5
+skeleton_hash: 34eec87e5d2f2bc4
 entity_hashes:
   func:Page: d710ec3bcbfd4e2f
-  overview: a752ca63e1e75a0e
+  overview: b0edd278ef51fffe
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:35:01Z
+generated_at: 2026-06-06T21:54:02Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin Next.js tabanlı yönetim panelindeki siparişler rotasının ana giriş noktasıdır. Yönetici kullanıcıların siparişleri görüntüleyip yönetebileceği sayfanın temel iskeletini oluşturur. Projeye özel çok dilli çeviri desteği ve dinamik içerik yüklemesi kullanarak hem çoklu dil uyumluluğu hem de gelişmiş sayfa yükleme performansı sağlar.
+Bu modül, VentHub HVAC projesinin yönetim panelindeki siparişler rotasının giriş noktasıdır. Yönetici kullanıcıların siparişleri görüntüleyip yönetebileceği sayfayı, çok dil desteği ve dinamik yükleme ile sunar.
 
 ## Fonksiyon Grupları
-### Rota Ana Sayfa Bileşeni
-Yönetim paneli siparişler rotasının varsayılan çalıştırılabilir bileşeni olarak görev alır, çeviri altyapısını hazırlar ve dinamik olarak yüklenen asıl sipariş yönetimi görünümünü yükleme sırasında sarmalayıcı ile kullanıcıya sunar.
+### Rota Sayfası Bileşeni
+Siparişler rotasının ana sayfa bileşeni olarak görev yapar, çeviri altyapısını kurar ve asıl yönetim görünümünü yükleme durumunda animasyonlu bekleyici ile birlikte sunar.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, Next.js routing tarafından çağrılan bir sayfa bileşenidir. Aşağıdaki mimari varsayımlar fonksiyon imzası ve modül sabitlerine dayanarak çıkarılmıştır.
+
+---
+
+**[Aksiyom 1]:** Eğer `AdminOrdersPage` bileşeni projede tanımlı veya import edilebilir değilse, `Page()` fonksiyonu derleme zamanı hatası ile karşılaşır.
+
+> **Gerekçe:** Modül sabitlerinde `AdminOrdersPage (call)` olarak belirtilmiştir; yani fonksiyon gövdesinde bu bileşenin çağrılması zorunludur.
+
+---
+
+**[Aksiyom 2]:** Eğer `Page()` fonksiyonu React/Next.js bileşeni olarak return etmiyorsa, tarayıcıda渲染 hatası oluşur ve sayfa görüntülenemez.
+
+> **Gerekçe:** Fonksiyon imzası `Page()` — parametresiz, slotsuz bir React bileşenidir. Next.js App Router tarafından `/admin/orders` rotasının varsayılan bileşeni olarak yüklenir.
+
+---
+
+**[Aksiyom 3]:** Eğer `AdminOrdersPage` bileşeni props bekliyorsa ancak `Page()` fonksiyonundan prop geçirilmiyorsa (fonksiyon imzasında parametre yok), bileşen varsayılan değerlerle veya hata ile çalışır.
+
+> **Gerekçe:** Fonksiyon imzası tamamen parametresizdir: `Page()`. Hiçbir props传递 yapılmamaktadır.
 
 ---
 
@@ -37,19 +56,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## SABİTLER
-- **AdminOrdersPage** (call) — `dynamic(
+- **AdminOrdersPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminOrdersPage'),
-  { ssr: f...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/app/admin/orders/page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `t` — `useI18n()` hook’undan alınan yerelleştirme (çeviri) fonksiyonu; `t('common.loading')` ile `Suspense` fallback’inde gösterilecek metni döndürür.
-- **Dönüş**: JSX.Element (React bileşeni)
+  { ss...`
 
 ---
 

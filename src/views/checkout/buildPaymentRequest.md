@@ -3,24 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\buildPaymentRequest.ts
-skeleton_hash: d8e58db5a87487ca
+skeleton_hash: 1c47edb9be957105
 entity_hashes:
   func:buildPaymentRequest: 874080c807e1dee1
-  overview: 8c8c4c1fa405942e
-generated_at: 2026-05-28T22:40:07Z
+  overview: d55be1ad42d13d7e
+generated_at: 2026-06-06T21:58:16Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun ödeme sürecinde yer alarak, sipariş ödeme adımında ihtiyaç duyulan standartlaştırılmış ödeme isteklerinin oluşturulmasını sağlar. Kullanıcı ve sipariş detaylarını içeren giriş parametrelerini işleyerek, üçüncü taraf ödeme servisleriyle uyumlu, geçerli bir ödeme talebi yapısını üretir.
+Bu modül, VentHub HVAC platformunun ödeme sürecinin temel taşı olarak, sipariş ve müşteri verilerini harici ödeme servislerinin beklediği standart formata dönüştürme sorumluluğunu taşır. Checkout akışında, yerel sistem verilerini alarak geçerli ve eksiksiz bir ödeme talebi yapısı oluşturur ve böylece ödeme işleminin başarıyla başlatılmasını garanti altına alır.
 
 ## Fonksiyon Grupları
-### Ana Ödeme İsteği Oluşturucu
-Modülün temel sorumluluğu olan ödeme talebi oluşturma işlemini gerçekleştiren ana işlevi barındırır. Tüm giriş argümanlarını standart ödeme servisi formatına uygun hale getirerek kullanılabilir bir istek nesnesi haline getirir.
+### Ödeme İsteği Oluşturucu
+Modülün tek ve temel sorumluluğu olan, ödeme süreci için gerekli olan standartlaştırılmış istek nesnesini oluşturma işlemini yönetir.
 - buildPaymentRequest
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmıştır.
 
+[Aksiyom 1]: Eğer `args` parametresi (`BuildPaymentArgs` tipinde) geçerli (null/undefined olmayan) bir nesne içermiyorsa, fonksiyon hata fırlatır veya beklenmeyen bir sonuç üretir.
+[Aksiyom 2]: Eğer `args` nesnesi içindeki alanlar (örn. `orderId`, `amount`, `currency` vb. - tam liste bilinmiyor) ödeme servisinin beklediği formata uygun (gerekli alanları içeren) değilse, fonksiyon geçersiz bir ödeme isteği yapısı üretir.
+[Aksiyom 3]: Eğer `args` içindeki `amount` alanı sayısal bir değer değilse (örn. string, null veya NaN), fonksiyon tutarsız veya hatalı bir ödeme tutarı içeren istek üretir.
+[Aksiyom 4]: Eğer `args` içindeki `currency` alanı geçerli bir para birimi kodu (örn. 'USD', 'EUR', 'TRY') içermiyorsa, fonksiyon geçersiz para birimi koduna sahip bir istek üretir.
+[Aksiyom 5]: Eğer `args` içindeki `orderId` alanı benzersiz veya geçerli bir sipariş tanımlayıcısı içermiyorsa, fonksiyon hedeflenen siparişle eşleşmeyen bir ödeme isteği üretir.
 
 ---
 
@@ -97,51 +104,29 @@ type InvoiceInfo = Partial<{ tckn: string; companyName: string; vkn: string; tax
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/checkout/buildPaymentRequest.ts::buildPaymentRequest
-- **params**: [args: BuildPaymentArgs]
+- **params**:
+  - `args: BuildPaymentArgs` — ödeme isteği için gerekli tüm bilgileri (tutar, ürünler, müşteri, adresler, fatura, yasal onaylar vb.) barındıran nesne
 - **ic_degiskenler**:
-  - `amount` — args nesnesinden çıkarılan ödeme işlemi için toplam tutar değeri
-  - `items` — args nesnesinden çıkarılan müşteri sepetindeki ham ürün listesi
-  - `customer` — args nesnesinden çıkarılan müşteri kimlik ve iletişim bilgileri nesnesi
-  - `shipping` — args nesnesinden çıkarılan ham gönderim adresi nesnesi
-  - `billing` — args nesnesinden çıkarılan ham fatura adresi nesnesi
-  - `sameAsShipping` — args nesnesinden çıkarılan, fatura adresinin gönderim adresiyle aynı olup olmadığını belirten bayrak
-  - `userId` — args nesnesinden çıkarılan sistemdeki kayıtlı kullanıcı kimliği
-  - `invoiceType` — args nesnesinden çıkarılan fatura türü (şahıs/kurum vb.) değeri
-  - `invoiceInfo` — args nesnesinden çıkarılan fatura düzenleme için gerekli detaylar nesnesi
-  - `legalConsents` — args nesnesinden çıkarılan müşterinin onayladığı yasal sözleşmeler nesnesi
-  - `shippingMethod` — args nesnesinden çıkarılan seçilen kargo teslimat yöntemi
-  - `cartItems` — items listesi üzerinden ödeme sistemi formatına dönüştürülerek oluşturulan standart sepet ürünleri listesi
-  - `normalizeAddress` — farklı formatlardaki adres nesnelerini tek standart formata dönüştürmek için tanımlanan iç fonksiyon
-  - `shippingAddress` — normalize edilmiş, adres türü 'shipping' olarak ayarlanmış nihai gönderim adresi nesnesi
-  - `billingAddress` — normalize edilmiş, adres türü 'billing' olarak ayarlanmış nihai fatura adresi nesnesi; sameAsShipping true ise gönderim adresi kullanılır
-  - `customerName` — müşterinin isim bilgilerinden birleştirilerek oluşturulan tam isim string'i
-  - `consents` — legalConsents nesnesinin tip dönüşümü yapılmış hali, yasal onayların erişimini kolaylaştırır
-  - `req` — tüm toplanan verilerle oluşturulan nihai ödeme isteği nesnesi
-  - `args.couponCode` — args nesnesinden erişilen, eğer varsa müşterinin kullandığı indirim kuponu kodu
-- **Dönüş**: Ödeme işlemi için hazırlanmış standart formatlı ödeme isteği nesnesi (req)
-
-### [N2_NASIL] AST Pointer: src/views/checkout/buildPaymentRequest.ts::items.map callback fonksiyonu
-- **params**: [it: ham sepet ürünü nesnesi]
-- **ic_degiskenler**:
-  - `it.product.id` - dönüştürülen ürünün benzersiz kimliği
-  - `it.quantity` - sepetteki ürün adedi
-  - `it.product.price` - ürünün ham fiyat değeri
-  - `safeNumber` - harici import edilen tip dönüştürme fonksiyonu, fiyat değerini güvenli sayı formatına çevirir
-  - `it.product.name` - ürünün ekranda gösterilecek tam adı
-  - `it.product.image_url` - ürünün kapak resminin URL'si
-- **Dönüş**: Ödeme sistemi ile uyumlu standartlaştırılmış tek sepet ürünü nesnesi
-
-### [N3_NASIL] AST Pointer: src/views/checkout/buildPaymentRequest.ts::normalizeAddress
-- **params**: [addr: AddressInput | UserAddress | null]
-- **ic_degiskenler**:
-  - `a` - addr nesnesinin Record<string, unknown> tipine dönüştürülmüş hali, farklı tipteki adres alanlarına güvenli erişim sağlar
-  - `a.fullAddress` - ham adresin standart camelCase formatlı tam adres alanı
-  - `a.full_address` - ham adresin snake_case formatlı tam adres alanı
-  - `a.city` - ham adresin şehir bilgisini tutan alan
-  - `a.district` - ham adresin ilçe bilgisini tutan alan
-  - `a.postalCode` - ham adresin standart camelCase formatlı posta kodu alanı
-  - `a.postal_code` - ham adresin snake_case formatlı posta kodu alanı
-- **Dönüş**: Tüm adres formatları için ortak, standartlaştırılmış adres nesnesi (fullAddress, city, district, postalCode alanları içerir)
+  - `amount` — ödeme tutarı, args'ten destructure edilir
+  - `items` — sepet ürünleri dizisi, her biri ürün bilgisi ve adet içerir
+  - `customer` — müşteri bilgileri (isim, e-posta, telefon)
+  - `shipping` — kargo adresi girdisi (AddressInput | UserAddress | null)
+  - `billing` — fatura adresi girdisi (AddressInput | UserAddress | null)
+  - `sameAsShipping` — fatura adresinin kargo adresi ile aynı olup olmadığını belirten boolean
+  - `userId` — giriş yapmış kullanıcının ID'si (opsiyonel)
+  - `invoiceType` — fatura türü
+  - `invoiceInfo` — fatura detay bilgileri
+  - `legalConsents` — yasal onayların (KVKK, mesafeli satış, ön bilgilendirme vb.) tutulduğu nesne
+  - `shippingMethod` — kargo yöntemi (ör. standard)
+  - `cartItems` — items dizisinin map ile dönüştürülmüş hali; her eleman {product_id, quantity, price, product_name, product_image_url} yapısındadır
+  - `normalizeAddress` — inner function; AddressInput | UserAddress | null alıp {fullAddress, city, district, postalCode} formatında normalize edilmiş adres nesnesi döndürür; null ise boş alanlarla varsayılan nesne döner; Record<string, unknown> cast ile hem camelCase hem snake_case alan isimlerini destekler
+  - `a` — normalizeAddress içinde addr'nin Record<string, unknown> olarak cast edilmiş hali, alan erişimi için kullanılır
+  - `shippingAddress` — normalizeAddress(shipping) sonucuna `address_type: 'shipping'` eklenmiş kargo adresi nesnesi
+  - `billingAddress` — sameAsShipping true ise shippingAddress'in kopyasına `address_type: 'billing'` eklenir; false ise normalizeAddress(billing) ile oluşturulur
+  - `customerName` — customer.name varsa onu kullanır, yoksa firstName ve lastName birleştirilerek oluşturulur, trim ile boşluk temizlenir
+  - `consents` — legalConsents'ın Record<string, boolean | undefined> olarak cast edilmiş hali, yasal onay anahtarlarına erişim için kullanılır
+  - `req` — ödeme istek nesnesi; amount, cartItems, customerInfo (name, email, phone), shippingAddress, billingAddress, user_id, invoiceType, invoiceInfo, legalConsents (kvkk, distanceSales, preInfo, orderConfirm, marketing — her biri accepted boolean ve timestamp), shippingMethod, couponCode alanlarını içerir
+- **Dönüş**: `req` nesnesi — ödemeateway'e gönderilecek yapılandırılmış istek nesnesi (tutar, sepet, müşteri bilgisi, adresler, fatura, yasal onaylar, kargo yöntemi, kupon kodu)
 
 ---
 

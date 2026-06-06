@@ -3,36 +3,21 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\AboutPage.tsx
-skeleton_hash: 4726f670bf91f4bf
+skeleton_hash: ecd28b653e17510e
 entity_hashes:
   func:AboutPage: 7a07cf459964f7ab
   func:t: 470aecfc62464333
-  overview: 508336c7594890ab
+  overview: 9d68dc23ca71a802
   style_tokens: 6526e41f4914ea4c
-generated_at: 2026-05-28T22:39:07Z
+generated_at: 2026-06-06T21:56:30Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin Hakkında sayfasını oluşturan bir React görünümüdür. Sayfa, proje veya ekip hakkında bilgi vermek için tasarlanmış, dil destekli tek bileşenli bir arayüz sunar. Modül, sayfa yapısını ve çok dilli metinleri yönetmek için gerekli temel işlevleri içerir.
-
-## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Modülün tüm arayüz ve render sorumluluğunu üstlenen, sayfanın ana yapısını ve düzenini tanımlayan React bileşeni.
-- AboutPage
-
-### Dil Destek Fonksiyonu
-Sayfa içindeki metinleri, belirtilen dile göre çevirmek ve yerelleştirme sağlamak için kullanılan bir yardımcı fonksiyon.
-- t
+VentHub HVAC projesinin “Hakkında” sayfasını sunan, dil destekli bir React bileşenidir. Modül, sayfanın tüm arayüz yapısını ve çok dilli metin gösterimini yönetir.
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-VentHub HVAC projesinin istemci tarafı uygulamasında yer alan, hakkında sayfasını render eden React TypeScript view bileşenidir. Bu modülün başarıyla derlenmesi, yayınlanması ve son kullanıcılara sunulabilmesi için aşağıdaki koşulların varlığı zorunludur.
 
-[Aksiyom 1]: Eğer projeye React kütüphanesi entegre edilmemiş veya AboutPage bileşeninin kullandığı JSX sözdizimini desteklemeyen bir React sürümü kullanılıyorsa, AboutPage bileşeni hiçbir şekilde render edilemez, uygulama çalışma zamanında hata fırlatır.
-[Aksiyom 2]: Eğer projenin TypeScript derleyici yapılandırmasında TSX dosyalarını işleyip derleyecek ayarlar tanımlanmamışsa, AboutPage modülü derleme aşamasında hata üretir, uygulama üretim ortamına yüklenemez.
-[Aksiyom 3]: Eğer uygulamanın istemci tarafı yönlendirme (routing) mekanizmasında, hakkında sayfasına ait rota için AboutPage bileşenini yükleyecek yapılandırma yapılmamışsa, son kullanıcılar hiçbir şekilde AboutPage içeriğine erişemez.
-[Aksiyom 4]: Eğer AboutPage modülünün sabit kaynak dosya yolu (src/views/AboutPage.tsx) değiştirilirse, bu modülü proje içinden içe aktaran tüm bağımlı modüller içe aktarma hatası alır, uygulama derlenemez.
 
 ---
 
@@ -69,69 +54,42 @@ VentHub HVAC projesinin istemci tarafı uygulamasında yer alan, hakkında sayfa
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AboutPage.tsx::AboutPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: AboutPage.tsx::AboutPage
+- **params**: `({ lang = 'tr' })` — lang parametresi, sayfanın dilini belirler (varsayılan: 'tr')
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, SEO başlığında kullanılır
-  - `useI18n` — Çoklu dil desteği sağlayan hook, içinden çeviri fonksiyonu çekilir
-  - `heroBadgeRef` — Hero bölümündeki rozet elemanının scroll animasyonu için DOM referansı
-  - `heroBadgeVisible` — Hero rozetinin scroll ile görünür olup olmadığını belirten boolean state
-  - `useScrollAnimation` — Elemanların scroll ile animasyonlu görünmesini sağlayan hook, threshold parametresi alır
-  - `heroTitleRef` — Hero başlık elemanının scroll animasyonu DOM referansı
-  - `heroTitleVisible` — Hero başlığının görünürlük state'i
-  - `heroTextRef` — Hero açıklama metni elemanının scroll animasyonu DOM referansı
-  - `heroTextVisible` — Hero metninin görünürlük state'i
-  - `statsRef` — İstatistikler grid elemanının scroll animasyonu DOM referansı
-  - `statsVisible` — İstatistikler gridinin görünürlük state'i
-  - `storyRef` - Hikaye bölümü görseli elemanının scroll animasyonu DOM referansı
-  - `storyVisible` — Hikaye bölümü görselinin görünürlük state'i
-  - `valuesRef` — Değerler grid elemanının scroll animasyonu DOM referansı
-  - `valuesVisible` — Değerler gridinin görünürlük state'i
-  - `scrollAnimationClasses` — Animasyon sınıflarını içeren nesne, elemanlara stillendirme için uygulanır
-  - `stats` — Şirket istatistiklerini tutan nesne dizisi, her eleman value, label, icon alanlarına sahiptir
-  - `coreValues` — Şirketin temel değerlerini tutan nesne dizisi, her eleman title, description, icon alanlarına sahiptir
-  - `Seo` — Arama motoru optimizasyonu bileşeni, sayfa başlığı ve açıklaması prop'u alır
-  - `Image` — Next.js resim optimizasyonu bileşeni, tüm sayfa görselleri için kullanılır
-  - `Link` — Next.js client tarafı yönlendirme bileşeni, CTA butonlarında kullanılır
-  - `Routes.contact` — İletişim sayfası yolunu döndüren rota fonksiyonu, Link'in href prop'una atanır
-  - `Routes.products` — Ürünler sayfası yolunu döndüren rota fonksiyonu, Link'in href prop'una atanır
-  - `HVAC_BRANDS` — Yetkili markaların listesini tutan sabit dizi, marka şeridinde iterasyon için kullanılır
-  - `BrandIcon` — Marka ikonlarını render eden bileşen, her marka için uygun ikonu gösterir
-- **Dönüş**: JSX element, AboutPage sayfasının tamamını içeren React bileşeni çıktısı
+  - `dict` — lang parametresine göre seçilen sözlük nesnesi (en veya tr)
+  - `t` — çeviri helper fonksiyonu, key.split('.') ile iç içe erişim yapar
+  - `stats` — istatistik verilerini tutan dizi: {value, label, icon} nesnelerinden oluşur
+  - `coreValues` — temel değerleri tutan dizi: {title, description, icon} nesnelerinden oluşur
+- **Dönüş**: JSX elementi (React component)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AboutPage.tsx::stats_map_callback
-- **params**: (stat, i)
+### [N2_NASIL] AST Pointer: AboutPage.tsx::t
+- **params**: `(key: string)` — çevrilecek metin anahtarı (örn: 'aboutPage.heroTitle')
 - **ic_degiskenler**:
-  - `stat` — İstatistikler dizisinden gelen mevcut iterasyon elemanı, value ve label alanları kullanılır
-  - `i` — İstatistik elemanının dizi indeksi, key değeri ve sıralı animasyon için kullanılır
-  - `scrollAnimationClasses.fadeUp` — Yukarıdan görünme animasyonu sınıfını döndüren fonksiyon, statsVisible ile çağrılır
-  - `scrollAnimationClasses.staggerChild` — Sıralı animasyon için gecikme stili üreten fonksiyon, indeks i ile çağrılır
-  - `statsVisible` — Üst kapsamda tanımlanan istatistikler gridinin görünürlük state'i
-- **Dönüş**: JSX element, tek bir istatistik kartını temsil eden div elementi
+  - `parts` — key.split('.') ile oluşan nokta ayrılmış string dizisi
+  - `current` — mevcut sözlük seviyesi (unknown tipinde başlatılır, Record<string, unknown> olarak cast edilir)
+  - `obj` — current'ın Record<string, unknown> cast edilmiş hali
+- **Dönüş**: string — çevrilmiş metin veya hata durumunda orijinal key
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AboutPage.tsx::team_avatar_map_callback
-- **params**: (i)
-- **ic_degiskenler**:
-  - `i` — Avatar elemanının dizi indeksi, key değeri olarak kullanılır
-  - `Image` — Next.js resim bileşeni, takım üyesi avatarını yüklemek için kullanılır
-- **Dönüş**: JSX element, tek bir takım üyesi avatarını temsil eden div elementi
+### [N3_NASIL] AST Pointer: AboutPage.tsx::stats_map_callback
+- **params**: `(stat, i)` — stat: {value, label, icon} nesnesi; i: dizi indeksi
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX elementi (ScrollReveal içinde istatistik gösterimi)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AboutPage.tsx::brands_map_callback
-- **params**: (brand)
-- **ic_degiskenler**:
-  - `brand` — HVAC_BRANDS dizisinden gelen mevcut iterasyon elemanı, slug ve name alanları kullanılır
-  - `BrandIcon` — Marka ikonunu render eden bileşen, brand.name prop'u ile çağrılır
-- **Dönüş**: JSX element, tek bir marka kartını temsil eden div elementi
+### [N4_NASIL] AST Pointer: AboutPage.tsx::team_avatars_map_callback
+- **params**: `i` — dizi indeksi
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX elementi (avatar görseli)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\AboutPage.tsx::corevalues_map_callback
-- **params**: (value, i)
-- **ic_degiskenler**:
-  - `value` — coreValues dizisinden gelen mevcut iterasyon elemanı, icon, title, description alanları kullanılır
-  - `i` — Değer elemanının dizi indeksi, key değeri ve sıralı animasyon için kullanılır
-  - `scrollAnimationClasses.fadeUp` — Yukarıdan görünme animasyonu sınıfını döndüren fonksiyon, valuesVisible ile çağrılır
-  - `scrollAnimationClasses.staggerChild` — Sıralı animasyon için gecikme stili üreten fonksiyon, indeks i ile çağrılır
-  - `valuesVisible` — Üst kapsamda tanımlanan değerler gridinin görünürlük state'i
-- **Dönüş**: JSX element, tek bir temel değer kartını temsil eden div elementi
+### [N5_NASIL] AST Pointer: AboutPage.tsx::hvac_brands_map_callback
+- **params**: `(brand)` — HVAC_BRANDS dizisinden gelen brand nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX elementi (marka ikonu ve kart)
+
+### [N6_NASIL] AST Pointer: AboutPage.tsx::coreValues_map_callback
+- **params**: `(value, i)` — value: {title, description, icon} nesnesi; i: dizi indeksi
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX elementi (ScrollReveal içinde değer gösterimi)
 
 ---
 

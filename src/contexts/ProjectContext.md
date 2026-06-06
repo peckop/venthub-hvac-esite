@@ -3,33 +3,32 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectContext.tsx
-skeleton_hash: 0ca82cae15ab546c
+skeleton_hash: d6d5b7190c071445
 entity_hashes:
-  overview: 24280a0c197e7d12
+  overview: b4447e01cfb0157f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:37:26Z
+generated_at: 2026-06-06T21:55:08Z
 ---
 
 ## Genel Bakış
 
-Bu modül, VentHub HVAC uygulamasında proje verilerinin uygulama genelinde paylaşılmasını sağlayan React Context tanımıdır. Supabase veritabanından gelen `UserProject`, `ProjectItem` ve `Product` tiplerini içe aktararak, tüm bileşenler tarafından erişilebilir bir `ProjectContext` bağlam nesnesi oluşturur. Dosya herhangi bir iş mantığı veya fonksiyon barındırmaz; sadece proje verileri (projeler, yükleme durumu, ekleme/silme işlemleri) için gerekli bağlam altyapısını tanımlar.
+Bu modül, VentHub HVAC uygulamasında proje verilerinin tüm bileşenler tarafından erişilebilir olmasını sağlayan React Context (bağlam) altyapısını tanımlar. Dosya, `UserProject`, `ProjectItem` ve `Product` gibi Supabase veritabanı tiplerini içe aktararak `ProjectContext` adında bir bağlam nesnesi oluşturur. Modülde herhangi bir işlevsel fonksiyon veya API çağrısı bulunmaz; sadece veri paylaşımının temelini oluşturan tanım (declaration) katmanıdır.
 
-## Modül Yapısı
+## Fonksiyon Grupları
 
-- **Bağımlılıklar:** React kütüphanesinden `createContext` ve Supabase tipleri (`UserProject`, `ProjectItem`, `Product`) kullanılır
-- **Oluşturulan bağlam:** `ProjectContext` nesnesi, uygulama hiyerarşisindeki tüm alt bileşenlere proje verilerini sağlamak için tasarlanmıştır
-- **İşlevsellik:** Dosya salt tanım (declaration) içerir; gerçek veri işleme ve API çağrıları bu bağlamı sağlayan (Provider) bileşenlerde gerçekleştirilir
+Bu dosyada fonksiyon veya metod bulunmamaktadır. Modül, sadece React Context tanımı ve ilgili tiplerin import edilmesinden ibaret olup, gerçek veri işleme ve bileşen mantığı farklı dosyalarda (örneğin Provider bileşeninde) yer almaktadır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, React uygulama ağacındaki alt bileşenlerin proje verilerine erişebilmesi için zorunlu bir Context (bağlam) sağlayıcısı (Provider) altyapısı tanımlar.
 
-[Aksiyom 1]: Eğer `ProjectContext.Provider` bileşeni, uygulama hiyerarşisinin üst seviyelerinde (`App` veya bir üst düzey layout bileşeni gibi) doğru `value` prop'u ile sarılmamışsa, bu bağlamı kullanan tüm alt bileşenler `undefined` veya varsayılan başlangıç değeri alır ve beklenmeyen davranışlara neden olur.
+Bu modül bir React Context tanımıdır ve fonksiyon gövdesi içermemektedir; yalnızca `createContext` çağrısıyla bir bağlam nesnesi oluşturmaktadır. Aşağıdaki varsayımlar modülün yapısına ve bağlam kullanım modeline dayanmaktadır.
 
-[Aksiyom 2]: Eğer `ProjectContext`'e sarılan (`Provider` ile çevrelenen) bir bileşen, içinde bulunduğu bağlam nesnesini (`useContext(ProjectContext)`) kullanmıyorsa veya yanlış bir bağlam nesnesi kullanıyorsa, bu bileşen proje verilerine erişemez veya tutarsız veri ile karşılaşır.
+**[Aksiyom 1]:** Eğer `ProjectContext` sağlayan bir Provider bileşeni uygulama bileşen hiyerarşisinde tanımlanmamışsa, `useContext(ProjectContext)` kullanan tüm alt bileşenler `undefined` değer alır ve proje verilerine erişemez.
 
-[Aksiyom 3]: Eğer `ProjectContext` için tanımlanan başlangıç değeri (initial value) `null`, `undefined` veya geçersiz bir yapıda ise, bağlamı tüketen bileşenlerin ilk render'ında `TypeError` veya “Cannot read property of undefined” gibi hatalar oluşur.
+**[Aksiyom 2]:** Eğer içe aktarılan Supabase tipleri (`UserProject`, `ProjectItem`, `Product`) geçerli bir Supabase şemasıyla eşleşmiyor veya tanımsızsa, TypeScript derleme zamanında tip hatası oluşur; çalışma zamanında veri tutarsızlıkları meydana gelir.
+
+**[Aksiyom 3]:** Eğer `ProjectContext`'e verilen başlangıç değeri (default value) bileşenlerin gerçek kullanım ihtiyacını karşılamıyorsa (örn: `projects` dizisi boş iken bileşenler `map` işlemi yapıyorsa), çalışma zamanında `TypeError` oluşur.
 
 ---
 
@@ -58,11 +57,10 @@ Bu modül, React uygulama ağacındaki alt bileşenlerin proje verilerine erişe
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\ProjectContext.tsx::ProjectContext oluşturma çağrısı
-- **params**: (çağrıya gönderilen parametreler, eksik fonksiyon gövdesi nedeniyle tespit edilemedi)
-- **ic_degiskenler**:
-  - `ProjectContext` — React'in `createContext` API'si ile oluşturulan, uygulama genelinde projeyle ilgili verileri paylaşmak için kullanılan context nesnesi; ilişkili tipler import edilen `UserProject`, `ProjectItem`, `Product` olarak tanımlı
-- **Dönüş**: React Context nesnesi, `createContext` API çağrısından döndürülen değer olarak atanır
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\contexts\ProjectContext.tsx::ProjectContext
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `createContext()` çağrısının sonucu olan bir React.Context nesnesi (UserProject, ProjectItem veya Product tiplerini içerebilir)
 
 ---
 

@@ -3,30 +3,24 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useSettings.ts
-skeleton_hash: 9aca7355dd0ea4fc
+skeleton_hash: ed9f98cd3060abe2
 entity_hashes:
   func:useSettings: 0139115fd60135da
-  overview: be44b38718294952
-generated_at: 2026-05-28T22:37:49Z
+  overview: 611d74a1adafaf67
+generated_at: 2026-06-06T21:55:43Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinde React tabanlı arayüz bileşenleri tarafından kullanılmak üzere geliştirilmiş özel bir hook modülüdür. Uygulama genelindeki sistem ve kullanıcı ayarlarına merkezi, tutarlı erişim sağlamak amacıyla tasarlanmıştır. Tüm ayar yönetimi süreçlerini tek ana işlev üzerinden yürütür.
+VentHub HVAC projesindeki bu modül, React uygulaması genelindeki ayar verilerine tutarlı ve merkezi bir erişim noktası sağlayan özel bir hook sunar. Tek bir `useSettings` fonksiyonu üzerinden ayarların okunması ve güncellenmesi işlemleri gerçekleştirilerek, farklı bileşenler arasında veri tutarlılığı ve tekil kaynak (SSOT) prensibi garantilenir.
 
 ## Fonksiyon Grupları
-### Merkezi Ayar Yönetimi Hook'u
-Tüm uygulama genelinde kullanılacak ayarların okunması, güncellenmesi ve farklı bileşenler arasında güvenilir şekilde paylaşılmasını sağlayan ana işlevi barındırır.
+### Merkezi Ayar Erişim ve Yönetim Katmanı
+Uygulama genelindeki ayar değerlerinin (örneğin birim tercihleri, tema ayarları vb.) tek bir kaynaktan okunmasını ve güncellenmesini sağlayan, tüm bileşenlerin ortak kullanımına sunulan arayüz katmanıdır.
 - useSettings
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu React custom hook'u, uygulama genelindeki ayar değerlerine merkezi erişim sağlamak üzere tasarlanmıştır, çalışması için geçerli bir React runtime ortamı ve ayar state'ini barındıran üst bağlam/altyapının mevcut olması zorunludur.
 
-[Aksiyom 1]: Eğer hook, yalnızca React bileşenleri veya diğer React custom hook'ları içinde olmak zorunda olan geçerli bir çağrı bağlamında tetiklenmezse, React tarafından runtime hatası fırlatılır ve hook çalışmaz.
-[Aksiyom 2]: Eğer bu hook'un erişmesi gereken SettingsContext veya eşdeğer ayar sağlayıcı altyapı, hook'un çağrıldığı bileşen ağacında üst seviyede tanımlanmamışsa, ayar değerlerine erişilemez, boş/hatalı değer döner veya uygulama çalışma anında çöker.
-[Aksiyom 3]: Eğer projeye React kütüphanesi dahil edilmemişse veya React sürümü hook'ları (16.8 ve üzeri) desteklemiyorsa, useSettings hook'u hiç çalışmaz, uygulama build veya runtime aşamasında hata alır.
-[Aksiyom 4]: Eğer hook'un ayar verilerini okuduğu yerel depolama veya sunucu altyapısı erişilemez durumdaysa, useSettings tarafından döndürülen ayar değerleri güncel olmaz, uygulama ayarlara bağlı tüm özellikler beklendiği gibi çalışmaz.
 
 ---
 
@@ -64,41 +58,33 @@ Bu React custom hook'u, uygulama genelindeki ayar değerlerine merkezi erişim s
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useSettings::useSettings
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `settings` — Uygulama ayarlarını saklayan, AppSettings | null tipinde React state değişkeni
-  - `setSettings` — settings state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `loading` — Ayarların yükleme durumunu saklayan boolean tipinde React state değişkeni
-  - `setLoading` — loading state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `error` — Yükleme sırasında oluşan hataları saklayan string | null tipinde React state değişkeni
-  - `setError` — error state değerini güncellemek için kullanılan React state setter fonksiyonu
-  - `useEffect` — Bileşen ilk mount olduğunda bir kere çalışacak yan etki oluşturmak için kullanılan React hook'u
-  - `fetchSettings` — useEffect içinde tanımlanan, Supabase'den ayarları çeken async iç fonksiyon
-  - `data` — fetchSettings içinde Supabase sorgusundan dönen ayar verisini saklayan değişken
-  - `fetchError` — fetchSettings içinde Supabase sorgusu sırasında oluşan hatayı saklayan değişken
-  - `err` — fetchSettings içindeki try/catch bloğunda yakalanan genel hata nesnesi
-- **Dönüş**: { settings, loading, error } içeren state nesnesi
+### [N1_NASIL] AST Pointer: src/hooks/useSettings.ts::useSettings
+- **params**: (yok)
+- **ic_degiskenler**: 
+  - `settings` — Uygulama ayarlarını tutan state değişkeni, başlangıçta null
+  - `setSettings` — settings state'ini güncelleyen setter fonksiyonu
+  - `loading` — Veri yükleme durumunu belirten boolean state, başlangıçta true
+  - `setLoading` — loading state'ini güncelleyen setter fonksiyonu
+  - `error` — Hata mesajını tutan string state, başlangıçta null
+  - `setError` — error state'ini güncelleyen setter fonksiyonu
+  - `fetchSettings` — useEffect içinde tanımlanan asenkron veri çekme fonksiyonu
+- **Dönüş**: { settings, loading, error } objesi
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useSettings::anonim useEffect callback fonksiyonu
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `fetchSettings` — Supabase'den uygulama ayarlarını çekmek için tanımlanan async iç fonksiyon
-  - `data` — fetchSettings içinde Supabase sorgusundan dönen ayar verisini saklayan değişken
-  - `fetchError` — fetchSettings içinde Supabase sorgusu sırasında oluşan hatayı saklayan değişken
-  - `err` — fetchSettings içindeki try/catch bloğunda yakalanan genel hata nesnesi
-- **Dönüş**: yok
+### [N2_NASIL] AST Pointer: src/hooks/useSettings.ts::() => (anonymous)
+- **params**: (yok)
+- **ic_degiskenler**: 
+  - `data` — Supabase'den çekilen app_settings tablosunun tek satır verisi
+  - `fetchError` — Supabase sorgusu sırasında oluşabilecek hata nesnesi
+  - `err` — Try bloğunda yakalanan hata, Error tipinde olmayabilir
+- **Dönüş**: yok (async state güncelleme fonksiyonu)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useSettings::fetchSettings
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `data` — Supabase app_settings tablosundan sorgulanarak dönen ayar verisini saklayan değişken
-  - `fetchError` — Supabase sorgusu sırasında oluşan hatayı saklayan değişken
-  - `err` — try/catch bloğunda fırlatılan hataları yakalayan hata nesnesi
-  - `setSettings` — Harici erişilen settings state'ini güncellemek için kullanılan setter fonksiyonu
-  - `setError` — Harici erişilen error state'ini güncellemek için kullanılan setter fonksiyonu
-  - `setLoading` — Harici erişilen loading state'ini güncellemek için kullanılan setter fonksiyonu
-- **Dönüş**: yok
+### [N3_NASIL] AST Pointer: src/hooks/useSettings.ts::fetchSettings
+- **params**: (yok)
+- **ic_degiskenler**: 
+  - `data` — Supabase'den çekilen app_settings tablosunun tek satır verisi
+  - `fetchError` — Supabase sorgusu sırasında oluşabilecek hata nesnesi
+  - `err` — Try bloğunda yakalanan hata, Error tipinde olmayabilir
+- **Dönüş**: yok (async state güncelleme fonksiyonu)
 
 ---
 

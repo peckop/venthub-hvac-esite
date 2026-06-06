@@ -3,42 +3,27 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\error-groups\page.tsx
-skeleton_hash: 17706649c0ccf0e3
+skeleton_hash: 6a47267efde97431
 entity_hashes:
   func:Page: b47a5eb18beb6937
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:34:54Z
+generated_at: 2026-06-06T21:53:47Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki “Hata Grupları” sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, dinamik olarak yüklenecek `AdminErrorGroupsPage` bileşenini render ederek ilgili UI’nın oluşturulmasını sağlar ve dışa aktarılır.
+Bu modül, yönetim panelindeki "Hata Grupları" sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, dinamik olarak yüklenecek `AdminErrorGroupsPage` bileşenini render ederek ilgili arayüzün oluşturulmasını sağlar.
 
 ## Fonksiyon Grupları
 ### Sayfa Render ve UI Oluşturma
-Sayfanın temel yapısını kurar; dinamik import edilen `AdminErrorGroupsPage` bileşenini JSX olarak döndürür, böylece hata gruplarının listelenmesi ve yönetilmesi arayüzü sunulur.  
+Sayfanın temel yapısını kurar; dinamik import edilen `AdminErrorGroupsPage` bileşenini JSX olarak döndürerek hata gruplarının listelenmesi ve yönetilmesi arayüzünü sunar.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, **Page** fonksiyonunun yönetim panelindeki “Hata Grupları” sayfasını sorunsuz bir şekilde oluşturabilmesi için aşağıdaki koşulların varlığını varsayar.
 
-**Aksiyom 1**: Eğer `AdminErrorGroupsPage` bileşeni proje içinde tanımlı ve erişilebilir değilse, `Page` fonksiyonu çalıştırıldığında **render hatası** oluşur ve sayfa hiç görüntülenmez.  
-
-**Aksiyom 2**: Eğer React (veya Next.js) çalışma zamanı ortamı (ör. `react`, `react-dom`, `next/server` paketleri) mevcut değilse, `Page` fonksiyonu **derleme/çalıştırma hatası** verir ve uygulama başlatılamaz.  
-
-**Aksiyom 3**: Eğer sayfanın bulunduğu rota, gerekli **auth‑provider** (ör. `SessionProvider`, `AuthContext`) ile sarmalanmamışsa, `AdminErrorGroupsPage` içinde erişim kontrolü sağlanamaz; bu durumda ya **yetkisiz erişim** gerçekleşir ya da bileşen içinde ek bir hata gösterilir.  
-
-**Aksiyom 4**: Eğer sayfanın üst‑seviye **layout** (ör. `AdminLayout`, `Sidebar`, `Header`) bileşeni sağlanmazsa, `Page` fonksiyonu yine de render olur ancak **UI bozulması** (eksik menü, hatalı stil) meydana gelir.  
-
-**Aksiyom 5**: Eğer `AdminErrorGroupsPage` içinde kullanılan **veri çekme** (ör. `fetch('/api/error-groups')` ya da SWR/React‑Query hookları) başarısız olursa, `Page` fonksiyonu hâlâ render edilir fakat **boş liste** ya da **hata mesajı** gösterilir; sayfanın temel işlevi (hata gruplarını listeleme) yerine getirilmez.  
-
-**Aksiyom 6**: Eğer TypeScript tip tanımları (ör. `ErrorGroup[]`, `PageProps`) eksik ya da uyumsuzsa, derleme aşamasında **tip hatası** alınır ve `Page` fonksiyonunun çıktısı güvenilir olmaz.  
-
-**Aksiyom 7**: Eğer istemci tarafı **JavaScript** devre dışı bırakılmışsa, `Page` bileşeni (özellikle dinamik alt‑bileşenler) **statik HTML** olarak render edilir; bu durumda interaktif özellikler (örn. filtreleme, silme) çalışmaz.  
-
-> **Not:** Yukarıdaki aksiyomlar, fonksiyon gövdesinde doğrudan görülen bağımlılıklar (ör. `AdminErrorGroupsPage` çağrısı) ve tipik bir Next.js/React admin sayfasının çalışma ortamı göz önüne alınarak türetilmiştir. Başka bir bilgi kaynağından (docstring, yorum vs.) çıkarım yapılmamıştır.
+Bu modül, `Page` fonksiyonunu dışa aktaran ve `AdminErrorGroupsPage` bileşenini dinamik olarak import eden basit bir sayfa kök bileşenidir. Fonksiyon gövdesinde herhangi bir koşul kontrolü, veri bağımlılığı veya iş mantığı bulunmamaktadır; sadece JSX döndürmektedir. Dolayısıyla, bu modülün doğru çalışması için ek bir mimari varsayım (aksiyom) gerekmemektedir.
 
 ---
 
@@ -54,18 +39,18 @@ Bu modül, **Page** fonksiyonunun yönetim panelindeki “Hata Grupları” sayf
 ---
 
 ## SABİTLER
-- **AdminErrorGroupsPage** (call) — `dynamic(
+- **AdminErrorGroupsPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminErrorGroupsPage'),
-  { s...`
+ ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\error-groups\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<AdminErrorGroupsPage />`) – React bileşeni olarak render edilen bir eleman.
+### [N1_NASIL] AST Pointer: src/app/admin/error-groups/page.tsx::Page
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `<AdminErrorGroupsPage />` — `nextDynamic` ile import edilen `AdminErrorGroupsPage` bileşeninin render edilmiş karşılığı; fonksiyon gövdesinde herhangi bir değişken tanımlanmaz, doğrudan JSX elemanı döndürülür
 
 ---
 

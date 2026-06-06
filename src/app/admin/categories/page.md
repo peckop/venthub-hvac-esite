@@ -3,31 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\categories\page.tsx
-skeleton_hash: a52e9b8539fa4dbd
+skeleton_hash: b2c033b3f572f6dd
 entity_hashes:
   func:Page: 3494fba1713b6485
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:34:54Z
+generated_at: 2026-06-06T21:53:58Z
 ---
 
 ## Genel Bakış
-Bu modül, admin panelindeki kategoriler sayfasının giriş noktasını tanımlayan tek bir React bileşenini içerir. Page fonksiyonu, AdminCategoriesPage bileşenini dinamik olarak yükleyerek sayfanın görüntülenmesini sağlar.
+Bu modül, venthub-hvac projesinin admin panelindeki kategori yönetim sayfasının giriş noktasını tanımlayan tek bir React bileşenini içerir. Modülün temel amacı, sayfanın render edilmesi için gerekli üst düzey bileşeni döndürerek Next.js App Router yapısına entegre olmaktır.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Modülün tek sorumluluğu, admin kategorileri sayfasını render eden üst düzey bileşeni döndürmektir.
+Bu grup, modülün tek ve ana sorumluluğunu yerine getiren üst düzey bileşeni temsil eder. Sayfa, sadece ilgili alt bileşeni döndürerek sayfanın görüntülenmesini sağlar.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül Next.js App Router mimarisinde çalışan yönetim paneli kategori yönetim sayfasının ana bileşenidir, çalışması için Next.js rota kurallarının, çağrılan alt bileşenin erişilebilirliğinin ve modern React çalışma zamanının varlığı zorunludur.
+Bu modül, Next.js App Router yapısında çalışan bir admin sayfası giriş bileşenidir.
 
-[Aksiyom 1]: Eğer Next.js App Router'ın "app dizini altındaki page.tsx dosyalarını tanımlı rotalara eşleme" kuralı yoksa, bu modül /admin/categories adresinde kullanıcılara sunulamaz, istekte 404 bulunamadı hatası alınır.
-[Aksiyom 2]: Eğer bu modül tarafından çağrılan AdminCategoriesPage alt bileşeni proje içinde erişilebilir konumda mevcut değilse, sayfa yüklenemez hatası oluşur, kategori yönetim arayüzü hiç görüntülenemez.
-[Aksiyom 3]: Eğer modern fonksiyonel React bileşen sözdizimini destekleyen bir çalışma zamanı ortamı yoksa, bu modül hiç render edilemez, sayfa kullanıcılara sunulamaz.
-[Aksiyom 4]: Eğer bu modüle erişimden önce yönetici yetkisi kontrolü yapan bir ara katman (middleware, route guard vb.) devreye alınmamışsa, yetkisi olmayan kullanıcılar kategori yönetim arayüzüne erişebilir, güvenlik ihlali oluşur.
+[Aksiyom 1]: Eğer `AdminCategoriesPage` modülü veya bileşeni yoksa, sayfa boş render edilir veya hata oluşur.
+[Aksiyom 2]: Eğer Next.js rota sistemi çalışmıyorsa (örn: serverless ortamda), bu modül hiç çağrılmaz.
+[Aksiyom 3]: Eğer React çalışma zamanı (`react-dom`) yüklenmemişse, bileşen hiyerarşisi oluşturulamaz.
+[Aksiyom 4]: Eğer `next/dynamic` kullanılarak dinamik yükleme yapılmışsa ve network bağlantısı kopuksa, `AdminCategoriesPage` bileşeni yüklenemez ve fallback gösterilir (eğer tanımlıysa) veya hata oluşur.
 
 ---
 
@@ -43,18 +43,9 @@ Bu modül Next.js App Router mimarisinde çalışan yönetim paneli kategori yö
 ---
 
 ## SABİTLER
-- **AdminCategoriesPage** (call) — `dynamic(
+- **AdminCategoriesPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminCategoriesPage'),
-  { ss...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src\app\admin\categories\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-- **Dönüş**: AdminCategoriesPage bileşenini döndürür
+  ...`
 
 ---
 

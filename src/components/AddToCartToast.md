@@ -3,45 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx
-skeleton_hash: db9ea97a25e2dcc9
+skeleton_hash: 9a8701d25a4ae6cf
 entity_hashes:
   func:AddToCartToast: 581f14d900d31bb4
-  overview: 2f0c7613311f5aad
+  overview: 4631aecdd4e1b7b7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-29T19:59:05Z
+generated_at: 2026-06-06T21:54:24Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıya sepete ekleme işlemi sonrası kısa süreli bir bildirim (toast) gösteren tek bir React fonksiyonel bileşenini tanımlar. Bileşen, bildirimin zamanlamasını, otomatik kaybolmasını ve kullanıcı etkileşimlerini (örn. bildirimi kapatma) kendi içinde yönetir.
+Bu modül, kullanıcı sepete bir ürün eklediğinde kısa süreli bir bildirim (toast) gösteren tek bir React bileşenini içerir. Bileşen, bildirimin zamanlamasını, otomatik kaybolmasını ve kapatma eylemini kendi içinde yönetir.
 
 ## Fonksiyon Grupları
-### Bildirim Bileşeni
-Modül, sepete ekleme sonrası bildirimini gösteren ve yöneten ana (ve tek) bileşeni içerir. Bu bileşen, olaylarla tetiklenir, belirli süre sonra otomatik kaybolur ve çeviri destekli metinler kullanır.
+### Sepete Ekleme Bildirimi
+Modül, sepete ekleme işlemi sonrasında kullanıcıya kısa süreli bir bildirim gösteren ana (ve tek) bileşeni tanımlar.
 - AddToCartToast
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
 
-Bu modül için, fonksiyon imzası (`AddToCartToast()`) ve modül sabitlerine dayanarak belirlenebilecek somut aksiyomlar sınırlıdır. Aşağıda sadece arayüz seviyesinde çıkarılabilen varsayımlar yer almaktadır.
-
----
-
-**[Aksiyom 1]**: Eğer `AddToCartToast` bileşeni React bileşen ağacının dışında (React Provider hiyerarşisi dışında) render edilirse, bileşen düzgün çalışmaz veya hata fırlatır olur.
-
-> *Gerekçe*: Fonksiyon imzasında prop parametresi (`props`) tanımlı değildir; bileşen React Hook'ları veya Context API kullanarak dış kaynaklara erişebilir. Bu kaynakların sağlanması için bileşenin uygun bir React.Provider içnde bulunması zorunludur.
-
-**[Aksiyom 2]**: Eğer bileşenin bağımlı olduğu translation (i18n) sistemi mevcut değilse veya sağlanamıyorsa, bileşen gösterilen bildirim metinlerini doğru dille render edemez olur.
-
-> *Gerekçe*: Fonksiyon imzasında dışarıdan çeviri/lokalizasyon parametresi geçirilmez; bu nedenle çeviri kaynakları iç hook veya context aracılığıyla çözülmelidir.
-
-**[Aksiyom 3]**: Eğer bileşenin tetiklenmesini sağlayan üst bileşen (parent) bileşeni mount/unmount döngüsünü uygun şekilde yönetmezse, birden fazla toast bildirimi üst üste birikir veya beklenmeyen zamanlama davranışı gösterir olur.
-
-> *Gerekçe*: Fonksiyon `AddToCartToast()` adıyla çağrılmaktadır; bileşenin ne zaman挂載edileceği ve ne zaman kaldırılacağı üst bileşenin sorumluluğundadır. İç zamanlayıcı (timer) ve state yönetimi bileşen içindedir, ancak mount sıklığı dışarıdan kontrol edilir.
-
----
-
-**Not**: Bu bileşenin fonksiyon gövdesi (implementation body) analiz edilemediğinden, iç state yönetimi, timer süreleri, animation parametreleri gibi detaylı aksiyomlar çıkarılamamıştır. Yukarıdaki aksiyomlar yalnızca fonksiyon imzası ve bileşen türü (React .tsx) bilgisine dayanmaktadır.
 
 ---
 
@@ -59,10 +39,50 @@ Bu modül için, fonksiyon imzası (`AddToCartToast()`) ve modül sabitlerine da
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast
-- **params**: (parametre yok)
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `onAdded` — Sepete ürün eklendiğinde tetiklenen event handler; CustomEvent'ten product bilgisini çıkarır ve Sonner toast'unu tetikler
-- **Dönüş**: `null` (Saf controller bileşeni, DOM render etmez; yan etki olarak toast gösterir)
+  (dış scope'ta doğrudan değişken yok — tüm mantık `useEffect` içinde)
+- **Dönüş**: `null` — Saf controller bileşeni, DOM döndürmez; sadece event listener yönetimi yapar
+
+---
+
+### [N2_NASIL] AST Pointer: src/components/AddToCartToast.tsx::useEffect_callback
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `onAdded` — `cart-item-added` custom event'i geldiğinde çağrılan event handler fonksiyonu; ürün detayını extracted edip Sonner toast'unu tetikler
+- **Dönüş**: Temizlik fonksiyonu `() => { window.removeEventListener(EVENT, onAdded as EventListener) }` — component unmount'ta listener'ı kaldırır
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/AddToCartToast.tsx::onAdded
+- **params**: `e: Event` — `window` üzerinde tetiklenen DOM Event nesnesi
+- **ic_degiskenler**:
+  - `customEvent` — `e`'nin `CustomEvent<{ product?: Product }>` tipine cast edilmiş hali; TypeScript'te `detail` alanına tip güvenli erişim sağlar
+  - `detail` — `customEvent.detail` üzerinden erişilen event payload'u; `{ product?: Product }` yapısındadır
+  - `product` — `detail.product` varsa çıkarılan `Product` nesnesi; toast içeriğine ve benzersiz ID oluşturmaya kullanılır
+- **Dönüş**: yok (void) — Yan etki olarak `toast.custom(...)` çağrısı yapar
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/AddToCartToast.tsx::toast_custom_render
+- **params**: `id` — Sonner toast motoru tarafından atanan benzersiz toast ID'si; `toast.dismiss(id)` ile kapatma işleminde kullanılır
+- **ic_degiskenler**:
+  - `product` — closure'dan gelen `Product` nesnesi; `AddToCartToastContent` bileşenine prop olarak iletilir
+- **Dönüş**: `<AddToCartToastContent product={product} onClose={() => toast.dismiss(id)} />` JSX elemanı
+
+---
+
+### [N5_NASIL] AST Pointer: src/components/AddToCartToast.tsx::onClose_callback
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `toast.dismiss(id)` çağırarak ilgili toast'u kapatır; `id` parent scope'taki toast render fonksiyonundan closure ile gelir
+
+---
+
+### [N6_NASIL] AST Pointer: src/components/AddToCartToast.tsx::cleanup_effect
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (void) — `window`'dan `EVENT` topic'indeki `onAdded` listener'ını `removeEventListener` ile kaldırır; bellek sızıntısını engeller
 
 ---
 

@@ -3,35 +3,57 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\ui-models.ts
-skeleton_hash: c0ae2609eb4ab5d0
+skeleton_hash: 99b64ded625b7139
 entity_hashes:
-  overview: 6e34f2c4a0b0ebfe
-generated_at: 2026-05-28T22:38:42Z
+  overview: 880a05d23bd685e7
+generated_at: 2026-06-06T21:56:21Z
 ---
 
 ## Genel Bakış
-
-Bu dosya, VentHub HVAC projesinin UI katmanı için tip tanımları içeren, yalnızca derleme zamanında var olan bir TypeScript modülüdür. `db-rows` modülünden gelen `DbCategory` ve `DbProduct` veritabanı tiplerini import ederek, bu tipleri UI katmanının ihtiyaçlarına göre düzenlenmiş (sanitize) versiyonlar olarak tanımlar. Dosyada herhangi bir çalıştırılabilir kod, sabit veya fonksiyon bulunmamaktadır; tüm amacı TypeScript derleyicisi aracılığıyla tip güvenliği sağlamaktır.
+Bu modül, VentHub HVAC projesinin UI katmanı için tip tanımları içeren, yalnızca derleme zamanında var olan bir TypeScript modülüdür. Veritabanı tablolarına karşılık gelen temel tipleri (DbCategory, DbProduct vb.) import ederek, bu verilerin UI bileşenlerinde güvenli bir şekilde kullanılmasını sağlayacak arayüz ve tip tanımları tanımlar. Dosyada herhangi bir çalıştırılabilir kod, sabit veya fonksiyon bulunmamaktadır; tüm amacı tip güvenliği sağlamaktır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül yalnızca derleme zamanında aktif olan TypeScript tip tanımları içermektedir; herhangi bir çalıştırılabilir fonksiyon gövdesi barındırmaz.
+Bu modül yalnızca TypeScript tip tanımları içermektedir; herhangi bir çalıştırılabilir fonksiyon gövdesi veya modül sabiti bulunmamaktadır. Bu nedenle, fonksiyon gövdesinden türetilebilecek aksiyom yoktur.
 
-**[Aksiyom 1]:** Eğer `db-rows` modülünden import edilen `Category` ve `Product` tip tanımları yoksa, bu modüldeki UI model tiplerinin temel yapıları tanımsız kalır ve derleme hatası oluşur.
+**[Aksiyom 1]:** Eğer `db-rows` modülü mevcut değilse veya içinden `DbCategory` ve `DbProduct` tipleri export edilmiyorsa, derleme zamanında hata oluşur.
 
-**[Aksiyom 2]:** Eğer TypeScript derleyicisi (tsc) kullanılmıyorsa, bu dosyada tanımlanan tipler runtime ortamında hiçbir etkiye sahip olmaz; dosya tamamen yok sayılır.
+**[Aksiyom 2]:** Eğer `db-rows` modülündeki `DbCategory` veya `DbProduct` tiplerinin yapıları (alan isimleri/tipleri) değiştirilirse, bu modüldeki karşılık gelen UI tip tanımlarının da güncellenmesi gerekir; aksi takdirde derleme hatası oluşur.
 
-**[Aksiyom 3]:** Eğer bu dosya bir UI katmanı bileşeni tarafından import edilmiyorsa, tanımlanan tipler hiçbir tip kontrolüne katkıda bulunmaz ve işlevsel olarak var olmaz.
+---
 
-**[Aksiyom 4]:** Eğer `db-rows` modülündeki kaynak tiplerde değişiklik yapılırsa, bu modüldeki UI model tanımlarının da güncellenmesi gerekir; aksi takdirde tip uyumsuzluk hataları oluşur.
-
-**[Aksiyom 5]:** Bu dosyada herhangi bir runtime sabiti, ortam değişkeni veya harici API çağrısı bulunduğu varsayılamaz; tüm içerik statik tip tanımıyla sınırlıdır.
+**Not:** Bu dosyada herhangi bir fonksiyon gövdesi, sabit veya çalıştırılabilir kod bulunmadığından, fonksiyonel davranışa ilişkin aksiyom üretilememektedir. Mevcut aksiyomlar yalnızca derleme zamanı bağımlılığı ilişkisine dayanmaktadır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## INTERFACES
+
+### SearchSuggestion
+- `text?: string`
+- `label: string`
+- `type: 'product' | 'category' | 'brand'`
+- `slug?: string`
+- `url: string`
+- `metadata?: Json`
+
+### FtsProductResult extends DomainProduct
+- `rank?: number`
+- `is_fuzzy_match?: boolean`
+
+### GetProductsParams
+- `categoryIds?: string[]`
+- `searchQuery?: string`
+- `brand?: string`
+- `minPrice?: number`
+- `maxPrice?: number`
+- `limit?: number`
+- `offset?: number`
 
 ---
 
@@ -56,23 +78,39 @@ type DomainProduct = Omit<DbProduct, 'name' | 'description' | 'brand'> & {
 }
 ```
 
+### Category
+
+### Product
+
+### UserProject
+
+### ProjectItem
+```typescript
+type ProjectItem = DbProjectItem & { product?: Product }
+```
+
+### UserAddress
+
+### InvoiceProfile
+
 ---
 
 ## AST POINTERS
 
-Bu dosyada fonksiyon bulunmamaktadır.
+Bu dosya (`C:\Users\alize\venthub-hvac\src\types\ui-models.ts`) **tip tanımları dosyasıdır** ve:
 
----
+- **Fonksiyon gövdesi**: Yok
+- **Fonksiyon imzası**: Yok
+- **Sabit tanımı**: Yok
+- **Class tanımı**: Yok
 
-### Dosya Özeti: `C:\Users\alize\venthub-hvac\src\types\ui-models.ts`
+Dosya sadece şu import'ları içerir:
+```typescript
+import type { DbCategory, DbProduct, DbUserProject, DbProjectItem, DbUserAddress, DbInvoiceProfile }
+import type { Json } from './database.types';
+```
 
-**Dosya Tipi:** TypeScript type/interface tanım dosyası
-
-**İçe Aktarılan Tipler:**
-- `DbCategory` — `./db-rows` modülünden (veritabanı kategori satır yapısı)
-- `DbProduct` — `./db-rows` modülünden (veritabanı ürün satır yapısı)
-
-**Durum:** Dosya yalnızca type/interface tanımları içermektedir. Çalışan (executable) fonksiyon gövdesi, method veya sınıf metodu bulunmamaktadır. Bu nedenle AST Pointer oluşturulacak herhangi bir fonksiyon mevcut değildir.
+Bu import'lar, dosya içinde tanımlanacak tipler tarafından kullanılacak referanslardır. Dosyanın kendisinde herhangi bir çalıştırılabilir fonksiyon veya metot gövdesi bulunmadığından **AST Pointer üretilecek fonksiyon yoktur**.
 
 ---
 
@@ -83,5 +121,19 @@ Bu dosyada fonksiyon bulunmamaktadır.
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: Category
   export: DomainCategory
   export: DomainProduct
+  export: FtsProductResult
+  export: GetProductsParams
+  export: InvoiceProfile
+  export: Product
+  export: ProjectItem
+  export: SearchSuggestion
+  export: UserAddress
+  export: UserProject
+
+---
+
+## BILEŞIM (CONTAINS)
+  contains: DomainProduct

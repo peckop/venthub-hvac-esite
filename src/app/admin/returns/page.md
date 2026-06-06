@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\returns\page.tsx
-skeleton_hash: efb4e684e247b5a7
+skeleton_hash: d55306965018a37f
 entity_hashes:
   func:Page: 8443af27af30d61d
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:35:19Z
+generated_at: 2026-06-06T21:54:16Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki iade (returns) sayfasının temel rota bileşenini tanımlar. Sayfa, ana iş mantığını ve durum yönetimini içeren `AdminReturnsPage` adlı alt bileşeni dinamik olarak yükleyerek kullanıcıya sunar. Modülün kendisi son derece basit olup, yalnızca bileşen yükleme ve yönlendirme sorumluluğunu taşır.
+Bu modül, yönetim panelindeki iade (returns) sayfasının rota bileşenini tanımlar. Modül oldukça minimal olup, ana sayfa bileşenini dinamik olarak yükleyerek Next.js App Router yapısında `/admin/returns` rotasını sunar. Sayfa, iade yönetim arayüzünün görüntülenmesi için gerekli bileşeni monte etmekle sorumludur.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
@@ -21,7 +21,13 @@ Bu grup, iade sayfasının giriş noktası olarak işlev gören rota bileşenini
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, basit bir Next.js rota bileşeni olup sadece `AdminReturnsPage` alt bileşenini dinamik olarak yükleyerek render eder.
+
+**[Aksiyom 1]**: Eğer `AdminReturnsPage` bileşeni import edilebilir konumda (modül sistemi tarafından erişilebilir) yoksa, `Page` bileşeninin render işlemi başarısız olur ve uygulama hata verir.
+
+**[Aksiyom 2]**: Eğer `AdminReturnsPage` bileşeni geçerli bir React bileşeni (JSX döndüren fonksiyon veya sınıf) olarak tanımlı değilse, `Page` bileşeninin render ettiği içerik boş veya hatalı olur.
 
 ---
 
@@ -44,19 +50,18 @@ Bu fonksiyon herhangi bir parametre almaz.
 ---
 
 ## SABİTLER
-- **AdminReturnsPage** (call) — `dynamic(
+- **AdminReturnsPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminReturnsPage'),
-  { ssr: ...`
+  { s...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\app\admin\returns\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde değişken tanımlanmamış)
-- **Dönüş**: `<AdminReturnsPage />` JSX elementi (React component)
-- **Notlar**: Fonksiyon, `AdminReturnsPage` componentini render ederek yan etki olarak sayfa içeriğini oluşturur
+### [N1_NASIL] AST Pointer: src/app/admin/returns/page.tsx::Page
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX element (AdminReturnsPage component'ini render eder)
 
 ---
 

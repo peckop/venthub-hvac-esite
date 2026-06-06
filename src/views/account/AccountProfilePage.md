@@ -3,20 +3,20 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountProfilePage.tsx
-skeleton_hash: 04eeead58cbf5946
+skeleton_hash: 422e2ff5a3ff1bd3
 entity_hashes:
   func:AccountProfilePage: 754183d7e2ba9791
-  overview: dc99ac3fc9b4a582
+  overview: dd4bd16d5abc640e
   style_tokens: d7513d5d715e48fe
-generated_at: 2026-05-29T18:52:27Z
+generated_at: 2026-06-06T21:56:42Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı profil sayfasını temsil eden bir React bileşenidir. Kullanıcının mevcut profil bilgilerini (ad soyad ve telefon) görüntülemesini, düzenlemesini ve Supabase üzerinden güncelleme yapmasını sağlar.
+Bu modül, kullanıcının hesap profil bilgilerini görüntülemesini ve düzenlemesini sağlayan tek sayfalık bir React bileşenidir. Kullanıcı, mevcut ad-soyad ve telefon bilgilerini forma yansıtır, düzenleyebilir ve Supabase kimlik doğrulama servisi aracılığıyla güncellemelerini kaydedebilir.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Sayfanın tüm kullanıcı arayüzünü, durum yönetimini ve veriyle etkileşimi tek bir bileşen içinde yönetir.
+Sayfanın tüm kullanıcı arayüzünü, form durumunu ve Supabase ile olan veri akışını tek bir kapsamlı bileşen içinde yönetir.
 - AccountProfilePage
 
 ---
@@ -49,30 +49,34 @@ Sayfanın tüm kullanıcı arayüzünü, durum yönetimini ve veriyle etkileşim
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AccountProfilePage.tsx::AccountProfilePage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/views/account/AccountProfilePage.tsx::AccountProfilePage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan dönen çeviri fonksiyonu; UI string'lerini dil bazlı render eder
-  - `user` — useAuth hook'undan dönen mevcut Supabase kullanıcı nesnesi; user_metadata alanı profili bilgilerini tutar
-  - `fullName` — React state (string), kullanıcının tam adını tutar; input value'sine bağlanır; başlangıç değeri boş string
-  - `setFullName` — fullName state'ini güncelleyen setter; input onChange handler'ında kullanılır
-  - `phone` — React state (string), kullanıcının telefon numarasını tutar; input value'sine bağlanır; başlangıç değeri boş string
-  - `setPhone` — phone state'ini güncelleyen setter; input onChange handler'ında kullanılır
-  - `saving` — React state (boolean), form kaydetme işleminin devam edip etmediğini kontrol eder; true iken buton disable edilir ve spinner gösterilir
-  - `setSaving` — saving state'ini güncelleyen setter; onSave fonksiyonunda try/finally bloklarında kullanılır
-- **Dönüş**: JSX — Kullanıcı profil düzenleme sayfasını render eder; isim ve telefon alanlarını içerir
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, sayfa genelinde locale metinleri için kullanılır
+  - `user` — useAuth() hook'undan dönen oturum açmış kullanıcı nesnesi, user_metadata alanı üzerinden profil bilgilerine erişilir
+  - `fullName` — React state, kullanıcının tam adını tutan editable metin input değeri, onChange ile güncellenir, useEffect ile user.user_metadata.full_name'den başlatılır
+  - `setFullName` — fullName state setter'ı, input onChange handler'ında ve useEffect callback'inde çağrılır
+  - `phone` — React state, kullanıcının telefon numarasını tutan editable metin input değeri, regex filtreleme (yalnızca rakam, +, boşluk, tire) uygulanarak güncellenir, useEffect ile user.user_metadata.phone'dan başlatılır
+  - `setPhone` — phone state setter'ı, input onChange handler'ında ve useEffect callback'inde çağrılır
+  - `saving` — React state (boolean), updateUser API çağrısı devam ederken true olur, butonu disabled yapar ve spinner gösterir
+  - `setSaving` — saving state setter'ı, onSave fonksiyonunun try/finally bloklarında çağrılır
+  - `onSave` — inner async fonksiyon, form onSubmit handler'ı olarak bağlanır, supabase.auth.updateUser ile profil günceller
+- **Dönüş**: JSX (React component return value — form sayfası)
 
-### [N1_NASIL] AST Pointer: AccountProfilePage.tsx::onSave
-- **params**: `e: React.FormEvent` — form submit olay nesnesi
+### [N2_NASIL] AST Pointer: src/views/account/AccountProfilePage.tsx::useEffect callback ([])
+- **params**: (yok — React.useEffect callback)
 - **ic_degiskenler**:
-  - `error` — supabase.auth.updateUser çağrısının destructure edilmiş error alanı; hata varsa hata nesnesi, yoksa undefined
-- **Dönüş**: void (async) — supabase.auth.updateUser ile full_name ve phone alanlarını günceller; başarılıysa toast.success, hatalıysa toast.error gösterir; her durumda saving'i false'a çeker
+  - `meta` — user.user_metadata değerinin `UserMetadata` cast edilmiş hali, `{}` fallback ile undefined koruması; full_name ve phone alanlarından okuma yapılır
+- **Dönüş**: yok (React side-effect callback, state setter'ları çağırır)
 
-### [N1_NASIL] AST Pointer: AccountProfilePage.tsx::useEffect callback (anonim)
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/views/account/AccountProfilePage.tsx::onSave
+- **params**:
+  - `e` — React.FormEvent, form submit event, e.preventDefault() ile varsayılan submit engellenir
 - **ic_degiskenler**:
-  - `meta` — user?.user_metadata değerinin UserMetadata tipine cast edilmiş hali; user_metadata mevcut değilse boş obje `{}` kullanılır
-- **Dönüş**: yok — user değiştiğinde tetiklenerek fullName ve phone state'lerini meta.full_name ve meta.phone değerleriyle başlatır (yan etki)
+  - `error` — supabase.auth.updateUser({ data: {...} }) yanıtından destructured edilen hata nesnesi; truthy ise throw ile catch bloğuna düşülür
+  - `e` (catch bloğu) — yakalanan exception nesnesi, console.error ile loglanır; parametre `e`'yi shadow eder
+- **Yan etkiler**: supabase.auth.updateUser çağrısı ile user_metadata güncellenir; başarı/hata durumunda toast bildirimi gösterilir
+- **Dönüş**: yok (async void — promise döner ama return değeri kullanılmaz)
 
 ---
 

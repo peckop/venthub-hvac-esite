@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx
-skeleton_hash: 6dcd87ef2140afca
+skeleton_hash: e9ea44f5f6a76f90
 entity_hashes:
   func:AdminProductsPage: 7ee4bfb4fdbbf892
   func:bulkDelete: 396db34432b201cc
@@ -22,92 +22,30 @@ entity_hashes:
   func:toggleSelect: 5a6b497e4acebdf1
   func:toggleSelectAll: b6733934eb7cddda
   func:toggleSort: 865bfd9d85445d70
-  overview: 6edaaf2ebf329de0
+  overview: 968137f18d4e8d88
   style_tokens: 4970a750083c3797
-generated_at: 2026-05-28T22:39:02Z
+generated_at: 2026-06-06T21:58:52Z
 ---
 
-## Genel Bakış  
-AdminProductsPage, ürün yönetimi için tek sayfa arayüzünü sunar. Kullanıcıların ürünleri listelemesi, seçmesi, düzenlemesi, toplu işlemler yapması ve teknik özellikleri görüntülemesi için gerekli tüm etkileşimleri sağlar. Sayfa, React bileşeni olarak yapılandırılmış olup, durum yönetimi ve API çağrılarıyla bütünleşir.
+## Genel Bakış
+AdminProductsPage, yönetici panelinde ürünlerin kapsamlı bir şekilde yönetildiği ana sayfadır. Bu bileşen, ürün listesini sunma, bireysel ve toplu CRUD (Oluştur, Oku, Güncelle, Sil) işlemleri yürütme, sıralama ve filtreleme yapma ile teknik özelliklerin detaylı bir şekilde görüntülenmesini sağlama gibi temel sorumlulukları bir arada yönetir.
 
-## Fonksiyon Grupları  
+## Fonksiyon Grupları
+### Sayfa Temeli ve Görünüm Yönetimi
+Ana bileşeni oluşturan ve sayfanın genel görünümü, seçim durumları, sıralama göstergeleri ile durum rozetlerini yöneten temel fonksiyonlar.
+- `AdminProductsPage`, `toggleSelect`, `toggleSelectAll`, `toggleExpand`, `toggleSort`, `sortIndicator`, `statusBadge`
 
-### Görünüm ve Durum Yönetimi  
-Bu grup, sayfanın görünümünü kontrol eden ve bileşenin durumunu güncelleyen fonksiyonları içerir.  
-- `AdminProductsPage`  
-- `toggleSelect`  
-- `toggleSelectAll`  
-- `toggleExpand`  
-- `toggleSort`  
-- `sortIndicator`  
-- `statusBadge`  
+### Tekil Ürün İşlemleri
+Bireysel ürünlerle ilgili temel işlemleri başlatan ve yöneten fonksiyonlar.
+- `handleCreate`, `handleEdit`, `handleModalSuccess`, `remove`, `saveInlineEdit`, `loadTechSpecs`
 
-### İşlem Başlatıcıları  
-Kullanıcı eylemlerini başlatan ve ilgili API çağrılarını tetikleyen fonksiyonlar.  
-- `handleCreate`  
-- `handleEdit`  
-- `handleModalSuccess`  
-
-### Tekil Ürün İşlemleri  
-Bireysel ürün üzerinde yapılan değişiklikleri yöneten fonksiyonlar.  
-- `remove`  
-
-### Toplu İşlemler  
-Birden fazla üründe aynı anda değişiklik yapılmasını sağlayan fonksiyonlar.  
-- `bulkStatusChange`  
-- `bulkFeatureToggle`  
-- `bulkDelete`  
-- `bulkPriceAdjust`  
-
-### Veri Yükleme ve Güncelleme  
-Veri çekme ve satır içi düzenlemeleri kaydetme işlemlerini kapsar.  
-- `loadTechSpecs`  
-- `saveInlineEdit`
+### Toplu İşlemler
+Birden fazla ürünün aynı anda seçilerek toplu olarak durum değiştirme, öne çıkarma, fiyat ayarlama veya silinmesini sağlayan fonksiyonlar.
+- `bulkStatusChange`, `bulkFeatureToggle`, `bulkDelete`, `bulkPriceAdjust`
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül, yönetim panelinde ürün listesinin görüntülenmesi, seçilmesi, düzenlenmesi ve toplu işlemlerin yürütülmesi için UI‑mantığı sağlar.  
 
-**Aksiyom 1**: Eğer `toggleSelect(id)` çağrısında verilen **id** mevcut bir ürün kaydına karşılık gelmiyorsa, seçim durumu değişmez ve UI’da bir hata/uyarı gösterilmez.  
-
-**Aksiyom 2**: Eğer `toggleSelectAll()` çağrıldığında listede **hiç ürün bulunmuyorsa**, hiçbir seçim durumu değişmez.  
-
-**Aksiyom 3**: Eğer `toggleExpand(id)` içinde verilen **id** listede bulunmuyorsa, genişletme/katlama durumu değişmez ve UI’da bir değişiklik olmaz.  
-
-**Aksiyom 4**: Eğer `handleCreate()` çalıştırıldığında **gerekli modal/form bileşenleri yüklenemezse**, yeni ürün oluşturma süreci başlatılamaz ve UI’da “create” aksiyonu başarısız olur.  
-
-**Aksiyom 5**: Eğer `handleEdit(id)` içinde verilen **id** geçerli bir ürün kaydı değilse, düzenleme modalı açılmaz ve UI’da bir değişiklik olmaz.  
-
-**Aksiyom 6**: Eğer `handleModalSuccess()` çağrısı **aktif bir modal** olmadan gerçekleşirse, hiçbir veri kaydedilmez ve UI’da bir yan etki oluşmaz.  
-
-**Aksiyom 7**: Eğer `remove(id)` içinde verilen **id** listede bulunmuyorsa, silme işlemi gerçekleşmez ve UI’da bir değişiklik olmaz.  
-
-**Aksiyom 8**: Eğer `bulkStatusChange(status)` içinde verilen **status** değeri geçerli bir durum (ör. “active”, “inactive” vb.) değilse, seçili ürünlerin durumu değiştirilmez.  
-
-**Aksiyom 9**: Eğer `bulkFeatureToggle(featured)` çağrısı **hiç ürün seçilmemişse**, “featured” özelliği hiçbir ürüne uygulanmaz.  
-
-**Aksiyom 10**: Eğer `bulkDelete()` çağrısı **seçili ürün yoksa**, silme işlemi gerçekleşmez ve UI’da bir değişiklik olmaz.  
-
-**Aksiyom 11**: Eğer `bulkPriceAdjust(mode, value)` içinde **mode** `'percent'` ya da `'fixed'` dışındaki bir değer alırsa, fiyat ayarlaması uygulanmaz.  
-
-**Aksiyom 12**: Eğer `bulkPriceAdjust` için **value** `null` ya da `undefined` ise, fiyat ayarlaması uygulanmaz.  
-
-**Aksiyom 13**: Eğer `saveInlineEdit()` sırasında **veri doğrulama hatası** oluşursa, değişiklikler kaydedilmez ve UI’da hatalı alanlar işaretlenir.  
-
-**Aksiyom 14**: Eğer `loadTechSpecs(_productId)` içinde verilen **_productId** geçerli bir ürün kimliği değilse, teknik özellikler yüklenmez ve UI’da boş bir alan gösterilir.  
-
-**Aksiyom 15**: Eğer `toggleSort(key)` içinde verilen **key** geçerli bir `SortKey` (ör. `name`, `price`, `status` vb.) değilse, sıralama düzeni değişmez.  
-
-**Aksiyom 16**: Eğer `sortIndicator(key)` içinde verilen **key** mevcut bir sıralama anahtarı değilse, varsayılan (boş) sıralama göstergesi döndürülür.  
-
-**Aksiyom 17**: Eğer `statusBadge(s)` çağrısında **s** `null` ya da `undefined` ise, varsayılan (bilinmeyen) durum rozeti gösterilir.  
-
-### Domain‑specific kurallar
-- `bulkPriceAdjust`‑de **mode** yalnızca `'percent'` ya da `'fixed'` olabilir; başka bir değer kabul edilmez.  
-- `statusBadge`‑de **s** parametresi opsiyoneldir; `null`/`undefined` olduğunda “bilinmiyor” badge’ı gösterilir.  
-
-*Bu aksiyomlar, yalnızca fonksiyon imzalarından türetilmiş olup, modülün doğru çalışması için gerekli koşulları tanımlar.*
 
 ---
 
@@ -241,244 +179,303 @@ Bu modül, yönetim panelinde ürün listesinin görüntülenmesi, seçilmesi, d
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleSelect
-- **params**: (id: string)
+### [N1_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::toggleSelectAll
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `selectedIds` — component state `Set<string>`; used to check current selection size.
-  - `rows` — component state `DomainProduct[]`; used to map all row ids.
-  - `setSelectedIds` — state setter; updates the selection set.
-- **Dönüş**: yok (state günceller)
+  - `selectedIds` — mevcut seçili ürün ID seti; `size === rows.length` kontrolü ile tümü seçili mi bakılır
+  - `rows` — ürün satır listesi; `r.id` değerleri `new Set` içine map edilerek tümü seçilir
+- **Dönüş**: yok (state updater: `setSelectedIds`)
 
-### [N2_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleSelectAll
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::loadVisibleColsFromStorage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `selectedIds` — component state `Set<string>`; compared with `rows.length`.
-  - `rows` — component state `DomainProduct[]`; used to build a new set of all ids.
-  - `setSelectedIds` — state setter; replaces the selection set.
-- **Dönüş**: yok
+  - `c` — `localStorage.getItem(\`${STORAGE_KEY}:cols\`)` ile okunan JSON string; görünür sütun tercihlerini tutar
+  - `d` — `localStorage.getItem(\`${STORAGE_KEY}:density\`)` ile okunan string; `'compact'` veya `'comfortable'` olabilir
+  - `STORAGE_KEY` — localStorage anahtarı kökü (dışarıdan referans)
+  - `visibleCols` — mevcut sütun görünürlük state'i; `...JSON.parse(c)` ile genişletilir
+  - `setDensity` — density state setter
+  - `setVisibleCols` — visibleCols state setter
+- **Dönüş**: yok (yan etki: state güncelleme)
 
-### [N3_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleExpand
-- **params**: (id: string)
+### [N3_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::saveVisibleColsToStorage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `expandedIds` — component state `Set<string>`; toggles presence of `id`.
-  - `setExpandedIds` — state setter; updates the expanded set.
-- **Dönüş**: yok
+  - `visibleCols` — mevcut sütun görünürlük nesnesi; `JSON.stringify` ile serialize edilip localStorage'a yazılır
+  - `STORAGE_KEY` — localStorage anahtarı kökü
+- **Dönüş**: yok (yan etki: localStorage yazma)
 
-### [N4_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleCreate
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::saveDensityToStorage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `setEditingId` — state setter; sets `null` for create mode.
-  - `setIsModalOpen` — state setter; opens the modal.
-- **Dönüş**: yok
+  - `density` — mevcut yoğunluk modu string'i (`'compact'` | `'comfortable'`); localStorage'a doğrudan yazılır
+  - `STORAGE_KEY` — localStorage anahtarı kökü
+- **Dönüş**: yok (yan etki: localStorage yazma)
 
-### [N5_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleEdit
-- **params**: (id: string)
+### [N5_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::getInitialSortKey
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `setEditingId` — state setter; stores the id of the product to edit.
-  - `setIsModalOpen` — state setter; opens the modal.
-- **Dönüş**: yok
+  - `v` — `localStorage.getItem(SORT_KEY_STORAGE) as SortKey | null` ile okunan sıralama sütunu adı; `'name' | 'sku' | 'category' | 'status' | 'price' | 'stock'` olabilir
+  - `SORT_KEY_STORAGE` — localStorage sıralama anahtarı
+- **Dönüş**: `SortKey` — geçerli bir sort key veya `'name'` (varsayılan)
 
-### [N6_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleModalSuccess
-- **params**: (parametre yok)
+### [N6_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::getInitialSortDir
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `load` — function reference; triggers data reload.
-- **Dönüş**: yok
+  - `v` — `localStorage.getItem(SORT_DIR_STORAGE) as 'asc' | 'desc' | null` ile okunan sıralama yönü
+  - `SORT_DIR_STORAGE` — localStorage sıralama yönü anahtarı
+- **Dönüş**: `'asc' | 'desc'` — geçerli yön veya `'asc'` (varsayılan)
 
-### [N7_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::remove
-- **params**: (id: string)
+### [N7_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::applyDeepLink
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `rows` — component state; used to find the row before deletion (`before`).
-  - `supabase` — imported client; performs `delete` on `products`.
-  - `logAdminAction` — dynamically imported; logs the delete action.
-  - `load` — reloads data after deletion.
-  - `setError`, `setRows`, `setTotal` — state setters used in error handling (not in success path).
-- **Dönüş**: yok
+  - `deepLinkAppliedRef` — ref nesnesi; deep link'in daha önce uygulanıp uygulanmadığını takip eder, `current` boolean
+  - `searchParams` — Next.js `useSearchParams` hook'undan gelen URL query parametreleri nesnesi
+  - `queryParam` — `searchParams?.get('q') || ''` ile alınan URL'deki arama terimi
+- **Dönüş**: yok (yan etki: `setQ`, `setDebouncedQ`, `deepLinkAppliedRef.current` güncelleme)
 
-### [N8_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkStatusChange
-- **params**: (status: string)
+### [N8_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::load
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `selectedIds` — `Set<string>`; determines which rows to update.
-  - `supabase` — client; updates `status` for all selected ids.
-  - `setSelectedIds` — clears selection after successful update.
-  - `load` — reloads data.
-- **Dönüş**: yok
+  - `term` — `debouncedQ.trim()` ile elde edilentrimmed arama terimi
+  - `list` — `DomainProduct[]` tipinde ürün listesi; API veya DB sorgusundan dönen verilerle doldurulur
+  - `totalCount` — toplam ürün sayısı; RPC `total_count` alanından veya `count`'tan alınır
+  - `offset` — `(page - 1) * PAGE_SIZE` hesaplaması ile sayfalama ofseti
+  - `results` — `adminSearchProducts(...)` RPC çağrısından dönen arama sonuçları
+  - `filtered` — `DbAdminSearchResult[]` tipinde; RPC sonuçları client-side status/featured filtresi uygulanmış hali
+  - `statuses` — `string[]`; aktif filtre durumlarının toplandığı dizi (`'active'`, `'inactive'`, `'out_of_stock'`)
+  - `anyStatus` — boolean; herhangi bir status filtresinin aktif olup olmadığı
+  - `query` — Supabase `from('products').select(...)` sorgu builder nesnesi
+  - `sortableMap` — `Record<SortKey, string | null>`; sıralama sütunu adlarını DB kolon adlarına eşler
+  - `col` — sıralama için kullanılacak DB kolon adı veya null
+  - `from` — sayfalama başlangıç indeksi `(page - 1) * PAGE_SIZE`
+  - `to` — sayfalama bitiş indeksi `from + PAGE_SIZE - 1`
+  - `data` — Supabase query.raw() sonucundan dönen satır verisi
+  - `error` — Supabase sorgu hatası
+  - `count` — Supabase count option sonucu (toplam satır)
+  - `c` — `Promise.all` içindeki categories sorgu sonucu; `{ data, error }` shape
+  - `s` — `Promise.all` içindeki inventory_settings sorgu sonucu; `{ data, error }` shape
+  - `ids` — `list.map(x => x.id)` ile elde edilen ürün ID dizisi (kapak görselleri için)
+  - `chunkSize` — `20`; ID'leri parçalama boyutu
+  - `chunks` — `string[][]`; ID'lerin parçalanmış hali (URL uzunluğu kısıtlaması için)
+  - `results` (cover images) — `Promise.all(chunks.map(...))` ile gelen product_images sorgu sonuçları
+  - `map` — `Record<string, string>`; `{ productId → coverPath }` eşleme nesnesi
+  - `e` — try-catch yakalanan hata nesnesi
+  - `ensureSessionFresh` — oturum tazeleme fonksiyonu (import)
+  - `adminSearchProducts` — FTS RPC arama fonksiyonu (import)
+  - `toUIProductList` — DB satırlarını domain tiplerine dönüştürücü (import)
+  - `PAGE_SIZE` — sayfa başına satır sabiti
+- **Dönüş**: yok (yan etki: `setLoading`, `setError`, `setRows`, `setTotal`, `setCats`, `setCovers` state güncellemeleri ve DB/FSH okuma)
 
-### [N9_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkFeatureToggle
-- **params**: (featured: boolean)
+### [N9_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::coverImageResultHandler
+- **params**: `{ data }` — Supabase sorgu sonucu; `data` option'u `{ product_id, path, sort_order }[]` shape'inde
 - **ic_degiskenler**:
-  - `selectedIds` — `Set<string>`; ids to update.
-  - `supabase` — client; updates `is_featured`.
-  - `setSelectedIds` — clears selection.
-  - `load` — reloads data.
-- **Dönüş**: yok
+  - `data` — product_images tablosundan dönen satır dizisi; her satır `{ product_id: string; path: string; sort_order: number }`
+  - `map` — kapsama alanı haritası; `r.product_id` key'ine ilk `r.path` yazılır
+  - `r` — forEach içindeki her bir ürün görseli satırı
+- **Dönüş**: yok (yan etki: `map` nesnesini doldurma)
 
-### [N10_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkDelete
-- **params**: (parametre yok)
+### [N10_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::coverImageRowHandler
+- **params**: `r` — `{ product_id: string; path: string; sort_order: number }` tipinde ürün görseli satırı
 - **ic_degiskenler**:
-  - `selectedIds` — `Set<string>`; ids to delete.
-  - `supabase` — client; performs bulk delete.
-  - `setSelectedIds` — clears selection.
-  - `load` — reloads data.
-- **Dönüş**: yok
+  - `map` — kapsama alanı haritası; `r.product_id` key'ine `r.path` yazılır (yalnızca ilk kez看到lduysa)
+- **Dönüş**: yok (yan etki: `map` mutasyonu)
 
-### [N11_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::bulkPriceAdjust
-- **params**: (mode: 'percent' | 'fixed', value: number)
+### [N11_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::useEffectDebounce
+- **params**: (yok — useEffect callback)
 - **ic_degiskenler**:
-  - `selectedIds` — `Set<string>`; ids to adjust.
-  - `supabase` — client; fetches current prices and applies updates.
-  - `mode`, `value` — control calculation (percentage or fixed amount).
-  - `updates` — array of `{id, price}` objects with new calculated price.
-  - `results` — array of Supabase update responses; checked for errors.
-  - `setSelectedIds` — clears selection after success.
-  - `load` — reloads data.
-- **Dönüş**: yok
+  - `t` — `setTimeout` sonucu; 300ms debounce timer ID'si
+  - `q` — mevcut arama terimi state'i; `trim()` edilip `setDebouncedQ`'ya yazılır
+  - `setDebouncedQ` — debounce edilmiş arama terimi setter
+  - `setPage` — sayfa numarası setter; 1'e resetlenir
+- **Dönüş**: temizlik fonksiyonu `() => clearTimeout(t)` (cleanup)
 
-### [N12_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::saveInlineEdit
-- **params**: (parametre yok)
+### [N12_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::debouncedHandler
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `inlineEdit` — state object `{id, field, value}`; contains edited field/value.
-  - `parseFloat`, `isNaN` — validate numeric input.
-  - `payload` — `Partial<DomainProduct>` built from edited field.
-  - `supabase` — client; updates the product.
-  - `setRows` — updates local rows with new value.
-  - `setInlineEdit` — clears edit state.
-- **Dönüş**: yok
+  - `q` — mevcut arama terimi state'i; trim edilip `setDebouncedQ`'ya yazılır
+  - `setDebouncedQ` — debounce edilmiş arama terimi setter
+  - `setPage` — sayfa numarası setter; 1'e resetlenir
+- **Dönüş**: yok (yan etki: state güncelleme)
 
-### [N13_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::loadTechSpecs
-- **params**: (_productId: string)
-- **ic_degiskenler**:
-  - `techSpecs` — component state map of productId → specs; checked before fetch.
-  - `supabase` — client; selects `technical_specs` for the product.
-  - `setTechSpecs` — stores fetched specs or empty object on failure.
-- **Dönüş**: yok
+### [N13_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::handleCreate
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: `setEditingId(null)`, `setIsModalOpen(true)`)
 
-### [N14_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::toggleSort
-- **params**: (key: SortKey)
-- **ic_degiskenler**:
-  - `sortKey`, `sortDir` — component state; updated based on current key.
-  - `setSortKey`, `setSortDir` — state setters.
-  - `setPage` — resets pagination to first page.
-- **Dönüş**: yok
+### [N14_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::handleEdit
+- **params**: `id: string` — düzenlenecek ürünün benzersiz tanımlayıcısı
+- **ic_degiskenler**: (yok — parametre doğrudan kullanılır)
+- **Dönüş**: yok (yan etki: `setEditingId(id)`, `setIsModalOpen(true)`)
 
-### [N15_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::sortIndicator
-- **params**: (key: SortKey)
-- **ic_degiskenler**:
-  - `sortKey`, `sortDir` — component state; used to decide indicator direction.
-- **Dönüş**: yok (JSX element returned)
+### [N15_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::handleModalSuccess
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: `load()` çağrısı ile listeyi yeniler)
 
-### [N16_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::statusBadge
-- **params**: (s?: string | null)
+### [N16_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::remove
+- **params**: `id: string` — silinecek ürünün ID'si
 - **ic_degiskenler**:
-  - `s` — status string; normalized to lower case.
-  - `baseClass` — base CSS class string.
-  - `t` — translation function (from i18n context) used in rendered spans.
-- **Dönüş**: yok (JSX element)
+  - `before` — silinmeden önceki ürün verisi; `rows.find(r => r.id === id)` ile bulunan satır veya `null`
+  - `error` — Supabase delete sorgu hatası
+  - `logAdminAction` — dinamik import ile yüklenen audit loglama fonksiyonu
+  - `e` — try-catch yakalanan hata nesnesi
+  - `t` — i18n çeviri fonksiyonu; confirmation mesajı ve alert metinleri için
+  - `confirm` — tarayıcı onay dialogu
+- **Dönüş**: yok (yan etki: DB silme, audit loglama, `load()` ile liste yenileme)
 
-### [N17_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::handleCategoryChange
-- **params**: (value: string)
+### [N17_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::bulkStatusChange
+- **params**: `status: string` — hedef durum değeri (`'active'`, `'inactive'`, `'out_of_stock'`)
 - **ic_degiskenler**:
-  - `setSelectedCategoryFilter` — state setter; stores selected category id.
-- **Dönüş**: yok
+  - `ids` — `Array.from(selectedIds)` ile Set'ten diziye dönüştürülmüş seçili ID'ler
+  - `error` — Supabase update sorgu hatası
+  - `e` — try-catch yakalanan hata nesnesi
+  - `selectedIds` — seçili ürün ID seti; güncelleme sonrası `new Set()` ile temizlenir
+- **Dönüş**: yok (yan etki: DB toplu güncelleme, `setSelectedIds`, `load()`)
 
-### [N18_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::categorySelectProps
-- **params**: (parametre yok)
+### [N18_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::bulkFeatureToggle
+- **params**: `featured: boolean` — vitrine ekleme/çıkarma bayrağı
 - **ic_degiskenler**:
-  - `selectedCategoryFilter` — current filter value.
-  - `handleCategoryChange` — change handler.
-  - `cats` — array of category options; mapped to `{value, label}`.
-- **Dönüş**: object with `value`, `onChange`, `options`.
+  - `ids` — `Array.from(selectedIds)` ile elde edilen seçili ID dizisi
+  - `error` — Supabase update sorgu hatası
+  - `e` — try-catch yakalanan hata nesnesi
+- **Dönüş**: yok (yan etki: DB toplu güncelleme, `setSelectedIds`, `load()`)
 
-### [N19_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::exportCsv
-- **params**: (parametre yok)
+### [N19_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::bulkDelete
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `sorted` — currently sorted rows.
-  - `cols` — column identifiers.
-  - `header` — CSV header line.
-  - `lines` — array of CSV rows built from each product.
-  - `csv` — final CSV string with BOM.
-  - `blob`, `url`, `a` — DOM objects used to trigger download.
-- **Dönüş**: yok
+  - `ids` — `Array.from(selectedIds)` ile elde edilen seçili ID dizisi
+  - `error` — Supabase delete sorgu hatası
+  - `e` — try-catch yakalanan hata nesnesi
+- **Dönüş**: yok (yan etki: DB toplu silme, `setSelectedIds`, `load()`)
 
-### [N20_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::mapCategories
-- **params**: (parametre yok)
+### [N20_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::bulkPriceAdjust
+- **params**: `mode: 'percent' | 'fixed'` — fiyat ayarlama modu (yüzde veya sabit tutar), `value: number` — uygulanacak değer
 - **ic_degiskenler**:
-  - `cats` — array of category objects.
-  - `map` — `Map<string, string>` mapping id → name.
-- **Dönüş**: `Map<string, string>`
+  - `label` — onay mesajı için formatlanmış fiyat etiketi; `%` veya `₺` prefix ile
+  - `ids` — `Array.from(selectedIds)` ile elde edilen seçili ID dizisi
+  - `products` — `supabase.from('products').select('id,price,name,sku,brand').in('id', ids)` ile çekilen mevcut ürün verileri
+  - `fetchErr` — ürün çekme sorgu hatası
+  - `updates` — her ürün için `{ id, price }` güncellemesi içeren dizi; `products.map(...)` ile hesaplanır
+  - `results` — `Promise.all(updates.map(...))` ile gerçekleştirilen toplu update sorgu sonuçları
+  - `errorResult` — hatalı sonuçlardan ilk bulunan
+  - `e` — try-catch yakalanan hata nesnesi
+- **Dönüş**: yok (yan etki: DB toplu fiyat güncelleme, `setSelectedIds`, `load()`)
 
-### [N21_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::applySorting
-- **params**: (parametre yok)
+### [N21_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::bulkPriceAdjustMapper
+- **params**: `p` — `{ id: string; price: number | null; name: string; sku: string; brand: string }` tekil ürün verisi
 - **ic_degiskenler**:
-  - `filtered` — set of rows after filters.
-  - `sortKey`, `sortDir` — sorting criteria.
-  - `catsMap` — map of category ids to names.
-  - `arr` — copy of filtered rows.
-- **Dönüş**: sorted array of `DomainProduct`
+  - `currentPrice` — mevcut fiyat; `p.price ?? 0` ile null-safe
+  - `newPrice` — mod'a göre hesaplanan yeni fiyat; percent: `Math.round(currentPrice * (1 + value / 100) * 100) / 100`, fixed: `Math.round((currentPrice + value) * 100) / 100`
+  - `mode` — parent'tan gelen fiyat ayarlama modu
+  - `value` — parent'tan gelen fiyat değeri
+- **Dönüş**: `{ id: string; price: number }` — güncellenmiş fiyat objesi (negatif fiyat `Math.max(0, ...)` ile engellenir)
 
-### [N22_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::compareRows
-- **params**: (a, b)
+### [N22_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::saveInlineEdit
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `sortKey`, `sortDir` — used to compute direction.
-  - `catsMap` — for category comparison.
-- **Dönüş**: number (comparison result for `Array.sort`)
+  - `inlineEdit` — inline düzenleme state'i; `{ id: string; field: 'price' | 'stock_qty'; value: string }` shape
+  - `numVal` — `parseFloat(inlineEdit.value)` ile parse edilmiş sayısal değer
+  - `payload` — `Partial<DomainProduct>`; field'a göre `{ price: numVal }` veya `{ stock_qty: numVal }`
+  - `error` — Supabase update sorgu hatası
+  - `e` — try-catch yakalanan hata nesnesi
+- **Dönüş**: yok (yan etki: DB güncelleme, `setRows` ile local state patch, `setInlineEdit(null)`)
 
-### [N23_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::load
-- **params**: (parametre yok)
+### [N23_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::loadTechSpecs
+- **params**: `_productId: string` — teknik özellikleri yüklenecek ürünün ID'si
 - **ic_degiskenler**:
-  - `setLoading`, `setError`, `setRows`, `setTotal`, `setCats`, `setCovers` — state setters.
-  - `ensureSessionFresh` — ensures session validity.
-  - `debouncedQ`, `page`, `PAGE_SIZE`, `selectedCategoryFilter`, `featuredOnly`, `statusFilter` — query parameters.
-  - `adminSearchProducts` — RPC for full‑text search.
-  - `toUIProductList` — converts DB rows to UI model.
-  - `supabase` — used for normal queries, categories, settings, images.
-  - `sortKey`, `sortDir` — sorting.
-  - `ids`, `chunks`, `results`, `map` — image‑fetching logic.
-  - `setTechSpecs` — not used here but part of component state.
-- **Dönüş**: yok (state updates)
+  - `techSpecs` — mevcut teknik özellikler nesnesi; `{ [productId]: Record<string, string> }`
+  - `data` — `supabase.from('products').select('technical_specs').eq('id', _productId).maybeSingle()` sonucu
+- **Dönüş**: yok (yan etki: `setTechSpecs` ile cache doldurma; `{ [key]: {} }` fallback)
 
-### [N24_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::useDebounceEffect
-- **params**: (parametre yok)
+### [N24_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::toggleSort
+- **params**: `key: SortKey` — sıralanacak sütun anahtarı
 - **ic_degiskenler**:
-  - `q` — search input.
-  - `setDebouncedQ`, `setPage` — state setters.
-  - `setTimeout`, `clearTimeout` — timer handling.
-- **Dönüş**: cleanup function for effect.
+  - `sortKey` — mevcut sıralama sütunu; aynı key ise yön terslenir, farklı ise yeni key ile `'asc'` başlanır
+  - `sortDir` — mevcut sıralama yönü; toggle edilir
+- **Dönüş**: yok (yan etki: `setSortKey`, `setSortDir`, `setPage(1)`)
 
-### [N25_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::onSearchChange
-- **params**: (parametre yok)
+### [N25_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::sortIndicator
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `setDebouncedQ`, `setPage` — reset pagination on manual search change.
-- **Dönüş**: yok
+  - `map` — `Map<string, string>`; category ID → category name eşlemesi
+  - `cats` — `CategoryOpt[]` dizisi; her eleman `{ id, name }` shape'inde
+- **Dönüş**: `Map<string, string>` — category ID'lerinden isimlere eşleme haritası
 
-### [N26_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::openCreateModal
-- **params**: (parametre yok)
+### [N26_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::sorted
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `setEditingId(null)`, `setIsModalOpen(true)` — open modal for creation.
-- **Dönüş**: yok
+  - `arr` — `filtered` dizisinin sıralanmış kopyası; spread ile shallow copy
+  - `filtered` — filtrelenmiş ürün listesi
+  - `sortDir` — sıralama yönü (`'asc' | 'desc'`); `dir = sortDir === 'asc' ? 1 : -1` ile çarpan
+  - `sortKey` — sıralama sütunu (`'name' | 'sku' | 'category' | 'status' | 'price' | 'stock'`)
+  - `catsMap` — category ID → name Map'i
+- **Dönüş**: `DomainProduct[]` — sıralanmış ürün listesi
 
-### [N27_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::openEditModal
-- **params**: (id: string)
+### [N27_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::sortComparator
+- **params**: `a` — `DomainProduct` sol eleman, `b` — `DomainProduct` sağ eleman
 - **ic_degiskenler**:
-  - `setEditingId(id)`, `setIsModalOpen(true)` — open modal for editing.
-- **Dönüş**: yok
+  - `dir` — sıralama çarpanı (`1` veya `-1`)
+  - `sortKey` — sıralama sütunu
+  - `sortDir` — sıralama yönü
+  - `an` — `a.category_id` için catsMap'ten alınan kategori adı
+  - `bn` — `b.category_id` için catsMap'ten alınan kategori adı
+- **Dönüş**: `number` — negatif/sıfır/pozitif sıralama karşılaştırma sonucu
 
-### [N28_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::loadOnMount
-- **params**: (parametre yok)
+### [N28_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::statusBadge
+- **params**: `s?: string | null` — ürün durum string'i
 - **ic_degiskenler**:
-  - `load` — invoked once on component mount.
-- **Dönüş**: yok
+  - `v` — `(s || '').toLowerCase()` ile normalize edilmiş durum değeri
+  - `baseClass` — ortak CSS class'ları (`"px-2.5 py-1 text-xs font-black uppercase tracking-wider rounded-lg border"`)
+- **Dönüş**: `JSX.Element` — duruma göre renklendirilmiş badge `<span>` elemanı veya varsayılan `'-'` badge
 
-### [N29_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::rowRenderer
-- **params**: (r: DomainProduct)
-- **ic_degiskenler**:
-  - `expandedIds`, `selectedIds`, `hasWriteAccess`, `covers`, `visibleCols`, `catsMap`, `statusBadge`, `inlineEdit`, `saveInlineEdit`, `setInlineEdit`, `formatCurrency`, `lang`, `t` — all used to render a table row with actions, inline editing, expand/collapse, images, etc.
-- **Dönüş**: JSX `<React.Fragment>` representing a table row (and optional expanded row).
+### [N29_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::handleCategoryChange
+- **params**: `value: string` — seçilen kategori ID'si (boş string = tümü)
+- **ic_degiskenler**: (yok — parametre doğrudan kullanılır)
+- **Dönüş**: yok (yan etki: `setSelectedCategoryFilter(value)`)
 
-### [N30_NASIL] AST Pointer: src\views\admin\AdminProductsPage.tsx::techSpecRenderer
-- **params**: ([key, val])
+### [N30_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::categoryFilterProps
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `key`, `val` — entry from `techSpecs[productId]`; rendered inside a styled div.
-- **Dönüş**: JSX element for a single tech‑spec key/value pair.
+  - `selectedCategoryFilter` — mevcut kategori filtresi state'i; `value` alanına atanır
+  - `cats` — kategori dizisi; `.map(c => ({ value: c.id, label: c.name.toUpperCase() }))` ile options'a dönüştürülür
+  - `t` — i18n çeviri fonksiyonu; varsayılan label metni için
+- **Dönüş**: `{ value: string; onChange: Function; options: { value: string; label: string }[] }` — AdminToolbar'a geçirilen kategori filtre prop'u
+
+### [N31_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::exportCSV
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `cols` — CSV sütun başlıkları dizisi: `['id', 'name', 'sku', 'category_id', 'status', 'price', 'stock_qty']`
+  - `header` — `cols.join(',')` ile oluşturulan CSV başlık satırı
+  - `lines` — `sorted.map(...)` ile her satırın virgülle ayrılmış değerleri
+  - `csv` — BOM (`\ufeff`) + header + lines ile tam CSV string
+  - `blob` — `new Blob([csv], { type: 'text/csv;charset=utf-8;' })` ile oluşturulan CSV dosyası
+  - `url` — `URL.createObjectURL(blob)` ile elde edilen geçici dosya URL'i
+  - `a` — `document.createElement('a')` ile oluşturulan gizli link elemanı
+  - `sorted` — sıralanmış ürün listesi (parent scope'tan referans)
+- **Dönüş**: yok (yan etki: CSV dosya indirme tetikleme)
+
+### [N32_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::exportCSVRowMapper
+- **params**: `r` — `DomainProduct` satır nesnesi
+- **ic_degiskenler**:
+  - `r.name` — ürün adı; `replace(/"/g, '""')` ile CSV escape uygulanır, çift tırnak içine alınır
+  - `r.id`, `r.sku`, `r.category_id`, `r.status`, `r.price`, `r.stock_qty` — sırasıyla CSV hücre değerlerine map edilir
+- **Dönüş**: `string` — virgülle ayrılmış CSV satır string'i
+
+### [N33_NASIL] AST Pointer: `src/views/admin/AdminProductsPage.tsx`::renderRow
+- **params**: `r` — `DomainProduct` satır nesnesi
+- **ic_degiskenler**:
+  - `isExpanded` — `expandedIds.has(r.id)` ile teknik özellik panelinin açık olup olmadığı
+  - `isSelected` — `selectedIds.has(r.id)` ile satırın seçili olup olmadığı
+  - `covers` — `{ [productId]: imagePath }` haritası; `covers[r.id]` ile kapak görseli alınır
+  - `catsMap` — category ID → name haritası; `catsMap.get(r.category_id)` ile kategori adı
+  - `techSpecs` — teknik özellikler cache'i; `techSpecs[r.id]` ile ürünün teknik özellikleri
+  - `visibleCols` — görünür sütun tercihleri nesnesi; hangi sütunların render edileceğini kontrol eder
+  - `inlineEdit` — inline düzenleme state'i; fiyat/stock hücrelerinde edit modu kontrolü
+  - `hasWriteAccess` — yazma yetkisi boolean; checkbox ve aksiyon butonlarının gösterilmesini kontrol eder
+  - `process.env.NEXT_PUBLIC_SUPABASE_URL` — Supabase Storage URL kökü; kapak görselleri için
+  - `adminTableCellClass`, `cellPad` — tablo hücresi CSS sınıfları
+  - `adminTableActionClass`, `adminTableActionDangerClass` — buton CSS sınıfları
+  - `t` — i18n çeviri fon
 
 ---
 
@@ -503,15 +500,15 @@ graph TD
     AdminProductsPage_tsx__toggleSelect["toggleSelect"]
     AdminProductsPage_tsx__toggleSelectAll["toggleSelectAll"]
     AdminProductsPage_tsx__toggleSort["toggleSort"]
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__remove
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
 ```
 
 ## NODE ID STANDARD

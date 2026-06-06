@@ -3,33 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\webhook-events\page.tsx
-skeleton_hash: 64ca1a86eba5b3eb
+skeleton_hash: fad447b6edb0cff9
 entity_hashes:
   func:Page: 03bf0c7eea267025
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-05-28T22:35:15Z
+generated_at: 2026-06-06T21:54:19Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki webhook olayları sayfasını sunan basit bir giriş noktasıdır. Tek bir React bileşeni (`Page`) dışa aktarır ve asıl sayfa yapısını dinamik olarak yüklenen bir alt bileşene (`AdminWebhookEventsPage`) devreder.
+Bu modül, yönetim panelindeki webhook olayları sayfasını sunan bir React giriş noktasıdır. Tek bir bileşeni (`Page`) dışa aktararak, sayfanın asıl içeriğini dinamik olarak yüklenen `AdminWebhookEventsPage` alt bileşenine devreder.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Sayfanın dışa açık tek bileşenini barındırır. Routing yapısı tarafından çağrılır ve ana sayfa arayüzünü render ederek kullanıcıya sunar.
+### Sayfa Bileşeni
+Modülün dışa açık tek bileşenini tanımlar. Bu bileşen, Next.js App Router yapısında ilgili rotaya bağlanır ve kullanıcıya sayfa arayüzünü sunar.
 - Page
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bir React sayfa bileşeni olup minimal bir sarmalayıcı (wrapper) yapısına sahiptir.
-
-**[Aksiyom 1]**: Eğer `AdminWebhookEventsPage` bileşeni modül erişim alanında (scope) tanımlı veya import edilmiş değilse, `Page` bileşeni render sırasında hata fırlatır.
-
-**[Aksiyom 2]**: Eğer bu bileşen bir Next.js App Router yapısında `/admin/webhook-events` rotasına bağlı değilse, kullanıcı arayüzü beklenen rotada görüntülenmez (bu dosya yolu varsayımının dayandığı rota yapısına bağlıdır).
-
-**[Aksiyom 3]**: Eğer `AdminWebhookEventsPage` bileşeni geçerli bir React bileşeni (fonksiyon veya sınıf) olarak tanımlı değilse, `Page` bileşeni geçerli bir JSX döndüremez.
 
 ---
 
@@ -48,9 +40,8 @@ Bu modül, bir React sayfa bileşeni olup minimal bir sarmalayıcı (wrapper) ya
 ---
 
 ## SABİTLER
-- **AdminWebhookEventsPage** (call) — `dynamic(
-  () => import('../../../views/admin/AdminWebhookEventsPage'),
-  {...`
+- **AdminWebhookEventsPage** (call) — `nextDynamic(
+  () => import('../../../views/admin/AdminWebhookEventsPage'),...`
 
 ---
 
@@ -58,8 +49,9 @@ Bu modül, bir React sayfa bileşeni olup minimal bir sarmalayıcı (wrapper) ya
 
 ### [N1_NASIL] AST Pointer: src/app/admin/webhook-events/page.tsx::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `<AdminWebhookEventsPage />` JSX bileşeni döndürülür
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde hiçbir değişken tanımlanmamış)
+- **Dis Bilesenler**: `AdminWebhookEventsPage` — import edilmiş React bileşeni, fonksiyon içinde `<AdminWebhookEventsPage />` şeklinde JSX olarak render ediliyor
+- **Dönüş**: JSX Element (`<AdminWebhookEventsPage />`) — bir sonraki React bileşeninin render edeceği UI yapısını döndürüyor
 
 ---
 

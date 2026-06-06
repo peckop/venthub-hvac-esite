@@ -3,53 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\movements\page.tsx
-skeleton_hash: 137709aebfeddc36
+skeleton_hash: 7804c758a3d6534d
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-28T22:35:18Z
+generated_at: 2026-06-06T21:53:56Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetim panelindeki "Hareketler" (Movements) bölümünün ana giriş noktasıdır. Tek bir `Page` bileşeni aracılığıyla, istemci tarafı uygulamaya gerekli sayfa bileşenini dinamik olarak yükleyerek ve bir yükleme durumu göstererek hizmet verir.
+Bu modül, VentHub HVAC yönetim panelindeki "Hareketler" (Movements) sayfasının ana giriş noktasıdır. Next.js uygulamasında admin arayüzünde hareket kayıtlarının görüntülendiği sayfayı sunar. Tek bileşenli yapısıyla, hareketlere ilişkin yönetim arayüzünün yüklenmesini ve render edilmesini sağlar.
 
 ## Fonksiyon Grupları
-### Sayfa Giriş ve Yönlendirme
-Bu grup, belirli bir yönetimsel sayfaya (hareketler) erişim sağlamanın temel mekanizmasını yönetir. Gerekli bileşeni dinamik olarak yükleyerek uygulamanın performansını ve yüklenme davranışını kontrol eder.
+### Sayfa Bileşeni
+Hareketler yönetim sayfasının ana bileşenini tanımlar ve Next.js sayfa yönlendirme yapısıyla entegre çalışarak istemci tarafında render işlemini gerçekleştirir.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için verilen fonksiyon imzalarından (sadece `Page()` – parametresiz) çıkarılabilecek mimari varsayım bulunmamaktadır.
 
 ---
 
-**Açıklama:**
+**Gerekçe:**
 
-`Page` fonksiyonu parametre almamaktadır ve fonksiyon gövdesi hakkında detaylı bilgi verilmemiştir. Mevcut bilgiye dayanarak:
-
-| Gözlem | Durum |
-|--------|-------|
-| Fonksiyon imzası | `Page()` - parametresiz |
-| Geri dönüş | React bileşeni (belirtilmiş) |
-| Modül sabiti | `PageComponent` (çağrılabilir) |
-| Fonksiyon gövdesi detayı | Sağlanmamış |
-
-**Neden aksiyom tanımlanamadı:**
-
-1. Fonksiyon gövdesi detaylı olarak verilmemiştir
-2. Parametre olmadığı için giriş koşulu varsayımı yapılamaz
-3. Docstring/yorumlardan bilgi çıkarılması yasaktır
-4. `PageComponent`'in nasıl kullanıldığı (prop geçilip geçilmediği, hangi verilerin aktarıldığı) bilinmemektedir
-
-**Not:** Bu sayfa bileşeni muhtemelen:
-- Yetkilendirme kontrolü yapıyordur (admin erişimi)
-- `PageComponent`'i render ediyordur
-
-Ancak bu bilgiler fonksiyon gövdesinden doğrulanamadığı için aksiyom olarak tanımlanmamıştır.
+Modülde tanımlı tek fonksiyon imzası `Page()` olup herhangi bir parametre, return tipi veya zorunlu bağımlılık belirtmemektedir. Bu nedenle fonksiyon imzasına dayalı olarak hüküm yürütülebilecek bir aksiyom üretilememektedir.
 
 ---
 
@@ -68,22 +48,22 @@ Ancak bu bilgiler fonksiyon gövdesinden doğrulanamadığı için aksiyom olara
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../views/admin/AdminMovementsPage'), {
-  ssr: fa...`
+- **PageComponent** (call) — `nextDynamic(() => import('../../../views/admin/AdminMovementsPage'), {
+  ssr...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\app\admin\movements\page.tsx::AnonymousLoader
-- **params**: (none)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi - ekran ortasında dönen bir yükleme animasyonu gösterir
+### [N1_NASIL] AST Pointer: src/app/admin/movements/page.tsx::(anonim_arrow_loading)
+- **params**: ()
+- **ic_degiskenler**: (yok — sadece JSX döndürür)
+- **Dönüş**: JSX element — ekran ortasında dönen spinner animasyonu gösteren loading bileşeni
 
-### [N2_NASIL] AST Pointer: src\app\admin\movements\page.tsx::Page
-- **params**: (none)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi - PageComponent bileşenini render eder
+### [N2_NASIL] AST Pointer: src/app/admin/movements/page.tsx::Page
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `<PageComponent />` JSX — admin movements sayfasının ana bileşeni olarak dinamik yüklenmiş `PageComponent`'i render eder
 
 ---
 

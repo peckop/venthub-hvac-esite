@@ -3,143 +3,154 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\address.service.ts
-skeleton_hash: 6bf9f793f87a4a2d
+skeleton_hash: 575b41c40dad6154
 entity_hashes:
-  func:createAddress: 3a0ae8a07514212f
-  func:deleteAddress: b5bce7485abe70ef
-  func:listAddresses: 955ed4f9e3da2dfd
-  func:setDefaultAddress: 3a668e9b028a6847
-  func:updateAddress: 5f0b9ef63055f2b6
-  overview: 6e4e019d765306bc
-generated_at: 2026-05-28T22:38:18Z
+  func:createAddress: 652a6e47616cd8a3
+  func:deleteAddress: 768abcb2b7d9aab4
+  func:listAddresses: 5d3a031e4bc3b5d2
+  func:setDefaultAddress: d9af7591e0ec5d4e
+  func:updateAddress: 60af9abeb26332a2
+  overview: dee5103fa0cd16a1
+generated_at: 2026-06-06T21:55:43Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunda kullanıcı adreslerinin yönetimini sağlayan merkezi servistir. Kullanıcıların teslimat ve fatura adreslerini eklemesini, güncellemesini, silmesini ve listelemesini sağlar. Ayrıca, kullanıcıların belirli bir adresi varsayılan teslimat veya fatura adresi olarak belirlemesine olanak tanır.
+Bu modül, kullanıcı adreslerinin tüm yaşam döngüsünü yöneten bir veri servisidir. Temel olarak, adreslerin eklenmesi, değiştirilmesi, listelenmesi ve silinmesi gibi standart CRUD işlemlerini yürütür. Ayrıca, kullanıcıların bir adresi teslimat veya fatura için varsayılan olarak belirlemesine olanak tanıyan işlevsel bir düzenleme sunar.
 
 ## Fonksiyon Grupları
-### Temel Adres CRUD İşlemleri
-Kullanıcı adreslerinin temel yaşam döngüsü yönetimini sağlar. Mevcut adreslerin listelenmesinden yeni adres oluşturulmasına, var olan adreslerin güncellenmesinden kalıcı olarak silinmesine kadar tüm standart veri操纵 işlemlerini kapsar.
+### Adres Temel İşlemleri
+Kullanıcı adreslerinin standart veri manipülasyonu işlemlerini yönetir; bu, yeni adres oluşturma, mevcut adresleri listeleme ve güncelleme ile adresleri kalıcı olarak silmeyi kapsar.
 - listAddresses, createAddress, updateAddress, deleteAddress
 
-### Varsayılan Adres Atama
-Kullanıcıların belirli bir adresi teslimat veya fatura süreçleri için varsayılan olarak belirlemesini sağlar. Bu fonksiyon, seçilen adresin türüne göre (teslimat veya fatura) ilgili alanın güncellenmesini yönetir.
+### Varsayılan Adres Yönetimi
+Kullanıcıların belirli bir adresi teslimat veya fatura amaçlı olarak varsayılan olarak belirlemesini sağlar; bu, ilgili adres kaydının türüne göre özel bir alan güncellenmesini içerir.
 - setDefaultAddress
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için, fonksiyon imzalarından çıkarılabilecek temel mimari varsayımlar aşağıdadır.
 
-[Aksiyom 1]: Eğer `listAddresses` çağrıldığında mevcut bir kullanıcı oturumu veya bağlamı (user context) yoksa, modül kullanıcının adreslerini hangi ölçüde filtreleyeceğine dair bir temel bilgiye sahip olamaz ve yanlış veya boş bir liste döndürür.
+Bu modül, kullanıcı adreslerinin CRUD işlemlerini ve varsayılan adres belirleme mantığını yöneten servis katmanıdır.
 
-[Aksiyom 2]: Eğer `createAddress(payload: DbUserAddressInsert)` çağrıldığında `payload` parametresi, veritabanı şemasına uygun bir `DbUserAddressInsert` yapısı değilse, adres kaydı oluşturulamaz veya bozuk veri yazılır.
+**[Aksiyom 1 - Supabase Bağlantı Gereksinimi]:** Eğer geçerli bir Supabase istemcisi (`supabase`) sağlanmazsa, tüm CRUD işlemleri (`listAddresses`, `createAddress`, `updateAddress`, `deleteAddress`) ve `setDefaultAddress` fonksiyonları başarısız olur veya veritabanı bağlantısı kurulamaz.
 
-[Aksiyom 3]: Eğer `updateAddress(id: string, ...)` veya `deleteAddress(id: string)` çağrıldığında sağlanan `id`, sistemde var olmayan veya kullanıcıya ait olmayan bir adresin kimliğiyse, ilgili güncelleme veya silme işlemi mantıksal olarak başarısız olur.
+**[Aksiyom 2 - Var olan Adres Kimliği Zorunluluğu]:** Eğer `updateAddress` veya `deleteAddress` fonksiyonuna geçersiz veya var olmayan bir `id: string` parametresi girilirse, ilgili adres bulunamaz ve işlem başarısız olur.
 
-[Aksiyom 4]: Eğer `setDefaultAddress(kind: 'shipping' | 'billing', id: string)` çağrıldığında `id` parametresi, belirtilen `kind` kategorisine ait geçerli bir adres değilse, `kind` parametresi için izin verilen değerlerden biri değilse (`'shipping'` veya `'billing'` dışındaki bir değer), varsayılan adres ataması yapılamaz.
+**[Aksiyom 3 - Adres Türü Kısıtlaması]:** Eğer `setDefaultAddress` fonksiyonuna `kind` parametresi olarak `'shipping'` veya `'billing'` değerlerinden farklı bir değer girilirse, fonksiyon hata fırlatır veya beklenmeyen davranış sergiler (TypeScript derleme zamanı kısıtlaması: `kind: 'shipping' | 'billing'`).
 
-[Aksiyom 5]: Eğer `setDefaultAddress` başarıyla çalışırsa, aynı `kind` kategorisinde daha önce varsayılan olarak ayarlanmış olan diğer tüm adreslerin `is_default` alanı güncellenerek `false` yapılır (veya benzer bir mantıkla varsayılanlık tekil olur).
+**[Aksiyom 4 - Veri Yapısı Gereksinimi (Create)]:** Eğer `createAddress` fonksiyonuna `DbUserAddressInsert` tipine uymayan bir `payload` nesnesi girilirse, Supabase insert işlemi başarısız olur veya veritabanı kısıtlamaları ihlal edilir.
 
-[Aksiyom 6]: Eğer `deleteAddress` ile bir adres silinir ve bu adres, o kullanıcı için mevcut `kind` kategorisinde (`'shipping'` veya `'billing'`) tek ve varsayılan adres ise, kullanıcının o kategoride artık varsayılan bir adresi kalmaz ve iş akışı bu duruma karşı bir tepki (hata, uyarı) gerektirebilir.
+**[Aksiyom 5 - Veri Yapısı Gereksinimi (Update)]:** Eğer `updateAddress` fonksiyonuna `DbUserAddressUpdate` tipine uymayan bir `payload` nesnesi girilirse, Supabase update işlemi başarısız olur veya veritabanı kısıtlamaları ihlal edilir.
+
+**[Aksiyom 6 - Varsayılan İstemci Erişilebilirliği]:** Eğer `defaultClient` sabiti (ternary expression ile belirlenir) geçerli bir Supabase istemcisine dönüşemezse, opsiyonel olarak istemci sağlanmadığında modül varsayılan bağlantı mechanismasını kullanamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### listAddresses
-**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait tüm adres kayıtlarını getirir. Sonuçlar, adresin varsayılan gönderim adresi olup olmadığına göre (önce true olanlar) ve ardından oluşturulma tarihine göre (en yeniden en eskiye) sıralanır.
-**Nasıl yapar**: Supabase istemcisi kullanarak 'user_addresses' tablosundaki tüm sütunları (`*`) sorgular. Sıralama için iki aşamalı bir `order` zinciri uygular: önce `is_default_shipping` sütunu azalan (false -> true) sırayla, ardından `created_at` sütunu azalan (yeni -> eski) sırayla. Sorgu başarılıysa veriyi `DbUserAddress[]` türüne dönüştürerek döndürür, boşsa boş bir dizi döndürür.
-**Parametreler**: Parametre almaz.
-**Dönüş**: `Promise<DbUserAddress[]>` — Sıralanmış kullanıcı adres nesneleri dizisi.
+**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait tüm adresleri alır.
+**Nasıl yapar**: Supabase istemcisini kullanarak `user_addresses` tablosundaki tüm satırları sorgular. Sonuçları, `is_default_shipping` alanına göre azalan (true önce gelir) ve ardından `created_at` alanına göre azalan sırada sıralar. Veritabanı sorgusu başarısız olursa bir hata fırlatır.
+**Parametreler**:
+- supabase: SupabaseClient — Veritabanı işlemleri için kullanılacak istemci. Opsiyoneldir ve varsayılan olarak modülde tanımlı `defaultClient` kullanılır.
+**Dönüş**: Promise<DbUserAddress[]> — Sıralanmış kullanıcı adresleri dizisi. Sorgu başarılı olmazsa boş bir dizi döner.
 
 ### createAddress
-**Ne yapar**: Kimliği doğrulanmış kullanıcı için yeni bir adres kaydı oluşturur. Paylaşımdaki bilgilere göre adresi otomatik olarak varsayılan gönderim veya fatura adresi olarak ayarlayabilir.
-**Nasıl yapar**: Önce `supabase.auth.getUser()` ile mevcut kullanıcıyı doğrular. Kullanıcı yoksa hata fırlatır. Gelen `payload` verisini, kullanıcının `user_id`'sini ekleyerek ve gerekli alanları standartlaştırarak (`street_address` ve `address_type`) veritabanı için uygun bir nesneye dönüştürür. Ardından 'user_addresses' tablosuna `insert` işlemi uygular ve `select('*').single()` ile yeni eklenen kaydı getirir. Eklenen kaydın `is_default_shipping` veya `is_default_billing` bayrakları true ise, `setDefaultAddress` fonksiyonunu çağırarak ilgili türdeki diğer adreslerin varsayılan bayraklarını temizler ve bu adresi yeni varsayılan yapar.
+**Ne yapar**: Kimliği doğrulanmış kullanıcı için yeni bir adres kaydı oluşturur.
+**Nasıl yapar**: Önce kullanıcının oturumunu doğrular. Ardından, sağlanan `payload` verisini kullanıcının ID'si ile genişleterek veritabanına ekler. `street_address` alanını `address_line`'dan, `address_type` alanını ise `is_default_shipping` bayrağına göre belirler. İşlem başarılı olduktan sonra, `is_default_shipping` veya `is_default_billing` bayrakları true ise ilgili adresi varsayılan olarak ayarlar.
 **Parametreler**:
-- payload: `DbUserAddressInsert` — Oluşturulacak adresin tüm gerekli ve opsiyonel verilerini içeren nesne. `street_address` ve `address_type` alanları opsiyoneldir, belirtilmezse otomatik doldurulur.
-**Dönüş**: `Promise<DbUserAddress>` — Yeni oluşturulmuş ve veritabanından getirilmiş adres nesnesi.
+- payload: DbUserAddressInsert — Oluşturulacak adresin tüm verilerini içeren nesne.
+- supabase: SupabaseClient — Veritabanı işlemleri için kullanılacak istemci. Opsiyoneldir ve varsayılan olarak modülde tanımlı `defaultClient` kullanılır.
+**Dönüş**: Promise<DbUserAddress> — Yeni oluşturulan adres nesnesi.
 
 ### updateAddress
-**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait belirli bir adres kaydını günceller. Güncelleme verisi içindeki `address_line` alanını otomatik olarak `street_address` alanına eşler ve gerekirse adresi yeni bir varsayılan adres yapar.
-**Nasıl yapar**: Güncellenme isteğiyle gelen `payload` nesnesini, varsa `address_line` alanını `street_address` alanına kopyalayarak düzenler. Ardından 'user_addresses' tablosunda, `id` parametresine eşleşen kaydı `update` ile günceller ve güncellenmiş kaydı `select('*').single()` ile getirir. Eğer güncelleme içeriğinde `is_default_shipping` veya `is_default_billing` true olarak ayarlandıysa, `setDefaultAddress` fonksiyonunu çağırarak ilgili türdeki diğer adreslerin varsayılanlık durumunu kaldırır ve bu adresi yeni varsayılan yapar.
+**Ne yapar**: Mevcut bir adresi kimliği doğrulanmış kullanıcı adına günceller.
+**Nasıl yapar**: Verilen `id` ile eşleşen adres kaydını bulur ve `payload` içindeki alanlarla günceller. `address_line` alanı sağlanmışsa bunu `street_address` alanına eşler. Güncelleme başarılı olduktan sonra, `is_default_shipping` veya `is_default_billing` bayrakları true ise ilgili adresi varsayılan olarak ayarlar.
 **Parametreler**:
-- id: `string` — Güncellenecek adresin benzersiz tanımlayıcısı (UUID).
-- payload: `DbUserAddressUpdate` — Güncellenecek alanları içeren kısmi veri nesnesi.
-**Dönüş**: `Promise<DbUserAddress>` — Güncellenmiş ve veritabanından getirilmiş adres nesnesi.
+- id: string — Güncellenecek adresin benzersiz tanımlayıcısı.
+- payload: DbUserAddressUpdate — Güncellenecek alanları içeren kısmi veri nesnesi.
+- supabase: SupabaseClient — Veritabanı işlemleri için kullanılacak istemci. Opsiyoneldir ve varsayılan olarak modülde tanımlı `defaultClient` kullanılır.
+**Dönüş**: Promise<DbUserAddress> — Güncellenmiş adres nesnesi.
 
 ### deleteAddress
-**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait belirli bir adres kaydını kalıcı olarak siler.
-**Nasıl yapar**: 'user_addresses' tablosunda, `id` parametresine eşleşen kaydı `delete` işlemiyle siler. İşlem başarılıysa `true` değeri döndürür. Hata oluşursa异常`throw` eder.
+**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait belirli bir adresi kalıcı olarak siler.
+**Nasıl yapar**: Verilen `id` parametresine sahip adres kaydını `user_addresses` tablosundan siler. İşlem başarılıysa `true` değeri döner. Veritabanı silme işleminde bir hata oluşursa bir istisna fırlatır.
 **Parametreler**:
-- id: `string` — Silinecek adresin benzersiz tanımlayıcısı (UUID).
-**Dönüş**: `Promise<boolean>` — Silme işlemi başarılıysa `true`.
+- id: string — Silinecek adresin benzersiz tanımlayıcısı.
+- supabase: SupabaseClient — Veritabanı işlemleri için kullanılacak istemci. Opsiyoneldir ve varsayılan olarak modülde tanımlı `defaultClient` kullanılır.
+**Dönüş**: Promise<boolean> — Silme işlemi başarılıysa `true`.
 
 ### setDefaultAddress
-**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait bir adresi, belirtilen türde (gönderim veya fatura) varsayılan adres olarak ayarlar. Bu işlemi yaparken, kullanıcının aynı türdeki diğer tüm adreslerinin varsayılan bayrağını önce kaldırır, ardından belirtilen adresi varsayılan yapar.
-**Nasıl yapar**: `kind` parametresine göre `flag` adında bir alan adı (`is_default_shipping` veya `is_default_billing`) belirler. Kullanıcıyı kimlik doğrulamasından geçirir. İlk olarak, kullanıcının (`user_id` eşleşen) ve aynı `flag` alanına sahip tüm adreslerin bu bayrağını `false` olarak günceller (önceki varsayılanı kaldırır). Ardından, `id` parametresine eşleşen adresin `flag` alanını `true` olarak günceller ve bu güncellenmiş adres nesnesini `select('*').single()` ile getirerek döndürür.
+**Ne yapar**: Bir adresi kullanıcının varsayılan gönderim veya fatura adresi olarak ayarlar.
+**Nasıl yapar**: Önce kullanıcının oturumunu doğrular. Then, kullanıcının tüm adreslerinde belirtilen türdeki (`shipping` veya `billing`) varsayılanlık bayrağını (`is_default_shipping` veya `is_default_billing`) `false` olarak günceller. Bu, mevcut tüm varsayılan adresleri devre dışı bırakır. Ardından, belirtilen `id`'ye sahip adresin aynı bayrağını `true` olarak ayarlayarak onu yeni varsayılan yapar.
 **Parametreler**:
-- kind: `'shipping' | 'billing'` — Ayarlanacak varsayılan adresin türü: gönderim (`shipping`) veya fatura (`billing`).
-- id: `string` — Varsayılan olarak ayarlanacak adresin benzersiz tanımlayıcısı (UUID).
-**Dönüş**: `Promise<DbUserAddress>` — Varsayılan olarak ayarlanmış ve güncellenmiş adres nesnesi.
+- kind: 'shipping' | 'billing' — Varsayılan olarak ayarlanacak adres türü.
+- id: string — Varsayılan olarak ayarlanacak adresin benzersiz tanımlayıcısı.
+- supabase: SupabaseClient — Veritabanı işlemleri için kullanılacak istemci. Opsiyoneldir ve varsayılan olarak modülde tanımlı `defaultClient` kullanılır.
+**Dönüş**: Promise<DbUserAddress> — Varsayılan olarak ayarlanmış güncel adres nesnesi.
+
+---
+
+## SABİTLER
+- **defaultClient** (ternary_expression) — `typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: address.service.ts::listAddresses
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/lib/services/address.service.ts::listAddresses
+- **params**: `(supabase = defaultClient)`
 - **ic_degiskenler**:
-  - `data` — supabase sorgusundan dönen adres listesi
-  - `error` — supabase sorgusu sırasında oluşabilecek hata nesnesi
-- **Dönüş**: `Promise<DbUserAddress[]>` — kullanıcının tüm adresleri varsayılan sırayla
+  - `data` — Supabase'den dönen satır listesi (DbUserAddress[])
+  - `error` — Supabase sorgusu sonucu oluşabilecek hata nesnesi
+- **Dönüş**: `DbUserAddress[]` — kullanıcının tüm adresleri,created_at azalan sırada
 
 ---
 
-### [N2_NASIL] AST Pointer: address.service.ts::createAddress
-- **params**: `payload: DbUserAddressInsert` — oluşturulacak adresin verileri
+### [N2_NASIL] AST Pointer: src/lib/services/address.service.ts::createAddress
+- **params**: `(payload: DbUserAddressInsert, supabase = defaultClient)`
 - **ic_degiskenler**:
-  - `authData` — supabase auth.getUser() sonucu, mevcut oturum kullanıcısını içerir
-  - `userError` — auth sorgusu sırasında oluşabilecek hata nesnesi
-  - `user` — authData?.user, oturum açmış kullanıcı nesnesi
-  - `dbPayload` — payload ile user.id ve varsayılan alan eşlemelerinin birleştirilmiş hali, veritabanına yazılacak nihai veri
-  - `data` — insert sorgusundan dönen yeni oluşturulmuş adres satırı
-  - `error` — insert sorgusu sırasında oluşabilecek hata nesnesi
-- **Dönüş**: `Promise<DbUserAddress>` — yeni oluşturulan adres kaydı
+  - `authData` — supabase.auth.getUser() sonucu oturum verisi
+  - `userError` — auth sorgusundaki olası hata
+  - `user` — authData.user, oturumdaki kullanıcı nesnesi
+  - `dbPayload` — veritabanına yazılacak final payload; payload.user_id ile user.id, street_address fallback ile address_type fallback doldurulur
+  - `data` — insert sonrası dönen tek satır (DbUserAddress)
+  - `error` — insert sorgusundaki olası hata
+- **Dönüş**: `DbUserAddress` — yeni oluşturulan adres kaydı
 
 ---
 
-### [N3_NASIL] AST Pointer: address.service.ts::updateAddress
-- **params**: `id: string` — güncellenecek adresin benzersiz kimliği, `payload: DbUserAddressUpdate` — güncellenecek alanların değerleri
+### [N3_NASIL] AST Pointer: src/lib/services/address.service.ts::updateAddress
+- **params**: `(id: string, payload: DbUserAddressUpdate, supabase = defaultClient)`
 - **ic_degiskenler**:
-  - `updatePatch` — payload'ın kopyası, address_line varsa street_address'e eşlenir
-  - `data` — update sorgusundan dönen güncellenmiş adres satırı
-  - `error` — update sorgusu sırasında oluşabilecek hata nesnesi
-- **Dönüş**: `Promise<DbUserAddress>` — güncellenmiş adres kaydı
+  - `updatePatch` — payload'un kopyası; address_line varsa street_address alanına eşlenir
+  - `data` — update sonrası dönen tek satır (DbUserAddress)
+  - `error` — update sorgusundaki olası hata
+- **Dönüş**: `DbUserAddress` — güncellenmiş adres kaydı
 
 ---
 
-### [N4_NASIL] AST Pointer: address.service.ts::deleteAddress
-- **params**: `id: string` — silinecek adresin benzersiz kimliği
+### [N4_NASIL] AST Pointer: src/lib/services/address.service.ts::deleteAddress
+- **params**: `(id: string, supabase = defaultClient)`
 - **ic_degiskenler**:
-  - `error` — delete sorgusu sırasında oluşabilecek hata nesnesi
-- **Dönüş**: `Promise<boolean>` — silme başarılıysa `true`
+  - `error` — delete sorgusundaki olası hata
+- **Dönüş**: `boolean` — silme başarılıysa `true`
 
 ---
 
-### [N5_NASIL] AST Pointer: address.service.ts::setDefaultAddress
-- **params**: `kind: 'shipping' | 'billing'` — hangi varsayılan adres türünün ayarlanacağı, `id: string` — varsayılan olarak işaretlenecek adresin kimliği
+### [N5_NASIL] AST Pointer: src/lib/services/address.service.ts::setDefaultAddress
+- **params**: `(kind: 'shipping' | 'billing', id: string, supabase = defaultClient)`
 - **ic_degiskenler**:
-  - `authData` — supabase auth.getUser() sonucu, mevcut oturum kullanıcısını içerir
-  - `userError` — auth sorgusu sırasında oluşabilecek hata nesnesi
-  - `user` — authData?.user, oturum açmış kullanıcı nesnesi
-  - `flag` — kind değerine karşılık gelen sütun adı (`is_default_shipping` veya `is_default_billing`)
-  - `clearPatch` — flag alanını `false` yapan güncelleme nesnesi, kullanıcının diğer adreslerindeki eski varsayılan işaretini temizlemek için
-  - `clear` — clearPatch ile yapılan supabase update isteği sonucu
-  - `setPatch` — flag alanını `true` yapan güncelleme nesnesi, seçilen adresi yeni varsayılan yapar
-  - `data` — setPatch ile yapılan update sorgusundan dönen güncellenmiş adres satırı
-  - `error` — setPatch update sorgusu sırasında oluşabilecek hata nesnesi
-- **Dönüş**: `Promise<DbUserAddress>` — varsayılan olarak ayarlanmış adres kaydı
+  - `authData` — supabase.auth.getUser() sonucu oturum verisi
+  - `userError` — auth sorgusundaki olası hata
+  - `user` — authData.user, oturumdaki kullanıcı nesnesi
+  - `flag` — kind değerine göre `'is_default_shipping'` veya `'is_default_billing'` seçilen alan adı
+  - `clearPatch` — `{ [flag]: false }` formatında, ilgili flag'i false yapacak güncelleme nesnesi
+  - `clear` — aynı kullanıcının diğer tüm adreslerinde ilgili flag'i false yapan Supabase sorgu sonucu
+  - `setPatch` — `{ [flag]: true }` formatında, ilgili flag'i true yapacak güncelleme nesnesi
+  - `data` — setPatch uygulandıktan sonra dönen tek satır (DbUserAddress)
+  - `error` — setPatch sorgusundaki olası hata
+- **Dönüş**: `DbUserAddress` — varsayılan olarak ayarlanan adres kaydı
 
 ---
 
@@ -152,8 +163,8 @@ graph TD
     address_service_ts__listAddresses["listAddresses"]
     address_service_ts__setDefaultAddress["setDefaultAddress"]
     address_service_ts__updateAddress["updateAddress"]
-    address_service_ts__updateAddress --> address_service_ts__setDefaultAddress
     address_service_ts__createAddress --> address_service_ts__setDefaultAddress
+    address_service_ts__updateAddress --> address_service_ts__setDefaultAddress
 ```
 
 ## NODE ID STANDARD

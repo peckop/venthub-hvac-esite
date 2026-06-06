@@ -3,31 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminDashboardPage.tsx
-skeleton_hash: 07e1183ef19058d5
+skeleton_hash: c340030cf8d34671
 entity_hashes:
   func:AdminDashboardPage: d9f200a1ae3a63e1
-  overview: 558644615f3ac259
+  overview: 98a75f3d9ee8aa18
   style_tokens: 12dd6d905c26f46b
-generated_at: 2026-05-28T22:38:56Z
+generated_at: 2026-06-06T21:57:10Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC sisteminin yönetici paneline ait ana giriş sayfasını oluşturan React bileşenini barındırmaktadır. Yöneticilerin platformdaki tüm yönetim işlevlerine ve verilere erişmesini sağlayan ilk karşılaşılan arayüz olarak görev yapar.
+Bu modül, VentHub HVAC yönetici panelinin ana giriş sayfasını render eden tek bir React bileşeni içermektedir. Yöneticilerin sistem genelindeki verileri görüntülediği ve yönetim işlevlerine eriştiği ilk arayüz noktası olarak görev yapar.
 
 ## Fonksiyon Grupları
 ### Yönetici Paneli Ana Sayfa Bileşeni
-Modüldeki tek işlev grubu olarak, yönetici paneline ait tüm içerikleri, gezinme öğelerini ve panele özel özellikleri bir araya getirerek kullanıcıya sunar.
+Yönetici paneline ait tüm içerikleri, durum özetlerini ve gezinme bileşenlerini bir araya getirerek kullanıcıya tek bir sayfa üzerinden sunar.
 - AdminDashboardPage
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı admin kontrol paneli sayfasının doğru çalışması için uygulama mimarisinin ve çalışma zamanı ortamının tüm temel entegrasyon koşullarını karşılaması zorunludur, aksi takdirde modül işlevini yerine getiremez.
 
-[Aksiyom 1]: Eğer bu TSX türündeki React bileşenini işleyebilecek uygun sürümde bir React çalışma zamanı ortamı yoksa, bileşen ekrana hiç çizilemez ve modül tamamen işlevsiz kalır.
-[Aksiyom 2]: Eğer bu modüle erişimi yalnızca yetkili admin rolüne sahip kullanıcılarla sınırlayacak bir uygulama seviyesi yetkilendirme katmanı (router koruması veya üst bileşen doğrulaması) yoksa, yetkisiz kullanıcılar hassas admin paneline erişebilir, sistem güvenliği ihlal edilir.
-[Aksiyom 3]: Eğer modülün kullanması gereken tüm dahili/harici bağımlılıklar projeye dahil edilmemiş ve çalışır durumda değilse, modül derleme veya çalışma zamanı hatası verir.
-[Aksiyom 4]: Modülün iç işleyişine ait domain-specific kurallar, eşik değerleri ve kabul kriterleri, modülün fonksiyon gövdesi sağlanmadığı için bilinmiyor, bu konuda ek özel aksiyom tanımlanamaz.
 
 ---
 
@@ -52,70 +46,47 @@ Bu React tabanlı admin kontrol paneli sayfasının doğru çalışması için u
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminDashboardPage.tsx::AdminDashboardPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/views/admin/AdminDashboardPage.tsx::AdminDashboardPage
+- **params**: ()
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, arayüz metinlerini yerelleştirmek için kullanılır
-  - `ordersCount` — Toplam sipariş sayısını saklayan state değişkeni
-  - `setOrdersCount` — ordersCount state'ini güncelleyen setter fonksiyonu
-  - `salesTotal` — Toplam satış tutarını saklayan state değişkeni
-  - `setSalesTotal` — salesTotal state'ini güncelleyen setter fonksiyonu
-  - `pendingReturns` - Beklemedeki iade sayısını saklayan state değişkeni
-  - `setPendingReturns` — pendingReturns state'ini güncelleyen setter fonksiyonu
-  - `pendingShipments` — Gönderilmesi gereken bekleyen sipariş sayısını saklayan state değişkeni
-  - `setPendingShipments` — pendingShipments state'ini güncelleyen setter fonksiyonu
-  - `loading` — Veri yükleme durumunu saklayan state değişkeni
-  - `setLoading` — loading state'ini güncelleyen setter fonksiyonu
-  - `error` — Oluşan hataların mesajını saklayan state değişkeni
-  - `setError` — error state'ini güncelleyen setter fonksiyonu
-  - `recentOrders` — Son 5 siparişi DbOrder tipinde saklayan state dizisi
-  - `setRecentOrders` — recentOrders state'ini güncelleyen setter fonksiyonu
-  - `chartData` — Satış grafiği için kullanılan DashboardChartData tipinde veri dizisini saklayan state değişkeni
-  - `setChartData` — chartData state'ini güncelleyen setter fonksiyonu
-  - `tiedCapital` — Stokta bağlı kalan toplam sermaye tutarını saklayan state değişkeni
-  - `setTiedCapital` — tiedCapital state'ini güncelleyen setter fonksiyonu
-  - `alarmCount` — Düşük stok eşiğine ulaşan ürün sayısını saklayan state değişkeni
-  - `setAlarmCount` — alarmCount state'ini güncelleyen setter fonksiyonu
-  - `loadKPIs` — Tüm panel metriklerini veritabanından çeken useCallback ile sarmalanmış async fonksiyon
-- **Dönüş**: Yönetici paneli arayüzünü oluşturan JSX elementleri
+  - `t` — useI18n hook'unun döndürdüğü çeviri fonksiyonu
+  - `ordersCount` — toplam sipariş sayısını tutan state
+  - `salesTotal` — toplam satış tutarını tutan state
+  - `pendingReturns` — bekleyen iade sayısını tutan state
+  - `pendingShipments` — bekleyen sevkiyat sayısını tutan state
+  - `loading` — yükleme durumunu tutan boolean state
+  - `error` — hata mesajını tutan state
+  - `recentOrders` — son siparişleri tutan DbOrder dizisi state
+  - `chartData` — grafik verisini tutan DashboardChartData dizisi state
+  - `tiedCapital` — bağlı sermaye (stok değeri) tutan state
+  - `alarmCount` — stok alarm sayısını tutan state
+  - `loadKPIs` — KPI verilerini yükleyen useCallback fonksiyonu
+- **Dönüş**: React JSX (admin dashboard sayfasını render eder)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminDashboardPage.tsx::loadKPIs
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/views/admin/AdminDashboardPage.tsx::loadKPIs
+- **params**: ()
 - **ic_degiskenler**:
-  - `setLoading` — Yükleme durumunu güncellemek için kullanılan state setter'ı
-  - `setError` — Hata mesajını güncellemek için kullanılan state setter'ı
-  - `ensureSessionFresh` — Kullanıcı oturumunun geçerliliğini kontrol eden yardımcı fonksiyon
-  - `ordersData` — Supabase'den çekilen sipariş verilerini saklayan değişken
-  - `oCount` - Çekilen toplam sipariş sayısını saklayan değişken
-  - `oErr` — Sipariş verisi çekerken oluşan hatayı saklayan değişken
-  - `supabase` — Veritabanı işlemleri için kullanılan Supabase istemcisi
-  - `setOrdersCount` — Toplam sipariş sayısı state'ini güncelleyen setter
-  - `setSalesTotal` — Toplam satış tutarı state'ini güncelleyen setter
-  - `setRecentOrders` — Son siparişler listesi state'ini güncelleyen setter
-  - `setChartData` — Grafik verisi state'ini güncelleyen setter
-  - `returnsRes` — İade verileri sorgusundan dönen Supabase yanıtı
-  - `shipRes` — Bekleyen gönderi verileri sorgusundan dönen Supabase yanıtı
-  - `productsRes` — Ürün stok verileri sorgusundan dönen Supabase yanıtı
-  - `setPendingReturns` — Bekleyen iade sayısı state'ini güncelleyen setter
-  - `setPendingShipments` — Bekleyen gönderi sayısı state'ini güncelleyen setter
-  - `rawProducts` — Tip dönüşümü yapılmış ürün verilerini saklayan dizi
-  - `capital` — Stoktaki toplam bağlı sermayeyi hesaplamak için kullanılan geçici değişken
-  - `alarms` — Düşük stok alarmı sayısını hesaplamak için kullanılan geçici değişken
-  - `i` — Ürün dizisi üzerinde döngü yapmak için kullanılan sayaç değişkeni
-  - `p` — Döngüdeki mevcut ürün nesnesini saklayan değişken
-  - `stockQty` — Mevcut ürünün stok miktarını tip kontrolü yaparak saklayan değişken
-  - `purchasePrice` — Mevcut ürünün alış fiyatını tip kontrolü yaparak saklayan değişken
-  - `lowStockThreshold` — Mevcut ürünün düşük stok eşik değerini tip kontrolü yaparak saklayan değişken
-  - `setTiedCapital` — Bağlı sermaye state'ini güncelleyen setter
-  - `setAlarmCount` — Stok alarmı sayısı state'ini güncelleyen setter
-  - `err` — Try bloğunda oluşan hatayı yakalayan değişken
-- **Dönüş**: async Promise<void> (geri dönüş değeri yok, yan etki olarak state'leri günceller)
+  - `ordersData` — supabase'den çekilen sipariş verileri (data alanı)
+  - `oCount` — supabase'den çekilen sipariş sayısı
+  - `oErr` — sipariş çekme işlemindeki hata
+  - `returnsRes` — iade sayısını çeken supabase sonucu
+  - `shipRes` — sevkiyat sayısını çeken supabase sonucu
+  - `productsRes` — ürünler verisini çeken supabase sonucu
+  - `rawProducts` — productsRes.data'yı DbProduct[] tipine cast eden değişken
+  - `capital` — döngü içinde toplam sermaye hesaplayan accumulator
+  - `alarms` — döngü içinde alarm sayısını hesaplayan accumulator
+  - `p` — döngüdeki mevcut ürün nesnesi
+  - `stockQty` — ürünün stok miktarı
+  - `purchasePrice` — ürünün alış fiyatı
+  - `lowStockThreshold` — ürünün düşük stok eşiği
+  - `err` — catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: Promise<void> (async fonksiyon, state'leri günceller)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminDashboardPage.tsx::useEffect_callback
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/views/admin/AdminDashboardPage.tsx::useEffectCallback
+- **params**: ()
 - **ic_degiskenler**:
-  - `loadKPIs` — Bileşen ilk render edildiğinde metrikleri çekmek için çağrılan KPI yükleme fonksiyonu
-- **Dönüş**: yok
+  - (yok — sadece loadKPIs() çağrısı yapıyor)
+- **Dönüş**: void (useEffect callback'i)
 
 ---
 

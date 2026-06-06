@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountSecurityPage.tsx
-skeleton_hash: 3ee88315eea607cf
+skeleton_hash: b17f74b19a7c2fff
 entity_hashes:
   func:AccountSecurityPage: c6bf7ae08fac23f0
-  overview: 44f19fdf9e73a3e3
+  overview: cc7d6b7ff9f545d5
   style_tokens: ac89c7eeea9aa372
-generated_at: 2026-05-29T18:53:04Z
+generated_at: 2026-06-06T21:56:59Z
 ---
 
 ## Genel Bakış
@@ -17,16 +17,16 @@ generated_at: 2026-05-29T18:53:04Z
 ## Fonksiyon Grupları
 ### Güvenlik Ayarları Arayüzü ve Etkileşim
 Sayfanın ana rendered durumunu, form alanlarını ve kullanıcı etkileşimlerini yöneten tek bir kapsamlı bileşeni içerir. Şifre formu alanlarını, durum yönetimini ve tüm UI mantığını barındırır.
-- `AccountSecurityPage` (sayfanın tüm render, durum ve etkileşim mantığını yöneten ana bileşen)
+- `AccountSecurityPage`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, kullanıcının hesap güvenliğiyle ilgili tüm ayarları yönettiği ana React sayfasıdır.
 
----
-
-**Not:** `AccountSecurityPage()` fonksiyon imzası parametresizdir ve modül sabitleri tanımlı değildir. Fonksiyon gövdesi analiz edilmediği için, veri bağımlılıkları, koşullar ve iş mantığı çıkarılamamıştır. Mimari varsayımlar belirlenememiştir.
+[Aksiyom 1]: Eğer component, kullanıcı bilgilerini (oturum açmış kullanıcı) alamıyorsa veya kullanıcının kimliği doğrulanamıyorsa, security ayarları gösterilemez ve form alanları doldurulamaz.
+[Aksiyom 2]: Eğer component, şifre değiştirme formunu submit ederken gerekli alanların (mevcut şifre, yeni şifre, onay) validasyonunu yapamıyorsa veya eksik alan varsa, form gönderilemez.
+[Aksiyom 3]: Eğer component, şifre gücü kontrolü için gerekli kuralları veya
 
 ---
 
@@ -46,40 +46,64 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/account/AccountSecurityPage.tsx`::AccountSecurityPage
+### [N1_NASIL] AST Pointer: AccountSecurityPage.tsx::AccountSecurityPage
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `router` — `useRouter()` hookundan dönen Next.js yönlendirici nesnesi, sayfa yönlendirmeleri için kullanılır
-  - `user` — `useAuth()` hookundan destructure edilen mevcut oturum açmış kullanıcı nesnesi
-  - `t` — `useI18n()` hookundan destructure edilen çeviri fonksiyonu, UI metinleri için kullanılır
-  - `current` — `useState('')` state'i, mevcut/eski şifre input değerini tutar
-  - `password` — `useState('')` state'i, yeni şifre input değerini tutar
-  - `confirm` — `useState('')` state'i, şifre tekrar input değerini tutar
-  - `saving` — `useState(false)` state'i, form gönderim işleminin devam edip etmediğini belirtir
-  - `identities` — `useState<Array<{id?: string; provider?: string}>>()` state'i, kullanıcının bağlı kimlik/bağlantı listesini tutar (google, email vb.)
-  - `hasProvider` — arrow fonksiyon, verilen provider string'ine sahip identities elemanı olup olmadığını kontrol eder
-  - `passwordRules` — dizi, her biri `key`, `label`, `test` alanına sahip şifre kuralları nesneleri dizisi (uzunluk, büyük harf, rakam, özel karakter)
-  - `passedRules` — `passwordRules` dizisi üzerinden `password` state'inin test ettiği kural sayısı (0-4 arası)
-  - `strengthColor` — `passedRules` sayısına göre arka plan rengi CSS sınıfı (bg-red-500, bg-orange-400, bg-yellow-400, bg-green-500)
-  - `strengthLabel` — `passedRules` sayısına göre Türkçe güç etiketi string'i (Zayıf, Orta, İyi, Güçlü)
-- **Dönüş**: JSX (React bileşen render çıktısı)
+  - `router` — Next.js router nesnesi, programlı sayfa yönlendirmeleri (router.push) için
+  - `user` — useAuth hook'undan gelen mevcut kullanıcı nesnesi, user.email erişimi yapılır
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, tüm UI metinleri için kullanılır
+  - `current` — useState: Mevcut şifre inputunun değeri, kullanıcının girdiği mevcut şifreyi tutar
+  - `password` — useState: Yeni şifre inputunun değeri, güç göstergesi ve kurallar hesaplanırken kullanılır
+  - `confirm` — useState: Şifre tekrar inputunun değeri, password ile eşleşme kontrolü yapılır
+  - `saving` — useState: Kaydetme işleminin devam edip etmediğini belirten boolean loading flag
+  - `identities` — useState<Array<{id?, provider?}>>: Kullanıcının bağlı kimliklerinin (google, email vb.) listesi
+  - `hasProvider` — Fonksiyon: Verilen provider adının identities dizisinde varlığını Some ile kontrol eder
+  - `passwordRules` — Şifre güvenlik kurallarının tanımlandığı dizi (length, upper, digit, special test fonksiyonları ile)
+  - `passedRules` — passwordRules dizisi üzerinde filter + length ile kaç kuralın geçildiğini hesaplayan sayı
+  - `strengthColor` — passedRules sayısına göre CSS renk sınıfı stringi (red-500, orange-400, yellow-400, green-500)
+  - `strengthLabel` — passedRules sayısına göre metin etiketi: 'Zayıf', 'Orta', 'İyi' veya 'Güçlü'
+- **Dönüş**: JSX (React component render çıktısı), return yok ama yan etki olarak UI döndürür
 
-### [N2_NASIL] AST Pointer: `src/views/account/AccountSecurityPage.tsx`::refreshIdentities
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data` — `supabase.auth.getUser()` çağrısından dönen data nesnesi, kullanıcı bilgilerini içerir
-  - `error` — `supabase.auth.getUser()` çağrısından dönen hata nesnesi, hata yoksa undefined
-  - `ids` — `data.user.identities` alanının tip cast edilmiş hali `Array<{id?: string; provider?: string}>`, boş dizi fallback ile `setIdentities(ids)` ile state'e yazılır
-- **Dönüş**: void (yan etki: `identities` state'ini günceller)
+---
 
-### [N3_NASIL] AST Pointer: `src/views/account/AccountSecurityPage.tsx`::handleSubmit
-- **params**: `e: React.FormEvent` — form submit event nesnesi, `e.preventDefault()` ile varsayılan engellenir
+### [N2_NASIL] AST Pointer: AccountSecurityPage.tsx::refreshIdentities
+- **params**: (yok) — AccountSecurityPage içinde inner async fonksiyon
 - **ic_degiskenler**:
-  - `email` — `user?.email || ''` ile elde edilen kullanıcı e-posta adresi, yeniden kimlik doğrulama için kullanılır
-  - `reauth` — `supabase.auth.signInWithPassword({ email, password: current })` çağrısının sonucu, mevcut şifre ile yeniden kimlik doğrulama yanıtı; `reauth.error` varsa yanlış şifre
-  - `pwned` — `hibpPwnedCount(password)` async çağrısının sonucu (sayı), yeni şifrenin Have I Been Pwned veritabanında kaç kez sızdırıldığını gösterir; 0'dan büyükse şifre reddedilir
-  - `error` — `supabase.auth.updateUser({ password })` çağrısından destructure edilen hata nesnesi, şifre güncelleme başarısızsa fırlatılır
-- **Dönüş**: void (yan etkiler: şifre günceller, form alanlarını sıfırlar, toast bildirimleri gösterir)
+  - `data` — supabase.auth.getUser() sonucu gelen {user: {...}} verisi, user.identities dizisine erişilir
+  - `error` — supabase.auth.getUser() sonucu hata nesnesi, null olmadığında kullanıcı verisi alınır
+  - `ids` — (data.user as {identities?}).identities cast edilerek elde edilen kimlikler dizisi, || [] ile fallback boş dizi
+- **Dönüş**: void — async fonksiyon, setIdentities(state updater) ile identities state'ini günceller
+
+---
+
+### [N3_NASIL] AST Pointer: AccountSecurityPage.tsx::handleSubmit
+- **params**:
+  - `e` — React.FormEvent, form onSubmit olay nesnesi, e.preventDefault() ile varsayılan engellenir
+- **ic_degiskenler**:
+  - `email` — user?.email || '' ile elde edilen kullanıcının e-posta adresi, reauth signInWithPassword için kullanılır
+  - `reauth` — supabase.auth.signInWithPassword({email, password: current}) sonucu, mevcut şifreyle yeniden kimlik doğrulama
+  - `pwned` — hibpPwnedCount(password) sonucu, şifrenin HaveIBeenPwned veritabanında kaç kez sızıntıda bulunduğunu gösteren sayı
+  - `error` — supabase.auth.updateUser({password}) sonucu hata nesnesi, throw ile catch bloğuna iletilir
+- **Dönüş**: void — async fonksiyon, yan etkiler: toast bildirimleri, supabase auth güncelleme, state resetleme (setCurrent, setPassword, setConfirm)
+
+---
+
+### [N4_NASIL] AST Pointer: AccountSecurityPage.tsx::Google unlink handler (anonymous async)
+- **params**: (yok) — Button onClick handler, async arrow fonksiyon
+- **ic_degiskenler**:
+  - `google` — identities.find(i => (i.provider||'').toLowerCase() === 'google') ile bulunan Google provider kimlik nesnesi, google.id kullanılır
+  - `error` — supabase.auth.unlinkIdentity(google as UserIdentity) sonucu hata nesnesi, throw ile catch bloğuna iletilir
+- **Dönüş**: void — async fonksiyon, yan etkiler: toast bildirimleri, supabase auth unlinkIdentity çağrısı, refreshIdentities() ile state güncelleme
+
+---
+
+### [N5_NASIL] AST Pointer: AccountSecurityPage.tsx::Google link handler (anonymous async)
+- **params**: (yok) — Button onClick handler, async arrow fonksiyon
+- **ic_degiskenler**:
+  - `data` — supabase.auth.linkIdentity({provider: 'google', options: {redirectTo: ...}}) sonucu veri nesnesi
+  - `error` — supabase.auth.linkIdentity sonucu hata nesnesi, throw ile catch bloğuna iletilir
+  - `url` — (data as {url?: string})?.url ile elde edilen OAuth yönlendirme URL'si, varsa router.push ile açılır
+- **Dönüş**: void — async fonksiyon, yan etkiler: toast bildirimleri, supabase auth linkIdentity çağrısı, olası router.push(url), refreshIdentities() ile state güncelleme
 
 ---
 

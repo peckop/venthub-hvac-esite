@@ -3,43 +3,49 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\checkoutHelpers.ts
-skeleton_hash: 86380db8e7148a1a
+skeleton_hash: 62a9fd0e67da535d
 entity_hashes:
   func:getPriceHashLocal: 13f64c7a6218a753
   func:getPriceHashServer: 9916fbf1157483b4
   func:getTranslationWithFallback: 017e759a3be126ab
   func:to2: b98feff70eaa59fa
-  overview: 88f2922b0a8d3c89
-generated_at: 2026-05-28T22:38:45Z
+  overview: 72cc4065bdd6058b
+generated_at: 2026-06-06T21:57:04Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC platformu sipariş tamamlama (checkout) sürecinde ihtiyaç duyulan tüm yardımcı işlevleri tek bir noktada toplayan bir yardımcı modüldür. Hem istemci hem sunucu tarafı checkout akışlarını destekleyerek fiyat tutarlılığı, içerik formatlama ve çeviri yönetimi gibi temel işlemleri sorunsuz bir şekilde yürütülmesini sağlar. Tekrar kullanılabilir yapısıyla checkout sürecindeki tekrarlayan kod miktarını azaltır.
+Bu modül, HVAC platformu sipariş tamamlama (checkout) sürecinde kullanılan yardımcı işlevleri barındırır. Temel olarak fiyat verilerinin tutarlılığını sağlamak için hash oluşturma, sayısal değerleri formatlama ve çeviri metinlerini yönetme gibi tekrarlayan görevleri merkezi bir noktadan sunar. Hem istemci hem sunucu taraflı akışları destekleyerek kod tekrarını azaltır.
 
 ## Fonksiyon Grupları
-### Fiyat Tutarlılığı Doğrulama Fonksiyonları
-İstemci sepetindeki ürünler ve sunucu tarafından sağlanan ürün verileriyle benzersiz fiyat hash'leri oluşturur, checkout sürecinde fiyat tutarsızlığı olup olmadığını kontrol etmeye olanak tanır. İki farklı çalışma ortamı için ayrı hash üretim işlevi sunar.
+### Fiyat Hash Oluşturma Fonksiyonları
+Sepet veya sipariş öğeleri için benzersiz bir parmak izi (hash) oluşturarak, checkout sürecin farklı aşamalarında veya taraflarında fiyatların tutarlı olduğunu doğrulamak için kullanılır.
 - getPriceHashLocal, getPriceHashServer
 
 ### Temel Biçimlendirme Yardımcısı
-Sayıları standart formatlara dönüştüren temel formatlama işlevini sunar, genellikle para tutarları veya nicelik değerlerini standartlaştırmak için kullanılır.
+Özellikle fiyat tutarları gibi nicelikleri standart ve okunabilir formata dönüştürmek için temel bir yardımcı işlev sunar.
 - to2
 
 ### Çeviri Yedekleme Yardımcısı
-Checkout arayüzünde gösterilecek metinler için güvenilir bir çeviri mekanizması sunar. İstenen metin için çeviri bulunamadığında önceden tanımlanmış varsayılan bir metin döndürerek arayüzün eksik içerikle görünmesini engeller.
+Arayüz metinleri için çeviri anahtarlarını güvenli bir şekilde işler; istenen çeviri yoksa belirli bir varsayılan metni döndürerek eksik içerik sorunlarını önler.
 - getTranslationWithFallback
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, ödeme (checkout) adımında kullanılan yerel/sunucu fiyat hash hesaplama, sayı formatlama ve çeviri yardımcı fonksiyonlarını barındırır; tüm girdi parametrelerinin tanımlı türlerinde ve fiyat/çeviri hesaplaması için zorunlu alanları içermesi zorunludur.
 
-[Aksiyom 1]: Eğer to2 fonksiyonuna gönderilen n parametresi number türünde değilse, 2 basamaklı sayı formatlama işlemi başarısız olur, hata fırlatılır.
-[Aksiyom 2]: Eğer getPriceHashLocal fonksiyonuna gönderilen CartItem türündeki yerel sepet öğeleri fiyat hesaplaması için zorunlu alanları içermiyorsa, yerel fiyat hash'i doğru hesaplanamaz, sepet fiyatı tutarsızlığı oluşur.
-[Aksiyom 3]: Eğer getPriceHashServer fonksiyonuna gönderilen serverItems parametresi, null/undefined haricinde tanımlı Array<{product_id: string; quantity?: number; unit_price: number}> türünden farklı bir türdeyse, sunucu tarafı fiyat hash'i hesaplanamaz, ödeme güvenlik doğrulaması başarısız olur.
-[Aksiyom 4]: Eğer getPriceHashServer'a gönderilen serverItems veya localItems listelerindeki öğeler, fiyat karşılaştırması için zorunlu product_id ve unit_price alanlarını içermiyorsa, sunucu ve yerel fiyat hash'leri eşleşmez, fiyat manipülasyonu tespiti mekanizması çalışmaz.
-[Aksiyom 5]: Eğer getTranslationWithFallback fonksiyonuna gönderilen ilk parametredeki çeviri fonksiyonu (t) string döndüren çalışan bir fonksiyon değilse, istenen çeviri metni getirilemez, kullanıcı arayüzünde geçersiz içerik görüntülenir.
-[Aksiyom 6]: Eğer getTranslationWithFallback'a gönderilen fallback parametresi string türünde değilse, çeviri anahtarına karşılık değer bulunamadığında gösterilecek yedek metin kullanılamaz, arayüzde boş içerik oluşur.
+Bu modül, checkout sürecinde fiyat tutarlılığı, veri formatlama ve çeviri fallback mekanizması sağlayan yardımcı fonksiyonlar içermektedir. Aşağıda her bir fonksiyonun doğru çalışması için gereken mimari varsayımlar listelenmiştir.
+
+[Aksiyom 1]: Eğer `to2` fonksiyonuna geçilen `n` parametresi geçerli bir sayı (finite number) değilse (örn: `NaN`, `Infinity`), sonuç `NaN` veya `Infinity` olur ve para birimi formatlaması anlamsızlaşır.
+
+[Aksiyom 2]: Eğer `getPriceHashLocal` fonksiyonuna geçilen `items` dizisi `null` veya `undefined` ise veya içindeki herhangi bir elemanın `product_id` alanı eksikse, hesaplanan fiyat hash'i tutarsız veya eksik olur ve fiyat doğrulaması yanıltıcı sonuç verebilir.
+
+[Aksiyom 3]: Eğer `getPriceHashServer` fonksiyonuna `serverItems` parametresi olarak `undefined` veya `null` geçilirse, fonksiyon sadece `localItems`'ı kullanarak bir hash oluşturur; ancak bu durumda sunucu tarafı fiyat doğrulaması yapılamaz ve olası fiyat tutarsızlıkları tespit edilemez.
+
+[Aksiyom 4]: Eğer `getPriceHashServer` fonksiyonuna hem `serverItems` hem de `localItems` geçilirse ve her iki listedeki ürünlerin `product_id` eşleşmelerinde (`serverItems`'daki `product_id` ile `localItems`'daki `product_id`) tutarsızlık varsa (örn: farklı ürünler, eksik ürünler), hesaplanan hash'ler farklı olur; bu durum modülün fiyat tutarlılığı doğrulama amacına hizmet eder ancak hash'lerin karşılaştırılabilirliği için her iki tarafın da aynı ürün setini ve sırasını beklemesi gerekir.
+
+[Aksiyom 5]: Eğer `getTranslationWithFallback` fonksiyonuna geçilen `t` fonksiyonu (çeviri fonksiyonu) verilen `key` için bir çeviri sağlayamazsa (boş string veya `undefined` döndürürse), `fallback` değeri döndürülür. Eğer `fallback` de boş string ise, sonuç boş string olur ve arayüzde eksik metin görünebilir.
+
+[Aksiyom 6]: `getPriceHashLocal` ve `getPriceHashServer` fonksiyonlarının döndürdüğü hash değerlerinin karşılaştırılabilir olması için, her iki fonksiyonun da aynı hash algoritmasını (örn: aynı string birleştirme ve hash fonksiyonu) kullanması gerekir; aksi takdirde fiyat tutarlılığı karşılaştırması yapılamaz.
 
 ---
 
@@ -80,29 +86,49 @@ Bu modül, ödeme (checkout) adımında kullanılan yerel/sunucu fiyat hash hesa
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\checkoutHelpers.ts::to2
-- **params**: [n: number]
-- **ic_degiskenler**: yok
-- **Dönüş**: unknown
+### [N1_NASIL] AST Pointer: checkoutHelpers.ts::to2
+- **params**: `(n: number)`
+- **ic_degiskenler**: (gövde verilmemiş — sadece imza mevcut)
+- **Dönüş**: tipi imzada belirtilmemiş; kullanım bağlamından (`to2(Number(...))`) number döndüğü anlaşılıyor
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\checkoutHelpers.ts::getPriceHashLocal
-- **params**: [items: CartItem[]]
-- **ic_degiskenler**:
-  - `norm` — Sepet öğelerini standartlaştırıp ürün id'sine göre sıralanmış olarak tutan nesne dizisi, her öğe benzersiz ürün id'si, miktar ve işlenmiş birim fiyat değerini içerir
-- **Dönüş**: string (standartlaştırılmış dizinin JSON serileştirilmiş hali)
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\checkoutHelpers.ts::getPriceHashServer
-- **params**: [serverItems: Array<{ product_id: string; quantity?: number; unit_price: number }> | undefined | null, localItems: CartItem[]]
+### [N2_NASIL] AST Pointer: checkoutHelpers.ts::getPriceHashLocal
+- **params**: `(items: CartItem[])`
 - **ic_degiskenler**:
-  - `arr` — Sunucudan gelen öğeler dizisi değilse boş dizi atayarak oluşturulan standart işlenebilir dizi
-  - `norm` — Sunucu öğelerini yerel sepet öğeleriyle eşleştirip standartlaştırıp ürün id'sine göre sıralanmış olarak tutan nesne dizisi
-- **Dönüş**: string (standartlaştırılmış dizinin JSON serileştirilmiş hali)
+  - `norm` — `items` dizisinin her elemanını `{ id, qty, unit }` formatına map edip `id` alanına göre alfabetik sıralanmış hali
+  - Map callback içindeki `i` — o an işlenen CartItem elemanı
+  - `i.id` — ürünün benzersiz kimliği
+  - `i.quantity` — ürün miktarı
+  - `i.unitPrice` — ürünün birim fiyatı (number olup olmadığı kontrol edilir; number değilse `i.product.price` kullanılır, `to2()` ile 2 ondalığa yuvarlanır)
+  - Sort callback içindeki `a`, `b` — sıralama karşılaştırmasında kullanılan iki eleman; `a.id.localeCompare(b.id)` ile string karşılaştırma yapılır
+- **Dönüş**: `JSON.stringify(norm)` — string (normalize edilmiş sepetin JSON temsili)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\checkoutHelpers.ts::getTranslationWithFallback
-- **params**: [t: (key: string) => string, key: string, fallback: string]
+---
+
+### [N3_NASIL] AST Pointer: checkoutHelpers.ts::getPriceHashServer
+- **params**: `(serverItems: Array<{ product_id: string; quantity?: number; unit_price: number }> | undefined | null, localItems: CartItem[])`
 - **ic_degiskenler**:
-  - `v` — Çeviri fonksiyonu çağrılarak verilen key üzerinden elde edilen çeviri metni değeri
-- **Dönüş**: string (geçerli çeviri mevcutsa çeviri metni, hata alma veya geçersiz çeviri durumunda yedek fallback metni)
+  - `arr` — `serverItems`'ın array olup olmadığının kontrolü; array ise kendisi kullanılır, değilse boş dizi (`[]`) atanır
+  - `norm` — `arr` dizisinin her elemanını `{ id, qty, unit }` formatına map edip `id` alanına göre alfabetik sıralanmış hali
+  - Map callback içindeki `i` — o an işlenen server item elemanı
+  - `i.product_id` — sunucudaki ürün kimliği (String'e çevrilerek kullanılır)
+  - `i.quantity` — sunucudaki ürün miktarı; `undefined` ise fallback olarak `localItems` içinde aynı `product_id`'ye sahip elemanın `quantity`'si aranır, o da yoksa `0` kullanılır
+  - `i.unit_price` — sunucudaki birim fiyat; `to2(Number(...))` ile 2 ondalığa yuvarlanır
+  - `localItems.find(it => it.id === String(i.product_id))?.quantity` — localItems dizisinde `product_id` eşleşmesi arayan vequantity değerini döndüren arama ifadesi
+  - Sort callback içindeki `a`, `b` — sıralama karşılaştırmasında kullanılan iki eleman
+- **Dönüş**: `JSON.stringify(norm)` — string (normalize edilmiş sepetin JSON temsili)
+
+---
+
+### [N4_NASIL] AST Pointer: checkoutHelpers.ts::getTranslationWithFallback
+- **params**: `(t: (key: string) => string, key: string, fallback: string)`
+- **ic_degiskenler**:
+  - `t` — çeviri fonksiyonu; verilen key'e karşılık gelen çeviriyi döndürür
+  - `key` — çevrilmesi istenen anahtar kelime/dize
+  - `fallback` — çeviri bulunamadığında veya hata oluştuğunda kullanılacak varsayılan metin
+  - `v` — `t(key)` çağrısının sonucu; çeviri metni. Eğer `v === key` ise çeviri bulunamamıştır (t fonksiyonu key'in kendisini döndürmüş), bu durumda `fallback` döner; değilse `v` döner
+- **Dönüş**: string — çeviri metni (`v`) veya `fallback`
 
 ---
 
@@ -114,8 +140,8 @@ graph TD
     checkoutHelpers_ts__getPriceHashServer["getPriceHashServer"]
     checkoutHelpers_ts__getTranslationWithFallback["getTranslationWithFallback"]
     checkoutHelpers_ts__to2["to2"]
-    checkoutHelpers_ts__getPriceHashLocal --> checkoutHelpers_ts__to2
     checkoutHelpers_ts__getPriceHashServer --> checkoutHelpers_ts__to2
+    checkoutHelpers_ts__getPriceHashLocal --> checkoutHelpers_ts__to2
 ```
 
 ## NODE ID STANDARD

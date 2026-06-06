@@ -3,20 +3,20 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\_components\ProductDetailPageView.tsx
-skeleton_hash: 342b38f29eeee555
+skeleton_hash: dd30c877f434d69a
 entity_hashes:
   func:ProductDetailPage: e3b845e07eaace73
-  overview: b2e31a149bb57a71
+  overview: 13dd8be9bcbca1c9
   style_tokens: 97bcb7e77cb5d07f
-generated_at: 2026-05-29T18:42:54Z
+generated_at: 2026-06-06T21:54:37Z
 ---
 
 ## Genel Bakış
-`ProductDetailPageView.tsx`, bir HVAC ürününün detay sayfasını görüntüleyen ana React bileşenini tanımlar. Sunucu tarafında veya üst bileşen tarafından sağlanan ilk ürün verisini (`initialProduct`) kullanarak, ürün bilgileri, görseller ve etkileşimli aksiyonları içeren eksiksiz bir inceleme sayfası render eder.
+`ProductDetailPageView.tsx`, bir HVAC ürününün detay sayfasını render eden ana React bileşenini barındırır. Sunucu tarafında veya üst bileşen tarafından sağlanan ilk ürün verisini alarak, ürün bilgileri, görseller ve etkileşimli unsurları içeren eksiksiz bir inceleme sayfası oluşturur.
 
 ## Fonksiyon Grupları
-### Ürün Detayı Görüntüleme
-Sayfanın tamamını oluşturan merkezi bileşendir. Verilen ürün verisini alarak başlık, özellikler, görseller ve kullanım arayüzünü tek bir tutarlı sayfa yapısında bir araya getirir.
+### Ürün Detayı Sayfası
+Sayfanın tamamını oluşturan merkezi bileşendir. Verilen ürün verisini kullanarak başlık, özellikler, görseller ve kullanım arayüzünü tek bir tutarlı yapıda sunar.
 - ProductDetailPage
 
 ---
@@ -52,160 +52,200 @@ Sayfanın tamamını oluşturan merkezi bileşendir. Verilen ürün verisini ala
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: ProductDetailPageView.tsx::categoryLookup
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - `sc` — `categories` listesinden `product.subcategory_id` değerine eşleşen alt kategori nesnesi, bulunamazsa null
-  - `mc` — `categories` listesinden `product.category_id` değerine eşleşen ana kategori nesnesi, bulunamazsa null
-- **Dönüş**: `{ mainCategory: mc, subCategory: sc }` object
+### [N1_NASIL] AST Pointer: ProductDetailPageView.tsx::() => { if (!product) ... }
+- **params**: ()
+- **ic_degiskenler**: 
+  - `sc` — `categories` dizisi içinde `product.subcategory_id` eşleşen kategoriyi bulur veya null döner
+  - `mc` — `categories` dizisi içinde `product.category_id` eşleşen kategoriyi bulur veya null döner
+- **Dönüş**: `{ mainCategory: mc, subCategory: sc }` objesi veya `{ mainCategory: null, subCategory: null }`
 
-### [N2_NASIL] AST Pointer: ProductDetailPageView.tsx::toggleSpecSection
-- **params**: `(sectionKey: string)` — açılıp kapatılacak teknik özellik grubu anahtarı
+### [N2_NASIL] AST Pointer: ProductDetailPageView.tsx::(sectionKey: string) => { ... }
+- **params**: `(sectionKey: string)` — toggle edilecek bölüm anahtarı
 - **ic_degiskenler**:
-  - `sectionKey` — kontrol edilecek bölümün anahtarı
-- **Dönüş**: yok (state güncelleme: `setOpenSpecSections` ile `openSpecSections` array'ini günceller)
+  - `setOpenSpecSections` — açık teknik özellik bölümlerini güncelleyen state setter
+  - `prev` — önceki açık bölüm listesi (setOpenSpecSections callback parametresi)
+- **Dönüş**: yok (state güncelleme)
 
-### [N3_NASIL] AST Pointer: ProductDetailPageView.tsx::handleRefreshProjects
-- **params**: () — parametre yok
+### [N3_NASIL] AST Pointer: ProductDetailPageView.tsx::prev => { ... }
+- **params**: `prev` — önceki açık bölüm listesi
 - **ic_degiskenler**: yok
-- **Dönüş**: yok (`refreshProjects()` fonksiyonunu çağırır)
+- **Dönüş**: Güncellenmiş açık bölüm listesi (sectionKey varsa çıkar, yoksa ekler)
 
-### [N4_NASIL] AST Pointer: ProductDetailPageView.tsx::fetchProductEffect
-- **params**: () — parametre yok (useEffect callback)
+### [N4_NASIL] AST Pointer: ProductDetailPageView.tsx::() => { refreshProjects() }
+- **params**: ()
 - **ic_degiskenler**:
-  - `fetchProduct` — içerde tanımlı asenkron fonksiyon, ürün verisini getirir
-- **Dönüş**: yok (yan etki: `setProduct`, `setLoading`, `setImages`, `setRelatedProducts` state günceller)
+  - `refreshProjects` — projeleri yenileyen fonksiyon
+- **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: ProductDetailPageView.tsx::fetchProduct
-- **params**: () — parametre yok
+### [N5_NASIL] AST Pointer: ProductDetailPageView.tsx::() => { async function fetchProduct() { ... } }
+- **params**: ()
 - **ic_degiskenler**:
-  - `productData` — `getProductBySlugOrId(currentSlug)` çağrısından dönen ürün verisi
-  - `imgs` — `supabase.from('product_images').select(...)` çağrısından dönen görseller dizisi
-  - `list` — `imgs` array'inin tipi normalize edilmiş hali (`{ path: string; alt?: string | null }[]`)
-  - `related` — `getProductsEnriched({ categoryIds: [productData.subcategory_id], limit: 10 })` çağrısından dönen ilişkili ürünler dizisi
-  - `error` — try-catch bloğundan yakalanan hata nesnesi
-- **Dönüş**: yok (yan etki: `setProduct`, `setLoading`, `setImages`, `setRelatedProducts` state günceller)
+  - `currentSlug` — mevcut URL slug'ı
+  - `product` — mevcut ürün state'i
+  - `initialProduct` — başlangıçta verilen ürün verisi
+  - `setProduct` — ürün state'ini güncelleyen setter
+  - `setLoading` — yükleme durumunu güncelleyen setter
+  - `productData` — getProductBySlug ile çekilen ürün verisi
+  - `imgs` — supabase'den çekilen ürün resimleri verisi
+  - `list` — filtrelenmiş resim listesi
+  - `setImages` — resimler state'ini güncelleyen setter
+  - `related` — getProductsEnriched ile çekilen ilgili ürünler
+  - `setRelatedProducts` — ilgili ürünler state'ini güncelleyen setter
+  - `error` — yakalanan hata nesnesi
+- **Dönüş**: yok (side-effect: product, images, relatedProducts state'lerini günceller)
 
-### [N6_NASIL] AST Pointer: ProductDetailPageView.tsx::handleScrollSetup
-- **params**: () — parametre yok (useEffect callback)
+### [N6_NASIL] AST Pointer: ProductDetailPageView.tsx::async function fetchProduct() { ... }
+- **params**: ()
+- **ic_degiskenler**: (N5 ile aynı değişkenler)
+- **Dönüş**: yok (asenkron yan etkiler: product, images, relatedProducts state'lerini günceller)
+
+### [N7_NASIL] AST Pointer: ProductDetailPageView.tsx::() => { const handleScroll = () => { ... } }
+- **params**: ()
 - **ic_degiskenler**:
-  - `handleScroll` — scroll olayını dinleyen iç fonksiyon, `navTriggerRef.current` offset'ine göre `setIsNavSticky` state'ini günceller
-- **Dönüş**: cleanup fonksiyonu (`window.removeEventListener` ile scroll listener'ı kaldırır)
+  - `handleScroll` — scroll olayını işleyen iç fonksiyon
+  - `navTriggerRef` — navigasyon tetikleyicisi referansı
+  - `setIsNavSticky` — yapışkan navigasyon durumunu güncelleyen setter
+- **Dönüş**: Temizleme fonksiyonu (scroll event listener'ı kaldırır)
 
-### [N7_NASIL] AST Pointer: ProductDetailPageView.tsx::handleScrollSpySetup
-- **params**: () — parametre yok (useEffect callback)
+### [N8_NASIL] AST Pointer: ProductDetailPageView.tsx::() => { if (navTriggerRef.current) { ... } }
+- **params**: ()
 - **ic_degiskenler**:
-  - `handleScrollSpy` — scroll pozisyonuna göre aktif bölümü tespit eden iç fonksiyon
-  - `navEl` — `document.getElementById('pdp-sticky-nav')` ile bulunan sticky navigation elementi
-  - `headerOffset` — `navEl` yüksekliği + 120px, bulunamazsa 200
-  - `scrollPosition` — `window.scrollY + headerOffset` hesaplanmış toplam scroll pozisyonu
-  - `sectionOffsets` — `sectionRefs.current` object'inin entries'inden oluşan `{ id, top, bottom }` objeleri dizisi
-- **Dönüş**: cleanup fonksiyonu (`window.removeEventListener` ile scroll listener'ı kaldırır)
+  - `navTriggerRef` — navigasyon tetikleyicisi referansı
+  - `triggerTop` — tetikleyicinin dikey pozisyonu
+  - `scrollY` — mevcut scroll pozisyonu
+  - `setIsNavSticky` — yapışkan navigasyon durumunu güncelleyen setter
+- **Dönüş**: yok (state güncelleme)
 
-### [N8_NASIL] AST Pointer: ProductDetailPageView.tsx::mapSectionRef
-- **params**: `[id, ref]` — Object.entries'den gelen tuple (section ID ve DOM referansı)
+### [N9_NASIL] AST Pointer: ProductDetailPageView.tsx::() => { const handleScrollSpy = () => { ... } }
+- **params**: ()
 - **ic_degiskenler**:
-  - `id` — section'ın string ID'si
-  - `ref` — section'ın DOM element referansı
-- **Dönüş**: `{ id, top: ref.offsetTop, bottom: ref.offsetTop + ref.offsetHeight }` object veya null
+  - `handleScrollSpy` — scroll izleme fonksiyonu
+  - `navEl` — pdp-sticky-nav DOM elementi
+  - `headerOffset` — hesaplama için ofset değeri
+  - `scrollPosition` — hesaplanmış scroll pozisyonu
+  - `sectionOffsets` — bölüm offset bilgileri dizisi
+  - `setActiveSection` — aktif bölümü güncelleyen setter
+- **Dönüş**: Temizleme fonksiyonu (scroll event listener'ı kaldırır)
 
-### [N9_NASIL] AST Pointer: ProductDetailPageView.tsx::scrollToSection
-- **params**: `(sectionId: string)` — kaydırılacak section'ın ID'si
-- **ic_degiskenler**:
-  - `element` — `sectionRefs.current[sectionId]` ile bulunan DOM elementi
-  - `navEl` — `document.getElementById('pdp-sticky-nav')` ile bulunan sticky navigation elementi
-  - `currentNavHeight` — `navEl` yüksekliği, bulunamazsa 0
-  - `extraGap` — sabit 84px ek boşluk
-  - `y` — hesaplanmış hedef scroll pozisyonu
-- **Dönüş**: yok (`window.scrollTo` ile smooth scroll yapar)
+### [N10_NASIL] AST Pointer: ProductDetailPageView.tsx::() => { const navEl = ... }
+- **params**: ()
+- **ic_degiskenler**: (N9 ile aynı değişkenler, handleScrollSpy içindeki mantık)
+- **Dönüş**: yok (aktif bölümü günceller)
 
-### [N10_NASIL] AST Pointer: ProductDetailPageView.tsx::handleDownloadPdf
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - `error` — try-catch bloğundan yakalanan hata nesnesi
-- **Dönüş**: yok (yan etki: `setIsGeneratingPdf` state günceller, `generateProductDatasheet` çağırır, toast bildirimleri gösterir)
-
-### [N11_NASIL] AST Pointer: ProductDetailPageView.tsx::handleShare
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - `err` — try-catch bloğundan yakalanan hata nesnesi (AbortError kontrolü yapılır)
-- **Dönüş**: yok (yan etki: `navigator.share` veya `navigator.clipboard.writeText` çağırır, toast bildirimi gösterir)
-
-### [N12_NASIL] AST Pointer: ProductDetailPageView.tsx::getCategorySlug
-- **params**: `(slug?: string | null)` — kontrol edilecek slug string'i, opsiyonel
-- **ic_degiskenler**:
-  - `s` — `slug` değerinin küçük harfe çevrilmiş hali
-- **Dönüş**: string veya null (slug içeriğine göre kategori slug'ı döndürür)
-
-### [N13_NASIL] AST Pointer: ProductDetailPageView.tsx::handleBack
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - `stack` — `sessionStorage.getItem('vh_nav_stack')` JSON parse edilmiş navigasyon geçmişi array'i, parse hatası olursa boş array
-  - `lastSafeStop` — `stack[stack.length - 1]` ile erişilen son navigasyon noktası
-- **Dönüş**: yok (`router.push` ile navigasyon yapar)
-
-### [N14_NASIL] AST Pointer: ProductDetailPageView.tsx::renderJumpButton
-- **params**: `s` — section objesi (id ve title özelliklerine sahip)
+### [N11_NASIL] AST Pointer: ProductDetailPageView.tsx::([id, ref]) => { ... }
+- **params**: `[id, ref]` — bölüm ID ve DOM referansı çifti
 - **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<button>` — section'a scroll yapan buton)
+- **Dönüş**: `{ id, top: ref.offsetTop, bottom: ref.offsetTop + ref.offsetHeight }` veya null
 
-### [N15_NASIL] AST Pointer: ProductDetailPageView.tsx::renderStickyNavButton
-- **params**: `section` — section objesi (id, icon, title özelliklerine sahip)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<button>` — aktif section durumuna göre stil değişen buton)
-
-### [N16_NASIL] AST Pointer: ProductDetailPageView.tsx::renderSection
-- **params**: `section` — section objesi (id, icon, title, bgClass özelliklerine sahip)
+### [N12_NASIL] AST Pointer: ProductDetailPageView.tsx::(sectionId: string) => { ... }
+- **params**: `(sectionId: string)` — kaydırılacak bölüm ID'si
 - **ic_degiskenler**:
-  - `IconComponent` — `section.icon` değerinin JSX bileşeni olarak ataması
-- **Dönüş**: JSX element (`<section>` — ürün detayının ana section'ı)
+  - `element` — sectionRefs.current[sectionId] DOM elementi
+  - `navEl` — pdp-sticky-nav DOM elementi
+  - `currentNavHeight` — navigasyon yüksekliği
+  - `extraGap` — ek boşluk miktarı (84px)
+  - `y` — hesaplanmış hedef Y pozisyonu
+- **Dönüş**: yok (pencereyi smooth scroll ile kaydırır)
 
-### [N17_NASIL] AST Pointer: ProductDetailPageView.tsx::renderQuickDetailItem
-- **params**: `(item, i)` — item: `{ label, value }` objesi, i: index numarası
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<div>` — marka, model, kategori gibi hızlı detay satırı)
-
-### [N18_NASIL] AST Pointer: ProductDetailPageView.tsx::renderVariant
-- **params**: `variant` — varyant numarası (1, 2, 3 dizisi elemanı)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<div>` — ürün varyantı kartı)
-
-### [N19_NASIL] AST Pointer: ProductDetailPageView.tsx::renderSpecGroup
-- **params**: `[groupKey, group]` — Object.entries'den gelen tuple (grup anahtarı ve grup objesi)
+### [N13_NASIL] AST Pointer: ProductDetailPageView.tsx::async () => { ... }
+- **params**: ()
 - **ic_degiskenler**:
-  - `isOpen` — `openSpecSections.includes(groupKey)` ile kontrol edilen grubun açık olup olmadığı
-  - `Icon` — `group.icon` değerinin JSX bileşeni
-- **Dönüş**: JSX element (`<div>` — teknik özellik grubu, açılır/kapanır paneller)
+  - `product` — mevcut ürün verisi
+  - `isGeneratingPdf` — PDF üretim durumu
+  - `setIsGeneratingPdf` — PDF üretim durumunu güncelleyen setter
+  - `generateProductDatasheet` — dinamik import edilen PDF üretici fonksiyon
+  - `translateSpecKey` — teknik özellik çevirisi yapan fonksiyon
+  - `lang` — mevcut dil
+  - `error` — yakalanan hata nesnesi
+- **Dönüş**: yok (yan etki: PDF üretimi başlatır, toast mesajı gösterir)
 
-### [N20_NASIL] AST Pointer: ProductDetailPageView.tsx::renderSpecItem
-- **params**: `[key, val]` — Object.entries'den gelen tuple (özellik anahtarı ve değeri)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<div>` — tek bir teknik özellik satırı)
+### [N14_NASIL] AST Pointer: ProductDetailPageView.tsx::async () => { ... }
+- **params**: ()
+- **ic_degiskenler**:
+  - `product` — mevcut ürün verisi (navigator.share için)
+  - `window.location.href` — mevcut sayfa URL'i
+  - `err` — yakalanan hata nesnesi
+- **Dönüş**: yok (yan etki: paylaşım API'si veya clipboard kopyalama, toast mesajı)
 
-### [N21_NASIL] AST Pointer: ProductDetailPageView.tsx::renderDiagram
-- **params**: `type` — diagram tipi string'i ('mounting' veya 'electrical')
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<div>` — teknik çizim kartı)
+### [N15_NASIL] AST Pointer: ProductDetailPageView.tsx::(slug?: string | null): string | null => { ... }
+- **params**: `(slug?: string | null)` — kontrol edilecek slug
+- **ic_degiskenler**:
+  - `s` — slug'ın küçük harfli hali
+- **Dönüş**: `string | null` — slug'a karşılık gelen model tipi veya null
 
-### [N22_NASIL] AST Pointer: ProductDetailPageView.tsx::render3DView
-- **params**: `(item, i)` — item: `{ icon, label, sub }` objesi, i: index numarası
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<div>` — 3D görünüm veya ölçülü çizim kartı)
+### [N16_NASIL] AST Pointer: ProductDetailPageView.tsx::() => { ... }
+- **params**: ()
+- **ic_degiskenler**:
+  - `stack` — sessionStorage'dan okunan navigasyon yığıtı
+  - `lastSafeStop` — yığıttaki son güvenli durak
+  - `subCategory` — alt kategori verisi
+  - `mainCategory` — ana kategori verisi
+  - `router` — Next.js router
+- **Dönüş**: yok (sayfa yönlendirme)
 
-### [N23_NASIL] AST Pointer: ProductDetailPageView.tsx::renderDocument
-- **params**: `(doc, i)` — doc: document tipi string'i, i: index numarası
+### [N17_NASIL] AST Pointer: ProductDetailPageView.tsx::(s) => { ... }
+- **params**: `s` — bölüm nesnesi (id ve title içerir)
 - **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<div>` — belge kartı, indirme butonu ile)
+- **Dönüş**: JSX button elementi (bölüm başlığını gösterir, tıklanınca scrollToSection çağırır)
 
-### [N24_NASIL] AST Pointer: ProductDetailPageView.tsx::renderPdf
-- **params**: `type` — PDF tipi string'i ('productCatalog' veya 'technicalBrochure')
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<div>` — PDF kataloğu veya broşür kartı)
+### [N18_NASIL] AST Pointer: ProductDetailPageView.tsx::(section) => { ... }
+- **params**: `section` — bölüm nesnesi (id, icon, title, bgClass içerir)
+- **ic_degiskenler**:
+  - `IconComponent` — section.icon bileşeni
+  - `activeSection` — aktif bölüm ID'si
+  - `sectionRefs` — bölüm referansları objesi
+- **Dönüş**: JSX section elementi (tam bölüm içeriğini render eder)
 
-### [N25_NASIL] AST Pointer: ProductDetailPageView.tsx::renderCertificate
-- **params**: `(cert, i)` — cert: sertifika tipi string'i, i: index numarası
+### [N19_NASIL] AST Pointer: ProductDetailPageView.tsx::(item, i) => { ... }
+- **params**: `item` — { label, value } çifti, `i` — indeks
 - **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<div>` — sertifika kartı, bilgi ile)
+- **Dönüş**: JSX div elementi (hızlı detay satırı)
+
+### [N20_NASIL] AST Pointer: ProductDetailPageView.tsx::(variant) => { ... }
+- **params**: `variant` — varyant numarası (1, 2 veya 3)
+- **ic_degiskenler**:
+  - `product` — mevcut ürün verisi
+- **Dönüş**: JSX div elementi (ürün varyantı kartı)
+
+### [N21_NASIL] AST Pointer: ProductDetailPageView.tsx::([groupKey, group]) => { ... }
+- **params**: `[groupKey, group]` — teknik özellik grubu anahtarı ve grubun kendisi
+- **ic_degiskenler**:
+  - `openSpecSections` — açık teknik özellik bölümleri listesi
+  - `groupKey` — grubun anahtarı
+  - `group` — grubun kendisi (icon ve specs içerir)
+  - `isOpen` — bu grubun açık olup olmadığı
+  - `Icon` — grubun ikonu
+- **Dönüş**: JSX div elementi (katlanabilir teknik özellik grubu)
+
+### [N22_NASIL] AST Pointer: ProductDetailPageView.tsx::([key, val]) => { ... }
+- **params**: `[key, val]` — teknik özellik anahtarı ve değeri
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX div elementi (tek bir teknik özellik satırı)
+
+### [N23_NASIL] AST Pointer: ProductDetailPageView.tsx::(type) => { ... }
+- **params**: `type` — diyagram tipi ('mounting' veya 'electrical')
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX div elementi (teknik diyagram kartı)
+
+### [N24_NASIL] AST Pointer: ProductDetailPageView.tsx::(item, i) => { ... }
+- **params**: `item` — { icon, label, sub } nesnesi, `i` — indeks
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX div elementi (3D görünüm kartı)
+
+### [N25_NASIL] AST Pointer: ProductDetailPageView.tsx::(doc, i) => { ... }
+- **params**: `doc` — doküman tipi stringi, `i` — indeks
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX div elementi (doküman kartı)
+
+### [N26_NASIL] AST Pointer: ProductDetailPageView.tsx::(type) => { ... }
+- **params**: `type` — PDF tipi ('productCatalog' veya 'technicalBrochure')
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX div elementi (PDF kartı, technicalBrochure için handleDownloadPdf bağlanır)
+
+### [N27_NASIL] AST Pointer: ProductDetailPageView.tsx::(cert, i) => { ... }
+- **params**: `cert` — sertifika tipi stringi, `i` — indeks
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX div elementi (sertifika kartı)
 
 ---
 

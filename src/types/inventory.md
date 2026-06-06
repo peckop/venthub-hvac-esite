@@ -3,33 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\inventory.ts
-skeleton_hash: b6300d6fc404b991
+skeleton_hash: e42c63a5e284355e
 entity_hashes:
-  overview: 0673781afc683fb3
-generated_at: 2026-05-28T22:38:41Z
+  overview: 8013fdfdc560f88e
+generated_at: 2026-06-06T21:56:05Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin envanter yönetim sistemi için merkezi TypeScript tip tanımlarını barındıran bir tür deposudur. Supabase veritabanından gelen `Category` tipini, admin paneli ortak tiplerinden `Density` ve `LoadState` tiplerini içe aktararak envanter verilerinin proje genelinde güvenli ve tutarlı bir şekilde işlenmesini sağlar. Herhangi bir işlev, sabit veya çalıştırılabilir kod içermeyen bu dosya, tamamen derleme zamanı tip güvenliği amacıyla var olur ve `InventoryRow` gibi envanter satır yapılarının tanımını merkezileştirir.
+Bu modül, VentHub HVAC projesinde envanter yönetimiyle ilgili veri yapılarını tanımlayan merkezi bir TypeScript tip deposudur. Supabase veritabanından gelen `Category` tipini ve admin paneli ortak tiplerinden `Density` ile `LoadState` tiplerini içe aktararak, envanter satırları (`InventoryRow` yapısı) ve ilgili diğer veri modelleri için proje genelinde tutarlı ve güvenli tip tanımları sunar. Dosyada herhangi bir fonksiyon, sabit veya çalıştırılabilir kod bulunmamakta olup, tamamen derleme zamanı tip güvenliği ve veri şeması uyumu sağlamak amacıyla varlık gösterir.
 
-## Modül Yapısı
-Bu dosya salt tip tanımı (type definition) modülüdür — çalışabilir fonksiyon veya modül-seviyesi executable kod barındırmaz. Sunduğu tipler, projenin envanter ile ilgili tüm katmanlarında (API çağrıları, bileşen prop'ları, veri işleme) kullanılarak veri akışının tipsel olarak doğrulanmasını mümkün kılar. Doğru çalışması, projenin TypeScript yapılandırmasında doğru yola sahip olmasına ve gerçek envanter veri şemasıyla uyumlu olmasına bağlıdır.
+## Modül Yapısı ve Sorumluluk
+Bu dosya salt tip tanımı (type definition) modülüdür. Ana sorumluluğu, envanter verilerinin farklı katmanlarda (API çağrıları, bileşenler, veri işleme mantığı) kullanılırken uyulması gereken yapıyı ve veri tiplerini tek bir merkezi noktada tanımlamaktır. Bu sayede envanter ile ilgili tüm veri akışlarının tipsel olarak doğrulanması ve hata oluşumu en aza indirilmesi hedeflenir. Doğru çalışması, tanımlı tiplerin gerçek Supabase tablo şeması ve uygulama ihtiyaçlarıyla uyumlu olmasına bağlıdır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül salt bir TypeScript tip tanımı (type definition) modülüdür. Doğru çalışması için aşağıda listelenen koşulların varolması gerekir; aksi takdirde derleme zamanı hataları oluşur.
 
-Bu modül için özel aksiyom tanımlanmamıştır.
+[Aksiyom 1]: Eğer `Category` tipi (Supabase veritabanından içe aktarılan) doğru tanımlanmamış veya erişilebilir değilse, `InventoryRow` ve türevi yapılar oluşamaz ve projenin envanter ile ilgili tüm derleme zamanı tip güvenliği bozulur.
 
----
+[Aksiyom 2]: Eğer `Density` ve `LoadState` tipleri (admin paneli ortak tiplerinden içe aktarılan) doğru tanımlanmamış veya erişilebilir değilse, modülün sunduğu ortak tip tanımları tutarsız olur ve bu tipleri kullanan tüm modüllerde derleme zamanı hataları meydana gelir.
 
-**Gerekçe:** Bu modül (`inventory.ts`) yalnızca TypeScript tip tanımları içeren bir type-definition dosyasıdır. Fonksiyon gövdesi, çalıştırılabilir kod veya sabit içermemektedir. Verilen modül imzası listesi de boş (yok) olarak belirtilmiştir. Aksiyomlar yalnızca fonksiyon gövdelerinden üretilebildiği ve docstring/yorum/variable isminden bilgi çıkarılamayacağı için, bu modül için mimari varsayım türetilmemiştir.
-
-**Not:** Bu modülün gerçek anlamda işlevsel olabilmesi için şu **dolaylı bağımlılıklar** (fonksiyon gövdesinden üretilmeyen, dış kaynak notları olarak sunulan) söylenebilir:
-- Supabase veritabanı tarafındaki ilgili tablo tanımlarının var olması gerekir
-- `admin` panelinden içe aktarılan tip tanımlarının (`yoğunluk`, `yük durumu`) var olması gerekir
-
-Ancak bu bilgiler modülün kendi fonksiyon gövdesinden türetilmediği için aksiyom formatına dahil edilmemiştir.
+[Aksiyom 3]: Eğer modül, salt tip tanımları içermek yerine herhangi bir işlevsel kod veya çalışma zamanı bağımlılığı eklerse, projenin derleme zamanı odaklı tasarım ilkesi ihlal edilir ve modülün saf amacı (merkezi tip deposu olmak) bozulur.
 
 ---
 
@@ -85,7 +80,17 @@ type VisibleCols = {
 
 ## AST POINTERS
 
-Bu dosyada fonksiyon gövdesi bulunmamaktadır.
+Bu dosya (`inventory.ts`) bir **Tür Tanımlama (Type Definition)** dosyasıdır. Fonksiyon gövdeleri, fonksiyon imzaları ve class tanımları içermemektedir. Sadece import edilen türler (`Category`, `Density`, `LoadState`) referans olarak yer almaktadır.
+
+Dosyada analiz edilecek herhangi bir fonksiyon bulunmamaktadır.
+
+| Durum | Açıklama |
+|-------|----------|
+| Fonksiyon Sayısı | 0 |
+| Import | `Category` (./ui-models), `Density`, `LoadState` (./admin-shared) |
+| Sabit | Yok |
+| Class | Yok |
+| AST Pointer | Oluşturulacak fonksiyon yok |
 
 ---
 

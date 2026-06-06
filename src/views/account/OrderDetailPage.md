@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx
-skeleton_hash: 622dd4d11cb43f53
+skeleton_hash: db798fd9cd69ba82
 entity_hashes:
   func:OrderDetailPage: 9d9093210e07827e
-  overview: 77f78a571695c8af
+  overview: 9e1c669269632790
   style_tokens: 2d7ff3d6e2a546ab
-generated_at: 2026-05-29T18:54:36Z
+generated_at: 2026-06-06T21:57:41Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,23 @@ Modülün tek ve ana bileşenidir; tüm sayfa yapısını, alt bileşenleri ve g
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca fonksiyon imzasından çıkarılabilecek mimari varsayımlar aşağıda sunulmuştur.
+
+[Aksiyom 1]: Eğer `OrderDetailPage` bileşeni çağrıldığında React ortamı (React, ReactDOM) mevcut değilse, bileşen render edilemez ve uygulama hata verir.
+
+[Aksiyom 2]: Eğer bileşen `views/account/` yolunda yer alıyorsa ve fonksiyon imzası `OrderDetailPage()` şeklinde parametresiz tanımlıysa, bileşenin sipariş detay bilgilerini kendi içinden (örn. route params, context veya API çağrısı ile) edinmesi gerekir; aksi halde görüntülenecek sipariş verisi bilinmez.
+
+[Aksiyom 3]: Eğer bileşen bir React functional component olarak tanımlıysa ve imzasında parametre (props) belirtilmemişse, bileşen dışarıdan prop almamaktadır; bu durumda bileşen bağımsız çalışmak zorundadır (örn. kendi içinde `useParams()`, `useContext()` veya doğrudan API çağrısı kullanıyordur).
+
+[Aksiyom 4]: Eğer bileşen sayfa seviyesinde bir view bileşeni ise ve modül sabitleri tanımlı değilse, bileşenin使用的 tüm sabit değerler (API endpoint'leri, route path'leri vb.) ya fonksiyon gövdesinde inline olarak tanımlıdır ya da üst modüllerden sağlanır.
+
+[Aksiyom 5]: Eğer bileşen modül sığası `(skeleton_hash: 622dd4d11cb43f53)` ile ilişkilendirilmişse ve bu modül için tanımlı bir stil token'ı `(2d7ff3d6e2a546ab)` mevcutsa, bileşenin görünümü bu stil token'ına uygun olmalıdır; aksi halde tasarım tutarsızlığı oluşur.
+
+---
+
+**Not:** Fonksiyon gövdesi (implementasyon detayı) sağlanmadığı için, bileşenin içerdiği alt bileşenler, state yönetimi, API çağrıları ve hata yönetimi gibi konularda kesin aksiyom üretilememiştir.
 
 ---
 
@@ -92,123 +108,122 @@ Modülün tek ve ana bileşenidir; tüm sayfa yapısını, alt bileşenleri ve g
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: OrderDetailPage.tsx::useEffect_authGuard
-- **params**: (parametre yok)
-- **ic_degiskenler**: (useEffect callback içindeki anonymous arrow function)
-- **Dönüş**: yok (useEffect side-effect, erişim yoksa login sayfasına yönlendirir)
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::authRedirectCallback
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok
 
-### [N2_NASIL] AST Pointer: OrderDetailPage.tsx::useEffect_loadOrder
-- **params**: (parametre yok)
-- **ic_degiskenler**: (useEffect callback içindeki anonymous arrow function)
-- **Dönüş**: yok (useEffect side-effect, sipariş verisini yükler ve `setOrder` ile state'i günceller)
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::loadEffect
+- **params**: ()
+- **ic_degiskenler**: 
+  - `load` — asenkron veri yükleme fonksiyonu, çağrılarak çalıştırılır
+- **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: OrderDetailPage.tsx::load (useEffect içinde tanımlı)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `orderData` — supabase'den dönen sipariş ana verileri ve ilişkisel order_items (destructuring ile `data` ve `error` ayrıştırılır, `orderData` sipariş bilgilerini içerir)
-  - `orderError` — supabase sorgusundan dönen hata nesnesi, null ise sorgu başarılıdır
-  - `rawItems` — `orderData.venthub_order_items` değerinin `Record<string, unknown>[]` olarak cast edilmiş ham hali
-  - `mappedItems` — `rawItems` dizisinin `.map()` ile `OrderItem[]` tipine dönüştürülmüş hali; her eleman için `id`, `product_id`, `product_name`, `quantity`, `unit_price`, `total_price`, `product_image_url` alanları çıkarılır
-  - `unit` — her bir sipariş kaleminin `it.price_at_time` değerinin Number'a çevrilmiş birim fiyatı, `|| 0` ile varsayılan
-  - `qty` — her bir sipariş kaleminin `it.quantity` değerinin Number'a çevrilmiş miktarı, `|| 0` ile varsayılan
-  - `mappedOrder` — `Order` tipinde tam sipariş nesnesi; `orderData` alanlarından ve `mappedItems`'den oluşur, eksik alanlar `|| undefined` ile doldurulur
-- **Dönüş**: yok (async function, `setOrder(mappedOrder)` ile state'i güncüler, `setLoading(false)` ile loading durumunu kapatır)
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::load
+- **params**: ()
+- **ic_degiskenler**: 
+  - `orderData` — supabase sorgusundan dönen sipariş verisi
+  - `orderError` — supabase sorgusundan dönen hata nesnesi
+  - `rawItems` — sipariş kalemlerinin ham verisi, Record dizisi olarak
+  - `mappedItems` — ham verilerin OrderItem[] dizisine dönüştürülmüş hali
+  - `mappedOrder` — sipariş verisinin Order arayüzüne dönüştürülmüş hali
+  - `e` — catch bloğunda yakalanan hata
+- **Dönüş**: yok (async fonksiyon, promise döndürür)
 
-### [N4_NASIL] AST Pointer: OrderDetailPage.tsx::rawItems.map callback (it)
-- **params**: `it` — `Record<string, unknown>` tipinde tek bir ham sipariş kalemi nesnesi
-- **ic_degiskenler**:
-  - `unit` — `it.price_at_time` değerinin Number'a çevrilmiş birim fiyatı
-  - `qty` — `it.quantity` değerinin Number'a çevrilmiş miktarı
-- **Dönüş**: `OrderItem` nesnesi — `{ id, product_id, product_name, quantity, unit_price, total_price, product_image_url }`
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::mapOrderItem
+- **params**: (it: Record<string, unknown>)
+- **ic_degiskenler**: 
+  - `unit` — birim fiyat, it.price_at_time'dan Number ile dönüştürülür
+  - `qty` — miktar, it.quantity'dan Number ile dönüştürülür
+- **Dönüş**: OrderItem nesnesi
 
-### [N5_NASIL] AST Pointer: OrderDetailPage.tsx::handleCopyToClipboard
-- **params**: `text` — `string | undefined`, panoya kopyalanacak metin
-- **ic_degiskenler**: (yok, tek satırlık try-catch bloğu)
-- **Dönüş**: Promise<void> — `navigator.clipboard.writeText` ile metni panoya yazar, başarı/hata toast gösterir
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::copyToClipboard
+- **params**: (text?: string)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: OrderDetailPage.tsx::handleDownloadProforma
-- **params**: `o` — `Order` tipinde sipariş nesnesi
-- **ic_degiskenler**:
-  - `jsPDF` — dinamik import ile yüklenen `jspdf` modülünün default export'u (PDF oluşturma sınıfı)
-  - `autoTable` — dinamik import ile yüklenen `jspdf-autotable` modülünün default export'u (tablo ekleme fonksiyonu)
-  - `doc` — `jsPDF` instance'ı, A4 boyutunda `pt` birimiyle oluşturulmuş PDF dokümanı
-  - `nf` — `Intl.NumberFormat` instance'ı, dil ayarına göre TRY para birimi formatlayıcı
-  - `orderNo` — sipariş numarası; `o.order_number` varsa `'-'` ile split edilip ikinci eleman, yoksa `o.id`'nin son 8 karakteri büyük harfe çevrilmiş
-  - `head` — autoTable için tablo başlık satırı dizisi: `[['Ürün', 'Adet', 'Birim Fiyat', 'Toplam']]` formunda i18n çeviri anahtarları ile
-  - `body` — `o.order_items` dizisinin `.map()` ile tablo satırlarına dönüştürülmüş hali; her satır `[product_name, quantity, unit_price, total_price]` formatında string değerler
-  - `after` — autoTable'ın `lastAutoTable.finalY` değerinden hesaplanan tablonun bitiş Y koordinatı, `|| 100` ile varsayılan
-- **Dönüş**: Promise<void> — `doc.save()` ile PDF dosyasını indirir, hata olursa toast gösterir
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::generateProformaPDF
+- **params**: (o: Order)
+- **ic_degiskenler**: 
+  - `jsPDF` — jsPDF kütüphanesinin asenkron olarak import edilmiş hali
+  - `autoTable` — jspdf-autotable eklentisinin asenkron olarak import edilmiş hali
+  - `doc` — jsPDF doküman nesnesi
+  - `nf` — Intl.NumberFormat nesnesi para formatı için
+  - `orderNo` — sipariş numarası, o.order_number'dan çıkarılır veya o.id'den üretilir
+  - `head` — tablo başlık satırı dizisi
+  - `body` — tablo gövde satırları dizisi
+  - `after` — tablonun son Y koordinatı
+  - `e` — catch bloğunda yakalanan hata
+- **Dönüş**: yok
 
-### [N7_NASIL] AST Pointer: OrderDetailPage.tsx::handleReorder
-- **params**: `o` — `Order` tipinde sipariş nesnesi
-- **ic_degiskenler**:
-  - `ids` — `o.order_items` dizisinden `product_id` değerlerinin `Set` ile benzersizleştirilip `string[]`'e dönüştürülmüş hali; `undefined` olanlar filtrelenir
-  - `names` — `product_id`'si olmayan ama `product_name`'i olan sipariş kalemlerinden benzersiz ürün isimleri dizisi
-  - `productMap` — `Record<string, Product>` tipinde; ürün ID'si veya adına göre `Product` nesnelerini eşleyen harita
-  - `data` — supabase'den dönen `products` tablosu verisi (ID ile sorgulamada)
-  - `error` — supabase sorgusundan dönen hata nesnesi (ID ile sorgulamada)
-  - `data` — supabase'den dönen `products` tablosu verisi (isim ile sorgulamada)
-  - `error` — supabase sorgusundan dönen hata nesnesi (isim ile sorgulamada)
-  - `added` — sepete eklenen toplam ürün adedi sayacı, başlangıçta 0
-  - `prod` — döngü içinde her sipariş kalemi için bulunan `Product` nesnesi veya `undefined`
-  - `it` — `o.order_items` dizisindeki her bir sipariş kalemi (`OrderItem`)
-- **Dönüş**: Promise<void> — sepette ürün varsa `addToCart` ile ekler ve `/cart` sayfasına yönlendirir, yoksa hata toast'u gösterir
+### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::reorder
+- **params**: (o: Order)
+- **ic_degiskenler**: 
+  - `ids` — sipariş kalemlerindeki benzersiz product_id dizisi
+  - `names` — product_id olmayan kalemlerdeki benzersiz ürün adları dizisi
+  - `productMap` — ürün id veya adına göre ürün nesnelerini eşleyen harita
+  - `data` — supabase sorgusundan dönen ürün verisi
+  - `error` — supabase sorgusundan dönen hata nesnesi
+  - `prod` — bulunulan ürün nesnesi
+  - `added` — sepete eklenen toplam ürün miktarı
+  - `e` — catch bloğunda yakalanan hata
+- **Dönüş**: yok
 
-### [N8_NASIL] AST Pointer: OrderDetailPage.tsx::getStatusColorClass
-- **params**: `status` — `string` tipinde sipariş durumu değeri
-- **ic_degiskenler**: (yok, switch-case bloğu)
-- **Dönüş**: `string` — Tailwind CSS renk sınıfı (ör: `'bg-yellow-100 text-yellow-800'`)
+### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::getStatusColorClass
+- **params**: (status: string)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string (CSS sınıf adı)
 
-### [N9_NASIL] AST Pointer: OrderDetailPage.tsx::getStatusText
-- **params**: `status` — `string` tipinde sipariş durumu değeri
-- **ic_degiskenler**: (yok, switch-case bloğu)
-- **Dönüş**: `string` — i18n çeviri ile insan-okunabilir sipariş durumu metni (ör: `'Sipariş Alındı'`, `'Kargoya Verildi'`)
+### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::getStatusText
+- **params**: (status: string)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string (durum metni)
 
-### [N10_NASIL] AST Pointer: OrderDetailPage.tsx::renderStep (JSX callback)
-- **params**: `s` — adım durumu string'i (sipariş durumu), `idx` — adım indeksi (number)
-- **ic_degiskenler**: (yok, doğrudan JSX döndürür)
-- **Dönüş**: `React.Fragment` — sipariş takip adımını gösteren JSX; adım numarası, durum metni ve bağlayıcı çizgi
+### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::renderStep
+- **params**: (s: string, idx: number)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX element
 
-### [N11_NASIL] AST Pointer: OrderDetailPage.tsx::renderTabButton (JSX callback)
-- **params**: `tt` — tab anahtarı string'i (ör: `'overview'`, `'items'`, `'shipping'`, `'invoice'`)
-- **ic_degiskenler**: (yok, doğrudan JSX döndürür)
-- **Dönüş**: `JSX.Element` — tab seçme butonu; aktif/pasif duruma göre stil değişir, tıklanınca `setTab(tt)` çağırır
+### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::renderTabButton
+- **params**: (tt: string)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX element
 
-### [N12_NASIL] AST Pointer: OrderDetailPage.tsx::renderShippingAddress (JSX callback)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `addr` — `order.shipping_address` değerinin `ShippingAddress` tipine cast edilmiş hali
-  - `line1` — `addr.fullAddress` veya `addr.street` değerinden oluşan birinci adres satırı
-  - `line2` — `addr.city` ve `addr.district || addr.state` değerlerinin `', '` ile birleştirilmiş ikinci adres satırı
-  - `line3` — `addr.postalCode || addr.postal_code` değerinden oluşan posta kodu satırı
-- **Dönüş**: `JSX.Element` — adres bilgilerini `<p>` etiketleri içinde gösteren div
+### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::renderShippingAddress
+- **params**: ()
+- **ic_degiskenler**: 
+  - `addr` — order.shipping_address'ın ShippingAddress türüne cast edilmiş hali
+  - `line1` — adresin birinci satırı, fullAddress veya street
+  - `line2` — ikinci satır, city ve district virgülle birleştirilmiş
+  - `line3` — posta kodu
+- **Dönüş**: JSX element
 
-### [N13_NASIL] AST Pointer: OrderDetailPage.tsx::renderOrderItemRow (JSX callback)
-- **params**: `item` — `OrderItem` tipinde tek bir sipariş kalemi
-- **ic_degiskenler**: (yok, doğrudan JSX döndürür; `item.product_id`, `item.product_name`, `item.product_image_url`, `item.quantity`, `item.unit_price`, `item.total_price` erişimleri)
-- **Dönüş**: `JSX.Element` — `<tr>` satırı; ürün adı (link veya düz metin), görsel (`VentImage` veya placeholder), adet, birim fiyat, toplam fiyat
+### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::renderOrderItemRow
+- **params**: (item: OrderItem)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX element (tr)
 
-### [N14_NASIL] AST Pointer: OrderDetailPage.tsx::renderInvoiceInfo (JSX callback)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `info` — `order.invoice_info` değerinin `Record<string, unknown>` tipine cast edilmiş hali, `{}` ile fallback
-  - `iv` — helper fonksiyon; verilen key ile `info` nesnesinden string değer çeker, yoksa `'-'` döner
-- **Dönüş**: `JSX.Element` — fatura bilgilerini gösteren div; kurumsal ise şirket adı/VKN/vergi dairesi, bireysel ise TCKN
+### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::renderInvoiceInfo
+- **params**: ()
+- **ic_degiskenler**: 
+  - `info` — order.invoice_info nesnesinin Record<string, unknown> türüne cast edilmiş hali
+  - `iv` — invoice_info'dan belirli bir anahtarın değerini string olarak döndüren yardımcı fonksiyon
+- **Dönüş**: JSX element
 
-### [N15_NASIL] AST Pointer: OrderDetailPage.tsx::renderLegalConsents (JSX callback)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `cons` — `order.legal_consents` değerinin `Record<string, { accepted?: boolean; ts?: string | null }>` tipine cast edilmiş hali
-  - `row` — iç helper fonksiyon; `(label: string, k: string)` alır, yasal onay durumunu JSX olarak döndürür
-    - `c` — `cons?.[k]` ile çekilen tek bir yasal onay nesnesi (`{ accepted, ts }`)
-    - `ok` — `c?.accepted` değerinin boolean'a çevrilmiş hali
-    - `ts` — `c?.ts` varsa `formatDateTime` ile formatlanmış zaman damgası, yoksa `'-'`
-- **Dönüş**: `JSX.Element` — KVKK, Mesafeli Satış, Ön Bilgilendirme, Sipariş Onayı, Pazarlama İzni onaylarının herbirini gösteren Fragment
+### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::renderLegalConsents
+- **params**: ()
+- **ic_degiskenler**: 
+  - `cons` — order.legal_consents nesnesinin Record<string, { accepted?: boolean; ts?: string | null }> türüne cast edilmiş hali
+  - `row` — yasal onay satırını oluşturan yardımcı fonksiyon
+- **Dönüş**: JSX element
 
-### [N16_NASIL] AST Pointer: OrderDetailPage.tsx::renderLegalConsentRow (label helper)
-- **params**: `label` — `string` (gösterilecek etiket metni, ör: `'KVKK'`), `k` — `string` (legal_consents nesnesindeki key, ör: `'kvkk'`)
-- **ic_degiskenler**:
-  - `c` — `cons?.
+### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hbac\src\views\account\OrderDetailPage.tsx::renderConsentRow
+- **params**: (label: string, k: string)
+- **ic_degiskenler**: 
+  - `c` — cons[k] değerinden alınan nesne
+  - `ok` — c.accepted boolean değeri
+  - `ts` — c.ts zaman damgasının formatlanmış hali
+- **Dönüş**: JSX element
 
 ---
 

@@ -3,49 +3,47 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressSelectModal.tsx
-skeleton_hash: a92619f9be2e9c05
+skeleton_hash: 8a7fdbb5be0360d2
 entity_hashes:
   func:AddressSelectModal: adfcf435f03c2db9
-  overview: cd2d8adfb0ea97a4
+  overview: 55656091e9138090
   style_tokens: 0a79973eb6842aa3
-generated_at: 2026-06-06T08:46:37Z
+generated_at: 2026-06-06T21:58:17Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun ödeme (checkout) sürecinde yer alan bu React modülü, kullanıcıların kayıtlı adreslerini listelediği ve birini seçerek ödeme işlemini başlattığı bir modal pencere bileşenidir. Modal, aynı zamanda mevcut adreslerin düzenlenmesi ve silinmesi gibi temel adres yönetimi fonksiyonlarını da tek bir arayüzde sunarak ödeme akışını basitleştirir.
+Bu modül, ödeme (checkout) sürecinde kullanıcıların kayıtlı adreslerini görüntülediği, birini seçerek ödeme işlemini başlattığı ve adres yönetimi (düzenleme, silme) yaptığı bir modal pencere bileşenidir. Tüm adres seçim ve yönetim işlevlerini tek bir arayüzde toplayarak ödeme akışını basitleştirir.
 
 ## Fonksiyon Grupları
-### Ana Modal Bileşeni
-Tüm adres seçim ve yönetim mantığını içinde barındıran, kullanıcıya açılan etkileşimli arayüzün temelini oluşturan ana React bileşenidir.
+### Ana Bileşen
+Tüm modal pencere mantığını ve kullanıcı etkileşimini yöneten temel React bileşenidir.
 - AddressSelectModal
 
-### Temel Kontrol ve Yapılandırma
-Modal penceresinin görünümünü ve temel kullanım akışını kontrol eden parametrelerdir. Başlık ayarı ve pencerenin kapatılma işlemi bu gruba girer.
+### Pencere Kontrolleri
+Modal penceresinin görünümünü ve temel kullanım akışını belirleyen parametrelerdir.
 - title, onClose
 
-### Adres Listesi ve Yönetim İşlevleri
-Kullanıcının mevcut adreslerine erişmesini, birini seçmesini, düzenlemesini veya silmesini sağlayan tüm işlevsel parametrelerdir.
+### Adres Verisi ve İşlevleri
+Kullanıcının adreslerini gösteren veri ve bu adreslerle yapılan tüm seçim, düzenleme ve silme işlemlerini tetikleyen callback fonksiyonlarıdır.
 - addresses, onPick, onEdit, onDel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-[Genel varsayım] AddressSelectModal, parametre olarak verilen bir dizi adres içerisinden seçim yapılmasını sağlayan React bileşenidir. Tüm parametreler zorunludur; hiçbirinin default değeri tanımlanmamıştır.
+Bu modül için somut fonksiyon gövdesi mevcut değildir; yalnızca fonksiyon imzası ve eski doküman bilgisi verilmiştir. Dolayısıyla aşağıda, imza parametrelerine ve eski dokümanın genel bakış açıklamasına dayanan **kabul varsayımları** sunulmaktadır.
 
-[Aksiyom 1]: Eğer `addresses` parametresi bir dizi (Array) olarak sağlanmazsa, bileşen adres listesini render edemez ve seçim sunamaz — bileşen hata verir veya boş bir modal gösterir.
+**[Aksiyom 1]:** Eğer `addresses` parametresi `undefined`, `null` veya boş dizi (`[]`) ise, modal üzerinde kullanıcıya gösterilecek adres listesi boş olur ve kullanıcının bir adres seçmesi (`onPick` çağrısı) mümkün değildir.
 
-[Aksiyom 2]: Eğer `onPick` parametresi bir fonksiyon (callback) olarak sağlanmazsa, kullanıcı bir adres seçtiğinde seçilen adres üst bileşene iletilemez — seçim işlevsiz kalır.
+**[Aksiyom 2]:** Eğer `onPick` callback'i çağrılmadan modal kapatılırsa (`onClose` çağrısı ile), seçilmemiş bir adres durumu oluşur ve üst bileşenin bu durumu ele alması beklenir.
 
-[Aksiyom 3]: Eğer `onClose` parametresi bir fonksiyon (callback) olarak sağlanmazsa, modal kapatma işlemi tetiklendiğinde bileşenin kapanma sinyali üst bileşene ulaştırılamaz — modal kapanmaz veya hata oluşur.
+**[Aksiyom 3]:** Eğer `onEdit` callback'i çağrılmadan önce ilgili adresin geçerliliği (ör. silinmiş, sunucu tarafında kaldırılmış) düşmüşse, düzenleme akışında hata oluşabilir; bu durum modülün kendi içinde ele alınmaz.
 
-[Aksiyom 4]: Eğer `onEdit` parametresi bir fonksiyon (callback) olarak sağlanmazsa, kullanıcı bir adresi düzenlemek istediğinde düzenleme işlemi başlatılamaz — düzenle butonu işlevsiz kalır.
+**[Aksiyom 4]:** Eğer `onDel` callback'i çağrılarak bir adres silinirse, `addresses` listesinin güncellenmiş hali üst bileşen tarafından sağlanmalı ve modal listeyi yeniden render etmelidir. Liste dışarıdan güncellenmezse modal eski veriyi göstermeye devam eder.
 
-[Aksiyom 5]: Eğer `onDel` parametresi bir fonksiyon (callback) olarak sağlanmazsa, kullanıcı bir adresi silmek istediğinde silme işlemi tetiklenemez — sil butonu işlevsiz kalır.
+**[Aksiyom 5]:** Eğer `title` parametresi boş string (`""`) veya `undefined` ise, modal başlığının nasıl render edileceği üst bileşenin sorumluluğundadır; modül içinde bir fallback başlık değeri tanımlı değildir.
 
-[Aksiyom 6]: Eğer `title` parametresi bir string olarak sağlanmazsa, modal penceresinin başlık alanı anlamsız veya boş görünür — kullanıcı modalın amacını bilemeyebilir.
-
-[Aksiyom 7]: Eğer `addresses` dizisi boş bir dizi (`[]`) olarak sağlanırsa, modal açık kalır ancak seçim yapılabilecek herhangi bir adres listelenmez — kullanıcı mevcut bir adres yoksa yeni adres eklemeye yönlendirilmelidir (bileşen dışındaki bir sorumluluk).
+**[Aksiyom 6]:** Eğer `onClose`, `onPick`, `onEdit` veya `onDel` callback'lerinden herhangi biri `undefined` olarak geçirilirse, ilgili butona tıklandığında zaman hatası (`is not a function`) oluşur; modül içinde callback varlık kontrolü yapılmaz.
 
 ---
 
@@ -81,19 +79,19 @@ Kullanıcının mevcut adreslerine erişmesini, birini seçmesini, düzenlemesin
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `AddressSelectModal.tsx`::AddressSelectModal
-- **params**: (`title`, `addresses`, `onClose`, `onPick`, `onEdit`, `onDelete`, `t`)
+### [N1_NASIL] AST Pointer: AddressSelectModal.tsx::AddressSelectModal
+- **params**: `{ title, addresses, onClose, onPick, onEdit, onDelete, t, onAddNew }`
+- **ic_degiskenler**: Tanımlı iç değişken yok. Tüm kullanım parametreler üzerindendir.
+- **Dönüş**: JSX Elemanı (React.FC<AddressSelectModalProps>).
+
+### [N2_NASIL] AST Pointer: AddressSelectModal.tsx::(anonim map callback)
+- **params**: `a` — `addresses` dizisindeki tek bir `UserAddress` nesnesi.
 - **ic_degiskenler**:
-  - Fonksiyon gövdesi saf JSX render fonksiyonudur; iç değişken tanımlanmamıştır. Tüm parametreler doğrudan JSX içinde kullanılır.
-- **Parametre Kullanımları**:
-  - `title` — Modal başlık metni; `{title}` olarak `<div>` içinde render edilir
-  - `addresses` — `UserAddress[]` dizisi; `addresses.length === 0` boşluk kontrolü ve `addresses.map((a) => ...)` iterasyonu ile listelenir
-  - `onClose` — Kapatma callback'i; `<button onClick={onClose}>` olarak bağlanır
-  - `onPick` — Seçim callback'i; `() => onPick(a)` arrow ile her address için bağlanır
-  - `onEdit` — Düzenleme callback'i; `() => onEdit(a)` arrow ile her address için bağlanır
-  - `onDelete` — Silme callback'i; `() => onDelete(a.id)` arrow ile address ID gönderilerek bağlanır
-  - `t` — i18n çeviri fonksiyonu; `t('checkout.saved.close')`, `t('checkout.saved.address')`, `t('checkout.saved.default')`, `t('checkout.saved.edit')`, `t('checkout.saved.delete')`, `t('checkout.saved.use')` çağrılır
-- **Dönüş**: `JSX.Element` — modal overlay + dialog JSX yapısı
+  - `a.id` — Adresin benzersiz tanımlayıcısı, `key` prop'u ve `onDelete` çağrıları için kullanılır.
+  - `a.label` — Kullanıcının tanımladığı adres etiketi. Yoksa `t('checkout.saved.address')` çevirisi ile değiştirilir.
+  - `a.is_default_shipping` — Boole. Varsayılan nakliye adresi ise `true` döner ve "Varsayılan" etiketi gösterilir.
+  - `a.full_address` — Adresin tamamı, satır atlama karakterleri ile formatlanmış metin.
+- **Dönüş**: JSX Elemanı (Her bir adres kartı `<div>`).
 
 ---
 

@@ -3,32 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ProductCard.tsx
-skeleton_hash: a9c5f54f770565d8
+skeleton_hash: 3de726cd21c481ab
 entity_hashes:
-  overview: f6fc01dbf8632730
+  overview: 4ebb1c4f22471a6d
   style_tokens: 19c7d9ec430fc71d
-generated_at: 2026-05-28T22:36:39Z
+generated_at: 2026-06-06T21:55:05Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC ürünlerini görsel olarak sunan ve kullanıcı etkileşimini yöneten bir React bileşenidir. Supabase veri yapısındaki `Product` nesnesini kullanarak ürün görselini, marka ikonunu ve `formatCurrency` ile yerelleştirilmiş fiyatı gösterir; ayrıca `useCart` hook'u aracılığıyla sepete ekleme işlevselliği sunar. Next.js `Link` bileşeni ile ürün detay sayfasına yönlendirme sağlarken, grid veya liste gibi farklı düzen seçeneklerini destekler.
+Bu modül, HVAC ürün kartlarını render eden bir React bileşenidir. `Product` nesnesinden gelen verileri (görsel, marka, fiyat) alır, yerelleştirilmiş fiyat gösterimi ve sepete ekleme işlevselliği sunar. Next.js `Link` ile ürün detay sayfasına yönlendirme sağlar ve `grid`/`list` olmak üzere iki farklı düzen seçeneğini destekler.
+
+Bu bileşen以下 bağımlılıklar kullanır: `Product` türü, `BrandIcon`, `VentImage`, `useCart` hook'u, `useI18n` hook'u ve `formatCurrency` yardımcı fonksiyonu. `onQuickView` prop'u ile hızlı bakış işlevselliği de desteklenir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için fonksiyon gövdesi verilmemiş olup, yalnızca arayüz tanımı ve genel bakış bilgisi mevcuttur. Aşağıdaki varsayımlar bu bilgilere dayanarak çıkarılmıştır.
 
-[Aksiyom 1]: Eğer `Product` nesnesinin yapısı `ProductCard` bileşeninin beklentileriyle (örn: görsel, fiyat, marka alanı) uyumlu değilse, bileşen render hataları verir veya eksik bilgi gösterir.
+Bu modül için fonksiyon gövdesi (implementation) verilmemiştir. Sağlanan bilgiler仅有 dosya yolu ve modül sabitleri olup, mimari varsayımların türetilmesi için gerekli olan **fonksiyon gövdesi** bulunmamaktadır.
 
-[Aksiyom 2]: Eğer `formatCurrency` yardımcı fonksiyonu çağrılamıyorsa (örn: modül içe aktarımı eksik), bileşen fiyat gösteremez.
+---
 
-[Aksiyom 3]: Eğer `useCart` hook'u çağrılamıyorsa veya `addToCart` metodu sağlamıyorsa, sepete ekleme işlevi çalışmaz.
+**Not:** Mimari varsayımlar (axioms), yalnızca fonksiyon gövdesinden (implementation code) üretilebilir. Dosya yolu, modül adı veya eski doküman içeriği gibi kaynaklardan çıkarım yapılması güvenilir değildir. 
 
-[Aksiyom 4]: Eğer `onQuickView` prop'u sağlandığında ilgili işlevsellik (örn: modal açma) bileşen içinde uygulanmamışsa, prop çağrılsa bile hiçbir şey olmaz.
+`ProductCard` bileşeninin gerçek implementasyon kodu (React component body) sağlandığında, aşağıdaki alanlarda aksiyomlar çıkarılabilir:
 
-[Aksiyom 5]: Eğer `product.id` değeri yoksa veya geçersizse, `Link` bileşeninin yönlendirdiği ürün detay sayfası (örn: `/products/${id}`) hedefine ulaşılamaz.
+- Props interface zorunlulukları (hangi alanların `undefined` olamayacağı)
+- `useCart` hook'unun dönüş yapısı varsayımları
+- `formatCurrency` fonksiyonunun giriş koşulları
+- `Product` nesnesinin minimum gerekli alanları
+- `Link` bileşenine geçilen URL formatı gereksinimleri
 
-[Aksiyom 6]: Eğer `layout` prop'u `'grid'` veya `'list'` değerlerinden farklı bir değer alırsa (örn: `undefined` olmadan farklı bir string), bileşen beklenmeyen bir düzen ile render olabilir veya stil bozukluğu oluşur.
+**Öneri:** Lütfen `ProductCard.tsx` dosyasının **fonksiyon gövdesini** (component implementation) paylaşın.
 
 ---
 
@@ -59,13 +64,16 @@ Bu modül için fonksiyon gövdesi verilmemiş olup, yalnızca arayüz tanımı 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ProductCard.tsx::(e) => { ... }
-- **params**: e — `React.MouseEvent` nesnesi, tıklama olayını temsil eder
-- **ic_degiskenler**:
-  - `e` — olay nesnesi; `preventDefault()` ve `stopPropagation()` metodlarıyla varsayılan davranış ve olay yayılımı durdurulur
-  - `product` — dışarıdan kapalı (closure) olarak gelen `Product` nesnesi; `addToCart` fonksiyonuna eklenmek üzere gönderilir
-  - `addToCart` — `useCart` hookundan alınan fonksiyon; verilen `product`ı alışveriş sepetine ekler
-- **Dönüş**: yok (fonksiyon yan etki olarak `addToCart` çağrısı yapar)
+### [N1_NASIL] AST Pointer: ProductCard.tsx::onClickAddToCart
+- **params**: `(e: React.MouseEvent)` — React click event nesnesi, preventDefault ve stopPropagation metotlarını içerir
+- **ic_degiskenler**: []
+- **Dönüş**: yok (event handler fonksiyonu, return değeri yok)
+
+**Notlar**:
+- Fonksiyon `e.preventDefault()` ile varsayılan tarayıcı olayını engeller
+- Fonksiyon `e.stopPropagation()` ile olayın yukarı doğru yayılmasını engeller
+- Fonksiyon `addToCart(product)` çağrısı ile ürün sepete eklenir
+- `addToCart` ve `product` değişkenleri dış scope'dan closure ile gelir (fonksiyon gövdesinde tanımlı değildir)
 
 ---
 

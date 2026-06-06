@@ -3,44 +3,48 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx
-skeleton_hash: 83e168b3983c2755
+skeleton_hash: 824de6e3b573097a
 entity_hashes:
   func:EnhancedNeedsWizard: ca7bec73e049fe61
   func:getUsageLocations: 1e08ffb88dd30b7d
   func:nextStep: 173c7fd2dc919ffb
   func:prevStep: ac646de7f0306b72
-  overview: ef7448c5718a23ce
+  overview: c93213ab24e014e9
   style_tokens: 4dfca29db2f1dc25
-generated_at: 2026-05-28T22:35:45Z
+generated_at: 2026-06-06T21:54:46Z
 ---
 
 ## Genel Bakış
-EnhancedNeedsWizard modülü, kullanıcıların ihtiyaçlarını adım adım belirlemelerini sağlayan bir sihirbaz bileşenidir. Bu bileşen, kullanıcı arayüzünü render eder, adımlar arasında ileri ve geri geçişleri yönetir ve ihtiyaç analizinde kullanılacak konum bilgilerini hazırlayan bir yardımcı işlevi içerir.
+Bu modül, kullanıcıların ihtiyaçlarını adım adım belirlemelerini sağlamak için tasarlanmış bir sihirbaz bileşenidir. Ana işlevi, kullanıcı arayüzünü sunmak, adımlar arasında gezinmeyi yönetmek ve ihtiyaç analizi için gerekli kullanım konumlarını bir yardımcı fonksiyon aracılığıyla temin etmektir.
 
 ## Fonksiyon Grupları
-### Kullanıcı Arayüzü ve Bileşen Tanımı
-Bu grup, modülün görsel yapısını oluşturan ve React bileşenini tanımlayan işlevi içerir.
+### Bileşen Tanımı ve Ana Mantık
+Bu grup, modülün merkezi React bileşenini tanımlar; bileşenin dışarıdan aldığı özelliklerle (prop) nasıl çalışacağını ve genel yapısını belirler.
 - EnhancedNeedsWizard
 
-### Adım Geçişi ve Navigasyon Kontrolü
-Sihirbazın içindeki adımlar arasında kullanıcı tarafından ileri ve geri hareketleri sağlayan işlevleri barındırır.
-- nextStep
-- prevStep
+### Adım Tabanlı Navigasyon
+Sihirbazın farklı aşamaları arasında kullanıcı etkileşimiyle ileri ve geri geçişler yapmayı sağlayan işlevleri kapsar. Bu işlevler bileşenin içindeki adım durumunu günceller.
+- nextStep, prevStep
 
-### Yardımcı İşlevler
-Sihirbazın iş mantığını destekleyen, çeviri fonksiyonu üzerinden kullanım konumlarını elde eden işlevi içerir.
+### Yardımcı Veri İşlevi
+Sihirbazın adım içeriklerini veya seçeneklerini doldurmak için gereken verileri hazırlayan, çeviri fonksiyonuyla çalışan yardımcı bir işlevdir.
 - getUsageLocations
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `getUsageLocations` fonksiyonuna geçirilen `t` parametresi `(key: string) => string` türünde bir fonksiyon değilse, çeviri işlemi başarısız olur veya fonksiyon beklenmeyen bir değer döndürür.  
-[Aksiyom 2]: Eğer `EnhancedNeedsWizard` bileşenine `isOpen` prop'u boolean türünde verilmezse, bileşenin görünürlük durumu (açık/kapalı) beklenen şekilde çalışmayabilir.  
-[Aksiyom 3]: Eğer `EnhancedNeedsWizard` bileşenine `onClose` prop'u bir fonksiyon verilmezse, `onClose` tetiklendiğinde çalışma zamanı hatası oluşur.  
-[Aksiyom 4]: Eğer `EnhancedNeedsWizard` bileşenine `parentSlug` prop'u string türünde verilmezse, slug tabanlı işlemler (örneğin yönlendirme, filtreleme) beklenmeyen sonuç verebilir.  
-[Aksiyom 5]: Eğer `nextStep` veya `prevStep` fonksiyonları bileşenin render edildiği bağlam dışında (örneğin component unmount sonrası) çağrılırsa, durum güncelleme işlemi (setState benzeri) başarısız olabilir ve uyarı/hataya yol açabilir.
+Bu modül için verilen fonksiyon imzalarına dayanan temel mimari varsayımlar tanımlanmıştır.
+
+**[Aksiyom 1]:** Eğer `onClose` prop'u sağlanmazsa, bileşen kapatılamaz ve kullanıcı sihirbazı kapatma girişiminde bulunamaz.
+
+**[Aksiyom 2]:** Eğer `isOpen` prop'u `false` veya `truthy` bir değer değilse, bileşen UI olarak render edilmez.
+
+**[Aksiyom 3]:** Eğer `parentSlug` prop'u string bir değer değilse, kategori hiyerarşisi ve kullanım konumları doğru şekilde belirlenemez.
+
+**[Aksiyom 4]:** Eğer `nextStep` ve `prevStep` arasında modül içi bir `currentStep` state'i (veya eşdeğeri) mevcut değilse, adım ilerleme ve geri gelme navigasyonu çalışmaz.
+
+**[Aksiyom 5]:** Eğer `getUsageLocations` çağrıldığında `t` parametresi (çeviri fonksiyonu) sağlanmazsa, kullanım konumu metinleri hata ile karşılaşır veya boş döner.
 
 ---
 
@@ -113,15 +117,44 @@ type WizardStep = 1 | 2 | 3 | 4 | 5 | 6
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx::getUsageLocations
-- **params**: t: (key: string) => string (çeviri fonksiyonu)
+### [N1_NASIL] AST Pointer: src/components/category/EnhancedNeedsWizard.tsx::getUsageLocations
+- **params**: `t: (key: string) => string` — i18n çeviri fonksiyonu, anahtar karşılığında localized metin döndürür
 - **ic_degiskenler**:
-  - `id` — her lokasyonun benzersiz tanımlayıcısı (entrance, cold-storage, industrial, retail)
-  - `title` — lokasyonun görünen başlığı, t() ile çevrilir
-  - `description` — lokasyonun açıklaması, t() ile çevrilir veya sabit metin
-  - `icon` — lokasyonu temsil eden React ikon bileşeni
-  - `tip` — lokasyon için ek ipucu metni
-- **Dönüş**: Kullanım lokasyonları listesi (dizi, her elemanı lokasyon nesnesi)
+  _(fonksiyon gövdesinde değişken tanımlanmamıştır, doğrudan literal array döndürülür)_
+- **Dönüş**: Array<{ id: string, title: string, description: string, icon: ComponentType, tip: string }> — 4 kullanım alanı nesnesi (entrance, cold-storage, industrial, retail)
+
+---
+
+### [N2_NASIL] AST Pointer: src/components/category/EnhancedNeedsWizard.tsx::EnhancedNeedsWizard
+- **params**:
+  - `isOpen: boolean` — dialogun açık olup olmadığını belirler, false ise null döner (render engellenir)
+  - `onClose: () => void` — dialog kapatma callback'i, backdrop ve X butonuna bağlıdır
+  - `parentSlug: string` — üst kategori slug'ı, supabase ürün sorgusunda `category_slugs` filtresi olarak kullanılır
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, tüm UI metinleri bu fonksiyonla çekilir
+  - `state` — `useState<WizardState>` ile tanımlanan sihirbaz durumu nesnesi; `step` (mevcut adım, 1-6), `usageLocation` (seçilen kullanım alanı), `sector`, `doorWidth` (kapı genişliği, default 1.0), `doorHeight` (kapı yüksekliği, default 2.2), `windCondition` (rüzgar durumu), `trafficIntensity` (yoğunluk), `heatingNeeded` (ısıtma ihtiyacı: yes/no/unsure), `climateZone`, `doorFrequency`, `hasHeating` alanlarını içerir
+  - `matchedProducts` — `useState<MatchedProduct[]>([])` ile tanımlanan eşleşen ürün listesi, step 6'da `matchProducts` tarafından doldurulur
+  - `loading` — `useState<boolean>(false)` ile tanımlanan yükleme durumu flag'i, supabase isteği sırasında true olur
+  - `matchProducts` — `useCallback` ile sarılmış asenkron ürün eşleştirme fonksiyonu; supabase'den aktif ürünleri çeker, `calculateAirCurtain` ile hesaplama yapar, ürünleri kapı boyutu ve ısıtma tercihine göre puanlayarak en iyi 3'ünü `matchedProducts` state'ine yazar
+  - `nextStep` — inner fonksiyon: `state.step` değerini 1 artırarak state'i günceller
+  - `prevStep` — inner fonksiyon: `state.step` değerini 1 azaltarak state'i günceller
+- **Dönüş**: React JSX element (dialog UI) — isOpen false ise `null` döner; step 1'de kullanım alanı seçimi, step 2'de kapı boyutları, step 3'te ısıtma tercihi, step 6'da eşleşen ürün kartları render edilir
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/category/EnhancedNeedsWizard.tsx::nextStep
+- **params**: _(parametre yok)_
+- **ic_degiskenler**:
+  _(fonksiyon gövdesinde değişken tanımlanmamıştır)_
+- **Dönüş**: yok — `setState` çağrısıyla `state.step` değerini mevcut değer + 1 olarak günceller (side effect: wizard bir sonraki adıma geçer)
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/category/EnhancedNeedsWizard.tsx::prevStep
+- **params**: _(parametre yok)_
+- **ic_degiskenler**:
+  _(fonksiyon gövdesinde değişken tanımlanmamıştır)_
+- **Dönüş**: yok — `setState` çağrısıyla `state.step` değerini mevcut değer - 1 olarak günceller (side effect: wizard bir önceki adıma döner)
 
 ---
 
@@ -133,8 +166,8 @@ graph TD
     EnhancedNeedsWizard_tsx__getUsageLocations["getUsageLocations"]
     EnhancedNeedsWizard_tsx__nextStep["nextStep"]
     EnhancedNeedsWizard_tsx__prevStep["prevStep"]
-    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__nextStep
     EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__getUsageLocations
+    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__nextStep
 ```
 
 ## NODE ID STANDARD

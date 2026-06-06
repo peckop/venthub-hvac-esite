@@ -3,25 +3,45 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ScrollReveal.tsx
-skeleton_hash: 84763740762acabd
+skeleton_hash: 1d5c6fded933b5c6
 entity_hashes:
-  func:ScrollReveal: 39da2fea3b6e7b32
-  overview: ba85d2375389c5ab
+  func:ScrollReveal: 5164aa702775b185
+  overview: 7c3e9f948c132ef9
   style_tokens: fce5caac08f51876
-generated_at: 2026-05-28T22:36:57Z
+generated_at: 2026-06-06T21:55:06Z
 ---
 
 ## Genel Bakış
-(Sentez hatası)
+ScrollReveal, VentHub HVAC projesinde kaydırma tabanlı animasyonlar için kullanılan bir React sarmalayıcı bileşenidir. İçeriğin ekran görünür alanında belirdiğinde seçilen animasyon efektini uygulayarak görsel geçişler sağlar. Esnek yapılandırması ile farklı HTML elementlerine ve animasyon türlerine adapte olabilir.
+
+## Fonksiyon Grupları
+
+### Kaydırma Animasyonu Bileşeni
+ScrollReveal, çocuk bileşenleri sarmalayarak kaydırma olaylarını izler ve görünümde belirdiğinde animasyon efektlerini tetikler. Farklı HTML elementleri, animasyon türleri ve sıralı gecikmeler ile özelleştirilebilir yapı sunar.
+- ScrollReveal
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-(Sentez hatası)
+
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### ScrollReveal
+
+**Ne yapar**: ScrollReveal, çocuk bileşenlerin sayfa kaydırma (scroll) sırasında belirli animasyon efektleriyle görünür olmasını sağlayan sarmalayıcı (wrapper) bir React bileşeniderek. Görünmezlikten görünürlüğe geçiş animasyonlarını kontrol ederek kullanıcı deneyimini zenginleştirir.
+
+**Nasıl yapar**: Bileşen, belirtilen animasyon türüne göre çocuk elemanları sarar ve scroll pozisyonuna bağlı olarak animasyon tetiklerini yönetir. `as` prop'u ile hangi HTML elementi (div, section, article vb.) olarak render edileceği belirlenebilir. `staggerIndex` parametresi ile çoklu elemanlarda animasyonların sıralı ve gecikmeli tetiklenmesi sağlanarak kademeli görünüm efektleri elde edilir.
+
+**Parametreler**:
+- `children` — `React.ReactNode` — Scroll animasyonu uygulanacak alt bileşenler veya içerik. Bileşenin sarmalayacağı tüm JSX içeriği bu prop üzerinden iletilir.
+- `animation` — `AnimationType` — Uygulanacak animasyon stilini tanımlar (örn. fade-in, slide-up, scale vb.). Hangi geçiş efektinin kullanılacağını belirler.
+- `className` — `string` — Ek CSS sınıf adları eklemek için kullanılır. Varsayılan değeri boş dizedir (`''`). Bileşenin stilini özelleştirmek için opsiyonel olarak verilir.
+- `staggerIndex` — `number | undefined` — Birden fazla ScrollReveal bileşeni kullanıldığında animasyonların sıralı tetiklenmesi için gecikme indeksini belirtir. Değer arttıkça animasyon daha geç tetiklenir.
+- `as` — `ElementType` — Bileşenin hangi HTML elementi olarak render edileceğini belirler. Varsayılan olarak `div` kullanılır; `section`, `article`, `span` gibi farklı elementler atanabilir.
+
+**Dönüş**: `React.FC<ScrollRevealProps>` — Bileşen, children'ı sarmalayan ve scroll tabanlı animasyon uygulayan bir React fonksiyonel bileşeni döndürür. Render edilen eleman, belirlenen HTML elementi (`as` prop'u) içinde animasyon durumuna göre stil değişiklikleri uygulanmış şekilde döner.
 
 ---
 
@@ -37,7 +57,20 @@ generated_at: 2026-05-28T22:36:57Z
 ---
 
 ## AST POINTERS
-(Sentez hatası)
+
+### [N1_NASIL] AST Pointer: components/ScrollReveal.tsx::ScrollReveal
+- **params**:
+  - `children` — bileşen içinde render edilecek React çocuk elemanları
+  - `animation` — hangi scroll animasyonunun uygulanacağını belirten anahtar, `scrollAnimationClasses` dict'inde lookup için kullanılır
+  - `className` — üzerine eklenecek ek CSS sınıf adları, varsayılan `''`
+  - `staggerIndex` — stagger (sıralı) animasyon için indeks, tanımlıysa `scrollAnimationClasses.staggerChild`'a geçirilir
+  - `as` (Component olarak yeniden adlandırılmış) — render edilecek HTML elemanı veya bileşen, varsayılan `'div'`
+- **ic_degiskenler**:
+  - `ref` — `useScrollAnimation<HTMLElement>` hook'unun döndürdüğü ref objesi; bileşene atanarak viewport izleme başlatılır
+  - `visible` — `useScrollAnimation` hook'unun döndürdüğü boolean; elemanın viewport'a girip girmediğini belirtir
+  - `animClass` — `scrollAnimationClasses[animation](visible)` çağrısından elde edilen CSS sınıf dizgisi; animasyonun görünür/gizli durumuna göre uygun sınıfı seçer
+  - `style` — `staggerIndex` tanımlıysa `scrollAnimationClasses.staggerChild(staggerIndex)` çağrısıyla dönen inline style nesnesi; tanımlı değilse `undefined`
+- **Dönüş**: `JSX.Element` — `Component` elemanının `ref`, `className` (`animClass` + `className` birleşimi) ve `style` özellikleriyle sarılmış `{children}` içeriği
 
 ---
 

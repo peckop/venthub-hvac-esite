@@ -3,26 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminAuditLogPage.tsx
-skeleton_hash: faa129e425bec71a
+skeleton_hash: 70abd3db6590fef6
 entity_hashes:
   func:AdminAuditLogPage: 50d17db2bc55805a
-  overview: 2053e68b7986a9b1
+  overview: 7ad01a8799bdff81
   style_tokens: d2a1c3bee3a34f52
-generated_at: 2026-05-28T22:38:53Z
+generated_at: 2026-06-06T21:57:07Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının yönetici paneli altındaki denetim günlüğü sayfasını uygulayan tek React bileşenini barındırır. Yalnızca yetkili yönetici kullanıcıların sistemde gerçekleştirilen tüm eylemlerin kayıtlarını görüntülemesi için bir kullanıcı arayüzü sunar.
+Bu modül, VentHub HVAC uygulamasının yönetici panelinde yer alan denetim günlüğü sayfasını sunan React bileşenidir. Sistem üzerinde gerçekleştirilen kullanıcı ve sistem aktivitelerinin kayıtlarını yetkili yöneticilere görüntüleme arayüzü sağlar. Projenin admin rotaları altında konumlandırılmış olup, yalnızca admin şablonu içinde render edilmek üzere tasarlanmıştır.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Modülün tek sorumluluğunu kapsar: Yönetici denetim günlüğü sayfasının tüm kullanıcı arayüzünü ve temel işlevselliğini sağlayan React bileşenini tanımlar.
+### Sayfa Bileşeni
+Modülün tek sorumluluğu olan yönetici denetim günlüğü sayfasının kullanıcı arayüzünü ve sayfa düzeyindeki işlevselliği tanımlar.
 - AdminAuditLogPage
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
 
 ---
 
@@ -53,40 +52,65 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::AdminAuditLogPage
-- **params**: (none)
+### [N1_NASIL] AST Pointer: AdminAuditLogPage.tsx::AdminAuditLogPage
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — translation function from `useI18n`
-  - `lang` — current language code from `useI18n`
-  - `dragScrollRef` — ref object for drag‑scroll container from `useDragScroll`
-  - `router` — Next.js router instance from `useRouter`
-  - `rows` — state array of `AuditRow` objects
-  - `setRows` — state updater for `rows`
-  - `loading` — boolean state indicating data fetch in progress
-  - `setLoading` — state updater for `loading`
-  - `error` — string or null state for error message
-  - `setError` — state updater for `error`
-  - `total` — numeric state of total audit log count
-  - `setTotal` — state updater for `total`
-  - `page` — current page number state
-  - `setPage` — state updater for `page`
-  - `q` — search query string state
-  - `setQ` — state updater for `q`
-  - `debouncedQ` — debounced search query string state
-  - `setDebouncedQ` — state updater for `debouncedQ`
-  - `fromDate` — start date filter string state
-  - `setFromDate` — state updater for `fromDate`
-  - `toDate` — end date filter string state
-  - `setToDate` — state updater for `toDate`
-  - `action` — action filter string state
-  - `setAction` — state updater for `action`
-  - `batch` — batch filter string state
-  - `setBatch` — state updater for `batch`
-  - `pathname` — current path string from `usePathname`
-  - `searchParams` — URL search parameters object from `useSearchParams`
-  - `expandedId` — id of currently expanded row or null
-  - `setExpandedId` — state updater for `expandedId`
-- **Dönüş**: JSX element tree rendering the audit log page
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini çevirir
+  - `lang` — useI18n hook'undan gelen mevcut dil kodu
+  - `dragScrollRef` — useDragScroll hook'undan gelen ref nesnesi, sürükleme ile yatay kaydırma için DOM referansı
+  - `router` — useRouter hook'undan gelen Next.js yönlendirici nesnesi, sayfa yönlendirmeleri için
+  - `rows` — AuditRow[] türünde state, sunucudan çekilen denetim logu satırlarını tutar
+  - `loading` — boolean state, veri yükleme durumunu belirtir
+  - `error` — string|null türünde state, hata mesajını tutar
+  - `total` — number state, toplam log sayısını tutar (sayfalama için)
+  - `page` — number state, mevcut sayfa numarasını tutar
+  - `q` — string state, arama çubuğuna girilen ham arama sorgusunu tutar
+  - `debouncedQ` — string state, debounce uygulanmış arama sorgusunu tutar
+  - `fromDate` — string state, filtre için başlangıç tarihini tutar (YYYY-MM-DD formatında)
+  - `toDate` — string state, filtre için bitiş tarihini tutar (YYYY-MM-DD formatında)
+  - `action` — string state, filtre için aksiyon türünü tutar (INSERT, UPDATE, DELETE, CUSTOM)
+  - `batch` — string state, filtre için batch ID'sini tutar
+  - `expandedId` — string|null türünde state, genişletilmiş satırın ID'sini tutar
+  - `pathname` — usePathname hook'undan gelen mevcut sayfa yolunu tutar
+  - `searchParams` — useSearchParams hook'undan gelen URL arama parametrelerini tutar
+- **Dönüş**: React.FC (React fonksiyonel component)
+
+### [N2_NASIL] AST Pointer: AdminAuditLogPage.tsx::debounceEffect
+- **params**: () — useEffect callback'i olarak çağrılır
+- **ic_degiskenler**:
+  - `t` — setTimeout sonucu oluşturulan zamanlayıcı ID'si, debounce gecikmesini kontrol eder
+- **Dönüş**: void (clearTimeout cleanup fonksiyonu döndürür)
+
+### [N3_NASIL] AST Pointer: AdminAuditLogPage.tsx::fetchLogs
+- **params**: () — useCallback ile sarılmış async fonksiyon
+- **ic_degiskenler**:
+  - `query` — Supabase sorgu nesnesi, filtreler ve sayfalama ile oluşturulur
+  - `like` — string, debounce edilmiş arama sorgusunu LIKE operatörü için formatlar
+  - `from` — number, sayfalama için başlangıç indeksini hesaplar
+  - `to` — number, sayfalama için bitiş indeksini hesaplar
+  - `data` — AuditRow[]|null, Supabase'den dönen veri dizisi
+  - `error` — any türünde Supabase hatası
+  - `count` — number|null, toplam kayıt sayısını döner
+  - `e` — Error türünde yakalanan hata nesnesi
+- **Dönüş**: Promise<void> (async fonksiyon)
+
+### [N4_NASIL] AST Pointer: AdminAuditLogPage.tsx::searchParamsEffect
+- **params**: () — useEffect callback'i olarak çağrılır
+- **ic_degiskenler**:
+  - `b` — string, searchParams'dan alınan batch parametresinin temizlenmiş hali
+- **Dönüş**: void
+
+### [N5_NASIL] AST Pointer: AdminAuditLogPage.tsx::clearBatchHandler
+- **params**: () — onClick handler olarak çağrılır
+- **ic_degiskenler**:
+  - `url` — URL nesnesi, mevcut sayfa URL'sini temsil eder
+- **Dönüş**: void
+
+### [N6_NASIL] AST Pointer: AdminAuditLogPage.tsx::renderRow
+- **params**: `r` — AuditRow türünde, tek bir denetim log satırı
+- **ic_degiskenler**:
+  - (ic değişken yok — sadece parametre `r` kullanılır)
+- **Dönüş**: JSX.Element (React fragment ve tr elemanları)
 
 ---
 

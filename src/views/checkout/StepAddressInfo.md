@@ -3,27 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx
-skeleton_hash: 61818ab3eba26faa
+skeleton_hash: a0457c9364541b22
 entity_hashes:
   func:StepAddressInfo: d5b5813fe5d1d5af
-  overview: f4c7e4e155655b30
+  overview: a2c2c2af4883e494
   style_tokens: 7a84088359f41f22
-generated_at: 2026-05-28T22:40:06Z
+generated_at: 2026-06-06T21:58:35Z
 ---
 
 ## Genel Bakış
-Bu modül, ödeme sürecinin adres bilgisi adımını yöneten bir React bileşenidir. Kullanıcının teslimat ve fatura adresi bilgilerini girebilmesi için gerekli form arayüzünü ve veri akışını sağlar.
+Bu modül, ödeme sürecinin (checkout) adres bilgisi adımını yöneten bir React bileşenidir. Kullanıcının teslimat ve fatura adresi bilgilerini girebilmesi için gerekli form arayüzünü sağlar ve bu verilerin üst bileşen tarafından kontrol edilen state’lerle senkronize edilmesini yönetir.
 
 ## Fonksiyon Grupları
-
-### Adres Bilgisi Arayüzü
+### Adres Formu Yönetimi
 Ödeme akışı sırasında teslimat ve fatura adresi verilerinin kullanıcıya sunulmasını ve bu verilerin güncellenmesini sağlayan ana bileşendir.
 - StepAddressInfo
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
 
 ---
 
@@ -71,23 +69,36 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx::anonymous_1
-- **params**: (e)
-- **ic_degiskenler**:
-  - `e` — olay nesnesi, `e.target.value` üzerinden girilen metin alınır
-  - `v` — `e.target.value` içindeki sadece rakamları tutan ve ilk 10 karaktere kesilen string
-  - `shippingAddress` — dışarıdan gelen state nesnesi, mevcut adres bilgilerini içerir
-  - `setShippingAddress` — React state güncelleme fonksiyonu, yeni `postalCode` değeriyle state’i günceller
-- **Dönüş**: yok (callback olarak kullanılan anonim fonksiyon, bir değer döndürmez)
+### [N1_NASIL] AST Pointer: `StepAddressInfo.tsx`::StepAddressInfo
+- **params**:
+  - `shippingAddress` — Kullanıcının seçtiği teslimat adresi nesnesi (CheckoutAddressInfo tipinde)
+  - `setShippingAddress` — shippingAddress durumunu güncelleyen React state setter fonksiyonu
+  - `billingAddress` — Kullanıcının seçtiği fatura adresi nesnesi (CheckoutAddressInfo tipinde)
+  - `setBillingAddress` — billingAddress durumunu güncelleyen React state setter fonksiyonu
+- **ic_degiskenler**: *(gövde verilmemiş — sadece imza bilgisi mevcut)*
+- **Dönüş**: `React.FC<StepAddressInfoProps>` (JSX bileşeni)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx::anonymous_2
-- **params**: (e)
+---
+
+### [N2_NASIL] AST Pointer: `StepAddressInfo.tsx`::shippingPostalCodeHandler (anonim arrow function)
+- **params**:
+  - `e` — React `ChangeEvent<HTMLInputElement>` olay nesnesi, input'un değişim olayını temsil eder
 - **ic_degiskenler**:
-  - `e` — olay nesnesi, `e.target.value` üzerinden girilen metin alınır
-  - `v` — `e.target.value` içindeki sadece rakamları tutan ve ilk 10 karaktere kesilen string
-  - `billingAddress` — dışarıdan gelen state nesnesi, mevcut fatura adresi bilgilerini içerir
-  - `setBillingAddress` — React state güncelleme fonksiyonu, yeni `postalCode` değeriyle state’i günceller
-- **Dönüş**: yok (callback olarak kullanılan anonim fonksiyon, bir değer döndürmez)
+  - `v` — `e.target.value` değerinden rakam dışı karakterlerin temizlendiği ve en fazla 10 karakter uzunluğunda tutulan posta kodu stringi
+- **yan_etkiler**:
+  - `setShippingAddress` çağrısı — mevcut `shippingAddress` nesnesinin `postalCode` alanını `v` değeriyle genişleterek (spread) günceller: `{ ...shippingAddress, postalCode: v }`
+- **Dönüş**: yok
+
+---
+
+### [N3_NASIL] AST Pointer: `StepAddressInfo.tsx`::billingPostalCodeHandler (anonim arrow function)
+- **params**:
+  - `e` — React `ChangeEvent<HTMLInputElement>` olay nesnesi, input'un değişim olayını temsil eder
+- **ic_degiskenler**:
+  - `v` — `e.target.value` değerinden rakam dışı karakterlerin temizlendiği ve en fazla 10 karakter uzunluğunda tutulan posta kodu stringi
+- **yan_etkiler**:
+  - `setBillingAddress` çağrısı — mevcut `billingAddress` nesnesinin `postalCode` alanını `v` değeriyle genişleterek (spread) günceller: `{ ...billingAddress, postalCode: v }`
+- **Dönüş**: yok
 
 ---
 
