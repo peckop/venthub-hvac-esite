@@ -1,6 +1,7 @@
 import React, { cache } from 'react'
 import PageComponent from '../../../../views/CategoryPage'
-import { supabase, getProductsEnriched } from '../../../../lib/supabase'
+import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+import { getProductsEnriched } from '@/lib/services/product.service'
 import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
 import type { DomainCategory, DomainProduct } from '../../../../lib/type-converters'
 import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../../../types/db-rows'

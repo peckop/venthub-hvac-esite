@@ -3,26 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\invoices\page.tsx
-skeleton_hash: 0ad86876ec50ba32
+skeleton_hash: df4e5591ff5aa6e8
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-28T22:34:48Z
+generated_at: 2026-06-06T19:23:13Z
 ---
 
 ## Genel Bakış
-Bu dosya, kullanıcı hesabı altındaki fatura listesi sayfasının kök bileşenini tanımlar. Tek bir `Page` fonksiyonu, dinamik olarak yüklenen `AccountInvoicesPage` bileşenini döndürerek sayfanın veri çekme, yetkilendirme ve kullanıcı arayüzü düzenlemesini yönetir.
+Bu modül, kullanıcının hesap panelindeki fatura listesi sayfasını temsil eden kök React bileşenini içerir. Sayfa, dinamik bir yükleme stratejisi kullanarak asıl görünüm bileşenini yükler ve böylece performansı artırırken ilgili arayüzü sunar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Hesap faturaları sayfasının kök bileşenini oluşturur. Dinamik içe aktarma (dynamic import) yoluyla ilgili görünümü yükler ve render eder.
+Hesap faturaları sayfasının giriş noktasını ve temel yapısını oluşturur. Dinamik içe aktarma yoluyla asıl görünüm bileşenini yükleyerek sayfayı render eder.
 - Page
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
 
 ---
 
@@ -41,22 +40,23 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../../views/account/AccountInvoicesPage'), {
-  s...`
+- **PageComponent** (call) — `nextDynamic(() => import('../../../../views/account/AccountInvoicesPage'), {...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::anonymous_arrow_function
+### [N1_NASIL] AST Pointer: `[lang]/account/invoices/page.tsx`::(anonim.loading)
 - **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: React JSX elementi (merkezlenmiş yükleme spinner bileşeni)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `div` içinde `animate-spin` class'lı spinner loading göstergesi döndürür; `min-h-screen`, `flex`, `items-center`, `justify-center` ile ekran ortasında dönen bir yükleme animasyonu sunar
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\invoices\page.tsx::Page
+---
+
+### [N2_NASIL] AST Pointer: `[lang]/account/invoices/page.tsx`::Page
 - **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: `<PageComponent />` React bileşeni
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `PageComponent` sabitini render eder; `PageComponent` dosya başında `nextDynamic` ile import edilmiş (muhtemelen code-split) bir bileşendir
 
 ---
 

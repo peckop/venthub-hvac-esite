@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import Seo from '../components/Seo'
 import { BrandIcon } from '../components/HVACIcons'
-import { HVAC_BRANDS } from '../lib/brands'
+import { HVAC_BRANDS } from '../data/brands'
 import ScrollReveal from '../components/ScrollReveal'
 import { tr } from '../i18n/dictionaries/tr'
 import { en } from '../i18n/dictionaries/en'

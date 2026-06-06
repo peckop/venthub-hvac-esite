@@ -6,7 +6,7 @@ import {
     DoorOpen, Snowflake, Factory, ShoppingCart,
     Ruler, ArrowRight
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { toUIProductList, type DomainProduct } from '../../lib/type-converters'
 import { DbProduct, DbJson } from '../../types/db-rows'
 import { calculateAirCurtain } from '../../lib/hvacCalculations'

@@ -5,7 +5,7 @@ import {
   getMotorInference,
   generateEngineeringSummary
 } from '../engineeringIntelligence';
-import { Product } from '../../lib/supabase';
+import type { Product } from '@/types/ui-models';
 
 describe('engineeringIntelligence', () => {
   describe('getNoiseInference', () => {

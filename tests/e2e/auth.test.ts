@@ -35,6 +35,21 @@ vi.mock('@supabase/ssr', () => {
           if (res.error) return { data: { user: null }, error: res.error }
           return { data: { user: res.user }, error: null }
         },
+        getClaims: async () => {
+          const res = mockUserResolver()
+          if (res.error) return { data: null, error: res.error }
+          if (!res.user) return { data: null, error: null }
+          return {
+            data: {
+              claims: {
+                user_role: res.user.user_metadata?.role,
+                app_metadata: res.user.app_metadata,
+                user_metadata: res.user.user_metadata
+              }
+            },
+            error: null
+          }
+        },
         getSession: async () => {
           const res = mockUserResolver()
           if (res.error) return { data: { session: null }, error: res.error }

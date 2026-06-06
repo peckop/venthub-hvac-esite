@@ -1,6 +1,6 @@
 import { cache } from 'react'
-import { getProductBySlug } from '../supabase'
-import { supabase } from '../supabase'
+import { getProductBySlug } from '@/lib/services/product.service'
+import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import { mapDatabaseCategoryToDomain } from '../type-converters'
 import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../types/db-rows'
 
@@ -27,7 +27,7 @@ export const getCachedCategoryData = cache(async (slug: string) => {
     description: data.description as string | null,
     metadata: data.metadata as CategoryMetadata | null,
     authority_content: data.authority_content as AuthorityContent | null
-  } as unknown as DbCategory)
+  } as DbCategory)
 })
 
 // Preload pattern functions that can be called early in the render phase

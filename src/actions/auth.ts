@@ -1,6 +1,6 @@
 'use server'
 
-import { supabase } from '../lib/supabase'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 export interface AuthActionState {
@@ -17,6 +17,7 @@ export async function loginAction(_prevState: AuthActionState | null, formData: 
   }
 
   try {
+    const supabase = await createSupabaseServerClient()
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,

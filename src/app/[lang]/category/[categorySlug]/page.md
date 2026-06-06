@@ -3,20 +3,21 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\category\[categorySlug]\page.tsx
-skeleton_hash: cf914e160936bdb3
+skeleton_hash: fbd6725e7fce4452
 entity_hashes:
   func:Page: 83982c2082601bcb
   func:generateMetadata: bff06976b3e638cc
   func:generateStaticParams: 5124c4ce610dd009
-  overview: f42538946dac9021
+  overview: e47cdadb5c23e6e0
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-05-29T11:36:31Z
+generated_at: 2026-06-06T19:24:22Z
 ---
 
 ## Genel Bakış
 Bu modül, Next.js App Router yapısında dinamik kategori sayfalarını sunar. URL'deki `categorySlug` parametresine göre sayfa içeriğini, SEO meta bilgilerini ve statik üretim parametrelerini yönetir. Modül, hem sunucu taraflı veri çekme hem de istemci tarafı arayüz sunma sorumluluğunu taşır.
 
 ## Fonksiyon Grupları
+
 ### Statik Üretim Yapılandırması
 Uygulama derleme aşamasında hangi kategori slug'larının önceden üretileceğini belirleyerek statik site oluşturma sürecini yönetir.
 - `generateStaticParams`
@@ -76,29 +77,33 @@ Kategori sayfasının ana React bileşenini oluşturarak kullanıcının gördü
 ### [N1_NASIL] AST Pointer: src/app/[lang]/category/[categorySlug]/page.tsx::generateStaticParams
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — supabase'den aktif kategorilerin slug değerlerini çeken sorgunun sonucu
-  - `categoriesList` — data'nın null olma durumuna karşı korumalı olarak diziye dönüştürülmüş hali
-- **Dönüş**: `{ lang: string, categorySlug: string }[]` formatında, her kategori için 'tr' ve 'en' dillerinde iki nesne içeren dizi
+  - `data` — Supabase'den gelen aktif kategorilerin verisi (sadece slug alanlarını içerir)
+  - `categoriesList` — `data` veya boş dizi olarak cast edilmiş, her elemanın `slug` alanı olan dizi
+  - `c` — flatMap içinde döngü değişkeni, her kategoriyi temsil eder
+- **Dönüş**: `{ lang: string, categorySlug: string }[]` — Her kategori için Türkçe ve İngilizce dil kodlu nesnelerden oluşan dizi
 
 ### [N2_NASIL] AST Pointer: src/app/[lang]/category/[categorySlug]/page.tsx::generateMetadata
 - **params**: `{ params: Promise<{ categorySlug: string }> }` — URL parametrelerini içeren promise
 - **ic_degiskenler**:
-  - `categorySlug` — params promise'ından çözümlenen kategori slug'ı
-  - `category` — categorySlug kullanılarak cached getCategoryData ile çekilen kategori verisi
-- **Dönüş**: `Metadata` formatında SEO verisi (title, description, alternates, openGraph)
+  - `categorySlug` — await edilmiş params'dan çıkarılmış kategori slug'ı
+  - `category` — getCachedCategoryData ile getirilmiş kategori verisi (DomainCategory tipinde veya null)
+- **Dönüş**: SEO metadata nesnesi (title, description, alternates, openGraph alanlarını içerir)
 
 ### [N3_NASIL] AST Pointer: src/app/[lang]/category/[categorySlug]/page.tsx::Page
 - **params**: `{ params: Promise<{ categorySlug: string }> }` — URL parametrelerini içeren promise
 - **ic_degiskenler**:
-  - `categorySlug` — params promise'ından çözümlenen kategori slug'ı
-  - `category` — categorySlug ile cached getCategoryData ile çekilen kategori verisi
-  - `products` — varsayılan boş dizi, kategori varsa getProductsEnriched ile zenginleştirilmiş ürünler dizisi
-  - `subCategories` — varsayılan boş dizi, kategori varsa supabase'den çekilen alt kategorilerin domain formatına dönüştürülmüş hali
-  - `subsData` — supabase'den çekilen alt kategori verilerinin raw hali
-  - `categoriesArray` — subsData'nın null olma durumuna karşı korumalı DbCategory dizisi
-  - `categoryIds` — ana kategori ID'si ve tüm alt kategori ID'lerinden oluşan dizi
-  - `jsonLd` — JSON-LD formatında yapılandırılmış veri nesnesi
-- **Dönüş**: `<React.Suspense>` ile sarmalanmış `<PageComponent>` ve JSON-LD script'i içeren JSX
+  - `categorySlug` — await edilmiş params'dan çıkarılmış kategori slug'ı
+  - `category` — getCachedCategoryData ile getirilmiş kategori verisi (DomainCategory tipinde veya null)
+  - `products` — Başlangıçta boş dizi, category varsa getProductsEnriched ile doldurulacak DomainProduct dizisi
+  - `subCategories` — Başlangıçta boş dizi, category varsa Supabase'den çekilen alt kategorilerin dönüştürülmüş hali (DomainCategory dizisi)
+  - `subsData` — Supabase'den gelen ham alt kategori verisi (DbCategory dizisi)
+  - `categoriesArray` — `subsData` veya boş dizi olarak cast edilmiş DbCategory dizisi
+  - `s` — map içinde döngü değişkeni, her alt kategoriyi temsil eder (DbCategory tipinde)
+  - `categoryIds` — Ana kategori ID'si ve tüm alt kategori ID'lerini içeren dizi
+  - `jsonLd` — Schema.org CollectionPage yapısında JSON-LD verisi
+  - `prod` — products filtreleme ve map işleminde döngü değişkeni
+  - `index` — products map işleminde pozisyon indeksi
+- **Dönüş**: JSX elementi (script etiketi ve React.Suspense ile sarılmış PageComponent)
 
 ---
 

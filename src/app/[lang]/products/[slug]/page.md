@@ -3,18 +3,18 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\products\[slug]\page.tsx
-skeleton_hash: b7be7254cb30049f
+skeleton_hash: 9525409a021484e9
 entity_hashes:
   func:Page: 23ecda9f387402f7
   func:generateMetadata: c086561deb8aad58
   func:generateStaticParams: 10793e6b52b39af0
-  overview: 07121e801c64b94e
+  overview: 400995d1dea4efaa
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-06T06:34:39Z
+generated_at: 2026-06-06T19:25:17Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js App Router yapısında çok dilli (dil ve ürün slug'ı tabanlı) ürün detay sayfalarını yönetir. Modül, derleme zamanında hangi sayfaların önceden oluşturulacağını belirler, her sayfa için SEO uyumlu meta verileri üretir ve son olarak ilgili ürün içeriğini kullanıcıya sunar.
+Bu modül, Next.js App Router yapısında çok dilli (Türkçe ve İngilizce) ürün detay sayfalarını yönetir. Modül, derleme zamanında hangi sayfaların önceden oluşturulacağını belirler, her sayfa için SEO uyumlu meta verileri üretir ve son olarak ilgili ürün içeriğini kullanıcıya sunar.
 
 ## Fonksiyon Grupları
 
@@ -72,37 +72,29 @@ Dil ve slug parametrelerine göre ürün verisini çekerek, kullanıcının gör
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/[lang]/products/[slug]/page.tsx`::generateStaticParams
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/app/[lang]/products/[slug]/page.tsx::generateStaticParams
+- **params**: parametre yok
 - **ic_degiskenler**:
-  - `products` — Supabase'den gelen aktif ürün listesi, `select('slug')` ile sadece slug alanlarını içerir; `data` destructuring ile alınır
-  - `paths` — `products` array'inden türetilen `{ lang, slug }` çiftlerinin flat listesi; her ürün hem `'tr'` hem `'en'` dili için bir entry oluşturur; `filter` ile slug'ı null olanlar elenir, `flatMap` ile dil çiftleri genişletilir
-  - `e` — `try/catch` bloğundaki yakalanan hata nesnesi, `console.warn` ile loglanır
-- **Dönüş**: `{ lang: string, slug: string }[]` — statik olarak oluşturulacak rotaların listesi; hata durumunda boş dizi `[]`
+  - `products` — Supabase products tablosundan aktif ve slug'ı dolu tüm ürünleri getiren sorgunun sonucu
+  - `paths` — products dizisini filtreleyerek her slug için 'tr' ve 'en' dilleriyle oluşturulan statik parametre yolları dizisi
+- **Dönüş**: `{ lang: string, slug: string }[]` veya boş dizi
 
----
-
-### [N2_NASIL] AST Pointer: `src/app/[lang]/products/[slug]/page.tsx`::generateMetadata
-- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — Promise olarak gelen dinamik rota parametreleri
+### [N2_NASIL] AST Pointer: src/app/[lang]/products/[slug]/page.tsx::generateMetadata
+- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — Next.js 15+ formatında parametreler
 - **ic_degiskenler**:
-  - `slug` — `await params` ile çözümlenen ürün slug değeri, URL'den gelen benzersiz ürün tanımlayıcısı
-  - `product` — `getCachedProductBySlug(slug)` ile önbellekten getirilen ürün verisi (`Product` tipi); `preloadProduct(slug)` ile preload tetiklenir
-  - `canonicalPath` — `product.slug` değerinden elde edilen kanonik URL yolu, SEO canonical linki için kullanılır
-  - `e` — `try/catch` bloğundaki yakalanan hata nesnesi
-- **Dönüş**: `Metadata` nesnesi — `title`, `description`, `alternates.canonical`, ve `openGraph` alanlarını içerir; ürün bulunamazsa (`product` falsy veya `product.slug` yoksa) `try` bloğu içinde dönüş yapılmaz, fonksiyon sonunda varsayılan fallback metadata döner
+  - `slug` — params promise'inden çözülen ürün slug değeri
+  - `product` — getCachedProductBySlug ile slug'a karşılık gelen ürün verisi
+  - `canonicalPath` — product.slug değerinden oluşan kanonik URL yolu
+- **Dönüş**: Metadata objesi (title, description, alternates, openGraph) veya varsayılan metadata
 
----
-
-### [N3_NASIL] AST Pointer: `src/app/[lang]/products/[slug]/page.tsx`::Page
-- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — Promise olarak gelen dinamik rota parametreleri
+### [N3_NASIL] AST Pointer: src/app/[lang]/products/[slug]/page.tsx::Page
+- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — Next.js 15+ formatında parametreler
 - **ic_degiskenler**:
-  - `slug` — `await params` ile çözümlenen ürün slug değeri, veri getirme ve JSON-LD oluşturma için kullanılır
-  - `productData` — `getCachedProductBySlug(slug)` ile getirilen ürün verisi; `Product | null` tipinde; `slug !== 'generic'` koşulu sağlanmazsa `null` kalır; `PageComponent`'e `initialProduct` prop olarak geçirilir
-  - `err` — `try/catch` bloğundaki yakalanan hata, `unknown` tipinde
-  - `errorMsg` — `err`'ın string karşılığı; `Error` instance ise `err.message`, değilse `String(err)` kullanılır; `'fetch failed'` içeriği kontrol edilerek Supabase env eksikliği durumu ayrıştırılır
-  - `canonicalPath` — `productData?.slug` değerinin fallback'idir; ürün slug'ı mevcutsa onu, değilse `'generic'` döner; JSON-LD `productID`, `url` ve `Brand` alanlarında kullanılır
-  - `jsonLd` — Schema.org uyumlu `Product` tipinde JSON-LD objesi; `@context`, `@type`, `productID`, `name`, `description`, `url`, `image`, `brand` ve `offers` alanlarını içerir; `productData` alanlarından spread operatörü ile koşullu olarak doldurulur; `stock_qty > 0` kontrolü ile `availability` belirlenir
-- **Dönüş**: JSX — `<script type="application/ld+json">` ile JSON-LD yerleştirilir (`dangerouslySetInnerHTML` ile, `<` ve `>` karakterleri escape edilmiş); ardından `<PageComponent initialProduct={productData} />` render edilir
+  - `slug` — params promise'inden çözülen ürün slug değeri
+  - `productData` — Başlangıçta null, ardından getCachedProductBySlug ile yüklenen ürün verisi
+  - `canonicalPath` — productData?.slug veya 'generic' fallback değeri
+  - `jsonLd` — Schema.org uyumlu JSON-LD yapılandırılmış veri objesi
+- **Dönüş**: JSX (script tag ve PageComponent)
 
 ---
 

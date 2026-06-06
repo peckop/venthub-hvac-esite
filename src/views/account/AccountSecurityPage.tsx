@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import type { UserIdentity } from '@supabase/supabase-js'
 import { toast } from 'sonner'
 import { useAuth } from '../../hooks/useAuth'

@@ -1,16 +1,8 @@
 'use client'
 
 import React, { createContext,  useEffect, useState, useMemo, useCallback } from 'react'
-import { 
-  listUserProjects, 
-  createProject, 
-  deleteProject, 
-  addProductToProject, 
-  removeProductFromProject, 
-  listProjectItems,
-  UserProject,
-  ProjectItem
-} from '../lib/supabase'
+import { listUserProjects, createProject, deleteProject, addProductToProject, removeProductFromProject, listProjectItems } from '@/lib/services/project.service'
+import type { UserProject, ProjectItem } from '@/types/ui-models'
 import { useAuth } from '../hooks/useAuth'
 import { toast } from 'sonner'
 

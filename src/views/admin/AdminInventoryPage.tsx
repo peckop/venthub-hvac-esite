@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useI18n } from '../../i18n/I18nProvider';
-import { supabase } from '../../lib/supabase';
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { 
   Package, 
   Search, 

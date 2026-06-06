@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Plus, FolderPlus, ChevronRight, Loader2 } from 'lucide-react'
 import { useProjectLists } from '../../hooks/useProjectLists'
-import type { Product } from '../../lib/supabase'
+import type { Product } from '@/types/ui-models'
 
 interface AddToProjectModalProps {
   product: Product

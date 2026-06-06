@@ -1,5 +1,5 @@
 import { safeNumber } from '../../utils/type-converters'
-import { UserAddress } from '../../lib/supabase'
+import type { UserAddress } from '@/types/ui-models'
 
 export interface CartItemInput {
   id: string

@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useI18n } from '../i18n/I18nProvider'
-import { supabase } from '../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { Routes } from '../utils/routes'
 
 const LoginPage: React.FC = () => {

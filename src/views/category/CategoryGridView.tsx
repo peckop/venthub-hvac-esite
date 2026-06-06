@@ -6,7 +6,7 @@ import ProductCard from '../../components/ProductCard'
 import CategoryFiltersComponent from '../../components/category/CategoryFilters'
 import { useI18n } from '../../i18n/I18nProvider'
 import PageShell from '../../components/layout/PageShell'
-import type { Product } from '../../lib/supabase'
+import type { Product } from '@/types/ui-models'
 import type { DomainCategory } from '../../lib/type-converters'
 import type { CategoryFilters } from '../../hooks/useCategoryGateway'
 

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { toast } from 'sonner'
-import type { Product } from '../lib/supabase'
+import type { Product } from '@/types/ui-models'
 import AddToCartToastContent from './AddToCartToastContent'
 
 const EVENT = 'vh_cart_item_added'

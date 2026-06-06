@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { InvoiceProfile } from '../../lib/supabase'
+import type { InvoiceProfile } from '@/types/ui-models'
 import { X, User, Building2, Landmark, CheckCircle } from 'lucide-react'
 import { useI18n } from '@/i18n/I18nProvider'
 

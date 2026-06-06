@@ -2,7 +2,7 @@
 'use client'
 
 import React from 'react'
-import type { Product } from '../lib/supabase'
+import type { Product } from '@/types/ui-models'
 import { BrandIcon } from './HVACIcons'
 import Link from 'next/link'
 import VentImage from './ui/VentImage'

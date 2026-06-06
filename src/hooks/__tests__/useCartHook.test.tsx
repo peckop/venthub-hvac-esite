@@ -2,7 +2,8 @@ import React from 'react'
 import { renderHook } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { useCart } from '../useCartHook'
-import { CartContext, type CartContextType, type CartItem } from '../../contexts/CartContext'
+import { CartContext, type CartContextType } from '../../contexts/CartContext'
+import type { CartItem } from '@/types/cart'
 import type { DomainProduct as Product } from '../../types/ui-models'
 
 describe('useCart hook', () => {

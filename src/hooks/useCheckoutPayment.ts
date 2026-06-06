@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { supabase } from '../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { validateServerCart } from '../lib/order'
 import { getPriceHashLocal, getPriceHashServer } from '../utils/checkoutHelpers'
-import { CartItem } from '../contexts/CartContext'
+import type { CartItem } from '@/types/cart'
 import type { User } from '@supabase/supabase-js'
 
 import { 

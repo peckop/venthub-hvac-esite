@@ -6,7 +6,7 @@ export interface HVACBrand {
   founded?: number
   headquarters?: string
   website?: string
-  specialty: string
+  specialty?: string
   logo?: string
 }
 
@@ -60,8 +60,12 @@ export const HVAC_BRANDS: HVACBrand[] = [
     headquarters: 'İstanbul',
     website: 'https://www.flexiva.com.tr',
     specialty: 'Esnek Hava Kanalları'
+  },
+  {
+    name: 'Frekans Konvertörü',
+    slug: 'frekans-konvertoru',
+    description: 'Yüksek verimli hız kontrolü',
+    country: 'DK',
+    specialty: 'Hız Kontrol Cihazları'
   }
 ]
-
-
-

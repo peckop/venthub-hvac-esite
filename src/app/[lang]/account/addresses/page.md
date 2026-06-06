@@ -3,26 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\addresses\page.tsx
-skeleton_hash: 257d63d68f82e19b
+skeleton_hash: 09aed64513c67e34
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-28T22:34:48Z
+generated_at: 2026-06-06T19:22:50Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcının hesabındaki adresleri yönetmesine olanak tanıyan, dile duyarlı bir sayfanın ana bileşenini barındırır. Tek bir `Page` fonksiyonu, adres listeleme, düzenleme ve yeni adres ekleme gibi işlemleri yürüten arayüzü oluşturur.
+Bu modül, kullanıcının hesabındaki adresleri yönetmesine olanak tanıyan Next.js sayfa giriş noktasıdır. Tek bir `Page` fonksiyonu ile dinamik olarak yüklenen `AccountAddressesPage` bileşenini render ederek dil duyarlı adres yönetim arayüzünü sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni
-Bu grup, adres yönetim sayfasının görsel çıktısını üretmek ve ilgili UI parçalarını birleştirmekten sorumludur.  
+### Sayfa Giriş Noktası
+Modülün tek bileşeni olan `Page`, adres yönetim sayfasının içerik bölümünü dinamik import yoluyla yükler ve sayfayı kullanıcıya sunar.
 - Page
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
 
 ---
 
@@ -42,22 +41,25 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../../views/account/AccountAddressesPage'), {
-  ...`
+- **PageComponent** (call) — `nextDynamic(() => import('../../../../views/account/AccountAddressesPage'), {...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/[lang]/account/addresses/page.tsx`::anonymous function
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX (loading spinner container with `animate-spin` elementi)
+### [N1_NASIL] AST Pointer: [lang]/account/addresses/page.tsx::anonim_arrow_function
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  (değişken yok — doğrudan JSX döndürür)
+- **Dönüş**: JSX — `min-h-screen` flex container içinde `animate-spin` sınıfına sahip dönen spinner div'i; loading durumu için kullanıluyor (nextDynamic loading bileşeni olarak)
 
-### [N2_NASIL] AST Pointer: `src/app/[lang]/account/addresses/page.tsx`::Page
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX (`<PageComponent />`)
+---
+
+### [N2_NASIL] AST Pointer: [lang]/account/addresses/page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  (değişken yok — doğrudan JSX döndürür)
+- **Dönüş**: JSX — `<PageComponent />` bileşeninin render edilmesi; `PageComponent`, `next/dynamic` ile import edilmiş olan dinamik adres sayfası bileşenidir
 
 ---
 

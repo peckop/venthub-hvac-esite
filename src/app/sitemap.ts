@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
-import { getCategories, getAllProducts } from '../lib/supabase'
-import { HVAC_BRANDS } from '../lib/brands'
+import { getCategories } from '../lib/services/category.service'
+import { getAllProducts } from '../lib/services/product.service'
+import { HVAC_BRANDS } from '../data/brands'
 import { SITE_URL } from '../config/siteUrl'
 import { Routes } from '../utils/routes'
 

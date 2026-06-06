@@ -1,5 +1,30 @@
 # Changelog
 
+### [2026-06-06] VentHub Supabase Client Architecture & Realtime Security Upgrade
+
+**Özet:** Veri yalıtımı ve güvenliğini en üst düzeye çıkarmak amacıyla Supabase istemci mimarisi parçalanmış, ara katman yetkilendirmesi claims tabanlı yapıya yükseltilmiş, çıkış işlemleri API rotasına taşınmış ve realtime WebSocket kanalları veritabanı RLS seviyesinde kiracı bazlı izole edilmiştir.
+
+**Değişiklik Kapsamı:**
+- **Supabase İstemci Fabrikaları (Milestone 1):**
+  - Eski `src/lib/supabase.ts` singleton yapısı kaldırılarak; `src/lib/supabase/client.ts` (Browser), `src/lib/supabase/server.ts` (Request-bound Server) ve `src/lib/supabase/static.ts` (Static SSG) olarak üç ayrı fabrika fonksiyonuna/istemcisine bölünmüştür.
+  - Servislerin toplu export yapısı (`export *`) kaldırılarak tüm bileşen ve servislerde doğrudan ithalat modeline geçilmiştir.
+- **Middleware & Güvenlik Sıkılaştırması (Milestone 2):**
+  - `src/middleware.ts` içindeki auth guard, `getSession()` ve manuel JWT decode işlemlerinden arındırılarak güvenli `supabase.auth.getClaims()` API'sine geçirilmiştir.
+  - Middleware yönlendirmelerinde (redirect) `createServerClient` tarafından set edilen çerezlerin ve HTTP başlıklarının tarayıcıya kayıpsız iletilmesini sağlayan çerez/başlık replikasyon mantığı (`redirectResponse`) kurulmuştur.
+- **Güvenli Çıkış Rota Yönlendiricisi (Milestone 2):**
+  - `src/app/auth/signout/route.ts` rotası POST metodu ile çağrılacak şekilde oluşturulmuş, aktif claims varlığında `signOut()` çağırarak oturumu sonlandırması ve Next.js düzen cache'ini (`revalidatePath`) temizlemesi sağlanmıştır.
+- **Realtime Kanal ve RLS İzolasyonu (Milestone 3):**
+  - Gerçek zamanlı WebSocket stok ve bildirim mesajlarının kiracılar arasında sızmasını önlemek amacıyla `realtime.messages` tablosuna Row Level Security (RLS) uygulanmıştır.
+  - `supabase/migrations/20260606180000_realtime_messages_rls.sql` migration'ı ile kiracının JWT'deki tenant ID'sinin kanal topic'i ile eşleşmesini zorunlu kılan `realtime_messages_select_policy` ve `realtime_messages_insert_policy` RLS kuralları eklenmiştir.
+- **Codebase İthalat Güncellemeleri ve Entegrasyon (Milestone 4):**
+  - Platform genelindeki 70+ dosyada eski `src/lib/supabase` referansları ve servis bağımlılıkları yeni bağımlılık yapısına uygun olarak refaktör edilmiştir.
+- **Milestone 5 Doğrulama ve Raporlama:**
+  - Tüm kod tabanında type-check, lint ve build süreçleri çalıştırılarak sıfır hata ile derleme doğrulanmıştır.
+
+**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ | `pnpm run build` ✅ | `git diff CONTEXT.md` (Değişiklik yok) ✅
+
+---
+
 ### [2026-05-30] VentHub SaaS Transformation Phase 1 — Foundation & Master Docs Compilation
 **Özet:** VentHub HVAC platformunun çoklu kiracılı (multi-tenant) SaaS mimarisine geçişinin 1. Fazı (Foundation) tamamen uygulanmış, test edilmiş, veritabanı şeması ve Edge fonksiyonları master belgeleri derlenerek NotebookLM kütüphaneleriyle eksiksiz olarak senkronize edilmiştir.
 **Değişiklik Kapsamı:**

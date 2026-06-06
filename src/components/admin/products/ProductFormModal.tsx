@@ -7,7 +7,7 @@ import { X, Loader2, Save } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { supabase } from '../../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import type { DbCategory, DbProductInsert, DbProductUpdate, DbJson } from '../../../types/db-rows'
 import { toast } from 'sonner'
 

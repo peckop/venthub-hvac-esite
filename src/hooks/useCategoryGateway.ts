@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { Product, getProductsEnriched } from '../lib/supabase'
+import type { Product } from '@/types/ui-models'
+import { getProductsEnriched } from '@/lib/services/product.service'
 import { DomainCategory } from '../lib/type-converters'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { useIsMounted } from './useIsMounted'

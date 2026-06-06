@@ -3,7 +3,7 @@
 import React from 'react'
 import { MapPin } from 'lucide-react'
 import Link from 'next/link'
-import { UserAddress } from '../../lib/supabase'
+import type { UserAddress } from '@/types/ui-models'
 import { Routes } from '../../utils/routes'
 
 import { CheckoutAddressInfo, CheckoutInvoiceInfo, CheckoutLegalConsents } from '../../types/db-rows'

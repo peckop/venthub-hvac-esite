@@ -3,7 +3,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import type { FtsProductResult, SearchSuggestion } from '../lib/supabase'
+import type { FtsProductResult, SearchSuggestion } from '@/types/ui-models'
 import { useI18n } from '../i18n/I18nProvider'
 import { highlightMatch } from '../utils/searchHighlight'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
@@ -89,7 +89,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
 
       try {
         setLoading(true)
-        const { getSearchSuggestions } = await import('../lib/supabase')
+        const { getSearchSuggestions } = await import('../lib/services/product.service')
         const items = await getSearchSuggestions(debounced, 6)
 
         if (active) {
@@ -141,7 +141,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     setActiveIndex(-1)
 
     try {
-      const { ftsSearchProducts } = await import('../lib/supabase')
+      const { ftsSearchProducts } = await import('../lib/services/product.service')
       const rows = await ftsSearchProducts(term, 20)
       setResults(rows)
     } catch {

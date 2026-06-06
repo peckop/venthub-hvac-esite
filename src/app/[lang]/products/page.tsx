@@ -1,7 +1,7 @@
 import React from 'react'
 import CategoryMasterView from '../../../views/CategoryMasterView'
 
-import { getProductsEnriched } from '../../../lib/supabase'
+import { getProductsEnriched } from '@/lib/services/product.service'
 import type { DomainProduct } from '../../../lib/type-converters'
 
 

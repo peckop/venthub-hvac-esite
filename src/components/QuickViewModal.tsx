@@ -1,5 +1,5 @@
 import React from 'react'
-import { Product } from '../lib/supabase'
+import type { Product } from '@/types/ui-models'
 import { X, ShoppingCart, Eye } from 'lucide-react'
 import { useCart } from '../hooks/useCartHook'
 import Link from 'next/link'

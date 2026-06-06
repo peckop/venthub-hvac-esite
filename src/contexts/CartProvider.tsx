@@ -1,5 +1,5 @@
 import React, { useEffect, useState, ReactNode, useRef, useMemo, useCallback } from 'react'
-import type { Product } from '../lib/supabase'
+import type { Product } from '@/types/ui-models'
 import { useAuth } from '../hooks/useAuth'
 
 const CART_SERVER_SYNC = (process.env.NEXT_PUBLIC_CART_SERVER_SYNC ?? 'true') === 'true'
@@ -12,7 +12,8 @@ const CART_OWNER_KEY = 'venthub-cart-owner'
 const CART_SCHEMA_KEY = 'venthub-cart-schema'
 const CURRENT_CART_SCHEMA = '2'
 
-import { CartContext, CartItem } from '../contexts/CartContext'
+import { CartContext } from '../contexts/CartContext'
+import type { CartItem } from '@/types/cart'
 
 
 
@@ -122,7 +123,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       mergingRef.current = true
       setSyncing(true)
       try {
-        const { getOrCreateShoppingCart, listCartItemsWithProducts, clearCartItems: clearDbCartItems, getEffectivePriceInfo, upsertCartItem, supabase } = await import('../lib/supabase')
+        const { getOrCreateShoppingCart, listCartItemsWithProducts, clearCartItems: clearDbCartItems, upsertCartItem } = await import('../lib/services/cart.service')
+        const { getEffectivePriceInfo } = await import('../lib/services/pricing.service')
+        const { supabaseBrowserClient: supabase } = await import('../lib/supabase/client')
         const cart = await getOrCreateShoppingCart(user.id)
         if (cancelled) return
         setServerCartId(cart.id)
@@ -283,7 +286,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // If logged in, also sync to server (optimistic)
     if (CART_SERVER_SYNC && user && serverCartId) {
       // compute effective price and upsert optimistically, also reflect locally
-      import('../lib/supabase').then(({ getEffectivePriceInfo, upsertCartItem }) => {
+      Promise.all([
+        import('../lib/services/pricing.service'),
+        import('../lib/services/cart.service')
+      ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }]) => {
         getEffectivePriceInfo(product)
           .then(info => {
             upsertCartItem({ cartId: serverCartId, _productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
@@ -315,7 +321,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
 
     if (CART_SERVER_SYNC && user && serverCartId) {
-      import('../lib/supabase').then(({ removeCartItem }) => {
+      import('../lib/services/cart.service').then(({ removeCartItem }) => {
         return removeCartItem(serverCartId, _productId)
       }).catch(err => console.error('server removeFromCart error', err))
     }
@@ -338,7 +344,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (CART_SERVER_SYNC && user && serverCartId) {
       const product = items.find(i => i.product.id === _productId)?.product
       if (product) {
-        import('../lib/supabase').then(({ getEffectivePriceInfo, upsertCartItem }) => {
+        Promise.all([
+          import('../lib/services/pricing.service'),
+          import('../lib/services/cart.service')
+        ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }]) => {
           getEffectivePriceInfo(product)
             .then(info => {
               upsertCartItem({ cartId: serverCartId, _productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
@@ -378,7 +387,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     if (CART_SERVER_SYNC && user && serverCartId) {
-      import('../lib/supabase').then(({ clearCartItems }) => {
+      import('../lib/services/cart.service').then(({ clearCartItems }) => {
         return clearCartItems(serverCartId)
       }).catch(err => console.error('server clearCart error', err))
     }
@@ -435,7 +444,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Sunucuya da yalnızca değişenleri yansıt (varsa)
     if (changedIds.size > 0 && CART_SERVER_SYNC && user && serverCartId) {
       try {
-        import('../lib/supabase').then(({ upsertCartItem }) => {
+        import('../lib/services/cart.service').then(({ upsertCartItem }) => {
           const tasks: Promise<unknown>[] = []
           for (let i = 0; i < items.length; i++) {
             const it = items[i]

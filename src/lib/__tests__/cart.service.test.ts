@@ -2,24 +2,89 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { getOrCreateShoppingCart, listCartItems, upsertCartItem, removeCartItem, clearCartItems } from '../services/cart.service'
 import { supabase } from '../supabase'
 
-vi.mock('../supabase', () => ({
-  supabase: {
-    auth: {
-      getUser: vi.fn(),
-    },
-    from: vi.fn(() => ({
-      select: vi.fn().mockReturnThis(),
-      insert: vi.fn().mockReturnThis(),
-      update: vi.fn().mockReturnThis(),
-      delete: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      in: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      single: vi.fn().mockReturnThis(),
-      maybeSingle: vi.fn().mockReturnThis()
-    }))
+vi.mock('../supabase', () => {
+  const getMock = () => {
+    const globalObj = globalThis as Record<string, unknown>
+    if (!globalObj.__mockSupabase) {
+      globalObj.__mockSupabase = {
+        auth: {
+          getUser: vi.fn(),
+        },
+        from: vi.fn(() => ({
+          select: vi.fn().mockReturnThis(),
+          insert: vi.fn().mockReturnThis(),
+          update: vi.fn().mockReturnThis(),
+          delete: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          in: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockReturnThis(),
+          single: vi.fn().mockReturnThis(),
+          maybeSingle: vi.fn().mockReturnThis()
+        }))
+      }
+    }
+    return globalObj.__mockSupabase
   }
-}))
+  return {
+    supabase: getMock()
+  }
+})
+
+vi.mock('../supabase/client', () => {
+  const getMock = () => {
+    const globalObj = globalThis as Record<string, unknown>
+    if (!globalObj.__mockSupabase) {
+      globalObj.__mockSupabase = {
+        auth: {
+          getUser: vi.fn(),
+        },
+        from: vi.fn(() => ({
+          select: vi.fn().mockReturnThis(),
+          insert: vi.fn().mockReturnThis(),
+          update: vi.fn().mockReturnThis(),
+          delete: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          in: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockReturnThis(),
+          single: vi.fn().mockReturnThis(),
+          maybeSingle: vi.fn().mockReturnThis()
+        }))
+      }
+    }
+    return globalObj.__mockSupabase
+  }
+  return {
+    supabaseBrowserClient: getMock()
+  }
+})
+
+vi.mock('../supabase/static', () => {
+  const getMock = () => {
+    const globalObj = globalThis as Record<string, unknown>
+    if (!globalObj.__mockSupabase) {
+      globalObj.__mockSupabase = {
+        auth: {
+          getUser: vi.fn(),
+        },
+        from: vi.fn(() => ({
+          select: vi.fn().mockReturnThis(),
+          insert: vi.fn().mockReturnThis(),
+          update: vi.fn().mockReturnThis(),
+          delete: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          in: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockReturnThis(),
+          single: vi.fn().mockReturnThis(),
+          maybeSingle: vi.fn().mockReturnThis()
+        }))
+      }
+    }
+    return globalObj.__mockSupabase
+  }
+  return {
+    supabaseStaticClient: getMock()
+  }
+})
 
 vi.mock('../type-converters', () => ({
   mapDatabaseProductToDomain: vi.fn((p) => p)

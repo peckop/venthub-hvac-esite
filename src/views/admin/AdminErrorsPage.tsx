@@ -2,7 +2,7 @@
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import { useTenant } from '../../hooks/useTenant'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { 
   adminSectionTitleClass, 
   adminCardClass, 
@@ -115,7 +115,7 @@ const AdminErrorsPage: React.FC = () => {
 
   React.useEffect(() => {
     const ch = supabase
-      .channel(`client-errors-${tenantId}`)
+      .channel(`client-errors-${tenantId}`, { config: { private: true } })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'client_errors' }, () => {
         scheduleRefetch()
       })

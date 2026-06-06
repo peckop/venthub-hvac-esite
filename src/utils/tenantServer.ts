@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { supabase } from '../lib/supabase';
+import { supabaseStaticClient as supabase } from '@/lib/supabase/static';
 
 export interface TenantConfig {
   id: string;

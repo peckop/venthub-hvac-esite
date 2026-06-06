@@ -1,8 +1,10 @@
 'use client'
 
-import dynamic from 'next/dynamic'
+import nextDynamic from 'next/dynamic'
 
-const AdminAuditLogsPage = dynamic(
+export const dynamic = 'force-dynamic'
+
+const AdminAuditLogsPage = nextDynamic(
   () => import('../../../views/admin/AdminAuditLogPage'),
   { ssr: false, loading: () => <div className="p-8 text-center text-slate-400 animate-pulse">Yükleniyor...</div> }
 )
@@ -10,6 +12,7 @@ const AdminAuditLogsPage = dynamic(
 export default function Page() {
   return <AdminAuditLogsPage />
 }
+
 
 
 

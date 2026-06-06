@@ -20,7 +20,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LayoutGrid, List } from 'lucide-react'
 import { useI18n } from '../i18n/I18nProvider'
-import type { Product } from '../lib/supabase'
+import type { Product } from '@/types/ui-models'
 import type { DomainCategory } from '../lib/type-converters'
 import ProductCard from '../components/ProductCard'
 

@@ -3,7 +3,7 @@
 import React from 'react'
 import { ShieldCheck, Zap, Volume2, Activity, Cpu } from 'lucide-react'
 import { generateEngineeringSummary, EngineeringInference } from '../../utils/engineeringIntelligence'
-import { Product } from '../../lib/supabase'
+import type { Product } from '@/types/ui-models'
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface ProductSmartInferenceProps {

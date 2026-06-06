@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { ShoppingBag, Box, Bell, X, Check, Activity, Clock } from 'lucide-react'
 import { formatDateTime } from '../../i18n/datetime'
@@ -104,10 +104,10 @@ const AdminRealtimeNotifications: React.FC = () => {
     useEffect(() => {
         // 1. Sipariş Kanalı
         const ordersChannel = supabase
-            .channel(`admin-orders-realtime-${tenantId}`)
+            .channel(`admin-orders-realtime-${tenantId}`, { config: { private: true } })
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'venthub_orders' },
+                { event: 'INSERT', schema: 'public', table: 'venthub_orders', filter: 'tenant_id=eq.' + tenantId },
                 (payload) => {
                     const newOrder = payload.new as Record<string, unknown>
                     const totalAmt = Number(newOrder.total_amount || 0)
@@ -165,10 +165,10 @@ const AdminRealtimeNotifications: React.FC = () => {
 
         // 2. Stok Hareketi Kanalı
         const stockChannel = supabase
-            .channel(`admin-stock-realtime-${tenantId}`)
+            .channel(`admin-stock-realtime-${tenantId}`, { config: { private: true } })
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'inventory_movements' },
+                { event: 'INSERT', schema: 'public', table: 'inventory_movements', filter: 'tenant_id=eq.' + tenantId },
                 (payload) => {
                     const m = payload.new as Record<string, unknown>
                     const delta = Number(m.delta || 0)

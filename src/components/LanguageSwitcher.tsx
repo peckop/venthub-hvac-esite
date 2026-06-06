@@ -18,7 +18,9 @@ const LanguageSwitcher: React.FC = () => {
 
     // Local storage güncelle (I18nProvider fallback için)
     try {
-      localStorage.setItem('lang', newLang)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('lang', newLang)
+      }
     } catch {}
 
     // İstemci tarafı state'ini anında güncelle (Buton ve client çevirileri için)

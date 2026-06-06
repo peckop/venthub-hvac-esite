@@ -13,24 +13,29 @@ import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
-// Mock toast (default export function with .error/.success methods)
-vi.mock('react-hot-toast', () => {
-  const toastFn = Object.assign(vi.fn(), {
+// Mock sonner
+vi.mock('sonner', () => ({
+  toast: {
     error: vi.fn(),
     success: vi.fn()
-  })
-  return { default: toastFn }
-})
+  }
+}))
 
-// Mock supabase auth API used by AccountSecurityPage
-vi.mock('../../../lib/supabase', () => ({
-  supabase: {
+// Mock supabase client used by AccountSecurityPage
+vi.mock('@/lib/supabase/client', () => {
+  const mockClient = {
     auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
       signInWithPassword: vi.fn(),
       updateUser: vi.fn(),
-    },
-  },
-}))
+      unlinkIdentity: vi.fn(),
+      linkIdentity: vi.fn()
+    }
+  }
+  return {
+    supabaseBrowserClient: mockClient
+  }
+})
 
 // Mock HIBP checker to avoid external network and allow updates in tests
 vi.mock('../../../utils/passwordSecurity', () => ({
@@ -41,7 +46,7 @@ vi.mock('../../../utils/passwordSecurity', () => ({
 import { AuthContext } from '../../../contexts/AuthContextDefinition'
 import { I18nProvider } from '../../../i18n/I18nProvider'
 import AccountSecurityPage from '../AccountSecurityPage'
-import { supabase } from '../../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
 function renderWithProviders(ui: React.ReactElement, { userEmail = 'u@example.com' } = {}) {
@@ -101,7 +106,7 @@ describe('AccountSecurityPage', () => {
     await userEvent.type(confirmInput, '12345')
     await userEvent.click(saveBtn)
 
-    expect(toast.error).toHaveBeenCalledWith('account.security.rulesNotMet')
+    expect(toast.error).toHaveBeenCalledWith('Your password must meet all security rules')
     expect(supabase.auth.signInWithPassword).not.toHaveBeenCalled()
   })
 

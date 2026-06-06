@@ -12,7 +12,7 @@ import {
   Eye,
   PanelRight,
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { AuthorityBuilder } from '@/components/admin/authority-builder/AuthorityBuilder';
 import { AuthorityRenderer } from '@/components/authority/AuthorityRenderer';
 import { AuthorityBlock, SpecsBlock } from '@/types/authority';

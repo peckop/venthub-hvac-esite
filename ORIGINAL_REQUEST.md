@@ -773,3 +773,209 @@ Bu projedeki tüm veritabanı değişikliklerinden ÖNCE aşağıdaki skill dosy
 2. **Doğrulama**: Her DDL değişikliğinden sonra `get_advisors` (MCP) veya `supabase db advisors` (CLI) çalıştırarak yeni uyarı oluşmadığını kontrol edin
 3. **Commit**: Değişiklikler doğrulandığında `supabase migration new <descriptive-name>` ile temiz migration dosyası oluşturun
 4. **Son kontrol**: `supabase migration list --local` ile migration'ın doğru kaydedildiğini teyit edin
+
+## Follow-up — 2026-06-06T17:31:48Z
+
+# Teamwork Project Prompt — Final
+
+> Status: Launched
+> Tier: 🏢 Enterprise
+
+VentHub HVAC projesinin Supabase istemci altyapısını enterprise seviyeye yükseltmek. GAP analizinde tespit edilen 11 mimari ve güvenlik açığını kapatarak, mevcut fonksiyonaliteyi bozmadan projeyi Supabase resmi SSR standartlarına taşımak. Bu bir yama değil — mimari seviye yükseltmedir.
+
+Working directory: c:\Users\alize\venthub-hvac
+Integrity mode: development
+Project tier: enterprise
+
+## PROJECT DNA
+
+- Project: VentHub HVAC — HVAC E-Commerce & Engineering SaaS Platform
+- Stack: TypeScript 5.7 — Next.js 15 (App Router), React 19, Supabase (DB + Auth + Realtime + Edge Functions + Storage), TailwindCSS 4, React Three Fiber, Framer Motion, Recharts, Vitest
+- Package Manager: pnpm
+- Deployment: Vercel (frontend) + Supabase (backend, PostgreSQL, Deno Edge Functions)
+- Database: 28 tables, 132 RLS policies, 55 RPC functions, 47 indexes, 173 migrations
+- SaaS Phase: Faz 1 (Foundation) COMPLETE — Faz 2 (White-Label) PLANNED
+- Multi-Tenant: Shared DB + RLS strategy, jwt_tenant_id() RPC, tenant_id isolation
+- Test baseline: 401 tests passing / 9 pre-existing failures / 2 skipped (63 test files)
+- Test command: `pnpm run test -- --run`
+- External integrations: İyzico (3D Secure payments), Resend (email), Twilio (WhatsApp/SMS), Sentry (error tracking)
+
+## QUALITY CONTRACT — ENTERPRISE GRADE
+
+### Test & Doğrulama
+- Her yeni public fonksiyon/metot için unit test zorunludur
+- Mevcut 401 test baseline hiçbir koşulda düşürülemez
+- `pnpm run type-check`, `pnpm run lint`, `pnpm run build` hatasız geçmelidir
+
+### Tip Güvenliği
+- TypeScript strict mode, `any` kullanımı YASAK
+- Tüm yeni fonksiyonlar tam tip anotasyonlu olmalıdır
+
+### Dokümantasyon
+- Yeni public API fonksiyonları için JSDoc zorunlu
+- Karmaşık mantık inline comment içermeli
+
+## CRITICAL RULES — DO NOT VIOLATE
+
+### Dokunulmaz Dosyalar
+- `.next/`, `node_modules/`, `.env`, `.env.local`, `.env.production`
+- `.agent/` — AI ajan konfigürasyonu
+- `supabase/migrations/` — Mevcut migration'lar değiştirilemez (yeni eklenebilir)
+- `CONTEXT.md`, `project-dna.yaml`
+- `src/types/database.types.ts` — Supabase CLI ile otomatik üretilir
+- `src/lib/hvacCalculations.ts` — Saf metrik motor, tenant-agnostik, DOKUNULMAYACAK
+- `src/design-system/tokens.js` — Tasarım token SSOT, arbitrary Tailwind yasak
+
+### İhlal Edilemez Kurallar
+1. Mevcut 401 testın hiçbiri kırılmamalı
+2. Yeni public fonksiyon = yeni unit test zorunlu
+3. TypeScript strict mode, `any` YASAK
+4. RLS izolasyonu ve tenant_id sızdırmazlığı asla ihlal edilmemeli
+5. i18n: Her yeni UI metni hem TR hem EN sözlüğe eklenmeli
+6. 3D: React Three Fiber ekosistemi dışında 3D kütüphane eklenmemeli
+7. İyzico 3D Secure ödeme akışı bozulmamalı
+8. Edge Functions Deno runtime uyumlu olmalı
+9. Multi-tenant: Tüm sorgular tenant_id bazlı filtrelenmeli, cross-tenant veri sızıntısı YASAK
+10. HVAC Motoru: hvacCalculations.ts saf metriktir, emperyal birim hardcoded YASAK
+11. Middleware'de Supabase Client ile DB sorgusu YASAK (Edge Runtime)
+12. 3D Canvas gölge haritalama türü 'percentage' olmalı
+13. RSC'de Supabase ORM sorguları React.cache() ile tekilleştirilmeli
+14. i18n çevirileri için ilişkisel tablo açmak YASAK — JSONB formatı zorunlu
+
+## ARAŞTIRMA REFERANSLARI
+
+Bu görev için önceden hazırlanmış 3 detaylı rapor mevcuttur. Ajanlar bu dosyaları mutlaka okumalıdır:
+
+1. **GAP Analizi Raporu** (563 satır): `C:\Users\alize\.gemini\antigravity\brain\856b6197-f611-4a2d-8f58-6707896950e2\scratch\gap_analysis_report.md`
+   — 8 katmanda 11 GAP, ön koşul bağımlılık zinciri, risk matrisi, 5 fazlı aksiyon planı
+
+2. **Mevcut Durum (AS-IS) Raporu** (276 satır): `C:\Users\alize\.gemini\antigravity\brain\856b6197-f611-4a2d-8f58-6707896950e2\scratch\as_is_state_report.md`
+   — middleware.ts, auth.ts, AuthContext, supabase.ts, generateStaticParams fiziksel analizi
+
+3. **Hedef Mimari (TO-BE) Raporu** (700+ satır): `C:\Users\alize\.gemini\antigravity\brain\856b6197-f611-4a2d-8f58-6707896950e2\scratch\to_be_target_report.md`
+   — Supabase resmi dokümantasyonundan getClaims, proxy katmanı, private channels, SSG/SSR best practices
+
+## MEVCUT ARAÇLAR
+
+Ajanlar aşağıdaki araçları kullanabilir:
+- **Supabase MCP** (`search_docs`) — Resmi Supabase dokümantasyonu sorguları
+- **NotebookLM** (Notebook ID: `235043eb-970f-4a52-9f39-1d02b2621e9c`) — VentHub proje hafızası (30 kaynak)
+- **Fallow** — Statik kod analizi (circular deps, unused files, complexity)
+- **Terminal** — `pnpm run type-check`, `pnpm run lint`, `pnpm run build`, `pnpm run test -- --run`
+
+## Requirements
+
+### R1. Supabase Client Fabrika Yapısı (GAP-04, GAP-08)
+
+Mevcut `src/lib/supabase.ts` tek-dosya singleton yapı 3 ayrı istemci fabrikasına ayrılmalıdır:
+
+- **Browser client** (`src/lib/supabase/client.ts`) — `createBrowserClient` ile singleton
+- **Server client** (`src/lib/supabase/server.ts`) — `createServerClient` ile per-request, `cookies()` API'si ile
+- **Static client** (`src/lib/supabase/static.ts`) — Çerezsiz `createClient` (generateStaticParams, sitemap)
+
+Ek olarak:
+- Tip tanımları (`Category`, `Product`, `CartItem` vb.) → `src/types/` altına taşınmalı
+- İş verisi (`HVAC_BRANDS`) → `src/data/brands.ts` altına taşınmalı
+- 7 servis modülünün `export *` re-export'ları → kaldırılmalı, her servis bağımsız import
+- 70+ tüketici dosyada import yolları güncellenmelidir
+
+### R2. Middleware Güvenlik Yükseltmesi (GAP-01, GAP-02, GAP-03)
+
+`src/middleware.ts` dosyasında:
+- `getSession()` (satır 180) → `getClaims()` ile değiştirilmeli
+- Manuel `decodeJwt()` fonksiyonu (satır 38-53) tamamen kaldırılmalı
+- `getClaims()` ile dönen claims objesi kullanılarak RBAC guard uygulanmalı
+- `setAll` callback'e ikinci argüman (`headers`) desteği eklenmeli (CDN cache koruması)
+- UUID→Slug dalındaki boş `setAll()` fonksiyonu (satır 127) düzeltilmeli
+
+### R3. Auth Akışı Yeniden Yapılandırma (GAP-05, GAP-05b, GAP-05c)
+
+- `src/actions/auth.ts` → modül seviyesi statik singleton yerine per-request server client
+- Login sonrası oturum çerezlerinin HTTP response'a yazılması sağlanmalı
+- Logout için `app/auth/signout/route.ts` route handler oluşturulmalı
+- OAuth callback mevcut ise sunucu tarafı route handler'a taşınmalı
+
+### R4. Realtime Kanal Güvenliği (GAP-07)
+
+- `AdminRealtimeNotifications.tsx` → kanallara `{ config: { private: true } }` eklenmeli
+- `postgres_changes` subscription'larına `filter: 'tenant_id=eq.${tenantId}'` eklenmeli
+- `realtime.messages` tablosu için RLS politikası Supabase migration dosyası oluşturulmalı
+
+### R5. SSG/SSR Sınır Netleştirme (GAP-06)
+
+- `generateStaticParams` kullanan 3 rota → yeni static client kullanmalı
+- Auth gereken sayfalara `export const dynamic = 'force-dynamic'` eklenmeli
+
+### R6. Enterprise Kalite Standardı
+
+Tüm yeni kod için:
+- Yeni public fonksiyonlar tam tip anotasyonlu olmalı
+- Yeni modüller için unit test zorunlu
+- Mevcut 401 test regresyona uğramamalı
+- Public API'ler için JSDoc zorunlu
+
+### R7. Dokümantasyon Güncellemesi
+
+Tüm geliştirme tamamlandıktan sonra, yapılan mimari değişiklikleri yansıtacak şekilde kök dizindeki ilgili markdown dosyaları güncellenmelidir:
+- `README.md` — Yeni client fabrika yapısı, auth akışı, proje yapısı değişiklikleri
+- `CHANGELOG.md` — Yapılan tüm değişikliklerin kronolojik kaydı
+- Kök dizindeki diğer ilgili `.md` dosyaları (varsa)
+
+**DİKKAT:** `CONTEXT.md` dosyasına DOKUNULMAMALIDIR — bu dosya NotebookLM tarafından yönetilir.
+
+### R8. Gelecek Geliştirme Önerileri (Kapsam Sınırlı)
+
+Tüm gereksinimler (R1-R7) tamamlandıktan sonra, ekip **yalnızca kendi çalıştığı alanda** tespit ettiği iyileştirme fırsatlarını sunmalıdır:
+- Dokunduğu dosyalarda gördüğü teknik borç veya iyileştirme fırsatları
+- Çözdüğü GAP'lerin doğal devamı olan sonraki adımlar
+- Refactoring sırasında keşfettiği performans veya güvenlik riskleri
+
+**KAPSAM SINIRI:** Dokunmadığı alanlarda (3D rendering, ödeme sistemi, HVAC hesaplamaları, i18n sözlükler, tasarım sistemi vb.) öneri YAPMAMALIDIR. Projenin mimari aksiyomlarını ve korunan dosyalarını bilmeden yapılan öneriler kabul edilemez.
+
+Bu rapor `RECOMMENDATIONS.md` olarak kök dizine yazılmalıdır.
+
+## Acceptance Criteria
+
+### Build & Type Safety
+- [ ] `pnpm run type-check` hatasız geçer
+- [ ] `pnpm run lint` hatasız geçer
+- [ ] `pnpm run build` başarıyla tamamlanır
+- [ ] Hiçbir yeni dosyada `any` tipi kullanılmamış olmalı
+
+### Security
+- [ ] `middleware.ts` dosyasında `getSession()` çağrısı kalmamış olmalı
+- [ ] `decodeJwt` fonksiyonu tamamen silinmiş olmalı
+- [ ] `getClaims()` middleware'de aktif kullanılıyor olmalı
+- [ ] Realtime kanallarında `private: true` config mevcut olmalı
+- [ ] Realtime subscription'larında tenant bazlı `filter` parametresi olmalı
+
+### Architecture
+- [ ] `src/lib/supabase.ts` artık servis re-export (`export *`) içermemeli
+- [ ] `src/lib/supabase/client.ts`, `server.ts`, `static.ts` dosyaları mevcut olmalı
+- [ ] `actions/auth.ts` per-request server client kullanıyor olmalı
+- [ ] Dairesel bağımlılık döngüsü kırılmış olmalı
+
+### Regression
+- [ ] `pnpm run test -- --run` çalıştırıldığında ≥ 401 test geçmeli
+- [ ] Login/logout akışı çalışır durumda olmalı
+
+### Documentation
+- [ ] `README.md` yeni mimari yapıyı yansıtacak şekilde güncellenmiş olmalı
+- [ ] `CHANGELOG.md` tüm değişiklikleri içermeli
+- [ ] `CONTEXT.md` dosyasına dokunulmuş olmamalı
+
+### Future Recommendations
+- [ ] `RECOMMENDATIONS.md` dosyası kök dizinde mevcut olmalı ve en az 5 somut öneri içermeli
+
+## Verification Protocol
+Tüm kabul kriterleri aşağıdaki sırayla doğrulanmalıdır:
+1. `pnpm run type-check`
+2. `pnpm run lint`
+3. `pnpm run build`
+4. `pnpm run test -- --run`
+5. `grep -r "getSession" src/middleware.ts` → sonuç boş olmalı
+6. `grep -r "decodeJwt" src/middleware.ts` → sonuç boş olmalı
+7. `grep -r "export \*" src/lib/supabase.ts` → sonuç boş olmalı
+8. Dosya varlık kontrolü: `src/lib/supabase/client.ts`, `server.ts`, `static.ts`
+9. `CONTEXT.md` değişmemiş olmalı (git diff ile doğrula)
+10. `RECOMMENDATIONS.md` mevcut ve en az 5 öneri içermeli

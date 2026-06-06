@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useI18n } from '../../i18n/I18nProvider'
 import StatCard from '../../components/admin/dashboard/StatCard'

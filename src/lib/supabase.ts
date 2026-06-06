@@ -1,146 +1,17 @@
-/// <reference types="node" />
-import { createClient } from '@supabase/supabase-js'
-import { createBrowserClient } from '@supabase/ssr'
-import type { Database, Json } from '../types/database.types'
-import type { DomainCategory, DomainProduct } from '../types/ui-models'
+/**
+ * @deprecated This monolithic entry point is deprecated.
+ * - For browser-side operations, import `supabaseBrowserClient` from `@/lib/supabase/client`.
+ * - For static operations/public queries, import `supabaseStaticClient` from `@/lib/supabase/static`.
+ * - For server-side operations requiring cookie sync, use `createSupabaseServerClient` from `@/lib/supabase/server`.
+ * - For services, import directly from `@/lib/services/*.service.ts`.
+ * - For types, import directly from `@/types/*.ts` or `@/data/*.ts`.
+ */
 
-import type { 
-  DbAdminSearchResult, 
-  DbFtsSearchResult,
-  DbUserProject,
-  DbProjectItem,
-  DbUserAddress,
-  DbInvoiceProfile
-} from '../types/db-rows'
+import { supabaseBrowserClient } from './supabase/client'
+import { supabaseStaticClient } from './supabase/static'
 
-export type { DbAdminSearchResult, DbFtsSearchResult }
-export type UserAddress = DbUserAddress
-export type InvoiceProfile = DbInvoiceProfile
-
-// Define SUPABASE config from process.env for Next.js
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-
-// Fallback mechanism to prevent white screen on build/env errors
-const missingEnv = !SUPABASE_URL || !SUPABASE_ANON_KEY
-if (missingEnv) {
-  console.error('CRITICAL: Supabase config missing. App will strictly fail on data fetch but should render UI.')
-  if (typeof window !== 'undefined') {
-    window.__SUPABASE_CONFIG_ERROR__ = true
-  }
-}
-
-// Create client with real or dummy values to prevent instant crash
-export const supabase = typeof window !== 'undefined'
-  ? createBrowserClient<Database>(
-      SUPABASE_URL || 'https://placeholder.supabase.co',
-      SUPABASE_ANON_KEY || 'placeholder-key'
-    )
-  : createClient<Database>(
-      SUPABASE_URL || 'https://placeholder.supabase.co',
-      SUPABASE_ANON_KEY || 'placeholder-key',
-      {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false
-        }
-      }
-    )
-
-// Database types
-export type Category = DomainCategory
-export type Product = DomainProduct
-export type UserProject = DbUserProject
-export type ProjectItem = DbProjectItem & { product?: Product }
-
-export interface CartItem {
-  id: string
-  product: Product
-  quantity: number
-  price: number
-}
-
-// Search and Enriched types
-export interface SearchSuggestion {
-  text?: string
-  label: string
-  type: 'product' | 'category' | 'brand'
-  slug?: string
-  url: string
-  metadata?: Json
-}
-
-export interface FtsProductResult extends DomainProduct {
-  rank?: number
-  is_fuzzy_match?: boolean
-}
-
-export interface GetProductsParams {
-  categoryIds?: string[]
-  searchQuery?: string
-  brand?: string
-  minPrice?: number
-  maxPrice?: number
-  limit?: number
-  offset?: number
-}
-
-// HVAC specific types
-export interface HVACBrand {
-  name: string
-  slug: string
-  description: string
-  country: string
-  logo?: string
-}
-
-export const HVAC_BRANDS: HVACBrand[] = [
-  {
-    name: 'AVenS',
-    slug: 'avens',
-    description: 'Türk premium HVAC çözümleri',
-    country: 'TR'
-  },
-  {
-    name: 'Vortice',
-    slug: 'vortice',
-    description: 'İtalyan havalandırma teknolojisi',
-    country: 'IT'
-  },
-  {
-    name: 'Casals',
-    slug: 'casals',
-    description: 'İspanyol güvenilir çözümler',
-    country: 'ES'
-  },
-  {
-    name: 'Nicotra Gebhardt',
-    slug: 'nicotra-gebhardt',
-    description: 'Alman endüstriyel teknoloji',
-    country: 'DE'
-  },
-  {
-    name: 'Flexiva',
-    slug: 'flexiva',
-    description: 'Esnek kanal sistemleri',
-    country: 'EU'
-  },
-  {
-    name: 'Frekans Konvertörü',
-    slug: 'frekans-konvertoru',
-    description: 'Yüksek verimli hız kontrolü',
-    country: 'DK'
-  }
-]
-
-// API functions
-
-// ========== Services Re-Exports ==========
-export * from './services/category.service'
-export * from './services/product.service'
-export * from './services/cart.service'
-export * from './services/address.service'
-export * from './services/invoice.service'
-export * from './services/pricing.service'
-export * from './services/project.service'
+/**
+ * Legacy monolithic client instance for backward compatibility.
+ * @deprecated Use browser, static, or server clients directly from their respective factories.
+ */
+export const supabase = typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient

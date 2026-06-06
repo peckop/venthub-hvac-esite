@@ -1,14 +1,8 @@
 'use client'
 
 import React, { useEffect, useCallback, useState } from 'react'
-import { 
-  createInvoiceProfile, 
-  deleteInvoiceProfile, 
-  listInvoiceProfiles, 
-  setDefaultInvoiceProfile, 
-  updateInvoiceProfile, 
-  type InvoiceProfile
-} from '../../lib/supabase'
+import { createInvoiceProfile, deleteInvoiceProfile, listInvoiceProfiles, setDefaultInvoiceProfile, updateInvoiceProfile } from '@/lib/services/invoice.service'
+import type { InvoiceProfile } from '@/types/ui-models'
 import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '../../i18n/I18nProvider'
 import { toast } from 'sonner'

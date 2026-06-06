@@ -1,7 +1,7 @@
  
 import React, { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useI18n } from '../../i18n/I18nProvider'
 import { 

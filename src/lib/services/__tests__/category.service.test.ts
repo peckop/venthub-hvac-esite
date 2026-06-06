@@ -2,15 +2,62 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { getCategories } from '../category.service'
 import { supabase } from '../../supabase'
 
-vi.mock('../../supabase', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      order: vi.fn().mockReturnThis()
-    }))
+vi.mock('../../supabase', () => {
+  const getMock = () => {
+    const globalObj = globalThis as Record<string, unknown>
+    if (!globalObj.__mockSupabaseCategory) {
+      globalObj.__mockSupabaseCategory = {
+        from: vi.fn(() => ({
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          order: vi.fn().mockReturnThis()
+        }))
+      }
+    }
+    return globalObj.__mockSupabaseCategory
   }
-}))
+  return {
+    supabase: getMock()
+  }
+})
+
+vi.mock('../../supabase/client', () => {
+  const getMock = () => {
+    const globalObj = globalThis as Record<string, unknown>
+    if (!globalObj.__mockSupabaseCategory) {
+      globalObj.__mockSupabaseCategory = {
+        from: vi.fn(() => ({
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          order: vi.fn().mockReturnThis()
+        }))
+      }
+    }
+    return globalObj.__mockSupabaseCategory
+  }
+  return {
+    supabaseBrowserClient: getMock()
+  }
+})
+
+vi.mock('../../supabase/static', () => {
+  const getMock = () => {
+    const globalObj = globalThis as Record<string, unknown>
+    if (!globalObj.__mockSupabaseCategory) {
+      globalObj.__mockSupabaseCategory = {
+        from: vi.fn(() => ({
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          order: vi.fn().mockReturnThis()
+        }))
+      }
+    }
+    return globalObj.__mockSupabaseCategory
+  }
+  return {
+    supabaseStaticClient: getMock()
+  }
+})
 
 vi.mock('../../type-converters', () => ({
   toUICategoryList: vi.fn((list) => list)

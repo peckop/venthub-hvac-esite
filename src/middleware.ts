@@ -35,23 +35,6 @@ function detectLocale(request: NextRequest): string {
   return 'tr'
 }
 
-function decodeJwt(token: string) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error('Failed to decode JWT:', error);
-    return null;
-  }
-}
-
 // ── Ana Middleware ───────────────────────────────────────────────────────────
 export async function middleware(request: NextRequest) {
   const host = request.headers.get('host') || ''
@@ -66,6 +49,18 @@ export async function middleware(request: NextRequest) {
     });
     return res;
   };
+
+  const redirectResponse = (url: URL | string, status: number) => {
+    const res = NextResponse.redirect(url, status)
+    setTenantCookie(res)
+    response.cookies.getAll().forEach(({ name, value, ...options }) => {
+      res.cookies.set(name, value, options)
+    })
+    response.headers.forEach((value, key) => {
+      res.headers.set(key, value)
+    })
+    return res
+  }
 
   const { pathname } = request.nextUrl
   const segments = pathname.split('/').filter(Boolean)
@@ -91,19 +86,19 @@ export async function middleware(request: NextRequest) {
     if (effectiveSegments[0] === 'admin') {
       const url = request.nextUrl.clone()
       url.pathname = `/admin${pathname.substring(3 + firstSegment.length)}`
-      return setTenantCookie(NextResponse.redirect(url, 307))
+      return redirectResponse(url, 307)
     }
   } else {
     // Rota locale barındırmıyor
     // Admin, API veya statik sitemap/robots dosyaları değilse dil alt dizinine yönlendir
-    const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || 
+    const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || firstSegment === 'auth' || 
                            pathname.endsWith('sitemap.xml') || pathname.endsWith('robots.txt')
     
     if (!isSpecialRoute) {
       const detectedLocale = detectLocale(request)
       const url = request.nextUrl.clone()
       url.pathname = `/${detectedLocale}${pathname === '/' ? '' : pathname}`
-      return setTenantCookie(NextResponse.redirect(url, 307))
+      return redirectResponse(url, 307)
     }
   }
 
@@ -123,9 +118,24 @@ export async function middleware(request: NextRequest) {
       try {
         const supabase = createServerClient(supabaseUrl, anonKey, {
           cookies: {
-            getAll() { return request.cookies.getAll() },
-            setAll() { }
-          }
+            getAll() {
+              return request.cookies.getAll()
+            },
+            setAll(cookiesToSet, headers) {
+              cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+              response = NextResponse.next({
+                request,
+              })
+              cookiesToSet.forEach(({ name, value, options }) =>
+                response.cookies.set(name, value, options)
+              )
+              if (headers) {
+                Object.entries(headers).forEach(([key, value]) =>
+                  response.headers.set(key, value)
+                )
+              }
+            },
+          },
         })
 
         const { data } = await supabase
@@ -137,7 +147,7 @@ export async function middleware(request: NextRequest) {
         if (data?.slug) {
           const url = request.nextUrl.clone()
           url.pathname = `/${locale}${Routes.product(data.slug)}`
-          return setTenantCookie(NextResponse.redirect(url, 308))
+          return redirectResponse(url, 308)
         }
       } catch (error) {
         console.error('[Middleware] UUID Slug Lookup Hatası:', error)
@@ -164,7 +174,7 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           response = NextResponse.next({
             request,
@@ -172,29 +182,33 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options)
           )
+          if (headers) {
+            Object.entries(headers).forEach(([key, value]) =>
+              response.headers.set(key, value)
+            )
+          }
         },
       },
     })
 
     // Güvenli Auth Kontrolü
-    const { data: { session }, error } = await supabase.auth.getSession()
+    const { data, error } = await supabase.auth.getClaims()
+    const claims = data?.claims
+    const jwtRole = claims?.user_role
 
-    if (error || !session) {
+    if (error || !claims) {
       const loginUrl = request.nextUrl.clone()
       loginUrl.pathname = '/auth/login'
       loginUrl.searchParams.set('from', pathname)
       if (error) loginUrl.searchParams.set('reason', 'expired')
-      return setTenantCookie(NextResponse.redirect(loginUrl, 302))
+      return redirectResponse(loginUrl, 302)
     }
-
-    const decoded = decodeJwt(session.access_token)
-    const jwtRole = decoded?.user_role
 
     if (!jwtRole || !ADMIN_ROLES.has(jwtRole.toLowerCase())) {
       const homeUrl = request.nextUrl.clone()
       homeUrl.pathname = '/'
       homeUrl.searchParams.set('auth_error', 'unauthorized')
-      return setTenantCookie(NextResponse.redirect(homeUrl, 302))
+      return redirectResponse(homeUrl, 302)
     }
 
     return setTenantCookie(response)

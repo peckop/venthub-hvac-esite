@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
-import type { Product } from '../lib/supabase'
+import type { Product } from '@/types/ui-models'
 import { Routes } from '../utils/routes'
 
 interface AddToCartToastContentProps {

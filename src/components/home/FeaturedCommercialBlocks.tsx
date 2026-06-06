@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import React, { useMemo, useState } from 'react'
 import ProductCard from '../ProductCard'
 import { useI18n } from '../../i18n/I18nProvider'
-import { type Category, type Product } from '../../lib/supabase'
+import type { Category, Product } from '@/types/ui-models'
 import Link from 'next/link'
 import Image from 'next/image'
 

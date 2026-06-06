@@ -1,5 +1,8 @@
-import { supabase } from '../supabase'
+import { supabaseBrowserClient } from '../supabase/client'
+import { supabaseStaticClient } from '../supabase/static'
 import type { DbUserAddress, DbUserAddressInsert, DbUserAddressUpdate } from '../../types/db-rows'
+
+const defaultClient = typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient
 
 /**
  * Retrieves a list of all addresses for the authenticated user.
@@ -12,7 +15,7 @@ import type { DbUserAddress, DbUserAddressInsert, DbUserAddressUpdate } from '..
  * const addresses = await listAddresses();
  * console.log(`Found ${addresses.length} addresses.`);
  */
-export async function listAddresses(): Promise<DbUserAddress[]> {
+export async function listAddresses(supabase = defaultClient): Promise<DbUserAddress[]> {
   const { data, error } = await supabase
     .from('user_addresses')
     .select('*')
@@ -40,7 +43,7 @@ export async function listAddresses(): Promise<DbUserAddress[]> {
  *   is_default_shipping: true
  * });
  */
-export async function createAddress(payload: DbUserAddressInsert): Promise<DbUserAddress> {
+export async function createAddress(payload: DbUserAddressInsert, supabase = defaultClient): Promise<DbUserAddress> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
@@ -61,8 +64,8 @@ export async function createAddress(payload: DbUserAddressInsert): Promise<DbUse
 
   if (error) throw error
 
-  if (payload.is_default_shipping) await setDefaultAddress('shipping', data.id)
-  if (payload.is_default_billing) await setDefaultAddress('billing', data.id)
+  if (payload.is_default_shipping) await setDefaultAddress('shipping', data.id, supabase)
+  if (payload.is_default_billing) await setDefaultAddress('billing', data.id, supabase)
 
   return data as DbUserAddress
 }
@@ -82,7 +85,7 @@ export async function createAddress(payload: DbUserAddressInsert): Promise<DbUse
  *   is_default_billing: true
  * });
  */
-export async function updateAddress(id: string, payload: DbUserAddressUpdate): Promise<DbUserAddress> {
+export async function updateAddress(id: string, payload: DbUserAddressUpdate, supabase = defaultClient): Promise<DbUserAddress> {
   const updatePatch: DbUserAddressUpdate = { ...payload }
   if (payload.address_line) {
     updatePatch.street_address = payload.address_line
@@ -97,8 +100,8 @@ export async function updateAddress(id: string, payload: DbUserAddressUpdate): P
 
   if (error) throw error
 
-  if (payload.is_default_shipping) await setDefaultAddress('shipping', id)
-  if (payload.is_default_billing) await setDefaultAddress('billing', id)
+  if (payload.is_default_shipping) await setDefaultAddress('shipping', id, supabase)
+  if (payload.is_default_billing) await setDefaultAddress('billing', id, supabase)
 
   return data as DbUserAddress
 }
@@ -113,7 +116,7 @@ export async function updateAddress(id: string, payload: DbUserAddressUpdate): P
  * @example
  * await deleteAddress('address-123');
  */
-export async function deleteAddress(id: string): Promise<boolean> {
+export async function deleteAddress(id: string, supabase = defaultClient): Promise<boolean> {
   const { error } = await supabase
     .from('user_addresses')
     .delete()
@@ -135,7 +138,7 @@ export async function deleteAddress(id: string): Promise<boolean> {
  * @example
  * const defaultShipping = await setDefaultAddress('shipping', 'address-123');
  */
-export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string): Promise<DbUserAddress> {
+export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string, supabase = defaultClient): Promise<DbUserAddress> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user

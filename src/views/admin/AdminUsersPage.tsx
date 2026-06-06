@@ -1,7 +1,7 @@
  
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useRouter, usePathname } from 'next/navigation'
 import { Crown, Shield, ShieldCheck, Users, AlertCircle, Package, Tag, Eye, SearchX } from 'lucide-react'

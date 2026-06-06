@@ -5,12 +5,9 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Route } from 'next'
-import { 
-  getProductBySlugOrId, 
-  getProductsEnriched, 
-  type Product, 
-  supabase 
-} from '../../lib/supabase'
+import { getProductBySlug, getProductsEnriched } from '../../lib/services/product.service'
+import type { Product } from '../../types/ui-models'
+import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import { useCart } from '../../hooks/useCartHook'
 import { BrandIcon } from '../../components/HVACIcons'
 import ProductCard from '../../components/ProductCard'
@@ -121,7 +118,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
       try {
         setLoading(true)
-        const productData = await getProductBySlugOrId(currentSlug)
+        const productData = await getProductBySlug(currentSlug)
         if (!productData) {
           setProduct(null)
           return

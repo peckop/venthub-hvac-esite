@@ -1,5 +1,6 @@
-import { supabase } from '../supabase'
-import type { Product } from '../supabase'
+import { supabaseBrowserClient } from '../supabase/client'
+import { supabaseStaticClient } from '../supabase/static'
+import type { Product } from '../../types/ui-models'
 
 export type UserRole = 'individual' | 'dealer' | 'corporate' | 'admin'
 
@@ -18,19 +19,17 @@ function nowIso(): string {
   return new Date().toISOString()
 }
 
+const defaultClient = typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient
+
 /**
  * Retrieves the effective unit price for a given product by evaluating user roles,
  * active price lists, and any applicable discounts.
  *
  * @param product - The product object containing base price information.
  * @returns The resolved unit price as a number.
- *
- * @example
- * const price = await getEffectiveUnitPrice(myProduct);
- * console.log(price); // e.g., 149.99
  */
-export async function getEffectiveUnitPrice(product: Product): Promise<number> {
-  const info = await getEffectivePriceInfo(product)
+export async function getEffectiveUnitPrice(product: Product, supabase = defaultClient): Promise<number> {
+  const info = await getEffectivePriceInfo(product, supabase)
   return info.unitPrice
 }
 
@@ -41,12 +40,8 @@ export async function getEffectiveUnitPrice(product: Product): Promise<number> {
  *
  * @param product - The product for which to determine the price.
  * @returns An object containing the calculated unit price and the ID of the applied price list (if any).
- *
- * @example
- * const info = await getEffectivePriceInfo(myProduct);
- * // returns { unitPrice: 120.00, priceListId: 'uuid-1234' }
  */
-export async function getEffectivePriceInfo(product: Product): Promise<{ unitPrice: number, priceListId: string | null }> {
+export async function getEffectivePriceInfo(product: Product, supabase = defaultClient): Promise<{ unitPrice: number, priceListId: string | null }> {
   const fallback = (() => {
     const v = typeof product.price === 'number' ? product.price : parseFloat(String(product.price || 0))
     return Number.isFinite(v) ? v : 0

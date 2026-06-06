@@ -3,49 +3,44 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\brands\[slug]\page.tsx
-skeleton_hash: 2f315cfbe580b99a
+skeleton_hash: 4d0ac74e07602d47
 entity_hashes:
   func:Page: 4d65ed88cfe128b6
   func:generateMetadata: 188fde844857a885
   func:generateStaticParams: e00bf8d31deb4098
-  overview: 0855ea40aeede843
+  overview: dfd9b0c15561ff9a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:34:48Z
+generated_at: 2026-06-06T19:23:41Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js uygulamasındaki belirli bir marka sayfasını ([slug]) yönetir. Derleme anında statik yolları oluşturur, marka özelinde SEO meta verilerini dinamik olarak üretir ve son olarak istenen marka verisini çekerek kullanıcı arayüzünü render eder.
+Bu modül, Next.js App Router yapısında dinamik bir marka detay sayfasını yönetir. Her bir marka (`slug`) için derleme aşamasında statik yolları oluşturur, SEO uyumlu meta bilgileri dinamik olarak üretir ve marka verisini çekerek nihai sayfa arayüzünü render eder.
 
 ## Fonksiyon Grupları
+
 ### Statik Yol Üretimi
-Uygulama derlenirken hangi marka sayfalarının (slug) statik olarak oluşturulacağını belirler.
-- generateStaticParams
+Uygulama derlenirken hangi marka sayfalarının statik olarak oluşturulacağını belirler; böylece build aşamasında gerekli tüm slug'lar hazırlanır.
+- `generateStaticParams`
 
-### Meta‑Bilgi Oluşturma
-İlgili marka sayfası için başlık, açıklama ve SEO uyumlu meta etiketlerini dinamik olarak hazırlar.
-- generateMetadata
+### SEO Meta Bilgi Üretimi
+Her marka sayfası için başlık, açıklama ve Open Graph gibi SEO etiketlerini ilgili marka verisine göre dinamik olarak hazırlar.
+- `generateMetadata`
 
-### Sayfa Renderı
-Marka verisini alır ve kullanıcıya gösterilecek nihai React bileşenini döndürerek sayfayı render eder.
-- Page
+### Sayfa Render
+Marka verisini çeker ve kullanıcıya gösterilecek tam sayfa bileşenini döndürerek istenen marka detay sayfasını render eder.
+- `Page`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Next.js App Router dinamik route yapısına bağlı olarak çalışır.
+Bu modül için, yalnızca fonksiyon imzalarından çıkarılabilecek temel mimari varsayımlar aşağıdadır. `generateStaticParams` fonksiyonunun dönüş yapısı bilinmediği için, bu fonksiyonun output'a dair bir varsayımda bulunulamamaktadır.
 
-[Aksiyom 1]: Eğer route paterninde `lang` ve `slug` parametreleri yoksa, `generateMetadata` ve `Page` fonksiyonları `params` erişiminde başarısız olur.
+[Aksiyom 1]: Eğer `generateMetadata` veya `Page` fonksiyonuna iletilen `params` nesnesi içinde `lang` alanı string olarak sağlanmazsa, fonksiyonun doğru çalışması garanti edilemez.
 
-[Aksiyom 2]: Eğer `params` bir `Promise` olarak gelip `await` edilmezse, `lang` ve `slug` değerlerine erişilemez (undefined kalır).
+[Aksiyom 2]: Eğer `generateMetadata` veya `Page` fonksiyonuna iletilen `params` nesnesi içinde `slug` alanı string olarak sağlanmazsa, fonksiyonun doğru çalışması garanti edilemez.
 
-[Aksiyom 3]: Eğer `lang` string değilse, sayfa dili tanımsız kalır.
-
-[Aksiyom 4]: Eğer `slug` string değilse veya geçerli bir marka tanımlayıcısına karşılık gelmiyorsa, `generateMetadata` hatalı SEO meta-bilgisi üretir.
-
-[Aksiyom 5]: Eğer `generateStaticParams` boş dizi döndürürse, derleme aşamasında hiçbir marka sayfası statik olarak üretilmez.
-
-[Aksiyom 6]: Eğer `generateStaticParams` tarafından döndürülen objelerde `lang` veya `slug` alanları eksikse, ilgili sayfa derleme sırasında oluşmaz.
+[Aksiyom 3]: Eğer `generateMetadata` veya `Page` fonksiyonuna iletilen `params` değeri bir `Promise` olarak çözülmemiş (await edilmemiş) haliyle kullanılmaya çalışılırsa, fonksiyonun doğru çalışması garanti edilemez.
 
 ---
 
@@ -71,28 +66,28 @@ Bu modül, Next.js App Router dinamik route yapısına bağlı olarak çalışı
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/[lang]/brands/[slug]/page.tsx::generateStaticParams
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: app/[lang]/brands/[slug]/page.tsx::generateStaticParams
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `uniqueBrands` — `HVAC_BRANDS` dizisinden her markanın `slug` değerlerini çıkararak oluşturulan string dizisi
-  - `paths` — `uniqueBrands` dizisini her slug için `lang: 'tr'` ve `lang: 'en'` varyasyonlarıyla genişleterek oluşan statik yol nesneleri dizisi
-  - `e` — try-catch bloğu içinde yakalanan hata nesnesi, `console.warn` ile loglanır
-- **Dönüş**: `paths` dizisi (statik parametreler dizisi) veya hata durumunda boş dizi `[]`
+  - `uniqueBrands` — HVAC_BRANDS dizisindeki her markanın slug değerini içeren dizi
+  - `paths` — uniqueBrands dizisinden oluşturulan ve her slug için 'tr' ve 'en' dillerini içeren yollar dizisi
+  - `e` — try bloğunda yakalanan hata nesnesi
+- **Dönüş**: `{ lang: string, slug: string }[]` dizisi veya boş dizi
 
-### [N2_NASIL] AST Pointer: src/app/[lang]/brands/[slug]/page.tsx::generateMetadata
-- **params**: `{ params }: { params: Promise<{ lang: string, slug: string }> }` — Next.js tarafından sağlanan parametreler promise'i, `await` ile çözülür
+### [N2_NASIL] AST Pointer: app/[lang]/brands/[slug]/page.tsx::generateMetadata
+- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — Asenkron olarak çözülecek parametreler nesnesi
 - **ic_degiskenler**:
-  - `slug` — `params` promise'inden `await` ile çözülen ve route segmentinden gelen marka slug string değeri
-  - `brand` — `HVAC_BRANDS` dizisi üzerinde `find()` ile `slug` eşleşmesi aranarak bulunan marka nesnesi (bulunamazsa `undefined`)
-- **Dönüş**: SEO metadata nesnesi (`title`, `description`, `alternates`, `openGraph` alanlarını içerir); marka bulunamazsa sadece `title` alanına sahip basit nesne
+  - `slug` — params nesnesinden çözülen ve URL'deki slug değerini içeren string
+  - `brand` — HVAC_BRANDS dizisinde slug eşleşmesiyle bulunan marka nesnesi veya undefined
+- **Dönüş**: Metadata nesnesi (title, description, alternates, openGraph alanlarını içerir)
 
-### [N3_NASIL] AST Pointer: src/app/[lang]/brands/[slug]/page.tsx::Page
-- **params**: `{ params }: { params: Promise<{ lang: string, slug: string }> }` — Next.js tarafından sağlanan parametreler promise'i, `await` ile çözülür
+### [N3_NASIL] AST Pointer: app/[lang]/brands/[slug]/page.tsx::Page
+- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — Asenkron olarak çözülecek parametreler nesnesi
 - **ic_degiskenler**:
-  - `slug` — `params` promise'inden `await` ile çözülen ve route segmentinden gelen marka slug string değeri
-  - `brand` — `HVAC_BRANDS` dizisi üzerinde `find()` ile `slug` eşleşmesi aranan marka nesnesi (bulunamazsa `undefined`)
-  - `jsonLd` — Schema.org JSON-LD yapılandırılmış veri nesnesi; `brand` nesnesinin `name`, `description` alanlarını veya slug fallback'ini kullanarak `@type: "Brand"` yapısı oluşturur
-- **Dönüş**: JSX fragment — `<script>` etiketi ile JSON-LD verisini (XSS koruması ile HTML escape'lenmiş) ve `<PageComponent>` bileşenini (`initialBrandSlug` prop'u ile) render eder
+  - `slug` — params nesnesinden çözülen ve URL'deki slug değerini içeren string
+  - `brand` — HVAC_BRANDS dizisinde slug eşleşmesiyle bulunan marka nesnesi veya undefined
+  - `jsonLd` — JSON-LD yapılandırılmış veri nesnesi (schema.org formatında marka bilgisi)
+- **Dönüş**: JSX içeriği (script etiketi ve PageComponent bileşeni)
 
 ---
 

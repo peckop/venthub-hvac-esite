@@ -1,4 +1,4 @@
-import { CartItem } from '../contexts/CartContext'
+import type { CartItem } from '@/types/cart'
 
 /**
  * Safely converts a number to 2 decimal places.

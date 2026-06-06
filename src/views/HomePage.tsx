@@ -11,7 +11,7 @@ import KnowledgeBlock from '../components/home/KnowledgeBlock'
 import RevealSection from '../components/home/RevealSection'
 import HomePageClientWrapper from '../components/home/HomePageClientWrapper'
 import { ScrollObserver } from '../components/ui/ScrollObserver'
-import { Product } from '../lib/supabase'
+import type { Product } from '@/types/ui-models'
 import { DomainCategory } from '../lib/type-converters'
 import { CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
 

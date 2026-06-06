@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { HVAC_BRANDS } from '../lib/brands'
+import { HVAC_BRANDS } from '../data/brands'
 import { BrandIcon } from '../components/HVACIcons'
 import Link from 'next/link'
 import Image from 'next/image'

@@ -1,38 +1,38 @@
-# Project: VentHub Multi-Tenant SaaS Foundation (Phase 1)
+# Project: VentHub HVAC Client Architecture Upgrade
 
 ## Architecture
-- **Tenant Resolution**: Handled in Middleware (`src/middleware.ts`) via Edge-safe resolver (`src/lib/tenantResolver.ts`) using domain/subdomain parsing. Direct DB querying inside middleware is strictly prohibited. Fallback static map is used in development.
-- **Tenant Context Propagation**: Propagated downstream via request header `x-tenant-id` and a cookie.
-- **Database Multi-Tenancy**: Shared database schema with tenant isolation using row-level security (RLS). Every tenant-aware table has a `tenant_id` column referencing the `tenants` table.
-- **Auth Integration**: Supabase Auth JWT claims (`app_metadata.tenant_id`) populated on login/signup, linked via `user_profiles.tenant_id`.
-- **Cache Isolation**: All Next.js cache entries (`unstable_cache`) use key schema `[key, lang, tenantId]`.
-- **Hybrid Feature Flags**: Async server-side `getTenantConfig()` + client-side `useTenant()` React context.
+- **Supabase Client Factories**: Split the singleton `src/lib/supabase.ts` into three separate factory creators:
+  - **Browser Client** (`src/lib/supabase/client.ts`): Client-side singleton utilizing `createBrowserClient`.
+  - **Server Client** (`src/lib/supabase/server.ts`): Per-request server client utilizing `createServerClient` and `cookies()`.
+  - **Static Client** (`src/lib/supabase/static.ts`): Cookie-less `createClient` for static rendering boundaries.
+- **Service Decoupling**: Remove the bulk re-exports (`export *`) from `src/lib/supabase.ts` and require consumers to import services directly.
+- **Middleware & Auth Security**: Transition middleware from `getSession()` to `getClaims()` and inline JWT role enforcement. Upgrade the Auth action to utilize per-request server client and support clean cookie propagation.
+- **Realtime Isolation**: Enforce private channels and tenant-based PostgreSQL subscriptions.
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
-|---|------|-------|-------------|--------|
-| M1 | Database & Schema Setup | `tenants` table, `tenant_id` columns, FK indexes, `jwt_tenant_id()` helper, RLS updates, Default Tenant migration | None | DONE |
-| M2 | Middleware & Auth | `tenantResolver.ts` implementation, `middleware.ts` header injection, JWT claim setup, `user_profiles` link | M1 | DONE |
-| M3 | Cache & Feature Flags | `getTenantConfig()`, `useTenant()`, Cache key isolation, Realtime channel isolation | M2 | DONE |
-| M4 | Webhooks & Edge Functions | DB INSERT/UPDATE Edge Functions audit, Webhook isolation (shipping & iyzico), Storage Bucket RLS | M2, M3 | DONE |
-| M5 | final_e2e_pass | Pass 100% of generated E2E tests, execute Tier 5 Adversarial Coverage Hardening | M1, M2, M3, M4 | DONE |
+|---|---|---|---|---|
+| M1 | Client Factories & Data/Type Migration | Setup client factories under `src/lib/supabase/`, move types to `src/types/`, and brands data to `src/data/brands.ts`. | None | DONE (Worker 1: 9739dbd7-b83b-4583-acf7-3b8376d0fc41) |
+| M2 | Middleware & Auth Security Upgrade | Update `src/middleware.ts` (getClaims, JWT role) and `src/actions/auth.ts` (per-request client, cookie handling, signout route). | M1 | DONE |
+| M3 | Realtime & SSG/SSR Boundaries | Channel hardening (private: true, tenant filter) and dynamic force-dynamic config on SSG/SSR pages. | M2 | DONE |
+| M4 | Codebase Import Updates | Resolve and update import paths across 70+ consumer files. | M1, M2, M3 | DONE |
+| M5 | Final Verification & Docs | Execute build, type-check, lint, test suite (>=401 pass), update README/CHANGELOG, and write RECOMMENDATIONS.md. | M4 | DONE |
 
-> ℹ️ **Milestone 5 Validation Note**: All 89 E2E tests are successfully passing, and the global forensic audit has issued a certified CLEAN verdict.
+> ℹ️ **Milestones Validation Note**: All milestones (M1–M5) have been successfully completed. The system compiles cleanly, lints with 0 errors, passes all 410 Vitest tests, and a global forensic audit has issued a certified CLEAN verdict.
 
 ## Interface Contracts
-### Middleware ↔ Downstream App
-- Header name: `x-tenant-id` (UUID format or 'default')
-- Cookie name: `tenant_id`
-- Server utility: `getTenantConfig(): Promise<TenantConfig>` returns features, styles, configuration.
-- Client utility: `useTenant(): TenantContext` provides runtime state of active tenant.
+### Supabase Client Factories
+- Browser client: `createBrowserClient<Database>(...)`
+- Server client: `createServerClient<Database>(..., { cookies: { ... } })`
+- Static client: `createClient<Database>(...)`
 
-### JWT Claims ↔ RLS Policies
-- `jwt_tenant_id()` RPC returns active tenant UUID from `app_metadata.tenant_id`.
-- RLS Policy Condition: `tenant_id = jwt_tenant_id()` for authenticated writes and reads.
+### Middleware Auth Security
+- Claims-based RBAC enforcement replacing `getSession()` and `decodeJwt()`
 
 ## Code Layout
-- `src/lib/tenantResolver.ts` - Edge-safe tenant resolver.
-- `src/middleware.ts` - Next.js Middleware injecting tenant headers.
-- `src/hooks/useTenant.ts` - Client hook for React component feature flags & styling.
-- `src/utils/tenantServer.ts` - Server-side tenant helper `getTenantConfig()`.
-- `supabase/migrations/` - Atomic PostgreSQL database migrations.
+- `src/lib/supabase/client.ts` - Browser client singleton factory
+- `src/lib/supabase/server.ts` - Request-bound server client factory
+- `src/lib/supabase/static.ts` - Cookie-less static client factory
+- `src/middleware.ts` - Edge middleware for claims verification
+- `src/actions/auth.ts` - Request-bound server actions for auth
+- `app/auth/signout/route.ts` - Route handler for signout

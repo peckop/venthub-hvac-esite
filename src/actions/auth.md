@@ -3,50 +3,50 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\actions\auth.ts
-skeleton_hash: b555f38881aa12f9
+skeleton_hash: 3a5d9cd138c91154
 entity_hashes:
-  func:loginAction: c7a355d296759a37
-  overview: 73ce20828c8a34de
-generated_at: 2026-05-28T22:34:48Z
+  func:loginAction: c30804abb0cb7f33
+  overview: d107b84c0f7e9bda
+generated_at: 2026-06-06T19:22:29Z
 ---
 
 ## Genel Bakış
-`src/actions/auth.ts` modülü, Venthub HVAC uygulamasının kullanıcı kimlik doğrulama süreçlerini yöneten merkezi bir sunucu eylemleri modülüdür. Kullanıcı giriş işlemini tek bir yapılandırılmış fonksiyon aracılığıyla yürütür, oturum yönetimi katmanına işlem sonuçlarını standart bir formatta iletir.
+`src/actions/auth.ts` modülü, Venthub HVAC uygulamasının kullanıcı kimlik doğrulama süreçlerini yöneten sunucu taraflı eylem modülüdür. Kullanıcı giriş işlemlerini form verileri üzerinden alarak merkezi bir yapı ile işler ve sonuçları standartlaştırılmış durum nesneleri olarak döndürür.
 
 ## Fonksiyon Grupları
-### Giriş İşlemi Yönetimi
-Bu grup, kullanıcı giriş formundan alınan verileri işleyerek kimlik doğrulama sürecini yürütür, başarılı veya başarısız işlem sonuçlarını yapılandırılmış bir durum nesnesi olarak döndürür.
+### Kimlik Doğrulama Eylemleri
+Kullanıcı giriş formundan gelen verileri işleyerek kimlik doğrulama sürecini yönetir ve işlem sonucunu yapılandırılmış bir durum nesnesi olarak ilgili katmana iletir.
 - loginAction
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Kullanıcı giriş sürecini yöneten bu kimlik doğrulama aksiyon modülünün doğru çalışması için giriş verilerinin beklenen formatta gönderilmesi, bağlı olduğu kimlik doğrulama servisinin erişilebilir olması ve tükettiği oturum yönetimi katmanının döndürülen durum nesnesini doğru işlemesi zorunludur.
 
-[Aksiyom 1]: Eğer loginAction fonksiyonuna iletilen FormData nesnesi kimlik doğrulama için gerekli tüm alanları içermiyorsa, arka uç kimlik doğrulama isteği gönderilemez, tüm giriş denemeleri başarısız olur.
-[Aksiyom 2]: Eğer loginAction'ın iletişim kurması gereken arka uç kimlik doğrulama servisi ağ veya servis hatası nedeniyle erişilebilir değilse, hiçbir kullanıcı için geçerli oturum oluşturulamaz, tüm giriş istekleri hata ile sonuçlanır.
-[Aksiyom 3]: Eğer loginAction'a gönderilen _prevState parametresi, tanımlanan AuthActionState tipinde veya null değilse, önceki giriş denemelerine ait hata bilgileri veya state verileri doğru işlenemez, form validasyon süreçleri çalışmaz.
-[Aksiyom 4]: Eğer uygulamanın oturum yönetimi katmanı bu modül tarafından döndürülen AuthActionState tipindeki durum nesnesini doğru yorumlayamıyorsa, başarılı giriş sonrası oturum açılamaz veya başarısız giriş durumlarında kullanıcıya doğru hata mesajı gösterilemez.
+Bu kimlik doğrulama modülünün doğru çalışması için giriş formu verilerinin ve durum yönetimi altyapısının beklenen şekilde hazırlanmış olması gerekir.
+
+[Aksiyom 1]: Eğer `formData` parametresi geçerli bir `FormData` nesnesi olarak sağlanmazsa, giriş işlemi yürütülemez ve fonksiyon hata ile karşılaşır.
+
+[Aksiyom 2]: Eğer `formData` içinde kimlik doğrulama için gerekli alanlar (kullanıcı adı/e-posta ve şifre) mevcut değilse, kimlik doğrulama başarısız olur.
+
+[Aksiyom 3]: Eğer `AuthActionState` tipi tanımlı değilse veya beklenen yapıda değilse, fonksiyon imzası derleme zamanında hata verir.
+
+[Aksiyom 4]: Eğer oturum yönetimi katmanı (session management) erişilebilir değilse, başarılı kimlik doğrulama sonrası oturum başlatılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### loginAction
-**Ne yapar**: Kullanıcıdan gelen e‑posta ve şifre bilgilerini doğrulayıp, Supabase kimlik doğrulama servisi üzerinden oturum açma işlemini gerçekleştirir. Başarılı ya da hatalı sonuçları `AuthActionState` nesnesi olarak döndürür.
 
-**Nasıl yapar**:  
-1. `formData` içinden `email` ve `password` alanlarını alır.  
-2. Alanlardan biri eksikse, hata mesajı içeren bir `AuthActionState` döner.  
-3. Supabase’ın `signInWithPassword` metodunu `await` ederek kimlik doğrulamayı dener.  
-4. Supabase’dan bir `error` gelirse, hata mesajını döner; aksi takdirde `revalidatePath` ile ana sayfa önbelleğini yeniler ve başarı işareti verir.  
-5. İstisna yakalanırsa, genel bir hata mesajı döndürülür.
+**Ne yapar**: Kullanıcının email ve şifresini kullanarak Supabase kimlik doğrulama sistemi üzerinden giriş yapmasını sağlar. Bu fonksiyon bir Next.js Server Action olarak tanımlanmıştır ve React'ın useActionState hook'u ile entegre çalışacak şekilde tasarlanmıştır.
+
+**Nasıl yapar**: FormData nesnesinden email ve şifre bilgilerini çıkarır. Önce bu alanların dolu olup olmadığını kontrol eder, ardından createSupabaseServerClient() ile sunucu tarafı Supabase istemcisi oluşturur. Supabase auth.signInWithPassword metodunu çağırarak kimlik doğrulamasını gerçekleştirir. İşlem başarılı olduğunda revalidatePath ile sayfa önbelleğini yeniler ve success durumunu döner.
 
 **Parametreler**:
-- `_prevState`: AuthActionState | null — Önceki aksiyon durumunu temsil eder; bu fonksiyon içinde kullanılmaz.
-- `formData`: FormData — HTTP isteğiyle gelen form verilerini tutar; `email` ve `password` alanlarını içerir.
+- `_prevState`: AuthActionState | null — Önceki action durumunu temsil eder. React useActionState hook'unun ilk parametresi olarak kullanılır, bu fonksiyon tarafından doğrudan erişilmez (underscore prefix ile belirtilmiştir)
+- `formData`: FormData — Formdan gelen verileri içeren nesne. 'email' ve 'password' alanlarını barındırır
 
-**Dönüş**: Promise\<AuthActionState\> — Asenkron olarak `error` (string) veya `success` (boolean) alanlarından birini içeren bir nesne döner.
+**Dönüş**: Promise<AuthActionState> — İşlem sonucuna göre success: true veya error: string alanlarını içeren durum nesnesi döner. Hata durumunda kullanıcıya bilgilendirme mesajı, başarı durumunda success flag'i döner
 
 ---
 
@@ -61,12 +61,13 @@ Kullanıcı giriş sürecini yöneten bu kimlik doğrulama aksiyon modülünün 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/actions/auth.ts::loginAction
-- **params**: `_prevState: AuthActionState | null`, `formData: FormData`
+- **params**: `_prevState: AuthActionState | null, formData: FormData`
 - **ic_degiskenler**:
-  - `email` — `formData.get('email')` ile alınan kullanıcı e-posta adresi (string)
-  - `password` — `formData.get('password')` ile alınan kullanıcı şifresi (string)
-  - `error` — `supabase.auth.signInWithPassword()` çağrısından destructure edilen hata nesnesi; varsa `error.message` dönüş nesnesine yazılır
-- **Dönüş**: `Promise<AuthActionState>` — başarılıysa `{ success: true }`, hata varsa `{ error: string }` döndürür.
+  - `email` — FormData nesnesinden `'email'` anahtarı ile alınan string değer, kullanıcının giriş e-posta adresi; boşsa doğrudan hata döner
+  - `password` — FormData nesnesinden `'password'` anahtarı ile alınan string değer, kullanıcının giriş şifresi; boşsa doğrudan hata döner
+  - `supabase` — `createSupabaseServerClient()` asenkron çağrısının sonucu, Supabase istemci nesnesi; oturum açma işlemleri için kullanılır
+  - `error` — `supabase.auth.signInWithPassword({ email, password })` çağrısının destructuring ile çıkarılan hata alanı; giriş başarısızsa Supabase hata mesajını içerir
+- **Dönüş**: `Promise<AuthActionState>` — Hata durumunda `{ error: string }`, başarı durumunda `{ success: true }` nesnesi döner; ayrıca `revalidatePath('/', 'layout')` çağrısı ile Next.js önbelleğini yeniler (yan etki)
 
 ---
 

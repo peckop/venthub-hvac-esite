@@ -1,6 +1,6 @@
  
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { 
   adminSectionTitleClass, 

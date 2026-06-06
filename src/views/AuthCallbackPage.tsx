@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { CheckCircle, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { Routes } from '../utils/routes'

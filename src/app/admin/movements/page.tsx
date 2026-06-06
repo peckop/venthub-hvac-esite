@@ -1,8 +1,10 @@
 'use client'
 
-import dynamic from 'next/dynamic'
+import nextDynamic from 'next/dynamic'
 
-const PageComponent = dynamic(() => import('../../../views/admin/AdminMovementsPage'), {
+export const dynamic = 'force-dynamic'
+
+const PageComponent = nextDynamic(() => import('../../../views/admin/AdminMovementsPage'), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen flex items-center justify-center">
@@ -14,6 +16,7 @@ const PageComponent = dynamic(() => import('../../../views/admin/AdminMovementsP
 export default function Page() {
   return <PageComponent />
 }
+
 
 
 

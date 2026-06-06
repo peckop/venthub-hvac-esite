@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Product } from './supabase';
+import type { Product } from '@/types/ui-models';
 import { PDF_FONTS, PDF_COLORS, getBase64ImageFromUrl } from './pdfAssets';
 import { SITE_URL } from '../config/siteUrl';
 

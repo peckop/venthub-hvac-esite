@@ -2,7 +2,7 @@
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import { useTenant } from '../../hooks/useTenant'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -201,7 +201,7 @@ const AdminErrorGroupsPage: React.FC = () => {
   // Realtime: refresh list on any change in error_groups
   React.useEffect(() => {
     const ch = supabase
-      .channel(`error-groups-${tenantId}`)
+      .channel(`error-groups-${tenantId}`, { config: { private: true } })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'error_groups' }, () => {
         scheduleRefetch()
       })

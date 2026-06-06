@@ -17,7 +17,7 @@ interface UseNavigationStateOptions {
  * @returns An object containing the current state flags and setter callbacks for all navigation surfaces.
  *
  * @example
- * const { isMenuOpen, openMenu, mode } = useNavigationState({ isScrolled: window.scrollY > 50 });
+ * const { isMenuOpen, openMenu, mode } = useNavigationState({ isScrolled: typeof window !== 'undefined' ? window.scrollY > 50 : false });
  */
 export function useNavigationState({ isScrolled }: UseNavigationStateOptions) {
     const [activeSurface, setActiveSurface] = useState<NavigationSurface>('none')

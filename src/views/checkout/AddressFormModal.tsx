@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { UserAddress } from '../../lib/supabase'
+import type { UserAddress } from '@/types/ui-models'
 import { createAddress, updateAddress } from '../../lib/services/address.service'
 import { toast } from 'sonner'
 import type { DbUserAddressInsert } from '../../types/db-rows'

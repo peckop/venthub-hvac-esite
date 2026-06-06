@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDate } from '../../i18n/datetime'
 import { toast } from 'sonner'

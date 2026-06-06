@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
-import { getCategories } from '../lib/supabase';
+import { getCategories } from '@/lib/services/category.service';
 import { toUICategoryList, DomainCategory } from '../lib/type-converters';
 import type { CategoryMetadata } from '../types/db-rows';
 

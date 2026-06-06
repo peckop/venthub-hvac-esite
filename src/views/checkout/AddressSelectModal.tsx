@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { UserAddress } from '../../lib/supabase'
+import type { UserAddress } from '@/types/ui-models'
 
 interface AddressSelectModalProps {
     title: string

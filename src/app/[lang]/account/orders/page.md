@@ -3,26 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\orders\page.tsx
-skeleton_hash: 32022cd7918a95b0
+skeleton_hash: bc4635546982ea45
 entity_hashes:
   func:Page: 02ee67f324c336e5
-  overview: 3abd4459140e249f
+  overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-28T22:34:48Z
+generated_at: 2026-06-06T19:23:22Z
 ---
 
 ## Genel Bakış
-`src/app/account/orders/page.tsx` modülü, kullanıcı hesabındaki siparişlerin gösterildiği bir Next.js sayfa bileşenini tanımlar. Tek sorumluluğu, `/account/orders` rotasına karşılık gelen üst‑seviye React bileşenini (PageComponent) render etmektir; veri çekme, yetkilendirme ve alt bileşenlerin dinamik yüklenmesi gibi işlemler bu bileşenin içinde gerçekleşir.
+Bu modül, kullanıcı hesabındaki siparişlerin listelendiği sayfaya karşılık gelen Next.js sayfa rotasını tanımlar. Tek bileşeni olan `Page` fonksiyonu, dinamik olarak yüklenen `OrdersPage` ana görünümünü render ederek sayfanın giriş noktasını oluşturur.
 
 ## Fonksiyon Grupları
-### Sayfa Render ve Giriş Noktası
-Bu grup, sipariş sayfasının ana giriş noktası olarak React bileşenini döndürmekle sorumludur.  
-- Page   (tek fonksiyon, diğer fonksiyonları çağırmaz)
+### Sayfa Giriş Noktası ve Sarmalayıcı
+Bu grup, hesap siparişleri rotası için üst seviye React bileşenini döndürmekle sorumludur. Fonksiyon herhangi bir veri çekme veya iş mantığı içermez; sadece asıl sayfa içeriğini barındıran dinamik yüklenmiş bir alt bileşeni sarar ve sunar.
+- Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, bir Next.js üst‑seviye sayfa bileşenidir ve sadece bir JSX öğesi döndürür.
+
+[Aksiyom 1]: Eğer `PageComponent` (çağrılabilir bir React bileşeni) yoksa, `Page` fonksiyonu geçerli bir React JSX yapısı döndüremeyeceği için sayfa render edilemez ve uygulama çalışması sonlanır.
 
 ---
 
@@ -37,24 +39,23 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `dynamic(() => import('../../../../views/OrdersPage'), {
+- **PageComponent** (call) — `nextDynamic(() => import('../../../../views/OrdersPage'), {
   ssr: false,
-  loa...`
+ ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\orders\page.tsx::anonim_loading_arrow_fn
-- **params**: (parametre yok)
-- **ic_degiskenler**: içinde tanımlı herhangi bir değişken yok, yalnızca gömülü JSX elemanları oluşturulur
-- **Dönüş**: Yüklenme animasyonlu spinner içeren JSX React DOM elementi
+### [N1_NASIL] AST Pointer: [lang]/account/orders/page.tsx::loading (anonymous)
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `min-h-screen` container içinde animasyonlu dönen spinner (next/dynamic loader bileşeni)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\account\orders\page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `PageComponent` — Dinamik olarak yüklenen ana siparişler sayfası bileşeni, fonksiyon içinde render edilmek üzere çağrılır
-- **Dönüş**: PageComponent JSX bileşeni
+### [N2_NASIL] AST Pointer: [lang]/account/orders/page.tsx::Page
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `<PageComponent />` — dinamik olarak import edilmiş PageComponent bileşeninin render edilmesi
 
 ---
 

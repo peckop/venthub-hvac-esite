@@ -41,7 +41,7 @@ describe('ensureSessionFresh', () => {
 
     it('should do nothing if session lacks expires_at', async () => {
         vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-            data: { session: { expires_at: undefined } as unknown as Session },
+            data: { session: { expires_at: undefined } as never as Session },
             error: null
         })
 
@@ -52,7 +52,7 @@ describe('ensureSessionFresh', () => {
 
     it('should not refresh if remaining time is well above margin (e.g. 100 seconds)', async () => {
         vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-            data: { session: { expires_at: 1100 } as unknown as Session }, // 1100 - 1000 = 100s remaining
+            data: { session: { expires_at: 1100 } as never as Session }, // 1100 - 1000 = 100s remaining
             error: null
         })
 
@@ -63,7 +63,7 @@ describe('ensureSessionFresh', () => {
 
     it('should refresh if remaining time is below or equal to margin (e.g. 59 seconds)', async () => {
         vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-            data: { session: { expires_at: 1059 } as unknown as Session }, // 1059 - 1000 = 59s remaining
+            data: { session: { expires_at: 1059 } as never as Session }, // 1059 - 1000 = 59s remaining
             error: null
         })
 
@@ -74,7 +74,7 @@ describe('ensureSessionFresh', () => {
 
     it('should refresh if token is already expired', async () => {
         vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-            data: { session: { expires_at: 900 } as unknown as Session }, // 900 - 1000 = -100s remaining
+            data: { session: { expires_at: 900 } as never as Session }, // 900 - 1000 = -100s remaining
             error: null
         })
 

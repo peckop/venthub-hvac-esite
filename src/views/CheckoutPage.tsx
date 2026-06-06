@@ -23,7 +23,8 @@ import { useCheckoutCoupon } from '../hooks/useCheckoutCoupon'
 import { useCheckoutPayment } from '../hooks/useCheckoutPayment'
 import { useCheckoutOrchestrator } from '../hooks/useCheckoutOrchestrator'
 import { CheckoutAddressInfo } from '../types/db-rows'
-import { UserAddress, listAddresses, deleteAddress } from '../lib/supabase'
+import type { UserAddress } from '@/types/ui-models'
+import { listAddresses, deleteAddress } from '@/lib/services/address.service'
 import { toast } from 'sonner'
 
 const CheckoutPage: React.FC = () => {

@@ -53,7 +53,9 @@ export async function getUserRole(userId: string, userEmail?: string): Promise<s
   }
 
   try {
-    const { supabase } = await import('../lib/supabase')
+    const { supabaseBrowserClient } = await import('../lib/supabase/client')
+    const { supabaseStaticClient } = await import('../lib/supabase/static')
+    const supabase = typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient
     const { data, error } = await supabase
       .from('user_profiles')
       .select('role')
@@ -133,7 +135,9 @@ export function checkAdminAccess(user: { email?: string; user_metadata?: { role?
  */
 export async function setUserAdminRole(userId: string, role: string): Promise<boolean> {
   try {
-    const { supabase } = await import('../lib/supabase')
+    const { supabaseBrowserClient } = await import('../lib/supabase/client')
+    const { supabaseStaticClient } = await import('../lib/supabase/static')
+    const supabase = typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient
     // Database RPC (SECURITY DEFINER) – sunucu tarafında gerçek rol ataması
     const { data, error } = await supabase.rpc('set_user_admin_role', {
       user_id: userId,
@@ -159,7 +163,9 @@ export async function listAdminUsers(): Promise<AdminUser[]> {
   try {
     const { ensureSessionFresh } = await import('../lib/ensureSessionFresh')
     await ensureSessionFresh()
-    const { supabase } = await import('../lib/supabase')
+    const { supabaseBrowserClient } = await import('../lib/supabase/client')
+    const { supabaseStaticClient } = await import('../lib/supabase/static')
+    const supabase = typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient
     // Güvenli RPC (SECURITY DEFINER + role kontrolü) – tek kaynak
     const rpcRes = await supabase.rpc('admin_list_users')
     const rpcErr = (rpcRes as { error?: unknown }).error

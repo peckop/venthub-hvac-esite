@@ -1,13 +1,7 @@
 import { createContext } from 'react'
-import type { Product } from '../lib/supabase'
+import type { Product } from '../types/ui-models'
+import type { CartItem } from '../types/cart'
 
-export interface CartItem {
-  id: string
-  product: Product
-  quantity: number
-  // Snapshot unit price (role/tier-based) if available
-  unitPrice?: number
-}
 
 export interface CartContextType {
   items: CartItem[]

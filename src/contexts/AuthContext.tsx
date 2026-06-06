@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { UserRole } from '../lib/rbac';
 import { AuthContext, type AuthError } from './AuthContextDefinition';

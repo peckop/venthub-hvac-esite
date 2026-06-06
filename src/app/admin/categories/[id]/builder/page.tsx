@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { use } from 'react';
 import CategoryBuilderView from '@/views/admin/CategoryBuilderView';
 
@@ -20,3 +22,4 @@ export default function CategoryBuilderPage({ params }: { params: Promise<{ id: 
 
   return <CategoryBuilderView categoryId={id} />;
 }
+

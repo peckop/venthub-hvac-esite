@@ -3,9 +3,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useApiCall } from '../useApiCall'
 import { toast } from 'sonner'
 
-// Mock react-hot-toast
-vi.mock('react-hot-toast', () => ({
-    default: {
+// Mock sonner
+vi.mock('sonner', () => ({
+    toast: {
         success: vi.fn(),
         error: vi.fn(),
     }

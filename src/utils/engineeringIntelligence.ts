@@ -3,7 +3,7 @@
  * Ham teknik verileri mühendislik çıkarımları için anahtarlara dönüştürür.
  */
 
-import { Product } from '../lib/supabase';
+import type { Product } from '@/types/ui-models';
 import { isRecord } from './type-converters';
 
 export interface EngineeringInference {

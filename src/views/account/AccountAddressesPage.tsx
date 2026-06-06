@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { createAddress, deleteAddress, listAddresses, setDefaultAddress, updateAddress, UserAddress } from '../../lib/supabase'
+import { createAddress, deleteAddress, listAddresses, setDefaultAddress, updateAddress } from '@/lib/services/address.service'
+import type { UserAddress } from '@/types/ui-models'
 import { toast } from 'sonner'
 import { useI18n } from '@/i18n/I18nProvider'
 import { MapPin, Plus, Trash2, Edit2, CheckCircle, Truck, CreditCard, Loader2 } from 'lucide-react'

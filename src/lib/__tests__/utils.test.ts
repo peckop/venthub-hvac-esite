@@ -19,9 +19,9 @@ describe('buildWhatsAppLink', () => {
   })
 
   it('should handle undefined or null inputs gracefully (includes empty text param)', () => {
-    // @ts-expect-error testing invalid inputs
+    // @ts-expect-error REASON: testing invalid inputs
     expect(buildWhatsAppLink(null, null)).toBe('https://wa.me/?text=')
-    // @ts-expect-error testing invalid inputs
+    // @ts-expect-error REASON: testing invalid inputs
     expect(buildWhatsAppLink(undefined, undefined)).toBe('https://wa.me/?text=')
   })
 
@@ -31,7 +31,7 @@ describe('buildWhatsAppLink', () => {
     // Mock URLSearchParams to throw an error
     globalThis.URLSearchParams = vi.fn().mockImplementation(function() {
       throw new Error('Mock error')
-    }) as unknown as typeof URLSearchParams
+    }) as never as typeof URLSearchParams
 
     const result = buildWhatsAppLink('+90 (555) 123-4567', 'Hello')
     expect(result).toBe('https://wa.me/905551234567')

@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { adminButtonPrimaryClass, adminButtonSecondaryClass, adminCardClass } from '../../../utils/adminUi'
 import { useI18n } from '../../../i18n/I18nProvider'
 import type { Database } from '../../../types/database.types'

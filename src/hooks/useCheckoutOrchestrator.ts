@@ -3,11 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from './useAuth'
 import { useI18n } from '../i18n/I18nProvider'
-import { 
-  listAddresses, 
-  UserAddress, 
-  InvoiceProfile 
-} from '../lib/supabase'
+import { listAddresses } from '@/lib/services/address.service'
+import type { UserAddress, InvoiceProfile } from '@/types/ui-models'
 import { listInvoiceProfiles } from '../lib/services/invoice.service'
 import { 
   CheckoutCustomerInfo, 

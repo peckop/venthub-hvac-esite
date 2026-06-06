@@ -1,4 +1,4 @@
-import { Category } from '../lib/supabase'
+import { Category } from './ui-models'
 export type { Category }
 
 export type InventoryRow = {

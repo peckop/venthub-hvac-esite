@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { supabase } from '../lib/supabase'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { Package, Calendar, CreditCard, Eye, ShoppingBag } from 'lucide-react'
 import { toast } from 'sonner'
 import { useI18n } from '../i18n/I18nProvider'

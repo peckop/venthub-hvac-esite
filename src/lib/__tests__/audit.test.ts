@@ -29,7 +29,7 @@ describe('logAdminAction', () => {
     mockSupabase.auth.getSession.mockResolvedValueOnce({ data: { session: { user: { id: 'session-user-id' } } } })
 
     const input = { table_name: 'test', action: 'INSERT' as const }
-    await logAdminAction(mockSupabase as unknown as SupabaseClient, input)
+    await logAdminAction(mockSupabase as never as SupabaseClient, input)
 
     expect(mockSupabase.auth.getSession).toHaveBeenCalled()
     expect(mockSupabase.auth.getUser).not.toHaveBeenCalled()
@@ -42,7 +42,7 @@ describe('logAdminAction', () => {
     mockSupabase.auth.getUser.mockResolvedValueOnce({ data: { user: { id: 'get-user-id' } } })
 
     const input = { table_name: 'test', action: 'UPDATE' as const }
-    await logAdminAction(mockSupabase as unknown as SupabaseClient, input)
+    await logAdminAction(mockSupabase as never as SupabaseClient, input)
 
     expect(mockSupabase.auth.getSession).toHaveBeenCalled()
     expect(mockSupabase.auth.getUser).toHaveBeenCalled()
@@ -53,7 +53,7 @@ describe('logAdminAction', () => {
     mockSupabase.auth.getSession.mockResolvedValueOnce({ data: { session: { user: { id: 'session-user-id' } } } })
 
     const input = { table_name: 'test', action: 'DELETE' as const, actor: 'custom-actor' }
-    await logAdminAction(mockSupabase as unknown as SupabaseClient, input)
+    await logAdminAction(mockSupabase as never as SupabaseClient, input)
 
     expect(mockSupabase.insert).toHaveBeenCalledWith([{ ...input }])
   })
@@ -65,7 +65,7 @@ describe('logAdminAction', () => {
       { table_name: 'test1', action: 'INSERT' as const },
       { table_name: 'test2', action: 'DELETE' as const, actor: 'provided-actor' }
     ]
-    await logAdminAction(mockSupabase as unknown as SupabaseClient, inputs)
+    await logAdminAction(mockSupabase as never as SupabaseClient, inputs)
 
     expect(mockSupabase.insert).toHaveBeenCalledWith([
       { ...inputs[0], actor: 'batch-user-id' },
@@ -78,14 +78,14 @@ describe('logAdminAction', () => {
     mockSupabase.auth.getSession.mockRejectedValueOnce(new Error('Auth failed'))
 
     // It should proceed and just use actor: null
-    await logAdminAction(mockSupabase as unknown as SupabaseClient, { table_name: 'test', action: 'INSERT' })
+    await logAdminAction(mockSupabase as never as SupabaseClient, { table_name: 'test', action: 'INSERT' })
 
     expect(mockSupabase.insert).toHaveBeenCalledWith([{ table_name: 'test', action: 'INSERT', actor: null }])
 
     // Now test if insert itself throws an exception
     mockSupabase.select.mockRejectedValueOnce(new Error('Insert failed DB'))
 
-    await expect(logAdminAction(mockSupabase as unknown as SupabaseClient, { table_name: 'test', action: 'INSERT' })).resolves.not.toThrow()
+    await expect(logAdminAction(mockSupabase as never as SupabaseClient, { table_name: 'test', action: 'INSERT' })).resolves.not.toThrow()
     expect(consoleWarnSpy).toHaveBeenCalledWith('audit log insert exception', expect.any(Error))
 
     consoleWarnSpy.mockRestore()
@@ -95,7 +95,7 @@ describe('logAdminAction', () => {
      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
      mockSupabase.select.mockResolvedValueOnce({ data: null, error: { message: 'Some DB error' } })
 
-     await logAdminAction(mockSupabase as unknown as SupabaseClient, { table_name: 'test', action: 'INSERT' })
+     await logAdminAction(mockSupabase as never as SupabaseClient, { table_name: 'test', action: 'INSERT' })
 
      expect(consoleWarnSpy).toHaveBeenCalledWith('audit log insert failed', { message: 'Some DB error' })
 

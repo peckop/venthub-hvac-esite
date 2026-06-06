@@ -4,7 +4,7 @@ import { Environment } from '@react-three/drei'
 import { ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 const Category3DIcon = dynamic(() => import('../products/Category3DIcon'), { ssr: false, loading: () => null })
-import type { Category } from '../../lib/supabase'
+import type { Category } from '@/types/ui-models'
 
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 

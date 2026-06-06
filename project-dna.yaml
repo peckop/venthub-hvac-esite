@@ -1,0 +1,113 @@
+# project-dna.yaml — VentHub HVAC Proje Genetik Kartı
+# Bu dosya projenin kalite seviyesini, test altyapısını ve sınırlarını tanımlar.
+# teamwork-director skill'i bu dosyayı okuyarak prompt'u otomatik zenginleştirir.
+# Fiziksel kod taraması ve CONTEXT.md analizi ile oluşturulmuştur.
+
+project:
+  name: "VentHub HVAC"
+  tier: enterprise                          # enterprise | professional | mvp | prototype
+  domain: "HVAC E-Commerce & Engineering SaaS Platform"
+  description: >
+    HVAC sektörüne özel, Next.js 15 App Router + React 19 + Supabase üzerine kurulu
+    multi-tenant SaaS e-ticaret platformu. 3D ürün görselleştirme (React Three Fiber),
+    mühendislik hesaplayıcıları (ASHRAE/EN standartları), ihtiyaç sihirbazı,
+    bilgi merkezi, premium admin paneli ve çoklu dil desteği (TR/EN) içerir.
+    Faz 1 (SaaS Foundation) tamamlanmış, Faz 2 (White-Label) planlanmıştır.
+  saas_phase: "Faz 1 Complete — Faz 2 Planned"
+  business_model: "Multi-Tenant SaaS (Shopify model)"
+  target_audience:
+    - "Makine mühendisleri"
+    - "Mimarlar ve müteahhitler"
+    - "Tesisat firmaları"
+    - "Son kullanıcılar"
+  languages:
+    primary: "tr"
+    secondary: "en"
+
+stack:
+  language: typescript
+  version: "5.7"
+  frameworks:
+    - nextjs@15              # App Router, SSR/SSG/ISR
+    - react@19               # UI bileşenler
+    - supabase               # Database, Auth, Realtime, Storage, Edge Functions
+    - tailwindcss@4           # Styling, Dynamic Theme (.light/.dark CSS variables)
+    - react-three-fiber      # 3D ürün görselleştirme (GLB/GLTF modeller)
+    - framer-motion          # Animasyonlar ve micro-interactions
+    - recharts               # Analitik grafikler
+    - vitest                 # Test framework
+  package_manager: pnpm
+  deployment:
+    frontend: vercel
+    backend: supabase        # Edge Functions (Deno/TypeScript)
+    database: postgresql     # Supabase hosted
+  external_integrations:
+    - iyzico                 # Ödeme altyapısı (3D Secure)
+    - resend                 # Transactional e-posta
+    - twilio                 # WhatsApp/SMS bildirimleri
+    - sentry                 # Hata izleme ve raporlama
+
+database:
+  tables: 28
+  rls_policies: 132
+  rpc_functions: 55
+  indexes: 47
+  migrations: 173
+
+quality:
+  test_runner: vitest
+  test_command: "pnpm run test -- --run"
+  test_baseline: 401                       # 401 passed / 9 failed (pre-existing) / 2 skipped — 2026-06-06 doğrulandı
+  test_files_total: 63                     # 59 passed / 2 failed / 2 skipped
+  pre_existing_failures: 9                 # Bu hatalar bu refactoring'den ÖNCE mevcut
+  type_check_command: "pnpm run type-check"
+  lint_command: "pnpm run lint"
+  build_command: "pnpm run build"
+  integrity_mode: development
+
+boundaries:
+  protected_paths:
+    - ".next/"
+    - "node_modules/"
+    - ".env"
+    - ".env.local"
+    - ".env.production"
+    - ".agent/"                             # AI ajan konfigürasyonu
+    - "supabase/migrations/"                # Mevcut migration dosyaları (yeni eklenebilir ama mevcut değiştirilemez)
+    - "CONTEXT.md"                          # NotebookLM tarafından yönetilir
+    - "project-dna.yaml"                    # Proje genetik kartı
+    - "src/types/database.types.ts"         # Supabase CLI ile otomatik üretilir
+    - "src/lib/hvacCalculations.ts"          # Saf metrik motor — tenant-agnostik, DOKUNULMAYACAK
+    - "src/design-system/tokens.js"          # Tasarım token SSOT — arbitrary Tailwind yasak
+  critical_rules:
+    - "Mevcut testlerin hiçbiri kırılmamalı (baseline: 401 passed / 9 pre-existing failure)"
+    - "Yeni public fonksiyon/API = yeni unit test zorunlu"
+    - "TypeScript strict mode kuralları korunmalı, 'any' kullanılmamalı"
+    - "RLS (Row-Level Security) izolasyonu ve tenant_id sızdırmazlığı asla ihlal edilmemeli"
+    - "i18n: Her yeni UI metni hem TR hem EN sözlüğe eklenmeli, parity korunmalı"
+    - "3D bileşenler: React Three Fiber ekosistemi (@react-three/fiber, @react-three/drei) dışında 3D kütüphane eklenmemeli"
+    - "Ödeme akışı (İyzico): Checkout ve payment dosyalarında değişiklik yapılırken mevcut 3D Secure akışı bozulmamalı"
+    - "Supabase Edge Functions: Deno runtime'a uyumlu olmalı, Node.js API'leri kullanılmamalı"
+    - "Multi-tenant: Tüm veritabanı sorguları tenant_id bazlı filtrelenmeli, cross-tenant veri sızıntısı yasak"
+    - "HVAC Motoru: src/lib/hvacCalculations.ts saf metrik motordur. Emperyal birim (CFM, Fahrenheit) hardcoded yazılamaz — Adapter Pattern ile çözülmeli"
+    - "Middleware Edge DB Yasağı: src/middleware.ts içinde Supabase Client ile DB sorgusu YASAK (Edge Runtime kısıtı)"
+    - "3D Canvas: Gölge haritalama türü kesinlikle 'percentage' olmalı (PCFSoftShadowMap deprecation)"
+    - "React.cache(): RSC'de birden fazla çağrılabilecek Supabase ORM sorguları React.cache() ile tekilleştirilmeli"
+    - "i18n JSONB Aksiyomu: Çeviriler için ilişkisel tablo açmak YASAK — JSONB (metadata->lang) formatı zorunlu"
+
+context:
+  blueprint: null
+  context_md: "CONTEXT.md"
+  notebooklm_id: "235043eb-970f-4a52-9f39-1d02b2621e9c"
+
+features:
+  i18n: true                               # TR/EN çoklu dil desteği aktif
+  multi_tenant: true                       # Faz 1 tamamlandı
+  three_d_rendering: true                  # React Three Fiber ile 3D ürün modelleri
+  engineering_calculators: true            # ASHRAE/EN standart hesaplayıcılar
+  realtime_notifications: true             # Supabase Realtime ile admin bildirimleri
+  payment_gateway: true                    # İyzico 3D Secure
+  email_notifications: true                # Resend transactional email
+  admin_panel: true                        # ERP benzeri admin yönetim paneli
+  knowledge_hub: true                      # HVAC teknik makale/rehber sistemi
+  needs_wizard: true                       # Ürün eşleştirme sihirbazı
