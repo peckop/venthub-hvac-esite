@@ -1,4 +1,4 @@
-import PageComponent from '../../../../views/ProductDetailPage'
+import PageComponent from '../../../_components/ProductDetailPageView'
 import { supabase, type Product } from '../../../../lib/supabase'
 import { SITE_URL } from '../../../../config/siteUrl'
 import { getCachedProductBySlug, preloadProduct } from '../../../../lib/data/preload'

@@ -7,7 +7,9 @@
     "registry/**",
     ".next/**",
     ".agent/**",
-    ".agents/**"
+    ".agents/**",
+    "scripts/**",
+    "supabase/**"
   ],
   "ignoreDependencies": [
     "clsx",
