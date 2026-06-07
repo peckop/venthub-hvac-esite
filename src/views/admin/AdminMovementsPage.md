@@ -12,8 +12,8 @@ entity_hashes:
   func:sortIndicator: 43ac755400ab07d3
   func:toggleSort: 920f5ed12088bfa0
   overview: 727d8000b31a89fa
-  style_tokens: af6801b829712c93
-generated_at: 2026-06-06T21:57:55Z
+  style_tokens: 4a63e81d7d11a34c
+generated_at: 2026-06-07T18:03:57Z
 ---
 
 ## Genel Bakış
@@ -293,4 +293,4 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Renkler:** `bg-amber-500`, `bg-cyan-500/50`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/2`, `bg-white/5`, `border-amber-500/20`, `border-b`, `border-emerald-500/20`, `border-rose-500/20`, `border-t`, `border-white/5`, `hover:bg-white/2`, `hover:text-cyan-400`, `text-amber-400`
 - **Layout:** `!h-8`, `flex`, `flex-col`, `gap-0.5`, `gap-1`, `gap-2`, `h-1`, `h-1.5`, `inline-flex`, `items-center`, `justify-between`, `min-w-700px`, `overflow-hidden`, `overflow-x-auto`, `p-0`
 - **Varyant/Responsive:** `:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `!px-4`, `${adminCardClass`, `${adminTableActionWarningClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${cellPad`, `${headPad`, `${m.delta`, `0`, `:`, `<`, `>`, `animate-pulse`, `border`, `font-black`
+- **Yardımcı Sınıflar:** `!px-4`, `${adminCardClass`, `${adminTableActionWarningClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${cellPad`, `${headPad`, `${m.delta`, `0`, `:`, `<`, `>`, `animate-pulse`, `border`, `content-auto-table`

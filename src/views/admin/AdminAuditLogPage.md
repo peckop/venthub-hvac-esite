@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminAuditLogPage: 50d17db2bc55805a
   overview: 7ad01a8799bdff81
   style_tokens: d2a1c3bee3a34f52
-generated_at: 2026-06-06T21:57:07Z
+generated_at: 2026-06-07T18:03:57Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,10 @@ Modülün tek sorumluluğu olan yönetici denetim günlüğü sayfasının kulla
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
 
+*(Not: Verilen bilgiler arasında AdminAuditLogPage fonksiyonunun gövdesi bulunmamaktadır. Mimari varsayımlar, yalnızca fonksiyon gövdesindeki kod analizinden üretilebilir. Fonksiyon gövdesi paylaşılmadığı için somut aksiyon çıkarılamamıştır.)*
 
 ---
 

@@ -218,7 +218,7 @@ const AdminAuditLogPage: React.FC = () => {
 
         <div className="p-4 pt-0">
           <div ref={dragScrollRef} className="overflow-x-auto rounded-2xl border border-white/5 bg-surface-deep/40">
-            <table className="w-full text-left">
+            <table className="content-auto-table w-full text-left">
               <thead>
                 <tr className="glass-strong">
                   <th className={adminTableHeadCellClass}>{t('admin.ui.date') || 'Tarih'}</th>

@@ -345,7 +345,7 @@ const AdminMovementsPage: React.FC = () => {
 
       <div className={`${adminCardClass} overflow-hidden`}>
         <div ref={dragScrollRef} className="overflow-x-auto w-full">
-          <table className="w-full min-w-700px">
+          <table className="content-auto-table w-full min-w-700px">
             <thead className="glass-strong">
               <tr>
                 {visibleCols.date && (

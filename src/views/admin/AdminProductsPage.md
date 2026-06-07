@@ -24,7 +24,7 @@ entity_hashes:
   func:toggleSort: 865bfd9d85445d70
   overview: 968137f18d4e8d88
   style_tokens: 4970a750083c3797
-generated_at: 2026-06-07T12:14:22Z
+generated_at: 2026-06-07T18:04:19Z
 ---
 
 ## Genel Bakış
@@ -45,7 +45,29 @@ Birden fazla ürünün aynı anda seçilerek toplu olarak durum değiştirme, ö
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, yönetici panelinde ürün listesi üzerinde CRUD ve toplu işlem (bulk operations) yürütülmesini sağlayan React bileşenidir.
+
+**[Aksiyom 1 – Seçim Bağımlılığı]:** Eğer `toggleSelect` ile hiçbir ürün seçilmediyse (seçili ürün listesi boşsa), `bulkStatusChange`, `bulkFeatureToggle`, `bulkDelete` ve `bulkPriceAdjust` fonksiyonlarının çalışması anlamsızdır ve bir eylem başlatılmamalıdır.
+
+**[Aksiyom 2 – Geçerli Ürün Kimliği]:** Eğer `toggleSelect(id)`, `toggleExpand(id)`, `handleEdit(id)` veya `remove(id)` için verilen `id` parametresi mevcut ürün listesinde bir ürüne karşılık gelmiyorsa, ilgili fonksiyon bir hata üretir veya sessizce başarısız olur.
+
+**[Aksiyom 3 – Sıralama Anahtarı Geçerliliği]:** Eğer `toggleSort(key)` veya `sortIndicator(key)` için verilen `key` parametresi `SortKey` tipine uygun bir değer değilse, sıralama davranışı tanımsızdır.
+
+**[Aksiyom 4 – Toplu Fiyat Ayarı Parametreleri]:** Eğer `bulkPriceAdjust` fonksiyonunda `mode` parametresi `'percent'` veya `'fixed'` değerlerinden biri değilse, fiyat hesaplama mantığı hatalı çalışır. Ayrıca `value` parametresinin `0`'dan küçük olması halinde fiyat düzeltmesi negatif sonuç verebilir (modül bu durumu engellememektedir).
+
+**[Aksiyom 5 – Toplu Durum Değişikliği]:** Eğer `bulkStatusChange(status)` için verilen `status` parametresi geçerli bir durum dizesi değilse, ürünlerin durumu tutarsız hale gelir.
+
+**[Aksiyom 6 – Ürün Detay Genişletme]:** Eğer `toggleExpand(id)` çağrıldığında ilgili ürün zaten genişletilmiş (expanded) durumdaysa, fonksiyon durumu daraltılmış (collapsed) hale getirir; aksi halde genişletir.
+
+**[Aksiyom 7 – Modal Başarı Geri Çağrısı]:** Eğer `handleModalSuccess` fonksiyonu bir modal (oluşturma/düzenleme) başarıyla tamamlanmadan tetiklenirse, ürün listesi ile modal durumu arasında tutarsızlık oluşur.
+
+**[Aksiyom 8 – Teknik Özellikler Yüklenmesi]:** Eğer `loadTechSpecs(_productId)` için verilen `_productId` parametresi geçerli bir ürün kimliği değilse, teknik özellikler yüklenemez veya boş veri döner.
+
+**[Aksiyom 9 – Seçili Ürün Bağımlılığı (Toplu İşlemler)]:** Eğer `toggleSelectAll` ile tüm ürünler seçili hale getirildiyse, ardından `bulkDelete` gibi bir toplu işlem çalıştırıldığında **tüm** ürünler silinebilir; bu geri alınamaz bir durumdur.
+
+**[Aksiyom 10 – Durum Rozeti Gösterimi]:** Eğer `statusBadge(s)` fonksiyonuna `null` veya `undefined` değerli `s` parametresi verilirse, rozet varsayılan/bilinmeyen bir durum gösterecektir; bu durum için modül içinde tanımlı bir rozet değeri bilinmemektedir.
 
 ---
 
@@ -500,15 +522,15 @@ graph TD
     AdminProductsPage_tsx__toggleSelect["toggleSelect"]
     AdminProductsPage_tsx__toggleSelectAll["toggleSelectAll"]
     AdminProductsPage_tsx__toggleSort["toggleSort"]
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__remove
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
-    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__handleEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleExpand
     AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__loadTechSpecs
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__saveInlineEdit
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__statusBadge
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSort
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__remove
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__toggleSelect
+    AdminProductsPage_tsx__AdminProductsPage --> AdminProductsPage_tsx__sortIndicator
 ```
 
 ## NODE ID STANDARD

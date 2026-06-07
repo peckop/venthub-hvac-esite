@@ -555,7 +555,7 @@ const AdminProductsPage: React.FC = () => {
         </div>
 
         <div ref={dragScrollRef} className="overflow-x-auto w-full custom-scrollbar">
-          <table className="w-full min-w-1200px">
+          <table className="content-auto-table w-full min-w-1200px">
             <thead>
               <tr className="glass-strong">
                 <th className={`${adminTableHeadCellClass} ${headPad} w-10 text-center py-4`}>

@@ -1,5 +1,6 @@
 import { headers } from 'next/headers';
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static';
+import { cache } from 'react';
 
 export interface TenantConfig {
   id: string;
@@ -61,7 +62,7 @@ interface SupabaseClientOverride {
   };
 }
 
-export async function getTenantConfig(): Promise<TenantConfig> {
+export const getTenantConfig = cache(async function getTenantConfig(): Promise<TenantConfig> {
   let tenantId: string | null = null;
   
   try {
@@ -108,4 +109,4 @@ export async function getTenantConfig(): Promise<TenantConfig> {
     console.error(`[Tenant Server] Error fetching tenant config:`, err);
     return DEFAULT_TENANT_CONFIG;
   }
-}
+});
