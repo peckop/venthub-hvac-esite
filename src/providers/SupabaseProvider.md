@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\providers\SupabaseProvider.tsx
-skeleton_hash: 206efd9c448ac8ef
+skeleton_hash: 8b9157ceae697368
 entity_hashes:
-  func:SupabaseProvider: d2391552680159cd
+  func:SupabaseProvider: 10fa967be7816ba2
   func:useSupabaseClient: 117ceb934f45e8a6
-  overview: 191f6f58b43bb490
+  overview: 4ad62b48f1f2b3ca
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-07T14:02:47Z
+generated_at: 2026-06-07T16:38:23Z
 ---
 
 ## Genel Bakış
@@ -24,13 +24,21 @@ Modül, Supabase istemcisini oluşturup React bileşen ağacı boyunca iletmek v
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi verilmediğinden, sadece imza bilgilerine dayanan anlamlı bir mimari varsayım üretmek mümkün değildir. Bu nedenle, sadece yapısal ve zorunlu aksiyomlar tanımlanmıştır.
+Supabase istemcisini React bileşen ağacında paylaşmak ve erişilebilir kılmak için tasarlanmış bir context provider modülüdür.
 
-[Aksiyom 1]: Eğer `SupabaseContext` doğru bir React Context olarak çağrılmamışsa (örn. `createContext` ile oluşturulmamış veya `call` metodu tanımsızsa), `useSupabaseClient` hook'u `undefined` veya `null` bir değer döndürür ve bu durumda client kullanan tüm alt bileşenler çalışma zamanı hatası alır.
+---
 
-[Aksiyom 2]: Eğer `SupabaseProvider`, uygulama bileşen hiyerarşisinde `useSupabaseClient` hook'unu kullanan bileşenlerin üstünde konumlandırılmamışsa (örn.-provider dışında bir yerde kullanılırsa), hook çağrısı `Context`'e erişemez ve `undefined` değer döner; bu durumda veritabanı işlemleri başarısız olur.
+**[Aksiyom 1]**: Eğer `useSupabaseClient()` hook'u `SupabaseProvider` bileşeninin kapsamı dışında (hierarşik olarak üstünde) çağrılırsa, `SupabaseContext` değeri `undefined`/`null` olur ve runtime hatası oluşur.
 
-[Aksiyom 3]: Eğer `SupabaseProvider`'ın içine geçirilen `children` prop'u geçerli bir React.ReactNode (örn. JSX Element, string, number, array veya null) değilse, React render ağacı bozulur ve bileşen ağaçları doğru oluşturulamaz.
+**[Aksiyom 2]**: Eğer `SupabaseProvider` bileşeninin `children` prop'u sağlanmazsa veya geçerli bir `React.ReactNode` içermiyorsa, bileşen ağacı düzgün render edilmez veya boş render sonucu oluşur.
+
+**[Aksiyom 3]**: Eğer uygulama kök seviyesinde (veya Supabase'e erişilmesi gereken en üst bileşenin之上ında) `SupabaseProvider` kullanılmamışsa, tüm alt bileşenlerdeki `useSupabaseClient()` çağrıları başarısız olur.
+
+**[Aksiyom 4]**: Eğer `SupabaseContext` çağrısı (`call`) başarısız olursa veya bağlam değeri tanımsız kalırsa, `useSupabaseClient()` geçerli bir Supabase istemcisi döndürememe durumuna düşer.
+
+---
+
+> **Not**: Fonksiyon gövdesi (implementation) sağlandığında, Supabase client oluşturma parametreleri (URL, anon key vb.), hata yönetimi mekanizmaları ve opsiyel konfigürasyonlar için ek aksiyomlar eklenebilir. Mevcut aksiyomlar yalnızca fonksiyon imzaları ve standart React Context kalıpları üzerinden türetilmiştir.
 
 ---
 
@@ -38,14 +46,14 @@ Bu modül için fonksiyon gövdesi verilmediğinden, sadece imza bilgilerine day
 
 ### SupabaseProvider
 
-**Ne yapar**: React uygulamasının tüm alt bileşenlerine Supabase istemcisini sağlamak için kullanılan bir context provider bileşenidir. Bu bileşen, uygulama hiyerarşisinde sarmaladığı tüm çocuk bileşenlerin Supabase bağlantısına erişmesini mümkün kılar.
+**Ne yapar**: Uygulama genelinde kullanılabilir Supabase istemcisini oluşturur ve React Context aracılığıyla tüm alt bileşenlere sunar. Bu bileşen, uygulamanın üst seviyesinde yer alarak çocuk bileşenlerin Supabase bağlantısına erişmesini sağlar.
 
-**Nasıl yapar**: `useState` hook'u kullanarak tarayıcı tarafında tek bir Supabase istemcisi oluşturur ve bu istemciyi `createBrowserClient` fonksiyonuyla başlatır. Ortam değişkenlerinden (`NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY`) yapılandırma bilgilerini okur; bu değerler tanımlı değilse `placeholder` değerleriyle varsayılan bir istemci oluşturur. Oluşturulan istemci nesnesi `SupabaseContext.Provider` aracılığıyla tüm alt bileşenlere dağıtılır.
+**Nasıl yapar**: İlk olarak `useState` hook'u ile lazy initialization (tembel başlatma) deseni kullanarak bir kez Supabase tarayıcı istemcisi oluşturur. Ortam değişkenlerinden `NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY` değerlerini okur; eğer bu değerler tanımsızsa yer tutucu (placeholder) değerler kullanır. Oluşturulan istemci nesnesini `useMemo` ile sararak gereksiz yeniden oluşturmaları önler ve `{ supabase }` değerini içeren bir context nesnesi oluşturur. Son olarak `SupabaseContext.Provider` bileşenini döndürerek children'ları bu context ile sarar.
 
 **Parametreler**:
-- `children`: `React.ReactNode` — Provider içinde sarılacak alt React bileşenleri. Bu prop, provider'ın render edeceği tüm JSX içeriğini temsil eder.
+- `children`: `React.ReactNode` — Provider bileşeninin içine sarılacak olan tüm alt React bileşenleri. Bu parametre, Supabase bağlantısına ihtiyaç duyan tüm alt bileşenlerin bu bağlama erişebilmesini sağlar.
 
-**Dönüş**: `JSX.Element` — `SupabaseContext.Provider` ile sarılmış children bileşenlerini içeren JSX yapısı döndürür.
+**Dönüş**: `JSX.Element` — `SupabaseContext.Provider` bileşeni döndürülür. Bu provider, `value` prop'u olarak `{ supabase }` nesnesini alır ve tüm çocuk bileşenlerin `useSupabase()` hook'u aracılığıyla Supabase istemcisine erişmesini mümkün kılar.
 
 ### useSupabaseClient
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -70,17 +78,22 @@ type SupabaseContextType = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/providers/SupabaseProvider.tsx::SupabaseProvider
-- **params**: (`{ children }: { children: React.ReactNode }`)
+### [N1_NASIL] AST Pointer: SupabaseProvider.tsx::SupabaseProvider
+- **params**: `{ children }` — `children: React.ReactNode` — Provider tarafından sarılacak alt React elemanları
 - **ic_degiskenler**:
-  - `supabase` — `useState` ile oluşturulan state değişkeni. Fonksiyonsal güncelleyici ile `createBrowserClient` çağrısı yapılarak bir kere oluşturulur. `process.env.NEXT_PUBLIC_SUPABASE_URL` ve `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` çevre değişkenlerinden değerleri alır; tanımlı değillerse placeholder değerler kullanılır. `Database` tipi ile generic olarak tiplenmiştir.
-- **Dönüş**: JSX (React.ReactNode), `SupabaseContext.Provider` ile sarılmış `children`.
+  - `supabase` — `createBrowserClient<Database>` ile oluşturulmuş Supabase istemcisi instance'ı; `useState` ile bir kez initialize edilir, sonraki render'larda aynı referans korunur
+  - `process.env.NEXT_PUBLIC_SUPABASE_URL` — Supabase projesi URL'i; environment variable'dan okunur, yoksa `'https://placeholder.supabase.co'` fallback'i kullanılır
+  - `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon public anahtarı; environment variable'dan okunur, yoksa `'placeholder-key'` fallback'i kullanılır
+  - `contextValue` — `useMemo` ile memoize edilmiş `{ supabase }` nesnesi; `supabase` bağımlılık dizisi değiştiğinde yeniden oluşturulur
+- **Dönüş**: JSX — `SupabaseContext.Provider` elemanını `value={contextValue}` ile sarıp `children`'ı render eder
 
-### [N2_NASIL] AST Pointer: src/providers/SupabaseProvider.tsx::useSupabaseClient
+---
+
+### [N2_NASIL] AST Pointer: SupabaseProvider.tsx::useSupabaseClient
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `context` — `useContext(SupabaseContext)` ile alınan bağlam nesnesi. `SupabaseProvider` içinde verilen `value={{ supabase }}` objesini içerir. `context` falsy ise bir `Error` fırlatılır (mesaj: `'useSupabaseClient must be used inside a SupabaseProvider'`).
-- **Dönüş**: `context` objesi (içerisinde `supabase` anahtarı bulunan `{ supabase: SupabaseClient<Database> }`).
+  - `context` — `useContext(SupabaseContext)` çağrısıyla elde edilen mevcut context değeri; içinde `{ supabase }` nesnesini tutar; `SupabaseProvider` dışındaysa `undefined` olabilir
+- **Dönüş**: `context` — `{ supabase: SupabaseClient<Database> }` nesnesi; `context` falsy ise hata fırlatılır
 
 ---
 

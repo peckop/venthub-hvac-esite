@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\movements\page.tsx
-skeleton_hash: 7804c758a3d6534d
+skeleton_hash: e470ff7722d42d88
 entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: c697ddf7c92cfa4f
+  func:Page: 9c08060caeb88969
+  overview: 9da4b48a024a6a7c
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-06T21:53:56Z
+generated_at: 2026-06-07T16:37:49Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetim panelindeki "Hareketler" (Movements) sayfasının ana giriş noktasıdır. Next.js uygulamasında admin arayüzünde hareket kayıtlarının görüntülendiği sayfayı sunar. Tek bileşenli yapısıyla, hareketlere ilişkin yönetim arayüzünün yüklenmesini ve render edilmesini sağlar.
+Bu modül, VentHub HVAC yönetim panelindeki "Hareketler" (Movements) sayfasının ana giriş noktasıdır. Tek bileşenli yapısıyla, hareketlere ilişkin yönetim arayüzünün yüklenmesini ve istemci tarafında render edilmesini sağlar.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
@@ -23,27 +23,28 @@ Hareketler yönetim sayfasının ana bileşenini tanımlar ve Next.js sayfa yön
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen fonksiyon imzalarından (sadece `Page()` – parametresiz) çıkarılabilecek mimari varsayım bulunmamaktadır.
+Bu modül, Next.js `app` router yapısında yer alan bir sayfa bileşenidir. Verilen fonksiyon imzası (`Page()` – parametresiz) ve modül yapısından (sadece `PageComponent` çağrısı) çıkarılabilecek minimum mimari varsayımlar aşağıdadır.
 
----
+**[Aksiyom 1]:** Eğer `PageComponent` modül ortamında tanımlı değilse veya yüklenemezse, `Page()` fonksiyonu bir `ReferenceError` / `ImportError` ile karşılaşır ve sayfa hiç render edilemez.
 
-**Gerekçe:**
+**[Aksiyom 2]:** Eğer Next.js app router yapılandırması `/admin/movements` rota yolunu geçerli bir sayfa olarak tanımıyorsa, `Page()` fonksiyonu hiç çağrılmaz ve kullanıcı bu sayfaya erişemez.
 
-Modülde tanımlı tek fonksiyon imzası `Page()` olup herhangi bir parametre, return tipi veya zorunlu bağımlılık belirtmemektedir. Bu nedenle fonksiyon imzasına dayalı olarak hüküm yürütülebilecek bir aksiyom üretilememektedir.
+**[Aksiyom 3]:** Fonksiyon parametresiz (`Page()`) olduğundan, bu sayfa dinamik rota parametrelerine (`params`, `searchParams`) bağımsızdır. Eğer ileride dinamik parametre kullanımı gerekirse, fonksiyon imzasının güncellenmesi zorunludur; aksi halde ilgili verilere erişilemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Next.js uygulamasında admin movements sayfasının ana sayfa bileşenini.render eder. Bu fonksiyon, sayfa yoluna erişildiğinde tarayıcıda görüntülenecek olan React bileşenini döndürür.
 
-**Nasıl yapar**: Fonksiyon minimal bir wrapper (kapsayıcı) yapısıyla çalışır. Herhangi bir state yönetimi, veri çekimi veya mantık içermez; doğrudan PageComponent adlı alt bileşeni çağırarak onun JSX çıktısını döndürür. Bu yapı, sayfa bileşeninin modular ve yeniden kullanılabilir olmasını sağlar.
+**Ne yapar**: Ana sayfa bileşenini Suspense sarmalayıcısı ile sararak, asenkron yüklemeler sırasında kullanıcıya animasyonlu bir yükleme göstergesi sunar ve yükleme tamamlandığında asıl sayfa bileşenini render eder.
+
+**Nasıl yapar**: React'in `Suspense` API'sini kullanarak iç bileşenlerin (`PageComponent`) yüklenme sürecini yönetir. `fallback` prop'u aracılığıyla, `PageComponent` henüz hazır olmadığında ekranda ortalanmış, dönen bir animasyonlu spinner (yüksekliği ve genişliği 12 birim olan, primary-navy renkli alt kenarlıklı yuvarlak) gösterir. Bu sayede kullanıcı deneyimi kesintisiz hale gelir.
 
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz.
+- Parametre almaz (propsuz fonksiyonel bileşen)
 
-**Dönüş**: `JSX.Element` — Sayfa yükleniğinde tarayıcıda render edilecek olan PageComponent bileşeninin JSX yapısını döndürür.
+**Dönüş**: `React.ReactNode` — Suspense ile sarılmış JSX yapısı döndürür. İçerisinde loading fallback'i ve `PageComponent` bileşenini barındırır.
 
 ---
 
@@ -55,15 +56,15 @@ Modülde tanımlı tek fonksiyon imzası `Page()` olup herhangi bir parametre, r
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/movements/page.tsx::(anonim_arrow_loading)
-- **params**: ()
-- **ic_degiskenler**: (yok — sadece JSX döndürür)
-- **Dönüş**: JSX element — ekran ortasında dönen spinner animasyonu gösteren loading bileşeni
+### [N1_NASIL] AST Pointer: src/app/admin/movements/page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — doğrudan JSX döner)
+- **Dönüş**: JSX element — `Suspense` sarıcı içinde `PageComponent` render eder; `fallback` olarak spinner JSX'i verilmiştir
 
-### [N2_NASIL] AST Pointer: src/app/admin/movements/page.tsx::Page
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `<PageComponent />` JSX — admin movements sayfasının ana bileşeni olarak dinamik yüklenmiş `PageComponent`'i render eder
+### [N2_NASIL] AST Pointer: src/app/admin/movements/page.tsx::(anonim fallback arrow)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — doğrudan JSX döner)
+- **Dönüş**: JSX element — yükleme durumunda gösterilen spinner (animasyonlu `div`)
 
 ---
 
