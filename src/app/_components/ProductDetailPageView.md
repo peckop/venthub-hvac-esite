@@ -8,7 +8,7 @@ entity_hashes:
   func:ProductDetailPage: e3b845e07eaace73
   overview: 13dd8be9bcbca1c9
   style_tokens: 97bcb7e77cb5d07f
-generated_at: 2026-06-06T21:54:37Z
+generated_at: 2026-06-07T12:01:37Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,19 @@ Sayfanın tamamını oluşturan merkezi bileşendir. Verilen ürün verisini kul
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modülün doğru çalışması için `initialProduct` parametresinin sağlanması zorunludur. Bileşen, bu veriye bağımlıdır ve veri olmadan anlamlı bir çıktı üretemez.
+
+[Aksiyom 1]: Eğer `initialProduct` parametresi `null` veya `undefined` ise, bileşen hatalı veya boş bir sayfa render eder.
+[Aksiyom 2]: Eğer `initialProduct` bir nesne (`object`) türünde değilse, bileşen iç erişimlerde (`.` notasyonu ile özellik erişimi) hata fırlatır.
+[Aksiyom 3]: Eğer `initialProduct` geçerli bir ürün verisi içermiyorsa (örneğin, boş bir `{}` nesnesi ise), bileşen eksik bilgilerle (örn: isimsiz, fiyat göstermeyen) bir sayfa render eder.
+[Aksiyom 4]: Eğer `initialProduct` içinde `images` alanı (`Array` türünde bir görsel listesi) tanımlı değilse veya boşsa, ürün görsel galerisi boş render edilir.
+[Aksiyom 5]: Eğer `initialProduct` içinde `features` alanı (`Array` türünde bir özellik listesi) tanımlı değilse, özellikler bölümü boş render edilir.
+[Aksiyom 6]: Eğer `initialProduct` içinde `price` alanı (`number` veya `string` türünde bir fiyat değeri) tanımlı değilse, fiyat bölümü boş render edilir.
+[Aksiyom 7]: Eğer `initialProduct` içinde `name` alanı (`string` türünde bir ürün adı) tanımlı değilse, sayfa başlığı bölümü boş render edilir.
+[Aksiyom 8]: Eğer `initialProduct` içinde `description` alanı (`string` türünde bir açıklama metni) tanımlı değilse, açıklama bölümü boş render edilir.
+[Aksiyom 9]: Eğer `initialProduct` içinde `stock` alanı (`number` türünde bir stok miktarı) tanımlı değilse, stok durumu bölümü boş render edilir veya stok durumu belirsiz gösterilir.
 
 ---
 

@@ -118,7 +118,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
       try {
         setLoading(true)
-        const productData = await getProductBySlug(currentSlug)
+        const productData = await getProductBySlug(supabase, currentSlug)
         if (!productData) {
           setProduct(null)
           return
@@ -137,7 +137,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
         // Related Products (GATEWAY ADAPTATION)
         if (productData.subcategory_id) {
-          const related = await getProductsEnriched({ 
+          const related = await getProductsEnriched(supabase, { 
             categoryIds: [productData.subcategory_id],
             limit: 10
           })

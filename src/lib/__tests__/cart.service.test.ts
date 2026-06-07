@@ -113,7 +113,7 @@ describe('cart.service', () => {
       })
       ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-      const result = await getOrCreateShoppingCart('user-1')
+      const result = await getOrCreateShoppingCart(supabase, 'user-1')
       expect(result).toEqual(mockCart)
     })
 
@@ -140,7 +140,7 @@ describe('cart.service', () => {
 
       ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-      const result = await getOrCreateShoppingCart('user-1')
+      const result = await getOrCreateShoppingCart(supabase, 'user-1')
       expect(result).toEqual(mockCart)
     })
 
@@ -166,7 +166,7 @@ describe('cart.service', () => {
 
         ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-        await expect(getOrCreateShoppingCart('user-1')).rejects.toEqual(mockError)
+        await expect(getOrCreateShoppingCart(supabase, 'user-1')).rejects.toEqual(mockError)
     })
   })
 
@@ -180,7 +180,7 @@ describe('cart.service', () => {
         }))
         ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-        const result = await listCartItems('cart-1')
+        const result = await listCartItems(supabase, 'cart-1')
         expect(result).toEqual(mockItems)
     })
   })
@@ -208,7 +208,7 @@ describe('cart.service', () => {
       })
       ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-      const result = await upsertCartItem({ cartId: 'cart-1', _productId: 'prod-1', quantity: 2 })
+      const result = await upsertCartItem(supabase, { cartId: 'cart-1', _productId: 'prod-1', quantity: 2 })
       expect(result).toEqual(mockItems)
     })
 
@@ -245,7 +245,7 @@ describe('cart.service', () => {
         })
         ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-        const result = await upsertCartItem({ cartId: 'cart-1', _productId: 'prod-1', quantity: 3 })
+        const result = await upsertCartItem(supabase, { cartId: 'cart-1', _productId: 'prod-1', quantity: 3 })
         expect(result).toEqual(mockItems)
       })
   })
@@ -261,7 +261,7 @@ describe('cart.service', () => {
         }))
         ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-        const result = await removeCartItem('cart-1', 'prod-1')
+        const result = await removeCartItem(supabase, 'cart-1', 'prod-1')
         expect(result).toBe(true)
     })
   })
@@ -275,7 +275,7 @@ describe('cart.service', () => {
         }))
         ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-        const result = await clearCartItems('cart-1')
+        const result = await clearCartItems(supabase, 'cart-1')
         expect(result).toBe(true)
     })
   })

@@ -93,7 +93,7 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
 
     const categoryIds = [category.id, ...subCategories.map(s => s.id)]
 
-    products = await getProductsEnriched({
+    products = await getProductsEnriched(supabase, {
       categoryIds,
       limit: 100
     })

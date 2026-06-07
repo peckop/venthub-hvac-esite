@@ -7,6 +7,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { HVAC_BRANDS } from '../data/brands'
 import { getProductsEnriched } from '../lib/services/product.service'
+import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { Product } from '../types/ui-models'
 import { BrandIcon } from '../components/HVACIcons'
 import { ArrowRight, Package, ExternalLink } from 'lucide-react'
@@ -109,7 +110,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
       if (!brand) return
       setLoading(true)
       try {
-        const data = await getProductsEnriched({
+        const data = await getProductsEnriched(supabaseBrowserClient, {
           brand: brand.name,
           limit: 8
         })

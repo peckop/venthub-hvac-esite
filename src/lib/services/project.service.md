@@ -3,185 +3,154 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts
-skeleton_hash: 1295cdbdebcee598
+skeleton_hash: 88db724d7c0cc06b
 entity_hashes:
-  func:addProductToProject: 1594b3164eacd4b8
-  func:createProject: d26dd214d1190fe7
-  func:deleteProject: 8954b4b6fc99d6f8
-  func:listProjectItems: 24cba4ef469359cd
-  func:listUserProjects: ecb590d6a7ea8030
-  func:removeProductFromProject: f7c9369ca9c14979
-  overview: 7ff4279173d96528
-generated_at: 2026-06-06T21:55:58Z
+  func:addProductToProject: 3ad72ee68e6e1dbb
+  func:createProject: f04be25a87702fe5
+  func:deleteProject: 46636280fcd04430
+  func:listProjectItems: 8111ac3266bdd891
+  func:listUserProjects: 01a071f49edbfd8e
+  func:removeProductFromProject: a5c4e58b38ee1a14
+  overview: de97a73d679f4e9d
+generated_at: 2026-06-07T12:09:53Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunda kullanıcıların projelerini oluşturmasını, listelemesini ve silmesini sağlayan temel bir proje yönetim servisidir. Ayrıca her bir projeye ürün eklenmesi, çıkarılması ve proje içeriğinin sorgulanması gibi ürün bazlı yönetim işlemlerini destekler. Tüm fonksiyonlar Supabase istemcisi üzerinden veritabanıyla iletişim kurar ve kullanıcı oturumuna bağlı çalışır.
+VentHub HVAC platformunda kullanıcıların projelerini yönetmesini ve bu projelere ürün ekleyip çıkarmasını sağlayan bir servis modülüdür. Modül, Supabase veritabanı üzerinden proje yaşam döngüsü (oluşturma, listeleme, silme) ve proje içeriği yönetimi (ürün ekleme, çıkarma, listeleme) işlemlerini merkezi olarak yürütür.
 
 ## Fonksiyon Grupları
 ### Proje Yaşam Döngüsü
-Kullanıcının kendi projeleri üzerindeki temel CRUD işlemlerini yönetir; projenin varoluşundan silinmesine kadar olan tüm adımları kapsar.
+Kullanıcının kendi projeleri üzerindeki temel CRUD (Oluştur, Oku, Güncelle, Sil) işlemlerini yönetir; projenin varoluşundan silinmesine kadar olan tüm adımları kapsar.
 - listUserProjects, createProject, deleteProject
 
 ### Proje Ürün Yönetimi
-Oluşturulmuş bir projeye bağlı ürünlerin eklenmesi, çıkarılması ve listelenmesi gibi proje içeriğiyle ilgili işlemleri yürütür.
+Oluşturulmuş bir projeye bağlı ürünlerin eklenmesi, çıkarılması ve projenin mevcut içeriğinin sorgulanması gibi proje detayıyla ilgili işlemleri yürütür.
 - addProductToProject, removeProductFromProject, listProjectItems
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kullanıcıların proje oluşturmasını, yönetmesini ve projelere ürün eklemesini/çıkarmasını sağlayan bir servis katmanıdır. Aşağıdaki mimari varsayımlar, fonksiyon imzaları ve modül sabitlerinden türetilmiştir.
+Bu modül, Supabase tabanlı bir proje yönetim servisidir ve fonksiyon imzalarından çıkarılan aşağıdaki mimari varsayımlara dayanır.
 
----
+**[Aksiyom 1]:** Eğer `SupabaseClient<Database>` parametresi geçerli ve oturum açmış (authenticated) bir istemci değilse, tüm veritabanı işlemleri başarısız olur veya boş sonuç döner.
 
-**[Aksiyom 1 – Supabase İstemci Bağımlılığı]:**
-Tüm fonksiyonlar (`listUserProjects`, `createProject`, `deleteProject`, `addProductToProject`, `removeProductFromProject`, `listProjectItems`) zorunlu bir `supabase` parametresi alır. Eğer işlevsel bir Supabase istemcisi (veya geçerli bir bağlantı) sağlanmazsa, hiçbir veritabanı okuma/yazma işlemi gerçekleştirilemez ve fonksiyonlar başarısız olur.
+**[Aksiyom 2]:** Eğer `listUserProjects` fonksiyonu çağrıldığında aktif bir kullanıcı oturumu (session) yoksa, kullanıcının projeleri listelenemez (boş dizi döner veya hata oluşur).
 
----
+**[Aksiyom 3]:** Eğer `deleteProject` için verilen `id` parametresi mevcut bir projeye ait değilse, silinecek kayıt bulunamaz ve değişiklik yapılamaz.
 
-**[Aksiyom 2 – `user_projects` Tablosu Varlığı]:**
-`createProject` fonksiyonu `TablesInsert<'user_projects'>` tipinde bir parametre alır. Eğer Supabase veritabanında `user_projects` adında bir tablo (ilgili kolon tanımlarıyla birlikte) yoksa, proje oluşturma işlemleri veritabanı düzeyinde hata verir.
+**[Aksiyom 4]:** Eğer `addProductToProject` için verilen `projectId` mevcut bir proje değilse, referans bütünlüğü ihlali (foreign key violation) oluşur.
 
----
+**[Aksiyom 5]:** Eğer `addProductToProject` için verilen `productId` mevcut bir ürün değilse, referans bütünlüğü ihlali oluşur.
 
-**[Aksiyom 3 – Proje Tanımlayıcı Zorunluluğu]:**
-`deleteProject`, `addProductToProject`, `removeProductFromProject` ve `listProjectItems` fonksiyonlarının tümü bir `projectId: string` (veya `id: string`) parametresi alır. Eğer geçerli (mevcut ve doğru formatta) bir proje UUID'si sağlanmazsa, ilgili proje üzerindeki silme, ürün ekleme/çıkarma veya listelege Operations başarısız olur veya tutarsız veriye yol açar.
+**[Aksiyom 6]:** Eğer `addProductToProject` için `quantity` parametresi pozitif bir sayı değilse (0 veya negatif), anlamsız bir ürün-miktar ilişkisi oluşturulur.
 
----
+**[Aksiyom 7]:** Eğer `removeProductFromProject` için verilen `projectId` veya `productId` kombinasyonu mevcut bir proje-ürün ilişkisi değilse, kaldırılacak kayıt bulunamaz.
 
-**[Aksiyom 4 – Ürün Tanımlayıcı Zorunluluğu]:**
-`addProductToProject` ve `removeProductFromProject` fonksiyonları `productId: string` parametresi alır. Eğer geçerli (mevcut) bir ürün tanımlayıcısı sağlanmazsa, proje-ürün ilişkisi oluşturulamaz veya kaldırılamaz.
+**[Aksiyom 8]:** Eğer `createProject` için verilen `TablesInsert<'user_projects'>` verisi gerekli alanları (zorunlu kolonları) içermiyorsa, veritabanı insert işlemi başarısız olur.
 
----
+**[Aksiyom 9]:** Eğer `listProjectItems` için verilen `projectId` mevcut bir projeye ait değilse, boş sonuç kümesi döner veya hata oluşur.
 
-**[Aksiyom 5 – Miktar Sayısal Olmalı]:**
-`addProductToProject` fonksiyonu `quantity: number` parametresi alır. Fonksiyon imzasında sıfır, negatif veya sıfırdan büyük olduğuna dair bir kısıt belirtilmemiştir; ancak miktarın `number` tipinde olması zorunludur. Eğer `quantity` sayısal bir değer olarak sağlanmazsa, fonksiyon imzası ihlal edilmiş olur.
-
----
-
-**[Aksiyom 6 – Kullanıcı Bağlamı (Dolaylı):**
-Fonksiyon isimleri (`listUserProjects`) ve tablo adı (`user_projects`) bir kullanıcı-proje ilişkisi olduğunu gösterir. Bu ilişkili operations'ların doğru çalışması için, sağlanan `supabase` istemcisinin geçerli bir kullanıcı oturumu/kimlik bağlamına sahip olması beklenir. Eğer böyle bir bağlam yoksa, kullanıcıya ait projelerin listelenmesi veya kullanıcıya ait projeye yazı yapılması anlam tutarsızlığına veya erişim hatasına yol açar.
-
----
-
-**[Aksiyom 7 – `defaultClient` Ternary Mantığı]:**
-Modül sabitleri arasında `defaultClient` adında bir ternary ifade (koşullu değer ataması) bulunmaktadır. Bu sabit, bir koşula bağlı olarak farklı bir Supabase istem
+**[Aksiyom 10]:** Fonksiyon imzalarında proje sahiplik doğrulaması (ownership check) uygulama katmanında görünmemektedir; eğer Supabase Row-Level Security (RLS) politikaları tanımlı değilse, kullanıcılar başkalarının projelerine erişebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### listUserProjects
-**Ne yapar**: Oturum açmış kullanıcıya ait tüm projeleri getirir. Proje listesi son güncelleme tarihine göre azalan sırada sıralanır.
-
-**Nasıl yapar**: `user_projects` tablosundaki tüm kayıtları `updated_at` alanına göre azalan (en yeni en üstte) sırayla sorgular. Sorgu sonucunda hata oluşursa fırlatır, aksi halde veri dizisini döner.
-
+**Ne yapar**: Kimliği doğrulanmış mevcut kullanıcıya ait tüm projeleri getirir.
+**Nasıl yapar**: Supabase istemcisi aracılığıyla 'user_projects' tablosundaki tüm kayıtları, `updated_at` alanına göre azalan sırayla (en son güncellenen üstte) sorgular. Sorgu sonucunda veri yoksa boş bir dizi döner, hata oluşursa fırlatır.
 **Parametreler**:
-- `supabase` : `SupabaseClient` — Kullanılacak Supabase istemcisi. Belirtilmezse varsayılan istemci (`defaultClient`) kullanılır.
-
-**Dönüş**: `Promise<DbUserProject[]>` — Kullanıcının projelerinin bir dizisi. Kullanıcının hiç projesi yoksa boş bir dizi döner.
+- `supabase`: SupabaseClient<Database> — Etkin Supabase istemci örneği.
+**Dönüş**: `Promise<DbUserProject[]>` — Kullanıcının proje kayıtlarının bir dizisi; eğer proje yoksa boş bir dizi döner.
 
 ### createProject
 **Ne yapar**: Kimliği doğrulanmış kullanıcı için yeni bir proje oluşturur.
-**Nasıl yapar**: Verilen proje nesnesini (`project`) `user_projects` tablosuna ekler. Ekledikten sonra `select()` ile eklenen kaydı geri çeker ve `.single()` ile tek bir kayıt olarak alır. Veritabanı ekleme işlemi başarılıysa yeni oluşan `DbUserProject` kaydını döndürür; bir hata oluşursa hatayı fırlatır.
+**Nasıl yapar**: Verilen proje detaylarını kullanarak 'user_projects' tablosuna yeni bir satır ekler, eklenen kaydı (`select().single()`) döndürür. İşlem başarısız olursa bir hata fırlatır.
 **Parametreler**:
-- project: `TablesInsert<'user_projects'>` — Veritabanı şemasıyla eşleşen, oluşturulacak projenin detaylarını içeren nesne.
-**Dönüş**: `Promise<DbUserProject>` — Yeni oluşturulan kullanıcı projesi kaydını temsil eden bir nesne döner.
+- `supabase`: SupabaseClient<Database> — Etkin Supabase istemci örneği.
+- `project`: TablesInsert<'user_projects'> — Veritabanı şemasıyla eşleşen eklenecek proje detayları.
+**Dönüş**: `Promise<DbUserProject>` — Yeni oluşturulan kullanıcı projesi kaydı.
 
 ### deleteProject
-**Ne yapar**: Belirtilen kimliğe sahip kullanıcı projesini ve ilişkili tüm öğelerini siler (kaskad silme veritabanı tarafından ele alınır).
-**Nasıl yapar**: `user_projects` tablosunda `id` alanı verilen parametreye eşleşen kaydı siler. İşlem başarılıysa `true` değerini döndürür; bir hata oluşursa hatayı fırlatır.
+**Ne yapar**: Belirtilen projeyi ve ilişkili tüm öğelerini siler (kaskad silme genellikle veritabanı tarafından işlenir).
+**Nasıl yapar**: Verilen `id` ile eşleşen kaydı 'user_projects' tablosundan siler. İşlem başarılı olursa `true` döner, aksi takdirde hata fırlatır.
 **Parametreler**:
-- id: `string` — Silinecek projenin benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<boolean>` — Silme işlemi başarılıysa `true` döner.
+- `supabase`: SupabaseClient<Database> — Etkin Supabase istemci örneği.
+- `id`: string — Silineceğin projenin benzersiz tanımlayıcısı.
+**Dönüş**: `Promise<boolean>` — Silme işlemi başarılı olursa `true`.
 
 ### addProductToProject
-**Ne yapar**: Belirli bir ürünü, belirli bir projeye istenen miktar kadar ekler.
-**Nasıl yapar**: `project_items` tablosuna, verilen `projectId`, `productId` ve `quantity` değerlerini içeren yeni bir kayıt ekler. Ekledikten sonra `select()` ile eklenen kaydı geri çeker ve `.single()` ile tek bir kayıt olarak alır. İşlem başarılıysa yeni oluşan `DbProjectItem` kaydını döndürür; bir hata oluşursa hatayı fırlatır. Miktar parametresi opsiyoneldir ve varsayılan olarak 1'dir.
+**Ne yapar**: Belirli bir ürünü, belirtilen miktarda (varsayılan olarak 1) bir kullanıcı projesine ekler.
+**Nasıl yapar**: 'project_items' tablosuna `project_id`, `product_id` ve `quantity` alanlarını içeren yeni bir satır ekler ve eklenen kaydı döndürür.
 **Parametreler**:
-- projectId: `string` — Ürünün ekleneceği hedef projenin benzersiz tanımlayıcısı.
-- productId: `string` — Eklenen ürünün benzersiz tanımlayıcısı.
-- quantity: `number` — Eklenecek birim sayısı (varsayılan değer 1'dir).
-**Dönüş**: `Promise<DbProjectItem>` — Yeni oluşan proje öğesi kaydını temsil eden bir nesne döner.
+- `supabase`: SupabaseClient<Database> — Etkin Supabase istemci örneği.
+- `projectId`: string — Hedef projenin benzersiz tanımlayıcısı.
+- `productId`: string — Eklenen ürünün benzersiz tanımlayıcısı.
+- `quantity`: number — Eklenecek birim sayısı (varsayılan 1).
+**Dönüş**: `Promise<DbProjectItem>` — Yeni oluşturulan proje öğesi kaydı.
 
 ### removeProductFromProject
-**Ne yapar**: Belirli bir projeden belirli bir ürünü kaldırır.
-**Nasıl yapar**: `project_items` tablosunda `project_id` ve `product_id` alanları verilen parametrelere eşleşen kaydı siler. İşlem başarılıysa `true` değerini döndürür; bir hata oluşursa hatayı fırlatır.
+**Ne yapar**: Belirli bir ürünü belirtilen bir kullanıcı projesinden kaldırır.
+**Nasıl yapar**: 'project_items' tablosunda, hem `project_id` hem de `product_id` alanları eşleşen kaydı siler. İşlem başarılı olursa `true` döner.
 **Parametreler**:
-- projectId: `string` — Ürünün kaldırılacağı hedef projenin benzersiz tanımlayıcısı.
-- productId: `string` — Kaldırılacak ürünün benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<boolean>` — Silme işlemi başarılıysa `true` döner.
+- `supabase`: SupabaseClient<Database> — Etkin Supabase istemci örneği.
+- `projectId`: string — Hedef projenin benzersiz tanımlayıcısı.
+- `productId`: string — Kaldırılacak ürünün benzersiz tanımlayıcısı.
+**Dönüş**: `Promise<boolean>` — Kaldırma işlemi başarılı olursa `true`.
 
 ### listProjectItems
-**Ne yapar**: Belirli bir projedeki tüm ürünleri, karşılıklı gelen alan ürün verileriyle birlikte getirir.
-**Nasıl yapar**: `project_items` tablosunda `project_id` alanı verilen parametreye eşleşen tüm kayıtları sorgular. `product:products(*)` seçimi ile her bir proje öğesinin ilişkili `products` tablosundaki tam verisini de (sol dış birleştirme) çeker. Sonuçta her bir `DbProjectItem` nesnesi, `product` alanı olarak ilgili `DbProduct` nesnesini içerir. Ham veritabanı verisi, `mapDatabaseProductToDomain` yardımcı fonksiyonu kullanılarak alan modeline dönüştürülür. Veritabanı sorgusu başarısız olursa hata fırlatılır.
+**Ne yapar**: Belirli bir projedeki tüm öğeleri, karşılık gelen alan ürün verileriyle birlikte getirir.
+**Nasıl yapar**: 'project_items' tablosunu 'products' tablosu ile birleştirerek (join) belirtilen `project_id` ile eşleşen tüm satırları çeker. Elde edilen her bir öğe, `mapDatabaseProductToDomain` yardımıyla zenginleştirilerek `product` alanı eklenmiş halde döndürülür.
 **Parametreler**:
-- projectId: `string` — Öğelerin getirileceği hedef projenin benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<ProjectItem[]>` — Her biri tam ürün ayrıntılarıyla zenginleştirilmiş proje öğelerini temsil eden bir dizi döner.
-
----
-
-## SABİTLER
-- **defaultClient** (ternary_expression) — `typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient`
+- `supabase`: SupabaseClient<Database> — Etkin Supabase istemci örneği.
+- `projectId`: string — Hedef projenin benzersiz tanımlayıcısı.
+**Dönüş**: `Promise<ProjectItem[]>` — Her biri tam ürün detaylarıyla zenginleştirilmiş proje öğelerinin bir dizisi.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: project.service.ts::listUserProjects
-- **params**: `supabase` — Supabase istemcisi (varsayılan: defaultClient)
+- **params**: (supabase: SupabaseClient<Database>)
 - **ic_degiskenler**:
-  - `data` — user_projects tablosundan gelen satır verileri (DbUserProject[])
-  - `error` — Supabase sorgu hatası (yoksa null)
-- **Dönüş**: `Promise<DbUserProject[]>` — kullanıcı projeleri listesi
+  - `data` — Supabase'den `user_projects` tablosuna yapılan sorgunun成功的 sonucunu tutar (Proje nesneleri dizisi veya null).
+  - `error` — Supabase sorgusu sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
+- **Dönüş**: `Promise<DbUserProject[]>` — Hata fırlatmazsa, sıralanmış proje listesini veya boş bir dizi döndürür.
 
 ### [N2_NASIL] AST Pointer: project.service.ts::createProject
-- **params**: 
-  - `project` — Oluşturulacak proje verisi (TablesInsert<'user_projects'> tipinde)
-  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
+- **params**: (supabase: SupabaseClient<Database>, project: TablesInsert<'user_projects'>)
 - **ic_degiskenler**:
-  - `data` — Yeni oluşturulmuş proje satırı (DbUserProject)
-  - `error` — Supabase insert hatası (yoksa null)
-- **Dönüş**: `Promise<DbUserProject>` — yeni oluşturulan proje
+  - `data` — Yeni oluşturulan projenin tam verisini tutar (tek bir DbUserProject nesnesi veya null).
+  - `error` — `insert` ve `select` işlemleri sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
+- **Dönüş**: `Promise<DbUserProject>` — Hata fırlatmazsa, yeni oluşturulan projenin verisini döndürür.
 
 ### [N3_NASIL] AST Pointer: project.service.ts::deleteProject
-- **params**: 
-  - `id` — Silinecek projenin ID'si (string)
-  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
+- **params**: (supabase: SupabaseClient<Database>, id: string)
 - **ic_degiskenler**:
-  - `error` — Supabase delete hatası (yoksa null)
-- **Dönüş**: `Promise<boolean>` — silme başarılı ise true
+  - `error` — Belirtilen `id`'ye sahip projeyi silme işlemi sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
+- **Dönüş**: `Promise<boolean>` — Hata fırlatmazsa `true` döndürerek silme işleminin başarılı olduğunu belirtir.
 
 ### [N4_NASIL] AST Pointer: project.service.ts::addProductToProject
-- **params**: 
-  - `projectId` — Ürün eklenecek projenin ID'si (string)
-  - `productId` — Eklenecek ürünün ID'si (string)
-  - `quantity` — Eklenecek ürün miktarı (number, varsayılan: 1)
-  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
+- **params**: (supabase: SupabaseClient<Database>, projectId: string, productId: string, quantity: number = 1)
 - **ic_degiskenler**:
-  - `data` — Yeni eklenmiş proje öğesi satırı (DbProjectItem)
-  - `error` — Supabase insert hatası (yoksa null)
-- **Dönüş**: `Promise<DbProjectItem>` — eklenen proje öğesi
+  - `data` — Yeni eklenen proje ürününün tam verisini tutar (tek bir DbProjectItem nesnesi veya null).
+  - `error` — `project_items` tablosuna `insert` ve ardından `select` işlemleri sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
+- **Dönüş**: `Promise<DbProjectItem>` — Hata fırlatmazsa, yeni eklenen proje ürününün verisini döndürür.
 
 ### [N5_NASIL] AST Pointer: project.service.ts::removeProductFromProject
-- **params**: 
-  - `projectId` — Ürün silinecek projenin ID'si (string)
-  - `productId` — Silinecek ürünün ID'si (string)
-  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
+- **params**: (supabase: SupabaseClient<Database>, projectId: string, productId: string)
 - **ic_degiskenler**:
-  - `error` — Supabase delete hatası (yoksa null)
-- **Dönüş**: `Promise<boolean>` — silme başarılı ise true
+  - `error` — Belirtilen `projectId` ve `productId`'ye sahip ürünü `project_items` tablosundan silme işlemi sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
+- **Dönüş**: `Promise<boolean>` — Hata fırlatmazsa `true` döndürerek silme işleminin başarılı olduğunu belirtir.
 
 ### [N6_NASIL] AST Pointer: project.service.ts::listProjectItems
-- **params**: 
-  - `projectId` — Öğeleri listelenecek projenin ID'si (string)
-  - `supabase` — Supabase istemcisi (varsayılan: defaultClient)
+- **params**: (supabase: SupabaseClient<Database>, projectId: string)
 - **ic_degiskenler**:
-  - `data` — Proje öğeleri ve ilişkili ürün verileri (DbProjectItem & { product: DbProduct | null }[])
-  - `error` — Supabase select hatası (yoksa null)
-  - `items` — Ham verinin tip güvenli versiyonu ve boş dizi fallback'i
-- **Dönüş**: `Promise<ProjectItem[]>` — dönüştürülmüş proje öğeleri listesi (ürün verisi mapDatabaseProductToDomain ile alanı dönüştürülmüş)
+  - `data` — Supabase'den `project_items` tablosu ile `products` tablosunu birleştiren (join) sorgunun sonucunu tutar (ilişkili veri dizisi veya null).
+  - `error` — Birleşik (join) sorgu ve `eq` filtresi uygulanırken oluşabilecek hatayı tutar (null veya Error nesnesi).
+  - `items` — `data` dizisinin null olma ihtimaline karşı `|| []` ile安全 hale getirilmiş ve `(DbProjectItem & { product: DbProduct | null })[]` türüne dönüştürülmüş halini tutar.
+- **Dönüş**: `Promise<ProjectItem[]>` — Hata fırlatmazsa, her bir `item` üzerinde `.map` ile dönüştürülmüş ve `product` alanı `mapDatabaseProductToDomain` ile alan-aralıklı (domain) modele dönüştürülmüş proje ürünü listesini döndürür.
 
 ---
 

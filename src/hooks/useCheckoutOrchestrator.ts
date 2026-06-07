@@ -6,6 +6,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { listAddresses } from '@/lib/services/address.service'
 import type { UserAddress, InvoiceProfile } from '@/types/ui-models'
 import { listInvoiceProfiles } from '../lib/services/invoice.service'
+import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { 
   CheckoutCustomerInfo, 
   CheckoutAddressInfo, 
@@ -81,7 +82,7 @@ export const useCheckoutOrchestrator = () => {
     async function loadInvoiceProfiles() {
       if (!user) return
       try {
-        const rows = await listInvoiceProfiles()
+        const rows = await listInvoiceProfiles(supabaseBrowserClient)
         setSavedInvoiceProfiles(rows)
         // Find default or first profile to pre-fill
         const defProfile = rows.find(r => r.is_default) || rows[0]
@@ -122,7 +123,7 @@ export const useCheckoutOrchestrator = () => {
     async function loadAddresses() {
       if (!user) return
       try {
-        const rows = await listAddresses()
+        const rows = await listAddresses(supabaseBrowserClient)
         setSavedAddresses(rows)
         const defShip = rows.find(r => r.is_default_shipping)
         if (defShip) {

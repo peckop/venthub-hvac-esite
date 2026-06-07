@@ -81,7 +81,7 @@ describe('category.service', () => {
 
       ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-      const result = await getCategories()
+      const result = await getCategories(supabase)
 
       expect(result).toEqual(mockCategories)
       expect(supabase.from).toHaveBeenCalledWith('categories')
@@ -102,7 +102,7 @@ describe('category.service', () => {
 
       ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-      await expect(getCategories()).rejects.toThrow('Fetch failed')
+      await expect(getCategories(supabase)).rejects.toThrow('Fetch failed')
     })
   })
 })

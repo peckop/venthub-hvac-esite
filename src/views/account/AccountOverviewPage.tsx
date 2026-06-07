@@ -45,7 +45,7 @@ export default function AccountOverviewPage() {
 
         // 1. Adresler
         try {
-          const addrData = await listAddresses()
+          const addrData = await listAddresses(supabase)
           if (mounted) setAddresses(addrData)
         } catch { }
 

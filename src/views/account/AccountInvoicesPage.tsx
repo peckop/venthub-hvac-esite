@@ -2,6 +2,7 @@
 
 import React, { useEffect, useCallback, useState } from 'react'
 import { createInvoiceProfile, deleteInvoiceProfile, listInvoiceProfiles, setDefaultInvoiceProfile, updateInvoiceProfile } from '@/lib/services/invoice.service'
+import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { InvoiceProfile } from '@/types/ui-models'
 import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -33,7 +34,7 @@ export default function AccountInvoicesPage() {
   const load = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await listInvoiceProfiles()
+      const data = await listInvoiceProfiles(supabaseBrowserClient)
       setItems(data as InvoiceProfile[])
     } catch (e) {
       console.error(e)
@@ -100,10 +101,10 @@ export default function AccountInvoicesPage() {
       }
 
       if (editingId) {
-        await updateInvoiceProfile(editingId, payload)
+        await updateInvoiceProfile(supabaseBrowserClient, editingId, payload)
         toast.success('Profil güncellendi')
       } else {
-        await createInvoiceProfile(payload)
+        await createInvoiceProfile(supabaseBrowserClient, payload)
         toast.success('Profil oluşturuldu')
       }
       resetForm()
@@ -119,7 +120,7 @@ export default function AccountInvoicesPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Silmek istediğinize emin misiniz?')) return
     try {
-      await deleteInvoiceProfile(id)
+      await deleteInvoiceProfile(supabaseBrowserClient, id)
       toast.success('Profil silindi')
       await load()
     } catch (e) {
@@ -130,7 +131,7 @@ export default function AccountInvoicesPage() {
 
   const handleMakeDefault = async (id: string) => {
     try {
-      await setDefaultInvoiceProfile(id)
+      await setDefaultInvoiceProfile(supabaseBrowserClient, id)
       toast.success('Varsayılan profil yapıldı')
       await load()
     } catch (e) {

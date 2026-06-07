@@ -3,123 +3,83 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\sitemap.ts
-skeleton_hash: fa7c2b0046492944
+skeleton_hash: b03af8c8b5a74eba
 entity_hashes:
-  func:sitemap: 07414dd0bcd23791
-  overview: fbb6fde2da42ac38
-generated_at: 2026-06-06T21:54:28Z
+  func:sitemap: 6471d8775000e352
+  overview: 9af1926cebf28d0e
+generated_at: 2026-06-07T12:01:58Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js uygulaması için site haritasını (sitemap) dinamik olarak oluşturmaktan sorumludur. Statik sayfalar, kategoriler, markalar ve ürünler gibi tüm içerik türlerinin URL'lerini toplayarak arama motorları için yapılandırılmış bir site haritası üretir. Türkçe ve İngilizce çoklu dil desteğiyle, her URL için son değişiklik tarihi, değişim sıklığı ve öncelik gibi meta verileri içerir.
+Bu modül, Next.js uygulaması için arama motoru dostu site haritasını dinamik olarak üretir. Statik sayfalar, kategoriler, markalar ve ürünler olmak üzere tüm içerik türlerinin URL'lerini toplayarak, Türkçe ve İngilizce çoklu dil desteğiyle yapılandırılmış bir site haritası döndürür.
 
 ## Fonksiyon Grupları
 ### Site Haritası Oluşturma
-Uygulamanın tüm rotalarını tarayarak arama motoru dostu site haritası verisini hazırlar.
+Uygulamanın tüm sayfa rotalarını (statik sayfalar, kategoriler, markalar, ürünler) tarayarak arama motorları için geçerli bir site haritası yapısı hazırlar.
 - sitemap
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için minimum aksiyom tanımlanabilir. `sitemap()` fonksiyonu parametresizdir ve modül sabiti bulunmamaktadır. Fonksiyon gövdesi sunulmadığı için yalnızca imza tabanlı çıkarımlar yapılabilir:
+
+[Aksiyom 1]: Eğer fonksiyonun döndüğü veri yapısı arama motoru tarafından okunamaz formatta ise, site haritası geçersiz olur.
+
+[Aksiyom 2]: Eğer Next.js router yapılandırmasında tanımlı rotalar değiştirilir ancak fonksiyon bu değişiklikleri yansıtmazsa, site haritası eksik veya tutarsız URL'ler içerir.
+
+[Aksiyom 3]: Eğer fonksiyon çağrıldığında içeriğe erişim sağlanamazsa (veritabanı, API, dosya sistemi vb.), site haritası boş veya hatalı döner.
+
+---
+
+**Not:** Fonksiyon gövdesi detaylı olarak sunulmadığından, bağımlılıklar, dönüş tipi yapısı ve iş mantığı hakkında kesin aksiyom türetilmemiştir. Daha kesin aksiyonlar için `sitemap()` gövdesinin tam kodu gereklidir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### sitemap
-**Ne yapar**: Bu fonksiyon, web sitesinin tüm sayfalarını (statik sayfalar, kategoriler, markalar ve ürünler) arama motorları için yapılandırılmış bir site haritası formatında, çoklu dil desteğiyle (Türkçe ve İngilizce) oluşturur.
-**Nasıl yapar**: Fonksiyon, site URL'sini ve desteklenen dilleri temel alır. Asenkron olarak kategori ve ürün verilerini çeker. Ardından, tanımlanmış statik rotaları, çekilen kategori verilerine göre kategori rotalarını, önceden tanımlı `HVAC_BRANDS` dizisinden marka rotalarını ve geçerli bir `slug` değeri olan ürünler için ürün rotalarını, her biri için yerelleştirilmiş URL'ler, son güncellenme tarihi, değişim sıklığı ve öncelik gibi meta verilerle birleştirip döndürür.
+
+**Ne yapar**: Bu fonksiyon, web sitesinin tüm sayfalarını içeren bir site haritası (sitemap) oluşturur. Arama motorlarının siteyi doğru bir şekilde indekslemesini sağlamak için statik sayfaları, kategori sayfalarını, marka sayfalarını ve ürün sayfalarını tek bir çatı altında toplar. Her URL için dil alternatifleri, güncellenme tarihleri ve öncelik seviyeleri dahil olmak üzere SEO dostu metadata bilgileri üretir.
+
+**Nasıl yapar**: Fonksiyon çalıştırıldığında öncelikle Supabase üzerinden tüm kategorileri ve ürünleri paralel olarak getirir. Ardından dört aşamalı bir süreç izler: önce tanımlı statik rotaları (anasayfa, ürünler, markalar, iletişim vb.) her iki dil için oluşturur; ardından veritabanından gelen kategori rotalarını, sabit olarak tanımlı HVAC_BRANDS dizisinden marka rotalarını ve sadece `slug` değeri olan ürünleri filtreleyerek ürün rotalarını üretir. Her bir rota nesnesi için `alternates.languages` alanında Türkçe ve İngilizce URL karşılıkları tanımlanır. Son olarak tüm bu dizi birleştirilip döndürülür. Veri çekme işlemlerinde hata oluşursa boş dizi döner (`catch(() => [])`), böylece hatalı veriler sitemap üretimini bozmaz.
+
 **Parametreler**:
-Bu fonksiyon parametre almaz.
-**Dönüş**: `Promise<MetadataRoute.Sitemap>` - Tüm sayfaları (statik, kategori, marka ve ürün) ve bunların dil alternatiflerini içeren, arama motoru optimizasyonu için hazırlanmış bir site haritası dizisi.
+
+Bu fonksiyon herhangi bir parametre almaz. Tüm yapılandırma değerleri fonksiyon gövdesi içinde tanımlıdır:
+
+- `SITE_URL`: `string` — Sitemap'teki tüm URL'lerin oluşturulmasında kullanılan temel site adresi (base URL). Modül düzeyinde tanımlı bir sabittir.
+- `locales`: `string[]` — Desteklenen dil kodlarının dizisi. Fonksiyon içinde `['tr', 'en']` olarak sabit tanımlanmıştır ve her rotanın her iki dil varyantını üretmek için kullanılır.
+- `supabaseStaticClient`: `object` — Veritabanı istekleri için kullanılan statik Supabase istemcisi. `getCategories` ve `getAllProducts` fonksiyonlarına argüman olarak geçilir.
+- `staticRoutesList`: `string[]` — Sitemap'e dahil edilecek statik sayfa yollarının listesi. Anasayfa, ürünler, markalar, iletişim, hakkımızda, destek merkezi, sepet ve yasal sayfaları (KVKK, gizlilik politikası, çerez politikası) bu dizi içinde tanımlıdır.
+- `HVAC_BRANDS`: `array` — Marka rotalarının oluşturulmasında kullanılan sabit marka listesi. Her bir marka nesnesinin `slug` alanı rota üretiminde referans olarak kullanılır.
+- `Routes`: `object` — Uygulama genelinde tanımlı rota oluşturucu yardımcı fonksiyonları içeren nesne. `Routes.category()`, `Routes.brand()` ve `Routes.product()` metodları ile parametreli URL'ler üretilir.
+
+**Dönüş**: `Promise<MetadataRoute.Sitemap>` — Asenkron bir şekilde, site haritası için gereken tüm URL nesnelerini içeren bir dizi döndürür. Her bir nesne şu alanları içerir:
+
+- `url`: `string` — Sayfanın tam URL'i (dil kodu ve rota dahil).
+- `lastModified`: `Date` — Sayfanın son güncellenme tarihi. Statik rotalar için güncel tarih, dinamik rotalar için veritabanındaki `updated_at` değeri kullanılır; bu alan yoksa güncel tarih fallback olarak atanır.
+- `changefreq`: `string` — Arama motorlarına sayfanın güncellenme sıklığını bildirir. Statik rotalar için `daily`, kategori ve marka rotaları için `weekly`, ürün rotaları için `daily` olarak ayarlanmıştır.
+- `priority`: `number` — Sayfanın göreli önceliğini belirtir. Anasayfa `1.0` ile en yüksek önceliğe sahiptir; ürün rotaları `0.9`, statik rotalar `0.8`, kategoriler `0.7` ve markalar `0.6` değerlerine sahiptir.
+- `alternates.languages`: `Record<string, string>` — Her URL'in Türkçe (`tr`) ve İngilizce (`en`) karşılıklarını içeren dil haritası. Arama motorlarına alternatif dil sürümlerini bildirmek için kullanılır.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap`
+### [N1_NASIL] AST Pointer: src/app/sitemap.ts::sitemap
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `baseUrl` — SITE_URL sabitinden alınan site kök URL'si, tüm sitemap URL'lerinin başına eklenir
-  - `locales` — Desteklenen dil kodlarının dizisi `['tr', 'en']`, her sayfanın çok dilli versiyonunu oluşturmak için kullanılır
-  - `categories` — `getCategories()` API çağrısının sonucu; kategori listesi, categoryRoutes oluşturmak için kullanılır; hata durumunda boş diziye düşer
-  - `products` — `getAllProducts()` API çağrısının sonucu; ürün listesi, productRoutes oluşturmak için kullanılır; hata durumunda boş diziye düşer
-  - `staticRoutesList` — Statik sayfa yollarının dizisi (örn. `/products`, `/brands`), her dil için sitemap girdileri üretmek kullanılır
-  - `staticRoutes` — `locales.flatMap` ile üretilen statik sayfaların sitemap objeleri dizisi; her route için dil bazlı URL, lastModified, changefreq, priority ve alternates içerir
-  - `categoryRoutes` — `locales.flatMap` ile üretilen kategori sayfalarının sitemap objeleri dizisi; `cat.slug` ve `cat.updated_at` değerlerinden URL ve meta bilgileri türetilir
-  - `brandRoutes` — `locales.flatMap` ile üretilen marka sayfalarının sitemap objeleri dizisi; `HVAC_BRANDS` dizisindeki her markanın `slug` değeri kullanılarak üretilir
-  - `productRoutes` — `locales.flatMap` ile üretilen ürün sayfalarının sitemap objeleri dizisi; sadece `slug` değeri olan ürünler (`!!prod.slug` filtresi) dahil edilir, `prod.slug!` ile non-null assertion kullanılır
-- **Dönüş**: `Promise<MetadataRoute.Sitemap>` — statik, kategori, marka ve ürün rotalarının birleşik dizisi
-
----
-
-### [N2_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) =>` (static routes flatMap callback)
-- **params**: `lang` — şu anki dil kodu (`'tr'` veya `'en'`)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `staticRoutesList` dizisi üzerinde `map` ile üretilen sitemap objeleri dizisi; her biri `${baseUrl}/${lang}${route}` formatında URL, `new Date()` lastModified, `daily` changefreq, priority (ana sayfa `1.0`, diğerleri `0.8`) ve `alternates.languages` alanlarını içerir
-
----
-
-### [N3_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) => → (route) =>` (static route map callback)
-- **params**: `route` — `staticRoutesList` dizisindeki tek bir statik yol stringi (örn. `''`, `'/products'`, `'/brands'`)
-- **ic_degiskenler**:
-  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
-  - `lang` — kapama yoluyla erişilen üst kapsamdaki dil kodu
-- **Dönüş**: `{ url, lastModified, changefreq, priority, alternates }` objesi; `url` `${baseUrl}/${lang}${route}`, `priority` `route === '' ? 1.0 : 0.8` koşuluyla belirlenir, `alternates.languages` her iki dil için de sabit URL üretir
-
----
-
-### [N4_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) =>` (category routes flatMap callback)
-- **params**: `lang` — şu anki dil kodu (`'tr'` veya `'en'`)
-- **ic_degiskenler**:
-  - `categories` — kapama yoluyla erişilen üst kapsamdaki kategori dizisi
-  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
-- **Dönüş**: `categories` dizisi üzerinde `map` ile üretilen sitemap objeleri dizisi; her biri `${baseUrl}/${lang}${Routes.category(cat.slug)}` formatında URL, `cat.updated_at` veya fallback `new Date()` ile `lastModified`, `weekly` changefreq, `0.7` priority ve `alternates.languages` içerir
-
----
-
-### [N5_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) => → (cat) =>` (category map callback)
-- **params**: `cat` — tek bir kategori objesi; `.slug` ve `.updated_at` özellikleri kullanılır
-- **ic_degiskenler**:
-  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
-  - `lang` — kapama yoluyla erişilen üst kapsamdaki dil kodu
-- **Dönüş**: `{ url, lastModified, changefreq, priority, alternates }` objesi; `url` `Routes.category(cat.slug)` kullanılarak, `lastModified` `new Date(cat.updated_at || new Date())` ile, `alternates.languages` her iki dil için `Routes.category(cat.slug)` kullanılarak üretilir
-
----
-
-### [N6_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) =>` (brand routes flatMap callback)
-- **params**: `lang` — şu anki dil kodu (`'tr'` veya `'en'`)
-- **ic_degiskenler**:
-  - `HVAC_BRANDS` — kapama yoluyla erişilen üst kapsamdaki marka sabit dizisi
-  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
-- **Dönüş**: `HVAC_BRANDS` dizisi üzerinde `map` ile üretilen sitemap objeleri dizisi; her biri `${baseUrl}/${lang}${Routes.brand(brand.slug)}` formatında URL, `new Date()` lastModified, `weekly` changefreq, `0.6` priority ve `alternates.languages` içerir
-
----
-
-### [N7_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) => → (brand) =>` (brand map callback)
-- **params**: `brand` — tek bir marka objesi; `.slug` özelliği kullanılır
-- **ic_degiskenler**:
-  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
-  - `lang` — kapama yoluyla erişilen üst kapsamdaki dil kodu
-- **Dönüş**: `{ url, lastModified, changefreq, priority, alternates }` objesi; `url` `Routes.brand(brand.slug)` kullanılarak, `lastModified` `new Date()`, `alternates.languages` her iki dil için `Routes.brand(brand.slug)` kullanılarak üretilir
-
----
-
-### [N8_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) =>` (product routes flatMap callback)
-- **params**: `lang` — şu anki dil kodu (`'tr'` veya `'en'`)
-- **ic_degiskenler**:
-  - `products` — kapama yoluyla erişilen üst kapsamdaki ürün dizisi; önce `.filter((prod) => !!prod.slug)` ile slug değeri olanlar filtrelenir
-  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
-- **Dönüş**: Filtrelenmiş `products` dizisi üzerinde `map` ile üretilen sitemap objeleri dizisi; her biri `${baseUrl}/${lang}${Routes.product(prod.slug!)}` formatında URL, `prod.updated_at` veya fallback `new Date()` ile `lastModified`, `daily` changefreq, `0.9` priority ve `alternates.languages` içerir
-
----
-
-### [N9_NASIL] AST Pointer: `src/app/sitemap.ts::sitemap → (lang) => → (prod) =>` (product map callback)
-- **params**: `prod` — tek bir ürün objesi; `.slug` (non-null assertion ile `!`) ve `.updated_at` özellikleri kullanılır; filtre tarafından `slug`'ı tanımlı olanlar ile sınırlıdır
-- **ic_degiskenler**:
-  - `baseUrl` — kapama yoluyla erişilen üst kapsamdaki site kök URL'si
-  - `lang` — kapama yoluyla erişilen üst kapsamdaki dil kodu
-- **Dönüş**: `{ url, lastModified, changefreq, priority, alternates }` objesi; `url` `Routes.product(prod.slug!)` kullanılarak, `lastModified` `new Date(prod.updated_at || new Date())` ile, `alternates.languages` her iki dil için `Routes.product(prod.slug!)` kullanılarak üretilir
+  - `baseUrl` — SITE_URL sabitinden alınan site temel URL adresi
+  - `locales` — Desteklenen dil kodlarının listesi: 'tr' ve 'en'
+  - `categories` — getCategories ile çekilen tüm kategori dizisi; Promise.all ile products ile birlikte paralel yüklenir, hata durumunda boş diziye düşer
+  - `products` — getAllProducts ile çekilen tüm ürün dizisi; Promise.all ile categories ile birlikte paralel yüklenir, hata durumunda boş diziye düşer
+  - `staticRoutesList` — Statik sayfa rotalarının string dizisi ('', '/products', '/brands', '/contact', '/about', '/destek/merkez', '/cart', '/legal/kvkk', '/legal/gizlilik-politikasi', '/legal/cerez-politikasi')
+  - `staticRoutes` — staticRoutesList ve locales üzerinden oluşturulan statik rota sitemap nesneleri dizisi; her dil için tüm statik rotaları URL, lastModified, changefreq, priority ve alternates alanlarıyla haritalar
+  - `categoryRoutes` — categories ve locales üzerinden oluşturulan kategori rota sitemap nesneleri dizisi; her dil ve kategori için Routes.category(cat.slug) kullanarak URL oluşturur, cat.updated_at değerini lastModified olarak kullanır
+  - `brandRoutes` — HVAC_BRANDS ve locales üzerinden oluşturulan marka rota sitemap nesneleri dizisi; her dil ve marka için Routes.brand(brand.slug) kullanarak URL oluşturur
+  - `productRoutes` — products ve locales üzerinden oluşturulan ürün rota sitemap nesneleri dizisi; slug değeri olan ürünler (.filter((prod) => !!prod.slug)) ile oluşturulur, Routes.product(prod.slug!) kullanılarak URL üretilir, prod.updated_at lastModified olarak kullanılır
+- **Dönüş**: `Promise<MetadataRoute.Sitemap>` — staticRoutes, categoryRoutes, brandRoutes ve productRoutes dizilerinin spread edilerek birleştirildiği toplam sitemap dizisi
 
 ---
 

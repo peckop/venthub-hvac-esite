@@ -1,5 +1,5 @@
-import { supabaseBrowserClient } from '../supabase/client'
-import { supabaseStaticClient } from '../supabase/static'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '../../types/database.types'
 import type { Product } from '../../types/ui-models'
 
 export type UserRole = 'individual' | 'dealer' | 'corporate' | 'admin'
@@ -19,17 +19,16 @@ function nowIso(): string {
   return new Date().toISOString()
 }
 
-const defaultClient = typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient
-
 /**
  * Retrieves the effective unit price for a given product by evaluating user roles,
  * active price lists, and any applicable discounts.
  *
+ * @param supabase - The active Supabase client instance.
  * @param product - The product object containing base price information.
  * @returns The resolved unit price as a number.
  */
-export async function getEffectiveUnitPrice(product: Product, supabase = defaultClient): Promise<number> {
-  const info = await getEffectivePriceInfo(product, supabase)
+export async function getEffectiveUnitPrice(supabase: SupabaseClient<Database>, product: Product): Promise<number> {
+  const info = await getEffectivePriceInfo(supabase, product)
   return info.unitPrice
 }
 
@@ -38,10 +37,14 @@ export async function getEffectiveUnitPrice(product: Product, supabase = default
  * It queries active price lists sorted by effective dates and applies the best valid price or discount.
  * If no matching price list is found or an error occurs, it returns a fallback based on the product's default price.
  *
+ * @param supabase - The active Supabase client instance.
  * @param product - The product for which to determine the price.
  * @returns An object containing the calculated unit price and the ID of the applied price list (if any).
  */
-export async function getEffectivePriceInfo(product: Product, supabase = defaultClient): Promise<{ unitPrice: number, priceListId: string | null }> {
+export async function getEffectivePriceInfo(
+  supabase: SupabaseClient<Database>,
+  product: Product
+): Promise<{ unitPrice: number, priceListId: string | null }> {
   const fallback = (() => {
     const v = typeof product.price === 'number' ? product.price : parseFloat(String(product.price || 0))
     return Number.isFinite(v) ? v : 0

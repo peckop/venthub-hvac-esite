@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import type { UserAddress } from '@/types/ui-models'
 import { createAddress, updateAddress } from '../../lib/services/address.service'
+import { supabaseBrowserClient } from '../../lib/supabase/client'
 import { toast } from 'sonner'
 import type { DbUserAddressInsert } from '../../types/db-rows'
 
@@ -38,7 +39,7 @@ const AddressFormModal: React.FC<AddressFormModalProps> = ({
         try {
             setSaving(true)
             if (address) {
-                await updateAddress(address.id, {
+                await updateAddress(supabaseBrowserClient, address.id, {
                     label: form.label,
                     full_name: form.full_name,
                     phone: form.phone,
@@ -64,7 +65,7 @@ const AddressFormModal: React.FC<AddressFormModalProps> = ({
                     is_default_shipping: form.is_default_shipping,
                     is_default_billing: form.is_default_billing,
                 }
-                await createAddress(newAddressPayload)
+                await createAddress(supabaseBrowserClient, newAddressPayload)
                 toast.success(t('account.addresses.toasts.created') || 'Address created')
             }
             onSaved()

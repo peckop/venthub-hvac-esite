@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\BrandDetailPage.tsx
-skeleton_hash: 5ebfbc255d93d723
+skeleton_hash: fd12542b7daeb278
 entity_hashes:
   func:BrandDetailPage: 658e62bc6ce56cad
-  overview: fe818cee1b9d8c5f
+  overview: 68ae513578edc20b
   style_tokens: 4208267ad108784f
-generated_at: 2026-06-06T21:58:12Z
+generated_at: 2026-06-07T12:10:24Z
 ---
 
 ## Genel Bakış
-BrandDetailPage modülü, VentHub HVAC platformunda belirli bir markanın detay sayfasını sunan React bileşenidir. Prop olarak aldığı marka slug değerini kullanarak ilgili markanın ürünleri, özellikleri ve içerikleri gibi bilgileri kullanıcıya sunar. Sayfa, dinamik olarak marka verisine göre oluşturulur ve marka bazlı bir tüketici deneyimi sağlar.
+BrandDetailPage modülü, VentHub HVAC platformunda belirli bir markanın detay sayfasını sunan React bileşenidir. Prop olarak aldığı initialBrandSlug değerini kullanarak ilgili markanın ürünleri, özellikleri ve içerikleri gibi bilgileri kullanıcıya sunar. Sayfa, dinamik olarak marka verisine göre oluşturulur ve marka bazlı bir tüketici deneyimi sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
@@ -21,7 +21,14 @@ Sayfanın tamamını oluşturan ve yöneten ana React bileşenidir. Gelen marka 
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül için temel mimari varsayımlar, bileşenin props yapısı ve statik veri yapısı üzerine kurulmuştur.
 
+[Aksiyom 1]: Eğer `initialBrandSlug` prop'u verilmezse, bileşen hangi markanın detayını göstereceğini bilemez ve bileşen düzgün çalışamaz.
+
+[Aksiyom 2]: Eğer `BRAND_DETAILS` nesnesi, `initialBrandSlug` ile eşleşen bir marka anahtarı içermiyorsa, bileşen gösterilecek marka verisini bulamaz ve hata oluşur.
+
+[Aksiyom 3]: Eğer `BRAND_DETAILS` nesnesi boş veya tanımsız olursa, bileşen hiç bir marka verisi kullanamaz ve render edilemez.
 
 ---
 
@@ -58,46 +65,47 @@ Sayfanın tamamını oluşturan ve yöneten ana React bileşenidir. Gelen marka 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: BrandDetailPage.tsx::BrandDetailPage
-- **params**: `initialBrandSlug` — sayfa yüklenirken dışarıdan verilen marka slug'ı
+### [N1_NASIL] AST Pointer: BrandDetailPage.tsx::BrandDetailPage (main component)
+- **params**: `(initialBrandSlug)` — prop olarak gelen marka slug'ı, URL'den veya sunucu tarafından sağlanır
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, sayfadaki metinlerin çok dilli çevirisini sağlar
-  - `params` — useParams hook'undan gelen URL parametreleri nesnesi
-  - `slug` — URL'den veya initialBrandSlug'tan gelen normalize edilmiş marka tanımlayıcısı
-  - `heroIconRef` — useScrollAnimation hook'undan gelen hero ikonu için referans, animasyon tetikleme için kullanılır
-  - `heroIconVisible` — hero ikonunun görünür olup olmadığını belirten boolean flag
-  - `heroTitleRef` — useScrollAnimation hook'undan gelen hero başlığı için referans
-  - `heroTitleVisible` — hero başlığının görünür olup olmadığını belirten boolean flag
-  - `heroMetaRef` — useScrollAnimation hook'undan gelen hero meta bilgileri için referans
-  - `heroMetaVisible` — hero meta bilgilerinin görünür olup olmadığını belirten boolean flag
-  - `brand` — HVAC_BRANDS dizisinde slug ile eşleşen marka nesnesi, yoksa null
-  - `detail` — BRAND_DETAILS nesnesinden brand.slug ile erişilen marka detay bilgileri
-  - `products` — useState ile yönetilen Product tipinde ürün listesi state'i
-  - `loading` — useState ile yönetilen yükleme durumu boolean state'i
-  - `breadcrumbItems` — sayfa içi navigasyon içinBreadcrumb bileşenine geçirilen öğeler dizisi
-- **Dönüş**: JSX bileşeni (sayfanın tam HTML yapısı)
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, tüm UI metinleri için kullanılır
+  - `params` — useParams() hook'undan dönen URL parametreleri nesnesi
+  - `slug` — normalleştirilmiş marka slug'ı string, initialBrandSlug veya params.slug'dan elde edilir; `as string` ile tip genişletmesi yapılır
+  - `heroIconRef` — useScrollAnimation<HTMLDivElement> hook'undan dönen ref, hero ikonu için DOM referansı tutar (scroll tetikleme eşiği 0.2)
+  - `heroIconVisible` — useScrollAnimation hook'undan dönen boolean, hero ikonunun görünür olup olmadığını belirler
+  - `heroTitleRef` — useScrollAnimation<HTMLHeadingElement> hook'undan dönen ref, hero başlık için DOM referansı tutar (eşik 0.2)
+  - `heroTitleVisible` — useScrollAnimation hook'undan dönen boolean, hero başlığın görünür olup olmadığını belirler
+  - `heroMetaRef` — useScrollAnimation<HTMLDivElement> hook'undan dönen ref, hero meta alanı için DOM referansı tutar (eşik 0.2)
+  - `heroMetaVisible` — useScrollAnimation hook'undan dönen boolean, hero meta alanının görünür olup olmadığını belirler
+  - `brand` — HVAC_BRANDS.find() ile slug'a eşleşen marka nesnesi; `b.slug === slug` veya nicotra özel eşleşmesi ile bulunur; eşleşme yoksa undefined kalır
+  - `detail` — brand varsa `BRAND_DETAILS[brand.slug]` ile erişilen marka detay nesnesi; brand yoksa null atanır
+  - `products` — useState<Product[]> ile oluşturulan state, yüklenecek ürün dizisi tutar
+  - `loading` — useState(true) ile oluşturulan boolean state, ürün yükleme durumunu takip eder
+  - `breadcrumbItems` — breadcrumb navigasyon öğeleri dizisi, her biri `{ label, href }` yapısındadır; home, brands ve mevcut marka adını içerir
+- **Dönüş**: JSX element (JSX — conditional: brand yoksa "not found" sayfası, varsa ana marka detay sayfası JSX'i döner)
 
-### [N2_NASIL] AST Pointer: BrandDetailPage.tsx::useEffect Callback
+### [N2_NASIL] AST Pointer: BrandDetailPage.tsx::useEffect callback (loadProducts trigger)
 - **params**: yok
 - **ic_degiskenler**:
-  - `loadProducts` — iç içe tanımlı asenkron fonksiyon, markaya ait ürünleri yükler
-- **Dönüş**: yok (yan etki: useEffect ile loadProducts fonksiyonunu çağırır)
+  - `loadProducts` — async inner fonksiyon, ürünleri supabase'den yükler; useEffect içinde tanımlanıp hemen çağrılır
+- **Dönüş**: yok (useEffect callback, side effect tetikler)
 
-### [N3_NASIL] AST Pointer: BrandDetailPage.tsx::loadProducts
-- **params**: yok (dış kapsamdan brand, setLoading, setProducts değişkenlerini kullanır)
+### [N3_NASIL] AST Pointer: BrandDetailPage.tsx::loadProducts (async inner function)
+- **params**: yok (closure ile dış kapsamdan `brand` ve `setProducts`, `setLoading` erişilir)
 - **ic_degiskenler**:
-  - `data` — getProductsEnriched API çağrısından dönen ürün dizisi
-- **Dönüş**: yok (yan etki: products ve loading state'lerini günceller, hata durumunda konsola yazdırır)
+  - `data` — getProductsEnriched() async çağrısından dönen Product[] dizisi; supabaseBrowserClient ve `{ brand: brand.name, limit: 8 }` parametreleri ile çağrılır
+  - `e` — try-catch bloğundaki hata nesnesi; console.error ile loglanır
+- **Dönüş**: Promise<void> (explicit return yok, state set edilir)
 
-### [N4_NASIL] AST Pointer: BrandDetailPage.tsx::Stats Mapping Callback
-- **params**: `stat` — tek bir istatistik nesnesi (label ve value alanları), `i` — dizi içindeki indeks numarası
-- **ic_degiskenler**: yok (sadece parametreleri kullanarak JSX döndürür)
-- **Dönüş**: JSX bileşeni (tek bir istatistik satırı)
+### [N4_NASIL] AST Pointer: BrandDetailPage.tsx::stat map callback
+- **params**: `(stat, i)` — `stat`: detail.stats dizisindeki tek bir istatistik nesnesi (label ve value özellikleri taşır); `i`: dizi indeksi, React key olarak kullanılır
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (div — label ve value içeren satır)
 
-### [N5_NASIL] AST Pointer: BrandDetailPage.tsx::Products Mapping Callback
-- **params**: `product` — tek bir Product nesnesi (id, name, slug, image_url, sku alanları)
-- **ic_degiskenler**: yok (sadece parametreyi kullanarak JSX döndürür)
-- **Dönüş**: JSX bileşeni (ürün kartı)
+### [N5_NASIL] AST Pointer: BrandDetailPage.tsx::product map callback
+- **params**: `(product)` — tek bir Product nesnesi; product.id, product.slug, product.name, product.image_url, product.sku özellikleri erişilir
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (Link component — ürün kartı, VentImage ile görsel, ürün adı ve SKU gösterimi)
 
 ---
 

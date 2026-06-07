@@ -1,12 +1,13 @@
-import { supabaseBrowserClient } from '../supabase/client'
-import { supabaseStaticClient } from '../supabase/static'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '../../types/database.types'
 import type { DbProduct, DbAdminSearchResult } from '../../types/db-rows'
 import type { Product, SearchSuggestion, FtsProductResult, GetProductsParams } from '../../types/ui-models'
 import { toUIProductList, mapDatabaseProductToDomain } from '../type-converters'
 
-const defaultClient = typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient
-
-export async function getProductsEnriched(params: GetProductsParams = {}, supabase = defaultClient): Promise<Product[]> {
+export async function getProductsEnriched(
+  supabase: SupabaseClient<Database>,
+  params: GetProductsParams = {}
+): Promise<Product[]> {
   let resolvedCategoryIds = params.categoryIds;
 
   // If we have category IDs that are actually SLUGS (from CATEGORY_REGISTRY), resolve them to IDs first
@@ -69,7 +70,11 @@ export async function getProductsEnriched(params: GetProductsParams = {}, supaba
   return toUIProductList(enrichedProducts)
 }
 
-export async function getSearchSuggestions(q: string, limit: number = 6, supabase = defaultClient): Promise<SearchSuggestion[]> {
+export async function getSearchSuggestions(
+  supabase: SupabaseClient<Database>,
+  q: string,
+  limit: number = 6
+): Promise<SearchSuggestion[]> {
   const { data, error } = await supabase.rpc('get_search_suggestions', {
     p_q: q,
     p_limit: limit
@@ -84,14 +89,19 @@ export async function getSearchSuggestions(q: string, limit: number = 6, supabas
 }
 
 // Full‑text search (Turkish) via RPC; returns lightweight fields + rank
-export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }, supabase = defaultClient): Promise<FtsProductResult[]> {
+export async function ftsSearchProducts(
+  supabase: SupabaseClient<Database>,
+  q: string,
+  limit = 20,
+  filters?: { category_id?: string }
+): Promise<FtsProductResult[]> {
   const payload = { p_q: q, p_limit: limit, p_filters: filters || {} }
   const { data, error } = await supabase.rpc('fts_search_products', payload)
   if (error) throw error
   return (data as FtsProductResult[]) || []
 }
 
-export async function getProducts(limit?: number, supabase = defaultClient): Promise<Product[]> {
+export async function getProducts(supabase: SupabaseClient<Database>, limit?: number): Promise<Product[]> {
   let query = supabase
     .from('products')
     .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
@@ -109,7 +119,7 @@ export async function getProducts(limit?: number, supabase = defaultClient): Pro
 }
 
 // Get all products without limit
-export async function getAllProducts(supabase = defaultClient): Promise<Product[]> {
+export async function getAllProducts(supabase: SupabaseClient<Database>): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
@@ -121,7 +131,7 @@ export async function getAllProducts(supabase = defaultClient): Promise<Product[
   return toUIProductList((data as DbProduct[]) || [])
 }
 
-export async function getProductsByCategory(categoryId: string, supabase = defaultClient): Promise<Product[]> {
+export async function getProductsByCategory(supabase: SupabaseClient<Database>, categoryId: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
@@ -134,7 +144,7 @@ export async function getProductsByCategory(categoryId: string, supabase = defau
   return toUIProductList((data as DbProduct[]) || [])
 }
 
-export async function getProductsBySubcategory(subcategoryId: string, supabase = defaultClient): Promise<Product[]> {
+export async function getProductsBySubcategory(supabase: SupabaseClient<Database>, subcategoryId: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
@@ -147,7 +157,12 @@ export async function getProductsBySubcategory(subcategoryId: string, supabase =
   return toUIProductList((data as DbProduct[]) || [])
 }
 
-async function fetchProductBy(column: 'id' | 'slug', value: string, throwOnError = false, supabase = defaultClient): Promise<Product | null> {
+async function fetchProductBy(
+  supabase: SupabaseClient<Database>,
+  column: 'id' | 'slug',
+  value: string,
+  throwOnError = false
+): Promise<Product | null> {
   const query = supabase
     .from('products')
     .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
@@ -160,20 +175,20 @@ async function fetchProductBy(column: 'id' | 'slug', value: string, throwOnError
   return mapDatabaseProductToDomain(data as DbProduct)
 }
 
-export async function getProductById(id: string, supabase = defaultClient): Promise<Product | null> {
-  return fetchProductBy('id', id, true, supabase)
+export async function getProductById(supabase: SupabaseClient<Database>, id: string): Promise<Product | null> {
+  return fetchProductBy(supabase, 'id', id, true)
 }
 
-export async function getProductBySlugOrId(identifier: string, supabase = defaultClient): Promise<Product | null> {
+export async function getProductBySlugOrId(supabase: SupabaseClient<Database>, identifier: string): Promise<Product | null> {
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier)
-  return fetchProductBy(isUuid ? 'id' : 'slug', identifier, false, supabase)
+  return fetchProductBy(supabase, isUuid ? 'id' : 'slug', identifier, false)
 }
 
-export async function getProductBySlug(slug: string, supabase = defaultClient): Promise<Product | null> {
-  return fetchProductBy('slug', slug, false, supabase)
+export async function getProductBySlug(supabase: SupabaseClient<Database>, slug: string): Promise<Product | null> {
+  return fetchProductBy(supabase, 'slug', slug, false)
 }
 
-export async function getFeaturedProducts(supabase = defaultClient): Promise<Product[]> {
+export async function getFeaturedProducts(supabase: SupabaseClient<Database>): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
@@ -185,7 +200,7 @@ export async function getFeaturedProducts(supabase = defaultClient): Promise<Pro
   return toUIProductList((data as DbProduct[]) || [])
 }
 
-export async function searchProducts(query: string, supabase = defaultClient): Promise<Product[]> {
+export async function searchProducts(supabase: SupabaseClient<Database>, query: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
@@ -198,7 +213,11 @@ export async function searchProducts(query: string, supabase = defaultClient): P
 }
 
 export async function adminSearchProducts(
-  q: string, limit = 50, offset = 0, categoryId?: string, supabase = defaultClient
+  supabase: SupabaseClient<Database>,
+  q: string,
+  limit = 50,
+  offset = 0,
+  categoryId?: string
 ): Promise<DbAdminSearchResult[]> {
   const payload: { p_q: string; p_limit: number; p_offset: number; p_category_id?: string } = { 
     p_q: q, 

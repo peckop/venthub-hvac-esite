@@ -2,6 +2,7 @@ import React from 'react'
 import CategoryMasterView from '../../../views/CategoryMasterView'
 
 import { getProductsEnriched } from '@/lib/services/product.service'
+import { supabaseStaticClient } from '@/lib/supabase/static'
 import type { DomainProduct } from '../../../lib/type-converters'
 
 
@@ -11,7 +12,7 @@ import { getTenantConfig } from '../../../utils/tenantServer'
 import { TenantProvider } from '../../../hooks/useTenant'
 
 const getCachedProducts = (lang: string, tenantId: string) => unstable_cache(
-  async () => getProductsEnriched({ limit: 100 }),
+  async () => getProductsEnriched(supabaseStaticClient, { limit: 100 }),
   ['products-discovery', lang, tenantId],
   { tags: ['products-discovery', `products-discovery-${tenantId}`], revalidate: false }
 )()

@@ -1,6 +1,7 @@
 import React from 'react'
 import HomePage from '../../views/HomePage'
 import { getCategories } from '@/lib/services/category.service'
+import { supabaseStaticClient } from '@/lib/supabase/static'
 import { getProducts } from '@/lib/services/product.service'
 import type { Product } from '@/types/ui-models'
 import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
@@ -74,8 +75,8 @@ import { TenantProvider } from '../../hooks/useTenant'
 const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
   async () => {
     const [catData, prodData] = await Promise.all([
-      getCategories(),
-      getProducts(12)
+      getCategories(supabaseStaticClient),
+      getProducts(supabaseStaticClient, 12)
     ])
     return { catData, prodData }
   },

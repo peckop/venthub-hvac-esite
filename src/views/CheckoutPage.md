@@ -9,37 +9,44 @@ entity_hashes:
   func:handleAddressDelete: ec0b9e7a9db92cd8
   func:handleAddressSaved: 301e608092f98f4d
   func:onNextStep: 3e6b3d1f38e13467
-  overview: f3dca71a885b6cf6
+  overview: 0980ab7c30b476fc
   style_tokens: 71bc3e57c5f9a6e4
-generated_at: 2026-06-06T08:46:13Z
+generated_at: 2026-06-07T12:11:26Z
 ---
 
 ## Genel Bakış
 Bu modül, VentHub HVAC uygulamasının sipariş tamamlama sürecini yöneten temel React bileşenini barındırır. Kullanıcıdan müşteri ve teslimat bilgilerini toplamak, adres eklemek/silmek ve ödeme adımlarını kontrol etmek gibi süreçleri bir arada yönetir.
 
 ## Fonksiyon Grupları
-### Ana Bileşen ve Durum Yönetimi
-Modülün temel yapısını ve genel sayfa akışını oluşturur. Tüm alt süreçleri ve durum yönetimini koordine eder.
+### Ana Bileşen ve Süreç Koordinasyonu
+Modülün temel yapısını ve genel sayfa akışını oluşturur. Tüm alt süreçleri, durum Yönetimini ve kullanıcının satın alma deneyimini koordine eder.
 - CheckoutPage
 
-### Adres Operasyonları
-Müşterinin teslimat adreslerini kaydetme ve silme gibi CRUD işlemlerini yönetir.
+### Adres Yönetimi Operasyonları
+Müşterinin teslimat adreslerinin eklenmesi ve silinmesi gibi temel CRUD işlemlerini yönetir. Adres verilerinin doğruluğunu ve akışını kontrol eder.
 - handleAddressSaved, handleAddressDelete
 
-### Süreç Geçiş Kontrolü
-Ödeme sürecindeki bir sonraki adıma geçiş mantığını ve ilerlemeyi kontrol eder.
+### Adım İlerleme Kontrolü
+Ödeme sürecinde bir sonraki aşamaya geçiş mantığını ve kullanıcının ilerlemesini doğrular. Adımlar arası geçiş kurallarını uygular.
 - onNextStep
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için temel mimari varsayımlar, fonksiyon imzalarındaki parametre gereksinimlerine dayanır.
 
-[Aksiyom 1]: Eğer `handleAddressDelete` fonksiyonuna geçerli bir `string` türünde `id` parametresi verilmezse, adres silme işlemi gerçekleştirilemez.
+Bu modül, sipariş tamamlama sürecini yöneten bir React bileşeni olup, temel olarak durum yönetimi, adres CRUD işlemleri ve adım navigasyonunu kapsar. Modülün doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
 
----
+[Aksiyom 1]: Eğer CheckoutPage bileşeninin kullandığı durum yönetimi (state) veya bağlam (context) sağlayıcıları (örn: sipariş verisi, kullanıcı oturumu) render edildiği üst bileşen tarafından sağlanmıyorsa, bileşen beklenmedik hatalarla karşılaşır veya hiç render olmaz.
 
-**Not:** Modülde sabit (constant) tanımlı değildir ve fonksiyon imzalarında dönüş tipleri belirtilmemiştir. Bu nedenle eşik değerleri, varsayılan akış varsayımları veya durum yönetimi ile ilgili ek aksiyomlar yalnızca fonksiyon gövdelerinden çıkarılamamıştır.
+[Aksiyom 2]: Eğer handleAddressSaved fonksiyonu, geçerli bir adres nesnesi (örn: gerekli alanları içeren) ile çağrılmıyorsa, adres kaydetme işlemi başarısız olur veya uygulama tutarsız bir duruma girer.
+
+[Aksiyom 3]: Eğer handleAddressDelete(id: string) fonksiyonu, var olmayan veya geçersiz bir `id` parametresi ile çağrılırsa, silme işlemi hedeflenen adresi bulamaz ve sessizce başarısız olur veya bir hata fırlatır.
+
+[Aksiyom 4]: Eğer onNextStep fonksiyonu çağrıldığında, mevcut adımın tamamlanması için zorunlu alanlar (örn: teslimat adresi) doldurulmamışsa, adım geçişi engellenir ve kullanıcı bilgilendirilmezse süreç ilerlemez.
+
+[Aksiyom 5]: Eğer modül, iç işleyişi için外部 bir API servisine (örn: ödeme doğrulama, adres kaydetme) bağımlıysa ve bu servislerde kesinti veya hata oluşursa, ilgili kullanıcı işlemleri (adres kaydetme, adım geçme) tamamlanamaz.
+
+[Aksiyom 6]: Eğer CheckoutPage bileşeni, alt bileşenlere (örn: adres formu, ödeme formu) prop olarak geçilen callback fonksiyonları (handleAddressSaved, onNextStep vb.) sağlamıyorsa, bu alt bileşenler kendi içlerindeki olayları yukarı taşıyamaz ve süreç durur.
 
 ---
 
@@ -88,83 +95,80 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzalarındaki parametre ge
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CheckoutPage.tsx::CheckoutPage
-- **params**: (parametre yok)
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `items` — useCart hook'undan gelen sepet ürünleri listesi
-  - `getCartTotal` — sepet toplam tutarını hesaplayan fonksiyon
-  - `clearCart` — sepeti tamamen temizleyen fonksiyon
-  - `applyServerPricing` — sunucu tarafı fiyat uygulamasını tetikleyen fonksiyon
-  - `user` — useAuth hook'undan gelen oturum açmış kullanıcı nesnesi
-  - `authLoading` — useAuth'tan gelen `loading` alias'ı, kimlik doğrulama yükleniyor durumu
-  - `router` — Next.js useRouter navigasyon nesnesi
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
-  - `lang` — useI18n hook'undan gelen aktif dil kodu
-  - `editingAddress` — useState ile yönetilen, düzenlenen adres nesnesi (UserAddress | null)
-  - `showAddressFormModal` — useState ile yönetilen, adres form modalının açık/kapalı durumu
-  - `orchestrator` — useCheckoutOrchestrator hook'undan dönen checkout süreç yöneticisi nesnesi
-  - `step` — orchestrator'dan gelen mevcut checkout adımı numarası (1-4)
-  - `setStep` — orchestrator'dan gelen checkout adımını değiştiren setter
-  - `customerInfo` — orchestrator'dan gelen müşteri bilgileri nesnesi
-  - `setCustomerInfo` — orchestrator'dan gelen müşteri bilgilerini güncelleyen setter
-  - `shippingAddress` — orchestrator'dan gelen kargo adresi bilgisi
-  - `setShippingAddress` — orchestrator'dan gelen kargo adresini güncelleyen setter
-  - `billingAddress` — orchestrator'dan gelen fatura adresi bilgisi
-  - `setBillingAddress` — orchestrator'dan gelen fatura adresini güncelleyen setter
-  - `invoiceType` — orchestrator'dan gelen fatura türü (bireysel/kurumsal)
-  - `setInvoiceType` — orchestrator'dan gelen fatura türünü güncelleyen setter
-  - `invoiceInfo` — orchestrator'dan gelen fatura detay bilgileri nesnesi
-  - `setInvoiceInfo` — orchestrator'dan gelen fatura detaylarını güncelleyen setter
-  - `legalConsents` — orchestrator'dan gelen yasal onay/rıza durumları
-  - `setLegalConsents` — orchestrator'dan gelen yasal onayları güncelleyen setter
-  - `sameAsShipping` — orchestrator'dan gelen, fatura adresinin kargo adresiyle aynı olup olmadığı bayrağı
-  - `setSameAsShipping` — orchestrator'dan gelen sameAsShipping setter'ı
-  - `shippingMethod` — orchestrator'dan gelen seçili kargo yöntemi
-  - `setShippingMethod` — orchestrator'dan gelen kargo yöntemini güncelleyen setter
-  - `showHelp` — orchestrator'dan gelen yardım paneli görünürlük durumu
-  - `setShowHelp` — orchestrator'dan gelen yardım paneli görünürlük setter'ı
-  - `savedAddresses` — orchestrator'dan gelen kullanıcının kayıtlı adresleri listesi
-  - `showAddressModal` — orchestrator'dan gelen adres seçim modalının görünürlük durumu
-  - `setShowAddressModal` — orchestrator'dan gelen adres modal görünürlük setter'ı
-  - `addressPickTarget` — orchestrator'dan gelen, adres seçim hedefi ('shipping' veya 'billing')
-  - `setAddressPickTarget` — orchestrator'dan gelen adres hedefini güncelleyen setter
-  - `savedInvoiceProfiles` — orchestrator'dan gelen kayıtlı fatura profilleri listesi
-  - `showInvoiceModal` — orchestrator'dan gelen fatura profil modalının görünürlük durumu
-  - `setShowInvoiceModal` — orchestrator'dan gelen fatura modal görünürlük setter'ı
-  - `handleSelectInvoiceProfile` — orchestrator'dan gelen fatura profili seçimi işleyici fonksiyonu
-  - `handleNextStep` — orchestrator'dan gelen sonraki adıma geçiş işleyici fonksiyonu
-  - `couponCode` — useCheckoutCoupon hook'undan gelen girilmiş kupon kodu
-  - `setCouponCode` — useCheckoutCoupon hook'undan gelen kupon kodu setter'ı
-  - `couponApplied` — useCheckoutCoupon hook'undan gelen başarılı şekilde uygulanmış kupon bilgisi
-  - `applyCoupon` — useCheckoutCoupon hook'undan gelen kuponu sunucuya gönderen fonksiyon
-  - `removeCoupon` — useCheckoutCoupon hook'undan gelen uygulanmış kuponu kaldıran fonksiyon
-  - `payment` — useCheckoutPayment hook'undan dönen ödeme nesnesi (iyzToken, paymentFrameContent, initiatePayment, loading, formReady, progressPct içerir)
-  - `totalAmount` — getCartTotal() çağrısı ile hesaplanan kdv dahil toplam tutar
-  - `vatAmount` — `Number((totalAmount - totalAmount / 1.2).toFixed(2))` ile hesaplanan kdv tutarı
-  - `finalAmount` — `Number((totalAmount - (couponApplied?.discount || 0)).toFixed(2))` ile hesaplanan kupon indirimi sonrası nihai tutar
-- **Dönüş**: JSX element (React.FC)
-
----
+  - `items` — useCart'tan gelen sepet öğeleri listesi, sepet boşluk kontrolünde ve bileşenlere prop olarak kullanılır
+  - `getCartTotal` — useCart'tan gelen sepet toplam tutarını hesaplayan fonksiyon, useCheckoutCoupon'a ve tutar hesaplamalarına geçirilir
+  - `clearCart` — useCart'tan gelen sepeti temizleme fonksiyonu, useCheckoutPayment'a geçirilir
+  - `applyServerPricing` — useCart'tan gelen sunucu tabanlı fiyatlandırma uygulama fonksiyonu, useCheckoutPayment'a geçirilir
+  - `user` — useAuth'tan gelen mevcut kullanıcı nesnesi, auth kontrolünde ve useCheckoutPayment'ta kullanılır
+  - `authLoading` — useAuth'tan gelen kimlik doğrulama yükleme durumu flag'i, useEffect'te auth kontrolü için kullanılır
+  - `router` — next/navigation'dan gelen yönlendirici nesne, auth yönlendirmesi ve buton navigasyonları için kullanılır
+  - `t` — useI18n'dan gelen çeviri fonksiyonu, tüm bileşenlere ve UI metinlerine geçirilir
+  - `lang` — useI18n'dan gelen aktif dil kodu string'i, OrderSummarySidebar'a geçirilir
+  - `editingAddress` — useState ile tutulan düzenlenecek adres nesnesi (UserAddress | null), AddressFormModal'a prop olarak geçer
+  - `setEditingAddress` — editingAddress state setter'ı, adres düzenleme ve ekleme akışlarında çağrılır
+  - `showAddressFormModal` — useState ile tutulan adres formu modalının açık/kapalı durumu boolean'ı
+  - `setShowAddressFormModal` — showAddressFormModal state setter'ı, modal açma/kapama işlemlerinde kullanılır
+  - `orchestrator` — useCheckoutOrchestrator hook'undan dönen süreç yöneticisi nesnesi, tüm checkout state'lerini ve handler'ları barındırır
+  - `step` — orchestrator'dan gelen mevcut checkout adım numarası (1-4), koşullu render ve navigasyon mantığını kontrol eder
+  - `setStep` — orchestrator'dan gelen step state setter'ı, geri gitme ve adım değiştirme butonlarında kullanılır
+  - `customerInfo` — orchestrator'dan gelen müşteri bilgileri nesnesi, StepCustomerInfo ve ReviewSummary'a prop olarak geçer
+  - `setCustomerInfo` — orchestrator'dan gelen müşteri bilgileri setter'ı, StepCustomerInfo'ya prop olarak geçer
+  - `shippingAddress` — orchestrator'dan gelen teslimat adresi nesnesi (CheckoutAddressInfo), StepAddressInfo/ReviewSummary'a geçer ve adres seçiminde kullanılır
+  - `setShippingAddress` — orchestrator'dan gelen teslimat adresi setter'ı, adres seçim callback'inde ve StepAddressInfo'da kullanılır
+  - `billingAddress` — orchestrator'dan gelen fatura adresi nesnesi (CheckoutAddressInfo), StepAddressInfo/ReviewSummary'a geçer
+  - `setBillingAddress` — orchestrator'dan gelen fatura adresi setter'ı, adres seçim callback'inde ve StepAddressInfo'da kullanılır
+  - `invoiceType` — orchestrator'dan gelen fatura türü değeri, StepAddressInfo ve ReviewSummary'a prop olarak geçer
+  - `setInvoiceType` — orchestrator'dan gelen fatura türü setter'ı, StepAddressInfo'ya prop olarak geçer
+  - `invoiceInfo` — orchestrator'dan gelen fatura bilgileri nesnesi, StepAddressInfo ve ReviewSummary'a prop olarak geçer
+  - `setInvoiceInfo` — orchestrator'dan gelen fatura bilgileri setter'ı, StepAddressInfo'ya prop olarak geçer
+  - `legalConsents` — orchestrator'dan gelen yasal onay durumları nesnesi, StepAddressInfo'ya prop olarak geçer
+  - `setLegalConsents` — orchestrator'dan gelen yasal onay setter'ı, StepAddressInfo'ya prop olarak geçer
+  - `sameAsShipping` — orchestrator'dan gelen boolean flag, fatura adresinin teslimat adresiyle aynı olup olmadığını belirtir
+  - `setSameAsShipping` — orchestrator'dan gelen sameAsShipping setter'ı, StepAddressInfo'ya prop olarak geçer
+  - `shippingMethod` — orchestrator'dan gelen kargo yöntemi değeri, StepAddressInfo'ya prop olarak geçer
+  - `setShippingMethod` — orchestrator'dan gelen kargo yöntemi setter'ı, StepAddressInfo'ya prop olarak geçer
+  - `showHelp` — orchestrator'dan gelen yardım paneli görünürlük boolean'ı, PaymentIframeContainer'a prop olarak geçer
+  - `setShowHelp` — orchestrator'dan gelen showHelp setter'ı, PaymentIframeContainer'a prop olarak geçer
+  - `savedAddresses` — orchestrator'dan gelen kayıtlı adresler listesi, AddressSelectModal ve StepAddressInfo'a prop olarak geçer
+  - `showAddressModal` — orchestrator'dan gelen adres seçimi modalının açık/kapalı boolean'ı, koşullu render'da kontrol edilir
+  - `setShowAddressModal` — orchestrator'dan gelen showAddressModal setter'ı, modal açma/kapama işlemlerinde kullanılır
+  - `addressPickTarget` — orchestrator'dan gelen adres seçiminin hedef belirteci (shipping/billing), onPick callback'inde hangi adresin set edileceğini belirler
+  - `setAddressPickTarget` — orchestrator'dan gelen addressPickTarget setter'ı, onOpenAddressModal callback'inde çağrılır
+  - `savedInvoiceProfiles` — orchestrator'dan gelen kayıtlı fatura profilleri listesi, InvoiceProfileModal'a prop olarak geçer
+  - `showInvoiceModal` — orchestrator'dan gelen fatura profili modalının açık/kapalı boolean'ı, koşullu render'da kontrol edilir
+  - `setShowInvoiceModal` — orchestrator'dan gelen showInvoiceModal setter'ı, modal açma/kapama işlemlerinde kullanılır
+  - `handleSelectInvoiceProfile` — orchestrator'dan gelen fatura profili seçim handler fonksiyonu, InvoiceProfileModal'a prop olarak geçer
+  - `handleNextStep` — orchestrator'dan gelen bir sonraki adıma geçiş handler fonksiyonu, onNextStep tanımında kullanılır
+  - `couponCode` — useCheckoutCoupon'dan gelen kupon kodu string'i, OrderSummarySidebar'a prop olarak geçer
+  - `setCouponCode` — useCheckoutCoupon'dan gelen kupon kodu setter'ı, OrderSummarySidebar'a prop olarak geçer
+  - `couponApplied` — useCheckoutCoupon'dan gelen uygulanan kupon bilgisi nesnesi, indirim hesaplamasında ve bileşenlere prop olarak kullanılır
+  - `applyCoupon` — useCheckoutCoupon'dan gelen kupon uygulama fonksiyonu, OrderSummarySidebar'a prop olarak geçer
+  - `removeCoupon` — useCheckoutCoupon'dan gelen kupon kaldırma fonksiyonu, OrderSummarySidebar'a prop olarak geçer
+  - `payment` — useCheckoutPayment hook'undan dönen ödeme nesnesi, iyzToken/paymentFrameContent/loading/progressPct/formReady/initiatePayment alanlarını içerir
+  - `onNextStep` — handleNextStep'i payment.initiatePayment argümanıyla sarmalayan local arrow fonksiyon, ilerleme butonunun onClick handler'ı olarak kullanılır
+  - `totalAmount` — getCartTotal() çağrı sonucu, sepet toplam tutarı number değeri; VAT ve finalAmount hesaplamalarında ve OrderSummarySidebar'a geçer
+  - `vatAmount` — totalAmount üzerinden hesaplanan KDV tutarı number değeri (totalAmount - totalAmount/1.2), OrderSummarySidebar'a prop olarak geçer
+  - `finalAmount` — kupon indirimi sonrası nihai tutar number değeri (totalAmount - couponApplied.discount), OrderSummarySidebar'a prop olarak geçer
+- **Dönüş**: React JSX — CheckoutPage ana bileşeninin render ettiği full sayfa JSX'i (boş sepet uyarısı veya 4 adımlı checkout akışı)
 
 ### [N2_NASIL] AST Pointer: CheckoutPage.tsx::handleAddressSaved
-- **params**: (parametre yok)
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `refreshed` — listAddresses() async çağrısından dönen yenilenmiş adres listesi
-- **Dönüş**: Promise<void> (implicit)
-
----
+  - `refreshed` — listAddresses(supabaseBrowserClient) asenkron çağrısının sonucu, güncellenmiş adres listesi; orchestrator.setSavedAddresses'e geçirilerek state güncellenir
+- **Dönüş**: yok (async void) — yan etki olarak orchestrator'daki savedAddresses state'ini yeniler
 
 ### [N3_NASIL] AST Pointer: CheckoutPage.tsx::handleAddressDelete
-- **params**: `id: string` — silinecek kayıtlı adresin benzersiz tanımlayıcısı
+- **params**: `id: string` — silinecek kayıtlı adresin benzersiz tanımlayıcı string'i
 - **ic_degiskenler**:
-  - `refreshed` — listAddresses() async çağrısı ile silme sonrası yenilenen adres listesi
-- **Dönüş**: Promise<void> (implicit)
-
----
+  - `refreshed` — listAddresses(supabaseBrowserClient) asenkron çağrısının sonucu, silme sonrası güncellenmiş adres listesi; orchestrator.setSavedAddresses'e geçirilerek state güncellenir
+- **Dönüş**: yok (async void) — yan etki olarak window.confirm ile onay alır, deleteAddress ile siler, toast bildirimi gösterir ve savedAddresses state'ini yeniler
 
 ### [N4_NASIL] AST Pointer: CheckoutPage.tsx::onNextStep
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (handleNextStep sonucunu döndürür, payment.initiatePayment callback'ini argüman olarak iletir)
+- **params**: (yok)
+- **ic_degiskenler**: (yok — basit sarmalayıcı fonksiyon)
+- **Dönüş**: yok (void) — handleNextStep'i payment.initiatePayment fonksiyonu argümanıyla çağırarak checkout adım ilerlemesini ve ödeme başlatma sürecini tetikler
 
 ---
 

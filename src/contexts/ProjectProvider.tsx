@@ -2,6 +2,7 @@
 
 import React, { createContext,  useEffect, useState, useMemo, useCallback } from 'react'
 import { listUserProjects, createProject, deleteProject, addProductToProject, removeProductFromProject, listProjectItems } from '@/lib/services/project.service'
+import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { UserProject, ProjectItem } from '@/types/ui-models'
 import { useAuth } from '../hooks/useAuth'
 import { toast } from 'sonner'
@@ -28,7 +29,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!user) return
     setLoading(true)
     try {
-      const data = await listUserProjects()
+      const data = await listUserProjects(supabaseBrowserClient)
       setProjects(data as UserProject[])
     } catch {
       console.error('Error refreshing projects')
@@ -52,7 +53,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return null
     }
     try {
-      const newProject = await createProject({ name, description, user_id: user.id })
+      const newProject = await createProject(supabaseBrowserClient, { name, description, user_id: user.id })
       setProjects(prev => [newProject, ...prev])
       toast.success('Proje başarıyla oluşturuldu.')
       return newProject
@@ -64,7 +65,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const removeProject = useCallback(async (id: string) => {
     try {
-      await deleteProject(id)
+      await deleteProject(supabaseBrowserClient, id)
       setProjects(prev => prev.filter(p => p.id !== id))
       toast.success('Proje silindi.')
     } catch {
@@ -74,7 +75,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const addItem = useCallback(async (projectId: string, _productId: string, quantity: number = 1) => {
     try {
-      await addProductToProject(projectId, _productId, quantity)
+      await addProductToProject(supabaseBrowserClient, projectId, _productId, quantity)
       toast.success('Ürün projeye eklendi.')
     } catch {
       toast.error('Ürün eklenemedi.')
@@ -83,7 +84,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const removeItem = useCallback(async (projectId: string, _productId: string) => {
     try {
-      await removeProductFromProject(projectId, _productId)
+      await removeProductFromProject(supabaseBrowserClient, projectId, _productId)
       toast.success('Ürün projeden çıkarıldı.')
     } catch {
       toast.error('Ürün çıkarılamadı.')
@@ -92,7 +93,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const getProjectItems = useCallback(async (projectId: string): Promise<ProjectItem[]> => {
     try {
-      const items = await listProjectItems(projectId)
+      const items = await listProjectItems(supabaseBrowserClient, projectId)
       return items as ProjectItem[]
     } catch {
       console.error('Error getting project items')

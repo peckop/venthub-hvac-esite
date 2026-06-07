@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { createAddress, deleteAddress, listAddresses, setDefaultAddress, updateAddress } from '@/lib/services/address.service'
+import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { UserAddress } from '@/types/ui-models'
 import { toast } from 'sonner'
 import { useI18n } from '@/i18n/I18nProvider'
@@ -45,7 +46,7 @@ export default function AccountAddressesPage() {
   const refresh = React.useCallback(async () => {
     try {
       setLoading(true)
-      const data = await listAddresses()
+      const data = await listAddresses(supabaseBrowserClient)
       setItems(data)
     } catch (e) {
       console.error(e)
@@ -92,7 +93,7 @@ export default function AccountAddressesPage() {
       if (!user) throw new Error('Not authenticated')
       setSaving(true)
       if (isEditing && form.id) {
-        await updateAddress(form.id, {
+        await updateAddress(supabaseBrowserClient, form.id, {
           label: form.label,
           full_name: form.full_name,
           phone: form.phone,
@@ -107,7 +108,7 @@ export default function AccountAddressesPage() {
         })
         toast.success(t('account.addresses.toasts.updated'))
       } else {
-        await createAddress({
+        await createAddress(supabaseBrowserClient, {
           user_id: user.id,
           address_type: form.is_default_shipping ? 'shipping' : 'billing',
           label: form.label,
@@ -137,7 +138,7 @@ export default function AccountAddressesPage() {
   async function handleDelete(id: string) {
     if (!confirm(t('account.addresses.toasts.confirmDelete') as string)) return
     try {
-      await deleteAddress(id)
+      await deleteAddress(supabaseBrowserClient, id)
       toast.success(t('account.addresses.toasts.deleted'))
       await refresh()
       if (form.id === id) resetForm()
@@ -149,7 +150,7 @@ export default function AccountAddressesPage() {
 
   async function makeDefault(id: string, kind: 'shipping' | 'billing') {
     try {
-      await setDefaultAddress(kind, id)
+      await setDefaultAddress(supabaseBrowserClient, kind, id)
       toast.success(kind === 'shipping' ? (t('account.addresses.toasts.defaultSetShipping')) : (t('account.addresses.toasts.defaultSetBilling')))
       await refresh()
     } catch (e) {

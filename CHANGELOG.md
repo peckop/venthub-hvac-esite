@@ -1,5 +1,23 @@
 # Changelog
 
+### [2026-06-07] VentHub Database Service Layers Dependency Injection Refactoring
+
+**Özet:** Veri tabanı servis katmanında gevşek bağımlılıkları ve potansiyel istemci kirlenmelerini (client contamination) önlemek amacıyla `src/lib/services/` altındaki tüm servis fonksiyonları, ilk parametre olarak `supabase` istemcisini (`SupabaseClient<Database>`) alacak şekilde refaktör edilmiştir (Dependency Injection). Böylece modül düzeyindeki statik veya varsayılan istemci importları tamamen ortadan kaldırılmıştır.
+
+**Değişiklik Kapsamı:**
+- **Servis Katmanı Refaktör Edilmesi (7 Servis Dosyası):**
+  - `src/lib/services/` altındaki 7 adet servis dosyası, statik istemci importlarından temizlenmiş ve tüm veritabanı sorguları parametre olarak gelen `supabase` istemcisine bağlanmıştır.
+- **Çağırıcı Bileşen ve Hook Güncellemeleri (12+ Tüketici Bağlamı/Görünüm/Hook/Sayfa):**
+  - İstemci ve sunucu tarafında bu servisleri kullanan 12'den fazla context, view, custom hook ve sayfa bileşeni, ilgili ortama uygun Supabase istemcisini (`supabaseBrowserClient`, `createSupabaseServerClient` veya `supabaseStaticClient`) servis çağrılarına parametre olarak geçecek şekilde güncellenmiştir.
+- **Unit Test Güncellemeleri (2 Test Süiti):**
+  - Servislerin ve bağlı bileşenlerin unit testleri, test ortamındaki mock/gerçek Supabase istemci enjeksiyonu ile uyumlu hale getirilmiş ve 2 büyük unit test süiti güncellenmiştir.
+- **Proje Sağlığı:**
+  - Tüm type-check, lint, build süreçleri ve testler sıfır hata ile tamamlanmıştır.
+
+**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ | `pnpm run build` ✅ | `pnpm run test -- --run` (412 tests green) ✅
+
+---
+
 ### [2026-06-07] VentHub Console Warnings Remediation & i18n Redirection Consolidation
 
 **Özet:** Konsol uyarılarını gidermek ve yazı tipi yükleme performansını artırmak amacıyla Next.js yazı tipi yapılandırması değişken tabanlı CSS `--font-sans` yapısına geçirilmiş, yerelleştirilmiş rota proxy'si memoize edilerek gereksiz yeniden oluşturma döngüleri (HMR uyarıları) engellenmiş ve auth/signout akışlarındaki yerelleştirilmiş yönlendirme mantığı middleware ile uyumlu hale getirilmiştir.

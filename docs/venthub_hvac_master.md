@@ -2,14 +2,160 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-06T22:00:17.349461+00:00
+compiled_at: 2026-06-07T11:10:59.234299+00:00
 total_compiled_files: 377
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-06T22:00:17.349461+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-07T11:10:59.234299+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
+
+---
+# FILE: src\middleware.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\middleware.ts
+skeleton_hash: 17d96593b201eac7
+entity_hashes:
+  func:detectLocale: 25418ec7d07f6d80
+  func:middleware: 869802a18899b914
+  overview: 64f7e17620830c7c
+generated_at: 2026-06-07T11:02:59Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC projesinin Next.js ara katmanıdır ve tüm HTTP isteklerini rota öncesinde yakalayarak merkezi bir işlerlik sağlar. Dil tespiti, JWT tabanlı kimlik doğrulama ve erişim kontrolü gibi ön işlemleri koordineli bir şekilde yöneterek proje genelinde tutarlı ve güvenli bir kullanıcı deneyimi sunar.
+
+## Fonksiyon Grupları
+
+### Dil/Locale Tespiti
+Gelen isteklerin başlıkları ve çerezleri analiz edilerek kullanıcının tercih ettiği dil ve bölgesel ayarlar otomatik olarak belirlenir.
+- detectLocale
+
+### Güvenlik ve Kimlik Doğrulama
+JWT tabanlı token çözümleme ve kimlik doğrulama gibi güvenlik önlemlerini uygulayan yardımcı işlevleri barındırır.
+- decodeJwt
+
+### Merkezi Koordinasyon
+Tüm gelen istekleri yakalayan ana işleyici; dil tespiti, kimlik doğrulama ve yetkilendirme gibi süreçleri sırayla ve koordineli olarak yürütür.
+- middleware
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, HTTP isteklerini işleyen bir Next.js ara katmanıdır ve locale tespiti ile erişim kontrolü sağlar.
+
+[Aksiyom 1]: Eğer `detectLocale` fonksiyonuna geçerli bir `NextRequest` nesnesi sağlanmazsa, locale tespiti başarısız olur ve varsayılan bir locale kullanılmalıdır.
+
+[Aksiyom 2]: Eğer tespit edilen locale değeri `LOCALES` kümesinde yer almazsa, istemci için geçersiz bir dil tercihi işlenir ve uygulama tanımlı bir fallback locale'a dönmelidir.
+
+[Aksiyom 3]: Eğer `middleware` fonksiyonuna geçerli bir `NextRequest` nesnesi sağlanmazsa, middleware zinciri kırılır ve istek işlenmeden reddedilir.
+
+[Aksiyom 4]: Eğer istekteki kullanıcının rolü `ADMIN_ROLES` kümesinde tanımlırollerden biri değilse, admin-only rotalara erişim engellenir.
+
+[Aksiyom 5]: Eğer rotada parametre olarak beklenen değer `UUID_REGEX` kalıbına uymazsa, UUID tabanlı rota eşleştirmesi başarısız olur.
+
+[Aksiyom 6]: Eğer `config` nesnesi tanımlı değilse veya geçerli bir Next.js middleware config yapısına sahip değilse, middleware başarıyla register edilmez ve hiçbir istek işlenmez.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### detectLocale
+
+**Ne yapar**: Kullanıcının tercih ettiği dilini (Türkçe veya İngilizce) belirler. Öncelikle cookie değerine, ardından tarayıcı dil tercihine bakarak uygun locale kodunu döndürür.
+
+**Nasıl yapar**: Fonksiyon öncelikle `NEXT_LOCALE` adlı cookie'yi kontrol eder; eğer değeri geçerli bir dil koduysa (`tr` veya `en`) doğrudan bunu kullanır. Cookie'de geçerli bir dil yoksa, isteğin `accept-language` başlığını analiz eder ve İngilizce içeriyorsa `'en'` döndürür. Hiçbir koşul sağlanmazsa varsayılan olarak `'tr'` (Türkçe) değerini döndürür.
+
+**Parametreler**:
+- `request`: `NextRequest` — HTTP isteği nesnesi. Cookie değerlerine ve HTTP başlıklarına erişmek için kullanılır.
+
+**Dönüş**: `string` — Belirlenen dil kodu (`'tr'` veya `'en'`).
+
+### middleware
+
+**Ne yapar**: Next.js uygulamasının tüm isteklerini yakalayan merkezi middleware fonksiyonudur. Tenant (kiracı) tespiti, dil tabanlı URL yönlendirmeleri, UUID'den slug'a SEO uyumlu yönlendirmeler ve admin paneli için RBAC (Rol Tabanlı Erişim Kontrolü) koruması gibi çok katmanlı bir istek filtreleme ve yönlendirme mekanizmasını yönetir.
+
+**Nasıl yapar**: Fonksiyonun çalışma mantığı sırasıyla şu adımlardan oluşur: Önce `host` başlığından tenant kimliği çözümlenir ve `x-tenant-id` istek başlığına eklenir. Ardından URL'nin ilk segmenti incelenerek dil (locale) kontrolü yapılır — eğer ilk segment desteklenen dillerden biriyse dil alt dizin olarak kabul edilir ve admin rotası haricinde normal akışa devam edilir; değilse ve rota özel bir rota (admin, API, auth callback, sitemap, robots.txt) değilse, tespit edilen dile göre 307 yönlendirmesi gönderilir. Son olarak, dil segmenti çıkarılmış `effectiveSegments` kullanılarak iki ana dal ele alınır: (1) Ürün UUID'den slug'a 308 yönlendirmesi için Supabase'den sorgulama yapılır, (2) Admin rotaları için JWT claims üzerinden rol doğrulaması gerçekleştirilir ve yetkisiz kullanıcılar oturum sayfasına yönlendirilir. Tüm süreç boyunca `setTenantCookie` ve `redirectResponse` yardımcı fonksiyonları kullanılarak yanıt nesneleri tutarlı şekilde oluşturulur.
+
+**Parametreler**:
+- `request`: `NextRequest` — Next.js tarafından middleware'e iletilen HTTP istek nesnesi. İstek başlıkları, URL'si, çerezleri ve diğer meta bilgileri içerir. Fonksiyon bu nesne üzerinden okuma yapar ve yanıt oluştururken header'ları korur.
+
+**Dönüş**: `NextResponse` — Fonksiyon her durumda bir `NextResponse` nesnesi döndürür. Bu yanıt bir yönlendirme (redirect, 302/307/308), normal devam yanıtı (`NextResponse.next()`) veya tenant cookie'si set edilmiş bir yanıt olabilir. Yanıtın `cookies` ve `headers` alanları, istek zincirinin sürekliliğini sağlamak üzere kopyalanır.
+
+---
+
+## SABİTLER
+- **config** (object) — `{
+
+  matcher: [
+
+    // Statik varlıklar dışındaki tüm istekleri dinle
+
+    '...`
+- **UUID_REGEX** (regex) — `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`
+- **ADMIN_ROLES** (new_expression) — `new Set(['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'])`
+- **LOCALES** (as_expression) — `['tr', 'en'] as const`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/middleware.ts::detectLocale
+- **params**: (request: NextRequest)
+- **ic_degiskenler**: 
+  - `cookieLocale` — request'ten alınan 'NEXT_LOCALE' çerez değeri, dil tercihini belirler
+  - `acceptLang` — request'ten alınan 'accept-language' başlık değeri, tarayıcı dil tercihini belirler
+- **Dönüş**: string (Algılanan dil kodu: 'tr' veya 'en')
+
+### [N2_NASIL] AST Pointer: src/middleware.ts::middleware
+- **params**: (request: NextRequest)
+- **ic_degiskenler**:
+  - `host` — request'ten alınan 'host' başlık değeri, tenant çözümleme için kullanılır
+  - `tenantId` — resolveTenant(host) çağrısından elde edilen kiracı ID'si
+  - `setTenantCookie` — Inner function: NextResponse'a 'tenant_id' çerezini ayarlar
+  - `redirectResponse` — Inner function: URL'e yönlendirme yanıtı oluşturur, tenant çerezini ve mevcut çerezleri/ başlıkları kopyalar
+  - `pathname` — request.nextUrl.pathname, istek yol adı
+  - `segments` — pathname'i '/' ile bölüp boş olanları filtreleyerek elde edilen yol segmentleri dizisi
+  - `firstSegment` — segments[0], ilk yol segmenti
+  - `response` — NextResponse.next() ile oluşturulan başlangıç yanıtı
+  - `locale` — Başlangıçta DEFAULT_LOCALE, sonradan algılanan dil ile güncellenen dil kodu
+  - `effectiveSegments` — Dil segmenti varsa onu çıkarılmış yol segmentleri dizisi
+  - `isLocaleInPath` — firstSegment'in LOCALES dizisinde olup olmadığını kontrol eden boolean
+  - `isAuthApi` — auth API rotası olup olmadığını kontrol eden boolean (auth/callback veya auth/signout)
+  - `isSpecialRoute` — Admin, API, auth API veya sitemap/robots rotası olup olmadığını kontrol eden boolean
+  - `detectedLocale` — detectLocale(request) çağrısı ile belirlenen dil (sadece locale redirect durumunda)
+  - `identifier` — effectiveSegments[1], products rotasında UUID/_slug tanımlayıcısı
+  - `supabase` (products bloğu) — createServerClient ile oluşturulan Supabase istemcisi (products UUID araması için)
+  - `data` (products bloğu) — supabase.from('products').select('slug').eq('id', identifier).single() sorgusunun sonucu
+  - `isDev` — process.env.NODE_ENV === 'development' kontrolü ile belirlenen development ortamı boolean'ı
+  - `isLocalhost` — host'un localhost veya 127.0.0.1 ile başlayıp başlamadığını kontrol eden boolean
+  - `supabase` (admin bloğu) — createServerClient ile oluşturulan Supabase istemcisi (admin RBAC için)
+  - `data` (admin bloğu) — supabase.auth.getClaims() çağrısının sonucu
+  - `error` — supabase.auth.getClaims() çağrısında oluşabilecek hata nesnesi
+  - `claims` — data?.claims, JWT claim verileri
+  - `jwtRole` — claims?.user_role, JWT'den alınan kullanıcı rolü
+- **Dönüş**: yok (void) — Fonksiyon yan etki olarak NextResponse döndürür veya yönlendirme yapar
+
+---
+
+## NODE ID STANDARD
+
+  file: src\middleware.ts
+  function: src\middleware.ts::detectLocale
+  function: src\middleware.ts::middleware
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: config
+  export: detectLocale
+  export: middleware
 
 ---
 # FILE: src\actions\auth.md
@@ -97,6 +243,112 @@ Bu kimlik doğrulama modülünün doğru çalışması için giriş formu verile
 ## DISA AKTARILANLAR (EXPORTS)
   export: AuthActionState
   export: loginAction
+
+---
+# FILE: src\app\layout.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\layout.tsx
+skeleton_hash: 121ea14bce4b42cb
+entity_hashes:
+  func:RootLayout: b91efb59fd6362f0
+  overview: b75fce6203810ddf
+  style_tokens: eebc13a3fedd1bcb
+generated_at: 2026-06-07T11:00:50Z
+---
+
+## Genel Bakış
+Bu modül, VentHub web uygulamasının temel yapı taşını oluşturur. Tüm sayfaları saran kök layout bileşenini tanımlayarak tutarlı bir HTML yapısı, font ayarları ve ortak stil referanslarını sağlar. Sayfa içerikleri bu düzenin içine yerleştirilerek uygulamanın genel görünümünü ve düzenini belirler.
+
+## Fonksiyon Grupları
+### Layout Rendering
+Uygulamanın en dış çerçevesini ve temel HTML yapısını oluşturarak tüm sayfaların bu düzen bileşeni üzerinden tarayıcıya sunulmasını sağlar.
+- RootLayout
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için belirgin mimari varsayımlar mevcuttur.
+
+**[Aksiyom 1]:** Eğer `children` parametresi sağlanmazsa, React bileşeni hata verir veya boş bir layout render edilir.
+
+---
+
+**Not:** Verilen bilgiler (fonksiyon imzası, modül sabitleri ve eski doküman içeriği) incelendiğinde, bu bir React layout bileşenidir ve minimal bir API'ye sahiptir. Fonksiyon gövdesine erişim olmadan, iş mantığına dayalı detaylı aksiyomlar çıkarılamamaktadır. Mevcut verilerden sadece parametre zorunluluğu tespit edilebilmiştir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### RootLayout
+
+**Ne yapar**: Next.js uygulamasının kök layout (yerleşim) bileşenidir. Tüm sayfaların ortak HTML yapısını, stil değişkenlerini, sağlayıcıları (providers) ve JSON-LD yapılandırılmış veri şemasını tanımlayarak sayfa içeriğinin render edilmesini sağlar.
+
+**Nasıl yapar**: Fonksiyon, React.ReactNode türünde children parametresini alır ve bu içeriği çok katmanlı bir sarmalama (wrapper) yapısı içerisinde render eder. Önce `<html>` etiketi ile Türkçe dil ayarı ve smooth scroll davranışı tanımlanır, ardından Inter font değişkenleri body etiketine uygulanır. İçerik sırasıyla Providers (uygulama sağlayıcıları), ClientLayout (istemci tarafı düzen) ve son olarak children ile sarılır. Ek olarak, JSON-LD formatında WebSite schema markup'u script etiketi ile enjekte edilerek SEO dostu yapılandırılmış veri sunulur; bu veride VentHub adı ve SITE_URL değişkeni kullanılır.
+
+**Parametreler**:
+- `children`: React.ReactNode — Layout bileşeninin içinde render edilecek olan alt sayfa veya bileşen içeriği. Next.js'de her sayfa bu parametre aracılığıyla root layout'a传递 edilir.
+
+**Dönüş**: `JSX.Element` — Tüm HTML yapısını, provider sarmalını, client layout'u ve children içeriğini içeren JSX yapısı döndürülür. Return ifadesinde `<html>` elementi kök olarak verilmiştir.
+
+---
+
+## SABİTLER
+- **inter** (call) — `Inter({ subsets: ['latin'], display: 'swap', variable: '--font-sans' })`
+- **metadata** (object) — `{
+
+    metadataBase: new URL(SITE_URL),
+
+    title: "VentHub - Endüstriyel Ha...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: `src/app/layout.tsx`::RootLayout
+- **params**:
+  - `children` — `React.ReactNode` tipinde, layout içinde render edilecek alt sayfa ve bileşenlerin tümünü temsil eder; `ClientLayout` içine `{children}` olarak yerleştirilir
+- **ic_degiskenler**: Fonksiyon gövdesinde `const`/`let` ile tanımlanmış yerel değişken yoktur. JSX içinde aşağıdaki harici referanslar kullanılır:
+  - `inter` — `next/font/google`'dan import edilmiş font nesnesi; `inter.variable` ve `inter.className` özellikleri `<body>`'nin `className` prop'una template literal ile bağlanarak Inter fontu uygulanır
+  - `Providers` — `ClientLayout` modülünden import edilmiş context sağlayıcı sarmalayıcı bileşen; sayfa genelinde (theme, query client vb.) sağlayıcıları children'a outer sarmalayıcı olarak sarılır
+  - `ClientLayout` — client tarafı layout sarmalayıcı bileşen; `Providers` içinde, `children`'ı ve JSON-LD scriptini sarmalar
+  - `SITE_URL` — `@/config/siteUrl`'den import edilmiş sabit string; JSON-LD `WebSite` nesnesinin `url` alanına atanarak schema.org yapılandırılmış verisi oluşturulur
+  - `JSON.stringify` — JSON-LD nesnesini string'e dönüştürür; ardından `.replace(/</g, '\\u003c').replace(/>/g, '\\u003e')` zinciri ile `<` ve `>` karakterleri escape edilir
+  - `dangerouslySetInnerHTML` — React prop'u; script etiketine `__html` anahtarıyla doğrudan HTML enjekte eder
+- **Dönüş**: Belirtilmemiş (Explicit return type yok). Fonksiyon JSX döndürür — `<html>` > `<body>` > `<Providers>` > `<ClientLayout>` > (`<script>` JSON-LD + `{children}`) şeklinde tam sayfa iskeletini render eder. Yan etki olarak Inter font CSS değişkenleri sayfaya yayılır ve schema.org WebSite JSON-LD markup'u DOM'a enjekte edilir.
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\layout.tsx
+  function: src\app\layout.tsx::RootLayout
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: RootLayout
+  export: metadata
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `${inter.className`, `${inter.variable`
 
 ---
 # FILE: src\app\robots.md
@@ -1714,79 +1966,6 @@ Bu modül, Supabase webhook olaylarını HMAC ile doğrulayıp önbellek yenilem
 
   file: src\app\api\webhook\supabase\route.ts
   function: src\app\api\webhook\supabase\route.ts::POST
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: POST
-
----
-# FILE: src\app\auth\signout\route.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\auth\signout\route.ts
-skeleton_hash: e0e2bdaab1f2798b
-entity_hashes:
-  func:POST: a903ddf8e05f6051
-  overview: 4d1b3d1efbd01157
-generated_at: 2026-06-06T21:54:17Z
----
-
-## Genel Bakış
-
-Bu modül, kullanıcı oturumunu sonlandırmak için bir API endpoint'i sağlar. Next.js App Router yapısında POST isteklerini işleyerek kullanıcı çıkış işlemini gerçekleştirir.
-
-## Fonksiyon Grupları
-
-### Yetkilendirme İşlemleri
-Kullanıcı oturumunu sonlandırma ve çıkış işlemlerini yönetir.
-- POST
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-## FONKSİYON DETAYLARI
-
-### POST
-
-**Ne yapar**: Kullanıcının oturumunu sonlandırır ve giriş sayfasına yönlendirir. Bu fonksiyon, bir Next.js API route handler olarak POST isteklerini karşılar ve Supabase auth servisi üzerinden güvenli çıkış işlemini gerçekleştirir.
-
-**Nasıl yapar**: Öncelikle Supabase server client'ı oluşturur. Ardından mevcut kullanıcının auth claims bilgilerini kontrol eder; eğer claims verisi mevcutsa signOut işlemini tetikler. Çıkış işleminden sonra tüm layout'ları yeniden doğrulayarak önbellek temizliği yapar ve son olarak kullanıcıyı 302 kalıcı olmayan yönlendirme ile /auth/login sayfasına aktarır.
-
-**Parametreler**:
-- request: Request — Next.js tarafından otomatik olarak geçirilen HTTP istek nesnesi. İstek URL'si bu nesne üzerinden erişilerek yönlendirme hedefinin kök URL'si dinamik olarak belirlenir.
-
-**Dönüş**: `NextResponse.redirect(new URL('/auth/login', requestUrl.origin), 302)` — Kullanıcıyı giriş sayfasına 302 status kodu ile yönlendiren bir NextResponse nesnesi döndürür. Yönlendirme hedefi, isteğin geldiği origin adresine göre dinamik olarak oluşturulur.
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/app/auth/signout/route.ts::POST
-- **params**: `(request: Request)` — Next.js tarafından otomatik olarak enjekte edilen HTTP istek nesnesi
-- **ic_degiskenler**:
-  - `supabase` — `createSupabaseServerClient()` ile oluşturulan Supabase istemcisi, kullanıcının oturumunu yönetmek ve auth işlemleri yapmak için kullanılır
-  - `data` — `supabase.auth.getClaims()` çağrısından dönen nesnenin `data` özelliği, destructure edilmiş; kullanıcının claim bilgilerini (yetki/talep) tutar
-  - `requestUrl` — `request.url` string'inden `new URL()` ile oluşturulan URL nesnesi, yönlendirme için origin bilgisini almak amacıyla kullanılır
-- **Dönüş**: `NextResponse.redirect(new URL('/auth/login', requestUrl.origin), 302)` — Kullanıcı çıkış yaptıktan sonra `/auth/login` sayfasına 302 redirect yanıtı döner
-
-**Yan etkiler**:
-- `supabase.auth.signOut()` — Kullanıcı claim'leri varsa oturumu kapatır
-- `revalidatePath('/', 'layout')` — Next.js önbelleğindeki tüm layout seviyesindeki yolları yeniden doğrular (cache invalidation)
-
----
-
-## NODE ID STANDARD
-
-  file: src\app\auth\signout\route.ts
-  function: src\app\auth\signout\route.ts::POST
 
 ---
 
@@ -8733,166 +8912,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `absolute`, `z-10`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `inset-0`, `pointer-events-none`
-
----
-# FILE: src\components\StickyHeader.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\StickyHeader.tsx
-skeleton_hash: 01238508f4af3cc3
-entity_hashes:
-  overview: 66f525d6ccd8cb73
-  style_tokens: 55949ae1f3201280
-generated_at: 2026-05-28T22:37:16Z
----
-
-## Genel Bakış
-Bu modül, VentHub HVAC platformundaki sayfalarda sabit bir üst menü (sticky header) olarak görev yapan ana React bileşenidir. Sayfa kaydırma hareketine göre otomatik gizleme/gösterme davranışı, kullanıcı kimlik doğrulama durumu ve alışveriş sepeti bilgisi gibi temel durumları ilgili özel hook'lardan alarak yönetir. Arama, mega menü ve kategori navigasyonu için gerekli açılır pencereleri (overlay) kendi içinde render ederek tüm üst başlık işlevselliğini merkezi olarak sunar.
-
-## Fonksiyon Grupları
-Bu dosyada herhangi bir fonksiyon veya metot tanımlı değildir. Kod yapısı, bir React bileşen tanımı ve bir dizi hook çağrısı ile alt bileşen yerleşiminden oluşmaktadır.
-
----
-
-## AXIOMS – Mimari Varsayım
-
-Bu modül için fonksiyon gövdesi verilmemiş olup, yalnızca modül sabitlerinden (import edilen bileşenler) üretilen temel bağımlılık aksiyomları tanımlanmıştır.
-
-[Aksiyom 1]: Eğer `SearchOverlay` bileşeni modülde tanımlı veya import edilmiş değilse, StickyHeader bileşeni derleme zamanında hata verir.
-
-[Aksiyom 2]: Eğer `MegaMenu` bileşeni modülde tanımlı veya import edilmiş değilse, StickyHeader bileşeni derleme zamanında hata verir.
-
-[Aksiyom 3]: Eğer `CategoryHubOverlay` bileşeni modülde tanımlı veya import edilmiş değilse, StickyHeader bileşeni derleme zamanında hata verir.
-
----
-
-**Not:** Bu modül için fonksiyon imzası, parametre, default değer veya çalış zamanı koşulları içeren bir gövde verilmemiştir. Dolayısıyla; çalış zamanı (runtime) koşulları, hook bağımlılıkları, scroll davranışı eşik değerleri veya props zorunlulukları gibi aksiyomlar **fonksiyon gövdesinden üretilememiştir** ve uydurulmamıştır. Söz konusu detaylar fonksiyon gövdesi temin edildiğinde çıkarılabilir.
-
----
-
-## FONKSİYON DETAYLARI
-
----
-
-## INTERFACES
-
-### StickyHeaderProps
-- `isScrolled: boolean`
-
----
-
-## SABİTLER
-- **SearchOverlay** (call) — `React.lazy(() => import('./SearchOverlay'))`
-- **MegaMenu** (call) — `React.lazy(() => import('./MegaMenu'))`
-- **CategoryHubOverlay** (call) — `React.lazy(() => import('./navigation/CategoryHubOverlay'))`
-- **StickyHeader** (call) — `React.memo(function StickyHeader({ isScrolled }) {
-
-  const { t, lang } = use...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/components/StickyHeader.tsx::loadRecentProducts
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `raw` — `window.localStorage.getItem('recentProducts')` sonucunu tutan string, parse edilmemis haliyle
-- **Dönüş**: yok (yan etki: `setRecentProducts` state güncelleme)
-
-### [N2_NASIL] AST Pointer: src/components/StickyHeader.tsx::useEffectForClickOutside
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `handleClickOutside` — Mousedown olayinda menu disinda tiklanip tiklanmadigini kontrol eden fonksiyon
-- **Dönüş**: cleanup fonksiyonu (event listener kaldırma)
-
-### [N3_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleClickOutside
-- **params**: `(event: MouseEvent)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: `closeUserMenu` çağrısı)
-
-### [N4_NASIL] AST Pointer: src/components/StickyHeader.tsx::roleLabel
-- **params**: `(role: string)`
-- **ic_degiskenler**: (yok, sadece parametre ve switch)
-- **Dönüş**: `string` — rol için yerelleştirilmiş etiket
-
-### [N5_NASIL] AST Pointer: src/components/StickyHeader.tsx::useEffectForScrollProgress
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `ticking` — requestAnimationFrame kuyruğunu kontrol eden bayrak
-  - `handleScroll` — Kaydırma olayını işleyen ve `%` hesaplayan fonksiyon
-- **Dönüş**: cleanup fonksiyonu (scroll listener kaldırma)
-
-### [N6_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleScrollRequestFrame
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `winScroll` — `document.documentElement.scrollTop` ile elde edilen mevcut dikey kaydırma miktarı
-  - `height` — Kaydırılabilir toplam sayfa yüksekliği (`scrollHeight - clientHeight`)
-  - `scrolled` — Kaydırma ilerleme yüzdesi (`(winScroll / height) * 100`)
-- **Dönüş**: yok (yan etki: `setScrollProgress` state güncelleme)
-
-### [N7_NASIL] AST Pointer: src/components/StickyHeader.tsx::calculateScrolled
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `winScroll` — Mevcut dikey kaydırma miktarı
-  - `height` — Toplam kaydırılabilir yükseklik
-  - `scrolled` — Hesaplanmış yüzdelik ilerleme
-- **Dönüş**: yok (yan etki: `setScrollProgress` çağrısı)
-
-### [N8_NASIL] AST Pointer: src/components/StickyHeader.tsx::useEffectForGlobalSearch
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `handleGlobalKeyDown` — Klavye olayını işleyen ve arama overlay'ını açan fonksiyon
-- **Dönüş**: cleanup fonksiyonu (keydown listener kaldırma)
-
-### [N9_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleGlobalKeyDown
-- **params**: `(event: KeyboardEvent)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: `openSearchOverlay` çağrısı)
-
-### [N10_NASIL] AST Pointer: src/components/StickyHeader.tsx::openCategories
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etkiler: `trackEvent`, `openCategoryHub` çağrıları)
-
-### [N11_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleSignOut
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: Promise<void> (async fonksiyon)
-
-### [N12_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleItemHover
-- **params**: `(itemId: string)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: `prefetchProductsPage` koşullu çağrısı)
-
-### [N13_NASIL] AST Pointer: src/components/StickyHeader.tsx::renderUserSection
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok, JSX döndürür)
-- **Dönüş**: `ReactElement` — Kullanıcı oturum durumuna göre login/register butonları veya kullanıcı menüsü JSX'i
-
----
-
-## NODE ID STANDARD
-
-  file: src\components\StickyHeader.tsx
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-r`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `from-primary-navy`, `hover:bg-air-blue/20`, `hover:bg-air-blue/25`, `hover:bg-red-50`, `hover:text-primary-navy`, `hover:text-red-600`, `text-left`, `text-slate-900`, `text-sm`, `text-steel-gray`
-- **Layout:** `-right-2`, `-top-2`, `absolute`, `backdrop-blur-md`, `block`, `flex`, `flex-1`, `from-primary-navy`, `gap-1.5`, `gap-2.5`, `gap-3`, `h-16`, `h-5`, `h-8`, `hidden`
-- **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
-- **Yardımcı Sınıflar:** `${isUserMenuOpen`, `:`, `border`, `duration-300`, `font-bold`, `font-medium`, `font-semibold`, `group`, `hover:-translate-y-0.5`, `md:px-4`, `mt-3`, `opacity-100`, `px-2`, `px-3`, `px-3.5`
 
 ---
 # FILE: src\components\SubcategoryFlow.md
@@ -30442,26 +30461,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useLocalizedRoutes.ts
-skeleton_hash: 6befadb027c593fb
+skeleton_hash: 94d250cc79d4c683
 entity_hashes:
   func:createLocalizedProxy: fe510a2a1776b976
   func:localizeUrl: cc0ed6edc9446b73
-  func:useLocalizedRoutes: c1fffb3d151d0025
-  overview: 4cb1ca7dbbecdb31
-generated_at: 2026-05-28T22:37:47Z
+  func:useLocalizedRoutes: d8dba6cf829a1dea
+  overview: 97bf2a088d5e0b24
+generated_at: 2026-06-07T11:02:13Z
 ---
 
 ## Genel Bakış
-useLocalizedRoutes hook'u, uygulama genelindeki merkezi `Routes` tanımlarını dinamik olarak o anki aktif dile (`lang`) göre yerelleştirilmiş (localized) rotalara dönüştüren akıllı bir Proxy mekanizması sunar.
+Bu modül, uygulama içindeki merkezi rota tanımlarını o anki aktif dile göre otomatik olarak dönüştüren bir hook ve yardımcı fonksiyonlar sağlar. Temel işlevi, her dil için ayrı route tanımları oluşturmak yerine mevcut rotaları bir Proxy aracılığıyla dinamik olarak işleyerek dil ön ekleri ekleyerek URL'leri oluşturmaktır.
 
 ## Fonksiyon Grupları
-### Yardımcı Metotlar
-Dil ön eki ekleme ve proxy sarmalama işlemlerini yöneten iç metotlar.
-- localizeUrl
-- createLocalizedProxy
+### Yardımcı Fonksiyonlar
+URL'leri dile göre dönüştüren ve yerelleştirilmiş bir Proxy nesnesi oluşturan yardımcı işlevleri içerir.
+- localizeUrl, createLocalizedProxy
 
 ### Ana Hook
-Dile göre yerelleştirilmiş Routes nesnesini döndüren ana kanca.
+Aktif dil context'ini kullanarak yerelleştirilmiş Routes nesnesini döndüren ana React hook'u.
 - useLocalizedRoutes
 
 ---
@@ -30469,13 +30487,36 @@ Dile göre yerelleştirilmiş Routes nesnesini döndüren ana kanca.
 ## AXIOMS – Mimari Varsayımlar
 Bu modülün çalışması için yerelleştirilmiş I18nProvider'ın ve merkezi rota nesnesinin erişilebilir olması gerekir.
 
-[Aksiyom 1]: I18nProvider context yapısı erişilebilir olmalıdır, aksi takdirde aktif dil (`lang`) tespit edilemez.
-[Aksiyom 2]: Admin ve API rotaları dil ön eki (`/tr` veya `/en`) almamalıdır, aksi takdirde backend entegrasyonları ve yönetim paneli kilitlenir.
-[Aksiyom 3]: Zaten dil ön eki barındıran rotalar (`/tr/...` veya `/en/...`) tekrar işlenmemelidir, aksi takdirde `/en/en` gibi mükerrer dil segmentli 404 sayfaları oluşur.
+[Aksiyom 1]: Eğer `useLocalizedRoutes` hook'u, uygulama içinde bir React bileşeni dışından veya uygun bir Context Provider'ın altı dışında çağrılırsa, dil bilgisi (`lang`) için gerekli bağlam sağlanamaz.
+
+[Aksiyom 2]: Eğer `createLocalizedProxy` fonksiyonuna geçilen `target` nesnesi (merkezi `Routes` nesnesi) tanımlanmamış veya null ise, proxy nesnesi oluşturulamaz ve rota erişimi çalışmaz.
+
+[Aksiyom 3]: Eğer `localizeUrl` fonksiyonuna geçilen `url` parametresi geçerli bir rota formatına (örneğin başlangıcı `/` olan bir string) uymuyorsa, döndürülen yerelleştirilmiş URL beklenmeyen bir yapıya sahip olabilir.
+
+[Aksiyom 4]: Eğer `localizeUrl` fonksiyonuna geçilen `lang` parametresi, uygulama tarafından desteklenen geçerli bir dil kodu (örneğin `'en'`, `'tr'`) formatında değilse, URL ön ek eklenmesi çalışmayabilir veya hata oluşabilir.
+
+[Aksiyom 5]: Eğer `useLocalizedRoutes` hook'u, uygulamanın dil bilgisini sağlayan bir Context Provider'ın (örneğin I18nProvider) alt birimlerinde kullanılmıyorsa, hook içinde dil bilgisine erişilemez ve yerelleştirme yapılamaz.
+
+[Aksiyom 6]: Eğer merkezi `Routes` nesnesi, `createLocalizedProxy` fonksiyonuna verilmeden önce modifiye edilmiş veya üzerine ek yapılmışsa, proxy bu değişiklikleri yansıtmaz; s
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### localizeUrl
+
+**Ne yapar**: Verilen URL'ye dil kodu (lang) ön ekini ekleyerek lokalize bir URL üretir. Admin ve API rotaları gibi dil gerektirmeyen yolları hariç tutar.
+
+**Nasıl yapar**: Fonksiyon, üç aşamalı bir kontrol sırası izler. Önce URL'nin `/admin` veya `/api` ile başlayıp başlamadığını kontrol eder — bu rotalar dil segmenti almadığı için doğrudan orijinal URL döner. Ardından URL'nin zaten `/tr` veya `/en` ile başlayıp başlamadığına bakılır; böylece mükerrer dil ön eki eklenmesi engellenir. Son olarak, her iki koşul da sağlanmıyorsa URL'nin başına `${lang}` eklenir ve kök sayfa (`/`) özel olarak işlenerek çift eğik çizgi oluşumu önlenir.
+
+**Parametreler**:
+- `url` : `string` — Lokalize edilecek olan URL yolu. Örneğin `/hvac-solutions` veya `/`.
+- `lang` : `string` — Hedef dil kodu. Geçerli değerler `/tr` ve `/en` önekleri ile eşleşen `"tr"` veya `"en"` gibi değerlerdir.
+
+**Dönüş**: `string` — Dil kodu eklenmiş veya korunmuş tam lokalize URL. Örneğin `localizeUrl("/hvac-solutions", "tr")` çağrısı `"/tr/hvac-solutions"` sonucunu döndürür.
+
+### createLocalizedProxy
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### useLocalizedRoutes
 **Ne yapar**: Aktif dil context'ine duyarlı, yerelleştirilmiş bir Routes proxy nesnesi döner.  
@@ -30495,10 +30536,23 @@ type RouteFunction = (...args: unknown[]) => string
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/hooks/useLocalizedRoutes.ts::useLocalizedRoutes
+### [N1_NASIL] AST Pointer: useLocalizedRoutes.ts::localizeUrl
+- **params**: `(url: string, lang: string)`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` — Dil segmenti eklenmiş veya korunmuş URL'yi döndürür
+
+### [N2_NASIL] AST Pointer: useLocalizedRoutes.ts::createLocalizedProxy
+- **params**: `(target: T, lang: string)`
 - **ic_degiskenler**:
-  - `lang` — useI18n kancası üzerinden okunan aktif dil ön eki.
-- **Dönüş**: Proxy<Routes>
+  - `target` — Localization uygulanacak orijinal nesne
+  - `lang` — Hedef dil kodu (örn: 'tr', 'en')
+- **Dönüş**: `T` — Localization proxy'si sarılmış nesne
+
+### [N3_NASIL] AST Pointer: useLocalizedRoutes.ts::useLocalizedRoutes
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `lang` — useI18n() hook'undan alınan mevcut dil kodu
+- **Dönüş**: yok — Localization proxy'si oluşturulup useMemo ile memoize edilmiş nesne döndürülür
 
 ---
 

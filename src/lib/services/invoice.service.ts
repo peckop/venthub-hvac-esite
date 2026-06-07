@@ -1,10 +1,8 @@
-import { supabaseBrowserClient } from '../supabase/client'
-import { supabaseStaticClient } from '../supabase/static'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '../../types/database.types'
 import type { DbInvoiceProfile, DbInvoiceProfileInsert, DbInvoiceProfileUpdate } from '../../types/db-rows'
 
-const defaultClient = typeof window !== 'undefined' ? supabaseBrowserClient : supabaseStaticClient
-
-export async function listInvoiceProfiles(supabase = defaultClient): Promise<DbInvoiceProfile[]> {
+export async function listInvoiceProfiles(supabase: SupabaseClient<Database>): Promise<DbInvoiceProfile[]> {
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .select('*')
@@ -22,7 +20,10 @@ export async function listInvoiceProfiles(supabase = defaultClient): Promise<DbI
   return (data as DbInvoiceProfile[]) || []
 }
 
-export async function createInvoiceProfile(payload: DbInvoiceProfileInsert, supabase = defaultClient): Promise<DbInvoiceProfile> {
+export async function createInvoiceProfile(
+  supabase: SupabaseClient<Database>,
+  payload: DbInvoiceProfileInsert
+): Promise<DbInvoiceProfile> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
@@ -43,7 +44,11 @@ export async function createInvoiceProfile(payload: DbInvoiceProfileInsert, supa
   return data as DbInvoiceProfile
 }
 
-export async function updateInvoiceProfile(id: string, payload: DbInvoiceProfileUpdate, supabase = defaultClient): Promise<DbInvoiceProfile> {
+export async function updateInvoiceProfile(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  payload: DbInvoiceProfileUpdate
+): Promise<DbInvoiceProfile> {
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .update(payload)
@@ -55,7 +60,7 @@ export async function updateInvoiceProfile(id: string, payload: DbInvoiceProfile
   return data as DbInvoiceProfile
 }
 
-export async function deleteInvoiceProfile(id: string, supabase = defaultClient): Promise<boolean> {
+export async function deleteInvoiceProfile(supabase: SupabaseClient<Database>, id: string): Promise<boolean> {
   const { error } = await supabase
     .from('user_invoice_profiles')
     .delete()
@@ -64,7 +69,7 @@ export async function deleteInvoiceProfile(id: string, supabase = defaultClient)
   return true
 }
 
-export async function setDefaultInvoiceProfile(id: string, supabase = defaultClient): Promise<DbInvoiceProfile> {
+export async function setDefaultInvoiceProfile(supabase: SupabaseClient<Database>, id: string): Promise<DbInvoiceProfile> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
@@ -89,7 +94,7 @@ export async function setDefaultInvoiceProfile(id: string, supabase = defaultCli
   return data as DbInvoiceProfile
 }
 
-export async function fetchDefaultInvoiceProfile(supabase = defaultClient): Promise<DbInvoiceProfile | null> {
+export async function fetchDefaultInvoiceProfile(supabase: SupabaseClient<Database>): Promise<DbInvoiceProfile | null> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user

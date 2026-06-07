@@ -6,7 +6,7 @@ import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../types
 
 // Cached product fetcher
 export const getCachedProductBySlug = cache(async (slug: string) => {
-  return getProductBySlug(slug)
+  return getProductBySlug(supabase, slug)
 })
 
 // Cached category fetcher

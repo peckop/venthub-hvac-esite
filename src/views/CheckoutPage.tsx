@@ -25,6 +25,7 @@ import { useCheckoutOrchestrator } from '../hooks/useCheckoutOrchestrator'
 import { CheckoutAddressInfo } from '../types/db-rows'
 import type { UserAddress } from '@/types/ui-models'
 import { listAddresses, deleteAddress } from '@/lib/services/address.service'
+import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
 const CheckoutPage: React.FC = () => {
@@ -73,7 +74,7 @@ const CheckoutPage: React.FC = () => {
 
   const handleAddressSaved = async () => {
     try {
-      const refreshed = await listAddresses()
+      const refreshed = await listAddresses(supabaseBrowserClient)
       orchestrator.setSavedAddresses(refreshed)
     } catch (err) {
       console.error('Failed to refresh addresses:', err)
@@ -83,9 +84,9 @@ const CheckoutPage: React.FC = () => {
   const handleAddressDelete = async (id: string) => {
     if (!window.confirm(t('checkout.saved.confirmDelete') || 'Are you sure you want to delete this address?')) return
     try {
-      await deleteAddress(id)
+      await deleteAddress(supabaseBrowserClient, id)
       toast.success(t('checkout.saved.deleted') || 'Address deleted')
-      const refreshed = await listAddresses()
+      const refreshed = await listAddresses(supabaseBrowserClient)
       orchestrator.setSavedAddresses(refreshed)
     } catch (err) {
       console.error(err)

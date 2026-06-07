@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation'
 import type { Product } from '@/types/ui-models'
 import { getProductsEnriched } from '@/lib/services/product.service'
+import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { DomainCategory } from '../lib/type-converters'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { useIsMounted } from './useIsMounted'
@@ -212,7 +213,7 @@ export function useCategoryGateway(initialCategory?: DomainCategory | null, init
             setFilters(prev => ({ ...prev, priceRange: [prev.priceRange[0], Math.max(prev.priceRange[1], ceilMax)] }))
           }
         } else if (categoryIds.length > 0 || !slug) {
-          const productsData = await getProductsEnriched({
+          const productsData = await getProductsEnriched(supabaseBrowserClient, {
             categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
             limit: 100
           })

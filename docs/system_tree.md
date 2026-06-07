@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-06T22:00:17.132326+00:00
+compiled_at: 2026-06-07T11:10:58.983820+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-06T22:00:17.132326+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-07T11:10:58.983820+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -153,8 +153,8 @@ Bu belge, otonom derleyici tarafından 2026-06-06T22:00:17.132326+00:00 tarihind
 │   │   │           └── ✅ `route.ts`
 │   │   ├── 📂 **auth/**
 │   │   │   └── 📂 **signout/**
-│   │   │       └── ✅ `route.ts`
-│   │   ├── ❌ `layout.tsx`
+│   │   │       └── ❌ `route.ts`
+│   │   ├── ✅ `layout.tsx`
 │   │   ├── ✅ `robots.ts`
 │   │   └── ❌ `sitemap.ts`
 │   ├── 📂 **assets/**
@@ -189,7 +189,7 @@ Bu belge, otonom derleyici tarafından 2026-06-06T22:00:17.132326+00:00 tarihind
 │   │   ├── ✅ `SecurityRibbon.tsx`
 │   │   ├── ✅ `Seo.tsx`
 │   │   ├── ✅ `SpotlightHeroOverlay.tsx`
-│   │   ├── ✅ `StickyHeader.tsx`
+│   │   ├── ❌ `StickyHeader.tsx`
 │   │   ├── ✅ `SubcategoryFlow.tsx`
 │   │   ├── ❌ `TiltCard.tsx`
 │   │   ├── ✅ `UndecidedUserCTA.tsx`
@@ -435,7 +435,7 @@ Bu belge, otonom derleyici tarafından 2026-06-06T22:00:17.132326+00:00 tarihind
 │   │   ├── ✅ `tenantResolver.ts`
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `utils.ts`
-│   ├── ❌ `middleware.ts`
+│   ├── ✅ `middleware.ts`
 │   ├── 📂 **test/**
 │   ├── 📂 **types/**
 │   │   ├── ✅ `admin-shared.ts`
@@ -617,11 +617,12 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\app\admin\coupons\page.md`
 - [❌] `src\app\admin\inventory\report\page.md`
 - [❌] `src\app\admin\webhook-events\page.md`
-- [❌] `src\app\layout.md`
+- [❌] `src\app\auth\signout\route.md`
 - [❌] `src\app\sitemap.md`
 - [❌] `src\components\AddToCartToast.md`
 - [❌] `src\components\PaymentWatcher.md`
 - [❌] `src\components\ScrollReveal.md`
+- [❌] `src\components\StickyHeader.md`
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\admin\dashboard\AbcPieChart.md`
 - [❌] `src\components\layout\PageShell.md`
@@ -638,7 +639,6 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\lib\data\preload.md`
 - [❌] `src\lib\pdfAssets.md`
 - [❌] `src\lib\supabase\static.md`
-- [❌] `src\middleware.md`
 - [❌] `src\types\database.md`
 - [❌] `src\utils\analytics.md`
 - [❌] `src\utils\applicationUi.md`

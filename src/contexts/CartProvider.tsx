@@ -126,7 +126,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const { getOrCreateShoppingCart, listCartItemsWithProducts, clearCartItems: clearDbCartItems, upsertCartItem } = await import('../lib/services/cart.service')
         const { getEffectivePriceInfo } = await import('../lib/services/pricing.service')
         const { supabaseBrowserClient: supabase } = await import('../lib/supabase/client')
-        const cart = await getOrCreateShoppingCart(user.id)
+        const cart = await getOrCreateShoppingCart(supabase, user.id)
         if (cancelled) return
         setServerCartId(cart.id)
 
@@ -174,11 +174,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
           if ((process.env.NEXT_PUBLIC_DEBUG ?? 'false') === 'true') {
             console.warn('Clearing server cart (guest items present or post-order flag)')
           }
-          await clearDbCartItems(cart.id)
+          await clearDbCartItems(supabase, cart.id)
         }
 
         // Fetch server items (will be empty if we just cleared)
-        const serverRows = await listCartItemsWithProducts(cart.id)
+        const serverRows = await listCartItemsWithProducts(supabase, cart.id)
         const serverItems: CartItem[] = serverRows.map((row) => ({ 
           id: row.item.product_id, 
           product: row.product, 
@@ -196,8 +196,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const priceInfoList = await Promise.all(
           merged.map(async (it) => {
             try {
-              const info = await getEffectivePriceInfo(it.product)
-              await upsertCartItem({ cartId: cart.id, _productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
+              const info = await getEffectivePriceInfo(supabase, it.product)
+              await upsertCartItem(supabase, { cartId: cart.id, _productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
               return { _productId: it.product.id, unitPrice: info.unitPrice }
             } catch (e) {
               console.error('cart upsert error', e)
@@ -288,11 +288,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // compute effective price and upsert optimistically, also reflect locally
       Promise.all([
         import('../lib/services/pricing.service'),
-        import('../lib/services/cart.service')
-      ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }]) => {
-        getEffectivePriceInfo(product)
+        import('../lib/services/cart.service'),
+        import('../lib/supabase/client')
+      ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }, { supabaseBrowserClient: supabase }]) => {
+        getEffectivePriceInfo(supabase, product)
           .then(info => {
-            upsertCartItem({ cartId: serverCartId, _productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
+            upsertCartItem(supabase, { cartId: serverCartId, _productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
               .catch(err => console.error('server addToCart error', err))
             // Update local snapshot unit price
             setItems(curr => curr.map(it => it.product.id === product.id ? { ...it, unitPrice: info.unitPrice } : it))
@@ -321,8 +322,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
 
     if (CART_SERVER_SYNC && user && serverCartId) {
-      import('../lib/services/cart.service').then(({ removeCartItem }) => {
-        return removeCartItem(serverCartId, _productId)
+      Promise.all([
+        import('../lib/services/cart.service'),
+        import('../lib/supabase/client')
+      ]).then(([{ removeCartItem }, { supabaseBrowserClient: supabase }]) => {
+        return removeCartItem(supabase, serverCartId, _productId)
       }).catch(err => console.error('server removeFromCart error', err))
     }
   }, [user, serverCartId])
@@ -346,11 +350,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (product) {
         Promise.all([
           import('../lib/services/pricing.service'),
-          import('../lib/services/cart.service')
-        ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }]) => {
-          getEffectivePriceInfo(product)
+          import('../lib/services/cart.service'),
+          import('../lib/supabase/client')
+        ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }, { supabaseBrowserClient: supabase }]) => {
+          getEffectivePriceInfo(supabase, product)
             .then(info => {
-              upsertCartItem({ cartId: serverCartId, _productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
+              upsertCartItem(supabase, { cartId: serverCartId, _productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
                 .catch(err => console.error('server updateQuantity error', err))
               // Ensure local snapshot unit price is present
               setItems(curr => curr.map(it => it.product.id === _productId ? { ...it, unitPrice: info.unitPrice } : it))
@@ -387,8 +392,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     if (CART_SERVER_SYNC && user && serverCartId) {
-      import('../lib/services/cart.service').then(({ clearCartItems }) => {
-        return clearCartItems(serverCartId)
+      Promise.all([
+        import('../lib/services/cart.service'),
+        import('../lib/supabase/client')
+      ]).then(([{ clearCartItems }, { supabaseBrowserClient: supabase }]) => {
+        return clearCartItems(supabase, serverCartId)
       }).catch(err => console.error('server clearCart error', err))
     }
   }, [user, serverCartId])
@@ -444,14 +452,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Sunucuya da yalnızca değişenleri yansıt (varsa)
     if (changedIds.size > 0 && CART_SERVER_SYNC && user && serverCartId) {
       try {
-        import('../lib/services/cart.service').then(({ upsertCartItem }) => {
+        Promise.all([
+          import('../lib/services/cart.service'),
+          import('../lib/supabase/client')
+        ]).then(([{ upsertCartItem }, { supabaseBrowserClient: supabase }]) => {
           const tasks: Promise<unknown>[] = []
           for (let i = 0; i < items.length; i++) {
             const it = items[i]
             if (!changedIds.has(it.product.id)) continue
             const up = pmap.get(it.product.id)
             if (up == null) continue
-            tasks.push(upsertCartItem({ cartId: serverCartId, _productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
+            tasks.push(upsertCartItem(supabase, { cartId: serverCartId, _productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
               .catch(e => console.warn('applyServerPricing upsert error', e)))
           }
           Promise.allSettled(tasks).catch(() => { })

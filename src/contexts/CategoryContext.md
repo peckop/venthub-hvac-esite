@@ -3,39 +3,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx
-skeleton_hash: 26708e127e1d653d
+skeleton_hash: ff5eed69181f5d50
 entity_hashes:
   func:CategoryProvider: 664f5248857922aa
   func:useCategories: bc181eebe7b5a618
-  overview: fe0862ea34c377d1
+  overview: a88f952f06e9968e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-06T21:55:27Z
+generated_at: 2026-06-07T12:04:21Z
 ---
 
 ## Genel Bakış
-Bu modül, React uygulaması genelinde kategori verilerinin yönetimini ve paylaşımını merkezi olarak sağlayan bir Context yapısıdır. Tüm alt bileşenlerin kategori listesine ve ilgili durumlarına tutarlı bir şekilde erişmesini amaçlar.
+CategoryContext modülü, React uygulaması genelinde kategori verilerinin tutarlı bir şekilde paylaşılmasını ve yönetimini sağlayan merkezi bir yapıdır. CategoryProvider bileşeni, kategori verisi ve ilgili durumları alt bileşenlere aktarırken, useCategories hook'u bu verilere kolay erişim imkanı tanır.
 
 ## Fonksiyon Grupları
 ### Kategori Sağlayıcı
-Uygulamanın üst seviyelerinde yer alarak, kategori verisi ve durumunu içeren React Context değerini tüm alt bileşenler için hazırlanır ve sağlar.
+Uygulama ağaç yapısının üst seviyelerinde yer alarak, kategori verisi ve durumunu içeren React Context değerini tüm alt bileşenler için hazırlar ve sağlar.
 - CategoryProvider
 
 ### Kategori Erişim Aracı
-Bileşenler içinde, `CategoryProvider` tarafından sağlanan kategori verisine ve ilgili araçlara güvenli ve kolay erişim imkanı tanıyan bir React Hook'u sunar.
+Alt bileşenler içinde, CategoryProvider tarafından sağlanan kategori verisine ve ilgili araçlara erişim sağlamak için güvenli ve kullanımı kolay bir React Hook'u sunar.
 - useCategories
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül, React Context yapısını temel alan kategori veri paylaşım servisidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir:
 
-[Aksiyom 1]: Eğer `CategoryProvider` bileşeni, uygulama ağaç yapısında `useCategories()` hook'unu kullanan tüm bileşenlerin üstünde yer almıyorsa, o bileşenler kategori verilerine erişemez.
-
-[Aksiyom 2]: Eğer `CategoryProvider` bileşeninin `children` prop'u tanımlı bir React düğüm içermiyorsa (boş veya geçersizse), uygulama içinde kategori verisi gerektiren hiçbir alt bileşen render edilemez.
-
-[Aksiyom 3]: Eğer `CategoryContext` çağrısı yapılmamışsa (veya `CategoryProvider` içinde sağlanmamışsa), `useCategories()` hook'u `undefined` veya geçersiz bir değer döndürür.
-
-[Aksiyom 4]: Eğer `useCategories()` hook'u `CategoryProvider` sarmalama alanı dışında kullanılırsa, kategori verisine erişim başarısız olur ve muhtemelen runtime hatası verir.
 
 ---
 
@@ -77,75 +68,25 @@ Bu modül, React Context yapısını temel alan kategori veri paylaşım servisi
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CategoryContext.tsx::CategoryProvider
-- **params**: `{ children }` — React child bileşenleri, provider içine render edilecek
+- **params**: ({ children }) — children: React.ReactNode, provider'ın sarmalayacağı alt bileşenler
 - **ic_degiskenler**:
-  - `categories` — DomainCategory[] tipinde state, yüklenen kategorilerin listesi
-  - `loading` — boolean state, kategorilerin yükleme durumunu takip eder
-  - `error` — string | null state, hata mesajını saklar
-  - `loadCategories` — useCallback ile memoize edilmiş async fonksiyon, kategorileri getCategories API'sinden yükler
-  - `categoryTree` — useMemo ile hesaplanmış, parent_id'si olmayan ana kategorilerin sıralı listesi
-  - `categoriesSlugMap` — useMemo ile hesaplanmış, slug ile DomainCategory eşleştiren Map lookup tablosu
-  - `categoriesParentMap` — useMemo ile hesaplenmiş, parent_id ile alt kategorilerin listesini eşleştiren Map lookup tablosu
-  - `getCategoryBySlug` — useCallback ile memoize edilmiş, slug ile kategori getiren fonksiyon
-  - `getSubCategories` — useCallback ile memoize edilmiş, parent_id ile alt kategorileri getiren fonksiyon
-  - `value` — useMemo ile hesaplanmış, context değerini oluşturan obje
-- **Dönüş**: `<CategoryContext.Provider value={value}>{children}</CategoryContext.Provider>` (JSX elementi)
+  - `categories` — Kategorilerin listesi, state olarak tutulur (DomainCategory[])
+  - `loading` — Kategorilerin yüklenme durumu (boolean)
+  - `error` — Hata mesajı varsa tutulur (string | null)
+  - `loadCategories` — Kategorileri API'den yükleyen asenkron fonksiyon (useCallback ile memoize)
+  - `categoryTree` — Ana kategorileri (parent_id olmayanları) sıralı olarak tutan memoize edilmiş ağaç yapısı
+  - `categoriesSlugMap` — Slug bazlı hızlı erişim için Map yapısı (slug -> DomainCategory)
+  - `categoriesParentMap` — Parent ID bazlı hızlı erişim için Map yapısı (parent_id -> DomainCategory[])
+  - `getCategoryBySlug` — Slug ile kategori getiren memoize fonksiyon
+  - `getSubCategories` — Parent ID ile alt kategorileri getiren memoize fonksiyon
+  - `value` — Context değerini oluşturan memoize obje
+- **Dönüş**: React.FC<{ children: React.ReactNode }> — CategoryContext.Provider ile sarmalanmış children
 
-### [N2_NASIL] AST Pointer: CategoryContext.tsx::loadCategories
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: CategoryContext.tsx::useCategories
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — getCategories API çağrısından dönen ham kategori verisi
-  - `domainCats` — toUICategoryList(data) çağrısı ile dönüştürülmüş DomainCategory listesi
-  - `err` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: yok (state setter'ları çağırarak yan etki yapar: setCategories, setError, setLoading)
-
-### [N3_NASIL] AST Pointer: CategoryContext.tsx::useEffect callback
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (loadCategories() çağırarak yan etki yapar)
-
-### [N4_NASIL] AST Pointer: CategoryContext.tsx::categoryTree useMemo callback
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `mainCats` — categories.filter(c => !c.parent_id) ile elde edilen, parent_id'si olmayan ana kategoriler
-  - `a`, `b` — sort karşılaştırma fonksiyonu parametreleri, sıralanacak kategoriler
-  - `orderA` — (a.metadata as CategoryMetadata | null)?.sort_order ?? 0 ile elde edilen birinci kategorinin sıralama değeri
-  - `orderB` — (b.metadata as CategoryMetadata | null)?.sort_order ?? 0 ile elde edilen ikinci kategorinin sıralama değeri
-- **Dönüş**: mainCats.sort(...) ile sıralanmış ana kategoriler listesi
-
-### [N5_NASIL] AST Pointer: CategoryContext.tsx::categoryTree sort callback
-- **params**: `(a, b)` — sıralanacak iki DomainCategory nesnesi
-- **ic_degiskenler**:
-  - `orderA` — a.metadata cast edilerek CategoryMetadata tipine dönüştürüldükten sonra sort_order değeri, 0 default
-  - `orderB` — b.metadata cast edilerek CategoryMetadata tipine dönüştürüldükten sonra sort_order değeri, 0 default
-- **Dönüş**: orderA - orderB (numerik sıralama için fark değeri)
-
-### [N6_NASIL] AST Pointer: CategoryContext.tsx::categoriesSlugMap useMemo callback
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `map` — new Map<string, DomainCategory>() ile oluşturulmuş boş harita
-  - `c` — for döngüsündeki her bir kategori nesnesi
-- **Dönüş**: slug ile DomainCategory eşleştiren dolu Map nesnesi
-
-### [N7_NASIL] AST Pointer: CategoryContext.tsx::categoriesParentMap useMemo callback
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `map` — new Map<string, DomainCategory[]>() ile oluşturulmuş boş harita
-  - `c` — for döngüsündeki her bir kategori nesnesi
-  - `siblings` — belirli bir parent_id'ye sahip alt kategorilerin listesi
-  - `a`, `b` — ikinci for döngüsünde sıralama yapılacak kategoriler
-- **Dönüş**: parent_id ile alt kategori listelerini eşleştiren ve sıralanmış dolu Map nesnesi
-
-### [N8_NASIL] AST Pointer: CategoryContext.tsx::value useMemo callback
-- **params**: (yok)
-- **ic_degiskenler**: (yok, sadece dış değişkenlere referans)
-- **Dönüş**: `{ categories, categoryTree, loading, error, refresh: loadCategories, getCategoryBySlug, getSubCategories }` objesi
-
-### [N9_NASIL] AST Pointer: CategoryContext.tsx::useCategories
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `context` — useContext(CategoryContext) çağrısı ile elde edilen context değeri
-- **Dönüş**: context (CategoryContext tipinde obje) veya hata fırlatır
+  - `context` — CategoryContext'ten alınan değer, useCategories hook'u
+- **Dönüş**: CategoryContext tipinde context değeri (eğer provider dışındaysa hata fırlatır)
 
 ---
 

@@ -3,19 +3,19 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx
-skeleton_hash: 465c7bbf39df0e39
+skeleton_hash: 19ca955f9f321742
 entity_hashes:
   func:RootPage: 465ea7eadb5b28f2
   func:generateMetadata: 507857aa921043d5
   func:generateStaticParams: 8c98a454509d7f36
   func:getCachedHomeData: 3cdedf9dace01d81
-  overview: b1be993a0b342f12
+  overview: 42896b594ed92fa2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-06T19:24:54Z
+generated_at: 2026-06-07T12:00:49Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js App Router yapısıyla entegre çalışan, dil destekli ana sayfanın (homepage) temel iskeletini oluşturur. Statik sayfa üretim parametrelerini belirleyerek, SEO için gerekli meta verileri dinamik olarak üreterek ve önbelleklenmiş verilerle ana bileşeni render ederek sayfanın oluşturulma sürecini koordine eder.
+Bu modül, Next.js App Router yapısıyla entegre çalışan, dil destekli ana sayfanın temel iskeletini oluşturur. Statik sayfa üretim parametrelerini belirleyerek, SEO için gerekli meta verileri dinamik olarak üreterek ve önbelleklenmiş verilerle ana bileşeni render ederek sayfanın oluşturulma sürecini koordine eder.
 
 ## Fonksiyon Grupları
 ### Sayfa Yapısı ve Meta Veri Yönetimi
@@ -28,7 +28,20 @@ Bu grup, dil ve kiracı bazlı ana sayfa verilerini önbellekten alarak ana Reac
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül, bir Next.js App Router yapısında dil destekli ana sayfayı render eder. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
 
+**[Aksiyom 1]:** Eğer `generateStaticParams` fonksiyonu, geçerli bir dil listesi (örn. `["tr", "en"]`) döndürmüyorsa, istatik sayfa üretim süreci başarısız olur veya yalnızca varsayılan dil için sayfa oluşturulur.
+
+**[Aksiyom 2]:** Eğer `generateMetadata` fonksiyonuna传递 edilen `params` nesnesinde geçerli bir `lang` özelliği yoksa, SEO için gerekli meta veriler (başlık, açıklama vb.) dil bağımsız veya varsayılan bir dil ile oluşturulur, bu da hedef kitlenin diline göre optimize edilmemiş bir sayfa sonucu doğurur.
+
+**[Aksiyom 3]:** Eğer `getCachedHomeData` fonksiyonuna传递 edilen `lang` parametresi, uygulama tarafından desteklenmeyen bir dil kodu ise, ilgili dil için önbelleklenmiş veri bulunamaz ve fonksiyon hata döndürür veya boş bir veri yapısı ile cevap verir.
+
+**[Aksiyom 4]:** Eğer `getCachedHomeData` fonksiyonuna传递 edilen `tenantId` parametresi, geçerli veya aktif bir kiracı (tenant) identifier'ı değilse, ilgili kiracının verileri retrieve edilemez ve fonksiyon hata veya boş veri döndürür.
+
+**[Aksiyom 5]:** Eğer `RootPage` bileşeninin render edeceği `params` nesnesinde geçerli bir `lang` özelliği yoksa, bileşen dil-aware (dil duyarlı) bir şekilde render edilemez ve sayfa yanlış bir dilde veya eksik içerikle görüntülenebilir.
+
+**[Aksiyom 6]:** Eğer `getCachedHomeData` fonksiyonu tarafından döndürülen veri yapısı, `RootPage` bileşeninin beklediği shape'e (yapıya) uymuyorsa, bileşen render aşamasında hata verir veya eksik kısımlarla çalışır.
 
 ---
 
@@ -86,40 +99,58 @@ type Props = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx::generateStaticParams
-- **params**: parametre yok
-- **ic_degiskenler**: (değişken yok)
-- **Dönüş**: Static dil parametrelerini içeren dizi: `{ lang: 'tr' }` ve `{ lang: 'en' }` objeleri
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx::generateMetadata
-- **params**: `{ params }: Props` — Sayfa parametrelerini içeren Props objesi
+### [N1_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx`::generateStaticParams
+- **params**: yok
 - **ic_degiskenler**:
-  - `lang` — `await params` ile elde edilen dil kodu ('tr' veya 'en')
-  - `dict` — Diline göre sözlük nesnesi (`en` veya `tr`)
-  - `siteUrl` — SITE_URL sabitinden gelen site adresi
-  - `canonical` — Canonical URL, `${siteUrl}/${lang}` formatında
-- **Dönüş**: Metadata objesi (title, description, alternates, openGraph, twitter, robots alanlarını içerir)
+  - (iç değişken yok — doğrudan sabit dizi döner)
+- **Dönüş**: `{ lang: 'tr' } | { lang: 'en' }` dizisi
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx::getCachedHomeData
-- **params**: `(lang: string, tenantId: string)` — Dil kodu ve kiracı ID'si
-- **ic_degiskenler**: (değişken yok — fonksiyon doğrudan unstable_cache çağrısını döndürür)
-- **Dönüş**: `unstable_cache` ile sarılmış async fonksiyonun sonucu: `{ catData, prodData }` objesi
+### [N2_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx`::generateMetadata
+- **params**: `{ params }: Props` — Next.js tarafından verilen URL parametreleri
+- **ic_degiskenler**:
+  - `lang` — `await params` ile elde edilen dil kodu (`'tr'` veya `'en'`)
+  - `dict` — `lang` değerine göre seçilen sözlük nesnesi (`en` veya `tr`); SEO başlıkları ve açıklamaları buradan okunur
+  - `siteUrl` — `SITE_URL` sabit import'undan gelen site kök adresi
+  - `canonical` — `siteUrl` ve `lang` birleştirilerek oluşturulan canonical URL
+- **Dönüş**: `Promise<Metadata>` — title, description, alternates, openGraph, twitter, robots alanlarını içeren Metadata nesnesi
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx::RootPage
-- **params**: `{ params }: Props` — Sayfa parametrelerini içeren Props objesi
+### [N3_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx`::getCachedHomeData
+- **params**: `lang: string` — dil kodu, cache key bileşeni; `tenantId: string` — kiracı ID'si, cache key bileşeni
+- **ic_degiskenler**:
+  - `catData` — `getCategories(supabaseStaticClient)` asenkron çağrısıyla çekilen kategori ham verisi
+  - `prodData` — `getProducts(supabaseStaticClient, 12)` asenkron çağrısıyla çekilen ilk 12 ürün ham verisi
+  - `Promise.all` ile eşzamanlı olarak çekilir; `unstable_cache` ile `['home-page-data', lang, tenantId]` key'i ile önbelleğe alınır, `revalidate: false` ile sonsuz cache süresi tanılır
+- **Dönüş**: `{ catData, prodData }` — kategori ve ürün verilerini içeren nesne
+
+### [N4_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx`::RootPage
+- **params**: `{ params }: Props` — Next.js page bileşen parametreleri
 - **ic_degiskenler**:
   - `lang` — `await params` ile elde edilen dil kodu
-  - `dict` — Diline göre sözlük nesnesi (`en` veya `tr`)
-  - `tenantConfig` — `await getTenantConfig()` ile elde edilen kiracı yapılandırma bilgisi
-  - `tenantId` — `tenantConfig.id` ile elde edilen kiracı ID'si
-  - `categories` — DomainCategory tipinde dizi, varsayılan olarak boş dizi
-  - `products` — Product tipinde dizi, varsayılan olarak boş dizi
-  - `catData` — `getCachedHomeData` fonksiyonundan gelen ham kategori verileri
-  - `prodData` — `getCachedHomeData` fonksiyonundan gelen ham ürün verileri
-  - `displayCategories` — `CategoryViewModelLite` tipinde dizi, filtrelenmiş ve çevrilmiş kategoriler
-  - `siteUrl` — SITE_URL sabitinden gelen site adresi
-  - `jsonLds` — JSON-LD yapılandırma dizisi (WebSite ve Organization şemaları)
-- **Dönüş**: JSX içeriği (TenantProvider ile sarılmış script etiketleri ve HomePage bileşeni)
+  - `dict` — `lang` değerine göre seçilen sözlük (`en` veya `tr`); çeviri metinleri için kullanılır
+  - `tenantConfig` — `await getTenantConfig()` ile çekilen kiracı yapılandırma nesnesi
+  - `tenantId` — `tenantConfig.id`; cache key ve kiracı tanımlayıcısı olarak kullanılır
+  - `categories` — `DomainCategory[]` tipinde kategori listesi; başlangıçta boş dizi, `getCachedHomeData` başarısız olursa boş kalır
+  - `products` — `Product[]` tipinde ürün listesi; başlangıçta boş dizi
+  - `catData` — `getCachedHomeData` sonucundan destructure edilen kategori ham verisi
+  - `prodData` — `getCachedHomeData` sonucundan destructure edilen ürün ham verisi
+  - `error` — `catch` bloğu yakaladığı hata nesnesi; `console.warn` ile loglanır
+  - `displayCategories` — `CategoryViewModelLite[]` tipinde; `categories` dizisinden `parent_id` olmayanlar filtrelenip `name` göre sıralanır, ardından `map` ile her kategori `dict.common.categoryList` içinden çevrilmiş isimle dönüştürülür; fallback olarak `menu_label` veya `name` kullanılır
+  - `siteUrl` — `SITE_URL` sabit import'undan gelen site kök adresi; JSON-LD ve URL oluşturma için kullanılır
+  - `jsonLds` — JSON-LD yapılandırması dizisi; `WebSite` (arama eylemi) ve `Organization` (iletişim) tiplerinde iki nesne içerir
+- **Dönüş**: JSX — `<TenantProvider>` sarmalayıcısı içinde JSON-LD scriptleri ve `<HomePage>` bileşeni döner; `<HomePage>`'e `initialCategories`, `rawCategories`, `initialProducts`, `dictionary` prop'ları geçirilir
+
+### [N5_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx`::map callback (displayCategories oluşturma)
+- **params**: `c` — `DomainCategory` tipinde mevcut kategori nesnesi (`.map()` iterasyonu)
+- **ic_degiskenler**:
+  - `categoryListDict` — `dict.common?.categoryList` erişiminden elde edilen `CategoryDict` tipinde çeviri sözlüğü; üst seviye kategori slug'larını çeviri isimlerine eşler
+  - `subListDict` — `categoryListDict?.sub` erişiminden elde edilen `Record<string, string>` tipinde alt kategori çeviri sözlüğü; üst seviyede bulunamayan slug'lar için fallback aranır
+  - `translatedName` — `c.slug` anahtarıyla `categoryListDict`'den veya `subListDict`'den aranan çevrilmiş kategori adı; bulunamazsa `menu_label` veya `name` kullanılır
+- **Dönüş**: `{ id, slug, displayName, description, image_url }` — `CategoryViewModelLite` nesnesi
+
+### [N6_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx`::jsonLd map callback (script oluşturma)
+- **params**: `ld` — JSON-LD yapılandırma nesnesi (WebSite veya Organization); `i` — dizi indeks anahtarı olarak kullanılır
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX `<script>` elementi; `type="application/ld+json"`, `key={i}`, `dangerouslySetInnerHTML` ile `JSON.stringify(ld)` çıktısı `<` ve `>` karakterleri escape edilerek içeriğe yerleştirilir
 
 ---
 

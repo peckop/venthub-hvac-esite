@@ -10,6 +10,7 @@ import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { Routes } from '../utils/routes'
 import type { DbCategory } from '../types/db-rows'
 import { useCategories } from '../contexts/CategoryContext'
+import { supabaseBrowserClient } from '../lib/supabase/client'
 
 interface SearchOverlayProps {
   open: boolean
@@ -90,7 +91,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       try {
         setLoading(true)
         const { getSearchSuggestions } = await import('../lib/services/product.service')
-        const items = await getSearchSuggestions(debounced, 6)
+        const items = await getSearchSuggestions(supabaseBrowserClient, debounced, 6)
 
         if (active) {
           setSuggestions(items)
@@ -142,7 +143,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
 
     try {
       const { ftsSearchProducts } = await import('../lib/services/product.service')
-      const rows = await ftsSearchProducts(term, 20)
+      const rows = await ftsSearchProducts(supabaseBrowserClient, term, 20)
       setResults(rows)
     } catch {
       setError(t('search.noResults') || 'Arama sırasında hata oluştu.')

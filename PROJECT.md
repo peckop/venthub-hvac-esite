@@ -1,38 +1,30 @@
-# Project: VentHub HVAC Client Architecture Upgrade
+# Project: VentHub HVAC Database Service Layer DI Refactoring
 
 ## Architecture
-- **Supabase Client Factories**: Split the singleton `src/lib/supabase.ts` into three separate factory creators:
-  - **Browser Client** (`src/lib/supabase/client.ts`): Client-side singleton utilizing `createBrowserClient`.
-  - **Server Client** (`src/lib/supabase/server.ts`): Per-request server client utilizing `createServerClient` and `cookies()`.
-  - **Static Client** (`src/lib/supabase/static.ts`): Cookie-less `createClient` for static rendering boundaries.
-- **Service Decoupling**: Remove the bulk re-exports (`export *`) from `src/lib/supabase.ts` and require consumers to import services directly.
-- **Middleware & Auth Security**: Transition middleware from `getSession()` to `getClaims()` and inline JWT role enforcement. Upgrade the Auth action to utilize per-request server client and support clean cookie propagation.
-- **Realtime Isolation**: Enforce private channels and tenant-based PostgreSQL subscriptions.
+- **Dependency Injection**: Inject `supabase: SupabaseClient<Database>` as the first argument to all functions in the database service layer files under `src/lib/services/`.
+- **Remove Static Imports**: Eliminate import and use of static clients (`supabaseBrowserClient`, `supabaseStaticClient`, `defaultClient`) at the module scope inside the service layer files.
+- **Consumer Updates**: Ensure every caller in the codebase passes the context-appropriate active Supabase client instance (browser client for client components/hooks/providers, request-bound server client for server components/actions/route handlers).
+- **Documentation**: Update README.md, CHANGELOG.md, and create RECOMMENDATIONS.md at the project root to capture DI patterns, changes made, and future architectural recommendations.
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|---|---|---|---|
-| M1 | Client Factories & Data/Type Migration | Setup client factories under `src/lib/supabase/`, move types to `src/types/`, and brands data to `src/data/brands.ts`. | None | DONE (Worker 1: 9739dbd7-b83b-4583-acf7-3b8376d0fc41) |
-| M2 | Middleware & Auth Security Upgrade | Update `src/middleware.ts` (getClaims, JWT role) and `src/actions/auth.ts` (per-request client, cookie handling, signout route). | M1 | DONE |
-| M3 | Realtime & SSG/SSR Boundaries | Channel hardening (private: true, tenant filter) and dynamic force-dynamic config on SSG/SSR pages. | M2 | DONE |
-| M4 | Codebase Import Updates | Resolve and update import paths across 70+ consumer files. | M1, M2, M3 | DONE |
-| M5 | Final Verification & Docs | Execute build, type-check, lint, test suite (>=401 pass), update README/CHANGELOG, and write RECOMMENDATIONS.md. | M4 | DONE |
-
-> ℹ️ **Milestones Validation Note**: All milestones (M1–M5) have been successfully completed. The system compiles cleanly, lints with 0 errors, passes all 410 Vitest tests, and a global forensic audit has issued a certified CLEAN verdict.
+| M1 | Exploration & Caller Audit | Audit references to all 7 services and list functions/callers | None | DONE |
+| M2 | Service & Caller Refactoring | Refactor 7 service files to strict DI and update all callers | M1 | DONE |
+| M3 | Test Suite Updates | Update Vitest service test files to pass the Supabase client as the first argument | M2 | DONE |
+| M4 | Documentation Updates | Update README.md, CHANGELOG.md, and create RECOMMENDATIONS.md | M2, M3 | DONE |
+| M5 | Final Verification & Audit | Execute build, type-check, lint, test suite, and audit integrity | M3, M4 | IN_PROGRESS |
 
 ## Interface Contracts
-### Supabase Client Factories
-- Browser client: `createBrowserClient<Database>(...)`
-- Server client: `createServerClient<Database>(..., { cookies: { ... } })`
-- Static client: `createClient<Database>(...)`
-
-### Middleware Auth Security
-- Claims-based RBAC enforcement replacing `getSession()` and `decodeJwt()`
+### Service Functions (Strict DI)
+- Signature: `export async function serviceFunction(supabase: SupabaseClient<Database>, ...args: any[]): Promise<Result>`
+- No default values for `supabase` parameter.
 
 ## Code Layout
-- `src/lib/supabase/client.ts` - Browser client singleton factory
-- `src/lib/supabase/server.ts` - Request-bound server client factory
-- `src/lib/supabase/static.ts` - Cookie-less static client factory
-- `src/middleware.ts` - Edge middleware for claims verification
-- `src/actions/auth.ts` - Request-bound server actions for auth
-- `app/auth/signout/route.ts` - Route handler for signout
+- `src/lib/services/address.service.ts`
+- `src/lib/services/cart.service.ts`
+- `src/lib/services/category.service.ts`
+- `src/lib/services/invoice.service.ts`
+- `src/lib/services/pricing.service.ts`
+- `src/lib/services/product.service.ts`
+- `src/lib/services/project.service.ts`

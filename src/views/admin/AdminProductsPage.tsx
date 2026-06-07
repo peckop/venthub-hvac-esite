@@ -146,7 +146,7 @@ const AdminProductsPage: React.FC = () => {
       if (term) {
         // ── FTS RPC ile akıllı arama ──
         const offset = (page - 1) * PAGE_SIZE
-        const results = await adminSearchProducts(
+        const results = await adminSearchProducts(supabase,
           term,
           PAGE_SIZE,
           offset,

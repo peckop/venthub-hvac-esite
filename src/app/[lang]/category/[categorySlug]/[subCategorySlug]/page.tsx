@@ -61,7 +61,7 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
   
   let products: DomainProduct[] = []
   if (category) {
-    products = await getProductsEnriched({
+    products = await getProductsEnriched(supabase, {
       categoryIds: [category.id],
       limit: 100
     })

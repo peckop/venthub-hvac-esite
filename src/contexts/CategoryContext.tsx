@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { getCategories } from '@/lib/services/category.service';
+import { supabaseBrowserClient } from '@/lib/supabase/client';
 import { toUICategoryList, DomainCategory } from '../lib/type-converters';
 import type { CategoryMetadata } from '../types/db-rows';
 
@@ -29,7 +30,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const loadCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getCategories();
+      const data = await getCategories(supabaseBrowserClient);
       const domainCats = toUICategoryList(data);
       setCategories(domainCats);
     } catch (err) {

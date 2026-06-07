@@ -8,7 +8,7 @@ entity_hashes:
   func:preloadCategory: 5c31b78ecaccbf15
   func:preloadProduct: ffb09955ca2af5e6
   overview: 4f8c5f040d941a01
-generated_at: 2026-06-06T21:55:38Z
+generated_at: 2026-06-07T12:06:28Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,17 @@ Bu grup, belirli bir slug ile gelen istekleri işleyerek ilgili verilerin taray�
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, tarayıcı tarafında veri önbellekleme tetikleyicileri içerir. Aşağıdaki varsayımlar, fonksiyon imzalarından ve modül yapısından türetilmiştir.
+
+[Aksiyom 1]: Eğer `preloadProduct` fonksiyonu çağrıldığında `slug` parametresi geçerli bir ürün tanımlayıcısı değilse, ilgili ürün verisi önbelleğe alınamaz ve potansiyel navigasyonda veri yükleme gecikmesi yaşanır.
+
+[Aksiyom 2]: Eğer `preloadCategory` fonksiyonu çağrıldığında `slug` parametresi geçerli bir kategori tanımlayıcısı değilse, ilgili kategori verisi önbelleğe alınamaz ve potansiyel navigasyonda veri yükleme gecikmesi yaşanır.
+
+[Aksiyom 3]: Bu modülün doğru çalışması için, `getCachedProductBySlug` ve `getCachedCategoryData` fonksiyonlarının var olması ve çağrılabilir durumda olması gerekir; aksi takdirde önbellekleme tetikleme işlemleri başarısız olur.
+
+[Aksiyom 4]: Bu modüldeki fonksiyonlar sadece yükleme işlemini tetikler, doğrudan veri dönmez; eğer tetikleme mekanizması başarısız olursa, sonraki sayfa geçişlerinde veriler önbellekten alınamaz ve tam yükleme gecikmesi yaşanır.
 
 ---
 
@@ -45,7 +55,7 @@ Bu grup, belirli bir slug ile gelen istekleri işleyerek ilgili verilerin taray�
 
 ## SABİTLER
 - **getCachedProductBySlug** (call) — `cache(async (slug: string) => {
-  return getProductBySlug(slug)
+  return getProductBySlug(supabase, slug)
 })`
 - **getCachedCategoryData** (call) — `cache(async (slug: string) => {
   const { data, error } = await supabase
@@ -60,31 +70,6 @@ Bu grup, belirli bir slug ile gelen istekleri işleyerek ilgili verilerin taray�
 - **ic_degiskenler**:
   _(değişken yok — doğrudan return ile çağrı iletilir)_
 - **Dönüş**: `getProductBySlug(slug)`ReturnType — slug ile ürün servisi sonucu (Promise); `void` ile sarılmış olarak kullanılır
-
----
-
-### [N2_NASIL] AST Pointer: src/lib/data/preload.ts::getCachedCategoryData
-- **params**: (`slug: string`)
-- **ic_degiskenler**:
-  - `data` — Supabase `categories` tablosundan `.single()` ile dönen satır verisi; alanları `id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content` olarak select edilir
-  - `error` — Supabase sorgusunda oluşabilecek hata nesnesi; `null` ise sorgu başarılı demektir
-- **Dönüş**: `mapDatabaseCategoryToDomain(...)` çağrısının dönüşü (domain kategori nesnesi) veya `null` (hata/veri yoksa)
-
----
-
-### [N3_NASIL] AST Pointer: src/lib/data/preload.ts::preloadProduct
-- **params**: (`slug: string`)
-- **ic_degiskenler**:
-  _(değişken yok — doğrudan `getCachedProductBySlug` çağrısı yapılır)_
-- **Dönüş**: yok (`void` — fonksiyon sonucu kasıtlı olarak atılır; sadece yan etki/cache warming amaçlıdır)
-
----
-
-### [N4_NASIL] AST Pointer: src/lib/data/preload.ts::preloadCategory
-- **params**: (`slug: string`)
-- **ic_degiskenler**:
-  _(değişken yok — doğrudan `getCachedCategoryData` çağrısı yapılır)_
-- **Dönüş**: yok (`void` — fonksiyon sonucu kasıtlı olarak atılır; sadece yan etki/cache warming amaçlıdır)
 
 ---
 

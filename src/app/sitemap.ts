@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getCategories } from '../lib/services/category.service'
+import { supabaseStaticClient } from '../lib/supabase/static'
 import { getAllProducts } from '../lib/services/product.service'
 import { HVAC_BRANDS } from '../data/brands'
 import { SITE_URL } from '../config/siteUrl'
@@ -11,8 +12,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fetch all categories and products
   const [categories, products] = await Promise.all([
-    getCategories().catch(() => []),
-    getAllProducts().catch(() => [])
+    getCategories(supabaseStaticClient).catch(() => []),
+    getAllProducts(supabaseStaticClient).catch(() => [])
   ])
 
   // 1. Static Routes

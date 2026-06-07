@@ -5,12 +5,12 @@ namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx
 skeleton_hash: d22870f9ca9919a7
 entity_hashes:
-  func:Page: b8d7156be466dee4
+  func:Page: 22b0a365108072dc
   func:generateStaticParams: 28452401205f49a6
   func:getCategoryData: e78b546d8d1e7e91
   overview: 1bae58277fa3a2b2
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-06-06T19:24:00Z
+generated_at: 2026-06-07T11:59:32Z
 ---
 
 ## Genel Bakış
@@ -43,24 +43,6 @@ Bu modül, Next.js App Router yapısında dinamik kategori/alt kategori sayfa bi
 
 ---
 
-**[Aksiyom 1]:** `getCategoryData(slug)` fonksiyonuna geçilen `slug` parametresi geçerli bir string değilse, veri çekme işlemi başarısız olur veya boş/yanlış veri döner.
-
-**[Aksiyom 2]:** `Page` bileşeninin `params` Promise'i çözümlendiğinde `categorySlug` ve `subCategorySlug` alanlarını içermesi gerekir; bu alanlardan herhangi biri eksikse sayfa düzgün render edilemez.
-
-**[Aksiyom 3]:** `getCategoryData` fonksiyonu asenkron çalışmalıdır (Promise döner); eğer bu fonksiyon senkron çalıştırılmaya zorlanırsa zaman aşımlı hata oluşur.
-
-**[Aksiyom 4]:** `generateStaticParams()` fonksiyonu, SSG (Static Site Generation) sırasında çağrılmalı ve geçerli kategori/alt kategori slug çiftleri listesi döndürmelidir; boş liste dönerse hiçbir sayfa statik olarak oluşturulamaz.
-
-**[Aksiyom 5]:** URL yapısı (`[lang]/category/[categorySlug]/[subCategorySlug]`) üç dinamik segment içerir; `Page` fonksiyonunun `params` imzasında yalnızca `categorySlug` ve `subCategorySlug` görünmektedir — `lang` parametresinin farklı bir mekanizma (middleware,更高 katman context) ile sağlandığı varsayılır.
-
-**[Aksiyom 6]:** `getCategoryData` bir string `slug` alırken, `Page` bileşeni iki ayrı slug (`categorySlug` ve `subCategorySlug`) alır; dolayısıyla `getCategoryData`'ya hangi slug'ın (üst kategori mi, alt kategori mi) geçirildiği调用 noktasında belirlenmelidir — bu eşleşme modül içinde net olarak tanımlı değildir ve调用ya bağımlıdır.
-
----
-
-> **Not:** Modül sabitleri bölümü boş olduğundan, eşik değeri, format veya kabul kriteri gibi sabit tabanlı aksiyom tanımlanamamıştır. `getCategoryData`'nın dönüş tipi ve hata fırlatma davranışı fonksiyon imzasında görünmediğinden bu konularda aksiyom türetilememiştir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### getCategoryData
@@ -83,53 +65,55 @@ Bu modül, Next.js App Router yapısında dinamik kategori/alt kategori sayfa bi
 **Dönüş**: `Promise<Array<{ lang: string; categorySlug: string; subCategorySlug: string }>>` — Statik olarak oluşturulacak tüm alt kategori sayfaları için URL parametrelerini içeren bir dizi. Her bir alt kategori, iki farklı dil (tr ve en) için bir dizi elemanı olarak temsil edilir.
 
 ### Page
-**Ne yapar**: Bir alt kategori sayfasının React server component'idir. URL parametrelerinden alt kategori slug'ını alır, ilgili kategori ve ürün verilerini getirir ve istemci tarafında render edilecek bileşene aktarır.
+**Ne yapar**: Belirli bir alt kategorinin sayfasını sunucu tarafında render eden asenkron React bileşenidir. Ana görevi, URL parametrelerinden kategori bilgisini çekerek ilgili kategori ve ürünlerini yüklemek ve bunları istemciye bir Suspense sarmalayıcısı içinde sunmaktır.
 
-**Nasıl yapar**: Fonksiyon, bir `Promise` olarak gelen `params` nesnesini `await` ile çözerek `subCategorySlug` değerine erişir. Bu slug'ı `getCategoryData` fonksiyonuna göndererek kategori bilgisini çeker. Eğer kategori varsa, o kategorideki ürünleri (maksimum 100 adet) `getProductsEnriched` fonksiyonuyla getirir. Son olarak, elde edilen `category` ve `products` başlangıç verilerini (`initialCategory`, `initialProducts`) `PageComponent`'e prop olarak geçirir ve bir `React.Suspense` sarmalayıcısı içinde sunar.
+**Nasıl yapar**: Fonksiyon, promise olarak gelen `params` nesnesini await ederek `subCategorySlug` değerini çıkarır. Ardından `getCategoryData` fonksiyonunu çağırarak ilgili kategorinin tüm verisini alır. Eğer kategori başarıyla yüklendiyse, `getProductsEnriched` fonksiyonunu kullanarak o kategoriye ait en fazla 100 ürünü getirir. Son olarak, hem kategori hem de ürün verilerini `PageComponent`'e başlangıç verisi olarak aktarır ve tüm bu sürecin yüklenme (fallback) durumunu yöneten bir `React.Suspense` bileşeni içinde render eder.
 
 **Parametreler**:
-- params: `Promise<{ categorySlug: string, subCategorySlug: string }>` — Next.js tarafından sağlanan, URL segmentlerinden çözülen parametrelerin promise'i. `categorySlug` üst kategoriyi, `subCategorySlug` ise mevcut sayfanın alt kategoriyi temsil eder.
+- params: `Promise<{ categorySlug: string, subCategorySlug: string }>` — URL'den gelen asenkron parametreler nesnesi. `categorySlug` ve `subCategorySlug` olmak üzere iki string değer içerir. Fonksiyon içinde sadece `subCategorySlug` değeri kullanılır.
 
-**Dönüş**: JSX elementi döner. Spesifik olarak, `React.Suspense` ile sarılmış ve bir `fallback` (yükleniyor mesajı) içeren `PageComponent` JSX'ini döner.
+**Dönüş**: `JSX.Element` — `React.Suspense` ile sarmalanmış `PageComponent`'i döndürür. Yükleme durumunda bir fallback (Yükleniyor...) mesajı gösterir.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: `[lang]/category/[categorySlug]/[subCategorySlug]/page.tsx`::getCategoryData
-- **params**: `(slug: string)` — Veritabanından çekilecek kategorinin URL slug'ı
+- **params**: `slug: string` — Kategorinin URL slug değeri, veritabanında sorgulanacak anahtar
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen tek satırlık kategori ham verisi (`id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content` alanları); `single()` ile tek obje olarak gelir
-  - `error` — Supabase `.single()` sorgusunun hata nesnesi; `data` ile birlikte destructure edilir (`{ data, error }`); truthy ise sorgu başarısızdır
-- **Dönüş**: `mapDatabaseCategoryToDomain(...)` ile dönüştürülmüş domain kategori objesi veya `null` (hata ya da veri yoksa)
+  - `data` — Supabase'den dönen kategori satır verisi (tüm alanlarıyla birlikte, `select` ile belirtilen kolonlar)
+  - `error` — Supabase sorgusundan dönen hata nesnesi, sorgu başarısızsa dolu olur
+  - `data.name` — Kategorinin adı, `''` ile fallback uygulanarak asla undefined olmaması sağlanır
+  - `data.menu_label` — Menüde görünen kısa etiket, `string | null` olarak cast edilir
+  - `data.marketing_title` — Pazarlama amaçlı başlık, `string | null` olarak cast edilir
+  - `data.translation_key` — Çeviri anahtarı, `string | null` olarak cast edilir
+  - `data.description` — Kategori açıklaması, `string | null` olarak cast edilir
+  - `data.metadata` — Kategorinin JSON metadata yapısı, `CategoryMetadata | null` olarak cast edilir
+  - `data.authority_content` — Yetkili içerik bilgisi, `AuthorityContent | null` olarak cast edilir
+- **Dönüş**: `mapDatabaseCategoryToDomain` ile dönüştürülmüş domain kategori nesnesi veya sorgu başarısızsa `null`
 
 ---
 
 ### [N2_NASIL] AST Pointer: `[lang]/category/[categorySlug]/[subCategorySlug]/page.tsx`::generateStaticParams
-- **params**: (yok)
+- **params**: yok
 - **ic_degiskenler**:
-  - `data` — İlk Supabase sorgusundan dönen aktif alt kategoriler listesi (`slug, parent_id` alanları); `parent_id` NULL olmayan (yani alt kategori olan) kayıtlar
-  - `parents` — İkinci Supabase sorgusundan dönen tüm aktif kategoriler listesi (`id, slug` alanları); ebeveyn slug'larını eşlemek için kullanılır
-  - `parentsList` — `parents`'ın type-cast edilmiş hali `{ id: string, slug: string | null }[]`; null-safe遍历 için güvenli referans
-  - `parentMap` — `Map<string, string>` yapısı; kategori `id`'sini ebeveyn `slug`'ına eşler (`parentsList.map(p => [p.id, p.slug || ''])`); alt kategorinin `parent_id`'sinden ebeveyn slug'ını bulmak için kullanılır
-  - `subCategoriesList` — `data`'nın type-cast edilmiş hali `{ slug: string | null, parent_id: string | null }[]`; flatMap iterasyonunda her bir alt kategori kaydı olarak kullanılır
-- **flatMap callback içindeki değişkenler**:
-  - `c` — `subCategoriesList`'teki her bir alt kategori objesi; `c.slug` (alt kategori slug'ı) ve `c.parent_id` (ebeveyn kategori id'si) alanlarına erişilir
-  - `parentSlug` — `parentMap.get(c.parent_id || '')` ile bulunan ebeveyn kategorinin slug'ı; bulunamazsa `'unknown'` default'u alınır
-- **Dönüş**: `{ lang: string, categorySlug: string, subCategorySlug: string }` objelerinden oluşan array; her alt kategori için `tr` ve `en` dilleri olmak üzere ikişer eleman döner
+  - `data` — Supabase'den dönen alt kategori satırları, `slug` ve `parent_id` alanlarını içerir
+  - `parents` — Supabase'den dönen tüm aktif kategoriler (ana kategoriler dahil), `id` ve `slug` alanlarını içerir
+  - `parentsList` — `parents` dizisinin tip güvensiz cast edilmiş hali, `id: string` ve `slug: string | null` alanlarıyla
+  - `parentMap` — `id -> slug` eşleştirmesi yapan Map yapısı, her alt kategorinin üst kategorisinin slug'ını bulmak için kullanılır
+  - `subCategoriesList` — `data` dizisinin tip güvensiz cast edilmiş hali, `slug: string | null` ve `parent_id: string | null` alanlarıyla
+  - `parentSlug` — flatMap callback içinde hesaplanan üst kategori slug'ı, `parentMap.get()` ile alınır, bulunamazsa `'unknown'` fallback'i kullanılır
+- **Dönüş**: `{ lang: string, categorySlug: string, subCategorySlug: string }[]` — Her alt kategori için Türkçe ve İngilizce olmak üzere ikişer parametre objesi
 
 ---
 
 ### [N3_NASIL] AST Pointer: `[lang]/category/[categorySlug]/[subCategorySlug]/page.tsx`::Page
-- **params**: `{ params: Promise<{ categorySlug: string, subCategorySlug: string }> }` — Next.js tarafından sağlanan URL parametreleri promise'i
+- **params**: `{ params: Promise<{ categorySlug: string, subCategorySlug: string }> }` — Next.js tarafından sağlanan URL parametreleri, Promise olarak gelir ve await ile çözümlenir
 - **ic_degiskenler**:
-  - `subCategorySlug` — `await params` ile çözülen alt kategori slug string'i; `getCategoryData` çağrısına argüman olarak verilir
-  - `category` — `getCategoryData(subCategorySlug)` çağırılarak çekilen domain kategori objesi; `null` olabilir (kategori bulunamazsa)
-  - `products` — Başlangıçta boş `DomainProduct[]` dizisi; `category` truthy ise `getProductsEnriched({ categoryIds: [category.id], limit: 100 })` ile en fazla 100 adet enriched ürün listesi ile overwrite edilir
-- **API çağrıları**:
-  - `getCategoryData(subCategorySlug)` — Supabase'den kategori verisi çeker
-  - `getProductsEnriched({ categoryIds: [category.id], limit: 100 })` — İlgili kategorideki ürünleri enriched olarak çeker
-- **Dönüş**: JSX — `React.Suspense` sarıcısı içinde `PageComponent` bileşeni; `initialCategory` ve `initialProducts` prop'ları ile render edilir; Suspense fallback'i `"Yükleniyor..."` metnidir
+  - `subCategorySlug` — `params` Promise'i await ile çözümlendiğinde elde edilen alt kategori slug değeri, `getCategoryData`'ya argüman olarak geçirilir
+  - `category` — `getCategoryData` çağrısından dönen domain kategori nesnesi veya `null`, `null` ise ürün sorgulanmaz
+  - `products` — `DomainProduct[]` tipinde ürün listesi, başlangıçta boş dizi olarak tanımlanır; `category` mevcutsa `getProductsEnriched` ile doldurulur
+- **Dönüş**: `React.Suspense` ile sarılmış `<PageComponent>` JSX'i, `initialCategory` ve `initialProducts` prop'larıyla birlikte render edilir
 
 ---
 
