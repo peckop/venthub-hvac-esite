@@ -127,6 +127,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
           fetchPriority="high"
           loading="eager"
           decoding="sync"
+          quality={70}
           className="object-cover object-center"
         />
         <div className="absolute inset-0 bg-slate-950/60" />
@@ -150,6 +151,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
               sizes="(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px"
               priority={false}
               loading="lazy"
+              quality={70}
               className="object-cover object-center"
             />
             {/* Performance overlay */}
@@ -297,6 +299,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                         fetchPriority={slideIdx === 0 ? "high" : "low"}
                         decoding={slideIdx === 0 ? "sync" : "async"}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                        quality={70}
                         className="object-contain" 
                       />
                     </div>
