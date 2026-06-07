@@ -3,57 +3,45 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx
-skeleton_hash: 4c35b083d08a3617
+skeleton_hash: abdf7c719afe9daf
 entity_hashes:
   func:FeaturedCommercialBlocks: 1889811721e866db
-  func:normalizeImageUrl: e7ff2d52e57ce97b
-  overview: e2b71b884b394ef9
+  overview: 1af19abb15edd41e
   style_tokens: 0fba0ab3cddfc2f6
-generated_at: 2026-06-06T21:54:49Z
+generated_at: 2026-06-07T19:51:14Z
 ---
 
 ## Genel Bakış
-Bu modül, ana sayfada öne çıkan ticari ürünlere ait görsel ve bilgi bloklarını sergileyen bir React bileşenini tanımlar. Görsel URL'lerinin güvenli bir şekilde işlenmesini sağlayan bir yardımcı fonksiyon ile birlikte, ürün listesini alıp kullanıcıya düzenli bir şekilde sunar.
+Bu modül, ana sayfada öne çıkan ticari ürünleri görselleri ve temel bilgileriyle birlikte sergileyen bir React bileşenidir. Ürün listesini düzenleyerek kullanıcıya sunmanın yanı sıra, görsel URL'lerinin geçerli ve kullanıma hazır olmasını sağlayan bir yardımcı işlevi de içerir.
 
 ## Fonksiyon Grupları
-### Yardımcı İşlevler
-Görsel adreslerinin boş veya geçersiz olma durumlarını temizleyerek, kullanıma hazır standart bir URL formatı üretir.
+### Görsel İşleme Yardımcıları
+Boş veya geçersiz görsel URL değerlerini temizleyerek, bileşenin kullanabileceği güvenli ve standart bir URL formatı üretir.
 - normalizeImageUrl
 
-### Ana Bileşen
-Ürün verisini alarak, öne çıkan ticari ürünleri görsel ve ilgili bilgileriyle birlikte düzenler ve ekranda render eder; başlangıç verisi eksikse varsayılan boş bir liste kullanır.
+### Ana Görünüm Bileşeni
+Öne çıkan ticari ürünleri, verilen başlangıç verisine göre alıp düzenler ve kullanıcıya görselleriyle birlikte sunar; veri eksikse varsayılan boş liste ile çalışır.
 - FeaturedCommercialBlocks
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için, yalnızca fonksiyon imzasından türetilebilen mimari varsayımlar aşağıdadır.
+Bu modül, ana sayfada öne çıkan ticari ürün bloklarını sergileyen bir React bileşenidir.
 
-**[Aksiyom 1]**: Eğer `normalizeImageUrl` fonksiyonuna `null` veya `undefined` değeri verilirse, fonksiyon geçerli bir görsel URL'si döndüremeyebilir — bu durumda çağrının bir fallback mekanizması (örn: varsayılan bir görsel) kullanması beklenir.
+**[Aksiyom 1]**: Eğer `initialProducts` prop'u array türünde bir değer olarak sağlanmazsa, bileşen varsayılan boş dizi `[]` ile başlatılır ve render edilecek ürün bloğu bulunmaz.
 
-**[Aksiyom 2]**: Eğer `FeaturedCommercialBlocks` bileşeni `initialProducts` parametresi olmadan çağrılırsa, bileşen boş bir dizi (`[]`) ile çalışacak şekilde varsayılan değer kullanır.
+**[Aksiyom 2]**: Eğer `initialProducts` içindeki herhangi bir ürün nesnesi görsel URL bilgisi içermiyorsa veya geçersiz bir URL sağlıyorsa, `normalizeImageUrl` yardımcı fonksiyonu bu durumu temizleyerek standart bir URL formatı üretmek zorundadır; aksi takdirde render edilen görsel bileşeni kırılır.
 
-**[Aksiyom 3]**: Eğer `FeaturedCommercialBlocks` bileşenine geçersiz veya bozuk bir `initialProducts` verisi (örn: `null`, `undefined`, veya dizi olmayan bir değer) aktarılırsa, bileşen hata verebilir veya beklenmeyen davranış gösterebilir.
+**[Aksiyom 3]**: Eğer `initialProducts` boş dizi olarak kalırsa (hiç ürün sağlanmazsa), bileşen öne çıkan ürün bloklarını gösteren bölümü boş/hiç render etmelidir; bileşen çökmemeli veya hata fırlatmamalıdır.
 
----
+**[Aksiyom 4]**: Eğer `normalizeImageUrl` fonksiyonu boş string (`""`) veya `null`/`undefined` değer alırsa, bileşenin görsel gösterim zinciri bozulmadan çalışacak şekilde bir fallback mekanizması sunmalıdır.
 
-**Not:** Modül sabitleri kısmında herhangi bir sabit tanımlı değildir. Eski dokümandaki domain-specific bilgiler (eşik değerleri, kabul kriterleri vb.) bu aksiyomlara dahil edilmemiştir, çünkü bu bilgiler fonksiyon gövdesinden türetilememektedir.
+**[Aksiyom 5]**: Eğer `initialProducts` dizisindeki ürünlerin görsel alanı bir external (harici) URL ile sağlanıyorsa, bu URL'lerin scheme'i (http/https) geçerli olmalıdır; aksi takdirde `normalizeImageUrl` düzeltme yapamaz ve görsel yüklenemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
-
-### normalizeImageUrl
-
-**Ne yapar**: Verilen URL değerini standart ve kullanılabilir bir forma dönüştürür. Boş, undefined veya geçersiz URL durumlarında varsayılan bir placeholder görsel döndürerek bileşenlerin hata almasını engeller.
-
-**Nasıl yapar**: Fonksiyon, gelen url parametresinin null veya undefined olup olmadığını kontrol eder. Eğer geçerli bir URL varsa bunu doğrudan döndürür. Boş veya tanımsız durumlarda ise önceden tanımlanmış varsayılan bir görsel yolunu string olarak geri verir.
-
-**Parametreler**:
-- `url`: `string | null | undefined` — Normalize edilecek görsel URL'si. Null veya undefined olabilir.
-
-**Dönüş**: `string` — Normalize edilmiş geçerli bir görsel URL'si döndürür.
 
 ### FeaturedCommercialBlocks
 **Ne yapar**: Başlangıç ürün listesi ile öne çıkan ticari blokları gösteren bir React bileşenidir.  
@@ -83,52 +71,44 @@ type CommercialTab = 'featured' | 'newArrivals' | 'bestSellers'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::normalizeImageUrl
-- **params**: (url: string | null | undefined)
+### [N1_NASIL] AST Pointer: FeaturedCommercialBlocks.tsx::FeaturedCommercialBlocks
+- **params**: (initialProducts = [])
 - **ic_degiskenler**:
-  - `trimmedUrl` — URL parametresinin boşlukları temizlenmiş hali;startsWith kontrolleri için kullanılır
-- **Dönüş**: string — normalize edilmiş URL (başına '/' eklenmiş veya doğrudan kullanılmış)
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, farklı locale anahtarlarını çevirerek UI metinlerini oluşturur
+  - `activeTab` — Mevcut aktif sekmeyi tutan state, 'featured' ile başlıyor
+  - `productsByTab` — useMemo ile hesaplanan, sekmelere göre ayrılmış ürün listelerini tutan nesne {featured, newArrivals, bestSellers}
+  - `activeProducts` — productsByTab nesnesinden activeTab ile erişilen, mevcut sekmeye karşılık gelen ürün listesi
+- **Dönüş**: React JSX section elementi (featured ticari ürün bloklarını gösteren bölüm)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::FeaturedCommercialBlocks
-- **params**: ({ initialProducts = [] }) — başlangıç ürünleri listesi, varsayılan boş dizi
+### [N2_NASIL] AST Pointer: FeaturedCommercialBlocks.tsx::productsByTab callback
+- **params**: ()
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, Tüm metinler için kullanılır
-  - `activeTab` — useState hook'u ile oluşturulan aktif sekme durumu (commercial tab tipinde)
-  - `productsByTab` — useMemo hook'u ile hesaplanan sekelere göre gruplandırılmış ürünler nesnesi
-  - `activeProducts` — productsByTab nesnesinden activeTab anahtarına erişilerek elde edilen aktif ürün listesi
-- **Dönüş**: React.FC bileşeni (JSX)
+  - `featured` — initialProducts içinden is_featured flag'ine göre filtrelenmiş ve ilk 4 ürüne kesilmiş liste, eğer boşsa ilk 4 üründen oluşan liste
+  - `newArrivals` — initialProducts'ıncreated_at tarihine göre büyükten küçüğe sıralanmış ve ilk 4 ürüne kesilmiş liste
+  - `bestSellers` — initialProducts içinden indeks 4-8 aralığındaki ürünler (ilk 4'ten sonraki 4 ürün), eğer boşsa ilk 4 üründen oluşan liste
+- **Dönüş**: { featured, newArrivals, bestSellers } nesnesi
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::productsByTab useMemo callback
-- **params**: () — parametre yok (useMemo callback'i)
-- **ic_degiskenler**:
-  - `featured` — is_featured flag'i olan veya ilk 4 üründen fallback yapılan öne çıkan ürünler dizisi
-  - `newArrivals` — created_at tarihine göre sıralanmış yeni gelen ürünler dizisi (en fazla 4)
-  - `bestSellers` — en çok satanlar için fallback ürün listesi (dizinin 4-8 arası veya ilk 4'ü)
-- **Dönüş**: { featured: Product[], newArrivals: Product[], bestSellers: Product[] }
+### [N3_NASIL] AST Pointer: FeaturedCommercialBlocks.tsx::tab button mapper
+- **params**: (tab)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: React JSX button elementi (sekmeler arası geçiş butonu)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::tabButton render callback
-- **params**: (tab) — sekmeyi temsil eden string
-- **ic_degiskenler**: yok — sadece parametre ve dış scope değişkenleri kullanılır
-- **Dönüş**: JSX — tekil tab butonu elementi
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::productCard render callback
-- **params**: (product: Product, idx: number) — ürün nesnesi ve indeks
-- **ic_degiskenler**: yok — sadece parametreler ve dış scope bileşenleri kullanılır
-- **Dönüş**: JSX — animasyonlu ürün kartı wrapper elementi
+### [N4_NASIL] AST Pointer: FeaturedCommercialBlocks.tsx::product mapper
+- **params**: (product, idx)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: React JSX motion.div elementi (ProductCard'ı sarmalayan animasyonlu div)
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\components\home\FeaturedCommercialBlocks.tsx
-  function: src\components\home\FeaturedCommercialBlocks.tsx::normalizeImageUrl
   function: src\components\home\FeaturedCommercialBlocks.tsx::FeaturedCommercialBlocks
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FeaturedCommercialBlocks
-  export: normalizeImageUrl
 
 ---
 

@@ -11,7 +11,7 @@ entity_hashes:
   func:handleMouseMove: 717aaec7fdab40a5
   overview: cc9625ba5ae503da
   style_tokens: a631f55105b3a4d3
-generated_at: 2026-05-28T22:36:14Z
+generated_at: 2026-06-07T19:50:52Z
 ---
 
 ## Genel Bakış
@@ -31,31 +31,6 @@ Fare girişlerini dinleyerek hotspot'ların görünürlük ve aktiflik durumlar�
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, ürün görselleri üzerinde etkileşimli hotspot noktaları sunarak kullanıcı deneyimi sağlayan bir bileşen kümesidir.
-
----
-
-**[Aksiyom 1]:** Eğer `productImages` dizisi boş veya tanımsız ise, `CinematicProductShowcase` bileşeni görüntülenecek ürün içeriği sunamaz ve boş bir gösterim oluşur.
-
-**[Aksiyom 2]:** Eğer `Hotspot` bileşenine `x` ve `y` koordinatları sağlanmazsa, hotspot noktası doğru konumda render edilemez ve görsel konumlandırma hatası oluşur.
-
-**[Aksiyom 3]:** Eğer `Hotspot` bileşenine `onToggle` callback fonksiyonu sağlanmazsa, kullanıcı hotspot üzerine tıklandığında `isActive` durumu değiştirilemez ve etkileşim çalışmaz.
-
-**[Aksiyom 4]:** Eğer `handleMouseMove` fonksiyonuna geçerli bir `React.MouseEvent` nesnesi ulaşmazsa, fare pozisyonu takip edilemez ve hotspot vurgulama mekanizması devre dışı kalır.
-
-**[Aksiyom 5]:** Eğer `Hotspot` bileşenine `label` veya `detail` değerleri sağlanmazsa, hotspot noktasının kullanıcılara gösterilecek açıklayıcı içeriği bulunmaz.
-
-**[Aksiyom 6]:** Eğer `handleMouseLeave` tetiklenmezse (fare bileşen alanı terk etmezse), aktif hotspot durumları sıfırlanmayabilir ve eski vurgulama ekranda kalabilir.
-
-**[Aksiyom 7]:** Eğer `productImages` dizisindeki elemanlar geçerli görsel referansları içermiyorsa, bileşen kırık görsel gösterimi ile karşılaşır.
-
-**[Aksiyom 8]:** Eğer `isActive` boolean tipinde sağlanmazsa, hotspot bileşeni aktif/pasif durumunu doğru şekilde yorumlayamaz.
-
----
-
-### Domain-Specific Kurallar
-- `Hotspot` bileşeni minimum olarak `x`, `y`, `isActive`, `onToggle` değerlerine ihtiyaç duyar (konum ve etkileşim için zorunlu)
-- `label` ve `detail` opsiyonel görünse de, iyi bir UX için sağlanmalıdır
-- Fare etkileşimi `React.MouseEvent` tipinde olmalıdır (standart browser event)
 
 ---
 
@@ -124,64 +99,6 @@ Bu modül, ürün görselleri üzerinde etkileşimli hotspot noktaları sunarak 
 - **ic_degiskenler**:
   - `t` — useI18n() hook'undan dönen çeviri fonksiyonu
 - **Dönüş**: JSX element (button ile popup tooltip içeren absolute pozisyonlu div)
-
----
-
-### [N2_NASIL] AST Pointer: CinematicProductShowcase.tsx::CinematicProductShowcase
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, sayfa içi metin çevirileri için kullanılır
-  - `activeHotspot` — şu an aktif olan hotspot'in key değeri veya null (useState<string | null>)
-  - `setActiveHotspot` — activeHotspot state'ini güncellemek için setter fonksiyonu
-  - `activeImageIdx` — şu an gösterilen ürün görselinin indeksi (useState<number>, başlangıç: 0)
-  - `setActiveImageIdx` — activeImageIdx state'ini güncellemek için setter fonksiyonu
-  - `containerRef` — 3D mouse hareketi için referans olan HTMLDivElement ref'i
-  - `mouseX` — mouse'un yatay konumunu Framer Motion ile takip eden motion value (useMotionValue, başlangıç: 0)
-  - `mouseY` — mouse'un dikey konumunu takip eden motion value (useMotionValue, başlangıç: 0)
-  - `springConfig` — spring animasyonu için yapılandırma nesnesi ({ damping: 25, stiffness: 150 })
-  - `rotateX` — mouseY motion value'sinden türetilen X- ekseni rotasyon değeri, spring ile yumuşatılmış ([-10, 10] aralığı)
-  - `rotateY` — mouseX motion value'sinden türetilen Y- ekseni rotasyon değeri, spring ile yumuşatılmış ([-15, 15] aralığı)
-  - `handleMouseMove` — mouse hareketlerini yakalayıp mouseX/mouseY'yi güncelleyen olay dinleyici fonksiyonu
-  - `handleMouseLeave` — mouse離開tığında mouseX, mouseY'yi sıfırlayıp activeHotspot'u temizleyen fonksiyon
-  - `currentHotspots` — productImages[activeImageIdx].hotspots ile o anki görselin hotspot dizisi
-- **Dönüş**: JSX element (section içinde 3D perspektif ürün görseli, hotspot'ler, görsel navigasyon thumbnail'leri ve metin içerik)
-
----
-
-### [N3_NASIL] AST Pointer: CinematicProductShowcase.tsx::handleMouseMove
-- **params**: `e` — React.MouseEvent (fare hareket olayı)
-- **ic_degiskenler**:
-  - `rect` — containerRef.current.getBoundingClientRect() ile elde edilen DOM rect nesnesi, container'ın viewport içindeki pozisyon ve boyut bilgisi
-  - `x` — mouse'un container genişliğine göre normalize edilmiş yatay pozisyonu, -0.5 ile 0.5 arasında (formül: (e.clientX - rect.left) / rect.width - 0.5)
-  - `y` — mouse'un container yüksekliğine göre normalize edilmiş dikey pozisyonu, -0.5 ile 0.5 arasında (formül: (e.clientY - rect.top) / rect.height - 0.5)
-- **Dönüş**: yok (yan etki: mouseX.set(x) ve mouseY.set(y) ile 3D rotasyon değerlerini günceller)
-
----
-
-### [N4_NASIL] AST Pointer: CinematicProductShowcase.tsx::handleMouseLeave
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — sadece üst kapsam değişkenlerine erişir)
-- **Dönüş**: yok (yan etki: mouseX ve mouseY'yi 0'a, activeHotspot'u null'a sıfırlar)
-
----
-
-### [N5_NASIL] AST Pointer: CinematicProductShowcase.tsx::Hotspot.map callback
-- **params**: `spot` — productImages[activeImageIdx].hotspots dizisindeki tek bir hotspot nesnesi (içerir: key, x, y)
-- **ic_degiskenler**:
-  - `t` — üst kapsamdan (CinematicProductShowcase) gelen çeviri fonksiyonu
-  - `activeHotspot` — üst kapsamdan gelen aktif hotspot state'i
-  - `setActiveHotspot` — üst kapsamdan gelen state setter
-- **Dönüş**: Hotspot bileşeni JSX'i (key: `${activeImageIdx}-${spot.key}`, x, y, label, detail, isActive, onToggle)
-
----
-
-### [N6_NASIL] AST Pointer: CinematicProductShowcase.tsx::productImages.map callback
-- **params**: `img` — productImages dizisindeki tek bir görsel nesnesi (içerir: src, label), `idx` — görselin dizideki indeksi
-- **ic_degiskenler**:
-  - `activeImageIdx` — üst kapsamdan gelen aktif görsel indeksi state'i
-  - `setActiveImageIdx` — üst kapsamdan gelen state setter
-  - `setActiveHotspot` — üst kapsamdan gelen hotspot state setter'ı
-- **Dönüş**: Thumbnail buton JSX'i (onClick ile görsel değiştirme, Image bileşeni, aktif duruma göre koşullu stil)
 
 ---
 

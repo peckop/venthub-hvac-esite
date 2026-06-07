@@ -263,7 +263,9 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                           <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400/60" />
                           
                           {/* Animated Scan Line Inside HUD */}
-                          <div className="absolute left-0 right-0 h-px bg-cyan-400/10 pointer-events-none animate-scan-slow" />
+                          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute inset-0 border-b border-cyan-400/10 animate-scan-slow" />
+                          </div>
 
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">

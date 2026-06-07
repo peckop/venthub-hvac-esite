@@ -2,6 +2,7 @@ import { Routes } from '../../utils/routes'
 import Link from 'next/link'
 import Image from 'next/image'
 import React from 'react'
+import { normalizeImageUrl } from '@/utils/imageUtils'
 
 export interface CategoryViewModelLite {
   id: string;
@@ -16,15 +17,6 @@ interface GuidedCategoryDiscoveryProps {
 }
 
 const FALLBACK_CATEGORY_IMAGE = '/images/vortice_lineo_futuristic.png'
-
-const normalizeImageUrl = (url: string | null | undefined): string => {
-  if (!url || url.trim().length === 0) return FALLBACK_CATEGORY_IMAGE;
-  const trimmed = url.trim();
-  if (trimmed.startsWith('http') || trimmed.startsWith('/') || trimmed.startsWith('data:')) return trimmed;
-  
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  return `${supabaseUrl}/storage/v1/object/public/category-images/${trimmed}`;
-};
 
 const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displayCategories = [] }) => {
   return (
@@ -56,7 +48,8 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
         {/* Mobile: Horizontal Scroll | Desktop: Grid */}
         <div className="flex overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar gap-4 md:grid md:grid-cols-2 lg:grid-cols-4 lg:gap-2 md:overflow-visible md:pb-0">
           {displayCategories.map((category, idx) => {
-            const finalSrc = normalizeImageUrl(category.image_url);
+            const finalSrc = normalizeImageUrl(category.image_url, FALLBACK_CATEGORY_IMAGE, 'category-images');
+
             const delayClass = ['delay-0', 'delay-100', 'delay-200', 'delay-300'][idx % 4];
             
             return (

@@ -3,45 +3,43 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\GuidedCategoryDiscovery.tsx
-skeleton_hash: bf54d167d56982ec
+skeleton_hash: bb4c9176e8c993df
 entity_hashes:
   func:GuidedCategoryDiscovery: 3b7f2bdef4872624
-  func:normalizeImageUrl: 52049e5c49068b7a
-  overview: 7fd7e15085073901
+  overview: a1eb122d99c941ad
   style_tokens: ba1e7efd5f41a7fe
-generated_at: 2026-05-28T22:35:52Z
+generated_at: 2026-06-07T19:51:37Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıya yönlendirilmiş kategori keşfi deneyimi sunan bir React bileşenini ve görsel URL'lerini standartlaştıran küçük bir yardımcı işlevi içerir. Bileşen, dışarıdan gelen kategori listesini alarak kullanıcıya görsel ve metin tabanlı bir keşif arayüzü oluşturur. Yardımcı işlev ise görsel adreslerinin geçerli ve tutarlı bir formatta kullanılmasını sağlar.
+Bu modül, ana sayfada kullanıcılara yönlendirilmiş bir kategori keşfi deneyimi sunan bir React bileşenini tanımlar. Bileşen, dışarıdan gelen kategori listesini alarak görsel ve metin tabanlı bir arayüz oluşturur ve kullanıcıları farklı HVAC ürünleri hakkında bilgilendirir.
 
 ## Fonksiyon Grupları
-### Yardımcı İşlevler
-Görsel URL'lerini normalize ederek null veya tanımsız değerleri güvenli bir dizeye dönüştürür.
-- normalizeImageUrl
-
 ### Bileşen Tanımları
-Kategori keşfi arayüzünü render eder, dışarıdan gelen kategori listesini görsel ve metin öğeleriyle kullanıcıya sunar.
+Ana sayfada kategori keşfi arayüzünü oluşturarak ve kullanıcıya farklı HVAC ürün kategorilerini görsel ve metin öğeleriyle sunarak yönlendirici bir deneyim sağlar.
 - GuidedCategoryDiscovery
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyomlar fonksiyon imzalardan türetilmiştir.
 
-[Aksiyom 1]: Eğer normalizeImageUrl fonksiyonuna geçirilen url değeri **string, null veya undefined** türünde **değilse**, fonksiyonun çalışması beklenmedik sonuç verir (örneğin TypeError fırlatabilir).  
-[Aksiyom 2]: Eğer GuidedCategoryDiscovery component'ine **displayCategories** prop'u tanımlanmazsa **ve** default değeri de sağlanmazsa, component render sırasında hata verir. (Varsayılan değer sağlandığı sürece, prop tanımlanmazsa boş bir dizi kullanarak güvenli bir şekilde render eder.)
+Bu modül için yalnızca fonksiyon imzalarından türetilebilen temel mimari varsayımlar tanımlanmıştır. `normalizeImageUrl` yardımcısının imzası verilmediğinden, ona ilişkin aksiyom belirlenememiştir.
+
+**[Aksiyom 1]:** Eğer `displayCategories` bir array (`Array`) tipinde değilse, bileşen render sırasında hata verir veya beklenmedik davranış gösterir.
+*Gerekçe:* Fonksiyon imzası `displayCategories = []` olarak tanımlıdır; varsayılan değer bir array olduğundan, prop'un da array olması beklenir.
+
+**[Aksiyom 2]:** Eğer `displayCategories` boş array (`[]`) olarak kalırsa (prop hiç verilmezse veya boş geçilirse), bileşen "boş durum" (empty state) gösterimi sunmalıdır.
+*Gerekçe:* Varsayılan değerin `[]` olarak ayarlanması, boş listenin geçerli ve ele alınması gereken bir durum olduğunu ima eder.
+
+**[Aksiyom 3]:** Eğer `displayCategories` içindeki elemanlar `null` veya `undefined` değerler içerirse, bileşen bu elemanları render ederken hata alır.
+*Gerekçe:* Fonksiyon imzasında elemanların filtrelenmesine veya null-check'e ilişkin bir zorunluluk belirtilmemiştir; bu nedenle array'in geçerli objelerden oluştuğu varsayılır.
+
+**[Aksiyom 4]:** Eğer `displayCategories` herhangi bir prop olarak hiç geçirilmezse, bileşen `[]` (boş array) ile başlatılır ve kendi başına veri üretmez.
+*Gerekçe:* Fonksiyon imzasında `displayCategories`'in供（sourcing）için bir mechanism tanımlanmamıştır; bileşen tamamen dışarıdan gelen veriye bağımlıdır (sunulan veriyi sunar, kendi başına fetch/db çağrısı yapmaz).
 
 ---
 
 ## FONKSİYON DETAYLARI
-
-### normalizeImageUrl
-**Ne yapar**: Verilen bir görsel URL’sini alır, null veya undefined gibi geçersiz değerleri temizler ve standart bir string URL formatına dönüştürür.  
-**Nasıl yapar**: Fonksiyon, gelen değeri önce tanımlı olup olmadığını kontrol eder; değer null veya undefined ise boş string döndürür, aksi takdirde girdiyi doğrudan string olarak döndürür (gerekirse trim veya temel biçimlendirme işlemleri uygulanabilir).  
-**Parametreler**:
-- url: string | null | undefined — Normalize edilmek istenen görsel URL’si; null veya undefined olabilir.  
-**Dönüş**: string — Temizlenmiş ve güvenli bir görsel URL’si; giriş geçersizse boş string döner.
 
 ### GuidedCategoryDiscovery
 **Ne yapar**: `displayCategories` prop’u ile sağlanan kategori listesini kullanarak, kullanıcıya yönlendirilmiş kategori keşfi arayüzünü render eden bir React bileşenidir.  
@@ -68,31 +66,24 @@ Bu modül için özel aksiyomlar fonksiyon imzalardan türetilmiştir.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::normalizeImageUrl
-- **params**: (url: string | null | undefined)
-- **ic_degiskenler**: 
-  - `trimmed` — url değerinden baş ve son boşluklar kaldırılmış hali
-  - `supabaseUrl` — NEXT_PUBLIC_SUPABASE_URL ortam değişkeninin değeri
-- **Dönüş**: string (normalize edilmiş resim URL’si)
+### [N1_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::GuidedCategoryDiscovery
+- **params**: (`displayCategories = []`)
+- **ic_degiskenler**:
+  (yok)
+- **Dönüş**: JSX (React element) - Kategori kartlarını gösteren bölüm HTML'i
 
-### [N2_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::GuidedCategoryDiscovery
-- **params**: ({ displayCategories = [] })
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (React.FC<GuidedCategoryDiscoveryProps>) – kategorileri gösteren bölüm
-
-### [N3_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::(category, idx) => { ... }
-- **params**: (category, idx)
-- **ic_degiskenler**: 
-  - `finalSrc` — normalizeImageUrl ile elde edilen kategori görselinin最终 URL’si
-  - `delayClass` — idx’ye göre ['delay-0','delay-100','delay-200','delay-300'] dizisinden seçilen gecikme sınıfı
-- **Dönüş**: JSX elementi (her kategori için render edilen <div> kartı)
+### [N2_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::(category, idx) => { ... }
+- **params**: (`category`, `idx`)
+- **ic_degiskenler**:
+  - `finalSrc` — normalizeImageUrl ile elde edilen kategori görseli URL'si, FALLBACK_CATEGORY_IMAGE ile yedekleniyor
+  - `delayClass` — idx modulo 4'e göre animasyon gecikme sınıfı (delay-0, delay-100, delay-200, delay-300)
+- **Dönüş**: JSX (kategori kartı için React elementi)
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\components\home\GuidedCategoryDiscovery.tsx
-  function: src\components\home\GuidedCategoryDiscovery.tsx::normalizeImageUrl
   function: src\components\home\GuidedCategoryDiscovery.tsx::GuidedCategoryDiscovery
 
 ---
@@ -100,7 +91,6 @@ Bu modül için özel aksiyomlar fonksiyon imzalardan türetilmiştir.
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryViewModelLite
   export: GuidedCategoryDiscovery
-  export: normalizeImageUrl
 
 ---
 

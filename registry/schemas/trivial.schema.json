@@ -67,8 +67,8 @@
     "max_files_changed": {
       "type": "integer",
       "minimum": 1,
-      "maximum": 5,
-      "description": "Bu görevin dosya değiştirme bütçesi. Trivial görevler için maksimum sınır 5'tir. Aşarsanız plan hazırlamanız zorunludur."
+      "maximum": 15,
+      "description": "Bu görevin dosya değiştirme bütçesi. Trivial görevler için maksimum sınır 15'tir. Aşarsanız plan hazırlamanız zorunludur."
     },
     "allowed_change_types": {
       "type": "array",

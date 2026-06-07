@@ -1,0 +1,62 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "Gemini 3 Flash",
+  "date": "2026-06-07",
+  "task_id": "P00-999",
+  "task_title": "Performance Update",
+  "description": "Optimize animations using GPU acceleration and fix tab contrast on FeaturedCommercialBlocks.tsx",
+  "files_modified": [
+    "src/index.css",
+    "src/components/home/HomeSinevizyon.tsx",
+    "src/components/home/CinematicProductShowcase.tsx",
+    "src/components/home/FeaturedCommercialBlocks.tsx",
+    "src/components/home/GuidedCategoryDiscovery.tsx",
+    "src/components/ui/VentImage.tsx",
+    "src/utils/imageUtils.ts",
+    "vitest-setup.tsx",
+    "src/components/home/__tests__/AnimationPerformance.test.tsx",
+    "src/utils/__tests__/imageNormalization.test.ts",
+    "registry/schemas/trivial.schema.json",
+    "registry/P00-Standalone/backlog/999-performance-update/trivial.json",
+    ".agent/scratch/quality_compiler_judge_report.md"
+  ],
+  "allowed_paths": [
+    "src/index.css",
+    "src/components/home/HomeSinevizyon.tsx",
+    "src/components/home/CinematicProductShowcase.tsx",
+    "src/components/home/FeaturedCommercialBlocks.tsx",
+    "src/components/home/GuidedCategoryDiscovery.tsx",
+    "src/components/ui/VentImage.tsx",
+    "src/utils/imageUtils.ts",
+    "vitest-setup.tsx",
+    "src/components/home/__tests__/AnimationPerformance.test.tsx",
+    "src/utils/__tests__/imageNormalization.test.ts",
+    "registry/schemas/trivial.schema.json",
+    "registry/P00-Standalone/backlog/999-performance-update/trivial.json",
+    ".agent/scratch/quality_compiler_judge_report.md"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 15,
+  "allowed_change_types": [
+    "component_refactor",
+    "performance_optimization"
+  ],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "eslint . passed with 0 errors and 0 warnings",
+      "passed": true
+    },
+    {
+      "command": "pnpm run type-check",
+      "result": "tsc --noEmit compiled successfully without errors",
+      "passed": true
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "Vitest: 443 tests passed successfully",
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

@@ -8,6 +8,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import type { Category, Product } from '@/types/ui-models'
 import Link from 'next/link'
 import Image from 'next/image'
+import { normalizeImageUrl } from '@/utils/imageUtils'
 
 type CommercialTab = 'featured' | 'newArrivals' | 'bestSellers'
 
@@ -18,12 +19,6 @@ interface FeaturedCommercialBlocksProps {
   initialCategories?: Category[]
 }
 
-const normalizeImageUrl = (url: string | null | undefined): string => {
-  if (!url || url.trim().length === 0) return '/images/vortice_lineo_futuristic.png';
-  const trimmedUrl = url.trim();
-  if (trimmedUrl.startsWith('http') || trimmedUrl.startsWith('/')) return trimmedUrl;
-  return `/${trimmedUrl}`;
-};
 
 const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
   initialProducts = []

@@ -125,11 +125,16 @@ const CinematicProductShowcase: React.FC = () => {
         <div className="absolute inset-0 bg-cyan-grid bg-grid-100 mask-radial-ellipse" />
         
         {/* Scanning Line */}
-        <motion.div 
-          animate={{ top: ['0%', '100%', '0%'] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent z-10"
-        />
+        <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
+          <motion.div 
+            animate={{ y: ['-100%', '100%'] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0"
+            data-testid="cinematic-scan-line"
+          >
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent absolute bottom-0" />
+          </motion.div>
+        </div>
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

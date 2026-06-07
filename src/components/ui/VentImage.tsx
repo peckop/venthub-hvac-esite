@@ -1,5 +1,6 @@
 import React from 'react';
 import Image, { ImageProps } from 'next/image';
+import { normalizeImageUrl } from '@/utils/imageUtils';
 
 interface VentImageProps extends Omit<ImageProps, 'src'> {
   /**
@@ -38,21 +39,8 @@ const VentImage: React.FC<VentImageProps> = ({
   const [error, setError] = React.useState(false);
   const [isLoaded, setIsLoaded] = React.useState(false);
 
-  // 1. Kaynak kontrolü ve URL inşası
-  const getImageUrl = (): string => {
-    if (!src || error) return FALLBACK_IMAGES[fallbackType];
-    if (src.startsWith('http')) return src;
-    if (src.startsWith('/')) return src;
+  const finalSrc = error ? FALLBACK_IMAGES[fallbackType] : normalizeImageUrl(src, FALLBACK_IMAGES[fallbackType]);
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (supabaseUrl) {
-      const cleanPath = src.replace(`${supabaseUrl}/storage/v1/object/public/`, '');
-      return `${supabaseUrl}/storage/v1/object/public/${cleanPath}`;
-    }
-    return src;
-  };
-
-  const finalSrc = getImageUrl();
   
   const { width, height, fill, ...rest } = props;
   

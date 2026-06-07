@@ -30,25 +30,114 @@ vi.mock('lucide-react', async () => {
 
 // Mock Framer Motion with proper Ref types and Display Names
 vi.mock('framer-motion', () => {
-  const MockDiv = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>(({ children, ...props }, ref) => <div {...props} ref={ref}>{children}</div>)
+  class MockMotionValue {
+    private val: number
+    constructor(init: number) {
+      this.val = init
+    }
+    get(): number {
+      return this.val
+    }
+    set(v: number): void {
+      this.val = v
+    }
+    onChange(): () => void {
+      return () => {}
+    }
+    clearListeners(): void {}
+  }
+
+  const useMotionValue = (init: number) => new MockMotionValue(init)
+  const useTransform = (value: MockMotionValue, inputRange: number[], outputRange: number[]) => {
+    return new MockMotionValue(outputRange[0] ?? 0)
+  }
+  const useSpring = (value: MockMotionValue | number) => {
+    const val = typeof value === 'number' ? value : value.get()
+    return new MockMotionValue(val)
+  }
+  const useInView = () => [null, false]
+
+  const filterMotionProps = (props: Record<string, unknown>) => {
+    const cleanProps: Record<string, unknown> = {}
+    const motionKeys = new Set([
+      'animate', 'transition', 'variants', 'initial', 'exit', 
+      'whileHover', 'whileTap', 'whileInView', 'viewport', 
+      'layout', 'drag', 'dragConstraints', 'dragElastic',
+      'dragMomentum', 'onAnimationComplete', 'onUpdate'
+    ])
+    
+    Object.keys(props).forEach(key => {
+      if (!motionKeys.has(key)) {
+        cleanProps[key] = props[key]
+      }
+    })
+    
+    if (props.style && typeof props.style === 'object') {
+      const styleObj = props.style as Record<string, unknown>
+      const style: Record<string, unknown> = {}
+      Object.keys(styleObj).forEach(k => {
+        const val = styleObj[k]
+        if (val && typeof val === 'object' && 'get' in val && typeof (val as { get: () => unknown }).get === 'function') {
+          style[k] = (val as { get: () => unknown }).get()
+        } else {
+          style[k] = val
+        }
+      })
+      cleanProps.style = style
+    }
+    
+    if (props.animate && typeof props.animate === 'object') {
+      const animateObj = props.animate as Record<string, unknown>
+      const style = { ...(cleanProps.style as Record<string, unknown> || {}) }
+      if ('y' in animateObj) {
+        style.transform = `translateY(${Array.isArray(animateObj.y) ? animateObj.y[0] : animateObj.y})`
+      }
+      cleanProps.style = style
+    }
+    
+    return cleanProps
+  }
+
+  const MockDiv = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>(({ children, ...props }, ref) => {
+    const cleanProps = filterMotionProps(props as Record<string, unknown>) as React.ComponentPropsWithoutRef<'div'>
+    return <div {...cleanProps} ref={ref}>{children}</div>
+  })
   MockDiv.displayName = 'MockMotionDiv'
 
-  const MockButton = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(({ children, ...props }, ref) => <button {...props} ref={ref}>{children}</button>)
+  const MockButton = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(({ children, ...props }, ref) => {
+    const cleanProps = filterMotionProps(props as Record<string, unknown>) as React.ComponentPropsWithoutRef<'button'>
+    return <button {...cleanProps} ref={ref}>{children}</button>
+  })
   MockButton.displayName = 'MockMotionButton'
 
-  const MockH2: React.FC<React.ComponentPropsWithoutRef<'h2'>> = ({ children, ...props }) => <h2 {...props}>{children}</h2>
+  const MockH2: React.FC<React.ComponentPropsWithoutRef<'h2'>> = ({ children, ...props }) => {
+    const cleanProps = filterMotionProps(props as Record<string, unknown>) as React.ComponentPropsWithoutRef<'h2'>
+    return <h2 {...cleanProps}>{children}</h2>
+  }
   MockH2.displayName = 'MockH2'
 
-  const MockP: React.FC<React.ComponentPropsWithoutRef<'p'>> = ({ children, ...props }) => <p {...props}>{children}</p>
+  const MockP: React.FC<React.ComponentPropsWithoutRef<'p'>> = ({ children, ...props }) => {
+    const cleanProps = filterMotionProps(props as Record<string, unknown>) as React.ComponentPropsWithoutRef<'p'>
+    return <p {...cleanProps}>{children}</p>
+  }
   MockP.displayName = 'MockP'
 
-  const MockSpan: React.FC<React.ComponentPropsWithoutRef<'span'>> = ({ children, ...props }) => <span {...props}>{children}</span>
+  const MockSpan: React.FC<React.ComponentPropsWithoutRef<'span'>> = ({ children, ...props }) => {
+    const cleanProps = filterMotionProps(props as Record<string, unknown>) as React.ComponentPropsWithoutRef<'span'>
+    return <span {...cleanProps}>{children}</span>
+  }
   MockSpan.displayName = 'MockSpan'
 
-  const MockSection: React.FC<React.ComponentPropsWithoutRef<'section'>> = ({ children, ...props }) => <section {...props}>{children}</section>
+  const MockSection: React.FC<React.ComponentPropsWithoutRef<'section'>> = ({ children, ...props }) => {
+    const cleanProps = filterMotionProps(props as Record<string, unknown>) as React.ComponentPropsWithoutRef<'section'>
+    return <section {...cleanProps}>{children}</section>
+  }
   MockSection.displayName = 'MockSection'
 
-  const MockNav: React.FC<React.ComponentPropsWithoutRef<'nav'>> = ({ children, ...props }) => <nav {...props}>{children}</nav>
+  const MockNav: React.FC<React.ComponentPropsWithoutRef<'nav'>> = ({ children, ...props }) => {
+    const cleanProps = filterMotionProps(props as Record<string, unknown>) as React.ComponentPropsWithoutRef<'nav'>
+    return <nav {...cleanProps}>{children}</nav>
+  }
   MockNav.displayName = 'MockNav'
 
   const MockAnimatePresence: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>
@@ -65,6 +154,10 @@ vi.mock('framer-motion', () => {
       nav: MockNav
     },
     AnimatePresence: MockAnimatePresence,
+    useMotionValue,
+    useTransform,
+    useSpring,
+    useInView,
   }
 })
 
