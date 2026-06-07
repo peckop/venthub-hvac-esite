@@ -7,7 +7,7 @@ import { resolveUserClaims, createRedirectResponse } from '@/utils/router'
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|images|.*\\.(?:svg|png|jpg|webp|ico)).*)',
+    '/((?!_next/static|_next/image|favicon.ico|images|fonts|.*\\.(?:svg|png|jpg|webp|ico|ttf|woff|woff2|otf)).*)',
   ],
 }
 

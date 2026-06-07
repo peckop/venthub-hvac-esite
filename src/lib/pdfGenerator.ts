@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { Product } from '@/types/ui-models';
-import { PDF_FONTS, PDF_COLORS, getBase64ImageFromUrl } from './pdfAssets';
+import { PDF_FONTS, PDF_COLORS, getBase64ImageFromUrl, getAbsoluteAssetUrl } from './pdfAssets';
 import { SITE_URL } from '../config/siteUrl';
 
 /**
@@ -20,10 +20,10 @@ export async function generateProductDatasheet(
     });
 
     // ----- FONT YÜKLEME -----
-    let hasLoadedFonts = false;
+    let fontName = 'helvetica';
     try {
         // Roboto fontunu lokal sunucudan yükle (Türkçe karakter desteği için)
-        const fontResponse = await fetch(PDF_FONTS.Roboto.regular);
+        const fontResponse = await fetch(getAbsoluteAssetUrl(PDF_FONTS.Roboto.regular));
         if (!fontResponse.ok) throw new Error(`Regular font load status: ${fontResponse.status}`);
         const fontBuffer = await fontResponse.arrayBuffer();
         const fontBase64 = arrayBufferToBase64(fontBuffer);
@@ -32,7 +32,7 @@ export async function generateProductDatasheet(
         doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
 
         // Bold versiyonu
-        const fontBoldResponse = await fetch(PDF_FONTS.Roboto.bold);
+        const fontBoldResponse = await fetch(getAbsoluteAssetUrl(PDF_FONTS.Roboto.bold));
         if (!fontBoldResponse.ok) throw new Error(`Bold font load status: ${fontBoldResponse.status}`);
         const fontBoldBuffer = await fontBoldResponse.arrayBuffer();
         const fontBoldBase64 = arrayBufferToBase64(fontBoldBuffer);
@@ -40,14 +40,10 @@ export async function generateProductDatasheet(
         doc.addFileToVFS('Roboto-Bold.ttf', fontBoldBase64);
         doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
 
-        doc.setFont('Roboto');
-        hasLoadedFonts = true;
+        fontName = 'Roboto';
+        doc.setFont(fontName);
     } catch (error) {
         console.error('Font loading failed, falling back to standard fonts (Helvetica):', error);
-    }
-
-    const fontName = hasLoadedFonts ? 'Roboto' : 'helvetica';
-    if (!hasLoadedFonts) {
         doc.setFont(fontName);
     }
 

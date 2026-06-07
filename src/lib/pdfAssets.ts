@@ -1,6 +1,15 @@
+import { SITE_URL } from '../config/siteUrl';
+
 /**
  * Assets and constants for PDF generation
  */
+
+export function getAbsoluteAssetUrl(path: string): string {
+    const base = typeof window !== 'undefined' && window.location
+        ? window.location.origin
+        : SITE_URL;
+    return new URL(path, base).toString();
+}
 
 // Roboto font URLs from reliable local server (for runtime loading and CSP compliance)
 export const PDF_FONTS = {
