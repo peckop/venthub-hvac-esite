@@ -51,7 +51,7 @@ const tailwindConfig = {
         'silver-accent': '#9CA3AF',
       },
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
+        'sans': ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
         'hvac-tight': '0.1em',

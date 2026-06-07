@@ -5,7 +5,7 @@ import '@/lib/three-setup'
 import { Providers, ClientLayout } from '../components/layout/ClientLayout'
 import { SITE_URL } from '@/config/siteUrl'
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' })
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-sans' })
 
 export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
@@ -35,7 +35,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="tr" data-scroll-behavior="smooth">
-            <body className={inter.className}>
+            <body className={`${inter.variable} ${inter.className}`}>
                 <Providers>
                     <ClientLayout>
                         <script

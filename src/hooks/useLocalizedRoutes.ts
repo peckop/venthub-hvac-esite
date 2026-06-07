@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
@@ -39,5 +40,5 @@ function createLocalizedProxy<T extends object>(target: T, lang: string): T {
 
 export function useLocalizedRoutes() {
   const { lang } = useI18n()
-  return createLocalizedProxy(Routes, lang)
+  return useMemo(() => createLocalizedProxy(Routes, lang), [lang])
 }

@@ -1,5 +1,26 @@
 # Changelog
 
+### [2026-06-07] VentHub Console Warnings Remediation & i18n Redirection Consolidation
+
+**Özet:** Konsol uyarılarını gidermek ve yazı tipi yükleme performansını artırmak amacıyla Next.js yazı tipi yapılandırması değişken tabanlı CSS `--font-sans` yapısına geçirilmiş, yerelleştirilmiş rota proxy'si memoize edilerek gereksiz yeniden oluşturma döngüleri (HMR uyarıları) engellenmiş ve auth/signout akışlarındaki yerelleştirilmiş yönlendirme mantığı middleware ile uyumlu hale getirilmiştir.
+
+**Değişiklik Kapsamı:**
+- **Next.js Yazı Tipi Yükleme Optimizasyonu (`layout.tsx`, `index.css`, `tailwind.config.js`):**
+  - `src/app/layout.tsx` dosyasında Inter yazı tipi Next.js Google Fonts API'si ile `display: 'swap'` ve `variable: '--font-sans'` olarak yüklenmiştir.
+  - Yüklenen değişken body etiketinde `className={`${inter.variable} ${inter.className}}`` olarak bağlanmıştır.
+  - `tailwind.config.js` dosyasında `sans` yazı tipi ailesi `var(--font-sans)` CSS değişkenine yönlendirilmiş ve `src/index.css` içindeki `html, body` kurallarında yer alan sabit `Inter` ifadesi `var(--font-sans)` ile değiştirilmiştir. Sayfa yerleşim kaymaları (CLS) sıfırlanmıştır.
+- **Yerelleştirilmiş Rota Yönetimi & HMR Konsol Uyarıları (`StickyHeader.tsx`, `useLocalizedRoutes.ts`):**
+  - İstemci tarafı yönlendirmelerini aktif dile göre dinamik çözümleyen proxy yapısı `useLocalizedRoutes` hook'u altında `useMemo` kullanılarak sarmalanmış; böylece her render'da proxy'nin sıfırdan oluşturulması engellenmiş ve konsol uyarıları/HMR döngüleri çözülmüştür.
+  - `StickyHeader.tsx` bileşenindeki statik rota importu (`Routes`), yerelleştirilmiş `useLocalizedRoutes` hook'u ile değiştirilmiştir.
+- **Middleware & Oturum Kapatma Yönlendirme Düzeltmeleri (`middleware.ts`, `signout/route.ts`):**
+  - `/auth/callback` ve `/auth/signout` gibi auth servis API rotaları, middleware üzerinde dil alt dizinine yönlendirilme muafiyet listesine (`isAuthApi`) eklenmiştir.
+  - `middleware.ts` içindeki admin korumasında yetkisiz kullanıcı yönlendirmesi, kullanıcının dil tercihi tespit edilerek yerelleştirilmiş şekilde (`/${detectedLocale}/auth/login`) güncellenmiştir.
+  - `src/app/auth/signout/route.ts` çıkış rotasında, çıkış işlemi sonrası yönlendirme hedefi `NEXT_LOCALE` çerezi okunarak yerelleştirilmiş giriş sayfasına (`/${lang}/auth/login`) 302 yönlendirmesi olacak şekilde düzeltilmiştir.
+
+**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ | `pnpm run build` ✅
+
+---
+
 ### [2026-06-06] VentHub Supabase Client Architecture & Realtime Security Upgrade
 
 **Özet:** Veri yalıtımı ve güvenliğini en üst düzeye çıkarmak amacıyla Supabase istemci mimarisi parçalanmış, ara katman yetkilendirmesi claims tabanlı yapıya yükseltilmiş, çıkış işlemleri API rotasına taşınmış ve realtime WebSocket kanalları veritabanı RLS seviyesinde kiracı bazlı izole edilmiştir.

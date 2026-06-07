@@ -16,7 +16,7 @@ import { useCategories } from '../contexts/CategoryContext'
 import { trackEvent } from '../utils/analytics'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { NAVIGATION_PRIMARY_ITEMS, NAVIGATION_SECONDARY_ITEMS } from '../utils/navigationConfig'
-import { Routes } from '../utils/routes'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 
 import NavActionButton from './navigation/NavActionButton'
 import NavBrand from './navigation/NavBrand'
@@ -37,6 +37,7 @@ interface StickyHeaderProps {
 const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHeader({ isScrolled }) {
   const { t, lang } = useI18n()
   const router = useRouter()
+  const Routes = useLocalizedRoutes()
   // const pathname = usePathname()
   
   const {
@@ -144,7 +145,7 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
     setManualLogout(true)
     closeUserMenu()
     router.push(Routes.home())
-  }, [closeUserMenu, router, signOut])
+  }, [closeUserMenu, router, signOut, Routes])
 
   const primaryItems = useMemo(
     () => NAVIGATION_PRIMARY_ITEMS.map((item) => ({ id: item.id, href: item.href, label: t(item.labelKey) })),

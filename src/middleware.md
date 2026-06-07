@@ -6,9 +6,9 @@ source_path: C:\Users\alize\venthub-hvac\src\middleware.ts
 skeleton_hash: 17d96593b201eac7
 entity_hashes:
   func:detectLocale: 25418ec7d07f6d80
-  func:middleware: fab8e08b31b0004b
+  func:middleware: 869802a18899b914
   overview: 64f7e17620830c7c
-generated_at: 2026-06-06T21:56:12Z
+generated_at: 2026-06-07T11:02:59Z
 ---
 
 ## Genel Bakış
@@ -30,7 +30,21 @@ Tüm gelen istekleri yakalayan ana işleyici; dil tespiti, kimlik doğrulama ve 
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, HTTP isteklerini işleyen bir Next.js ara katmanıdır ve locale tespiti ile erişim kontrolü sağlar.
+
+[Aksiyom 1]: Eğer `detectLocale` fonksiyonuna geçerli bir `NextRequest` nesnesi sağlanmazsa, locale tespiti başarısız olur ve varsayılan bir locale kullanılmalıdır.
+
+[Aksiyom 2]: Eğer tespit edilen locale değeri `LOCALES` kümesinde yer almazsa, istemci için geçersiz bir dil tercihi işlenir ve uygulama tanımlı bir fallback locale'a dönmelidir.
+
+[Aksiyom 3]: Eğer `middleware` fonksiyonuna geçerli bir `NextRequest` nesnesi sağlanmazsa, middleware zinciri kırılır ve istek işlenmeden reddedilir.
+
+[Aksiyom 4]: Eğer istekteki kullanıcının rolü `ADMIN_ROLES` kümesinde tanımlırollerden biri değilse, admin-only rotalara erişim engellenir.
+
+[Aksiyom 5]: Eğer rotada parametre olarak beklenen değer `UUID_REGEX` kalıbına uymazsa, UUID tabanlı rota eşleştirmesi başarısız olur.
+
+[Aksiyom 6]: Eğer `config` nesnesi tanımlı değilse veya geçerli bir Next.js middleware config yapısına sahip değilse, middleware başarıyla register edilmez ve hiçbir istek işlenmez.
 
 ---
 
@@ -48,14 +62,15 @@ Tüm gelen istekleri yakalayan ana işleyici; dil tespiti, kimlik doğrulama ve 
 **Dönüş**: `string` — Belirlenen dil kodu (`'tr'` veya `'en'`).
 
 ### middleware
-**Ne yapar**: Next.js uygulamasında her isteği yakalayan merkezi middleware fonksiyonudur. Tenant çözümlemesi, dil yönlendirmesi, UUID'den slug'a SEO dostu yönlendirme ve admin paneli için Rol Tabanlı Erişim Kontrolü (RBAC) görevlerini tek bir akışta yürütür.
 
-**Nasıl yapar**: Fonksiyon, isteğin `host` başlığını alarak `resolveTenant` ile tenant'ı belirler ve `x-tenant-id` başlığını isteğe ekler. Ardından URL'in ilk segmentini analiz ederek dil alt dizini (locale) varlığını kontrol eder; dil yoksa kullanıcı tarayıcısının dil tercihine göre algılanan dile 307 yönlendirmesi yapar. Dil içinde admin rotası tespit edilirse locale'siz kök `/admin` rotasına yönlendirir. Yolun `/products/{identifier}` formatında olup UUID_regex'e uyduğunu tespit ettiğinde Supabase üzerinden `slug` sorgulayarak 308 kalıcı yönlendirme üretir. `/admin` rotasına erişimde development ortamı ve localhost kontrolü sonrası Supabase auth claims'inden JWT rolünü okur; rol `ADMIN_ROLES` kümesinde yoksa veya auth başarısızsa uygun hata yönlendirmesi yapar. Her yanıt nesnesine `tenant_id` çerezi eklenerek döndürülür.
+**Ne yapar**: Next.js uygulamasının tüm isteklerini yakalayan merkezi middleware fonksiyonudur. Tenant (kiracı) tespiti, dil tabanlı URL yönlendirmeleri, UUID'den slug'a SEO uyumlu yönlendirmeler ve admin paneli için RBAC (Rol Tabanlı Erişim Kontrolü) koruması gibi çok katmanlı bir istek filtreleme ve yönlendirme mekanizmasını yönetir.
+
+**Nasıl yapar**: Fonksiyonun çalışma mantığı sırasıyla şu adımlardan oluşur: Önce `host` başlığından tenant kimliği çözümlenir ve `x-tenant-id` istek başlığına eklenir. Ardından URL'nin ilk segmenti incelenerek dil (locale) kontrolü yapılır — eğer ilk segment desteklenen dillerden biriyse dil alt dizin olarak kabul edilir ve admin rotası haricinde normal akışa devam edilir; değilse ve rota özel bir rota (admin, API, auth callback, sitemap, robots.txt) değilse, tespit edilen dile göre 307 yönlendirmesi gönderilir. Son olarak, dil segmenti çıkarılmış `effectiveSegments` kullanılarak iki ana dal ele alınır: (1) Ürün UUID'den slug'a 308 yönlendirmesi için Supabase'den sorgulama yapılır, (2) Admin rotaları için JWT claims üzerinden rol doğrulaması gerçekleştirilir ve yetkisiz kullanıcılar oturum sayfasına yönlendirilir. Tüm süreç boyunca `setTenantCookie` ve `redirectResponse` yardımcı fonksiyonları kullanılarak yanıt nesneleri tutarlı şekilde oluşturulur.
 
 **Parametreler**:
-- `request`: NextRequest — Gelen HTTP isteği nesnesi. URL bilgileri, başlıklar ve çerezler bu nesne üzerinden okunur.
+- `request`: `NextRequest` — Next.js tarafından middleware'e iletilen HTTP istek nesnesi. İstek başlıkları, URL'si, çerezleri ve diğer meta bilgileri içerir. Fonksiyon bu nesne üzerinden okuma yapar ve yanıt oluştururken header'ları korur.
 
-**Dönüş**: NextResponse — Middleware her durumda bir `NextResponse` nesnesi döndürür. Bu yanıt `NextResponse.next()` ile devam eden bir istek, `NextResponse.redirect()` ile bir yönlendirme veya tenant çerezi set edilmiş bir yanıt olabilir. Her dönen yanıtda `tenant_id` çerezi bulunur.
+**Dönüş**: `NextResponse` — Fonksiyon her durumda bir `NextResponse` nesnesi döndürür. Bu yanıt bir yönlendirme (redirect, 302/307/308), normal devam yanıtı (`NextResponse.next()`) veya tenant cookie'si set edilmiş bir yanıt olabilir. Yanıtın `cookies` ve `headers` alanları, istek zincirinin sürekliliğini sağlamak üzere kopyalanır.
 
 ---
 
@@ -73,37 +88,40 @@ Tüm gelen istekleri yakalayan ana işleyici; dil tespiti, kimlik doğrulama ve 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/middleware.ts::detectLocale
-- **params**: `(request: NextRequest)`
-- **ic_degiskenler**:
-  - `cookieLocale` — `NEXT_LOCALE` çerezinin değerini tutar, dil tercihini belirler
-  - `acceptLang` — `accept-language` header değerini tutar, varsayılan boş string
-- **Dönüş**: `string` - algılanan dil kodu ('tr' veya 'en')
+- **params**: (request: NextRequest)
+- **ic_degiskenler**: 
+  - `cookieLocale` — request'ten alınan 'NEXT_LOCALE' çerez değeri, dil tercihini belirler
+  - `acceptLang` — request'ten alınan 'accept-language' başlık değeri, tarayıcı dil tercihini belirler
+- **Dönüş**: string (Algılanan dil kodu: 'tr' veya 'en')
 
 ### [N2_NASIL] AST Pointer: src/middleware.ts::middleware
-- **params**: `(request: NextRequest)`
+- **params**: (request: NextRequest)
 - **ic_degiskenler**:
-  - `host` — istek header'ındaki host değerini tutar, varsayılan boş string
-  - `tenantId` — `resolveTenant(host)` çağrısından elde edilen kiraci ID'si
-  - `setTenantCookie` — anonim fonksiyon, response'a tenant_id çerezini ekler
-  - `redirectResponse` — anonim fonksiyon, URL ve status ile redirect response oluşturur
-  - `pathname` — `request.nextUrl.pathname` değerinden alınan yol
-  - `segments` — pathname'i '/' karakterine göre ayırıp boş olmayan parçaları tutar
-  - `firstSegment` — segments dizisinin ilk elemanını tutar
-  - `response` — `NextResponse.next()` çağrısıyla oluşturulan temel response nesnesi
-  - `locale` — algılanan dil kodunu tutar, başlangıçta `DEFAULT_LOCALE`
-  - `effectiveSegments` — segments dizisinin kopyasını tutar, locale offsetsine göre düzenlenir
-  - `isLocaleInPath` — firstSegment'in LOCALES dizisinde olup olmadığını tutar (boolean)
-  - `supabaseUrl` — `NEXT_PUBLIC_SUPABASE_URL` ortam değişkenini tutar
-  - `anonKey` — `NEXT_PUBLIC_SUPABASE_ANON_KEY` ortam değişkenini tutar
-  - `identifier` — products rotasında ürün tanımlayıcısını tutar (UUID veya slug)
-  - `supabase` — `createServerClient` ile oluşturulan Supabase istemcisi (iki farklı blokta oluşturulur)
-  - `data` — Supabase sorgusundan dönen veriyi tutar (products rotasında)
-  - `error` — Supabase auth sorgusundan dönen hatayı tutar (admin rotasında)
-  - `claims` — JWT claimlerini tutar (admin rotasında)
-  - `jwtRole` — JWT'deki user_role değerini tutar (admin rotasında)
-  - `loginUrl` — login yönlendirmesi için URL nesnesini tutar (admin rotasında)
-  - `homeUrl` — ana sayfa yönlendirmesi için URL nesnesini tutar (admin rotasında)
-- **Dönüş**: `NextResponse | void` - middleware sonucu olarak response döner veya void
+  - `host` — request'ten alınan 'host' başlık değeri, tenant çözümleme için kullanılır
+  - `tenantId` — resolveTenant(host) çağrısından elde edilen kiracı ID'si
+  - `setTenantCookie` — Inner function: NextResponse'a 'tenant_id' çerezini ayarlar
+  - `redirectResponse` — Inner function: URL'e yönlendirme yanıtı oluşturur, tenant çerezini ve mevcut çerezleri/ başlıkları kopyalar
+  - `pathname` — request.nextUrl.pathname, istek yol adı
+  - `segments` — pathname'i '/' ile bölüp boş olanları filtreleyerek elde edilen yol segmentleri dizisi
+  - `firstSegment` — segments[0], ilk yol segmenti
+  - `response` — NextResponse.next() ile oluşturulan başlangıç yanıtı
+  - `locale` — Başlangıçta DEFAULT_LOCALE, sonradan algılanan dil ile güncellenen dil kodu
+  - `effectiveSegments` — Dil segmenti varsa onu çıkarılmış yol segmentleri dizisi
+  - `isLocaleInPath` — firstSegment'in LOCALES dizisinde olup olmadığını kontrol eden boolean
+  - `isAuthApi` — auth API rotası olup olmadığını kontrol eden boolean (auth/callback veya auth/signout)
+  - `isSpecialRoute` — Admin, API, auth API veya sitemap/robots rotası olup olmadığını kontrol eden boolean
+  - `detectedLocale` — detectLocale(request) çağrısı ile belirlenen dil (sadece locale redirect durumunda)
+  - `identifier` — effectiveSegments[1], products rotasında UUID/_slug tanımlayıcısı
+  - `supabase` (products bloğu) — createServerClient ile oluşturulan Supabase istemcisi (products UUID araması için)
+  - `data` (products bloğu) — supabase.from('products').select('slug').eq('id', identifier).single() sorgusunun sonucu
+  - `isDev` — process.env.NODE_ENV === 'development' kontrolü ile belirlenen development ortamı boolean'ı
+  - `isLocalhost` — host'un localhost veya 127.0.0.1 ile başlayıp başlamadığını kontrol eden boolean
+  - `supabase` (admin bloğu) — createServerClient ile oluşturulan Supabase istemcisi (admin RBAC için)
+  - `data` (admin bloğu) — supabase.auth.getClaims() çağrısının sonucu
+  - `error` — supabase.auth.getClaims() çağrısında oluşabilecek hata nesnesi
+  - `claims` — data?.claims, JWT claim verileri
+  - `jwtRole` — claims?.user_role, JWT'den alınan kullanıcı rolü
+- **Dönüş**: yok (void) — Fonksiyon yan etki olarak NextResponse döndürür veya yönlendirme yapar
 
 ---
 

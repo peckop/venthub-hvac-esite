@@ -91,7 +91,8 @@ export async function middleware(request: NextRequest) {
   } else {
     // Rota locale barındırmıyor
     // Admin, API veya statik sitemap/robots dosyaları değilse dil alt dizinine yönlendir
-    const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || firstSegment === 'auth' || 
+    const isAuthApi = firstSegment === 'auth' && (segments[1] === 'callback' || segments[1] === 'signout')
+    const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || isAuthApi || 
                            pathname.endsWith('sitemap.xml') || pathname.endsWith('robots.txt')
     
     if (!isSpecialRoute) {
@@ -198,7 +199,8 @@ export async function middleware(request: NextRequest) {
 
     if (error || !claims) {
       const loginUrl = request.nextUrl.clone()
-      loginUrl.pathname = '/auth/login'
+      const detectedLocale = detectLocale(request)
+      loginUrl.pathname = `/${detectedLocale}/auth/login`
       loginUrl.searchParams.set('from', pathname)
       if (error) loginUrl.searchParams.set('reason', 'expired')
       return redirectResponse(loginUrl, 302)

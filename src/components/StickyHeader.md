@@ -3,34 +3,22 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\StickyHeader.tsx
-skeleton_hash: 01238508f4af3cc3
+skeleton_hash: 85566afc0d785f1c
 entity_hashes:
-  overview: 66f525d6ccd8cb73
+  overview: 6861442481f6e3f8
   style_tokens: 55949ae1f3201280
-generated_at: 2026-05-28T22:37:16Z
+generated_at: 2026-06-07T11:01:42Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformundaki sayfalarda sabit bir üst menü (sticky header) olarak görev yapan ana React bileşenidir. Sayfa kaydırma hareketine göre otomatik gizleme/gösterme davranışı, kullanıcı kimlik doğrulama durumu ve alışveriş sepeti bilgisi gibi temel durumları ilgili özel hook'lardan alarak yönetir. Arama, mega menü ve kategori navigasyonu için gerekli açılır pencereleri (overlay) kendi içinde render ederek tüm üst başlık işlevselliğini merkezi olarak sunar.
+Bu modül, VentHub HVAC web platformunda sayfaların üst kısmında sabit bir başlık (sticky header) olarak çalışan React bileşenidir. Kullanıcı kaydırma (scroll) hareketine yanıt olarak otomatik olarak gizlenip gösterilir, kullanıcı giriş durumu ve alışveriş sepeti bilgilerini ilgili özel hook'lardan alarak üst çubukta durum bilgisini ve simgeleri görüntüler. Ayrıca arama çubuğu, mega menü ve kategori navigasyonu için gerekli olan açılır pencereleri (overlay'leri) kendi içinde barındırarak tüm üst menü işlevselliğini merkezi bir noktadan yönetir.
 
 ## Fonksiyon Grupları
-Bu dosyada herhangi bir fonksiyon veya metot tanımlı değildir. Kod yapısı, bir React bileşen tanımı ve bir dizi hook çağrısı ile alt bileşen yerleşiminden oluşmaktadır.
+Bu dosyada tanımlı herhangi bir fonksiyon veya metot bulunmamaktadır. Modül, bir React bileşen tanımı ile bir dizi hook çağrısından ve alt bileşen yerleşiminden oluşmaktadır.
 
 ---
 
-## AXIOMS – Mimari Varsayım
 
-Bu modül için fonksiyon gövdesi verilmemiş olup, yalnızca modül sabitlerinden (import edilen bileşenler) üretilen temel bağımlılık aksiyomları tanımlanmıştır.
-
-[Aksiyom 1]: Eğer `SearchOverlay` bileşeni modülde tanımlı veya import edilmiş değilse, StickyHeader bileşeni derleme zamanında hata verir.
-
-[Aksiyom 2]: Eğer `MegaMenu` bileşeni modülde tanımlı veya import edilmiş değilse, StickyHeader bileşeni derleme zamanında hata verir.
-
-[Aksiyom 3]: Eğer `CategoryHubOverlay` bileşeni modülde tanımlı veya import edilmiş değilse, StickyHeader bileşeni derleme zamanında hata verir.
-
----
-
-**Not:** Bu modül için fonksiyon imzası, parametre, default değer veya çalış zamanı koşulları içeren bir gövde verilmemiştir. Dolayısıyla; çalış zamanı (runtime) koşulları, hook bağımlılıkları, scroll davranışı eşik değerleri veya props zorunlulukları gibi aksiyomlar **fonksiyon gövdesinden üretilememiştir** ve uydurulmamıştır. Söz konusu detaylar fonksiyon gövdesi temin edildiğinde çıkarılabilir.
 
 ---
 
@@ -56,81 +44,81 @@ Bu modül için fonksiyon gövdesi verilmemiş olup, yalnızca modül sabitlerin
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/StickyHeader.tsx::loadRecentProducts
+### [N1_NASIL] AST Pointer: StickyHeader.tsx::loadRecentProducts
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `raw` — `window.localStorage.getItem('recentProducts')` sonucunu tutan string, parse edilmemis haliyle
-- **Dönüş**: yok (yan etki: `setRecentProducts` state güncelleme)
+  - `raw` — localStorage'dan alınan ham JSON string verisi
+- **Dönüş**: yok (yan etki: `setRecentProducts` ile state güncelleme)
 
-### [N2_NASIL] AST Pointer: src/components/StickyHeader.tsx::useEffectForClickOutside
+### [N2_NASIL] AST Pointer: StickyHeader.tsx::useClickOutsideSetup
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `handleClickOutside` — Mousedown olayinda menu disinda tiklanip tiklanmadigini kontrol eden fonksiyon
+  - `handleClickOutside` — Dışarı tıklama olayını yöneten iç fonksiyon
 - **Dönüş**: cleanup fonksiyonu (event listener kaldırma)
 
-### [N3_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleClickOutside
-- **params**: `(event: MouseEvent)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: `closeUserMenu` çağrısı)
+### [N3_NASIL] AST Pointer: StickyHeader.tsx::handleClickOutside
+- **params**: (event: MouseEvent)
+- **ic_degiskenler**: (sadece parametre kullanılıyor)
+- **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: src/components/StickyHeader.tsx::roleLabel
-- **params**: `(role: string)`
-- **ic_degiskenler**: (yok, sadece parametre ve switch)
-- **Dönüş**: `string` — rol için yerelleştirilmiş etiket
+### [N4_NASIL] AST Pointer: StickyHeader.tsx::roleLabel
+- **params**: (role: string)
+- **ic_degiskenler**: (sadece parametre kullanılıyor)
+- **Dönüş**: string (yerelleştirilmiş rol etiketi)
 
-### [N5_NASIL] AST Pointer: src/components/StickyHeader.tsx::useEffectForScrollProgress
+### [N5_NASIL] AST Pointer: StickyHeader.tsx::useScrollProgress
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `ticking` — requestAnimationFrame kuyruğunu kontrol eden bayrak
-  - `handleScroll` — Kaydırma olayını işleyen ve `%` hesaplayan fonksiyon
-- **Dönüş**: cleanup fonksiyonu (scroll listener kaldırma)
+  - `ticking` — requestAnimationFrame tekrar çağrılmasını önleyen bayrak
+  - `handleScroll` — Scroll olayını yöneten iç fonksiyon
+- **Dönüş**: cleanup fonksiyonu (scroll event listener kaldırma)
 
-### [N6_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleScrollRequestFrame
+### [N6_NASIL] AST Pointer: StickyHeader.tsx::handleScrollAnimationFrame
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `winScroll` — `document.documentElement.scrollTop` ile elde edilen mevcut dikey kaydırma miktarı
-  - `height` — Kaydırılabilir toplam sayfa yüksekliği (`scrollHeight - clientHeight`)
-  - `scrolled` — Kaydırma ilerleme yüzdesi (`(winScroll / height) * 100`)
-- **Dönüş**: yok (yan etki: `setScrollProgress` state güncelleme)
+  - `winScroll` — Dikey kaydırma miktarı
+  - `height` — Sayfanın toplam kaydırılabilir yüksekliği
+  - `scrolled` — Yüzde olarak kaydırma ilerlemesi
+- **Dönüş**: yok (yan etki: `setScrollProgress` ile state güncelleme)
 
-### [N7_NASIL] AST Pointer: src/components/StickyHeader.tsx::calculateScrolled
+### [N7_NASIL] AST Pointer: StickyHeader.tsx::scrollCalculation
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `winScroll` — Mevcut dikey kaydırma miktarı
-  - `height` — Toplam kaydırılabilir yükseklik
-  - `scrolled` — Hesaplanmış yüzdelik ilerleme
-- **Dönüş**: yok (yan etki: `setScrollProgress` çağrısı)
+  - `winScroll` — Dikey kaydırma miktarı
+  - `height` — Sayfanın toplam kaydırılabilir yüksekliği
+  - `scrolled` — Yüzde olarak kaydırma ilerlemesi
+- **Dönüş**: yok (yan etki: `setScrollProgress` ile state güncelleme)
 
-### [N8_NASIL] AST Pointer: src/components/StickyHeader.tsx::useEffectForGlobalSearch
+### [N8_NASIL] AST Pointer: StickyHeader.tsx::useGlobalKeydownSetup
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `handleGlobalKeyDown` — Klavye olayını işleyen ve arama overlay'ını açan fonksiyon
-- **Dönüş**: cleanup fonksiyonu (keydown listener kaldırma)
+  - `handleGlobalKeyDown` — Global tuş basma olayını yöneten iç fonksiyon
+- **Dönüş**: cleanup fonksiyonu (event listener kaldırma)
 
-### [N9_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleGlobalKeyDown
-- **params**: `(event: KeyboardEvent)`
-- **ic_degiskenler**: (yok)
+### [N9_NASIL] AST Pointer: StickyHeader.tsx::handleGlobalKeyDown
+- **params**: (event: KeyboardEvent)
+- **ic_degiskenler**: (sadece parametre kullanılıyor)
 - **Dönüş**: yok (yan etki: `openSearchOverlay` çağrısı)
 
-### [N10_NASIL] AST Pointer: src/components/StickyHeader.tsx::openCategories
+### [N10_NASIL] AST Pointer: StickyHeader.tsx::handleCategoryClick
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etkiler: `trackEvent`, `openCategoryHub` çağrıları)
+- **ic_degiskenler**: (dışarıdan gelen `mode` parametresi kullanılıyor)
+- **Dönüş**: yok (yan etki: `trackEvent` ve `openCategoryHub` çağrıları)
 
-### [N11_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleSignOut
+### [N11_NASIL] AST Pointer: StickyHeader.tsx::handleSignOut
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
+- **ic_degiskenler**: (dışarıdan gelen fonksiyonlar kullanılıyor)
 - **Dönüş**: Promise<void> (async fonksiyon)
 
-### [N12_NASIL] AST Pointer: src/components/StickyHeader.tsx::handleItemHover
-- **params**: `(itemId: string)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: `prefetchProductsPage` koşullu çağrısı)
+### [N12_NASIL] AST Pointer: StickyHeader.tsx::handleItemHover
+- **params**: (itemId: string)
+- **ic_degiskenler**: (sadece parametre kullanılıyor)
+- **Dönüş**: yok (yan etki: `prefetchProductsPage` çağrısı)
 
-### [N13_NASIL] AST Pointer: src/components/StickyHeader.tsx::renderUserSection
+### [N13_NASIL] AST Pointer: StickyHeader.tsx::renderUserMenu
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok, JSX döndürür)
-- **Dönüş**: `ReactElement` — Kullanıcı oturum durumuna göre login/register butonları veya kullanıcı menüsü JSX'i
+- **ic_degiskenler**: (dışarıdan gelen değişkenler kullanılıyor: user, isDevBypass, t, userMenuRef, finalUserDisplayName, finalHasPrivilegedRole, userRole, finalIsAdmin, closeUserMenu, handleSignOut, Routes)
+- **Dönüş**: JSX elementi (React component)
 
 ---
 
