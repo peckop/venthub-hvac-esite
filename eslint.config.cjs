@@ -98,5 +98,40 @@ module.exports = [
         }
       ]
     }
+  },
+  {
+    files: ["src/lib/services/**/*.ts"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        "patterns": [{
+          "group": [
+            "**/lib/supabase/client",
+            "@/lib/supabase/client",
+            "**/lib/supabase/server",
+            "@/lib/supabase/server"
+          ],
+          "message": "Dependency Injection Guard: Services must not import browser or server Supabase client directly. Injected Supabase client must be passed instead."
+        }]
+      }]
+    }
+  },
+  {
+    files: [
+      "src/components/**/*.{ts,tsx}",
+      "src/views/**/*.{ts,tsx}",
+      "src/providers/**/*.{ts,tsx}",
+      "src/hooks/**/*.{ts,tsx}"
+    ],
+    rules: {
+      "no-restricted-imports": ["error", {
+        "patterns": [{
+          "group": [
+            "**/lib/supabase/server",
+            "@/lib/supabase/server"
+          ],
+          "message": "Client Environment Guard: Client components/views/providers/hooks must not import server-side Supabase client. Use useSupabaseClient hook or inject browser-side client."
+        }]
+      }]
+    }
   }
 ];

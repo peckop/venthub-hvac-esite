@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { getCategories } from '@/lib/services/category.service';
-import { supabaseBrowserClient } from '@/lib/supabase/client';
+import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { toUICategoryList, DomainCategory } from '../lib/type-converters';
 import type { CategoryMetadata } from '../types/db-rows';
 
@@ -23,6 +23,7 @@ const CategoryContext = createContext<CategoryContextType | undefined>(undefined
  * @description Merkezi Kategori Otoritesi. Tüm uygulama genelinde kategori hiyerarşisini yönetir.
  */
 export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { supabase } = useSupabaseClient();
   const [categories, setCategories] = useState<DomainCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +31,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const loadCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getCategories(supabaseBrowserClient);
+      const data = await getCategories(supabase);
       const domainCats = toUICategoryList(data);
       setCategories(domainCats);
     } catch (err) {
@@ -39,7 +40,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     loadCategories();

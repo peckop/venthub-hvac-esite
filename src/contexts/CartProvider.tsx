@@ -1,6 +1,7 @@
 import React, { useEffect, useState, ReactNode, useRef, useMemo, useCallback } from 'react'
 import type { Product } from '@/types/ui-models'
 import { useAuth } from '../hooks/useAuth'
+import { useSupabaseClient } from '@/providers/SupabaseProvider'
 
 const CART_SERVER_SYNC = (process.env.NEXT_PUBLIC_CART_SERVER_SYNC ?? 'true') === 'true'
 
@@ -19,6 +20,7 @@ import type { CartItem } from '@/types/cart'
 
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { supabase } = useSupabaseClient()
   const [items, setItems] = useState<CartItem[]>([])
   const { user } = useAuth()
   const [serverCartId, setServerCartId] = useState<string | null>(null)
@@ -125,7 +127,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       try {
         const { getOrCreateShoppingCart, listCartItemsWithProducts, clearCartItems: clearDbCartItems, upsertCartItem } = await import('../lib/services/cart.service')
         const { getEffectivePriceInfo } = await import('../lib/services/pricing.service')
-        const { supabaseBrowserClient: supabase } = await import('../lib/supabase/client')
         const cart = await getOrCreateShoppingCart(supabase, user.id)
         if (cancelled) return
         setServerCartId(cart.id)
@@ -230,7 +231,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true }
     // only run when user changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+  }, [user, supabase])
 
   // Clear owner when user logs out
   useEffect(() => {
@@ -288,9 +289,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // compute effective price and upsert optimistically, also reflect locally
       Promise.all([
         import('../lib/services/pricing.service'),
-        import('../lib/services/cart.service'),
-        import('../lib/supabase/client')
-      ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }, { supabaseBrowserClient: supabase }]) => {
+        import('../lib/services/cart.service')
+      ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }]) => {
         getEffectivePriceInfo(supabase, product)
           .then(info => {
             upsertCartItem(supabase, { cartId: serverCartId, _productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
@@ -310,7 +310,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         import('sonner').then(({ toast }) => toast.success(`${product.name} sepete eklendi!`, { duration: 2500 })).catch(() => { })
       } catch { }
     }
-  }, [user, serverCartId, items])
+  }, [user, serverCartId, items, supabase])
 
   const removeFromCart = useCallback((_productId: string) => {
     setItems(currentItems => {
@@ -322,14 +322,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
 
     if (CART_SERVER_SYNC && user && serverCartId) {
-      Promise.all([
-        import('../lib/services/cart.service'),
-        import('../lib/supabase/client')
-      ]).then(([{ removeCartItem }, { supabaseBrowserClient: supabase }]) => {
+      import('../lib/services/cart.service').then(({ removeCartItem }) => {
         return removeCartItem(supabase, serverCartId, _productId)
       }).catch(err => console.error('server removeFromCart error', err))
     }
-  }, [user, serverCartId])
+  }, [user, serverCartId, supabase])
 
   const updateQuantity = useCallback((_productId: string, quantity: number) => {
     if (quantity <= 0) {
@@ -350,9 +347,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (product) {
         Promise.all([
           import('../lib/services/pricing.service'),
-          import('../lib/services/cart.service'),
-          import('../lib/supabase/client')
-        ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }, { supabaseBrowserClient: supabase }]) => {
+          import('../lib/services/cart.service')
+        ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }]) => {
           getEffectivePriceInfo(supabase, product)
             .then(info => {
               upsertCartItem(supabase, { cartId: serverCartId, _productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
@@ -364,7 +360,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }).catch(() => { })
       }
     }
-  }, [user, serverCartId, removeFromCart, items])
+  }, [user, serverCartId, removeFromCart, items, supabase])
 
   const clearCart = useCallback((opts?: { silent?: boolean }) => {
     setItems([])
@@ -392,14 +388,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     if (CART_SERVER_SYNC && user && serverCartId) {
-      Promise.all([
-        import('../lib/services/cart.service'),
-        import('../lib/supabase/client')
-      ]).then(([{ clearCartItems }, { supabaseBrowserClient: supabase }]) => {
+      import('../lib/services/cart.service').then(({ clearCartItems }) => {
         return clearCartItems(supabase, serverCartId)
       }).catch(err => console.error('server clearCart error', err))
     }
-  }, [user, serverCartId])
+  }, [user, serverCartId, supabase])
 
   const cartTotal = useMemo(() => {
     return items.reduce((total, item) => {
@@ -452,10 +445,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Sunucuya da yalnızca değişenleri yansıt (varsa)
     if (changedIds.size > 0 && CART_SERVER_SYNC && user && serverCartId) {
       try {
-        Promise.all([
-          import('../lib/services/cart.service'),
-          import('../lib/supabase/client')
-        ]).then(([{ upsertCartItem }, { supabaseBrowserClient: supabase }]) => {
+        import('../lib/services/cart.service').then(({ upsertCartItem }) => {
           const tasks: Promise<unknown>[] = []
           for (let i = 0; i < items.length; i++) {
             const it = items[i]
@@ -469,7 +459,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }).catch(() => { })
       } catch { /* no-op */ }
     }
-  }, [items, user, serverCartId])
+  }, [items, user, serverCartId, supabase])
 
   const value = useMemo(() => ({
     items,

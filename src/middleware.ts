@@ -3,25 +3,16 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { resolveTenant } from './lib/tenantResolver'
-
-/**
- * Edge Middleware — Sorumluluklar:
- * 1. i18n Alt Dizin Yönlendirmesi ve Dil Algılaması (tr/en)
- * 2. UUID tabanlı /products/[uuid] → slug canonical URL 308 SEO yönlendirmesi
- * 3. /admin/* yolları için JWT + Rol doğrulaması (Server-side RBAC Guard)
- */
+import { resolveUserClaims, createRedirectResponse } from '@/utils/router'
 
 export const config = {
   matcher: [
-    // Statik varlıklar dışındaki tüm istekleri dinle
     '/((?!_next/static|_next/image|favicon.ico|images|.*\\.(?:svg|png|jpg|webp|ico)).*)',
   ],
 }
 
-// ── Sabit Tanımlar ──────────────────────────────────────────────────────────
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const ADMIN_ROLES = new Set(['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'])
-
 const LOCALES = ['tr', 'en'] as const
 const DEFAULT_LOCALE = 'tr'
 
@@ -35,62 +26,54 @@ function detectLocale(request: NextRequest): string {
   return 'tr'
 }
 
-// ── Ana Middleware ───────────────────────────────────────────────────────────
 export async function middleware(request: NextRequest) {
   const host = request.headers.get('host') || ''
   const { tenantId } = resolveTenant(host)
   request.headers.set('x-tenant-id', tenantId)
 
-  const setTenantCookie = (res: NextResponse) => {
-    res.cookies.set('tenant_id', tenantId, {
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    });
-    return res;
-  };
-
-  const redirectResponse = (url: URL | string, status: number) => {
-    const res = NextResponse.redirect(url, status)
-    setTenantCookie(res)
-    response.cookies.getAll().forEach(({ name, value, ...options }) => {
-      res.cookies.set(name, value, options)
-    })
-    response.headers.forEach((value, key) => {
-      res.headers.set(key, value)
-    })
-    return res
-  }
-
-  const { pathname } = request.nextUrl
-  const segments = pathname.split('/').filter(Boolean)
-  const firstSegment = segments[0]
-
+  // 1. Prepare Base Response
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
 
-  // 1. Dil Alt Dizin Kontrolü ve Yönlendirme
+  const setTenantCookie = (res: NextResponse) => {
+    res.cookies.set('tenant_id', tenantId, {
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    })
+    return res
+  }
+
+  const redirectResponse = (url: URL | string, status: number) => {
+    // Set tenant cookie in response first so it is copied by createRedirectResponse
+    setTenantCookie(response)
+    return createRedirectResponse(request, url, response, status)
+  }
+
+  const { pathname } = request.nextUrl
+  const segments = pathname.split('/').filter(Boolean)
+  const firstSegment = segments[0]
+
+  // 2. Language Subdirectory Verification and Redirects
   let locale: string = DEFAULT_LOCALE
   let effectiveSegments = [...segments]
   const isLocaleInPath = LOCALES.includes(firstSegment as typeof LOCALES[number])
 
   if (isLocaleInPath) {
     locale = firstSegment
-    effectiveSegments = segments.slice(1) // Offset uygulandı
+    effectiveSegments = segments.slice(1)
     
-    // Eğer dil alt dizininde admin çağrıldıysa (/tr/admin/... veya /en/admin/...)
-    // Admin paneli locale'siz kalacağı için kök /admin rotasına yönlendir
+    // Redirect locale-prefixed admin pages back to non-prefixed roots
     if (effectiveSegments[0] === 'admin') {
       const url = request.nextUrl.clone()
       url.pathname = `/admin${pathname.substring(3 + firstSegment.length)}`
       return redirectResponse(url, 307)
     }
   } else {
-    // Rota locale barındırmıyor
-    // Admin, API veya statik sitemap/robots dosyaları değilse dil alt dizinine yönlendir
+    // Inject language prefix for user-facing routes missing a locale segments
     const isAuthApi = firstSegment === 'auth' && (segments[1] === 'callback' || segments[1] === 'signout')
     const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || isAuthApi || 
                            pathname.endsWith('sitemap.xml') || pathname.endsWith('robots.txt')
@@ -103,7 +86,6 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Supabase yetkileri
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
@@ -111,7 +93,7 @@ export async function middleware(request: NextRequest) {
     return setTenantCookie(response)
   }
 
-  // ── Kol 1: UUID → Slug SEO Yönlendirmesi (effectiveSegments ile) ────────────────
+  // ── Redirects Column 1: UUID → Slug SEO canonicalization ──
   if (effectiveSegments.length === 2 && effectiveSegments[0] === 'products') {
     const identifier = effectiveSegments[1]
 
@@ -119,21 +101,13 @@ export async function middleware(request: NextRequest) {
       try {
         const supabase = createServerClient(supabaseUrl, anonKey, {
           cookies: {
-            getAll() {
-              return request.cookies.getAll()
-            },
+            getAll: () => request.cookies.getAll(),
             setAll(cookiesToSet, headers) {
               cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-              response = NextResponse.next({
-                request,
-              })
-              cookiesToSet.forEach(({ name, value, options }) =>
-                response.cookies.set(name, value, options)
-              )
+              response = NextResponse.next({ request })
+              cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
               if (headers) {
-                Object.entries(headers).forEach(([key, value]) =>
-                  response.headers.set(key, value)
-                )
+                Object.entries(headers).forEach(([key, value]) => response.headers.set(key, value))
               }
             },
           },
@@ -151,51 +125,43 @@ export async function middleware(request: NextRequest) {
           return redirectResponse(url, 308)
         }
       } catch (error) {
-        console.error('[Middleware] UUID Slug Lookup Hatası:', error)
+        console.error('[Middleware] UUID Slug lookup error:', error)
       }
     }
 
     return setTenantCookie(response)
   }
 
-  // ── Kol 2: Admin RBAC Guard (effectiveSegments ile) ────────────────────────────────
+  // ── Redirects Column 2: Admin RBAC Auth Guard ──
   if (effectiveSegments[0] === 'admin') {
-    // Development ortamında localhost'ta kilitlenmemek için bypass
     const host = request.headers.get('host') || ''
     const isDev = process.env.NODE_ENV === 'development'
     const isLocalhost = host.startsWith('localhost') || host.startsWith('127.0.0.1')
 
+    // Bypass auth in local development env to avoid locking ourselves out
     if (isDev && isLocalhost) {
       return setTenantCookie(response)
     }
 
-    // Auth ve Rol doğrulaması: Çerezleri senkronize eden tam Supabase Client
     const supabase = createServerClient(supabaseUrl, anonKey, {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
+        getAll: () => request.cookies.getAll(),
         setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          response = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
+          response = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
           if (headers) {
-            Object.entries(headers).forEach(([key, value]) =>
-              response.headers.set(key, value)
-            )
+            Object.entries(headers).forEach(([key, value]) => response.headers.set(key, value))
           }
         },
       },
     })
 
-    // Güvenli Auth Kontrolü
-    const { data, error } = await supabase.auth.getClaims()
-    const claims = data?.claims
+    // Resolve claims through our high performance caching layer (AES-GCM cryptographically secure cookies)
+    const secret = process.env.JWT_CLAIMS_COOKIE_SECRET || anonKey
+    const { claims, error } = await resolveUserClaims(request, response, supabase, secret)
     const jwtRole = claims?.user_role
+    const roleString = typeof jwtRole === 'string' ? jwtRole : ''
 
     if (error || !claims) {
       const loginUrl = request.nextUrl.clone()
@@ -206,7 +172,7 @@ export async function middleware(request: NextRequest) {
       return redirectResponse(loginUrl, 302)
     }
 
-    if (!jwtRole || !ADMIN_ROLES.has(jwtRole.toLowerCase())) {
+    if (!roleString || !ADMIN_ROLES.has(roleString.toLowerCase())) {
       const homeUrl = request.nextUrl.clone()
       homeUrl.pathname = '/'
       homeUrl.searchParams.set('auth_error', 'unauthorized')

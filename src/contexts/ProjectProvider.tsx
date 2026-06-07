@@ -2,7 +2,7 @@
 
 import React, { createContext,  useEffect, useState, useMemo, useCallback } from 'react'
 import { listUserProjects, createProject, deleteProject, addProductToProject, removeProductFromProject, listProjectItems } from '@/lib/services/project.service'
-import { supabaseBrowserClient } from '@/lib/supabase/client'
+import { useSupabaseClient } from '@/providers/SupabaseProvider'
 import type { UserProject, ProjectItem } from '@/types/ui-models'
 import { useAuth } from '../hooks/useAuth'
 import { toast } from 'sonner'
@@ -21,6 +21,7 @@ interface ProjectContextType {
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { supabase } = useSupabaseClient()
   const [projects, setProjects] = useState<UserProject[]>([])
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
@@ -29,14 +30,14 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!user) return
     setLoading(true)
     try {
-      const data = await listUserProjects(supabaseBrowserClient)
+      const data = await listUserProjects(supabase)
       setProjects(data as UserProject[])
     } catch {
       console.error('Error refreshing projects')
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, supabase])
 
   useEffect(() => {
     if (user) {
@@ -53,7 +54,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return null
     }
     try {
-      const newProject = await createProject(supabaseBrowserClient, { name, description, user_id: user.id })
+      const newProject = await createProject(supabase, { name, description, user_id: user.id })
       setProjects(prev => [newProject, ...prev])
       toast.success('Proje başarıyla oluşturuldu.')
       return newProject
@@ -61,45 +62,45 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       toast.error('Proje oluşturulamadı.')
       return null
     }
-  }, [user?.id])
+  }, [user?.id, supabase])
 
   const removeProject = useCallback(async (id: string) => {
     try {
-      await deleteProject(supabaseBrowserClient, id)
+      await deleteProject(supabase, id)
       setProjects(prev => prev.filter(p => p.id !== id))
       toast.success('Proje silindi.')
     } catch {
       toast.error('Proje silinemedi.')
     }
-  }, [])
+  }, [supabase])
 
   const addItem = useCallback(async (projectId: string, _productId: string, quantity: number = 1) => {
     try {
-      await addProductToProject(supabaseBrowserClient, projectId, _productId, quantity)
+      await addProductToProject(supabase, projectId, _productId, quantity)
       toast.success('Ürün projeye eklendi.')
     } catch {
       toast.error('Ürün eklenemedi.')
     }
-  }, [])
+  }, [supabase])
 
   const removeItem = useCallback(async (projectId: string, _productId: string) => {
     try {
-      await removeProductFromProject(supabaseBrowserClient, projectId, _productId)
+      await removeProductFromProject(supabase, projectId, _productId)
       toast.success('Ürün projeden çıkarıldı.')
     } catch {
       toast.error('Ürün çıkarılamadı.')
     }
-  }, [])
+  }, [supabase])
 
   const getProjectItems = useCallback(async (projectId: string): Promise<ProjectItem[]> => {
     try {
-      const items = await listProjectItems(supabaseBrowserClient, projectId)
+      const items = await listProjectItems(supabase, projectId)
       return items as ProjectItem[]
     } catch {
       console.error('Error getting project items')
       return []
     }
-  }, [])
+  }, [supabase])
 
   const value = useMemo(() => ({
     projects,
@@ -118,4 +119,3 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     </ProjectContext.Provider>
   )
 }
-

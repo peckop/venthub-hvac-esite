@@ -10,19 +10,23 @@ import { I18nProvider } from '../../i18n/I18nProvider'
 import { ProjectProvider } from '../../contexts/ProjectProvider'
 import CookieConsent from './CookieConsent'
 
+import { SupabaseProvider } from '@/providers/SupabaseProvider'
+
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
-        <I18nProvider>
-            <AuthProvider>
-                <CategoryProvider>
-                    <CartProvider>
-                        <ProjectProvider>
-                            {children}
-                        </ProjectProvider>
-                    </CartProvider>
-                </CategoryProvider>
-            </AuthProvider>
-        </I18nProvider>
+        <SupabaseProvider>
+            <I18nProvider>
+                <AuthProvider>
+                    <CategoryProvider>
+                        <CartProvider>
+                            <ProjectProvider>
+                                {children}
+                            </ProjectProvider>
+                        </CartProvider>
+                    </CategoryProvider>
+                </AuthProvider>
+            </I18nProvider>
+        </SupabaseProvider>
     )
 }
 

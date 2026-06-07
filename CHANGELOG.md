@@ -1,20 +1,25 @@
 # Changelog
 
-### [2026-06-07] VentHub Database Service Layers Dependency Injection Refactoring
+### [2026-06-07] Dependency Injection, Connection Pooling, Edge Claims Caching, and ESLint Guards Integration
 
-**Özet:** Veri tabanı servis katmanında gevşek bağımlılıkları ve potansiyel istemci kirlenmelerini (client contamination) önlemek amacıyla `src/lib/services/` altındaki tüm servis fonksiyonları, ilk parametre olarak `supabase` istemcisini (`SupabaseClient<Database>`) alacak şekilde refaktör edilmiştir (Dependency Injection). Böylece modül düzeyindeki statik veya varsayılan istemci importları tamamen ortadan kaldırılmıştır.
+**Özet:** Uygulamanın mimari bütünlüğünü, güvenlik sınırlarını ve sunucu performansını garanti altına almak amacıyla; Dependency Injection (DI) servis kayıt mekanizması (`ServiceRegistry`), Edge üzerinde JWT Claims Caching / Edge Middleware claims caching (`JWT_CLAIMS_COOKIE_SECRET`), serverless bağlantı havuzlama (port `6543`), çapraz ortam (browser/server) istemci kirlenmesini engelleyen ESLint guardrail kuralları entegre edilmiş ve tüm veritabanı servisleri dependency injection ile parametrik çalışacak şekilde tamamlanmıştır.
 
 **Değişiklik Kapsamı:**
-- **Servis Katmanı Refaktör Edilmesi (7 Servis Dosyası):**
-  - `src/lib/services/` altındaki 7 adet servis dosyası, statik istemci importlarından temizlenmiş ve tüm veritabanı sorguları parametre olarak gelen `supabase` istemcisine bağlanmıştır.
-- **Çağırıcı Bileşen ve Hook Güncellemeleri (12+ Tüketici Bağlamı/Görünüm/Hook/Sayfa):**
-  - İstemci ve sunucu tarafında bu servisleri kullanan 12'den fazla context, view, custom hook ve sayfa bileşeni, ilgili ortama uygun Supabase istemcisini (`supabaseBrowserClient`, `createSupabaseServerClient` veya `supabaseStaticClient`) servis çağrılarına parametre olarak geçecek şekilde güncellenmiştir.
-- **Unit Test Güncellemeleri (2 Test Süiti):**
-  - Servislerin ve bağlı bileşenlerin unit testleri, test ortamındaki mock/gerçek Supabase istemci enjeksiyonu ile uyumlu hale getirilmiş ve 2 büyük unit test süiti güncellenmiştir.
-- **Proje Sağlığı:**
-  - Tüm type-check, lint, build süreçleri ve testler sıfır hata ile tamamlanmıştır.
+- **Edge Middleware Claims Caching & Routing (`src/middleware.ts`, `src/utils/router.ts`):**
+  - Edge üzerinde token doğrulamalarını hızlandırmak ve network gidiş-dönüşlerini azaltmak amacıyla JWT claims şifreleme ve çerez tabanlı önbellekleme sistemi (`JWT_CLAIMS_COOKIE_SECRET`) entegre edildi.
+  - Yönlendirmelerde HTTP başlıklarının ve çerezlerin kaybolmasını önlemek için `createRedirectResponse` yardımcı fonksiyonu (`src/utils/router.ts`) oluşturuldu.
+- **Client-Side Dependency Injection Refaktörleri (`CartProvider.tsx`, `CategoryContext.tsx`):**
+  - `CartProvider.tsx` ve `CategoryContext.tsx` içerisindeki tüm statik browser client importları ve dinamik `import()` bağımlılıkları tamamen temizlenerek React context bazlı `useSupabaseClient()` enjeksiyonuna geçirildi.
+- **Server-Side Service Registry Entegrasyonu (`src/lib/services/registry.ts`):**
+  - Sunucu tarafında (Server Components, Server Actions ve API rotalarında) veritabanı servislerinin tek bir istek bazlı Supabase istemcisiyle yönetilmesini sağlayan `ServiceRegistry` yapısı kuruldu.
+- **ESLint Import Guardrails (`eslint.config.cjs`):**
+  - Servislerin (`src/lib/services/**/*.ts`) statik client importları yapmasını ve client dosyalarının (`src/components`, `src/views`, `src/providers`, `src/hooks`) sunucu client'ı (`**/lib/supabase/server`) import etmesini engelleyen `no-restricted-imports` kuralları eklendi.
+- **Güvenlik ve Performans Konfigürasyonları (`.env.local`, `RECOMMENDATIONS.md`):**
+  - Veritabanı bağlantısı serverless ortamda havuz portuna (`6543`) yönlendirildi. `RECOMMENDATIONS.md` üzerindeki tüm maddelerin mimari statüleri "Implemented" olarak güncellendi.
+- **Otomatik Testler & Doğrulama (`diSignature.test.ts`, `realtimeSecurity.test.ts`):**
+  - Vitest ile AST seviyesinde servis imzalarını ve realtime WebSocket sızdırmazlık kurallarını denetleyen testler başarıyla koşturuldu.
 
-**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ | `pnpm run build` ✅ | `pnpm run test -- --run` (412 tests green) ✅
+**Doğrulama:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ | `pnpm run test` (427 tests passed) ✅ | `pnpm run build` ✅
 
 ---
 

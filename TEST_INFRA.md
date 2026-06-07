@@ -15,10 +15,18 @@
 | 6 | Webhooks, Realtime & Storage | ORIGINAL_REQUEST §R7-R9, R11 | 5      | 5      | ✓      |
 
 ## Test Architecture
-- **Test Runner**: Vitest test suites executing API and route simulation tests.
-- **Location**: `tests/e2e/`
-- **Invocation**: `pnpm run test:e2e`
+- **Test Runner**: Vitest test suites executing API and route simulation tests, static analysis, and E2E simulation.
+- **Location**: 
+  - Service tests & Static analysis: `src/lib/__tests__/` (e.g. `src/lib/__tests__/diSignature.test.ts`)
+  - Integration & E2E tests: `tests/e2e/` (e.g. `tests/e2e/realtimeSecurity.test.ts`)
+- **Invocation**:
+  - Run all unit/static tests: `pnpm run test`
+  - Run DI signature compliance test: `pnpm run test -- src/lib/__tests__/diSignature.test.ts`
+  - Run E2E tests: `pnpm run test:e2e`
+  - Run specific E2E test: `pnpm run test:e2e -- tests/e2e/realtimeSecurity.test.ts`
 - **Directory Layout**:
+  - `src/lib/__tests__/diSignature.test.ts` (Static analysis DI signature checks)
+  - `tests/e2e/realtimeSecurity.test.ts` (Realtime RLS and WebSocket isolation checks)
   - `tests/e2e/resolution.test.ts`
   - `tests/e2e/isolation.test.ts`
   - `tests/e2e/auth.test.ts`
@@ -34,9 +42,12 @@
 | 3 | Cross-Tenant Leakage Attack Simulation | F1, F2, F4, F6 | Critical |
 | 4 | Webhook Concurrency Collision | F6 | High |
 | 5 | Custom Domain Resolution Edge Case | F1, F2 | Medium |
+| 6 | Realtime Cross-Tenant WebSocket Hijack Attempt | F2, F6 | Critical |
 
 ## Coverage Thresholds
 - Tier 1: ≥30 test cases
 - Tier 2: ≥30 test cases
 - Tier 3: ≥6 pairwise feature interaction cases
 - Tier 4: ≥5 realistic workload scenario cases
+- Tier 5: Static Analysis Compliance checks (DI signature constraints across 7 service files)
+

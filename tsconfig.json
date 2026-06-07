@@ -41,6 +41,7 @@
     "supabase",
     "threejs-skill-workspace",
     "threejs-component-builder-workspace",
-    "tests/e2e/empirical_*.test.ts"
+    "tests/e2e/empirical_*.test.ts",
+    "src/lib/__tests__/diSignature.test.ts"
   ]
 }

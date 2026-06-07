@@ -3,48 +3,19 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\middleware.ts
-skeleton_hash: 17d96593b201eac7
+skeleton_hash: 26f9b5f9a3ad6c83
 entity_hashes:
-  func:detectLocale: 25418ec7d07f6d80
-  func:middleware: 869802a18899b914
-  overview: 64f7e17620830c7c
-generated_at: 2026-06-07T11:02:59Z
+  func:detectLocale: 5c19d05a4ba76afe
+  func:middleware: 40d52344cd7722d0
+  overview: 93d9d476cdaf7bfc
+generated_at: 2026-06-07T14:02:24Z
 ---
 
-## Genel Bakış
-Bu modül, VentHub HVAC projesinin Next.js ara katmanıdır ve tüm HTTP isteklerini rota öncesinde yakalayarak merkezi bir işlerlik sağlar. Dil tespiti, JWT tabanlı kimlik doğrulama ve erişim kontrolü gibi ön işlemleri koordineli bir şekilde yöneterek proje genelinde tutarlı ve güvenli bir kullanıcı deneyimi sunar.
 
-## Fonksiyon Grupları
-
-### Dil/Locale Tespiti
-Gelen isteklerin başlıkları ve çerezleri analiz edilerek kullanıcının tercih ettiği dil ve bölgesel ayarlar otomatik olarak belirlenir.
-- detectLocale
-
-### Güvenlik ve Kimlik Doğrulama
-JWT tabanlı token çözümleme ve kimlik doğrulama gibi güvenlik önlemlerini uygulayan yardımcı işlevleri barındırır.
-- decodeJwt
-
-### Merkezi Koordinasyon
-Tüm gelen istekleri yakalayan ana işleyici; dil tespiti, kimlik doğrulama ve yetkilendirme gibi süreçleri sırayla ve koordineli olarak yürütür.
-- middleware
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
 
-Bu modül, HTTP isteklerini işleyen bir Next.js ara katmanıdır ve locale tespiti ile erişim kontrolü sağlar.
-
-[Aksiyom 1]: Eğer `detectLocale` fonksiyonuna geçerli bir `NextRequest` nesnesi sağlanmazsa, locale tespiti başarısız olur ve varsayılan bir locale kullanılmalıdır.
-
-[Aksiyom 2]: Eğer tespit edilen locale değeri `LOCALES` kümesinde yer almazsa, istemci için geçersiz bir dil tercihi işlenir ve uygulama tanımlı bir fallback locale'a dönmelidir.
-
-[Aksiyom 3]: Eğer `middleware` fonksiyonuna geçerli bir `NextRequest` nesnesi sağlanmazsa, middleware zinciri kırılır ve istek işlenmeden reddedilir.
-
-[Aksiyom 4]: Eğer istekteki kullanıcının rolü `ADMIN_ROLES` kümesinde tanımlırollerden biri değilse, admin-only rotalara erişim engellenir.
-
-[Aksiyom 5]: Eğer rotada parametre olarak beklenen değer `UUID_REGEX` kalıbına uymazsa, UUID tabanlı rota eşleştirmesi başarısız olur.
-
-[Aksiyom 6]: Eğer `config` nesnesi tanımlı değilse veya geçerli bir Next.js middleware config yapısına sahip değilse, middleware başarıyla register edilmez ve hiçbir istek işlenmez.
 
 ---
 
@@ -52,14 +23,14 @@ Bu modül, HTTP isteklerini işleyen bir Next.js ara katmanıdır ve locale tesp
 
 ### detectLocale
 
-**Ne yapar**: Kullanıcının tercih ettiği dilini (Türkçe veya İngilizce) belirler. Öncelikle cookie değerine, ardından tarayıcı dil tercihine bakarak uygun locale kodunu döndürür.
+**Ne yapar**: HTTP isteğinden kullanıcı tercihine uygun dil kodunu (`tr` veya `en`) tespit eder. Sırasıyla cookie değerini, ardından `Accept-Language` header'ını kontrol eder; hiçbir eşleşme bulunamazsa varsayılan olarak `'tr'` döner.
 
-**Nasıl yapar**: Fonksiyon öncelikle `NEXT_LOCALE` adlı cookie'yi kontrol eder; eğer değeri geçerli bir dil koduysa (`tr` veya `en`) doğrudan bunu kullanır. Cookie'de geçerli bir dil yoksa, isteğin `accept-language` başlığını analiz eder ve İngilizce içeriyorsa `'en'` döndürür. Hiçbir koşul sağlanmazsa varsayılan olarak `'tr'` (Türkçe) değerini döndürür.
+**Nasıl yapar**: Öncelikle `NEXT_LOCALE` adlı cookie'den bir dil tercihi okumaya çalışır. Eğer cookie `'tr'` veya `'en'` değerlerinden birine sahipse doğrudan o değeri döner. Cookie'de geçerli bir değer yoksa `Accept-Language` header'ının küçük harfe çevrilmiş halinde `'en'` alt dizesi aranır; bulunursa `'en'`, aksi halde `'tr'` döner. Bu stratejiyle hem tercih bildiren hem de bildirmeyen kullanıcılar için makul bir dil belirlenir.
 
 **Parametreler**:
-- `request`: `NextRequest` — HTTP isteği nesnesi. Cookie değerlerine ve HTTP başlıklarına erişmek için kullanılır.
+- `request`: NextRequest — Üzerinden cookie ve header değerlerine erişilen Next.js HTTP istek nesnesi. Fonksiyon bu nesnenin `cookies` ve `headers` API'lerini kullanarak dil bilgisini çıkarır.
 
-**Dönüş**: `string` — Belirlenen dil kodu (`'tr'` veya `'en'`).
+**Dönüş**: `string` — Tespit edilen dil kodu. Geçerli değerler `'tr'` veya `'en'` formatındadır.
 
 ### middleware
 
@@ -77,8 +48,7 @@ Bu modül, HTTP isteklerini işleyen bir Next.js ara katmanıdır ve locale tesp
 ## SABİTLER
 - **config** (object) — `{
   matcher: [
-    // Statik varlıklar dışındaki tüm istekleri dinle
-    '...`
+    '/((?!_next/static|_next/image|favicon.ico|images|.*\\.(?:...`
 - **UUID_REGEX** (regex) — `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`
 - **ADMIN_ROLES** (new_expression) — `new Set(['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'])`
 - **LOCALES** (as_expression) — `['tr', 'en'] as const`
@@ -88,40 +58,46 @@ Bu modül, HTTP isteklerini işleyen bir Next.js ara katmanıdır ve locale tesp
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/middleware.ts::detectLocale
-- **params**: (request: NextRequest)
-- **ic_degiskenler**: 
-  - `cookieLocale` — request'ten alınan 'NEXT_LOCALE' çerez değeri, dil tercihini belirler
-  - `acceptLang` — request'ten alınan 'accept-language' başlık değeri, tarayıcı dil tercihini belirler
-- **Dönüş**: string (Algılanan dil kodu: 'tr' veya 'en')
+- **params**: `request: NextRequest` — HTTP isteği nesnesi, cookie ve header bilgilerini içerir
+- **ic_degiskenler**:
+  - `cookieLocale` — `request.cookies.get('NEXT_LOCALE')?.value` ile okunur; tarayıcıda depolanan dil tercihini tutar, 'tr' veya 'en' olup kontrol edilir
+  - `acceptLang` — `request.headers.get('accept-language') || ''` ile okunur; tarayıcının dil tercih header'ını tutar, küçük harfe çevrilerek 'en' içerip içermediği kontrol edilir
+- **Dönüş**: `string` — `'en'` veya `'tr'` (varsayılan olarak)
+
+---
 
 ### [N2_NASIL] AST Pointer: src/middleware.ts::middleware
-- **params**: (request: NextRequest)
+- **params**: `request: NextRequest` — Next.js middleware'e gelen HTTP isteği
 - **ic_degiskenler**:
-  - `host` — request'ten alınan 'host' başlık değeri, tenant çözümleme için kullanılır
-  - `tenantId` — resolveTenant(host) çağrısından elde edilen kiracı ID'si
-  - `setTenantCookie` — Inner function: NextResponse'a 'tenant_id' çerezini ayarlar
-  - `redirectResponse` — Inner function: URL'e yönlendirme yanıtı oluşturur, tenant çerezini ve mevcut çerezleri/ başlıkları kopyalar
-  - `pathname` — request.nextUrl.pathname, istek yol adı
-  - `segments` — pathname'i '/' ile bölüp boş olanları filtreleyerek elde edilen yol segmentleri dizisi
-  - `firstSegment` — segments[0], ilk yol segmenti
-  - `response` — NextResponse.next() ile oluşturulan başlangıç yanıtı
-  - `locale` — Başlangıçta DEFAULT_LOCALE, sonradan algılanan dil ile güncellenen dil kodu
-  - `effectiveSegments` — Dil segmenti varsa onu çıkarılmış yol segmentleri dizisi
-  - `isLocaleInPath` — firstSegment'in LOCALES dizisinde olup olmadığını kontrol eden boolean
-  - `isAuthApi` — auth API rotası olup olmadığını kontrol eden boolean (auth/callback veya auth/signout)
-  - `isSpecialRoute` — Admin, API, auth API veya sitemap/robots rotası olup olmadığını kontrol eden boolean
-  - `detectedLocale` — detectLocale(request) çağrısı ile belirlenen dil (sadece locale redirect durumunda)
-  - `identifier` — effectiveSegments[1], products rotasında UUID/_slug tanımlayıcısı
-  - `supabase` (products bloğu) — createServerClient ile oluşturulan Supabase istemcisi (products UUID araması için)
-  - `data` (products bloğu) — supabase.from('products').select('slug').eq('id', identifier).single() sorgusunun sonucu
-  - `isDev` — process.env.NODE_ENV === 'development' kontrolü ile belirlenen development ortamı boolean'ı
-  - `isLocalhost` — host'un localhost veya 127.0.0.1 ile başlayıp başlamadığını kontrol eden boolean
-  - `supabase` (admin bloğu) — createServerClient ile oluşturulan Supabase istemcisi (admin RBAC için)
-  - `data` (admin bloğu) — supabase.auth.getClaims() çağrısının sonucu
-  - `error` — supabase.auth.getClaims() çağrısında oluşabilecek hata nesnesi
-  - `claims` — data?.claims, JWT claim verileri
-  - `jwtRole` — claims?.user_role, JWT'den alınan kullanıcı rolü
-- **Dönüş**: yok (void) — Fonksiyon yan etki olarak NextResponse döndürür veya yönlendirme yapar
+  - `host` — `request.headers.get('host') || ''` ile okunur; isteğin geldiği domain bilgisi, tenant çözümlemede kullanılır
+  - `tenantId` — `resolveTenant(host)` çağrısından dönen `{ tenantId }` destructured değer; kiracının benzersiz tanımlayıcısıdır, header'a ve cookie'ye yazılır
+  - `response` — `NextResponse.next({ request: { headers: request.headers } })` ile oluşturulan temel yanıt nesnesi; middleware zincirinin devamını sağlar, birden fazla yerde yeniden atanır
+  - `setTenantCookie` — `(res: NextResponse) => NextResponse` tipinde closure; verilen response'a `tenant_id` cookie'sini `path: '/'`, `sameSite: 'lax'`, `secure: process.env.NODE_ENV === 'production'` seçenekleriyle set eder
+  - `redirectResponse` — `(url: URL | string, status: number) => NextResponse` tipinde closure; önce `setTenantCookie(response)` çağırarak tenant cookie'sini ekler, ardından `createRedirectResponse(request, url, response, status)` ile yönlendirme yanıtı döner
+  - `pathname` — `request.nextUrl.pathname` ile okunur; URL'nin path kısmı (host dahil değil)
+  - `segments` — `pathname.split('/').filter(Boolean)` ile elde edilir; URL path'inin '/' ile bölünüp boş elemanları atılmış hali, dil ve rota segmentlerini tutar
+  - `firstSegment` — `segments[0]` olarak atanır; URL'nin ilk anlamlı segmenti, dil kodu mu rota mı olduğunu belirlemede kullanılır
+  - `locale` — `DEFAULT_LOCALE` olarak başlatılır; geçerli dil kodunu tutar, `isLocaleInPath` true ise `firstSegment` değerine atanır
+  - `effectiveSegments` — `[...segments]` ile kopyalanır, `isLocaleInPath` true ise `segments.slice(1)` ile dil prefix'i çıkarılmış segmentler olarak yeniden atanır; rota analizinde dil kodu olmadan kullanılır
+  - `isLocaleInPath` — `LOCALES.includes(firstSegment as typeof LOCALES[number])` ile hesaplanır; ilk segmentin bir dil kodu olup olmadığını boolean olarak tutar
+  - `detectedLocale` — `detectLocale(request)` çağrısıyla hesaplanır; cookie veya accept-language'den tespit edilen dil kodu; iki farklı blokta local variable olarak kullanılır (admin redirect ve locale enjeksiyonu için)
+  - `isAuthApi` — `firstSegment === 'auth' && (segments[1] === 'callback' || segments[1] === 'signout')` ile hesaplanır; isteğin auth callback/signout API rotası olup olmadığını tutar
+  - `isSpecialRoute` — admin, api, auth API, sitemap.xml veya robots.txt rotalarından biri olup olmadığını tutar; bu rotalara dil prefix'i eklenmez
+  - `supabaseUrl` — `process.env.NEXT_PUBLIC_SUPABASE_URL!` ile okunur; Supabase bağlantı URL'i, client oluşturmada kullanılır
+  - `anonKey` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!` ile okunur; Supabase anonim anahtarı, client oluşturmada ve JWT secret fallback'inde kullanılır
+  - `identifier` — `effectiveSegments[1]` olarak atanır; products rotasındaki ikinci segment (UUID veya slug olabilir), `UUID_REGEX.test(identifier)` ile UUID olup olmadığı kontrol edilir
+  - `supabase` — `createServerClient(supabaseUrl, anonKey, { cookies: {...} })` ile oluşturulan Supabase istemcisi; iki farklı blokta (UUID→slug redirect ve admin RBAC) ayrı ayrı oluşturulur, `cookies.setAll` callback'inde `response` değişkeni yeniden atanır
+  - `data` — `supabase.from('products').select('slug').eq('id', identifier).single()` sorgusunun `data` destructured sonucu; ürünün slug değerini tutar, `data?.slug` kontrolü ile UUID→slug yönlendirmesi yapılır
+  - `isDev` — `process.env.NODE_ENV === 'development'` ile hesaplanır; geliştirme modu olup olmadığını tutar
+  - `isLocalhost` — `host.startsWith('localhost') || host.startsWith('127.0.0.1')` ile hesaplanır; isteğin localhost'tan gelip gelmediğini tutar; `isDev && isLocalhost`条件ında birlikte kullanılır
+  - `secret` — `process.env.JWT_CLAIMS_COOKIE_SECRET || anonKey` olarak atanır; JWT claim'leri imzalamak/doğrulamak için kullanılan gizli anahtar
+  - `claims` — `await resolveUserClaims(request, response, supabase, secret)` destructured sonucu; kullanıcının JWT claim bilgilerini (user_role dahil) tutar, `claims?.user_role` erişimi yapılır
+  - `error` — `resolveUserClaims` destructured sonucu; hata durumunu tutar, `error || !claims` kontrolü ile auth başarısızlığı tespit edilir
+  - `jwtRole` — `claims?.user_role` olarak atanır; kullanıcının rol bilgisini tutar, string veya farklı tipte olabilir
+  - `roleString` — `typeof jwtRole === 'string' ? jwtRole : ''` ile atanır; `jwtRole`'ün string olduğundan emin olmak için güvenli çevrim; `ADMIN_ROLES.has(roleString.toLowerCase())` kontrolünde kullanılır
+  - `loginUrl` — `request.nextUrl.clone()` ile klonlanan URL; login sayfası yönlendirmesi için kullanılır, `pathname` ve `searchParams` (`from`, `reason`) ile mutate edilir
+  - `homeUrl` — `request.nextUrl.clone()` ile klonlanan URL; yetkisiz erişim durumunda ana sayfaya yönlendirme için kullanılır, `pathname: '/'` ve `searchParams: auth_error=unauthorized` olarak ayarlanır
+- **Dönüş**: `Response` (NextResponse) — yönlendirme yanıtı, cookie set edilmiş base response veya `NextResponse.next()` döner; fonksiyon asenkron olup her dalda farklı bir Response nesnesi döner
 
 ---
 
