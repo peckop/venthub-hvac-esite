@@ -292,6 +292,8 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                         alt={t('home.hero.sinevizyon.altProduct')} 
                         fill 
                         priority={slideIdx === 0}
+                        fetchPriority={slideIdx === 0 ? "high" : "low"}
+                        decoding={slideIdx === 0 ? "sync" : "async"}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                         className="object-contain" 
                       />

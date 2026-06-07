@@ -11,7 +11,7 @@ entity_hashes:
   func:handleTouchStart: 66d8f271101148e9
   overview: ad86b1170bdcb3cc
   style_tokens: e6977f079a17d9a9
-generated_at: 2026-05-28T22:35:54Z
+generated_at: 2026-06-07T19:01:44Z
 ---
 
 ## Genel Bakış
