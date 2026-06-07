@@ -72,6 +72,100 @@ When working on any Supabase task that touches auth, RLS, views, storage, or use
 
 For any security concern not covered above, fetch the Supabase product security index: `https://supabase.com/docs/guides/security/product-security.md`
 
+## Next.js 15 SSR Client Architecture & Factories
+
+Next.js 15 App Router requires request-bound isolating factories instead of singletons to prevent memory leaks and session cross-contamination (data bleeding).
+
+### 1. Browser Client (`src/lib/supabase/client.ts`)
+Only for Client Components (`'use client'`), instantiated via `createBrowserClient`:
+```typescript
+import { createBrowserClient } from '@supabase/ssr'
+import { Database } from '@/types/database.types'
+
+export const supabaseBrowserClient = createBrowserClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+```
+
+### 2. Server Client (`src/lib/supabase/server.ts`)
+For Server Components, Server Actions, and Route Handlers, instantiated dynamically (per-request) and awaiting `cookies()`:
+```typescript
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { Database } from '@/types/database.types'
+
+export async function createSupabaseServerClient() {
+  const cookieStore = await cookies()
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // Safe to ignore if called from a Server Component where cookies cannot be mutated
+          }
+        },
+      },
+    }
+  )
+}
+```
+
+### 3. Static Client (`src/lib/supabase/static.ts`)
+For Static Site Generation (SSG), Partially Prerendered (PPR) components, or build-time data fetching where request-bound cookie headers are unavailable, configure with `persistSession: false`:
+```typescript
+import { createClient } from '@supabase/supabase-js'
+import { Database } from '@/types/database.types'
+
+export const supabaseStaticClient = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false
+    }
+  }
+)
+```
+
+### 4. RSC ORM Query Deduplication (React.cache)
+Since Server Components can be rendered multiple times in a render pass, wrap database/ORM retrieval functions with `React.cache()` to avoid duplicate database queries (waterfalls):
+```typescript
+import { cache } from 'react'
+
+export const getProductBySlug = cache(async (slug: string) => {
+  const supabase = supabaseStaticClient // or await createSupabaseServerClient()
+  const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single()
+  return data
+})
+```
+
+### 5. SaaS Cache Isolation (unstable_cache keys)
+When caching data fetching with `unstable_cache`, always include the `tenantId` and language code to prevent cross-tenant cache contamination:
+```typescript
+const getCachedData = (tenantId: string, lang: string) =>
+  unstable_cache(
+    async () => fetchTenantData(tenantId),
+    ['tenant-data-key', lang, tenantId],
+    { revalidate: 3600 }
+  )()
+```
+
+### 6. Import Hygiene & Wildcard Ban
+- **Banned**: Wildcard exports (`export *`) from service files (e.g. `src/lib/supabase.ts`) are banned. Wildcard exports create circular dependencies and bloated JS bundles.
+- **Allowed**: Always direct-import services or database types from their respective files (e.g., import `{ Category }` from `@/types/database.types` or direct from `@/lib/services/category`).
+
 ## Supabase CLI
 
 Always discover commands via `--help` — never guess. The CLI structure changes between versions.
