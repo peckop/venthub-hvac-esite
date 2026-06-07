@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-07T12:39:22.452624+00:00
+compiled_at: 2026-06-07T14:05:35.737722+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-07T12:39:22.452624+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -153,7 +153,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T12:39:22.452624+00:00 tarihind
 │   │   │           └── ✅ `route.ts`
 │   │   ├── 📂 **auth/**
 │   │   │   └── 📂 **signout/**
-│   │   │       └── ❌ `route.ts`
+│   │   │       └── ✅ `route.ts`
 │   │   ├── ✅ `layout.tsx`
 │   │   ├── ✅ `robots.ts`
 │   │   └── ✅ `sitemap.ts`
@@ -369,9 +369,9 @@ Bu belge, otonom derleyici tarafından 2026-06-07T12:39:22.452624+00:00 tarihind
 │   │   ├── ✅ `AuthContextDefinition.ts`
 │   │   ├── ✅ `CartContext.tsx`
 │   │   ├── ✅ `CartProvider.tsx`
-│   │   ├── ❌ `CategoryContext.tsx`
+│   │   ├── ✅ `CategoryContext.tsx`
 │   │   ├── ✅ `ProjectContext.tsx`
-│   │   └── ❌ `ProjectProvider.tsx`
+│   │   └── ✅ `ProjectProvider.tsx`
 │   ├── 📂 **data/**
 │   │   └── ❌ `brands.ts`
 │   ├── 📂 **design-system/**
@@ -426,7 +426,8 @@ Bu belge, otonom derleyici tarafından 2026-06-07T12:39:22.452624+00:00 tarihind
 │   │   │   ├── ✅ `invoice.service.ts`
 │   │   │   ├── ✅ `pricing.service.ts`
 │   │   │   ├── ✅ `product.service.ts`
-│   │   │   └── ✅ `project.service.ts`
+│   │   │   ├── ✅ `project.service.ts`
+│   │   │   └── ✅ `registry.ts`
 │   │   ├── 📂 **supabase/**
 │   │   │   ├── ✅ `client.ts`
 │   │   │   ├── ✅ `server.ts`
@@ -435,7 +436,9 @@ Bu belge, otonom derleyici tarafından 2026-06-07T12:39:22.452624+00:00 tarihind
 │   │   ├── ✅ `tenantResolver.ts`
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `utils.ts`
-│   ├── ✅ `middleware.ts`
+│   ├── ❌ `middleware.ts`
+│   ├── 📂 **providers/**
+│   │   └── ✅ `SupabaseProvider.tsx`
 │   ├── 📂 **test/**
 │   ├── 📂 **types/**
 │   │   ├── ✅ `admin-shared.ts`
@@ -464,6 +467,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T12:39:22.452624+00:00 tarihind
 │   │   ├── ✅ `passwordSecurity.ts`
 │   │   ├── ✅ `prefetch.ts`
 │   │   ├── ✅ `productHelpers.ts`
+│   │   ├── ✅ `router.ts`
 │   │   ├── ✅ `routes.ts`
 │   │   ├── ✅ `searchHighlight.tsx`
 │   │   ├── ✅ `tenantServer.ts`
@@ -615,7 +619,6 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\app\admin\coupons\page.md`
 - [❌] `src\app\admin\inventory\report\page.md`
 - [❌] `src\app\admin\webhook-events\page.md`
-- [❌] `src\app\auth\signout\route.md`
 - [❌] `src\components\AddToCartToast.md`
 - [❌] `src\components\PaymentWatcher.md`
 - [❌] `src\components\ScrollReveal.md`
@@ -629,14 +632,13 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\components\products\3d\factory\Assembler.md`
 - [❌] `src\components\products\SeriesCard.md`
 - [❌] `src\config\orbitalCarouselConfig.md`
-- [❌] `src\contexts\CategoryContext.md`
-- [❌] `src\contexts\ProjectProvider.md`
 - [❌] `src\data\brands.md`
 - [❌] `src\design-system\tokens.md`
 - [❌] `src\hooks\useSettings.md`
 - [❌] `src\i18n\I18nContext.md`
 - [❌] `src\lib\pdfAssets.md`
 - [❌] `src\lib\supabase\static.md`
+- [❌] `src\middleware.md`
 - [❌] `src\types\database.md`
 - [❌] `src\utils\analytics.md`
 - [❌] `src\utils\applicationUi.md`

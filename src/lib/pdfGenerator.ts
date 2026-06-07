@@ -20,9 +20,11 @@ export async function generateProductDatasheet(
     });
 
     // ----- FONT YÜKLEME -----
+    let hasLoadedFonts = false;
     try {
-        // Roboto fontunu CDN'den yükle (Türkçe karakter desteği için)
+        // Roboto fontunu lokal sunucudan yükle (Türkçe karakter desteği için)
         const fontResponse = await fetch(PDF_FONTS.Roboto.regular);
+        if (!fontResponse.ok) throw new Error(`Regular font load status: ${fontResponse.status}`);
         const fontBuffer = await fontResponse.arrayBuffer();
         const fontBase64 = arrayBufferToBase64(fontBuffer);
 
@@ -31,6 +33,7 @@ export async function generateProductDatasheet(
 
         // Bold versiyonu
         const fontBoldResponse = await fetch(PDF_FONTS.Roboto.bold);
+        if (!fontBoldResponse.ok) throw new Error(`Bold font load status: ${fontBoldResponse.status}`);
         const fontBoldBuffer = await fontBoldResponse.arrayBuffer();
         const fontBoldBase64 = arrayBufferToBase64(fontBoldBuffer);
 
@@ -38,8 +41,14 @@ export async function generateProductDatasheet(
         doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
 
         doc.setFont('Roboto');
+        hasLoadedFonts = true;
     } catch (error) {
-        console.error('Font loading failed, falling back to standard fonts:', error);
+        console.error('Font loading failed, falling back to standard fonts (Helvetica):', error);
+    }
+
+    const fontName = hasLoadedFonts ? 'Roboto' : 'helvetica';
+    if (!hasLoadedFonts) {
+        doc.setFont(fontName);
     }
 
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -62,7 +71,7 @@ export async function generateProductDatasheet(
         doc.roundedRect(margin, 10, 20, 20, 3, 3, 'F');
         // VH Metni
         doc.setTextColor(255, 255, 255);
-        doc.setFont('Roboto', 'bold');
+        doc.setFont(fontName, 'bold');
         doc.setFontSize(14);
         doc.text('VH', margin + 10, 23.5, { align: 'center' });
 
@@ -70,19 +79,19 @@ export async function generateProductDatasheet(
         doc.setFontSize(22);
         doc.text('VentHub', margin + 28, 24);
         // Alt başlık
-        doc.setFont('Roboto', 'normal');
+        doc.setFont(fontName, 'normal');
         doc.setFontSize(8);
         doc.setTextColor(200, 200, 200);
         doc.text('HVAC PREMIUM', margin + 28, 30);
 
         // Sağ Taraf Başlık
         doc.setTextColor(255, 255, 255);
-        doc.setFont('Roboto', 'bold');
+        doc.setFont(fontName, 'bold');
         doc.setFontSize(14);
         const title = lang === 'tr' ? 'TEKNİK ÜRÜN FÖYÜ' : 'TECHNICAL DATASHEET';
         doc.text(title, pageWidth - margin, 20, { align: 'right' });
 
-        doc.setFont('Roboto', 'normal');
+        doc.setFont(fontName, 'normal');
         doc.setFontSize(9);
         doc.text(`Ref: ${product.sku || product.id.substring(0, 8).toUpperCase()}`, pageWidth - margin, 26, { align: 'right' });
     };
@@ -102,10 +111,10 @@ export async function generateProductDatasheet(
 
         // URL'yi sağ tarafa (sayfa numarasının üstüne) veya ortaya çakışmayacak şekilde koyalım
         doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
-        doc.setFont('Roboto', 'bold');
+        doc.setFont(fontName, 'bold');
         doc.text(SITE_URL.replace(/^https?:\/\//, ''), pageWidth / 2, pageHeight - 12, { align: 'center' });
 
-        doc.setFont('Roboto', 'normal');
+        doc.setFont(fontName, 'normal');
         doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);
         const pageText = lang === 'tr' ? `Sayfa ${pageNum} / ${totalPages}` : `Page ${pageNum} / ${totalPages}`;
         doc.text(pageText, pageWidth - margin, pageHeight - 12, { align: 'right' });
@@ -118,14 +127,14 @@ export async function generateProductDatasheet(
 
     // Ürün İsmi
     doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
-    doc.setFont('Roboto', 'bold');
+    doc.setFont(fontName, 'bold');
     doc.setFontSize(20);
     const splitTitle = doc.splitTextToSize(product.name, pageWidth - (margin * 2));
     doc.text(splitTitle, margin, currentY);
     currentY += (splitTitle.length * 8) + 5;
 
     // Marka & Model
-    doc.setFont('Roboto', 'normal');
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(11);
     doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);
     const brandModelText = lang === 'tr'
@@ -140,12 +149,12 @@ export async function generateProductDatasheet(
 
     const renderDescriptionFallback = () => {
         if (!product.description) return;
-        doc.setFont('Roboto', 'bold');
+        doc.setFont(fontName, 'bold');
         doc.setFontSize(11);
         doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
         doc.text(lang === 'tr' ? 'Ürün Açıklaması' : 'Product Description', margin, currentY);
 
-        doc.setFont('Roboto', 'normal');
+        doc.setFont(fontName, 'normal');
         doc.setFontSize(10);
         doc.setTextColor(PDF_COLORS.text[0], PDF_COLORS.text[1], PDF_COLORS.text[2]);
         const splitDesc = doc.splitTextToSize(product.description, contentWidth);
@@ -161,12 +170,12 @@ export async function generateProductDatasheet(
 
                 // Yanına açıklama
                 if (product.description) {
-                    doc.setFont('Roboto', 'bold');
+                    doc.setFont(fontName, 'bold');
                     doc.setFontSize(11);
                     doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
                     doc.text(lang === 'tr' ? 'Ürün Açıklaması' : 'Product Description', margin + imageSize + 10, currentY + 5);
 
-                    doc.setFont('Roboto', 'normal');
+                    doc.setFont(fontName, 'normal');
                     doc.setFontSize(10);
                     doc.setTextColor(PDF_COLORS.text[0], PDF_COLORS.text[1], PDF_COLORS.text[2]);
                     const descText = product.description.replace(/(\r\n|\n|\r)/gm, " ");
@@ -198,10 +207,10 @@ export async function generateProductDatasheet(
         doc.setFillColor(PDF_COLORS.accent[0], PDF_COLORS.accent[1], PDF_COLORS.accent[2]);
         doc.rect(margin, currentY - 5, 2, 6, 'F');
 
-        doc.setFont('Roboto', 'bold');
+        doc.setFont(fontName, 'bold');
         doc.setFontSize(14);
         doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
-        doc.text(lang === 'tr' ? 'Teknik Özellikler' : 'Technical _specifications', margin + 4, currentY);
+        doc.text(lang === 'tr' ? 'Teknik Özellikler' : 'Technical Specifications', margin + 4, currentY);
         currentY += 8;
 
         const tableData: string[][] = [];
@@ -219,7 +228,7 @@ export async function generateProductDatasheet(
             headStyles: {
                 fillColor: [248, 250, 252], // bg-slate-50
                 textColor: [27, 43, 75],
-                font: 'Roboto',
+                font: fontName,
                 fontStyle: 'bold',
                 fontSize: 10,
                 cellPadding: { top: 6, right: 6, bottom: 6, left: 6 }, // Premium padding
@@ -227,7 +236,7 @@ export async function generateProductDatasheet(
                 lineWidth: 0.1
             },
             bodyStyles: {
-                font: 'Roboto',
+                font: fontName,
                 fontSize: 9,
                 textColor: [55, 65, 81],
                 cellPadding: { top: 5, right: 6, bottom: 5, left: 6 },

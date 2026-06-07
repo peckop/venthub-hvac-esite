@@ -2,160 +2,14 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-07T12:39:23.008103+00:00
-total_compiled_files: 381
+compiled_at: 2026-06-07T14:05:35.881731+00:00
+total_compiled_files: 386
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-07T12:39:23.008103+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.881731+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
-
----
-# FILE: src\middleware.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\middleware.ts
-skeleton_hash: 17d96593b201eac7
-entity_hashes:
-  func:detectLocale: 25418ec7d07f6d80
-  func:middleware: 869802a18899b914
-  overview: 64f7e17620830c7c
-generated_at: 2026-06-07T11:02:59Z
----
-
-## Genel Bakış
-Bu modül, VentHub HVAC projesinin Next.js ara katmanıdır ve tüm HTTP isteklerini rota öncesinde yakalayarak merkezi bir işlerlik sağlar. Dil tespiti, JWT tabanlı kimlik doğrulama ve erişim kontrolü gibi ön işlemleri koordineli bir şekilde yöneterek proje genelinde tutarlı ve güvenli bir kullanıcı deneyimi sunar.
-
-## Fonksiyon Grupları
-
-### Dil/Locale Tespiti
-Gelen isteklerin başlıkları ve çerezleri analiz edilerek kullanıcının tercih ettiği dil ve bölgesel ayarlar otomatik olarak belirlenir.
-- detectLocale
-
-### Güvenlik ve Kimlik Doğrulama
-JWT tabanlı token çözümleme ve kimlik doğrulama gibi güvenlik önlemlerini uygulayan yardımcı işlevleri barındırır.
-- decodeJwt
-
-### Merkezi Koordinasyon
-Tüm gelen istekleri yakalayan ana işleyici; dil tespiti, kimlik doğrulama ve yetkilendirme gibi süreçleri sırayla ve koordineli olarak yürütür.
-- middleware
-
----
-
-## AXIOMS – Mimari Varsayımlar
-
-Bu modül, HTTP isteklerini işleyen bir Next.js ara katmanıdır ve locale tespiti ile erişim kontrolü sağlar.
-
-[Aksiyom 1]: Eğer `detectLocale` fonksiyonuna geçerli bir `NextRequest` nesnesi sağlanmazsa, locale tespiti başarısız olur ve varsayılan bir locale kullanılmalıdır.
-
-[Aksiyom 2]: Eğer tespit edilen locale değeri `LOCALES` kümesinde yer almazsa, istemci için geçersiz bir dil tercihi işlenir ve uygulama tanımlı bir fallback locale'a dönmelidir.
-
-[Aksiyom 3]: Eğer `middleware` fonksiyonuna geçerli bir `NextRequest` nesnesi sağlanmazsa, middleware zinciri kırılır ve istek işlenmeden reddedilir.
-
-[Aksiyom 4]: Eğer istekteki kullanıcının rolü `ADMIN_ROLES` kümesinde tanımlırollerden biri değilse, admin-only rotalara erişim engellenir.
-
-[Aksiyom 5]: Eğer rotada parametre olarak beklenen değer `UUID_REGEX` kalıbına uymazsa, UUID tabanlı rota eşleştirmesi başarısız olur.
-
-[Aksiyom 6]: Eğer `config` nesnesi tanımlı değilse veya geçerli bir Next.js middleware config yapısına sahip değilse, middleware başarıyla register edilmez ve hiçbir istek işlenmez.
-
----
-
-## FONKSİYON DETAYLARI
-
-### detectLocale
-
-**Ne yapar**: Kullanıcının tercih ettiği dilini (Türkçe veya İngilizce) belirler. Öncelikle cookie değerine, ardından tarayıcı dil tercihine bakarak uygun locale kodunu döndürür.
-
-**Nasıl yapar**: Fonksiyon öncelikle `NEXT_LOCALE` adlı cookie'yi kontrol eder; eğer değeri geçerli bir dil koduysa (`tr` veya `en`) doğrudan bunu kullanır. Cookie'de geçerli bir dil yoksa, isteğin `accept-language` başlığını analiz eder ve İngilizce içeriyorsa `'en'` döndürür. Hiçbir koşul sağlanmazsa varsayılan olarak `'tr'` (Türkçe) değerini döndürür.
-
-**Parametreler**:
-- `request`: `NextRequest` — HTTP isteği nesnesi. Cookie değerlerine ve HTTP başlıklarına erişmek için kullanılır.
-
-**Dönüş**: `string` — Belirlenen dil kodu (`'tr'` veya `'en'`).
-
-### middleware
-
-**Ne yapar**: Next.js uygulamasının tüm isteklerini yakalayan merkezi middleware fonksiyonudur. Tenant (kiracı) tespiti, dil tabanlı URL yönlendirmeleri, UUID'den slug'a SEO uyumlu yönlendirmeler ve admin paneli için RBAC (Rol Tabanlı Erişim Kontrolü) koruması gibi çok katmanlı bir istek filtreleme ve yönlendirme mekanizmasını yönetir.
-
-**Nasıl yapar**: Fonksiyonun çalışma mantığı sırasıyla şu adımlardan oluşur: Önce `host` başlığından tenant kimliği çözümlenir ve `x-tenant-id` istek başlığına eklenir. Ardından URL'nin ilk segmenti incelenerek dil (locale) kontrolü yapılır — eğer ilk segment desteklenen dillerden biriyse dil alt dizin olarak kabul edilir ve admin rotası haricinde normal akışa devam edilir; değilse ve rota özel bir rota (admin, API, auth callback, sitemap, robots.txt) değilse, tespit edilen dile göre 307 yönlendirmesi gönderilir. Son olarak, dil segmenti çıkarılmış `effectiveSegments` kullanılarak iki ana dal ele alınır: (1) Ürün UUID'den slug'a 308 yönlendirmesi için Supabase'den sorgulama yapılır, (2) Admin rotaları için JWT claims üzerinden rol doğrulaması gerçekleştirilir ve yetkisiz kullanıcılar oturum sayfasına yönlendirilir. Tüm süreç boyunca `setTenantCookie` ve `redirectResponse` yardımcı fonksiyonları kullanılarak yanıt nesneleri tutarlı şekilde oluşturulur.
-
-**Parametreler**:
-- `request`: `NextRequest` — Next.js tarafından middleware'e iletilen HTTP istek nesnesi. İstek başlıkları, URL'si, çerezleri ve diğer meta bilgileri içerir. Fonksiyon bu nesne üzerinden okuma yapar ve yanıt oluştururken header'ları korur.
-
-**Dönüş**: `NextResponse` — Fonksiyon her durumda bir `NextResponse` nesnesi döndürür. Bu yanıt bir yönlendirme (redirect, 302/307/308), normal devam yanıtı (`NextResponse.next()`) veya tenant cookie'si set edilmiş bir yanıt olabilir. Yanıtın `cookies` ve `headers` alanları, istek zincirinin sürekliliğini sağlamak üzere kopyalanır.
-
----
-
-## SABİTLER
-- **config** (object) — `{
-
-  matcher: [
-
-    // Statik varlıklar dışındaki tüm istekleri dinle
-
-    '...`
-- **UUID_REGEX** (regex) — `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`
-- **ADMIN_ROLES** (new_expression) — `new Set(['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'])`
-- **LOCALES** (as_expression) — `['tr', 'en'] as const`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/middleware.ts::detectLocale
-- **params**: (request: NextRequest)
-- **ic_degiskenler**: 
-  - `cookieLocale` — request'ten alınan 'NEXT_LOCALE' çerez değeri, dil tercihini belirler
-  - `acceptLang` — request'ten alınan 'accept-language' başlık değeri, tarayıcı dil tercihini belirler
-- **Dönüş**: string (Algılanan dil kodu: 'tr' veya 'en')
-
-### [N2_NASIL] AST Pointer: src/middleware.ts::middleware
-- **params**: (request: NextRequest)
-- **ic_degiskenler**:
-  - `host` — request'ten alınan 'host' başlık değeri, tenant çözümleme için kullanılır
-  - `tenantId` — resolveTenant(host) çağrısından elde edilen kiracı ID'si
-  - `setTenantCookie` — Inner function: NextResponse'a 'tenant_id' çerezini ayarlar
-  - `redirectResponse` — Inner function: URL'e yönlendirme yanıtı oluşturur, tenant çerezini ve mevcut çerezleri/ başlıkları kopyalar
-  - `pathname` — request.nextUrl.pathname, istek yol adı
-  - `segments` — pathname'i '/' ile bölüp boş olanları filtreleyerek elde edilen yol segmentleri dizisi
-  - `firstSegment` — segments[0], ilk yol segmenti
-  - `response` — NextResponse.next() ile oluşturulan başlangıç yanıtı
-  - `locale` — Başlangıçta DEFAULT_LOCALE, sonradan algılanan dil ile güncellenen dil kodu
-  - `effectiveSegments` — Dil segmenti varsa onu çıkarılmış yol segmentleri dizisi
-  - `isLocaleInPath` — firstSegment'in LOCALES dizisinde olup olmadığını kontrol eden boolean
-  - `isAuthApi` — auth API rotası olup olmadığını kontrol eden boolean (auth/callback veya auth/signout)
-  - `isSpecialRoute` — Admin, API, auth API veya sitemap/robots rotası olup olmadığını kontrol eden boolean
-  - `detectedLocale` — detectLocale(request) çağrısı ile belirlenen dil (sadece locale redirect durumunda)
-  - `identifier` — effectiveSegments[1], products rotasında UUID/_slug tanımlayıcısı
-  - `supabase` (products bloğu) — createServerClient ile oluşturulan Supabase istemcisi (products UUID araması için)
-  - `data` (products bloğu) — supabase.from('products').select('slug').eq('id', identifier).single() sorgusunun sonucu
-  - `isDev` — process.env.NODE_ENV === 'development' kontrolü ile belirlenen development ortamı boolean'ı
-  - `isLocalhost` — host'un localhost veya 127.0.0.1 ile başlayıp başlamadığını kontrol eden boolean
-  - `supabase` (admin bloğu) — createServerClient ile oluşturulan Supabase istemcisi (admin RBAC için)
-  - `data` (admin bloğu) — supabase.auth.getClaims() çağrısının sonucu
-  - `error` — supabase.auth.getClaims() çağrısında oluşabilecek hata nesnesi
-  - `claims` — data?.claims, JWT claim verileri
-  - `jwtRole` — claims?.user_role, JWT'den alınan kullanıcı rolü
-- **Dönüş**: yok (void) — Fonksiyon yan etki olarak NextResponse döndürür veya yönlendirme yapar
-
----
-
-## NODE ID STANDARD
-
-  file: src\middleware.ts
-  function: src\middleware.ts::detectLocale
-  function: src\middleware.ts::middleware
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: config
-  export: detectLocale
-  export: middleware
 
 ---
 # FILE: src\actions\auth.md
@@ -2064,6 +1918,81 @@ Bu modül, Supabase webhook olaylarını HMAC ile doğrulayıp önbellek yenilem
 
   file: src\app\api\webhook\supabase\route.ts
   function: src\app\api\webhook\supabase\route.ts::POST
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: POST
+
+---
+# FILE: src\app\auth\signout\route.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\auth\signout\route.ts
+skeleton_hash: b9c1accaa1c17d8a
+entity_hashes:
+  func:POST: c85301a22b3fe20e
+  overview: fa888e32d3000f25
+generated_at: 2026-06-07T13:56:49Z
+---
+
+## Genel Bakış
+Bu modül, kullanıcı oturumunu sonlandırmak için bir API endpoint'i içerir. Next.js App Router yapısında POST isteklerini işleyerek, Supabase kimlik doğrulama oturumunu sonlandırır, uygulama önbelleğini temizler ve kullanıcıyı dil ayarına göre giriş sayfasına yönlendirir.
+
+## Fonksiyon Grupları
+### Oturum Kapatma
+Kullanıcı oturumunu sonlandırma ve çıkış işlemini yönetir.
+- POST
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül, kullanıcı oturumunu sonlandıran bir API endpoint'idir.
+
+[Aksiyom 1]: Eğer POST metoduyla bir istek gelmezse, bu fonksiyon çağrılmaz.
+[Aksiyom 2]: Eğer geçerli bir `Request` nesnesi (request parametresi) sağlanmazsa, fonksiyon çalıştırılamaz.
+[Aksiyom 3]: Eğer oturum sonlandırma işlemi (örn. Supabase oturumu) başarısız olursa, beklenmeyen bir hata oluşur veya kullanıcı oturum açık kalır.
+[Aksiyom 4]: Eğer yönlendirme (redirect) işlemi başarısız olursa, istemci düzgün bir yanıt almaz.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### POST
+
+**Ne yapar**: Kullanıcının oturumunu sonlandırır (sign-out) ve login sayfasına yönlendirme yapar. Bu fonksiyon, bir HTTP POST isteği geldiğinde tetiklenen bir Next.js App Router rotasıdır.
+
+**Nasıl yapar**: Önce Supabase sunucu istemcisi oluşturarak kullanıcının mevcut oturum claims'lerini kontrol eder. Eğer geçerli claims'ler varsa `signOut()` metodunu çağırarak oturumu sonlandırır. Ardından tüm sayfa önbelleğini temizlemek için `revalidatePath` ile layout seviyesinde revalidation yapar. Kullanıcının tercih ettiği dil bilgisini (`NEXT_LOCALE` cookie'sinden) okur ve bu dile göre login sayfasına 302 yönlendirmesi oluşturur. Son olarak claims cache cookie'sini temizleyerek önbellekteki yetkilendirme verilerinin kalıcı olarak silinmesini sağlar.
+
+**Parametreler**:
+- `request`: Request — Next.js tarafından sağlanan HTTP istek nesnesi, isteğin URL bilgisini ve diğer header verilerini içerir
+
+**Dönüş**: `NextResponse` — Kullanıcıyı `/{lang}/auth/login` adresine yönlendiren 302 HTTP yanıt döner. Yanıt aynı zamanda claims cache cookie'sini temizleme işlemini de içerir.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/auth/signout/route.ts::POST
+- **params**: `(request: Request)`
+- **ic_degiskenler**:
+  - `supabase` — `createSupabaseServerClient()` ile oluşturulan Supabase istemcisi; auth işlemleri (getClaims, signOut) için kullanılır
+  - `data` — `supabase.auth.getClaims()` çağrısından dönen `{ data }` destructuring ile elde edilen claims nesnesi; mevcut claim'lerin olup olmadığını kontrol eder
+  - `requestUrl` — `request.url` string'inden `new URL()` ile oluşturulan URL nesnesi; redirect için `origin` bilgisini sağlamak üzere kullanılır
+  - `cookieStore` — `cookies()` ile elde edilen cookie deposu; tarayıcıdaki `NEXT_LOCALE` cookie'sine erişim sağlar
+  - `lang` — `cookieStore.get('NEXT_LOCALE')?.value || 'tr'` ifadesinden elde edilen dil kodu; login yönlendirme URL'inde path olarak kullanılır (`/${lang}/auth/login`); cookie yoksa `'tr'` varsayılır
+  - `response` — `NextResponse.redirect()` ile oluşturulan 302 redirect yanıtı; login sayfasına yönlendirme yapar ve `clearClaimsCacheCookie` ile temizlenip döndürülür
+- **Dönüş**: `NextResponse` — login sayfasına (`/${lang}/auth/login`) 302 redirect yanıtı döndürür; yan etkileri: supabase auth signOut çağırır, revalidatePath ile layout cache'ini temizler, claims cache cookie'sini siler
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\auth\signout\route.ts
+  function: src\app\auth\signout\route.ts::POST
 
 ---
 
@@ -19146,61 +19075,50 @@ entity_hashes:
   func:ClientLayout: 6950fd4597251d25
   func:ClientLayoutInner: 51b8420900083527
   func:NavigationTracker: 42dc03a7f1389152
-  func:Providers: 17b4bbfa6b876fcf
-  overview: 46b38c1acbe0e751
+  func:Providers: 3400c1a5354d979d
+  overview: 1cb24898c372f6f1
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-29T11:37:04Z
+generated_at: 2026-06-07T13:57:19Z
 ---
 
 ## Genel Bakış
-Bu modül, istemci tarafı uygulamanın temel yapı taşlarını bir araya getiren layout bileşenlerini tanımlar. Uygulama genelindeki bağlam sağlayıcılarını yapılandırır, gezinti olaylarını izler ve sayfa düzeninin katmanlı yapısını oluşturur.
+Bu modül, istemci tarafı uygulamanın temel yerleşim ve altyapı katmanlarını tanımlar. Uygulama genelindeki tüm çocukların erişeceği bağlam sağlayıcılarını yapılandırır, gezinti olaylarını merkezi olarak izler ve sayfa düzeninin dış- iç katmanlarını oluşturur.
 
 ## Fonksiyon Grupları
-### Bağlam Sağlayıcıları
+### Bağlam ve Yapılandırma
 Uygulama genelinde kullanılacak olan durum yönetimi ve servis sağlayıcılarını sıralı bir yapıda çocukların üzerine sararak, tüm alt bileşenlerin bu verilere erişmesini sağlar.
 - Providers
 
 ### Gezinti İzleme
-URL değişimlerini ve sayfa geçişlerini izleyen bileşendir; böylece uygulama içindeki gezinti olayları takip edilebilir hale gelir.
+URL değişimlerini ve sayfa geçişlerini izleyen bağımsız bir bileşendir; böylece uygulama içindeki gezinti olayları takip edilebilir ve tetiklenebilir hale gelir.
 - NavigationTracker
 
-### Düzen Bileşenleri
-Sayfa yapısının dış ve iç katmanlarını oluşturur; dış bileşen genel çerçeveyi tanımlarken, iç bileşen içerik alanının yerleşimini ve stillendirilmesini yönetir.
+### Düzen Katmanları
+Sayfa yapısının dış ve iç katmanlarını oluşturur. Dış katman (ClientLayout) genel sayfa çerçevesini ve sağlayıcıları sararken, iç katman (ClientLayoutInner) içerik alanının yerleşimini, düzenini ve alt bileşenlerin (örn. gezinti izleyici) konumunu yönetir.
 - ClientLayout, ClientLayoutInner
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdeleri paylaşılmadığından, yalnızca fonksiyon imzalarından çıkarılabilecek minimal varsayımlar tanımlanmıştır.
+Bu modül, istemci tarafı uygulamanın temel yapı taşlarını bir araya getiren layout bileşenlerinden oluşur. Aşağıdaki mimari varsayımlar, bu bileşenlerin doğru çalışması için zorunlu kabul edilir.
 
-[Aksiyom 1]: Eğer `Providers` bileşeni çağrıldığında `children` prop'u sağlanmazsa, sağlayıcılar içinde render edilecek hiçbir içerik olmayacağından uygulama içeriği görünmez hale gelir.
-
-[Aksiyom 2]: Eğer `NavigationTracker` bileşeni `usePathname` veya benzeri bir Next.js navigasyon hook'u kullanıyorsa ve bu hook providers zincirinin dışında çağrılırsa, bileşen doğru gezinti bilgisini alamaz ve navigasyon izleme çalışmaz.
-
-[Aksiyom 3]: Eğer `ClientLayoutInner` bileşeni çağrıldığında `children` prop'u sağlanmazsa, layout içinde sayfa içeriği render edilmez ve boş bir sayfa görüntülenir.
-
-[Aksiyom 4]: Eğer `ClientLayout` bileşeni çağrıldığında `children` prop'u sağlanmazsa, tüm layout yapısı (sağlayıcılar, gezinti izleyici, düzen) boş içeriğe sahip olur.
-
-[Aksiyom 5]: Eğer `Providers` bileşeni, iç içe geçmiş birden fazla context sağlayıcısı kullanıyorsa ve sağlayıcı sırası yanlışatersa, bağımlı sağlayıcılar doğru bağlam değerlerini bulamaz ve hata oluşur.
-
----
-
-**Not:** Bu modül için detaylı mimari varsayımların üretilebilmesi için fonksiyon gövdelerinin (function bodies) paylaşılması gerekmektedir. Mevcut aksiyonlar yalnızca fonksiyon imza imzalarından ve React bileşen kalıplarından (patterns) türetilmiştir.
+**[Aksiyom 1]: Eğer `Providers` bileşeni, uygulamanın üst seviye bileşenlerini sarmıyorsa (veya gerekli bağlam sağlayıcıları içermiyorsa), alt bileşenler
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Providers
-**Ne yapar**: Uygulama genelinde kullanılacak olan bağlam (context) sağlayıcılarını çocuk bileşenlerin üzerine katmanlar halinde sararak, tüm alt bileşenlerin bu bağlam verilerine erişmesini sağlar.
 
-**Nasıl yapar**: Beş farklı sağlayıcıyı iç içe bir yapıda sıralar: I18nProvider → AuthProvider → CategoryProvider → CartProvider → ProjectProvider. Sıralama önemlidir çünkü dış katmandaki sağlayıcılar, iç katmanlardaki sağlayıcıların verilerine erişebilir. `{children}` en iç katmanda yer alarak tüm bağlam verilerini miras alır.
+**Ne yapar**: Uygulamanın tüm context provider'larını bir araya getirerekchildren bileşenini saran üst seviye bir sarıcı (wrapper) bileşendir. Bu yapı sayesinde uygulama genelinde Supabase bağlantısı, dil desteği, kimlik doğrulama, kategori verileri, sepet ve proje verileri gibi servisler tek bir noktadan yönetilir.
+
+**Nasıl yapar**: Provider'ları iç içe nesting (yapısal katmanlama) yaparakhiyerarşik bir sarmalama oluşturur. En dış katman `SupabaseProvider` ile başlar ve sırasıyla `I18nProvider`, `AuthProvider`, `CategoryProvider`, `CartProvider` ile devam eder. En iç katman olan `ProjectProvider` içerisine `children` yerleştirilerek tüm provider'ların kapsam alanı tanımlanmış olur. Bu yapı, React Context'in doğası gereği iç katmanların dış katmanlara erişebilmesini sağlar.
 
 **Parametreler**:
-- `children`: `React.ReactNode` — Bu sağlayıcıların sarmalayacağı tüm alt bileşenlerin düğüm yapısıdır. Tüm uygulama içeriği bu parameter aracılığıyla sağlayıcılara dahil edilir.
+- `children`: React.ReactNode — Sarılacak alt bileşenlerdir. Tüm provider'ların kapsam alanı içinde yer alacak React elementlerini veya bileşenlerini temsil eder. Genellikle uygulamanın ana bileşen ağacı veya sayfa içerikleri buraya yerleştirilir.
 
-**Dönüş**: JSX yapısı döndürür. Doğrudan `{children}` düğümünü, sağlanan bağlam katmanlarının içine yerleştirilmiş biçimde render eder.
+**Dönüş**: JSX Element — Tüm provider'lar ile sarılmış `children` bileşenini döndürür. Return tipi doğrudan React fonksiyonel bileşen dönüşümü olup, `React.ReactElement` veya JSX.Element formatındadır.
 
 ### NavigationTracker
 **Ne yapar**: `useSearchParams` hook'u üzerinden geçerli URL arama parametrelerini izleyerek navigasyon değişikliklerini takip eder.  
@@ -19230,42 +19148,39 @@ Bu modül için fonksiyon gövdeleri paylaşılmadığından, yalnızca fonksiyo
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::Providers
-- **params**: `{ children }: { children: React.ReactNode }` — React alt elemanları
-- **ic_degiskenler**: (yok — sadece JSX döner)
-- **Dönüş**: JSX — I18nProvider > AuthProvider > CategoryProvider > CartProvider > ProjectProvider ile sarmalanmış children
-
----
-
-### [N2_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::NavigationTracker
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: ClientLayout.tsx::Providers
+- **params**: `{ children }: { children: React.ReactNode }`
 - **ic_degiskenler**:
-  - `pathname` — `usePathname()` hook'undan gelen mevcut URL yolu, navigasyon stack mantığında birincil belirleyici
-  - `searchParams` — `useSearchParams()` hook'undan gelen URL arama parametreleri, currentFullPath oluşturmada kullanılır
-  - `handlePopState` — popstate eventi tetiklendiğinde `sessionStorage`'a `'vh_is_pop'` flag'ini `'true'` olarak yazan callback, geri butonu tespiti için
-  - `handleInteraction` — mousedown ve keydown eventlerinde `sessionStorage`'a `'vh_is_pop'` flag'ini `'false'` olarak yazan callback, kullanıcı etkileşimi ile geri tuşu ayrımı için
-  - `updateStack` — navigasyon geçmişini `sessionStorage` anahtarı `'vh_nav_stack'` altında JSON array olarak yöneten ana mantık fonksiyonu
-  - `search` — `searchParams?.toString() || ''` ile elde edilen query string, currentFullPath birleştirmesinde kullanılır
-  - `hash` — `window.location.hash || ''` ile elde edilen URL fragment, currentFullPath birleştirmesinde kullanılır
-  - `currentFullPath` — pathname + search + hash birleşiminden oluşan tam URL yolu, stack karşılaştırmalarında kullanılır
-  - `stack` — `JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]')` ile okunan navigasyon geçmişi dizisi, maksimum 10 eleman tutulur
-  - `lastItem` — `stack[stack.length - 1]` ile alınan son navigasyon girişi, mevcut sayfa ile aynıysa stack değiştirilmez
-  - `secondLastItem` — `stack[stack.length - 2]` ile alınan sondan bir önceki navigasyon girişi, geri gidilen sayfa tespiti için kullanılır
-- **Dönüş**: `null` — bileşen JSX üretmez, yan etkisi olarak sessionStorage'da navigasyon geçmişini tutar
+  - `children` — Alt bileşenler, provider sarmalama zincirinin en içine yerleştirilen React düğümleri
+- **Dönüş**: JSX (SupabaseProvider > I18nProvider > AuthProvider > CategoryProvider > CartProvider > ProjectProvider > children sarmalama yapısı)
 
----
+### [N2_NASIL] AST Pointer: ClientLayout.tsx::NavigationTracker
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `pathname` — `usePathname()` hook'undan gelen mevcut URL path'i, navigasyon yığını güncellemelerinde hangi sayfada olunduğunu belirler
+  - `searchParams` — `useSearchParams()` hook'undan gelen URL arama parametreleri, tam yol hesaplamasında query string kısmını oluşturur
+  - `handlePopState` — Arrow fonksiyon; tarayıcı geri/ileri butonu ile navigasyonda `sessionStorage`'a `vh_is_pop` = `'true'` yazan event handler
+  - `handleInteraction` — Arrow fonksiyon; fare tıklaması veya tuş basımı ile `sessionStorage`'a `vh_is_pop` = `'false'` yazan event handler (capture modunda)
+  - `updateStack` — Arrow fonksiyon; mevcut path, search params ve hash'i birleştirerek `vh_nav_stack` session storage anahtarında navigasyon geçmişini yığın olarak yönetir
+  - `search` — `searchParams?.toString()` sonucu, URL query string'i (`?key=value` formatında); yol birleştirme için kullanılır
+  - `hash` — `window.location.hash`, URL fragment identifier'ı; tam yol hesaplamasında eklenir
+  - `currentFullPath` — `pathname`, `search` ve `hash` birleştirilerek oluşturulan tam URL yolu; navigasyon yığınındaki eşleşmeleri kontrol eder
+  - `stack` — `string[]` tipinde dizi; `sessionStorage`'dan okunan veya boş dizi ile başlatılan navigasyon geçmiş yığını, `currentFullPath` eklenip/çıkartılarak güncellenir
+  - `lastItem` — `stack[stack.length - 1]`, navigasyon yığınının en üstündeki (son eklenen) yol; mevcut yol ile karşılaştırma için kullanılır
+  - `secondLastItem` — `stack[stack.length - 2]`, navigasyon yığınının sondan bir önceki yolu; geri navigasyon algılama için kullanılır
+- **Dönüş**: `null` (JSX render etmez, sadece yan etki olarak sessionStorage ve event listener yönetimi yapar)
 
-### [N3_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::ClientLayoutInner
-- **params**: `{ children }: { children: React.ReactNode }` — React alt elemanları
-- **ic_degiskenler**: (yok — sadece JSX döner)
-- **Dönüş**: JSX — MainLayout içine children, CookieConsent ve Suspense ile sarılmış NavigationTracker döner
+### [N3_NASIL] AST Pointer: ClientLayout.tsx::ClientLayoutInner
+- **params**: `{ children }: { children: React.ReactNode }`
+- **ic_degiskenler**:
+  - `children` — Alt bileşenler, `MainLayout` içine yerleştirilen React düğümleri
+- **Dönüş**: JSX (MainLayout sarmalaması içinde children, CookieConsent ve Suspense ile sarılmış NavigationTracker)
 
----
-
-### [N4_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::ClientLayout
-- **params**: `{ children }: { children: React.ReactNode }` — React alt elemanları
-- **ic_degiskenler**: (yok — sadece JSX döner)
-- **Dönüş**: JSX — ClientLayoutInner içine children sarmalanarak döner
+### [N4_NASIL] AST Pointer: ClientLayout.tsx::ClientLayout
+- **params**: `{ children }: { children: React.ReactNode }`
+- **ic_degiskenler**:
+  - `children` — Alt bileşenler, `ClientLayoutInner` içine aktarılan React düğümleri
+- **Dönüş**: JSX (ClientLayoutInner sarmalaması içinde children)
 
 ---
 
@@ -28762,46 +28677,49 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CartProvider.tsx
-skeleton_hash: 6f3bf147d7c80aab
+skeleton_hash: 99a1da87ec776a41
 entity_hashes:
-  func:CartProvider: e83c9bf7bdf3fefe
-  overview: c67d6fc9d2212091
+  func:CartProvider: 2c15a5ccde773496
+  overview: a21c79a8976fc711
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-07T12:03:55Z
+generated_at: 2026-06-07T13:58:20Z
 ---
 
 ## Genel Bakış
-Bu modül, alışveriş sepeti yönetimini merkezi olarak sağlamak için oluşturulmuş bir React Context sağlayıcı bileşenidir. Uygulama içindeki tüm alt bileşenlerin sepet durumuna ve ilgili işlemlere erişmesini mümkün kılar.
+Bu modül, alışveriş sepeti durumını ve ilgili işlemleri uygulama genelinde yönetmek için merkezi bir React Context sağlayıcısıdır. Tüm alt bileşenlerin sepet verilerine ve bunlarla ilişkili fonksiyonlara erişmesini mümkün kılar.
 
 ## Fonksiyon Grupları
 ### Ana Context Sağlayıcı Bileşeni
-Modülün temel ve tek bileşenidir; sepet verilerini ve bu verilerle ilgili tüm işlevselliği uygulama genelinde paylaşmak üzere context'ini oluşturur.
+Modülün temel ve tek bileşenidir; sepet verilerini, işlevselliklerini ve durum yönetimi mantığını uygulama ağacının alt kısımlarına sağlamak üzere createContext ile context oluşturur.
 - CartProvider
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, React Context Provider pattern'ini uygulayan bir bileşendir; children prop'u zorunludur ve React component lifecycle kurallarına tabidir.
+Bu modül, alışveriş sepeti durumunu uygulama genelinde paylaşan bir React Context Provider bileşenidir.
 
-[Aksiyom 1]: Eğer `children` prop'u verilmezse, bileşen hata verir veya boş render üretir.
+[Aksiyom 1]: Eğer `children` prop'u sağlanmazsa veya `undefined` olursa, provider hiçbir alt bileşini sarmayacak ve context'e erişim sağlanamayacaktır.
 
-[Aksiyom 2]: Eğer `CartProvider` alt ağaçta bir消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费消费
+[Aksiyom 2]: Eğer `CART_SERVER_SYNC` sabit değeri `true` ise, sepet verileri sunucu ile senkronize edilmelidir; sunucu bağlantısı kopuk veya API endpoint'i erişilemez durumdaysa, senkronizasyon başarısız olur ve yerel sepet durumuyla devam edilir.
+
+[Aksiyom 3]: Eğer `CART_SERVER_SYNC` sabit değeri `false` ise, sunucu senkronizasyonu gerçekleştirilmez; sepet verileri yalnızca istemci tarafında (client-side) tutulur.
+
+[Aksiyom 4]: Eğer React component tree içinde bu provider üst seviyede konumlandırılmazsa, alt bileşenlerin `useCart` veya benzeri hook'lar aracılığıyla sepet context'ine erişimi başarısız olur.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CartProvider
+**Ne yapar**: Sepet durumunu (state) ve ilgili tüm işlemleri (ekleme, çıkarma, miktar güncelleme, temizleme) yöneten React Context Provider bileşenidir. Kullanıcının oturum durumuna göre yerel depolama (localStorage) ve sunucu tabanlı veritabanı ile senkronizasyon sağlar.
 
-**Ne yapar**: Uygulama genelinde alışveriş sepeti durumunu (state) yöneten React context provider bileşenidir. Sepet verilerini yerel depolama (localStorage) ile sunucu tarafı veritabanı (Supabase) arasında senkronize eder, misafir kullanıcılar ile giriş yapmış kullanıcıların sepetlerini birleştirir ve sepetle ilgili tüm işlemleri (ekleme, çıkarma, miktar güncelleme, temizleme) merkezi olarak sunar.
-
-**Nasıl yapar**: Bileşen başlangıçta localStorage'dan sepet verilerini yükler, Versiyon bazlı şema migration ve son sipariş durumu kontrolü yaparak tutarsız verileri temizler. Kullanıcı oturum durumuna göre (`user` değişkeni) sunucu ile senkronizasyon başlatır, misafir sepeti ile sunucu sepetini `mergeItems` ile birleştirir. Cross-tab senkronizasyon için `StorageEvent` dinleyicisi kurar ve sepet verileri her değiştiğinde yerel depolamayı günceller. Sağladığı `value` nesnesi üzerinden tüm alt bileşenlere sepet state'i ve işlem fonksiyonlarını iletir.
+**Nasıl yapar**: Bileşen, çeşitli `useState` ve `useEffect` hook'ları kullanarak sepet verisini tutar. Başlangıçta `localStorage`'dan sepeti yükler. Kullanıcı giriş yaptığında veya çıkış yaptığında sunucu ile senkronizasyon (merge) işlemini tetikler. `useCallback` ile sarılmış fonksiyonları (addToCart vb.) ve `useMemo` ile hesaplanmış değerleri (toplam tutar, adet) alt bileşenlere sağlar. Sepet verisindeki her değişiklikte hem yerel depoyu hem de (kullanıcı giriş yapmışsa) sunucudaki ilgili kaydı günceller.
 
 **Parametreler**:
-- `children`: `ReactNode` — Provider tarafından sarılacak alt bileşenler, sepet context'ine erişebilen tüm UI ağacı
+- children: ReactNode — Provider tarafından sarılacak olan alt bileşenler.
 
-**Dönüş**: `JSX.Element` — `CartContext.Provider` ile sarılmış `children` bileşenlerini döndürür
+**Dönüş**: CartContext.Provider bileşeni, `children`'ı sararak ve `value` prop'u ile sepet değerlerini ve fonksiyonlarını sağlayarak döner.
 
 ---
 
@@ -28812,120 +28730,285 @@ Bu modül, React Context Provider pattern'ini uygulayan bir bileşendir; childre
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/contexts/CartProvider.tsx::useEffect_load_cart
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `schema` — localStorage'daki CART_SCHEMA_KEY değerini tutar, mevcut şema ile karşılaştırma yapar
-  - `lastStatus` — son sipariş durumunu tutar (vh_last_order_status), 'success' ise sepeti temizler
-  - `savedCart` — localStorage'dan okunan kayıtlı sepet verisi (JSON string)
-  - `savedVer` — localStorage'dan okunan yerel versiyon numarası (string)
-  - `v` — savedVer'in parseInt ile sayısal karşılığı, geçerliyse localVersionRef.current'a atanır
-- **Dönüş**: yok (useEffect side-effect)
+### [N1_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_load_cart
+- **params**: () — parametresiz
+- **ic_degiskenler**:
+  - `schema` — localStorage'dan okunan mevcut CART_SCHEMA_KEY değeri, mevcut şema ile karşılaştırma yapar
+  - `lastStatus` — localStorage'daki 'vh_last_order_status' değeri, son sipariş durumunu tutar
+  - `savedCart` — localStorage'dan okunanserialized sepet verisi (JSON string)
+  - `savedVer` — localStorage'dan okunan versiyon number stringi
+  - `v` — savedVer'in parseInt ile number'a çevirilmiş hali
+- **Dönüş**: void — yan etki: `setItems` çağırarak state'i günceller
 
-### [N2_NASIL] AST Pointer: src/contexts/CartProvider.tsx::useEffect_save_cart
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `v` — Date.now() ile oluşturulan zaman damgası, hem yerel versiyon hem de localStorage'a yazılır
-- **Dönüş**: yok (useEffect side-effect)
+---
 
-### [N3_NASIL] AST Pointer: src/contexts/CartProvider.tsx::mergeItems
+### [N2_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_save_cart
+- **params**: () — parametresiz
+- **ic_degiskenler**:
+  - `v` — Date.now() ile elde edilen timestamp, yerel versiyon olarak kaydedilir
+- **Dönüş**: void — yan etki: localStorage'a items ve versiyon yazar, `localVersionRef.current` güncellenir
+
+---
+
+### [N3_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::mergeItems
 - **params**: (local: CartItem[], server: CartItem[], isGuestCart: boolean)
-- **ic_degiskenler**: 
-  - `map` — CartItem'ları product.id key'li Map olarak tutar, birleştirme mantığını yönetir
-- **Dönüş**: Array.from(map.values()) — birleştirilmiş CartItem dizisi
+- **ic_degiskenler**:
+  - `map` — Merge işleminde kullanılan Map<string, CartItem>, product.id key'li benzersiz ürün haritası
+- **Dönüş**: CartItem[] — birleştirilmiş benzersiz item listesi
 
-### [N4_NASIL] AST Pointer: src/contexts/CartProvider.tsx::useEffect_sync_with_server
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `cancelled` — cleanup fonksiyonu için flag, true olduğunda async işlemler iptal edilir
-  - `syncWithServer` — nested async fonksiyon, sunucu senkronizasyonunu gerçekleştirir
+---
+
+### [N4_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_syncWithServer
+- **params**: () — parametresiz (useEffect callback)
+- **ic_degiskenler**:
+  - `cancelled` — async işlem iptal flag'i, cleanup'ta true yapılır
+  - `syncWithServer` — iç tanımlı async fonksiyon, sunucu senkronizasyonunu yürütür
 - **Dönüş**: cleanup fonksiyonu () => { cancelled = true }
 
-### [N5_NASIL] AST Pointer: src/contexts/CartProvider.tsx::syncWithServer
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `cancelled` — useEffect'den gelen flag, true ise işlem iptal edilir
-  - `cart` — getOrCreateShoppingCart ile alınan veya oluşturulan alışveriş sepeti nesnesi
-  - `currentOwner` — localStorage'dan okunan sepet sahibi (CART_OWNER_KEY), misafir sepeti belirler
-  - `isGuestCart` — currentOwner yoksa veya kullanıcıya eşleşmiyorsa true, misafir sepeti olduğunu gösterir
-  - `discardLocalGuestCart` — son ödeme başarılıysa yerel misafir sepetini atma kararı
-  - `clearOnce` — localStorage'dan vh_clear_server_cart_once flag'i, post-order temizleme için
-  - `raw` — localStorage'dan vh_pending_order JSON verisi
-  - `data` — parse edilmiş pending order verisi { orderId?: string }
-  - `oid` — pending order ID'si
-  - `ord` — supabase'den sorgulanan sipariş kaydı (status, created_at)
-  - `ordErr` — sipariş sorgulama hatası
-  - `serverRows` — listCartItemsWithProducts ile sunucudan alınan satır verileri
-  - `serverItems` — serverRows'dan dönüştürülmüş CartItem[] dizisi, her satır için { id, product, quantity }
-  - `merged` — merge stratejisine göre birleştirilmiş sepet öğeleri
-  - `priceInfoList` — merged üzerinde getEffectivePriceInfo ile hesaplanan fiyat bilgileri
-  - `unitMap` — productId → unitPrice mapping'i
-  - `mergedWithPrices` — birleştirilmiş sepete birim fiyat eklenmiş son hal
-- **Dönüş**: yok (async side-effect, setItems ile state günceller)
+---
 
-### [N6_NASIL] AST Pointer: src/contexts/CartProvider.tsx::useEffect_handle_logout
-- **params**: (parametre yok)
+### [N5_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::syncWithServer
+- **params**: () — parametresiz
+- **ic_degiskenler**:
+  - `cancelled` — async iptal flag'i (dış scope'tan)
+  - `cart` — getOrCreateShoppingCart sonucu dönen shopping cart nesnesi (id içerir)
+  - `currentOwner` — localStorage'dan okunan CART_OWNER_KEY, kimin sepetini tuttuğunu gösterir
+  - `isGuestCart` — misafir sepeti olup olmadığını belirleyen boolean
+  - `discardLocalGuestCart` — yerel misafir sepetinin atılıp atılmayacağını belirler
+  - `clearOnce` — 'vh_clear_server_cart_once' flag'inden okunan boolean, post-order temizlik bayrağı
+  - `raw` — localStorage'dan okunan 'vh_pending_order' ham JSON string
+  - `data` — JSON.parse ile elde edilen { orderId?: string } nesnesi
+  - `oid` — data.orderId değerinin string karşılığı, sipariş ID'si
+  - `ord` — Supabase'den sorgulanan venthub_orders satırı, status ve created_at içerir
+  - `ordErr` — Supabase sorgu hatası
+  - `serverRows` — listCartItemsWithProducts ile gelen ham satır dizisi
+  - `serverItems` — serverRows'un map ile CartItem[] formatına dönüştürülmüş hali
+  - `merged` — merge stratejisine göre oluşturulmuş nihai birleşik item listesi
+  - `priceInfoList` — her merged item için Promise.all ile hesaplanan birim fiyat bilgi listesi
+  - `unitMap` — _productId -> unitPrice eşlemesi yapan Map
+  - `mergedWithPrices` — birim fiyatlar eklenmiş nihai merged item listesi
+- **Dönüş**: void — yan etkiler: setItems, setServerCartId, setSyncing, localStorage, Supabase upsert
+
+---
+
+### [N6_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::row_map_callback
+- **params**: (row) — Supabase'den dönen ham satır objesi
+- **ic_degiskenler**: (yok — tek ifade)
+- **Dönüş**: { id: row.item.product_id, product: row.product, quantity: row.item.quantity } — CartItem formatında nesne
+
+---
+
+### [N7_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::upsert_map_callback
+- **params**: (it) — merged item listesindeki her CartItem
+- **ic_degiskenler**:
+  - `info` — getEffectivePriceInfo sonucu { unitPrice, priceListId } nesnesi
+- **Dönüş**: { _productId: string, unitPrice: number | undefined } — fiyat bilgili item sonucu
+
+---
+
+### [N8_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_logout_handler
+- **params**: () — parametresiz (useEffect callback)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok (useEffect side-effect)
+- **Dönüş**: void — yan etki: CART_OWNER_KEY silinir, setServerCartId(null) çağrılır
 
-### [N7_NASIL] AST Pointer: src/contexts/CartProvider.tsx::useEffect_handle_storage
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `onStorage` — StorageEvent handler fonksiyonu, sepet senkronizasyonunu yönetir
-- **Dönüş**: cleanup fonksiyonu
+---
 
-### [N8_NASIL] AST Pointer: src/contexts/CartProvider.tsx::onStorage
-- **params**: (e: StorageEvent)
-- **ic_degiskenler**: 
-  - `owner` — localStorage'dan okunan sepet sahibi (CART_OWNER_KEY)
-  - `vStr` — localStorage'dan okunan versiyon stringi, yoksa '0'
-  - `v` — vStr'in parseInt karşılığı, geçersizse 0
-  - `raw` — localStorage'dan okunan CartItem JSON verisi
-  - `next` — parse edilmiş CartItem dizisi
-- **Dönüş**: yok (side-effect, setItems ile state günceller)
+### [N9_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_cross_tab_sync
+- **params**: () — parametresiz (useEffect callback)
+- **ic_degiskenler**:
+  - `onStorage` — StorageEvent handler fonksiyonu, cross-tab senkronizasyonunu yönetir
+- **Dönüş**: cleanup () => window.removeEventListener('storage', onStorage)
 
-### [N9_NASIL] AST Pointer: src/contexts/CartProvider.tsx::addToCart
+---
+
+### [N10_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::onStorage
+- **params**: (e: StorageEvent) — tarayıcı storage değişiklik olayı
+- **ic_degiskenler**:
+  - `owner` — localStorage'dan okunan CART_OWNER_KEY, sepet sahibi user ID
+  - `vStr` — localStorage'dan okunan CART_VERSION_KEY string değeri
+  - `v` — vStr'in parseInt ile number karşılığı, versiyon numarası
+  - `raw` — localStorage'dan okunan CART_LOCAL_STORAGE_KEY ham JSON string
+  - `next` — JSON.parse ile elde edilen parsed CartItem[] dizisi
+- **Dönüş**: void — yan etki: setItems ile state güncellenir
+
+---
+
+### [N11_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart
 - **params**: (product: Product, quantity = 1)
-- **ic_degiskenler**: 
-  - `existingItem` — currentItems.find ile ürünün sepetteki mevcut hali
-- **Dönüş**: yok (side-effect, setItems ile state günceller, sunucuya senkronize eder, event dispatch eder)
+- **ic_degiskenler**: (yok — doğrudan setItems ve async işlemler)
+- **Dönüş**: void — yan etkiler: setItems, Supabase upsert, CustomEvent dispatch, toast
 
-### [N10_NASIL] AST Pointer: src/contexts/CartProvider.tsx::removeFromCart
+---
+
+### [N12_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart_setItems_callback
+- **params**: (currentItems) — mevcut CartItem[] state'i
+- **ic_degiskenler**:
+  - `existingItem` — currentItems içinde product.id eşleşen mevcut item (varsa)
+- **Dönüş**: CartItem[] — güncellenmiş item listesi (mevcut item varsa quantity artırılır, yoksa eklenir)
+
+---
+
+### [N13_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart_map_callback
+- **params**: (item) — mevcut items listesindeki her CartItem
+- **ic_degiskenler**: (yok — tek ifade)
+- **Dönüş**: CartItem — product.id eşleşen item'ın quantity'si artırılmış yeni nesne, eşleşmiyorsa aynı item
+
+---
+
+### [N14_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart_promise_callback
+- **params**: ([{ getEffectivePriceInfo }, { upsertCartItem }]) — dinamik import edilmiş modül destructuring'i
+- **ic_degiskenler**: (yok — promise chain başlatır)
+- **Dönüş**: Promise<void>
+
+---
+
+### [N15_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart_info_callback
+- **params**: (info) — getEffectivePriceInfo sonucu { unitPrice, priceListId } nesnesi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void — yan etki: upsertCartItem ve setItems çağrılır
+
+---
+
+### [N16_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::removeFromCart
 - **params**: (_productId: string)
-- **ic_degiskenler**: 
-  - `item` — currentItems.find ile kaldırılacak ürünün mevcut hali (toast için)
-- **Dönüş**: yok (side-effect, setItems ile state günceller, sunucudan siler)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void — yan etkiler: setItems, removeCartItem, toast
 
-### [N11_NASIL] AST Pointer: src/contexts/CartProvider.tsx::updateQuantity
+---
+
+### [N17_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::removeFromCart_setItems_callback
+- **params**: (currentItems) — mevcut CartItem[] state'i
+- **ic_degiskenler**:
+  - `item` — _productId eşleşen mevcut item (toast gösterimi için kullanılır)
+- **Dönüş**: CartItem[] — _productId eşleşen item filtrelenmiş liste
+
+---
+
+### [N18_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::removeFromCart_import_callback
+- **params**: ({ removeCartItem }) — dinamik import edilmiş modül destructuring'i
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Promise<void> — removeCartItem sonucu
+
+---
+
+### [N19_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity
 - **params**: (_productId: string, quantity: number)
-- **ic_degiskenler**: 
-  - `product` — items.find ile ürün nesnesi, sunucu güncellemesi için fiyat hesaplamasında kullanılır
-- **Dönüş**: yok (side-effect, setItems ile state günceller, sunucuya senkronize eder)
+- **ic_degiskenler**:
+  - `product` — items listesinde _productId eşleşen item'ın product nesnesi (server sync için kullanılır)
+- **Dönüş**: void — quantity <= 0 ise removeFromCart çağrılır, sonst setItems ve server upsert
 
-### [N12_NASIL] AST Pointer: src/contexts/CartProvider.tsx::clearCart
+---
+
+### [N20_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity_setItems_callback
+- **params**: (currentItems) — mevcut CartItem[] state'i
+- **ic_degiskenler**: (yok — inline map)
+- **Dönüş**: CartItem[] — _productId eşleşen item'ın quantity'si güncellenmiş liste
+
+---
+
+### [N21_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity_map_callback
+- **params**: (item) — mevcut items listesindeki her CartItem
+- **ic_degiskenler**: (yok — tek ifade)
+- **Dönüş**: CartItem — _productId eşleşiyorsa quantity güncellenmiş yeni nesne, eşleşmiyorsa aynı item
+
+---
+
+### [N22_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity_promise_callback
+- **params**: ([{ getEffectivePriceInfo }, { upsertCartItem }]) — dinamik import edilmiş modül destructuring'i
+- **ic_degiskenler**: (yok — promise chain başlatır)
+- **Dönüş**: Promise<void>
+
+---
+
+### [N23_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity_info_callback
+- **params**: (info) — getEffectivePriceInfo sonucu { unitPrice, priceListId }
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void — yan etki: upsertCartItem ve setItems çağrılır
+
+---
+
+### [N24_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::clearCart
 - **params**: (opts?: { silent?: boolean })
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok (side-effect, setItems ile state temizler, localStorage'ı temizler, sunucudan temizler)
+- **Dönüş**: void — yan etkiler: setItems([]), localStorage temizliği, StorageEvent dispatch, clearCartItems, toast
 
-### [N13_NASIL] AST Pointer: src/contexts/CartProvider.tsx::getCartTotal
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `unit` — her item için birim fiyat, unitPrice yoksa product.price kullanılır
-- **Dönüş**: number — toplam sepet tutarı
+---
 
-### [N14_NASIL] AST Pointer: src/contexts/CartProvider.tsx::getCartCount
-- **params**: (parametre yok)
+### [N25_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::clearCart_import_callback
+- **params**: ({ clearCartItems }) — dinamik import edilmiş modül destructuring'i
 - **ic_degiskenler**: (yok)
-- **Dönüş**: number — sepetteki toplam ürün sayısı
+- **Dönüş**: Promise<void> — clearCartItems sonucu
 
-### [N15_NASIL] AST Pointer: src/contexts/CartProvider.tsx::applyServerPricing
+---
+
+### [N26_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::getCartTotal
+- **params**: () — parametresiz
+- **ic_degiskenler**: (yok)
+- **Dönüş**: number — sepetin toplam tutarı (birim fiyat × quantity toplamı)
+
+---
+
+### [N27_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::getCartTotal_reduce_callback
+- **params**: (total, item) — accumulator ve mevcut CartItem
+- **ic_degiskenler**:
+  - `unit` — item.unitPrice number ise onu, değilse item.product.price'ı fallback olarak kullanan birim fiyat
+- **Dönüş**: number — total + unit * item.quantity
+
+---
+
+### [N28_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::getCartCount
+- **params**: () — parametresiz
+- **ic_degiskenler**: (yok)
+- **Dönüş**: number — sepetteki toplam ürün adedi (quantity toplamı)
+
+---
+
+### [N29_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::getCartCount_reduce_callback
+- **params**: (count, item) — accumulator ve mevcut CartItem
+- **ic_degiskenler**: (yok — tek ifade)
+- **Dönüş**: number — count + item.quantity
+
+---
+
+### [N30_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::applyServerPricing
 - **params**: (serverItems: { product_id: string, unit_price: number }[])
-- **ic_degiskenler**: 
-  - `to2` — sayıyı 2 ondalık basamağa yuvarlayan yardımcı fonksiyon
-  - `nearlyEqual` — iki sayının 0.01 toleransla eşit olup olmadığını kontrol eder
-  - `pmap` — product_id → unit_price mapping'i, normalize edilmiş 2 ondalıklı değerler
-  - `changedIds` — gerçekten fiyat değişen item ID'leri set'i
-- **Dönüş**: yok (side-effect, setItems ile yerel state günceller, sunucuya da yansıtır)
+- **ic_degiskenler**:
+  - `to2` — bir sayıyı 2 ondalık basamağa yuvarlayan yardımcı fonksiyon
+  - `nearlyEqual` — iki sayının 0.01 toleransla eşit olup olmadığını kontrol eden fonksiyon
+  - `pmap` — product_id -> unit_price eşlemesi yapan Map, normalize edilmiş 2 ondalıklı fiyatlar
+  - `changedIds` — gerçekten fiyat değişen itemların product_id'lerini tutan Set
+- **Dönüş**: void — yan etkiler: setItems, upsertCartItem (sunucuya değişiklik yansıtır)
+
+---
+
+### [N31_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::applyServerPricing_setItems_callback
+- **params**: (curr) — mevcut CartItem[] state'i
+- **ic_degiskenler**: (yok — inline map)
+- **Dönüş**: CartItem[] — unitPrice'ları güncellenmiş item listesi
+
+---
+
+### [N32_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::applyServerPricing_map_callback
+- **params**: (it) — mevcut items listesindeki her CartItem
+- **ic_degiskenler**:
+  - `nextUnit` — pmap'ten gelen yeni birim fiyat veya null/undefined
+  - `currUnit` — item'ın mevcut birim fiyat değeri (unitPrice veya product.price fallback)
+- **Dönüş**: CartItem — fiyat değiştiyse unitPrice güncellenmiş yeni nesne, aynıysa mevcut item
+
+---
+
+### [N33_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::applyServerPricing_import_callback
+- **params**: ({ upsertCartItem }) — dinamik import edilmiş modül destructuring'i
+- **ic_degiskenler**:
+  - `tasks` — Promise<unknown>[] dizisi, her changed item için upsert promise'ları tutar
+- **Dönüş**: void — yan etki: Promise.allSettled ile toplu upsert
+
+---
+
+### [N34_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::CartProvider_context_value
+- **params**: () — parametresiz
+- **ic_degiskenler**: (yok — doğrudan nesne literal)
+- **Dönüş**: CartContextValue — { items, syncing, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal, getCartCount, applyServerPricing }
 
 ---
 
@@ -28938,6 +29021,237 @@ Bu modül, React Context Provider pattern'ini uygulayan bir bileşendir; childre
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CartProvider
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\contexts\CategoryContext.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx
+skeleton_hash: 4db0fbb44a4efb44
+entity_hashes:
+  func:CategoryProvider: 664f5248857922aa
+  func:useCategories: bc181eebe7b5a618
+  overview: b7214bc7e9cfb3ac
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-07T13:59:03Z
+---
+
+## Genel Bakış
+CategoryContext modülü, React uygulaması genelinde kategori verilerinin tutarlı bir şekilde paylaşılmasını ve yönetimini sağlayan merkezi bir yapıdır. CategoryProvider bileşeni, kategori verisi ve ilgili durumları alt bileşenlere aktarırken, useCategories hook'u bu verilere kolay erişim imkanı tanır.
+
+## Fonksiyon Grupları
+### Kategori Sağlayıcı
+Uygulama ağaç yapısının üst seviyelerinde yer alarak, kategori verisi ve durumunu içeren React Context değerini tüm alt bileşenler için hazırlar ve sağlar.
+- CategoryProvider
+
+### Kategori Erişim Aracı
+Alt bileşenler içinde, CategoryProvider tarafından sağlanan kategori verisine ve ilgili araçlara erişim sağlamak için güvenli ve kullanımı kolay bir React Hook'u sunar.
+- useCategories
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için gerekli mimari varsayımlar, fonksiyon imzalarından çıkarılmaktadır.
+
+---
+
+[Aksiyom 1]: Eğer `useCategories()` bir `CategoryProvider` üst bileşeninin alt ağacı içinde çağrılmazsa, context değeri (`undefined`) olarak döner ve bileşen hata verir veya boş veri ile çalışır.
+
+**Etkilediği durumlar:**
+- `useCategories()` çağrısının component tree'de yukarıda `CategoryProvider` olmasını gerektirir
+- Provider dışında kullanım, runtime hatası veya `undefined` context sonucunu doğurur
+
+---
+
+[Aksiyom 2]: Eğer `CategoryProvider` bileşeni `children` almadan kullanılırsa, React component tree'de render edilecek alt bileşen olmadığı için Context hiçbir alt bileşene değer iletmez.
+
+**Etkilediği durumlar:**
+- Provider'ın component hierarchy'de wrap (sarmalama) amaçlı kullanılması zorunludur
+- `children` olmadan provider'ın işlevsel anlamı kalmaz
+
+---
+
+[Aksiyom 3]: `useCategories()` hook'u parametsiz (`()`) olarak tanımlıdır; bu nedenle hangi kategori verisinin istendiği, filtreleme kriterleri veya opsiyonel yapılandırma parametre ile belirlenemez — tüm kategori verisi veya varsayılan bir alt küme döner.
+
+**Etkilediği durumlar:**
+- Hook'un esnek filtreleme veya parametrik sorgu desteği yoktur
+- Filtreleme ihtiyacı varsa, hook'u çağıran bileşen tarafında yapılmalıdır
+
+---
+
+[Aksiyom 4]: `CategoryProvider` ve `useCategories()` aynı namespace/modül (`CategoryContext`) içindedir; bu nedenle `useCategories()` inner implementation'da `CategoryContext`'i tüketir. Eğer `CategoryContext`'in `Provider`'ı ayrı bir modüle taşınırsa, `useCategories()` kırılır.
+
+**Etkilediği durumlar:**
+- Modülün iç bağımlılık bütünlüğü korunmalıdır
+- `CategoryContext` export'u ile `useCategories()` arasında güçlü bağ vardır
+
+---
+
+## FONKSİYON DETAYLARI
+
+### CategoryProvider
+**Ne yapar**: Uygulama genelinde merkezi kategori otoritesi olarak çalışan React Context sağlayıcısıdır, tüm uygulama ağacındaki bileşenlerin paylaşılan kategori hiyerarşisine erişmesini ve bu veriyi tutarlı şekilde yönetmesini sağlar. Tüm uygulama genelinde kategori verisinin tek merkezden yönetilmesini mümkün kılar.
+**Nasıl yapar**: React'ın Context API altyapısını kullanarak, kendisi ile sarmalanmış tüm alt bileşenlere kategori state'ini ve ilgili yönetim işlevlerini aktarır. Kategori verisindeki herhangi bir değişikliği tüm tüketici bileşenlere senkronize ederek veride tutarsızlık oluşmasını engeller.
+**Parametreler**:
+- children: React.ReactNode — CategoryProvider tarafından sarmalanan, uygulamanın tüm alt ağacını oluşturan React çocuk elemanlarıdır, provider tarafından sağlanan kategori verisine erişim hakkı kazanır.
+**Dönüş**: React.FC<{ children: React.ReactNode }> türünde, içerisine aldığı children elemanını kategori context sağlayıcısı ile sarmalayarak ekranda render eden bir React bileşeni döndürür.
+
+### useCategories
+**Ne yapar**: CategoryProvider tarafından sağlanan merkezi kategori verisine ve yönetim işlevlerine erişim sağlayan özel React hook'udur. Sadece CategoryProvider altında çalışan bileşenler içinde kullanılabilir, uygulamanın herhangi bir noktasından kategori verisine güvenli erişim imkanı sunar.
+**Nasıl yapar**: CategoryProvider tarafından oluşturulan özel context nesnesini tüketerek, context içindeki tüm değerleri çağrıldığı bileşene sunar. Eğer yanlışlıkla CategoryProvider dışında çağrılırsa geçerli bir bağlam olmadığı için hata fırlatarak yanlış kullanımı önler.
+**Parametreler**: Hiçbir giriş parametresi almaz.
+**Dönüş**: Kaynak kodda dönüş tipi açıkça tanımlanmamış, void veya bilinmiyor olarak belirtilmiştir. Çalışma prensibi gereği CategoryProvider tarafından yönetilen kategori hiyerarşisi ve ilgili yönetim işlevlerini içeren bir nesne döndürmesi amaçlanmıştır.
+
+---
+
+## INTERFACES
+
+### CategoryContextType
+- `categories: DomainCategory[]`
+- `categoryTree: DomainCategory[]`
+- `loading: boolean`
+- `error: string | null`
+- `refresh: () => Promise<void>`
+- `getCategoryBySlug: (slug: string) => DomainCategory | undefined`
+- `getSubCategories: (_parentId: string) => DomainCategory[]`
+
+---
+
+## SABİTLER
+- **CategoryContext** (call) — `createContext<CategoryContextType | undefined>(undefined)`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: CategoryContext.tsx::CategoryProvider
+- **params**: `({ children })` — React children nodes, provider içinde render edilecek alt bileşenler
+- **ic_degiskenler**:
+  - `supabase` — `useSupabaseClient()` hook'undan gelen Supabase client instance, API çağrıları için kullanılır
+  - `categories` — `useState<DomainCategory[]>([])`, tüm kategorileri tutan state dizisi
+  - `loading` — `useState(true)`, yükleme durumunu belirten boolean state
+  - `error` — `useState<string | null>(null)`, hata mesajını tutan nullable string state
+  - `loadCategories` — `useCallback(async () => {...}, [supabase])`, kategorileri asenkron yükleyen memoized fonksiyon, `refresh` olarak context'e verilir
+  - `categoryTree` — `useMemo(() => {...}, [categories])`, parent_id'si olmayan ana kategorilerin metadata.sort_order'a göre sıralanmış hali
+  - `categoriesSlugMap` — `useMemo(() => {...}, [categories])`, slug -> DomainCategory eşlemesi yapan Map, O(1) erişim sağlar
+  - `categoriesParentMap` — `useMemo(() => {...}, [categories])`, parent_id -> DomainCategory[] eşlemesi yapan Map, alt kategorileri gruplar ve sıralar
+  - `getCategoryBySlug` — `useCallback((slug: string) => categoriesSlugMap.get(slug), [categoriesSlugMap])`, slug ile kategori arayan memoized fonksiyon
+  - `getSubCategories` — `useCallback((parentId: string) => categoriesParentMap.get(parentId) || [], [categoriesParentMap])`, parentId ile alt kategorileri getiren memoized fonksiyon
+  - `value` — `useMemo(() => ({...}), [...])`, Context.Provider'a verilen tüm değerleri içeren memoized nesne
+- **Dönüş**: `<CategoryContext.Provider value={value}>{children}</CategoryContext.Provider>` JSX'i döner
+
+---
+
+### [N2_NASIL] AST Pointer: CategoryContext.tsx::loadCategories
+- **params**: yok (useCallback ile kapalı闭 closure, `supabase`'i dışarıdan alır)
+- **ic_degiskenler**:
+  - `data` — `await getCategories(supabase)` çağrısından dönen ham kategori verisi (CategoryMetadata[])
+  - `domainCats` — `toUICategoryList(data)` ile ham veriden dönüştürülmüş DomainCategory dizisi
+  - `err` — catch bloğundaki hata nesnesi, `console.error` ile loglanır
+- **Yan etkiler**: `setLoading(true)` ile başlar, `setCategories(domainCats)` ile state'i günceller, hata olursa `setError('Kategoriler yüklenemedi.')` çağırır, finally'de `setLoading(false)` yapar
+- **Dönüş**: void (async, Promise<void>)
+
+---
+
+### [N3_NASIL] AST Pointer: CategoryContext.tsx::useEffect_callback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Yan etkiler**: `loadCategories()` çağırarak kategorileri yükler; `loadCategories` bağımlılık dizisinde olduğundan supabase değiştiğinde tekrar tetiklenir
+- **Dönüş**: yok
+
+---
+
+### [N4_NASIL] AST Pointer: CategoryContext.tsx::categoryTree_memo
+- **params**: yok
+- **ic_degiskenler**:
+  - `mainCats` — `categories.filter(c => !c.parent_id)`, parent_id'si olmayan (üst seviye) kategorileri filtreleyen dizi
+- **Dönüş**: `mainCats.sort(...)` sonucu — metadata.sort_order'a göre artan sırada sıralanmış üst seviye kategori dizisi
+
+---
+
+### [N5_NASIL] AST Pointer: CategoryContext.tsx::sort_compare
+- **params**: `(a, b)` — sıralanacak iki DomainCategory nesnesi
+- **ic_degiskenler**:
+  - `orderA` — `(a.metadata as CategoryMetadata | null)?.sort_order ?? 0`, birinci kategorinin sıralama değeri, metadata yoksa 0
+  - `orderB` — `(b.metadata as CategoryMetadata | null)?.sort_order ?? 0`, ikinci kategorinin sıralama değeri, metadata yoksa 0
+- **Dönüş**: `orderA - orderB` (number), negatif ise a önce, pozitif ise b önce gelir
+
+---
+
+### [N6_NASIL] AST Pointer: CategoryContext.tsx::categoriesSlugMap_memo
+- **params**: yok
+- **ic_degiskenler**:
+  - `map` — `new Map<string, DomainCategory>()`, slug anahtarlı kategori haritası
+  - `c` — for-of döngüsünde her bir DomainCategory elemanı
+- **Dönüş**: `Map<string, DomainCategory>` — slug ile O(1) kategori erişimi sağlayan harita
+
+---
+
+### [N7_NASIL] AST Pointer: CategoryContext.tsx::categoriesParentMap_memo
+- **params**: yok
+- **ic_degiskenler**:
+  - `map` — `new Map<string, DomainCategory[]>()`, parent_id anahtarlı çocuk kategoriler haritası
+  - `c` — birinci for-of döngüsünde her bir DomainCategory elemanı
+  - `siblings` — `map.get(c.parent_id)` ile alınan veya oluşturulan, aynı parent'a ait kardeş kategoriler dizisi
+  - `siblings` (ikinci döngü) — `map.entries()` destructuring'inden gelen, sort öncesi çocuk kategori dizisi
+- **Dönüş**: `Map<string, DomainCategory[]>` — parent_id -> sıralanmış çocuk kategoriler haritası
+
+---
+
+### [N8_NASIL] AST Pointer: CategoryContext.tsx::value_memo
+- **params**: yok
+- **ic_degiskenler**: yok (dışarıdaki değişkenleri referans alarak nesne oluşturur)
+- **Dönüş**: `{ categories, categoryTree, loading, error, refresh, getCategoryBySlug, getSubCategories }` — Context value nesnesi; seven bağımlılık dizisi ile memoize edilir
+  - `categories` — tüm kategoriler dizisi
+  - `categoryTree` — sıralanmış üst seviye kategoriler
+  - `loading` — yükleme durumu boolean
+  - `error` — hata mesajı string|null
+  - `refresh` — `loadCategories` referansı, manuel yenileme tetikler
+  - `getCategoryBySlug` — slug ile kategori arama fonksiyonu
+  - `getSubCategories` — parentId ile alt kategorileri getirme fonksiyonu
+
+---
+
+### [N9_NASIL] AST Pointer: CategoryContext.tsx::useCategories
+- **params**: yok
+- **ic_degiskenler**:
+  - `context` — `useContext(CategoryContext)`, CategoryProvider tarafından sağlanan context değeri
+- **Hata yönetimi**: `context === undefined` ise `'useCategories must be used within a CategoryProvider'` hata fırlatır
+- **Dönüş**: `context` nesnesi (categories, categoryTree, loading, error, refresh, getCategoryBySlug, getSubCategories alanlarını içerir)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\contexts\CategoryContext.tsx
+  function: src\contexts\CategoryContext.tsx::CategoryProvider
+  function: src\contexts\CategoryContext.tsx::useCategories
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: CategoryProvider
+  export: useCategories
 
 ---
 
@@ -29033,6 +29347,184 @@ Bu modül bir React Context tanımıdır ve fonksiyon gövdesi içermemektedir; 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProjectContext
   export: ProjectContextType
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\contexts\ProjectProvider.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectProvider.tsx
+skeleton_hash: 58fcf7c654a51a80
+entity_hashes:
+  func:ProjectProvider: 48fd4159fdf830c0
+  overview: 71feeb2615451519
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-07T13:59:21Z
+---
+
+## Genel Bakış
+ProjectProvider, VentHub HVAC projesinde proje verilerinin uygulama genelinde paylaşılmasını sağlayan bir React Context sağlayıcı bileşenidir. Bileşen ağacının üst katmanlarında konumlandırılarak, prop drilling ihtiyacını ortadan kaldırır ve tüm alt bileşenlere tutarlı veri erişimi sunar.
+
+## Fonksiyon Grupları
+### Bağlam Sağlayıcı
+Uygulama içindeki proje verilerini ve ilgili işlevsellikleri merkezi bir noktadan yöneterek alt bileşenlere iletir.
+- ProjectProvider
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+ProjectProvider modülü, bir React Context sağlayıcısı olarak proje verilerini alt bileşenlere iletmek için tasarlanmıştır. Aşağıdaki mimari varsayımlar, fonksiyon imzası ve modül sabitlerine dayanmaktadır:
+
+[Aksiyom 1]: Eğer `children` parametresi geçilmezse veya `undefined`/`null` olursa, provider bileşeni geçerli bir React node render edemez ve bileşen ağacında hata oluşur.
+
+[Aksiyom 2]: Eğer `ProjectContext` modül seviyesinde doğru tanımlanmamış veya dışa aktarılmamışsa, provider'ın sağlayacağı bağlam değeri alt bileşenlere ulaştırılamaz ve `useContext(ProjectContext)` kullanan tüm alt bileşenler `undefined` değer alır.
+
+[Aksiyom 3]: Eğer `children` JSX elementi içermiyorsa (boş fragment veya empty array), provider geçerli birReact ağacı oluşturur ancak hiçbir alt bileşene bağlam sağlamaz.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### ProjectProvider
+**Ne yapar**: ProjectProvider, React Context API kullanarak proje ile ilgili verileri ve işlevsellikleri alt bileşenlere (children) sağlayan bir Context Provider bileşenidir. Bu bileşen, uygulama genelinde proje verilerinin erişilebilirliğini ve paylaşılmasını kolaylaştırır.
+
+**Nasıl yapar**: React'ın Context Provider desenini uygulayarak, sarmaladığı tüm alt bileşenlere proje bağlamını (context) iletir. children prop'u aracılığıyla içeriye alınan bileşenler, bu sağlayıcı tarafından sunulan değerlere ve fonksiyonlara erişebilir hale gelir.
+
+**Parametreler**:
+- `children`: React.ReactNode — Provider bileşeninin içinde sarılacak alt bileşenlerdir. Bu prop, Proje bağlamının erişilebilir olacağı tüm alt bileşenleri kapsar.
+
+**Dönüş**: `React.FC<{ children: React.ReactNode }>` — JSX döndüren bir React Fonksiyonel Bileşeni. Children prop'unu alır ve sağlayıcı sarmalayıcısı içinde render eder.
+
+**Notlar**: Bu bileşen, React Context deseninin temel yapısını izleyerek proje verilerinin bileşen ağacının derinliklerine prop drilling ihtiyacı olmadan iletilmesini sağlar. Tipik olarak React.createContext ile oluşturulan bir Context nesnesinin Provider bileşeni olarak kullanılır.
+
+---
+
+## INTERFACES
+
+### ProjectContextType
+- `projects: UserProject[]`
+- `loading: boolean`
+- `refreshProjects: () => Promise<void>`
+- `addProject: (name: string, description?: string) => Promise<UserProject | null>`
+- `removeProject: (id: string) => Promise<void>`
+- `addItem: (projectId: string, _productId: string, quantity?: number) => Promise<void>`
+- `removeItem: (projectId: string, _productId: string) => Promise<void>`
+- `getProjectItems: (projectId: string) => Promise<ProjectItem[]>`
+
+---
+
+## SABİTLER
+- **ProjectContext** (call) — `createContext<ProjectContextType | undefined>(undefined)`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::ProjectProvider
+- **params**: `{ children }` — React bileşen çocukları
+- **ic_degiskenler**:
+  - `supabase` — Supabase istemcisi, `useSupabaseClient()` hook'undan alınır, tüm API çağrılarında kullanılır
+  - `projects` — `useState<UserProject[]>([])` ile oluşturulan proje listesi state'i
+  - `loading` — `useState(true)` ile oluşturulan yükleme durumu flag'i
+  - `user` — `useAuth()` hook'undan alınan mevcut oturum açmış kullanıcı nesnesi
+  - `refreshProjects` — useCallback ile sarılmış, projeleri API'den çekip state'i güncelleyen fonksiyon
+  - `addProject` — useCallback ile sarılmış, yeni proje oluşturan fonksiyon
+  - `removeProject` — useCallback ile sarılmış, proje silen fonksiyon
+  - `addItem` — useCallback ile sarılmış, projeye ürün ekleyen fonksiyon
+  - `removeItem` — useCallback ile sarılmış, projeden ürün çıkaran fonksiyon
+  - `getProjectItems` — useCallback ile sarılmış, projenin ürünlerini getiren fonksiyon
+  - `value` — `useMemo` ile oluşturulan, context'e verilen değer nesnesi
+- **Dönüş**: `<ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>` JSX
+
+---
+
+### [N2_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::refreshProjects
+- **params**: yok
+- **ic_degiskenler**:
+  - `data` — `await listUserProjects(supabase)` çağrısının dönüş değeri, proje listesi
+- **Dönüş**: `void` (async, return değeri yok)
+
+---
+
+### [N3_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useEffect (projeleri yükleme efekti)
+- **params**: yok (anonim arrow function)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (side-effect: `refreshProjects()` çağırır veya `projects`/`loading` state'lerini sıfırlar)
+
+---
+
+### [N4_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::addProject
+- **params**: `name: string`, `description?: string` (opsiyonel)
+- **ic_degiskenler**:
+  - `newProject` — `await createProject(supabase, { name, description, user_id: user.id })` çağrısının dönüşü, newly created proje nesnesi
+- **Dönüş**: `Promise<UserProject | null>` — başarıysa `newProject`, hata/sebep yoksa `null`
+
+---
+
+### [N5_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::removeProject
+- **params**: `id: string` — silinecek projenin ID'si
+- **ic_degiskenler**: yok
+- **Dönüş**: `Promise<void>` (return yok)
+
+---
+
+### [N6_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::addItem
+- **params**: `projectId: string`, `_productId: string`, `quantity: number = 1`
+- **ic_degiskenler**: yok
+- **Dönüş**: `Promise<void>` (return yok)
+
+---
+
+### [N7_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::removeItem
+- **params**: `projectId: string`, `_productId: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: `Promise<void>` (return yok)
+
+---
+
+### [N8_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::getProjectItems
+- **params**: `projectId: string`
+- **ic_degiskenler**:
+  - `items` — `await listProjectItems(supabase, projectId)` çağrısının dönüşü, proje ürünleri listesi
+- **Dönüş**: `Promise<ProjectItem[]>` — başarıysa `items`, hata ise boş dizi `[]`
+
+---
+
+### [N9_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::value (useMemo callback)
+- **params**: yok (anonim arrow function)
+- **ic_degiskenler**: yok (dışarıdaki `projects`, `loading`, `refreshProjects`, `addProject`, `removeProject`, `addItem`, `removeItem`, `getProjectItems` değişkenlerini doğrudan referans olarak döndürür)
+- **Dönüş**: nesne — `{ projects, loading, refreshProjects, addProject, removeProject, addItem, removeItem, getProjectItems }`
+
+---
+
+## NODE ID STANDARD
+
+  file: src\contexts\ProjectProvider.tsx
+  function: src\contexts\ProjectProvider.tsx::ProjectProvider
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: ProjectProvider
 
 ---
 
@@ -35704,6 +36196,674 @@ graph TD
   export: removeProductFromProject
 
 ---
+# FILE: src\lib\services\registry.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\lib\services\registry.ts
+skeleton_hash: 50e57eab60a2724c
+entity_hashes:
+  func:AddressService:constructor: 0e35462915cc5372
+  func:AddressService:createAddress: 610d4cd342edb149
+  func:AddressService:deleteAddress: 9dd56a6af60ae911
+  func:AddressService:listAddresses: f1864ad9990631a5
+  func:AddressService:setDefaultAddress: 1fb233bcfce543c5
+  func:AddressService:updateAddress: df83314a160401dc
+  func:CartService:clearCartItems: e5288a23587a30e5
+  func:CartService:constructor: 0e35462915cc5372
+  func:CartService:getOrCreateShoppingCart: 56ef117cdaec779d
+  func:CartService:listCartItems: b1344b3014f00843
+  func:CartService:listCartItemsWithProducts: 9933c98a5e23b7d4
+  func:CartService:removeCartItem: 790c0e8eb8809d7f
+  func:CartService:upsertCartItem: c02594fbb6f625da
+  func:CategoryService:constructor: 0e35462915cc5372
+  func:CategoryService:getCategories: 267df561bb884d42
+  func:InvoiceService:constructor: 0e35462915cc5372
+  func:InvoiceService:createInvoiceProfile: 201a6001e63fddd3
+  func:InvoiceService:deleteInvoiceProfile: 960037284824bcac
+  func:InvoiceService:fetchDefaultInvoiceProfile: 5c25067368b13d9b
+  func:InvoiceService:listInvoiceProfiles: 7611db7b5f134e84
+  func:InvoiceService:setDefaultInvoiceProfile: 4c684c75c1f44302
+  func:InvoiceService:updateInvoiceProfile: 4666047aa0d29d4e
+  func:PricingService:constructor: 0e35462915cc5372
+  func:PricingService:getEffectivePriceInfo: cf564dbdf168d6f1
+  func:PricingService:getEffectiveUnitPrice: 1d3f924608a0a54f
+  func:ProductService:adminSearchProducts: 5c46368893fc056d
+  func:ProductService:constructor: 0e35462915cc5372
+  func:ProductService:ftsSearchProducts: 01a525f00a12cf6b
+  func:ProductService:getAllProducts: 8949438f20aea47d
+  func:ProductService:getFeaturedProducts: 656a387fd35eb0ae
+  func:ProductService:getProductById: 38d53284a4889ab0
+  func:ProductService:getProductBySlug: 5b058ba43c9bca7a
+  func:ProductService:getProductBySlugOrId: 6dee1121996f4853
+  func:ProductService:getProducts: 8cb83fccd0624f9f
+  func:ProductService:getProductsByCategory: 052f2ff3b4934488
+  func:ProductService:getProductsBySubcategory: 0a621b8639d811ef
+  func:ProductService:getProductsEnriched: 0a0357b8c4480782
+  func:ProductService:getSearchSuggestions: f828af306a10601d
+  func:ProductService:searchProducts: 3ba4b2d8b0027d5a
+  func:ProjectService:addProductToProject: 835ce083f03e61b1
+  func:ProjectService:constructor: 0e35462915cc5372
+  func:ProjectService:createProject: 08186ae461b0a5d6
+  func:ProjectService:deleteProject: 1bb4189dbbb9b828
+  func:ProjectService:listProjectItems: a0921fb164ce18a3
+  func:ProjectService:listUserProjects: 96b38aafc316f0a8
+  func:ProjectService:removeProductFromProject: 616bb2fd054964a1
+  func:ServiceRegistry:constructor: 0e35462915cc5372
+  overview: 01e17ea82195b5d7
+generated_at: 2026-06-07T14:01:34Z
+---
+
+## Genel Bakış
+
+Bu modül, venthub-hvac e-ticariat uygulamasının tüm servislerini merkezi bir yapıda tanımlar ve sunar. Her bir servis, Supabase veritabanı üzerinden belirli bir iş alanına (adresler, sepet, ürünler, fiyatlandırma, projeler vb.) yönelik CRUD ve iş mantığı operasyonlarını yönetir. ServiceRegistry sınıfı, tüm bu servisleri tek bir noktadan örnekler ve uygulama genelinde tutarlı bir erişim sağlar.
+
+## Fonksiyon Grupları
+
+### Ürün ve Kategori Yönetimi
+Ürün kataloğunun sorgulanması, aranması ve kategorilere göre filtrelenmesiyle ilgilenir. Zenginleştirilmiş ürün verileri, slug tabanlı erişim ve tam metin arama desteği sunar.
+- `getProductsEnriched`, `getProducts`, `getAllProducts`, `getProductsByCategory`, `getProductsBySubcategory`, `getProductById`, `getProductBySlugOrId`, `getProductBySlug`, `getFeaturedProducts`, `searchProducts`, `ftsSearchProducts`, `getSearchSuggestions`, `adminSearchProducts`
+- `getCategories`
+
+### Sepet İşlemleri
+Kullanıcı alışveriş sepetinin oluşturulması, öğelerin eklenip kaldırılması ve temizlenmesini yönetir. Ürün detaylarıyla birlikte sepet içeriği sorgulama desteği de sağlar.
+- `getOrCreateShoppingCart`, `listCartItems`, `listCartItemsWithProducts`, `upsertCartItem`, `removeCartItem`, `clearCartItems`
+
+### Fiyatlandırma
+Ürünler için geçerli birim fiyat ve fiyat bilgilerini hesaplar. Fiyat listesi ve kampanya gibi dinamik fiyatlandırma kurallarını değerlendirerek nihai fiyatı belirler.
+- `getEffectiveUnitPrice`, `getEffectivePriceInfo`
+
+### Kullanıcı Profil Bilgileri (Adresler ve Fatura Profilleri)
+Kullanıcının teslimat/fatura adreslerini ve fatura profillerini yönetir. Varsayılan adres/profil belirleme, CRUD işlemleri ve varsayılan profilleri getirme işlevlerini kapsar.
+- `listAddresses`, `createAddress`, `updateAddress`, `deleteAddress`, `setDefaultAddress`
+- `listInvoiceProfiles`, `createInvoiceProfile`, `updateInvoiceProfile`, `deleteInvoiceProfile`, `setDefaultInvoiceProfile`, `fetchDefaultInvoiceProfile`
+
+### Proje Yönetimi
+Kullanıcıların ürünleri gruplandırarak oluşturduğu projeleri yönetir. Projelere ürün ekleme, çıkarma ve proje öğelerini listeleme işlemlerini kapsar.
+- `listUserProjects`, `createProject`, `deleteProject`, `addProductToProject`, `removeProductFromProject`, `listProjectItems`
+
+### Servis Kayıt ve Koordinasyonu
+Tüm servislerin merkezi örneklendirilmesini ve uygulama genelinde tutarlı şekilde erişilmesini sağlar. Tek bir Supabase istemcisi üzerinden tüm servis örneklerini oluşturur ve sunar.
+- `ServiceRegistry` (constructor)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, tüm servislerin merkezi olarak oluşturulduğu ve erişildiği bir Servis Registry'sidir. Tüm servisler aynı `SupabaseClient`instance'ını paylaşır.
+
+[Aksiyom 1]: Eğer `ServiceRegistry` constructor'a geçilen `supabase` parametresi geçerli ve aktif bir `SupabaseClient<Database>` instance'ı değilse, registry tarafından üretilen tüm servislerin (AddressService, CartService, CategoryService, InvoiceService, PricingService, ProductService, ProjectService) veritabanı işlemleri başarısız olur.
+
+[Aksiyom 2]: Eğer `ServiceRegistry` constructor hiç çağrılmadan servislere erişilmeye çalışılırsa (örn. statik/instance olmadan), tüm servis metodları `undefined` referans hatası ile karşılaşır.
+
+[Aksiyom 3]: Registry'den alınan servis instance'ları arasında `SupabaseClient` bağımlılığı ortaktır; eğer bir servisin içindeki `supabase` bağlantısı koparsa veya geçersizleşirse, yalnızca o servis değil, aynı client'ı paylaşan diğer servisler de etkilenebilir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### listAddresses
+**Ne yapar**: Kullanıcıya ait tüm adres kayıtlarını listeler.
+**Nasıl yapar**: AddressService sınıfının içinde, constructor'dan enjekte edilen supabase istemcisini kullanarak harici `listAddresses` fonksiyonunu çağırır ve sonucu doğrudan döndürür. Bu, veritabanındaki adresleri getirmek için bir proxy görevi görür.
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+**Dönüş**: ReturnType olarak `listAddresses(this.supabase)` çağrısının dönüşü, yani adres listesi döner. Kesin dönüş tipi harici fonksiyona bağlıdır.
+
+### createAddress
+**Ne yapar**: Verilen verilerle yeni bir adres kaydı oluşturur.
+**Nasıl yapar**: Adres verilerini (payload) alır ve harici `createAddress` fonksiyonuna, supabase istemcisi ile birlikte iletir. İşlem supabase istemcisi üzerinden veritabanına yazma realizasyonunu yapar.
+**Parametreler**:
+- payload: DbUserAddressInsert — Oluşturulacak adresin verilerini içeren nesne. Veritabanı şemasına uygun insert veri tipi.
+**Dönüş**: ReturnType olarak `createAddress(this.supabase, payload)` çağrısının dönüşü, yani oluşturulan adres kaydı döner.
+
+### updateAddress
+**Ne yapar**: Belirli bir ID'ye sahip adres kaydını günceller.
+**Nasıl yapar**: Güncellenecek adresin ID'sini ve yeni verileri (payload) alır. Supabase istemcisi ile harici `updateAddress` fonksiyonunu çağırarak ilgili kaydı veritabanında günceller.
+**Parametreler**:
+- id: string — Güncellenecek adresin benzersiz tanımlayıcısı.
+- payload: DbUserAddressUpdate — Adresin güncellenecek alanlarını içeren nesne.
+**Dönüş**: ReturnType olarak `updateAddress(this.supabase, id, payload)` çağrısının dönüşü, yani güncellenen adres kaydı döner.
+
+### deleteAddress
+**Ne yapar**: Belirli bir ID'ye sahip adres kaydını siler.
+**Nasıl yapar**: Silinecek adresin ID'sini alır. Supabase istemcisi ve harici `deleteAddress` fonksiyonu kullanılarak ilgili kayıt veritabanından kalıcı olarak kaldırılır.
+**Parametreler**:
+- id: string — Silinecek adresin benzersiz tanımlayıcısı.
+**Dönüş**: ReturnType olarak `deleteAddress(this.supabase, id)` çağrısının dönüşü, yani silme işleminin sonucu döner.
+
+### setDefaultAddress
+**Ne yapar**: Kullanıcının belirli bir türdeki (gönderi veya fatura) varsayılan adresini ayarlar.
+**Nasıl yapar**: Adres türünü ('shipping' veya 'billing') ve ilgili adresin ID'sini alır. Harici `setDefaultAddress` fonksiyonunu çağırarak, kullanıcının o türdeki varsayılan adresini belirtilen ID ile günceller.
+**Parametreler**:
+- kind: 'shipping' | 'billing' — Ayarlanacak varsayılan adresin türü: gönderi adresi mi yoksa fatura adresi mi.
+- id: string — Varsayılan olarak ayarlanacak adresin benzersiz tanımlayıcısı.
+**Dönüş**: ReturnType olarak `setDefaultAddress(this.supabase, kind, id)` çağrısının dönüşü, yani güncelleme işleminin sonucu döner.
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getOrCreateShoppingCart
+**Ne yapar**: Belirli bir kullanıcıya ait alışveriş sepetini bulur veya yoksa yeni bir tane oluşturur.
+**Nasıl yapar**: Kullanıcı ID'sini alır. Supabase istemcisi ve harici `getOrCreateShoppingCart` fonksiyonu kullanılarak, kullanıcının mevcut sepeti sorgulanır. Eğer sepet yoksa, yeni bir sepet kaydı oluşturulur ve sepet döndürülür.
+**Parametreler**:
+- userId: string — Alışveriş sepati oluşturulacak veya mevcut sepeti aranacak kullanıcının benzersiz tanımlayıcısı.
+**Dönüş**: ReturnType olarak `getOrCreateShoppingCart(this.supabase, userId)` çağrısının dönüşü, yani bulunan veya oluşturulan alışveriş sepeti nesnesi döner.
+
+### listCartItems
+**Ne yapar**: Belirli bir alışveriş sepetindeki tüm ürün kalemlerini listeler.
+**Nasıl yapar**: Sepet ID'sini alır. Harici `listCartItems` fonksiyonunu, supabase istemcisi ile birlikte çağırarak ilgili.sepetteki tüm kalemleri (ürün, miktar vb.) getirir.
+**Parametreler**:
+- cartId: string — Ürün kalemListesinin getirileceği alışveriş sepetinin benzersiz tanımlayıcısı.
+**Dönüş**: ReturnType olarak `listCartItems(this.supabase, cartId)` çağrısının dönüşü, yani sepet kalemlerinin listesi döner.
+
+### listCartItemsWithProducts
+**Ne yapar**: Belirli bir alışveriş sepetindeki ürün kalemlerini, ilgili ürün detaylarıyla birlikte listeler.
+**Nasıl yapar**: Sepet ID'sini alır. Harici `listCartItemsWithProducts` fonksiyonunu çağırır. Bu fonksiyon, sepet kalemlerini çekerken ilişkili ürün tablosuyla bir JOIN işlemi yaparak, her kalem için ürün adı, fiyatı, görseli gibi detaylı bilgileri de getirir.
+**Parametreler**:
+- cartId: string — Ürün detaylı kalemListesinin getirileceği alışveriş sepetinin benzersiz tanımlayıcısı.
+**Dönüş**: ReturnType olarak `listCartItemsWithProducts(this.supabase, cartId)` çağrısının dönüşü, yani ürün detayları zenginleştirilmiş sepet kalemlerinin listesi döner.
+
+### upsertCartItem
+**Ne yapar**: Belirtilen sepetteki bir ürünü ekler veya varsa miktar ve fiyat bilgilerini günceller. Sepet öğesi mevcut değilse yeni bir kayıt oluşturur, mevcutsa quantity ve opsiyonel fiyat alanlarını günceller.
+**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve bir payload nesnesi alır. Payload içinde cartId, _productId, quantity, opsiyonel unitPrice ve priceListId bulunur. Bu verileri kullanarak ilgili sepet tablosunda bir upsert (insert/update) işlemi gerçekleştirir.
+**Parametreler**:
+- payload: `{ cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string }` — Sepet işlemi için gerekli tüm verileri içeren nesne. cartId sepeti, _productId ürünü, quantity miktarı belirtir. unitPrice ve priceListId opsiyoneldir ve fiyatlandırma bilgisini taşır.
+**Dönüş**: Promise, realizasyonunda upsert işleminin sonucunu (örneğin eklenen/güncellenen satır verisi) döndürür.
+
+### removeCartItem
+**Ne yapar**: Belirtilen sepetteki belirli bir ürünü tamamen kaldırır.
+**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi, cartId ve productId parametrelerini alır. Bu bilgilerle sepet tablosunda ilgili ürünü bulur ve siler.
+**Parametreler**:
+- cartId: string — Ürünün kaldırılacağı sepetin benzersiz tanımlayıcısı.
+- productId: string — Sepetten kaldırılacak ürünün benzersiz tanımlayıcısı.
+**Dönüş**: Promise, realizasyonunda silme işleminin sonucunu (örneğin success durumu veya silinen satır sayısı) döndürür.
+
+### clearCartItems
+**Ne yapar**: Belirtilen sepetteki tüm ürünleri (tüm sepet öğelerini) toplu olarak silerek sepeti tamamen boşaltır.
+**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve cartId alır. Bu cartId ile ilişkili tüm seket kalemlerini bulur ve toplu silme işlemi uygular.
+**Parametreler**:
+- cartId: string — Tüm öğeleri temizlenecek sepetin benzersiz tanımlayıcısı.
+**Dönüş**: Promise, realizasyonunda temizleme işleminin sonucunu (örneğin silinen toplam satır sayısı) döndürür.
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getCategories
+**Ne yapar**: Sistemde tanımlı tüm ürün kategorilerini listeler.
+**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi alır ve ilgili kategoriler tablosundan tüm kayıtları sorgular. Sonuç olarak kategori listesini döndürür.
+**Parametreler**: Bu fonksiyonun dışarıdan alınan herhangi bir parametresi yoktur. Sadece sınıf içindeki `this.supabase` nesnesini kullanır.
+**Dönüş**: Promise, realizasyonunda DbCategory türünde bir dizi (array) veya ilgili kategori verilerini içeren bir nesne döndürür.
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### listInvoiceProfiles
+**Ne yapar**: Sistemde tanımlı tüm fatura profillerini listeler.
+**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi alır ve fatura profilleri tablosundan tüm kayıtları sorgular. Sonuç olarak fatura profillerinin listesini döndürür.
+**Parametreler**: Bu fonksiyonun dışarıdan alınan herhangi bir parametresi yoktur. Sadece sınıf içindeki `this.supabase` nesnesini kullanır.
+**Dönüş**: Promise, realizasyonunda DbInvoiceProfile türünde bir dizi (array) veya ilgili fatura profili verilerini içeren bir nesne döndürür.
+
+### createInvoiceProfile
+**Ne yapar**: Yeni bir fatura profili oluşturur ve veritabanına kaydeder.
+**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve DbInvoiceProfileInsert türünde bir payload alır. Bu payload, oluşturulacak fatura profilinin tüm veri alanlarını içerir. Fonksiyon bu verileri kullanarak fatura profilleri tablosuna yeni bir satır ekler.
+**Parametreler**:
+- payload: DbInvoiceProfileInsert — Oluşturulacak yeni fatura profilinin tüm zorunlu ve opsiyonel alanlarını içeren veri nesnesi.
+**Dönüş**: Promise, realizasyonunda oluşturulan fatura profilinin verilerini (örneğin generated ID ile birlikte) döndürür.
+
+### updateInvoiceProfile
+**Ne yapar**: Var olan bir fatura profilini günceller.
+**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi, güncellenecek profilin ID'si ve DbInvoiceProfileUpdate türünde bir payload alır. Bu bilgilerle veritabanındaki ilgili kaydı bulur ve payload'daki alanlarla günceller.
+**Parametreler**:
+- id: string — Güncellenecek fatura profilinin benzersiz tanımlayıcısı.
+- payload: DbInvoiceProfileUpdate — Güncellenecek alanları içeren veri nesnesi. Sadece değiştirilmek istenen alanlar gönderilebilir.
+**Dönüş**: Promise, realizasyonunda güncellenen fatura profilinin güncel verilerini döndürür.
+
+### deleteInvoiceProfile
+**Ne yapar**: Belirtilen ID'ye sahip fatura profilini veritabanından siler.
+**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve silinecek profilin ID'sini alır. Bu ID ile fatura profilleri tablosundaki ilgili kaydı bulur ve siler.
+**Parametreler**:
+- id: string — Silinecek fatura profilinin benzersiz tanımlayıcısı.
+**Dönüş**: Promise, realizasyonunda silme işleminin sonucunu (örneğin success durumu) döndürür.
+
+### setDefaultInvoiceProfile
+**Ne yapar**: Verilen ID'ye sahip fatura profilini varsayılan olarak ayarlar. Bu işlem, kullanıcının veya firmanın aktif faturasını belirler.
+**Nasıl yapar**: Inner function yapısında çalışır. Service katmanındaki `this.supabase` bağlantısını alarak dışarıdaki `setDefaultInvoiceProfile` fonksiyonuna aktarır. Gerçek veritabanı işlemleri bu dış fonksiyon içinde yürütülür.
+**Parametreler**:
+- id: string — Varsayılan olarak ayarlanacak faturanın benzersiz tanımlayıcısı
+**Dönüş**: Promise<boolean> veyaPromise<{ success: boolean }> — İşlemin başarı durumunu döner
+
+### fetchDefaultInvoiceProfile
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getEffectiveUnitPrice
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getEffectivePriceInfo
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getProductsEnriched
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getSearchSuggestions
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### ftsSearchProducts
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getProducts
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getAllProducts
+
+**Ne yapar**: Veritabanındaki tüm ürünleri getirir. Ürün listeleme sayfaları veya katalog görüntüleme senaryolarında kullanılır.
+
+**Nasıl yapar**: Sınıf içindeki `supabase` istemcisini alarak bağımsız `getAllProducts` fonksiyonuna iletir. Gerçek veritabanı sorgulama mantığı dışarıdaki fonksiyonda yürütülür, bu metot yalnızca bir yönlendirici (delegator) görevi görür.
+
+**Parametreler**:
+
+Bu fonksiyon herhangi bir parametre almaz. Supabase istemcisi zaten sınıf seviyesinde constructor aracılığıyla enjekte edilmiştir.
+
+**Dönüş**: `Promise<Product[]>` — Veritabanındaki tüm ürün kayıtlarını içeren bir promise döner.
+
+### getProductsByCategory
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getProductsBySubcategory
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getProductById
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getProductBySlugOrId
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getProductBySlug
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getFeaturedProducts
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### searchProducts
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### adminSearchProducts
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### listUserProjects
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### createProject
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### deleteProject
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### addProductToProject
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### removeProductFromProject
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### listProjectItems
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### constructor
+**Ne yapar**: ProjectService sınıfını başlatır ve Supabase istemcisini_dependency olarak enjekte eder. Bu构造函数, servisin tüm metodlarının veritabanı bağlantısını kullanabilmesi için gerekli olan Supabase client'ını sınıf内部实例ına kaydeder.
+
+**Nasıl yapar**: TypeScript'in `private` erişim belirtecini kullanarak `supabase` parametresini doğrudan sınıfın `this.supabase` özel değişkenine atar. Bu sayede servisin tüm diğer metodları bu bağlantı bilgisine erişebilir.
+
+**Parametreler**:
+- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemleri için kullanılacak Supabase istemcisi. Tip güvenliği sağlanmış `Database` generic'i ile tanımlanmıştır.
+
+**Dönüş**: `void` — Constructor'lar dönüş değeri dönmez.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.listAddresses
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `this.supabase` — Adres servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: listAddresses(this.supabase) çağrı sonucu
+
+### [N2_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.createAddress
+- **params**: `payload: DbUserAddressInsert` — oluşturulacak adres verisi
+- **ic_degiskenler**:
+  - `this.supabase` — Adres servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: createAddress(this.supabase, payload) çağrı sonucu
+
+### [N3_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.updateAddress
+- **params**: `id: string` — güncellenecek adresin ID'si, `payload: DbUserAddressUpdate` — güncelleme verisi
+- **ic_degiskenler**:
+  - `this.supabase` — Adres servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: updateAddress(this.supabase, id, payload) çağrı sonucu
+
+### [N4_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.deleteAddress
+- **params**: `id: string` — silinecek adresin ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Adres servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: deleteAddress(this.supabase, id) çağrı sonucu
+
+### [N5_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.setDefaultAddress
+- **params**: `kind: 'shipping' | 'billing'` — adres türü (teslimat veya fatura), `id: string` — varsayılan yapılacak adresin ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Adres servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: setDefaultAddress(this.supabase, kind, id) çağrı sonucu
+
+### [N6_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.getOrCreateShoppingCart
+- **params**: `userId: string` — kullanıcının ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Sepet servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getOrCreateShoppingCart(this.supabase, userId) çağrı sonucu
+
+### [N7_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.listCartItems
+- **params**: `cartId: string` — sepetin ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Sepet servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: listCartItems(this.supabase, cartId) çağrı sonucu
+
+### [N8_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.listCartItemsWithProducts
+- **params**: `cartId: string` — sepetin ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Sepet servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: listCartItemsWithProducts(this.supabase, cartId) çağrı sonucu
+
+### [N9_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.upsertCartItem
+- **params**: `payload: { cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string }` — sepet öğesi ekleme/güncelleme verisi
+- **ic_degiskenler**:
+  - `this.supabase` — Sepet servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: upsertCartItem(this.supabase, payload) çağrı sonucu
+
+### [N10_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.removeCartItem
+- **params**: `cartId: string` — sepetin ID'si, `productId: string` — kaldırılacak ürünün ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Sepet servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: removeCartItem(this.supabase, cartId, productId) çağrı sonucu
+
+### [N11_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.clearCartItems
+- **params**: `cartId: string` — sepetin ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Sepet servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: clearCartItems(this.supabase, cartId) çağrı sonucu
+
+### [N12_NASIL] AST Pointer: src/lib/services/registry.ts::CategoryService.getCategories
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `this.supabase` — Kategori servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getCategories(this.supabase) çağrı sonucu
+
+### [N13_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.listInvoiceProfiles
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `this.supabase` — Fatura servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: listInvoiceProfiles(this.supabase) çağrı sonucu
+
+### [N14_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.createInvoiceProfile
+- **params**: `payload: DbInvoiceProfileInsert` — oluşturulacak fatura profili verisi
+- **ic_degiskenler**:
+  - `this.supabase` — Fatura servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: createInvoiceProfile(this.supabase, payload) çağrı sonucu
+
+### [N15_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.updateInvoiceProfile
+- **params**: `id: string` — güncellenecek fatura profilinin ID'si, `payload: DbInvoiceProfileUpdate` — güncelleme verisi
+- **ic_degiskenler**:
+  - `this.supabase` — Fatura servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: updateInvoiceProfile(this.supabase, id, payload) çağrı sonucu
+
+### [N16_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.deleteInvoiceProfile
+- **params**: `id: string` — silinecek fatura profilinin ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Fatura servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: deleteInvoiceProfile(this.supabase, id) çağrı sonucu
+
+### [N17_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.setDefaultInvoiceProfile
+- **params**: `id: string` — varsayılan yapılacak fatura profilinin ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Fatura servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: setDefaultInvoiceProfile(this.supabase, id) çağrı sonucu
+
+### [N18_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.fetchDefaultInvoiceProfile
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `this.supabase` — Fatura servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: fetchDefaultInvoiceProfile(this.supabase) çağrı sonucu
+
+### [N19_NASIL] AST Pointer: src/lib/services/registry.ts::PricingService.getEffectiveUnitPrice
+- **params**: `product: Product` — fiyat bilgisi alınacak ürün nesnesi
+- **ic_degiskenler**:
+  - `this.supabase` — Fiyatlandırma servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getEffectiveUnitPrice(this.supabase, product) çağrı sonucu
+
+### [N20_NASIL] AST Pointer: src/lib/services/registry.ts::PricingService.getEffectivePriceInfo
+- **params**: `product: Product` — fiyat bilgisi alınacak ürün nesnesi
+- **ic_degiskenler**:
+  - `this.supabase` — Fiyatlandırma servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getEffectivePriceInfo(this.supabase, product) çağrı sonucu
+
+### [N21_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductsEnriched
+- **params**: `options: Parameters<typeof getProductsEnriched>[1]` — ürün sorgulama seçenekleri
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getProductsEnriched(this.supabase, options) çağrı sonucu
+
+### [N22_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getSearchSuggestions
+- **params**: `query: string` — arama sorgusu, `limit?: number` — önerilen maksimum sonuç sayısı
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getSearchSuggestions(this.supabase, query, limit) çağrı sonucu
+
+### [N23_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.ftsSearchProducts
+- **params**: `term: string` — tam metin arama terimi, `limit?: number` — maksimum sonuç sayısı
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: ftsSearchProducts(this.supabase, term, limit) çağrı sonucu
+
+### [N24_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProducts
+- **params**: `limit?: number` — getirilecek maksimum ürün sayısı
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getProducts(this.supabase, limit) çağrı sonucu
+
+### [N25_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getAllProducts
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getAllProducts(this.supabase) çağrı sonucu
+
+### [N26_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductsByCategory
+- **params**: `categoryId: string` — kategori ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getProductsByCategory(this.supabase, categoryId) çağrı sonucu
+
+### [N27_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductsBySubcategory
+- **params**: `subcategoryId: string` — alt kategori ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getProductsBySubcategory(this.supabase, subcategoryId) çağrı sonucu
+
+### [N28_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductById
+- **params**: `id: string` — ürün ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getProductById(this.supabase, id) çağrı sonucu
+
+### [N29_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductBySlugOrId
+- **params**: `identifier: string` — slug veya ID olarak kullanılabilecek tanımlayıcı
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getProductBySlugOrId(this.supabase, identifier) çağrı sonucu
+
+### [N30_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductBySlug
+- **params**: `slug: string` — ürün slug'ı
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getProductBySlug(this.supabase, slug) çağrı sonucu
+
+### [N31_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getFeaturedProducts
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: getFeaturedProducts(this.supabase) çağrı sonucu
+
+### [N32_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.searchProducts
+- **params**: `query: string` — arama sorgusu
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: searchProducts(this.supabase, query) çağrı sonucu
+
+### [N33_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.adminSearchProducts
+- **params**: `query: string` — admin arama sorgusu
+- **ic_degiskenler**:
+  - `this.supabase` — Ürün servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: adminSearchProducts(this.supabase, query) çağrı sonucu
+
+### [N34_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.listUserProjects
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `this.supabase` — Proje servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: listUserProjects(this.supabase) çağrı sonucu
+
+### [N35_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.createProject
+- **params**: `project: TablesInsert<'user_projects'>` — oluşturulacak proje verisi
+- **ic_degiskenler**:
+  - `this.supabase` — Proje servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: createProject(this.supabase, project) çağrı sonucu
+
+### [N36_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.deleteProject
+- **params**: `id: string` — silinecek projenin ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Proje servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: deleteProject(this.supabase, id) çağrı sonucu
+
+### [N37_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.addProductToProject
+- **params**: `projectId: string` — projenin ID'si, `productId: string` — eklenecek ürünün ID'si, `quantity?: number` — opsiyonel miktar
+- **ic_degiskenler**:
+  - `this.supabase` — Proje servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: addProductToProject(this.supabase, projectId, productId, quantity) çağrı sonucu
+
+### [N38_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.removeProductFromProject
+- **params**: `projectId: string` — projenin ID'si, `productId: string` — kaldırılacak ürünün ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Proje servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: removeProductFromProject(this.supabase, projectId, productId) çağrı sonucu
+
+### [N39_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.listProjectItems
+- **params**: `projectId: string` — projenin ID'si
+- **ic_degiskenler**:
+  - `this.supabase` — Proje servisi için kullanılan Supabase istemcisi referansı
+- **Dönüş**: listProjectItems(this.supabase, projectId) çağrı sonucu
+
+### [N40_NASIL] AST Pointer: src/lib/services/registry.ts::ServiceRegistry.constructor
+- **params**: `private supabase: SupabaseClient<Database>` — tüm servisler için kullanılacak Supabase istemcisi
+- **ic_degiskenler**:
+  - `this.address` — AddressService örneği, adres yönetimi için kullanılır
+  - `this.cart` — CartService örneği, sepet yönetimi için kullanılır
+  - `this.category` — CategoryService örneği, kategori yönetimi için kullanılır
+  - `this.invoice` — InvoiceService örneği, fatura profili yönetimi için kullanılır
+  - `this.pricing` — PricingService örneği, fiyatlandırma hesaplamaları için kullanılır
+  - `this.product` — ProductService örneği, ürün CRUD ve arama işlemleri için kullanılır
+  - `this.project` — ProjectService örneği, proje yönetimi için kullanılır
+- **Dönüş**: yok (constructor)
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    registry_ts__addProductToProject["addProductToProject"]
+    registry_ts__adminSearchProducts["adminSearchProducts"]
+    registry_ts__clearCartItems["clearCartItems"]
+    registry_ts__constructor["constructor"]
+    registry_ts__createAddress["createAddress"]
+    registry_ts__createInvoiceProfile["createInvoiceProfile"]
+    registry_ts__createProject["createProject"]
+    registry_ts__deleteAddress["deleteAddress"]
+    registry_ts__deleteInvoiceProfile["deleteInvoiceProfile"]
+    registry_ts__deleteProject["deleteProject"]
+    registry_ts__fetchDefaultInvoiceProfile["fetchDefaultInvoiceProfile"]
+    registry_ts__ftsSearchProducts["ftsSearchProducts"]
+    registry_ts__getAllProducts["getAllProducts"]
+    registry_ts__getCategories["getCategories"]
+    registry_ts__getEffectivePriceInfo["getEffectivePriceInfo"]
+    registry_ts__getEffectiveUnitPrice["getEffectiveUnitPrice"]
+    registry_ts__getFeaturedProducts["getFeaturedProducts"]
+    registry_ts__getOrCreateShoppingCart["getOrCreateShoppingCart"]
+    registry_ts__getProductById["getProductById"]
+    registry_ts__getProductBySlug["getProductBySlug"]
+    registry_ts__getProductBySlugOrId["getProductBySlugOrId"]
+    registry_ts__getProducts["getProducts"]
+    registry_ts__getProductsByCategory["getProductsByCategory"]
+    registry_ts__getProductsBySubcategory["getProductsBySubcategory"]
+    registry_ts__getProductsEnriched["getProductsEnriched"]
+    registry_ts__getSearchSuggestions["getSearchSuggestions"]
+    registry_ts__listAddresses["listAddresses"]
+    registry_ts__listCartItems["listCartItems"]
+    registry_ts__listCartItemsWithProducts["listCartItemsWithProducts"]
+    registry_ts__listInvoiceProfiles["listInvoiceProfiles"]
+    registry_ts__listProjectItems["listProjectItems"]
+    registry_ts__listUserProjects["listUserProjects"]
+    registry_ts__removeCartItem["removeCartItem"]
+    registry_ts__removeProductFromProject["removeProductFromProject"]
+    registry_ts__searchProducts["searchProducts"]
+    registry_ts__setDefaultAddress["setDefaultAddress"]
+    registry_ts__setDefaultInvoiceProfile["setDefaultInvoiceProfile"]
+    registry_ts__updateAddress["updateAddress"]
+    registry_ts__updateInvoiceProfile["updateInvoiceProfile"]
+    registry_ts__upsertCartItem["upsertCartItem"]
+```
+
+## NODE ID STANDARD
+
+  file: src\lib\services\registry.ts
+  class: src\lib\services\registry.ts::AddressService
+  class: src\lib\services\registry.ts::CartService
+  class: src\lib\services\registry.ts::CategoryService
+  class: src\lib\services\registry.ts::InvoiceService
+  class: src\lib\services\registry.ts::PricingService
+  class: src\lib\services\registry.ts::ProductService
+  class: src\lib\services\registry.ts::ProjectService
+  class: src\lib\services\registry.ts::ServiceRegistry
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: AddressService
+  export: CartService
+  export: CategoryService
+  export: InvoiceService
+  export: PricingService
+  export: ProductService
+  export: ProjectService
+  export: ServiceRegistry
+
+---
+
+## BILEŞIM (CONTAINS)
+  contains: AddressService
+  contains: CartService
+  contains: CategoryService
+  contains: InvoiceService
+  contains: PricingService
+  contains: ProductService
+  contains: ProjectService
+
+---
 # FILE: src\lib\supabase\client.md
 
 ---
@@ -35882,6 +37042,123 @@ Fonksiyon, `SupabaseClient<Database>` tipinde bir nesne döndürür. Bu nesne, s
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: createSupabaseServerClient
+
+---
+# FILE: src\providers\SupabaseProvider.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\providers\SupabaseProvider.tsx
+skeleton_hash: 206efd9c448ac8ef
+entity_hashes:
+  func:SupabaseProvider: d2391552680159cd
+  func:useSupabaseClient: 117ceb934f45e8a6
+  overview: 191f6f58b43bb490
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-07T14:02:47Z
+---
+
+## Genel Bakış
+Bu modül, Supabase istemcisini React uygulaması genelinde paylaşmak için bir bağlam (context) sağlar. Uygulama bileşenlerinin Supabase veritabanı veya kimlik doğrulama hizmetlerine erişmesini kolaylaştırır.
+
+## Fonksiyon Grupları
+### Bağlam Sağlama ve Tüketme
+Modül, Supabase istemcisini oluşturup React bileşen ağacı boyunca iletmek ve bileşenlerin bu istemciye erişmesini sağlamakla sorumludur.
+- SupabaseProvider, useSupabaseClient
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için fonksiyon gövdesi verilmediğinden, sadece imza bilgilerine dayanan anlamlı bir mimari varsayım üretmek mümkün değildir. Bu nedenle, sadece yapısal ve zorunlu aksiyomlar tanımlanmıştır.
+
+[Aksiyom 1]: Eğer `SupabaseContext` doğru bir React Context olarak çağrılmamışsa (örn. `createContext` ile oluşturulmamış veya `call` metodu tanımsızsa), `useSupabaseClient` hook'u `undefined` veya `null` bir değer döndürür ve bu durumda client kullanan tüm alt bileşenler çalışma zamanı hatası alır.
+
+[Aksiyom 2]: Eğer `SupabaseProvider`, uygulama bileşen hiyerarşisinde `useSupabaseClient` hook'unu kullanan bileşenlerin üstünde konumlandırılmamışsa (örn.-provider dışında bir yerde kullanılırsa), hook çağrısı `Context`'e erişemez ve `undefined` değer döner; bu durumda veritabanı işlemleri başarısız olur.
+
+[Aksiyom 3]: Eğer `SupabaseProvider`'ın içine geçirilen `children` prop'u geçerli bir React.ReactNode (örn. JSX Element, string, number, array veya null) değilse, React render ağacı bozulur ve bileşen ağaçları doğru oluşturulamaz.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### SupabaseProvider
+
+**Ne yapar**: React uygulamasının tüm alt bileşenlerine Supabase istemcisini sağlamak için kullanılan bir context provider bileşenidir. Bu bileşen, uygulama hiyerarşisinde sarmaladığı tüm çocuk bileşenlerin Supabase bağlantısına erişmesini mümkün kılar.
+
+**Nasıl yapar**: `useState` hook'u kullanarak tarayıcı tarafında tek bir Supabase istemcisi oluşturur ve bu istemciyi `createBrowserClient` fonksiyonuyla başlatır. Ortam değişkenlerinden (`NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY`) yapılandırma bilgilerini okur; bu değerler tanımlı değilse `placeholder` değerleriyle varsayılan bir istemci oluşturur. Oluşturulan istemci nesnesi `SupabaseContext.Provider` aracılığıyla tüm alt bileşenlere dağıtılır.
+
+**Parametreler**:
+- `children`: `React.ReactNode` — Provider içinde sarılacak alt React bileşenleri. Bu prop, provider'ın render edeceği tüm JSX içeriğini temsil eder.
+
+**Dönüş**: `JSX.Element` — `SupabaseContext.Provider` ile sarılmış children bileşenlerini içeren JSX yapısı döndürür.
+
+### useSupabaseClient
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+---
+
+## TYPE ALIASES
+
+### SupabaseContextType
+```typescript
+type SupabaseContextType = {
+  supabase: SupabaseClient<Database>
+}
+```
+
+---
+
+## SABİTLER
+- **SupabaseContext** (call) — `createContext<SupabaseContextType | undefined>(undefined)`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/providers/SupabaseProvider.tsx::SupabaseProvider
+- **params**: (`{ children }: { children: React.ReactNode }`)
+- **ic_degiskenler**:
+  - `supabase` — `useState` ile oluşturulan state değişkeni. Fonksiyonsal güncelleyici ile `createBrowserClient` çağrısı yapılarak bir kere oluşturulur. `process.env.NEXT_PUBLIC_SUPABASE_URL` ve `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` çevre değişkenlerinden değerleri alır; tanımlı değillerse placeholder değerler kullanılır. `Database` tipi ile generic olarak tiplenmiştir.
+- **Dönüş**: JSX (React.ReactNode), `SupabaseContext.Provider` ile sarılmış `children`.
+
+### [N2_NASIL] AST Pointer: src/providers/SupabaseProvider.tsx::useSupabaseClient
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `context` — `useContext(SupabaseContext)` ile alınan bağlam nesnesi. `SupabaseProvider` içinde verilen `value={{ supabase }}` objesini içerir. `context` falsy ise bir `Error` fırlatılır (mesaj: `'useSupabaseClient must be used inside a SupabaseProvider'`).
+- **Dönüş**: `context` objesi (içerisinde `supabase` anahtarı bulunan `{ supabase: SupabaseClient<Database> }`).
+
+---
+
+## NODE ID STANDARD
+
+  file: src\providers\SupabaseProvider.tsx
+  function: src\providers\SupabaseProvider.tsx::SupabaseProvider
+  function: src\providers\SupabaseProvider.tsx::useSupabaseClient
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: SupabaseProvider
+  export: useSupabaseClient
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
 
 ---
 # FILE: src\types\admin-shared.md
@@ -38608,6 +39885,254 @@ graph TD
   export: formatSpecValue
   export: groupTechnicalSpecs
   export: translateSpecKey
+
+---
+# FILE: src\utils\router.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\utils\router.ts
+skeleton_hash: e9ecfccf339fa630
+entity_hashes:
+  func:clearClaimsCacheCookie: baefb8519ef63f63
+  func:createRedirectResponse: 05310081a4cd5ade
+  func:decryptClaims: 2068430aed6e8d59
+  func:encryptClaims: 76648dff74640cd4
+  func:getCryptoKey: 31659864bb2e78d3
+  func:resolveUserClaims: d4caa44069b031aa
+  func:setClaimsCacheCookie: ec602be634499d82
+  overview: efa2eee8e5e3339c
+generated_at: 2026-06-07T14:03:33Z
+---
+
+## Genel Bakış
+Bu modül, bir Next.js uygulamasında kullanıcı oturum yönetimi ve yönlendirme işlemleri için gerekli yardımcı (utility) fonksiyonları içerir. Temel olarak, kullanıcının kimlik doğrulama bilgilerini (claims) güvenli bir şekilde şifreleyip çözmeyi, bunları önbellek cookie'si ile yönetmeyi ve isteklere uygun yönlendirme yanıtları oluşturmayı sağlar.
+
+## Fonksiyon Grupları
+### Kripto İşlemleri
+Bu grup, hassas kullanıcı bilgilerinin (claims) güvenli bir şekilde şifrelenmesi ve çözülmesi için gerekli kripto anahtarı yönetimini ve asimetrik şifreleme mantığını barındırır.
+- getCryptoKey, encryptClaims, decryptClaims
+
+### Kullanıcı İddiası Çözümleme
+Bu grup, bir HTTP isteğindeki (request) kullanıcı bilgilerini (claims) çözmek için merkezi bir işlev sunar. Farklı kaynaklardan (cookie önbelleği veya doğrudan istemci) veri almayı ve hatasıyla birlikte sonuç döndürmeyi yönetir.
+- resolveUserClaims
+
+### Cookie Yönetimi
+Bu grup, çözülmüş kullanıcı bilgilerinin önbelleğe alınması veya temizlenmesi için HTTP yanıtındaki (response) cookie'leri ayarlar veya siler.
+- setClaimsCacheCookie, clearClaimsCacheCookie
+
+### Yönlendirme Yardımcıları
+Bu grup, bir kullanıcıyı yeni bir URL'ye yönlendirmek için uygun format ve durum koduna sahip HTTP yanıt nesneleri oluşturur.
+- createRedirectResponse
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül, kullanıcı kimlik doğrulama claim'lerini (yetkilendirme bilgilerini) şifreleme, çözümleme ve cookie üzerinden yönetme sorumluluğunu üstlenir. Modülün doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer `secret` parametresi, kriptografik işlemler için yeterli entropi (rastgelelik ve uzunluk) içermiyorsa, üretilen anahtar (`getCryptoKey`) zayıf olur ve şifreleme (`encryptClaims`, `decryptClaims`) güvenli değildir. Bu durumda, saldırganlar şifrelenmiş claim'leri çözebilir.
+
+[Aksiyom 2]: Eğer `encryptClaims` ve `decryptClaims` fonksiyonları çağrılırken kullanılan `secret` parametreleri birbirinden farklıysa, `decryptClaims` fonksiyonu, daha önce `encryptClaims` ile şifrelenmiş bir `cookieValue`'yu başarıyla çözemez. Bu durumda fonksiyon hata üretir veya geçersiz veri döner.
+
+[Aksiyom 3]: Eğer `resolveUserClaims` fonksiyonuna geçirilen `supabase` nesnesinin `auth.getClaims` metodu çağrılamazsa (örn. fonksiyon tanımsızsa veya promise reddedilirse), kullanıcının mevcut claim'leri (sessions, roller vb.) sunucudan alınamaz. Bu durumda, `resolveUserClaims` hata fırlatır veya varsayılan/boş bir claim seti ile devam eder.
+
+[Aksiyom 4]: Eğer `setClaimsCacheCookie` fonksiyonuna geçirilen `maxAgeSeconds` parametresi, bir tarayıcı cookie'si için geçerli (0'dan büyük) bir süreyi temsil etmiyorsa (örn. negatif veya `Infinity`), cookie'nin süresi tarayıcı tarafından hemen sona erdirilir veya belirsiz hale gelir. Bu durumda, cache cookie'si beklenen süreyi koruyamaz.
+
+[Aksiyom 5]: Eğer `decryptClaims` fonksiyonuna geçirilen `cookieValue`, `encryptClaims` fonksiyonunun output formatına (örn. Base64-URL encoded, belirli bir JSON yapısı) uymuyorsa, çözümleme işlemi başarısız olur. Bu durumda fonksiyon `null`, boş bir nesne veya bir hata fırlatır.
+
+[Aksiyom 6]: Eğer `createRedirectResponse` fonksiyonuna geçirilen `targetUrl`, geçerli bir URL nesnesi veya string'i değilse (örn. boş string, `undefined` veya bozuk bir yapı), oluşan redirect response (`302`/`301` status kodu ile) tarayıcıyı geçersiz veya beklenmeyen bir hedefe yönlendirir. Bu durumda kullanıcı hedef sayfaya ulaşamaz.
+
+[Aksiyom 7]: Eğer `setClaimsCacheCookie` veya `clearClaimsCacheCookie` fonksiyonlarına
+
+---
+
+## FONKSİYON DETAYLARI
+
+### getCryptoKey
+**Ne yapar**: Verilen bir gizli metin dizesinden (secret) AES kriptoografik anahtarı türetir. Bu işlem,Edge ortamlarıyla uyumlu Web Crypto API kullanılarak gerçekleştirilir.
+
+**Nasıl yapar**: Secret dizisini UTF-8 byte dizisine dönüştürür, SHA-256 algoritması ile deterministik bir hash (dize parmak izi) üretir. Elde edilen 256-bit hash değerini, AES-GCM algoritması için ‘raw’ formatında import ederek, şifreleme ve şifre çözümü için kullanılabilecek bir CryptoKey nesnesi oluşturur.
+
+**Parametreler**:
+- `secret`: string — Anahtar türetme için kullanılacak gizli dize.
+
+**Dönüş**: `Promise<CryptoKey>` — AES-GCM algoritması için kullanılabilecek, ‘encrypt’ ve ‘decrypt’ izinlerine sahip CryptoKey nesnesi.
+
+### encryptClaims
+**Ne yapar**: Bir claims (talep) nesnesini AES-GCM algoritması ile şifreler, oluşturulan şifreli veriyi Base64URL formatına dönüştürerek bir token string’i üretir.
+
+**Nasıl yapar**: Claims nesnesini JSON stringine dönüştürür ve byte dizisine çevirir. Rastgele 12 byte uzunluğunda bir başlatma vektörü (IV) üretir. CryptoKey ile AES-GCM şifreleme işlemi yapar. Oluşturulan rastgele IV ile şifreli veriyi tek bir byte dizisinde birleştirir. Son olarak, bu byte dizisini Base64URL formatına (URL'lerde güvenli, padding'siz) dönüştürür.
+
+**Parametreler**:
+- `claims`: Record<string, unknown> — Şifrelenecek anahtar-değer çiftlerinden oluşan nesne.
+- `secret`: string — Kriptoografik anahtarı türetmek için kullanılacak gizli dize.
+
+**Dönüş**: `Promise<string>` — Base64URL ile kodlanmış, IV ve şifreli veriyi içeren tek bir string.
+
+### decryptClaims
+**Ne yapar**: Base64URL kodlanmış bir AES-GCM token'ını çözer ve claims nesnesine dönüştürür. Şifreleme başarısız olursa (imza geçersizse, veriler değiştirilmişse veya secret yanlış/expiry ise) null döner.
+
+**Nasıl yapar**: Base64URL string'ini standart Base64'e ve ardından byte dizisine geri dönüştürür. Byte dizisinin en az 12 byte (IV uzunluğu) olup olmadığını kontrol eder. İlk 12 byte'ı IV olarak, geri kalanını şifreli veri olarak ayırır. CryptoKey ve IV ile AES-GCM şifre çözümü yapar. Çözülmüş byte'ları UTF-8 stringine ve ardından JSON nesnesine dönüştürür. İşlem sırasında oluşabilecek herhangi bir hatayı yakalar ve null döner.
+
+**Parametreler**:
+- `cookieValue`: string — Base64URL ile kodlanmış, çözülecek token.
+- `secret`: string — Kriptoografik anahtarı türetmek için kullanılacak gizli dize.
+
+**Dönüş**: `Promise<Record<string, unknown> | null>` — Başarılı olursa claims nesnesi, başarısız olursa `null`.
+
+### resolveUserClaims
+**Ne yapar**: Kullanıcı claims bilgisini önbellekten veya Supabase istemcisinden çözer. Önce HTTP cookie'sindeki şifreli önbelleği kontrol eder, geçerli claims yoksa Supabase'den taze bilgi çeker ve önbelleği günceller.
+
+**Nasıl yapar**: İstek cookie'sindeki ‘sb-claims-cache’ değerini alır ve `decryptClaims` ile çözmeyi dener. Çözülen claims içinde `user_role` alanı varsa, bu bilgiyi ‘cache’ kaynağından döner. Önbellek miss (bulunamadı/hatalı) ise, `supabase.auth.getClaims()` çağrısıyla sunucudan taze claims alır. Başarılı olursa claims’i `encryptClaims` ile şifreler ve `setClaimsCacheCookie` ile yanıt nesnesinde 15 dakikalık (900 saniye) bir cookie olarak saklar.
+
+**Parametreler**:
+- `request`: NextRequest — Mevcut HTTP isteği (cookie'leri okumak için).
+- `response`: NextResponse — Önbellek cookie'sinin ayarlanacağı HTTP yanıtı.
+- `supabase`: `{ auth: { getClaims: () => Promise<{ data: { claims: Record<string, unknown> | null } | null; error: unknown }> } }` — Kullanıcı claims'ini almak için Supabase client instance.
+- `secret`: string — Kriptoografik anahtarı türetmek için kullanılacak gizli dize.
+
+**Dönüş**: `Promise<{ claims: Record<string, unknown> | null; error: unknown; source: 'cache' | 'client' }>` — Çözülen claims, varsa hata ve bilginin kaynak bilgisini (önbellek veya istemci) içeren nesne.
+
+### setClaimsCacheCookie
+**Ne yapar**: HTTP-only, güvenli ve belirli bir ömre sahip claims önbellek cookie'sini HTTP yanıtına ekler.
+
+**Nasıl yapar**: `response.cookies.set` metodunu kullanarak ‘sb-claims-cache’ adında bir cookie ayarlar. Cookie, sadece HTTP istekleriyle gönderilir (`httpOnly: true`), production ortamında sadece HTTPS üzerinden gönderilir (`secure`), CSRF saldırılarına karşı ‘lax’ sameSite politikası uygulanır ve belirtilen `maxAgeSeconds` süresince tarayıcıda kalır.
+
+**Parametreler**:
+- `response`: NextResponse — Cookie'nin ekleneceği HTTP yanıtı.
+- `cookieValue`: string — Cookie'nin değeri (genellikle şifreli claims token'ı).
+- `maxAgeSeconds`: number — Cookie'nin tarayıcıda kalma süresi (saniye cinsinden, varsayılan: 900).
+
+**Dönüş**: Yok (void).
+
+### clearClaimsCacheCookie
+**Ne yapar**: Claims önbellek cookie'sini hemen silmek için HTTP yanıtına ekler. Çıkış (logout) işlemlerinde çağrılmalıdır.
+
+**Nasıl yapar**: `response.cookies.set` metodunu kullanarak ‘sb-claims-cache’ cookie’sini boş bir değerle ve `maxAge: 0` ile ayarlayarak tarayıcıdan anında silinmesini sağlar. Diğer güvenlik ayarları (`httpOnly`, `secure`, `sameSite`) korunur.
+
+**Parametreler**:
+- `response`: NextResponse — Cookie'nin silineceği HTTP yanıtı.
+
+**Dönüş**: Yok (void).
+
+### createRedirectResponse
+**Ne yapar**: Mevcut bir HTTP yanıtındaki (örn., bir middleware yanıtında) tüm header'ları ve cookie'leri koruyarak yeni bir yönlendirme (redirect) yanıtı oluşturur. Bu, kimlik doğrulama veya kiracı (tenant) bilgisi içeren cookie'lerin yönlendirme sırasında kaybolmasını önler.
+
+**Nasıl yapar**: Belirtilen URL ve durum koduyla yeni bir `NextResponse.redirect` nesnesi oluşturur. `responseToCopyFrom` parametresinden gelen yanıtın tüm cookie'lerini (`getAll()`) yeni yanıta kopyalar. Aynı şekilde, tüm header'ları da (`forEach`) yeni yanıta aktarır.
+
+**Parametreler**:
+- `request`: NextRequest — Yönlendirme isteği (mevcut API için gerekli, ancak işlevde doğrudan kullanılmıyor).
+- `targetUrl`: string | URL — Yönlendirme yapılacak hedef URL.
+- `responseToCopyFrom`: NextResponse — Header ve cookie'lerin kopyalanacağı kaynak yanıt.
+- `status`: number — Yönlendirme HTTP durum kodu (varsayılan: 302).
+
+**Dönüş**: `NextResponse` — Tüm header ve cookie'leri korunmuş yönlendirme yanıtı.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/utils/router.ts::getCryptoKey
+- **params**: (secret: string)
+- **ic_degiskenler**:
+    - `encoder` — Metinleri byte dizisine dönüştüren TextEncoder nesnesi
+    - `secretBytes` — `secret` parametresinin byte dizisi karşılığı
+    - `hash` — `secretBytes` değerinin SHA-256 ile hashlenmiş 256-bit hali
+- **Dönüş**: Promise<CryptoKey>
+
+### [N2_NASIL] AST Pointer: src/utils/router.ts::encryptClaims
+- **params**: (claims: Record<string, unknown>, secret: string)
+- **ic_degiskenler**:
+    - `key` — `secret` kullanılarak oluşturulan şifreleme anahtarı (CryptoKey)
+    - `encoder` — Metinleri byte dizisine dönüştüren TextEncoder nesnesi
+    - `dataBytes` — `claims` nesnesinin JSON string halinin byte dizisi
+    - `iv` — AES-GCM şifrelemesi için rastgele 12 byte'lık başlatma vektörü
+    - `encryptedBuffer` — `dataBytes`'ın `iv` ile şifrelenmiş hali (ArrayBuffer)
+    - `combined` — `iv` ve `encryptedBuffer`'ın birleştirilmiş byte dizisi
+- **Dönüş**: Promise<string> (Base64URL formatında şifreli metin)
+
+### [N3_NASIL] AST Pointer: src/utils/router.ts::decryptClaims
+- **params**: (cookieValue: string, secret: string)
+- **ic_degiskenler**:
+    - `key` — `secret` kullanılarak oluşturulan şifreleme anahtarı (CryptoKey)
+    - `base64` — `cookieValue`'nin Base64'e dönüştürülmüş hali (tire ve alt çizgi temizlenmiş)
+    - `binary` — `base64` string'inin atob() ile çözülmüş ikili metin hali
+    - `bytes` — `binary` metninin Uint8Array karşılığı
+    - `iv` — `bytes` dizisinin ilk 12 byte'ı (başlatma vektörü)
+    - `encryptedData` — `bytes` dizisinin 12. byte'dan sonuna kadar olan şifreli veri kısmı
+    - `decryptedBuffer` — `encryptedData`'nın `iv` ile çözülmüş hali (ArrayBuffer)
+    - `decryptedStr` — `decryptedBuffer`'ın TextDecoder ile metin string'e dönüştürülmüş hali
+- **Dönüş**: Promise<Record<string, unknown> | null> (hata durumunda null)
+
+### [N4_NASIL] AST Pointer: src/utils/router.ts::resolveUserClaims
+- **params**: (request: NextRequest, response: NextResponse, supabase: { auth: { getClaims: () => Promise<{ data: { claims: Record<string, unknown> | null } | null; error: unknown }> } }, secret: string)
+- **ic_degiskenler**:
+    - `cachedCookie` — İstekten alınan 'sb-claims-cache' cookie değeri
+    - `claims` — Önbellekten başarıyla çözülen veya Supabase'den alınan kullanıcı iddiaları (claims)
+    - `data` — Supabase auth.getClaims() çağrısının successful sonucu (claims içeren nesne)
+    - `error` — Supabase auth.getClaims() çağrısının hata sonucu
+    - `encrypted` — `claims`'in `secret` ile şifrelenmiş hali (cookie için hazırlanmış)
+- **Dönüş**: Promise<{ claims: Record<string, unknown> | null; error: unknown; source: 'cache' | 'client' }>
+
+### [N5_NASIL] AST Pointer: src/utils/router.ts::setClaimsCacheCookie
+- **params**: (response: NextResponse, cookieValue: string, maxAgeSeconds: number)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: response nesnesine cookie ekler)
+
+### [N6_NASIL] AST Pointer: src/utils/router.ts::clearClaimsCacheCookie
+- **params**: (response: NextResponse)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: response nesnesindeki cookie'yi siler)
+
+### [N7_NASIL] AST Pointer: src/utils/router.ts::createRedirectResponse
+- **params**: (request: NextRequest, targetUrl: string | URL, responseToCopyFrom: NextResponse, status: number)
+- **ic_degiskenler**:
+    - `redirectRes` — Yeni oluşturulacak ve döndürülecek yönlendirme yanıtı
+- **Dönüş**: NextResponse (yeni yönlendirme yanıtı)
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    router_ts__clearClaimsCacheCookie["clearClaimsCacheCookie"]
+    router_ts__createRedirectResponse["createRedirectResponse"]
+    router_ts__decryptClaims["decryptClaims"]
+    router_ts__encryptClaims["encryptClaims"]
+    router_ts__getCryptoKey["getCryptoKey"]
+    router_ts__resolveUserClaims["resolveUserClaims"]
+    router_ts__setClaimsCacheCookie["setClaimsCacheCookie"]
+    router_ts__decryptClaims --> router_ts__getCryptoKey
+    router_ts__resolveUserClaims --> router_ts__encryptClaims
+    router_ts__resolveUserClaims --> router_ts__decryptClaims
+    router_ts__encryptClaims --> router_ts__getCryptoKey
+    router_ts__resolveUserClaims --> router_ts__setClaimsCacheCookie
+```
+
+## NODE ID STANDARD
+
+  file: src\utils\router.ts
+  function: src\utils\router.ts::getCryptoKey
+  function: src\utils\router.ts::encryptClaims
+  function: src\utils\router.ts::decryptClaims
+  function: src\utils\router.ts::resolveUserClaims
+  function: src\utils\router.ts::setClaimsCacheCookie
+  function: src\utils\router.ts::clearClaimsCacheCookie
+  function: src\utils\router.ts::createRedirectResponse
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: clearClaimsCacheCookie
+  export: createRedirectResponse
+  export: decryptClaims
+  export: encryptClaims
+  export: getCryptoKey
+  export: resolveUserClaims
+  export: setClaimsCacheCookie
 
 ---
 # FILE: src\utils\routes.md
