@@ -16,7 +16,7 @@ interface GuidedCategoryDiscoveryProps {
   displayCategories?: CategoryViewModelLite[]
 }
 
-const FALLBACK_CATEGORY_IMAGE = '/images/vortice_lineo_futuristic.png'
+const FALLBACK_CATEGORY_IMAGE = '/images/vortice_lineo_futuristic.webp'
 
 const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displayCategories = [] }) => {
   return (
@@ -65,7 +65,7 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
                       src={finalSrc}
                       alt={category.displayName}
                       fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      sizes="(max-width: 640px) 280px, (max-width: 768px) 320px, (max-width: 1200px) 50vw, 25vw"
                       className="object-cover transition-transform duration-1.5s ease-out group-hover:scale-110 grayscale-30 group-hover:grayscale-0"
                     />
                     {/* Architectural Overlay */}

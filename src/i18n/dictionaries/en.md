@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts
 skeleton_hash: 1301a265d976dd04
 entity_hashes:
   overview: 9303b0df67433683
-generated_at: 2026-06-06T09:07:34Z
+generated_at: 2026-06-07T20:34:31Z
 ---
 
 ## Genel Bakış

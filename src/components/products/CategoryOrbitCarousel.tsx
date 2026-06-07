@@ -144,7 +144,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                 return {
                     id: vm.slug,
                     title: vm.displayName,
-                    image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.png',
+                    image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.webp',
                     categorySlug: vm.slug,
                     modelType: dbModelType || getModelTypeForCategory(vm.slug)
                 }
@@ -157,7 +157,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                 return {
                     id: vm.slug,
                     title: vm.displayName,
-                    image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.png',
+                    image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.webp',
                     categorySlug: vm.slug,
                     modelType: dbModelType || getModelTypeForCategory(vm.slug)
                 }

@@ -11,7 +11,7 @@ entity_hashes:
   func:handleTouchStart: 66d8f271101148e9
   overview: ad86b1170bdcb3cc
   style_tokens: 209427f386c5ad68
-generated_at: 2026-06-07T19:51:37Z
+generated_at: 2026-06-07T20:34:31Z
 ---
 
 ## Genel Bakış
@@ -95,9 +95,9 @@ Verilen slayt indeksine göre o slaytta gösterilecek tüm içeriği sağlayarak
 
   {
 
-    image: '/images/hero_hvac_industrial_premium_1.png',
+    image: '/images/hero_hvac_industrial_premium_1.webp',
 
-    product...`
+    produc...`
 
 ---
 

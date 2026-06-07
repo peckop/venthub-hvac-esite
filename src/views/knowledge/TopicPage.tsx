@@ -67,7 +67,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
       <section className="relative pt-32 pb-20 bg-slate-950 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <Image 
-            src={t(`${base}.image`) || "/images/hvac_installation_close_up_premium_3.png"} 
+            src={t(`${base}.image`) || "/images/hvac_installation_close_up_premium_3.webp"} 
             alt={title} 
             fill 
             priority

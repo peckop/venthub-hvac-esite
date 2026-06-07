@@ -100,7 +100,7 @@ const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, tr
           >
             <div className="relative aspect-video w-full overflow-hidden rounded-hvac-2xl border border-slate-200 shadow-2xl">
               <Image
-                src="/images/hvac_installation_close_up_premium_3.png"
+                src="/images/hvac_installation_close_up_premium_3.webp"
                 alt={t.visualAlt || 'Visual'}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"

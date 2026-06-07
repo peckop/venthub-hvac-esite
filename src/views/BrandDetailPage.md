@@ -8,7 +8,7 @@ entity_hashes:
   func:BrandDetailPage: 658e62bc6ce56cad
   overview: 68ae513578edc20b
   style_tokens: 4208267ad108784f
-generated_at: 2026-06-07T12:10:24Z
+generated_at: 2026-06-07T20:34:41Z
 ---
 
 ## Genel Bakış

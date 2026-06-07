@@ -48,19 +48,40 @@ vi.mock('jspdf-autotable', () => {
 })
 
 describe('generateProductDatasheet Fallback Handling', () => {
-  const mockProduct = {
+  const mockProduct: Product = {
     id: 'test-uuid-12345678',
     name: 'Test VentHub Fan',
     brand: 'VentHub',
     sku: 'VH-12345',
     model_code: 'VH-FAN-01',
     description: 'High quality ventilation fan with low noise rating.',
+    price: 99.99,
+    category_id: 'cat-uuid-123',
+    subcategory_id: null,
+    status: 'active',
+    is_featured: true,
+    image_url: '/images/vortice_lineo_futuristic.webp',
+    stock_qty: 10,
+    low_stock_threshold: 2,
+    low_stock_override: false,
     technical_specs: {
       airflow: '400 m³/h',
       noise: '35 dB',
       power: '25 W',
     },
-  } as unknown as Product
+    slug: 'test-venthub-fan',
+    airflow_capacity: null,
+    is_category_manual: null,
+    meta_description: null,
+    meta_title: null,
+    noise_level: null,
+    pressure_rating: null,
+    purchase_price: null,
+    created_at: '2026-06-07T00:00:00Z',
+    updated_at: '2026-06-07T00:00:00Z',
+    warehouse_location: 'A-1',
+    supplier_name: 'Test Supplier'
+  }
 
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>
 

@@ -158,7 +158,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
       <section className="relative h-60vh lg:h-70vh flex items-center justify-center overflow-hidden bg-slate-950 text-white">
         <div className="absolute inset-0 z-0">
           <Image 
-            src="/images/hvac_installation_close_up_premium_3.png" 
+            src="/images/hvac_installation_close_up_premium_3.webp" 
             alt={brand.name} 
             fill 
             sizes="100vw"

@@ -9,7 +9,7 @@ entity_hashes:
   func:getModelTypeForCategory: d5b53316e0d1f0a0
   overview: 81bcbf9882608552
   style_tokens: 47138b5b4fa0854f
-generated_at: 2026-05-28T22:37:01Z
+generated_at: 2026-06-07T20:34:31Z
 ---
 
 ## Genel Bakış

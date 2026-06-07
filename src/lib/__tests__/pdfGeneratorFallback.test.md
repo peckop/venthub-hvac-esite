@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\lib\__tests__\pdfGeneratorFallback.
 skeleton_hash: 6f910285d7493481
 entity_hashes:
   overview: 7c69a4b29725167d
-generated_at: 2026-06-07T15:51:15Z
+generated_at: 2026-06-07T20:34:31Z
 ---
 
 ## Genel Bakış
@@ -54,55 +54,6 @@ Bu modül bir test dosyasıdır ve mock fonksiyonlardan oluşan test altyapısı
 - **params**: (yok)
 - **ic_degiskenler**: (yok — doğrudan literal obje döner)
 - **Dönüş**: `{ jsPDF: class }` — jsPDF sınıfının mock versiyonunu döner; `internal.pageSize` (getWidth/getHeight), `setFont`, `setFontSize`, `setFillColor`, `rect`, `roundedRect`, `setTextColor`, `text`, `setDrawColor`, `line`, `splitTextToSize`, `addImage`, `addPage`, `setPage`, `save`, `addFileToVFS`, `addFont` alanlarını içerir; her alan ilgili mock fonksiyona (örn. `mockSetFont`, `mockText`, `mockSave`, `mockAddFileToVFS`, `mockAddFont`, `mockSplitTextToSize`) veya `vi.fn()`'e bağlanmıştır
-
----
-
-### [N2_NASIL] AST Pointer: `pdfGeneratorFallback.test.ts`::(default_mock_factory)
-- **params**: (yok)
-- **ic_degiskenler**: (yok — doğrudan literal obje döner)
-- **Dönüş**: `{ default: vi.fn() }` — `default` anahtarıyla bir vi.fn() mock'u döner
-
----
-
-### [N3_NASIL] AST Pointer: `pdfGeneratorFallback.test.ts`::(test_suite_body)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `mockProduct` — testlerde kullanılan sahte `Product` nesnesi; `id`, `name`, `brand`, `sku`, `model_code`, `description`, `technical_specs` (airflow, noise, power) alanlarını içerir
-  - `consoleErrorSpy` — `console.error` fonksiyonunu izleyen spy; beforeEach'te oluşturulur, afterEach'te geri yüklenir
-- **Dönüş**: (yok — describe bloğu yan etki olarak testleri kaydeder)
-
----
-
-### [N4_NASIL] AST Pointer: `pdfGeneratorFallback.test.ts`::(beforeEach_callback)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `consoleErrorSpy` — `vi.spyOn(console, 'error').mockImplementation(() => {})` ile oluşturulur; console.error çağrılarını yakalar ve susturur; üst kapsam (test_suite_body) ile paylaşılan değişkene atama yapılır
-- **Dönüş**: (yok — yan etki: mock'ları temizler ve console spy'ı kurar)
-
----
-
-### [N5_NASIL] AST Pointer: `pdfGeneratorFallback.test.ts`::(afterEach_callback)
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: (yok — yan etki: `consoleErrorSpy.mockRestore()` ve `vi.restoreAllMocks()` çağırarak mock'ları temizler)
-
----
-
-### [N6_NASIL] AST Pointer: `pdfGeneratorFallback.test.ts`::(it_fallback_font_fetch_reject)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `fetchSpy` — `vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network offline'))` ile oluşturulur; global fetch fonksiyonunu mock eder ve her çağrıyı reddeder
-- **Dönüş**: Promise<void> — `await expect(generateProductDatasheet(mockProduct)).resolves.not.toThrow()` ile sonuç doğrulanır
-- **Yan etkiler**: `consoleErrorSpy`'in çağrılmış olması beklenir; `mockSetFont`'ün `'helvetica'` argümanıyla çağrılması beklenir; test sonunda `fetchSpy.mockRestore()` ile fetch mock'u geri yüklenir
-
----
-
-### [N7_NASIL] AST Pointer: `pdfGeneratorFallback.test.ts`::(it_fallback_font_non_ok_status)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `fetchSpy` — `vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: false, status: 404, statusText: 'Not Found' } as Response)` ile oluşturulur; global fetch fonksiyonunu mock eder ve 404 yanıtı döner
-- **Dönüş**: Promise<void> — `await expect(generateProductDatasheet(mockProduct)).resolves.not.toThrow()` ile sonuç doğrulanır
-- **Yan etkiler**: `consoleErrorSpy`'in çağrılmış olması beklenir; `mockSetFont`'ün `'helvetica'` argümanıyla çağrılması beklenir; test sonunda `fetchSpy.mockRestore()` ile fetch mock'u geri yüklenir
 
 ---
 

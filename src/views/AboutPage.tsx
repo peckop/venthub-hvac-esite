@@ -71,7 +71,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
       <section className="relative h-70vh flex items-center justify-center overflow-hidden bg-slate-950 text-white">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/hvac_installation_close_up_premium_3.png"
+            src="/images/hvac_installation_close_up_premium_3.webp"
             alt=""
             fill
             sizes="100vw"
@@ -147,7 +147,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
                   {[1, 2, 3, 4].map(i => (
                     <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden relative">
                       <Image 
-                        src={`/images/hvac_installation_close_up_premium_3.png`} 
+                        src={`/images/hvac_installation_close_up_premium_3.webp`} 
                         alt="" 
                         fill 
                         sizes="48px"

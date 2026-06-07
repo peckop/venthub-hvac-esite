@@ -8,7 +8,7 @@ entity_hashes:
   func:AddToProjectModal: 27f66ff6372a1fa9
   overview: 4cc7e676daf152dc
   style_tokens: 49ec4d1f3ff40796
-generated_at: 2026-06-06T21:55:02Z
+generated_at: 2026-06-07T20:34:31Z
 ---
 
 ## Genel Bakış
@@ -38,10 +38,6 @@ Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel aksiyom
 [Aksiyom 4]: Eğer `isOpen` `true` iken `onClose` çağrıldığında state güncellenmezse, modal kapanmaz ve açık kalır.
 
 [Aksiyom 5]: Eğer `product` nesnesi gerekli alanları (örn: ürün adı, görsel, fiyat — değerler bilinmiyor) içermiyorsa, modal içinde eksik veya hatalı veri gösterimi oluşur.
-
----
-
-**Not:** Fonksiyon gövdesi (React hook'ları, JSX yapısı, state yönetimi) paylaşılmadığından, bileşen içi state mantığına (örn: `useState`, `useEffect` kullanımı) ilişkin aksiyomlar **bilinmiyor** olarak değerlendirilmiştir.
 
 ---
 

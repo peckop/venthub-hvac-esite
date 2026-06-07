@@ -36,7 +36,7 @@ export const compressImage = async (file: File): Promise<Blob> => {
  */
 export const normalizeImageUrl = (
   url: string | null | undefined,
-  fallback: string = '/images/vortice_lineo_futuristic.png',
+  fallback: string = '/images/vortice_lineo_futuristic.webp',
   bucketPrefix?: string
 ): string => {
   if (!url || typeof url !== 'string') return fallback;

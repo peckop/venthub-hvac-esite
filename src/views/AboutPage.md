@@ -9,7 +9,7 @@ entity_hashes:
   func:t: 470aecfc62464333
   overview: 9d68dc23ca71a802
   style_tokens: 6526e41f4914ea4c
-generated_at: 2026-06-06T21:56:30Z
+generated_at: 2026-06-07T20:34:41Z
 ---
 
 ## Genel Bakış
@@ -17,7 +17,13 @@ VentHub HVAC projesinin “Hakkında” sayfasını sunan, dil destekli bir Reac
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için verilen fonksiyon imzaları ve genel bakışa dayanarak, doğru çalışması için aşağıdaki temel mimari varsayımlar belirlenmiştir.
+
+[Aksiyom 1]: Eğer `t` çeviri fonksiyonu (veya bağlı olduğu çeviri sistemi) çağrılamazsa veya geçerli bir çeviri anahtarı döndüremezse, sayfanın tüm metin içeriği eksik, hatalı veya tanımsız görünür.
+
+[Aksiyom 2]: Eğer `lang` parametresi olarak sağlanan değer (örneğin 'tr' veya 'en'), `t` fonksiyonunun veya çeviri sözlüğünün desteklediği bir dil kodu değilse, sayfa o dilde görüntülenemez. Bu durumda bileşenin davranışı `t` fonksiyonunun uygulama mantığına bağlıdır; bilinmiyor, ancak muhtemelen varsayılan dile (`'tr'`) geri döner veya hata gösterir.
 
 ---
 

@@ -87,7 +87,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
         <div className="p-6 space-y-6">
           <div className="flex items-start space-x-4">
             <div className="w-16 h-16 bg-light-gray rounded-lg flex-shrink-0 overflow-hidden border border-light-gray">
-              <VentImage src={product.image_url || '/images/vortice_lineo_futuristic.png'} 
+              <VentImage src={product.image_url || '/images/vortice_lineo_futuristic.webp'} 
                 alt={product.name} 
                 className="w-full h-full object-contain p-1"
                />

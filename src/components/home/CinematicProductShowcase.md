@@ -11,7 +11,7 @@ entity_hashes:
   func:handleMouseMove: 717aaec7fdab40a5
   overview: cc9625ba5ae503da
   style_tokens: a631f55105b3a4d3
-generated_at: 2026-06-07T19:50:52Z
+generated_at: 2026-06-07T20:34:31Z
 ---
 
 ## Genel Bakış
@@ -86,9 +86,9 @@ Bu modül, ürün görselleri üzerinde etkileşimli hotspot noktaları sunarak 
 
   { 
 
-    src: '/images/vortice_lineo_futuristic.png', 
+    src: '/images/vortice_lineo_futuristic.webp', 
 
-    label: 'Futur...`
+    label: 'Futu...`
 
 ---
 

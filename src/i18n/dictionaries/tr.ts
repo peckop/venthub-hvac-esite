@@ -255,14 +255,14 @@ export const tr = {
     topics: {
       'air-curtain': {
         title: 'Hava Perdesi Seçimi',
-        image: '/images/hvac_installation_close_up_premium_3.png',
+        image: '/images/hvac_installation_close_up_premium_3.webp',
         summary: 'Doğru hava perdesi seçimi için kapı yüksekliği, genişliği ve kullanım amacı (konfor/endüstriyel) belirleyicidir.',
         steps: ['Kapı genişliği = cihaz genişliği (bariyer kesintisiz olmalı).', 'Çıkış hızı 7–9 m/s; zeminde 2–3 m/s hedef.', 'Nozül 10–15° iç mekâna eğimli; kapı kontağı ile otomatik hız.'],
         pitfalls: ['Kısa cihaz kullanımı', 'Çok düşük hız', 'Nozülü dışa doğru eğmek']
       },
       'jet-fan': {
         title: 'Jet Fan (Otopark)',
-        image: '/images/hvac_installation_close_up_premium_3.png',
+        image: '/images/hvac_installation_close_up_premium_3.webp',
         summary: 'CO/NOx ve duman senaryosu için akışı egzoza yönlendiren tavan fanları; kör nokta bırakmadan yerleşim gerekir.',
         steps: ['Debi: Hacim × ACH (ör. 7.200 m³ × 8 ACH ≈ 57.600 m³/h).', 'İtme kuvveti 50–100 N tipik; mesafe ve plana göre belirlenir.', 'Yerleşim: eksen aralığı 25–35 m; egzoza sürükleme; sensör zonları kapsansın.'],
         pitfalls: ['Kör hacim bırakmak', 'Sensör kapsamasını atlamak']

@@ -8,7 +8,7 @@ entity_hashes:
   func:BrandsPage: 7fe8abffb7e6dbf9
   overview: f92b067f7968b22a
   style_tokens: 583cff7322941abd
-generated_at: 2026-06-06T21:58:26Z
+generated_at: 2026-06-07T20:34:41Z
 ---
 
 ## Genel Bakış

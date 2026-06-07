@@ -184,7 +184,7 @@ export const en: typeof tr = {
         summary: 'Ceiling fans that direct flow to exhaust for CO/NOx and smoke scenarios; layout must avoid dead zones.',
         steps: ['Flow: Volume × ACH (e.g. 7,200 m³ × 8 ACH ≈ 57,600 m³/h).', 'Thrust 50–100 N typical; pick by distance and plan.', 'Layout: axis spacing 25–35 m; drive to exhaust; cover sensor zones.'],
         pitfalls: ['Leaving dead zones', 'Missing sensor coverage'],
-        image: '/images/hvac_installation_close_up_premium_3.png'
+        image: '/images/hvac_installation_close_up_premium_3.webp'
       },
       hrv: {
         title: 'Heat Recovery (HRV/ERV)',
@@ -194,7 +194,7 @@ export const en: typeof tr = {
         image: '/images/hvac_installation_close_up_premium_4.png'
       },
       'air-curtain': {
-        image: '/images/hvac_installation_close_up_premium_3.png',
+        image: '/images/hvac_installation_close_up_premium_3.webp',
         pitfalls: ['Device too short', 'Too low velocity', 'Tilting nozzle outward'],
         steps: ['Door width = device width (unbroken barrier).', 'Nozzle velocity 7–9 m/s; at floor 2–3 m/s target.', 'Nozzle tilted 10–15° inwards; auto speed via door contact.'],
         summary: 'For correct air curtain selection, door height, width and usage purpose (comfort/industrial) are decisive.',

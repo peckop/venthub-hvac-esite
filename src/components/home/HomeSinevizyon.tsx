@@ -25,26 +25,26 @@ interface SlideData {
 
 const slidesData: SlideData[] = [
   {
-    image: '/images/hero_hvac_industrial_premium_1.png',
+    image: '/images/hero_hvac_industrial_premium_1.webp',
     products: [
-      { url: '/images/vortice_lineo_futuristic.png', labelKey: 'home.hero.sinevizyon.slides.0.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.0.subLabel', link: '/category/fans/duct-type-fans' },
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.0.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.0.subLabel', link: '/category/fans/duct-type-fans' },
       { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.0.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.1.subLabel', link: '/category/fans/quiet-duct-fans' }
     ],
     key: 0
   },
   {
-    image: '/images/vortice_lineo_futuristic.png',
+    image: '/images/vortice_lineo_futuristic.webp',
     products: [
       { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.1.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.0.subLabel', link: '/category/fans/duct-type-fans' },
-      { url: '/images/vortice_lineo_futuristic.png', labelKey: 'home.hero.sinevizyon.slides.1.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.1.subLabel', link: '/category/fans/duct-type-fans' }
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.1.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.1.subLabel', link: '/category/fans/duct-type-fans' }
     ],
     key: 1
   },
   {
-    image: '/images/hvac_installation_close_up_premium_3.png',
+    image: '/images/hvac_installation_close_up_premium_3.webp',
     products: [
       { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.2.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.0.subLabel', link: '/category/fans/duct-type-fans' },
-      { url: '/images/vortice_lineo_futuristic.png', labelKey: 'home.hero.sinevizyon.slides.2.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.1.subLabel', link: '/category/fans/duct-type-fans' }
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.2.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.1.subLabel', link: '/category/fans/duct-type-fans' }
     ],
     key: 2
   }
@@ -298,7 +298,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                         priority={slideIdx === 0}
                         fetchPriority={slideIdx === 0 ? "high" : "low"}
                         decoding={slideIdx === 0 ? "sync" : "async"}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                        sizes="(max-width: 640px) 256px, (max-width: 768px) 320px, 400px"
                         quality={70}
                         className="object-contain" 
                       />

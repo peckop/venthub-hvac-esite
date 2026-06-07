@@ -61,7 +61,7 @@ const Hotspot: React.FC<HotspotProps> = ({ x, y, label, detail, isActive, onTogg
 
 const productImages = [
   { 
-    src: '/images/vortice_lineo_futuristic.png', 
+    src: '/images/vortice_lineo_futuristic.webp', 
     label: 'Futuristic Premium',
     hotspots: [
       { x: 55, y: 35, key: 'motor' },

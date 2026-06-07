@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { normalizeImageUrl } from '../imageUtils'
 
 describe('normalizeImageUrl', () => {
-  const defaultFallback = '/images/vortice_lineo_futuristic.png'
+  const defaultFallback = '/images/vortice_lineo_futuristic.webp'
 
   beforeEach(() => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test-supabase.co')

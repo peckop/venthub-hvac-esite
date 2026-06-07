@@ -136,7 +136,7 @@ const BrandsPage: React.FC = () => {
             
             <div className="relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden border border-white/5">
               <Image 
-                src="/images/hvac_installation_close_up_premium_3.png" 
+                src="/images/hvac_installation_close_up_premium_3.webp" 
                 alt="Technical Network" 
                 fill 
                 sizes="(max-width: 1024px) 100vw, 50vw"

@@ -56,7 +56,7 @@ const HubPage: React.FC = () => {
       <section className="relative pt-32 pb-20 bg-slate-950 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <Image 
-            src="/images/hvac_installation_close_up_premium_3.png" 
+            src="/images/hvac_installation_close_up_premium_3.webp" 
             alt="Engineering Hub" 
             fill 
             priority

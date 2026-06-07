@@ -8,7 +8,7 @@ entity_hashes:
   func:GuidedCategoryDiscovery: 3b7f2bdef4872624
   overview: a1eb122d99c941ad
   style_tokens: ba1e7efd5f41a7fe
-generated_at: 2026-06-07T19:51:37Z
+generated_at: 2026-06-07T20:34:31Z
 ---
 
 ## Genel Bakış

@@ -8,7 +8,7 @@ entity_hashes:
   func:compressImage: 52ddf4e7747053ca
   func:normalizeImageUrl: a7c1782886d55260
   overview: 3edb070ce8076b34
-generated_at: 2026-06-07T19:52:14Z
+generated_at: 2026-06-07T20:34:31Z
 ---
 
 ## Genel Bakış
@@ -78,23 +78,6 @@ Bu modül, resimleri sıkıştırmak ve görsel URL'leri normalize etmek için b
   - `newHeight` — hesaplanan final yükseklik; genişlik kısaltıldıysa `img.height * scaleSize`, değilse orijinal yükseklik
   - `ctx` — `CanvasRenderingContext2D | null`, canvas'ın 2d çizim bağlamı; `drawImage` ve `toBlob` için kullanılır
 - **Dönüş**: `Promise<Blob>` — WebP formatında, kalite 0.8 ile sıkıştırılmış görsel Blob'u. Hata durumunda reject ile Error fırlatır.
-
----
-
-### [N2_NASIL] AST Pointer: `src/utils/imageUtils.ts::normalizeImageUrl`
-- **params**:
-  - `url: string | null | undefined` — normalize edilecek ham görsel URL'si veya yolu
-  - `fallback: string` — geçersiz/boş URL durumunda kullanılacak varsayılan görsel yolu (`'/images/vortice_lineo_futuristic.png'`)
-  - `bucketPrefix?: string` — Supabase storage bucket ön eki (opsiyonel, örneğin `'category-images'`)
-- **ic_degiskenler**:
-  - `trimmed` — `url.trim()` ile boşlukları temizlenmiş URL dizgisi
-  - `hasExtension` — `boolean`, URL'nin standart görsel uzantısı (jpg, jpeg, png, webp, gif, svg, bmp, tiff) içerip içermediğini kontrol eden regex eşleşmesi sonucu
-  - `isAbsolute` — `boolean`, URL'nin `http://`, `https://` veya `data:` ile başlayıp başlamadığını belirler
-  - `isRootRelative` — `boolean`, URL'nin `/` ile başlayıp başlamadığını belirler (kök bağıl yol)
-  - `supabaseUrl` — `process.env.NEXT_PUBLIC_SUPABASE_URL` değerinden okunan Supabase URL'si; Supabase storage yolu oluşturmak için kullanılır
-  - `pathWithBucket` — `bucketPrefix` verilmişse ve `trimmed` zaten o prefix ile başlamıyorsa `${bucketPrefix}/${trimmed}` olarak birleştirilmiş yol; aksi halde `trimmed`'in kendisi
-  - `cleanPath` — `pathWithBucket` içindeki mükerrer `${supabaseUrl}/storage/v1/object/public/` ifadesi temizlenmiş yol
-- **Dönüş**: `string` — normalize edilmiş tam görsel URL'si. Geçersiz/boş URL → `fallback`, mutlak/yönel yollar → olduğu gibi döner, Supabase yolları → tam URL'ye dönüştürülerek döner.
 
 ---
 
