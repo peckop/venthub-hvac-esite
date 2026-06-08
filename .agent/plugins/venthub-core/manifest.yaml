@@ -36,6 +36,8 @@ skills:
       triggers_on: ["notebooklm query", "ikizden sorgula", "RAG query"]
       inputs: ["query string"]
       outputs: ["rag response text"]
+      recovery:
+        on_auth_expired: "powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1"
 
     - name: notebooklm-sync
       path: .agent/skills/notebooklm-sync/SKILL.md
@@ -43,7 +45,9 @@ skills:
       triggers_on: ["nlm sync", "defteri güncelle", "hafızayı yenile"]
       inputs: ["docs/*.md"]
       outputs: ["synced NotebookLM source"]
-      prerequisites: ["nlm login (Terminal yetkisi expired olduğunda 'nlm login' çalıştırılmalıdır)"]
+      prerequisites: ["nlm login"]
+      recovery:
+        on_auth_expired: "powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1"
 
     - name: orion-cli
       path: .agent/skills/orion-cli/SKILL.md
@@ -52,6 +56,8 @@ skills:
       inputs: ["source code files"]
       outputs: ["docs/*.md"]
       prerequisites: ["OPENROUTER_API_KEY", "nlm login (NotebookLM sync için)"]
+      recovery:
+        on_auth_expired: "powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1"
 
     - name: find-skills
       path: .agent/skills/find-skills/SKILL.md
